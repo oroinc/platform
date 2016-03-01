@@ -28,7 +28,7 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcess(array $input, array $expected)
     {
-        $this->assertSame($expected, $this->configuration->processConfiguration($input));
+        $this->assertEquals($expected, $this->configuration->processConfiguration($input));
     }
 
     /**
@@ -49,6 +49,7 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'order' => 0,
                     'exclude_definitions'   => array(),
                     'actions_configuration' => array(),
+                    'pre_conditions' => array()
                 ),
             ),
             'maximum data' => array(
@@ -60,6 +61,7 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'order' => 10,
                     'exclude_definitions'   => array(),
                     'actions_configuration' => array('key' => 'value'),
+                    'pre_conditions' => array('test')
                 ),
                 'expected' => array(
                     'name' => 'my_definition',
@@ -69,6 +71,7 @@ class ProcessDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'order' => 10,
                     'exclude_definitions'   => array(),
                     'actions_configuration' => array('key' => 'value'),
+                    'pre_conditions' => array('test')
                 ),
             ),
         );

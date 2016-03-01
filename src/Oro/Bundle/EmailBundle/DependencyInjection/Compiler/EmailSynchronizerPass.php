@@ -10,6 +10,8 @@ class EmailSynchronizerPass implements CompilerPassInterface
     const SERVICE_KEY = 'oro_email.email_synchronization_manager';
     const TAG         = 'oro_email.email_synchronizer';
 
+    const SERVICE_TOKEN_STORAGE = 'security.token_storage';
+
     /**
      * {@inheritDoc}
      */
@@ -19,10 +21,15 @@ class EmailSynchronizerPass implements CompilerPassInterface
             return;
         }
 
+        $tokenStorsgeDef = $container->getDefinition(self::SERVICE_TOKEN_STORAGE);
+
         $selectorDef    = $container->getDefinition(self::SERVICE_KEY);
         $taggedServices = $container->findTaggedServiceIds(self::TAG);
         foreach ($taggedServices as $synchronizerServiceId => $tagAttributes) {
             $selectorDef->addMethodCall('addSynchronizer', array($synchronizerServiceId));
+
+            $synchronizerDef = $container->getDefinition($synchronizerServiceId);
+            $synchronizerDef->addMethodCall('setTokenStorage', [$tokenStorsgeDef]);
         }
     }
 }

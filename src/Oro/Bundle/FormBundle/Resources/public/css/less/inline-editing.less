@@ -1,0 +1,235 @@
+.oro-datagrid.grid-editable .grid {
+  .number-cell, .integer-cell, .align-right, .editable {
+    padding-right: 28px;
+  }
+  .row-edit-mode {
+    background: @rowHighlightBackground;
+  }
+  .view-mode > .inline-editor__edit-action {
+    display: none !important;
+  }
+  .editable {
+    &.save-success {
+      background: @cellSuccessBackground;
+      position: relative;
+      &:before {
+        position: absolute;
+        font-family: 'FontAwesome';
+        content: '\f00c';
+        font-size: 14px;
+        top: 4px;
+        right: 6px;
+        color: @cellSuccessColor;
+      }
+      &:hover:before {
+        display: none;
+      }
+    }
+    &.save-fail {
+      background: @cellErrorBackground;
+    }
+    &.edit-mode {
+      position: relative;
+      > .inline-editor__edit-action {
+        display: none !important;
+      }
+      &:before {
+        content: '';
+        position: absolute;
+        background-color: inherit;
+        top: 0;
+        bottom: 0;
+        left: 0;
+        right: 0;
+      }
+    }
+    &.view-mode.has-error{
+      position: relative;
+      background: @cellErrorBackground;
+      &:hover {
+        background: @cellErrorBackground;
+        > .inline-editor__edit-action {
+          &:before{
+            color: @errorMessageBalloonBackground;
+          }
+        }
+      }
+      &:before{
+        content: '';
+        display: inline-block;
+        border-right: 6px solid transparent;
+        border-top: 6px solid #eea19f;
+        position: absolute;
+        top: 0;
+        left: 0;
+      }
+    }
+    &.view-mode:hover {
+      background: @cellSelectedBackground;
+      position: relative;
+      > .inline-editor__edit-action {
+        display: block !important;
+        position: absolute;
+        top: 2px;
+        right: -1px;
+        width: 25px;
+        height: 25px;
+        line-height: 35px;
+        text-align: center;
+        padding-left: 2px;
+        &:before{
+          color: @inlineActionColor;
+        }
+      }
+    }
+    &.loading{
+      background: @cellLoadingBackground;
+      &.view-mode > .inline-editor__edit-action {
+        display: none !important;
+      }
+      &:before {
+        background: url('../../../oroui/img/loader-16.gif') no-repeat center center transparent;
+        display: block !important;
+        content: "";
+        position: absolute;
+        top: 0;
+        right: 1px;
+        width: 29px;
+        height: 29px;
+      }
+    }
+  }
+}
+.grid thead th.header-cell-highlight {
+  #gradient > .vertical(@rowHighlightBackground, @rowSelectedBackground);
+}
+.icon-times:before {
+  content: "\f00d";
+}
+
+.inline-editor__actions {
+  position: absolute;
+  top: 0;
+  right: 0;
+  padding: 0 4px;
+}
+.inline-editor__action-item {
+  display: block;
+  float: left;
+  width: 22px;
+  height: 30px;
+  box-sizing: border-box;
+  padding: 0;
+  background: none;
+  border: none;
+  font-size: 14px;
+  color: #636363;
+  &[disabled] {
+    cursor: auto;
+    color: #b7b7b7;
+  }
+  &:focus, &:active, &:hover {
+    outline: none;
+    box-shadow: none;
+  }
+}
+.inline-editor__fields {
+  input[type=text] {
+    width: 100%;
+    box-sizing: border-box;
+    height: 30px;
+    margin: 0;
+    border-radius: 0;
+    font-size: 13px;
+    line-height: 19px;
+    .box-shadow(none);
+    &:focus {
+      .box-shadow(none);
+    }
+    &:first-child {
+      padding-left: 9px;
+    }
+    &:last-child {
+      padding-right: 52px;
+    }
+  }
+}
+.inline-editor-wrapper {
+  position: absolute;
+  min-width: 150px;
+  .select2-chosen {
+    padding-left: 9px !important;
+  }
+  .icon-check:before {
+    content: "\f00c";
+  }
+  .validation-failed:last-child {
+    margin-bottom: 2px;
+  }
+  &.number-editor {
+    // about 10+2 digits
+    min-width: 189px;
+    input[name=value] {
+      text-align: right;
+    }
+  }
+  &.date-editor {
+    .hasDatepicker {
+      padding-left: 9px;
+    }
+  }
+  &.datetime-editor {
+    min-width: 225px;
+    width: auto !important;
+    .hasDatepicker {
+      border-right: none;
+      padding-left: 9px;
+      width: 105px;
+    }
+    .timepicker-input {
+      width: 121px;
+    }
+  }
+  &.select-editor {
+    min-width: 180px;
+    .select2-choice {
+      width: calc(~"100% - 52px");
+      border-right: 1px solid #ddd;
+    }
+    .select2-dropdown-open .select2-choice {
+      border-right-color: #aaa;
+    }
+    .select2-container {
+      border-radius: 0;
+    }
+  }
+  &.multi-select-editor, &.multi-relation-editor{
+    width: auto !important; // ignore cell width
+    min-width: 0; // ignore min-width
+    .select2-container {
+      height: auto;
+      width: auto !important;
+    }
+    .select2-choices {
+      max-height: 40vh;
+      max-width: 50vw;
+      min-width: 130px;
+      overflow: auto;
+    }
+  }
+}
+
+.inline-editor__select2-drop.select2-drop {
+  border-radius: 0;
+}
+.datepicker-focusser {
+  background: transparent;
+  border: 0px;
+  width: 0px;
+  height: 0px;
+  position: absolute;
+  &:focus{
+    outline: none;
+    box-shadow: none;
+  }
+}

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActivityListBundle\Tests\Unit\Entity\Manager;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Entity\Manager\CollectListManager;
 
@@ -112,5 +114,51 @@ class CollectListManagerTest extends \PHPUnit_Framework_TestCase
             ->method('computeChangeSet')
             ->with($metaData, $resultActivityList);
         $this->assertTrue($this->manager->processUpdatedEntities([$testEntity], $em));
+    }
+
+    public function testProcessFillOwners()
+    {
+        $activityOwner = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityOwner')
+            ->setMethods(['isOwnerInCollection'])->disableOriginalConstructor()->getMock();
+        $activityOwner->expects($this->exactly(2))
+            ->method('isOwnerInCollection')
+            ->willReturn(false);
+        $activity = $this->getMockBuilder('Oro\Bundle\ActivityListBundle\Entity\ActivityList')
+            ->disableOriginalConstructor()->getMock();
+        $activity->expects($this->once())
+            ->method('getActivityOwners')
+            ->willReturn(new ArrayCollection([$activityOwner]));
+        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()->getMock();
+        $testEntity = new \stdClass();
+        $this->chainProvider->expects($this->once())
+            ->method('getActivityListByEntity')
+            ->willReturn($activity);
+        $emailProvider = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider')
+            ->disableOriginalConstructor()->getMock();
+        $emailProvider->expects($this->once())
+            ->method('getActivityOwners')
+            ->willReturn([$activityOwner]);
+        $this->chainProvider->expects($this->once())
+            ->method('getProviderForOwnerEntity')
+            ->willReturn($emailProvider);
+        $activity->expects($this->once())
+            ->method('removeActivityOwner');
+        $activity->expects($this->once())
+            ->method('addActivityOwner');
+
+        $this->manager->processFillOwners([$testEntity], $em);
+    }
+
+    public function testIsSupportedOwnerEntity()
+    {
+        $testEntity = new \stdClass();
+
+        $this->chainProvider->expects($this->once())
+            ->method('isSupportedOwnerEntity')
+            ->with($testEntity)
+            ->willReturn(true);
+
+        $this->assertTrue($this->manager->isSupportedOwnerEntity($testEntity));
     }
 }

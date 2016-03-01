@@ -102,7 +102,7 @@ class EnumSelectTypeTest extends AbstractEnumTypeTestCase
             [false, false, '', null],
             [false, true, null, null],
             [true, false, null, null],
-            [true, true, null, null],
+            [true, true, null, null]
         ];
     }
 

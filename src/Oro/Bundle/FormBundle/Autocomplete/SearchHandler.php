@@ -7,6 +7,10 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccess;
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
@@ -53,9 +57,9 @@ class SearchHandler implements SearchHandlerInterface
     protected $aclHelper;
 
     /**
-     * @var int
+     * @var PropertyAccessor
      */
-    protected $latestFoundIdsCount = 0;
+    protected $propertyAccessor;
 
     /**
      * @param string $entityName
@@ -65,6 +69,7 @@ class SearchHandler implements SearchHandlerInterface
     {
         $this->entityName = $entityName;
         $this->properties = $properties;
+        $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
     /**
@@ -139,7 +144,7 @@ class SearchHandler implements SearchHandlerInterface
             $items = $this->searchEntities($query, $firstResult, $perPage);
         }
 
-        $hasMore = $this->latestFoundIdsCount === $perPage;
+        $hasMore = count($items) === $perPage;
         if ($hasMore) {
             $items = array_slice($items, 0, $perPage - 1);
         }
@@ -173,9 +178,25 @@ class SearchHandler implements SearchHandlerInterface
         $entityIds = $this->searchIds($search, $firstResult, $maxResults);
 
         $resultEntities = [];
-
         if ($entityIds) {
-            $resultEntities = $this->getEntitiesByIds($entityIds);
+            $unsortedEntities = $this->getEntitiesByIds($entityIds);
+
+            /**
+             * We need to sort entities in the same order given by method searchIds.
+             *
+             * @todo Should be not necessary after implementation of BAP-5691.
+             */
+            $entityByIdHash = [];
+
+            foreach ($unsortedEntities as $entity) {
+                $entityByIdHash[$this->getPropertyValue($this->idFieldName, $entity)] = $entity;
+            }
+
+            foreach ($entityIds as $entityId) {
+                if (isset($entityByIdHash[$entityId])) {
+                    $resultEntities[] = $entityByIdHash[$entityId];
+                }
+            }
         }
 
         return $resultEntities;
@@ -190,9 +211,8 @@ class SearchHandler implements SearchHandlerInterface
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $this->entityRepository->createQueryBuilder('e');
         $queryBuilder->where($queryBuilder->expr()->in('e.' . $this->idFieldName, $entityIds));
-        $query = $this->aclHelper->apply($queryBuilder, 'VIEW');
 
-        return $query->getResult();
+        return $queryBuilder->getQuery()->getResult();
     }
 
     /**
@@ -211,8 +231,6 @@ class SearchHandler implements SearchHandlerInterface
             $ids[] = $element->getRecordId();
         }
 
-        $this->latestFoundIdsCount = count($ids);
-
         return $ids;
     }
 
@@ -227,7 +245,6 @@ class SearchHandler implements SearchHandlerInterface
     {
         return $this->getEntitiesByIds(explode(',', $query));
     }
-
 
     /**
      * @param array $items
@@ -261,26 +278,32 @@ class SearchHandler implements SearchHandlerInterface
     }
 
     /**
-     * @param string $name
+     * @param string $propertyPath
      * @param object|array $item
      * @return mixed
      */
-    protected function getPropertyValue($name, $item)
+    protected function getPropertyValue($propertyPath, $item)
     {
-        $result = null;
-
-        if (is_object($item)) {
-            $method = 'get' . str_replace(' ', '', str_replace('_', ' ', ucwords($name)));
-            if (method_exists($item, $method)) {
-                $result = $item->$method();
-            } elseif (isset($item->$name)) {
-                $result = $item->$name;
-            }
-        } elseif (is_array($item) && array_key_exists($name, $item)) {
-            $result = $item[$name];
+        if (!(is_object($item) || is_array($item))) {
+            return null;
         }
 
-        return $result;
+        if (is_array($item)) {
+            $keys = array_map(
+                function ($key) {
+                    return sprintf('[%s]', $key);
+
+                },
+                explode('.', $propertyPath)
+            );
+            $propertyPath = implode('', $keys);
+        }
+
+        try {
+            return $this->propertyAccessor->getValue($item, $propertyPath);
+        } catch (NoSuchPropertyException $e) {
+            return null;
+        }
     }
 
     /**

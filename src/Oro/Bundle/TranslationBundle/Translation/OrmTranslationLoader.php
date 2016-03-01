@@ -2,29 +2,30 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageCatalogue;
 
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 
 class OrmTranslationLoader implements LoaderInterface
 {
-    /**
-     * @var EntityManager
-     */
-    protected $em;
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
+    /** @var bool|null */
+    protected $dbCheck;
 
     /**
-     * Constructor
-     *
-     * @param EntityManager $em
+     * @param ManagerRegistry $doctrine
      */
-    public function __construct(EntityManager $em)
+    public function __construct(ManagerRegistry $doctrine)
     {
-        $this->em = $em;
+        $this->doctrine = $doctrine;
     }
 
     /**
@@ -38,7 +39,7 @@ class OrmTranslationLoader implements LoaderInterface
         if ($this->checkDatabase()) {
             $messages = [];
             /** @var TranslationRepository $translationRepo */
-            $translationRepo = $this->em->getRepository(Translation::ENTITY_NAME);
+            $translationRepo = $this->getEntityManager()->getRepository(Translation::ENTITY_NAME);
             /** @var Translation[] $translations */
             $translations = $translationRepo->findValues($locale, $domain);
             foreach ($translations as $translation) {
@@ -55,29 +56,27 @@ class OrmTranslationLoader implements LoaderInterface
     }
 
     /**
-     * Check if translations table exists in db
+     * Checks whether the translations table exists in the database
      *
      * @return bool
      */
     protected function checkDatabase()
     {
-        $tableName = $this->em->getClassMetadata(Translation::ENTITY_NAME)->getTableName();
-        $result    = false;
-        try {
-            $conn = $this->em->getConnection();
-
-            if (!$conn->isConnected()) {
-                $this->em->getConnection()->connect();
-            }
-
-            $result = $conn->isConnected()
-                && (bool)array_intersect(
-                    array($tableName),
-                    $this->em->getConnection()->getSchemaManager()->listTableNames()
-                );
-        } catch (\PDOException $e) {
+        if (null === $this->dbCheck) {
+            $this->dbCheck = SafeDatabaseChecker::tablesExist(
+                $this->getEntityManager()->getConnection(),
+                SafeDatabaseChecker::getTableName($this->doctrine, Translation::ENTITY_NAME)
+            );
         }
 
-        return $result;
+        return $this->dbCheck;
+    }
+
+    /**
+     * @return EntityManager
+     */
+    protected function getEntityManager()
+    {
+        return $this->doctrine->getManagerForClass(Translation::ENTITY_NAME);
     }
 }

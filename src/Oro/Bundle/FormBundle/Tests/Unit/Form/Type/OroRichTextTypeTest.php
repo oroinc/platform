@@ -35,7 +35,9 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
         $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->assetsHelper = $this->getMock('Symfony\Component\Templating\Asset\PackageInterface');
+        $this->assetsHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->htmlTagProvider = $this->getMock('Oro\Bundle\FormBundle\Provider\HtmlTagProvider');
         $this->formType = new OroRichTextType($this->configManager, $this->htmlTagProvider);
         $this->formType->setAssetHelper($this->assetsHelper);
@@ -79,7 +81,7 @@ class OroRichTextTypeTest extends FormIntegrationTestCase
             ->with('oro_form.wysiwyg_enabled')
             ->will($this->returnValue($globalEnable));
 
-        $this->assetsHelper->expects($this->exactly(2))
+        $this->assetsHelper->expects($this->once())
             ->method('getUrl')
             ->will(
                 $this->returnCallback(

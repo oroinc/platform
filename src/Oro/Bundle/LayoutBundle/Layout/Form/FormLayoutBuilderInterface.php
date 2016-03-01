@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Form;
 
-use Symfony\Component\Form\FormInterface;
-
 use Oro\Component\Layout\BlockBuilderInterface;
 
 interface FormLayoutBuilderInterface

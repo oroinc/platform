@@ -1,3 +1,5 @@
 config:
     paths:
         'ororeport/js/chart-options': 'bundles/ororeport/js/chart-options.js'
+        'ororeport/js/view-sql-query-builder': 'bundles/ororeport/js/view-sql-query-builder.js'
+        'ororeport/js/app/plugins/grid/view-sql-query-plugin': 'bundles/ororeport/js/app/plugins/grid/view-sql-query-plugin.js'

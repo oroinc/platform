@@ -12,8 +12,6 @@ use Oro\Bundle\SearchBundle\Engine\EngineInterface;
 /**
  * Update and reindex (automatically) fulltext-indexed table(s).
  * Use carefully on large data sets - do not run this task too often.
- *
- * @author magedan
  */
 class ReindexCommand extends ContainerAwareCommand
 {
@@ -31,7 +29,19 @@ class ReindexCommand extends ContainerAwareCommand
                 'Full or compact class name of entity which should be reindexed' .
                 '(f.e. Oro\Bundle\UserBundle\Entity\User or OroUserBundle:User)'
             )
-             ->setDescription('Rebuild search index');
+            ->addArgument(
+                'offset',
+                InputArgument::OPTIONAL,
+                'INTEGER. Tells indexer to start indexation from given entity number.',
+                null
+            )
+            ->addArgument(
+                'limit',
+                InputArgument::OPTIONAL,
+                'INTEGER. Limit indexation of entity by given number. ',
+                null
+            )
+            ->setDescription('Rebuild search index');
     }
 
     /**
@@ -39,20 +49,31 @@ class ReindexCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $class = $input->getArgument('class');
+        $class  = $input->getArgument('class');
+        $offset = null;
+        $limit  = null;
         if ($class) {
             // convert from short format to FQСN
             $class = $this->getContainer()->get('doctrine')
                 ->getManagerForClass($class)->getClassMetadata($class)->getName();
+
+            $offsetArg = $input->getArgument('offset');
+            $limitArg  = $input->getArgument('limit');
+            if (null !== $offsetArg && null !== $limitArg) {
+                $offset = (int) $offsetArg;
+                $limit  = (int) $limitArg;
+            }
         }
 
-        $placeholder = $class ? '"' . $class .'" entity' : 'all mapped entities';
+        $placeholder = $class ? '"' . $class . '" entity' : 'all mapped entities';
 
         $output->writeln('Starting reindex task for ' . $placeholder);
 
         /** @var $searchEngine EngineInterface */
         $searchEngine = $this->getContainer()->get('oro_search.search.engine');
-        $recordsCount = $searchEngine->reindex($class);
+
+
+        $recordsCount = $searchEngine->reindex($class, $offset, $limit);
 
         $output->writeln(sprintf('Total indexed items: %u', $recordsCount));
     }

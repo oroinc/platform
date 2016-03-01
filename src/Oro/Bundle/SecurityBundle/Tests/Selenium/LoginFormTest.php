@@ -156,7 +156,7 @@ class LoginFormTest extends Selenium2TestCase
         $this->waitPageToLoad();
         $this->waitForAjax();
         $messageActual = $this->byXPath("//*[@id='top-page']//div[contains(@class,'alert-error')]")->text();
-        $messageExpect = "The username or email address \"123test123\" does not exist.";
+        $messageExpect = "There is no active user with username or email address \"123test123\".";
         $this->assertEquals($messageExpect, $messageActual);
 
         $this->byId('prependedInput')->value('admin@example.com');

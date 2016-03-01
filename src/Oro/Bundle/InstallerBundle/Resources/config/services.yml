@@ -20,7 +20,6 @@ services:
     kernel.listener.install.event:
         class: %oro_installer.listener.request.class%
         arguments:
-            - "@router"
             - %installed%
             - %kernel.debug%
         tags:

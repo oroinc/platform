@@ -1,0 +1,70 @@
+.activity-list-widget {
+  .activity-list {
+    .info {
+      margin-bottom: @contentPadding;
+    }
+  }
+  .grid-toolbar {
+    padding: 0;
+    margin-bottom: @contentPadding;
+    .filter-container {
+      padding: 0;
+      margin-bottom: @contentPadding;
+    }
+    .actions-panel {
+      margin-left: 0;
+      a.action.btn {
+        display: inline-block;
+      }
+    }
+    .pagination {
+      text-align: center;
+      margin: 0;
+    }
+  }
+  .comments-view-footer {
+    margin-bottom: 0;
+  }
+  .accordion-body .message .comment {
+    padding-right: 0;
+  }
+}
+@media screen and (max-width: 650px){
+  .activity-list-widget {
+    .grid-toolbar {
+      .btn-group {
+        margin: 0 10px 10px 0;
+      }
+      .pagination {
+        width: calc(~"100% - 40px");
+        overflow: hidden;
+        text-overflow: ellipsis;
+        text-align: left;
+      }
+    }
+    .accordion > .items {
+      .message-item {
+        clear: left;
+        margin: 7px 0 7px 4px;
+        width: calc(~"100% - 186px");
+      }
+      .details {
+        min-width: 0;
+        max-width: calc(~"100% - 72px");
+        margin-right: 0;
+      }
+      .actions {
+        margin-left: 0;
+        margin-right: -10px;
+      }
+    }
+    .accordion-body {
+      .widget-content > .responsive-block {
+        min-width: 100%;
+      }
+      .message .comment {
+        padding: 0 ;
+      }
+    }
+  }
+}

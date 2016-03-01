@@ -15,13 +15,12 @@ use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\TagBundle\Entity\Tag;
-use Oro\Bundle\TagBundle\Entity\Taggable;
 use Oro\Bundle\UserBundle\Model\ExtendUser;
 use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
 
@@ -38,7 +37,18 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      routeName="oro_user_index",
  *      routeView="oro_user_view",
  *      defaultValues={
- *          "entity"={"icon"="icon-user","context-grid"="users-for-context-grid"},
+ *          "entity"={
+ *              "icon"="icon-user"
+ *          },
+ *          "grouping"={
+ *              "groups"={"dictionary"}
+ *          },
+ *          "dictionary"={
+ *              "virtual_fields"={"id"},
+ *              "search_fields"={"firstName", "lastName"},
+ *              "representation_field"="fullName",
+ *              "activity_support"="true"
+ *          },
  *          "ownership"={
  *              "owner_type"="BUSINESS_UNIT",
  *              "owner_field_name"="owner",
@@ -54,13 +64,19 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "form"={
  *              "form_type"="oro_user_select",
  *              "grid_name"="users-select-grid"
+ *          },
+ *          "grid"={
+ *              "default"="users-grid",
+ *              "context"="users-for-context-grid"
+ *          },
+ *          "tag"={
+ *              "enabled"=true
  *          }
  *      }
  * )
  * @JMS\ExclusionPolicy("ALL")
  */
 class User extends ExtendUser implements
-    Taggable,
     EmailOwnerInterface,
     EmailHolderInterface,
     FullNameInterface,
@@ -334,13 +350,15 @@ class User extends ExtendUser implements
      * @var Email[]|Collection
      *
      * @ORM\OneToMany(targetEntity="Email", mappedBy="user", orphanRemoval=true, cascade={"persist"})
+     * @ConfigField(
+     *      defaultValues={
+     *          "dataaudit"={
+     *              "auditable"=true
+     *          }
+     *      }
+     * )
      */
     protected $emails;
-
-    /**
-     * @var Tag[]
-     */
-    protected $tags;
 
     /**
      * @var BusinessUnit[]|Collection
@@ -364,7 +382,9 @@ class User extends ExtendUser implements
     /**
      * @var EmailOrigin[]|Collection
      *
-     * @ORM\OneToMany(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="owner", cascade={"all"})
+     * @ORM\OneToMany(
+     *      targetEntity="Oro\Bundle\EmailBundle\Entity\EmailOrigin", mappedBy="owner", cascade={"persist", "remove"}
+     * )
      */
     protected $emailOrigins;
 
@@ -381,6 +401,11 @@ class User extends ExtendUser implements
      * )
      */
     protected $createdAt;
+
+    /**
+     * @var AccountTypeModel
+     */
+    protected $imapAccountType;
 
     /**
      * @var \DateTime $updatedAt
@@ -801,14 +826,6 @@ class User extends ExtendUser implements
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function getTaggableId()
-    {
-        return $this->getId();
-    }
-
-    /**
      * {@inheritdoc}
      */
     public function getId()
@@ -826,28 +843,6 @@ class User extends ExtendUser implements
         $this->id = $id;
 
         return $this;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getTags()
-    {
-        if (!$this->tags) {
-            $this->tags = new ArrayCollection();
-        }
-
-        return $this->tags;
-    }
-
-    /**
-     * {@inheritdoc}
-     *
-     * @return User
-     */
-    public function setTags($tags)
-    {
-        $this->tags = $tags;
     }
 
     /**
@@ -951,21 +946,21 @@ class User extends ExtendUser implements
     /**
      * Set IMAP configuration
      *
-     * @param ImapEmailOrigin $imapConfiguration
+     * @param UserEmailOrigin $imapConfiguration
      *
      * @return User
      */
-    public function setImapConfiguration(ImapEmailOrigin $imapConfiguration = null)
+    public function setImapConfiguration($imapConfiguration = null)
     {
         $currentImapConfiguration = $this->getImapConfiguration();
         if ($currentImapConfiguration &&
-            (null === $imapConfiguration || $currentImapConfiguration !== $imapConfiguration)
+            (null === $imapConfiguration || $currentImapConfiguration->getId() !== $imapConfiguration->getId())
         ) {
             // deactivate current IMAP configuration and remove a reference to it
-            $currentImapConfiguration->setIsActive(false);
+            $currentImapConfiguration->setActive(false);
             $this->removeEmailOrigin($currentImapConfiguration);
         }
-        if (null !== $imapConfiguration) {
+        if (null !== $imapConfiguration && null !== $imapConfiguration->getUser()) {
             $this->addEmailOrigin($imapConfiguration);
         }
 
@@ -975,14 +970,16 @@ class User extends ExtendUser implements
     /**
      * Get IMAP configuration
      *
-     * @return ImapEmailOrigin
+     * @return UserEmailOrigin
      */
     public function getImapConfiguration()
     {
         $items = $this->emailOrigins->filter(
             function ($item) {
                 return
-                    $item instanceof ImapEmailOrigin
+                    ($item instanceof UserEmailOrigin)
+                    && $item->isActive()
+                    && !$item->getMailbox()
                     && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
             }
         );
@@ -990,6 +987,45 @@ class User extends ExtendUser implements
         return $items->isEmpty()
             ? null
             : $items->first();
+    }
+
+    /**
+     * @param AccountTypeModel|null $accountTypeModel
+     */
+    public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
+    {
+        $this->imapAccountType = $accountTypeModel;
+        if ($accountTypeModel instanceof AccountTypeModel) {
+            $this->setImapConfiguration($accountTypeModel->getUserEmailOrigin());
+        }
+    }
+
+    /**
+     * @return AccountTypeModel
+     */
+    public function getImapAccountType()
+    {
+        if ($this->imapAccountType === null) {
+            /** @var UserEmailOrigin $userEmailOrigin */
+            $userEmailOrigin = $this->getImapConfiguration();
+            $accountTypeModel = null;
+            if ($userEmailOrigin) {
+                $accountTypeModel = new AccountTypeModel();
+                if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
+                } else {
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_OTHER);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
+                }
+            }
+
+            if ($accountTypeModel) {
+                return $accountTypeModel;
+            }
+        }
+
+        return $this->imapAccountType;
     }
 
     /**
@@ -1016,6 +1052,8 @@ class User extends ExtendUser implements
     public function addEmailOrigin(EmailOrigin $emailOrigin)
     {
         $this->emailOrigins->add($emailOrigin);
+
+        $emailOrigin->setOwner($this);
 
         return $this;
     }
@@ -1133,5 +1171,15 @@ class User extends ExtendUser implements
     public function getCurrentOrganization()
     {
         return $this->currentOrganization;
+    }
+
+    /**
+     * Get user full name
+     *
+     * @return string
+     */
+    public function getFullName()
+    {
+        return sprintf('%s %s', $this->getFirstName(), $this->getLastName());
     }
 }

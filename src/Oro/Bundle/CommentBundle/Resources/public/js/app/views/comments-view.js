@@ -1,13 +1,12 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var CommentsView,
-        BaseView = require('oroui/js/app/views/base/view'),
-        CommentsHeaderView = require('./comments-header-view'),
-        CommentItemView = require('./comment-item-view'),
-        BaseCollectionView = require('oroui/js/app/views/base/collection-view'),
-        template = require('text!../../../templates/comment/comments-view.html');
+    var CommentsView;
+    var BaseView = require('oroui/js/app/views/base/view');
+    var CommentsHeaderView = require('./comments-header-view');
+    var CommentItemView = require('./comment-item-view');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var template = require('text!../../../templates/comment/comments-view.html');
 
     CommentsView = BaseView.extend({
         template: template,
@@ -18,18 +17,18 @@ define(function (require) {
             'comment-load-more': 'onLoadMore'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.canCreate = options.canCreate;
             CommentsView.__super__.initialize.apply(this, arguments);
         },
 
-        getTemplateData: function () {
+        getTemplateData: function() {
             var data = CommentsView.__super__.getTemplateData.apply(this, arguments);
             data.canCreate = this.canCreate;
             return data;
         },
 
-        render: function () {
+        render: function() {
             CommentsView.__super__.render.apply(this, arguments);
             this.subview('header', new CommentsHeaderView({
                 el: this.$('.comments-view-header'),
@@ -46,22 +45,22 @@ define(function (require) {
             }));
         },
 
-        onLoadMore: function (e) {
+        onLoadMore: function(e) {
             e.stopImmediatePropagation();
             this.trigger('loadMore');
         },
 
-        onAddCommentClick: function (e) {
+        onAddCommentClick: function(e) {
             e.stopImmediatePropagation();
             this.trigger('toAdd');
         },
 
-        onEditComment: function (e, model) {
+        onEditComment: function(e, model) {
             e.stopImmediatePropagation();
             this.trigger('toEdit', model);
         },
 
-        onRemoveComment: function (e, model) {
+        onRemoveComment: function(e, model) {
             e.stopImmediatePropagation();
             this.trigger('toRemove', model);
         }

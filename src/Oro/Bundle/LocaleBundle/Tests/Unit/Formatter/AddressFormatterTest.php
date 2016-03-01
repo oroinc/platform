@@ -3,6 +3,7 @@
 namespace Oro\Bundle\LocaleBundle\Tests\Unit\Formatter;
 
 use Oro\Bundle\LocaleBundle\Formatter\AddressFormatter;
+use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 use Oro\Bundle\LocaleBundle\Tests\Unit\Formatter\Stubs\AddressStub;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfiguration;
@@ -10,12 +11,12 @@ use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration as LocaleConfigura
 class AddressFormatterTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|LocaleSettings
      */
     protected $localeSettings;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|NameFormatter
      */
     protected $nameFormatter;
 
@@ -29,19 +30,19 @@ class AddressFormatterTest extends \PHPUnit_Framework_TestCase
         $this->localeSettings = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
             ->disableOriginalConstructor()
             ->setMethods(
-                array(
+                [
                     'getLocale',
                     'getCountry',
                     'getAddressFormats',
                     'getLocaleByCountry',
                     'isFormatAddressByAddressCountry'
-                )
+                ]
             )
             ->getMock();
 
         $this->nameFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\NameFormatter')
             ->disableOriginalConstructor()
-            ->setMethods(array('format'))
+            ->setMethods(['format'])
             ->getMock();
 
         $this->addressFormatter = new AddressFormatter($this->localeSettings, $this->nameFormatter);
@@ -49,9 +50,7 @@ class AddressFormatterTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->localeSettings);
-        unset($this->nameFormatter);
-        unset($this->addressFormatter);
+        unset($this->localeSettings, $this->nameFormatter, $this->addressFormatter);
     }
 
     /**
@@ -60,18 +59,26 @@ class AddressFormatterTest extends \PHPUnit_Framework_TestCase
      * @param string $regionCode
      * @param string $expected
      * @param bool $formatByCountry
+     * @param string $street2
+     * @param string|null $separator
      */
-    public function testFormat($format, $regionCode, $expected, $formatByCountry = false)
-    {
-        $address = new AddressStub();
+    public function testFormat(
+        $format,
+        $regionCode,
+        $expected,
+        $formatByCountry = false,
+        $street2 = 'apartment 10',
+        $separator = "\n"
+    ) {
+        $address = new AddressStub($street2);
         $address->setRegionCode($regionCode);
         $locale = 'en';
         $country = 'CA';
-        $addressFormats = array(
-            $country => array(
+        $addressFormats = [
+            $country => [
                 LocaleSettings::ADDRESS_FORMAT_KEY => $format
-            ),
-        );
+            ],
+        ];
 
         $this->localeSettings->expects($this->once())
             ->method('getAddressFormats')
@@ -99,54 +106,65 @@ class AddressFormatterTest extends \PHPUnit_Framework_TestCase
             ->with($address, $locale)
             ->will($this->returnValue('Formatted User NAME'));
 
-        $this->assertEquals($expected, $this->addressFormatter->format($address));
+        $this->assertEquals($expected, $this->addressFormatter->format($address, null, $separator));
     }
 
+    /**
+     * @return array
+     */
     public function formatDataProvider()
     {
-        return array(
-            'simple street' => array(
+        return [
+            'simple street' => [
                 '%name%\n%organization%\n%street%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code%',
                 'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK NY UNITED STATES 12345"
-            ),
-            'complex street' => array(
+            ],
+            'complex street' => [
                 '%name%\n%organization%\n%street1%\n%street2%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code%',
                 'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str.\napartment 10\nNEW YORK NY UNITED STATES 12345"
-            ),
-            'unknown field' => array(
+            ],
+            'unknown field' => [
                 '%unknown_data_one% %name%\n'
                 . '%organization%\n%street%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code% %unknown_data_two%',
                 'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK NY UNITED STATES 12345"
-            ),
-            'multi spaces' => array(
+            ],
+            'multi spaces' => [
                 '%unknown_data_one% %name% %unknown_data_one%\n'
                 . '%organization%\n%street%\n'
                 . '%CITY% %unknown_data_one% %REGION_CODE% %COUNTRY% %postal_code% %unknown_data_two%',
                 'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK NY UNITED STATES 12345"
-            ),
-            'address country format' => array(
+            ],
+            'address country format' => [
                 '%name%\n%organization%\n%street%\n%CITY% %REGION_CODE% %COUNTRY% %postal_code%',
                 'NY',
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK NY UNITED STATES 12345",
                 true
-            ),
-            'unknown region code' => array(
+            ],
+            'unknown region code' => [
                 '%name%\n%organization%\n%street%\n%CITY% %region_code% %COUNTRY% %postal_code%',
                 null,
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK New York UNITED STATES 12345",
                 true
-            ),
-            'region name' => array(
+            ],
+            'region name' => [
                 '%name%\n%organization%\n%street%\n%CITY% %region% %COUNTRY% %postal_code%',
                 null,
                 "Formatted User NAME\nCompany Ltd.\n1 Tests str. apartment 10\nNEW YORK New York UNITED STATES 12345",
                 true
-            ),
-        );
+            ],
+            'empty field with custom delimiter' => [
+                '%name%\n%organization%\n%street%\n%CITY% %region% %COUNTRY% %postal_code% %name_suffix%',
+                'NY',
+                'Formatted User NAME, Company Ltd., 1 Tests str., NEW YORK New York UNITED STATES 12345',
+                true,
+                '',
+                ', '
+            ],
+        ];
     }
 
     /**
@@ -200,46 +218,46 @@ class AddressFormatterTest extends \PHPUnit_Framework_TestCase
      */
     public function getAddressFormatDataProvider()
     {
-        return array(
-            'direct' => array(
-                'addressFormats' => array(
-                    'US' => array(LocaleSettings::ADDRESS_FORMAT_KEY => '%address_format%')
-                ),
+        return [
+            'direct' => [
+                'addressFormats' => [
+                    'US' => [LocaleSettings::ADDRESS_FORMAT_KEY => '%address_format%']
+                ],
                 'localeOrRegion' => 'US',
                 'expectedFormat' => '%address_format%'
-            ),
-            'parse_country' => array(
-                'addressFormats' => array(
-                    'CA' => array(LocaleSettings::ADDRESS_FORMAT_KEY => '%address_format%')
-                ),
+            ],
+            'parse_country' => [
+                'addressFormats' => [
+                    'CA' => [LocaleSettings::ADDRESS_FORMAT_KEY => '%address_format%']
+                ],
                 'localeOrRegion' => 'fr_CA',
                 'expectedFormat' => '%address_format%'
-            ),
-            'empty_locale_or_region' => array(
-                'addressFormats' => array(
-                    'RU' => array(LocaleSettings::ADDRESS_FORMAT_KEY => '%address_format%')
-                ),
+            ],
+            'empty_locale_or_region' => [
+                'addressFormats' => [
+                    'RU' => [LocaleSettings::ADDRESS_FORMAT_KEY => '%address_format%']
+                ],
                 'localeOrRegion' => false,
                 'expectedFormat' => '%address_format%',
                 'defaultCountry' => 'RU'
-            ),
-            'default_system_country' => array(
-                'addressFormats' => array(
-                    'RU' => array(LocaleSettings::ADDRESS_FORMAT_KEY => '%address_format%')
-                ),
+            ],
+            'default_system_country' => [
+                'addressFormats' => [
+                    'RU' => [LocaleSettings::ADDRESS_FORMAT_KEY => '%address_format%']
+                ],
                 'localeOrRegion' => 'fr_CA',
                 'expectedFormat' => '%address_format%',
                 'defaultCountry' => 'RU'
-            ),
-            'default_fallback' => array(
-                'addressFormats' => array(
-                    LocaleConfiguration::DEFAULT_COUNTRY => array(
+            ],
+            'default_fallback' => [
+                'addressFormats' => [
+                    LocaleConfiguration::DEFAULT_COUNTRY => [
                         LocaleSettings::ADDRESS_FORMAT_KEY => '%address_format%'
-                    )
-                ),
+                    ]
+                ],
                 'localeOrRegion' => 'fr_CA',
                 'expectedFormat' => '%address_format%'
-            ),
-        );
+            ],
+        ];
     }
 }

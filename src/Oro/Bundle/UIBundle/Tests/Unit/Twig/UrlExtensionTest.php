@@ -26,13 +26,19 @@ class UrlExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->extension->getFunctions();
-        $this->assertCount(1, $functions);
+        $this->assertCount(2, $functions);
 
         /** @var \Twig_SimpleFunction $function */
-        $function = current($functions);
+        $function = $functions[0];
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_url_add_query', $function->getName());
         $this->assertEquals([$this->extension, 'addQuery'], $function->getCallable());
+
+        /** @var \Twig_SimpleFunction $function */
+        $function = $functions[1];
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals('oro_is_url_local', $function->getName());
+        $this->assertEquals([$this->extension, 'isUrlLocal'], $function->getCallable());
     }
 
     /**
@@ -110,6 +116,93 @@ class UrlExtensionTest extends \PHPUnit_Framework_TestCase
                 'expected' => '/path?baz=2&foo=1#bar',
                 'source'   => '/path?foo=1#bar',
                 'query'    => ['baz' => 2],
+            ],
+        ];
+    }
+
+    /**
+     * @param string $expected
+     * @param string $server
+     * @param string $linkUrl
+     * @dataProvider isUrlLocalProvider
+     */
+    public function testIsUrlLocal($expected, $server, $linkUrl)
+    {
+        if (null !== $server) {
+            $request = new Request();
+            $request->server->add($server);
+            $this->extension->setRequest($request);
+        }
+
+        $this->assertEquals($expected, $this->extension->isUrlLocal($linkUrl));
+    }
+
+    /**
+     * @return array
+     */
+    public function isUrlLocalProvider()
+    {
+        return [
+            'same page' => [
+                'expected' => true,
+                'server'   => [
+                    'REQUEST_SCHEME' => 'http',
+                    'SERVER_NAME'    => 'test.url',
+                    'SERVER_PORT'    => 80,
+                    'REQUEST_URI'    => '/info',
+                ],
+                'link_url' => 'http://test.url/info',
+            ],
+            'different path' => [
+                'expected' => true,
+                'server'   => [
+                    'REQUEST_SCHEME' => 'http',
+                    'SERVER_NAME'    => 'test.url',
+                    'SERVER_PORT'    => 80,
+                    'REQUEST_URI'    => '/contact',
+                ],
+                'link_url' => 'http://test.url/info',
+            ],
+            'different host' => [
+                'expected' => false,
+                'server'   => [
+                    'REQUEST_SCHEME' => 'http',
+                    'SERVER_NAME'    => 'test.com',
+                    'SERVER_PORT'    => 80,
+                    'REQUEST_URI'    => '/info',
+                ],
+                'link_url' => 'http://test.url/info',
+            ],
+            'different port' => [
+                'expected' => false,
+                'server'   => [
+                    'REQUEST_SCHEME' => 'http',
+                    'SERVER_NAME'    => 'test.url',
+                    'SERVER_PORT'    => 80,
+                    'REQUEST_URI'    => '/info',
+                ],
+                'link_url' => 'http://test.url:8080/info',
+            ],
+            'link from secure to insecure' => [
+                'expected' => false,
+                'server'   => [
+                    'REQUEST_SCHEME' => 'https',
+                    'SERVER_NAME'    => 'test.url',
+                    'SERVER_PORT'    => 443,
+                    'REQUEST_URI'    => '/contact',
+                    'HTTPS'          => 'on',
+                ],
+                'link_url' => 'http://test.url/info',
+            ],
+            'link from insecure to secure' => [
+                'expected' => true,
+                'server'   => [
+                    'REQUEST_SCHEME' => 'http',
+                    'SERVER_NAME'    => 'test.url',
+                    'SERVER_PORT'    => 80,
+                    'REQUEST_URI'    => '/contact',
+                ],
+                'link_url' => 'https://test.url/info',
             ],
         ];
     }

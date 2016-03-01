@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 
 use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\ORM\Query;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndexer;
@@ -46,29 +45,26 @@ class ActivitySearchApiEntityManager extends ApiEntityManager
     }
 
     /**
-     * Returns the list of fields responsible to store activity associations for the given activity entity type
+     * Get search aliases for specified entity class(es). By default returns all search aliases
+     * for all entities which can be associated with an activity this manager id work with.
      *
-     * @return array
+     * @param string[] $entities
+     *
+     * @return string[]
      */
-    public function getAssociations()
+    protected function getSearchAliases(array $entities)
     {
-        return $this->activityManager->getActivityTargets($this->class);
-    }
+        if (empty($entities)) {
+            $entities = array_flip($this->activityManager->getActivityTargets($this->class));
+        }
+        $aliases = [];
+        foreach ($entities as $targetEntityClass) {
+            $alias = $this->searchIndexer->getEntityAlias($targetEntityClass);
+            if (null !== $alias) {
+                $aliases[] = $alias;
+            }
+        }
 
-    /**
-     * Get search aliases for specified entity class(es). By default returns all associated entities.
-     *
-     * @param string[] $from
-     *
-     * @return array
-     */
-    protected function getSearchAliases(array $from)
-    {
-        $entities = empty($from)
-            ? $this->activityManager->getActivityTargets($this->class)
-            : array_flip($from);
-        $aliases  = array_intersect_key($this->searchIndexer->getEntitiesListAliases(), $entities);
-
-        return array_values($aliases);
+        return $aliases;
     }
 }

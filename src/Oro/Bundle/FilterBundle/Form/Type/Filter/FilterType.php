@@ -75,8 +75,10 @@ class FilterType extends AbstractType
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $children                     = $form->all();
-        $view->vars['value']['type']  = $children['type']->getViewData();
-        $view->vars['value']['value'] = $children['value']->getViewData();
+        if (!is_object($view->vars['value'])) {
+            $view->vars['value']['type']  = $children['type']->getViewData();
+            $view->vars['value']['value'] = $children['value']->getViewData();
+        }
         $view->vars['show_filter']    = $options['show_filter'];
     }
 
@@ -93,6 +95,7 @@ class FilterType extends AbstractType
                 'operator_type'    => 'choice',
                 'operator_options' => array(),
                 'show_filter'      => false,
+                'lazy'             => false,
             )
         )->setRequired(
             array(

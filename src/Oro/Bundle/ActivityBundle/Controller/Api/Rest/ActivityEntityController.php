@@ -24,12 +24,12 @@ use Oro\Bundle\SoapBundle\Model\RelationIdentifier;
 class ActivityEntityController extends RestController
 {
     /**
-     * Returns the list of entities associated with the specified activity entity.
+     * Get entities associated with the specified activity.
      *
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
-     * @Get("/activities/{activity}/{id}/relations", name="")
+     * @Get("/activities/{activity}/{id}/relations")
      *
      * @QueryParam(
      *      name="page",
@@ -45,7 +45,7 @@ class ActivityEntityController extends RestController
      * )
      *
      * @ApiDoc(
-     *      description="Returns the list of entities associated with the specified activity entity",
+     *      description="Get entities associated with the specified activity",
      *      resource=true
      * )
      *
@@ -70,7 +70,7 @@ class ActivityEntityController extends RestController
      * @param string $activity The type of the activity entity.
      * @param int    $id       The id of the activity entity.
      *
-     * @Post("/activities/{activity}/{id}/relations", name="")
+     * @Post("/activities/{activity}/{id}/relations")
      *
      * @ApiDoc(
      *      description="Adds an association between an activity and a target entity",
@@ -95,7 +95,7 @@ class ActivityEntityController extends RestController
      * @param string $entity   The type of the target entity.
      * @param mixed  $entityId The id of the target entity.
      *
-     * @Delete("/activities/{activity}/{id}/{entity}/{entityId}", name="")
+     * @Delete("/activities/{activity}/{id}/{entity}/{entityId}")
      *
      * @ApiDoc(
      *      description="Deletes an association between an activity and a target entity",

@@ -32,7 +32,8 @@ class ExcludeImportExportFields extends AbstractFixture implements ContainerAwar
     {
         $entityProvider = $this->container->get('oro_entity.entity_provider');
         $entityConnector = $this->container->get('oro_workflow.entity_connector');
-        $configProvider = $this->container->get('oro_entity_config.provider.importexport');
+        $configManager = $this->container->get('oro_entity_config.config_manager');
+        $configProvider = $configManager->getProvider('importexport');
 
         foreach ($entityProvider->getEntities() as $entity) {
             $entityName = $entity['name'];
@@ -40,16 +41,16 @@ class ExcludeImportExportFields extends AbstractFixture implements ContainerAwar
                 if ($configProvider->hasConfig($entityName, FieldGenerator::PROPERTY_WORKFLOW_ITEM)) {
                     $fieldConfig = $configProvider->getConfig($entityName, FieldGenerator::PROPERTY_WORKFLOW_ITEM);
                     $fieldConfig->set('excluded', true);
-                    $configProvider->persist($fieldConfig);
+                    $configManager->persist($fieldConfig);
                 }
                 if ($configProvider->hasConfig($entityName, FieldGenerator::PROPERTY_WORKFLOW_STEP)) {
                     $fieldConfig = $configProvider->getConfig($entityName, FieldGenerator::PROPERTY_WORKFLOW_STEP);
                     $fieldConfig->set('excluded', true);
-                    $configProvider->persist($fieldConfig);
+                    $configManager->persist($fieldConfig);
                 }
             }
         }
 
-        $configProvider->flush();
+        $configManager->flush();
     }
 }

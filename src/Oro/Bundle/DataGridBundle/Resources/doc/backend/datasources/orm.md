@@ -59,6 +59,15 @@ datagrid:
                         - { join: address.country, alias: country }
                         - { join: address.region, alias: region }
             hints:
-                - { name: HINT_CUSTOM_OUTPUT_WALKER, value: %oro_translation.translation_walker.class%}
+                - { name: HINT_CUSTOM_OUTPUT_WALKER, value: %oro_translation.translation_walker.class% }
 ```
 
+Please pay attention that ORM datasource uses [Query Hint Resolver](./../../../../../EntityBundle/Resources/doc/query_hint_resolver.md) service to handle hints. If you create own query walker and wish to use it in a grid, just register it in the Query Hint Resolver. For example the hint `HINT_TRANSLATABLE` is registered as an alias for the translation walker and as result the following configurations are equal:
+
+``` yaml
+            hints:
+                - { name: HINT_CUSTOM_OUTPUT_WALKER, value: %oro_translation.translation_walker.class% }
+
+            hints:
+                - HINT_TRANSLATABLE
+```

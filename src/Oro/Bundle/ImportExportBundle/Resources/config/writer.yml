@@ -5,6 +5,7 @@ parameters:
     oro_importexport.writer.dummy.class: Oro\Bundle\ImportExportBundle\Writer\DummyWriter
     oro_importexport.writer.doctrine_clear.class: Oro\Bundle\ImportExportBundle\Writer\DoctrineClearWriter
     oro_importexport.writer.echo.csv.class: Oro\Bundle\ImportExportBundle\Writer\CsvEchoWriter
+    oro_importexport.writer.insert_from_select_writer.class: Oro\Bundle\ImportExportBundle\Writer\InsertFromSelectWriter
 
 services:
     oro_importexport.writer.csv:
@@ -17,24 +18,32 @@ services:
     oro_importexport.writer.entity:
         class: %oro_importexport.writer.entity.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity.doctrine_helper
             - @oro_importexport.writer.entity_detach_fixer
             - @oro_importexport.context_registry
 
     oro_importexport.writer.entity_detach_fixer:
         class: %oro_importexport.writer.entity_detach_fixer.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @oro_entity.doctrine_helper
+            - @oro_importexport.field.field_helper
+            - @property_accessor
 
     oro_importexport.writer.dummy:
         class: %oro_importexport.writer.dummy.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
 
     oro_importexport.writer.doctrine_clear:
         class: %oro_importexport.writer.doctrine_clear.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
 
     oro_importexport.writer.echo.csv:
         class: %oro_importexport.writer.echo.csv.class%
+
+    oro_importexport.writer.insert_from_select_writer:
+        class: %oro_importexport.writer.insert_from_select_writer.class%
+        arguments:
+            - @oro_entity.orm.insert_from_select_query_executor
+        abstract: true

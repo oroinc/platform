@@ -7,9 +7,7 @@ use Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUser
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
- * @dbReindex
  */
 class DashboardControllerAclTest extends WebTestCase
 {
@@ -21,7 +19,7 @@ class DashboardControllerAclTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient();
-        $this->loadFixtures(array('Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData'));
+        $this->loadFixtures(['Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData']);
 
         $this->dashboardManager = $this->getContainer()->get('oro_dashboard.manager');
     }

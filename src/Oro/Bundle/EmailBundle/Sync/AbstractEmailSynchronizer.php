@@ -7,12 +7,18 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
 use Psr\Log\LoggerAwareInterface;
 use Psr\Log\LoggerAwareTrait;
 use Psr\Log\NullLogger;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Exception\SyncFolderTimeoutException;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationToken;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -31,8 +37,14 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     /** @var KnownEmailAddressCheckerFactory */
     protected $knownEmailAddressCheckerFactory;
 
+    /** @var TokenStorage */
+    protected $tokenStorage;
+
     /** @var KnownEmailAddressCheckerInterface */
     private $knownEmailAddressChecker;
+
+    /** @var TokenInterface */
+    private $currentToken;
 
     /**
      * Constructor
@@ -46,6 +58,15 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     ) {
         $this->doctrine                        = $doctrine;
         $this->knownEmailAddressCheckerFactory = $knownEmailAddressCheckerFactory;
+    }
+
+    /**
+     * @param TokenStorage $tokenStorage
+     */
+    public function setTokenStorage(TokenStorage $tokenStorage)
+    {
+        $this->tokenStorage = $tokenStorage;
+        $this->currentToken = $tokenStorage->getToken();
     }
 
     /**
@@ -69,6 +90,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      * @param int $maxTasks             The maximum number of email origins which can be synchronized
      *                                  Set -1 to unlimited
      *                                  Defaults to 1
+     * @return int
+     *
      * @throws \Exception
      *
      * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -80,7 +103,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         if (!$this->checkConfiguration()) {
-            $this->logger->notice('Exit because synchronization was not configured.');
+            $this->logger->info('Exit because synchronization was not configured or disabled.');
+            return 0;
         }
 
         $startTime = $this->getCurrentUtcDateTime();
@@ -94,19 +118,19 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         while (true) {
             $origin = $this->findOriginToSync($maxConcurrentTasks, $minExecIntervalInMin);
             if ($origin === null) {
-                $this->logger->notice('Exit because nothing to synchronise.');
+                $this->logger->info('Exit because nothing to synchronise.');
                 break;
             }
 
             if (isset($processedOrigins[$origin->getId()])) {
-                $this->logger->notice('Exit because all origins have been synchronised.');
+                $this->logger->info('Exit because all origins have been synchronised.');
                 break;
             }
 
             if ($maxExecTimeout !== false) {
                 $date = $this->getCurrentUtcDateTime();
                 if ($date->sub($maxExecTimeout) >= $startTime) {
-                    $this->logger->notice('Exit because allocated time frame elapsed.');
+                    $this->logger->info('Exit because allocated time frame elapsed.');
                     break;
                 }
             }
@@ -121,7 +145,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             }
 
             if ($maxTasks > 0 && count($processedOrigins) >= $maxTasks) {
-                $this->logger->notice('Exit because the limit of tasks are reached.');
+                $this->logger->info('Exit because the limit of tasks are reached.');
                 break;
             }
         }
@@ -134,6 +158,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
                 )
             );
         }
+
+        return 0;
     }
 
     /**
@@ -149,7 +175,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         }
 
         if (!$this->checkConfiguration()) {
-            $this->logger->notice('Exit because synchronization was not configured.');
+            $this->logger->info('Exit because synchronization was not configured.');
         }
 
         $failedOriginIds = [];
@@ -194,9 +220,16 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      */
     protected function doSyncOrigin(EmailOrigin $origin)
     {
-        $processor = $this->createSynchronizationProcessor($origin);
-        if ($processor instanceof LoggerAwareInterface) {
-            $processor->setLogger($this->logger);
+        $this->impersonateOrganization($origin->getOrganization());
+        try {
+            $processor = $this->createSynchronizationProcessor($origin);
+            if ($processor instanceof LoggerAwareInterface) {
+                $processor->setLogger($this->logger);
+            }
+        } catch (\Exception $ex) {
+            $this->logger->error(sprintf('Skip origin synchronization. Error: %s', $ex->getMessage()));
+
+            throw $ex;
         }
 
         try {
@@ -205,10 +238,10 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
                 $processor->process($origin, $syncStartTime);
                 $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS, $syncStartTime);
             } else {
-                $this->logger->notice('Skip because it is already in process.');
+                $this->logger->info('Skip because it is already in process.');
             }
         } catch (SyncFolderTimeoutException $ex) {
-            $this->logger->notice($ex->getMessage());
+            $this->logger->info($ex->getMessage());
             $this->changeOriginSyncState($origin, self::SYNC_CODE_SUCCESS);
 
             throw $ex;
@@ -218,17 +251,30 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             } catch (\Exception $innerEx) {
                 // ignore any exception here
                 $this->logger->error(
-                    sprintf('Cannot set the fail state. Error: %s.', $innerEx->getMessage()),
+                    sprintf('Cannot set the fail state. Error: %s', $innerEx->getMessage()),
                     ['exception' => $innerEx]
                 );
             }
 
             $this->logger->error(
-                sprintf('The synchronization failed. Error: %s.', $ex->getMessage()),
+                sprintf('The synchronization failed. Error: %s', $ex->getMessage()),
                 ['exception' => $ex]
             );
 
             throw $ex;
+        }
+    }
+
+    /**
+     * Switches the security context to the given organization
+     * @todo: Should be deleted after email sync process will be refactored
+     */
+    protected function impersonateOrganization(Organization $organization = null)
+    {
+        if ($this->currentToken === null && $organization) {
+            $this->tokenStorage->setToken(
+                new OrganizationToken($organization)
+            );
         }
     }
 
@@ -328,7 +374,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      */
     protected function findOriginToSync($maxConcurrentTasks, $minExecIntervalInMin)
     {
-        $this->logger->notice('Finding an email origin ...');
+        $this->logger->info('Finding an email origin ...');
 
         $now = $this->getCurrentUtcDateTime();
         $border = clone $now;
@@ -375,11 +421,11 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
 
         if ($result === null) {
             if (!empty($origins)) {
-                $this->logger->notice('The maximum number of concurrent tasks is reached.');
+                $this->logger->info('The maximum number of concurrent tasks is reached.');
             }
-            $this->logger->notice('An email origin was not found.');
+            $this->logger->info('An email origin was not found.');
         } else {
-            $this->logger->notice(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
+            $this->logger->info(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
         }
 
         return $result;
@@ -393,7 +439,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      */
     protected function findOrigin($originId)
     {
-        $this->logger->notice(sprintf('Finding an email origin (id: %d) ...', $originId));
+        $this->logger->info(sprintf('Finding an email origin (id: %d) ...', $originId));
 
         $repo  = $this->getEntityManager()->getRepository($this->getEmailOriginClass());
         $query = $repo->createQueryBuilder('o')
@@ -408,9 +454,9 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $result = !empty($origins) ? $origins[0] : null;
 
         if ($result === null) {
-            $this->logger->notice('An email origin was not found.');
+            $this->logger->info('An email origin was not found.');
         } else {
-            $this->logger->notice(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
+            $this->logger->info(sprintf('Found "%s" email origin. Id: %d.', (string)$result, $result->getId()));
         }
 
         return $result;
@@ -421,7 +467,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
      */
     protected function resetHangedOrigins()
     {
-        $this->logger->notice('Resetting hanged email origins ...');
+        $this->logger->info('Resetting hanged email origins ...');
 
         $now = $this->getCurrentUtcDateTime();
         $border = clone $now;
@@ -438,7 +484,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             ->getQuery();
 
         $affectedRows = $query->execute();
-        $this->logger->notice(sprintf('Updated %d row(s).', $affectedRows));
+        $this->logger->info(sprintf('Updated %d row(s).', $affectedRows));
     }
 
     /**

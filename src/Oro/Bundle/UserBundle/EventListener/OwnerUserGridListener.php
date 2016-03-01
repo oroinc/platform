@@ -137,10 +137,15 @@ class OwnerUserGridListener
             $leftJoins[] = ['join' => 'u.businessUnits', 'alias' => 'bu'];
             $config->offsetSetByPath('[source][query][join][inner]', $leftJoins);
 
-            $where = array_merge(
-                $where,
-                ['bu.id in (' . implode(', ', $resultBuIds) . ')']
-            );
+            if ($resultBuIds) {
+                $where = array_merge(
+                    $where,
+                    ['bu.id in (' . implode(', ', $resultBuIds) . ')']
+                );
+            } else {
+                // There are no records to show, make query to return empty result
+                $where = array_merge($where, ['1 = 0']);
+            }
         }
         if (count($where)) {
             $config->offsetSetByPath('[source][query][where][and]', $where);

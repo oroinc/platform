@@ -4,6 +4,8 @@ namespace Oro\Bundle\FormBundle\Form\Type;
 
 /**
  * Allows to provide additional attributes for 'option' element of 'choice' form type
+ *
+ * @deprecated since 1.8. Use the 'choice_attr' option of ChoiceType
  */
 class ChoiceListItem
 {

@@ -12,7 +12,7 @@ class ReflectionClassHelperTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->utils = new ReflectionClassHelper(
-            'Oro\Component\Layout\Tests\Unit\Extension\Theme\Stubs\StubLayoutBuilderInterface'
+            'Oro\Component\PhpUtils\Tests\Unit\Stubs\StubInterface'
         );
     }
 

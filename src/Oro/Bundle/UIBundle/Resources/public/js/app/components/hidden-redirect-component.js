@@ -1,11 +1,10 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var HiddenRedirectComponent,
-        $ = require('jquery'),
-        mediator = require('oroui/js/mediator'),
-        BaseComponent = require('oroui/js/app/components/base/component');
+    var HiddenRedirectComponent;
+    var $ = require('jquery');
+    var mediator = require('oroui/js/mediator');
+    var BaseComponent = require('oroui/js/app/components/base/component');
 
     /**
      * @export oroui/js/app/components/hidden-redirect-component
@@ -26,7 +25,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.element = options._sourceElement;
             if (!this.element) {
                 return;
@@ -37,7 +36,7 @@ define(function (require) {
             }
 
             var self = this;
-            this.element.on('click.' + this.cid, function (e) {
+            this.element.on('click.' + this.cid, function(e) {
                 e.preventDefault();
                 $.ajax({
                     url: self.element.attr('href'),
@@ -56,7 +55,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed || !this.element) {
                 return;
             }

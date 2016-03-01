@@ -34,6 +34,9 @@ class EmailRenderer extends \Twig_Environment
     /** @var PropertyAccessor */
     protected $accessor;
 
+    /** @var array */
+    private $systemVariables;
+
     /**
      * @param \Twig_LoaderInterface   $loader
      * @param array                   $options
@@ -144,20 +147,31 @@ class EmailRenderer extends \Twig_Environment
      */
     public function compileMessage(EmailTemplateInterface $template, array $templateParams = [])
     {
-        $templateParams['system'] = $this->variablesProvider->getSystemVariableValues();
-
         $subject = $template->getSubject();
         $content = $template->getContent();
 
-        if (isset($templateParams['entity'])) {
-            $subject = $this->processDefaultFilters($subject, $templateParams['entity']);
+        $templateRendered = $this->renderWithDefaultFilters($content, $templateParams);
+        $subjectRendered  = $this->renderWithDefaultFilters($subject, $templateParams);
+
+        return [$subjectRendered, $templateRendered];
+    }
+
+    /**
+     * Renders content with default filters
+     *
+     * @param string $content
+     * @param array  $templateParams
+     *
+     * @return string
+     */
+    public function renderWithDefaultFilters($content, array $templateParams = [])
+    {
+        $templateParams['system'] = $this->getSystemVariableValues();
+        if (array_key_exists('entity', $templateParams)) {
             $content = $this->processDefaultFilters($content, $templateParams['entity']);
         }
 
-        $templateRendered = $this->render($content, $templateParams);
-        $subjectRendered  = $this->render($subject, $templateParams);
-
-        return [$subjectRendered, $templateRendered];
+        return $this->render($content, $templateParams);
     }
 
     /**
@@ -264,5 +278,17 @@ class EmailRenderer extends \Twig_Environment
         }
 
         return $this->accessor;
+    }
+
+    /**
+     * @return array
+     */
+    protected function getSystemVariableValues()
+    {
+        if (null === $this->systemVariables) {
+            $this->systemVariables = $this->variablesProvider->getSystemVariableValues();
+        }
+
+        return $this->systemVariables;
     }
 }

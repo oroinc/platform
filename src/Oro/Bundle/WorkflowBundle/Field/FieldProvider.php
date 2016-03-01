@@ -51,7 +51,7 @@ class FieldProvider extends EntityFieldProvider
                 continue;
             }
 
-            $label = $this->getFieldLabel($className, $associationName);
+            $label = $this->getFieldLabel($metadata, $associationName);
 
             $field = [
                 'name' => $associationName,

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Field;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -86,7 +86,9 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
         $entityConfig->expects($this->once())->method('is')->with('is_extend')
             ->will($this->returnValue(false));
 
-        $extendConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $extendConfigProvider->expects($this->any())->method('getConfig')->with($entityClass)
             ->will($this->returnValue($entityConfig));
 
@@ -103,11 +105,21 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
         $this->entityConnector->expects($this->once())->method('isWorkflowAware')->with($entityClass)
             ->will($this->returnValue(false));
 
-        $extendConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
-        $entityConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
-        $formConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
-        $viewConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
-        $importExportConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $formConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $viewConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $importExportConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $providerMap = array(
             array('extend', $extendConfigProvider),
@@ -253,7 +265,7 @@ class FieldGeneratorTest extends \PHPUnit_Framework_TestCase
     protected function addHideAssertions($entityClass, $fieldName, $iteration)
     {
         $fieldModel = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel')->getMock();
-        $fieldModel->expects($this->once())->method('setType')->with(ConfigModelManager::MODE_HIDDEN);
+        $fieldModel->expects($this->once())->method('setType')->with(ConfigModel::MODE_HIDDEN);
 
         $this->configManager->expects($this->at(17 + $iteration))->method('getConfigFieldModel')
             ->with($entityClass, $fieldName)

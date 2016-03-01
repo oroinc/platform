@@ -1,17 +1,147 @@
-@import "../../../oroui/css/less/mixins";
+@import "oroui/css/less/mixins";
+@import "./header";
+@import "./email-notification-menu";
+@import "./short-emails-list";
+@import "./sidebar-widget";
+
+.auto-response-rules {
+  .select-all-header-cell__dropdown-menu .all-visible {
+    display: none;
+  }
+}
+
+.auto-response-rule-header {
+  height: 28px;
+  line-height: 28px;
+
+  h5 {
+    display: inline-block;
+    margin: 0;
+  }
+}
+
+.ui-dialog [data-ftid=oro_email_autoresponserule] .form-horizontal .control-group .controls {
+  input[type=text] {
+    width: 456px;
+  }
+
+  select {
+    width: 458px;
+    max-width: 458px;
+  }
+
+  .select2-container {
+    width: 468px;
+    max-width: 468px;
+  }
+
+  .create-select-entity-choice-container {
+    margin-left: -142px;
+
+    [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:nth-child(2) {
+      margin-left: 50px;
+      .control-label.wrap {
+        width: 130px;
+        label {
+          display: block;
+        }
+      }
+    }
+
+    [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:nth-child(3) > .control-label.wrap {
+      width: 130px;
+    }
+
+    [data-ftid=oro_email_autoresponserule_template_new_entity] > .control-group:last-of-type {
+      text-align: right;
+
+      .control-label.wrap {
+        float: none;
+        display: inline-block;
+      }
+
+      input {
+        margin-top: 0;
+      }
+
+      .controls {
+        margin: 0;
+        display: inline-block;
+      }
+    }
+  }
+
+  .emailtemplate-translatation {
+    .control-label {
+      width: 70px;
+    }
+
+    .controls {
+      margin-left: 85px;
+    }
+
+    .tab-content {
+      margin-left: -85px;
+      border-top: 1px solid #ddd;
+      margin-top: -1px;
+    }
+
+    .mce-tinymce {
+      width: 468px;
+    }
+  }
+
+  [data-ftid=oro_email_autoresponserule_conditions] {
+    .selector {
+      margin: 0 5px 0 0;
+    }
+
+    select {
+      width: 85px;
+
+      &.type {
+        width: 105px;
+      }
+    }
+
+    input {
+      width: 190px;
+    }
+  }
+}
+
+
 
 .emailtemplate-translatation {
   .tab-content {
-    padding-top: 20px;
-    padding-bottom: 10px;
+    padding: 20px 16px 10px 0;
+    overflow-x: hidden;
+    .mce-tinymce {
+      width: 100%;
+      max-width: 542px;
+    }
     .tab-pane {
       input,
       textarea {
         width: 100%;
+        box-sizing: border-box;
+      }
+      input {
+        height: 32px;
       }
     }
   }
 }
+
+.choice-template-type .oro-clearfix {
+  display: inline-block;
+  margin-right: 10px;
+  width: auto;
+  input[type="radio"] {
+    margin: -2px 6px 0 0;
+  }
+}
+
 .emailtemplate-variables {
   .tab-content {
     padding-top: 12px;
@@ -21,8 +151,8 @@
     float: none;
     padding-left: 15px;
     padding-bottom: 10px;
-    &>li,
-    &>li.active {
+    & > li,
+    & > li.active {
       text-transform: none;
       font-size: 13px;
     }
@@ -34,8 +164,13 @@
     .group-label {
       font-weight: bold;
     }
-    .nav-list > li > a {
-      display: inline-block;
+    .nav {
+      padding-left: 15px;
+      padding-right: 15px;
+      & > li > a {
+        display: inline-block;
+        padding: 3px 0;
+      }
     }
   }
   ul.caption {
@@ -49,15 +184,20 @@
     }
   }
 }
+
 .modal-body {
   .loading-content {
     background: #fff url('../../img/loader.gif') no-repeat center left;
     padding-left: 30px;
   }
 }
+
 .ui-dialog {
   .email-form {
     padding-bottom: 14px;
+    .select2-container-disabled .select2-arrow {
+      display: none;
+    }
     .mce-tinymce {
       width: calc(~"97% + 12px");
     }
@@ -86,6 +226,7 @@
     height: 200px;
   }
 }
+
 .select2-container.select2-container-multi.taggable-email {
   width: calc(~"97% + 12px");
   max-width: none;
@@ -94,45 +235,47 @@
     padding-right: 60px;
   }
 }
+
 .cc-bcc-holder {
   position: absolute;
   top: 5px;
   right: 0;
   .showCc, .showBcc {
-    cursor:pointer;
+    cursor: pointer;
     padding: 0 5px;
     &:hover {
       text-decoration: underline;
     }
   }
 }
+
 .activity-list-widget {
   .email-info, .email-load-more {
     margin: 0 20px 0 0;
-  }
-  .email-context-activity-list {
-    padding: 0 @horizontalPadding;
   }
   .accordion-body > .message .email-content .comment {
     padding-right: 0;
   }
 }
+
 .icon-email-thread {
   background: url('../../img/icon-email-thread.png');
   width: 21px;
   height: 18px;
   display: inline-block;
 }
+
 span.icon.grid {
   color: #999;
 }
+
 span.icon.grid .icon-paperclip {
   font-size: 21px;
 }
 
-.thread-view{
+.thread-view {
   padding-left: @horizontalPadding;
-  .email-load-more{
+  .email-load-more {
     border-bottom: 1px solid #e5e5e5;
     .load-more-items(#e5e5e5, #f5f5f5, #888);
     &.process {
@@ -147,6 +290,7 @@ span.icon.grid .icon-paperclip {
     }
   }
 }
+
 .email-thread-action-panel {
   .email-view-toggle-all {
     color: #888;
@@ -156,6 +300,7 @@ span.icon.grid .icon-paperclip {
     }
   }
 }
+
 .email-info {
   border-bottom: 1px solid #e5e5e5;
   &:last-child {
@@ -177,7 +322,7 @@ span.icon.grid .icon-paperclip {
   .comment-count {
     margin-right: 5px;
   }
-  .email-has-attachment{
+  .email-has-attachment {
     font-size: 1.3em;
     margin-right: .5em;
   }
@@ -233,7 +378,7 @@ span.icon.grid .icon-paperclip {
       padding-bottom: 9px;
     }
     .email-body {
-      &>iframe {
+      & > iframe {
         border: 0;
         width: 100%;
         height: 0;
@@ -282,11 +427,13 @@ span.icon.grid .icon-paperclip {
     border-left: 1px solid #000000;
   }
 }
+
 .responsive-section {
   .email-content {
     .responsive-cell {
       padding-left: 0;
       padding-right: 15px;
+      margin-bottom: 0 !important; /* overrides activity list widget styles */
     }
     .responsive-cell:only-child,
     .responsive-cell:last-child {
@@ -298,7 +445,20 @@ span.icon.grid .icon-paperclip {
       padding-right: 0;
     }
   }
+  &.responsive-small {
+    .email-content {
+      .responsive-cell:not(:last-child) {
+        margin-bottom: 20px !important; /* overrides activity list widget styles */
+      }
+    }
+  }
 }
+.accordion-body .email-info {
+  &:last-child .email-content {
+    padding-bottom: 0;
+  }
+}
+
 .email-detailed-info-table {
   display: inline-block;
   .dropdown-toggle {
@@ -312,7 +472,7 @@ span.icon.grid .icon-paperclip {
   }
   .dropdown-menu {
     padding: 8px 10px 2px 0px;
-    margin-left: -20px;
+    margin-left: -16px;
     margin-top: 3px;
     &:before {
       content: '';
@@ -320,7 +480,7 @@ span.icon.grid .icon-paperclip {
       border-left: 7px solid transparent;
       border-right: 7px solid transparent;
       border-bottom: 7px solid #ccc;
-      border-bottom-color: rgba(0,0,0,0.2);
+      border-bottom-color: rgba(0, 0, 0, 0.2);
       position: absolute;
       top: -7px;
       left: 19px;
@@ -335,7 +495,10 @@ span.icon.grid .icon-paperclip {
       top: -6px;
       left: 20px;
     }
-    ul{
+    &.fixed-width .controls {
+      white-space: normal;
+    }
+    ul {
       margin: 0;
       list-style: none;
     }
@@ -360,11 +523,13 @@ span.icon.grid .icon-paperclip {
     }
   }
 }
+
 .forged-required label em {
   color: #c30b25;
   font-size: 15px;
   line-height: 1px;
 }
+
 .attachment-item {
   display: inline-block;
   float: left;
@@ -390,9 +555,11 @@ span.icon.grid .icon-paperclip {
     z-index: -1;
   }
 }
+
 a.attachment .icon .icon-link {
   color: #999;
 }
+
 .control-group .email-body-action {
   margin-right: 15px;
 }
@@ -427,70 +594,13 @@ a.attachment .icon .icon-link {
     border-left: 7px solid transparent;
     border-right: 7px solid transparent;
     border-bottom: 7px solid #ccc;
-    border-bottom-color: rgba(0,0,0,0.2);
+    border-bottom-color: rgba(0, 0, 0, 0.2);
     position: absolute;
     top: -7px;
     left: 9px;
   }
 }
-.email-context-activity-list {
-  margin-bottom: 5px;
-}
-.email-context-activity-items .context-item {
-  display: inline-block;
-  margin-right: 8px;
-  font-size: 11px;
-}
-.context-item {
-  list-style: none;
-  cursor: pointer;
-  padding: 0 7px 0 7px;
-  white-space: nowrap;
-  .active {
-    background-color: #ebebeb;
-  }
-}
-.context-item:hover {
-  background-color: #ebebeb;
-}
-.customer-content .context-item .icon-remove {
-  cursor: pointer;
-}
-.email-context-activity-label {
-  float: left;
-  margin-right: 10px;
-  font-size: 11px;
-  line-height: 14px;
-}
-.email-context-activity-items {
-  margin-left: 55px;
-  font-size: 11px;
-  line-height: 14px;
-}
-.email-context-activity-block {
-  .email-context-activity {
-    margin-top: 5px;
-    width: 720px;
-  }
-}
 
-.context-items-dropdown {
-  top: 35px;
-  left: 15px;
-}
-.email-context-current-block {
-  cursor: pointer;
-  background-color:#FFFFFF;
-  border: none;
-  outline:none;
-  margin: 10px 10px 15px 10px;
-  box-shadow: none;
-}
-.email-context-current-item {
-  font-size: 18px;
-  font-weight: bold;
-  color: #666666;
-}
 .attachment-list-popup {
   width: 350px;
 }
@@ -548,6 +658,80 @@ a.attachment .icon .icon-link {
   padding-top: 1px;
 }
 
-.template-editor .mce-tinymce {
-  width: 542px;
+.email-row-is-readed {
+  background-color: #f5f5f5;
+}
+
+.email-mail-count-circle {
+  display: inline;
+  background-color: orange;
+  color: white;
+  border-radius: 4px;
+  padding: 2px 3px;
+  font-size: 12px;
+}
+.oro-email-user-emails .email-count {
+  margin-left: 4px;
+  color: orange;
+}
+.has-new-emails .icon-user {
+  color: orange;
+}
+
+a.sync-btn span.dots {
+  width: 10px;
+  display: inline-block;
+  text-align: left;
+}
+
+.ui-multiselect-menu.select-filter-widget.multiselect-origin-folder {
+  .ui-multiselect-checkboxes {
+    li.ui-multiselect-optgroup-label {
+      border-bottom: none;
+      text-align: left;
+      padding-left: 5px;
+      a {
+        color: rgb(68, 68, 68);
+        font-size: 13px;
+      }
+    }
+  }
+}
+
+.folder-tree {
+  .folder-tree-widget {
+    margin-top: 5px;
+  }
+
+  .folder-label {
+    margin-left: 5px;
+  }
+
+  .folder-sub-folders {
+    margin-left: 20px;
+  }
+
+  .folder-tree-widget {
+    .folder-list {
+      margin-left: 20px;
+    }
+
+    input[type="checkbox"] {
+      margin: 0;
+    }
+  }
+}
+.check-connection-messages .alert {
+  margin-top: 10px;
+}
+
+#oro_email_mailbox_origin_check_connection,
+.check-connection-messages {
+  width: 294px;
+}
+
+.container-fluid {
+  .email-activity-widget {
+    margin-bottom: 20px;
+  }
 }

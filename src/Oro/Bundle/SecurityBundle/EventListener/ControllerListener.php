@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Doctrine\Common\Util\ClassUtils;
 use Psr\Log\LoggerInterface;
+
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\HttpKernel\Event\FilterControllerEvent;
 use Symfony\Component\HttpKernel\HttpKernelInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ControllerListener
@@ -53,7 +55,7 @@ class ControllerListener
              */
             if (is_array($controller)) {
                 list($object, $method) = $controller;
-                $className = ClassUtils::getClass($object);
+                $className = ClassUtils::getRealClass($object);
 
                 $this->logger->debug(
                     sprintf(

@@ -3,13 +3,17 @@
 namespace Oro\Bundle\AddressBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Validator\Constraint;
 
 use Oro\Bundle\AddressBundle\Form\EventListener\AddressCountryAndRegionSubscriber;
 
 class AddressType extends AbstractType
 {
+    const ABSTRACT_ADDRESS_GROUP = 'AbstractAddress';
     /**
      * @var AddressCountryAndRegionSubscriber
      */
@@ -54,16 +58,28 @@ class AddressType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             array(
-                'data_class'           => 'Oro\Bundle\AddressBundle\Entity\Address',
-                'intention'            => 'address',
+                'data_class' => 'Oro\Bundle\AddressBundle\Entity\Address',
+                'intention' => 'address',
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
-                'single_form'          => true
+                'single_form' => true,
+                'region_route' => 'oro_api_country_get_regions',
+                'validation_groups' => [Constraint::DEFAULT_GROUP, self::ABSTRACT_ADDRESS_GROUP],
             )
         );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        if (!empty($options['region_route'])) {
+            $view->vars['region_route'] = $options['region_route'];
+        }
     }
 
     /**

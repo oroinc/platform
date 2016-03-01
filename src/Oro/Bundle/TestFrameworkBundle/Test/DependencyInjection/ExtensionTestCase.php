@@ -27,12 +27,17 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected $actualDefinitions = array();
+    protected $actualDefinitions = [];
 
     /**
      * @var array
      */
-    protected $actualParameters = array();
+    protected $actualParameters = [];
+
+    /**
+     * @var array
+     */
+    protected $extensionConfigs = [];
 
     /**
      * Verifies that definitions have been initialized (defined and not empty)
@@ -100,7 +105,7 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
     protected function buildContainerMock()
     {
         return $this->getMockBuilder('Symfony\Component\DependencyInjection\ContainerBuilder')
-            ->setMethods(array('setDefinition', 'setParameter'))
+            ->setMethods(['setDefinition', 'setParameter', 'prependExtensionConfig'])
             ->getMock();
     }
 
@@ -128,6 +133,18 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+        $container->expects($this->any())
+            ->method('prependExtensionConfig')
+            ->will(
+                $this->returnCallback(
+                    function ($name, array $config) {
+                        if (!isset($this->extensionConfigs[$name])) {
+                            $this->extensionConfigs[$name] = [];
+                        }
+                        array_unshift($this->extensionConfigs[$name], $config);
+                    }
+                )
+            );
 
         return $container;
     }
@@ -144,5 +161,23 @@ abstract class ExtensionTestCase extends \PHPUnit_Framework_TestCase
         $extension->load($config, $this->getContainerMock());
 
         return $this;
+    }
+
+    /**
+     * @param array $expectedExtensionConfigs
+     */
+    protected function assertExtensionConfigsLoaded(array $expectedExtensionConfigs)
+    {
+        foreach ($expectedExtensionConfigs as $extensionName) {
+            $this->assertArrayHasKey(
+                $extensionName,
+                $this->extensionConfigs,
+                sprintf('Config for extension "%s" has not been loaded.', $extensionName)
+            );
+            $this->assertNotEmpty(
+                $this->extensionConfigs[$extensionName],
+                sprintf('Config for extension "%s" is empty.', $extensionName)
+            );
+        }
     }
 }

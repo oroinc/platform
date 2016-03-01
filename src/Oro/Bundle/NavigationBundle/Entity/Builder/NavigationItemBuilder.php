@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Builder;
 
-use Oro\Bundle\NavigationBundle\Entity\Builder\AbstractBuilder;
 use Oro\Bundle\NavigationBundle\Entity\NavigationItem;
 
 class NavigationItemBuilder extends AbstractBuilder
@@ -15,7 +14,7 @@ class NavigationItemBuilder extends AbstractBuilder
      */
     public function buildItem($params)
     {
-        $navigationItem = new NavigationItem($params);
+        $navigationItem = new $this->className($params);
         $navigationItem->setType($this->getType());
 
         return $navigationItem;
@@ -29,6 +28,6 @@ class NavigationItemBuilder extends AbstractBuilder
      */
     public function findItem($itemId)
     {
-        return $this->getEntityManager()->find('OroNavigationBundle:NavigationItem', $itemId);
+        return $this->getEntityManager()->find($this->className, $itemId);
     }
 }

@@ -6,6 +6,7 @@ use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class BusinessUnitRepository extends EntityRepository
@@ -204,5 +205,13 @@ class BusinessUnitRepository extends EntityRepository
         }
 
         return $options;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    public function getQueryBuilder()
+    {
+        return $this->createQueryBuilder('businessUnit');
     }
 }

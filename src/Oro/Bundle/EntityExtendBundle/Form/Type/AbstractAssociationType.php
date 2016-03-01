@@ -54,13 +54,11 @@ abstract class AbstractAssociationType extends AbstractConfigType
         $configId  = $options['config_id'];
         $className = $configId->getClassName();
 
-        if (!empty($className)) {
-            if ($this->typeHelper->isAssociationOwningSideEntity($className, $options['association_class'])) {
+        if (!empty($className)
+            && $this->typeHelper->isDictionary($className)
+            && !$this->typeHelper->isSupportActivityEnabled($className)
+        ) {
                 return true;
-            }
-            if ($this->typeHelper->isDictionary($className)) {
-                return true;
-            }
         }
 
         return parent::isReadOnly($options);

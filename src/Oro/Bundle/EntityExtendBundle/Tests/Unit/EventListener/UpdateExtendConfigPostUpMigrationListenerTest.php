@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\EventListener;
 use Oro\Bundle\EntityExtendBundle\EventListener\UpdateExtendConfigPostUpMigrationListener;
 use Oro\Bundle\EntityExtendBundle\Migration\UpdateExtendConfigMigration;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestMigration;
-
 use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class UpdateExtendConfigPostUpMigrationListenerTest extends \PHPUnit_Framework_TestCase
@@ -13,13 +12,15 @@ class UpdateExtendConfigPostUpMigrationListenerTest extends \PHPUnit_Framework_T
     public function testOnPostUp()
     {
         $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $initialStatePath = realpath(__DIR__ . '/../Fixtures') . '/initial_state.yml';
         $commandExecutor = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Tools\CommandExecutor')
             ->disableOriginalConstructor()
             ->getMock();
 
         $postUpMigrationListener = new UpdateExtendConfigPostUpMigrationListener(
             $commandExecutor,
-            $optionsPath
+            $optionsPath,
+            $initialStatePath
         );
 
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
@@ -40,7 +41,8 @@ class UpdateExtendConfigPostUpMigrationListenerTest extends \PHPUnit_Framework_T
         $this->assertEquals(
             new UpdateExtendConfigMigration(
                 $commandExecutor,
-                $optionsPath
+                $optionsPath,
+                $initialStatePath
             ),
             $migrations[1]
         );

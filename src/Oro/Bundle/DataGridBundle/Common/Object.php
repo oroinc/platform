@@ -3,9 +3,12 @@
 namespace Oro\Bundle\DataGridBundle\Common;
 
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\PropertyAccess\PropertyAccess;
-use Symfony\Component\PropertyAccess\PropertyAccessor;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
@@ -13,7 +16,7 @@ class Object implements \ArrayAccess, \IteratorAggregate
 {
     const NAME_KEY = 'name';
 
-    /** @var PropertyAccessor */
+    /** @var PropertyAccessorInterface */
     protected $accessor;
 
     /** @var array */
@@ -21,7 +24,7 @@ class Object implements \ArrayAccess, \IteratorAggregate
 
     protected function __construct(array $params)
     {
-        $this->accessor = PropertyAccess::createPropertyAccessor();
+        $this->accessor = new PropertyAccessor();
         $this->params   = $params;
     }
 
@@ -133,19 +136,43 @@ class Object implements \ArrayAccess, \IteratorAggregate
     /**
      * Try to get property using PropertyAccessor
      *
-     * @param string $path
-     * @param null   $default
+     * @param string|PropertyPathInterface $path
+     * @param null                         $default
      *
      * @return mixed
      */
     public function offsetGetByPath($path, $default = null)
     {
-        $value = $this->accessor->getValue($this, $path);
+        try {
+            $value = $this->accessor->getValue($this, $path);
+        } catch (NoSuchPropertyException $e) {
+            return $default;
+        }
+
         if ($default === null && $value !== null) {
             return $value;
         }
 
         return $value ? : $default;
+    }
+
+    /**
+     * Check property existence using PropertyAccessor
+     *
+     * @param string|PropertyPathInterface $path
+     *
+     * @return mixed
+     */
+    public function offsetExistByPath($path)
+    {
+        try {
+            $value = $this->accessor->getValue($this, $path);
+        } catch (NoSuchPropertyException $e) {
+            return false;
+        }
+
+        // If NULL then result is FALSE, same behavior as function isset() has
+        return $value !== null;
     }
 
     /**
@@ -161,8 +188,8 @@ class Object implements \ArrayAccess, \IteratorAggregate
     /**
      * Set property using PropertyAccessor
      *
-     * @param string $path
-     * @param mixed  $value
+     * @param string|PropertyPathInterface $path
+     * @param mixed                        $value
      *
      * @return $this
      */
@@ -184,9 +211,11 @@ class Object implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * Expects data format for array data
+     * Unset property using PropertyAccessor
      *
-     * {@inheritDoc}
+     * @param string|PropertyPathInterface $path
+     *
+     * @return $this
      */
     public function offsetUnsetByPath($path)
     {
@@ -213,12 +242,12 @@ class Object implements \ArrayAccess, \IteratorAggregate
     }
 
     /**
-     * @param string $path
+     * @param string|PropertyPathInterface $path
      * @return array
      */
     protected function explodeArrayPath($path)
     {
-        return explode('.', strtr($path, array('][' => '.', '[' => '', ']' => '')));
+        return explode('.', strtr($path, ['][' => '.', '[' => '', ']' => '']));
     }
 
     /**
@@ -263,8 +292,8 @@ class Object implements \ArrayAccess, \IteratorAggregate
     /**
      * Merge value to array property, if property not isset creates new one
      *
-     * @param  string $path
-     * @param array   $value
+     * @param string|PropertyPathInterface $path
+     * @param array                        $value
      *
      * @return $this
      */

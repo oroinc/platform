@@ -2,8 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Builder;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Doctrine\ORM\EntityManager;
 
@@ -29,7 +28,7 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected $emailOwnerProvider;
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     private $eventDispatcher;
 
@@ -63,12 +62,12 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
      *
      * @param EmailAddressManager $emailAddressManager
      * @param EmailOwnerProvider $emailOwnerProvider
-     * @param EventDispatcher $eventDispatcher
+     * @param EventDispatcherInterface $eventDispatcher
      */
     public function __construct(
         EmailAddressManager $emailAddressManager,
         EmailOwnerProvider $emailOwnerProvider,
-        EventDispatcher $eventDispatcher
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->emailAddressManager = $emailAddressManager;
         $this->emailOwnerProvider = $emailOwnerProvider;
@@ -360,9 +359,8 @@ class EmailEntityBatchProcessor implements EmailEntityBatchInterface
     protected function updateFolderReferences(EmailFolder $oldFolder, EmailFolder $newFolder)
     {
         foreach ($this->emailUsers as $emailUser) {
-            if ($emailUser->getFolder() === $oldFolder) {
-                $emailUser->setFolder($newFolder);
-            }
+            $emailUser->removeFolder($oldFolder);
+            $emailUser->addFolder($newFolder);
         }
     }
 }

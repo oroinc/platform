@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\ConfigExpression;
 
-use Doctrine\Common\Util\ClassUtils;
-
+use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\ConfigExpression\ContextAccessor;
-
 use Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted;
 
 class AclGrantedTest extends \PHPUnit_Framework_TestCase
@@ -72,7 +70,7 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
-            ->with(ClassUtils::getClass($options[1]))
+            ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue(null));
 
         $this->securityFacade->expects($this->once())
@@ -110,7 +108,7 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
-            ->with(ClassUtils::getClass($options[1]))
+            ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($em));
 
         $this->securityFacade->expects($this->once())
@@ -146,12 +144,12 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
-            ->with(ClassUtils::getClass($options[1]))
+            ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($em));
 
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
-            ->with($options[0], 'entity:' . ClassUtils::getClass($options[1]))
+            ->with($options[0], 'entity:' . ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($expectedResult));
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
@@ -184,12 +182,12 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
 
         $this->doctrine->expects($this->once())
             ->method('getManagerForClass')
-            ->with(ClassUtils::getClass($options[1]))
+            ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($em));
 
         $this->securityFacade->expects($this->once())
             ->method('isGranted')
-            ->with($options[0], 'entity:' . ClassUtils::getClass($options[1]))
+            ->with($options[0], 'entity:' . ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($expectedResult));
 
         $this->assertSame($this->condition, $this->condition->initialize($options));

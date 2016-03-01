@@ -8,15 +8,17 @@ use Symfony\Component\Form\FormView;
 
 class PermissionCollectionType extends AbstractType
 {
+    const NAME = 'oro_acl_permission_collection';
+
     /**
      * {@inheritdoc}
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
         $view->vars['privileges_config'] = $options['options']['privileges_config'];
-        //TODO: Removing 'SHARE' from config. Remove this code after sharing is implemented.
-        if (in_array('SHARE', $view->vars['privileges_config']['permissions'])) {
-            array_pop($view->vars['privileges_config']['permissions']);
+
+        if ($key = array_search('SHARE', $view->vars['privileges_config']['permissions'], true)) {
+            unset($view->vars['privileges_config']['permissions'][$key]);
         }
     }
 
@@ -25,7 +27,7 @@ class PermissionCollectionType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_acl_permission_collection';
+        return self::NAME;
     }
 
     /**

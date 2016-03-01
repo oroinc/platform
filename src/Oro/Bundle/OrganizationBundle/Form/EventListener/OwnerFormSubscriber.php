@@ -8,12 +8,13 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class OwnerFormSubscriber implements EventSubscriberInterface
 {
-    /** @var ManagerRegistry */
-    protected $managerRegistry;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var string */
     protected $fieldName;
@@ -28,20 +29,20 @@ class OwnerFormSubscriber implements EventSubscriberInterface
     protected $defaultOwner;
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param DoctrineHelper $doctrineHelper
      * @param string $fieldName
      * @param string $fieldLabel
      * @param bool $isAssignGranted this parameter is transmitted as link because value can be changed in form class
      * @param null $defaultOwner
      */
     public function __construct(
-        ManagerRegistry $managerRegistry,
+        DoctrineHelper $doctrineHelper,
         $fieldName,
         $fieldLabel,
         &$isAssignGranted,
         $defaultOwner = null
     ) {
-        $this->managerRegistry = $managerRegistry;
+        $this->doctrineHelper = $doctrineHelper;
         $this->fieldName = $fieldName;
         $this->fieldLabel = $fieldLabel;
         $this->isAssignGranted = &$isAssignGranted;
@@ -76,12 +77,15 @@ class OwnerFormSubscriber implements EventSubscriberInterface
             }
 
             $entityClass = ClassUtils::getClass($entity);
-            $entityManager = $this->managerRegistry->getManagerForClass($entityClass);
-            if (!$entityManager) {
+            if (!$this->doctrineHelper->isManageableEntity($entityClass)) {
                 return;
             }
 
-            $entityIdentifier = $entityManager->getClassMetadata($entityClass)->getIdentifierValues($entity);
+            $entityIdentifier = $this->doctrineHelper
+                ->getEntityManager($entityClass)
+                ->getClassMetadata($entityClass)
+                ->getIdentifierValues($entity);
+
             $isEntityExists = !empty($entityIdentifier);
         }
 

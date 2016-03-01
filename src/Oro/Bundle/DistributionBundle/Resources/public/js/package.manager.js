@@ -1,9 +1,23 @@
+/*global $*/
+/*jshint -W098*/
 function PackageManager(Urls, util) {
+    'use strict';
 
     var InstallStatus = {INSTALLED: 0, ERROR: 1, CONFIRM: 2};
     var UpdateStatus = {UPDATED: 0, ERROR: 1};
 
-    var reflectUICallback = function () {
+    var reflectUICallback = function() {
+    };
+
+    var pm = {
+        install: function(params, _reflectUICallback) {
+            reflectUICallback = _reflectUICallback || reflectUICallback;
+            sendRequest(Urls.install, params, installCompleteCallback);
+        },
+        update: function(params, _reflectUICallback) {
+            reflectUICallback = _reflectUICallback || reflectUICallback;
+            sendRequest(Urls.update, params, updateCompleteCallback);
+        }
     };
 
     function sendRequest(url, params, completeCallback) {
@@ -32,7 +46,7 @@ function PackageManager(Urls, util) {
             case InstallStatus.CONFIRM:
                 var title = 'Confirm installation of ' + response.params.packageName;
                 var message = '';
-                message += "\n" + '<label>' +
+                message += '\n' + '<label>' +
                     ' <input type="checkbox" id="load-demo-data" checked="checked" />' +
                     '<span>Load demo data</span>' +
                     '</label>';
@@ -41,21 +55,21 @@ function PackageManager(Urls, util) {
                     var requirementsList = '';
                     for (var i = 0; i < response.requirements.length; i++) {
                         var r = response.requirements[i];
-                        requirementsList += "\n - " + r.name;
+                        requirementsList += '\n - ' + r.name;
                         requirementsList += r.installed ? ' <span class="installed">[installed]</span>' : '';
                     }
-                    message += "\n";
+                    message += '\n';
                     message += response.params.packageName + ' requires following packages: ' +
                         requirementsList +
-                        "\n\n" + 'All missing packages will be installed';
+                        '\n\nAll missing packages will be installed';
                 }
 
                 util.confirm(
                     title,
                     message,
-                    function () {
+                    function() {
                         var params = response.params;
-                        params['loadDemoData'] = $('#load-demo-data').is(':checked') ? 1 : 0;
+                        params.loadDemoData = $('#load-demo-data').is(':checked') ? 1 : 0;
 
                         pm.install(params);
                     },
@@ -67,7 +81,6 @@ function PackageManager(Urls, util) {
                 util.error('Unknown error');
                 reflectUICallback();
         }
-
 
     }
 
@@ -91,17 +104,6 @@ function PackageManager(Urls, util) {
                 reflectUICallback();
         }
     }
-
-    var pm = {
-        install: function (params, _reflectUICallback) {
-            reflectUICallback = _reflectUICallback || reflectUICallback;
-            sendRequest(Urls.install, params, installCompleteCallback);
-        },
-        update: function (params, _reflectUICallback) {
-            reflectUICallback = _reflectUICallback || reflectUICallback;
-            sendRequest(Urls.update, params, updateCompleteCallback);
-        }
-    };
 
     return pm;
 }

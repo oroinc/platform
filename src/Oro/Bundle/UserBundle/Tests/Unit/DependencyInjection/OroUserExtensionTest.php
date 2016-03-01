@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
 
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\UserBundle\DependencyInjection\OroUserExtension;
 
 class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
@@ -26,6 +27,39 @@ class OroUserExtensionTest extends \PHPUnit_Framework_TestCase
         $this->createFullConfiguration();
 
         $this->assertParameter(1800, 'oro_user.reset.ttl');
+    }
+
+    public function testPrepend()
+    {
+        $inputSecurityConfig = [
+            'firewalls' => [
+                'main' => ['main_config'],
+                'first' => ['first_config'],
+                'second' => ['second_config'],
+            ]
+        ];
+        $expectedSecurityConfig = [
+            'firewalls' => [
+                'first' => ['first_config'],
+                'second' => ['second_config'],
+                'main' => ['main_config'],
+            ]
+        ];
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ExtendedContainerBuilder $containerBuilder */
+        $containerBuilder = $this->getMockBuilder('Oro\Component\DependencyInjection\ExtendedContainerBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $containerBuilder->expects($this->once())
+            ->method('getExtensionConfig')
+            ->with('security')
+            ->willReturn([$inputSecurityConfig]);
+        $containerBuilder->expects($this->once())
+            ->method('setExtensionConfig')
+            ->with('security', [$expectedSecurityConfig]);
+
+        $extension = new OroUserExtension();
+        $extension->prepend($containerBuilder);
     }
 
     protected function createEmptyConfiguration()

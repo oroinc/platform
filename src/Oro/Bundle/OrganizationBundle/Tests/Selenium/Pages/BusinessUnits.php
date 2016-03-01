@@ -8,38 +8,23 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class BusinessUnits
  *
  * @package Oro\Bundle\OrganizationBundle\Tests\Selenium\Pages
- * @method BusinessUnits openBusinessUnits openBusinessUnits(string)
+ * @method BusinessUnits openBusinessUnits(string $bundlePath)
+ * @method BusinessUnit add()
+ * @method BusinessUnit open(array $filter)
  */
 class BusinessUnits extends AbstractPageFilteredGrid
 {
+    const NEW_ENTITY_BUTTON = "//a[@title='Create Business Unit']";
     const URL = 'organization/business_unit';
 
-    public function __construct($testCase, $redirect = true)
+    public function entityNew()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-    }
-
-    public function add()
-    {
-        $this->test->byXPath("//a[@title='Create Business Unit']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
         $businessUnit = new BusinessUnit($this->test);
         return $businessUnit->init();
     }
 
-    /**
-     * @param array $entityData
-     * @return BusinessUnit
-     */
-    public function open($entityData = array())
+    public function entityView()
     {
-        $contact = $this->getEntity($entityData);
-        $contact->click();
-        sleep(1);
-        $this->waitPageToLoad();
-        $this->waitForAjax();
         return new BusinessUnit($this->test);
     }
 
@@ -55,9 +40,13 @@ class BusinessUnits extends AbstractPageFilteredGrid
         if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
             $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
             $this->waitForAjax();
-            return $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']");
+            $result = $this->assertElementNotPresent("//ul[contains(@class,'dropdown-menu__action-cell')]" .
+                "[contains(@class,'dropdown-menu__floating')]//a[@title= '{$contextName}']");
+        } else {
+            $result = $this->assertElementNotPresent(
+                "//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']"
+            );
         }
-
-        return $this;
+        return $result;
     }
 }

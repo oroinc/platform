@@ -1,13 +1,12 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var VariableDatePickerView,
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        TabsView = require('oroui/js/app/views/tabs-view'),
-        DateVariableHelper = require('orofilter/js/date-variable-helper'),
-        DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
+    var VariableDatePickerView;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var TabsView = require('oroui/js/app/views/tabs-view');
+    var DateVariableHelper = require('orofilter/js/date-variable-helper');
+    var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     require('orofilter/js/datevariables-widget');
 
     VariableDatePickerView = DatePickerView.extend({
@@ -26,7 +25,7 @@ define(function (require) {
          * Initializes variable-date-picker view
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['backendFormat']));
             this.dateVariableHelper = new DateVariableHelper(options.datePickerOptions.dateVars);
             VariableDatePickerView.__super__.initialize.apply(this, arguments);
@@ -37,7 +36,7 @@ define(function (require) {
          *
          * @param {string} part
          */
-        setPart: function (part) {
+        setPart: function(part) {
             this.$variables.dateVariables('setPart', part);
         },
 
@@ -49,7 +48,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initPickerWidget: function (options) {
+        initPickerWidget: function(options) {
             this.initTabsView(options);
             this.initDatePicker(options);
             this.initVariablePicker(options);
@@ -60,7 +59,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initTabsView: function (options) {
+        initTabsView: function(options) {
             var tabs;
             this.$dropdown = this.$frontDateField
                 .wrap('<div class="dropdown datefilter">').parent();
@@ -82,7 +81,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initDatePicker: function (options) {
+        initDatePicker: function(options) {
             var widgetOptions = {};
             this.$calendar = this.$dropdown.find('#calendar-' + this.cid);
             _.extend(widgetOptions, options.datePickerOptions, {
@@ -90,7 +89,7 @@ define(function (require) {
             });
             this.$calendar.datepicker(widgetOptions);
             this.$calendar.addClass(widgetOptions.className)
-                .click(function (e) {
+                .click(function(e) {
                     e.stopImmediatePropagation();
                 });
         },
@@ -100,7 +99,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initVariablePicker: function (options) {
+        initVariablePicker: function(options) {
             var widgetOptions = {};
             _.extend(widgetOptions, options.datePickerOptions, {
                 onSelect: _.bind(this.onSelect, this)
@@ -113,7 +112,7 @@ define(function (require) {
         /**
          * Destroys picker widget
          */
-        destroyPickerWidget: function () {
+        destroyPickerWidget: function() {
             this.$calendar.datepicker('destroy');
             this.$calendar.off();
             this.$variables.dateVariables('destroy');
@@ -127,7 +126,7 @@ define(function (require) {
         /**
          * Handles pick date event
          */
-        onSelect: function (date) {
+        onSelect: function(date) {
             this.$frontDateField.val(date);
             VariableDatePickerView.__super__.onSelect.apply(this, arguments);
             this.close();
@@ -138,7 +137,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getBackendFormattedValue: function () {
+        getBackendFormattedValue: function() {
             var value = this.$frontDateField.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
@@ -153,7 +152,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getFrontendFormattedDate: function () {
+        getFrontendFormattedDate: function() {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
@@ -166,7 +165,7 @@ define(function (require) {
         /**
          * Opens dropdown with date-picker + variable-picker
          */
-        open: function () {
+        open: function() {
             this.$dropdown.addClass('open');
             var value = this.$frontDateField.val();
             if (!this.dateVariableHelper.isDateVariable(value)) {
@@ -182,8 +181,8 @@ define(function (require) {
         /**
          * Closes dropdown with date-picker + variable-picker
          */
-        close: function () {
-            this.$dropdown.removeClass('open');
+        close: function() {
+            this.$dropdown.trigger('tohide.bs.dropdown');
             this.trigger('close', this);
         }
     });

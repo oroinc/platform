@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\AttributeGuesser;
 
 class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
@@ -44,11 +45,13 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->managerRegistry
             = $this->getMockForAbstractClass('Doctrine\Common\Persistence\ManagerRegistry');
 
-        $this->entityConfigProvider
-            = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->formConfigProvider
-            = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $this->formConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->guesser = new AttributeGuesser(
             $this->formRegistry,
@@ -315,17 +318,12 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
         }
 
         if ($formConfig) {
+            $formConfigId     = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $formConfigObject = new Config($formConfigId, $formConfig);
             $this->formConfigProvider->expects($this->once())->method('hasConfig')
                 ->with($formConfig['entity'])->will($this->returnValue(true));
-            $formConfigObject = $this->getMockForAbstractClass('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-            $formConfigObject->expects($this->at(0))->method('has')->with('form_type')
-                ->will($this->returnValue(true));
-            $formConfigObject->expects($this->at(1))->method('get')->with('form_type')
-                ->will($this->returnValue($formConfig['form_type']));
-            $formConfigObject->expects($this->at(2))->method('has')->with('form_options')
-                ->will($this->returnValue(true));
-            $formConfigObject->expects($this->at(3))->method('get')->with('form_options')
-                ->will($this->returnValue($formConfig['form_options']));
             $this->formConfigProvider->expects($this->once())->method('getConfig')
                 ->with($formConfig['entity'])->will($this->returnValue($formConfigObject));
         }

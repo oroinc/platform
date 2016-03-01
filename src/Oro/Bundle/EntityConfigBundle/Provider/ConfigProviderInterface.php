@@ -5,6 +5,9 @@ namespace Oro\Bundle\EntityConfigBundle\Provider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
+/**
+ * @deprecated since 1.9. Use {@see Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider} instead
+ */
 interface ConfigProviderInterface
 {
     /**

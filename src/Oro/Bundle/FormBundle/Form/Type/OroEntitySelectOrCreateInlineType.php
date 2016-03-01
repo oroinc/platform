@@ -7,7 +7,7 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -54,6 +54,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
 
     /**
      * Options:
+     * - grid_widget_route - route of widget where selection grid will be rendered
      * - grid_name - name of grid that will be used for entity selection
      * - grid_parameters - parameters need to be passed to grid request
      * - grid_render_parameters - render parameters need to be set for grid rendering
@@ -65,7 +66,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
      *
      * {@inheritDoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [
@@ -74,6 +75,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                 'create_acl'                   => null,
                 'create_form_route'            => null,
                 'create_form_route_parameters' => [],
+                'grid_widget_route'            => 'oro_datagrid_widget',
                 'grid_name'                    => null,
                 'grid_parameters'              => [],
                 'grid_render_parameters'       => []
@@ -120,6 +122,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
+        $view->vars['grid_widget_route']            = $options['grid_widget_route'];
         $view->vars['grid_name']                    = $options['grid_name'];
         $view->vars['grid_parameters']              = $options['grid_parameters'];
         $view->vars['grid_render_parameters']       = $options['grid_render_parameters'];

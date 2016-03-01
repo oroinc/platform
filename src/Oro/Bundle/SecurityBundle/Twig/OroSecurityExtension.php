@@ -6,11 +6,9 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OroSecurityExtension extends \Twig_Extension
 {
-    /**
-     * @var SecurityFacade
-     */
+    /** @var SecurityFacade */
     protected $securityFacade;
-
+    
     /**
      * @param SecurityFacade $securityFacade
      */

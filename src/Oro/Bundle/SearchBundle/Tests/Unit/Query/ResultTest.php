@@ -1,6 +1,7 @@
 <?php
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product;
 
 use Oro\Bundle\SearchBundle\Query\Result;
@@ -41,7 +42,6 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             1,
             'test title',
             'http://example.com',
-            'test text',
             array(
                  'alias' => 'test_product',
                  'label' => 'test product',
@@ -59,7 +59,6 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             2,
             'test title 2',
             'http://example.com',
-            'test text',
             array(
                  'alias' => 'test_product',
                  'label' => 'test product',
@@ -77,7 +76,6 @@ class ResultTest extends \PHPUnit_Framework_TestCase
             3,
             'test title 3',
             'http://example.com',
-            'test text',
             array(
                  'alias' => 'test_product',
                  'label' => 'test product',
@@ -103,16 +101,15 @@ class ResultTest extends \PHPUnit_Framework_TestCase
     {
         $query = $this->result->getQuery();
         $from = $query->getFrom();
-        $searchCondition = $query->getOptions();
 
         $this->assertEquals('OroTestBundle:test', $from[0]);
         $this->assertEquals('OroTestBundle:product', $from[1]);
 
-        $this->assertEquals('name', $searchCondition[0]['fieldName']);
-        $this->assertEquals(Query::OPERATOR_CONTAINS, $searchCondition[0]['condition']);
-        $this->assertEquals('test string', $searchCondition[0]['fieldValue']);
-        $this->assertEquals(Query::TYPE_TEXT, $searchCondition[0]['fieldType']);
-        $this->assertEquals(Query::KEYWORD_AND, $searchCondition[0]['type']);
+        $whereExpression = $query->getCriteria()->getWhereExpression();
+        $this->assertInstanceOf('Doctrine\\Common\\Collections\\Expr\\Comparison', $whereExpression);
+        $this->assertEquals('text.name', $whereExpression->getField());
+        $this->assertEquals(Comparison::CONTAINS, $whereExpression->getOperator());
+        $this->assertEquals('test string', $whereExpression->getValue()->getValue());
     }
 
     public function testGetRecordsCount()

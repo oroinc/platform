@@ -1,0 +1,60 @@
+&.tags-column-editor {
+  width: auto!important; // ignore cell width
+  .select2-choices {
+    max-width: 20vw;
+  }
+  .select2-container {
+    width: auto !important;
+  }
+}
+&.tags-select-editor {
+  min-width: 100px; // ignore min-width
+  .select2-container {
+    border-radius: 0;
+    height: auto;
+  }
+  .select2-choices {
+    &:before {
+      content: '';
+      float: right;
+      width: 48px;
+      height: 25px;
+    }
+    &.select2-search-resize {
+      padding-right: 48px;// to fill area required for actions buttons
+    }
+    max-height: 40vh;
+    min-width: 130px;
+    overflow: auto;
+    background: white;
+    box-shadow: inset 0 1px 1px rgba(0,0,0,0.075);
+    .select2-search-field input {
+      height: 26px;
+      padding: 1px 5px;
+    }
+    .select2-search-choice {
+      font-size: 12px;
+      line-height: 12px;
+      padding: 5px 20px 5px 8px;
+      color: @tagItemColor;
+      background: @tagItemBackground;
+      border: 0 none;
+      border-radius: 10px;
+      box-shadow: none;
+      margin-left: 4px;
+      margin-bottom: 0;
+      .select2-search-choice-close {
+        top: 6px;
+        &:before {
+          color: @tagItemColor;
+        }
+      }
+      &.select2-locked {
+        padding: 4px 5px 3px 6px !important;
+      }
+    }
+  }
+  &.inline-view-editor .select2-choices {
+    width: 100% !important;
+  }
+}

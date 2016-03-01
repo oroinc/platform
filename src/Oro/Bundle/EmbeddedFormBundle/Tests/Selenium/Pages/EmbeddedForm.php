@@ -11,11 +11,6 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  */
 class EmbeddedForm extends AbstractPageEntity
 {
-    public function __construct($testCase, $redirect = true)
-    {
-        parent::__construct($testCase, $redirect);
-    }
-
     /**
      * @param string $title
      * @return $this

@@ -1,9 +1,8 @@
-/*global define*/
 define([
     './model-action',
     'oroui/js/delete-confirmation',
     'oroui/js/mediator'
-], function (ModelAction, DeleteConfirmation, mediator) {
+], function(ModelAction, DeleteConfirmation, mediator) {
     'use strict';
 
     var AjaxdeleteAction;
@@ -23,7 +22,7 @@ define([
 
         defaultMessages: {
             confirm_title: 'Delete Confirmation',
-            confirm_content: 'Are you sure you want to remove this item?',
+            confirm_content: 'Are you sure you want to delete this item?',
             confirm_ok: 'Yes',
             confirm_cancel: 'Cancel',
             success: 'Removed.',
@@ -31,13 +30,13 @@ define([
             empty_selection: 'Please, select item to remove.'
         },
 
-        _doAjaxRequest: function () {
+        _doAjaxRequest: function() {
             mediator.trigger('datagrid:beforeRemoveRow:' + this.datagrid.name, this.model);
 
             AjaxdeleteAction.__super__._doAjaxRequest.apply(this, arguments);
         },
 
-        _onAjaxSuccess: function (data) {
+        _onAjaxSuccess: function(data) {
             mediator.trigger('datagrid:afterRemoveRow:' + this.datagrid.name);
 
             AjaxdeleteAction.__super__._onAjaxSuccess.apply(this, arguments);

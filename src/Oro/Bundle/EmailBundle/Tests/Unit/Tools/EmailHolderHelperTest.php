@@ -21,7 +21,9 @@ class EmailHolderHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->extendConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->helper = new EmailHolderHelper($this->extendConfigProvider);
     }

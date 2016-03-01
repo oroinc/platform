@@ -1,8 +1,6 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     './abstract-action'
-], function (AbstractAction) {
+], function(AbstractAction) {
     'use strict';
 
     var ResetCollectionAction;
@@ -25,11 +23,11 @@ define([
          * @param {oro.PageableCollection} options.collection Collection
          * @throws {TypeError} If collection is undefined
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = options || {};
 
             if (!opts.datagrid) {
-                throw new TypeError("'datagrid' is required");
+                throw new TypeError('"datagrid" is required');
             }
             this.collection = opts.datagrid.collection;
 
@@ -39,7 +37,7 @@ define([
         /**
          * Execute reset collection
          */
-        execute: function () {
+        execute: function() {
             this.collection.updateState(this.collection.initialState);
             this.collection.fetch({reset: true});
         }

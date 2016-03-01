@@ -7,6 +7,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
@@ -26,15 +27,19 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_import")
      * @Template
      *
+     * @param Request $request
+     *
      * @return array
      */
-    public function importFormAction()
+    public function importFormAction(Request $request)
     {
-        $entityName = $this->getRequest()->get('entity');
+        $entityName = $request->get('entity');
+        $importJob = $request->get('importJob');
+        $importValidateJob = $request->get('importValidateJob');
 
         $importForm = $this->createForm('oro_importexport_import', null, ['entityName' => $entityName]);
 
-        if ($this->getRequest()->isMethod('POST')) {
+        if ($request->isMethod('POST')) {
             $importForm->submit($this->getRequest());
 
             if ($importForm->isValid()) {
@@ -48,15 +53,17 @@ class ImportExportController extends Controller
                 return $this->forward(
                     'OroImportExportBundle:ImportExport:importValidate',
                     ['processorAlias' => $processorAlias],
-                    $this->getRequest()->query->all()
+                    $request->query->all()
                 );
             }
         }
 
         return [
             'entityName' => $entityName,
-            'form'       => $importForm->createView(),
-            'options'    => $this->getOptionsFromRequest(),
+            'form' => $importForm->createView(),
+            'options' => $this->getOptionsFromRequest(),
+            'importJob' => $importJob,
+            'importValidateJob' => $importValidateJob
         ];
     }
 
@@ -67,18 +74,20 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_import")
      * @Template
      *
+     * @param Request $request
      * @param string $processorAlias
+     *
      * @return array
      */
-    public function importValidateAction($processorAlias)
+    public function importValidateAction(Request $request, $processorAlias)
     {
         $processorRegistry = $this->get('oro_importexport.processor.registry');
-        $entityName = $processorRegistry
+        $entityName        = $processorRegistry
             ->getProcessorEntityName(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $processorAlias);
-        $existingAliases = $processorRegistry
+        $existingAliases   = $processorRegistry
             ->getProcessorAliasesByEntity(ProcessorRegistry::TYPE_IMPORT_VALIDATION, $entityName);
 
-        $jobName = $this->getRequest()->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
+        $jobName = $request->get('importValidateJob', JobExecutor::JOB_VALIDATE_IMPORT_FROM_CSV);
         $result = $this->getImportHandler()->handleImportValidation(
             $jobName,
             $processorAlias,
@@ -87,6 +96,7 @@ class ImportExportController extends Controller
             $this->getOptionsFromRequest()
         );
         $result['showStrategy'] = count($existingAliases) > 1;
+        $result['importJob'] = $request->get('importJob');
 
         return $result;
     }
@@ -96,12 +106,13 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     *
      * @return JsonResponse
      */
     public function importProcessAction($processorAlias)
     {
         $jobName = $this->getRequest()->get('importJob', JobExecutor::JOB_IMPORT_FROM_CSV);
-        $result = $this->getImportHandler()->handleImport(
+        $result  = $this->getImportHandler()->handleImport(
             $jobName,
             $processorAlias,
             'csv',
@@ -117,6 +128,7 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     *
      * @return Response
      */
     public function instantExportAction($processorAlias)
@@ -141,12 +153,13 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $processorAlias
+     *
      * @return Response
      */
     public function templateExportAction($processorAlias)
     {
         $jobName = $this->getRequest()->get('exportTemplateJob', JobExecutor::JOB_EXPORT_TEMPLATE_TO_CSV);
-        $result = $this->getExportHandler()->getExportResult(
+        $result  = $this->getExportHandler()->getExportResult(
             $jobName,
             $processorAlias,
             ProcessorRegistry::TYPE_EXPORT_TEMPLATE,
@@ -163,6 +176,7 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport_export")
      *
      * @param string $fileName
+     *
      * @return Response
      */
     public function downloadExportResultAction($fileName)
@@ -175,16 +189,17 @@ class ImportExportController extends Controller
      * @AclAncestor("oro_importexport")
      *
      * @param string $jobCode
+     *
      * @return Response
      */
     public function errorLogAction($jobCode)
     {
         $jobExecutor = $this->getJobExecutor();
-        $errors  = array_merge(
+        $errors      = array_merge(
             $jobExecutor->getJobFailureExceptions($jobCode),
             $jobExecutor->getJobErrors($jobCode)
         );
-        $content = implode("\r\n", $errors);
+        $content     = implode("\r\n", $errors);
 
         return new Response($content, 200, ['Content-Type' => 'text/x-log']);
     }

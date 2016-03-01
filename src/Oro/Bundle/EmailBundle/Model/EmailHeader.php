@@ -77,6 +77,11 @@ class EmailHeader
     protected $xThreadId;
 
     /**
+     * @var string
+     */
+    protected $acceptLanguageHeader;
+
+    /**
      * Get email subject
      *
      * @return string
@@ -410,5 +415,21 @@ class EmailHeader
         $this->multiMessageId = $multiMessageId ? serialize($multiMessageId): null;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAcceptLanguageHeader()
+    {
+        return $this->acceptLanguageHeader;
+    }
+
+    /**
+     * @param string $acceptLanguageHeader
+     */
+    public function setAcceptLanguageHeader($acceptLanguageHeader)
+    {
+        $this->acceptLanguageHeader = $acceptLanguageHeader;
     }
 }

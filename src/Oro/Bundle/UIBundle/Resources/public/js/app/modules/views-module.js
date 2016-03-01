@@ -1,8 +1,7 @@
-/*global require*/
-require([
+define([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/app/views/page-view'
-], function (BaseController, PageView) {
+], function(BaseController, PageView) {
     'use strict';
 
     /**
@@ -26,7 +25,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oroui/js/app/views/page/content-view'
-    ], function (PageContentView) {
+    ], function(PageContentView) {
         BaseController.addToReuse('content', PageContentView, {
             el: 'region:mainContainer'
         });
@@ -37,7 +36,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oroui/js/app/views/page/before-content-addition-view'
-    ], function (PageBeforeContentAdditionView) {
+    ], function(PageBeforeContentAdditionView) {
         BaseController.addToReuse('beforeContentAddition', PageBeforeContentAdditionView, {
             el: 'region:beforeContentAddition'
         });
@@ -49,7 +48,7 @@ require([
     BaseController.loadBeforeAction([
         'oroui/js/app/views/page/main-menu-view',
         'oroui/js/app/views/page/breadcrumb-view'
-    ], function (PageMainMenuView, BreadcrumbView) {
+    ], function(PageMainMenuView, BreadcrumbView) {
         BaseController.addToReuse('breadcrumb', BreadcrumbView, {
             el: 'region:breadcrumb'
         });
@@ -63,7 +62,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oroui/js/app/views/page/user-menu-view'
-    ], function (PageUserMenuView) {
+    ], function(PageUserMenuView) {
         BaseController.addToReuse('userMenu', PageUserMenuView, {
             el: 'region:userMenu'
         });
@@ -75,9 +74,9 @@ require([
     BaseController.loadBeforeAction([
         'oroui/js/mediator',
         'oroui/js/app/views/loading-mask-view'
-    ], function (mediator, LoadingMaskView) {
+    ], function(mediator, LoadingMaskView) {
         BaseController.addToReuse('loadingMask', {
-            compose: function () {
+            compose: function() {
                 this.view = new LoadingMaskView({
                     container: 'body',
                     hideDelay: 25
@@ -96,7 +95,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oroui/js/app/views/page/messages-view'
-    ], function (PageMessagesView) {
+    ], function(PageMessagesView) {
         BaseController.addToReuse('messages', PageMessagesView, {
             el: 'region:messages'
         });
@@ -108,9 +107,9 @@ require([
     BaseController.loadBeforeAction([
         'oroui/js/mediator',
         'oroui/js/app/views/page/debug-toolbar-view'
-    ], function (mediator, DebugToolbarView) {
+    ], function(mediator, DebugToolbarView) {
         BaseController.addToReuse('debugToolbar', {
-            compose: function () {
+            compose: function() {
                 var view;
                 if (!mediator.execute('retrieveOption', 'debug')) {
                     return;

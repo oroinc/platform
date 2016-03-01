@@ -11,19 +11,13 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Provider\SystemAwareResolver;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Exception\LogicException;
-
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
 /**
- * Class AbstractConfigGridListener
- *
- * @package Oro\Bundle\EntityConfigBundle\EventListener
- *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 abstract class AbstractConfigGridListener implements EventSubscriberInterface
@@ -129,7 +123,6 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
      * @param string|null $alias
      * @param string|null $itemsType
      *
-     * @throws LogicException
      * @return array
      */
     protected function getDynamicFields($alias = null, $itemsType = null)
@@ -144,41 +137,17 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
                     continue;
                 }
 
-                if (!isset($item['options']['indexed']) || $item['options']['indexed'] === false) {
-                    throw new LogicException(
-                        sprintf(
-                            'Option "indexed" should be set to TRUE for property "%s" in scope "%s".',
-                            $code,
-                            $provider->getScope()
-                        )
-                    );
-                }
-
-                if (isset($item['options']['indexed_type']) && $item['options']['indexed_type'] !== 'scalar') {
-                    if ($item['grid']['type'] !== 'html' || !isset($item['grid']['template'])) {
-                        throw new LogicException(
-                            sprintf(
-                                'If the value of option "indexed_type" not "scalar" grid type should ' .
-                                'be set to "html" and grid template for rendering such value should be defined ' .
-                                'for property "%s" in scope "%s".',
-                                $code,
-                                $provider->getScope()
-                            )
-                        );
-                    }
-                }
-
                 $fieldName    = $provider->getScope() . '_' . $code;
                 $item['grid'] = $this->mapEntityConfigTypes($item['grid']);
 
+                $attributes = ['field_name' => $fieldName];
+                if (isset($item['options']['indexed']) && $item['options']['indexed']) {
+                    $attributes['expression'] = $alias . $provider->getScope() . '_' . $code . '.value';
+                } else {
+                    $attributes['data_name'] = '[data][' . $provider->getScope() . '][' . $code . ']';
+                }
                 $field = [
-                    $fieldName => array_merge(
-                        $item['grid'],
-                        [
-                            'expression' => $alias . $provider->getScope() . '_' . $code . '.value',
-                            'field_name' => $fieldName,
-                        ]
-                    )
+                    $fieldName => array_merge($item['grid'], $attributes)
                 ];
 
                 if (isset($item['options']['priority']) && !isset($fields[$item['options']['priority']])) {
@@ -189,25 +158,20 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             }
         }
 
+        // sort by priority and flatten
         ksort($fields);
+        $fields = call_user_func_array('array_merge', $fields);
 
-        $orderedFields = [];
-        // compile field list with pre-defined order
-        foreach ($fields as $field) {
-            $orderedFields = array_merge($orderedFields, $field);
-        }
-
-        return $orderedFields;
+        return $fields;
     }
 
     /**
-     * @param array  $orderedFields
-     * @param string $alias
+     * @param array $orderedFields
      *
      * @return array
      * @SuppressWarnings(PHPMD.NPathComplexity)
      */
-    public function getDynamicSortersAndFilters(array $orderedFields, $alias = '')
+    public function getDynamicSortersAndFilters(array $orderedFields)
     {
         $filters = $sorters = [];
 
@@ -215,7 +179,12 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
         foreach ($orderedFields as $fieldName => $field) {
             if (isset($field['sortable']) && $field['sortable']) {
                 $sorters['columns'][$fieldName] = [
-                    'data_name' => isset($field['expression']) ? $field['expression'] : $alias . $fieldName
+                    'data_name'      => isset($field['expression']) ? $field['expression'] : null,
+                    'apply_callback' => function (OrmDatasource $datasource, $sortKey, $direction) {
+                        if ($sortKey) {
+                            $datasource->getQueryBuilder()->addOrderBy($sortKey, $direction);
+                        }
+                    }
                 ];
             }
 
@@ -275,87 +244,92 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     {
         // configure properties from config providers
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
-        $filters    = [];
+        $columns    = $config->offsetGetByPath(self::PATH_COLUMNS, []);
         $actions    = [];
 
         $providers = $this->configManager->getProviders();
         foreach ($providers as $provider) {
             $gridActions = $provider->getPropertyConfig()->getGridActions($itemType);
-
-            $this->prepareProperties($gridActions, $properties, $actions, $filters);
-
-            // TODO: check if this neccessary for field config grid
-            if (static::GRID_NAME == 'entityconfig-grid' && $provider->getPropertyConfig()->getUpdateActionFilter()) {
-                $filters['update'] = $provider->getPropertyConfig()->getUpdateActionFilter();
+            if (!empty($gridActions)) {
+                $this->prepareProperties($gridActions, $columns, $properties, $actions);
             }
         }
 
-        if (count($filters)) {
+        if (count($actions)) {
             $config->offsetSet(
                 ActionExtension::ACTION_CONFIGURATION_KEY,
-                $this->getActionConfigurationClosure($filters, $actions)
+                $this->getActionConfigurationClosure($actions)
             );
         }
         $config->offsetSet(Configuration::PROPERTIES_KEY, $properties);
     }
 
     /**
-     * @param $gridActions
-     * @param $properties
-     * @param $actions
-     * @param $filters
+     * @param array $gridActions
+     * @param array $columns
+     * @param array $properties
+     * @param array $actions
      */
-    protected function prepareProperties($gridActions, &$properties, &$actions, &$filters)
+    protected function prepareProperties($gridActions, $columns, &$properties, &$actions)
     {
         foreach ($gridActions as $config) {
-            $properties[strtolower($config['name']) . '_link'] = [
+            $key = strtolower($config['name']);
+
+            $properties[$key . '_link'] = [
                 'type'   => 'url',
                 'route'  => $config['route'],
-                'params' => (isset($config['args']) ? $config['args'] : [])
+                'params' => isset($config['args']) ? $config['args'] : []
             ];
 
+            $filters = [];
             if (isset($config['filter'])) {
-                $filters[strtolower($config['name'])] = $config['filter'];
+                foreach ($config['filter'] as $column => $filter) {
+                    $dataName = isset($columns[$column]['data_name'])
+                        ? $columns[$column]['data_name']
+                        : $column;
+                    $filters[$dataName] = $filter;
+                }
             }
-
-            $actions[strtolower($config['name'])] = true;
+            $actions[$key] = $filters;
         }
     }
 
     /**
      * Returns closure that will configure actions for each row in grid
      *
-     * @param array $filters
      * @param array $actions
      *
      * @return callable
      */
-    public function getActionConfigurationClosure($filters, $actions)
+    public function getActionConfigurationClosure($actions)
     {
-        return function (ResultRecord $record) use ($filters, $actions) {
-            foreach ($filters as $action => $filter) {
-                foreach ($filter as $key => $value) {
-                    if (is_array($value)) {
-                        $error = true;
-                        foreach ($value as $v) {
-                            if ($record->getValue($key) == $v) {
-                                $error = false;
+        return function (ResultRecord $record) use ($actions) {
+            $result = [];
+            foreach ($actions as $action => $filters) {
+                $isApplicable = true;
+                foreach ($filters as $dataName => $filter) {
+                    $value = $record->getValue($dataName);
+                    if (is_array($filter)) {
+                        $atLeastOneMatched = false;
+                        foreach ($filter as $f) {
+                            if ($value == $f) {
+                                $atLeastOneMatched = true;
+                                break;
                             }
                         }
-                        if ($error) {
-                            $actions[$action] = false;
+                        if (!$atLeastOneMatched) {
+                            $isApplicable = false;
                             break;
                         }
-                    } else {
-                        if ($record->getValue($key) != $value) {
-                            $actions[$action] = false;
-                            break;
-                        }
+                    } elseif ($value != $filter) {
+                        $isApplicable = false;
+                        break;
                     }
                 }
+                $result[$action] = $isApplicable;
             }
 
-            return $actions;
+            return $result;
         };
     }
 
@@ -374,6 +348,9 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
             $configItems = $provider->getPropertyConfig()->getItems($itemsType);
             foreach ($configItems as $code => $item) {
                 if (!isset($item['grid'])) {
+                    continue;
+                }
+                if (!isset($item['options']['indexed']) || !$item['options']['indexed']) {
                     continue;
                 }
 
@@ -406,7 +383,7 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     protected function mapEntityConfigTypes(array $gridConfig)
     {
         if (isset($gridConfig['type'])
-            && $gridConfig['type'] == self::TYPE_HTML
+            && $gridConfig['type'] === self::TYPE_HTML
             && isset($gridConfig['template'])
         ) {
             $gridConfig['type']          = self::TYPE_TWIG;

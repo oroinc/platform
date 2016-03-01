@@ -417,11 +417,11 @@ class AclPrivilegeRepository
             if ($accessLevelName !== null) {
                 $maskName = 'MASK_' . $permission->getName() . '_' . $accessLevelName;
                 // check if a mask builder supports access levels
-                if (!$maskBuilder->hasConst($maskName)) {
+                if (!$maskBuilder->hasMask($maskName)) {
                     // remove access level name from the mask name if a mask builder do not support access levels
                     $maskName = 'MASK_' . $permission->getName();
                 }
-                $maskBuilder->add($maskBuilder->getConst($maskName));
+                $maskBuilder->add($maskBuilder->getMask($maskName));
             }
             $masks[$extension->getServiceBits($maskBuilder->get())] = $maskBuilder->get();
         }
@@ -449,34 +449,38 @@ class AclPrivilegeRepository
      * Sorts the given privileges by name in alphabetical order.
      * The root privilege is moved at the top of the list.
      *
-     * @param ArrayCollection|AclPrivilege[] $privileges [input/output]
+     * @param ArrayCollection $privileges
      */
-    protected function sortPrivileges(ArrayCollection &$privileges)
+    protected function sortPrivileges(ArrayCollection $privileges)
     {
-        /** @var \ArrayIterator $iterator */
-        $iterator = $privileges->getIterator();
-        $iterator->uasort(
-            function (AclPrivilege $a, AclPrivilege $b) {
-                if (strpos($a->getIdentity()->getId(), ObjectIdentityFactory::ROOT_IDENTITY_TYPE)) {
+        $data = [];
+        /** @var AclPrivilege $privilege */
+        foreach ($privileges->getIterator() as $privilege) {
+            $isRoot = false !== strpos($privilege->getIdentity()->getId(), ObjectIdentityFactory::ROOT_IDENTITY_TYPE);
+            $label  = !$isRoot
+                ? $this->translator->trans($privilege->getIdentity()->getName())
+                : null;
+
+            $data[] = [$privilege, $isRoot, $label];
+        }
+        uasort(
+            $data,
+            function ($a, $b) {
+                if ($a[1]) {
                     return -1;
                 }
-                if (strpos($b->getIdentity()->getId(), ObjectIdentityFactory::ROOT_IDENTITY_TYPE)) {
+                if ($b[1]) {
                     return 1;
                 }
 
-                return strcmp(
-                    $this->translator->trans($a->getIdentity()->getName()),
-                    $this->translator->trans($b->getIdentity()->getName())
-                );
+                return strcmp($a[2], $b[2]);
             }
         );
 
-        $result = new ArrayCollection();
-        foreach ($iterator as $item) {
-            $result->add($item);
+        $privileges->clear();
+        foreach ($data as $item) {
+            $privileges->add($item[0]);
         }
-
-        $privileges = $result;
     }
 
     /**
@@ -643,7 +647,9 @@ class AclPrivilegeRepository
                 $mask = $extension->adaptRootMask($mask, $privilege->getIdentity()->getId());
             }
             if ($extension->removeServiceBits($mask) === 0) {
-                foreach ($permissions as $permission) {
+                $supportedPermissions = array_intersect($permissions, $extension->getPermissions($mask));
+
+                foreach ($supportedPermissions as $permission) {
                     if (!$privilege->hasPermission($permission)) {
                         $privilege->addPermission(new AclPermission($permission, AccessLevel::NONE_LEVEL));
                     }

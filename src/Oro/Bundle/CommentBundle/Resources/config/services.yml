@@ -5,9 +5,14 @@ parameters:
     oro_comment.comment.api_manager.class:            Oro\Bundle\CommentBundle\Entity\Manager\CommentApiManager
     oro_comment.comment_lifecycle_listener.class:     Oro\Bundle\CommentBundle\EventListener\CommentLifecycleListener
     oro_comment.placeholder.filter.class:             Oro\Bundle\CommentBundle\Placeholder\CommentPlaceholderFilter
-    oro_comment.type.association_choice.class:        Oro\Bundle\CommentBundle\Form\Type\CommentAssociationChoiceType
 
 services:
+    oro_comment.association_helper:
+        class: Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+
     oro_comment.migration.extension.comment:
         class: %oro_comment.migration.extension.comment.class%
         tags:
@@ -23,6 +28,12 @@ services:
         parent: oro_entity_extend.entity_config_dumper.extension.association
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
+
+    oro_comment.exclusion_provider:
+        class: Oro\Bundle\CommentBundle\Provider\CommentExclusionProvider
+        public: false
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
 
     oro_comment.comment.api_manager:
         class: %oro_comment.comment.api_manager.class%
@@ -46,14 +57,7 @@ services:
     oro_comment.placeholder.filter:
         class: %oro_comment.placeholder.filter.class%
         arguments:
-            - @oro_entity_config.config_manager
+            - @oro_comment.association_helper
+            - @oro_entity.doctrine_helper
             - @oro_security.security_facade
-
-    oro_comment.type.association_choice:
-        class: %oro_comment.type.association_choice.class%
-        arguments:
-            - @oro_entity_extend.association_type_helper
-            - @oro_entity_config.config_manager
-        tags:
-            - { name: form.type, alias: oro_comment_association_choice }
 

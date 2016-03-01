@@ -8,6 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 abstract class BaseDriver
@@ -29,7 +30,7 @@ abstract class BaseDriver
     public function initRepo(EntityManager $em, ClassMetadata $class)
     {
         $this->entityName = $class->name;
-        $this->em = $em;
+        $this->em         = $em;
     }
 
     /**
@@ -60,13 +61,13 @@ abstract class BaseDriver
         $qb->distinct(true);
 
         // set max results count
-        if ($query->getMaxResults() > 0) {
-            $qb->setMaxResults($query->getMaxResults());
+        if ($query->getCriteria()->getMaxResults() > 0) {
+            $qb->setMaxResults($query->getCriteria()->getMaxResults());
         }
 
         // set first result offset
-        if ($query->getFirstResult() > 0) {
-            $qb->setFirstResult($query->getFirstResult());
+        if ($query->getCriteria()->getFirstResult() > 0) {
+            $qb->setFirstResult($query->getCriteria()->getFirstResult());
         }
 
         return $qb
@@ -86,7 +87,7 @@ abstract class BaseDriver
         $qb = $this->getRequestQB($query, false);
         $qb->select($qb->expr()->countDistinct('search.id'));
 
-        return (int) $qb->getQuery()->getSingleScalarResult();
+        return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
     /**
@@ -111,7 +112,7 @@ abstract class BaseDriver
 
     /**
      * @param AbstractPlatform $dbPlatform
-     * @param Connection $connection
+     * @param Connection       $connection
      */
     protected function truncateEntities(AbstractPlatform $dbPlatform, Connection $connection)
     {
@@ -126,20 +127,21 @@ abstract class BaseDriver
      * Truncate query for table
      *
      * @param AbstractPlatform $dbPlatform
-     * @param Connection $connection
-     * @param string $entityName
+     * @param Connection       $connection
+     * @param string           $entityName
      */
     protected function truncateTable(AbstractPlatform $dbPlatform, Connection $connection, $entityName)
     {
         /** @var ClassMetadata $metadata */
         $metadata = $this->em->getClassMetadata($entityName);
-        $query = $this->getTruncateQuery($dbPlatform, $metadata->getTableName()) ;
+        $query    = $this->getTruncateQuery($dbPlatform, $metadata->getTableName());
         $connection->executeUpdate($query);
     }
 
     /**
      * @param AbstractPlatform $dbPlatform
-     * @param string $tableName
+     * @param string           $tableName
+     *
      * @return string
      */
     protected function getTruncateQuery(AbstractPlatform $dbPlatform, $tableName)
@@ -157,18 +159,17 @@ abstract class BaseDriver
      *
      * @return string
      */
-    protected function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
+    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
         $useFieldName = $searchCondition['fieldName'] == '*' ? false : true;
-        $fieldValue = $this->filterTextFieldValue($searchCondition['fieldValue']);
+        $fieldValue   = $this->filterTextFieldValue($searchCondition['fieldValue']);
 
         // TODO Need to clarify search requirements in scope of CRM-214
-        if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {
+        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
             $searchString = $this->createContainsStringQuery($index, $useFieldName);
         } else {
             $searchString = $this->createNotContainsStringQuery($index, $useFieldName);
         }
-        $whereExpr = $searchCondition['type'] . ' (' . $searchString . ')';
 
         $this->setFieldValueStringParameter($qb, $index, $fieldValue, $searchCondition['condition']);
 
@@ -180,11 +181,12 @@ abstract class BaseDriver
             $this->setTextOrderBy($qb, $index);
         }
 
-        return $whereExpr;
+        return '(' . $searchString . ' ) ';
     }
 
     /**
      * @param array|string $fieldValue
+     *
      * @return array|string
      */
     protected function filterTextFieldValue($fieldValue)
@@ -262,17 +264,19 @@ abstract class BaseDriver
      *
      * @return string
      */
-    protected function addNonTextField(QueryBuilder $qb, $index, $searchCondition)
+    public function addNonTextField(QueryBuilder $qb, $index, $searchCondition)
     {
+        $value     = $searchCondition['fieldValue'];
         $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $qb->setParameter('field' . $index, $searchCondition['fieldName']);
-        $qb->setParameter('value' . $index, $searchCondition['fieldValue']);
+        $qb->setParameter('value' . $index, $value);
 
-        return $searchCondition['type'] . ' (' . $this->createNonTextQuery(
+        return $this->createNonTextQuery(
             $joinAlias,
             $index,
-            $searchCondition['condition']
-        ) . ')';
+            $searchCondition['condition'],
+            is_array($searchCondition['fieldName']) ? 'in' : '='
+        );
     }
 
     /**
@@ -284,23 +288,35 @@ abstract class BaseDriver
      *
      * @return string
      */
-    protected function createNonTextQuery($joinAlias, $index, $condition)
+    protected function createNonTextQuery($joinAlias, $index, $condition, $operator)
     {
-        if ($condition == Query::OPERATOR_IN) {
-            $searchString
-                = $joinAlias . '.field= :field' . $index . ' AND ' . $joinAlias . '.value ' . $condition . ' (:value'
-                . $index . ')';
-        } elseif ($condition == Query::OPERATOR_NOT_IN) {
-            $searchString
-                =
-                $joinAlias . '.field= :field' . $index . ' AND ' . $joinAlias . '.value NOT IN (:value' . $index . ')';
-        } else {
-            $searchString
-                = $joinAlias . '.field= :field' . $index . ' AND ' . $joinAlias . '.value ' . $condition . ' :value'
-                . $index;
+        $openBrackets  = '';
+        $closeBrackets = '';
+        if ($operator === 'in') {
+            $openBrackets  = '(';
+            $closeBrackets = ')';
         }
 
-        return $searchString;
+        switch ($condition) {
+            case Query::OPERATOR_IN:
+            case Query::OPERATOR_NOT_IN:
+                $queryString = '(%s.field %s %s :field%s %s AND %s.value %s (:value%s))';
+                break;
+            default:
+                $queryString = '(%s.field %s %s :field%s %s AND %s.value %s :value%s)';
+        }
+
+        return sprintf(
+            $queryString,
+            $joinAlias,
+            $operator,
+            $openBrackets,
+            $index,
+            $closeBrackets,
+            $joinAlias,
+            $condition !== Query::OPERATOR_NOT_IN ? $condition : 'not in',
+            $index
+        );
     }
 
     /**
@@ -316,29 +332,12 @@ abstract class BaseDriver
 
         $this->setFrom($query, $qb);
 
-        $whereExpr = array();
-        if (count($query->getOptions())) {
-            foreach ($query->getOptions() as $index => $searchCondition) {
-                $joinField = sprintf('search.%sFields', $searchCondition['fieldType']);
-                $joinAlias = $this->getJoinAlias($searchCondition['fieldType'], $index);
-                $qb->leftJoin($joinField, $joinAlias);
+        $criteria = $query->getCriteria();
 
-                if ($searchCondition['fieldType'] == Query::TYPE_TEXT) {
-                    if ($searchCondition['fieldValue'] === '') {
-                        $whereExpr[] = $joinAlias . '.field = :field' . $index;
-                        $qb->setParameter('field' . $index, $searchCondition['fieldName']);
-                    } else {
-                        $whereExpr[] = $this->addTextField($qb, $index, $searchCondition, $setOrderBy);
-                    }
-                } else {
-                    $whereExpr[] = $this->addNonTextField($qb, $index, $searchCondition);
-                }
-            }
-            if (substr($whereExpr[0], 0, 3) == 'and') {
-                $whereExpr[0] = substr($whereExpr[0], 3, strlen($whereExpr[0]));
-            }
-
-            $qb->andWhere(implode(' ', $whereExpr));
+        $whereExpression = $criteria->getWhereExpression();
+        if ($whereExpression) {
+            $visitor = new OrmExpressionVisitor($this, $qb, $setOrderBy);
+            $qb->andWhere($visitor->dispatch($whereExpression));
         }
 
         if ($setOrderBy) {
@@ -350,10 +349,11 @@ abstract class BaseDriver
 
     /**
      * @param string $fieldType
-     * @param int $index
+     * @param int    $index
+     *
      * @return string
      */
-    protected function getJoinAlias($fieldType, $index)
+    public function getJoinAlias($fieldType, $index)
     {
         return sprintf('%sField%s', $fieldType, $index);
     }
@@ -385,13 +385,15 @@ abstract class BaseDriver
      */
     protected function addOrderBy(Query $query, QueryBuilder $qb)
     {
-        $orderBy = $query->getOrderBy();
+        $orderBy = $query->getCriteria()->getOrderings();
 
         if ($orderBy) {
-            $orderRelation = $query->getOrderType() . 'Fields';
+            $direction = reset($orderBy);
+            list($fieldType, $fieldName) = Criteria::explodeFieldTypeName(key($orderBy));
+            $orderRelation = $fieldType . 'Fields';
             $qb->leftJoin('search.' . $orderRelation, 'orderTable', 'WITH', 'orderTable.field = :orderField')
-                ->orderBy('orderTable.value', $query->getOrderDirection())
-                ->setParameter('orderField', $orderBy);
+                ->orderBy('orderTable.value', $direction)
+                ->setParameter('orderField', $fieldName);
         }
     }
 

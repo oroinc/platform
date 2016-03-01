@@ -73,18 +73,21 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-        $registry->expects($this->any())
-            ->method('getManagerForClass')
-            ->with(self::TEST_CLASS)
-            ->will($this->returnValue($this->entityManager));
-        $registry->expects($this->any())
-            ->method('getRepository')
-            ->with(self::TEST_CLASS)
-            ->will($this->returnValue($this->repository));
+        $registry->expects($this->never())->method($this->anything());
 
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityManager')
+            ->with(self::TEST_CLASS)
+            ->will($this->returnValue($this->entityManager));
+
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->with(self::TEST_CLASS)
+            ->will($this->returnValue($this->repository));
 
         $fieldHelper = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
@@ -140,7 +143,10 @@ class DatabaseHelperTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_CLASS, $identifier)
             ->will($this->returnValue($entity));
 
-        $this->assertEquals($entity, $this->helper->find(self::TEST_CLASS, $identifier));
+        $found = $this->helper->find(self::TEST_CLASS, $identifier);
+        $this->assertEquals($entity, $found);
+
+        $this->assertSame($found, $this->helper->find(self::TEST_CLASS, $identifier));
     }
 
     public function testFindObjectFromEnotherOrganization()

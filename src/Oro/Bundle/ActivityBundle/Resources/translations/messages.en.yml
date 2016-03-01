@@ -7,3 +7,13 @@ oro:
 
         sections:
             activities:       Activity
+
+        contexts:
+            label:                    Context
+            placeholder:              Add Context
+            added:                    The context has been added
+            added.already:            The context has already been added
+            type.not_supported:       The context type is not supported
+            removed:                  The context has been removed
+            add_context.label:        Add Context
+            add_context_entity.label: Add Context Entity

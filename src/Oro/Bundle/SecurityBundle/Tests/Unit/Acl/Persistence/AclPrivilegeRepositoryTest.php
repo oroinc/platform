@@ -3,18 +3,18 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Persistence;
 
 use Doctrine\Common\Collections\ArrayCollection;
+
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
+
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
-use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclPrivilegeRepository;
 use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Acl\Exception\NotAllAclsFoundException;
-use Symfony\Component\Security\Acl\Model\EntryInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -56,10 +56,12 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             );
         $this->extension->expects($this->any())
             ->method('getMaskBuilder')
-            ->will($this->returnValue(new EntityMaskBuilder()));
+            ->will($this->returnValue(new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT'])));
         $this->extension->expects($this->any())
             ->method('getAllMaskBuilders')
-            ->will($this->returnValue(array(new EntityMaskBuilder())));
+            ->will($this->returnValue(
+                array(new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']))
+            ));
 
         $this->extensionSelector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
             ->disableOriginalConstructor()
@@ -307,13 +309,8 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->translator->expects($this->at(0))
+        $this->translator->expects($this->exactly(2))
             ->method('trans')
-            ->with('Class 1')
-            ->will($this->returnArgument(0));
-        $this->translator->expects($this->at(1))
-            ->method('trans')
-            ->with('Class 2')
             ->will($this->returnArgument(0));
 
         $result = $this->repository->getPrivileges($sid);
@@ -709,7 +706,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
     public static function getMask(array $masks, MaskBuilder $maskBuilder = null)
     {
         if ($maskBuilder === null) {
-            $maskBuilder = new EntityMaskBuilder();
+            $maskBuilder = new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']);
         }
         $maskBuilder->reset();
         foreach ($masks as $mask) {

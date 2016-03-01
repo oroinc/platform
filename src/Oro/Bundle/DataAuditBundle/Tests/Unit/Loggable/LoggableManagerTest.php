@@ -1,10 +1,8 @@
 <?php
 namespace Oro\Bundle\DataAuditBundle\Tests\Unit\Loggable;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\DataAuditBundle\Loggable\LoggableManager;
 use Oro\Bundle\DataAuditBundle\Metadata\ClassMetadata;
@@ -71,7 +69,8 @@ class LoggableManagerTest extends AbstractMetadataTest
             'Oro\Bundle\DataAuditBundle\Entity\Audit',
             'Oro\Bundle\DataAuditBundle\Entity\AuditField',
             $provider,
-            $securityContextLink
+            $securityContextLink,
+            $this->getMock('Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper')
         );
         $this->loggableManager->addConfig($this->config);
 
@@ -87,7 +86,7 @@ class LoggableManagerTest extends AbstractMetadataTest
         $collection = new PersistentCollection(
             $this->em,
             get_class($loggableCollectionClass),
-            array($loggableCollectionClass)
+            new ArrayCollection(array($loggableCollectionClass))
         );
         $collection->setDirty(true);
         $this->loggableClass->setCollection($collection);

@@ -30,7 +30,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW;CREATE;EDIT;DELETE",
  *              "group_name"=""
  *          },
  *          "note"={
@@ -134,7 +133,7 @@ class SystemCalendar
      */
     public function __toString()
     {
-        return $this->name;
+        return (string)$this->name;
     }
 
     /**

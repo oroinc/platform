@@ -35,4 +35,28 @@ class NoteTest extends \PHPUnit_Framework_TestCase
         $note->setOrganization($organization);
         $this->assertSame($organization, $note->getOrganization());
     }
+
+    public function testIsUpdatedFlags()
+    {
+        $user = new User();
+        $date = new \DateTime('2012-12-12 12:12:12');
+        $note = new Note();
+        $note->setUpdatedBy($user);
+        $note->setUpdatedAt($date);
+
+        $this->assertTrue($note->isUpdatedBySet());
+        $this->assertTrue($note->isUpdatedAtSet());
+    }
+
+    public function testIsNotUpdatedFlags()
+    {
+        $user = null;
+        $date = null;
+        $note = new Note();
+        $note->setUpdatedBy($user);
+        $note->setUpdatedAt($date);
+
+        $this->assertFalse($note->isUpdatedBySet());
+        $this->assertFalse($note->isUpdatedAtSet());
+    }
 }

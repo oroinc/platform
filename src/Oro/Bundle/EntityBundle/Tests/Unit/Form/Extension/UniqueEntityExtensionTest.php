@@ -34,6 +34,11 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
     protected $builder;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $doctrineHelper;
+
+    /**
      * @var UniqueEntityExtension
      */
     protected $extension;
@@ -44,17 +49,14 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->validator = $this
-            ->getMockBuilder('Symfony\Component\Validator\Validator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
 
         $translator = $this
             ->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
 
-        $this->configProvider = $this
-            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface')
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
             ->getMock();
 
         $this->config = $this
@@ -71,6 +73,10 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $metadata
             ->expects($this->any())
             ->method('getName')
@@ -80,7 +86,7 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
             $this->validator,
             $translator,
             $this->configProvider,
-            $this->configProvider
+            $this->doctrineHelper
         );
     }
 
@@ -93,8 +99,29 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->buildForm($this->builder, []);
     }
 
+    public function testForNotManageableEntity()
+    {
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with(self::ENTITY)
+            ->willReturn(false);
+
+        $this->configProvider->expects($this->never())
+            ->method('hasConfig');
+
+        $this->validatorMetadata->expects($this->never())
+            ->method('addConstraint');
+
+        $this->extension->buildForm($this->builder, ['data_class' => self::ENTITY]);
+    }
+
     public function testWithoutConfig()
     {
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with(self::ENTITY)
+            ->willReturn(true);
+
         $this->configProvider
             ->expects($this->once())
             ->method('hasConfig')
@@ -110,6 +137,11 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testWithoutUniqueKeyOption()
     {
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with(self::ENTITY)
+            ->willReturn(true);
+
         $this->configProvider
             ->expects($this->once())
             ->method('hasConfig')
@@ -121,12 +153,6 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::ENTITY)
             ->will($this->returnValue($this->config));
-
-        $this->config
-            ->expects($this->once())
-            ->method('has')
-            ->with('unique_key')
-            ->will($this->returnValue(false));
 
         $this->validatorMetadata
             ->expects($this->never())
@@ -137,6 +163,11 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testWithConfigAndKeys()
     {
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntity')
+            ->with(self::ENTITY)
+            ->willReturn(true);
+
         $this->configProvider
             ->expects($this->once())
             ->method('hasConfig')
@@ -147,12 +178,6 @@ class UniqueEntityExtensionTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('getConfig')
             ->will($this->returnValue($this->config));
-
-        $this->config
-            ->expects($this->once())
-            ->method('has')
-            ->with('unique_key')
-            ->will($this->returnValue(true));
 
         $this->config
             ->expects($this->any())

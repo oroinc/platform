@@ -2,129 +2,98 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
-use Doctrine\Common\Persistence\ObjectManager;
-use Doctrine\Common\Persistence\ObjectRepository;
-
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\ConfigBundle\Config\UserScopeManager;
 
 class UserScopeManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var UserScopeManager
-     */
-    protected $object;
+    /** @var UserScopeManager */
+    protected $manager;
 
-    /**
-     * @var ObjectRepository
-     */
-    protected $repository;
-
-    /**
-     * @var SecurityContextInterface
-     */
-    protected $security;
-
-    /**
-     * @var ObjectManager
-     */
-    protected $om;
-
-    /**
-     * @var array
-     */
-    protected $settings = array(
-        'oro_user' => array(
-            'level'    => array(
-                'value' => 20,
-                'type'  => 'scalar',
-            )
-        )
-    );
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $securityContext;
 
     protected function setUp()
     {
-        $repo = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Entity\Repository\ConfigRepository')
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $repo->expects($this->any())
-            ->method('loadSettings');
-        $this->om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
-        $this->om->expects($this->any())
-            ->method('getRepository')
-            ->will($this->returnValue($repo));
-        $this->object = new UserScopeManager($this->om);
+        $cache    = $this->getMockForAbstractClass('Doctrine\Common\Cache\CacheProvider');
 
-        $this->security   = $this->getMock('Symfony\Component\Security\Core\SecurityContextInterface');
-        $this->group1     = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
-        $this->group2     = $this->getMock('Oro\Bundle\UserBundle\Entity\Group');
+        $this->securityContext = $this
+            ->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $user  = new User();
-
-        $this->security
-            ->expects($this->any())
-            ->method('getToken')
-            ->will($this->returnValue($token));
-
-        $this->group1
-            ->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue(2));
-
-        $this->group2
-            ->expects($this->any())
-            ->method('getId')
-            ->will($this->returnValue(3));
-
-        $token
-            ->expects($this->any())
-            ->method('getUser')
-            ->will($this->returnValue($user));
-
-        $user
-            ->setId(1)
-            ->addGroup($this->group1)
-            ->addGroup($this->group2);
-
-        $this->object = new UserScopeManager($this->om);
-    }
-
-    public function testSecurity()
-    {
-        $object = $this->getMock(
-            'Oro\Bundle\ConfigBundle\Config\UserScopeManager',
-            array('loadStoredSettings'),
-            array($this->om)
-        );
-
-        $object->expects($this->exactly(3))
-            ->method('loadStoredSettings');
-
-        $object->setSecurity($this->security);
-
-        $this->assertEquals('user', $object->getScopedEntityName());
+        $this->manager = new UserScopeManager($doctrine, $cache);
+        $this->manager->setSecurityContext($this->securityContext);
     }
 
     public function testGetScopedEntityName()
     {
-        $this->assertEquals('user', $this->object->getScopedEntityName());
+        $this->assertEquals('user', $this->manager->getScopedEntityName());
+    }
+
+    public function testInitializeScopeId()
+    {
+        $user = new User();
+        $user->setId(123);
+
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->assertEquals(123, $this->manager->getScopeId());
+    }
+
+    public function testInitializeScopeIdForNewUser()
+    {
+        $user = new User();
+
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->assertEquals(0, $this->manager->getScopeId());
+    }
+
+    public function testInitializeScopeIdForUnsupportedUserObject()
+    {
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn('test user');
+
+        $this->assertEquals(0, $this->manager->getScopeId());
+    }
+
+    public function testInitializeScopeIdNoToken()
+    {
+        $this->securityContext->expects($this->once())
+            ->method('getToken')
+            ->willReturn(null);
+
+        $this->assertEquals(0, $this->manager->getScopeId());
     }
 
     public function testSetScopeId()
     {
-        $object = clone $this->object;
-        $object->setSecurity($this->security);
-        $object->setScopeId();
-        $this->assertEquals(1, $object->getScopeId());
-    }
+        $this->securityContext->expects($this->never())
+            ->method('getToken');
 
-    public function testGetScopeId()
-    {
-        $object = clone $this->object;
-        $object->setSecurity($this->security);
-        $this->assertEquals(1, $object->getScopeId());
+        $this->manager->setScopeId(456);
+        $this->assertEquals(456, $this->manager->getScopeId());
     }
 }

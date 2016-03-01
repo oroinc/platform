@@ -1,7 +1,7 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
 
-{% form_theme form with ['OroIntegrationBundle:Form:fields.html.twig'] %}
+{% form_theme form with oro_integration_themes(form) %}
 
 {% set entity = form.vars.value %}
 {% set isEditModeDissalow = entity.getEditMode == constant('Oro\\Bundle\\IntegrationBundle\\Entity\\Channel::EDIT_MODE_DISALLOW') %}
@@ -74,15 +74,7 @@
                     'aCss':   'no-hash schedule-button',
                     'label' : 'oro.integration.button.sync'|trans
                 }) }}
-
-                {{ UI.clientButton({
-                    'dataUrl': path('oro_integration_schedule', { 'id': entity.id, 'force': true }) ,
-                    'aCss':   'no-hash schedule-button',
-                    'label' : 'oro.integration.button.force_sync'|trans,
-                    'dataAttributes': {
-                        'force': true
-                    }
-                }) }}
+                {% placeholder oro_integration_force_sync_button with {'entity': entity} %}
             {% endset %}
             {{ UI.pinnedDropdownButton({'html': buttonsHtml}) }}
         </div>

@@ -59,34 +59,10 @@ class SearchListenerTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadata')
             ->will($this->returnValue($metadata));
 
-        $event = new PrepareEntityMapEvent($entity, get_class($entity), $data);
+        $event = new PrepareEntityMapEvent($entity, get_class($entity), $data, ['alias' => 'test']);
         $this->listener->prepareEntityMapEvent($event);
         $resultData = $event->getData();
 
         $this->assertEquals(3, $resultData['integer']['organization']);
-    }
-
-    public function testBeforeSearchEvent()
-    {
-        $query = new Query();
-        $query->from('testEntity')
-            ->andWhere('name', '~', 'string');
-        $this->securityFacade->expects($this->once())
-            ->method('getOrganizationId')
-            ->will($this->returnValue(5));
-        $event = new BeforeSearchEvent($query);
-
-        $this->listener->beforeSearchEvent($event);
-
-        $wherePart = $query->getOptions();
-        $this->assertCount(2, $wherePart);
-        $expexted = [
-            'fieldName' => 'organization',
-            'condition' => 'in',
-            'fieldValue' => [5, 0],
-            'fieldType' => 'integer',
-            'type' => 'and'
-        ];
-        $this->assertEquals($expexted, $wherePart[1]);
     }
 }

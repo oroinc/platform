@@ -23,13 +23,13 @@
         </div>
     </script>
     <script type="text/template" id="oro-email-template-variables-system-template">
-        <ul class="nav nav-list">
+        <ul class="nav">
             <% _.each(variables, function(variable, varName) { %>
             <li>
                 <a href="javascript:void(0);"
                    class="variable"
                    title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= root %>.<%= varName %><% if(variable.filter){%>|<%= variable.filter %><% } %> }}{% endverbatim %}</a>
-                <span>( <%= variable.label %> )</span>
+                <span>&ndash; <%= variable.label %></span>
             </li>
             <% }); %>
         </ul>
@@ -40,7 +40,7 @@
                class="variable"
                title="<%= _.__('oro.email.emailtemplate.variable_title', {'variable_label': variable.label}) %>"
             >{% verbatim %}{{ <%= varValue %> }}{% endverbatim %}</a>
-            <span>(</span>
+            <span>&ndash;</span>
             <ul class="caption">
                 <% for (var i = 1; i < breadcrumbs.length; i++) { %>
                 <li>
@@ -50,7 +50,6 @@
                 <% } %>
                 <li><%= variable.label %></li>
             </ul>
-            <span>)</span>
         </li>
     </script>
     <script type="text/template" id="oro-email-template-variables-entity-template">
@@ -78,7 +77,7 @@
             <% if (!_.isEmpty(fields)) { %>
             <li>
                 <div class="group-label"><%= _.__('oro.entity.field_choice.fields') %></div>
-                <ul class="nav nav-list">
+                <ul class="nav">
                 <% var variableTemplate =  _.template($('#oro-email-template-variables-entity-variable-template').html()) %>
                 <% _.each(fields, function(variable, varName) { %>
                     <%= variableTemplate({
@@ -124,14 +123,14 @@
             <% if (!_.isEmpty(relations)) { %>
             <li>
                 <div class="group-label"><%= _.__('oro.entity.field_choice.relations') %></div>
-                <ul class="nav nav-list">
+                <ul class="nav">
                     <% _.each(relations, function(variable, varName) { %>
                     <li>
                         <a href="javascript:void(0);"
                            class="reference"
                            data-path="<%= path + '/' + varName %>"
                            title="<%= _.__('oro.email.emailtemplate.reference_title', {'variable_label': variable.label}) %>">{% verbatim %}{{ <%= varPrefix %>.<%= varName %> }}{% endverbatim %}</a>
-                        <span>( <%= variable.label %> )</span>
+                        <span>&ndash; <%= variable.label %></span>
                     </li>
                     <% }); %>
                 </ul>
@@ -162,21 +161,18 @@
 
 {% macro renderPreviewDialog(formId, title) %}
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal'],
-        function($, _, __, Modal){
+        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oro/dialog-widget'],
+        function($, _, __, DialogWidget){
             $(function () {
                 var showEmailPreviewDialog = function(el) {
                     var iframeId = 'preview-frame';
                     var iframe = $('<iframe />', {
                         name: iframeId,
                         id: iframeId,
-                        'class': "scrollable-container",
                         frameborder: 0,
-                        marginwidth: 0,
-                        marginheight: 0,
-                        allowfullscreen: true,
-                        width: '100%',
-                        height: '98%'
+                        marginwidth: 20,
+                        marginheight: 20,
+                        allowfullscreen: true
                     });
 
                     var form = $('#{{ formId }}');
@@ -186,34 +182,26 @@
                         if (!e.result) {
                             return;
                         }
-
-                        var loader;
-                        var confirmModal = new Modal({
+                        var confirmModal = new DialogWidget({
                             title: __('Preview'),
-                            content: '<div class="loading-content">' + __('Loading...') + '</div>',
-                            okText: __('OK'),
-                            className: 'modal oro-modal-normal',
-                            template: _.template('<% if (title) { %>' +
-                                '<div class="modal-header">' +
-                                    '<% if (allowCancel) { %>' +
-                                    '<a class="close">×</a>' +
-                                    '<% } %>' +
-                                    '<h3><%- title %></h3>' +
-                                '</div>' +
-                                '<% } %>' +
-                                '<div class="modal-body"><%= content %></div>'
-                            )
+                            'dialogOptions': {
+                                'modal': true,
+                                'resizable': true,
+                                'width': '85%',
+                                'height': '70%',
+                                'autoResize': true
+                            }
                         });
-                        confirmModal.open();
-                        confirmModal.$content.append(iframe);
-                        loader = confirmModal.$content.find('.loading-content');
-
-                        loader.show();
+                        confirmModal.render();
+                        confirmModal._onContentLoad('<div class="widget-content"></div>');
+                        confirmModal._showLoading();
+                        confirmModal.widget.addClass('dialog-single-iframe-container');
+                        confirmModal.$el.append(iframe);
                         form.attr('target', iframeId);
                         form.attr('action', $(el).attr('href'));
 
                         iframe.one('load', function() {
-                            loader.hide();
+                            confirmModal._hideLoading();
                             form.removeAttr('target');
                             form.attr('action', formAction);
                         });
@@ -250,8 +238,13 @@
 #}
 {% macro email_address_link(emailAddress, label) -%}
     {% set label = label|default(_self.email_address_text(emailAddress)) %}
-    <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">
-        {{ label }}</a>
+    {% set route = oro_entity_route(emailAddress.owner.class) %}
+    {% if route is not null %}
+        <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
+            {{ label }}</a>
+    {% else %}
+        {{ label }}
+    {% endif %}
 {%- endmacro -%}
 
 {#
@@ -261,8 +254,13 @@
 #}
 {% macro email_address_recipient_link(emailAddress, emailAddressName, label) -%}
     {% set label = label|default(emailAddressName|default('N/A')) %}
-    <a href="{{ path(oro_entity_route(emailAddress.owner.class), {id:emailAddress.owner.id}) }}">
-        {{ label }}</a>
+    {% set route = oro_entity_route(emailAddress.owner.class) %}
+    {% if route is not null %}
+        <a href="{{ path(route, {id: emailAddress.owner.id}) }}">
+            {{ label }}</a>
+    {% else %}
+        {{ label }}
+    {% endif %}
 {%- endmacro -%}
 
 {#
@@ -333,8 +331,29 @@
         {% endif %}
 
         {% if emailAddress %}
-            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}">{{ title }}</a>
+            <a href="mailto:{{ emailAddress|e('html_attr') }}" title="{{ title|e('html_attr') }}" class="email">{{ title }}</a>
         {% endif %}
+    {% endif %}
+{%- endmacro -%}
+
+{#
+    Render email address with related actions block
+    Parameters:
+        email - EmailInterface object or string
+        entity - related entity record
+#}
+{%- macro renderEmailWithActions(email, entity) -%}
+    {% if email is not empty %}
+        {%- set actions %}
+            {%- placeholder email_actions with {email: email, entity: entity} -%}
+        {% endset -%}
+        {% set actions = actions|trim %}
+        <span class="inline-actions-element{% if actions is empty %} inline-actions-element_no-actions{% endif %}">
+            <span class="inline-actions-element_wrapper">{{ _self.email_address_simple(email) }}</span>
+            {% if actions is not empty -%}
+                <span class="inline-actions-element_actions email-actions">{{ actions|raw }}</span>
+            {%- endif %}
+        </span>
     {% endif %}
 {%- endmacro -%}
 
@@ -543,77 +562,41 @@
 {% endmacro %}
 
 {#
-    Render email contexts
-    Parameters:
-        email - email body entity Oro\Bundle\EmailBundle\Entity\Email
+    Render title and buttons for Mailbox configuration
 #}
-{% macro email_contexts(entity, target, checkTarget) %}
-    <script type="text/template" id="email-context-activity-list">
-        <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
-                <span data-id="<%= entity.get('targetId') %>">
-                    <span class="<%= entity.get('icon') %>"></span>
-
-                    <% if (entity.get('link')) { %>
-                        <a href="<%= entity.get('link') %>">
-                            <span class="context-label"><%= entity.get('title') %></span>
-                        </a>
-                    <% } else { %>
-                        <span class="context-label"><%= entity.get('title') %></span>
-                    <% }  %>
-                    {% if  resource_granted('EDIT', entity) %}
-                        <i class="icon-remove"></i>
+{% macro renderMailboxConfigTitleAndButtons(pageTitle, buttons) %}
+    <div class="container-fluid configuration-header clearfix">
+        {% if pageTitle is iterable %}
+            <div class="customer-info customer-simple pull-left">
+                {% for title in pageTitle%}
+                    {% if not loop.last %}
+                        <div class="sub-title">
+                            {% if title is iterable and title.link is defined and title.label is defined %}
+                                <a href="{{ title.link }}">{{ title.label }}</a>
+                            {% else %}
+                                {{ title }}
+                            {% endif %}
+                        </div>
+                        <span class="separator">/</span>
+                    {% else %}
+                        <h1 class="user-name">
+                            {% if title is iterable and title.link is defined and title.label is defined %}
+                                <a href="{{ title.link }}">{{ title.label }}</a>
+                            {% else %}
+                                {{ title }}
+                            {% endif %}
+                        </h1>
                     {% endif %}
-                </span>
-        </div>
-    </script>
-
-    {% if checkTarget is empty %}
-        {% set checkTarget = false %}
-    {% endif %}
-
-    {% set contextTargetArray = [] %}
-    {% set targetClassNameEncoded = oro_class_name(target, true) %}
-    {% for item in entity.getActivityTargetEntities() %}
-        {% set itemClassName = oro_class_name(item) %}
-        {% set itemClassNameEncoded = oro_class_name(item, true) %}
-        {% set contextTarget = {
-            'entityId': entity.id,
-            'targetId': item.id,
-            "targetClassName": itemClassNameEncoded,
-            'title': item|oro_format_name,
-            'icon': oro_entity_config_value(itemClassName, 'icon' ),
-            'link': oro_entity_metadata_value(itemClassName, 'routeView') ? path(oro_entity_route(itemClassName), {id:item.id} ) : false
-        } %}
-        {% if not ((app.user.id == item.id) and (oro_class_name(app.user) == itemClassName)) %}
-            {% set contextTargetArray = contextTargetArray|merge([contextTarget]) %}
+                {% endfor %}
+            </div>
+        {% else %}
+            <h1>
+                {{ pageTitle }}
+            </h1>
         {% endif %}
-    {% endfor %}
 
-    {% set options = {
-        contextTargets: contextTargetArray,
-        entityId: entity.id,
-        target: false,
-        checkTarget: checkTarget
-    } %}
-
-    {% if checkTarget %}
-        {% set targetEntity = {
-            'target': {
-                'id' : target.id,
-                'className': targetClassNameEncoded
-            }
-        } %}
-        {% set options = options|merge(targetEntity) %}
-    {% endif %}
-
-    <div class="email-context-activity"
-         data-page-component-module="oroemail/js/app/components/email-context-activity-component"
-         data-page-component-options="{{ options|json_encode }}"
-         data-layout="separate">
-        <div class="email-context-activity-label">
-            {{ 'oro.email.contexts.label'|trans }}
-        </div>
-        <div class="email-context-activity-items">
+        <div class="pull-right title-buttons-container">
+            {{ buttons|raw }}
         </div>
     </div>
 {% endmacro %}

@@ -1,8 +1,7 @@
-/*global require*/
-require([
+define([
     'oroui/js/app/controllers/base/controller',
     'oroui/js/tools'
-], function (BaseController, tools) {
+], function(BaseController, tools) {
     'use strict';
 
     /**
@@ -10,7 +9,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oronavigation/js/app/views/shortcuts-view'
-    ], function (ShortcutsView) {
+    ], function(ShortcutsView) {
         BaseController.addToReuse('shortcuts', ShortcutsView, {
             el: '.shortcuts .input'
         });
@@ -18,7 +17,7 @@ require([
 
     // following functionality is related only to desktop version
 
-    if(tools.isMobile()) {
+    if (tools.isMobile()) {
         return;
     }
 
@@ -27,7 +26,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oronavigation/js/app/views/history-view'
-    ], function (PageHistoryView) {
+    ], function(PageHistoryView) {
         BaseController.addToReuse('history', PageHistoryView, {
             el: '#history-content'
         });
@@ -38,7 +37,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oronavigation/js/app/views/most-viewed-view'
-    ], function (PageMostViewedView) {
+    ], function(PageMostViewedView) {
         BaseController.addToReuse('mostViewed', PageMostViewedView, {
             el: '#mostviewed-content'
         });
@@ -52,7 +51,7 @@ require([
         'oronavigation/js/app/components/favorite-component',
         'oronavigation/js/app/models/base/model',
         'oronavigation/js/app/models/base/collection'
-    ], function ($, FavoriteComponent, Model, Collection) {
+    ], function($, FavoriteComponent, Model, Collection) {
         var collection;
 
         collection = new Collection([], {
@@ -82,11 +81,10 @@ require([
         'oronavigation/js/app/models/base/collection',
         'oronavigation/js/app/views/page-state-view',
         'oronavigation/js/app/models/page-state-model'
-    ], function ($, PinComponent, Model, Collection, PageStateView, PageStateModel) {
-        var pinCollection, stateModel, template;
-
-        template = $('#template-list-pin-item').html();
-        pinCollection = new Collection([], {
+    ], function($, PinComponent, Model, Collection, PageStateView, PageStateModel) {
+        var stateModel;
+        var template = $('#template-list-pin-item').html();
+        var pinCollection = new Collection([], {
             model: Model
         });
 

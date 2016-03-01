@@ -10,6 +10,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
@@ -37,6 +38,9 @@ class ImportStrategyHelper
      */
     protected $fieldHelper;
 
+    /** @var ConfigProvider */
+    protected $extendConfigProvider;
+
     /**
      * @param ManagerRegistry $managerRegistry
      * @param ValidatorInterface $validator
@@ -53,6 +57,14 @@ class ImportStrategyHelper
         $this->validator = $validator;
         $this->translator = $translator;
         $this->fieldHelper = $fieldHelper;
+    }
+
+    /**
+     * @param ConfigProvider $extendConfigProvider
+     */
+    public function setConfigProvider(ConfigProvider $extendConfigProvider)
+    {
+        $this->extendConfigProvider = $extendConfigProvider;
     }
 
     /**
@@ -95,6 +107,10 @@ class ImportStrategyHelper
         );
 
         foreach ($importedEntityProperties as $propertyName) {
+            // we should not overwrite deleted fields
+            if ($this->isDeletedField($basicEntityClass, $propertyName)) {
+                continue;
+            }
             $importedValue = $this->fieldHelper->getObjectValue($importedEntity, $propertyName);
             $this->fieldHelper->setObjectValue($basicEntity, $propertyName, $importedValue);
         }
@@ -145,5 +161,22 @@ class ImportStrategyHelper
         foreach ($validationErrors as $validationError) {
             $context->addError($errorPrefix . ' ' . $validationError);
         }
+    }
+
+    /**
+     * Check if given class field is deleted
+     *
+     * @param string $className FQCN
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function isDeletedField($className, $fieldName)
+    {
+        if ($this->extendConfigProvider->hasConfig($className, $fieldName)) {
+            return $this->extendConfigProvider->getConfig($className, $fieldName)->is('is_deleted');
+        }
+
+        return false;
     }
 }

@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Twig\DynamicFieldsExtension;
 
@@ -24,7 +24,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
     protected $configManager;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProviderInterface
+     * @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
      */
     protected $configProvider;
 
@@ -44,7 +44,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface')
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
 

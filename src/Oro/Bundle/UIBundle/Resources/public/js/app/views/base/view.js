@@ -1,11 +1,9 @@
-/*jslint nomen:true, eqeq:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'chaplin',
     '../../models/base/collection'
-], function ($, _, Chaplin, BaseCollection) {
+], function($, _, Chaplin, BaseCollection) {
     'use strict';
 
     var BaseView;
@@ -16,10 +14,9 @@ define([
      * @extends Chaplin.View
      */
     BaseView = Chaplin.View.extend({
-        getTemplateFunction: function () {
-            var template, templateFunc;
-            template = this.template;
-            templateFunc = null;
+        getTemplateFunction: function() {
+            var template = this.template;
+            var templateFunc = null;
 
             if (typeof template === 'string') {
                 templateFunc = _.template(template);
@@ -32,7 +29,7 @@ define([
             return templateFunc;
         },
 
-        getTemplateData: function () {
+        getTemplateData: function() {
             var data;
             data = BaseView.__super__.getTemplateData.apply(this, arguments);
             if (!this.model && this.collection && this.collection instanceof BaseCollection) {
@@ -47,9 +44,9 @@ define([
          * @private
          * @override
          */
-        _ensureElement: function () {
-            var $el, el;
-            el = this.el;
+        _ensureElement: function() {
+            var $el;
+            var el = this.el;
 
             if (el && typeof el === 'string' && el.substr(0, 7) === 'region:') {
                 $el = this._findRegionElem(el.substr(7));
@@ -69,13 +66,13 @@ define([
          * @returns {jQuery|undefined}
          * @private
          */
-        _findRegionElem: function (name) {
-            var $el, region, instance;
-            region = Chaplin.mediator.execute('region:find', name);
-            if (region != null) {
-                instance = region.instance;
-                if (instance.container != null) {
-                    $el = instance.region != null ? $(instance.container).find(region.selector) : instance.container;
+        _findRegionElem: function(name) {
+            var $el;
+            var region = Chaplin.mediator.execute('region:find', name);
+            if (region) {
+                var instance = region.instance;
+                if (instance.container) {
+                    $el = instance.region ? $(instance.container).find(region.selector) : instance.container;
                 } else {
                     $el = instance.$(region.selector);
                 }

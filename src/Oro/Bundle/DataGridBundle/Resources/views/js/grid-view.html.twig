@@ -2,9 +2,9 @@
     <div class="btn-toolbar">
         <% if (choices.length) { %>
             <div class="btn-group views-group">
-                <button data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">
+                <div data-toggle="dropdown" class="btn btn-link dropdown-toggle <% if (disabled) { %>disabled<% } %>">
                     <%= title %>
-                </button>
+                </div>
                 <ul class="dropdown-menu">
                     <% _.each(choices, function (choice) { %>
                         <li><a href="#" data-value="<%= choice.value %>"><%= choice.label %></a></li>
@@ -14,9 +14,9 @@
         <% } %>
         <% if (showActions) { %>
             <div class="btn-group actions-group">
-                <button class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">
+                <div class="btn btn-link dropdown-toggle" data-toggle="dropdown" href="#">
                     <%= actionsLabel %>
-                </button>
+                </div>
                 <ul class="dropdown-menu">
                     <% _.each(actions, function(action) { %>
                         <% if (action.enabled) { %>
@@ -24,10 +24,10 @@
                         <% } %>
                     <% }); %>
                 </ul>
-            </div>
-            <% if (dirty) { %>
+                <% if (dirty) { %>
                 <div class="edited-label">&nbsp;-&nbsp;<%= editedLabel %></div>
-            <% } %>
+                <% } %>
+            </div>
         <% } %>
     </div>
 </script>

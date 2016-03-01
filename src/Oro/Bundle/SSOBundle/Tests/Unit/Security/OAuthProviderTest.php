@@ -2,17 +2,44 @@
 
 namespace Oro\Bundle\SSOBundle\Tests\Security;
 
+use HWI\Bundle\OAuthBundle\Security\Core\Authentication\Token\OAuthToken as HWIOauthToken;
+use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
+use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
+
+use Symfony\Component\Security\Core\User\UserCheckerInterface;
+
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SSOBundle\Security\OAuthProvider;
 use Oro\Bundle\SSOBundle\Security\OAuthToken;
+use Oro\Bundle\SSOBundle\Security\OAuthTokenFactory;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class OAuthProviderTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var OAuthProvider
+     */
     private $oauthProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|OAuthAwareUserProviderInterface
+     */
     private $userProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|ResourceOwnerMap
+     */
     private $resourceOwnerMap;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|UserCheckerInterface
+     */
     private $userChecker;
+
+    /**
+     * @var OAuthTokenFactory
+     */
+    private $tokenFactory;
 
     public function setUp()
     {
@@ -22,18 +49,38 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
         $this->userChecker = $this->getMock('Symfony\Component\Security\Core\User\UserCheckerInterface');
-        
+
+        $this->tokenFactory = new OAuthTokenFactory();
+
         $this->oauthProvider = new OAuthProvider($this->userProvider, $this->resourceOwnerMap, $this->userChecker);
     }
 
-    public function testSupportsShuldReturnTrueForOAuthToken()
+    public function testSupportsShouldReturnTrueForOAuthToken()
     {
-        $token = new OAuthToken('token');
+        $this->resourceOwnerMap->expects($this->once())
+            ->method('hasResourceOwnerByName')
+            ->with($this->equalTo('google'))
+            ->will($this->returnValue(true));
+
+        $token = new HWIOauthToken('token');
+        $token->setResourceOwnerName('google');
         $this->assertTrue($this->oauthProvider->supports($token));
     }
-    
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
+     * @expectedExceptionMessage Token Factory is not set in OAuthProvider.
+     */
+    public function testAuthenticateIfTokenFactoryIsNotSet()
+    {
+        $token = new OAuthToken('token');
+        $this->oauthProvider->authenticate($token);
+    }
+
     public function testTokenShouldBeAuthenticated()
     {
+        $this->oauthProvider->setTokenFactory($this->tokenFactory);
+
         $token = new OAuthToken('token');
         $token->setResourceOwnerName('google');
         $organization = new Organization();
@@ -41,7 +88,7 @@ class OAuthProviderTest extends \PHPUnit_Framework_TestCase
         $token->setOrganizationContext($organization);
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
-        
+
         $resourceOwner = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\ResourceOwnerInterface');
         $resourceOwner
             ->expects($this->any())

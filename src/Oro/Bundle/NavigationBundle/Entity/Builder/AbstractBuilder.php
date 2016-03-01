@@ -17,6 +17,11 @@ abstract class AbstractBuilder
     private $type;
 
     /**
+     * @var string
+     */
+    protected $className;
+
+    /**
      * @param EntityManager $em
      * @param string        $type
      */
@@ -59,5 +64,17 @@ abstract class AbstractBuilder
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return $this
+     */
+    public function setClassName($className)
+    {
+        $this->className = $className;
+
+        return $this;
     }
 }

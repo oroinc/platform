@@ -2821,8 +2821,7 @@
     ************************************/
 
     function makeGlobal(shouldDeprecate) {
-        /*global ender:false */
-        if (typeof ender !== 'undefined') {
+                if (typeof ender !== 'undefined') {
             return;
         }
         oldGlobalMoment = globalScope.moment;

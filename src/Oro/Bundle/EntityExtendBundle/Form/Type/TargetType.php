@@ -13,40 +13,54 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
-use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class TargetType extends AbstractType
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var FieldConfigId
-     */
+    /** @var FieldConfigId */
     protected $configId;
 
-    public function __construct(ConfigManager $configManager, $configId)
+    /** @var string|null */
+    protected $targetEntityClass;
+
+    /**
+     * @param ConfigManager $configManager
+     * @param FieldConfigId $configId
+     */
+    public function __construct(ConfigManager $configManager, FieldConfigId $configId)
     {
         $this->configManager = $configManager;
         $this->configId = $configId;
-        $this->targetEntity = $this->configManager
+        $this->targetEntityClass = $this->configManager
             ->getProvider('extend')
             ->getConfigById($this->configId)
             ->get('target_entity');
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventListener(FormEvents::PRE_SET_DATA, array($this, 'preSetData'));
     }
 
+    /**
+     * Sets selected target entity class
+     *
+     * @param FormEvent $event
+     */
     public function preSetData(FormEvent $event)
     {
-        $event->setData($this->targetEntity);
+        $event->setData($this->targetEntityClass);
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
@@ -55,12 +69,15 @@ class TargetType extends AbstractType
                     'class' => 'extend-rel-target-name'
                 ),
                 'label'       => 'oro.entity_extend.form.target_entity',
-                'empty_value' => $this->targetEntity ? null : '',
-                'read_only'   => (bool) $this->targetEntity,
+                'empty_value' => $this->targetEntityClass ? null : '',
+                'read_only'   => (bool) $this->targetEntityClass,
                 'choices'     => $this->getEntityChoiceList(
                     $this->configId->getClassName(),
                     $this->configId->getFieldType()
                 ),
+                'choice_attr' => function ($choice) {
+                    return $this->getChoiceAttributes($choice);
+                },
                 'configs' => array(
                     'allowClear'              => true,
                     'placeholder'             => 'oro.entity.form.choose_entity',
@@ -71,17 +88,20 @@ class TargetType extends AbstractType
         );
     }
 
+    /**
+     * @param string $entityClassName
+     * @param string $relationType
+     *
+     * @return array
+     */
     protected function getEntityChoiceList($entityClassName, $relationType)
     {
-        $choices       = array();
-        $extendEntityConfig = $this->configManager->getProvider('extend');
-
         /** @var EntityConfigId[] $entityIds */
-        $entityIds = $this->targetEntity
-            ? array($extendEntityConfig->getId($this->targetEntity))
-            : $extendEntityConfig->getIds();
+        $entityIds = $this->targetEntityClass
+            ? [$this->configManager->getId('extend', $this->targetEntityClass)]
+            : $this->configManager->getIds('extend');
 
-        if (in_array($relationType, array(RelationTypeBase::ONE_TO_MANY, RelationTypeBase::MANY_TO_MANY))) {
+        if (in_array($relationType, [RelationTypeBase::ONE_TO_MANY, RelationTypeBase::MANY_TO_MANY], true)) {
             $entityIds = array_filter(
                 $entityIds,
                 function (EntityConfigId $configId) {
@@ -97,24 +117,41 @@ class TargetType extends AbstractType
             function (EntityConfigId $configId) {
                 $config = $this->configManager->getConfig($configId);
 
-                return $config->is('is_extend', false) || !$config->is('state', ExtendScope::STATE_NEW);
+                return
+                    !$config->is('state', ExtendScope::STATE_NEW)
+                    && (
+                        $this->targetEntityClass
+                        || !$config->is('is_deleted')
+                    );
             }
         );
 
+        $choices = [];
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
-            if ($className != $entityClassName) {
+            if ($className !== $entityClassName) {
                 $entityConfig        = $this->configManager->getProvider('entity')->getConfig($className);
-                $choices[$className] = new ChoiceListItem(
-                    $entityConfig->get('label'),
-                    array(
-                        'data-icon' => $entityConfig->get('icon')
-                    )
-                );
+                $choices[$className] = $entityConfig->get('label');
             }
         }
 
         return $choices;
+    }
+
+    /**
+     * Returns a list of choice attributes for the given entity
+     *
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    protected function getChoiceAttributes($entityClass)
+    {
+        $entityConfig = $this->configManager->getProvider('entity')->getConfig($entityClass);
+
+        return [
+            'data-icon' => $entityConfig->get('icon')
+        ];
     }
 
     /**

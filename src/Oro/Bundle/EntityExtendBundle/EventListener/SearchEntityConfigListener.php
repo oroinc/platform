@@ -8,8 +8,8 @@ use Doctrine\DBAL\Types\Type;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityConfigBundle\Event\PersistConfigEvent;
 use Oro\Bundle\SearchBundle\Command\ReindexCommand;
 use Oro\Bundle\SearchBundle\Entity\UpdateEntity;
 
@@ -30,27 +30,27 @@ class SearchEntityConfigListener
     }
 
     /**
-     * @param PersistConfigEvent $event
+     * @param PreFlushConfigEvent $event
      */
-    public function persistConfig(PersistConfigEvent $event)
+    public function preFlush(PreFlushConfigEvent $event)
     {
-        $eventConfig   = $event->getConfig();
-        $eventConfigId = $event->getConfigId();
+        $config = $event->getConfig('search');
+        if (null === $config) {
+            return;
+        }
 
-        if ($eventConfigId->getScope() !== 'search') {
-            return;
-        }
         $configManager = $event->getConfigManager();
-        $configManager->calculateConfigChangeSet($eventConfig);
-        $change = $configManager->getConfigChangeSet($eventConfig);
-        if (empty($change) || !array_key_exists('searchable', $change)) {
+        $changeSet     = $configManager->getConfigChangeSet($config);
+        if (!isset($changeSet['searchable'])) {
             return;
         }
-        $class = $eventConfigId->getClassName();
-        if ($configManager->getProvider('extend')->getConfig($class)->get('state') === ExtendScope::STATE_ACTIVE) {
-            $this->addReindexJob($eventConfigId->getClassName());
+
+        $className    = $config->getId()->getClassName();
+        $extendConfig = $configManager->getProvider('extend')->getConfig($className);
+        if ($extendConfig->get('state') === ExtendScope::STATE_ACTIVE) {
+            $this->addReindexJob($className);
         } else {
-            $this->addPostponeJob($eventConfigId->getClassName());
+            $this->addPostponeJob($className);
         }
     }
 
@@ -59,9 +59,9 @@ class SearchEntityConfigListener
      */
     protected function addPostponeJob($entityClass)
     {
-        $update = $this->registry->getRepository('OroSearchBundle:UpdateEntity')->find($entityClass);
+        $em = $this->registry->getManagerForClass('OroSearchBundle:UpdateEntity');
+        $update = $em->getRepository('OroSearchBundle:UpdateEntity')->find($entityClass);
         if (!$update) {
-            $em     = $this->registry->getManager();
             $update = new UpdateEntity();
             $update->setEntity($entityClass);
             $em->persist($update);
@@ -77,7 +77,7 @@ class SearchEntityConfigListener
         $job = $this->registry->getRepository('JMSJobQueueBundle:Job')->createQueryBuilder('job')
             ->select('job')
             ->where('job.command = :command')
-            ->andWhere('job.args = :args')
+            ->andWhere('cast(job.args as text) = :args')
             ->andWhere('job.state in (\'pending\', \'running\')')
             ->setParameter('command', ReindexCommand::COMMAND_NAME)
             ->setParameter('args', ['class' => $entityClass], Type::JSON_ARRAY)

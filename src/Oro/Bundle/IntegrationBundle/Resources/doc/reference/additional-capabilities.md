@@ -29,6 +29,8 @@ and then methods `addStatusData` and `getStatusData` will be available.
         if (null !== $item && !$this->getSourceIterator()->valid()) {
             $this->addStatusData('lastItemUpdatedAt', $item['updated_at']);
         }
+        
+        return $item;
     }
     // ...
 

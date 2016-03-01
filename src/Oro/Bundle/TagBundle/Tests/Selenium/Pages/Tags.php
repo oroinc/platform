@@ -8,45 +8,23 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Tags
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages\Objects
- * @method Tags openTags() openTags(string)
+ * @method Tags openTags(string $bundlePath)
+ * @method Tag open(array $filter)
+ * @method Tag add()
  * {@inheritdoc}
  */
 class Tags extends AbstractPageFilteredGrid
 {
+    const NEW_ENTITY_BUTTON = "//a[@title='Create Tag']";
     const URL = 'tag';
 
-    public function __construct($testCase, $redirect = true)
+    public function entityNew()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
+        return new Tag($this->test);
     }
 
-    /**
-     * @param bool $new
-     *
-     * @return Tag
-     */
-    public function add($new = true)
+    public function entityView()
     {
-        $this->test->byXPath("//a[@title='Create Tag']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-        $tag = new Tag($this->test);
-        return $tag->init($new);
-    }
-
-    /**
-     * @param array $entityData
-     *
-     * @return Tag
-     */
-    public function open($entityData = array())
-    {
-        $contact = $this->getEntity($entityData);
-        $contact->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-
         return new Tag($this->test);
     }
 
@@ -55,33 +33,33 @@ class Tags extends AbstractPageFilteredGrid
      */
     public function edit()
     {
-        $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($menu);
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Edit']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-        $tag = new Tag($this->test);
-
-        return $tag->init();
-    }
-
-    public function delete()
-    {
-        $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
-        $this->test->moveto($menu);
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Delete']")->click();
-        $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
+        if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
+            $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
+            $this->test->moveto($menu);
+            $this->test->byXpath("//ul[contains(@class,'dropdown-menu__action-cell')]" .
+                "[contains(@class,'dropdown-menu__floating')]//a[@title= 'Edit']")->click();
+        } else {
+            $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Edit']")->click();
+        }
         $this->waitPageToLoad();
         $this->waitForAjax();
 
-        return $this;
+        return new Tag($this->test);
     }
 
     public function checkContextMenu($tagName, $contextName)
     {
         $this->filterBy('Tag', $tagName);
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
-        $this->waitForAjax();
-        $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']");
+        if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
+            $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
+            $this->waitForAjax();
+            $result = $this->assertElementNotPresent("//ul[contains(@class,'dropdown-menu__action-cell')]" .
+                "[contains(@class,'dropdown-menu__floating')]//a[@title= '{$contextName}']");
+        } else {
+            $result = $this->assertElementNotPresent(
+                "//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']"
+            );
+        }
+        return $result;
     }
 }

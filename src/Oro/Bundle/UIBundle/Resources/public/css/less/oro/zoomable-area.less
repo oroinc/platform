@@ -1,0 +1,44 @@
+.zoomable-area {
+  cursor: move;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+  position: relative; /* required for valid controls positioning */
+  .zoom-controls {
+    position: absolute;
+    z-index: 600;
+    right: 10px;
+    top: 10px;
+    .zoom-level {
+      width: 42px;
+      display: inline-block;
+      text-align: center;
+      vertical-align: middle;
+    }
+    button {
+      padding: 0 4px;
+    }
+  }
+}
+
+.icon-search-plus:before {
+  content: "\f00e";
+}
+
+.icon-search-minus:before {
+  content: "\f010";
+}
+
+.force-grabbed-cursor *{
+  cursor: move !important;
+  cursor: -moz-grabbing !important;
+  cursor: -webkit-grabbing !important;
+}
+
+.force-grabbed-cursor {
+  -webkit-touch-callout: none;
+  -webkit-user-select: none;
+  -khtml-user-select: none;
+  -moz-user-select: none;
+  -ms-user-select: none;
+  user-select: none;
+}

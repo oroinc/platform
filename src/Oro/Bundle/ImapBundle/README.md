@@ -45,6 +45,12 @@ Usage
     // Request an IMAP server for find emails
     $imapManager->selectFolder('INBOX');
     $emails = $imapManager->findItems($query);
+    
+    // Creating IMAP folder manager
+    $imapFolderManager = new ImapEmailFolderManager($imapConnector);
+    
+    // Getting IMAP folders 
+    $folders = $imapFolderManager->getFolders(null, true);
 ```
 
 Synchronization with IMAP servers
@@ -53,8 +59,9 @@ Each user who want to synchronize own emails with BAP need to configure own IMAP
 During the synchronization we load emails from user's inbox and outbox by the following algorithm:
 
  - If a user's mailbox is newer synchronized yet then we load emails for the last year only.
- - We load only emails related to BAP users/contacts only. It means that we load only emails sent to/from email addresses assigned to any user/contact.
-
+ - We load all emails for selected folders according to synchronization settings (User menu -> My user -> Edit -> Email synchronization settings tab).
+ - If a folder is deleted on IMAP server, it will be deleted in OroCRM as well. Folders with existing emails that already have been synchronized will not be deleted in OroCRM.
+ - After changing synchronization settings folders will be synchronized automatically (not emails).
 
 By default the synchronization is executed by CRON every 30 minutes. Also you can execute it manually using the following command:
 ```bash

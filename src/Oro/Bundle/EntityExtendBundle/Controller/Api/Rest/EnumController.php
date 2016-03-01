@@ -22,7 +22,11 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 class EnumController extends FOSRestController
 {
     /**
-     * Get all values of the specified enumeration
+     * Get all values of the specified enumeration.
+     * Deprecated since 1.9. Use /api/rest/{version}/{dictionary}.{_format} instead.
+     * For example /api/rest/latest/leadsources.json or /api/rest/latest/Extend_Entity_EV_Lead_Source.json.
+     * Take into account that 'priority' field is replaced with 'order' field.
+     * Also by default only the first 10 items are returned. To get all items add '?limit=-1'.
      *
      * @param string $entityName Entity full class name; backslashes (\) should be replaced with underscore (_).
      *
@@ -35,6 +39,8 @@ class EnumController extends FOSRestController
      * )
      *
      * @return Response
+     *
+     * @deprecated since 1.9. Use /api/rest/{version}/{dictionary}.{_format} (oro_api_get_dictionary_values) instead
      */
     public function getAction($entityName)
     {

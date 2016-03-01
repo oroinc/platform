@@ -1,5 +1,3 @@
-/*global define, require*/
-/*jslint nomen: true*/
 define([
     'jquery',
     'underscore',
@@ -27,7 +25,7 @@ define([
             }
 
             this._on(this.$fieldChoice, {
-                changed: function (e, fieldId) {
+                changed: function(e, fieldId) {
                     this.element.data('value', {});
                     if (this.auditFilter) {
                         this.element.one('changed', _.bind(this.auditFilter.reset, this.auditFilter));
@@ -37,7 +35,7 @@ define([
             });
         },
 
-        _renderChangeStateChoice: function (data) {
+        _renderChangeStateChoice: function(data) {
             if (this.$changeStateChoice) {
                 return;
             }
@@ -93,7 +91,7 @@ define([
             this.$filterContainer.after(this.$auditFilterContainer);
 
             this._on(this.auditFilter.$el, {
-                change: function () {
+                change: function() {
                     this.auditFilter.applyValue();
                 }
             });
@@ -102,7 +100,7 @@ define([
                 'changed_to_value': this._renderChangedToValueChoice
             };
             this._on(this.auditTypeFilter.$el, {
-                change: function () {
+                change: function() {
                     this.auditTypeFilter.applyValue();
                     onChangeCb[this.auditTypeFilter.value.type].apply(this);
                 }
@@ -112,7 +110,7 @@ define([
             this.element.data('value', data);
         },
 
-        _renderChangedChoice: function () {
+        _renderChangedChoice: function() {
             this.$filterContainer.hide();
             this.$auditFilterContainer.css('display', 'inline');
             this.auditFilter.$el.find('> .dropdown:last').before(this.$changeStateChoice);
@@ -120,7 +118,7 @@ define([
             this.$changeStateChoice.after(this.$interval);
         },
 
-        _renderChangedToValueChoice: function () {
+        _renderChangedToValueChoice: function() {
             this.$filterContainer.show();
             this.$auditFilterContainer.css('display', 'block');
             this.filter.$el.find('> .dropdown:last').before(this.$changeStateChoice);
@@ -138,7 +136,7 @@ define([
             this.$interval.prevUntil().hide();
         },
 
-        _getFilterCriterion: function () {
+        _getFilterCriterion: function() {
             var filter = {
                 filter: this.filter.name,
                 data: this.filter.getValue()
@@ -206,7 +204,7 @@ define([
             this.element.data('value', data);
         },
 
-        _onUpdate: function () {
+        _onUpdate: function() {
             if (!this.auditFilter || !this.auditFilter.value || this.auditFilter.isEmptyValue()) {
                 return this._superApply(arguments);
             }
@@ -220,7 +218,7 @@ define([
             this.element.trigger('changed');
         },
 
-        _destroy: function () {
+        _destroy: function() {
             this._superApply(arguments);
             if (this.auditFilter) {
                 this.auditFilter.dispose();

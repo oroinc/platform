@@ -10,15 +10,19 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\FieldAccessor;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class DynamicFieldsExtension extends AbstractTypeExtension
 {
@@ -31,10 +35,11 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var PropertyAccessor */
+    protected $propertyAccessor;
 
     /**
      * @param ConfigManager       $configManager
@@ -48,10 +53,11 @@ class DynamicFieldsExtension extends AbstractTypeExtension
         TranslatorInterface $translator,
         DoctrineHelper $doctrineHelper
     ) {
-        $this->configManager = $configManager;
-        $this->router        = $router;
-        $this->translator    = $translator;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->configManager    = $configManager;
+        $this->router           = $router;
+        $this->translator       = $translator;
+        $this->doctrineHelper   = $doctrineHelper;
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -59,21 +65,17 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
+        if (!$this->isApplicable($options)) {
             return;
         }
 
         $className = $options['data_class'];
-        if (!$this->configManager->getProvider('extend')->hasConfig($className)) {
-            return;
-        }
 
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $viewConfigProvider   = $this->configManager->getProvider('view');
-        $formConfigs          = $this->configManager->getProvider('form')->getConfigs($className);
 
-        $priorities = [];
-        $fields = [];
+        $fields      = [];
+        $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
                 continue;
@@ -88,14 +90,15 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 continue;
             }
 
-            $fields[] = $fieldName;
-            $priorities[] = $viewConfigProvider->getConfig($className, $fieldName)->get('priority', false, 0);
+            $fields[$fieldName] = [
+                'priority' => $viewConfigProvider->getConfig($className, $fieldName)->get('priority', false, 0)
+            ];
         }
 
-        array_multisort($priorities, SORT_DESC, $fields);
+        ArrayUtil::sortBy($fields, true);
 
-        foreach ($fields as $field) {
-            $builder->add($field);
+        foreach ($fields as $fieldName => $priority) {
+            $builder->add($fieldName);
         }
     }
 
@@ -106,16 +109,15 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        $className = $options['data_class'];
-        if ($options['dynamic_fields_disabled'] || empty($options['data_class']) ||
-            !$this->configManager->getProvider('extend')->hasConfig($className)) {
+        if (!$this->isApplicable($options)) {
             return;
         }
 
-        $extendConfigProvider = $this->configManager->getProvider('extend');
-        $formConfigProvider   = $this->configManager->getProvider('form');
+        $className = $options['data_class'];
 
-        $formConfigs = $formConfigProvider->getConfigs($className);
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+
+        $formConfigs = $this->configManager->getProvider('form')->getConfigs($className);
         foreach ($formConfigs as $formConfig) {
             if (!$formConfig->is('is_enabled')) {
                 continue;
@@ -137,7 +139,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
 
             $view->children[$fieldName]->vars['extra_field'] = true;
 
-            if (!in_array($fieldConfigId->getFieldType(), RelationType::$toManyRelations)) {
+            if (!in_array($fieldConfigId->getFieldType(), RelationType::$toManyRelations, true)) {
                 continue;
             }
 
@@ -152,7 +154,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     protected function addInitialElements(FormView $view, FormInterface $form, ConfigInterface $extendConfig)
     {
-        $data      = $form->getData();
+        $data = $form->getData();
         if (!is_object($data)) {
             return;
         }
@@ -214,21 +216,44 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     }
 
     /**
-     * @param ConfigInterface         $extendConfig
-     * @param ConfigProviderInterface $extendConfigProvider
+     * @param array $options
      *
      * @return bool
      */
-    protected function isApplicableField(ConfigInterface $extendConfig, ConfigProviderInterface $extendConfigProvider)
+    protected function isApplicable(array $options)
+    {
+        if ($options['dynamic_fields_disabled'] || empty($options['data_class'])) {
+            return false;
+        }
+
+        $className = $options['data_class'];
+        if (!$this->doctrineHelper->isManageableEntity($className)) {
+            return false;
+        }
+        if (!$this->configManager->getProvider('extend')->hasConfig($className)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param ConfigInterface $extendConfig
+     * @param ConfigProvider  $extendConfigProvider
+     *
+     * @return bool
+     */
+    protected function isApplicableField(ConfigInterface $extendConfig, ConfigProvider $extendConfigProvider)
     {
         return
-            !$extendConfig->is('is_deleted')
-            && $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
-            && !$extendConfig->is('state', ExtendScope::STATE_NEW)
-            && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations)
+            $extendConfig->is('owner', ExtendScope::OWNER_CUSTOM)
+            && ExtendHelper::isFieldAccessible($extendConfig)
+            && !in_array($extendConfig->getId()->getFieldType(), RelationType::$toAnyRelations, true)
             && (
                 !$extendConfig->has('target_entity')
-                || !$extendConfigProvider->getConfig($extendConfig->get('target_entity'))->is('is_deleted')
+                || ExtendHelper::isEntityAccessible(
+                    $extendConfigProvider->getConfig($extendConfig->get('target_entity'))
+                )
             );
     }
 
@@ -241,12 +266,17 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     protected function getInitialElements($entities, $defaultEntity, ConfigInterface $extendConfig)
     {
-        $result = [];
+        $result          = [];
+        $className       = $extendConfig->get('target_entity');
+        $identifier      = $this->getIdColumnName($className);
+        $defaultEntityId = $defaultEntity !== null
+            ? $this->propertyAccessor->getValue($defaultEntity, $identifier)
+            : null;
         foreach ($entities as $entity) {
             $extraData = [];
             foreach ($extendConfig->get('target_grid') as $fieldName) {
                 $label = $this->configManager->getProvider('entity')
-                    ->getConfig($extendConfig->get('target_entity'), $fieldName)
+                    ->getConfig($className, $fieldName)
                     ->get('label');
 
                 $extraData[] = [
@@ -260,23 +290,48 @@ class DynamicFieldsExtension extends AbstractTypeExtension
                 $title[] = FieldAccessor::getValue($entity, $fieldName);
             }
 
-            $result[] = [
-                'id'        => $entity->getId(),
-                'label'     => implode(' ', $title),
-                'link'      => $this->router->generate(
-                    'oro_entity_detailed',
-                    [
-                        'id'         => $entity->getId(),
-                        'entityName' => str_replace('\\', '_', $extendConfig->getId()->getClassName()),
-                        'fieldName'  => $extendConfig->getId()->getFieldName()
-                    ]
-                ),
-                'extraData' => $extraData,
-                'isDefault' => ($defaultEntity != null && $defaultEntity->getId() == $entity->getId())
+            /**
+             * If using ExtendExtension with a form that only updates part of
+             * of the entity, we need to make sure an ID is present. An ID
+             * isn't present when a PHP-based Validation Constraint is fired.
+             */
+            $id = $this->propertyAccessor->getValue($entity, $identifier);
 
-            ];
+            if (null !== $id) {
+                $result[] = [
+                    'id'        => $id,
+                    'label'     => implode(' ', $title),
+                    'link'      => $this->router->generate(
+                        'oro_entity_detailed',
+                        [
+                            'id'         => $id,
+                            'entityName' => str_replace('\\', '_', $extendConfig->getId()->getClassName()),
+                            'fieldName'  => $extendConfig->getId()->getFieldName()
+                        ]
+                    ),
+                    'extraData' => $extraData,
+                    'isDefault' => ($defaultEntity != null && $defaultEntityId === $id)
+                ];
+            }
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return string
+     */
+    protected function getIdColumnName($className)
+    {
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        if ($extendConfigProvider->hasConfig($className)) {
+            $idColumns = $extendConfigProvider->getConfig($className)->get('pk_columns', false, ['id']);
+
+            return reset($idColumns);
+        }
+
+        return 'id';
     }
 }

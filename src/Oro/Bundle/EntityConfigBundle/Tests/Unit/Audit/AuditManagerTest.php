@@ -2,120 +2,157 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Audit;
 
+use Symfony\Component\Security\Core\User\UserInterface;
+
+use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Audit\AuditManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AuditManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var AuditManager
-     */
-    private $auditManager;
+    const SCOPE = 'testScope';
+    const ENTITY_CLASS = 'Test\Entity';
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $tokenStorage;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $configManager;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    private $em;
+
+    /** @var AuditManager */
+    private $auditManager;
 
     protected function setUp()
     {
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $token = $this->getMockForAbstractClass('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $token->expects($this->any())->method('getUser')->will($this->returnValue($user));
-
-        $securityContext = $this->getMockForAbstractClass('Symfony\Component\Security\Core\SecurityContextInterface');
-        $securityContext->expects($this->any())->method('getToken')->will($this->returnValue($token));
-
-        $securityLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $securityLink->expects($this->any())->method('getService')->will($this->returnValue($securityContext));
+        $this->tokenStorage = $this->getMock(
+            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface'
+        );
 
         $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configManagerLink = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
-        )
+        $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $configManagerLink->expects($this->any())->method('getService')->will($this->returnValue($this->configManager));
 
-        $provider = new ConfigProvider($this->configManager, 'testScope', array());
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine->expects($this->any())
+            ->method('getManager')
+            ->with(null)
+            ->willReturn($this->em);
 
-        $this->configManager->expects($this->any())->method('getEntityManager')->will($this->returnValue($em));
-        $this->configManager->expects($this->any())->method('getUpdateConfig')->will(
-            $this->returnValue(
-                array(
-                    new Config(new EntityConfigId('testScope', 'testClass')),
-                    new Config(new FieldConfigId('testScope', 'testClass', 'testField', 'string')),
-                )
-            )
-        );
-
-        $this->configManager->expects($this->any())->method('getProvider')->will($this->returnValue($provider));
-
-        $this->auditManager = new AuditManager($configManagerLink, $securityLink);
+        $this->auditManager = new AuditManager($this->tokenStorage, $doctrine);
     }
 
     protected function tearDown()
     {
-        $this->auditManager = null;
+        unset($this->tokenStorage, $this->configManager, $this->auditManager);
     }
 
-    public function testLog()
+    public function testBuildEntity()
     {
-        $this->configManager->expects($this->any())->method('getConfigChangeSet')->will(
-            $this->returnValue(array('key' => 'value'))
-        );
+        $user = $this->initSecurityContext();
 
-        $this->auditManager->log();
+        $this->configManager->expects($this->once())
+            ->method('getUpdateConfig')
+            ->willReturn(
+                [
+                    new Config(new EntityConfigId(self::SCOPE, self::ENTITY_CLASS)),
+                    new Config(new FieldConfigId(self::SCOPE, self::ENTITY_CLASS, 'testField', 'string')),
+                ]
+            );
+
+        $configProvider = new ConfigProvider($this->configManager, self::SCOPE, []);
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->willReturn($configProvider);
+
+        $this->configManager->expects($this->exactly(2))
+            ->method('getConfigChangeSet')
+            ->willReturn(['old_val', 'new_value']);
+
+        $result = $this->auditManager->buildEntity($this->configManager);
+
+        $this->assertSame($user, $result->getUser());
+        $this->assertCount(2, $result->getDiffs());
     }
 
-    public function testLogWithOutChanges()
+    public function testBuildEntityNoChanges()
     {
-        $this->configManager->expects($this->any())->method('getConfigChangeSet')->will(
-            $this->returnValue(array())
-        );
+        $this->initSecurityContext();
 
-        $this->auditManager->log();
+        $this->configManager->expects($this->once())
+            ->method('getUpdateConfig')
+            ->willReturn([]);
+
+        $this->assertNull($this->auditManager->buildEntity($this->configManager));
     }
 
-    public function testLogWithoutUser()
+    public function testBuildEntityWithoutSecurityToken()
     {
-        $securityContext = $this->getMockForAbstractClass('Symfony\Component\Security\Core\SecurityContextInterface');
-        $securityContext->expects($this->any())->method('getToken');
+        $this->tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->willReturn(null);
+        $this->configManager->expects($this->never())
+            ->method('getUpdateConfig');
 
-        $securityLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+        $this->auditManager->buildEntity($this->configManager);
+    }
+
+    public function testBuildEntityWithUnsupportedSecurityToken()
+    {
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn('test');
+        $this->tokenStorage->expects($this->any())
+            ->method('getToken')
+            ->willReturn($token);
+        $this->configManager->expects($this->never())
+            ->method('getUpdateConfig');
+
+        $this->auditManager->buildEntity($this->configManager);
+    }
+
+    /**
+     * @return UserInterface
+     */
+    protected function initSecurityContext()
+    {
+        $user = $this->getMock('Symfony\Component\Security\Core\User\UserInterface');
+
+        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token->expects($this->once())
+            ->method('getUser')
+            ->willReturn($user);
+
+        $this->tokenStorage->expects($this->once())
+            ->method('getToken')
+            ->willReturn($token);
+
+        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
-        $securityLink->expects($this->any())->method('getService')->will($this->returnValue($securityContext));
+        $this->em->expects($this->once())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
+        $classMetadata->expects($this->once())
+            ->method('getIdentifierValues')
+            ->with($this->identicalTo($user))
+            ->willReturn(['id' => 123]);
+        $this->em->expects($this->once())
+            ->method('getReference')
+            ->with(get_class($user), 123)
+            ->willReturn($user);
 
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $configManagerLink = $this->getMockBuilder(
-            'Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
-        $configManagerLink->expects($this->any())->method('getService')->will($this->returnValue($configManager));
-
-        $auditManager = new AuditManager($configManagerLink, $securityLink);
-
-        $auditManager->log();
+        return $user;
     }
 }

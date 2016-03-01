@@ -225,7 +225,8 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->method('delete')
             ->with($this->attachment->getFilename());
 
-        $this->attachmentManager->preUpload($this->attachment);
+        $this->attachmentManager->preUpload($this->attachment); // delete should be called
+        $this->attachmentManager->preUpload($this->attachment); // delete shouldn't be called
 
         $this->assertNull($this->attachment->getFilename());
         $this->assertNull($this->attachment->getExtension());
@@ -320,5 +321,57 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
     public function testParseInvalidFileKey()
     {
         $this->attachmentManager->parseFileKey('Invalid Key');
+    }
+
+    public function testCopyLocalFileToStorage()
+    {
+        $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
+
+        $newFileName = 'test2.txt';
+
+        $resultStream = new InMemoryBuffer($this->filesystem, $newFileName);
+
+        $this->filesystem->expects($this->once())
+            ->method('createStream')
+            ->with($newFileName)
+            ->will($this->returnValue($resultStream));
+
+        $this->attachmentManager->copyLocalFileToStorage($localFilePath, $newFileName);
+        $resultStream->open(new StreamMode('rb+'));
+        $resultStream->seek(0);
+
+        $this->assertEquals('Test data', $resultStream->read(100));
+    }
+
+    public function testCopyAttachmentFile()
+    {
+        $localFilePath = __DIR__ . '/../Fixtures/testFile/test.txt';
+
+        $sourceStream = new InMemoryBuffer($this->filesystem, $this->attachment->getFilename());
+        $sourceStream->open(new StreamMode('wb+'));
+        $sourceStream->write(file_get_contents($localFilePath));
+        $sourceStream->seek(0);
+        $sourceStream->close();
+
+        $resultStream = new InMemoryBuffer($this->filesystem, 'test2.txt');
+
+        $this->filesystem->expects($this->at(0))
+            ->method('createStream')
+            ->with($this->attachment->getFilename())
+            ->will($this->returnValue($sourceStream));
+
+        $this->filesystem->expects($this->at(1))
+            ->method('createStream')
+            ->with($this->anything())
+            ->will($this->returnValue($resultStream));
+
+        $newAttachment = $this->attachmentManager->copyAttachmentFile($this->attachment);
+
+        $this->assertEquals($this->attachment->getOriginalFilename(), $newAttachment->getOriginalFilename());
+        $this->assertNotEquals($this->attachment->getFilename(), $newAttachment->getFilename());
+
+        $resultStream->open(new StreamMode('rb+'));
+        $resultStream->seek(0);
+        $this->assertEquals('Test data', $resultStream->read(100));
     }
 }

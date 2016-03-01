@@ -3,12 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\PreloadedExtension;
-use Symfony\Component\OptionsResolver\Options;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowAttributesType;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+use Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed;
 
 class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 {
@@ -73,48 +74,28 @@ class WorkflowTransitionTypeTest extends AbstractWorkflowAttributesTypeTestCase
 
     public function testSetDefaultOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults(['constraints' => null]);
 
-        $resolver->expects($this->once())
-            ->method('setRequired')
-            ->with(array('workflow_item', 'transition_name'));
-
-        $resolver->expects($this->once())
-            ->method('setAllowedTypes')
-            ->with(array('transition_name' => 'string'));
-
-        $resolver->expects($this->once())
-            ->method('setNormalizers')
-            ->will(
-                $this->returnCallback(
-                    function ($value) {
-                        $this->assertInternalType('array', $value);
-                        $this->assertArrayHasKey('constraints', $value);
-                        $this->assertInternalType('callable', $value['constraints']);
-
-                        $workflowItem = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem');
-                        $transitionName = 'test_transition';
-
-                        $options = new Options();
-
-                        $options->set('workflow_item', $workflowItem);
-                        $options->set('transition_name', $transitionName);
-
-                        $constraints = array();
-
-                        $constraints = $value['constraints']($options, $constraints);
-
-                        $this->assertInstanceOf(
-                            'Oro\Bundle\WorkflowBundle\Validator\Constraints\TransitionIsAllowed',
-                            $constraints[0]
-                        );
-
-                        $this->assertEquals($workflowItem, $constraints[0]->getWorkflowItem());
-                        $this->assertEquals($transitionName, $constraints[0]->getTransitionName());
-                    }
-                )
-            );
+        $workflowItem = new WorkflowItem();
+        $transitionName = 'TransitionName';
 
         $this->type->setDefaultOptions($resolver);
+        $result = $resolver->resolve(
+            [
+                'workflow_item' => $workflowItem,
+                'transition_name' => $transitionName
+            ]
+        );
+        $this->assertEquals(
+            [
+                'workflow_item' => $workflowItem,
+                'transition_name' => $transitionName,
+                'constraints' => [
+                    new TransitionIsAllowed($workflowItem, $transitionName)
+                ]
+            ],
+            $result
+        );
     }
 }

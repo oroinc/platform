@@ -6,6 +6,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ArrayUtil
 {
     /**
@@ -169,5 +172,204 @@ class ArrayUtil
         );
 
         return array_keys($sortable);
+    }
+
+    /**
+     * Compares 2 values based on order specified in the argument
+     *
+     * @param int[] $order
+     *
+     * @return callable
+     */
+    public static function createOrderedComparator(array $order)
+    {
+        return function ($a, $b) use ($order) {
+            if (!array_key_exists($b, $order)) {
+                return -1;
+            }
+
+            if (!array_key_exists($a, $order)) {
+                return 1;
+            }
+
+            return $order[$a] - $order[$b];
+        };
+    }
+
+    /**
+     * Return true if callback on any element returns truthy value, false otherwise
+     *
+     * @param callable $callback
+     * @param array    $array
+     *
+     * @return boolean
+     */
+    public static function some(callable $callback, array $array)
+    {
+        foreach ($array as $item) {
+            if (call_user_func($callback, $item)) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Return first element on which callback returns true value, null otherwise
+     *
+     * @param callable $callback
+     * @param array    $array
+     *
+     * @return mixed|null
+     */
+    public static function find(callable $callback, array $array)
+    {
+        foreach ($array as $item) {
+            if (call_user_func($callback, $item)) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    /**
+     * Return copy of the array starting with item for which callback returns falsity value
+     *
+     * @param callable $callback
+     * @param array    $array
+     *
+     * @return array
+     */
+    public static function dropWhile(callable $callback, array $array)
+    {
+        foreach ($array as $key => $value) {
+            if (!call_user_func($callback, $value)) {
+                return array_slice($array, $key);
+            }
+        }
+
+        return [];
+    }
+
+    /**
+     * Recursively merge arrays.
+     *
+     * Merge two arrays as array_merge_recursive do, but instead of converting values to arrays when keys are same
+     * replaces value from first array with value from second
+     *
+     * @param array $first
+     * @param array $second
+     *
+     * @return array
+     */
+    public static function arrayMergeRecursiveDistinct(array $first, array $second)
+    {
+        foreach ($second as $idx => $value) {
+            if (is_integer($idx)) {
+                $first[] = $value;
+            } else {
+                if (!array_key_exists($idx, $first)) {
+                    $first[$idx] = $value;
+                } else {
+                    if (is_array($value)) {
+                        $first[$idx] = self::arrayMergeRecursiveDistinct($first[$idx], $value);
+                    } else {
+                        $first[$idx] = $value;
+                    }
+                }
+            }
+        }
+
+        return $first;
+    }
+
+    /**
+     * Return array of ranges (inclusive)
+     * [[min1, max1], [min2, max2], ...]
+     *
+     * @param int[] $ints List of integers
+     *
+     * @return array
+     */
+    public static function intRanges(array $ints)
+    {
+        $ints = array_unique($ints);
+        sort($ints);
+
+        $result = [];
+        while (false !== ($subResult = static::shiftRange($ints))) {
+            $result[] = $subResult;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $sortedUniqueInts
+     *
+     * @return array|false Array 2 elements [min, max] or false when the array is empty
+     */
+    public static function shiftRange(array &$sortedUniqueInts)
+    {
+        if (!$sortedUniqueInts) {
+            return false;
+        }
+
+        $min = $max = reset($sortedUniqueInts);
+
+        $c = 1;
+        while (next($sortedUniqueInts) !== false && current($sortedUniqueInts) - $c === $min) {
+            $max = current($sortedUniqueInts);
+            array_shift($sortedUniqueInts);
+            $c++;
+        }
+        array_shift($sortedUniqueInts);
+
+        return [$min, $max];
+    }
+
+    /**
+     * Return the values from a single column in the input array
+     *
+     * http://php.net/manual/en/function.array-column.php
+     *
+     * @param array $array
+     * @param mixed $columnKey
+     * @param mixed $indexKey
+     *
+     * @return array
+     */
+    public static function arrayColumn(array $array, $columnKey, $indexKey = null)
+    {
+        $result = [];
+
+        if (empty($array)) {
+            return [];
+        }
+
+        if (empty($columnKey)) {
+            throw new \InvalidArgumentException('Column key is empty');
+        }
+
+        foreach ($array as $item) {
+            if (!isset($item[$columnKey])) {
+                continue;
+            }
+
+            if ($indexKey && !isset($item[$indexKey])) {
+                continue;
+            }
+
+            if ($indexKey) {
+                $index          = $item[$indexKey];
+                $result[$index] = $item[$columnKey];
+            } else {
+                $result[] = $item[$columnKey];
+            }
+        }
+
+        return $result;
     }
 }

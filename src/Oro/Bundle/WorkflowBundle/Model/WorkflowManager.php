@@ -234,7 +234,52 @@ class WorkflowManager
         $em->beginTransaction();
         try {
             $workflow->transit($workflowItem, $transition);
-            $workflowItem->setUpdated();
+            $workflowItem->setUpdated(); // transition might not change workflow item
+            $em->flush();
+            $em->commit();
+        } catch (\Exception $e) {
+            $em->rollback();
+            throw $e;
+        }
+    }
+
+    /**
+     * Transit several workflow items in one transaction
+     *
+     * Input data format:
+     * array(
+     *      array(
+     *          'workflowItem' => <workflow item entity: WorkflowItem>,
+     *          'transition'   => <transition name: string|Transition>
+     *      ),
+     *      ...
+     * )
+     *
+     * @param array $data
+     * @throws \Exception
+     */
+    public function massTransit(array $data)
+    {
+        /** @var EntityManager $em */
+        $em = $this->registry->getManager();
+        $em->beginTransaction();
+        try {
+            foreach ($data as $row) {
+                if (empty($row['workflowItem']) || !$row['workflowItem'] instanceof WorkflowItem
+                    || empty($row['transition'])
+                ) {
+                    continue;
+                }
+
+                /** @var WorkflowItem $workflowItem */
+                $workflowItem = $row['workflowItem'];
+                $workflow = $this->getWorkflow($workflowItem);
+                $transition = $row['transition'];
+
+                $workflow->transit($workflowItem, $transition);
+                $workflowItem->setUpdated(); // transition might not change workflow item
+            }
+
             $em->flush();
             $em->commit();
         } catch (\Exception $e) {

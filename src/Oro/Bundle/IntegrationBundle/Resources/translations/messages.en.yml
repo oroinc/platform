@@ -33,10 +33,22 @@ oro:
             synchronization_settings.label: Synchronization Settings
             is_two_way_sync_enabled.label: Enable two way sync
             sync_priority.label: Sync priority
+            sync_priority.tooltip: >
+                Select if your local version of the data or the remote application
+                data get priority in the case that both were updated since the last sync process.
             remote_wins.label: Remote wins
             local_wins.label: Local wins
             default_user_owner.label: Default owner
+            default_user_owner.description: >
+                Select the owner of the integration. All entities imported from the integration
+                will be assigned to the selected user.
+            default_business_unit_owner.label: Default Business Unit Owner
+            default_business_unit_owner.description: >
+                Select owner of the integration. All entities imported from the integration
+                will be owned by selected business unit. Parent units will be also assigned.
             organization.label: Organization
+            organization.description: >
+                Select the organization for the integration.
             enabled:
                 label:           Status
                 active.label:    Active
@@ -56,6 +68,7 @@ oro:
             synchronization_settings.label: Synchronization Settings
             organization.label:             Organization
             default_user_owner.label:       Default owner
+            default_business_unit_owner.label: Default Business Unit Owner
             edit_mode.label:                Edit mode
         integration_status:
             competed.label:  Completed

@@ -1,0 +1,5 @@
+oro_entity:
+    exclusions:
+        - { entity: Oro\Bundle\TagBundle\Entity\Tag, field: tagging }
+    entity_alias_exclusions:
+        - Oro\Bundle\TagBundle\Entity\Tagging

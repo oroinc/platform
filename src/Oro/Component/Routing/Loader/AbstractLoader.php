@@ -29,7 +29,8 @@ abstract class AbstractLoader extends Loader
     {
         $routes = new SortableRouteCollection();
 
-        foreach ($this->getResources() as $resource) {
+        $resources = $this->getResources();
+        foreach ($resources as $resource) {
             $routes->addCollection($this->resolve($resource)->load($resource));
         }
 

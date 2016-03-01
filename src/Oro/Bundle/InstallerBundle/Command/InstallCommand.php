@@ -2,20 +2,25 @@
 
 namespace Oro\Bundle\InstallerBundle\Command;
 
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Console\Helper\TableHelper;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
-class InstallCommand extends ContainerAwareCommand implements InstallCommandInterface
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
+class InstallCommand extends AbstractCommand implements InstallCommandInterface
 {
     /** @var InputOptionProvider */
     protected $inputOptionProvider;
@@ -36,13 +41,6 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
-            ->addOption(
-                'timeout',
-                null,
-                InputOption::VALUE_OPTIONAL,
-                'Timeout for child command execution',
-                CommandExecutor::DEFAULT_TIMEOUT
-            )
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption(
                 'sample-data',
@@ -56,6 +54,8 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 InputOption::VALUE_NONE,
                 'Database will be dropped and all data will be deleted.'
             );
+
+        parent::configure();
     }
 
     /**
@@ -70,13 +70,7 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
         $forceInstall = $input->getOption('force');
 
-        $commandExecutor = new CommandExecutor(
-            $input->hasOption('env') ? $input->getOption('env') : null,
-            $output,
-            $this->getApplication(),
-            $this->getContainer()->get('oro_cache.oro_data_cache_manager')
-        );
-        $commandExecutor->setDefaultTimeout($input->getOption('timeout'));
+        $commandExecutor = $this->getCommandExecutor($input, $output);
 
         // if there is application is not installed or no --force option
         $isInstalled = $this->getContainer()->hasParameter('installed')
@@ -116,9 +110,18 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
         $output->writeln('<info>Installing Oro Application.</info>');
         $output->writeln('');
 
+        $dropDatabase = 'none';
+        if ($forceInstall) {
+            if ($input->getOption('drop-database')) {
+                $dropDatabase = 'full';
+            } elseif ($isInstalled) {
+                $dropDatabase = 'app';
+            }
+        }
+
         $this
             ->checkStep($output)
-            ->prepareStep($commandExecutor, $input->getOption('drop-database'))
+            ->prepareStep($commandExecutor, $dropDatabase)
             ->loadDataStep($commandExecutor, $output)
             ->finalStep($commandExecutor, $output, $input);
 
@@ -201,30 +204,51 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      * Drop schema, clear entity config and extend caches
      *
      * @param CommandExecutor $commandExecutor
-     * @param bool            $dropFullDatabase
+     * @param string          $dropDatabase Can be 'none', 'app' or 'full'
      *
      * @return InstallCommand
      */
-    protected function prepareStep(CommandExecutor $commandExecutor, $dropFullDatabase = false)
+    protected function prepareStep(CommandExecutor $commandExecutor, $dropDatabase = 'none')
     {
-        $schemaDropOptions = [
-            '--force'             => true,
-            '--process-isolation' => true,
-        ];
-
-        if ($dropFullDatabase) {
-            $schemaDropOptions['--full-database'] = true;
+        if ($dropDatabase !== 'none') {
+            $schemaDropOptions = [
+                '--force'             => true,
+                '--process-isolation' => true
+            ];
+            if ($dropDatabase === 'full') {
+                $schemaDropOptions['--full-database'] = true;
+                $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
+            } else {
+                $managers = $this->getContainer()->get('doctrine')->getManagers();
+                foreach ($managers as $name => $manager) {
+                    if ($manager instanceof EntityManager) {
+                        $schemaDropOptions['--em'] = $name;
+                        $commandExecutor->runCommand('doctrine:schema:drop', $schemaDropOptions);
+                    }
+                }
+            }
+            $commandExecutor
+                ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
+                ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
         }
 
-        $commandExecutor
-            ->runCommand(
-                'doctrine:schema:drop',
-                $schemaDropOptions
-            )
-            ->runCommand('oro:entity-config:cache:clear', ['--no-warmup' => true])
-            ->runCommand('oro:entity-extend:cache:clear', ['--no-warmup' => true]);
-
         return $this;
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return callable
+     */
+    protected function getNotBlankValidator($message)
+    {
+        return function ($value) use ($message) {
+            if (strlen(trim($value)) === 0) {
+                throw new \Exception($message);
+            }
+
+            return $value;
+        };
     }
 
     /**
@@ -234,27 +258,9 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
      */
     protected function updateUser(CommandExecutor $commandExecutor)
     {
-        $emailValidator     = function ($value) {
-            if (strlen(trim($value)) === 0) {
-                throw new \Exception('The email must be specified');
-            }
-
-            return $value;
-        };
-        $firstNameValidator = function ($value) {
-            if (strlen(trim($value)) === 0) {
-                throw new \Exception('The first name must be specified');
-            }
-
-            return $value;
-        };
-        $lastNameValidator  = function ($value) {
-            if (strlen(trim($value)) === 0) {
-                throw new \Exception('The last name must be specified');
-            }
-
-            return $value;
-        };
+        $emailValidator     = $this->getNotBlankValidator('The email must be specified');
+        $firstNameValidator = $this->getNotBlankValidator('The first name must be specified');
+        $lastNameValidator  = $this->getNotBlankValidator('The last name must be specified');
         $passwordValidator  = function ($value) {
             if (strlen(trim($value)) < 2) {
                 throw new \Exception('The password must be at least 2 characters long');
@@ -425,7 +431,13 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
                 [
                     '--force'             => true,
                     '--process-isolation' => true,
-                    '--timeout'           => $commandExecutor->getDefaultTimeout()
+                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
+                ]
+            )
+            ->runCommand(
+                LoadPermissionConfigurationCommand::NAME,
+                [
+                    '--process-isolation' => true
                 ]
             )
             ->runCommand(
@@ -467,8 +479,13 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
                 array(
-                    '--process-isolation' => true,
-                    '--fixtures-type'     => 'demo',
+                    '--process-isolation'  => true,
+                    '--fixtures-type'      => 'demo',
+                    '--disabled-listeners' =>
+                        [
+                            'oro_dataaudit.listener.entity_listener',
+                            'oro_dataaudit.listener.deprecated_audit_data_listener'
+                        ]
                 )
             );
         }
@@ -505,7 +522,6 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
             ->runCommand(
                 'fos:js-routing:dump',
                 array(
-                    '--target'            => 'web/js/routes.js',
                     '--process-isolation' => true,
                 )
             )
@@ -539,13 +555,12 @@ class InstallCommand extends ContainerAwareCommand implements InstallCommandInte
 
         $this->updateInstalledFlag(date('c'));
 
-        // clear the cache set installed flag in DI container
-        $commandExecutor->runCommand(
-            'cache:clear',
-            array(
-                '--process-isolation' => true,
-            )
-        );
+        // clear the cache and set installed flag in DI container
+        $cacheClearOptions = ['--process-isolation' => true];
+        if ($commandExecutor->getDefaultOption('no-debug')) {
+            $cacheClearOptions['--no-debug'] = true;
+        }
+        $commandExecutor->runCommand('cache:clear', $cacheClearOptions);
 
         $output->writeln('');
 

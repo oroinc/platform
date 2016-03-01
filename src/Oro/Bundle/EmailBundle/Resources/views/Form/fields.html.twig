@@ -1,3 +1,13 @@
+{% block _oro_email_autoresponserule_conditions_entry_field_row %}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block _oro_email_autoresponserule_conditions_entry_filter_row %}
+    {% for child in form %}
+        {{ form_widget(child, {'attr': {'class': child.vars['name']}}) }}
+    {% endfor %}
+{% endblock %}
+
 {% block oro_email_template_list_row %}
     <script type="text/javascript">
         require(['jquery',
@@ -194,6 +204,106 @@
     </script>
 {% endblock %}
 
+{% block oro_email_email_folder_tree_row %}
+    {% if form.vars.value is not null and form.vars.value|length > 0 %}
+        {{ form_row(form) }}
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_email_folder_tree_widget %}
+    {% set options = {
+        dataInputSelector: 'input[name="' ~ full_name ~ '"]',
+        checkAllSelector: '.check-all',
+        relatedCheckboxesSelector: '.folder-list :checkbox'
+    } %}
+    <div class="folder-tree-widget"
+         data-page-component-module="oroemail/js/app/components/folder-tree-component"
+         data-page-component-options="{{ options|json_encode }}">
+        <input class="check-all" type="checkbox"/><label class="folder-label">{{ "oro.email.imap.folder.checkAll"|trans }}</label>
+        <div class="folder-list">
+            {% for key, folder in form.vars.value if folder.parentFolder is null and folder.outdatedAt is null %}
+                {{ _self.renderFolder(key, folder, form.vars.full_name) }}
+            {% endfor %}
+        </div>
+        <input name="{{ full_name }}" type="hidden">
+    </div>
+{% endblock %}
+
+{% block oro_email_mailbox_grid_row %}
+    {{ form_label(form) }}
+    {{ form_widget(form) }}
+{% endblock %}
+
+{% block oro_email_mailbox_grid_label %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set redirectData = {
+        'route': app.request.attributes.get('_route'),
+        'parameters': app.request.attributes.get('_route_params'),
+    } %}
+    {% if resource_granted('oro_organization_update') %}
+        <div class="row" style="margin-top: -42px;">
+            <div class="pull-right">
+                <div class="btn-group">
+                    {{ UI.addButton({
+                        'path': path('oro_email_mailbox_create', {redirectData: redirectData}),
+                        'label': 'oro.email.system_configuration.mailbox_configuration.add_mailbox.label'|trans
+                    }) }}
+                </div>
+            </div>
+        </div>
+    {% endif %}
+{% endblock %}
+
+{% block oro_email_mailbox_grid_widget %}
+    {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
+    {% set redirectData = {
+        'route': app.request.attributes.get('_route'),
+        'parameters': app.request.attributes.get('_route_params')
+    } %}
+    <div class="row" style="margin-right: -20px;">
+        {{ dataGrid.renderGrid('base-mailboxes-grid', {
+            'redirectData': redirectData, 'organization_ids': [get_current_organization().getId()]
+        }) }}
+    </div>
+{% endblock %}
+
+{% block oro_email_mailbox_widget %}
+    {% if  form.children.imapAccountType is defined %}
+        {% set imapAccountType = form_widget(form.children.imapAccountType) %}
+    {% endif %}
+    {% if  form.children.origin is defined %}
+        {% set imapAccountType = form_widget(form.children.origin) %}
+    {% endif %}
+
+    {% set process = form_row(form.children.processType) ~
+        form_widget(form.children.processSettings) %}
+    {% set access = form_row(form.children.authorizedUsers) ~
+        form_row(form.children.authorizedRoles)
+    %}
+    {% set options = {
+        el: '#' ~ form.vars.id
+    } %}
+    <div data-page-component-module="oroemail/js/app/views/mailbox-update-view"
+         data-page-component-options="{{ options|json_encode }}">
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.general.label'|trans }}</h5>
+            {{ form_widget(form) }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.origin.label'|trans }}</h5>
+            {{ imapAccountType|raw }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.process.label'|trans }}</h5>
+            {{ process|raw }}
+        </fieldset>
+        <fieldset class="form-horizontal form-horizontal-large">
+            <h5>{{ 'oro.email.mailbox.access.label'|trans }}</h5>
+            {{ access|raw }}
+        </fieldset>
+    </div>
+{% endblock %}
+
 {#
     Renders tab `li` tag for bootstrap tab panels
     paramters:
@@ -222,4 +332,23 @@
     <div class="emailtemplate-translatation-fields-{{ locale }} tab-pane{% if (app.request.locale == locale) %} active{% endif %}">
         {{ form_widget(form) }}
     </div>
+{% endmacro %}
+
+{% macro renderFolder(key, folder, namePrefix, maxDepth = 10) %}
+    {% if maxDepth %}
+        <div>
+            <input type="checkbox" data-name="syncEnabled"{% if folder.syncEnabled %}checked="checked"{% endif %}>
+            <label class="folder-label">{{ folder.name }}</label>
+            <input type="hidden" data-name="fullName" value="{{ folder.fullName }}">
+            <input type="hidden" data-name="name" value="{{ folder.name }}">
+            <input type="hidden" data-name="type" value="{{ folder.type }}">
+            {% if maxDepth > 1 and folder.subFolders|length > 0 %}
+                <div class="folder-sub-folders">
+                    {% for subKey, subFolder in folder.subFolders %}
+                        {{ _self.renderFolder(subKey, subFolder, namePrefix ~ '[' ~ key ~ '][subFolders]', maxDepth - 1) }}
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+    {% endif %}
 {% endmacro %}

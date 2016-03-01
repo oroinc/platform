@@ -54,7 +54,7 @@ class ConfigValueRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $queryBuilder->expects($this->once())
             ->method('delete')
-            ->with('OroConfigBundle:ConfigValue', 'cv')
+            ->with('Oro\Bundle\ConfigBundle\Entity\ConfigValue', 'cv')
             ->will($this->returnSelf());
         $queryBuilder->expects($this->once())
             ->method('where')

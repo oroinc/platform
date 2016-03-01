@@ -80,15 +80,10 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
-            ->disableOriginalConstructor()
-            ->getMock();
         $this->renderer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Provider\EmailRenderer')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->validator = $this->getMock('Symfony\Component\Validator\Validator\ValidatorInterface');
         $this->objectManager = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -290,9 +285,13 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * Test with expected \Doctrine\ORM\EntityNotFoundException for the case, when template does not found
+     *
+     * @expectedException \Doctrine\ORM\EntityNotFoundException
+     */
     public function testExecuteWithoutTemplateEntity()
     {
-        $this->setExpectedException('\Doctrine\ORM\EntityNotFoundException', 'Entity was not found.');
         $options = [
             'from' => 'test@test.com',
             'to' => 'test@test.com',
@@ -383,7 +382,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
             ->method('get')
             ->willReturn($violationListInterface);
         $this->validator->expects($this->once())
-            ->method('validateValue')
+            ->method('validate')
             ->willReturn($violationList);
 
         $this->objectRepository->expects($this->never())
@@ -464,6 +463,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                         $self->assertEquals($expected['subject'], $model->getSubject());
                         $self->assertEquals($expected['from'], $model->getFrom());
                         $self->assertEquals($expected['to'], $model->getTo());
+                        $self->assertEquals('txt', $model->getType());
 
                         return $emailUserEntity;
                     }

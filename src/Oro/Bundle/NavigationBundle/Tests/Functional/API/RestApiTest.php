@@ -7,7 +7,6 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestApiTest extends WebTestCase

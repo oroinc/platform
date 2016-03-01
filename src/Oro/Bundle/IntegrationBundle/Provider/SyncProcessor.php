@@ -6,6 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\ImportExportBundle\Processor\ProcessorRegistry;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
@@ -53,6 +54,17 @@ class SyncProcessor extends AbstractSyncProcessor
      */
     public function process(Integration $integration, $connector = null, array $parameters = [])
     {
+        if (!$integration->isEnabled()) {
+            $this->logger->error(
+                sprintf(
+                    'Integration "%s" with type "%s" is not enabled. Cannot process synchronization.',
+                    $integration->getName(),
+                    $integration->getType()
+                )
+            );
+            return false;
+        }
+
         $callback = null;
 
         if ($connector) {
@@ -76,22 +88,23 @@ class SyncProcessor extends AbstractSyncProcessor
      */
     protected function processConnectors(Integration $integration, array $parameters = [], callable $callback = null)
     {
+        $connectors = $this->getConnectorsToProcess($integration, $callback);
+
         $isSuccess = true;
-        $connectors = $this->getConnectorsToSync($integration, $callback);
 
-        foreach ((array)$connectors as $connector) {
+        $processedConnectorStatuses = [];
+        foreach ($connectors as $connector) {
             try {
-                $result = $this->processIntegrationConnector(
-                    $integration,
-                    $connector,
-                    $parameters
-                );
+                if (!$this->isConnectorAllowed($connector, $integration, $processedConnectorStatuses)) {
+                    continue;
+                }
+                $status = $this->processIntegrationConnector($integration, $connector, $parameters);
 
-                $isSuccess = $isSuccess && $result;
-            } catch (\Exception $e) {
+                $isSuccess = $isSuccess && $this->isIntegrationConnectorProcessSuccess($status);
+                $processedConnectorStatuses[$connector->getType()] = $status;
+            } catch (\Exception $exception) {
                 $isSuccess = false;
-
-                $this->logger->critical($e->getMessage());
+                $this->logger->critical($exception->getMessage(), ['exception' => $exception]);
             }
         }
 
@@ -100,10 +113,41 @@ class SyncProcessor extends AbstractSyncProcessor
 
     /**
      * @param Integration $integration
-     * @param callable $callback
-     * @return array
+     * @param callable|null $callback
+     * @return ConnectorInterface[]
      */
-    protected function getConnectorsToSync(Integration $integration, callable $callback = null)
+    protected function getConnectorsToProcess(Integration $integration, callable $callback = null)
+    {
+        $connectors = $this->loadConnectorsToProcess($integration, $callback);
+        $orderedConnectors = $this->getSortedConnectors($connectors);
+
+        return $orderedConnectors;
+    }
+
+    /**
+     * @param Integration $integration
+     * @param callable $callback
+     * @return ConnectorInterface[]
+     */
+    protected function loadConnectorsToProcess($integration, callable $callback = null)
+    {
+        $connectorTypes = $this->getTypesOfConnectorsToProcess($integration, $callback);
+
+        /** @var ConnectorInterface[] $realConnectors */
+        $connectors = array_map(function ($connectorType) use ($integration) {
+            return $this->getRealConnector($integration, $connectorType);
+        }, $connectorTypes);
+
+        return $connectors;
+    }
+
+    /**
+     * @param Integration $integration
+     * @param callable $callback
+     *
+     * @return string[]
+     */
+    protected function getTypesOfConnectorsToProcess(Integration $integration, callable $callback = null)
     {
         $connectors = $integration->getConnectors();
 
@@ -111,51 +155,84 @@ class SyncProcessor extends AbstractSyncProcessor
             $connectors = array_filter($connectors, $callback);
         }
 
-        return (array)$connectors;
+        return $connectors;
+    }
+
+    /**
+     * @param ConnectorInterface[] $connectors
+     * @return ConnectorInterface[]
+     */
+    protected function getSortedConnectors(array $connectors)
+    {
+        $sortCallback = function ($connector) {
+            return $connector instanceof OrderedConnectorInterface
+                ? $connector->getOrder()
+                : OrderedConnectorInterface::DEFAULT_ORDER;
+        };
+        ArrayUtil::sortBy($connectors, false, $sortCallback);
+
+        return $connectors;
+    }
+
+    /**
+     * Checks whether connector is allowed to process. Logs information if connector is not allowed.
+     *
+     * @param ConnectorInterface $connector
+     * @param Integration $integration
+     * @param Status[] $processedConnectorStatuses
+     * @return bool
+     */
+    protected function isConnectorAllowed(
+        ConnectorInterface $connector,
+        Integration $integration,
+        array $processedConnectorStatuses
+    ) {
+        if ($connector instanceof AllowedConnectorInterface
+            && !$connector->isAllowed($integration, $processedConnectorStatuses)
+        ) {
+            $this->logger->info(
+                sprintf(
+                    'Connector with type "%s" is not allowed and it\'s processing is skipped.',
+                    $connector->getType()
+                )
+            );
+
+            return false;
+        }
+
+        return true;
     }
 
     /**
      * Process integration connector
      *
-     * @param Integration $integration Integration object
-     * @param string      $connector   Connector name
-     * @param array       $parameters  Connector additional parameters
+     * @param Integration        $integration Integration object
+     * @param ConnectorInterface $connector   Connector object
+     * @param array              $parameters  Connector additional parameters
      *
-     * @return boolean
+     * @return Status
      */
     protected function processIntegrationConnector(
         Integration $integration,
-        $connector,
+        ConnectorInterface $connector,
         array $parameters = []
     ) {
-        if (!$integration->isEnabled()) {
-            return false;
-        }
-
         try {
-            $this->logger->info(sprintf('Start processing "%s" connector', $connector));
-            // Clone object here because it will be modified and changes should not be shared between
-            $realConnector = clone $this->registry->getConnectorType($integration->getType(), $connector);
+            $this->logger->info(sprintf('Start processing "%s" connector', $connector->getType()));
 
-            $jobName          = $realConnector->getImportJobName();
+            $jobName          = $connector->getImportJobName();
             $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
                 ProcessorRegistry::TYPE_IMPORT,
-                $realConnector->getImportEntityFQCN()
+                $connector->getImportEntityFQCN()
             );
-        } catch (\Exception $e) {
+        } catch (\Exception $exception) {
             // log and continue
-            $this->logger->error($e->getMessage());
-            $status = new Status();
-            $status
+            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
+            $status = $this->createConnectorStatus($connector)
                 ->setCode(Status::STATUS_FAILED)
-                ->setMessage($e->getMessage())
-                ->setConnector($connector);
-
-            $this->doctrineRegistry
-                ->getRepository('OroIntegrationBundle:Channel')
-                ->addStatus($integration, $status);
-
-            return false;
+                ->setMessage($exception->getMessage());
+            $this->addConnectorStatusAndFlush($integration, $status);
+            return $status;
         }
 
         $configuration = [
@@ -163,7 +240,7 @@ class SyncProcessor extends AbstractSyncProcessor
                 array_merge(
                     [
                         'processorAlias' => reset($processorAliases),
-                        'entityName'     => $realConnector->getImportEntityFQCN(),
+                        'entityName'     => $connector->getImportEntityFQCN(),
                         'channel'        => $integration->getId(),
                         'channelType'    => $integration->getType(),
                     ],
@@ -175,14 +252,14 @@ class SyncProcessor extends AbstractSyncProcessor
     }
 
     /**
-     * @param string      $connector
-     * @param string      $jobName
-     * @param array       $configuration
-     * @param Integration $integration
+     * @param ConnectorInterface $connector
+     * @param string             $jobName
+     * @param array              $configuration
+     * @param Integration        $integration
      *
-     * @return boolean
+     * @return Status
      */
-    protected function processImport($connector, $jobName, $configuration, Integration $integration)
+    protected function processImport(ConnectorInterface $connector, $jobName, $configuration, Integration $integration)
     {
         $event = new SyncEvent($jobName, $configuration);
         $this->eventDispatcher->dispatch(SyncEvent::SYNC_BEFORE, $event);
@@ -203,8 +280,7 @@ class SyncProcessor extends AbstractSyncProcessor
         $exceptions = $jobResult->getFailureExceptions();
         $isSuccess  = $jobResult->isSuccessful() && empty($exceptions);
 
-        $status = new Status();
-        $status->setConnector($connector);
+        $status = $this->createConnectorStatus($connector);
         $status->setData(is_array($connectorData) ? $connectorData : []);
 
         $message = $this->formatResultMessage($context);
@@ -228,14 +304,39 @@ class SyncProcessor extends AbstractSyncProcessor
             $status->setCode(Status::STATUS_FAILED)->setMessage($exceptions);
         }
 
-        $this->doctrineRegistry
-            ->getRepository('OroIntegrationBundle:Channel')
-            ->addStatus($integration, $status);
+        $this->addConnectorStatusAndFlush($integration, $status);
 
         if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
             $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
         }
 
-        return $isSuccess;
+        return $status;
+    }
+
+    /**
+     * Creates status of connector of integration.
+     *
+     * @param ConnectorInterface $connector
+     * @return Status
+     */
+    protected function createConnectorStatus(ConnectorInterface $connector)
+    {
+        $status = new Status();
+        $status->setConnector($connector->getType());
+
+        return $status;
+    }
+
+    /**
+     * Adds status of connector to integration and flush changes.
+     *
+     * @param Integration $integration
+     * @param Status $status
+     */
+    protected function addConnectorStatusAndFlush(Integration $integration, Status $status)
+    {
+        $this->doctrineRegistry
+            ->getRepository('OroIntegrationBundle:Channel')
+            ->addStatusAndFlush($integration, $status);
     }
 }

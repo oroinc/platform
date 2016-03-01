@@ -9,7 +9,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusinessUnitData;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class IntegrationControllerTest extends WebTestCase

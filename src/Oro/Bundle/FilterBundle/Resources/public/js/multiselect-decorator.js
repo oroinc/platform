@@ -1,11 +1,9 @@
-/*global define*/
-/*jslint nomen:true*/
 define([
     'jquery',
     'underscore',
     'jquery.multiselect',
     'jquery.multiselect.filter'
-], function ($, _) {
+], function($, _) {
     'use strict';
 
     /**
@@ -15,7 +13,7 @@ define([
      * @export orofilter/js/multiselect-decorator
      * @class  orofilter.MultiselectDecorator
      */
-    var MultiselectDecorator = function (options) {
+    var MultiselectDecorator = function(options) {
         this.initialize(options);
     };
 
@@ -44,9 +42,9 @@ define([
         /**
          * Initialize all required properties
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (!options.element) {
-                throw new Error("Select element must be defined");
+                throw new Error('Select element must be defined');
             }
             this.element = options.element;
 
@@ -75,12 +73,12 @@ define([
          *  - removes created widgets
          *  - removes reference on element
          */
-        dispose: function () {
+        dispose: function() {
             if (this.contextSearch && this.element.data('ech-multiselectfilter')) {
-                this.multiselectfilter("destroy");
+                this.multiselectfilter('destroy');
             }
             if (this.element.data('ech-multiselect')) {
-                this.multiselect("destroy");
+                this.multiselect('destroy');
             }
             this.element.hide();
             delete this.element;
@@ -91,7 +89,7 @@ define([
          *
          * @param {Backbone.View} view
          */
-        setViewDesign: function (view) {
+        setViewDesign: function(view) {
             view.$('.ui-multiselect').removeClass('ui-widget').removeClass('ui-state-default');
             view.$('.ui-multiselect span.ui-icon').remove();
         },
@@ -101,7 +99,7 @@ define([
          *
          * @protected
          */
-        _setDropdownDesign: function () {
+        _setDropdownDesign: function() {
             var widget = this.getWidget();
             widget.addClass('dropdown-menu');
             widget.removeClass('ui-widget-content');
@@ -114,7 +112,7 @@ define([
         /**
          * Action performed on dropdown open
          */
-        onOpenDropdown: function () {
+        onOpenDropdown: function() {
             this._setDropdownDesign();
             this.getWidget().find('input[type="search"]').focus();
             $('body').trigger('click');
@@ -125,11 +123,11 @@ define([
          *
          * @return {Number}
          */
-        getMinimumDropdownWidth: function () {
-            var elements, minimumWidth = 0;
+        getMinimumDropdownWidth: function() {
+            var minimumWidth = 0;
             this.getWidget().find('.ui-multiselect-checkboxes').removeClass('fixed-li');
-            elements = this.getWidget().find('.ui-multiselect-checkboxes li');
-            _.each(elements, function (element) {
+            var elements = this.getWidget().find('.ui-multiselect-checkboxes li');
+            _.each(elements, function(element) {
                 var width = this._getTextWidth($(element).find('label'));
                 if (width > minimumWidth) {
                     minimumWidth = width;
@@ -146,13 +144,12 @@ define([
          * @return {Integer}
          * @protected
          */
-        _getTextWidth: function (element) {
-            var html_org, html_calc, width;
-            html_org = element.html();
-            html_calc = '<span>' + html_org + '</span>';
-            element.html(html_calc);
-            width = element.outerWidth();
-            element.html(html_org);
+        _getTextWidth: function(element) {
+            var htmlOrg = element.html();
+            var htmlCalc = '<span>' + htmlOrg + '</span>';
+            element.html(htmlCalc);
+            var width = element.outerWidth();
+            element.html(htmlOrg);
             return width;
         },
 
@@ -161,7 +158,7 @@ define([
          *
          * @return {Object}
          */
-        getWidget: function () {
+        getWidget: function() {
             return this.multiselect('widget');
         },
 
@@ -171,7 +168,7 @@ define([
          * @param functionName
          * @return {Object}
          */
-        multiselect: function (functionName) {
+        multiselect: function(functionName) {
             return this.element.multiselect(functionName);
         },
 
@@ -181,14 +178,14 @@ define([
          * @param functionName
          * @return {Object}
          */
-        multiselectfilter: function (functionName) {
+        multiselectfilter: function(functionName) {
             return this.element.multiselectfilter(functionName);
         },
 
         /**
          *  Set dropdown position according to button element
          */
-        updateDropdownPosition: function () {
+        updateDropdownPosition: function() {
             this.multiselect('updatePos');
         }
     };

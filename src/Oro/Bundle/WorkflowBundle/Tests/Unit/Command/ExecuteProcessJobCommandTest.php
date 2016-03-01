@@ -3,8 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Command;
 
 use Oro\Bundle\WorkflowBundle\Command\ExecuteProcessJobCommand;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Command\Stub\TestOutput;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
 {
@@ -54,6 +57,7 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->input   = $this->getMockForAbstractClass('Symfony\Component\Console\Input\InputInterface');
         $this->output = new TestOutput();
+        $this->output->setVerbosity(OutputInterface::VERBOSITY_VERBOSE);
     }
 
     public function testConfigure()
@@ -107,11 +111,16 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
 
         $this->command->execute($this->input, $this->output);
 
-        $this->assertAttributeEquals(
-            $expectedOutput,
-            'messages',
-            $this->output
-        );
+        $messages = $this->getObjectAttribute($this->output, 'messages');
+        $found = 0;
+        foreach ($messages as $message) {
+            foreach ($expectedOutput as $expected) {
+                if (strpos($message, $expected) !== false) {
+                    $found++;
+                }
+            }
+        }
+        $this->assertCount($found, $expectedOutput);
     }
 
     /**
@@ -128,6 +137,14 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             $process->expects($this->any())
                 ->method('getId')
                 ->will($this->returnValue($id));
+            $definition = new ProcessDefinition();
+            $definition->setName('name');
+            $definition->setLabel('label');
+            $processTrigger = new ProcessTrigger();
+            $processTrigger->setDefinition($definition);
+            $process->expects($this->any())
+                ->method('getProcessTrigger')
+                ->will($this->returnValue($processTrigger));
             $result[] = $process;
         }
 
@@ -143,23 +160,23 @@ class ExecuteProcessJobCommandTest extends \PHPUnit_Framework_TestCase
             'single id' => array(
                 'ids' => array(1),
                 'output' => [
-                    'Process job 1 successfully finished'
+                    'Process job #1 successfully finished'
                 ],
             ),
             'several ids successful' => array(
                 'ids' => array(1, 2, 3),
                 'output' => [
-                    'Process job 1 successfully finished',
-                    'Process job 2 successfully finished',
-                    'Process job 3 successfully finished',
+                    'Process job #1 successfully finished',
+                    'Process job #2 successfully finished',
+                    'Process job #3 successfully finished',
                 ],
             ),
             'several ids failed' => array(
                 'ids' => array(1, 2, 3),
                 'output' => [
-                    'Process job 1 failed: Process 1 exception',
-                    'Process job 2 failed: Process 2 exception',
-                    'Process job 3 failed: Process 3 exception',
+                    'Process job #1 name failed: Process 1 exception',
+                    'Process job #2 name failed: Process 2 exception',
+                    'Process job #3 name failed: Process 3 exception',
                 ],
                 'exceptions' => [
                     new \Exception('Process 1 exception'),

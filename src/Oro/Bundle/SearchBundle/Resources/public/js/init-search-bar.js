@@ -1,4 +1,3 @@
-/* global require */
 require([
     'jquery',
     'underscore',
@@ -6,19 +5,20 @@ require([
     'oroui/js/mediator',
     'orotranslation/js/translator'
 ], function($, _, routing, mediator, __) {
-  'use strict';
-      $(function() {
-          var _searchFlag = false,
-              timeout = 700,
-              searchBarContainer = $('#search-div'),
-              searchBarInput = searchBarContainer.find('#search-bar-search'),
-              searchBarFrame = searchBarContainer.find('div.header-search-frame'),
-              searchBarDropdown = searchBarContainer.find('#search-bar-dropdown'),
-              searchBarButton = searchBarContainer.find('#search-bar-button'),
-              searchBarForm = $('#search-bar-from'),
-              searchDropdown = searchBarContainer.find('#search-dropdown');
+    'use strict';
 
-          mediator.bind('page:beforeChange', function () {
+    $(function() {
+          var _searchFlag = false;
+          var timeout = 700;
+          var searchBarContainer = $('#search-div');
+          var searchBarInput = searchBarContainer.find('#search-bar-search');
+          var searchBarFrame = searchBarContainer.find('div.header-search-frame');
+          var searchBarDropdown = searchBarContainer.find('#search-bar-dropdown');
+          var searchBarButton = searchBarContainer.find('#search-bar-button');
+          var searchBarForm = $('#search-bar-from');
+          var searchDropdown = searchBarContainer.find('#search-dropdown');
+
+          mediator.bind('page:beforeChange', function() {
               searchBarContainer.removeClass('header-search-focused');
               $('#oroplatform-header .search-form .search').val('');
           });
@@ -30,7 +30,7 @@ require([
               return false;
           });
 
-          $('.search-form').submit(function(){
+          $('.search-form').submit(function() {
               var $searchString = $.trim($(this).find('.search').val());
               if ($searchString.length === 0) {
                   return false;
@@ -78,7 +78,7 @@ require([
 
                           if (count === 0) {
                               noResults = __('oro.search.quick_search.noresults');
-                              searchDropdown.html('<li><span>' + noResults + '</span></li>');
+                              searchDropdown.html('<ul><li><span>' + noResults + '</span></li></ul>');
                           } else if (countAll > count) {
                               searchDropdown.append($('.search-more').html());
                           }
@@ -115,7 +115,8 @@ require([
           });
 
           searchBarInput.keypress(function(e) {
-              if (e.keyCode === 8 || e.keyCode === 46 || (e.which !== 0 && e.charCode !== 0 && !e.ctrlKey && !e.altKey)) {
+              if (e.keyCode === 8 || e.keyCode === 46 ||
+                  (e.which !== 0 && e.charCode !== 0 && !e.ctrlKey && !e.altKey)) {
                   clearInterval(searchInterval);
                   searchInterval = setInterval(searchByTag, timeout);
               } else {
@@ -134,23 +135,23 @@ require([
           });
 
           $(document).on('keydown', '#search-dropdown a', function(evt) {
-              var $this = $(this),
-                  selectPrevious = function() {
-                      $this.parent('li').prev().find('a').focus();
-                      evt.stopPropagation();
-                      evt.preventDefault();
+              var $this = $(this);
+              function selectPrevious() {
+                  $this.parent('li').prev().find('a').focus();
+                  evt.stopPropagation();
+                  evt.preventDefault();
 
-                      return false;
-                  },
-                  selectNext = function() {
+                  return false;
+              }
+              function selectNext() {
                   $this.parent('li').next().find('a').focus();
-                      evt.stopPropagation();
-                      evt.preventDefault();
+                  evt.stopPropagation();
+                  evt.preventDefault();
 
-                      return false;
-                  };
+                  return false;
+              }
 
-              switch(evt.keyCode) {
+              switch (evt.keyCode) {
                   case 13: // Enter key
                   case 32: // Space bar
                       this.click();
@@ -159,8 +160,7 @@ require([
                   case 9: // Tab key
                       if (evt.shiftKey) {
                           selectPrevious();
-                      }
-                      else {
+                      } else {
                           selectNext();
                       }
                       evt.preventDefault();

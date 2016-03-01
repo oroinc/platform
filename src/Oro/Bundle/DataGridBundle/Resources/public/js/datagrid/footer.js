@@ -1,13 +1,11 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backbone',
     'backgrid',
     './footer/footer-row',
     './footer/footer-cell'
-], function (_, Backbone, Backgrid, FooterRow, FooterCell) {
-    "use strict";
+], function(_, Backbone, Backgrid, FooterRow, FooterCell) {
+    'use strict';
 
     var Footer;
 
@@ -20,7 +18,7 @@ define([
      */
     Footer = Backgrid.Footer.extend({
         /** @property */
-        tagName: "tfoot",
+        tagName: 'tfoot',
 
         /** @property */
         row: FooterRow,
@@ -36,15 +34,15 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var state;
 
             this.rows = [];
             if (!options.collection) {
-                throw new TypeError("'collection' is required");
+                throw new TypeError('"collection" is required');
             }
             if (!options.columns) {
-                throw new TypeError("'columns' is required");
+                throw new TypeError('"columns" is required');
             }
 
             this.columns = options.columns;
@@ -55,7 +53,7 @@ define([
             state = options.collection.state || {};
             if (state.totals && Object.keys(state.totals).length) {
                 this.renderable = true;
-                _.each(state.totals, function (total, rowName) {
+                _.each(state.totals, function(total, rowName) {
                     this.rows[this.rows.length] = new this.row({
                         columns: this.columns,
                         collection: this.collection,
@@ -69,11 +67,11 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.rows, function (row) {
+            _.each(this.rows, function(row) {
                 row.dispose();
             });
             delete this.rows;
@@ -84,9 +82,9 @@ define([
         /**
          * Renders this table footer with a single row of footer cells.
          */
-        render: function () {
+        render: function() {
             if (this.renderable) {
-                _.each(this.rows, function (row) {
+                _.each(this.rows, function(row) {
                     this.$el.append(row.render().$el);
                 }, this);
             }

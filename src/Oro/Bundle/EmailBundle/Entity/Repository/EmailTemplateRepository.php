@@ -54,6 +54,7 @@ class EmailTemplateRepository extends EntityRepository
      * @param Organization $organization
      * @param bool         $includeNonEntity if true - system templates will be included in result set
      * @param bool         $includeSystemTemplates
+     * @param bool         $visibleOnly
      *
      * @return QueryBuilder
      */
@@ -61,7 +62,8 @@ class EmailTemplateRepository extends EntityRepository
         $entityName,
         Organization $organization,
         $includeNonEntity = false,
-        $includeSystemTemplates = true
+        $includeSystemTemplates = true,
+        $visibleOnly = true
     ) {
         $qb = $this->createQueryBuilder('e')
             ->where('e.entityName = :entityName')
@@ -75,6 +77,11 @@ class EmailTemplateRepository extends EntityRepository
         if (!$includeSystemTemplates) {
             $qb->andWhere('e.isSystem = :isSystem')
                 ->setParameter('isSystem', false);
+        }
+
+        if ($visibleOnly) {
+            $qb->andWhere('e.visible = :visible')
+                ->setParameter('visible', true);
         }
 
         $qb->andWhere("e.organization = :organization")

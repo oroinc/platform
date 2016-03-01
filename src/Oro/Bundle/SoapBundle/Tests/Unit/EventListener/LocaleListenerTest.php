@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SoapBundle\Tests\EventListener;
 
+use Gedmo\Translatable\TranslatableListener;
+
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\Routing\RequestContext;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
@@ -34,14 +36,23 @@ class LocaleListenerTest extends \PHPUnit_Framework_TestCase
         $request->server->set('REQUEST_URI', '/api/rest/test');
         $request->setDefaultLocale($this->defaultLocale);
 
-        $this->listener = new LocaleListener();
+        $translationListener = new TranslatableListener();
+        $container = $this->getMockBuilder('Symfony\Component\DependencyInjection\Container')
+            ->setMethods(['get'])
+            ->getMock();
+        $container->expects($this->any())
+            ->method('get')
+            ->willReturn($translationListener);
+        $this->listener = new LocaleListener($container);
         $this->listener->onKernelRequest($this->createGetResponseEvent($request));
 
         $this->assertEquals($customLocale, $request->getLocale());
+        $this->assertEquals($customLocale, $translationListener->getListenerLocale());
     }
 
     /**
      * @param Request $request
+     *
      * @return GetResponseEvent
      */
     protected function createGetResponseEvent(Request $request)

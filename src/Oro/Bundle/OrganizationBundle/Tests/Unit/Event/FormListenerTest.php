@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Tests\Event;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Event;
 
 use Oro\Bundle\OrganizationBundle\Event\FormListener;
 

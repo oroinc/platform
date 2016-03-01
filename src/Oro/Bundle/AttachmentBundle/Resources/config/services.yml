@@ -38,6 +38,12 @@ services:
           - %oro_attachment.files%
           - @oro_entity_extend.association_manager
 
+    oro_attachment.association_helper:
+        class: Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+
     oro_attachment.manager.api:
         class: %oro_attachment.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
@@ -108,7 +114,8 @@ services:
     oro_attachment.placeholder.filter:
         class: %oro_attachment.placeholder.filter.class%
         arguments:
-            - @oro_attachment.config
+            - @oro_attachment.association_helper
+            - @oro_entity.doctrine_helper
 
     oro_attachment.event_listener.attachment_grid_listener:
         class: %oro_attachment.attachment_grid_listener%
@@ -131,18 +138,24 @@ services:
             - oro_add_attachment_link
         tags:
             - { name: oro_ui.view_action_provider, group: activity, priority: -90 }
+            - { name: oro_ui.update_action_provider, group: activity, priority: -90 }
 
     oro_attachment.provider.attachment:
         class: %oro_attachment.provider.attachment.class%
         arguments:
             - @doctrine.orm.entity_manager
-            - @oro_attachment.config
+            - @oro_attachment.association_helper
+
+    oro_attachment.exclusion_provider:
+        class: Oro\Bundle\AttachmentBundle\Provider\AttachmentExclusionProvider
+        public: false
+        tags:
+            - { name: oro_entity.exclusion_provider.api }
 
     oro_attachment.config:
         class: %oro_attachment.config.class%
         arguments:
-            - @oro_entity_config.provider.attachment
-            - @oro_entity_config.provider.entity
+            - @oro_attachment.association_helper
 
     oro_attachment.formatter.image_encoded:
         class: %oro_attachment.formatter.image_encoded.class%

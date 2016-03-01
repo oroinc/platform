@@ -10,12 +10,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\EntityExtendBundle\Tools\SchemaTrait;
 use Oro\Bundle\EntityExtendBundle\Tools\SaveSchemaTool;
 use Oro\Bundle\EntityExtendBundle\Tools\EnumSynchronizer;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 class UpdateSchemaCommand extends ContainerAwareCommand
 {
+    use SchemaTrait;
+
     /**
      * Console command configuration
      */
@@ -48,15 +51,8 @@ class UpdateSchemaCommand extends ContainerAwareCommand
     {
         $output->writeln($this->getDescription());
 
-        /**
-         * Unfortunately due a poor design of the Doctrine\ORM\Tools\SchemaTool::getSchemaFromMetadata
-         * we have to use "class_alias" to replace "Doctrine\DBAL\Schema\Visitor\RemoveNamespacedAssets"
-         * with "Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaUpdateRemoveNamespacedAssets".
-         */
-        class_alias(
-            'Oro\Bundle\EntityExtendBundle\Tools\ExtendSchemaUpdateRemoveNamespacedAssets',
-            'Doctrine\DBAL\Schema\Visitor\RemoveNamespacedAssets'
-        );
+        $this->overrideRemoveNamespacedAssets();
+        $this->overrideSchemaDiff();
 
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');

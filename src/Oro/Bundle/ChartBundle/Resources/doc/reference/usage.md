@@ -14,7 +14,7 @@
 		// items - array in format: array(array("id" => 1, "firsName" => 'Alex', "fee" => 42), ...)
 		$items = $this->getChartData();
 
-    	$viewBuilder = $this->container->get('oro_chart.view_builder')
+    	$viewBuilder = $this->container->get('oro_chart.view_builder');
 
     	$view = $viewBuilder
     	    ->setOptions(array('name' => 'line_chart'))

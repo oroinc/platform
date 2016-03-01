@@ -207,7 +207,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $this->extension->preUpdate();
     }
 
-    public function testPreUpdateForNotNewField()
+    public function testPreUpdateForFieldToBeDeleted()
     {
         $entityClass = 'Test\Entity';
         $fieldName   = 'test_field';
@@ -217,7 +217,7 @@ class FileEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $entityConfig->set('is_extend', true);
 
         $fieldConfig = new Config(new FieldConfigId('extend', $entityClass, $fieldName, $fieldType));
-        $fieldConfig->set('state', ExtendScope::STATE_UPDATE);
+        $fieldConfig->set('state', ExtendScope::STATE_DELETE);
 
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()

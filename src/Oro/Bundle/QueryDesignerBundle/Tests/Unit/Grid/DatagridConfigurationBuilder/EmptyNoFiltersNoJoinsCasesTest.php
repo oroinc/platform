@@ -4,10 +4,9 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBu
 
 use Doctrine\ORM\Query;
 
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
 
-class EmptyNoFiltersNoJoinsCasesTest extends OrmQueryConverterTest
+class EmptyNoFiltersNoJoinsCasesTest extends DatagridConfigurationBuilderTestCase
 {
     /**
      * @expectedException \Oro\Bundle\QueryDesignerBundle\Exception\InvalidConfigurationException

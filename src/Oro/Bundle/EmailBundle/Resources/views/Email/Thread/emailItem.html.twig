@@ -38,17 +38,23 @@
     </div>
     <div class="email-full">
         <div class="email-view-toggle">
-            <div class="pull-right">
-                {% set actionParameters = routeParameters is defined ? {
-                    routeParameters: routeParameters
-                } : {} %}
-                {% set buttonsHtml %}
+            {% set actionParameters = routeParameters is defined ? {
+            routeParameters: routeParameters
+            } : {} %}
+            {% set buttonsHtml %}
+                {% if defaultReplyButton is not defined or defaultReplyButton == 1 %}
                     {{ Actions.replyButton(email, actionParameters) }}
-                    {{ Actions.forwardButton(email, actionParameters ) }}
-                {% endset %}
-                {{ UI.pinnedDropdownButton({
-                    'html': buttonsHtml
-                }) }}
+                    {{ Actions.replyAllButton(email, actionParameters) }}
+                {% else %}
+                    {{ Actions.replyAllButton(email, actionParameters) }}
+                    {{ Actions.replyButton(email, actionParameters) }}
+                {% endif %}
+                {{ Actions.forwardButton(email, actionParameters ) }}
+            {% endset %}
+            <div class="pull-right">
+                {% if isDesktopVersion() %}
+                    {{ UI.pinnedDropdownButton({'html': buttonsHtml}) }}
+                {% endif %}
                 <div class="email-sent-date">
                     <span class="comment-count" style="display:none" title="{{ 'oro.comment.quantity_label'|trans }}">
                         <i class="icon icon-comment"></i><span class="count"></span>
@@ -71,6 +77,9 @@
                     </div>
                 </div>
             </div>
+            {% if isMobileVersion() %}
+                <div class="email-actions clearfix">{{ buttonsHtml }}</div>
+            {% endif %}
         </div>
         <div class="email-content clearfix">
             <div class="email-body responsive-cell">

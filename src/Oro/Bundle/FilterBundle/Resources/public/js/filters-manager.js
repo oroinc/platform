@@ -1,60 +1,36 @@
-/*jshint devel:true, multistr:true*/
-/*jslint nomen:true*/
-/*global define*/
-define([
-    'jquery',
-    'underscore',
-    'backbone',
-    'oroui/js/mediator',
-    'oroui/js/tools',
-    'orotranslation/js/translator',
-    './multiselect-decorator',
-    './datafilter-wrapper'
-], function ($, _, Backbone, mediator, tools, __, MultiselectDecorator, filterWrapper) {
+define(function(require) {
     'use strict';
 
-    var FiltersManager,
-        DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
-
-    /**
-     * Defines parent element for dropdown-menu by toggle element
-     * (this method is taken from Bootstrap-Dropdown)
-     *
-     * @param {jQuery} $toggle
-     * @returns {*|jQuery|HTMLElement}
-     */
-    function getDropdownMenuParent($toggle) {
-        var $parent,
-            selector = $toggle.attr('data-target');
-        if (!selector) {
-            selector = $toggle.attr('href')
-            selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
-        }
-        $parent = selector && $(selector);
-        if (!$parent || !$parent.length) {
-            $parent = $toggle.parent();
-        }
-        return $parent;
-    }
+    var FiltersManager;
+    var DROPDOWN_TOGGLE_SELECTOR = '[data-toggle=dropdown]';
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var MultiselectDecorator = require('./multiselect-decorator');
+    var filterWrapper = require('./datafilter-wrapper');
 
     /**
      * View that represents all grid filters
      *
      * @export  orofilter/js/filters-manager
      * @class   orofilter.FiltersManager
-     * @extends Backbone.View
+     * @extends BaseView
      *
      * @event updateList    on update of filter list
      * @event updateFilter  on update data of specific filter
      * @event disableFilter on disable specific filter
      */
-    FiltersManager = Backbone.View.extend({
+    FiltersManager = BaseView.extend({
         /**
          * List of filter objects
          *
+         * @type {Object}
          * @property
          */
-        filters: {},
+        filters: null,
 
         /**
          * Template selector
@@ -71,7 +47,7 @@ define([
          *
          * @property
          */
-        filterSelector: '#add-filter-select',
+        filterSelector: '[data-action=add-filter-select]',
 
         /**
          * Add filter button hint
@@ -94,10 +70,17 @@ define([
          */
         buttonSelector: '.ui-multiselect.filter-list',
 
+        /**
+         * jQuery object that will be target for append multiselect dropdown menus
+         *
+         * @property
+         */
+        dropdownContainer: 'body',
+
         /** @property */
         events: {
-            'change #add-filter-select': '_onChangeFilterSelect',
-            'click #reset-filter-button': '_onReset',
+            'change [data-action=add-filter-select]': '_onChangeFilterSelect',
+            'click .reset-filter-button': '_onReset',
             'click a.dropdown-toggle': '_onDropdownToggle'
         },
 
@@ -108,13 +91,17 @@ define([
          * @param {Object} [options.filters]
          * @param {String} [options.addButtonHint]
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var filterListeners;
 
             this.template = _.template($(this.templateSelector).html());
 
+            this.filters = {};
+
+            _.extend(this, _.pick(options, ['addButtonHint']));
+
             if (options.filters) {
-                this.filters = options.filters;
+                _.extend(this.filters, options.filters);
             }
 
             filterListeners = {
@@ -127,7 +114,7 @@ define([
                 $('body').on('click.' + this.cid, DROPDOWN_TOGGLE_SELECTOR, _.bind(this._onBodyClick, this));
             }
 
-            _.each(this.filters, function (filter) {
+            _.each(this.filters, function(filter) {
                 if (filter.wrappable) {
                     _.extend(filter, filterWrapper);
                 }
@@ -135,22 +122,18 @@ define([
                 this.listenTo(filter, filterListeners);
             }, this);
 
-            if (options.addButtonHint) {
-                this.addButtonHint = options.addButtonHint;
-            }
-
             FiltersManager.__super__.initialize.apply(this, arguments);
         },
 
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
             $('body').off('.' + this.cid);
-            _.each(this.filters, function (filter) {
+            _.each(this.filters, function(filter) {
                 filter.dispose();
             });
             delete this.filters;
@@ -167,7 +150,8 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
-        _onFilterUpdated: function (filter) {
+        _onFilterUpdated: function(filter) {
+            this._resetHintContainer();
             this.trigger('updateFilter', filter);
         },
 
@@ -177,17 +161,18 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
-        _onFilterDisabled: function (filter) {
+        _onFilterDisabled: function(filter) {
             this.trigger('disableFilter', filter);
             this.disableFilter(filter);
+            this.trigger('afterDisableFilter', filter);
         },
 
         /**
          * Returns list of filter raw values
          */
-        getValues: function () {
+        getValues: function() {
             var values = {};
-            _.each(this.filters, function (filter) {
+            _.each(this.filters, function(filter) {
                 if (filter.enabled) {
                     values[filter.name] = filter.getValue();
                 }
@@ -199,8 +184,8 @@ define([
         /**
          * Sets raw values for filters
          */
-        setValues: function (values) {
-            _.each(values, function (value, name) {
+        setValues: function(values) {
+            _.each(values, function(value, name) {
                 if (_.has(this.filters, name)) {
                     this.filters[name].setValue(value);
                 }
@@ -212,9 +197,10 @@ define([
          *
          * @protected
          */
-        _onChangeFilterSelect: function () {
+        _onChangeFilterSelect: function() {
             this.trigger('updateList', this);
             this._processFilterStatus();
+            this.trigger('afterUpdateList', this);
         },
 
         /**
@@ -223,7 +209,7 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @return {*}
          */
-        enableFilter: function (filter) {
+        enableFilter: function(filter) {
             return this.enableFilters([filter]);
         },
 
@@ -233,7 +219,7 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @return {*}
          */
-        disableFilter: function (filter) {
+        disableFilter: function(filter) {
             return this.disableFilters([filter]);
         },
 
@@ -243,13 +229,13 @@ define([
          * @param filters []
          * @return {*}
          */
-        enableFilters: function (filters) {
+        enableFilters: function(filters) {
             if (_.isEmpty(filters)) {
                 return this;
             }
             var optionsSelectors = [];
 
-            _.each(filters, function (filter) {
+            _.each(filters, function(filter) {
                 filter.enable();
                 optionsSelectors.push('option[value="' + filter.name + '"]:not(:selected)');
             }, this);
@@ -272,13 +258,13 @@ define([
          * @param filters []
          * @return {*}
          */
-        disableFilters: function (filters) {
+        disableFilters: function(filters) {
             if (_.isEmpty(filters)) {
                 return this;
             }
             var optionsSelectors = [];
 
-            _.each(filters, function (filter) {
+            _.each(filters, function(filter) {
                 filter.disable();
                 optionsSelectors.push('option[value="' + filter.name + '"]:selected');
             }, this);
@@ -300,30 +286,50 @@ define([
          *
          * @return {*}
          */
-        render: function () {
-            var $container = $(this.template({ filters: this.filters }));
-            this.setElement($container);
+        render: function() {
+            this.$el.html(
+                this.template({filters: this.filters})
+            );
+            this.dropdownContainer = this.$el.find('.filter-container');
+            var $filterItems = this.dropdownContainer.find('.filter-items');
 
-            var fragment = document.createDocumentFragment();
-
-            _.each(this.filters, function (filter) {
+            _.each(this.filters, function(filter) {
+                if (_.isFunction(filter.setDropdownContainer)) {
+                    filter.setDropdownContainer(this.dropdownContainer);
+                }
                 filter.render();
                 if (!filter.enabled) {
                     filter.hide();
                 }
-                fragment.appendChild(filter.$el.get(0));
+                $filterItems.append(filter.$el);
+                filter.rendered();
             }, this);
 
             this.trigger('rendered');
 
             if (_.isEmpty(this.filters)) {
-                $container.hide();
+                this.$el.hide();
             } else {
-                $container.find('.filter-container').append(fragment);
                 this._initializeSelectWidget();
             }
 
             return this;
+        },
+
+        _resetHintContainer: function() {
+            var $container = this.dropdownContainer.find('.filter-items-hint');
+            var show = false;
+            $container.children('span').each(function() {
+                if (this.style.display !== 'none') {
+                    show = true;
+                    return false;
+                }
+            });
+            if (show) {
+                $container.show();
+            } else {
+                $container.hide();
+            }
         },
 
         /**
@@ -331,25 +337,31 @@ define([
          *
          * @protected
          */
-        _initializeSelectWidget: function () {
+        _initializeSelectWidget: function() {
+            var $button;
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.filterSelector),
                 parameters: {
                     multiple: true,
                     selectedList: 0,
                     selectedText: this.addButtonHint,
-                    classes: 'filter-list select-filter-widget',
-                    open: $.proxy(function () {
+                    classes: 'select-filter-widget',
+                    position: {
+                        my: 'left top+2',
+                        at: 'left bottom'
+                    },
+                    open: $.proxy(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
-                        this._updateDropdownPosition();
-                    }, this)
+                    }, this),
+                    appendTo: this.dropdownContainer
                 }
             });
 
             this.selectWidget.setViewDesign(this);
-            this.$('.filter-list span:first').replaceWith(
-                '<a id="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
+            $button = this.selectWidget.multiselect('instance').button;
+            $button.find('span:first').replaceWith(
+                '<a class="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
                     '<span class="caret"></span></a>'
             );
         },
@@ -359,7 +371,7 @@ define([
          *
          * @protected
          */
-        _setDropdownWidth: function () {
+        _setDropdownWidth: function() {
             var widget = this.selectWidget.getWidget();
             var requiredWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
@@ -371,45 +383,22 @@ define([
          *
          * @protected
          */
-        _processFilterStatus: function () {
+        _processFilterStatus: function() {
             var activeFilters = this.$(this.filterSelector).val();
 
-            _.each(this.filters, function (filter, name) {
+            _.each(this.filters, function(filter, name) {
                 if (!filter.enabled && _.indexOf(activeFilters, name) !== -1) {
                     this.enableFilter(filter);
                 } else if (filter.enabled && _.indexOf(activeFilters, name) === -1) {
                     this.disableFilter(filter);
                 }
             }, this);
-
-            this._updateDropdownPosition();
-        },
-
-        /**
-         * Set dropdown position according to current element
-         *
-         * @protected
-         */
-        _updateDropdownPosition: function () {
-            var button = this.$(this.buttonSelector);
-            var buttonPosition = button.offset();
-            var widgetWidth = this.selectWidget.getWidget().outerWidth();
-            var windowWidth = $(window).width();
-            var widgetLeftOffset = buttonPosition.left;
-            if (buttonPosition.left + widgetWidth > windowWidth) {
-                widgetLeftOffset = buttonPosition.left + button.outerWidth() - widgetWidth;
-            }
-
-            this.selectWidget.getWidget().css({
-                top: buttonPosition.top + button.outerHeight(),
-                left: widgetLeftOffset
-            });
         },
 
         /**
          * Reset button click handler
          */
-        _onReset: function () {
+        _onReset: function() {
             mediator.trigger('datagrid:doReset:' + this.collection.inputName);
         },
 
@@ -418,15 +407,12 @@ define([
          * @param e
          * @private
          */
-        _onDropdownToggle: function (e) {
+        _onDropdownToggle: function(e) {
             var $dropdown = this.$('.dropdown');
             e.preventDefault();
             e.stopPropagation();
             if (!$dropdown.hasClass('oro-open')) {
-                // closes other dropdown-menus
-                $(DROPDOWN_TOGGLE_SELECTOR).each(function () {
-                    getDropdownMenuParent($(this)).removeClass('open');
-                });
+                $(DROPDOWN_TOGGLE_SELECTOR).trigger('tohide.bs.dropdown');
             }
             $dropdown.toggleClass('oro-open');
         },
@@ -438,23 +424,23 @@ define([
          * @param {jQuery.Event} e
          * @protected
          */
-        _onBodyClick: function (e) {
+        _onBodyClick: function(e) {
             if (!_.contains($(e.target).parents(), this.el)) {
                 this.closeDropdown();
             }
         },
 
         /**
-         * Closes dropdown on mobile
+         * Close dropdown
          */
-        closeDropdown: function () {
+        closeDropdown: function() {
             this.$('.dropdown').removeClass('oro-open');
         },
 
         /**
          * On mobile closes filter box if value is changed
          */
-        _onUpdateCriteriaClick: function (filter) {
+        _onUpdateCriteriaClick: function(filter) {
             filter.once('update', this.closeDropdown, this);
             _.defer(_.bind(filter.off, filter, 'update', this.closeDropdown, this));
         }

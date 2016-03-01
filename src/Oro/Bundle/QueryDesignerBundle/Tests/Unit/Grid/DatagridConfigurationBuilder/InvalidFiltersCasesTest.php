@@ -4,9 +4,8 @@ namespace Oro\Bundle\QueryDesignerBundle\Tests\Unit\Grid\DatagridConfigurationBu
 
 use Oro\Bundle\QueryDesignerBundle\Exception\InvalidFiltersException;
 use Oro\Bundle\QueryDesignerBundle\Tests\Unit\Fixtures\QueryDesignerModel;
-use Oro\Bundle\QueryDesignerBundle\Tests\Unit\OrmQueryConverterTest;
 
-class InvalidFiltersCasesTest extends OrmQueryConverterTest
+class InvalidFiltersCasesTest extends DatagridConfigurationBuilderTestCase
 {
     /**
      * @dataProvider invalidFiltersStructureProvider

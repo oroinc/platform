@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Metadata;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Metadata\EntityMetadata;
 use Oro\Bundle\EntityConfigBundle\Tests\Unit\Fixture\DemoEntity;
 
@@ -16,7 +16,7 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->classMetadata       = new EntityMetadata(DemoEntity::ENTITY_NAME);
-        $this->classMetadata->mode = ConfigModelManager::MODE_DEFAULT;
+        $this->classMetadata->mode = ConfigModel::MODE_DEFAULT;
     }
 
     public function testSerialize()
@@ -27,10 +27,10 @@ class EntityMetadataTest extends \PHPUnit_Framework_TestCase
     public function testMerge()
     {
         $newMetadata       = new EntityMetadata(DemoEntity::ENTITY_NAME);
-        $newMetadata->mode = ConfigModelManager::MODE_READONLY;
+        $newMetadata->mode = ConfigModel::MODE_READONLY;
         $this->classMetadata->merge($newMetadata);
 
-        $this->assertEquals(ConfigModelManager::MODE_READONLY, $this->classMetadata->mode);
+        $this->assertEquals(ConfigModel::MODE_READONLY, $this->classMetadata->mode);
     }
 
     public function testGetRouteFromAnnotationValues()

@@ -14,6 +14,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInterface
 {
+    const ROUTE_GROUP = 'activity_association';
     const ACTIVITY_ATTRIBUTE = 'activity';
     const ACTIVITY_PLACEHOLDER = '{activity}';
     const ACTIVITY_ID_ATTRIBUTE = 'id';
@@ -28,6 +29,9 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
 
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
+
+    /** @var array */
+    private $supportedActivities;
 
     /**
      * @param ConfigProvider      $groupingConfigProvider
@@ -44,12 +48,30 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if ($route->getOption('group') !== 'activity_association') {
+        if ($route->getOption('group') !== self::ROUTE_GROUP) {
             return;
         }
 
         if ($this->hasAttribute($route, self::ACTIVITY_PLACEHOLDER)) {
-            $activities = array_map(
+            $activities = $this->getSupportedActivities();
+            if (!empty($activities)) {
+                $this->adjustRoutes($route, $routes, $activities);
+            }
+
+            $this->completeRouteRequirements($route);
+            $route->setOption('hidden', true);
+        } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
+            $this->completeRouteRequirements($route);
+        }
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getSupportedActivities()
+    {
+        if (null === $this->supportedActivities) {
+            $this->supportedActivities = array_map(
                 function (ConfigInterface $config) {
                     // convert to entity alias
                     return $this->entityAliasResolver->getPluralAlias(
@@ -67,15 +89,9 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
                     }
                 )
             );
-
-            if (!empty($activities)) {
-                $this->adjustRoutes($route, $routes, $activities);
-                $route->setRequirement(self::ACTIVITY_ATTRIBUTE, implode('|', $activities));
-            }
-            $this->completeRouteRequirements($route);
-        } elseif ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
-            $this->completeRouteRequirements($route);
         }
+
+        return $this->supportedActivities;
     }
 
     /**
@@ -125,6 +141,11 @@ class ActivityAssociationRouteOptionsResolver implements RouteOptionsResolverInt
      */
     protected function completeRouteRequirements(Route $route)
     {
+        if (null === $route->getRequirement(self::ACTIVITY_ATTRIBUTE)
+            && $this->hasAttribute($route, self::ACTIVITY_PLACEHOLDER)
+        ) {
+            $route->setRequirement(self::ACTIVITY_ATTRIBUTE, '\w+');
+        }
         if (null === $route->getRequirement(self::ACTIVITY_ID_ATTRIBUTE)
             && $this->hasAttribute($route, self::ACTIVITY_ID_PLACEHOLDER)
         ) {

@@ -7,6 +7,9 @@ use Doctrine\Common\Persistence\Mapping\MappingException as PersistenceMappingEx
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder;
 use Oro\Bundle\EntityExtendBundle\Tests\Util\ReflectionUtil;
 
@@ -16,6 +19,9 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
     const TARGET_CLASS = 'Test\TargetEntity';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $doctrine;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -23,6 +29,9 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
+        $this->doctrine        = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -31,23 +40,38 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
     }
 
-    public function testCreateManyToManyRelation()
+    public function testCreateManyToManyRelationForNewAssociation()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
         $builder = $this->getMock(
             'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
             ['getPrimaryKeyColumnNames'],
-            [$this->configManager, $this->relationBuilder]
+            [$this->doctrine, $this->configManager, $this->relationBuilder]
         );
+
+        $fieldName = 'target_entity_98c95332';
 
         $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
         $targetEntityConfig       = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
+        $targetEntityConfig->set('label', 'targetentity.label');
+        $targetEntityConfig->set('plural_label', 'targetentity.plural_label');
+        $targetEntityConfig->set('description', 'targetentity.description');
+        $fieldExtendConfig = new Config(
+            new FieldConfigId('extend', self::SOURCE_CLASS, $fieldName, RelationType::MANY_TO_MANY),
+            ['state' => ExtendScope::STATE_NEW]
+        );
 
         $extendConfigProvider = $this->getConfigProviderMock();
-        $extendConfigProvider->expects($this->once())
+        $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->with(self::SOURCE_CLASS)
-            ->will($this->returnValue($sourceEntityExtendConfig));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                        [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+                    ]
+                )
+            );
 
         $entityConfigProvider = $this->getConfigProviderMock();
         $entityConfigProvider->expects($this->once())
@@ -55,7 +79,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(self::TARGET_CLASS)
             ->will($this->returnValue($targetEntityConfig));
 
-        $this->configManager->expects($this->any())
+        $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->will(
                 $this->returnValueMap(
@@ -76,17 +100,23 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $this->identicalTo($sourceEntityExtendConfig),
                 self::TARGET_CLASS,
-                'target_entity_98c95332',
+                $fieldName,
                 ['id'],
                 ['id'],
-                ['id'],
+                ['id']
+            );
+        $this->relationBuilder->expects($this->once())
+            ->method('updateFieldConfigs')
+            ->with(
+                self::SOURCE_CLASS,
+                $fieldName,
                 [
                     'extend' => [
                         'without_default' => true,
                     ],
                     'entity' => [
-                        'label'       => 'test.targetentity.target_entity_98c95332.label',
-                        'description' => 'test.targetentity.target_entity_98c95332.description',
+                        'label'       => 'targetentity.plural_label',
+                        'description' => 'targetentity.description',
                     ],
                     'view'   => [
                         'is_displayable' => true
@@ -100,23 +130,35 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
         $builder->createManyToManyAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
 
-    public function testCreateManyToOneRelation()
+    public function testCreateManyToManyRelationForNewAssociationAndNoLabelForTargetEntity()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
         $builder = $this->getMock(
             'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
             ['getPrimaryKeyColumnNames'],
-            [$this->configManager, $this->relationBuilder]
+            [$this->doctrine, $this->configManager, $this->relationBuilder]
         );
+
+        $fieldName = 'target_entity_98c95332';
 
         $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
         $targetEntityConfig       = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
+        $fieldExtendConfig        = new Config(
+            new FieldConfigId('extend', self::SOURCE_CLASS, $fieldName, RelationType::MANY_TO_MANY),
+            ['state' => ExtendScope::STATE_NEW]
+        );
 
         $extendConfigProvider = $this->getConfigProviderMock();
-        $extendConfigProvider->expects($this->once())
+        $extendConfigProvider->expects($this->exactly(2))
             ->method('getConfig')
-            ->with(self::SOURCE_CLASS)
-            ->will($this->returnValue($sourceEntityExtendConfig));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                        [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+                    ]
+                )
+            );
 
         $entityConfigProvider = $this->getConfigProviderMock();
         $entityConfigProvider->expects($this->once())
@@ -124,7 +166,152 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(self::TARGET_CLASS)
             ->will($this->returnValue($targetEntityConfig));
 
-        $this->configManager->expects($this->any())
+        $this->configManager->expects($this->exactly(2))
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['extend', $extendConfigProvider],
+                        ['entity', $entityConfigProvider]
+                    ]
+                )
+            );
+
+        $builder->expects($this->once())
+            ->method('getPrimaryKeyColumnNames')
+            ->with(self::TARGET_CLASS)
+            ->will($this->returnValue(['id']));
+
+        $this->relationBuilder->expects($this->once())
+            ->method('addManyToManyRelation')
+            ->with(
+                $this->identicalTo($sourceEntityExtendConfig),
+                self::TARGET_CLASS,
+                $fieldName,
+                ['id'],
+                ['id'],
+                ['id']
+            );
+        $this->relationBuilder->expects($this->once())
+            ->method('updateFieldConfigs')
+            ->with(
+                self::SOURCE_CLASS,
+                $fieldName,
+                [
+                    'extend' => [
+                        'without_default' => true,
+                    ],
+                    'entity' => [
+                        'label'       => 'test.sourceentity.' . $fieldName . '.plural_label',
+                        'description' => 'test.sourceentity.' . $fieldName . '.description',
+                    ],
+                    'view'   => [
+                        'is_displayable' => true
+                    ],
+                    'form'   => [
+                        'is_enabled' => true
+                    ]
+                ]
+            );
+
+        $builder->createManyToManyAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
+    }
+
+    public function testCreateManyToManyRelationForExistingAssociation()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
+        $builder = $this->getMock(
+            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
+            ['getPrimaryKeyColumnNames'],
+            [$this->doctrine, $this->configManager, $this->relationBuilder]
+        );
+
+        $fieldName = 'target_entity_98c95332';
+
+        $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
+        $fieldExtendConfig        = new Config(
+            new FieldConfigId('extend', self::SOURCE_CLASS, $fieldName, RelationType::MANY_TO_MANY),
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                        [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+                    ]
+                )
+            );
+
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($extendConfigProvider));
+
+        $builder->expects($this->once())
+            ->method('getPrimaryKeyColumnNames')
+            ->with(self::TARGET_CLASS)
+            ->will($this->returnValue(['id']));
+
+        $this->relationBuilder->expects($this->once())
+            ->method('addManyToManyRelation')
+            ->with(
+                $this->identicalTo($sourceEntityExtendConfig),
+                self::TARGET_CLASS,
+                $fieldName,
+                ['id'],
+                ['id'],
+                ['id']
+            );
+        $this->relationBuilder->expects($this->never())
+            ->method('updateFieldConfigs');
+
+        $builder->createManyToManyAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
+    }
+
+    public function testCreateManyToOneRelationForNewAssociation()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
+        $builder = $this->getMock(
+            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
+            ['getPrimaryKeyColumnNames'],
+            [$this->doctrine, $this->configManager, $this->relationBuilder]
+        );
+
+        $fieldName = 'target_entity_98c95332';
+
+        $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
+        $targetEntityConfig       = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
+        $targetEntityConfig->set('label', 'targetentity.label');
+        $targetEntityConfig->set('plural_label', 'targetentity.plural_label');
+        $targetEntityConfig->set('description', 'targetentity.description');
+        $fieldExtendConfig = new Config(
+            new FieldConfigId('extend', self::SOURCE_CLASS, $fieldName, RelationType::MANY_TO_MANY),
+            ['state' => ExtendScope::STATE_NEW]
+        );
+
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                        [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+                    ]
+                )
+            );
+
+        $entityConfigProvider = $this->getConfigProviderMock();
+        $entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::TARGET_CLASS)
+            ->will($this->returnValue($targetEntityConfig));
+
+        $this->configManager->expects($this->exactly(2))
             ->method('getProvider')
             ->will(
                 $this->returnValueMap(
@@ -145,12 +332,18 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $this->identicalTo($sourceEntityExtendConfig),
                 self::TARGET_CLASS,
-                'target_entity_98c95332',
-                'id',
+                $fieldName,
+                'id'
+            );
+        $this->relationBuilder->expects($this->once())
+            ->method('updateFieldConfigs')
+            ->with(
+                self::SOURCE_CLASS,
+                $fieldName,
                 [
                     'entity' => [
-                        'label'       => 'test.targetentity.target_entity_98c95332.label',
-                        'description' => 'test.targetentity.target_entity_98c95332.description',
+                        'label'       => 'targetentity.label',
+                        'description' => 'targetentity.description',
                     ],
                     'view'   => [
                         'is_displayable' => false
@@ -160,6 +353,141 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             );
+
+        $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
+    }
+
+    public function testCreateManyToOneRelationForNewAssociationAndNoLabelForTargetEntity()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
+        $builder = $this->getMock(
+            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
+            ['getPrimaryKeyColumnNames'],
+            [$this->doctrine, $this->configManager, $this->relationBuilder]
+        );
+
+        $fieldName = 'target_entity_98c95332';
+
+        $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
+        $targetEntityConfig       = new Config(new EntityConfigId('entity', self::TARGET_CLASS));
+        $fieldExtendConfig        = new Config(
+            new FieldConfigId('extend', self::SOURCE_CLASS, $fieldName, RelationType::MANY_TO_MANY),
+            ['state' => ExtendScope::STATE_NEW]
+        );
+
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                        [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+                    ]
+                )
+            );
+
+        $entityConfigProvider = $this->getConfigProviderMock();
+        $entityConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::TARGET_CLASS)
+            ->will($this->returnValue($targetEntityConfig));
+
+        $this->configManager->expects($this->exactly(2))
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['extend', $extendConfigProvider],
+                        ['entity', $entityConfigProvider]
+                    ]
+                )
+            );
+
+        $builder->expects($this->once())
+            ->method('getPrimaryKeyColumnNames')
+            ->with(self::TARGET_CLASS)
+            ->will($this->returnValue(['id']));
+
+        $this->relationBuilder->expects($this->once())
+            ->method('addManyToOneRelation')
+            ->with(
+                $this->identicalTo($sourceEntityExtendConfig),
+                self::TARGET_CLASS,
+                $fieldName,
+                'id'
+            );
+        $this->relationBuilder->expects($this->once())
+            ->method('updateFieldConfigs')
+            ->with(
+                self::SOURCE_CLASS,
+                $fieldName,
+                [
+                    'entity' => [
+                        'label'       => 'test.sourceentity.' . $fieldName . '.label',
+                        'description' => 'test.sourceentity.' . $fieldName . '.description',
+                    ],
+                    'view'   => [
+                        'is_displayable' => false
+                    ],
+                    'form'   => [
+                        'is_enabled' => false
+                    ]
+                ]
+            );
+
+        $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
+    }
+
+    public function testCreateManyToOneRelationForExistingAssociation()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|AssociationBuilder $builder */
+        $builder = $this->getMock(
+            'Oro\Bundle\EntityExtendBundle\Tools\AssociationBuilder',
+            ['getPrimaryKeyColumnNames'],
+            [$this->doctrine, $this->configManager, $this->relationBuilder]
+        );
+
+        $fieldName = 'target_entity_98c95332';
+
+        $sourceEntityExtendConfig = new Config(new EntityConfigId('extend', self::SOURCE_CLASS));
+        $fieldExtendConfig        = new Config(
+            new FieldConfigId('extend', self::SOURCE_CLASS, $fieldName, RelationType::MANY_TO_MANY),
+            ['state' => ExtendScope::STATE_ACTIVE]
+        );
+
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::SOURCE_CLASS, null, $sourceEntityExtendConfig],
+                        [self::SOURCE_CLASS, $fieldName, $fieldExtendConfig]
+                    ]
+                )
+            );
+
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($extendConfigProvider));
+
+        $builder->expects($this->once())
+            ->method('getPrimaryKeyColumnNames')
+            ->with(self::TARGET_CLASS)
+            ->will($this->returnValue(['id']));
+
+        $this->relationBuilder->expects($this->once())
+            ->method('addManyToOneRelation')
+            ->with(
+                $this->identicalTo($sourceEntityExtendConfig),
+                self::TARGET_CLASS,
+                $fieldName,
+                'id'
+            );
+        $this->relationBuilder->expects($this->never())
+            ->method('updateFieldConfigs');
 
         $builder->createManyToOneAssociation(self::SOURCE_CLASS, self::TARGET_CLASS, null);
     }
@@ -175,6 +503,11 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn($em);
+
         $em->expects($this->once())
             ->method('getClassMetadata')
             ->with($entityClass)
@@ -184,11 +517,7 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getIdentifierColumnNames')
             ->will($this->returnValue(['id', 'name']));
 
-        $this->configManager->expects($this->once())
-            ->method('getEntityManager')
-            ->will($this->returnValue($em));
-
-        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
+        $builder     = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',
@@ -201,11 +530,11 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrimaryKeyColumnNamesWithReflectionException()
     {
-        $this->configManager->expects($this->once())
-            ->method('getEntityManager')
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
             ->will($this->throwException(new \ReflectionException('test')));
 
-        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
+        $builder     = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',
@@ -218,11 +547,11 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrimaryKeyColumnNamesWithORMMappingException()
     {
-        $this->configManager->expects($this->once())
-            ->method('getEntityManager')
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
             ->will($this->throwException(new ORMMappingException('test')));
 
-        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
+        $builder     = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',
@@ -235,11 +564,11 @@ class AssociationBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testPrimaryKeyColumnNamesWithPersistenceMappingException()
     {
-        $this->configManager->expects($this->once())
-            ->method('getEntityManager')
+        $this->doctrine->expects($this->any())
+            ->method('getManagerForClass')
             ->will($this->throwException(new PersistenceMappingException('test')));
 
-        $builder     = new AssociationBuilder($this->configManager, $this->relationBuilder);
+        $builder     = new AssociationBuilder($this->doctrine, $this->configManager, $this->relationBuilder);
         $columnNames = ReflectionUtil::callProtectedMethod(
             $builder,
             'getPrimaryKeyColumnNames',

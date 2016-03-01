@@ -4,6 +4,12 @@
 {% set name = app.user|oro_format_name|default('N/A') %}
 {% oro_title_set({params : {"%username%": name }}) %}
 
+{# grid params #}
+{% set params = {'userId': app.user.id} %}
+{% set gridName = 'user-email-grid' %}
+
+{% set pageTitle = 'oro.email.entity_plural_label'|trans %}
+
 {% block navButtons %}
     {% if resource_granted('oro_email_email_create') %}
         <div class="btn-group">
@@ -13,16 +19,102 @@
             }}
         </div>
     {% endif %}
+
+    {%- set actionSync =
+        '<i class="icon-refresh hide-text">' ~
+            'oro.email.action.sync'|trans ~
+        '</i>' ~
+        'oro.email.action.sync'|trans
+    %}
+    {%- set actionProcessing =
+        '<i class="icon-refresh hide-text">' ~
+            'oro.email.action.processing'|trans ~
+        '</i>' ~
+        'oro.email.action.processing'|trans ~
+        '&nbsp;<span class="dots">.</span>'
+    %}
+    <div class="btn-group">
+        <a type="button" class="btn sync-btn icons-holder-text no-hash" href="javascript: void(0);">
+            {{ actionSync|raw }}
+        </a>
+        <script type="text/javascript">
+            require(['jquery', 'oroui/js/mediator', 'oroui/js/messenger'],
+                function($, mediator, messenger) {
+                    var buttonSyncSelector = 'a[type=button].sync-btn';
+                    var _sync = function (e) {
+                        var button = $(e.currentTarget);
+                        if (button.attr('disabled')) {
+                            return;
+                        }
+
+                        var loader;
+                        var dotsLoader = function () {
+                            var dots = button.find('span.dots');
+                            if(dots.html() == '....') {
+                                dots.html('.');
+                            } else {
+                                dots.html(dots.html() + '.');
+                            }
+                        };
+
+                        $.ajax({
+                            type: 'GET',
+                            dataType: 'json',
+                            url: '{{ path('oro_email_user_sync_emails') }}',
+                            beforeSend: function () {
+                                button.html('{{ actionProcessing|raw }}');
+                                button.attr('disabled', 'disabled');
+
+                                messenger.notificationFlashMessage(
+                                    'info',
+                                    {{ 'oro.email.action.message.processing'|trans|json_encode|raw }}
+                                );
+
+                                loader = setInterval(function() { dotsLoader() }, 500);
+                            },
+                            success: function (response) {
+                                clearInterval(loader);
+
+                                button.html('{{ actionSync|raw }}');
+                                button.removeAttr('disabled');
+
+                                mediator.trigger('datagrid:doRefresh:{{ gridName }}');
+
+                                if (response.error !== undefined) {
+                                    messenger.notificationFlashMessage('error', response.error);
+                                } else {
+                                    messenger.notificationFlashMessage(
+                                            'success',
+                                            {{ 'oro.email.action.message.success'|trans|json_encode|raw }}
+                                    );
+                                }
+                            },
+                            error: function () {
+                                clearInterval(loader);
+
+                                button.html('{{ actionSync|raw }}');
+                                button.removeAttr('disabled');
+
+                                messenger.notificationFlashMessage(
+                                    'error',
+                                    {{ 'oro.email.action.message.error'|trans|json_encode|raw }}
+                                );
+                            }
+                        })
+                    };
+
+                    $(buttonSyncSelector).on('click.syncEmails', _sync);
+                    mediator.once('page:beforeChange', function () {
+                        $(buttonSyncSelector).off('click.syncEmails', _sync);
+                    });
+                });
+        </script>
+    </div>
 {% endblock %}
 
-{% set pageTitle = 'oro.email.entity_plural_label'|trans %}
-{% set gridName = 'user-email-grid' %}
-{# grid params #}
-{% set params = {'userId': app.user.id} %}
-
 {% block breadcrumb %}
-    {% set breadcrumbs = [
-        {'label': 'oro.email.menu.user_emails'|trans }
-    ] %}
+    {% set breadcrumbs = [{
+        'label': 'oro.email.menu.user_emails'|trans
+    }] %}
     {% include 'OroNavigationBundle:Menu:breadcrumbs.html.twig' %}
 {% endblock breadcrumb %}

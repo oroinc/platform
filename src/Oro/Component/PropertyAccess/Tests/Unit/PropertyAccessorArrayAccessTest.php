@@ -52,9 +52,15 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCa
     {
         return array(
             array($this->getContainer(array('firstName' => 'John')), 'lastName'),
+            array($this->getContainer(array('firstName' => 'John')), '[lastName]'),
             array($this->getContainer(array()), 'index.lastName'),
+            array($this->getContainer(array()), 'index[lastName]'),
+            array($this->getContainer(array()), '[index][lastName]'),
+            array($this->getContainer(array()), '[index].lastName'),
             array($this->getContainer(array('index' => array())), 'index.lastName'),
+            array($this->getContainer(array('index' => array())), '[index][lastName]'),
             array($this->getContainer(array('index' => array('firstName' => 'John'))), 'index.lastName'),
+            array($this->getContainer(array('index' => array('firstName' => 'John'))), '[index][lastName]'),
         );
     }
 
@@ -72,8 +78,16 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCa
      */
     public function testGetValueThrowsExceptionIfIndexNotFound($collection, $path)
     {
-        $this->propertyAccessor = new PropertyAccessor();
         $this->propertyAccessor->getValue($collection, $path);
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testGetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled($collection, $path)
+    {
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->assertNull($this->propertyAccessor->getValue($collection, $path));
     }
 
     /**
@@ -120,5 +134,21 @@ abstract class PropertyAccessorArrayAccessTest extends \PHPUnit_Framework_TestCa
         $this->propertyAccessor->remove($collection, $path);
 
         $this->assertEquals($clone, $collection);
+    }
+
+    /**
+     * @dataProvider getValidPropertyPaths
+     */
+    public function testIsReadable($collection, $path)
+    {
+        $this->assertTrue($this->propertyAccessor->isReadable($collection, $path));
+    }
+
+    /**
+     * @dataProvider getValidPropertyPaths
+     */
+    public function testIsWritable($collection, $path)
+    {
+        $this->assertTrue($this->propertyAccessor->isWritable($collection, $path, 'Updated'));
     }
 }

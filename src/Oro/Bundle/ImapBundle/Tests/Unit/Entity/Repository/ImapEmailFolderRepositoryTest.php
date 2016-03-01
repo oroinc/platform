@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImapBundle\Tests\Unit\Entity\Repository;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
@@ -37,7 +37,7 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
 
     public function testGetFoldersByOriginQueryBuilder()
     {
-        $origin = new ImapEmailOrigin();
+        $origin = new UserEmailOrigin();
 
         /** @var ImapEmailFolderRepository $repo */
         $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
@@ -58,7 +58,7 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
 
     public function testGetFoldersByOriginQueryBuilderWithOutdated()
     {
-        $origin = new ImapEmailOrigin();
+        $origin = new UserEmailOrigin();
 
         /** @var ImapEmailFolderRepository $repo */
         $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
@@ -79,7 +79,7 @@ class ImapEmailFolderRepositoryTest extends OrmTestCase
 
     public function testGetEmptyOutdatedFoldersByOriginQueryBuilder()
     {
-        $origin = new ImapEmailOrigin();
+        $origin = new UserEmailOrigin();
 
         /** @var ImapEmailFolderRepository $repo */
         $repo = $this->em->getRepository('OroImapBundle:ImapEmailFolder');

@@ -3,9 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class OroWorkflowBundleInstaller implements Installation
 {
     /**
@@ -13,7 +17,7 @@ class OroWorkflowBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_10';
+        return 'v1_12';
     }
 
     /**
@@ -133,16 +137,17 @@ class OroWorkflowBundleInstaller implements Installation
         $table = $schema->createTable('oro_process_trigger');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('definition_name', 'string', ['notnull' => false, 'length' => 255]);
-        $table->addColumn('event', 'string', ['length' => 255]);
+        $table->addColumn('event', 'string', ['length' => 255, 'notnull' => false]);
         $table->addColumn('field', 'string', ['notnull' => false, 'length' => 255]);
         $table->addColumn('queued', 'boolean', []);
         $table->addColumn('time_shift', 'integer', ['notnull' => false]);
+        $table->addColumn('cron', 'string', ['length' => 100, 'notnull' => false]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('priority', 'smallint', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['definition_name'], 'idx_48b327bccb9d81d2', []);
-        $table->addUniqueIndex(['event', 'field', 'definition_name'], 'process_trigger_unique_idx');
+        $table->addUniqueIndex(['event', 'field', 'definition_name', 'cron'], 'process_trigger_unique_idx');
     }
 
     /**
@@ -211,6 +216,11 @@ class OroWorkflowBundleInstaller implements Installation
         $table->addColumn('actions_configuration', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn(
+            'pre_conditions_configuration',
+            'array',
+            ['notnull' => false, 'comment' => '(DC2Type:array)']
+        );
         $table->setPrimaryKey(['name']);
     }
 

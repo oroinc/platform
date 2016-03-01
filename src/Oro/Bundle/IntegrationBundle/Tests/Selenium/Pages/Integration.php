@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Selenium\Pages;
 
+use Oro\Bundle\CronBundle\Tests\Selenium\Pages\Job;
 use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
 
 /**
@@ -11,11 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  */
 class Integration extends AbstractPageEntity
 {
-    public function __construct($testCase, $redirect = true)
-    {
-        parent::__construct($testCase, $redirect);
-    }
-
     /**
      * @param string $name
      * @return $this
@@ -35,8 +31,11 @@ class Integration extends AbstractPageEntity
      */
     public function setType($type)
     {
-        $field = $this->test->select($this->test->byXpath("//*[@data-ftid='oro_integration_channel_form_type']"));
-        $field->selectOptionByValue($type);
+        $this->test->byXpath("//div[starts-with(@id, 's2id_oro_integration_channel_form_type')]/a")->click();
+        $this->waitForAjax();
+        $this->test->byXpath("//div[@id='select2-drop']//div[contains(., '{$type}')]")->click();
+        $this->waitForAjax();
+        $this->waitPageToLoad();
 
         return $this;
     }
@@ -56,25 +55,17 @@ class Integration extends AbstractPageEntity
     /**
      * @return $this
      */
-    public function scheduleSync()
-    {
-        $this->test->byXPath(
-            "//div[@class='pull-left btn-group icons-holder']/a[contains(., 'Schedule sync')]"
-        )->click();
-        $this->waitForAjax();
-
-        return $this;
-    }
-
-    /**
-     * @return $this
-     */
     public function activate()
     {
         $this->test->byXPath(
             "//div[@class='pull-left btn-group icons-holder']/a[contains(., 'Activate')]"
         )->click();
         $this->waitForAjax();
+        $this->assertMessage('Integration activated');
+        $this->assertElementPresent(
+            "//div[@class='badge badge-enabled status-enabled'][text()='Active']",
+            'Integration status are not Active'
+        );
 
         return $this;
     }
@@ -88,6 +79,11 @@ class Integration extends AbstractPageEntity
             "//div[@class='pull-left btn-group icons-holder']/a[contains(., 'Deactivate')]"
         )->click();
         $this->waitForAjax();
+        $this->assertMessage('Integration deactivated');
+        $this->assertElementPresent(
+            "//div[@class='badge badge-disabled status-disabled'][text()='Inactive']",
+            'Integration status are not Inactive'
+        );
 
         return $this;
     }
@@ -104,14 +100,29 @@ class Integration extends AbstractPageEntity
     }
 
     /**
+     * Method click Schedule sync button
      * @return $this
      */
-    public function checkAddQueueMessage()
+    public function scheduleSync()
     {
-        $this->assertElementPresent(
-            "//div[@class='message'][starts-with((.), 'A sync job has been added to the queue.')]"
-        );
+        $this->test->byXPath("//div[@class='pull-right']//a[text()='Schedule sync']")->click();
+        $this->waitForAjax();
+        $this->waitPageToLoad();
+        $this->assertMessage('A sync job has been added to the queue. Check progress.');
 
         return $this;
+    }
+
+    /**
+     * Method click link at flash message
+     * @return Job
+     */
+    public function clickSyncMessageLink()
+    {
+        $this->test->byXPath("//div[@id = 'flash-messages']//a")->click();
+        $this->waitForAjax();
+        $this->waitPageToLoad();
+
+        return new Job($this->test);
     }
 }

@@ -1,11 +1,11 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailAttachmentModel,
-        datetime = require('orolocale/js/formatter/datetime'),
-        numeral = require('numeral'),
-        BaseModel = require('oroui/js/app/models/base/model');
+    var EmailAttachmentModel;
+    var _ = require('underscore');
+    var datetime = require('orolocale/js/formatter/datetime');
+    var numeral = require('numeral');
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroemail/js/app/models/email-template-model
@@ -28,7 +28,7 @@ define(function (require) {
 
         set: function(key, value, options) {
             var attrs;
-            if (_.isObject(key) || key == null) {
+            if (_.isObject(key) || key === null || key === void 0) {
                 attrs = key;
                 options = value;
             } else {
@@ -37,20 +37,20 @@ define(function (require) {
             }
 
             for (var attr in attrs) {
-                if (attr == 'fileName') {
-                    attrs['fileName'] = this.formatFileName(attrs['fileName']);
-                } else if (attr == 'fileSize') {
-                    if (attrs['fileSize']) {
-                        attrs['fileSize'] = numeral(attrs['fileSize']).format('b');
+                if (attr === 'fileName') {
+                    attrs.fileName = this.formatFileName(attrs.fileName);
+                } else if (attr === 'fileSize') {
+                    if (attrs.fileSize) {
+                        attrs.fileSize = numeral(attrs.fileSize).format('b');
                     }
-                } else if (attr == 'modified') {
-                    if (attrs['modified']) {
-                        attrs['modified'] = datetime.formatDateTime(attrs['modified']);
+                } else if (attr === 'modified') {
+                    if (attrs.modified) {
+                        attrs.modified = datetime.formatDateTime(attrs.modified);
                     }
                 }
             }
 
-            return Backbone.Model.prototype.set.call(this, attrs, options);
+            return EmailAttachmentModel.__super__.set.call(this, attrs, options);
         },
 
         formatFileName: function(fileName) {

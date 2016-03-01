@@ -3,6 +3,7 @@
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 class TestEmailOwner implements EmailOwnerInterface
 {
@@ -14,6 +15,9 @@ class TestEmailOwner implements EmailOwnerInterface
 
     /** @var string */
     protected $lastName;
+
+    /** @var OrganizationInterface */
+    protected $organization = null;
 
     public function __construct($id = null, $firstName = null)
     {
@@ -50,5 +54,10 @@ class TestEmailOwner implements EmailOwnerInterface
     public function getLastName()
     {
         return $this->lastName;
+    }
+
+    public function getOrganization()
+    {
+        return $this->organization;
     }
 }

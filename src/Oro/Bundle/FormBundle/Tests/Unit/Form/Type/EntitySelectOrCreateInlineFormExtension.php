@@ -8,7 +8,7 @@ use Genemu\Bundle\FormBundle\Form\JQuery\Type\Select2Type;
 
 use Symfony\Component\Form\AbstractExtension;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 
@@ -25,19 +25,19 @@ class EntitySelectOrCreateInlineFormExtension extends AbstractExtension
     protected $searchRegistry;
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $configProvider;
 
     /**
-     * @param EntityManager           $em
-     * @param SearchRegistry          $searchRegistry
-     * @param ConfigProviderInterface $configProvider
+     * @param EntityManager  $em
+     * @param SearchRegistry $searchRegistry
+     * @param ConfigProvider $configProvider
      */
     public function __construct(
         EntityManager $em,
         SearchRegistry $searchRegistry,
-        ConfigProviderInterface $configProvider
+        ConfigProvider $configProvider
     ) {
         $this->em             = $em;
         $this->searchRegistry = $searchRegistry;

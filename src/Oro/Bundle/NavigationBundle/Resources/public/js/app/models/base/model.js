@@ -1,15 +1,15 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'routing',
     'oroui/js/app/models/base/model'
-], function (_, routing, BaseModel) {
+], function(_, routing, BaseModel) {
     'use strict';
 
     var Model;
 
     Model = BaseModel.extend({
+        route: 'oro_api_get_navigationitems',
+
         defaults: {
             title: '',
             title_rendered: '',
@@ -18,12 +18,12 @@ define([
             type: null
         },
 
-        url: function () {
+        url: function() {
             var base = _.result(this, 'urlRoot') || _.result(this.collection, 'url');
             if (base && base.indexOf(this.get('type')) === -1) {
                 base += (base.charAt(base.length - 1) === '/' ? '' : '/') + this.get('type');
             } else if (!base) {
-                base = routing.generate('oro_api_get_navigationitems', { type: this.get('type') });
+                base = routing.generate(this.route, {type: this.get('type')});
             }
             if (this.isNew()) {
                 return base;

@@ -96,6 +96,23 @@ class Manager implements ManagerInterface
 
         $uniqueName = $this->getDatagridUniqueName($name);
         $parameters = $this->parametersFactory->createParameters($uniqueName);
+
+        /**
+         * In case of custom relation - $gridScope will be present.
+         * So we need to check for additional parameters (pager, sorter, etc.) by gridName (without scope).
+         * E.g. 'uniqueName' can be like 'entity-relation-grid:OroAcme_Bundle_AcmeBundle_Entity_AcmeEntit-relOneToMany'
+         *  so parameters by 'uniqueName' will contain 'class_name', 'field_name', 'id'
+         *  and parameters by 'gridName' (entity-relation-grid) will contain '_pager', '_sort_by', etc.
+         * In such cases we'll merge them together, otherwise pagination and sorters will not work.
+         */
+        if ($gridScope) {
+            $gridName   = $this->nameStrategy->parseGridName($name);
+            $additional = $this->parametersFactory->createParameters($gridName)->all();
+            if ($additional) {
+                $additionalParameters = array_merge($additionalParameters, $additional);
+            }
+        }
+
         $parameters->add($additionalParameters);
 
         return $this->getDatagrid($name, $parameters);

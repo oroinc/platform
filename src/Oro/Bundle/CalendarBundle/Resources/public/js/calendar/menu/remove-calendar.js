@@ -1,7 +1,9 @@
-/*jslint nomen:true*/
-/*global define, console*/
-define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/translator', 'oroui/js/messenger'
-    ], function (_, BaseView, __, messenger) {
+define([
+    'underscore',
+    'oroui/js/app/views/base/view',
+    'orotranslation/js/translator',
+    'oroui/js/messenger'
+], function(_, BaseView, __, messenger) {
     'use strict';
 
     /**
@@ -10,25 +12,25 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
      * @extends oroui/js/app/views/base/view
      */
     return BaseView.extend({
-        initialize: function (options) {
+        initialize: function(options) {
             this.connectionsView = options.connectionsView;
         },
 
-        execute: function (model, actionSyncObject) {
-            var removingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...')),
-                $connection = this.connectionsView.findItem(model);
+        execute: function(model, actionSyncObject) {
+            var removingMsg = messenger.notificationMessage('warning',
+                __('oro.calendar.flash_message.calendar_removing'));
+            var $connection = this.connectionsView.findItem(model);
             try {
                 $connection.hide();
                 model.destroy({
                     wait: true,
-                    success: _.bind(function () {
+                    success: _.bind(function() {
                         removingMsg.close();
-                        messenger.notificationFlashMessage('success', __('The calendar was removed.'), {
-                            namespace: 'calendar-ns'
-                        });
+                        messenger.notificationFlashMessage('success',
+                            __('oro.calendar.flash_message.calendar_removed'), {namespace: 'calendar-ns'});
                         actionSyncObject.resolve();
                     }, this),
-                    error: _.bind(function (model, response) {
+                    error: _.bind(function(model, response) {
                         removingMsg.close();
                         this._showError(__('Sorry, the calendar removing was failed'), response.responseJSON || {});
                         $connection.show();
@@ -43,7 +45,7 @@ define(['underscore', 'oroui/js/app/views/base/view', 'orotranslation/js/transla
             }
         },
 
-        _showError: function (message, err) {
+        _showError: function(message, err) {
             messenger.showErrorMessage(message, err);
         }
     });

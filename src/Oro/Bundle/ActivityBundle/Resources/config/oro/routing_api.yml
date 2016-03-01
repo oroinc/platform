@@ -13,3 +13,7 @@ oro_activity_search_api:
 oro_activity_target_api:
     resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityTargetController
     type:     rest
+
+oro_activity_context_api:
+    resource: Oro\Bundle\ActivityBundle\Controller\Api\Rest\ActivityContextController
+    type:     rest

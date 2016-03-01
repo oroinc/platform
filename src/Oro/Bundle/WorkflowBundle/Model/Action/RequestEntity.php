@@ -13,14 +13,10 @@ use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
 class RequestEntity extends AbstractAction
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $options;
 
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $registry;
 
     /**

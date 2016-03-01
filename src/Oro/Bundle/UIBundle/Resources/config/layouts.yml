@@ -1,0 +1,13 @@
+services:
+    oro_ui.layout_context_configurator.widget:
+        class: Oro\Bundle\UIBundle\Layout\Extension\WidgetContextConfigurator
+        arguments:
+            - @request_stack
+        tags:
+            - { name: layout.context_configurator, priority: -100 }
+
+    oro_ui.layout_loader.widget_path_provider:
+        class:  Oro\Bundle\UIBundle\Layout\Extension\Theme\WidgetPathProvider
+        public: false
+        tags:
+            - { name: layout.resource.path_provider, priority: -10 }

@@ -10,11 +10,12 @@ use JMS\Serializer\Serializer;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\NavigationBundle\Entity\Title;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\ConfigReader;
 use Oro\Bundle\NavigationBundle\Title\TitleReader\AnnotationsReader;
 use Oro\Bundle\NavigationBundle\Title\StoredTitle;
-use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManager;
+use Oro\Bundle\NavigationBundle\Menu\BreadcrumbManagerInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -40,14 +41,14 @@ class TitleService implements TitleServiceInterface
      *
      * @var array
      */
-    private $readers = array();
+    private $readers = [];
 
     /**
      * Current title template params
      *
      * @var array
      */
-    private $params = array();
+    private $params = [];
 
     /**
      * Current title suffix
@@ -84,15 +85,25 @@ class TitleService implements TitleServiceInterface
     protected $serializer = null;
 
     /**
-     * @var BreadcrumbManager
+     * @var ServiceLink
      */
-    protected $breadcrumbManager;
+    protected $breadcrumbManagerLink;
 
     /**
      * @var ConfigManager
      */
     protected $userConfigManager;
 
+    /**
+     * @param AnnotationsReader $reader
+     * @param ConfigReader $configReader
+     * @param TitleTranslator $titleTranslator
+     * @param ObjectManager $em
+     * @param Serializer $serializer
+     * @param $userConfigManager
+     * @param ServiceLink $breadcrumbManagerLink
+     * @param TitleProvider $titleProvider
+     */
     public function __construct(
         AnnotationsReader $reader,
         ConfigReader $configReader,
@@ -100,16 +111,26 @@ class TitleService implements TitleServiceInterface
         ObjectManager $em,
         Serializer $serializer,
         $userConfigManager,
-        BreadcrumbManager $breadcrumbManager,
+        ServiceLink $breadcrumbManagerLink,
         TitleProvider $titleProvider
     ) {
-        $this->readers = array($reader, $configReader);
+        $this->readers = [$reader, $configReader];
         $this->titleTranslator = $titleTranslator;
         $this->em = $em;
         $this->serializer = $serializer;
         $this->userConfigManager = $userConfigManager;
-        $this->breadcrumbManager = $breadcrumbManager;
+        $this->breadcrumbManagerLink = $breadcrumbManagerLink;
         $this->titleProvider = $titleProvider;
+    }
+
+    /**
+     * @param BreadcrumbManagerInterface $breadcrumbManager
+     *
+     * @deprecated since 1.8 will be moved to constructor
+     */
+    public function setBreadcrumbManager(BreadcrumbManagerInterface $breadcrumbManager)
+    {
+        $this->breadcrumbManager = $breadcrumbManager;
     }
 
     /**
@@ -124,7 +145,7 @@ class TitleService implements TitleServiceInterface
      * @return $this
      */
     public function render(
-        $params = array(),
+        $params = [],
         $title = null,
         $prefix = null,
         $suffix = null,
@@ -150,7 +171,7 @@ class TitleService implements TitleServiceInterface
                 }
             } catch (RuntimeException $e) {
                 // wrong json string - ignore title
-                $params = array();
+                $params = [];
                 $title  = 'Untitled';
                 $prefix = '';
                 $suffix = '';
@@ -191,7 +212,7 @@ class TitleService implements TitleServiceInterface
     {
         if (isset($values['titleTemplate'])
             && ($this->getTemplate() == null
-            || (isset($values['force']) && $values['force']))
+                || (isset($values['force']) && $values['force']))
         ) {
             $this->setTemplate($values['titleTemplate']);
         }
@@ -395,7 +416,7 @@ class TitleService implements TitleServiceInterface
     protected function createTitle($route, $title)
     {
         if (!($title instanceof Route)) {
-            $titleData = array();
+            $titleData = [];
 
             if ($title) {
                 $titleData[] = $title;
@@ -422,7 +443,7 @@ class TitleService implements TitleServiceInterface
      */
     protected function getBreadcrumbs($route)
     {
-        return $this->breadcrumbManager->getBreadcrumbLabels(
+        return $this->breadcrumbManagerLink->getService()->getBreadcrumbLabels(
             $this->userConfigManager->get('oro_navigation.breadcrumb_menu'),
             $route
         );

@@ -1,13 +1,13 @@
-/* jshint devel:true */
-/* global define */
 define([
     'backbone',
     'underscore',
     'routing',
     'orotranslation/js/translator',
     'oroui/js/mediator',
-    'oroui/js/messenger'],
-function (Backbone, _, routing, __, mediator, messenger) {
+    'oroui/js/messenger'
+], function(Backbone, _, routing, __, mediator, messenger) {
+    'use strict';
+
     var $ = Backbone.$;
 
     /**
@@ -31,12 +31,13 @@ function (Backbone, _, routing, __, mediator, messenger) {
 
         buttonsSelector: '.available-translation-widget-container .btn',
 
-        buttonTemplate: _.template('<button class="btn btn-mini" data-lang="<%= code %>" data-action="<%= action %>"><%= label %></button>'),
+        buttonTemplate: _.template('<button class="btn btn-mini" data-lang="<%= code %>" ' +
+            'data-action="<%= action %>"><%= label %></button>'),
 
         /**
          * Constructor
          */
-        initialize: function () {
+        initialize: function() {
             if (this.el.tagName !== 'INPUT') {
                 throw new TypeError('Configuration field el should be set');
             }
@@ -49,13 +50,12 @@ function (Backbone, _, routing, __, mediator, messenger) {
          *
          * @param {jQuery.Event} e
          */
-        clickHandler: function (e) {
+        clickHandler: function(e) {
             e.preventDefault();
 
-            var $el = $(e.currentTarget),
-                action = $el.data('action'),
-                code = $el.data('lang')
-            ;
+            var $el = $(e.currentTarget);
+            var action = $el.data('action');
+            var code = $el.data('lang');
 
             if (_.isUndefined(action)) {
                 throw new TypeError('Attribute "data-action" should be set for action button');
@@ -80,29 +80,29 @@ function (Backbone, _, routing, __, mediator, messenger) {
          *
          * @param {Object} actionMediator
          */
-        performAction: function (actionMediator) {
-            if (actionMediator.action == 'download' || actionMediator.action == 'update') {
+        performAction: function(actionMediator) {
+            if (actionMediator.action === 'download' || actionMediator.action === 'update') {
                 mediator.execute('showLoading');
 
-                var url = routing.generate(this.route, { code: actionMediator.code });
-                $.getJSON(url, _.bind(function (response) {
+                var url = routing.generate(this.route, {code: actionMediator.code});
+                $.getJSON(url, _.bind(function(response) {
                         if (true === response.success) {
                             this.markAsUpToDate(actionMediator);
                             this.postAction(actionMediator);
                         }
                     }, this))
-                    .always(_.bind(function (response, status) {
+                    .always(_.bind(function(response, status) {
                         var message;
 
                         mediator.execute('hideLoading');
 
                         if (status !== 'success' || response.success !== true) {
                             response = response.responseJSON ? response.responseJSON : (response || {});
-                            message  = _.isUndefined(response.message) ? __('unknown') : __(response.message);
-                            message  = __('Could not download translations, error: ') + message;
+                            message = _.isUndefined(response.message) ? __('unknown') : __(response.message);
+                            message = __('Could not download translations, error: ') + message;
                         } else {
-                            message = actionMediator.action == 'download'
-                                ? __('Download finished.')
+                            message = actionMediator.action === 'download' ?
+                                __('Download finished.')
                                 : __('Update finished.');
                         }
 
@@ -119,17 +119,17 @@ function (Backbone, _, routing, __, mediator, messenger) {
          *
          * @param {Object} actionMediator
          */
-        postAction: function (actionMediator) {
-            var $newButton,
-                action = actionMediator.action,
-                code = actionMediator.code,
-                value = this.$el.val(),
-                config = JSON.parse(value ? value : '{}');
+        postAction: function(actionMediator) {
+            var $newButton;
+            var action = actionMediator.action;
+            var code = actionMediator.code;
+            var value = this.$el.val();
+            var config = JSON.parse(value ? value : '{}');
 
-            if (action == 'download' || action == 'disable') {
+            if (action === 'download' || action === 'disable') {
                 $newButton = $(this.buttonTemplate({code: code, action: 'enable', label: __('Enable')}));
                 config[code] = this.options.STATUS_DOWNLOADED;
-            } else if (action == 'enable') {
+            } else if (action === 'enable') {
                 $newButton = $(this.buttonTemplate({code: code, action: 'disable', label: __('Disable')}));
                 config[code] = this.options.STATUS_ENABLED;
             }
@@ -139,7 +139,7 @@ function (Backbone, _, routing, __, mediator, messenger) {
 
             this.$el.val(JSON.stringify(config));
 
-            if (action == 'enable' || action == 'disable') {
+            if (action === 'enable' || action === 'disable') {
                 this.$el.parents('form').submit();
             }
         },
@@ -150,11 +150,12 @@ function (Backbone, _, routing, __, mediator, messenger) {
         markAsUpToDate: function(actionMediator) {
             var tableLine = actionMediator.el.parents('tr');
 
-            if (actionMediator.action == 'update') {
+            if (actionMediator.action === 'update') {
                 // remove update button
                 actionMediator.el.remove();
             }
-            tableLine.find('.translation-status').html($('<span class="status-up-to-date">' + __('Up to date') + '</span>'));
+            tableLine.find('.translation-status').html($('<span class="status-up-to-date">' +
+                __('Up to date') + '</span>'));
         }
     });
 });

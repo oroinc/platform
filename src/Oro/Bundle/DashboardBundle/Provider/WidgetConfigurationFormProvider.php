@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider;
 
+use Symfony\Component\Form\FormFactoryInterface;
+use Symfony\Component\Form\FormInterface;
+
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 use Oro\Bundle\DashboardBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\DashboardBundle\Model\ConfigProvider;
-use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
-use Symfony\Component\Form\FormFactoryInterface;
-use Symfony\Component\Form\FormInterface;
 
 class WidgetConfigurationFormProvider
 {
@@ -22,21 +22,16 @@ class WidgetConfigurationFormProvider
     /** @var ConfigProvider */
     protected $configProvider;
 
-    /** @var ConstraintFactory */
-    protected $constraintFactory;
-
     /**
-     * @param ConfigProvider $configProvider
+     * @param ConfigProvider       $configProvider
      * @param FormFactoryInterface $formFactory
      */
     public function __construct(
         ConfigProvider $configProvider,
-        FormFactoryInterface $formFactory,
-        ConstraintFactory $constraintFactory
+        FormFactoryInterface $formFactory
     ) {
         $this->configProvider = $configProvider;
         $this->formFactory = $formFactory;
-        $this->constraintFactory = $constraintFactory;
     }
 
     /**

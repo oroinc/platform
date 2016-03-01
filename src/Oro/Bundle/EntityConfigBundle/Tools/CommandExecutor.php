@@ -8,9 +8,9 @@ use Psr\Log\NullLogger;
 use Symfony\Component\HttpFoundation\File\Exception\FileNotFoundException;
 use Symfony\Component\Process\Process;
 use Symfony\Component\Process\ProcessBuilder;
+use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
-use Oro\Bundle\InstallerBundle\Process\PhpExecutableFinder;
 
 class CommandExecutor
 {
@@ -31,8 +31,13 @@ class CommandExecutor
      */
     protected $dataCacheManager;
 
+    /** @var array */
+    protected $defaultOptions;
+
     /**
      * @var int
+     *
+     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
      */
     protected $defaultTimeout = self::DEFAULT_TIMEOUT;
 
@@ -51,6 +56,9 @@ class CommandExecutor
         $this->consoleCmdPath   = $consoleCmdPath;
         $this->env              = $env;
         $this->dataCacheManager = $dataCacheManager;
+        $this->defaultOptions   = [
+            'process-timeout' => self::DEFAULT_TIMEOUT
+        ];
     }
 
     /**
@@ -70,20 +78,11 @@ class CommandExecutor
      * @return integer The exit status code
      *
      * @throws \RuntimeException if command failed and '--ignore-errors' parameter is not specified
-     *
-     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function runCommand($command, $params = [], LoggerInterface $logger = null)
     {
-        $params = array_merge(
-            [
-                'command' => $command
-            ],
-            $params
-        );
-        if ($this->env && $this->env !== 'dev') {
-            $params['--env'] = $this->env;
-        }
+        $params = $this->prepareParameters($command, $params);
+
         $ignoreErrors = false;
         if (array_key_exists('--ignore-errors', $params)) {
             $ignoreErrors = true;
@@ -98,8 +97,6 @@ class CommandExecutor
         if (array_key_exists('--process-timeout', $params)) {
             $pb->setTimeout($params['--process-timeout']);
             unset($params['--process-timeout']);
-        } else {
-            $pb->setTimeout($this->defaultTimeout);
         }
 
         $disableCacheSync = false;
@@ -124,7 +121,7 @@ class CommandExecutor
                 if ($type === Process::ERR) {
                     $logger->error($data);
                 } else {
-                    $logger->notice($data);
+                    $logger->info($data);
                 }
             }
         );
@@ -137,6 +134,33 @@ class CommandExecutor
         $this->processResult($exitCode, $ignoreErrors, $logger);
 
         return $exitCode;
+    }
+
+    /**
+     * Gets the default value of a given option
+     *
+     * @param string $name
+     *
+     * @return mixed
+     */
+    public function getDefaultOption($name)
+    {
+        return isset($this->defaultOptions[$name]) ? $this->defaultOptions[$name] : null;
+    }
+
+    /**
+     * Sets the default value of a given option
+     *
+     * @param string $name
+     * @param mixed  $value
+     *
+     * @return self
+     */
+    public function setDefaultOption($name, $value = true)
+    {
+        $this->defaultOptions[$name] = $value;
+
+        return $this;
     }
 
     /**
@@ -157,6 +181,35 @@ class CommandExecutor
     }
 
     /**
+     * @param string $command
+     * @param array  $params
+     *
+     * @return array
+     */
+    protected function prepareParameters($command, array $params)
+    {
+        $params = array_merge(
+            [
+                'command' => $command
+            ],
+            $params
+        );
+
+        if ($this->env && $this->env !== 'dev') {
+            $params['--env'] = $this->env;
+        }
+
+        foreach ($this->defaultOptions as $name => $value) {
+            $paramName = '--' . $name;
+            if (!array_key_exists($paramName, $params)) {
+                $params[$paramName] = $value;
+            }
+        }
+
+        return $params;
+    }
+
+    /**
      * @param ProcessBuilder    $pb
      * @param string            $name
      * @param array|string|null $value
@@ -166,7 +219,7 @@ class CommandExecutor
         if ($name && '-' === $name[0]) {
             if ($value === true) {
                 $this->addParameter($pb, $name);
-            } else {
+            } elseif ($value !== false) {
                 $this->addParameter($pb, $name, $value);
             }
         } else {
@@ -219,17 +272,21 @@ class CommandExecutor
 
     /**
      * @return int
+     *
+     * @deprecated since 1.8. Use {@see getDefaultOption('process-timeout')} instead
      */
     public function getDefaultTimeout()
     {
-        return $this->defaultTimeout;
+        return $this->getDefaultOption('process-timeout');
     }
 
     /**
      * @param int $defaultTimeout
+     *
+     * @deprecated since 1.8. Use {@see setDefaultOption('process-timeout', $timeout)} instead
      */
     public function setDefaultTimeout($defaultTimeout)
     {
-        $this->defaultTimeout = $defaultTimeout;
+        $this->setDefaultOption('process-timeout', $defaultTimeout);
     }
 }

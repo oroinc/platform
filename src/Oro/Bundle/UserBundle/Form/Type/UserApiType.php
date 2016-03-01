@@ -3,6 +3,8 @@
 namespace Oro\Bundle\UserBundle\Form\Type;
 
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\UserBundle\Form\EventListener\UserApiSubscriber;
@@ -29,12 +31,22 @@ class UserApiType extends UserType
     {
         parent::setDefaultOptions($resolver);
 
-        $resolver->setDefaults(
-            array(
-                'csrf_protection' => false,
-                'validation_groups' => array('ProfileAPI', 'Default'),
-            )
-        );
+        $resolver->setDefaults([
+            'csrf_protection'   => false,
+            'validation_groups' => function ($form) {
+                if ($form instanceof FormInterface) {
+                    $user = $form->getData();
+                } elseif ($form instanceof FormView) {
+                    $user = $form->vars['value'];
+                } else {
+                    $user = null;
+                }
+
+                return $user && $user->getId()
+                    ? ['ProfileAPI', 'Default']
+                    : ['Registration', 'ProfileAPI', 'Default'];
+            },
+        ]);
     }
 
     /**

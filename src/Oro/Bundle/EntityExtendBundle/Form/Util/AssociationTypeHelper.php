@@ -25,6 +25,7 @@ class AssociationTypeHelper extends ConfigTypeHelper
 
         $this->entityClassResolver = $entityClassResolver;
     }
+
     /**
      * Checks if the given entity is included in 'dictionary' group
      *
@@ -46,28 +47,22 @@ class AssociationTypeHelper extends ConfigTypeHelper
     }
 
     /**
-     * Checks if the given entity is an owning side of association
+     * Checks if the given entity is support activity
      *
      * @param string $className
-     * @param string $associationClass Represents the owning side entity, can be:
-     *                                 - full class name or entity name for single association
-     *                                 - a group name for multiple association
-     *                                 it is supposed that the group name should not contain \ and : characters
      *
      * @return bool
      */
-    public function isAssociationOwningSideEntity($className, $associationClass)
+    public function isSupportActivityEnabled($className)
     {
-        if (strpos($associationClass, ':') !== false || strpos($associationClass, '\\') !== false) {
-            // the association class is full class name or entity name
-            if ($className === $this->entityClassResolver->getEntityClass($associationClass)) {
+        $dictionaryConfigProvider = $this->configManager->getProvider('dictionary');
+        if ($dictionaryConfigProvider->hasConfig($className)) {
+            $activitySupport = $dictionaryConfigProvider
+                ->getConfig($className)
+                ->get(GroupingScope::GROUP_DICTIONARY_ACTIVITY_SUPPORT);
+            if ($activitySupport === 'true') {
                 return true;
             }
-        } else {
-            // the association class is a group name
-            if (!empty($className) && in_array($className, $this->getOwningSideEntities($associationClass))) {
-                return true;
-            };
         }
 
         return false;

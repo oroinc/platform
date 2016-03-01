@@ -8,8 +8,9 @@ use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class CalendarPropertyProvider
 {
@@ -90,7 +91,7 @@ class CalendarPropertyProvider
         $result = $qb->getQuery()->getArrayResult();
 
         // normalize integer foreign keys due Doctrine IDENTITY function always returns a string
-        if (!empty($intCasts)) {
+        if ($intCasts) {
             foreach ($result as &$item) {
                 foreach ($intCasts as $fieldName) {
                     if (isset($item[$fieldName]) && is_string($item[$fieldName])) {
@@ -137,15 +138,15 @@ class CalendarPropertyProvider
             $this->fields = [];
             $fieldConfigs = $this->configManager->getConfigs('extend', self::CALENDAR_PROPERTY_CLASS);
             foreach ($fieldConfigs as $fieldConfig) {
-                if ($fieldConfig->is('state', ExtendScope::STATE_NEW) || $fieldConfig->is('is_deleted')) {
+                if (!ExtendHelper::isFieldAccessible($fieldConfig)) {
                     continue;
                 }
                 /** @var FieldConfigId $fieldId */
                 $fieldId             = $fieldConfig->getId();
                 $fieldType           = $fieldId->getFieldType();
                 $underlyingFieldType = $this->fieldTypeHelper->getUnderlyingType($fieldType);
-                if (in_array($underlyingFieldType, ['ref-many', 'manyToMany', 'oneToMany'])) {
-                    // ignore multiple relations
+                if (in_array($underlyingFieldType, RelationType::$toManyRelations, true)) {
+                    // ignore to-many relations
                     continue;
                 }
 

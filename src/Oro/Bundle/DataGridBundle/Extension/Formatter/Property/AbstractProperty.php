@@ -64,6 +64,8 @@ abstract class AbstractProperty implements PropertyInterface
      * @param mixed $value
      *
      * @return mixed
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function convertValue($value)
     {
@@ -92,6 +94,15 @@ abstract class AbstractProperty implements PropertyInterface
                 break;
             case self::TYPE_BOOLEAN:
                 $result = (bool)$value;
+                break;
+            case self::TYPE_SIMPLE_ARRAY:
+                $result = $value ? implode(', ', $value) : '';
+                break;
+            case self::TYPE_ARRAY:
+                $result = $value !== null ? json_encode($value, JSON_FORCE_OBJECT) : '';
+                break;
+            case self::TYPE_ROW_ARRAY:
+                $result = is_array($value) ? $value : [];
                 break;
             default:
                 $result = $value;

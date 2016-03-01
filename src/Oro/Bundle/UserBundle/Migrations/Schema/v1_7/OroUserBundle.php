@@ -5,6 +5,7 @@ namespace Oro\Bundle\UserBundle\Migrations\Schema\v1_7;
 use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 
@@ -62,28 +63,40 @@ class OroUserBundle implements Migration
 
             if ($schema->hasTable('oro_entity_config_index_value') && $schema->hasTable('oro_entity_config_field')) {
                 $queries->addPostQuery(
-                    'DELETE FROM oro_entity_config_index_value
-                     WHERE entity_id IS NULL AND field_id IN(
-                       SELECT oecf.id FROM oro_entity_config_field AS oecf
-                       WHERE
-                        (oecf.field_name = \'owner\')
-                        AND
-                        oecf.entity_id = (
-                          SELECT oec.id
-                          FROM oro_entity_config AS oec
-                          WHERE oec.class_name = \'Oro\\\\Bundle\\\\UserBundle\\\\Entity\\\\Role\'
-                        )
-                     );
-                     DELETE FROM oro_entity_config_field
-                       WHERE
-                        field_name IN (\'owner\')
-                        AND
-                        entity_id IN (
-                          SELECT id
-                          FROM oro_entity_config
-                          WHERE class_name = \'Oro\\\\Bundle\\\\UserBundle\\\\Entity\\\\Role\'
-                        );
-                        '
+                    new ParametrizedSqlMigrationQuery(
+                        'DELETE FROM oro_entity_config_index_value '
+                        . 'WHERE entity_id IS NULL AND field_id IN ('
+                        . 'SELECT oecf.id FROM oro_entity_config_field AS oecf '
+                        . 'WHERE oecf.field_name = :field_name '
+                        . 'AND oecf.entity_id IN ('
+                        . 'SELECT oec.id FROM oro_entity_config AS oec WHERE oec.class_name = :class_name'
+                        . '))',
+                        [
+                            'field_name' => 'owner',
+                            'class_name' => 'Oro\Bundle\UserBundle\Entity\Role',
+                        ],
+                        [
+                            'field_name' => 'string',
+                            'class_name' => 'string'
+                        ]
+                    )
+                );
+                $queries->addPostQuery(
+                    new ParametrizedSqlMigrationQuery(
+                        'DELETE FROM oro_entity_config_field '
+                        . 'WHERE field_name = :field_name '
+                        . 'AND entity_id IN ('
+                        . 'SELECT oec.id FROM oro_entity_config AS oec WHERE oec.class_name = :class_name'
+                        . ')',
+                        [
+                            'field_name' => 'owner',
+                            'class_name' => 'Oro\Bundle\UserBundle\Entity\Role',
+                        ],
+                        [
+                            'field_name' => 'string',
+                            'class_name' => 'string'
+                        ]
+                    )
                 );
             }
         }

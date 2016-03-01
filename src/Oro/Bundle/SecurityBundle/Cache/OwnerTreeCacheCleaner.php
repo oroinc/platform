@@ -4,25 +4,25 @@ namespace Oro\Bundle\SecurityBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
-use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
 
 class OwnerTreeCacheCleaner implements CacheClearerInterface
 {
     /**
-     * @var OwnerTreeProvider
+     * @var OwnerTreeProviderInterface
      */
     protected $treeProvider;
 
     /**
-     * @param OwnerTreeProvider $treeProvider
+     * @param OwnerTreeProviderInterface $treeProvider
      */
-    public function __construct(OwnerTreeProvider $treeProvider)
+    public function __construct(OwnerTreeProviderInterface $treeProvider)
     {
         $this->treeProvider = $treeProvider;
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function clear($cacheDir)
     {

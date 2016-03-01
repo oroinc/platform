@@ -11,6 +11,11 @@ use Oro\Bundle\DataGridBundle\Entity\GridView;
 class GridViewType extends AbstractType
 {
     /**
+     * Example of usage:
+     *     Sorters options choices:
+     *     '-1': 'ASC',
+     *     '1': 'DESC'
+     *
      * {@inheritdoc}
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
@@ -18,6 +23,10 @@ class GridViewType extends AbstractType
         $builder
             ->add('label', 'text', [
                 'property_path' => 'name',
+            ])
+            ->add('is_default', 'checkbox', [
+                'required' => false,
+                'mapped'   => false,
             ])
             ->add('type', 'choice', [
                 'choices' => GridView::getTypes(),
@@ -27,20 +36,24 @@ class GridViewType extends AbstractType
             ])
             ->add('filters', null, [
                 'property_path' => 'filtersData',
-                'empty_data' => [],
+                'empty_data'    => [],
             ])
             ->add('sorters', 'collection', [
-                'property_path' => 'sorters_data',
+                'property_path'  => 'sorters_data',
                 'error_bubbling' => false,
-                'allow_add' => true,
-                'allow_delete' => true,
-                'type' => 'choice',
-                'options' => [
+                'allow_add'      => true,
+                'allow_delete'   => true,
+                'type'           => 'choice',
+                'options'        => [
                     'choices' => [
-                        1 => 1,
+                        1  => 1,
                         -1 => -1
                     ],
                 ],
+            ])
+            ->add('columns', null, [
+                'property_path' => 'columns_data',
+                'empty_data'    => []
             ]);
     }
 
@@ -50,7 +63,7 @@ class GridViewType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'data_class' => 'Oro\Bundle\DataGridBundle\Entity\GridView',
+            'data_class'      => 'Oro\Bundle\DataGridBundle\Entity\GridView',
             'csrf_protection' => false,
         ]);
     }

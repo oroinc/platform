@@ -1,10 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'backbone',
     'underscore',
-    'routing'
-], function (Backbone, _, routing) {
+    'routing',
+    'orotranslation/js/translator'
+], function(Backbone, _, routing, __) {
     'use strict';
 
     var GridViewsModel;
@@ -12,6 +11,7 @@ define([
     GridViewsModel = Backbone.Model.extend({
         route: 'oro_datagrid_api_rest_gridview_post',
         urlRoot: null,
+        sharedByLabel: 'oro.datagrid.grid_views.shared_by.label',
 
         /** @property */
         idAttribute: 'name',
@@ -20,14 +20,17 @@ define([
         defaults: {
             filters: [],
             sorters: [],
+            columns: {},
             deletable: false,
-            editable:  false
+            editable:  false,
+            is_default: false,
+            shared_by: null
         },
 
         /** @property */
         directions: {
-            "ASC": "-1",
-            "DESC": "1"
+            ASC: '-1',
+            DESC: '1'
         },
 
         /**
@@ -40,7 +43,7 @@ define([
          * @param {Array}  data.sorters
          * @param {Array}  data.filters
          */
-        initialize: function (data) {
+        initialize: function(data) {
             this.urlRoot = routing.generate(this.route);
 
             if (_.isArray(data.filters) && _.isEmpty(data.filters)) {
@@ -65,10 +68,11 @@ define([
          *
          * @returns {}
          */
-        toGridState: function () {
+        toGridState: function() {
             return {
                 filters:  this.get('filters'),
                 sorters:  this.get('sorters'),
+                columns:  this.get('columns'),
                 gridView: this.get('name')
             };
         },
@@ -76,8 +80,17 @@ define([
         /**
          * @returns {Array}
          */
-        toJSON: function () {
-            return _.omit(this.attributes, ['editable', 'deletable']);
+        toJSON: function() {
+            return _.omit(this.attributes, ['editable', 'deletable', 'shared_by']);
+        },
+
+        /**
+         * @returns {string}
+         */
+        getLabel: function() {
+            var label = this.get('label');
+            var sharedBy = this.get('shared_by');
+            return null === sharedBy ? label : label + '(' + __(this.sharedByLabel, {name: sharedBy}) + ')';
         }
     });
 

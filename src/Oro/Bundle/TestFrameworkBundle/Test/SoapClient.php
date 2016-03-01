@@ -37,6 +37,7 @@ class SoapClient extends BasicSoapClient
      * @param int $one_way
      *
      * @return string
+     * @throws \Exception
      */
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
     {

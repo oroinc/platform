@@ -1,8 +1,8 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var _ = require('underscore'),
-        Backbone = require('backbone');
+    var _ = require('underscore');
+    var Backbone = require('backbone');
 
     function BasePlugin(main, manager, options) {
         this.main = main;
@@ -18,12 +18,12 @@ define(function (require) {
          * @param main {Object} object this plugin attached to
          * @param options {object=}
          */
-        initialize: function (main, options) {},
+        initialize: function(main, options) {},
 
         /**
          * Enables plugin
          */
-        enable: function () {
+        enable: function() {
             this.enabled = true;
             this.trigger('enabled');
         },
@@ -31,13 +31,13 @@ define(function (require) {
         /**
          * Disables plugin
          */
-        disable: function () {
+        disable: function() {
             this.enabled = false;
             this.stopListening();
             this.trigger('disabled');
         },
 
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }

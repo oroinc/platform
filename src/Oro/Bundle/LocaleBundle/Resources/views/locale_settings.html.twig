@@ -83,5 +83,10 @@ function($, localeSettings) {
 
     localeSettings.extendDefaults(defaults);
     localeSettings.extendSettings(settings);
+
+    // google api configuration, set language for Google+ widgets
+    window.___gcfg = $.extend(window.___gcfg || {}, {
+        lang: localeSettings.getLocale()
+    });
 });
 </script>

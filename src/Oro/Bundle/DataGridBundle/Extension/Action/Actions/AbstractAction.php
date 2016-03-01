@@ -59,7 +59,7 @@ abstract class AbstractAction implements ActionInterface
     }
 
     /**
-     * Accert required options array
+     * Assert required options array
      */
     protected function assertHasRequiredOptions()
     {

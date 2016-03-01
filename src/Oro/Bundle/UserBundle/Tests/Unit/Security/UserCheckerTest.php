@@ -49,7 +49,12 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
 
         $this->flashBag = $this->getMock('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface');
 
-        $this->userChecker = new UserChecker($this->securityContextLink, $this->flashBag);
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator->expects($this->any())
+            ->method('trans')
+            ->willReturnArgument(0);
+
+        $this->userChecker = new UserChecker($this->securityContextLink, $this->flashBag, $translator);
     }
 
     /**
@@ -73,7 +78,7 @@ class UserCheckerTest extends \PHPUnit_Framework_TestCase
 
             $this->setExpectedException(
                 'Oro\Bundle\UserBundle\Exception\PasswordChangedException',
-                'oro.user.security.password_changed.message'
+                'Invalid password.'
             );
         }
 

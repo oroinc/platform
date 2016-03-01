@@ -109,11 +109,11 @@ class TrackingProcessor implements LoggerAwareInterface
             $this->logger = new NullLogger();
         }
 
-        $this->logger->notice('Check new visits...');
+        $this->logger->info('Check new visits...');
         $totalEvents = $this->getEventsCount();
         if ($totalEvents > 0) {
-            $totalBatches = number_format(ceil($totalEvents / self::BATCH_SIZE));
-            $this->logger->notice(
+            $totalBatches = number_format(ceil($totalEvents / $this->getBatchSize()));
+            $this->logger->info(
                 sprintf(
                     '<info>Total visits to be processed - %s (%s batches).</info>',
                     number_format($totalEvents),
@@ -128,12 +128,12 @@ class TrackingProcessor implements LoggerAwareInterface
             }
         }
 
-        $this->logger->notice('Recheck previous visit identifiers...');
+        $this->logger->info('Recheck previous visit identifiers...');
         $totalEvents = $this->getIdentifyPrevVisitsCount();
         if ($totalEvents > 0) {
-            $totalBatches           = number_format(ceil($totalEvents / self::BATCH_SIZE));
+            $totalBatches           = number_format(ceil($totalEvents / $this->getBatchSize()));
             $this->processedBatches = 0;
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf(
                     '<info>Total previous visit identifiers to be processed - %s (%s batches).</info>',
                     number_format($totalEvents),
@@ -148,12 +148,12 @@ class TrackingProcessor implements LoggerAwareInterface
             }
         }
 
-        $this->logger->notice('Recheck previous visit events...');
+        $this->logger->info('Recheck previous visit events...');
         $totalEvents = $this->getIdentifyPrevVisitEventsCount();
         if ($totalEvents > 0) {
-            $totalBatches           = number_format(ceil($totalEvents / self::BATCH_SIZE));
+            $totalBatches           = number_format(ceil($totalEvents / $this->getBatchSize()));
             $this->processedBatches = 0;
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf(
                     '<info>Total previous visit events to be processed - %s (%s batches).</info>',
                     number_format($totalEvents),
@@ -169,7 +169,7 @@ class TrackingProcessor implements LoggerAwareInterface
             }
         }
 
-        $this->logger->notice('<info>Done</info>');
+        $this->logger->info('<info>Done</info>');
     }
 
     /**
@@ -178,7 +178,7 @@ class TrackingProcessor implements LoggerAwareInterface
      */
     protected function logBatch($processed, $total)
     {
-        $this->logger->notice(
+        $this->logger->info(
             sprintf(
                 'Batch #%s of %s processed at <info>%s</info>.',
                 number_format($processed),
@@ -198,7 +198,7 @@ class TrackingProcessor implements LoggerAwareInterface
         if ($this->maxExecTimeout !== false) {
             $date = $this->getCurrentUtcDateTime();
             if ($date->sub($this->maxExecTimeout) >= $this->startTime) {
-                $this->logger->notice('<comment>Exit because allocated time frame elapsed.</comment>');
+                $this->logger->info('<comment>Exit because allocated time frame elapsed.</comment>');
 
                 return true;
             }
@@ -240,7 +240,7 @@ class TrackingProcessor implements LoggerAwareInterface
             ->where('entity.identifierDetected = false')
             ->andWhere('entity.parsedUID > 0')
             ->andWhere('entity.parsingCount < :maxRetries')
-            ->setParameter('maxRetries', self::MAX_RETRIES);
+            ->setParameter('maxRetries', $this->getMaxRetriesCount());
 
         if (count($this->skipList)) {
             $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
@@ -263,7 +263,7 @@ class TrackingProcessor implements LoggerAwareInterface
         $queryBuilder
             ->select('COUNT (entity.id)')
             ->andWhere('entity.parsingCount < :maxRetries')
-            ->setParameter('maxRetries', self::MAX_RETRIES);
+            ->setParameter('maxRetries', $this->getMaxRetriesCount());
 
         if (count($this->skipList)) {
             $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
@@ -286,8 +286,8 @@ class TrackingProcessor implements LoggerAwareInterface
         $queryBuilder
             ->select('entity')
             ->andWhere('entity.parsingCount < :maxRetries')
-            ->setParameter('maxRetries', self::MAX_RETRIES)
-            ->setMaxResults(self::BATCH_SIZE);
+            ->setParameter('maxRetries', $this->getMaxRetriesCount())
+            ->setMaxResults($this->getBatchSize());
 
         if (count($this->skipList)) {
             $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
@@ -333,8 +333,8 @@ class TrackingProcessor implements LoggerAwareInterface
             ->andWhere('entity.parsedUID > 0')
             ->andWhere('entity.parsingCount < :maxRetries')
             ->orderBy('entity.firstActionTime', 'ASC')
-            ->setParameter('maxRetries', self::MAX_RETRIES)
-            ->setMaxResults(self::BATCH_SIZE);
+            ->setParameter('maxRetries', $this->getMaxRetriesCount())
+            ->setMaxResults($this->getBatchSize());
 
         if (count($this->skipList)) {
             $queryBuilder->andWhere('entity.id not in(' . implode(',', $this->skipList) . ')');
@@ -467,7 +467,7 @@ class TrackingProcessor implements LoggerAwareInterface
             ->createQueryBuilder('entity')
             ->where('entity.parsed = false')
             ->orderBy('entity.id', 'ASC')
-            ->setMaxResults(self::BATCH_SIZE);
+            ->setMaxResults($this->getBatchSize());
 
         $entities = $queryBuilder->getQuery()->getResult();
 
@@ -703,6 +703,26 @@ class TrackingProcessor implements LoggerAwareInterface
         }
 
         return $em;
+    }
+
+    /**
+     * Get max retries to identify tracking visit
+     *
+     * @return int
+     */
+    protected function getMaxRetriesCount()
+    {
+        return self::MAX_RETRIES;
+    }
+
+    /**
+     * Get batch size for tracking events
+     *
+     * @return int
+     */
+    protected function getBatchSize()
+    {
+        return self::BATCH_SIZE;
     }
 
     /**

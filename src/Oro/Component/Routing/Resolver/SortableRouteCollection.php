@@ -16,7 +16,7 @@ class SortableRouteCollection extends EnhancedRouteCollection
         $routes = $this->all();
         ArrayUtil::sortBy(
             $routes,
-            false,
+            true,
             function (Route $route) {
                 return $route->getOption('priority') ?: 0;
             }

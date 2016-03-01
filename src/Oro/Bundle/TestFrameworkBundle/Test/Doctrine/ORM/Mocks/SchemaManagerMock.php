@@ -2,20 +2,11 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks;
 
+use Oro\Component\TestUtils\ORM\Mocks\SchemaManagerMock as BaseSchemaManagerMock;
+
 /**
- * This class is a clone of namespace Doctrine\Tests\Mocks\SchemaManagerMock that is excluded from doctrine
- * package since v2.4.
+ * @deprecated since 1.9. use {@see Oro\Component\TestUtils\ORM\Mocks\SchemaManagerMock}
  */
-class SchemaManagerMock extends \Doctrine\DBAL\Schema\AbstractSchemaManager
+class SchemaManagerMock extends BaseSchemaManagerMock
 {
-    public function __construct(\Doctrine\DBAL\Connection $conn)
-    {
-        parent::__construct($conn);
-    }
-
-    // @codingStandardsIgnoreStart
-    protected function _getPortableTableColumnDefinition($tableColumn) {
-    // @codingStandardsIgnoreEnd
-
-    }
 }

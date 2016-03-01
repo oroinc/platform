@@ -1,0 +1,48 @@
+parameters:
+    oro_entity.orm.hydrators:
+        'Doctrine\ORM\Query::HYDRATE_OBJECT':
+            name: ObjectHydrator
+            class: Doctrine\ORM\Internal\Hydration\ObjectHydrator
+        'Doctrine\ORM\Query::HYDRATE_ARRAY':
+            name: ArrayHydrator
+            class: Doctrine\ORM\Internal\Hydration\ArrayHydrator
+        'Doctrine\ORM\Query::HYDRATE_SCALAR':
+            name: ScalarHydrator
+            class: Doctrine\ORM\Internal\Hydration\ScalarHydrator
+        'Doctrine\ORM\Query::HYDRATE_SINGLE_SCALAR':
+            name: SingleScalarHydrator
+            class: Doctrine\ORM\Internal\Hydration\SingleScalarHydrator
+        'Doctrine\ORM\Query::HYDRATE_SIMPLEOBJECT':
+            name: SimpleObjectHydrator
+            class: Doctrine\ORM\Internal\Hydration\SimpleObjectHydrator
+        'Gedmo\Translatable\Query\TreeWalker\TranslationWalker::HYDRATE_OBJECT_TRANSLATION':
+            name: TranslatableObjectHydrator
+            class: Gedmo\Translatable\Hydrator\ORM\ObjectHydrator
+        'Gedmo\Translatable\Query\TreeWalker\TranslationWalker::HYDRATE_SIMPLE_OBJECT_TRANSLATION':
+            name: TranslatableSimpleObjectHydrator
+            class: Gedmo\Translatable\Hydrator\ORM\SimpleObjectHydrator
+
+services:
+    oro_entity.cache.warmer.logging_hydrator:
+        public: false
+        class: Oro\Bundle\EntityBundle\Cache\LoggingHydratorWarmer
+        arguments:
+            - %oro_entity.orm.hydrators%
+        tags:
+            - { name: kernel.cache_warmer, priority: 30 }
+
+    oro_entity.profiler.orm_logger:
+        public: false
+        class: Oro\Bundle\EntityBundle\DataCollector\OrmLogger
+        arguments:
+            - %oro_entity.orm.hydrators%
+            - @doctrine
+            - @?debug.stopwatch
+
+    oro_entity.profiler.orm_data_collector:
+        public: false
+        class: Oro\Bundle\EntityBundle\DataCollector\OrmDataCollector
+        arguments:
+            - @oro_entity.profiler.orm_logger
+        tags:
+            - { name: data_collector, template: OroEntityBundle:Collector:orm.html.twig, id: orm }

@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
@@ -7,7 +5,7 @@ define([
     'oroui/js/modal',
     'oroui/js/mediator',
     'oroui/js/messenger'
-], function ($, _, __, Modal, mediator, Messenger) {
+], function($, _, __, Modal, mediator, Messenger) {
     'use strict';
 
     /**
@@ -16,9 +14,8 @@ define([
      * @export  oroworkflow/js/delete-handler
      * @class   oroworkflow.WorkflowDeleteHandler
      */
-    return function () {
-        var element, confirmReset;
-        element = $(this);
+    return function() {
+        var element = $(this);
         if (element.data('_in-progress')) {
             return;
         }
@@ -28,27 +25,27 @@ define([
             element.data('_in-progress', false);
         }
 
-        confirmReset = new Modal({
+        var confirmReset = new Modal({
             title:   __('Workflow reset'),
             content: __('Attention: This action will reset workflow data for this record.'),
             okText:  __('Yes, Reset')
         });
 
-        confirmReset.on('ok', function () {
+        confirmReset.on('ok', function() {
             $.ajax({
                 url:  element.data('url'),
                 type: 'DELETE',
-                success: function () {
+                success: function() {
                     mediator.execute('refreshPage');
                 },
-                error: function () {
+                error: function() {
                     Messenger.notificationFlashMessage('error', __('Cannot reset workflow item data.'));
                     resetInProgress();
                 }
             });
         });
 
-        confirmReset.on('cancel', function () {
+        confirmReset.on('cancel', function() {
             resetInProgress();
         });
 

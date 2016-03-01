@@ -1,0 +1,65 @@
+.inline-editor-wrapper.multi-checkbox-editor {
+  z-index: 10002 !important; // to show over .ui-multiselect-menu
+  min-width: 190px;
+  .inline-editor__fields {
+    height: 0;
+    overflow: hidden;
+  }
+  button.ui-multiselect {
+    width: 100% !important;
+    height: 0;
+    border: 0 none;
+    padding: 0;
+    overflow: hidden;
+  }
+}
+.ui-multiselect-menu.multi-checkbox-editor {
+  margin: 0;
+  padding: 0;
+  border: 0 none;
+  z-index: 10001;
+  background: transparent;
+  .ui-widget-header {
+    padding: 0;
+    background: transparent;
+    border: 0 none;
+    margin: 0;
+  }
+  .ui-multiselect-filter {
+    float: none;
+    margin-right: 0;
+    input {
+      padding: 4px 52px 4px 9px;
+      box-sizing: border-box;
+      width: 100%;
+      margin: 0;
+      height: 30px;
+      font-size: 14px;
+      border-radius: 0;
+      border: 1px solid #ccc;
+      &:focus {
+        border-color: rgba(82,168,236,0.8);
+        outline: none;
+        box-shadow: none;
+      }
+    }
+  }
+  .ui-multiselect-checkboxes {
+    border: 1px solid #ccc;
+    border-top: 0 none;
+    background: white;
+    padding: 0 3px;
+    max-height: 300px;
+    border-radius: 0;
+    .box-shadow(0 4px 5px rgba(0,0,0,0.15));
+    input[type="radio"], input[type="checkbox"] {
+      margin-top: -4px;
+    }
+    li:first-child {
+      margin-top: 3px;
+    }
+    li:last-child {
+      margin-bottom: 3px;
+    }
+  }
+}

@@ -29,7 +29,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW",
  *              "group_name"=""
  *          },
  *          "note"={
@@ -92,6 +91,8 @@ class Calendar extends ExtendCalendar
      */
     public function __construct()
     {
+        parent::__construct();
+
         $this->events = new ArrayCollection();
     }
 

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
@@ -95,6 +96,8 @@ class EntityHierarchyProviderTest extends OrmTestCase
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject|null $emMock
      * @param boolean                                       $isReturnManager
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function getDoctrineMock($emMock = null, $isReturnManager = true)
     {
@@ -119,22 +122,28 @@ class EntityHierarchyProviderTest extends OrmTestCase
             ->getMock();
 
         $config1 = new Config(new EntityConfigId('extend', self::ENTITY_NAMESPACE . '\TestEntity1'));
+        $config1->set('is_extend', true);
         $config2 = new Config(new EntityConfigId('extend', self::ENTITY_NAMESPACE . '\TestEntity2'));
+        $config2->set('is_extend', true);
         $config3 = new Config(new EntityConfigId('extend', self::ENTITY_NAMESPACE . '\TestEntity3'));
+        $config3->set('is_extend', true);
 
         $newCustomEntityConfig = new Config(
             new EntityConfigId('extend', ExtendHelper::ENTITY_NAMESPACE . '\TestEntity4')
         );
+        $newCustomEntityConfig->set('is_extend', true);
         $newCustomEntityConfig->set('state', ExtendScope::STATE_NEW);
 
         $toBeDeletedCustomEntityConfig = new Config(
             new EntityConfigId('extend', ExtendHelper::ENTITY_NAMESPACE . '\TestEntity5')
         );
+        $toBeDeletedCustomEntityConfig->set('is_extend', true);
         $toBeDeletedCustomEntityConfig->set('state', ExtendScope::STATE_DELETE);
 
         $deletedCustomEntityConfig = new Config(
             new EntityConfigId('extend', ExtendHelper::ENTITY_NAMESPACE . '\TestEntity6')
         );
+        $deletedCustomEntityConfig->set('is_extend', true);
         $deletedCustomEntityConfig->set('state', ExtendScope::STATE_ACTIVE);
         $deletedCustomEntityConfig->set('is_deleted', true);
 
@@ -162,8 +171,8 @@ class EntityHierarchyProviderTest extends OrmTestCase
     protected function getProvider($isReturnManager = true)
     {
         return new EntityHierarchyProvider(
-            $this->extendConfigProvider,
-            $this->getDoctrineMock($this->emMock, $isReturnManager)
+            new DoctrineHelper($this->getDoctrineMock($this->emMock, $isReturnManager)),
+            $this->extendConfigProvider
         );
     }
 }

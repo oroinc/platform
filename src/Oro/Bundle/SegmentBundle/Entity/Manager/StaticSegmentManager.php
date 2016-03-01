@@ -120,7 +120,7 @@ class StaticSegmentManager
     {
         $organizationField = $this->ownershipMetadataProvider
             ->getMetadata($segment->getEntity())
-            ->getOrganizationFieldName();
+            ->getGlobalOwnerFieldName();
         if ($organizationField) {
             $qb->andWhere(
                 sprintf(

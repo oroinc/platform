@@ -2,13 +2,11 @@
 
 namespace Oro\Bundle\EmailBundle\Validator\Constraints;
 
-use Symfony\Component\Validator\Constraint;
+use Symfony\Component\Validator\Constraints\Email;
 
-class EmailAddress extends Constraint
+class EmailAddress extends Email
 {
     public $message = 'This value contains not valid email address.';
-    public $checkMX = false;
-    public $checkHost = false;
 
     /**
      * {@inheritdoc}

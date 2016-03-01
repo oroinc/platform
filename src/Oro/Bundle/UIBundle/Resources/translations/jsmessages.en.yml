@@ -44,7 +44,9 @@ maximize: maximize
 restore: restore
 minimize: minimize
 close: close
-
+Undo: Undo
+Redo: Redo
+"Copy to Clipboard": "Copy to Clipboard"
 oro:
     ui:
         widget_loading_failed: "Widget content loading failed"
@@ -72,3 +74,9 @@ oro:
             hrs: hrs
         components:
             initialization_error: 'Error occurred during layout update. Please contact system administrator.'
+        unload_message:
+            single: Changes are being saved and may be lost
+            group_title: Server is being updated and the following changes might be lost
+            other: Other
+        jstree:
+            move_node_error: "You can not move node {{ nodeText }} here."

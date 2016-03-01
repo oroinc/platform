@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Tests\Functional\Api\Rest;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class EmailActivityControllerTest extends WebTestCase

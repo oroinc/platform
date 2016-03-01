@@ -72,9 +72,7 @@ class EmbedFormController extends Controller
             $entityConfig     = $config->getConfig($entityClass);
             $formEntityConfig = $config->getConfig($formEntity);
 
-            if ($entityConfig->has('owner_field_name')
-                && $entityConfig->get('owner_type') == OwnershipType::OWNER_TYPE_ORGANIZATION
-            ) {
+            if ($entityConfig->get('owner_type') === OwnershipType::OWNER_TYPE_ORGANIZATION) {
                 $accessor = PropertyAccess::createPropertyAccessor();
                 $accessor->setValue(
                     $entity,

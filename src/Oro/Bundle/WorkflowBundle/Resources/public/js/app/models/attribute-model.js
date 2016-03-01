@@ -1,9 +1,8 @@
-/* global define */
 define(function(require) {
     'use strict';
 
-    var AttributeModel,
-        BaseModel = require('oroui/js/app/models/base/model');
+    var AttributeModel;
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     AttributeModel = BaseModel.extend({
         defaults: {

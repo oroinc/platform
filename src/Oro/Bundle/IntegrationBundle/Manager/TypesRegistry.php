@@ -6,10 +6,12 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\IntegrationBundle\Exception\LogicException;
-
+use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Entity\Transport;
 use Oro\Bundle\IntegrationBundle\Provider\ChannelInterface as IntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\ConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Provider\DefaultOwnerTypeAwareInterface;
+use Oro\Bundle\IntegrationBundle\Provider\ForceConnectorInterface;
 use Oro\Bundle\IntegrationBundle\Provider\IconAwareIntegrationInterface;
 use Oro\Bundle\IntegrationBundle\Provider\TransportInterface;
 
@@ -316,6 +318,49 @@ class TypesRegistry
         )->toArray();
 
         return array_combine($keys, $values);
+    }
+
+    /**
+     * Checks if there is at least one connector that supports force sync.
+     *
+     * @param Integration $integration
+     *
+     * @return boolean
+     */
+    public function supportsForceSync(Integration $integration)
+    {
+        $connectors = $this->getRegisteredConnectorsTypes($integration->getType());
+
+        foreach ($connectors as $connector) {
+            if ($connector instanceof ForceConnectorInterface) {
+                if ($connector->supportsForceSync()) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * Returns type of default owner for entities created by this integration.
+     *
+     * @param string|null $integrationType
+     *
+     * @return string 'user'\'business_unit'
+     */
+    public function getDefaultOwnerType($integrationType = null)
+    {
+        if ($integrationType === null) {
+            return DefaultOwnerTypeAwareInterface::USER;
+        }
+        $type = $this->integrationTypes[$integrationType];
+
+        if ($type instanceof DefaultOwnerTypeAwareInterface) {
+            return $type->getDefaultOwnerType();
+        }
+
+        return DefaultOwnerTypeAwareInterface::USER;
     }
 
     /**

@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\FormBundle\Form\Extension;
 
-use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
-
 use Symfony\Component\Form\AbstractTypeExtension;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
+
+use Oro\Bundle\FormBundle\Validator\ConstraintFactory;
 
 class ConstraintAsOptionExtension extends AbstractTypeExtension
 {
@@ -28,24 +28,15 @@ class ConstraintAsOptionExtension extends AbstractTypeExtension
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $constraintsNormalizer = function (Options $options, $constraints) {
-            $constraints = is_object($constraints) ? array($constraints) : (array) $constraints;
-
-            $constraintObjects = array();
-            foreach ($constraints as $constraint) {
-                if (is_array($constraint)) {
-                    foreach ($constraint as $name => $options) {
-                        $constraintObjects[] = $this->constraintFactory->create($name, $options);
-                    }
-                } elseif (is_object($constraint)) {
-                    $constraintObjects[] = $constraint;
+        $resolver->setNormalizers(
+            [
+                'constraints' => function (Options $options, $constraints) {
+                    return $this->constraintFactory->parse(
+                        is_object($constraints) ? [$constraints] : (array) $constraints
+                    );
                 }
-            }
-
-            return $constraintObjects;
-        };
-
-        $resolver->setNormalizers(array('constraints' => $constraintsNormalizer));
+            ]
+        );
     }
 
     /**

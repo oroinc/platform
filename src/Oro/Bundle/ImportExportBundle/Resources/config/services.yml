@@ -19,3 +19,31 @@ services:
             - @oro_importexport.job_executor
         tags:
             - { name: oro_workflow.action, alias: execute_job }
+
+    oro_importexport.formatter.formatter_provider:
+        class: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider
+        arguments:
+            - @service_container
+            - []
+            - []
+        public: false
+
+    oro_importexport.formatter.excel_datetime:
+        class: Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter
+        arguments:
+            - @oro_locale.settings
+            - @translator
+        tags:
+            - { name: oro_importexport.formatter.formatter, data_type: datetime, format_type: excel}
+            - { name: oro_importexport.formatter.formatter, data_type: date, format_type: excel}
+            - { name: oro_importexport.formatter.formatter, data_type: time, format_type: excel}
+
+    oro_importexport.formatter.locale_number:
+        class: Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter
+        arguments:
+            - @oro_locale.settings
+        tags:
+            - { name: oro_importexport.formatter.formatter, data_type: currency, format_type: excel }
+            - { name: oro_importexport.formatter.formatter, data_type: percent, format_type: excel }
+            - { name: oro_importexport.formatter.formatter, data_type: integer, format_type: excel }
+            - { name: oro_importexport.formatter.formatter, data_type: decimal, format_type: excel }

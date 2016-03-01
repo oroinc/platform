@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\SegmentBundle\Tests\Selenium\Pages;
 
-use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
+use Oro\Bundle\ReportBundle\Tests\Selenium\Pages\FilterConditions;
 
 /**
  * Class Segment
  *
  * @package Oro\Bundle\SegmentBundle\Tests\Selenium\Pages
- * @method Segments openSegments() openSegments(string)
- * @method Segment openSegment() openSegment(string)
+ * @method Segments openSegments(string $bundlePath)
+ * @method Segment openSegment(string $bundlePath)
  */
-class Segment extends AbstractPageEntity
+class Segment extends FilterConditions
 {
     protected $organization = '//select[@data-ftid="oro_segment_form_owner"]';
 
@@ -75,34 +75,6 @@ class Segment extends AbstractPageEntity
             $this->test->byXPath("//a[@title='Add']")->click();
             $this->waitForAjax();
         }
-
-        return $this;
-    }
-
-    /**
-     * @param $column
-     * @param $value
-     * @return $this
-     */
-    public function addFieldCondition($column, $value)
-    {
-        $element = $this->test->byXPath("//li[@data-criteria='condition-item']");
-        $element1 = $this->test->byXPath("//div[@id='oro_segment-condition-builder']/ul");
-        $this->test->moveto($element);
-        $this->test->buttondown();
-        $this->test->moveto($element1);
-        $this->test->buttonup();
-
-        $this->test->byXPath("(//div[@class='condition-item'])[1]//a")->click();
-        $this->waitForAjax();
-        $this->test->byXPath("//div[@id='select2-drop']/div/input")->value($column);
-        $this->waitForAjax();
-        $this->assertElementPresent(
-            "//div[@id='select2-drop']//div[contains(., '{$column}')]",
-            "Condition autocomplete doesn't return search value"
-        );
-        $this->test->byXPath("//div[@id='select2-drop']//div[contains(., '{$column}')]")->click();
-        $this->test->byXPath("(//div[@class='condition-item'])[1]//input[@name='value']")->value($value);
 
         return $this;
     }

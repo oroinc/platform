@@ -16,7 +16,7 @@ class OroCronBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_1';
+        return 'v1_3';
     }
 
     /**
@@ -126,10 +126,12 @@ class OroCronBundleInstaller implements Installation
     {
         $table = $schema->createTable('oro_cron_schedule');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('command', 'string', ['length' => 50]);
+        $table->addColumn('command', 'string', ['length' => 255]);
+        $table->addColumn('args', 'json_array', []);
+        $table->addColumn('args_hash', 'string', ['length' => 32]);
         $table->addColumn('definition', 'string', ['notnull' => false, 'length' => 100]);
         $table->setPrimaryKey(['id']);
-        $table->addUniqueIndex(['command'], 'UQ_COMMAND');
+        $table->addUniqueIndex(['command', 'args_hash', 'definition'], 'UQ_COMMAND');
     }
 
     /**

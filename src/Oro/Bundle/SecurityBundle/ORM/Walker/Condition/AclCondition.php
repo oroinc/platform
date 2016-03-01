@@ -4,7 +4,7 @@ namespace Oro\Bundle\SecurityBundle\ORM\Walker\Condition;
 
 use Doctrine\ORM\Query\AST\PathExpression;
 
-class AclCondition
+class AclCondition implements AclConditionInterface
 {
     /**
      * @var string

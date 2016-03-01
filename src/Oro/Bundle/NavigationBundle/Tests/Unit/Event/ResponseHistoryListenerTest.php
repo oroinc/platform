@@ -253,7 +253,12 @@ class ResponseHistoryListenerTest extends \PHPUnit_Framework_TestCase
             ->with('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem')
             ->will($this->returnValue($entityManager));
 
-        return new ResponseHistoryListener($factory, $securityContext, $registry, $this->getTitleService());
+        $listener = new ResponseHistoryListener($factory, $securityContext, $registry, $this->getTitleService());
+        $listener->setHistoryItemEntityFQCN('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem');
+        $listener->setUserEntityFQCN('Oro\Bundle\UserBundle\Entity\User');
+        $listener->setNavigationHistoryItemType('history');
+
+        return $listener;
     }
 
     /**

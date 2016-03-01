@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\SearchBundle\Provider;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ResultStatisticsProvider
 {
@@ -21,16 +22,16 @@ class ResultStatisticsProvider
     protected $configManager;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
     /**
-     * @param Indexer       $indexer
-     * @param ConfigManager $configManager
-     * @param Translator $translator
+     * @param Indexer             $indexer
+     * @param ConfigManager       $configManager
+     * @param TranslatorInterface $translator
      */
-    public function __construct(Indexer $indexer, ConfigManager $configManager, Translator $translator)
+    public function __construct(Indexer $indexer, ConfigManager $configManager, TranslatorInterface $translator)
     {
         $this->indexer = $indexer;
         $this->configManager = $configManager;

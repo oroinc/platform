@@ -15,6 +15,9 @@ oro:
         success_message:
             label: Success message
             default: Form has been submitted successfully
+            description: This message will appear after submitting the form.<br />Use <strong>{back_link|Back link text}</strong> placeholder to add back link to form.
 
         controller:
             saved_message: Form has been saved successfully
+        css:
+            description: Only CSS is allowed.

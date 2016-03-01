@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Pager;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -10,6 +9,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
@@ -49,7 +49,7 @@ class OrmPagerExtension extends AbstractExtension
         $disabled = $this->getOr(PagerInterface::DISABLED_PARAM, false)
             || $config->offsetGetByPath(ToolbarExtension::TOOLBAR_PAGINATION_HIDE_OPTION_PATH, false);
 
-        return !$disabled && $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
+        return !$disabled && $config->getDatasourceType() == OrmDatasource::TYPE;
     }
 
     /**
@@ -61,15 +61,22 @@ class OrmPagerExtension extends AbstractExtension
 
         if ($datasource instanceof OrmDatasource) {
             $this->pager->setQueryBuilder($datasource->getQueryBuilder());
-            $this->pager->setSkipAclCheck(
-                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)
-            );
+            $this->pager->setSkipAclCheck($config->isDatasourceSkipAclApply());
             $this->pager->setSkipCountWalker(
-                $config->offsetGetByPath(Builder::DATASOURCE_SKIP_COUNT_WALKER_PATH)
+                $config->offsetGetByPath(DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH)
             );
         }
-        $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
-        $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
+
+        if ($config->offsetGetByPath(ToolbarExtension::PAGER_ONE_PAGE_OPTION_PATH, false) ||
+            $config->offsetGetByPath(ModeExtension::MODE_OPTION_PATH) === ModeExtension::MODE_CLIENT
+        ) {
+            // no restrictions applied
+            $this->pager->setPage(0);
+            $this->pager->setMaxPerPage(0);
+        } else {
+            $this->pager->setPage($this->getOr(PagerInterface::PAGE_PARAM, 1));
+            $this->pager->setMaxPerPage($this->getOr(PagerInterface::PER_PAGE_PARAM, $defaultPerPage));
+        }
         $this->pager->init();
     }
 

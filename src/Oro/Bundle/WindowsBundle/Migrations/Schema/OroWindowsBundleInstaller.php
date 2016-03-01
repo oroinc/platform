@@ -3,56 +3,31 @@
 namespace Oro\Bundle\WindowsBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
 class OroWindowsBundleInstaller implements Installation
 {
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_1';
     }
 
-    /**
-     * {@inheritdoc}
-     */
+    /** {@inheritdoc} */
     public function up(Schema $schema, QueryBag $queries)
     {
-        /** Tables generation **/
-        $this->createOroWindowsStateTable($schema);
-
-        /** Foreign keys generation **/
-        $this->addOroWindowsStateForeignKeys($schema);
-    }
-
-    /**
-     * Create oro_windows_state table
-     *
-     * @param Schema $schema
-     */
-    protected function createOroWindowsStateTable(Schema $schema)
-    {
         $table = $schema->createTable('oro_windows_state');
-        $table->addColumn('id', 'integer', ['autoincrement' => true]);
-        $table->addColumn('user_id', 'integer', []);
-        $table->addColumn('data', 'text', []);
-        $table->addColumn('created_at', 'datetime', []);
-        $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn('id', Type::INTEGER, ['autoincrement' => true]);
+        $table->addColumn('user_id', Type::INTEGER, []);
+        $table->addColumn('data', Type::JSON_ARRAY, []);
+        $table->addColumn('created_at', Type::DATETIME, []);
+        $table->addColumn('updated_at', Type::DATETIME, []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_id'], 'IDX_8B134CF6A76ED395', []);
-    }
 
-    /**
-     * Add oro_windows_state foreign keys.
-     *
-     * @param Schema $schema
-     */
-    protected function addOroWindowsStateForeignKeys(Schema $schema)
-    {
         $table = $schema->getTable('oro_windows_state');
         $table->addForeignKeyConstraint(
             $schema->getTable('oro_user'),

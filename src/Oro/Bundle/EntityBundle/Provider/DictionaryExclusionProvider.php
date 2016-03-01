@@ -44,14 +44,6 @@ class DictionaryExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
-        if ($metadata->isSingleValuedAssociation($associationName)) {
-            $targetClassName = $metadata->getAssociationTargetClass($associationName);
-            $groups = $this->groupingConfigProvider->getConfig($targetClassName)->get('groups');
-            if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups)) {
-                return true;
-            }
-        }
-
         return false;
     }
 }

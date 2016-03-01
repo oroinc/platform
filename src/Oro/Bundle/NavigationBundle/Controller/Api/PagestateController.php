@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
+use Symfony\Component\HttpFoundation\Response;
+
+use Doctrine\Common\Persistence\ObjectRepository;
+
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\QueryParam;
@@ -10,7 +14,7 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\NavigationBundle\Entity\PageState;
+use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 
 /**
  * @NamePrefix("oro_api_")
@@ -29,7 +33,7 @@ class PagestateController extends FOSRestController implements ClassResourceInte
     {
         return $this->handleView(
             $this->view(
-                $this->getDoctrine()->getRepository('OroNavigationBundle:PageState')->findBy(
+                $this->getPageStateRepository()->findBy(
                     array('user' => $this->getUser())
                 ),
                 Codes::HTTP_OK
@@ -49,6 +53,8 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      *      {"name"="id", "dataType"="integer"},
      *  }
      * )
+     *
+     * @return Response
      */
     public function getAction($id)
     {
@@ -66,10 +72,15 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      *  description="Create new page state",
      *  resource=true
      * )
+     *
+     * @return Response
      */
     public function postAction()
     {
-        $entity = new PageState();
+        $pageStateClass = $this->getPageStateClass();
+
+        /** @var AbstractPageState $entity */
+        $entity = new $pageStateClass();
 
         $view = $this->get('oro_navigation.form.handler.pagestate')->process($entity)
             ? $this->view($this->getState($entity), Codes::HTTP_CREATED)
@@ -90,6 +101,8 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      *      {"name"="id", "dataType"="integer"},
      *  }
      * )
+     *
+     * @return Response
      */
     public function putAction($id)
     {
@@ -107,7 +120,7 @@ class PagestateController extends FOSRestController implements ClassResourceInte
     /**
      * Remove page state
      *
-     * @param int $d
+     * @param int $id
      *
      * @ApiDoc(
      *  description="Remove page state",
@@ -116,6 +129,8 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      *      {"name"="id", "dataType"="integer"},
      *  }
      * )
+     *
+     * @return Response
      */
     public function deleteAction($id)
     {
@@ -141,10 +156,10 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      */
     public function getCheckidAction()
     {
-        $entity = $this
-            ->getDoctrine()
-            ->getRepository('OroNavigationBundle:PageState')
-            ->findOneByPageHash(PageState::generateHash($this->getRequest()->get('pageId')));
+        $entity = $this->getPageStateRepository()
+            ->findOneByPageHash(
+                AbstractPageState::generateHash($this->get('request_stack')->getCurrentRequest()->get('pageId'))
+            );
 
         return $this->handleView($this->view($this->getState($entity), Codes::HTTP_OK));
     }
@@ -156,26 +171,43 @@ class PagestateController extends FOSRestController implements ClassResourceInte
      */
     protected function getManager()
     {
-        return $this->getDoctrine()->getManagerForClass('OroNavigationBundle:PageState');
+        return $this->getDoctrine()->getManagerForClass($this->getPageStateClass());
+    }
+
+    /**
+     * @return ObjectRepository
+     */
+    protected function getPageStateRepository()
+    {
+        return $this->getManager()->getRepository($this->getPageStateClass());
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPageStateClass()
+    {
+        return $this->getParameter('oro_navigation.entity.page_state.class');
     }
 
     /**
      * Get entity by id
      *
-     * @return PageState
+     * @param int $id
+     * @return AbstractPageState
      */
     protected function getEntity($id)
     {
-        return $this->getDoctrine()->getRepository('OroNavigationBundle:PageState')->findOneById((int) $id);
+        return $this->getPageStateRepository()->findOneById((int) $id);
     }
 
     /**
      * Get State for Backbone model
      *
-     * @param  PageState $entity
+     * @param  AbstractPageState $entity
      * @return array
      */
-    protected function getState(PageState $entity = null)
+    protected function getState(AbstractPageState $entity = null)
     {
         return array(
             'id' => $entity ? $entity->getId() : null,

@@ -6,7 +6,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\UserBundle\Tests\Functional\API\DataFixtures\LoadUserData;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestInvalidUsersTest extends WebTestCase

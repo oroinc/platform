@@ -4,7 +4,6 @@ namespace Oro\Bundle\BatchBundle\ORM\Query;
 
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query;
-use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
 /**
  * Iterates results of Query using buffer, allows to iterate large query
@@ -33,7 +32,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      *
      * @var integer
      */
-    private $requestedHydrationMode = null;
+    private $requestedHydrationMode;
 
     /**
      * The source Query or QueryBuilder
@@ -47,14 +46,14 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      *
      * @var Query
      */
-    private $query = null;
+    private $query;
 
     /**
      * Total count of records in query
      *
      * @var int
      */
-    private $totalCount = null;
+    private $totalCount;
 
     /**
      * Index of current page
@@ -89,7 +88,7 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      *
      * @var mixed
      */
-    private $current = null;
+    private $current;
 
     /**
      * @var int
@@ -115,6 +114,11 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      * @var bool
      */
     private $reverse = false;
+
+    /**
+     * @var callable|null
+     */
+    protected $pageCallback;
 
     /**
      * Constructor
@@ -154,6 +158,18 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
             throw new \InvalidArgumentException('$bufferSize must be greater than 0');
         }
         $this->requestedBufferSize = (int)$bufferSize;
+
+        return $this;
+    }
+
+    /**
+     * Sets callback to be called after page iteration was finished
+     *
+     * @param callable $callback
+     */
+    public function setPageCallback(callable $callback = null)
+    {
+        $this->pageCallback = $callback;
 
         return $this;
     }
@@ -330,6 +346,10 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      */
     protected function loadNextPage()
     {
+        if ($this->pageCallback && $this->page !== -1) {
+            call_user_func($this->pageCallback);
+        }
+
         $query = $this->getQuery();
 
         $totalPages = ceil($this->count() / $query->getMaxResults());

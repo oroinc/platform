@@ -10,4 +10,20 @@ class FolderType
     const DRAFTS = 'drafts';
     const SPAM   = 'spam';
     const OTHER  = 'other';
+
+    public static function outcomingTypes()
+    {
+        return [
+            static::SENT,
+            static::DRAFTS,
+        ];
+    }
+
+    public static function incomingTypes()
+    {
+        return [
+            static::INBOX,
+            static::SPAM,
+        ];
+    }
 }

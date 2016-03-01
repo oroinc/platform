@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Templating\Asset\PackageInterface;
+use Symfony\Component\Asset\Packages as AssetHelper;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\FormBundle\Form\DataTransformer\SanitizeHTMLTransformer;
@@ -19,31 +19,23 @@ class OroRichTextType extends AbstractType
     const TOOLBAR_SMALL   = 'small';
     const TOOLBAR_LARGE   = 'large';
 
-    /**
-     * @var PackageInterface
-     */
+    /** @var AssetHelper */
     protected $assetHelper;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var HtmlTagProvider
-     */
+    /** @var HtmlTagProvider */
     protected $htmlTagProvider;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $cacheDir;
 
     /**
      * @url http://www.tinymce.com/wiki.php/Configuration:toolbar
      * @var array
      */
-    protected $toolbars = [
+    public static $toolbars = [
         self::TOOLBAR_SMALL   => ['undo redo | bold italic underline | bullist numlist link | bdesk_photo'],
         self::TOOLBAR_DEFAULT => [
             'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo'
@@ -52,6 +44,11 @@ class OroRichTextType extends AbstractType
             'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo'
         ],
     ];
+
+    /**
+     * @var array
+     */
+    public static $defaultPlugins = ['textcolor', 'code', 'link', 'bdesk_photo'];
 
     /**
      * @param ConfigManager   $configManager
@@ -66,9 +63,9 @@ class OroRichTextType extends AbstractType
     }
 
     /**
-     * @param PackageInterface $assetHelper
+     * @param AssetHelper $assetHelper
      */
-    public function setAssetHelper(PackageInterface $assetHelper)
+    public function setAssetHelper(AssetHelper $assetHelper)
     {
         $this->assetHelper = $assetHelper;
     }
@@ -92,8 +89,20 @@ class OroRichTextType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $assetsVersionBaseUrl   = '';
+        $assetsVersionFormatted = '';
+        if ($this->assetHelper) {
+            /**
+             * As we can't get "assets_version_format" parameter and method "getVersion" returns only version value
+             * without any formatting - we have to calculate formatted version url's parameter to be used inside
+             * WYSIWYG editor.
+             */
+            $assetsVersionBaseUrl   = $this->assetHelper->getUrl('/');
+            $assetsVersionFormatted = substr($assetsVersionBaseUrl, strrpos($assetsVersionBaseUrl, '/') + 1);
+        }
+
         $defaultWysiwygOptions = [
-            'plugins'            => ['textcolor', 'code', 'link', 'bdesk_photo'],
+            'plugins'            => self::$defaultPlugins,
             'toolbar_type'       => self::TOOLBAR_DEFAULT,
             'skin_url'           => 'bundles/oroform/css/tinymce',
             'valid_elements'     => implode(',', $this->htmlTagProvider->getAllowedElements()),
@@ -102,10 +111,12 @@ class OroRichTextType extends AbstractType
             'relative_urls'      => false,
             'remove_script_host' => false,
             'convert_urls'       => true,
+            'cache_suffix'       => $assetsVersionFormatted,
+            'document_base_url'  => $assetsVersionBaseUrl
         ];
 
         $defaults = [
-            'wysiwyg_enabled' => (bool)$this->configManager->get('oro_form.wysiwyg_enabled'),
+            'wysiwyg_enabled' => (bool) $this->configManager->get('oro_form.wysiwyg_enabled'),
             'wysiwyg_options' => $defaultWysiwygOptions,
             'page-component'  => [
                 'module'  => 'oroui/js/app/components/view-component',
@@ -120,14 +131,21 @@ class OroRichTextType extends AbstractType
         $resolver->setNormalizers(
             [
                 'wysiwyg_options' => function (Options $options, $wysiwygOptions) use ($defaultWysiwygOptions) {
+                    if (!empty($wysiwygOptions['toolbar'])) {
+                        $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
+                        unset($wysiwygOptions['toolbar_type']);
+
+                        return $wysiwygOptions;
+                    }
+
                     if (empty($wysiwygOptions['toolbar_type'])
-                        || !array_key_exists($wysiwygOptions['toolbar_type'], $this->toolbars)
+                        || !array_key_exists($wysiwygOptions['toolbar_type'], self::$toolbars)
                     ) {
                         $toolbarType = self::TOOLBAR_DEFAULT;
                     } else {
                         $toolbarType = $wysiwygOptions['toolbar_type'];
                     }
-                    $wysiwygOptions['toolbar'] = $this->toolbars[$toolbarType];
+                    $wysiwygOptions['toolbar'] = self::$toolbars[$toolbarType];
 
                     $wysiwygOptions = array_merge($defaultWysiwygOptions, $wysiwygOptions);
                     unset($wysiwygOptions['toolbar_type']);
@@ -136,19 +154,10 @@ class OroRichTextType extends AbstractType
                 },
                 'attr'            => function (Options $options, $attr) {
                     $pageComponent  = $options->get('page-component');
-                    $wysiwygOptions = (array)$options->get('wysiwyg_options');
+                    $wysiwygOptions = (array) $options->get('wysiwyg_options');
 
-                    if ($this->assetHelper) {
-                        if (!empty($pageComponent['options']['content_css'])) {
-                            $pageComponent['options']['content_css'] = $this->assetHelper
-                                ->getUrl($pageComponent['options']['content_css']);
-                        }
-                        if (!empty($wysiwygOptions['skin_url'])) {
-                            $wysiwygOptions['skin_url'] = $this->assetHelper->getUrl($wysiwygOptions['skin_url']);
-                        }
-                    }
                     $pageComponent['options']            = array_merge($pageComponent['options'], $wysiwygOptions);
-                    $pageComponent['options']['enabled'] = (bool)$options->get('wysiwyg_enabled');
+                    $pageComponent['options']['enabled'] = (bool) $options->get('wysiwyg_enabled');
 
                     $attr['data-page-component-module']  = $pageComponent['module'];
                     $attr['data-page-component-options'] = json_encode($pageComponent['options']);

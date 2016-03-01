@@ -13,7 +13,15 @@ class ExtendOptionsManager
     const APPEND_SECTION      = '_append';
 
     /**
-     * @var array key = [table name] or [table name!column name]
+     * @var array
+     * [
+     *      {table name} => [...],
+     *      {table name}!{column name} => [...],
+     *      self::APPEND_SECTION => [
+     *          {table name} => [...],
+     *          {table name}!{column name} => [...],
+     *      ]
+     * ]
      */
     protected $options = [];
 
@@ -73,6 +81,19 @@ class ExtendOptionsManager
     public function setColumnType($tableName, $columnName, $columnType)
     {
         $this->setOptions(sprintf('%s!%s', $tableName, $columnName), [self::TYPE_OPTION => $columnType]);
+    }
+
+    /**
+     * Removes column options from the options manager
+     *
+     * @param string $tableName
+     * @param string $columnName
+     */
+    public function removeColumnOptions($tableName, $columnName)
+    {
+        $objectKey = sprintf('%s!%s', $tableName, $columnName);
+        unset($this->options[$objectKey]);
+        unset($this->options[self::APPEND_SECTION][$objectKey]);
     }
 
     /**
@@ -164,7 +185,7 @@ class ExtendOptionsManager
                     if (!isset($this->options[self::APPEND_SECTION][$objectKey][$scope])) {
                         $this->options[self::APPEND_SECTION][$objectKey][$scope] = [];
                     }
-                    if (!in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope])) {
+                    if (!in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope], true)) {
                         $this->options[self::APPEND_SECTION][$objectKey][$scope][] = $attrName;
                     }
                 }
@@ -182,6 +203,6 @@ class ExtendOptionsManager
     {
         return
             isset($this->options[self::APPEND_SECTION][$objectKey][$scope]) &&
-            in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope]);
+            in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope], true);
     }
 }

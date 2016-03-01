@@ -25,6 +25,19 @@ use Oro\Bundle\UserBundle\Entity\UserApi;
 class WsseAuthProvider extends Provider
 {
     /**
+     * @var WsseTokenFactoryInterface
+     */
+    protected $tokenFactory;
+
+    /**
+     * @param WsseTokenFactoryInterface $tokenFactory
+     */
+    public function setTokenFactory(WsseTokenFactoryInterface $tokenFactory)
+    {
+        $this->tokenFactory = $tokenFactory;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getSecret(UserInterface $user)
@@ -59,6 +72,10 @@ class WsseAuthProvider extends Provider
      */
     public function authenticate(TokenInterface $token)
     {
+        if (null === $this->tokenFactory) {
+            throw new AuthenticationException('Token Factory is not set in WsseAuthProvider.');
+        }
+
         /** @var User $user */
         $user = $this->getUserProvider()->loadUserByUsername($token->getUsername());
         if ($user) {
@@ -66,7 +83,7 @@ class WsseAuthProvider extends Provider
             if ($secret instanceof PersistentCollection) {
                 $validUserApi = $this->getValidUserApi($token, $secret, $user);
                 if ($validUserApi) {
-                    $authenticatedToken = new WsseToken($user->getRoles());
+                    $authenticatedToken = $this->tokenFactory->create($user->getRoles());
                     $authenticatedToken->setUser($user);
                     $authenticatedToken->setOrganizationContext($validUserApi->getOrganization());
                     $authenticatedToken->setAuthenticated(true);

@@ -51,6 +51,9 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
     /** The action name for add the theme(s) to be used for rendering the layout item and its children */
     const SET_BLOCK_THEME = 12;
 
+    /** The action name for add the form theme(s) to be used for rendering forms */
+    const SET_FORM_THEME = 13;
+
     /** @var LayoutRegistryInterface */
     protected $registry;
 
@@ -286,6 +289,20 @@ class DeferredLayoutManipulator implements DeferredLayoutManipulatorInterface
             self::SET_BLOCK_THEME,
             __FUNCTION__,
             [$themes, $id]
+        ];
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setFormTheme($themes)
+    {
+        $this->actions[self::GROUP_ADD][++$this->lastIndex] = [
+            self::SET_FORM_THEME,
+            __FUNCTION__,
+            [$themes]
         ];
 
         return $this;

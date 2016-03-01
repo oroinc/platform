@@ -59,7 +59,7 @@ class OwnerAssignmentCheckerTest extends OrmTestCase
             $this->em
         );
 
-        $expectedSql = 'SELECT t0_.id AS id0'
+        $expectedSql = 'SELECT t0_.id AS id_0'
             . ' FROM TestEntity t1_'
             . ' INNER JOIN TestOwnerEntity t0_ ON t1_.owner_id = t0_.id'
             . ' WHERE t0_.id = ? LIMIT 1';
@@ -72,7 +72,7 @@ class OwnerAssignmentCheckerTest extends OrmTestCase
     {
         return [
             [[], false],
-            [[['id0' => '1']], true]
+            [[['id_0' => '1']], true]
         ];
     }
 }

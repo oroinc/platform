@@ -1,9 +1,10 @@
-/*global define*/
-define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
-    ], function (_, Backbone, __, TagCollection) {
+define(function(require) {
     'use strict';
 
-    var $ = Backbone.$;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var Backbone = require('backbone');
+    var TagCollection = require('./collection');
 
     /**
      * @export  orotag/js/view
@@ -16,27 +17,12 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
         },
 
         /** @property */
-        template: _.template(
-            '<ul class="inline tag-list">' +
-                '<% _.each(models, function(tag, i) { %>' +
-                    '<li data-id="<%= tag.get("id") %>">' +
-                        '<% if (tag.get("url").length > 0) { %>' +
-                            '<a href="<%= tag.get("url") %>">' +
-                        '<%} %>' +
-                            '<span class="label label-info"><%- tag.get("name") %></span>' +
-                        '<% if (tag.get("url").length > 0) { %>' +
-                            '</a>' +
-                        '<%} %>' +
-                    '</li>' +
-                '<%}) %>' +
-                '<% if (models.length == 0) { %><%= _.__("Not tagged") %><%} %>' +
-            '</ul>'
-        ),
+        template: require('tpl!../templates/tag-list.html'),
 
         /**
          * Constructor
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.collection = new TagCollection();
             this.listenTo(this.getCollection(), 'reset', this.render);
@@ -53,7 +39,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
          *
          * @returns {*}
          */
-        filter: function (e) {
+        filter: function(e) {
             var $el = $(e.target);
 
             // clear all active links
@@ -72,7 +58,7 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
          *
          * @returns {*}
          */
-        getCollection: function () {
+        getCollection: function() {
             return this.collection;
         },
 
@@ -81,10 +67,10 @@ define(['underscore', 'backbone', 'orotranslation/js/translator', './collection'
          *
          * @returns {}
          */
-        render: function () {
-            this.$tagsHolder.html(
-                this.template(this.getCollection().getFilteredCollection(this.options.filter))
-            );
+        render: function() {
+            var templateData = this.getCollection().getFilteredCollection(this.options.filter);
+            templateData.options = this.options;
+            this.$tagsHolder.html(this.template(templateData));
             return this;
         }
     });

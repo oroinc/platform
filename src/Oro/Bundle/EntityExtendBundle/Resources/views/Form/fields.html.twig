@@ -2,13 +2,13 @@
     <div class="float-holder {% if form.label.vars.errors|length > 0 %} validation-error{% endif %}">
         <div class="input-append input-append-sortable collection-element-primary">
             {{ form_widget(form.label, {disabled: disabled}) }}
-            <label class="add-on{% if disabled %} disabled{% endif %}" title="{{ 'oro.entity_extend.enum_options.default.tooltip'|trans({}, 'tooltips') }}">
+            <label class="add-on{% if disabled %} disabled{% endif %}" title="{{ 'oro.entity_extend.enum_options.default.tooltip'|trans }}">
                 {{ form_widget(form.is_default, {disabled: disabled}) }}
             </label>
-            <label class="add-on{% if disabled %} disabled{% endif %}" title="{{ 'oro.entity_extend.enum_options.priority.tooltip'|trans({}, 'tooltips') }}">
-                <i class="icon-list ui-sortable-handle{% if disabled %} disabled{% endif %}"></i>
+            <span class="add-on{% if disabled %} disabled{% endif %}" title="{{ 'oro.entity_extend.enum_options.priority.tooltip'|trans }}">
+                <i class="icon-resize-vertical ui-sortable-handle{% if disabled %} disabled{% endif %}"></i>
                 {{ form_widget(form.priority, {disabled: disabled}) }}
-            </label>
+            </span>
         </div>
         {{ form_errors(form.label) }}
     </div>

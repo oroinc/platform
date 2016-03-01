@@ -15,9 +15,21 @@ use Oro\Bundle\EmailBundle\Migrations\Schema\v1_8\OroEmailBundle as OroEmailBund
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_9\OroEmailBundle as OroEmailBundle19;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\OroEmailBundle as OroEmailBundle112_1;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\RemoveOldSchema as OroEmailBundle112_2;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_12\UpdateEmailUser as OroEmailBundle112_3;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_13\OroEmailBundle as OroEmailBundle113;
 use Oro\Bundle\EmailBundle\Migrations\Schema\v1_14\OroEmailBundle as OroEmailBundle114;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_15\OroEmailBundle as OroEmailBundle115;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_16\OroEmailBundle as OroEmailBundle116_1;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_16\CreateAutoResponse as OroEmailBundle116_2;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_19\OroEmailBundle as OroEmailBundle119;
+use Oro\Bundle\EmailBundle\Migrations\Schema\v1_20\OroEmailBundle as OroEmailBundle120;
 
+/**
+ * Class OroEmailBundleInstaller
+ * @package Oro\Bundle\EmailBundle\Migrations\Schema
+ *
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OroEmailBundleInstaller implements Installation
 {
     /**
@@ -25,7 +37,7 @@ class OroEmailBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_14';
+        return 'v1_20';
     }
 
     /**
@@ -69,9 +81,28 @@ class OroEmailBundleInstaller implements Installation
         OroEmailBundle112_1::changeEmailToEmailBodyRelation($schema);
         OroEmailBundle112_1::splitEmailEntity($schema);
         OroEmailBundle112_2::removeOldSchema($schema);
+        OroEmailBundle112_3::updateEmailUser($schema);
 
         OroEmailBundle113::addColumnMultiMessageId($schema);
 
         OroEmailBundle114::addEmbeddedContentIdField($schema);
+
+        OroEmailBundle115::addEmailFolderFields($schema);
+        OroEmailBundle115::addEmailOriginFields($schema);
+        OroEmailBundle115::updateEmailRecipientConstraint($schema);
+
+        OroEmailBundle116_1::createOroEmailMailboxProcessSettingsTable($schema);
+        OroEmailBundle116_1::createOroEmailMailboxTable($schema);
+        OroEmailBundle116_1::addOwnerMailboxColumn($schema);
+        OroEmailBundle116_1::addOroEmailMailboxForeignKeys($schema);
+        OroEmailBundle116_1::addEmailUserMailboxOwnerColumn($schema);
+
+        OroEmailBundle116_2::oroEmailAutoResponseRuleTable($schema);
+        OroEmailBundle116_2::oroEmailAutoResponseRuleConditionTable($schema);
+        OroEmailBundle116_2::oroEmailTemplateTable($schema);
+        OroEmailBundle116_2::oroEmailTable($schema);
+
+        OroEmailBundle119::oroEmailUserTable($schema);
+        OroEmailBundle120::oroEmailTable($schema);
     }
 }

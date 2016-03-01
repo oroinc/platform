@@ -2,12 +2,34 @@
 
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
+use Zend\Mail\Storage\Exception as BaseException;
+
+use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
+
+/**
+ * Class Imap
+ * @package Oro\Bundle\ImapBundle\Mail\Storage
+ *
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Imap extends \Zend\Mail\Storage\Imap
 {
-    const RFC822_HEADER = 'RFC822.HEADER';
-    const FLAGS         = 'FLAGS';
-    const UID           = 'UID';
-    const INTERNALDATE  = 'INTERNALDATE';
+    const BODY_HEADER      = 'BODY[HEADER]';
+    const BODY_PEEK_HEADER = 'BODY.PEEK[HEADER]';
+    const BODY_PEEK_TEXT   = 'BODY.PEEK[TEXT]';
+    const RFC822_HEADER    = 'RFC822.HEADER';
+    const FLAGS            = 'FLAGS';
+    const UID              = 'UID';
+    const INTERNALDATE     = 'INTERNALDATE';
+
+    /**
+     * Indicates protocol capabilities
+     */
+    const CAPABILITY_IMAP4_REV_1      = 'IMAP4rev1';
+    const CAPABILITY_IMAP4            = 'IMAP4';
 
     /**
      * Indicates whether IMAP server can store the same message in different folders
@@ -47,6 +69,8 @@ class Imap extends \Zend\Mail\Storage\Imap
 
     /**
      * {@inheritdoc}
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function __construct($params)
     {
@@ -56,11 +80,55 @@ class Imap extends \Zend\Mail\Storage\Imap
             $params = $params->protocol;
         }
 
-        parent::__construct($params);
+        if (is_array($params)) {
+            $params = (object) $params;
+        }
+
+        $this->has['flags'] = true;
+
+        if ($params instanceof ProtocolImap) {
+            $this->protocol = $params;
+            try {
+                $this->selectFolder('INBOX');
+            } catch (BaseException\ExceptionInterface $e) {
+                throw new BaseException\RuntimeException('cannot select INBOX, is this a valid transport?', 0, $e);
+            }
+            $this->postInit();
+
+            return;
+        }
+
+        if (!isset($params->user)) {
+            throw new BaseException\InvalidArgumentException('need at least user in params');
+        }
+
+        $host     = isset($params->host)     ? $params->host     : 'localhost';
+        $password = isset($params->password) ? $params->password : '';
+        $port     = isset($params->port)     ? $params->port     : null;
+        $ssl      = isset($params->ssl)      ? $params->ssl      : false;
+
+        $this->protocol = new ProtocolImap();
+        $this->protocol->connect($host, $port, $ssl);
+
+        if ($params->accessToken === null) {
+            if (!$this->protocol->login($params->user, $password)) {
+                throw new BaseException\RuntimeException('cannot login, user or password wrong');
+            }
+        } else {
+            $this->oauth2Authenticate($params->user, $params->accessToken);
+        }
+
+        $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
+
+        $this->postInit();
+    }
+
+    protected function postInit()
+    {
         $this->messageClass = 'Oro\Bundle\ImapBundle\Mail\Storage\Message';
         $this->getMessageItems = array(
             self::FLAGS,
-            self::RFC822_HEADER,
+            self::BODY_PEEK_HEADER,
             self::UID,
             self::INTERNALDATE
         );
@@ -103,7 +171,7 @@ class Imap extends \Zend\Mail\Storage\Imap
     {
         $folders = $this->protocol->listMailbox((string)$rootFolder);
         if (!$folders) {
-            throw new \Zend\Mail\Storage\Exception\InvalidArgumentException('folder not found');
+            throw new BaseException\InvalidArgumentException('folder not found');
         }
 
         $decodedFolders = array();
@@ -148,7 +216,7 @@ class Imap extends \Zend\Mail\Storage\Imap
                 }
             } while ($stack);
             if (!$stack) {
-                throw new \Zend\Mail\Storage\Exception\RuntimeException('error while constructing folder tree');
+                throw new BaseException\RuntimeException('error while constructing folder tree');
             }
         }
 
@@ -212,12 +280,44 @@ class Imap extends \Zend\Mail\Storage\Imap
     public function search(array $criteria)
     {
         if (empty($criteria)) {
-            throw new \Zend\Mail\Storage\Exception\RuntimeException('The search criteria must not be empty.');
+            throw new BaseException\RuntimeException('The search criteria must not be empty.');
         }
 
         $response = $this->protocol->search($criteria);
         if (!is_array($response)) {
-            throw new \Zend\Mail\Storage\Exception\RuntimeException('Cannot search messages.');
+            throw new BaseException\RuntimeException('Cannot search messages.');
+        }
+
+        return $response;
+    }
+
+    /**
+     * Searches UIDS by the given criteria
+     *
+     * @param array $criteria
+     *
+     * @return mixed
+     */
+    public function uidSearch(array $criteria)
+    {
+        if (!$this->supportUidSearch()) {
+            throw new UnsupportException('The server do not support UID SEARCH.');
+        }
+        if (empty($criteria)) {
+            throw new BaseException\RuntimeException('The search criteria must not be empty.');
+        }
+
+        $response = $this->protocol->requestAndResponse('UID SEARCH', $criteria);
+        foreach ($response as $ids) {
+            if ($ids[0] === 'SEARCH') {
+                array_shift($ids);
+
+                return $ids;
+            }
+        }
+
+        if (!is_array($response)) {
+            throw new BaseException\RuntimeException('Cannot search messages.');
         }
 
         return $response;
@@ -239,7 +339,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         );
         if (!$selectResponse) {
             $this->currentFolder = '';
-            throw new \Zend\Mail\Storage\Exception\RuntimeException('cannot change folder, maybe it does not exist');
+            throw new UnselectableFolderException('cannot change folder, maybe it does not exist');
         }
 
         $this->uidValidity = $selectResponse['uidvalidity'];
@@ -267,7 +367,7 @@ class Imap extends \Zend\Mail\Storage\Imap
      */
     protected function createMessageObject($id, array $data)
     {
-        $header = $data[self::RFC822_HEADER];
+        $header = $data[self::BODY_HEADER];
 
         $flags = [];
         foreach ($data[self::FLAGS] as $flag) {
@@ -291,6 +391,19 @@ class Imap extends \Zend\Mail\Storage\Imap
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getRawContent($id, $part = null)
+    {
+        if ($part !== null) {
+            // TODO: implement
+            throw new BaseException\RuntimeException('not implemented');
+        }
+
+        return $this->protocol->fetch(self::BODY_PEEK_TEXT, $id);
+    }
+
+    /**
      * Get capabilities from IMAP server
      *
      * @return string[] list of capabilities
@@ -310,5 +423,42 @@ class Imap extends \Zend\Mail\Storage\Imap
     {
         $headers->addHeaderLine(self::UID, $data[self::UID]);
         $headers->addHeaderLine('InternalDate', $data[self::INTERNALDATE]);
+    }
+
+    /**
+     * @return bool
+     */
+    protected function supportUidSearch()
+    {
+        return in_array(self::CAPABILITY_IMAP4, $this->capability(), true)
+            || in_array(self::CAPABILITY_IMAP4_REV_1, $this->capability(), true);
+    }
+
+    /**
+     * @param string $email
+     * @param string $accessToken
+     *
+     * @throws OAuth2ConnectException
+     */
+    protected function oauth2Authenticate($email, $accessToken)
+    {
+        $authenticateParams = ['XOAUTH2', base64_encode("user=$email\1auth=Bearer $accessToken\1\1")];
+        $this->protocol->sendRequest('AUTHENTICATE', $authenticateParams);
+        while (true) {
+            $response = "";
+            $isExtraServerChallenge = $this->protocol->readLine($response, '+', true);
+            if ($isExtraServerChallenge) {
+                // Send empty client response.
+                $this->protocol->sendRequest('');
+            } else {
+                if (preg_match('/^NO /i', $response) || preg_match('/^BAD /i', $response)) {
+                    throw new OAuth2ConnectException(
+                        "Cannot login with XOAuth2, user or token wrong.\nResponse: " . $response
+                    );
+                } elseif (preg_match("/^OK /i", $response)) {
+                    return;
+                }
+            }
+        }
     }
 }

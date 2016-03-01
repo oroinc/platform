@@ -3,8 +3,9 @@
 namespace Oro\Bundle\SecurityBundle\ConfigExpression;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Component\ConfigExpression\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
@@ -118,7 +119,7 @@ class AclGranted extends AbstractCondition implements ContextAccessorAwareInterf
         $object     = $this->resolveValue($context, $this->object);
 
         if (is_object($object)) {
-            $class         = ClassUtils::getClass($object);
+            $class         = ClassUtils::getRealClass($object);
             $objectManager = $this->doctrine->getManagerForClass($class);
             if ($objectManager instanceof EntityManager) {
                 $unitOfWork = $objectManager->getUnitOfWork();

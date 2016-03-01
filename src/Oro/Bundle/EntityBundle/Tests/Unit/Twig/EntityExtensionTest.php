@@ -17,6 +17,9 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityNameResolver;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityAliasResolver;
+
     /** @var EntityExtension */
     protected $twigExtension;
 
@@ -32,10 +35,15 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityAliasResolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityAliasResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->twigExtension = new EntityExtension(
             $this->entityIdAccessor,
             $this->entityRoutingHelper,
-            $this->entityNameResolver
+            $this->entityNameResolver,
+            $this->entityAliasResolver
         );
     }
 
@@ -47,7 +55,7 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->twigExtension->getFunctions();
-        $this->assertCount(2, $functions);
+        $this->assertCount(3, $functions);
 
         /** @var \Twig_SimpleFunction $function */
         $function = $functions[0];
@@ -55,6 +63,10 @@ class EntityExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_class_name', $function->getName());
         $this->assertEquals([$this->twigExtension, 'getClassName'], $function->getCallable());
         $function = $functions[1];
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals('oro_class_alias', $function->getName());
+        $this->assertEquals([$this->twigExtension, 'getClassAlias'], $function->getCallable());
+        $function = $functions[2];
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_action_params', $function->getName());
         $this->assertEquals([$this->twigExtension, 'getActionParams'], $function->getCallable());

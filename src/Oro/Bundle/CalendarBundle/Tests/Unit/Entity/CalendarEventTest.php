@@ -160,28 +160,6 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testPrePersist()
-    {
-        $obj = new CalendarEvent();
-
-        $this->assertNull($obj->getCreatedAt());
-        $this->assertNull($obj->getUpdatedAt());
-
-        $obj->prePersist();
-        $this->assertInstanceOf('\DateTime', $obj->getCreatedAt());
-        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
-    }
-
-    public function testPreUpdate()
-    {
-        $obj = new CalendarEvent();
-
-        $this->assertNull($obj->getUpdatedAt());
-
-        $obj->preUpdate();
-        $this->assertInstanceOf('\DateTime', $obj->getUpdatedAt());
-    }
-
     public function testGetChildEventByCalendar()
     {
         $firstCalendar = new Calendar();
@@ -308,5 +286,22 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $obj->setSystemCalendar(null);
         $this->assertNull($obj->getCalendar());
         $this->assertNull($obj->getSystemCalendar());
+    }
+
+    public function testIsUpdatedFlags()
+    {
+        $date = new \DateTime('2012-12-12 12:12:12');
+        $calendarEvent = new CalendarEvent();
+        $calendarEvent->setUpdatedAt($date);
+
+        $this->assertTrue($calendarEvent->isUpdatedAtSet());
+    }
+
+    public function testIsNotUpdatedFlags()
+    {
+        $calendarEvent = new CalendarEvent();
+        $calendarEvent->setUpdatedAt(null);
+
+        $this->assertFalse($calendarEvent->isUpdatedAtSet());
     }
 }

@@ -8,7 +8,7 @@ use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\NavigationBundle\Entity\PageState;
+use Oro\Bundle\NavigationBundle\Entity\AbstractPageState;
 
 class PageStateHandler
 {
@@ -54,10 +54,10 @@ class PageStateHandler
     /**
      * Process form
      *
-     * @param  PageState $entity
-     * @return bool      True on successfull processing, false otherwise
+     * @param  AbstractPageState $entity
+     * @return bool True on successfull processing, false otherwise
      */
-    public function process(PageState $entity)
+    public function process(AbstractPageState $entity)
     {
         if ($this->security->getToken() && is_object($user = $this->security->getToken()->getUser())) {
             $entity->setUser($user);
@@ -81,9 +81,9 @@ class PageStateHandler
     /**
      * "Success" form handler
      *
-     * @param PageState $entity
+     * @param AbstractPageState $entity
      */
-    protected function onSuccess(PageState $entity)
+    protected function onSuccess(AbstractPageState $entity)
     {
         $this->manager->persist($entity);
         $this->manager->flush();

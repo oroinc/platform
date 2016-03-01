@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -28,6 +29,9 @@ class AdditionalFieldsExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $extendConfigProvider;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $datagridConfigProvider;
+
     /** @var AdditionalFieldsExtension */
     protected $extension;
 
@@ -40,9 +44,9 @@ class AdditionalFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->entityConfigProvider = $this->getConfigProviderMock();
-        $this->extendConfigProvider = $this->getConfigProviderMock();
-
+        $this->entityConfigProvider   = $this->getConfigProviderMock();
+        $this->extendConfigProvider   = $this->getConfigProviderMock();
+        $this->datagridConfigProvider = $this->getConfigProviderMock();
         $this->configManager->expects($this->any())
             ->method('getProvider')
             ->will(
@@ -50,6 +54,7 @@ class AdditionalFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                     [
                         ['entity', $this->entityConfigProvider],
                         ['extend', $this->extendConfigProvider],
+                        ['datagrid', $this->datagridConfigProvider]
                     ]
                 )
             );
@@ -158,6 +163,15 @@ class AdditionalFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($entityFieldConfig));
 
+        $datagridFieldConfig = new Config(
+            new FieldConfigId('datagrid', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType),
+            ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
+        );
+        $this->datagridConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::ENTITY_CLASS, self::FIELD_NAME)
+            ->will($this->returnValue($datagridFieldConfig));
+
         $config        = $this->getDatagridConfiguration();
         $initialConfig = $config->toArray();
         $this->extension->processConfigs($config);
@@ -168,7 +182,9 @@ class AdditionalFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                     'columns' => [
                         self::FIELD_NAME => [
                             'label'         => $fieldLabel,
-                            'frontend_type' => 'string'
+                            'frontend_type' => 'string',
+                            'renderable'    => false,
+                            'required'      => false
                         ]
                     ],
                     'sorters' => [
@@ -362,7 +378,7 @@ class AdditionalFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('addSelect')
-            ->with($relAlias . '.' . $targetFieldName . ' as ' . self::FIELD_NAME)
+            ->with(sprintf('IDENTITY(%s.%s) as %s', $alias, self::FIELD_NAME, self::FIELD_NAME))
             ->will($this->returnSelf());
 
         $datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')

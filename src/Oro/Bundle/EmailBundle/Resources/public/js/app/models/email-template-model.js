@@ -1,9 +1,8 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailTemplateModel,
-        BaseModel = require('oroui/js/app/models/base/model');
+    var EmailTemplateModel;
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     /**
      * @export  oroemail/js/app/models/email-template-model

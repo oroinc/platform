@@ -1,0 +1,59 @@
+.email-notification-menu {
+  .oro-dropdown-toggle {
+    .icon-envelope {
+      position: relative;
+      padding-top: 3px;
+      span {
+        display: none;
+        background: #36424c;
+      }
+    }
+  }
+  .dropdown-menu {
+    width: 335px !important;
+    padding: 0;
+    outline: none;
+    .empty {
+      padding: 5px 10px;
+    }
+  }
+
+  .icon-envelope {
+    color: #FFFFFF;
+  }
+  .oro-dropdown-toggle {
+    .icon-envelope.highlight {
+      width: 25px;
+      span {
+        display: inline-block;
+      }
+    }
+  }
+  .icon-envelope.highlight {
+    color: #fabb18;
+  }
+  .new-email-notification {
+    position: absolute;
+    top: 100%;
+    right: 0;
+    margin-top: 6px;
+    display: none;
+    width: 160px;
+    padding: 8px 12px;
+    background: #fff;
+    color: #666;
+    border-radius: 4px;
+    z-index: @zindexPopover;
+    .box-shadow(0 4px 30px 0px rgba(0,0,0,0.5));
+    &:after {
+      content: '';
+      display: inline-block;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid #fff;
+      position: absolute;
+      top: -6px;
+      right: 24px;
+    }
+  }
+}

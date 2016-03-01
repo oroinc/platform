@@ -1,12 +1,4 @@
 {% macro query_designer_condition_builder(params) %}
-    {% set fieldConditionOptions = {
-        fieldChoice: {
-            select2: {
-                placeholder: 'oro.query_designer.condition_builder.choose_entity_field'|trans
-            },
-            fieldsLoaderSelector: '[data-ftid=' ~ params.entity_choice_id ~ 'oro_api_querydesigner_fields_entity]'
-        }
-    } %}
     {% set segmentConditionOptions = {
         segmentChoice: {
             select2: {
@@ -30,36 +22,26 @@
     } %}
     {% set conditionBuilderOptions = update_segment_condition_builder_options(conditionBuilderOptions) %}
     <div class="condition-builder left-panel-container">
-        <div class="panel-placeholder">
-            <div>
-                <div class="row-fluid">
-                    <div class="span3 filter-criteria">
-                        <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
-                        <ul class="criteria-list" id="{{ params.criteria_list_id }}">
-                            {% placeholder segment_criteria_list with {params: params} %}
-                            <li class="option" data-criteria="condition-item"
-                                data-module="oroquerydesigner/js/field-condition"
-                                data-widget="fieldCondition"
-                                data-options="{{ fieldConditionOptions|json_encode }}">
-                                {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
-                            </li>
-                            <li class="option" data-criteria="condition-segment"
-                                data-module="orosegment/js/segment-condition"
-                                data-widget="segmentCondition"
-                                data-options="{{ segmentConditionOptions|json_encode }}">
-                                {{ 'oro.segment.condition_builder.criteria.segment_condition'|trans }}
-                            </li>
-                            <li class="option" data-criteria="conditions-group">
-                                {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="span9">
-                        <div class="condition-builder" id="{{ params.id }}"
-                             data-page-component-module="oroquerydesigner/js/app/components/condition-builder"
-                             data-page-component-options="{{ conditionBuilderOptions|json_encode }}"></div>
-                    </div>
-                </div>
+        <div class="row-fluid">
+            <div class="left-area filter-criteria">
+                <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
+                <ul class="criteria-list" id="{{ params.criteria_list_id }}">
+                    {% placeholder segment_criteria_list with {params: params} %}
+                    <li class="option" data-criteria="condition-segment"
+                        data-module="orosegment/js/segment-condition"
+                        data-widget="segmentCondition"
+                        data-options="{{ segmentConditionOptions|json_encode }}">
+                        {{ 'oro.segment.condition_builder.criteria.segment_condition'|trans }}
+                    </li>
+                    <li class="option" data-criteria="conditions-group">
+                        {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
+                    </li>
+                </ul>
+            </div>
+            <div class="right-area">
+                <div id="{{ params.id }}"
+                     data-page-component-module="oroquerydesigner/js/app/components/condition-builder"
+                     data-page-component-options="{{ conditionBuilderOptions|json_encode }}"></div>
             </div>
         </div>
     </div>
@@ -174,7 +156,7 @@
         {% set widgetOptions = widgetOptions|merge({'columnFieldChoiceOptions': {exclude: ['relation_type']} }) %}
     {% endif %}
 
-    {% set widgetOptions = update_segment_widget_options(widgetOptions) %}
+    {% set widgetOptions = update_segment_widget_options(widgetOptions, type) %}
 
     <div data-page-component-module="orosegment/js/app/components/segment-component"
          data-page-component-options="{{ widgetOptions|json_encode }}"></div>

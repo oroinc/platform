@@ -8,24 +8,28 @@ use Oro\Bundle\MigrationBundle\Event\PostMigrationEvent;
 
 class UpdateExtendConfigPostUpMigrationListener
 {
-    /**
-     * @var CommandExecutor
-     */
+    /** @var CommandExecutor */
     protected $commandExecutor;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $configProcessorOptionsPath;
+
+    /** @var string */
+    protected $initialEntityConfigStatePath;
 
     /**
      * @param CommandExecutor $commandExecutor
      * @param string          $configProcessorOptionsPath
+     * @param string          $initialEntityConfigStatePath
      */
-    public function __construct(CommandExecutor $commandExecutor, $configProcessorOptionsPath)
-    {
-        $this->commandExecutor            = $commandExecutor;
-        $this->configProcessorOptionsPath = $configProcessorOptionsPath;
+    public function __construct(
+        CommandExecutor $commandExecutor,
+        $configProcessorOptionsPath,
+        $initialEntityConfigStatePath
+    ) {
+        $this->commandExecutor              = $commandExecutor;
+        $this->configProcessorOptionsPath   = $configProcessorOptionsPath;
+        $this->initialEntityConfigStatePath = $initialEntityConfigStatePath;
     }
 
     /**
@@ -38,7 +42,8 @@ class UpdateExtendConfigPostUpMigrationListener
         $event->addMigration(
             new UpdateExtendConfigMigration(
                 $this->commandExecutor,
-                $this->configProcessorOptionsPath
+                $this->configProcessorOptionsPath,
+                $this->initialEntityConfigStatePath
             )
         );
     }

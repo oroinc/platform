@@ -47,10 +47,9 @@ class EntityConfigGridListener extends AbstractConfigGridListener
     public function getModuleChoices()
     {
         if (null === $this->moduleChoices) {
-            $repository = $this->configManager->getEntityManager()
-                ->getRepository('OroEntityConfigBundle:ConfigModelIndexValue');
-
-            $queryBuilder = $repository->createQueryBuilder('indexValue')
+            $queryBuilder = $this->configManager->getEntityManager()
+                ->getRepository('Oro\Bundle\EntityConfigBundle\Entity\ConfigModelIndexValue')
+                ->createQueryBuilder('indexValue')
                 ->select('indexValue.value')
                 ->distinct()
                 ->where('indexValue.scope = :scope')->setParameter('scope', 'entity_config')

@@ -5,15 +5,9 @@ namespace Oro\Bundle\InstallerBundle\EventListener;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\HttpKernel;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Router;
 
 class RequestListener
 {
-    /**
-     * @var Router
-     */
-    protected $router;
-
     /**
      * Installed flag
      *
@@ -29,11 +23,11 @@ class RequestListener
     protected $debug;
 
     /**
-     *
+     * @param bool $installed
+     * @param bool $debug
      */
-    public function __construct(Router $router, $installed, $debug = false)
+    public function __construct($installed, $debug = false)
     {
-        $this->router    = $router;
         $this->installed = $installed;
         $this->debug     = $debug;
     }

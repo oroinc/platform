@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is a copy of {@see Symfony\Component\PropertyAccess\PropertyAccessor}
+ *
+ * (c) Fabien Potencier <fabien@symfony.com>
+ */
+
 namespace Oro\Component\PropertyAccess;
 
 use Symfony\Component\PropertyAccess\Exception;
@@ -11,10 +17,11 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 /**
  * Writes and reads values to/from an object/array graph.
  *
- * This class is mostly a copy of {@see Symfony\Component\PropertyAccess\PropertyAccessor},
- * but it is a bit faster getValue method, allows to use the same syntax of the property
- * path for objects and arrays, and fixes some issues of Symfony's PropertyAccessor,
- * for example working with magic __get method.
+ * This class is mostly a copy of {@see Symfony\Component\PropertyAccess\PropertyAccessor} v2.7.3
+ * but it has the following advantages:
+ * * allows to use the same syntax of the property path for objects and arrays
+ * * a bit faster getValue method
+ * * fixes some issues of Symfony's PropertyAccessor, for example working with magic __get method
  * New features:
  * * 'remove' method is added to allow to remove items from arrays or objects
  *
@@ -28,12 +35,22 @@ class PropertyAccessor implements PropertyAccessorInterface
     /** @var bool */
     protected $magicCall;
 
+    /** @var bool */
+    protected $ignoreInvalidIndices;
+
     /**
-     * @param bool $magicCall
+     * @param bool $magicCall            Determines whether the use of "__call" is enabled
+     * @param bool $ignoreInvalidIndices Determines whether a reading a value by non-existing index
+     *                                   is allowed or an exception should be thrown
+     *                                   This has no influence on writing non-existing indices
+     *                                   with setValue() and remove()
+     *                                   setValue() always create an array item on-the-fly
+     *                                   remove() always ignore non-existing indices
      */
-    public function __construct($magicCall = false)
+    public function __construct($magicCall = false, $ignoreInvalidIndices = false)
     {
-        $this->magicCall = $magicCall;
+        $this->magicCall            = $magicCall;
+        $this->ignoreInvalidIndices = $ignoreInvalidIndices;
     }
 
     /**
@@ -59,30 +76,30 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * If neither is found, an exception is thrown.
      *
-     * @param object|array                 $object   The object or array to modify
-     * @param string|PropertyPathInterface $property The property path to modify
-     * @param mixed                        $value    The value to set at the end of the property path
+     * @param object|array                 $object       The object or array to modify
+     * @param string|PropertyPathInterface $propertyPath The property path to modify
+     * @param mixed                        $value        The value to set at the end of the property path
      *
      * @throws Exception\InvalidPropertyPathException If an object or a property path has invalid type.
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      */
-    public function setValue(&$object, $property, $value)
+    public function setValue(&$object, $propertyPath, $value)
     {
-        if (is_string($property)) {
-            $property = new PropertyPath($property);
-        } elseif (!$property instanceof PropertyPathInterface) {
+        if (is_string($propertyPath)) {
+            $propertyPath = new PropertyPath($propertyPath);
+        } elseif (!$propertyPath instanceof PropertyPathInterface) {
             throw new Exception\InvalidPropertyPathException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
                     '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
-                    is_object($property) ? get_class($property) : gettype($property)
+                    is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
                 )
             );
         }
 
-        $path      = $property->getElements();
-        $values    = &$this->readPropertiesUntil($object, $property, true);
+        $path      = $propertyPath->getElements();
+        $values    = &$this->readPropertiesUntil($object, $propertyPath, true);
         $overwrite = true;
 
         // Add the root object to the list
@@ -101,7 +118,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                             'PropertyAccessor requires a graph of objects or arrays to operate on, ' .
                             'but it found type "%s" while trying to traverse path "%s" at property "%s".',
                             gettype($object),
-                            (string)$property,
+                            (string)$propertyPath,
                             $path[$i]
                         )
                     );
@@ -137,29 +154,29 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * If it is found, an exception is thrown.
      *
-     * @param object|array                 $object   The object or array to modify
-     * @param string|PropertyPathInterface $property The property path to modify
+     * @param object|array                 $object       The object or array to modify
+     * @param string|PropertyPathInterface $propertyPath The property path to modify
      *
      * @throws Exception\InvalidPropertyPathException If an object or a property path has invalid type.
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      */
-    public function remove(&$object, $property)
+    public function remove(&$object, $propertyPath)
     {
-        if (is_string($property)) {
-            $property = new PropertyPath($property);
-        } elseif (!$property instanceof PropertyPathInterface) {
+        if (is_string($propertyPath)) {
+            $propertyPath = new PropertyPath($propertyPath);
+        } elseif (!$propertyPath instanceof PropertyPathInterface) {
             throw new Exception\InvalidPropertyPathException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
                     '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
-                    is_object($property) ? get_class($property) : gettype($property)
+                    is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
                 )
             );
         }
 
-        $path   = $property->getElements();
-        $values = &$this->readPropertiesUntil($object, $property);
+        $path   = $propertyPath->getElements();
+        $values = &$this->readPropertiesUntil($object, $propertyPath);
 
         if (count($values) < count($path) - 1) {
             return;
@@ -184,18 +201,18 @@ class PropertyAccessor implements PropertyAccessorInterface
                             'PropertyAccessor requires a graph of objects or arrays to operate on, ' .
                             'but it found type "%s" while trying to traverse path "%s" at property "%s".',
                             gettype($object),
-                            (string)$property,
+                            (string)$propertyPath,
                             $path[$i]
                         )
                     );
                 }
 
-                $property = $path[$i];
+                $propertyPath = $path[$i];
 
                 if ($i === $lastIndex) {
-                    $this->unsetProperty($object, $property);
+                    $this->unsetProperty($object, $propertyPath);
                 } else {
-                    $this->writeValue($object, $property, $value);
+                    $this->writeValue($object, $propertyPath, $value);
                 }
             }
 
@@ -227,46 +244,140 @@ class PropertyAccessor implements PropertyAccessorInterface
      *
      * If none of them are found, an exception is thrown.
      *
-     * @param object|array                 $object   The object or array to traverse
-     * @param string|PropertyPathInterface $property The property path to read
+     * @param object|array                 $object       The object or array to traverse
+     * @param string|PropertyPathInterface $propertyPath The property path to read
      *
      * @return mixed The value at the end of the property path
      *
      * @throws Exception\InvalidPropertyPathException If an object or a property path has invalid type.
      * @throws Exception\NoSuchPropertyException If a property does not exist or is not public.
      */
-    public function getValue($object, $property)
+    public function getValue($object, $propertyPath)
     {
-        if (is_string($property)) {
-            $property = new PropertyPath($property);
-        } elseif (!$property instanceof PropertyPathInterface) {
+        if (is_string($propertyPath)) {
+            $propertyPath = new PropertyPath($propertyPath);
+        } elseif (!$propertyPath instanceof PropertyPathInterface) {
             throw new Exception\InvalidPropertyPathException(
                 sprintf(
                     'The property path must be a string or an instance of ' .
                     '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
                     'Got: "%s".',
-                    is_object($property) ? get_class($property) : gettype($property)
+                    is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
                 )
             );
         }
 
-        $path   = $property->getElements();
+        $path   = $propertyPath->getElements();
         $length = count($path);
-        $value  = $this->readValue($object, $path[0], true, $property, 0);
+        $value  = $this->readValue($object, $path[0], !$this->ignoreInvalidIndices, $propertyPath, 0);
         for ($i = 1; $i < $length; ++$i) {
-            $value = $this->readValue($value[self::VALUE], $path[$i], true, $property, $i);
+            $value = $this->readValue($value[self::VALUE], $path[$i], !$this->ignoreInvalidIndices, $propertyPath, $i);
         }
 
         return $value[self::VALUE];
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isReadable($objectOrArray, $propertyPath)
+    {
+        if (is_string($propertyPath)) {
+            $propertyPath = new PropertyPath($propertyPath);
+        } elseif (!$propertyPath instanceof PropertyPathInterface) {
+            throw new Exception\InvalidPropertyPathException(
+                sprintf(
+                    'The property path must be a string or an instance of ' .
+                    '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
+                    'Got: "%s".',
+                    is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
+                )
+            );
+        }
+
+        try {
+            $this->readPropertiesUntil(
+                $objectOrArray,
+                $propertyPath,
+                false,
+                $this->ignoreInvalidIndices,
+                $propertyPath->getLength()
+            );
+
+            return true;
+        } catch (Exception\AccessException $e) {
+            return false;
+        } catch (Exception\UnexpectedTypeException $e) {
+            return false;
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isWritable($objectOrArray, $propertyPath)
+    {
+        if (is_string($propertyPath)) {
+            $propertyPath = new PropertyPath($propertyPath);
+        } elseif (!$propertyPath instanceof PropertyPathInterface) {
+            throw new Exception\InvalidPropertyPathException(
+                sprintf(
+                    'The property path must be a string or an instance of ' .
+                    '"Symfony\Component\PropertyAccess\PropertyPathInterface". ' .
+                    'Got: "%s".',
+                    is_object($propertyPath) ? get_class($propertyPath) : gettype($propertyPath)
+                )
+            );
+        }
+
+        try {
+            $propertyValues = $this->readPropertiesUntil(
+                $objectOrArray,
+                $propertyPath,
+                false,
+                true,
+                $propertyPath->getLength()
+            );
+
+            // Add the root object to the list
+            array_unshift($propertyValues, [
+                self::VALUE => $objectOrArray,
+                self::IS_REF => true,
+            ]);
+
+            for ($i = count($propertyValues) - 2; $i >= 0; --$i) {
+                $objectOrArray = $propertyValues[$i][self::VALUE];
+
+                $property = $propertyPath->getElement($i);
+
+                if ($objectOrArray instanceof \ArrayAccess || is_array($objectOrArray)) {
+                    return true;
+                }
+                if (!$this->isPropertyWritable($objectOrArray, $property)) {
+                    return false;
+                }
+
+                if ($propertyValues[$i][self::IS_REF]) {
+                    return true;
+                }
+            }
+
+            return true;
+        } catch (Exception\AccessException $e) {
+            return false;
+        } catch (Exception\UnexpectedTypeException $e) {
+            return false;
+        }
+    }
+
+    /**
      * Reads the path from an object up to a given path index.
      *
-     * @param object|array          $object       The object or array to read from
-     * @param PropertyPathInterface $propertyPath The property path to read
-     * @param bool                  $addMissing   Set true to allow create missing nested arrays on demand
-     * @param int                   $lastIndex    The index up to which should be read
+     * @param object|array          $object               The object or array to read from
+     * @param PropertyPathInterface $propertyPath         The property path to read
+     * @param bool                  $addMissing           Set true to allow create missing nested arrays on demand
+     * @param bool                  $ignoreInvalidIndices Whether to ignore invalid indices or throw an exception
+     * @param int                   $lastIndex            The index up to which should be read
      *
      * @return array The values read in the path.
      *
@@ -277,6 +388,7 @@ class PropertyAccessor implements PropertyAccessorInterface
         &$object,
         PropertyPathInterface $propertyPath,
         $addMissing = false,
+        $ignoreInvalidIndices = true,
         $lastIndex = -1
     ) {
         $values = [];
@@ -305,13 +417,14 @@ class PropertyAccessor implements PropertyAccessorInterface
             if (($object instanceof \ArrayAccess && !isset($object[$property]))
                 || (is_array($object) && !array_key_exists($property, $object))
             ) {
-                if (!$addMissing) {
+                if ($addMissing) {
+                    $object[$property] = $i + 1 < $length ? [] : null;
+                } elseif ($ignoreInvalidIndices) {
                     break;
                 }
-                $object[$property] = $i + 1 < $length ? [] : null;
             }
 
-            $value = &$this->readValue($object, $property, false, $propertyPath, $i);
+            $value = &$this->readValue($object, $property, !$ignoreInvalidIndices, $propertyPath, $i);
 
             $object = &$value[self::VALUE];
 
@@ -347,7 +460,9 @@ class PropertyAccessor implements PropertyAccessorInterface
         // Use an array instead of an object since performance is very crucial here
         $result = [self::VALUE => null, self::IS_REF => false];
 
-        if (is_array($object)) {
+        if (!$strict && null === $object) {
+            // Ignore NULL object if non strict read is requested
+        } elseif (is_array($object)) {
             if (isset($object[$property])) {
                 $result[self::VALUE]  = &$object[$property];
                 $result[self::IS_REF] = true;
@@ -367,13 +482,24 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
         } elseif (is_object($object)) {
             $reflClass = new \ReflectionClass($object);
-            $camel     = $this->camelize($property);
-            if ($reflClass->hasMethod($getter = 'get' . $camel) && $reflClass->getMethod($getter)->isPublic()) {
+            $camelized = $this->camelize($property);
+            if ($reflClass->hasMethod($getter = 'get' . $camelized)
+                && $reflClass->getMethod($getter)->isPublic()
+            ) {
                 $result[self::VALUE] = $object->$getter();
-            } elseif ($reflClass->hasMethod($isser = 'is' . $camel) && $reflClass->getMethod($isser)->isPublic()) {
+            } elseif ($reflClass->hasMethod($isser = 'is' . $camelized)
+                && $reflClass->getMethod($isser)->isPublic()
+            ) {
                 $result[self::VALUE] = $object->$isser();
-            } elseif ($reflClass->hasMethod($hasser = 'has' . $camel) && $reflClass->getMethod($hasser)->isPublic()) {
+            } elseif ($reflClass->hasMethod($hasser = 'has' . $camelized)
+                && $reflClass->getMethod($hasser)->isPublic()
+            ) {
                 $result[self::VALUE] = $object->$hasser();
+            } elseif ($reflClass->hasMethod($getsetter = lcfirst($camelized))
+                && $reflClass->getMethod($getsetter)->isPublic()
+            ) {
+                // jQuery style, e.g. read: last(), write: last($item)
+                $result[self::VALUE] = $object->$getsetter();
             } elseif ($reflClass->hasMethod('__get') && $reflClass->getMethod('__get')->isPublic()) {
                 if ($reflClass->hasMethod('__isset') && $reflClass->getMethod('__isset')->isPublic()) {
                     if (!isset($object->$property)) {
@@ -408,7 +534,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                     // we call the getter and hope the __call do the job
                     $result[self::VALUE] = $object->$getter();
                 } else {
-                    $methods = [$getter, $isser, $hasser, '__get'];
+                    $methods = [$getter, $getsetter, $isser, $hasser, '__get'];
                     if ($this->magicCall) {
                         $methods[] = '__call';
                     }
@@ -485,10 +611,13 @@ class PropertyAccessor implements PropertyAccessorInterface
             }
 
             $setter           = 'set' . $camelized;
+            $getsetter        = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
             $classHasProperty = $reflClass->hasProperty($property);
 
             if ($this->isMethodAccessible($reflClass, $setter, 1)) {
                 $object->$setter($value);
+            } elseif ($this->isMethodAccessible($reflClass, $getsetter, 1)) {
+                $object->$getsetter($value);
             } elseif ($this->isMethodAccessible($reflClass, '__set', 2)) {
                 $object->$property = $value;
             } elseif ($classHasProperty && $reflClass->getProperty($property)->isPublic()) {
@@ -506,7 +635,7 @@ class PropertyAccessor implements PropertyAccessorInterface
             } else {
                 throw new Exception\NoSuchPropertyException(
                     sprintf(
-                        'Neither the property "%s" nor one of the methods %s"%s()", ' .
+                        'Neither the property "%s" nor one of the methods %s"%s()", "%s()", ' .
                         '"__set()" or "__call()" exist and have public access in class "%s".',
                         $property,
                         implode(
@@ -519,6 +648,7 @@ class PropertyAccessor implements PropertyAccessorInterface
                             )
                         ),
                         $setter,
+                        $getsetter,
                         $reflClass->name
                     )
                 );
@@ -576,6 +706,46 @@ class PropertyAccessor implements PropertyAccessorInterface
         foreach ($itemsToAdd as $item) {
             $object->{$addMethod}($item);
         }
+    }
+
+    /**
+     * Returns whether a property is writable in the given object.
+     *
+     * @param object $object   The object to write to
+     * @param string $property The property to write
+     *
+     * @return bool Whether the property is writable
+     */
+    private function isPropertyWritable($object, $property)
+    {
+        if (!is_object($object)) {
+            return false;
+        }
+
+        $reflClass = new \ReflectionClass($object);
+
+        $camelized = $this->camelize($property);
+        $setter = 'set' . $camelized;
+        $getsetter = lcfirst($camelized); // jQuery style, e.g. read: last(), write: last($item)
+        $classHasProperty = $reflClass->hasProperty($property);
+
+        if ($this->isMethodAccessible($reflClass, $setter, 1)
+            || $this->isMethodAccessible($reflClass, $getsetter, 1)
+            || $this->isMethodAccessible($reflClass, '__set', 2)
+            || ($classHasProperty && $reflClass->getProperty($property)->isPublic())
+            || (!$classHasProperty && property_exists($object, $property))
+            || ($this->magicCall && $this->isMethodAccessible($reflClass, '__call', 2))) {
+            return true;
+        }
+
+        $singulars = (array) StringUtil::singularify($camelized);
+
+        // Any of the two methods is required, but not yet known
+        if (null !== $this->findAdderAndRemover($reflClass, $singulars)) {
+            return true;
+        }
+
+        return false;
     }
 
     /**

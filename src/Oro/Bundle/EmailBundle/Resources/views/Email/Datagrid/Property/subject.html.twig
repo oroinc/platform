@@ -1,9 +1,16 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 {% set emailBody = record.getValue('email.emailBody') %}
+{% set isNew = record.getValue('is_new') %}
 
 <div class="nowrap-ellipsis">
     <div>
-        <strong>{{ value ? value : 'oro.email.subject.no_subject.label'|trans }}</strong>
+        {% if isNew == 1 %}
+        <strong>
+        {% endif %}
+            {{ value ? value : 'oro.email.subject.no_subject.label'|trans }}
+        {% if isNew == 1 %}
+        </strong>
+        {% endif %}
         {% if emailBody.bodyContent is defined %}
             - {{ EA.email_short_body(emailBody) }}
         {% endif %}

@@ -1,0 +1,52 @@
+nelmio_api_doc:
+    motd:
+        template: OroApiBundle::ApiDoc/motd.html.twig
+
+security:
+    firewalls:
+        api_wsse_secured:
+            pattern: ^/api/(?!doc($|/.*))
+            wsse:
+                lifetime: 3600
+                realm:    "Secured API"
+                profile:  "UsernameToken"
+            context: main
+
+oro_api:
+    actions:
+        get_list:
+            processing_groups:
+                initialize:
+                    priority: -10
+                security_check:
+                    priority: -20
+                normalize_input:
+                    priority: -30
+                build_query:
+                    priority: -40
+                load_data:
+                    priority: -50
+                normalize_data:
+                    priority: -60
+                finalize:
+                    priority: -70
+                normalize_result:
+                    priority: -80
+        get:
+            processing_groups:
+                initialize:
+                    priority: -10
+                security_check:
+                    priority: -20
+                normalize_input:
+                    priority: -30
+                build_query:
+                    priority: -40
+                load_data:
+                    priority: -50
+                normalize_data:
+                    priority: -60
+                finalize:
+                    priority: -70
+                normalize_result:
+                    priority: -80

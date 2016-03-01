@@ -1,7 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
-define(['underscore', 'orotranslation/js/translator'
-    ], function (_, __) {
+define([
+    'underscore',
+    'orotranslation/js/translator'
+], function(_, __) {
     'use strict';
 
     return {
@@ -9,15 +9,16 @@ define(['underscore', 'orotranslation/js/translator'
         templates: {
             reminderIcon: '<i class="reminder-status icon-bell" title="' + __('Reminders') + '"></i>',
             notRespondedIcon: '<i class="invitation-status icon-reply" title="' + __('Not responded') + '"></i>',
-            tentativelyIcon: '<i class="invitation-status icon-question-sign" title="' + __('Tentatively accepted') + '"></i>',
+            tentativelyIcon: '<i class="invitation-status icon-question-sign" title="' +
+                __('Tentatively accepted') + '"></i>',
             acceptedIcon: '<i class="invitation-status icon-ok" title="' + __('Accepted') + '"></i>'
         },
 
-        decorate: function (eventModel, $el) {
-            var $body = $el.find('.fc-content'),
-                $timePlace = $el.find('.fc-time'),
-                reminders = eventModel.get('reminders'),
-                invitationStatus = eventModel.getInvitationStatus();
+        decorate: function(eventModel, $el) {
+            var $body = $el.find('.fc-content');
+            var $timePlace = $el.find('.fc-time');
+            var reminders = eventModel.get('reminders');
+            var invitationStatus = eventModel.getInvitationStatus();
             // if $time is not displayed show related info into $body
             if (!$timePlace.length) {
                 $timePlace = $body;

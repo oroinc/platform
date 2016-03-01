@@ -1,0 +1,22 @@
+doctrine:
+    dbal:
+        connections:
+            search:
+                driver:   %database_driver%
+                host:     %database_host%
+                port:     %database_port%
+                dbname:   %database_name%
+                user:     %database_user%
+                password: %database_password%
+                charset:  UTF8
+    orm:
+        entity_managers:
+            search:
+                connection: search
+                mappings:
+                    OroSearchBundle:
+                        mapping:   true
+                        is_bundle: true
+                metadata_cache_driver:
+                    type: service
+                    id:   oro_search.cache.doctrine_metadata

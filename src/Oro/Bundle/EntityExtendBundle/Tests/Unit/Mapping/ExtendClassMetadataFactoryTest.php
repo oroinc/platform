@@ -35,13 +35,17 @@ class ExtendClassMetadataFactoryTest extends \PHPUnit_Framework_TestCase
         );
 
         $cacheSalt = '$CLASSMETADATA';
-        $this->assertAttributeSame(
-            [
-                'DoctrineNamespaceCacheKey[]' => 1,
-                '[Oro\Bundle\UserBundle\Entity\User'.$cacheSalt .'][1]' => $metadata
-            ],
-            'data',
-            $this->cmf->getCacheDriver()
+        $this->assertTrue(
+            $this->cmf->getCacheDriver()->contains('Oro\Bundle\UserBundle\Entity\User' . $cacheSalt)
+        );
+    }
+
+    public function testSetMetadataForWithoutCacheDriver()
+    {
+        $metadata = new ClassMetadata('Oro\Bundle\UserBundle\Entity\User');
+        $this->cmf->setMetadataFor(
+            'Oro\Bundle\UserBundle\Entity\User',
+            $metadata
         );
     }
 }

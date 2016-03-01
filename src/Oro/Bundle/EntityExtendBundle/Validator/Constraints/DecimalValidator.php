@@ -17,7 +17,7 @@ class DecimalValidator extends ConstraintValidator
             return;
         }
 
-        if (!is_numeric($value)) {
+        if (!is_numeric($value) || $value >= PHP_INT_MAX || $value <= -PHP_INT_MAX) {
             throw new UnexpectedTypeException($value, 'numeric');
         }
 

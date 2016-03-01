@@ -6,19 +6,20 @@ datagrid:
             toolbarOptions:
                 pageSize:
                     default_per_page: 100
+        acl_resource: oro_entityconfig_manage
         source:
-            acl_resource: oro_entityconfig_manage
             type: orm
             query:
                 select:
                     - ce.id
                     - ce.updated
                     - ce.mode
+                    - ce.data
                 from:
                     - { table: OroEntityConfigBundle:EntityConfigModel, alias: ce }
                 where:
                     and:
-                        - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
+                        - ce.mode <> 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_HIDDEN'
         columns:
             updated:
                 label: oro.ui.updated_at
@@ -64,13 +65,14 @@ datagrid:
     # Entity field datagrid
     entityfields-grid:
         options:
+            mode: client
             entityHint: fields
             toolbarOptions:
                 pageSize:
                     default_per_page: 50
+        # TODO: check oro_entityconfig_view acl (403) right now
+        acl_resource: oro_entityconfig_manage
         source:
-            # TODO: check oro_entityconfig_view acl (403) right now
-            acl_resource: oro_entityconfig_manage
             type: orm
             query:
                 select:
@@ -80,6 +82,7 @@ datagrid:
                     - cf.type
                     - cf.mode
                     - ce.id as entity_id
+                    - cf.data
                 from:
                     - { table: OroEntityConfigBundle:FieldConfigModel, alias: cf }
                 join:
@@ -88,7 +91,7 @@ datagrid:
                 where:
                     and:
                         - ce.id = :entity_id
-                        - cf.mode <> 'Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager::MODE_HIDDEN'
+                        - cf.mode <> 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel::MODE_HIDDEN'
 
         columns:
             fieldName:
@@ -118,14 +121,18 @@ datagrid:
             columns:
                 fieldName:
                     data_name: cf.fieldName
+                type:
+                    data_name: cf.type
+            default:
+                fieldName: ASC
         filters: ~
 
     # Audit entity log grid
     entity-audit-grid:
         options:
             entityHint: history
+        acl_resource: oro_entityconfig_manage
         source:
-            acl_resource: oro_entityconfig_manage
             type: orm
             query:
                 select:
@@ -139,7 +146,7 @@ datagrid:
                         CONCAT(' - ', u.email)
                       ) as author
                 from:
-                    - { table: OroEntityConfigBundle:ConfigLog, alias: log }
+                    - { table: Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog, alias: log }
                 join:
                     left:
                         user:

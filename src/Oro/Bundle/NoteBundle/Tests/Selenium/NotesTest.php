@@ -38,7 +38,8 @@ class NotesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            ->filterBy('Name', $entityName)
+            ->filterBy('Name', $entityName, 'is equal to')
+            ->filterByMultiselect('Module', ['OroUserBundle'])
             ->open([$entityName])
             ->edit()
             ->enableNotes()
@@ -89,7 +90,7 @@ class NotesTest extends Selenium2TestCase
             ->open([PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN]);
         /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
-            ->editNote($note)
+            ->noteAction($note, 'Update Note')
             ->setNoteMessage($newNote)
             ->saveNote()
             ->assertMessage('Note saved')
@@ -112,7 +113,7 @@ class NotesTest extends Selenium2TestCase
             ->open([PHPUNIT_TESTSUITE_EXTENSION_SELENIUM_LOGIN]);
         /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
-            ->deleteNote($note)
+            ->noteAction($note, 'Delete Note')
             ->assertMessage('Activity item deleted');
     }
 
@@ -127,7 +128,7 @@ class NotesTest extends Selenium2TestCase
         $login = $this->login();
         /** @var ConfigEntities $login */
         $login->openConfigEntities('Oro\Bundle\EntityConfigBundle')
-            ->filterBy('Name', $entityName)
+            ->filterBy('Name', $entityName, 'is equal to')
             ->open([$entityName])
             ->edit()
             ->enableNotes('No')
@@ -140,5 +141,11 @@ class NotesTest extends Selenium2TestCase
         /** @var Notes $login */
         $login->openNotes('Oro\Bundle\NoteBundle')
             ->addNoteButtonNotAvailable();
+    }
+
+    public function testCloseWidgetWindow()
+    {
+        $login = $this->login();
+        $login->closeWidgetWindow();
     }
 }

@@ -1,9 +1,8 @@
-/*global define*/
 define([
     'oro/datagrid/action/ajaxdelete-action',
     'oroui/js/delete-confirmation',
     'oroui/js/mediator'
-], function (AjaxdeleteAction, DeleteConfirmation, mediator) {
+], function(AjaxdeleteAction, DeleteConfirmation, mediator) {
     'use strict';
 
     var AjaxdeletefieldAction;
@@ -31,7 +30,7 @@ define([
             error: 'Not removed.',
             empty_selection: 'Please, select item to remove.'
         },
-        _onAjaxSuccess: function (data) {
+        _onAjaxSuccess: function(data) {
             mediator.execute('refreshPage');
         }
     });

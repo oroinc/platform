@@ -47,7 +47,7 @@ class QuarterTypeTest extends FormIntegrationTestCase
 
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\InvalidOptionsException
-     * @expectedExceptionMessage The option "input" has the value "timestamp", but is expected to be one of "array"
+     * @expectedExceptionMessage The option "input" with value "timestamp" is invalid. Accepted values are: "array".
      */
     public function testBuildFormTryingToChangeInputType()
     {

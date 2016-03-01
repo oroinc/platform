@@ -2,21 +2,42 @@
 
 namespace Oro\Bundle\TranslationBundle\Translation;
 
+use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\ClearableCache;
+
+use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class Translator extends BaseTranslator
 {
-    /**
-     * @var DynamicTranslationMetadataCache
-     */
+    /** @var DynamicTranslationMetadataCache|null */
     protected $databaseTranslationMetadataCache;
+
+    /** @var Cache|null */
+    protected $resourceCache;
 
     /**
      * @var array
+     *  [
+     *      locale => [
+     *          [
+     *              'resource' => DynamicResourceInterface,
+     *              'format'   => string,
+     *              'locale'   => string,
+     *              'domain'   => string
+     *          ],
+     *          ...
+     *      ],
+     *      ...
+     *  ]
      */
-    private $dynamicResources = [];
+    protected $dynamicResources = [];
+
+    /** @var bool|null */
+    protected $dbCheck;
 
     /**
      * Collector of translations
@@ -103,51 +124,19 @@ class Translator extends BaseTranslator
     /**
      * {@inheritdoc}
      */
-    public function addResource($format, $resource, $locale, $domain = null)
+    public function addLoader($format, LoaderInterface $loader)
     {
-        // remember dynamic resources
-        if ($resource instanceof DynamicResourceInterface) {
-            if (!isset($this->dynamicResources[$locale])) {
-                $this->dynamicResources[$locale] = [];
-            }
-            $this->dynamicResources[$locale][] = $resource;
+        if (null !== $this->resourceCache) {
+            // wrap a resource loader by a caching loader to prevent loading of the same resource several times
+            // it strongly decreases a translation catalogue loading time
+            // for example a time of translation cache warming up is decreased in about 4 times
+            $loader = new CachingTranslationLoader($loader, $this->resourceCache);
         }
-
-        parent::addResource($format, $resource, $locale, $domain);
+        parent::addLoader($format, $loader);
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function loadCatalogue($locale)
-    {
-        $this->ensureDatabaseLoaderAdded($locale);
-
-        // check if any dynamic resource is changed and update translation catalogue if needed
-        if (!empty($this->dynamicResources)
-            && isset($this->dynamicResources[$locale])
-            && !empty($this->dynamicResources[$locale])
-        ) {
-            $catalogueFile = $this->options['cache_dir']
-                . '/catalogue.' . $locale . '.' . sha1(serialize($this->getFallbackLocales())) . '.php';
-            if (is_file($catalogueFile)) {
-                $time = filemtime($catalogueFile);
-                /** @var DynamicResourceInterface $dynamicResource */
-                foreach ($this->dynamicResources[$locale] as $dynamicResource) {
-                    if (!$dynamicResource->isFresh($time)) {
-                        // remove translation catalogue to allow parent class to rebuild it
-                        unlink($catalogueFile);
-                        break;
-                    }
-                }
-            }
-        }
-
-        parent::loadCatalogue($locale);
-    }
-
-    /**
-     * Setter for inject dependency
+     * Sets a cache of dynamic translation metadata
      *
      * @param DynamicTranslationMetadataCache $cache
      */
@@ -157,44 +146,141 @@ class Translator extends BaseTranslator
     }
 
     /**
-     * Ensure that database resource added
+     * Sets a cache of loaded translation resources
+     *
+     * @param Cache $cache
+     */
+    public function setResourceCache(Cache $cache)
+    {
+        $this->resourceCache = $cache;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function loadCatalogue($locale)
+    {
+        $this->initializeDynamicResources($locale);
+        parent::loadCatalogue($locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function initialize()
+    {
+        parent::initialize();
+        // add dynamic resources to the end to make sure that they override static translations
+        $this->registerDynamicResources();
+    }
+
+    /**
+     * Initializes dynamic translation resources
      *
      * @param string $locale
      */
-    private function ensureDatabaseLoaderAdded($locale)
+    protected function initializeDynamicResources($locale)
     {
-        if (null !== $this->databaseTranslationMetadataCache && $this->isInstalled()) {
-            $resources        = !empty($this->dynamicResources[$locale]) ? $this->dynamicResources[$locale] : [];
-            $databaseResource = array_filter(
-                $resources,
-                function ($resource) {
-                    return $resource instanceof OrmTranslationResource;
-                }
-            );
-            if (!$databaseResource) {
-                // register resources for all domains to load all available translations into cache
-                $availableDomains = $this->container->get('doctrine')
-                    ->getRepository(Translation::ENTITY_NAME)
-                    ->findAvailableDomains($locale);
-                foreach ($availableDomains as $domain) {
-                    $this->addResource(
-                        'oro_database_translation',
-                        new OrmTranslationResource($locale, $this->databaseTranslationMetadataCache),
-                        $locale,
-                        $domain
-                    );
+        $this->ensureDynamicResourcesLoaded($locale);
+
+        // check if any dynamic resource is changed and update translation catalogue if needed
+        if (!empty($this->dynamicResources[$locale])) {
+            $catalogueFile = $this->options['cache_dir']
+                . '/catalogue.' . $locale . '.' . sha1(serialize($this->getFallbackLocales())) . '.php';
+            if (is_file($catalogueFile)) {
+                $time = filemtime($catalogueFile);
+                foreach ($this->dynamicResources[$locale] as $item) {
+                    /** @var DynamicResourceInterface $dynamicResource */
+                    $dynamicResource = $item['resource'];
+                    if (!$dynamicResource->isFresh($time)) {
+                        // remove translation catalogue to allow parent class to rebuild it
+                        unlink($catalogueFile);
+                        // make sure that translations will be loaded from source resources
+                        if ($this->resourceCache instanceof ClearableCache) {
+                            $this->resourceCache->deleteAll();
+                        }
+                        break;
+                    }
                 }
             }
         }
     }
 
-    /*
+    /**
+     * Adds dynamic translation resources to the translator
+     */
+    protected function registerDynamicResources()
+    {
+        foreach ($this->dynamicResources as $items) {
+            foreach ($items as $item) {
+                $this->addResource($item['format'], $item['resource'], $item['locale'], $item['domain']);
+            }
+        }
+    }
+
+    /**
+     * Makes sure that dynamic translation resources are added to $this->dynamicResources
+     *
+     * @param string $locale
+     */
+    protected function ensureDynamicResourcesLoaded($locale)
+    {
+        if (null !== $this->databaseTranslationMetadataCache && $this->isInstalled()) {
+            $hasDatabaseResources = false;
+            if (!empty($this->dynamicResources[$locale])) {
+                foreach ($this->dynamicResources[$locale] as $item) {
+                    if ($item['format'] === 'oro_database_translation') {
+                        $hasDatabaseResources = true;
+                        break;
+                    }
+                }
+            }
+            if (!$hasDatabaseResources && $this->checkDatabase()) {
+                $locales = $this->getFallbackLocales();
+                array_unshift($locales, $locale);
+                $locales = array_unique($locales);
+
+                $availableDomainsData = $this->container->get('doctrine')
+                    ->getRepository(Translation::ENTITY_NAME)
+                    ->findAvailableDomainsForLocales($locales);
+                foreach ($availableDomainsData as $item) {
+                    $item['resource'] = new OrmTranslationResource(
+                        $item['locale'],
+                        $this->databaseTranslationMetadataCache
+                    );
+                    $item['format']   = 'oro_database_translation';
+
+                    $this->dynamicResources[$locale][] = $item;
+                }
+            }
+        }
+    }
+
+    /**
      * Check if the platform is installed
      *
      * @return bool
      */
-    private function isInstalled()
+    protected function isInstalled()
     {
         return $this->container->hasParameter('installed') && $this->container->getParameter('installed');
+    }
+
+    /**
+     * Checks whether the translations table exists in the database
+     *
+     * @return bool
+     */
+    protected function checkDatabase()
+    {
+        if (null === $this->dbCheck) {
+            $doctrine      = $this->container->get('doctrine');
+            $this->dbCheck = SafeDatabaseChecker::tablesExist(
+                $doctrine->getManagerForClass(Translation::ENTITY_NAME)->getConnection(),
+                SafeDatabaseChecker::getTableName($doctrine, Translation::ENTITY_NAME)
+            );
+        }
+
+        return $this->dbCheck;
     }
 }

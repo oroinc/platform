@@ -10,19 +10,9 @@ use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 
-class NumberFilterType extends AbstractType
+class NumberFilterType extends AbstractType implements NumberFilterTypeInterface
 {
-    const TYPE_GREATER_EQUAL = 1;
-    const TYPE_GREATER_THAN  = 2;
-    const TYPE_EQUAL         = 3;
-    const TYPE_NOT_EQUAL     = 4;
-    const TYPE_LESS_EQUAL    = 5;
-    const TYPE_LESS_THAN     = 6;
-    const NAME               = 'oro_type_number_filter';
-
-    const DATA_INTEGER = 'data_integer';
-    const DATA_DECIMAL = 'data_decimal';
-    const PERCENT      = 'percent';
+    const NAME = 'oro_type_number_filter';
 
     /**
      * @var TranslatorInterface

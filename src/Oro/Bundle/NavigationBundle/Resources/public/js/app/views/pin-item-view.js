@@ -1,21 +1,19 @@
-/*jslint browser:true, nomen:true*/
-/*global define*/
 define([
     'orotranslation/js/translator',
     'oroui/js/mediator',
     './bookmark-item-view'
-], function (__, mediator, BookmarkItemView) {
+], function(__, mediator, BookmarkItemView) {
     'use strict';
 
     var PinItemView;
 
     PinItemView = BookmarkItemView.extend({
-        remove: function () {
+        remove: function() {
             mediator.off('content-manager:content-outdated', this.outdatedContentHandler, this);
             PinItemView.__super__.remove.call(this);
         },
 
-        render: function () {
+        render: function() {
             PinItemView.__super__.render.call(this);
 
             // if cache used highlight tab on content outdated event
@@ -23,33 +21,33 @@ define([
             this.setActiveItem();
         },
 
-        outdatedContentHandler: function (event) {
-            var $el, self, url, refreshHandler, $noteEl;
-            self = this;
-            $el = this.$el;
-            url = this.model.get('url');
-            refreshHandler = function () {
-                if (self.checkCurrentUrl()) {
-                    $noteEl = $el.find('.pin-status.outdated');
-                    self.markNormal($noteEl);
-                    mediator.off('page:afterRefresh', refreshHandler);
-                }
-            };
-            if (!event.isCurrentPage && mediator.execute('compareUrl', url, event.path)) {
-                $noteEl = $el.find('.pin-status');
-                if (!$noteEl.is('.outdated')) {
-                    this.markOutdated($noteEl);
-                    mediator.on('page:afterRefresh', refreshHandler);
+        outdatedContentHandler: function(event) {
+            var url = this.model.get('url');
+            if (mediator.execute('compareUrl', url, event.path)) {
+                if (!this.getPinStatusIcon().is('.outdated')) {
+                    this.markOutdated();
+                    this.listenTo(mediator, 'page:afterRefresh', this.onPageRefresh);
                 }
             }
         },
 
-        markOutdated: function ($el) {
-            $el.addClass('outdated').attr('title', __('Content of pinned page is outdated'));
+        onPageRefresh: function() {
+            if (this.checkCurrentUrl()) {
+                this.markNormal();
+                this.stopListening(mediator, 'page:afterRefresh');
+            }
         },
 
-        markNormal: function ($el) {
-            $el.removeClass('outdated').removeAttr('title');
+        markOutdated: function() {
+            this.getPinStatusIcon().addClass('outdated').attr('title', __('Content of pinned page is outdated'));
+        },
+
+        markNormal: function() {
+            this.getPinStatusIcon().removeClass('outdated').removeAttr('title');
+        },
+
+        getPinStatusIcon: function() {
+            return this.$('.pin-status');
         }
     });
 

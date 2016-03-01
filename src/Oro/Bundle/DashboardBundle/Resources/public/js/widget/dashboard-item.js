@@ -1,16 +1,16 @@
-/*global define*/
 define([
     'underscore',
     'backbone',
     'orotranslation/js/translator',
     'oroui/js/mediator',
     'oro/block-widget',
-    'oroui/js/delete-confirmation'
-], function (_, Backbone, __, mediator, BlockWidget, DeleteConfirmation) {
+    'oroui/js/delete-confirmation',
+    'tpl!orodashboard/templates/widget/dashboard-item.html'
+], function(_, Backbone, __, mediator, BlockWidget, DeleteConfirmation, dashboardItemTpl) {
     'use strict';
 
-    var DashboardItemWidget,
-        $ = Backbone.$;
+    var DashboardItemWidget;
+    var $ = Backbone.$;
 
     /**
      * @export  orodashboard/js/widget/dashboard-item
@@ -28,7 +28,7 @@ define([
                 event.preventDefault();
                 if (this.state.expanded) {
                     this.collapse();
-                }else{
+                }else {
                     this.expand();
                 }
             },
@@ -66,42 +66,7 @@ define([
             contentContainer: '.row-fluid',
             contentClasses: [],
             allowEdit: false,
-            template: _.template(
-                '<div class="box-type1 dashboard-widget <%= allowEdit ? \'editable\' : \'\' %>">' +
-                    '<div class="pull-left actions-container">' +
-                        '<div class="pull-left collapse-expand-action-container">' +
-                            '<a class="collapse-action <%= collapsed ? \'collapsed\' : \'\' %>" href="#" ' +
-                                'data-collapsed-title="<%- _.__(\'oro.dashboard.widget.expand\') %>"' +
-                                ' data-expanded-title="<%- _.__(\'oro.dashboard.widget.collapse\') %>">' +
-                            '</a>' +
-                        '</div>' +
-                    '</div>' +
-                    '<div class="pull-right actions-container">' +
-                        '<div class="pull-right default-actions-container">' +
-                            '<span class="action-wrapper sortable">' +
-                                '<a class="move-action" href="#" title="<%- _.__(\'oro.dashboard.widget.move\') %>">' +
-                                    '<i class="icon-move hide-text"></i>' +
-                                '</a>' +
-                            '</span>' +
-                            '<% if (showConfig) { %>' +
-                                '<span class="action-wrapper">' +
-                                    '<a class="configure-action" href="#" title="<%- _.__(\'oro.dashboard.widget.configure\') %>">' +
-                                        '<i class="icon-cog hide-text"></i>' +
-                                    '</a>' +
-                                '</span>' +
-                            '<% } %>' +
-                            '<span class="action-wrapper">' +
-                                '<a class="remove-action" href="#" title="<%- _.__(\'oro.dashboard.widget.remove\') %>">' +
-                                    '<i class="icon-trash hide-text"></i>' +
-                                '</a>' +
-                            '</span>' +
-                        '</div>' +
-                        '<div class="pull-left widget-actions-container"></div>' +
-                    '</div>' +
-                    '<div class="title sortable widget-title" title="<%- title %>"><%- title %></div>' +
-                    '<div class="row-fluid <%= contentClasses.join(\' \') %>"></div>' +
-                '</div>'
-            )
+            template: dashboardItemTpl
         }),
 
         /**
@@ -127,7 +92,7 @@ define([
             DashboardItemWidget.__super__.initializeWidget.apply(this, arguments);
         },
 
-        _afterLayoutInit: function () {
+        _afterLayoutInit: function() {
             this.$el.removeClass('invisible');
             DashboardItemWidget.__super__._afterLayoutInit.apply(this, arguments);
         },
@@ -146,7 +111,7 @@ define([
             if (this.state.layoutPosition) {
                 this.state.layoutPosition = _.map(
                     this.state.layoutPosition,
-                    function (value) {
+                    function(value) {
                         return parseInt(value);
                     }
                 );
@@ -199,7 +164,7 @@ define([
                 mediator.trigger('widget:dashboard:collapse:' + this.getWid(), this.$el, this);
                 var self = this;
                 this.widgetContentContainer.slideUp({
-                    complete: function  () {
+                    complete: function() {
                         self.widget.addClass('collapsed');
                     }
                 });
@@ -226,7 +191,7 @@ define([
             this.state.expanded = true;
 
             var collapseControl = $('.collapse-expand-action-container', this.widget).find('.collapse-action');
-            var $chart = this.$el.find(".chart");
+            var $chart = this.$el.find('.chart');
             collapseControl.attr('title', collapseControl.data('expanded-title')).toggleClass('collapsed');
 
             this.widget.removeClass('collapsed');
@@ -238,8 +203,8 @@ define([
 
             }
 
-            if($chart.length > 0) {
-                $chart.trigger("update");
+            if ($chart.length > 0) {
+                $chart.trigger('update');
             }
         },
 
@@ -264,12 +229,12 @@ define([
          * Trigger remove action
          */
         onRemoveFromDashboard: function() {
-            var that = this,
-                confirm = new DeleteConfirmation({
+            var that = this;
+            var confirm = new DeleteConfirmation({
                 content: __('oro.dashboard.widget.delete_confirmation')
             });
-            
-            confirm.on('ok', function () {
+
+            confirm.on('ok', function() {
                 that.trigger('removeFromDashboard', that.$el, that);
                 mediator.trigger('widget:dashboard:removeFromDashboard:' + that.getWid(), that.$el, that);
             });

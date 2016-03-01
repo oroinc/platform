@@ -11,9 +11,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
- * @ORM\Table(name="oro_tracking_website", indexes={
- *     @ORM\Index(name="website_identifier_idx", columns={"identifier"})
- * })
+ * @ORM\Table(name="oro_tracking_website")
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
@@ -33,6 +31,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          "organization_field_name"="organization",
  *          "organization_column_name"="organization_id"
  *      },
+ *      "grid"={
+ *          "default"="website-grid"
+ *     }
  *  }
  * )
  */

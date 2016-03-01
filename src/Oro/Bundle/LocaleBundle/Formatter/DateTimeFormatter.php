@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\Formatter;
 
-use Symfony\Bundle\FrameworkBundle\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
@@ -14,17 +14,17 @@ class DateTimeFormatter
     /** @var LocaleSettings */
     protected $localeSettings;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     private $translator;
 
     /**
-     * @param LocaleSettings $localeSettings
-     * @param Translator $translator
+     * @param LocaleSettings      $localeSettings
+     * @param TranslatorInterface $translator
      */
-    public function __construct(LocaleSettings $localeSettings, Translator $translator)
+    public function __construct(LocaleSettings $localeSettings, TranslatorInterface $translator)
     {
         $this->localeSettings = $localeSettings;
-        $this->translator = $translator;
+        $this->translator     = $translator;
     }
 
     /**
@@ -100,12 +100,14 @@ class DateTimeFormatter
     /**
      * Get the pattern used for the IntlDateFormatter
      *
-     * @param int|string $dateType Constant of IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
-     * @param int|string $timeType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
+     * @param int|string  $dateType Constant of IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
+     * @param int|string  $timeType Constant IntlDateFormatter (NONE, FULL, LONG, MEDIUM, SHORT) or it's string name
      * @param string|null $locale
+     * @param string|null $value
+     *
      * @return string
      */
-    public function getPattern($dateType, $timeType, $locale = null)
+    public function getPattern($dateType, $timeType, $locale = null, $value = null)
     {
         if (!$locale) {
             $locale = $this->localeSettings->getLocale();
@@ -131,15 +133,17 @@ class DateTimeFormatter
      *
      * @param string|int|null $dateType
      * @param string|int|null $timeType
-     * @param string|null $locale
-     * @param string|null $timeZone
-     * @param string|null $pattern
+     * @param string|null     $locale
+     * @param string|null     $timeZone
+     * @param string|null     $pattern
+     * @param string|null     $value
+     *
      * @return \IntlDateFormatter
      */
-    protected function getFormatter($dateType, $timeType, $locale, $timeZone, $pattern)
+    protected function getFormatter($dateType, $timeType, $locale, $timeZone, $pattern, $value = null)
     {
         if (!$pattern) {
-            $pattern = $this->getPattern($dateType, $timeType, $locale);
+            $pattern = $this->getPattern($dateType, $timeType, $locale, $value);
         }
         return new \IntlDateFormatter(
             $this->localeSettings->getLanguage(),

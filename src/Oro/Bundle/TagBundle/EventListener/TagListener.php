@@ -2,42 +2,29 @@
 
 namespace Oro\Bundle\TagBundle\EventListener;
 
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Event\LifecycleEventArgs;
 
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 
-use Oro\Bundle\TagBundle\Entity\Taggable;
+use Oro\Bundle\TagBundle\Entity\TagManager;
 
-/**
- * TagListener.
- */
 class TagListener implements ContainerAwareInterface
 {
-    protected $manager;
+    /** @var TagManager */
+    protected $tagManager;
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @param LifecycleEventArgs $args
-     */
-    public function preRemove(LifecycleEventArgs $args)
-    {
-        if (is_null($this->manager) && $this->container) {
-            $this->manager = $this->container->get('oro_tag.tag.manager');
-        }
+    /** @var TaggableHelper */
+    protected $taggableHelper;
 
-        if (($resource = $args->getEntity()) && $resource instanceof Taggable) {
-            $this->manager->deleteTaggingByParams(
-                null,
-                ClassUtils::getClass($resource),
-                $resource->getTaggableId()
-            );
-        }
+    /** @param TaggableHelper $helper */
+    public function __construct(TaggableHelper $helper)
+    {
+        $this->taggableHelper = $helper;
     }
 
     /**
@@ -46,5 +33,19 @@ class TagListener implements ContainerAwareInterface
     public function setContainer(ContainerInterface $container = null)
     {
         $this->container = $container;
+    }
+
+    /**
+     * @param LifecycleEventArgs $args
+     */
+    public function preRemove(LifecycleEventArgs $args)
+    {
+        $entity = $args->getEntity();
+        if ($this->taggableHelper->isTaggable($entity)) {
+            if ((null === $this->tagManager) && $this->container) {
+                $this->tagManager = $this->container->get('oro_tag.tag.manager');
+            }
+            $this->tagManager->deleteTagging($entity, []);
+        }
     }
 }

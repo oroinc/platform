@@ -120,13 +120,7 @@ class EnumTypeHelper extends ConfigTypeHelper
         $extendConfigProvider = $this->configManager->getProvider('extend');
         $entityConfigs        = $extendConfigProvider->getConfigs(null, true);
         foreach ($entityConfigs as $entityConfig) {
-            if (!$entityConfig->is('inherit', ExtendHelper::BASE_ENUM_VALUE_CLASS)) {
-                continue;
-            }
-            if ($entityConfig->in('state', [ExtendScope::STATE_NEW, ExtendScope::STATE_DELETE])) {
-                continue;
-            }
-            if ($entityConfig->is('is_deleted')) {
+            if (!ExtendHelper::isEnumValueEntityAccessible($entityConfig)) {
                 continue;
             }
 

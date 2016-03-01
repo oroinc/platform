@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var WidgetConfigDatetimeRangeFilter,
-        DateFilter = require('oro/filter/date-filter'),
-        tools = require('oroui/js/tools');
+    var WidgetConfigDatetimeRangeFilter;
+    var DateFilter = require('oro/filter/date-filter');
+    var tools = require('oroui/js/tools');
 
     WidgetConfigDatetimeRangeFilter = DateFilter.extend({
         /**
@@ -18,7 +16,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        _formatRawValue: function (value) {
+        _formatRawValue: function(value) {
             if (value.value && value.value.start) {
                 value.value.start = this._toRawValue(value.value.start);
 
@@ -36,7 +34,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        setValue: function (value) {
+        setValue: function(value) {
             var oldValue = this.value;
             this.value = tools.deepClone(value);
             this._onValueUpdated(this.value, oldValue);

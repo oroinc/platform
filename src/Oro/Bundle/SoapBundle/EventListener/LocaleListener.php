@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\SoapBundle\EventListener;
 
+use Gedmo\Translatable\TranslatableListener;
+
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
@@ -11,6 +14,20 @@ class LocaleListener implements EventSubscriberInterface
 {
     const API_PREFIX = '/api/rest/';
 
+    /** @var TranslatableListener */
+    private $translatableListener = false;
+
+    /** @var ContainerInterface */
+    private $container;
+
+    /**
+     * @param ContainerInterface $container
+     */
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
+    }
+
     /**
      * @param GetResponseEvent $event
      */
@@ -18,9 +35,10 @@ class LocaleListener implements EventSubscriberInterface
     {
         $request = $event->getRequest();
 
-        $locale = $request->query->get('locale');
+        $locale = str_replace('-', '_', $request->query->get('locale'));
         if ($locale && $this->isApiRequest($request)) {
-            $request->setLocale(str_replace('-', '_', $locale));
+            $request->setLocale($locale);
+            $this->getTranslatableListener()->setTranslatableLocale($locale);
         }
     }
 
@@ -43,5 +61,17 @@ class LocaleListener implements EventSubscriberInterface
             // must be registered after Symfony's original LocaleListener
             KernelEvents::REQUEST  => array(array('onKernelRequest', -17)),
         );
+    }
+
+    /**
+     * @return TranslatableListener
+     */
+    protected function getTranslatableListener()
+    {
+        if ($this->translatableListener === false) {
+            $this->translatableListener = $this->container->get('stof_doctrine_extensions.listener.translatable');
+        }
+
+        return $this->translatableListener;
     }
 }

@@ -4,9 +4,11 @@ namespace Oro\Bundle\EntityBundle\EventListener;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Event\BuildAfter;
 use Oro\Bundle\DataGridBundle\Event\BuildBefore;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 
 class EntityRelationGridListener
@@ -14,15 +16,20 @@ class EntityRelationGridListener
     /** @var ConfigManager */
     protected $configManager;
 
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var Request */
     protected $request;
 
     /**
-     * @param ConfigManager $configManager
+     * @param ConfigManager  $configManager
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(ConfigManager $configManager)
+    public function __construct(ConfigManager $configManager, DoctrineHelper $doctrineHelper)
     {
-        $this->configManager = $configManager;
+        $this->configManager  = $configManager;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -37,6 +44,7 @@ class EntityRelationGridListener
 
     /**
      * @param BuildBefore $event
+     *
      * @return bool
      */
     public function onBuildBefore(BuildBefore $event)
@@ -57,7 +65,7 @@ class EntityRelationGridListener
             $extendFieldConfig->get('target_title'),
             $extendFieldConfig->get('target_detailed')
         );
-
+        $targetIdField    = $this->doctrineHelper->getSingleEntityIdentifierFieldName($targetEntityName);
         // build 'assigned' field expression
         if ($entityId) {
             $extendEntityConfig = $extendConfigProvider->getConfig($entityClassName);
@@ -65,18 +73,23 @@ class EntityRelationGridListener
             $relation           = $relations[$extendFieldConfig->get('relation_key')];
             $targetFieldName    = $relation['target_field_id']->getFieldName();
             $fieldType          = $extendFieldConfig->getId()->getFieldType();
-            $operator           = $fieldType == 'oneToMany' ? '=' : 'MEMBER OF';
-            $whenExpr           = '(:relation ' . $operator . ' o.' . $targetFieldName . ' OR o.id IN (:data_in))'
-                . ' AND o.id NOT IN (:data_not_in)';
+            $operator           = $fieldType === RelationType::ONE_TO_MANY ? '=' : 'MEMBER OF';
+            $whenExpr           = sprintf(
+                '(:relation %s o.%s OR o.%s IN (:data_in)) AND o.%s NOT IN (:data_not_in)',
+                $operator,
+                $targetFieldName,
+                $targetIdField,
+                $targetIdField
+            );
         } else {
-            $whenExpr = 'o.id IN (:data_in) AND o.id NOT IN (:data_not_in)';
+            $whenExpr = sprintf('o.%s IN (:data_in) AND o.%s NOT IN (:data_not_in)', $targetIdField, $targetIdField);
         }
-        $assignedExpr = "CASE WHEN " . $whenExpr . " THEN true ELSE false END";
+        $assignedExpr = 'CASE WHEN ' . $whenExpr . ' THEN true ELSE false END';
 
         // build a query skeleton
         $query = [
             'select' => [
-                'o.id',
+                sprintf('o.%s AS id', $targetIdField),
                 $assignedExpr . ' as assigned'
             ],
             'from'   => [

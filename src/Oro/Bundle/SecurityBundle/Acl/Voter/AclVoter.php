@@ -2,25 +2,17 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Voter;
 
-use Doctrine\Common\Util\ClassUtils;
-
-use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Voter\AclVoter as BaseAclVoter;
 use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
 
 /**
  * This voter uses ACL to determine whether the access to the particular resource is granted or not.
@@ -64,17 +56,9 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     protected $triggeredMask;
 
     /**
-     * @var ConfigProvider
+     * @var AclGroupProviderInterface
      */
-    protected $configProvider;
-
-    /**
-     * @param ConfigProvider $configProvider
-     */
-    public function setConfigProvider(ConfigProvider $configProvider)
-    {
-        $this->configProvider = $configProvider;
-    }
+    protected $groupProvider;
 
     /**
      * Sets the ACL extension selector
@@ -84,6 +68,14 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     public function setAclExtensionSelector(AclExtensionSelector $selector)
     {
         $this->extensionSelector = $selector;
+    }
+
+    /**
+     * @param AclGroupProviderInterface $provider
+     */
+    public function setAclGroupProvider(AclGroupProviderInterface $provider)
+    {
+        $this->groupProvider = $provider;
     }
 
     /**
@@ -113,8 +105,10 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             ? $object->getDomainObject()
             : $object;
 
+        list($this->object, $group) = $this->separateAclGroupFromObject($this->object);
+
         try {
-            $this->extension = $this->extensionSelector->select($object);
+            $this->extension = $this->extensionSelector->select($this->object);
         } catch (InvalidDomainObjectException $e) {
             return self::ACCESS_ABSTAIN;
         }
@@ -127,10 +121,12 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
             }
         }
 
-        $result = parent::vote($token, $object, $attributes);
+        //check acl group
+        $result = $this->checkAclGroup($attributes, $group);
 
-        //check organization context
-        $result = $this->checkOrganizationContext($result);
+        if ($result !== self::ACCESS_DENIED) {
+            $result = parent::vote($token, $this->object, $attributes);
+        }
 
         $this->extension = null;
         $this->object = null;
@@ -188,47 +184,52 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     }
 
     /**
-     * Check organization. If user try to access entity what was created in organization this user do not have access -
-     *  deny access
-     *
-     * @param int $result
+     * @param mixed $object
+     * @return array
+     */
+    protected function separateAclGroupFromObject($object)
+    {
+        $group = null;
+
+        if ($object instanceof ObjectIdentity) {
+            $type = $object->getType();
+
+            $delim = strpos($type, '@');
+            if ($delim) {
+                $object = new ObjectIdentity($this->object->getIdentifier(), ltrim(substr($type, $delim + 1), ' '));
+                $group = ltrim(substr($type, 0, $delim), ' ');
+            } else {
+                $group = AclGroupProviderInterface::DEFAULT_SECURITY_GROUP;
+            }
+        }
+
+        return [$object, $group];
+    }
+
+    /**
+     * @param array $attributes
+     * @param string $group
      * @return int
      */
-    protected function checkOrganizationContext($result)
+    protected function checkAclGroup(array $attributes, $group)
     {
-        $object = $this->object;
-        $token = $this->securityToken;
+        if ($group === null || !$this->groupProvider || !$this->object) {
+            return self::ACCESS_ABSTAIN;
+        }
 
-        if ($token instanceof OrganizationContextTokenInterface
-            && $result === self::ACCESS_GRANTED
-            && $this->extension instanceof EntityAclExtension
-            && is_object($object)
-            && !($object instanceof ObjectIdentity)
-        ) {
-            $className = ClassUtils::getClass($object);
-            if ($this->configProvider->hasConfig($className)) {
-                $config = $this->configProvider->getConfig($className);
-                $accessLevel = $this->extension->getAccessLevel($this->triggeredMask);
-                // we need to check organization in case if Access level is not system,
-                // or then access level and owner type of test object is User or Business Unit (in this owner types we
-                // do not allow to use System access level)
-                // (do not allow to manipulate records from another organization)
-                if (($accessLevel < AccessLevel::SYSTEM_LEVEL)
-                    || (
-                        $accessLevel === AccessLevel::SYSTEM_LEVEL
-                        && in_array($config->get('owner_type'), ['USER', 'BUSINESS_UNIT'])
-                    )
-                ) {
-                    if ($config->has('organization_field_name')) {
-                        $accessor = PropertyAccess::createPropertyAccessor();
-                        /** @var Organization $objectOrganization */
-                        $objectOrganization = $accessor->getValue($object, $config->get('organization_field_name'));
-                        if ($objectOrganization
-                            && $objectOrganization->getId() !== $token->getOrganizationContext()->getId()
-                        ) {
-                            $result = self::ACCESS_DENIED;
-                        }
-                    }
+        $result = self::ACCESS_DENIED;
+        if ($group === $this->groupProvider->getGroup()) {
+            $result = self::ACCESS_ABSTAIN;
+
+            $permissions = $this->extension->getPermissions(null, false, true);
+            foreach ($attributes as $attribute) {
+                if (!$this->supportsAttribute($attribute)) {
+                    continue;
+                }
+
+                if (!in_array($attribute, $permissions, true)) {
+                    $result = self::ACCESS_DENIED;
+                    break;
                 }
             }
         }

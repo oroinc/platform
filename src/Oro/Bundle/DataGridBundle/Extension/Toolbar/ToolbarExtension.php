@@ -20,6 +20,7 @@ class ToolbarExtension extends AbstractExtension
     const TOOLBAR_OPTION_PATH                  = '[options][toolbarOptions]';
     const PAGER_ITEMS_OPTION_PATH              = '[options][toolbarOptions][pageSize][items]';
     const PAGER_DEFAULT_PER_PAGE_OPTION_PATH   = '[options][toolbarOptions][pageSize][default_per_page]';
+    const PAGER_ONE_PAGE_OPTION_PATH           = '[options][toolbarOptions][pagination][onePage]';
     const TURN_OFF_TOOLBAR_RECORDS_NUMBER_PATH = '[options][toolbarOptions][turnOffToolbarRecordsNumber]';
     const TOOLBAR_PAGINATION_HIDE_OPTION_PATH  = '[options][toolbarOptions][pagination][hide]';
 
@@ -81,6 +82,7 @@ class ToolbarExtension extends AbstractExtension
          *       ],
          *      'pagination' => [
          *          'hide' => false,
+         *          'onePage' => false,
          *      ]
          *  ];
          */
@@ -116,6 +118,11 @@ class ToolbarExtension extends AbstractExtension
                 $options[MetadataObject::REQUIRED_MODULES_KEY]
             );
             unset($options[MetadataObject::REQUIRED_MODULES_KEY]);
+        }
+
+        // in case of one page pagination page selector should be hidden
+        if ($config->offsetGetByPath(self::PAGER_ONE_PAGE_OPTION_PATH, false)) {
+            $options['toolbarOptions']['pageSize']['hide'] = true;
         }
 
         // grid options passed under "options" node

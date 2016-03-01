@@ -1,12 +1,10 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
     './abstract-filter',
     'orofilter/js/multiselect-decorator'
-], function ($, _, __, AbstractFilter, MultiselectDecorator) {
+], function($, _, __, AbstractFilter, MultiselectDecorator) {
     'use strict';
 
     var SelectFilter;
@@ -86,6 +84,13 @@ define([
         },
 
         /**
+         * Selector, jQuery object or HTML element that will be target for append multiselect dropdown menu
+         *
+         * @property
+         */
+        dropdownContainer: 'body',
+
+        /**
          * Select widget menu opened flag
          *
          * @property
@@ -106,8 +111,7 @@ define([
             'keydown select': '_preventEnterProcessing',
             'click .filter-select': '_onClickFilterArea',
             'click .disable-filter': '_onClickDisableFilter',
-            'change select': '_onSelectChange',
-            'click .reset-filter': '_onClickResetFilter'
+            'change select': '_onSelectChange'
         },
 
         /**
@@ -115,8 +119,8 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
-            var opts = _.pick(options || {}, 'choices');
+        initialize: function(options) {
+            var opts = _.pick(options || {}, ['choices', 'dropdownContainer']);
             _.extend(this, opts);
 
             // init filter content options if it was not initialized so far
@@ -124,7 +128,7 @@ define([
                 this.choices = [];
             }
             // temp code to keep backward compatible
-            this.choices = _.map(this.choices, function (option, i) {
+            this.choices = _.map(this.choices, function(option, i) {
                 return _.isString(option) ? {value: i, label: option} : option;
             });
 
@@ -141,7 +145,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -156,7 +160,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             var options = this.choices.slice(0);
             if (this.populateDefault) {
                 options.unshift({value: '', label: this.placeholder});
@@ -164,11 +168,9 @@ define([
 
             this.setElement((
                 this.template({
-                    label: this.label,
+                    label: this.labelPrefix + this.label,
                     showLabel: this.showLabel,
                     options: options,
-                    placeholder: this.placeholder,
-                    nullLink: this.nullLink,
                     canDisable: this.canDisable,
                     selected: _.extend({}, this.emptyValue, this.value),
                     isEmpty: this.isEmpty()
@@ -181,43 +183,59 @@ define([
         },
 
         /**
+         * Set dropdownContainer for dropdown element
+         *
+         * @param {(jQuery|Element|String)} container
+         * @protected
+         */
+        setDropdownContainer: function(container) {
+            this.dropdownContainer = $(container);
+        },
+
+        /**
          * Initialize multiselect widget
          *
          * @protected
          */
-        _initializeSelectWidget: function () {
+        _initializeSelectWidget: function() {
+            var $dropdownContainer = this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer;
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
                     noneSelectedText: this.placeholder,
-                    selectedText: _.bind(function (numChecked, numTotal, checkedItems) {
+                    selectedText: _.bind(function(numChecked, numTotal, checkedItems) {
                         return this._getSelectedText(checkedItems);
                     }, this),
                     position: {
                         my: 'left top+7',
                         at: 'left bottom',
-                        of: this.$(this.containerSelector)
+                        of: this.$(this.containerSelector),
+                        collision: 'fit none',
+                        within: $dropdownContainer
                     },
-                    open: _.bind(function () {
+                    open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
                         this._setButtonPressed(this.$(this.containerSelector), true);
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
+                        this.selectWidget.updateDropdownPosition();
                     }, this),
-                    close: _.bind(function () {
+                    close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
-                        setTimeout(_.bind(function () {
-                            this.selectDropdownOpened = false;
+                        setTimeout(_.bind(function() {
+                            if (!this.disposed) {
+                                this.selectDropdownOpened = false;
+                            }
                         }, this), 100);
-                    }, this)
+                    }, this),
+                    appendTo: this.dropdownContainer
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
             });
 
             this.selectWidget.setViewDesign(this);
-            this.$(this.buttonSelector).append('<span class="caret"></span>');
-            this.selectWidget.getWidget().on('keyup', _.bind(function (e) {
+            this.selectWidget.getWidget().on('keyup', _.bind(function(e) {
                 if (e.keyCode === 27) {
                     this._onClickFilterArea(e);
                 }
@@ -229,7 +247,7 @@ define([
          *
          * @protected
          */
-        _clearChoicesStyle: function () {
+        _clearChoicesStyle: function() {
             var labels = this.selectWidget.getWidget().find('label');
             labels.removeClass('ui-state-hover');
             if (_.isEmpty(this.value.value)) {
@@ -243,13 +261,13 @@ define([
          * @param {Array} checkedItems
          * @protected
          */
-        _getSelectedText: function (checkedItems) {
+        _getSelectedText: function(checkedItems) {
             if (_.isEmpty(checkedItems)) {
                 return this.placeholder;
             }
 
             var elements = [];
-            _.each(checkedItems, function (element) {
+            _.each(checkedItems, function(element) {
                 var title = element.getAttribute('title');
                 if (title) {
                     elements.push(title);
@@ -263,10 +281,10 @@ define([
          *
          * @return {String}
          */
-        _getCriteriaHint: function () {
+        _getCriteriaHint: function() {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
-            var choice = _.find(this.choices, function (c) {
-                return (c.value == value.value);
+            var choice = _.find(this.choices, function(c) {
+                return (c.value === value.value);
             });
             return !_.isUndefined(choice) ? choice.label : this.placeholder;
         },
@@ -276,13 +294,13 @@ define([
          *
          * @protected
          */
-        _setDropdownWidth: function () {
+        _setDropdownWidth: function() {
             if (!this.cachedMinimumWidth) {
                 this.cachedMinimumWidth = this.selectWidget.getMinimumDropdownWidth() + 24;
             }
-            var widget = this.selectWidget.getWidget(),
-                filterWidth = this.$(this.containerSelector).width(),
-                requiredWidth = Math.max(filterWidth + 24, this.cachedMinimumWidth);
+            var widget = this.selectWidget.getWidget();
+            var filterWidth = this.$(this.containerSelector).width();
+            var requiredWidth = Math.max(filterWidth + 24, this.cachedMinimumWidth);
             widget.width(requiredWidth).css('min-width', requiredWidth + 'px');
             widget.find('input[type="search"]').width(requiredWidth - 30);
         },
@@ -293,13 +311,13 @@ define([
          * @param {Event} e
          * @protected
          */
-        _onClickFilterArea: function (e) {
+        _onClickFilterArea: function(e) {
             if (!this.selectDropdownOpened) {
-                setTimeout(_.bind(function () {
+                setTimeout(_.bind(function() {
                     this.selectWidget.multiselect('open');
                 }, this), 50);
             } else {
-                setTimeout(_.bind(function () {
+                setTimeout(_.bind(function() {
                     this.selectWidget.multiselect('close');
                 }, this), 50);
             }
@@ -312,7 +330,7 @@ define([
          *
          * @protected
          */
-        _onSelectChange: function () {
+        _onSelectChange: function() {
             // set value
             this.applyValue();
             // update dropdown
@@ -324,7 +342,7 @@ define([
          *
          * @param {Event} e
          */
-        _onClickDisableFilter: function (e) {
+        _onClickDisableFilter: function(e) {
             e.preventDefault();
             this.disable();
         },
@@ -332,17 +350,15 @@ define([
         /**
          * @inheritDoc
          */
-        _onValueUpdated: function (newValue, oldValue) {
+        _onValueUpdated: function(newValue, oldValue) {
             SelectFilter.__super__._onValueUpdated.apply(this, arguments);
             this.selectWidget.multiselect('refresh');
-            this.$(this.buttonSelector)
-                .toggleClass('filter-default-value', this.isEmpty());
         },
 
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function (value) {
+        _writeDOMValue: function(value) {
             this._setInputValue(this.inputSelector, value.value);
             return this;
         },
@@ -350,7 +366,7 @@ define([
         /**
          * @inheritDoc
          */
-        _readDOMValue: function () {
+        _readDOMValue: function() {
             return {
                 value: this._getInputValue(this.inputSelector)
             };

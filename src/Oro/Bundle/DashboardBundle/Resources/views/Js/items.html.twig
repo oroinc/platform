@@ -1,0 +1,41 @@
+<script id="widget-items-item-select-template" type="text/template">
+    <div class="pull-left items-selector-widget">
+        <select class="item-select filter-select-oro">
+            <option></option>
+            <% items.each(function (item) { %>
+                <option value="<%= item.get('id') %>"><%= item.get('label') %></option>
+            <% }); %>
+        </select>
+    </div>
+</script>
+
+<script id="widget-items-item-template" type="text/template">
+    <tr data-cid="<%= cid %>">
+        <td><%= label %></td>
+        <td class="action-cell">
+            <input type="hidden" name="<%= namePrefix %>[id]" value="<%= id %>">
+            <input data-name="order" type="hidden" class="order" name="<%= namePrefix %>[order]" value="<%= order %>">
+            <input class="hide" data-name="show" type="checkbox" name="<%= namePrefix %>[show]" <%= show ? 'checked' : '' %>>
+            <% if (_.isMobile()) { %>
+            <span class="btn delete-button" data-collection-action="delete" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
+                <i class="icon-trash hide-text"></i>
+            </span>
+            <span class="btn move-up<% if (isFirst) { %> disabled<% } %>" data-collection-action="moveUp" title="{{ 'oro.dashboard.datagrid.actions.move_column_up.label'|trans }}">
+                <i class="icon-chevron-up"></i>
+            </span>
+            <span class="btn move-down<% if (isLast) { %> disabled<% } %>" data-collection-action="moveDown" title="{{ 'oro.dashboard.datagrid.actions.move_column_down.label'|trans }}">
+                <i class="icon-chevron-down"></i>
+            </span>
+            <% } else { %>
+            <a href="javascript: void(0);" class="action no-hash delete-button"
+               title="{{ 'oro.dashboard.datagrid.actions.delete.label'|trans }}"
+               data-collection-action="delete">
+                <i class="icon-trash hide-text"></i>
+            </a>
+            <span title="{{ 'oro.dashboard.datagrid.actions.move_column.label'|trans }}">
+                <i class="icon-resize-vertical handle"></i>
+            </span>
+            <% } %>
+        </td>
+    </tr>
+</script>

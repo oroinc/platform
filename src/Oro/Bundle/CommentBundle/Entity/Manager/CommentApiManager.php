@@ -9,7 +9,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityNotFoundException;
 use Doctrine\ORM\QueryBuilder;
 
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
@@ -52,21 +52,21 @@ class CommentApiManager extends ApiEntityManager
     protected $configManager;
 
     /**
-     * @param Registry           $doctrine
-     * @param SecurityFacade     $securityFacade
-     * @param EntityNameResolver $entityNameResolver
-     * @param Pager              $pager
-     * @param EventDispatcher    $eventDispatcher
-     * @param AttachmentManager  $attachmentManager
-     * @param AclHelper          $aclHelper
-     * @param ConfigManager      $configManager
+     * @param Registry                 $doctrine
+     * @param SecurityFacade           $securityFacade
+     * @param EntityNameResolver       $entityNameResolver
+     * @param Pager                    $pager
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param AttachmentManager        $attachmentManager
+     * @param AclHelper                $aclHelper
+     * @param ConfigManager            $configManager
      */
     public function __construct(
         Registry $doctrine,
         SecurityFacade $securityFacade,
         EntityNameResolver $entityNameResolver,
         Pager $pager,
-        EventDispatcher $eventDispatcher,
+        EventDispatcherInterface $eventDispatcher,
         AttachmentManager $attachmentManager,
         AclHelper $aclHelper,
         ConfigManager $configManager

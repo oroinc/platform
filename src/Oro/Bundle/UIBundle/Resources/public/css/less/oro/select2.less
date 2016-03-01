@@ -19,11 +19,11 @@ Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
   .select2-choice {
     display: block;
     height: 28px;
-    padding: 0 0 0 8px;
+    padding: 0;
     overflow: hidden;
     position: relative;
     white-space: nowrap;
-    line-height: 28px;
+    line-height: 1em;
     color: #444;
     text-decoration: none;
     -webkit-background-clip: padding-box;
@@ -35,8 +35,15 @@ Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
     -moz-user-select: none;
     -ms-user-select: none;
     user-select: none;
+    &.select2-default .select2-chosen {
+      color: #666;
+    }
     img{
       max-width: 16px;
+      margin-top: -2px;
+      display: block;
+      float: left;
+      margin-right: 2px;
     }
     &:focus {
       border: none !important;
@@ -102,6 +109,19 @@ Version: 3.4.1 Timestamp: Thu Jun 27 18:02:10 PDT 2013
   */
   .border-radius(3px);
   .box-sizing(border-box);
+}
+
+.select2-drop {
+  .select2__result-entry-info {
+    font-style: italic;
+    color: #999;
+  }
+  .select2-highlighted {
+    .select2__result-entry-info {
+      color: lightblue;
+      font-style: italic;
+    }
+  }
 }
 
 .select2-drop-undermask,
@@ -306,12 +326,18 @@ body .select2-dropdown-open {
       padding-left: 125px
     }
   }
+  .select2-no-results, .select2-searching, .select2-selection-limit {
+    background-color: initial !important;
+  }
   li {
     list-style: none;
     display: list-item;
     background-image: none;
     &.select2-result-with-children > .select2-result-label {
       font-weight: bold;
+    }
+    &.hide {
+        display: none;
     }
     em {
       background: #feffde;
@@ -407,7 +433,7 @@ disabled look for disabled choices in the results dropdown
   height: 1%;
   margin: 0;
   padding: 0;
-  min-height: 26px;
+  min-height: 28px;
   position: relative;
   cursor: text;
   overflow: hidden;
@@ -428,7 +454,7 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-container-multi .select2-choices .select2-search-field input {
-  padding:3px 5px;
+  padding: 3px 5px 1px;
   margin: 1px 0;
   font-family:@baseFontFamily;
   font-size: 100%;
@@ -489,7 +515,13 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-container a.select2-choice .select2-chosen {
-  padding-right: 30px;
+  padding: 8px 30px 7px 8px;
+  & > i[class^=icon-] {
+    height: 16px;
+    margin-top: -3px;
+    vertical-align: middle;
+    float: left;
+  }
 }
 
 .select2-search-choice-close {

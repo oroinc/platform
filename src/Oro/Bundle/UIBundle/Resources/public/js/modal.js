@@ -1,14 +1,15 @@
-/*global define*/
 define([
     'underscore',
     'backbone',
     'orotranslation/js/translator',
+    'oroui/js/mediator',
+    'oroui/js/tools',
     'backbone-bootstrap-modal'
-], function (_, Backbone, __) {
+], function(_, Backbone, __, mediator, tools) {
     'use strict';
 
-    var Modal, $;
-    $ = Backbone.$;
+    var Modal;
+    var $ = Backbone.$;
 
     /**
      * Implementation of Bootstrap Modal
@@ -26,9 +27,9 @@ define([
         },
 
         /** @property {String} */
-        className: 'modal',
+        className: 'modal oro-modal-normal',
 
-        initialize: function (options) {
+        initialize: function(options) {
             options = options || {};
             _.defaults(options, this.defaults);
 
@@ -38,7 +39,7 @@ define([
             Modal.__super__.initialize.call(this, options);
         },
 
-        onClose: function (event) {
+        onClose: function(event) {
             event.preventDefault();
 
             this.trigger('close');
@@ -53,12 +54,14 @@ define([
          *
          * @param {Function} [cb]     Optional callback that runs only when OK is pressed.
          */
-        open: function (cb) {
-            if (!this.isRendered) this.render();
+        open: function(cb) {
+            if (!this.isRendered) {
+                this.render();
+            }
             this.delegateEvents();
 
-            var self = this,
-                $el = this.$el;
+            var self = this;
+            var $el = this.$el;
 
             //Create it
             $el.modal(_.extend({
@@ -67,7 +70,7 @@ define([
             }, this.options.modalOptions));
 
             //Focus OK button
-            $el.one('shown', function () {
+            $el.one('shown', function() {
                 if (self.options.focusOk) {
                     $el.find('.btn.ok').focus();
                 }
@@ -80,16 +83,16 @@ define([
             });
 
             //Adjust the modal and backdrop z-index; for dealing with multiple modals
-            var numModals = Backbone.BootstrapModal.count,
-                $backdrop = $('.modal-backdrop:eq(' + numModals + ')'),
-                backdropIndex = parseInt($backdrop.css('z-index'), 10),
-                elIndex = parseInt($backdrop.css('z-index'), 10) + 1;
+            var numModals = Backbone.BootstrapModal.count;
+            var $backdrop = $('.modal-backdrop:eq(' + numModals + ')');
+            var backdropIndex = parseInt($backdrop.css('z-index'), 10);
+            var elIndex = parseInt($backdrop.css('z-index'), 10) + 1;
 
             $backdrop.css('z-index', backdropIndex + numModals);
             this.$el.css('z-index', elIndex + numModals);
 
             if (this.options.allowCancel) {
-                $backdrop.one('click', function () {
+                $backdrop.one('click', function() {
                     if (self.options.content && self.options.content.trigger) {
                         self.options.content.trigger('cancel', self);
                     }
@@ -97,24 +100,27 @@ define([
                     self.trigger('cancel');
                 });
 
-                $(document).one('keyup.dismiss.modal' + this._eventNamespace(), function (e) {
+                $(document).one('keyup.dismiss.modal' + this._eventNamespace(), function(e) {
+                    if (e.which !== 27) {
+                        return;
+                    }
                     if (self.options.handleClose) {
-                        e.which === 27 && self.trigger('close');
+                        self.trigger('close');
                     } else {
-                        e.which === 27 && self.trigger('cancel');
+                        self.trigger('cancel');
                     }
 
                     if (self.options.content && self.options.content.trigger) {
-                        e.which === 27 && self.options.content.trigger('shown', self);
+                        self.options.content.trigger('shown', self);
                     }
                 });
             }
 
-            this.once('cancel', function () {
+            this.once('cancel', function() {
                 self.close();
             });
 
-            this.once('close', function () {
+            this.once('close', function() {
                 self.close();
             });
 
@@ -125,9 +131,15 @@ define([
                 self.on('ok', cb);
             }
 
-            this.once('cancel', _.bind(function () {
+            this.once('cancel', _.bind(function() {
                 this.$el.trigger('hidden');
             }, this));
+
+            if (tools.isMobile()) {
+                this._fixHeightForMobile();
+                $(window).on('resize' + this._eventNamespace(), _.bind(this._fixHeightForMobile, this));
+            }
+            mediator.trigger('modal:open', this);
 
             return this;
         },
@@ -135,19 +147,29 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        close: function() {
+            Modal.__super__.close.call(this);
+            $(document).off(this._eventNamespace());
+            $(window).off(this._eventNamespace());
+            this.stopListening();
+            mediator.trigger('modal:close', this);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
             delete this.$content;
-            $(document).off(this._eventNamespace());
             Modal.__super__.dispose.call(this);
         },
 
         /**
          * Updates content of modal dialog
          */
-        setContent: function (content) {
+        setContent: function(content) {
             this.options.content = content;
             this.$el.find('.modal-body').html(content);
         },
@@ -158,8 +180,18 @@ define([
          * @returns {string}
          * @protected
          */
-        _eventNamespace: function () {
+        _eventNamespace: function() {
             return '.delegateEvents' + this.cid;
+        },
+
+        _fixHeightForMobile: function() {
+            this.$('.modal-body').height('auto');
+            var clientHeight = this.$el[0].clientHeight;
+            if (clientHeight < this.$el[0].scrollHeight) {
+                this.$('.modal-body').height(clientHeight -
+                    this.$('.modal-header').outerHeight() -
+                    this.$('.modal-footer').outerHeight());
+            }
         }
     });
 

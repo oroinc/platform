@@ -68,7 +68,7 @@ App modules are atomic parts of general application, responsible for:
  * register handlers in `mediator` (see [Chaplin.mediator](http://docs.chaplinjs.org/chaplin.mediator.html));
  * and do all actions which precede creating an instance of application.
 
-App modules are not actually modules, they export nothing. It's `requirejs()` just call, which is executed right before the application is started.
+App modules export nothing, they are just callback functions that are executed right before the application is started.
 
 App modules are declared in `requirejs.yml` configuration file, in custom section `appmodules`:
 ```
@@ -82,7 +82,7 @@ This approach allows to define in each bundle code which should be executed on t
 ##### Example 1
 `oroui/js/app/modules/views-module` - declares global views which will be instantiated right before an action point of controller gains control
 ```javascript
-require([
+define([
     'oroui/js/app/controllers/base/controller'
 ], function (BaseController) {
     'use strict';
@@ -104,7 +104,7 @@ require([
 ##### Example 2
 `oroui/js/app/modules/messenger-module` - registers messenger's public methods as handlers in `mediator`
 ```javascript
-require([
+define([
     'oroui/js/mediator',
     'oroui/js/messenger'
 ], function (mediator, messenger) {

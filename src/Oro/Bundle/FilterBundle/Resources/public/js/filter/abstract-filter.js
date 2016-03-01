@@ -1,13 +1,20 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/app/views/base/view',
-    'oroui/js/tools'
-], function ($, _, __, BaseView, tools) {
+    'module',
+    'oroui/js/tools',
+    'orofilter/js/filter-template',
+    'orofilter/js/filter-hint'
+], function($, _, __, BaseView, module, tools, FilterTemplate, FilterHint) {
     'use strict';
+
+    var config = module.config();
+    config = _.extend({
+        placeholder: __('All'),
+        labelPrefix: ''
+    }, config);
 
     var AbstractFilter;
 
@@ -18,31 +25,7 @@ define([
      * @class   oro.filter.AbstractFilter
      * @extends Backbone.View
      */
-    AbstractFilter = BaseView.extend({
-        /**
-         * Template for filter criteria
-         *
-         * @property
-         */
-        template: '',
-
-        /**
-         * Template selector for filter criteria
-         * (should be defined for descendant filter)
-         *
-         * @property
-         */
-        templateSelector: '',
-
-        /**
-         * Filter decoration theme, empty string means default theme.
-         * Gets appended to base templateSelector property
-         *
-         * @property
-         */
-        templateTheme: '',
-
-
+    AbstractFilter = BaseView.extend(_.extend({}, FilterTemplate, {
         /**
          * Is filter can be disabled
          *
@@ -76,7 +59,7 @@ define([
          *
          * @property
          */
-        placeholder: __('All'),
+        placeholder: config.placeholder,
 
         /**
          * Label of filter
@@ -84,6 +67,13 @@ define([
          * @property {String}
          */
         label: __('Input Label'),
+
+        /**
+         * Label prefix of filter
+         *
+         * @property {String}
+         */
+        labelPrefix: config.labelPrefix,
 
         /**
          * Is filter label visible
@@ -100,11 +90,11 @@ define([
         buttonActiveClass: 'open-filter',
 
         /**
-         * Null link value
+         * Element enclosing a criteria dropdown
          *
-         * @property {String}
+         * @property {Array.<string|jQuery|HTMLElement>}
          */
-        nullLink: 'javascript:void(0);',
+        dropdownFitContainers: ['.ui-dialog-content', '#container:visible', 'body'],
 
         /**
          * Initialize.
@@ -112,7 +102,7 @@ define([
          * @param {Object} options
          * @param {Boolean} [options.enabled]
          */
-        initialize: function (options) {
+        initialize: function(options) {
             var opts = _.pick(options || {}, 'enabled', 'canDisable', 'placeholder', 'showLabel', 'label',
                 'templateSelector', 'templateTheme');
             _.extend(this, opts);
@@ -129,12 +119,24 @@ define([
             this.value = tools.deepClone(this.emptyValue);
 
             AbstractFilter.__super__.initialize.apply(this, arguments);
+
+            var hintView = new FilterHint({
+                filter: this
+            });
+
+            this.subview('hint', hintView);
+
+            this.listenTo(hintView, 'reset', this.reset);
+        },
+
+        rendered: function() {
+            this.subview('hint').render();
         },
 
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -148,7 +150,7 @@ define([
          *
          * @return {*}
          */
-        enable: function () {
+        enable: function() {
             if (!this.enabled) {
                 this.enabled = true;
                 this.show();
@@ -162,7 +164,7 @@ define([
          *
          * @return {*}
          */
-        disable: function () {
+        disable: function() {
             if (this.enabled) {
                 this.enabled = false;
                 this.hide();
@@ -177,7 +179,7 @@ define([
          *
          * @return {*}
          */
-        show: function () {
+        show: function() {
             this.$el.css('display', 'inline-block');
             return this;
         },
@@ -187,7 +189,7 @@ define([
          *
          * @return {*}
          */
-        hide: function () {
+        hide: function() {
             this.$el.hide();
             return this;
         },
@@ -197,7 +199,7 @@ define([
          *
          * @return {*}
          */
-        reset: function () {
+        reset: function() {
             this.setValue(this.emptyValue);
             return this;
         },
@@ -207,7 +209,7 @@ define([
          *
          * @return {Object}
          */
-        getValue: function () {
+        getValue: function() {
             return tools.deepClone(this.value);
         },
 
@@ -217,7 +219,7 @@ define([
          * @param value
          * @return {*}
          */
-        setValue: function (value) {
+        setValue: function(value) {
             if (!tools.isEqualsLoosely(this.value, value)) {
                 var oldValue = this.value;
                 this.value = tools.deepClone(value);
@@ -228,6 +230,21 @@ define([
         },
 
         /**
+         * Find element that dropdown of filter should fit to
+         *
+         * @param {string|jQuery|HTMLElement} element
+         * @return {*}
+         */
+        _findDropdownFitContainer: function(element) {
+            element = element || this.$el;
+            var $container = $();
+            for (var i = 0; i < this.dropdownFitContainers.length && $container.length === 0; i += 1) {
+                $container = $(element).closest(this.dropdownFitContainers[i]);
+            }
+            return $container.length === 0 ? null : $container;
+        },
+
+        /**
          * Converts a display value to raw format, e.g. decimal value can be displayed as "5,000,000.00"
          * but raw value is 5000000.0
          *
@@ -235,7 +252,7 @@ define([
          * @return {*}
          * @protected
          */
-        _formatRawValue: function (value) {
+        _formatRawValue: function(value) {
             return value;
         },
 
@@ -246,7 +263,7 @@ define([
          * @return {*}
          * @protected
          */
-        _formatDisplayValue: function (value) {
+        _formatDisplayValue: function(value) {
             return value;
         },
 
@@ -257,19 +274,22 @@ define([
          * @param {*} oldValue
          * @protected
          */
-        _onValueUpdated: function (newValue, oldValue) {
+        _onValueUpdated: function(newValue, oldValue) {
+            this._updateCriteriaHint();
             this._triggerUpdate(newValue, oldValue);
         },
 
         /**
-         * Handles click on filter-item reset button
+         * Updates criteria hint element with actual criteria hint value
          *
-         * @param {jQuery.Event} e
-         * @private
+         * @protected
+         * @return {*}
          */
-        _onClickResetFilter: function (e) {
-            e.stopPropagation();
-            this.reset();
+        _updateCriteriaHint: function() {
+            this.subview('hint').update(this._getCriteriaHint());
+            this.$el.find('.filter-criteria-selector')
+                .toggleClass('filter-default-value', this.isEmptyValue());
+            return this;
         },
 
         /**
@@ -279,7 +299,7 @@ define([
          * @param {*} oldValue
          * @protected
          */
-        _triggerUpdate: function (newValue, oldValue) {
+        _triggerUpdate: function(newValue, oldValue) {
             this.trigger('update');
         },
 
@@ -288,7 +308,7 @@ define([
          *
          * @return {Boolean}
          */
-        isEmpty: function () {
+        isEmpty: function() {
             return tools.isEqualsLoosely(this.getValue(), this.emptyValue);
         },
 
@@ -300,7 +320,7 @@ define([
          *
          * @return {Boolean}
          */
-        isEmptyValue: function () {
+        isEmptyValue: function() {
             if (_.has(this.emptyValue, 'value') && _.has(this.value, 'value')) {
                 return tools.isEqualsLoosely(this.value.value, this.emptyValue.value);
             }
@@ -314,12 +334,12 @@ define([
          * @return {*}
          * @protected
          */
-        _getInputValue: function (input) {
-            var result = undefined;
+        _getInputValue: function(input) {
+            var result;
             var $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
-                    $input.each(function () {
+                    $input.each(function() {
                         if ($(this).is(':checked')) {
                             result = $(this).val();
                         }
@@ -340,13 +360,13 @@ define([
          * @protected
          * @return {*}
          */
-        _setInputValue: function (input, value) {
+        _setInputValue: function(input, value) {
             var $input = this.$(input);
             switch ($input.attr('type')) {
                 case 'radio':
-                    $input.each(function () {
+                    $input.each(function() {
                         var $input = $(this);
-                        if ($input.attr('value') == value) {
+                        if ($input.attr('value') === value) {
                             $input.attr('checked', true);
                             $input.click();
                         } else {
@@ -367,7 +387,7 @@ define([
          * @return {*}
          * @protected
          */
-        _updateDOMValue: function () {
+        _updateDOMValue: function() {
             return this._writeDOMValue(this._getDisplayValue());
         },
 
@@ -376,7 +396,7 @@ define([
          *
          * @return {String}
          */
-        _getCriteriaHint: function () {
+        _getCriteriaHint: function() {
             return '';
         },
 
@@ -386,7 +406,7 @@ define([
          * @return {*}
          * @protected
          */
-        _getDisplayValue: function () {
+        _getDisplayValue: function() {
             var value = (arguments.length > 0) ? arguments[0] : this.getValue();
             return this._formatDisplayValue(value);
         },
@@ -399,8 +419,8 @@ define([
          * @protected
          * @return {*}
          */
-        _writeDOMValue: function (value) {
-            throw new Error("Method _writeDOMValue is abstract and must be implemented");
+        _writeDOMValue: function(value) {
+            throw new Error('Method _writeDOMValue is abstract and must be implemented');
             //this._setInputValue(inputValueSelector, value.value);
             //return this
         },
@@ -411,8 +431,8 @@ define([
          * @return {Object}
          * @protected
          */
-        _readDOMValue: function () {
-            throw new Error("Method _readDOMValue is abstract and must be implemented");
+        _readDOMValue: function() {
+            throw new Error('Method _readDOMValue is abstract and must be implemented');
             //return { value: this._getInputValue(this.inputValueSelector) }
         },
 
@@ -423,7 +443,7 @@ define([
          * @param {Boolean} status
          * @protected
          */
-        _setButtonPressed: function (element, status) {
+        _setButtonPressed: function(element, status) {
             if (status) {
                 element.parent().addClass(this.buttonActiveClass);
             } else {
@@ -437,8 +457,8 @@ define([
          * @param {Event} e
          * @private
          */
-        _preventEnterProcessing: function (e) {
-            if (e.keyCode == 13) {
+        _preventEnterProcessing: function(e) {
+            if (e.keyCode === 13) {
                 e.preventDefault();
                 e.stopPropagation();
             }
@@ -449,26 +469,10 @@ define([
          *
          * @public
          */
-        applyValue: function () {
+        applyValue: function() {
             this.setValue(this._formatRawValue(this._readDOMValue()));
-        },
-
-        /**
-         * Defines which template to use
-         *
-         * @private
-         */
-        _defineTemplate: function () {
-            this.template = this._getTemplate(this.templateSelector);
-        },
-
-        _getTemplate: function (selector) {
-            var theme = this.templateTheme,
-                src = theme && $(selector + '-' + theme).text() || $(selector).text();
-
-            return _.template(src);
         }
-    });
+    }));
 
     return AbstractFilter;
 });

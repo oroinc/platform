@@ -1,10 +1,9 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var DatePickerTabsView,
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var DatePickerTabsView;
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     DatePickerTabsView = BaseView.extend({
         autoRender: true,
@@ -16,7 +15,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['data', 'template']));
             DatePickerTabsView.__super__.initialize.apply(this, arguments);
         },
@@ -24,11 +23,10 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        render: function () {
-            var data, template, html;
-            data = this.getTemplateData();
-            template = this.getTemplateFunction();
-            html = template(data);
+        render: function() {
+            var data = this.getTemplateData();
+            var template = this.getTemplateFunction();
+            var html = template(data);
             this.$el.html(html);
         },
 
@@ -36,7 +34,7 @@ define(function (require) {
          * @inheritDoc
          * @returns {*}
          */
-        getTemplateData: function () {
+        getTemplateData: function() {
             return this.data;
         },
 
@@ -45,7 +43,7 @@ define(function (require) {
          *
          * @param {jQuery.Event} e
          */
-        onTabSwitch: function (e) {
+        onTabSwitch: function(e) {
             e.preventDefault();
             this.$(e.currentTarget).tab('show');
         },
@@ -55,7 +53,7 @@ define(function (require) {
          *
          * @param {string} tabName
          */
-        show: function (tabName) {
+        show: function(tabName) {
             this.$('[href^="#' + tabName + '-"]').tab('show');
         }
     });

@@ -57,6 +57,14 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                     'new_item' => [
                         'template' => 'test_template',
                     ],
+                    'new_applicable_string_item' => [
+                        'template' => 'test_template',
+                        'applicable' => 'test_condition'
+                    ],
+                    'new_applicable_array_item' => [
+                        'template' => 'test_template',
+                        'applicable' => ['test_condition1', 'test_condition2']
+                    ]
                 ]
             ]
         ];
@@ -103,6 +111,14 @@ class OroUIExtensionTest extends \PHPUnit_Framework_TestCase
                     'new_item' => [
                         'template' => 'test_template',
                     ],
+                    'new_applicable_string_item' => [
+                        'template' => 'test_template',
+                        'applicable' => 'test_condition'
+                    ],
+                    'new_applicable_array_item' => [
+                        'template' => 'test_template',
+                        'applicable' => ['test_condition1', 'test_condition2']
+                    ]
                 ]
             ],
             $palaceholders

@@ -6,6 +6,7 @@ use Doctrine\DBAL\Schema\Schema;
 
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\DataGridBundle\Migrations\Schema\v1_2\DefaultGridViewUsersRelation;
 
 class OroDataGridBundleInstaller implements Installation
 {
@@ -14,7 +15,7 @@ class OroDataGridBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_0';
+        return 'v1_2';
     }
 
     /**
@@ -23,6 +24,7 @@ class OroDataGridBundleInstaller implements Installation
     public function up(Schema $schema, QueryBag $queries)
     {
         $this->createOroGridViewTable($schema);
+        DefaultGridViewUsersRelation::createOroDefaultGridViewUsersTable($schema);
     }
 
     /**
@@ -38,6 +40,7 @@ class OroDataGridBundleInstaller implements Installation
         $table->addColumn('type', 'string', ['length' => 255]);
         $table->addColumn('filtersData', 'array', ['comment' => '(DC2Type:array)']);
         $table->addColumn('sortersData', 'array', ['comment' => '(DC2Type:array)']);
+        $table->addColumn('columnsData', 'array', ['comment' => '(DC2Type:array)', 'notnull' => false]);
         $table->addColumn('gridName', 'string', ['length' => 255]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_owner_id'], 'IDX_5B73FBCB9EB185F9', []);

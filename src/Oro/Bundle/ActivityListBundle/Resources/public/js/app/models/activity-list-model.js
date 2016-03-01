@@ -1,9 +1,8 @@
-/*global define*/
 define([
     'jquery',
     'underscore',
     'oroui/js/app/models/base/model'
-], function ($, _, BaseModel) {
+], function($, _, BaseModel) {
     'use strict';
 
     var ActivityModel;
@@ -42,14 +41,14 @@ define([
             targetEntityData: {}
         },
 
-        initialize: function () {
-            this.once('change:contentHTML', function () {
+        initialize: function() {
+            this.once('change:contentHTML', function() {
                 this.set('is_loaded', true);
             });
             ActivityModel.__super__.initialize.apply(this, arguments);
         },
 
-        getRelatedActivityClass: function () {
+        getRelatedActivityClass: function() {
             return this.get('relatedActivityClass').replace(/\\/g, '_');
         },
 
@@ -58,9 +57,9 @@ define([
          *
          * @param model {Object|ActivityModel} attributes or model to compare
          */
-        isSameActivity: function (model) {
+        isSameActivity: function(model) {
             var attrsToCompare;
-            attrsToCompare = model instanceof ActivityModel ? model.toJSON(): model;
+            attrsToCompare = model instanceof ActivityModel ? model.toJSON() : model;
 
             if (attrsToCompare.id === this.get('id')) {
                 return true;
@@ -87,7 +86,7 @@ define([
             return false;
         },
 
-        loadContentHTML: function (url) {
+        loadContentHTML: function(url) {
             var options = {
                     url: url,
                     type: 'get',
@@ -101,14 +100,14 @@ define([
 
             this.set('isContentLoading', true);
             return $.ajax(options)
-                .always(_.bind(function () {
+                .always(_.bind(function() {
                     this.set('isContentLoading', false);
                 }, this))
-                .done(_.bind(function (data) {
+                .done(_.bind(function(data) {
                     this.set('is_loaded', true);
                     this.set('contentHTML', data);
                 }, this))
-                .fail(_.bind(function (response) {
+                .fail(_.bind(function(response) {
                     if (response.status === 403) {
                         this.set('is_loaded', true);
                     }

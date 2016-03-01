@@ -12,7 +12,7 @@ class TagsTest extends Selenium2TestCase
      */
     public function testCreateTag()
     {
-        $tagName = 'Tag_'.mt_rand();
+        $tagName = 'Tag_' . mt_rand();
 
         $login = $this->login();
         /** @var Tags $login */
@@ -23,8 +23,7 @@ class TagsTest extends Selenium2TestCase
             ->setOwner('admin')
             ->save()
             ->assertMessage('Tag saved')
-            ->assertTitle('All - Tags - System')
-            ->close();
+            ->assertTitle('All - Tags - System');
 
         return $tagName;
     }
@@ -40,7 +39,7 @@ class TagsTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Tags $login*/
         $login->openTags('Oro\Bundle\TagBundle')
-            ->filterBy('Tag', $tagName)
+            ->filterBy('Name', $tagName)
             ->edit()
             ->assertTitle("{$tagName} Tag - Edit - Tags - System")
             ->setTagName($newTagName)
@@ -60,8 +59,8 @@ class TagsTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Tags $login*/
         $login->openTags('Oro\Bundle\TagBundle')
-            ->filterBy('Tag', $tagName)
-            ->delete()
+            ->filterBy('Name', $tagName)
+            ->delete([$tagName])
             ->assertMessage('Item deleted')
             ->assertTitle('All - Tags - System');
     }

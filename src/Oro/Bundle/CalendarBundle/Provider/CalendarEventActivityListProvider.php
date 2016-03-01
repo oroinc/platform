@@ -2,38 +2,59 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
-class CalendarEventActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
+class CalendarEventActivityListProvider implements
+    ActivityListProviderInterface,
+    CommentProviderInterface,
+    ActivityListDateProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    const ACL_CLASS = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ActivityAssociationHelper */
+    protected $activityAssociationHelper;
+
+    /** @var CommentAssociationHelper */
+    protected $commentAssociationHelper;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper            $doctrineHelper
+     * @param ActivityAssociationHelper $activityAssociationHelper
+     * @param CommentAssociationHelper  $commentAssociationHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ActivityAssociationHelper $activityAssociationHelper,
+        CommentAssociationHelper $commentAssociationHelper
+    ) {
+        $this->doctrineHelper            = $doctrineHelper;
+        $this->activityAssociationHelper = $activityAssociationHelper;
+        $this->commentAssociationHelper  = $commentAssociationHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
+    public function isApplicableTarget($entityClass, $accessible = true)
     {
-        $provider = $configManager->getProvider('activity');
-        return $provider->hasConfigById($configId)
-            && $provider->getConfigById($configId)->has('activities')
-            && in_array(self::ACTIVITY_CLASS, $provider->getConfigById($configId)->get('activities'));
+        return $this->activityAssociationHelper->isActivityAssociationEnabled(
+            $entityClass,
+            self::ACTIVITY_CLASS,
+            $accessible
+        );
     }
 
     /**
@@ -59,6 +80,14 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getSubject($entity)
     {
         /** @var $entity CalendarEvent */
@@ -72,6 +101,24 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     {
         /** @var $entity CalendarEvent */
         return $entity->getDescription();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedAt($entity)
+    {
+        /** @var $entity CalendarEvent */
+        return $entity->getCreatedAt();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedAt($entity)
+    {
+        /** @var $entity CalendarEvent */
+        return $entity->getUpdatedAt();
     }
 
     /**
@@ -135,10 +182,42 @@ class CalendarEventActivityListProvider implements ActivityListProviderInterface
     /**
      * {@inheritdoc}
      */
-    public function hasComments(ConfigManager $configManager, $entity)
+    public function isCommentsEnabled($entityClass)
     {
-        $config = $configManager->getProvider('comment')->getConfig($entity);
+        return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
+    }
 
-        return $config->is('enabled');
+    /**
+     * {@inheritdoc}
+     */
+    public function getActivityOwners($entity, ActivityList $activityList)
+    {
+        $organization = $this->getOrganization($entity);
+        $owner = $this->getOwner($entity);
+
+        if (!$organization || !$owner) {
+            return [];
+        }
+
+        $activityOwner = new ActivityOwner();
+        $activityOwner->setActivity($activityList);
+        $activityOwner->setOrganization($organization);
+        $activityOwner->setUser($owner);
+        return [$activityOwner];
+    }
+
+    /**
+     * Get calendar owner
+     *
+     * @param CalendarEvent $activityEntity
+     * @return null|User
+     */
+    public function getOwner($activityEntity)
+    {
+        /** @var $activityEntity CalendarEvent */
+        if ($activityEntity->getCalendar()) {
+            return $activityEntity->getCalendar()->getOwner();
+        }
+        return null;
     }
 }

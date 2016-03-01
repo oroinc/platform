@@ -172,3 +172,14 @@ Here is a list of key classes of EmailBundle:
  - EmailBodyLoaderSelector - implements a functionality to find appropriate email body and attachments loader.
  - AbstractEmailSynchronizer - provides a base algorithm which can be used to synchronize emails from different sort of mailboxes, for example IMAP or EWS. In derived class you need just implement two methods: getEmailOriginClass and createSynchronizationProcessor. Example you can see in OroImapBundle/Sync/ImapEmailSynchronizer.php.
  - AbstractEmailSynchronizationProcessor - a base class for different sort of email synchronization processors.
+
+Email flash popup
+-----------------
+You can add to config.yml this tree and have ability to set maximum visible emails in flash popup:
+
+oro_email:
+    flash_notification:
+        max_emails_display: %email_flash_max_emails_display%
+
+You can retrieve this parameter as usual:
+    $this->container->getParameter('oro_email.flash_notification.max_emails_display');

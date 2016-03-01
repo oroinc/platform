@@ -7,6 +7,7 @@ use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 /**
  * Provides an interface which should be implemented by a class
  * which makes decisions based on ownership of domain objects.
+ * @deprecated since 1.8 Please use AccessLevelOwnershipDecisionMakerInterface instead.
  */
 interface OwnershipDecisionMakerInterface
 {

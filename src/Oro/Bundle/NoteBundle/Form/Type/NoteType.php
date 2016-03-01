@@ -18,7 +18,7 @@ class NoteType extends AbstractType
         $builder
             ->add(
                 'message',
-                'oro_rich_text',
+                'oro_resizeable_rich_text',
                 [
                     'required' => true,
                     'label'    => 'oro.note.message.label'

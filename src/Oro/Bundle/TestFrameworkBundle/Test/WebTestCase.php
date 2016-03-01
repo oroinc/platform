@@ -118,6 +118,13 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         if (!self::$clientInstance) {
+            // Fix for: The "native_profiler" extension is not enabled in "*.html.twig".
+            // If you still getting this exception please run "php app/console cache:clear --env=test --no-debug".
+            // The cache will be cleared and warmed up without the twig profiler.
+            if (!isset($options['debug'])) {
+                $options['debug'] = false;
+            }
+
             /** @var Client $client */
             $client = self::$clientInstance = static::createClient($options, $server);
 
@@ -666,7 +673,8 @@ abstract class WebTestCase extends BaseWebTestCase
         try {
             \PHPUnit_Framework_TestCase::assertEquals(
                 $statusCode,
-                $response->getStatusCode()
+                $response->getStatusCode(),
+                $response->getContent()
             );
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
             if ($statusCode < 400

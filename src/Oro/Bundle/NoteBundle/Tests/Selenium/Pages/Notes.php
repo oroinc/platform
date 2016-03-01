@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  * Class Notes
  *
  * @package Oro\Bundle\NoteBundle\Pages\Objects
- * @method Notes openNotes() openNotes(string)
+ * @method Notes openNotes(string $bundlePath)
  * {@inheritdoc}
  */
 class Notes extends AbstractPageEntity
@@ -122,48 +122,38 @@ class Notes extends AbstractPageEntity
     }
 
     /**
-     * @param string $note
+     * Method implements Update and Delete actions for Notes activity
+     * @param $note
+     * @param $action
      * @return $this
      */
-    public function editNote($note)
+    public function noteAction($note, $action)
     {
         $actionMenu = "//*[@class='container-fluid accordion']".
             "//*[@class='message-item message'][contains(., '{$note}')]".
             "/parent::*/*[@class='actions']//a[contains(., '...')]";
-        $editAction =
-            "//*[@class='dropdown-menu activity-item pull-right launchers-dropdown-menu']".
-            "//a[@title='Update Note']";
-
-
-        $this->test->moveto($this->test->byXPath($actionMenu));
-        $this->test->byXPath($editAction)->click();
-        $this->waitForAjax();
-        $this->assertElementPresent(
-            "//div[contains(@class,'ui-dialog-titlebar')]".
-            "/span[normalize-space(.)='{$note}']",
-            'Update Note window is not opened'
-        );
-
-        return $this;
-    }
-
-    /**
-     * @param string $note
-     * @return $this
-     */
-    public function deleteNote($note)
-    {
-        $actionMenu = "//*[@class='container-fluid accordion']".
+        $selectedAction = "//*[@class='container-fluid accordion']".
             "//*[@class='message-item message'][contains(., '{$note}')]".
-            "/parent::*/*[@class='actions']//a[contains(., '...')]";
-        $deleteAction =
-            "//*[@class='dropdown-menu activity-item pull-right launchers-dropdown-menu']".
-            "//a[@title='Delete Note']";
-        $this->test->moveto($this->test->byXPath($actionMenu));
-        $this->test->byXPath($deleteAction)->click();
-        $this->test->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")->click();
-        $this->waitForAjax();
+            "/parent::*/*[@class='actions']//a[contains(., '{$action}')]";
 
+        $this->test->moveto($this->test->byXPath($actionMenu));
+        $this->test->byXPath($selectedAction)->click();
+
+        switch ($action) {
+            case 'Update Note':
+                $this->assertElementPresent(
+                    "//div[contains(@class,'ui-dialog-titlebar')]".
+                    "/span[normalize-space(.)='{$note}']",
+                    'Update Note window is not opened'
+                );
+                break;
+            case 'Delete Note':
+                $this->test->byXpath(
+                    "//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']"
+                )->click();
+                break;
+        }
+        $this->waitForAjax();
         return $this;
     }
 }

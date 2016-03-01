@@ -37,10 +37,7 @@ class SettingsProvider
     {
         $result = $priorities = [];
 
-        if (isset(
-            $this->settings[IntegrationConfiguration::FORM_NODE_NAME],
-            $this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name])
-        ) {
+        if (isset($this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name])) {
             $formData = $this->settings[IntegrationConfiguration::FORM_NODE_NAME][$name];
 
             foreach ($formData as $fieldName => $field) {

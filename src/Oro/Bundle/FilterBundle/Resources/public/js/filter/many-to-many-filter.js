@@ -1,8 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     './choice-filter'
-], function (ChoiceFilter) {
+], function(ChoiceFilter) {
+    'use strict';
 
     /**
      * @export  oro/filter/many-to-many-filter

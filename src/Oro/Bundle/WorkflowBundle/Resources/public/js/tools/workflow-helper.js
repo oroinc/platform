@@ -1,6 +1,7 @@
-/* global define */
-define(function() {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
 
     /**
      * @export  oroworkflow/js/tools/workflow-helper
@@ -38,8 +39,10 @@ define(function() {
 
         deepClone: function(obj) {
             var result = _.clone(obj);
-            for (var k in obj) if (obj.hasOwnProperty(k) && _.isObject(obj[k])) {
-                obj[k] = this.deepClone(obj[k]);
+            for (var k in obj) {
+                if (obj.hasOwnProperty(k) && _.isObject(obj[k])) {
+                    obj[k] = this.deepClone(obj[k]);
+                }
             }
 
             return result;

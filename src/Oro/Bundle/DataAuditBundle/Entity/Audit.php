@@ -2,28 +2,19 @@
 
 namespace Oro\Bundle\DataAuditBundle\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\Mapping as ORM;
-use Doctrine\ORM\Mapping\Index;
-
-use Gedmo\Loggable\Entity\MappedSuperclass\AbstractLogEntry;
 
 use JMS\Serializer\Annotation\Type;
 use JMS\Serializer\Annotation\SerializedName;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
-use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\DataAuditBundle\Entity\Repository\AuditRepository")
- * @ORM\Table(name="oro_audit", indexes={
- *  @Index(name="idx_oro_audit_logged_at", columns={"logged_at"})
- * })
  */
-class Audit extends AbstractLogEntry
+class Audit extends AbstractAudit
 {
     /**
      * @var integer $id
@@ -36,13 +27,6 @@ class Audit extends AbstractLogEntry
     protected $id;
 
     /**
-     * @var string $action
-     *
-     * @ORM\Column(type="string", length=8)
-     */
-    protected $action;
-
-    /**
      * @var string $loggedAt
      *
      * @ORM\Column(name="logged_at", type="datetime")
@@ -53,7 +37,7 @@ class Audit extends AbstractLogEntry
     /**
      * @var string $objectId
      *
-     * @ORM\Column(name="object_id", type="integer", length=32, nullable=true)
+     * @ORM\Column(name="object_id", type="integer", nullable=true)
      * @Soap\ComplexType("int", nillable=true)
      */
     protected $objectId;
@@ -83,20 +67,6 @@ class Audit extends AbstractLogEntry
     protected $version;
 
     /**
-     * Redefined parent property to remove the column from db
-     *
-     * @var array|null
-     */
-    protected $data;
-
-    /**
-     * @var AuditField[]|Collection
-     *
-     * @ORM\OneToMany(targetEntity="AuditField", mappedBy="audit", cascade={"persist"})
-     */
-    protected $fields;
-
-    /**
      * @var string $username
      *
      * @Soap\ComplexType("string", nillable=true)
@@ -104,38 +74,19 @@ class Audit extends AbstractLogEntry
     protected $username;
 
     /**
-     * @var User $user
+     * @var AbstractUser[] $user
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User", cascade={"persist"})
-     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\JoinColumn(name="user_id", referencedColumnName="id", onDelete="CASCADE")
      * @Type("string")
      * @SerializedName("username")
      */
     protected $user;
 
     /**
-     * @var Organization
-     *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
-     * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
+     * {@inheritdoc}
      */
-    protected $organization;
-
-    /**
-     * Constructor
-     */
-    public function __construct()
-    {
-        $this->fields = new ArrayCollection();
-    }
-
-    /**
-     * Set user
-     *
-     * @param  User  $user
-     * @return Audit
-     */
-    public function setUser(User $user = null)
+    public function setUser(AbstractUser $user = null)
     {
         $this->user = $user;
 
@@ -143,9 +94,7 @@ class Audit extends AbstractLogEntry
     }
 
     /**
-     * Get user
-     *
-     * @return User
+     * {@inheritdoc}
      */
     public function getUser()
     {
@@ -163,113 +112,9 @@ class Audit extends AbstractLogEntry
     }
 
     /**
-     * Get object name
-     *
-     * @return string
-     */
-    public function getObjectName()
-    {
-        return $this->objectName;
-    }
-
-    /**
-     * Set object name
-     *
-     * @param  string $objectName
-     * @return Audit
-     */
-    public function setObjectName($objectName)
-    {
-        $this->objectName = $objectName;
-
-        return $this;
-    }
-
-    /**
-     * Set organization
-     *
-     * @param Organization $organization
-     * @return User
-     */
-    public function setOrganization(Organization $organization = null)
-    {
-        $this->organization = $organization;
-
-        return $this;
-    }
-
-    /**
-     * Get organization
-     *
-     * @return Organization
-     */
-    public function getOrganization()
-    {
-        return $this->organization;
-    }
-
-    /**
-     * Get fields
-     *
-     * @return AuditField[]|Collection
-     */
-    public function getFields()
-    {
-        if ($this->fields === null) {
-            $this->fields = new ArrayCollection();
-        }
-
-        return $this->fields;
-    }
-
-    /**
-     * Get field
-     *
-     * @param string $field
-     *
-     * @return AuditField|false
-     */
-    public function getField($field)
-    {
-        return $this->fields->filter(function (AuditField $auditField) use ($field) {
-            return $auditField->getField() === $field;
-        })->first();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getData()
-    {
-        $data = [];
-        foreach ($this->getFields() as $field) {
-            $newValue = $field->getNewValue();
-            $oldValue = $field->getOldValue();
-            if (in_array($field->getDataType(), ['date', 'datetime'])) {
-                $newValue = [
-                    'value' => $newValue,
-                    'type'  => $field->getDataType(),
-                ];
-
-                $oldValue = [
-                    'value' => $oldValue,
-                    'type'  => $field->getDataType(),
-                ];
-            }
-
-            $data[$field->getField()] = [
-                'old' => $oldValue,
-                'new' => $newValue,
-            ];
-        }
-
-        return $data;
-    }
-
-    /**
      * {@inheritdoc}
      *
-     * @deprecated Use method createField instead
+     * @deprecated 1.8.0:2.1.0 Use method createField instead
      */
     public function setData($data)
     {
@@ -277,37 +122,12 @@ class Audit extends AbstractLogEntry
     }
 
     /**
-     * @deprecated This method is for internal use only. Use method getData or getFields instead
+     * @deprecated 1.8.0:2.1.0 This method is for internal use only. Use method getData or getFields instead
      *
      * @return array|null
      */
     public function getDeprecatedData()
     {
         return $this->data;
-    }
-
-    /**
-     * Create field
-     *
-     * @param string $field
-     * @param string $dataType
-     * @param mixed $newValue
-     * @param mixed $oldValue
-     * @return Audit
-     */
-    public function createField($field, $dataType, $newValue, $oldValue)
-    {
-        if ($this->fields === null) {
-            $this->fields = new ArrayCollection();
-        }
-
-        if ($existingField = $this->getField($field)) {
-            $this->fields->removeElement($existingField);
-        }
-
-        $auditField = new AuditField($this, $field, $dataType, $newValue, $oldValue);
-        $this->fields->add($auditField);
-
-        return $this;
     }
 }

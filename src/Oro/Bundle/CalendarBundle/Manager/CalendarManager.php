@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\CalendarBundle\Manager;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider;
 use Oro\Bundle\CalendarBundle\Provider\CalendarProviderInterface;
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 class CalendarManager
 {
@@ -164,7 +165,7 @@ class CalendarManager
             $this->applyCalendarDefaultValues($calendar, $defaultValues);
         }
 
-        ArrayUtils::sortBy($calendars, false, 'position');
+        ArrayUtil::sortBy($calendars, false, 'position');
     }
 
     /**

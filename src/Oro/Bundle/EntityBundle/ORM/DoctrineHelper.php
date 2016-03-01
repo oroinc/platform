@@ -8,13 +8,27 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
-use Doctrine\ORM\Query\Expr\Join;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\Exception;
 
 class DoctrineHelper
 {
+    /**
+     * @var ManagerRegistry
+     */
+    protected $registry;
+
+    /**
+     * @var EntityManager[]
+     */
+    private $managers = [];
+
+    /**
+     * @var array
+     */
+    private $managersMap = [];
+
     /**
      * @param ManagerRegistry $registry
      */
@@ -24,24 +38,38 @@ class DoctrineHelper
     }
 
     /**
-     * @param object|string $entityOrClass
+     * Gets a real class name for an entity.
+     *
+     * @param object|string $entityOrClass An entity object, entity class name or entity proxy class name
+     *
      * @return string
      */
     public function getEntityClass($entityOrClass)
     {
-        return is_object($entityOrClass)
-            ? ClassUtils::getClass($entityOrClass)
-            : ClassUtils::getRealClass($entityOrClass);
+        if (is_object($entityOrClass)) {
+            return ClassUtils::getClass($entityOrClass);
+        }
+
+        if (strpos($entityOrClass, ':') !== false) {
+            list($namespaceAlias, $simpleClassName) = explode(':', $entityOrClass, 2);
+            return $this->registry->getAliasNamespace($namespaceAlias) . '\\' . $simpleClassName;
+        }
+
+        return ClassUtils::getRealClass($entityOrClass);
     }
 
     /**
-     * @param object $entity
+     * Extracts the identifier values of the given entity.
+     *
+     * @param object $entity An entity object
+     *
      * @return array
      */
     public function getEntityIdentifier($entity)
     {
         // check if we can use getId method to fast get the identifier
         if (method_exists($entity, 'getId')) {
+            // @todo This code doesn't support composite keys.
             return ['id' => $entity->getId()];
         }
 
@@ -51,53 +79,53 @@ class DoctrineHelper
     }
 
     /**
+     * Check whether an entity is new
+     *
+     * @param object $entity An entity object
+     *
+     * @return bool
+     */
+    public function isNewEntity($entity)
+    {
+        $identifierValues = $this->getEntityMetadata($entity)->getIdentifierValues($entity);
+
+        return count($identifierValues) === 0;
+    }
+
+    /**
      * Gets the root entity alias of the query.
      *
      * @param QueryBuilder $qb
-     * @param bool         $triggerException
+     * @param bool         $throwException
      *
      * @return string|null
      *
      * @throws Exception\InvalidEntityException
+     *
+     * @deprecated since 1.9. Use QueryUtils::getSingleRootAlias instead
      */
-    public function getSingleRootAlias(QueryBuilder $qb, $triggerException = true)
+    public function getSingleRootAlias(QueryBuilder $qb, $throwException = true)
     {
-        $rootAliases = $qb->getRootAliases();
-
-        $result = null;
-        if (count($rootAliases) !== 1) {
-            if ($triggerException) {
-                $errorReason = count($rootAliases) === 0
-                    ? 'the query has no any root aliases'
-                    : sprintf('the query has several root aliases. "%s"', implode(', ', $rootAliases));
-
-                throw new Exception\InvalidEntityException(
-                    sprintf(
-                        'Can\'t get single root alias for the given query. Reason: %s.',
-                        $errorReason
-                    )
-                );
-            }
-        } else {
-            $result = $rootAliases[0];
-        }
-
-        return $result;
+        return QueryUtils::getSingleRootAlias($qb, $throwException);
     }
 
     /**
-     * @param object $entity
-     * @param bool   $triggerException
+     * Extracts the single identifier value of the given entity.
+     *
+     * @param object $entity         An entity object
+     * @param bool   $throwException Whether to throw exception in case the entity has several identifier fields
+     *
      * @return mixed|null
+     *
      * @throws Exception\InvalidEntityException
      */
-    public function getSingleEntityIdentifier($entity, $triggerException = true)
+    public function getSingleEntityIdentifier($entity, $throwException = true)
     {
         $entityIdentifier = $this->getEntityIdentifier($entity);
 
         $result = null;
         if (count($entityIdentifier) > 1) {
-            if ($triggerException) {
+            if ($throwException) {
                 throw new Exception\InvalidEntityException(
                     sprintf(
                         'Can\'t get single identifier for "%s" entity.',
@@ -106,14 +134,17 @@ class DoctrineHelper
                 );
             }
         } else {
-            $result = $entityIdentifier ? current($entityIdentifier) : null;
+            $result = $entityIdentifier ? reset($entityIdentifier) : null;
         }
 
         return $result;
     }
 
     /**
-     * @param object|string $entityOrClass
+     * Gets an array of identifier field names for the given entity or class.
+     *
+     * @param object|string $entityOrClass An entity object, entity class name or entity proxy class name
+     *
      * @return string[]
      */
     public function getEntityIdentifierFieldNames($entityOrClass)
@@ -124,18 +155,36 @@ class DoctrineHelper
     }
 
     /**
-     * @param object|string $entityOrClass
-     * @param bool          $triggerException
+     * Gets an array of identifier field names for the given entity class.
+     *
+     * @param string $entityClass The real class name of an entity
+     *
+     * @return string[]
+     */
+    public function getEntityIdentifierFieldNamesForClass($entityClass)
+    {
+        return $this
+            ->getEntityMetadataForClass($entityClass)
+            ->getIdentifierFieldNames();
+    }
+
+    /**
+     * Gets the name of the single id field.
+     *
+     * @param object|string $entityOrClass  An entity object, entity class name or entity proxy class name
+     * @param bool          $throwException Whether to throw exception in case the entity has several identifier fields
+     *
      * @return string|null
+     *
      * @throws Exception\InvalidEntityException
      */
-    public function getSingleEntityIdentifierFieldName($entityOrClass, $triggerException = true)
+    public function getSingleEntityIdentifierFieldName($entityOrClass, $throwException = true)
     {
         $fieldNames = $this->getEntityIdentifierFieldNames($entityOrClass);
 
         $result = null;
         if (count($fieldNames) > 1) {
-            if ($triggerException) {
+            if ($throwException) {
                 throw new Exception\InvalidEntityException(
                     sprintf(
                         'Can\'t get single identifier field name for "%s" entity.',
@@ -144,26 +193,30 @@ class DoctrineHelper
                 );
             }
         } else {
-            $result = $fieldNames ? current($fieldNames) : null;
+            $result = $fieldNames ? reset($fieldNames) : null;
         }
 
         return $result;
     }
 
     /**
-     * @param object|string $entityOrClass
-     * @param bool          $triggerException
+     * Gets the type of the single id field.
+     *
+     * @param object|string $entityOrClass  An entity object, entity class name or entity proxy class name
+     * @param bool          $throwException Whether to throw exception in case the entity has several identifier fields
+     *
      * @return string|null
+     *
      * @throws Exception\InvalidEntityException
      */
-    public function getSingleEntityIdentifierFieldType($entityOrClass, $triggerException = true)
+    public function getSingleEntityIdentifierFieldType($entityOrClass, $throwException = true)
     {
         $metadata   = $this->getEntityMetadata($entityOrClass);
         $fieldNames = $metadata->getIdentifierFieldNames();
 
         $result = null;
         if (count($fieldNames) !== 1) {
-            if ($triggerException) {
+            if ($throwException) {
                 throw new Exception\InvalidEntityException(
                     sprintf(
                         'Can\'t get single identifier field type for "%s" entity.',
@@ -172,70 +225,146 @@ class DoctrineHelper
                 );
             }
         } else {
-            $result = $metadata->getTypeOfField(current($fieldNames));
+            $result = $metadata->getTypeOfField(reset($fieldNames));
         }
 
         return $result;
     }
 
     /**
-     * @param object|string $entityOrClass
+     * Checks whether the given entity or class is manageable.
+     *
+     * @param object|string $entityOrClass An entity object, entity class name or entity proxy class name
+     *
      * @return bool
      */
     public function isManageableEntity($entityOrClass)
     {
-        $entityClass = $this->getEntityClass($entityOrClass);
-
-        return null !== $this->registry->getManagerForClass($entityClass);
+        return null !== $this->getEntityManager($entityOrClass, false);
     }
 
     /**
-     * @param $entityOrClass
-     * @return ClassMetadata
-     * @throws Exception\NotManageableEntityException
+     * Checks whether the given class is manageable entity.
+     *
+     * @param string $entityClass The real class name of an entity
+     *
+     * @return bool
      */
-    public function getEntityMetadata($entityOrClass)
+    public function isManageableEntityClass($entityClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-        if (!$entityManager) {
+        return null !== $this->getEntityManagerForClass($entityClass, false);
+    }
+
+    /**
+     * Gets the ORM metadata descriptor for the given entity or class.
+     *
+     * @param object|string $entityOrClass  An entity object, entity class name or entity proxy class name
+     * @param bool          $throwException Whether to throw exception in case the entity is not manageable
+     *
+     * @return ClassMetadata|null
+     *
+     * @throws Exception\NotManageableEntityException if the EntityManager was not found and $throwException is TRUE
+     */
+    public function getEntityMetadata($entityOrClass, $throwException = true)
+    {
+        return $this->getEntityMetadataForClass(
+            $this->getEntityClass($entityOrClass),
+            $throwException
+        );
+    }
+
+    /**
+     * Gets the ORM metadata descriptor for the given entity class.
+     *
+     * @param string $entityClass    The real class name of an entity
+     * @param bool   $throwException Whether to throw exception in case the entity is not manageable
+     *
+     * @return ClassMetadata|null
+     *
+     * @throws Exception\NotManageableEntityException if the EntityManager was not found and $throwException is TRUE
+     */
+    public function getEntityMetadataForClass($entityClass, $throwException = true)
+    {
+        $manager = $this->getEntityManagerForClass($entityClass, $throwException);
+
+        return null !== $manager
+            ? $manager->getClassMetadata($entityClass)
+            : null;
+    }
+
+    /**
+     * Gets the EntityManager associated with the given entity or class.
+     *
+     * @param object|string $entityOrClass  An entity object, entity class name or entity proxy class name
+     * @param bool          $throwException Whether to throw exception in case the entity is not manageable
+     *
+     * @return EntityManager|null
+     *
+     * @throws Exception\NotManageableEntityException if the EntityManager was not found and $throwException is TRUE
+     */
+    public function getEntityManager($entityOrClass, $throwException = true)
+    {
+        return $this->getEntityManagerForClass(
+            $this->getEntityClass($entityOrClass),
+            $throwException
+        );
+    }
+
+    /**
+     * Gets the EntityManager associated with the given class.
+     *
+     * @param string $entityClass    The real class name of an entity
+     * @param bool   $throwException Whether to throw exception in case the entity is not manageable
+     *
+     * @return EntityManager|null
+     *
+     * @throws Exception\NotManageableEntityException if the EntityManager was not found and $throwException is TRUE
+     */
+    public function getEntityManagerForClass($entityClass, $throwException = true)
+    {
+        $manager = $this->getManagerForClass($entityClass);
+        if (null === $manager && $throwException) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
 
-        return $entityManager->getClassMetadata($entityClass);
+        return $manager;
     }
 
     /**
-     * @param string|object $entityOrClass
-     * @return EntityManager
-     * @throws Exception\NotManageableEntityException
-     */
-    public function getEntityManager($entityOrClass)
-    {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-        if (!$entityManager) {
-            throw new Exception\NotManageableEntityException($entityClass);
-        }
-
-        return $entityManager;
-    }
-
-    /**
-     * @param string|object $entityOrClass
+     * Gets the repository for the given entity or class.
+     *
+     * @param object|string $entityOrClass An entity object, entity class name or entity proxy class name
+     *
      * @return EntityRepository
      */
     public function getEntityRepository($entityOrClass)
     {
-        $entityClass   = $this->getEntityClass($entityOrClass);
-        $entityManager = $this->getEntityManager($entityClass);
-
-        return $entityManager->getRepository($entityClass);
+        return $this->getEntityRepositoryForClass(
+            $this->getEntityClass($entityOrClass)
+        );
     }
 
     /**
-     * @param string $entityClass
-     * @param mixed  $entityId
+     * Gets the repository for the given entity class.
+     *
+     * @param string $entityClass The real class name of an entity
+     *
+     * @return EntityRepository
+     */
+    public function getEntityRepositoryForClass($entityClass)
+    {
+        return $this
+            ->getEntityManagerForClass($entityClass)
+            ->getRepository($entityClass);
+    }
+
+    /**
+     * Gets a reference to the entity identified by the given class and identifier
+     * without actually loading it, if the entity is not yet loaded.
+     *
+     * @param string $entityClass The class name of an entity
+     * @param mixed  $entityId    The identifier of an entity
+     *
      * @return object
      */
     public function getEntityReference($entityClass, $entityId)
@@ -246,20 +375,25 @@ class DoctrineHelper
     }
 
     /**
-     * @param string $entityClass
-     * @param mixed  $entityId
+     * Finds an entity by its identifier.
+     *
+     * @param string $entityClass The class name of an entity
+     * @param mixed  $entityId    The identifier of an entity
+     *
      * @return object|null
      */
     public function getEntity($entityClass, $entityId)
     {
         return $this
-            ->getEntityManager($entityClass)
-            ->getRepository($entityClass)
+            ->getEntityRepository($entityClass)
             ->find($entityId);
     }
 
     /**
-     * @param string $entityClass
+     * Creates a new instance of the mapped class, without invoking the constructor.
+     *
+     * @param string $entityClass The class name of an entity
+     *
      * @return object
      */
     public function createEntityInstance($entityClass)
@@ -276,12 +410,12 @@ class DoctrineHelper
      * @param int $limit The maximum number of items per page
      *
      * @return int
+     *
+     * @deprecated since 1.9. Use QueryUtils::getPageOffset instead
      */
     public function getPageOffset($page, $limit)
     {
-        return $page > 0
-            ? ($page - 1) * $limit
-            : 0;
+        return QueryUtils::getPageOffset($page, $limit);
     }
 
     /**
@@ -289,41 +423,12 @@ class DoctrineHelper
      *
      * @param QueryBuilder $qb
      * @param array|null   $joins
+     *
+     * @deprecated since 1.9. Use QueryUtils::applyJoins instead
      */
     public function applyJoins(QueryBuilder $qb, $joins)
     {
-        if (empty($joins)) {
-            return;
-        }
-
-        $qb->distinct(true);
-        $rootAlias = $this->getSingleRootAlias($qb);
-        foreach ($joins as $key => $val) {
-            if (empty($val)) {
-                $qb->leftJoin($rootAlias . '.' . $key, $key);
-            } elseif (is_array($val)) {
-                if (isset($val['join'])) {
-                    $join = $val['join'];
-                    if (false === strpos($join, '.')) {
-                        $join = $rootAlias . '.' . $join;
-                    }
-                } else {
-                    $join = $rootAlias . '.' . $key;
-                }
-                $condition     = null;
-                $conditionType = null;
-                if (isset($val['condition'])) {
-                    $condition     = $val['condition'];
-                    $conditionType = Join::WITH;
-                }
-                if (isset($val['conditionType'])) {
-                    $conditionType = $val['conditionType'];
-                }
-                $qb->leftJoin($join, $key, $conditionType, $condition);
-            } else {
-                $qb->leftJoin($rootAlias . '.' . $val, $val);
-            }
-        }
+        QueryUtils::applyJoins($qb, $joins);
     }
 
     /**
@@ -332,20 +437,33 @@ class DoctrineHelper
      * @param Criteria|array|null $criteria
      *
      * @return Criteria
+     *
+     * @deprecated since 1.9. Use QueryUtils::normalizeCriteria instead
      */
     public function normalizeCriteria($criteria)
     {
-        if (null === $criteria) {
-            $criteria = new Criteria();
-        } elseif (is_array($criteria)) {
-            $newCriteria = new Criteria();
-            foreach ($criteria as $fieldName => $value) {
-                $newCriteria->andWhere(Criteria::expr()->eq($fieldName, $value));
-            }
+        return QueryUtils::normalizeCriteria($criteria);
+    }
 
-            $criteria = $newCriteria;
+    /**
+     * @param string $entityClass The real class name of an entity
+     *
+     * @return EntityManager|null
+     */
+    private function getManagerForClass($entityClass)
+    {
+        if (!array_key_exists($entityClass, $this->managersMap)) {
+            $manager = $this->registry->getManagerForClass($entityClass);
+            if (null !== $manager) {
+                $hash = spl_object_hash($manager);
+                $this->managers[$hash] = $manager;
+                $this->managersMap[$entityClass] = $hash;
+            } else {
+                $this->managersMap[$entityClass] = null;
+            }
+            return $manager;
         }
 
-        return $criteria;
+        return $this->managersMap[$entityClass] ? $this->managers[$this->managersMap[$entityClass]] : null;
     }
 }

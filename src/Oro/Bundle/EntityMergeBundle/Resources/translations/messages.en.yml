@@ -16,9 +16,11 @@ oro:
             unite: Append
 
         form:
-            empty:         Empty
-            master_record: Master Record
-            strategy:      Strategy
-            select_all:    Select All Values
-            merge_values:  Merge Values
-            merge_button:  Merge
+            empty:                 Empty
+            master_record:         Master Record
+            master_record.tooltip: Field values from all records will be merged to Master Record, all other records will be deleted.
+            strategy:              Strategy
+            strategy.tooltip:      “Replace” strategy will use the selected value as the new value of the selected field. “Append” strategy will сombine selected values and set them as new value.
+            select_all:            Select All Values
+            merge_values:          Merge Values
+            merge_button:          Merge

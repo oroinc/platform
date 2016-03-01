@@ -40,6 +40,10 @@ class MigrationExecutorWithNameGenerator extends MigrationExecutor
      */
     protected function createSchemaObject(array $tables = [], array $sequences = [], $schemaConfig = null)
     {
+        if ($schemaConfig && $this->nameGenerator) {
+            $schemaConfig->setMaxIdentifierLength($this->nameGenerator->getMaxIdentifierSize());
+        }
+
         return new SchemaWithNameGenerator(
             $this->nameGenerator,
             $tables,

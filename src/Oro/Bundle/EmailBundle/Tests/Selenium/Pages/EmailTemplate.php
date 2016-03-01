@@ -102,13 +102,30 @@ class EmailTemplate extends AbstractPageEntity
     }
 
     /**
-     * @param $content
+     * @param $content string
      * @return $this
      */
     public function setContent($content)
     {
-        $this->content->clear();
-        $this->content->value($content);
+        $this->test->waitUntil(
+            function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
+                return $testCase->execute(
+                    [
+                        'script' => 'return tinyMCE.activeEditor.initialized',
+                        'args' => [],
+                    ]
+                );
+            },
+            intval(MAX_EXECUTION_TIME)
+        );
+
+        $this->test->execute(
+            [
+                'script' => sprintf('tinyMCE.activeEditor.setContent(\'%s\')', $content),
+                'args' => [],
+            ]
+        );
+
         return $this;
     }
 

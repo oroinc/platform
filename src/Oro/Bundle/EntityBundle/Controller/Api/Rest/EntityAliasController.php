@@ -25,7 +25,7 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
     /**
      * Get entity aliases.
      *
-     * @Get("/entities/aliases", name="")
+     * @Get("/entities/aliases")
      *
      * @ApiDoc(
      *      description="Get entity aliases",
@@ -43,7 +43,8 @@ class EntityAliasController extends FOSRestController implements ClassResourceIn
 
         $result = [];
         foreach ($resolver->getAll() as $className => $entityAlias) {
-            $result[$className] = [
+            $result[] = [
+                'entity'      => $className,
                 'alias'       => $entityAlias->getAlias(),
                 'pluralAlias' => $entityAlias->getPluralAlias(),
                 'urlSafeName' => $entityClassNameHelper->getUrlSafeClassName($className)

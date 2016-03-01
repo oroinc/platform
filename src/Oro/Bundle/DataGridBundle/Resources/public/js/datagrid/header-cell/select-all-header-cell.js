@@ -1,14 +1,12 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backgrid',
     'backbone'
-], function (_, Backgrid, Backbone) {
-    "use strict";
+], function(_, Backgrid, Backbone) {
+    'use strict';
 
-    var $, SelectAllHeaderCell;
-    $ = Backbone.$;
+    var SelectAllHeaderCell;
+    var $ = Backbone.$;
 
     /**
      * Contains mass-selection logic
@@ -24,14 +22,10 @@ define([
      */
     SelectAllHeaderCell = Backbone.View.extend({
         /** @property */
-        className: "select-all-header-cell",
+        className: 'select-all-header-cell renderable',
 
         /** @property */
-        tagName: "th",
-
-        events: {
-            'click': 'onClick'
-        },
+        tagName: 'th',
 
         template: '#template-select-all-header-cell',
 
@@ -43,7 +37,7 @@ define([
          * @param {Backgrid.Column} options.column
          * @param {Backbone.Collection} options.collection
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
@@ -65,7 +59,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -80,16 +74,21 @@ define([
          *  - reset set type in-set/not-in-set
          * @param {boolean=} inset flag of in-set/not-in-set mode
          */
-        initialState: function (inset) {
+        initialState: function(inset) {
             this.selectedModels = {};
-            this.inset = _.isUndefined(inset) ? true : inset;
+            /**
+             * While using "grid views" functionality,
+             *   e.g. switching between views can cause an Object arriving in "inset" property.
+             * So, we should add additional check and such case should be perceived the same way as "undefined".
+             */
+            this.inset = (_.isUndefined(inset) || _.isObject(inset)) ? true : inset;
             this.updateState();
         },
 
         /**
          * Updates state of selection (three states a checkbox: checked, unchecked, or indeterminate)
          */
-        updateState: function () {
+        updateState: function() {
             var $checkbox = this.$(':checkbox');
             if (_.isEmpty(this.selectedModels)) {
                 $checkbox.prop('indeterminate', false);
@@ -105,7 +104,7 @@ define([
          *
          * @returns {{selectedModels: *, inset: boolean}}
          */
-        getSelectionState: function () {
+        getSelectionState: function() {
             return {
                 selectedModels: this.selectedModels,
                 inset: this.inset
@@ -118,7 +117,7 @@ define([
          * @param {Backbone.Model} model
          * @returns {boolean}
          */
-        isSelectedModel: function (model) {
+        isSelectedModel: function(model) {
             return this.inset === _.has(this.selectedModels, model.id || model.cid);
         },
 
@@ -127,7 +126,7 @@ define([
          *
          * @param {Backbone.Model} model
          */
-        removeModel: function (model) {
+        removeModel: function(model) {
             delete this.selectedModels[model.id || model.cid];
             this.updateState();
         },
@@ -138,7 +137,7 @@ define([
          * @param {Backbone.Model} model
          * @param {boolean} selected
          */
-        selectModel: function (model, selected) {
+        selectModel: function(model, selected) {
             if (selected === this.inset) {
                 this.selectedModels[model.id || model.cid] = model;
                 this.updateState();
@@ -154,7 +153,7 @@ define([
          *  - marks all models in collection as selected
          *  start to collect models which have to be excluded
          */
-        selectAll: function () {
+        selectAll: function() {
             this.initialState(false);
             this._markSelected(true);
         },
@@ -166,7 +165,7 @@ define([
          *  - marks all models in collection as not selected
          *  start to collect models which have to be included
          */
-        selectNone: function () {
+        selectNone: function() {
             this.initialState();
             this._markSelected(false);
         },
@@ -176,7 +175,7 @@ define([
          *  - if necessary reset to initial state
          *  - marks all models in collection as selected
          */
-        selectAllVisible: function () {
+        selectAllVisible: function() {
             if (!this.inset) {
                 this.initialState();
             }
@@ -189,9 +188,9 @@ define([
          * @param {boolean} selected
          * @private
          */
-        _markSelected: function (selected) {
-            this.collection.each(function (model) {
-                model.trigger("backgrid:select", model, selected);
+        _markSelected: function(selected) {
+            this.collection.each(function(model) {
+                model.trigger('backgrid:select', model, selected);
             });
         },
 
@@ -200,14 +199,26 @@ define([
          *
          * @returns {orodatagrid.datagrid.cell.SelectAllHeaderCell}
          */
-        render: function () {
+        render: function() {
             this.$el.html(_.template($(this.template).text())());
+            this.delegateEvents();
             return this;
         },
 
-        onClick: function (e) {
-            var $el = $(e.target);
+        delegateEvents: function(events) {
+            SelectAllHeaderCell.__super__.delegateEvents.call(this, events);
+            // binds event handlers directly to dropdown-menu, because the menu can be attached to document body
+            this.$('.dropdown-menu').on('click' + this.eventNamespace(), _.bind(this.onClick, this));
+            return this;
+        },
 
+        undelegateEvents: function() {
+            this.$('.dropdown-menu').off(this.eventNamespace());
+            return SelectAllHeaderCell.__super__.undelegateEvents.call(this);
+        },
+
+        onClick: function(e) {
+            var $el = $(e.target);
             if ($el.is('[data-select]')) {
                 // Handles click on checkbox selectAll/selectNone
                 if (this.inset && _.isEmpty(this.selectedModels) === this.inset) {
@@ -243,7 +254,7 @@ define([
          * @param {Backbone.Model} model
          * @param {Object} obj
          */
-        isSelected: function (model, obj) {
+        isSelected: function(model, obj) {
             if ($.isPlainObject(obj)) {
                 obj.selected = this.isSelectedModel(model);
             }
@@ -261,7 +272,7 @@ define([
          *
          * @param {Object} obj
          */
-        getSelected: function (obj) {
+        getSelected: function(obj) {
             if ($.isEmptyObject(obj)) {
                 obj.selected = _.keys(this.selectedModels);
                 obj.inset = this.inset;

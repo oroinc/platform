@@ -1,24 +1,162 @@
-{% block oro_imap_configuration_check_row %}
-    {% set options = {
+{% block oro_imap_configuration_check_widget %}
+    {% if form.parent.parent.parent is not null %}
+        {% set data = form.parent.parent.parent.vars.value %}
+    {% else %}
+        {% set data = form.parent.parent.vars.value %}
+    {% endif %}
+    {% if data and 'oro_user_user_form' in form.parent.parent.vars.full_name %}
+        {% set forEntity = 'user' %}
+    {% else %}
+        {% set forEntity = 'mailbox' %}
+    {% endif %}
+    {% set options = form.vars.options|default({})|merge({
         elementNamePrototype: full_name,
-        id: form.parent.vars.value ? form.parent.vars.value.id : null
-    } %}
+        id: form.parent.vars.value and form.parent.vars.value.id is defined ? form.parent.vars.value.id : null,
+        forEntity: forEntity,
+        organization: data and data.organization is defined and data.organization ? data.organization.id : null,
+        parentElementSelector: 'fieldset'
+    }) %}
     {% set attr = attr|merge({
-        'data-page-component-module':  'oroimap/js/app/components/check-connection-btn',
+        'data-role': 'check-connection-btn',
+        'data-page-component-module':  'oroimap/js/app/components/check-connection-component',
         'data-page-component-options': options|json_encode|raw,
     }) %}
-    {% set wrapperId = id ~ '_wrapper' %}
-
-    <div class="control-group" id="{{ wrapperId }}">
-        <div class="controls">{{ form_widget(form, {'attr': attr }) }}</div>
+    <div class="control-group">
+        <div class="controls">
+            {{ form_widget(form, {'attr': attr }) }}
+            <div class="check-connection-messages"></div>
+        </div>
     </div>
-
-    <style type="text/css">
-        {{ '#' ~ wrapperId }} {
-            max-width: 465px;
-        }
-        {{ '#' ~ wrapperId }} .alert {
-            margin-top: 10px;
-        }
-    </style>
+    <div class="container-config-group"
+         data-page-component-module="oroimap/js/app/components/check-config-settings"
+         data-page-component-options="">
+    </div>
 {% endblock %}
+
+{% block oro_imap_choice_account_type_widget %}
+    {% set data = form.parent.vars.value %}
+
+    {% set options = form.vars.options|default({})|merge({
+        'route': "oro_imap_change_account_type",
+        'formSelector': '#'~formSelector|default(form.vars.id),
+        'formParentName': form.parent.vars.name,
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null
+    }) %}
+
+    <div class="container-change-account-type"
+        data-page-component-module="oroimap/js/app/components/account-type-component"
+        data-page-component-options="{{ options|json_encode }}">
+        <div {{ block('widget_container_attributes') }}>
+            {%- if form.parent is empty -%}
+                {{ form_errors(form) }}
+            {%- endif -%}
+
+            {% if (form.accountType is defined) %}
+                {{ form_row(form.accountType) }}
+            {% endif %}
+
+            {% if form.userEmailOrigin is defined %}
+                {{ form_widget(form.userEmailOrigin) }}
+            {% endif %}
+
+            {{- form_rest(form) -}}
+        </div>
+    </div>
+{% endblock %}
+
+{% block oro_imap_configuration_gmail_widget %}
+    {% set data = form.parent.parent.vars.value %}
+
+    {% set options = form.vars.options|default({})|merge({
+        'route': 'oro_imap_change_account_type',
+        'routeAccessToken': "oro_imap_gmail_access_token",
+        'routeGetFolders': "oro_imap_gmail_connection_check",
+        'formSelector': '#'~formSelector|default(form.vars.id),
+        'googleErrorMessage': '.google-alert',
+        'formParentName' : form.parent.parent.vars.name,
+        'type': constant('Oro\\Bundle\\ImapBundle\\Form\\Model\\AccountTypeModel::ACCOUNT_TYPE_GMAIL'),
+        'organization': data and data.organization is defined and data.organization ? data.organization.id : null,
+        'user': form.parent.userEmailOrigin.user.vars.value,
+        'accessToken': form.parent.userEmailOrigin.accessToken.vars.value,
+        'accessTokenExpiresAt': form.parent.userEmailOrigin.accessTokenExpiresAt.vars.value,
+        'id': form.vars.value and form.vars.value.id is defined ? form.vars.value.id : null,
+    }) %}
+
+    <div class="container-imap-gmail-container"
+         data-page-component-module="oroimap/js/app/components/imap-gmail-component"
+         data-page-component-options="{{ options|json_encode }}">
+        <div {{ block('widget_container_attributes') }}>
+            {%- if form.parent is empty -%}
+                {{ form_errors(form) }}
+            {%- endif -%}
+
+            {% if form.parent.userEmailOrigin.user.vars.value is not empty %}
+                <div class="control-group">
+                    <div class="control-label wrap">
+                        {{ 'oro.imap.configuration.reset_email.label'|trans }}
+                    </div>
+                    <div class="controls oro-item-collection">
+                        <div style="margin-top: 6px">
+                            <strong>{{ form.parent.userEmailOrigin.user.vars.value }}</strong>
+                            <button title="{{ 'oro.imap.configuration.disconnect.label'|trans }}" class="removeRow btn-action btn-link" type="button" style="vertical-align: baseline">×</button>
+                        </div>
+                    </div>
+                </div>
+            {% endif %}
+
+            {% if form.check is defined %}
+                <div class="control-group">
+                    <div class="controls">
+                        {{ form_widget(form.check) }}
+                    </div>
+                </div>
+            {% endif %}
+
+            <div class="control-group">
+                <div class="controls">
+                    <div class="google-alert google-connection-status alert alert-error" style="display: none"></div>
+                </div>
+            </div>
+
+            {% if form.checkFolder is defined %}
+                <div class="control-group">
+                    <div class="controls">
+                        {{ form_widget(form.checkFolder) }}
+                    </div>
+                </div>
+            {% endif %}
+
+            {{- form_rest(form) -}}
+        </div>
+    </div>
+{% endblock %}
+
+{% block oro_config_google_imap_sync_checkbox_widget %}
+    {% set options = {
+        errorMessage: '.default-alert',
+        successMessage: '.alert-success',
+        googleErrorMessage: '.google-alert',
+        googleWarningMessage: '.alert-warning'
+    } %}
+    <div data-page-component-module="oroimap/js/app/components/google-sync-checkbox-component"
+        data-page-component-options="{{ options|json_encode }}" style="margin-top: 3px">
+        {{ block('checkbox_widget') }}
+        <div class="alert google-connection-status alert-warning" style="display: none">
+            {{ 'oro.imap.system_configuration.fields.enable_google_imap.warning.label'|trans }}
+        </div>
+        <div class="google-alert google-connection-status alert alert-error" style="display: none">
+
+        </div>
+        <div class="default-alert google-connection-status alert alert-error" style="display: none">
+            {{ 'oro.imap.system_configuration.fields.enable_google_imap.error.label'|trans }}
+        </div>
+        <div class="alert google-connection-status alert-success" style="display: none">
+            {{ 'oro.imap.system_configuration.fields.enable_google_imap.success.label'|trans }}
+        </div>
+    </div>
+{% endblock %}
+
+{% block oro_pro_ews_check_button_row %}
+    {{ block('checkbox_row') }}
+{% endblock %}
+

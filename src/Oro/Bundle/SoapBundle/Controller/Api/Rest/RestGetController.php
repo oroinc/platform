@@ -19,7 +19,7 @@ use FOS\RestBundle\View\View;
 use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Request\ParamFetcherInterface;
 
-use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 use Oro\Bundle\SoapBundle\Handler\Context;
@@ -223,8 +223,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      *                           Both should be applied to 'user' relation.
      *                           ['user_id' => 'user', 'user_name' => 'user']
      *
-     * @return array
-     * @throws \Exception
+     * @return Criteria
      */
     protected function getFilterCriteria($parameters, $normalisers = [], $fieldMap = [])
     {
@@ -251,8 +250,7 @@ abstract class RestGetController extends FOSRestController implements EntityMana
      *                           Both should be applied to 'user' relation.
      *                           ['user_id' => 'user', 'user_name' => 'user']
      *
-     * @return array
-     * @throws \Exception
+     * @return Criteria
      */
     protected function buildFilterCriteria($filters, $normalisers = [], $fieldMap = [])
     {
@@ -289,8 +287,8 @@ abstract class RestGetController extends FOSRestController implements EntityMana
     protected function filterQueryParameters(array $supportedParameters)
     {
         if (false === preg_match_all(
-            '#([\w\d_-]+)([<>]?=|<>|[<>])([^&]+)#',
-            rawurldecode($this->getRequest()->getQueryString()),
+            '#(?P<name>[\w\d_-]+)(?P<operator>(<|>|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))(?P<value>[^&]+)#',
+            $this->getRequest()->getQueryString(),
             $matches,
             PREG_SET_ORDER
         )) {
@@ -298,15 +296,16 @@ abstract class RestGetController extends FOSRestController implements EntityMana
         }
 
         $filteredParameters = [];
-        foreach ($matches as $paramData) {
-            list (, $paramName, $operator, $value) = $paramData;
-            $paramName = urldecode($paramName);
-
-            if (false === in_array($paramName, $supportedParameters)) {
+        foreach ($matches as $match) {
+            $name = $match['name'];
+            if (false === in_array($name, $supportedParameters, true)) {
                 continue;
             }
 
-            $filteredParameters[$paramName] = [$operator, urldecode($value)];
+            $filteredParameters[$name] = [
+                rawurldecode($match['operator']),
+                rawurldecode($match['value'])
+            ];
         }
 
         return $filteredParameters;

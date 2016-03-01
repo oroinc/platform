@@ -150,7 +150,7 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @JMS\Type("string")
      * @JMS\Expose
      */
-    protected $type;
+    protected $type = 'html';
 
     /**
      * @var string
@@ -176,6 +176,12 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @ORM\Column(type="boolean", options={"default"=true})
+     * @var bool
+     */
+    protected $visible = true;
 
     /**
      * @param        $name
@@ -507,6 +513,26 @@ class EmailTemplate implements EmailTemplateInterface, Translatable
     public function getOrganization()
     {
         return $this->organization;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isVisible()
+    {
+        return $this->visible;
+    }
+
+    /**
+     * @param bool $visible
+     *
+     * @return $this
+     */
+    public function setVisible($visible = true)
+    {
+        $this->visible = $visible;
+
+        return $this;
     }
 
     /**

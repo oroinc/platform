@@ -1,6 +1,0 @@
-oro:
-    form:
-        system_configuration:
-            fields:
-                wysiwyg_enabled:
-                    tooltip: 'Enables WYSIWYG editor for all text fields'

@@ -53,12 +53,14 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
             'name'         => [
                 'options'   => ['chart_name' => 11],
                 'exception' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
-                'message'   => 'The option "chart_name" with value "11" is expected to be of type "string"'
+                'message'   => 'The option "chart_name" with value 11 is expected to be of type "string", '
+                    . 'but is of type "integer".'
             ],
             'chart_config' => [
                 'options'   => ['chart_name' => 'test', 'chart_config' => 11],
                 'exception' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
-                'message'   => 'The option "chart_config" with value "11" is expected to be of type "array"'
+                'message'   => 'The option "chart_config" with value 11 is expected to be of type "array", '
+                    . 'but is of type "integer".'
             ],
             'empty'        => [
                 'options'   => [],
@@ -132,6 +134,7 @@ class ChartSettingsTypeTest extends FormIntegrationTestCase
 
     /**
      * @param string $fieldName
+     *
      * @return array
      */
     protected function getFieldData($fieldName)

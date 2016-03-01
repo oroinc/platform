@@ -55,6 +55,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getDefaultValues($type, $fieldType);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getDefaultValues($type, $fieldType));
     }
 
     /**
@@ -66,6 +68,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getRequiredPropertyValues($type);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getRequiredPropertyValues($type));
     }
 
     /**
@@ -77,6 +81,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getNotAuditableValues($type);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getNotAuditableValues($type));
     }
 
     /**
@@ -88,6 +94,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getTranslatableValues($type);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getTranslatableValues($type));
     }
 
     /**
@@ -99,6 +107,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getIndexedValues($type);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getIndexedValues($type));
     }
 
     /**
@@ -110,6 +120,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->getFormItems($type, $fieldType);
 
         $this->assertEquals($expectedValues, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValues, $this->configContainer->getFormItems($type, $fieldType));
     }
 
     /**
@@ -121,6 +133,8 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
         $result = $this->configContainer->hasForm($type, $fieldType);
 
         $this->assertEquals($expectedValue, $result);
+        // test that a result is cached locally
+        $this->assertEquals($expectedValue, $this->configContainer->hasForm($type, $fieldType));
     }
 
     /**
@@ -152,17 +166,6 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
     {
         $this->configContainer->setConfig($config);
         $result = $this->configContainer->getGridActions($type);
-
-        $this->assertEquals($expectedValues, $result);
-    }
-
-    /**
-     * @dataProvider getUpdateActionFilterProvider
-     */
-    public function testGetUpdateActionFilter($type, $config, $expectedValues)
-    {
-        $this->configContainer->setConfig($config);
-        $result = $this->configContainer->getUpdateActionFilter($type);
 
         $this->assertEquals($expectedValues, $result);
     }
@@ -209,7 +212,7 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]
             ],
-            'field' => [
+            'field'  => [
                 'items' => [
                     'testAttr1' => [
                         'options' => [
@@ -1309,136 +1312,6 @@ class PropertyConfigContainerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 []
-            ],
-        ];
-    }
-
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function getUpdateActionFilterProvider()
-    {
-        return [
-            'no entity config'                     => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                [],
-                null
-            ],
-            'entity config'                        => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                [
-                    'entity' => [
-                        'update_filter' => [
-                            'test' => 'testVal',
-                        ]
-                    ]
-                ],
-                ['test' => 'testVal']
-            ],
-            'entity config (empty filter)'         => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                [
-                    'entity' => [
-                        'update_filter' => [
-                        ]
-                    ]
-                ],
-                []
-            ],
-            'entity config (no filter)'            => [
-                PropertyConfigContainer::TYPE_ENTITY,
-                [
-                    'entity' => [
-                    ]
-                ],
-                null
-            ],
-            'entity config (by id)'                => [
-                new EntityConfigId('testScope', 'Test\Cls'),
-                [
-                    'entity' => [
-                        'update_filter' => [
-                            'test' => 'testVal',
-                        ]
-                    ]
-                ],
-                ['test' => 'testVal']
-            ],
-            'entity config (empty filter) (by id)' => [
-                new EntityConfigId('testScope', 'Test\Cls'),
-                [
-                    'entity' => [
-                        'update_filter' => [
-                        ]
-                    ]
-                ],
-                []
-            ],
-            'entity config (no filter) (by id)'    => [
-                new EntityConfigId('testScope', 'Test\Cls'),
-                [
-                    'entity' => [
-                    ]
-                ],
-                null
-            ],
-            'field config'                         => [
-                PropertyConfigContainer::TYPE_FIELD,
-                [
-                    'field' => [
-                        'update_filter' => [
-                            'test' => 'testVal',
-                        ]
-                    ]
-                ],
-                ['test' => 'testVal']
-            ],
-            'field config (empty filter)'          => [
-                PropertyConfigContainer::TYPE_FIELD,
-                [
-                    'field' => [
-                        'update_filter' => [
-                        ]
-                    ]
-                ],
-                []
-            ],
-            'field config (no filter)'             => [
-                PropertyConfigContainer::TYPE_FIELD,
-                [
-                    'field' => [
-                    ]
-                ],
-                null
-            ],
-            'field config (by id)'                 => [
-                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
-                [
-                    'field' => [
-                        'update_filter' => [
-                            'test' => 'testVal',
-                        ]
-                    ]
-                ],
-                ['test' => 'testVal']
-            ],
-            'field config (empty filter) (by id)'  => [
-                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
-                [
-                    'field' => [
-                        'update_filter' => [
-                        ]
-                    ]
-                ],
-                []
-            ],
-            'field config (no filter) (by id)'     => [
-                new FieldConfigId('testScope', 'Test\Cls', 'fieldName', 'int'),
-                [
-                    'field' => [
-                    ]
-                ],
-                null
             ],
         ];
     }

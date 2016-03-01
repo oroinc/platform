@@ -1,6 +1,5 @@
-/*global define*/
 define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
-], function (_, __, Modal) {
+], function(_, __, Modal) {
     'use strict';
 
     /**
@@ -20,7 +19,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/modal'
         /**
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             options = _.extend({
                 title: __('oro.email.emailtemplate.apply_template_confirmation_title'),
                 okText: __('Yes, Proceed'),

@@ -5,7 +5,6 @@ namespace Oro\Bundle\DataAudit\Tests\Functional;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class ControllersTest extends WebTestCase
@@ -130,7 +129,7 @@ class ControllersTest extends WebTestCase
             $this->assertEquals($this->userData[$key], $value);
         }
 
-        $this->assertEquals('John Doe  - admin@example.com', $result['author']);
+        $this->assertEquals('John Doe - admin@example.com', $result['author']);
     }
 
     protected function clearResult($result)

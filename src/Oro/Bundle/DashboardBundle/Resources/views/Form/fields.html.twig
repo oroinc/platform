@@ -1,7 +1,7 @@
 {% block oro_type_widget_date_range_widget %}
     <div class="date-range-filter filter-criteria date-range-filter-{{ form.vars.name }}">
         <!-- datetime range filter placeholder -->
-        <input type="hidden" name="{{ form.vars.full_name }}[part]" value="source"/>
+        <input type="hidden" name="{{ form.vars.full_name }}[part]" value="value"/>
     </div>
     <script type="text/javascript">
         require(
@@ -22,7 +22,7 @@
                     valueConfig.startEndPrefix = '{{ form.vars.full_name }}';
 
                     value = {
-                        part: 'source',
+                        part: 'value',
                         type: {{ (form.vars.value.type != '') ? form.vars.value.type : 1 }},
                         value: valueConfig
                     };
@@ -31,7 +31,8 @@
                     dateRangeFilter._formatRawValue(value);
 
                     $('.date-range-filter-' + '{{ form.vars.name }}').append(dateRangeFilter.$el);
-                    $('div.widget-configuration').parent().css('overflow', 'inherit');
+                    $('div.widget-configuration').parent().not('.ui-widget-content').css('overflow', 'inherit');
+                    $('div.widget-configuration').closest('.ui-widget-content').trigger('dialogresize');
                 });
             }
         )
@@ -39,7 +40,7 @@
 {% endblock oro_type_widget_date_range_widget %}
 
 {% block oro_type_widget_title_widget %}
-    <div class="widget_title_widget">
+    <div class="widget-title-widget">
         {{ form_widget(form.title) }}
     </div>
     {{ form_row(form.useDefault) }}
@@ -63,3 +64,90 @@
         })
     </script>
 {% endblock oro_type_widget_title_widget %}
+
+{% block oro_type_widget_items_row %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    {% set rowId = form.vars.id ~ 'Row' %}
+
+    <div id="{{ rowId }}" class="dashboard-widget-items">
+        <div class="control-group">
+            <label class="control-label">{{ label|trans }}</label>
+            <div class="controls">
+                <div class="">
+                    {{ UI.clientButton({
+                        'aCss': 'no-hash add-button',
+                        'label': 'oro.dashboard.datagrid.actions.add.label'|trans
+                    }) }}
+                    {{ UI.clientButton({
+                        'aCss': 'no-hash btn-primary add-all-button',
+                        'label': 'oro.dashboard.datagrid.actions.add_all.label'|trans
+                    }) }}
+                </div>
+            </div>
+        </div>
+        <div class="grid-container">
+            <table id="{{ form.vars.id }}" class="grid table table-bordered table-condensed">
+                <thead>
+                    <tr>
+                        <th><span>{{ form.vars.item_label|trans }}</span></th>
+                        <th class="action-column"><span>{{ 'oro.dashboard.datagrid.columns.actions'|trans }}</span></th>
+                    </tr>
+                </thead>
+                <tbody class="item-container"></tbody>
+            </table>
+        </div>
+    </div>
+    {{ form_javascript(form) }}
+{% endblock %}
+
+{% block oro_type_widget_items_javascript %}
+    {% set options = {
+        itemsData: form.children.items.vars.value,
+        baseName: form.children.items.vars.full_name,
+        el: '#' ~ form.vars.id ~ 'Row'
+    } %}
+    {% if form.vars.attr is not empty and form.vars.attr.placeholder is defined %}
+        {% set options = options|merge({
+            placeholder: form.vars.attr.placeholder|trans
+        }) %}
+    {% endif %}
+
+    <script>
+        require([
+            'orodashboard/js/items/view'
+        ], function (ItemsView) {
+            'use strict';
+
+            new ItemsView({{ options|json_encode|raw }});
+        });
+    </script>
+{% endblock %}
+
+{% block oro_type_widget_date_widget %}
+    <div class="widget-date-widget">
+        {{ form_widget(form.useDate) }}
+    </div>
+    <div class="widget-date-input-widget">
+        {{ form_widget(form.date) }}
+    </div>
+    <script type="text/javascript">
+        require(['jquery'], function ($) {
+            $(function () {
+                var useDate = $('input#{{ form.useDate.vars.id }}');
+
+                if (useDate.prop('checked') !== true) {
+                    $('input#{{ form.date.vars.id }}').attr('readonly', 'readonly');
+                }
+
+                $(useDate).change(function() {
+                    var date    = $('input#date_selector_{{ form.date.vars.id }}');
+                    if ($(this).is(':checked')) {
+                        $(date).datepicker('enable');
+                    } else {
+                        $(date).datepicker('disable');
+                    }
+                });
+            });
+        })
+    </script>
+{% endblock oro_type_widget_date_widget %}

@@ -34,7 +34,7 @@ If it is not specified, or is "All", it is considered that the entity access to 
 
 You can create your list of accesses. For example, the string "VIEW;EDIT" will set the permissions parameters for the entity for viewing and editing.
 
-**group_name** parameter is used to group entities by groups in UI edit page. Now this parameter is not in use.
+**group_name** parameter is used to group entities by applications. It is used to split security into application scopes. 
 
 You can use @Acl and @AclAncestor annotations to protect controller actions.
 

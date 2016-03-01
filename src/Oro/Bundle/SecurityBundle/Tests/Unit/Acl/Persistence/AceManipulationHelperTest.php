@@ -423,7 +423,7 @@ class AceManipulationHelperTest extends \PHPUnit_Framework_TestCase
                 );
         }
 
-        $this->manipulator->deleteAce($this->acl, $type, $field, $index, $mask, $strategy);
+        $this->manipulator->deleteAce($this->acl, $type, $field, $index);
     }
 
     public static function aceTypesProvider()

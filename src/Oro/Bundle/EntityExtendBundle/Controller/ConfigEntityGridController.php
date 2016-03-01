@@ -64,8 +64,9 @@ class ConfigEntityGridController extends Controller
 
             if ($form->isValid()) {
                 $entityConfig->set('unique_key', $form->getData());
-                $entityProvider->persist($entityConfig);
-                $entityProvider->flush();
+                $configManager = $entityProvider->getConfigManager();
+                $configManager->persist($entityConfig);
+                $configManager->flush();
 
                 return $this->redirect(
                     $this->generateUrl('oro_entityconfig_view', array('id' => $entity->getId()))

@@ -24,6 +24,7 @@
             });
         </script>
     {% else %}
+        {% block page_container_before_form %}{% endblock %}
         {% if not form.vars.valid and form.vars.errors|length %}
             <div class="alert alert-error">
                 <div class="message">
@@ -56,7 +57,7 @@
                     {{ form_row(form.subject) }}
                     {{ form_row(form.template, {'includeNonEntity': true, 'includeSystemTemplates': false}) }}
                     {{ form_row(form.type) }}
-                    {{ form_row(form.body, {'attr': {'class': 'email-body', 'data-page-component-name': 'bodyEditor'} }) }}
+                    {{ form_row(form.body) }}
 
                     <div class="control-group email-body-actions">
                         <div class="controls">
@@ -85,8 +86,10 @@
 
                     {{ form_rest(form) }}
                     <div class="widget-actions form-actions" style="display: none;">
-                        <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
-                        <button class="btn btn-primary" type="submit">{{ 'Send'|trans }}</button>
+                        {% block page_container_form_actions %}
+                            <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                            <button class="btn btn-primary" type="submit">{{ 'Send'|trans }}</button>
+                        {% endblock %}
                     </div>
                 </fieldset>
             </form>

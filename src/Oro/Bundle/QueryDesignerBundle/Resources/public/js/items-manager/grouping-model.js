@@ -1,15 +1,16 @@
-/*global define*/
-/*jslint nomen: true*/
-define(['backbone'], function (Backbone) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @class   oroquerydesigner.itemsManager.GroupingModel
-     * @extends Backbone.Model
-     */
-    return Backbone.Model.extend({
+    var ColumnModel;
+    var EntityFieldModel = require('./entity-field-model');
+
+    ColumnModel = EntityFieldModel.extend({
+        fieldAttribute: 'name',
+
         defaults: {
-            name : null
+            name: null
         }
     });
+
+    return ColumnModel;
 });

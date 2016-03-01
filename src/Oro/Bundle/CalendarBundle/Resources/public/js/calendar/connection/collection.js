@@ -1,6 +1,8 @@
-/*global define*/
-define(['backbone', 'routing', 'orocalendar/js/calendar/connection/model'
-    ], function (Backbone, routing, ConnectionModel) {
+define([
+    'backbone',
+    'routing',
+    'orocalendar/js/calendar/connection/model'
+], function(Backbone, routing, ConnectionModel) {
     'use strict';
 
     /**
@@ -18,7 +20,7 @@ define(['backbone', 'routing', 'orocalendar/js/calendar/connection/model'
          *
          * @param {int} calendarId
          */
-        setCalendar: function (calendarId) {
+        setCalendar: function(calendarId) {
             this.url = routing.generate(this.route, {id: calendarId});
         }
     });

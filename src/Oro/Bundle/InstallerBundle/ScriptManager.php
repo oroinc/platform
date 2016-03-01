@@ -121,7 +121,7 @@ class ScriptManager
 
             $relativePathArray = explode(DIRECTORY_SEPARATOR, str_replace($rootDir, '', $bundleDirName));
             if ($relativePathArray[0] == '') {
-                unset ($relativePathArray[0]);
+                unset($relativePathArray[0]);
             }
             for ($i = count($relativePathArray); $i >= 0; $i--) {
                 unset($relativePathArray[$i]);

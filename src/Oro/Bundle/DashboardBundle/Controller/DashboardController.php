@@ -320,14 +320,16 @@ class DashboardController extends Controller
      * )
      * @Template("OroDashboardBundle:Dashboard:grid.html.twig")
      *
-     * @param string $gridName
+     * @param string  $widget
+     * @param string  $gridName
+     * @param Request $request
      *
      * @return array
      */
-    public function gridAction($widget, $gridName)
+    public function gridAction($widget, $gridName, Request $request)
     {
-        $params = $this->getRequest()->get('params', []);
-        $renderParams = $this->getRequest()->get('renderParams', []);
+        $params = $request->get('params', []);
+        $renderParams = $request->get('renderParams', []);
 
         $viewId = $this->getWidgetConfigs()->getWidgetOptions()->get('gridView');
         if ($viewId && null !== $view = $this->findView($viewId)) {

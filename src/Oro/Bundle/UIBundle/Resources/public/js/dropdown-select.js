@@ -1,6 +1,4 @@
-/*global define*/
-/*jslint nomen: true*/
-define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
+define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
     'use strict';
 
     $.widget('oroui.dropdownSelect', {
@@ -26,7 +24,7 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             useCaret: true
         },
 
-        _create: function () {
+        _create: function() {
             this._mapSelectOptions();
             this.element.append(this.template(this.options));
             this._on({
@@ -34,9 +32,9 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             });
         },
 
-        _mapSelectOptions: function () {
+        _mapSelectOptions: function() {
             var selected = this.options.selected;
-            this.options.options = $.map(this.options.options, function (option) {
+            this.options.options = $.map(this.options.options, function(option) {
                 var value = null;
                 if (_.isString(option)) {
                     value = option;
@@ -57,12 +55,12 @@ define(['jquery', 'underscore', 'jquery-ui'], function ($, _) {
             this.options.selected = selected;
         },
 
-        _onSelect: function (e) {
+        _onSelect: function(e) {
             e.preventDefault();
             this._select($(e.target).data('value'));
         },
 
-        _select: function (value) {
+        _select: function(value) {
             var option = _.findWhere(this.options.options, {value: value});
             if (option === this.options.selected) {
                 return;

@@ -25,6 +25,9 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
  *          "note"={
  *              "immutable"=true
  *          },
+ *          "comment"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
  *              "immutable"=true
  *          },

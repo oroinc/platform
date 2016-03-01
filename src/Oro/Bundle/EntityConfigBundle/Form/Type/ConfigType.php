@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Entity\OptionSet;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
 use Oro\Bundle\EntityConfigBundle\Provider\PropertyConfigContainer;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
@@ -17,31 +18,31 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigType extends AbstractType
 {
-    /**
-     * @var ConfigManager
-     */
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
-    /**
-     * @var DynamicTranslationMetadataCache
-     */
+    /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
 
     /**
-     * @param ConfigManager $configManager
-     * @param Translator    $translator
+     * @param ManagerRegistry                 $doctrine
+     * @param ConfigManager                   $configManager
+     * @param Translator                      $translator
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
+        ManagerRegistry $doctrine,
         ConfigManager $configManager,
         Translator $translator,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
+        $this->doctrine                   = $doctrine;
         $this->configManager              = $configManager;
         $this->translator                 = $translator;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
@@ -112,17 +113,11 @@ class ConfigType extends AbstractType
             }
         }
 
-        /** @deprecated since 1.4, will be removed in 2.0 */
-        if ($fieldType == 'optionSet') {
-            $data['extend']['set_options'] = $this->configManager->getEntityManager()
-                ->getRepository(OptionSet::ENTITY_NAME)
-                ->findOptionsByField($configModel->getId());
-        }
-
         $builder->setData($data);
 
         $builder->addEventSubscriber(
             new ConfigSubscriber(
+                $this->doctrine,
                 $this->configManager,
                 $this->translator,
                 $this->dbTranslationMetadataCache
@@ -139,7 +134,7 @@ class ConfigType extends AbstractType
 
         $resolver->setAllowedTypes(
             array(
-                'config_model' => 'Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel'
+                'config_model' => 'Oro\Bundle\EntityConfigBundle\Entity\ConfigModel'
             )
         );
     }

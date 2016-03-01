@@ -5,6 +5,8 @@ namespace Oro\Bundle\ConfigBundle\DependencyInjection\Compiler;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Exception\LogicException;
 use Symfony\Component\DependencyInjection\Extension\ExtensionInterface;
 use Symfony\Component\DependencyInjection\Reference;
 
@@ -24,9 +26,6 @@ class SystemConfigurationPass implements CompilerPassInterface
     const MAIN_MANAGER_SERVICE_ID = 'oro_config.manager';
 
     const API_MANAGER_SERVICE_ID = 'oro_config.manager.api';
-
-    const DEFAULT_SCOPE = 'app';
-    const DEFAULT_PRIORITY = 0;
 
     /**
      * {@inheritdoc}
@@ -48,16 +47,20 @@ class SystemConfigurationPass implements CompilerPassInterface
         $managers       = [];
         $taggedServices = $container->findTaggedServiceIds(self::SCOPE_MANAGER_TAG_NAME);
         foreach ($taggedServices as $id => $attributes) {
-            if (array_key_exists('priority', $attributes[0])) {
-                $priority = (int)$attributes[0]['priority'];
-            } else {
-                $priority = self::DEFAULT_PRIORITY;
+            $priority = array_key_exists('priority', $attributes[0])
+                ? (int)$attributes[0]['priority']
+                : 0;
+            if (!array_key_exists('scope', $attributes[0])) {
+                throw new LogicException(
+                    sprintf(
+                        'Tag "%s" for service "%s" must have attribute "scope".',
+                        self::SCOPE_MANAGER_TAG_NAME,
+                        $id
+                    )
+                );
             }
-            if (array_key_exists('scope', $attributes[0])) {
-                $scope = $attributes[0]['scope'];
-            } else {
-                $scope = self::DEFAULT_SCOPE;
-            }
+            $scope = $attributes[0]['scope'];
+
             $managers[$priority][$scope] = new Reference($id);
         }
         if (count($managers) === 0) {
@@ -66,18 +69,44 @@ class SystemConfigurationPass implements CompilerPassInterface
 
         // sort by priority and flatten
         ksort($managers);
-        $managers      = call_user_func_array('array_merge', $managers);
-        $apiManagerDef = $container->getDefinition(self::API_MANAGER_SERVICE_ID);
+        $managers = array_reverse(call_user_func_array('array_merge', $managers));
 
-        // register
-        $serviceDef = $container->getDefinition(self::MAIN_MANAGER_SERVICE_ID);
+        $this->registerManagers($container, $managers);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $managers
+     */
+    protected function registerManagers(ContainerBuilder $container, $managers)
+    {
+        $scopes    = array_keys($managers);
+        $mainScope = reset($scopes);
+
+        $mainManagerDef = $container->getDefinition(self::MAIN_MANAGER_SERVICE_ID);
+        $apiManagerDef  = $container->getDefinition(self::API_MANAGER_SERVICE_ID);
+
+        // register scoped config managers
+        /** @var Definition[] $managerDefs */
+        $managerDefs = [];
         foreach ($managers as $scope => $manager) {
-            $serviceDef->addMethodCall('addManager', [$scope, $manager]);
-            $serviceDef->addMethodCall('setScopeName', [$scope]);
-            $managerDef = clone $serviceDef;
-            $container->setDefinition('oro_config.' . $scope, $managerDef);
-            $apiManagerDef->addMethodCall('addConfigManager', [$scope, $managerDef]);
+            foreach ($managerDefs as $managerDef) {
+                $managerDef->addMethodCall('addManager', [$scope, $manager]);
+            }
+            $managerDef = clone $mainManagerDef;
+            $managerDef->addMethodCall('addManager', [$scope, $manager]);
+            $managerDefs[$scope] = $managerDef;
         }
+        foreach ($managerDefs as $scope => $managerDef) {
+            $managerDef->replaceArgument(0, $scope);
+            $managerId = 'oro_config.' . $scope;
+            $container->setDefinition($managerId, $managerDef);
+            $apiManagerDef->addMethodCall('addConfigManager', [$scope, new Reference($managerId)]);
+        }
+
+        // a main config manager should be an alias to the most priority scoped config manager
+        $container->removeDefinition(self::MAIN_MANAGER_SERVICE_ID);
+        $container->setAlias(self::MAIN_MANAGER_SERVICE_ID, 'oro_config.' . $mainScope);
     }
 
     /**

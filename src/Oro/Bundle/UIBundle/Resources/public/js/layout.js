@@ -1,26 +1,23 @@
-/*global define, window*/
-/*jslint nomen: true*/
-/*jshint browser:true, devel:true*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var layout, pageRenderedCbPool, document, console,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        scrollspy = require('oroui/js/scrollspy'),
-        mediator = require('oroui/js/mediator'),
-        tools = require('oroui/js/tools');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var scrollspy = require('oroui/js/scrollspy');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
     require('bootstrap');
     require('jquery-ui');
     require('jquery.uniform');
     require('oroui/js/responsive-jquery-widget');
 
-    document = window.document;
-    console = window.console;
-    pageRenderedCbPool = [];
+    var document = window.document;
+    var console = window.console;
+    var pageRenderedCbPool = [];
 
-    layout = {
+    var layout = {
         /**
          * Default padding to keep when calculate available height for fullscreen layout
          */
@@ -29,12 +26,12 @@ define(function (require) {
         /**
          * Height of header on mobile devices
          */
-        MOBILE_HEADER_HEIGHT: 54,
+        MOBILE_HEADER_HEIGHT: scrollHelper.MOBILE_HEADER_HEIGHT,
 
         /**
          * Height of header on mobile devices
          */
-        MOBILE_POPUP_HEADER_HEIGHT: 44,
+        MOBILE_POPUP_HEADER_HEIGHT: scrollHelper.MOBILE_POPUP_HEADER_HEIGHT,
 
         /**
          * Minimal height for fullscreen layout
@@ -47,13 +44,33 @@ define(function (require) {
         devToolbarHeight: undefined,
 
         /**
+         * List of elements with disabled scroll. Used to reset theirs state
+         * @private
+         */
+        _scrollDisabledElements: null,
+
+        /**
          * @returns {number} development toolbar height in dev mode, 0 in production mode
          */
-        getDevToolbarHeight: function () {
-            if (!this.devToolbarHeight) {
+        getDevToolbarHeight: function() {
+            if (!mediator.execute('retrieveOption', 'debug')) {
+                return 0;
+            }
+            if (!this.devToolbarHeightListenersAttached) {
+                this.devToolbarHeightListenersAttached = true;
+                $(window).on('resize', function() {
+                    delete layout.devToolbarHeight;
+                });
+                mediator.on('debugToolbar:afterUpdateView', function() {
+                    delete layout.devToolbarHeight;
+                });
+            }
+            if (this.devToolbarHeight === void 0) {
                 var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
-                if (devToolbarComposition && devToolbarComposition.view) {
-                    this.devToolbarHeight = devToolbarComposition.view.$el.height();
+                if (devToolbarComposition &&
+                    devToolbarComposition.view &&
+                    devToolbarComposition.view.$('.sf-toolbarreset').is(':visible')) {
+                    this.devToolbarHeight = devToolbarComposition.view.$('.sf-toolbarreset').outerHeight();
                 } else {
                     this.devToolbarHeight = 0;
                 }
@@ -70,7 +87,7 @@ define(function (require) {
          *
          * @param {string|HTMLElement|jQuery.Element} container
          */
-        init: function (container) {
+        init: function(container) {
             var $container;
 
             $container = $(container);
@@ -80,15 +97,15 @@ define(function (require) {
 
             $container.find('[data-toggle="tooltip"]').tooltip();
 
-            this.initPopover($container.find('label'));
+            this.initPopover($container.find('.control-label'));
         },
 
-        initPopover: function (container) {
-            var $items = container.find('[data-toggle="popover"]').filter(function () {
+        initPopover: function(container) {
+            var $items = container.find('[data-toggle="popover"]').filter(function() {
                 // skip already initialized popovers
                 return !$(this).data('popover');
             });
-            $items.not('[data-close="false"]').each(function (i, el) {
+            $items.not('[data-close="false"]').each(function(i, el) {
                 //append close link
                 var content = $(el).data('content');
                 content += '<i class="icon-remove popover-close"></i>';
@@ -97,19 +114,19 @@ define(function (require) {
 
             $items.popover({
                 animation: false,
-                delay: { show: 0, hide: 0 },
+                delay: {show: 0, hide: 0},
                 html: true,
                 container: false,
                 trigger: 'manual'
-            }).on('click.popover', function (e) {
+            }).on('click.popover', function(e) {
                 $(this).popover('toggle');
                 e.preventDefault();
             });
 
             $('body')
-                .on('click.popover-hide', function (e) {
+                .on('click.popover-hide', function(e) {
                     var $target = $(e.target);
-                    $items.each(function () {
+                    $items.each(function() {
                         //the 'is' for buttons that trigger popups
                         //the 'has' for icons within a button that triggers a popup
                         if (
@@ -120,19 +137,19 @@ define(function (require) {
                             $(this).popover('hide');
                         }
                     });
-                }).on('click.popover-prevent', '.popover', function (e) {
+                }).on('click.popover-prevent', '.popover', function(e) {
                     if (e.target.tagName.toLowerCase() !== 'a') {
                         e.preventDefault();
                     }
-                }).on('focus.popover-hide', 'select, input, textarea', function () {
+                }).on('focus.popover-hide', 'select, input, textarea', function() {
                     $items.popover('hide');
                 });
-            mediator.once('page:request', function () {
+            mediator.once('page:request', function() {
                 $('body').off('.popover-hide .popover-prevent');
             });
         },
 
-        hideProgressBar: function () {
+        hideProgressBar: function() {
             var $bar = $('#progressbar');
             if ($bar.is(':visible')) {
                 $bar.hide();
@@ -145,18 +162,22 @@ define(function (require) {
          *
          * @param {jQuery=} $container
          */
-        styleForm: function ($container) {
+        styleForm: function($container) {
             var $elements;
             if ($.isPlainObject($.uniform)) {
+                var notUniformFilter = function(i, el) {
+                    return $(el).parent('.selector, .uploader').length === 0;
+                };
+
                 // bind uniform plugin to select elements
-                $elements = $container.find('select:not(.no-uniform,.select2)');
+                $elements = $container.find('select:not(.no-uniform,.select2)').filter(notUniformFilter);
                 $elements.uniform();
                 if ($elements.is('.error:not([multiple])')) {
                     $elements.removeClass('error').closest('.selector').addClass('error');
                 }
 
                 // bind uniform plugin to input:file elements
-                $elements = $container.find('input:file');
+                $elements = $container.find('input:file').filter(notUniformFilter);
                 $elements.uniform({
                     fileDefaultHtml: __('Please select a file...'),
                     fileButtonHtml: __('Choose File')
@@ -165,6 +186,8 @@ define(function (require) {
                     $elements.removeClass('error').closest('.uploader').addClass('error');
                 }
             }
+
+            $container.one('content:changed', _.bind(this.styleForm, this, $container));
         },
 
         /**
@@ -172,7 +195,7 @@ define(function (require) {
          *
          * @param {jQuery=} $container
          */
-        unstyleForm: function ($container) {
+        unstyleForm: function($container) {
             var $elements;
 
             // removes uniform plugin from elements
@@ -182,7 +205,7 @@ define(function (require) {
             }
 
             // removes select2 plugin from elements
-            $container.find('.select2-container').each(function () {
+            $container.find('.select2-container').each(function() {
                 var $this = $(this);
                 if ($this.data('select2')) {
                     $this.select2('destroy');
@@ -190,7 +213,7 @@ define(function (require) {
             });
         },
 
-        onPageRendered: function (cb) {
+        onPageRendered: function(cb) {
             if (document.pageReady) {
                 _.defer(cb);
             } else {
@@ -198,16 +221,16 @@ define(function (require) {
             }
         },
 
-        pageRendering: function () {
+        pageRendering: function() {
             document.pageReady = false;
 
             pageRenderedCbPool = [];
         },
 
-        pageRendered: function () {
+        pageRendered: function() {
             document.pageReady = true;
 
-            _.each(pageRenderedCbPool, function (cb) {
+            _.each(pageRenderedCbPool, function(cb) {
                 try {
                     cb();
                 } catch (ex) {
@@ -235,11 +258,11 @@ define(function (require) {
          * @param $mainEl
          * @returns {number}
          */
-        getAvailableHeight: function ($mainEl) {
-            var $parents = $mainEl.parents(),
-                documentHeight = $(document).height(),
-                heightDiff = documentHeight - $mainEl[0].getBoundingClientRect().top;
-            $parents.each(function () {
+        getAvailableHeight: function($mainEl) {
+            var $parents = $mainEl.parents();
+            var documentHeight = $(document).height();
+            var heightDiff = documentHeight - $mainEl[0].getBoundingClientRect().top;
+            $parents.each(function() {
                 heightDiff += this.scrollTop;
             });
             return heightDiff - this.getDevToolbarHeight() - this.PAGE_BOTTOM_PADDING;
@@ -251,9 +274,9 @@ define(function (require) {
          * @param $mainEl
          * @returns {string}
          */
-        getPreferredLayout: function ($mainEl) {
-            if (!this.hasHorizontalScroll() && !tools.isMobile()
-                && this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
+        getPreferredLayout: function($mainEl) {
+            if (!this.hasHorizontalScroll() && !tools.isMobile() &&
+                this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
                 return 'fullscreen';
             } else {
                 return 'scroll';
@@ -266,27 +289,33 @@ define(function (require) {
          * @param $mainEl
          * @returns {string}
          */
-        disablePageScroll: function ($mainEl) {
+        disablePageScroll: function($mainEl) {
+            if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
+                this.enablePageScroll();
+            }
             var $scrollableParents = $mainEl.parents();
             $scrollableParents.scrollTop(0);
             $scrollableParents.addClass('disable-scroll');
+            this._scrollDisabledElements = $scrollableParents;
         },
 
         /**
-         * Enables ability to scroll of $mainEl's scrollable parents
+         * Enables ability to scroll where it was previously disabled
          *
-         * @param $mainEl
          * @returns {string}
          */
-        enablePageScroll: function ($mainEl) {
-            $mainEl.parents().removeClass('disable-scroll');
+        enablePageScroll: function() {
+            if (this._scrollDisabledElements && this._scrollDisabledElements.length) {
+                this._scrollDisabledElements.parents().removeClass('disable-scroll');
+                delete this._scrollDisabledElements;
+            }
         },
 
         /**
          * Returns true if page has horizontal scroll
          * @returns {boolean}
          */
-        hasHorizontalScroll: function () {
+        hasHorizontalScroll: function() {
             return $('body').outerWidth() > $(window).width();
         },
 
@@ -294,20 +323,8 @@ define(function (require) {
          * Try to calculate the scrollbar width for your browser/os
          * @return {Number}
          */
-        scrollbarWidth: function () {
-            if (!this._scrollbarWidth) {
-                var $div = $( //borrowed from anti-scroll
-                    '<div style="width:50px;height:50px;overflow-y:scroll;'
-                        + 'position:absolute;top:-200px;left:-200px;"><div style="height:100px;width:100%">'
-                        + '</div>'
-                );
-                $('body').append($div);
-                var w1 = $div.innerWidth();
-                var w2 = $('div', $div).innerWidth();
-                $div.remove();
-                this._scrollbarWidth =  w1 - w2;
-            }
-            return this._scrollbarWidth;
+        scrollbarWidth: function() {
+            return scrollHelper.scrollbarWidth();
         }
     };
 

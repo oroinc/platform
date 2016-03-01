@@ -13,6 +13,19 @@ class AddressStub implements AddressInterface, FullNameInterface
     protected $regionCode;
 
     /**
+     * @var string
+     */
+    protected $street2;
+
+    /**
+     * @param string $street2
+     */
+    public function __construct($street2 = null)
+    {
+        $this->street2 = $street2;
+    }
+
+    /**
      * @param string $code
      * @return AddressStub
      */
@@ -79,7 +92,7 @@ class AddressStub implements AddressInterface, FullNameInterface
      */
     public function getStreet2()
     {
-        return 'apartment 10';
+        return $this->street2;
     }
 
     /**

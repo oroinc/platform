@@ -1,14 +1,13 @@
-/*jslint browser:true, nomen:true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailVariableView,
-        document = window.document,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        mediator = require('oroui/js/mediator'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var EmailVariableView;
+    var document = window.document;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var BaseView = require('oroui/js/app/views/base/view');
     require('jquery-ui');
 
     /**
@@ -34,9 +33,9 @@ define(function (require) {
             entity: 'entity'
         },
 
-         /**
-         * @property {jQuery}
-         */
+        /**
+        * @property {jQuery}
+        */
         lastElement: null,
 
         /**
@@ -44,7 +43,7 @@ define(function (require) {
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
 
             this.template = _.template($(this.options.templateSelector).html());
@@ -68,7 +67,7 @@ define(function (require) {
          *
          * @returns {*}
          */
-        render: function () {
+        render: function() {
             var vars = {system: this._getSystemVariablesHtml(this.model.getSystemVariables())};
 
             this.$el.empty();
@@ -84,9 +83,9 @@ define(function (require) {
          *
          * @returns {boolean}
          */
-        isEmpty: function () {
+        isEmpty: function() {
             var result = true;
-            _.each(this.fields, function (el) {
+            _.each(this.fields, function(el) {
                 if (el.value) {
                     result = false;
                 }
@@ -97,8 +96,8 @@ define(function (require) {
         /**
          * Sets empty string as a value for all fields
          */
-        clear: function () {
-            _.each(this.fields, function (el) {
+        clear: function() {
+            _.each(this.fields, function(el) {
                 if (el.value) {
                     el.value = '';
                 }
@@ -110,13 +109,13 @@ define(function (require) {
          *
          * @private
          */
-        _renderEntityVariables: function () {
-            var $el = this._getSectionContent(this.sections.entity),
-                $tabEl = this._getSectionTab(this.sections.entity),
-                entityVars = this.model.getEntityVariables(),
-                entityLabel = this.model.getEntityLabel(),
-                path = this.model.getPath(),
-                pathLabels = this.model.getPathLabels();
+        _renderEntityVariables: function() {
+            var $el = this._getSectionContent(this.sections.entity);
+            var $tabEl = this._getSectionTab(this.sections.entity);
+            var entityVars = this.model.getEntityVariables();
+            var entityLabel = this.model.getEntityLabel();
+            var path = this.model.getPath();
+            var pathLabels = this.model.getPathLabels();
 
             // remove old content
             $el.empty();
@@ -160,7 +159,7 @@ define(function (require) {
          * @returns {boolean}
          * @private
          */
-        _isVisible: function ($el) {
+        _isVisible: function($el) {
             // $el.is(':visible') cannot be used here because it is possible that this method
             // is called when the element is temporary not visible
             // for example this view is rendered when 'Loading ...' mask is not hidden yet
@@ -172,7 +171,7 @@ define(function (require) {
          * @returns {string}
          * @private
          */
-        _getSystemVariablesHtml: function (variables) {
+        _getSystemVariablesHtml: function(variables) {
             return this.systemTemplate({
                 variables: variables,
                 root: this.sections.system
@@ -187,10 +186,10 @@ define(function (require) {
          * @returns {string}
          * @private
          */
-        _getEntityVariablesHtml: function (variables, entityLabel, path, pathLabels) {
-            var fields = {},
-                relations = {};
-            _.each(variables, function (variable, varName) {
+        _getEntityVariablesHtml: function(variables, entityLabel, path, pathLabels) {
+            var fields = {};
+            var relations = {};
+            _.each(variables, function(variable, varName) {
                 if (_.has(variable, 'related_entity_name')) {
                     relations[varName] = variable;
                     fields[varName] = variable;
@@ -212,8 +211,8 @@ define(function (require) {
          * @param {jQuery} $el
          * @private
          */
-        _applyDraggable: function ($el) {
-            $el.find('a.variable').on('dragstart', function (e) {
+        _applyDraggable: function($el) {
+            $el.find('a.variable').on('dragstart', function(e) {
                 var dt = e.originalEvent.dataTransfer;
                 for (var i = 0; i < dt.types.length; i++) {
                     var type = dt.types[i];
@@ -229,7 +228,7 @@ define(function (require) {
          * @returns {string}
          * @private
          */
-        _getSectionSelector: function (selectorTemplate, sectionName) {
+        _getSectionSelector: function(selectorTemplate, sectionName) {
             return selectorTemplate.replace(/\{sectionName\}/g, sectionName);
         },
 
@@ -238,7 +237,7 @@ define(function (require) {
          * @returns {jQuery}
          * @private
          */
-        _getSectionTab: function (sectionName) {
+        _getSectionTab: function(sectionName) {
             return this.$el.find(this._getSectionSelector(this.options.sectionTabSelector, sectionName));
         },
 
@@ -247,7 +246,7 @@ define(function (require) {
          * @returns {jQuery}
          * @private
          */
-        _getSectionContent: function (sectionName) {
+        _getSectionContent: function(sectionName) {
             return this.$el.find(this._getSectionSelector(this.options.sectionContentSelector, sectionName));
         },
 
@@ -257,17 +256,21 @@ define(function (require) {
          *
          * @param {Event} e
          */
-        _handleVariableClick: function (e) {
+        _handleVariableClick: function(e) {
             var field = this.fields.filter(document.activeElement);
-            var value = $(e.currentTarget).html();
+            var variable = $(e.currentTarget).html();
 
-            if (!field.length && this.lastElement && this.lastElement.is(':visible')) {
+            e.preventDefault();
+            if (!field.length && this.lastElement && this.lastElement.is(':visible, [data-focusable]')) {
                 field = this.lastElement;
             }
 
-            if (field) {
-                field.val(field.val() + value);
-                mediator.trigger('email-variable-view:click-variable', field, value);
+            if (field.length) {
+                field.insertAtCursor(variable).focus();
+                mediator.trigger('email-variable-view:click-variable', field, variable);
+            } else {
+                mediator.execute('showFlashMessage', 'error',
+                    __('oro.email.emailtemplate.cannot_insert_variable'));
             }
         },
 
@@ -278,9 +281,9 @@ define(function (require) {
          * @param {Event} e
          * @private
          */
-        _handleReferenceClick: function (e) {
-            var $el = $(e.currentTarget),
-                path = $el.data('path');
+        _handleReferenceClick: function(e) {
+            var $el = $(e.currentTarget);
+            var path = $el.data('path');
 
             this.model.setPath(path);
         },
@@ -291,7 +294,7 @@ define(function (require) {
          * @param {Event} e
          * @private
          */
-        _updateElementsMetaData: function (e) {
+        _updateElementsMetaData: function(e) {
             this.lastElement = $(e.currentTarget);
         }
     });

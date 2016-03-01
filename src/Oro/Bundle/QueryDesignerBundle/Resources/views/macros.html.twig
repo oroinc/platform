@@ -15,29 +15,25 @@
         }
     } %}
     <div class="condition-builder left-panel-container">
-        <div class="panel-placeholder">
-            <div>
-                <div class="row-fluid">
-                    <div class="span3 filter-criteria">
-                        <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
-                        <ul class="criteria-list" id="{{ params.criteria_list_id }}">
-                            <li class="option" data-criteria="condition-item"
-                                data-module="oroquerydesigner/js/field-condition"
-                                data-widget="fieldCondition"
-                                data-options="{{ fieldConditionOptions|json_encode }}">
-                                {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
-                            </li>
-                            <li class="option" data-criteria="conditions-group">
-                                {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
-                            </li>
-                        </ul>
-                    </div>
-                    <div class="span9">
-                        <div class="condition-builder" id="{{ params.id }}"
-                             data-page-component-module="oroquerydesigner/js/app/components/condition-builder"
-                             data-page-component-options="{{ conditionBuilderOptions|json_encode }}"></div>
-                    </div>
-                </div>
+        <div class="row-fluid">
+            <div class="left-area filter-criteria">
+                <div class="hint">{{ 'oro.query_designer.condition_builder.criteria.drag_hint'|trans }}</div>
+                <ul class="criteria-list" id="{{ params.criteria_list_id }}">
+                    <li class="option" data-criteria="condition-item"
+                        data-module="oroquerydesigner/js/field-condition"
+                        data-widget="fieldCondition"
+                        data-options="{{ fieldConditionOptions|json_encode }}">
+                        {{ 'oro.query_designer.condition_builder.criteria.field_condition'|trans }}
+                    </li>
+                    <li class="option" data-criteria="conditions-group">
+                        {{ 'oro.query_designer.condition_builder.criteria.conditions_group'|trans }}
+                    </li>
+                </ul>
+            </div>
+            <div class="right-area">
+                <div id="{{ params.id }}"
+                     data-page-component-module="oroquerydesigner/js/app/components/condition-builder"
+                     data-page-component-options="{{ conditionBuilderOptions|json_encode }}"></div>
             </div>
         </div>
     </div>
@@ -97,7 +93,7 @@
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%= cid %>">
             {% if ('column' in showItems) %}
-            <td class="name-cell"><%= name %></td>
+            <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             {% endif %}
             {% if ('label' in showItems) %}
             <td class="label-cell"><%- label %></td>
@@ -120,7 +116,7 @@
                         data-message="{{ 'oro.query_designer.datagrid.action.delete_column_confirmation'|trans }}">
                     <i class="icon-trash hide-text"></i></a>
                 <span title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
-                    <i class="icon-list handle"></i></span>
+                    <i class="icon-resize-vertical handle"></i></span>
             </td>
             {% endif %}
         </tr>
@@ -130,7 +126,7 @@
 {% macro query_designer_grouping_item_template(id) %}
     <script type="text/html" id="{{ id }}">
         <tr data-cid="<%= cid %>">
-            <td class="name-cell"><%= name %></td>
+            <td class="name-cell<% if (obj.deleted) { %> deleted-field<% } %>"><%= name %></td>
             <td class="action-cell">
                 <a href="javascript: void(0);" class="action no-hash edit-button"
                         title="{{ 'oro.query_designer.datagrid.action.update_column'|trans }}"
@@ -142,7 +138,7 @@
                         data-message="{{ 'oro.query_designer.datagrid.action.delete_column_confirmation'|trans }}">
                     <i class="icon-trash hide-text"></i></a>
                 <span title="{{ 'oro.query_designer.datagrid.action.move_column'|trans }}">
-                    <i class="icon-list handle"></i></span>
+                    <i class="icon-resize-vertical handle"></i></span>
             </td>
         </tr>
     </script>

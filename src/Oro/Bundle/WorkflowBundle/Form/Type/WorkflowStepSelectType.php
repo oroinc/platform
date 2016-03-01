@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\Type;
 
-use Doctrine\ORM\EntityRepository;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
+use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 class WorkflowStepSelectType extends AbstractType
 {
@@ -29,23 +31,23 @@ class WorkflowStepSelectType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setOptional(
-            array(
+            [
                 'workflow_entity_class',
                 'workflow_name'
-            )
+            ]
         );
 
         $resolver->setDefaults(
-            array(
+            [
                 'class' => 'OroWorkflowBundle:WorkflowStep',
                 'property' => 'label'
-            )
+            ]
         );
 
         $workflowManager = $this->workflowManager;
 
         $resolver->setNormalizers(
-            array(
+            [
                 'query_builder' => function (Options $options, $qb) use ($workflowManager) {
                     if (!$qb) {
                         if (isset($options['workflow_name'])) {
@@ -59,18 +61,18 @@ class WorkflowStepSelectType extends AbstractType
                         }
 
                         $definition = $workflow ? $workflow->getDefinition() : null;
-                        $qb = function (EntityRepository $er) use ($definition) {
-                            return $er->createQueryBuilder('ws')
-                                ->where('ws.definition = :workflowDefinition')
-                                ->setParameter('workflowDefinition', $definition)
-                                ->orderBy('ws.stepOrder', 'ASC')
-                                ->orderBy('ws.label', 'ASC');
-                        };
+                        /** @var EntityManager $em */
+                        $em = $options['em'];
+                        $qb = $em->getRepository($options['class'])->createQueryBuilder('ws')
+                            ->where('ws.definition = :workflowDefinition')
+                            ->setParameter('workflowDefinition', $definition)
+                            ->orderBy('ws.stepOrder', 'ASC')
+                            ->orderBy('ws.label', 'ASC');
                     }
 
                     return $qb;
                 },
-            )
+            ]
         );
     }
 

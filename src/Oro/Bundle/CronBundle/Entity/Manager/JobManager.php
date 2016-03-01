@@ -121,4 +121,29 @@ class JobManager
             ->getQuery()
             ->getSingleScalarResult();
     }
+
+    /**
+     * @param string      $name
+     * @param null|string $args
+     *
+     * @return bool
+     */
+    public function hasJobInQueue($name, $args = null)
+    {
+        $qb = $this->em->getRepository('JMSJobQueueBundle:Job')
+            ->createQueryBuilder('j');
+
+        $qb->select('count(j.id)')
+            ->andWhere('j.command=:command')
+            ->andWhere('j.state in (:stateName)')
+            ->setParameter('command', $name)
+            ->setParameter('stateName', [Job::STATE_NEW, Job::STATE_RUNNING, Job::STATE_PENDING]);
+
+        if ($args) {
+            $qb->andWhere($qb->expr()->like('cast(j.args as text)', ':args'));
+            $qb->setParameter('args', $args);
+        }
+
+        return $qb->getQuery()->getSingleScalarResult() > 0;
+    }
 }

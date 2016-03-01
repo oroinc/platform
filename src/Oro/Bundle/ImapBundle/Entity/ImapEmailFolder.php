@@ -26,7 +26,7 @@ class ImapEmailFolder
     /**
      * @var EmailFolder
      *
-     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailFolder")
+     * @ORM\OneToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\EmailFolder", cascade={"persist"})
      * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false)
      */
     protected $folder;

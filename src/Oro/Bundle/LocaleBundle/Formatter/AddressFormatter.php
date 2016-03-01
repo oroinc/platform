@@ -69,15 +69,15 @@ class AddressFormatter
                 $lowerCaseKey = strtolower($key);
                 if ('name' === $lowerCaseKey) {
                     $value = $this->nameFormatter->format($address, $countryLocale);
-                } elseif ('street' == $lowerCaseKey) {
-                    $value = $this->getValue($address, 'street') . ' ' . $this->getValue($address, 'street2');
-                } elseif ('street1' == $lowerCaseKey) {
+                } elseif ('street' === $lowerCaseKey) {
+                    $value = trim($this->getValue($address, 'street') . ' ' . $this->getValue($address, 'street2'));
+                } elseif ('street1' === $lowerCaseKey) {
                     $value = $this->getValue($address, 'street');
-                } elseif ('country' == $lowerCaseKey) {
+                } elseif ('country' === $lowerCaseKey) {
                     $value = $this->getValue($address, 'countryName');
-                } elseif ('region' == $lowerCaseKey) {
+                } elseif ('region' === $lowerCaseKey) {
                     $value = $this->getValue($address, 'regionName');
-                } elseif ('region_code' == $lowerCaseKey) {
+                } elseif ('region_code' === $lowerCaseKey) {
                     $value = $this->getValue($address, 'regionCode');
                     if (!$value) {
                         $value = $this->getValue($address, 'regionName');
@@ -101,6 +101,7 @@ class AddressFormatter
             $newLineSeparator,
             str_replace('\n', $newLineSeparator, $formatted)
         );
+        $formatted = trim($formatted, $newLineSeparator);
         $formatted = preg_replace('/ +/', ' ', $formatted);
         $formatted = preg_replace('/ +\n/', "\n", $formatted);
         return trim($formatted);

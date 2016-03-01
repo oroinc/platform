@@ -60,17 +60,29 @@ class OptionValueBag
      */
     public function buildValue(OptionValueBuilderInterface $builder)
     {
+        $actions = [
+            'add' => [],
+            'replace' => [],
+            'remove' => [],
+        ];
+
         foreach ($this->actions as $action) {
             switch ($action->getName()) {
                 case 'add':
-                    $builder->add($action->getArgument(0));
-                    break;
-                case 'remove':
-                    $builder->remove($action->getArgument(0));
+                    $actions['add'][] = [$action->getArgument(0)];
                     break;
                 case 'replace':
-                    $builder->replace($action->getArgument(0), $action->getArgument(1));
+                    $actions['replace'][] = [$action->getArgument(0), $action->getArgument(1)];
                     break;
+                case 'remove':
+                    $actions['remove'][] = [$action->getArgument(0)];
+                    break;
+            }
+        }
+
+        foreach ($actions as $action => $calls) {
+            foreach ($calls as $arguments) {
+                call_user_func_array([$builder, $action], $arguments);
             }
         }
 

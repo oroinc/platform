@@ -30,7 +30,7 @@ class AclConfigurationPass implements CompilerPassInterface
     const DOCTRINE_CONVERTER_CLASS = 'Oro\Bundle\SecurityBundle\Request\ParamConverter\DoctrineParamConverter';
     const SECURITY_FACADE_SERVICE = 'oro_security.security_facade';
 
-    const OWNERSHIP_CONFIG_PROVIDER = 'oro_entity_config.provider.ownership';
+    const ACL_GROUP_PROVIDER_CHAIN_PROVIDER = 'oro_security.acl.group_provider.chain';
 
     /**
      * {@inheritDoc}
@@ -116,6 +116,7 @@ class AclConfigurationPass implements CompilerPassInterface
 
     /**
      * @param ContainerBuilder $container
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function configureDefaultAclVoter(ContainerBuilder $container)
     {
@@ -138,11 +139,12 @@ class AclConfigurationPass implements CompilerPassInterface
                     );
                 }
 
-                //set owner config provider in voter
-                $voterDef->addMethodCall(
-                    'setConfigProvider',
-                    array(new Reference(self::OWNERSHIP_CONFIG_PROVIDER))
-                );
+                if ($container->hasDefinition(self::ACL_GROUP_PROVIDER_CHAIN_PROVIDER)) {
+                    $voterDef->addMethodCall(
+                        'setAclGroupProvider',
+                        [new Reference(self::ACL_GROUP_PROVIDER_CHAIN_PROVIDER)]
+                    );
+                }
             }
             // substitute the ACL Provider and set the default ACL Provider as a base provider for new ACL Provider
             if ($container->hasDefinition(self::NEW_ACL_PROVIDER)) {

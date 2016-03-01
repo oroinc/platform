@@ -43,6 +43,11 @@ class ImportStrategyListener
     protected $propertyAccessor;
 
     /**
+     * @var array
+     */
+    protected $organizationFieldByEntity = [];
+
+    /**
      * @param ManagerRegistry $registry
      * @param ServiceLink $securityFacadeLink
      * @param ServiceLink $metadataProviderLink
@@ -64,10 +69,7 @@ class ImportStrategyListener
     {
         $entity = $event->getEntity();
 
-        /** @var OwnershipMetadataProvider $metadataProvider */
-        $metadataProvider = $this->metadataProviderLink->getService();
-
-        $organizationField = $metadataProvider->getMetadata(ClassUtils::getClass($entity))->getOrganizationFieldName();
+        $organizationField = $this->getOrganizationField($entity);
         if (!$organizationField) {
             return;
         }
@@ -106,6 +108,7 @@ class ImportStrategyListener
     public function onClear()
     {
         $this->defaultOrganization = null;
+        $this->organizationFieldByEntity = [];
     }
 
     /**
@@ -140,5 +143,22 @@ class ImportStrategyListener
         }
 
         return $this->defaultOrganization ?: null;
+    }
+
+    /**
+     * @param object $entity
+     * @return string
+     */
+    protected function getOrganizationField($entity)
+    {
+        $entityName = ClassUtils::getClass($entity);
+        if (!array_key_exists($entityName, $this->organizationFieldByEntity)) {
+            /** @var OwnershipMetadataProvider $metadataProvider */
+            $metadataProvider = $this->metadataProviderLink->getService();
+            $this->organizationFieldByEntity[$entityName] = $metadataProvider->getMetadata($entityName)
+                ->getGlobalOwnerFieldName();
+        }
+
+        return $this->organizationFieldByEntity[$entityName];
     }
 }

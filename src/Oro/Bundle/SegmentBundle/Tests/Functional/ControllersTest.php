@@ -8,7 +8,6 @@ use Oro\Bundle\SegmentBundle\Entity\Segment;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class ControllersTest extends WebTestCase

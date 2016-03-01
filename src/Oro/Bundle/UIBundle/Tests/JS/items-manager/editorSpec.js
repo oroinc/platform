@@ -1,48 +1,46 @@
-/*global define, describe, it, expect, spyOn, beforeEach, afterEach*/
-/*jshint multistr: true*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var $ = require('oroui/js/items-manager/editor');
     var Backbone = require('backbone');
 
-    describe('oroui/js/items-manager/editor', function () {
+    describe('oroui/js/items-manager/editor', function() {
         var $el;
 
-        beforeEach(function () {
+        beforeEach(function() {
             $el = $('<div>');
-            $el.append('\
-                <input id="name" name="name"></input>\
-                <select id="choice" name="choice">\
-                    <option></option>\
-                    <option>1</option>\
-                    <option>2</option>\
-                    <option>3</option>\
-                </select>\
-                <textarea id="desc" name="desc"></textarea>\
-                <input id="a" type="submit"></input>\
-                <input id="b" type="submit"></input>\
-                <input id="c" type="submit"></input>\
-                <button class="add-button"></button>\
-                <button class="save-button"></button>\
-                <button class="cancel-button"></button>');
+            $el.append(
+                '<input id="name" name="name"/>' +
+                '<select id="choice" name="choice">' +
+                    '<option></option>' +
+                    '<option>1</option>' +
+                    '<option>2</option>' +
+                    '<option>3</option>' +
+                '</select>' +
+                '<textarea id="desc" name="desc"></textarea>' +
+                '<input id="a" type="submit"/>' +
+                '<input id="b" type="submit"/>' +
+                '<input id="c" type="submit"/>' +
+                '<button class="add-button"></button>' +
+                '<button class="save-button"></button>' +
+                '<button class="cancel-button"></button>');
             $('body').append($el);
         });
 
-        afterEach(function () {
+        afterEach(function() {
             $el.remove();
             $el = null;
         });
 
-        it('is $ widget', function () {
-            expect(function () {
+        it('is $ widget', function() {
+            expect(function() {
                 $el.itemsManagerEditor({
                     collection: new Backbone.Collection()
                 });
             }).not.toThrow();
         });
 
-        it('resets inputs', function () {
+        it('resets inputs', function() {
             $el.find('#name').val(1);
             $el.find('#choice').val(2);
             $el.find('#desc').val(3);
@@ -56,7 +54,7 @@ define(function (require) {
             expect($el.find('#desc')).toHaveValue('');
         });
 
-        it('does not reset special inputs', function () {
+        it('does not reset special inputs', function() {
             $el.find('#a').val(1);
             $el.find('#b').val(2);
             $el.find('#c').val(3);
@@ -70,7 +68,7 @@ define(function (require) {
             expect($el.find('#c')).toHaveValue('3');
         });
 
-        it('sets inputs from edited model', function () {
+        it('sets inputs from edited model', function() {
             var collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
@@ -88,7 +86,7 @@ define(function (require) {
             expect($el.find('#desc')).toHaveValue('Description');
         });
 
-        it('updates edited model on button click', function () {
+        it('updates edited model on button click', function() {
             var collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
@@ -112,7 +110,7 @@ define(function (require) {
             expect(collection.at(0).get('desc')).toEqual('Description2');
         });
 
-        it('does not update edited model on button click', function () {
+        it('does not update edited model on button click', function() {
             var collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
@@ -136,7 +134,7 @@ define(function (require) {
             expect(collection.at(0).get('desc')).toEqual('Description');
         });
 
-        it('creates model on button click', function () {
+        it('creates model on button click', function() {
             var collection = new Backbone.Collection();
 
             $el.itemsManagerEditor({
@@ -154,7 +152,7 @@ define(function (require) {
             expect(collection.at(0).get('desc')).toEqual('Description');
         });
 
-        it('does not create model on button click', function () {
+        it('does not create model on button click', function() {
             var collection = new Backbone.Collection();
 
             $el.itemsManagerEditor({
@@ -170,7 +168,7 @@ define(function (require) {
             expect(collection.length).toEqual(0);
         });
 
-        it('resets inputs if model removed', function () {
+        it('resets inputs if model removed', function() {
             var collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
@@ -189,7 +187,7 @@ define(function (require) {
             expect($el.find('#desc')).toHaveValue('');
         });
 
-        it('hides edit button if new model', function () {
+        it('hides edit button if new model', function() {
             var collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
@@ -203,7 +201,7 @@ define(function (require) {
             expect($el.find('.save-button')).toBeHidden();
         });
 
-        it('hides add button if editing model', function () {
+        it('hides add button if editing model', function() {
             var collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
@@ -219,7 +217,7 @@ define(function (require) {
             expect($el.find('.add-button')).toBeHidden();
         });
 
-        it('calls setter for each input', function () {
+        it('calls setter for each input', function() {
             var collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
@@ -228,7 +226,7 @@ define(function (require) {
 
             $el.itemsManagerEditor({
                 collection: collection,
-                setter: function ($el, name, value) {
+                setter: function($el, name, value) {
                     if (name === 'name') {
                         return value + '2';
                     }
@@ -249,7 +247,7 @@ define(function (require) {
             expect($el.find('#desc')).toHaveValue('Description2');
         });
 
-        it('calls getter for each input', function () {
+        it('calls getter for each input', function() {
             var collection = new Backbone.Collection([{
                 name: 'Name',
                 choice: '2',
@@ -258,7 +256,7 @@ define(function (require) {
 
             $el.itemsManagerEditor({
                 collection: collection,
-                getter: function ($el, name, value) {
+                getter: function($el, name, value) {
                     if (name === 'name') {
                         return value + '2';
                     }

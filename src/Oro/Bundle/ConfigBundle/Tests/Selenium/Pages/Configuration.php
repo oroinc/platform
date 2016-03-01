@@ -8,12 +8,12 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
  * Class Configuration
  *
  * @package Oro\Bundle\ConfigBundle\Tests\Selenium\Pages
- * @method Configuration openConfiguration() openConfiguration(string)
+ * @method Configuration openConfiguration(string $bundlePath)
  * {@inheritdoc}
  */
 class Configuration extends AbstractPage
 {
-    protected $redirectUrl = 'config/system';
+    const URL = 'config/system';
 
     /**
      * @param bool $directLoad

@@ -8,6 +8,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\SearchBundle\Engine\Indexer;
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoMysql extends BaseDriver
@@ -58,7 +59,7 @@ class PdoMysql extends BaseDriver
      *
      * @return string
      */
-    protected function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
+    public function addTextField(QueryBuilder $qb, $index, $searchCondition, $setOrderBy = true)
     {
         $words = $this->getWords(
             $this->filterTextFieldValue($searchCondition['fieldValue']),
@@ -66,7 +67,7 @@ class PdoMysql extends BaseDriver
         );
 
         // TODO Need to clarify search requirements in scope of CRM-214
-        if ($searchCondition['condition'] == Query::OPERATOR_CONTAINS) {
+        if (in_array($searchCondition['condition'], [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS])) {
             $whereExpr  = $this->createMatchAgainstWordsExpr($qb, $words, $index, $searchCondition, $setOrderBy);
             $shortWords = $this->getWordsLessThanFullTextMinWordLength($words);
             if ($shortWords) {
@@ -79,9 +80,7 @@ class PdoMysql extends BaseDriver
             $whereExpr = $this->createNotLikeWordsExpr($qb, $words, $index, $searchCondition);
         }
 
-        $whereExpr = $searchCondition['type'] . '(' . $whereExpr . ')';
-
-        return $whereExpr;
+        return '(' . $whereExpr . ')';
     }
 
     /**
@@ -171,7 +170,6 @@ class PdoMysql extends BaseDriver
     ) {
         $joinAlias      = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName      = $searchCondition['fieldName'];
-        $fieldValue     = $searchCondition['fieldValue'];
         $fieldParameter = 'field' . $index;
         $valueParameter = 'value' . $index;
 
@@ -187,13 +185,8 @@ class PdoMysql extends BaseDriver
         }
 
         if ($setOrderBy) {
-            $rawValueParameter = "raw_$valueParameter";
-            $qb->select(
-                [
-                    'search as item',
-                    "MATCH_AGAINST($joinAlias.value, :$rawValueParameter) AS rankField"
-                ]
-            )->setParameter($rawValueParameter, $fieldValue)->orderBy('rankField', 'DESC');
+            $qb->addSelect(sprintf('MATCH_AGAINST(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
+                ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
         }
 
         return (string)$result;

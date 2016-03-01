@@ -1,10 +1,11 @@
-/*global define*/
-define(['underscore'
-    ], function (_) {
+define(function(require) {
     'use strict';
 
+    var $ = require('jquery');
+    var _ = require('underscore');
+
     // define a constructor
-    var entityFieldUtil = function ($el) {
+    var entityFieldUtil = function($el) {
         this.$el = $el;
     };
 
@@ -22,18 +23,19 @@ define(['underscore'
 
         /** @property */
         optionTemplate: _.template(
-            '<option value="<%- name %>"<% _.each(_.omit(obj, ["name", "related_entity_fields"]), function (val, key) { %> data-<%- key %>="<%- val %>"<% }) %>>' +
+            '<option value="<%- name %>"<% _.each(_.omit(obj, ["name", "related_entity_fields"]), ' +
+                'function (val, key) { %> data-<%- key %>="<%- val %>"<% }) %>>' +
                 '<%- label %>' +
             '</option>'
         ),
 
-        findEntity: function (entity) {
+        findEntity: function(entity) {
             return {name: entity, label: entity, plural_label: entity, icon: null};
         },
 
-        splitFieldId: function (fieldId) {
+        splitFieldId: function(fieldId) {
             var result = [];
-            if (fieldId != '') {
+            if (fieldId !== '') {
                 result.push({
                     entity: this.findEntity(this.getEntityName()),
                     label: this._getFieldLabel(fieldId)
@@ -42,11 +44,11 @@ define(['underscore'
             return result;
         },
 
-        getEntityName: function () {
+        getEntityName: function() {
             return _.isUndefined(this.$el.data('entity')) ? null : this.$el.data('entity');
         },
 
-        changeEntity: function (entityName, fields) {
+        changeEntity: function(entityName, fields) {
             this.$el.data('entity', entityName);
             var emptyItem = this.$el.find('option[value=""]');
             this.$el.empty();
@@ -54,38 +56,38 @@ define(['underscore'
                 this.$el.append(this.optionTemplate({name: '', label: emptyItem.text()}));
             }
             var content = this._buildSelectContent(fields);
-            if (content != '') {
+            if (content !== '') {
                 this.$el.append(content);
             }
             this.$el.val(this.$el.is('[multiple]') ? [] : '');
             this.$el.trigger('change');
         },
 
-        getFieldData: function (fieldId) {
+        getFieldData: function(fieldId) {
             return this._getOptionElement(fieldId).data();
         },
 
-        filterData: function () {
-            this.$el.find('option').each(_.partial(function (that) {
+        filterData: function() {
+            this.$el.find('option').each(_.partial(function(that) {
                 if (that.exclude(that._getFieldApplicableConditions($(this).data(), that.getEntityName()))) {
                     $(this).remove();
                 }
             }, this));
         },
 
-        _getFieldLabel: function (fieldId) {
+        _getFieldLabel: function(fieldId) {
             return this._getOptionElement(fieldId).data('label');
         },
 
-        _getFieldGroupLabel: function (fieldId) {
+        _getFieldGroupLabel: function(fieldId) {
             return this._getOptionElement(fieldId).parent().attr('label');
         },
 
-        _getOptionElement: function (value) {
-            return this.$el.find('option[value="' + value.replace(/\\/g,"\\\\").replace(/:/g,"\\:") + '"]');
+        _getOptionElement: function(value) {
+            return this.$el.find('option[value="' + value.replace(/\\/g, '\\\\').replace(/:/g, '\\:') + '"]');
         },
 
-        _getFieldApplicableConditions: function (field, entity) {
+        _getFieldApplicableConditions: function(field, entity) {
             return _.extend({
                     entity: entity,
                     field: field.name
@@ -94,13 +96,13 @@ define(['underscore'
             );
         },
 
-        _buildSelectContent: function (fields) {
+        _buildSelectContent: function(fields) {
             var sFields = '';
             var sRelations = '';
-            _.each(fields, _.bind(function (field) {
-                if (_.isUndefined(field['relation_type'])) {
-                    if (_.isUndefined(this.exclude)
-                        || !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
+            _.each(fields, _.bind(function(field) {
+                if (_.isUndefined(field.relation_type)) {
+                    if (_.isUndefined(this.exclude) ||
+                        !this.exclude(this._getFieldApplicableConditions(field, this.getEntityName()))) {
                         sFields += this.optionTemplate(field);
                     }
                 } else {
@@ -108,11 +110,11 @@ define(['underscore'
                 }
             }, this));
 
-            if (sRelations == '') {
+            if (sRelations === '') {
                 return sFields;
             }
             var result = '';
-            if (sFields != '') {
+            if (sFields !== '') {
                 result += this.optGroupTemplate({
                     label: this.fieldsLabel,
                     options: sFields

@@ -7,11 +7,8 @@ use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 
-class UserCalendarProvider implements CalendarProviderInterface
+class UserCalendarProvider extends AbstractCalendarProvider
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
@@ -28,7 +25,7 @@ class UserCalendarProvider implements CalendarProviderInterface
         EntityNameResolver $entityNameResolver,
         AbstractCalendarEventNormalizer $calendarEventNormalizer
     ) {
-        $this->doctrineHelper          = $doctrineHelper;
+        parent::__construct($doctrineHelper);
         $this->entityNameResolver      = $entityNameResolver;
         $this->calendarEventNormalizer = $calendarEventNormalizer;
     }
@@ -38,6 +35,10 @@ class UserCalendarProvider implements CalendarProviderInterface
      */
     public function getCalendarDefaultValues($organizationId, $userId, $calendarId, array $calendarIds)
     {
+        if (empty($calendarIds)) {
+            return [];
+        }
+
         $qb = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:Calendar')
             ->createQueryBuilder('o')
             ->select('o, owner')
@@ -56,8 +57,6 @@ class UserCalendarProvider implements CalendarProviderInterface
             // prohibit to remove the current calendar from the list of connected calendars
             if ($calendar->getId() === $calendarId) {
                 $resultItem['removable'] = false;
-            }
-            if ($calendarId === $calendar->getId()) {
                 $resultItem['canAddEvent']    = true;
                 $resultItem['canEditEvent']   = true;
                 $resultItem['canDeleteEvent'] = true;
@@ -81,8 +80,9 @@ class UserCalendarProvider implements CalendarProviderInterface
         $extraFields = []
     ) {
         /** @var CalendarEventRepository $repo */
-        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $qb   = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, [], $extraFields);
+        $repo        = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $extraFields = $this->filterSupportedFields($extraFields, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+        $qb          = $repo->getUserEventListByTimeIntervalQueryBuilder($start, $end, [], $extraFields);
 
         $visibleIds = [];
         foreach ($connections as $id => $visible) {
@@ -90,7 +90,7 @@ class UserCalendarProvider implements CalendarProviderInterface
                 $visibleIds[] = $id;
             }
         }
-        if (!empty($visibleIds)) {
+        if ($visibleIds) {
             $qb
                 ->andWhere('c.id IN (:visibleIds)')
                 ->setParameter('visibleIds', $visibleIds);
@@ -109,11 +109,6 @@ class UserCalendarProvider implements CalendarProviderInterface
      */
     protected function buildCalendarName(Calendar $calendar)
     {
-        $name = $calendar->getName();
-        if (!$name) {
-            $name = $this->entityNameResolver->getName($calendar->getOwner());
-        }
-
-        return $name;
+        return $calendar->getName() ?: $this->entityNameResolver->getName($calendar->getOwner());
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Entity\Repository;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\Common\Util\ClassUtils;
 
@@ -25,6 +27,16 @@ class SearchIndexRepository extends EntityRepository
      * @var array
      */
     protected $drivers;
+
+    /**
+     * @var ManagerRegistry
+     */
+    protected $registry;
+
+    /**
+     * @var ObjectManager[]
+     */
+    protected $managers = [];
 
     /**
      * Search query to index
@@ -102,15 +114,13 @@ class SearchIndexRepository extends EntityRepository
     public function getItemsForEntities(array $entities)
     {
         if (!$entities) {
-            return array();
+            return [];
         }
 
-        $entityManager = $this->getEntityManager();
-
-        $identifiers = array();
+        $identifiers = [];
         foreach ($entities as $entity) {
             $class = ClassUtils::getClass($entity);
-            $ids   = $entityManager->getClassMetadata($class)->getIdentifierValues($entity);
+            $ids   = $this->getManager($class)->getClassMetadata($class)->getIdentifierValues($entity);
 
             if (!empty($ids)) {
                 $identifiers[$class][] = current($ids);
@@ -118,7 +128,7 @@ class SearchIndexRepository extends EntityRepository
         }
 
         if (!$identifiers) {
-            return array();
+            return [];
         }
 
         $queryBuilder = $this->createQueryBuilder('item');
@@ -137,7 +147,7 @@ class SearchIndexRepository extends EntityRepository
         /** @var Item[] $items */
         $items = $queryBuilder->getQuery()->getResult();
 
-        $groupedItems = array();
+        $groupedItems = [];
         foreach ($items as $item) {
             $class = $item->getEntity();
             $id    = $item->getRecordId();
@@ -145,5 +155,32 @@ class SearchIndexRepository extends EntityRepository
         }
 
         return $groupedItems;
+    }
+
+    /**
+     * @param string $entityClass
+     * @return ObjectManager
+     */
+    protected function getManager($entityClass)
+    {
+        if (array_key_exists($entityClass, $this->managers)) {
+            return $this->managers[$entityClass];
+        }
+
+        $this->managers[$entityClass] = $this->registry->getManagerForClass($entityClass);
+
+        if (null === $this->managers[$entityClass]) {
+            $this->managers[$entityClass] = $this->registry->getManager();
+        }
+
+        return $this->managers[$entityClass];
+    }
+
+    /**
+     * @param ManagerRegistry $registry
+     */
+    public function setRegistry($registry)
+    {
+        $this->registry = $registry;
     }
 }

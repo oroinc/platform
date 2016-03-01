@@ -28,7 +28,8 @@ use Oro\Bundle\AddressBundle\Model\ExtendCountry;
  *              "groups"={"dictionary"}
  *          },
  *          "dictionary"={
- *              "virtual_fields"={"iso2Code", "iso3Code", "name"}
+ *              "virtual_fields"={"iso2Code", "iso3Code", "name"},
+ *              "search_fields"={"name"}
  *          }
  *      }
  * )
@@ -96,6 +97,8 @@ class Country extends ExtendCountry implements Translatable
      */
     public function __construct($iso2Code)
     {
+        parent::__construct();
+
         $this->iso2Code = $iso2Code;
         $this->regions  = new ArrayCollection();
     }

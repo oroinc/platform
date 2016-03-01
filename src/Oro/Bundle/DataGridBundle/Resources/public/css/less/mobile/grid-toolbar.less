@@ -1,0 +1,42 @@
+.grid-toolbar {
+  .pagination-container {
+    margin: 0 auto;
+    width: 270px;
+    .forScreen(600px, margin, 0);
+    .forScreen(600px, width, auto);
+    .page-size {
+      margin-left: 16px;
+      label {
+        display: inline-block;
+        .forScreen(450px, display, none);
+      }
+    }
+    .pagination{
+      margin-left: -58px;
+      .forScreen(600px, margin, 0);
+      .dib{
+        .forScreen(450px, display, none!important);
+      }
+    }
+  }
+  .actions-panel {
+    margin-left: 16px;
+    .action.btn {
+      height: 32px;
+      margin-right: 8px;
+      padding: 0 7px;
+      &:last-child {
+        margin-right: 0;
+      }
+    }
+    a.action.btn {
+      .forScreen(400px, display, none);
+      i {
+        &:before {
+          font-size: 14px;
+          line-height: 30px;
+        }
+      }
+    }
+  }
+}

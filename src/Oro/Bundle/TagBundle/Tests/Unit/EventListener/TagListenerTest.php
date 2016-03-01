@@ -3,6 +3,8 @@
 namespace Oro\Bundle\TagBundle\Tests\Unit\EventListener;
 
 use Oro\Bundle\TagBundle\EventListener\TagListener;
+use Oro\Bundle\TagBundle\Tests\Unit\Fixtures\Taggable;
+use Oro\Bundle\TagBundle\Entity\Taggable as TaggableInterface;
 
 class TagListenerTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,15 +16,13 @@ class TagListenerTest extends \PHPUnit_Framework_TestCase
     private $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var TaggableInterface
      */
     private $resource;
 
     protected function setUp()
     {
-        $this->resource = $this->getMock('Oro\Bundle\TagBundle\Entity\Taggable');
-        $this->resource->expects($this->once())->method('getTaggableId')
-            ->will($this->returnValue(self::TEST_ID));
+        $this->resource = new Taggable(['id' => self::TEST_ID]);
     }
 
     protected function tearDown()
@@ -36,12 +36,22 @@ class TagListenerTest extends \PHPUnit_Framework_TestCase
      */
     public function testPreRemove()
     {
+        $helper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $helper->expects($this->once())
+            ->method('isTaggable')
+            ->with($this->resource)
+            ->willReturn(true);
+
         $manager = $this->getMockBuilder('Oro\Bundle\TagBundle\Entity\TagManager')
             ->disableOriginalConstructor()
             ->getMock();
+
         $manager->expects($this->once())
-            ->method('deleteTaggingByParams')
-            ->with(null, get_class($this->resource), self::TEST_ID);
+            ->method('deleteTagging')
+            ->with($this->resource, []);
 
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container->expects($this->once())
@@ -49,7 +59,7 @@ class TagListenerTest extends \PHPUnit_Framework_TestCase
             ->with($this->equalTo('oro_tag.tag.manager'))
             ->will($this->returnValue($manager));
 
-        $this->listener = new TagListener();
+        $this->listener = new TagListener($helper);
         $this->listener->setContainer($container);
 
         $args = $this->getMockBuilder('Doctrine\ORM\Event\LifecycleEventArgs')

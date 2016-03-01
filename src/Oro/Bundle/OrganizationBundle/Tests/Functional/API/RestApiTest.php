@@ -7,7 +7,6 @@ use Symfony\Component\BrowserKit\Response;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestApiTest extends WebTestCase

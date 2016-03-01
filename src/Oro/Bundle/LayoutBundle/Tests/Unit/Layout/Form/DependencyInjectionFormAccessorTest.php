@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Form;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Form\FormView;
 
 use Oro\Bundle\LayoutBundle\Layout\Form\DependencyInjectionFormAccessor;
@@ -11,7 +12,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
 {
     const FORM_SERVICE_ID = 'test_service_id';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var ContainerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $container;
 
     protected function setUp()
@@ -22,6 +23,8 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
     public function testGetForm()
     {
         $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form->expects($this->once())->method('getName')->willReturn('form_name');
+
         $this->container->expects($this->once())
             ->method('get')
             ->with(self::FORM_SERVICE_ID)
@@ -29,6 +32,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
 
         $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
         $this->assertSame($form, $formAccessor->getForm());
+        $this->assertEquals('form_name', $formAccessor->getName());
     }
 
     public function testToString()
@@ -130,6 +134,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         //   field1
         //     field2
         $formView                       = new FormView();
+        $formView->vars['id']           = self::FORM_SERVICE_ID;
         $field1View                     = new FormView($formView);
         $formView->children['field1']   = $field1View;
         $field2View                     = new FormView($field1View);
@@ -148,6 +153,7 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($formView, $formAccessor->getView());
         $this->assertSame($field1View, $formAccessor->getView('field1'));
         $this->assertSame($field2View, $formAccessor->getView('field1.field2'));
+        $this->assertSame($formView->vars['id'], $formAccessor->getId());
     }
 
     public function testProcessedFields()
@@ -159,5 +165,59 @@ class DependencyInjectionFormAccessorTest extends \PHPUnit_Framework_TestCase
         $processedFields = ['field' => 'block_id'];
         $formAccessor->setProcessedFields($processedFields);
         $this->assertSame($processedFields, $formAccessor->getProcessedFields());
+    }
+
+    public function testSetFormData()
+    {
+        $data = ['test'];
+
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form->expects($this->once())->method('setData')->with($data);
+        $form->expects($this->once())->method('getData')->willReturn($data);
+
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with(self::FORM_SERVICE_ID)
+            ->will($this->returnValue($form));
+
+        $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
+
+        $formAccessor->setFormData($data);
+        $this->assertEquals($data, $formAccessor->getForm()->getData());
+    }
+
+    public function testSetters()
+    {
+        $formConfig = $this->getMock('Symfony\Component\Form\FormConfigInterface');
+        $formView = new FormView();
+        $formView->vars['multipart'] = true;
+
+        $form = $this->getMock('Symfony\Component\Form\Test\FormInterface');
+        $form->expects($this->any())
+            ->method('getConfig')
+            ->will($this->returnValue($formConfig));
+        $form->expects($this->once())
+            ->method('createView')
+            ->will($this->returnValue($formView));
+
+        $this->container->expects($this->once())
+            ->method('get')
+            ->with(self::FORM_SERVICE_ID)
+            ->will($this->returnValue($form));
+
+        $formAccessor = new DependencyInjectionFormAccessor($this->container, self::FORM_SERVICE_ID);
+
+        $action = FormAction::createByRoute('test_route', ['foo' => 'bar']);
+        $formAccessor->setAction($action);
+        $this->assertEquals($action, $formAccessor->getAction());
+
+        $formAccessor->setActionRoute('test_route', []);
+        $this->assertEquals(FormAction::createByRoute('test_route', []), $formAccessor->getAction());
+
+        $formAccessor->setMethod('post');
+        $this->assertEquals('post', $formAccessor->getMethod());
+
+        $formAccessor->setEnctype('multipart/form-data');
+        $this->assertEquals('multipart/form-data', $formAccessor->getEnctype());
     }
 }

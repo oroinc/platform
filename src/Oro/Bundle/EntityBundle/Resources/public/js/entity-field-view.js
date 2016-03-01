@@ -1,6 +1,5 @@
-/*global define*/
 define(['underscore', 'backbone'
-    ], function (_, Backbone) {
+    ], function(_, Backbone) {
     'use strict';
 
     /**
@@ -20,7 +19,7 @@ define(['underscore', 'backbone'
         /** @property {Object} */
         util: null,
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             this.util = this.$el.data('entity-field-util');
             this.util.fieldsLabel = this.options.fieldsLabel;
@@ -34,24 +33,24 @@ define(['underscore', 'backbone'
             }
         },
 
-        getEntityName: function () {
+        getEntityName: function() {
             return this.util.getEntityName();
         },
 
-        changeEntity: function (entityName, fields) {
+        changeEntity: function(entityName, fields) {
             this.util.changeEntity(entityName, fields);
         },
 
-        splitFieldId: function (fieldId) {
+        splitFieldId: function(fieldId) {
             return this.util.splitFieldId(fieldId);
         },
 
-        getFieldData: function (fieldId) {
+        getFieldData: function(fieldId) {
             return this.util.getFieldData(fieldId);
         },
 
-        getFieldApplicableConditions: function (fieldId) {
-            if (_.isNull(fieldId) || fieldId == '') {
+        getFieldApplicableConditions: function(fieldId) {
+            if (_.isNull(fieldId) || fieldId === '') {
                 return {};
             }
 

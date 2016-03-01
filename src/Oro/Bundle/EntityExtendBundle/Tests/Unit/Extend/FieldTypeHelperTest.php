@@ -56,7 +56,6 @@ class FieldTypeHelperTest extends \PHPUnit_Framework_TestCase
             ['oneToMany', true],
             ['manyToOne', true],
             ['manyToMany', true],
-            ['optionSet', true],
             ['string', false],
             ['integer', false],
             ['text', false],

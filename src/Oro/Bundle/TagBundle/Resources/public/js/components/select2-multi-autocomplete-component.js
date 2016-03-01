@@ -1,18 +1,20 @@
-define(function (require) {
+define(function(require) {
     'use strict';
-    var Select2MultiAutocompleteComponent,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+
+    var Select2MultiAutocompleteComponent;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var Select2AutocompleteComponent = require('oro/select2-autocomplete-component');
+
     Select2MultiAutocompleteComponent = Select2AutocompleteComponent.extend({
         oroTagCreateGranted: false,
-        initialize: function (options) {
+        initialize: function(options) {
             this.oroTagCreateGranted = _.result(options, 'oro_tag_create_granted') || this.oroTagCreateGranted;
             Select2MultiAutocompleteComponent.__super__.initialize.call(this, options);
         },
-        preConfig: function (config) {
-            var that = this;
+
+        preConfig: function(config) {
+            var self = this;
             Select2MultiAutocompleteComponent.__super__.preConfig.call(this, config);
             config.maximumInputLength = 50;
 
@@ -20,10 +22,14 @@ define(function (require) {
                 var match = _.find(data, function(item) {
                         return item.name.toLowerCase().localeCompare(term.toLowerCase()) === 0;
                     });
-                if (typeof match == 'undefined' && that.oroTagCreateGranted) {
+                if (typeof match === 'undefined' && self.oroTagCreateGranted) {
                     return {
-                        id: term,
-                        name: term
+                        id: JSON.stringify({
+                            id: term,
+                            name: term
+                        }),
+                        name: term,
+                        isNew: true
                     };
                 }
                 return null;

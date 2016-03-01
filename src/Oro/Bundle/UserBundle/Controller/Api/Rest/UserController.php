@@ -18,9 +18,11 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\Role;
 use Oro\Bundle\UserBundle\Entity\Group;
 use Oro\Bundle\UserBundle\Entity\Email;
+
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
 
 /**
@@ -63,7 +65,7 @@ class UserController extends RestController implements ClassResourceInterface
      */
     public function cgetAction()
     {
-        $page = (int) $this->getRequest()->get('page', 1);
+        $page  = (int) $this->getRequest()->get('page', 1);
         $limit = (int) $this->getRequest()->get('limit', self::ITEMS_PER_PAGE);
 
         $criteria = $this->getFilterCriteria($this->getSupportedQueryParameters(__FUNCTION__));
@@ -168,7 +170,7 @@ class UserController extends RestController implements ClassResourceInterface
      */
     public function getRolesAction($id)
     {
-        $entity = $this->getManager()->getRepository()->findOneBy(array('id' => (int) $id));
+        $entity = $this->getManager()->find($id);
 
         if (!$entity) {
             return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
@@ -206,9 +208,21 @@ class UserController extends RestController implements ClassResourceInterface
     /**
      * Filter user by username or email
      *
-     * @QueryParam(name="email", requirements="[a-zA-Z0-9\-_\.@]+", nullable=true, description="Email to filter")
-     * @QueryParam(name="username", requirements="[a-zA-Z0-9\-_\.]+", nullable=true, description="Username to filter")
+     * @QueryParam(
+     *      name="email",
+     *      requirements="[a-zA-Z0-9\-_\.@]+",
+     *      nullable=true,
+     *      description="Email to filter"
+     * )
+     * @QueryParam(
+     *      name="username",
+     *      requirements="[a-zA-Z0-9\-_\.]+",
+     *      nullable=true,
+     *      description="Username to filter"
+     * )
+     *
      * @return \Symfony\Component\HttpFoundation\Response
+     *
      * @ApiDoc(
      *      description="Get user by username or email",
      *      resource=true,
@@ -221,20 +235,24 @@ class UserController extends RestController implements ClassResourceInterface
      */
     public function getFilterAction()
     {
-        $params = $this->getRequest()->query->all();
+        $params = array_intersect_key(
+            $this->getRequest()->query->all(),
+            array_flip($this->getSupportedQueryParameters(__FUNCTION__))
+        );
 
         if (empty($params)) {
-            return $this->handleView($this->view('', Codes::HTTP_BAD_REQUEST));
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
         }
 
+        /** @var User $entity */
         $entity = $this->getManager()->getRepository()->findOneBy($params);
+        if (!$entity) {
+            return $this->handleView($this->view('', Codes::HTTP_NOT_FOUND));
+        }
 
-        return $this->handleView(
-            $this->view(
-                $entity ? $this->getPreparedItem($entity) : null,
-                $entity ? Codes::HTTP_OK : Codes::HTTP_NOT_FOUND
-            )
-        );
+        $result = $this->getPreparedItem($entity);
+
+        return $this->buildResponse($result, self::ACTION_READ, ['result' => $result], Codes::HTTP_OK);
     }
 
     /**
@@ -244,30 +262,30 @@ class UserController extends RestController implements ClassResourceInterface
     {
         switch ($field) {
             case 'roles':
-                $result = array();
+                $result = [];
                 /** @var Role $role */
                 foreach ($value as $index => $role) {
-                    $result[$index] = array(
-                        'id' => $role->getId(),
-                        'role' => $role->getRole(),
+                    $result[$index] = [
+                        'id'    => $role->getId(),
+                        'role'  => $role->getRole(),
                         'label' => $role->getLabel(),
-                    );
+                    ];
                 }
                 $value = $result;
                 break;
             case 'groups':
-                $result = array();
+                $result = [];
                 /** @var Group $group */
                 foreach ($value as $index => $group) {
-                    $result[$index] = array(
-                        'id' => $group->getId(),
+                    $result[$index] = [
+                        'id'   => $group->getId(),
                         'name' => $group->getName()
-                    );
+                    ];
                 }
                 $value = $result;
                 break;
             case 'emails':
-                $result = array();
+                $result = [];
                 /** @var Email $email */
                 foreach ($value as $email) {
                     $result[] = $email->getEmail();
@@ -275,22 +293,22 @@ class UserController extends RestController implements ClassResourceInterface
                 $value = $result;
                 break;
             case 'businessUnits':
-                $result = array();
+                $result = [];
                 /** @var BusinessUnit $businessUnit */
                 foreach ($value as $index => $businessUnit) {
-                    $result[$index] = array(
-                        'id' => $businessUnit->getId(),
+                    $result[$index] = [
+                        'id'   => $businessUnit->getId(),
                         'name' => $businessUnit->getName()
-                    );
+                    ];
                 }
                 $value = $result;
                 break;
             case 'owner':
                 if ($value) {
-                    $value = array(
-                        'id' => $value->getId(),
+                    $value = [
+                        'id'   => $value->getId(),
                         'name' => $value->getName()
-                    );
+                    ];
                 }
                 break;
             default:

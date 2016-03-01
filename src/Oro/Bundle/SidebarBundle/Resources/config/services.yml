@@ -1,4 +1,7 @@
 parameters:
+    oro_sidebar.entity.sidebar_state.class: Oro\Bundle\SidebarBundle\Entity\SidebarState
+    oro_sidebar.entity.widget.class: Oro\Bundle\SidebarBundle\Entity\Widget
+
     oro_sidebar.widget_definition.registry.class: Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry
     oro_sidebar.twig.extension.class: Oro\Bundle\SidebarBundle\Twig\SidebarExtension
     oro_sidebar.request.handler.class: Oro\Bundle\SidebarBundle\EventListener\RequestHandler
@@ -20,7 +23,6 @@ services:
     oro_sidebar.request.handler:
         class: %oro_sidebar.request.handler.class%
         arguments:
-            - @oro_sidebar.widget_definition.registry
-            - @templating.helper.assets=
+            - @service_container
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }

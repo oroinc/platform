@@ -13,6 +13,8 @@ oro:
         datagrid:
             enum:
                 filter.empty:       None
+            dictionary:
+                filter.empty:       None
         form:
             data_type_group:
                 fields:             Fields
@@ -37,7 +39,6 @@ oro:
                 oneToMany:          One to many
                 manyToOne:          Many to one
                 manyToMany:         Many to many
-                optionSet:          Option Set (deprecated)
                 enum:               Select
                 multiEnum:          Multi-Select
 
@@ -62,6 +63,11 @@ oro:
         enum_name:    Option Set Name
         enum_public:  Public
         enum_options: Options
+        enum_name.tooltip: ""
+        enum_public.tooltip: Public option sets can be reused in other entities.
+        enum_options.tooltip: Deleting an option will remove it from all records that use it.
+        enum_options.priority.tooltip: Click and drag to reorder.
+        enum_options.default.tooltip: If marked, this option will be selected by default for new records.
         action:
             apply_changes: "Apply entityconfig changes"
             config_entity_grid:
@@ -110,15 +116,18 @@ oro:
                         length: "Length"
                         precision: "Precision"
                         scale: "Scale"
-                        set_expanded: "Expanded"
-                        set_options: "Options"
                         is_deleted: "Deleted"
 
             search:
                 field:
                     items:
                         searchable: "Searchable"
+                        searchable.tooltip: The field will appear in search results after the completion of reindex job that might take some time.
                         title_field: "The search result title"
+                        title_field.tooltip: Field value will be included into the search result title
+                entity:
+                    items:
+                        searchable.tooltip: The entity will appear in search results after the completion of reindex job that might take some time.
 
         config_grid:
             entities: Entities

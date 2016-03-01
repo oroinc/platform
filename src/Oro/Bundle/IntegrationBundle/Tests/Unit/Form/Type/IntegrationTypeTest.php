@@ -22,12 +22,10 @@ class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
         $subscribersNS      = 'Oro\\Bundle\\IntegrationBundle\\Form\\EventListener\\';
         $integrationFS          = $this->getMockBuilder($subscribersNS . 'ChannelFormSubscriber')
             ->disableOriginalConstructor()->getMock();
-        $defaultUserOwnerFS = $this->getMockBuilder($subscribersNS . 'DefaultUserOwnerSubscriber')
-            ->disableOriginalConstructor()->getMock();
-        $organizationFS     = $this->getMockBuilder($subscribersNS . 'OrganizationSubscriber')
+        $defaultUserOwnerFS = $this->getMockBuilder($subscribersNS . 'DefaultOwnerSubscriber')
             ->disableOriginalConstructor()->getMock();
 
-        $this->type = new IntegrationType($defaultUserOwnerFS, $integrationFS, $organizationFS);
+        $this->type = new IntegrationType($defaultUserOwnerFS, $integrationFS);
     }
 
     public function tearDown()
@@ -42,7 +40,7 @@ class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
             ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber'));
         $this->builder->expects($this->at(1))
             ->method('addEventSubscriber')
-            ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber'));
+            ->with($this->isInstanceOf('Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber'));
 
         $this->type->buildForm($this->builder, []);
     }
@@ -57,12 +55,12 @@ class IntegrationTypeTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('form', $this->type->getParent());
     }
 
-    public function testSetDefaultOptions()
+    public function testConfigureOptions()
     {
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
+        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolver');
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with($this->isType('array'));
-        $this->type->setDefaultOptions($resolver);
+        $this->type->configureOptions($resolver);
     }
 }

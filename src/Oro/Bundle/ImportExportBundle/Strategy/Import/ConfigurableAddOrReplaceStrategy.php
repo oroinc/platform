@@ -21,14 +21,20 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $this->assertEnvironment($entity);
 
         $this->cachedEntities = array();
-        $entity = $this->beforeProcessEntity($entity);
-        $entity = $this->processEntity($entity, true, true, $this->context->getValue('itemData'));
-        $entity = $this->afterProcessEntity($entity);
-        if ($entity) {
-            $entity = $this->validateAndUpdateContext($entity);
+
+        if (!$entity = $this->beforeProcessEntity($entity)) {
+            return null;
         }
 
-        return $entity;
+        if (!$entity = $this->processEntity($entity, true, true, $this->context->getValue('itemData'))) {
+            return null;
+        }
+
+        if (!$entity = $this->afterProcessEntity($entity)) {
+            return null;
+        }
+
+        return $this->validateAndUpdateContext($entity);
     }
 
     /**

@@ -1,6 +1,10 @@
-/*global define, alert*/
-define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js/formatter/address'
-    ], function (_, Backbone, __, addressFormatter) {
+define([
+    'underscore',
+    'backbone',
+    'orotranslation/js/translator',
+    'oroui/js/mediator',
+    'orolocale/js/formatter/address'
+], function(_, Backbone, __, mediator, addressFormatter) {
     'use strict';
 
     var $ = Backbone.$;
@@ -23,18 +27,18 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
             'click .item-remove-button': 'close'
         },
 
-        initialize: function () {
+        initialize: function() {
             this.$el.attr('id', 'address-book-' + this.model.id);
-            this.template = _.template($("#template-addressbook-item").html());
+            this.template = _.template($('#template-addressbook-item').html());
             this.listenTo(this.model, 'destroy', this.remove);
             this.listenTo(this.model, 'change:active', this.toggleActive);
         },
 
-        activate: function () {
+        activate: function() {
             this.model.set('active', true);
         },
 
-        toggleActive: function () {
+        toggleActive: function() {
             if (this.model.get('active')) {
                 this.$el.addClass('active');
             } else {
@@ -42,19 +46,19 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
             }
         },
 
-        edit: function () {
+        edit: function() {
             this.trigger('edit', this, this.model);
         },
 
-        close: function () {
+        close: function() {
             if (this.model.get('primary')) {
-                alert(__('Primary address can not be removed'));
+                mediator.execute('showErrorMessage', __('Primary address can not be removed'));
             } else {
                 this.model.destroy({wait: true});
             }
         },
 
-        render: function () {
+        render: function() {
             var data = this.model.toJSON();
             data.formatted_address = addressFormatter.format({
                 prefix: data.namePrefix,
@@ -72,7 +76,7 @@ define([ 'underscore', 'backbone', 'orotranslation/js/translator', 'orolocale/js
                 postal_code: data.postalCode,
                 region: data.region || data.regionText,
                 region_code: data.regionCode
-            }, null, "\n");
+            }, null, '\n');
             this.$el.append(this.template(data));
             if (this.model.get('primary')) {
                 this.activate();

@@ -181,7 +181,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                 'form' => $this->createForm(),
                 'expectedConstraints' => array($constraintWithNestedData),
                 'expectedAttributes' => array(
-                    'data-validation' => '{"NotNull":{"message":{"array":{"integer":2},"integer":1}}}'
+                    'data-validation' => '{"NotNull":{"message":{"array":{"integer":2},"integer":1},"payload":null}}'
                 )
             ),
             'set_custom_name' => array(
@@ -189,7 +189,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                 'form' => $this->createForm(),
                 'expectedConstraints' => array($constraintWithCustomName),
                 'expectedAttributes' => array(
-                    'data-validation' => '{"' . get_class($constraintWithCustomName) . '":{}}'
+                    'data-validation' => '{"' . get_class($constraintWithCustomName) . '":{"payload":null}}'
                 )
             ),
             'set_default' => array(
@@ -198,7 +198,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                 'expectedConstraints' => array(new Constraints\NotBlank()),
                 'expectedAttributes' => array(
                     'data-required'   => 1,
-                    'data-validation' => '{"NotBlank":{"message":"This value should not be blank."}}'
+                    'data-validation' => '{"NotBlank":{"message":"This value should not be blank.","payload":null}}'
                 )
             ),
             'merge_with_array' => array(
@@ -217,7 +217,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"NotNull":{"message":"This value should not be null."}},' .
-                        '"NotBlank":{"message":"This value should not be blank."}' .
+                        '"NotBlank":{"message":"This value should not be blank.","payload":null}' .
                         '}',
                     'data-required'   => 1
                 )
@@ -236,7 +236,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                     'data-validation' =>
                         '{' .
                         '"NotNull":{"message":"This value should not be null."},' .
-                        '"NotBlank":{"message":"This value should not be blank."}' .
+                        '"NotBlank":{"message":"This value should not be blank.","payload":null}' .
                         '}',
                     'data-required'   => 1
                 )
@@ -255,7 +255,7 @@ class JsValidationExtensionTest extends \PHPUnit_Framework_TestCase
                 ),
                 'expectedAttributes' => array(
                     'data-validation' =>
-                        '{"NotBlank":{"message":"This value should not be blank."}}',
+                        '{"NotBlank":{"message":"This value should not be blank.","payload":null}}',
                     'data-required'   => 1
                 )
             ),

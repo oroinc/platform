@@ -10,7 +10,7 @@ interface BlockTypeExtensionInterface
      * Builds the block.
      *
      * This method is called after the extended type has built the block
-     * and can be used to further modify the block.
+     * and can be used to further modify the block and prepare block options.
      *
      * @see BlockTypeInterface::buildForm()
      *
@@ -53,6 +53,16 @@ interface BlockTypeExtensionInterface
      * @param OptionsResolverInterface $resolver The resolver for the options.
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver);
+
+    /**
+     * Normalize options after they was resolved.
+     * You can implement this function to manipulate block options before build.
+     *
+     * @param array $options
+     * @param ContextInterface $context
+     * @param DataAccessorInterface $data
+     */
+    public function normalizeOptions(array &$options, ContextInterface $context, DataAccessorInterface $data);
 
     /**
      * Returns the name of the block type being extended.

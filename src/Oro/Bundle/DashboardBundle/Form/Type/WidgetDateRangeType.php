@@ -3,7 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\Extension\Core\ChoiceList\SimpleChoiceList;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -46,19 +45,14 @@ class WidgetDateRangeType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function buildView(FormView $view, FormInterface $form, array $options)
+    public function finishView(FormView $view, FormInterface $form, array $options)
     {
-        parent::buildView($view, $form, $options);
-
-        /** @var SimpleChoiceList $choices */
-        $choices = $form->get('type')->getConfig()->getOption('choice_list');
-
         $view->vars['datetime_range_metadata'] = [
-            'name'       => $view->vars['full_name'] . '[type]',
-            'label'      => $view->vars['label'],
-            'choices'    => $choices->getRemainingViews(),
-            'typeValues' => $view->vars['type_values'],
-            'dateParts'  => $view->vars['date_parts'],
+            'name'                   => $view->vars['full_name'] . '[type]',
+            'label'                  => $view->vars['label'],
+            'choices'                => $view->children['type']->vars['choices'],
+            'typeValues'             => $view->vars['type_values'],
+            'dateParts'              => $view->vars['date_parts'],
             'externalWidgetOptions'  => array_merge(
                 $view->vars['widget_options'],
                 ['dateVars' => $view->vars['date_vars']]
@@ -86,6 +80,7 @@ class WidgetDateRangeType extends AbstractType
         $resolver->setDefaults(
             [
                 'required'         => false,
+                'compile_date'     => false,
                 'field_type'       => WidgetDateRangeValueType::NAME,
                 'operator_choices' => $this->getOperatorChoices(),
                 'widget_options'   => [

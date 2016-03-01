@@ -48,13 +48,22 @@ class CalendarEventController extends Controller
     }
 
     /**
-     * @Route("/widget/info/{id}", name="oro_calendar_event_widget_info", requirements={"id"="\d+"})
+     * @Route(
+     *      "/widget/info/{id}/{renderContexts}",
+     *      name="oro_calendar_event_widget_info",
+     *      requirements={"id"="\d+", "renderContexts"="\d+"},
+     *      defaults={"renderContexts"=true}
+     * )
      * @Template
      * @AclAncestor("oro_calendar_event_view")
      */
-    public function infoAction(CalendarEvent $entity)
+    public function infoAction(CalendarEvent $entity, $renderContexts)
     {
-        return array('entity' => $entity);
+        return [
+            'entity'         => $entity,
+            'target'         => $this->getTargetEntity(),
+            'renderContexts' => (bool) $renderContexts
+        ];
     }
 
     /**
@@ -148,5 +157,22 @@ class CalendarEventController extends Controller
             'form'       => $this->get('oro_calendar.calendar_event.form.handler')->getForm()->createView(),
             'formAction' => $formAction
         );
+    }
+
+    /**
+     * Get target entity
+     *
+     * @return object|null
+     */
+    protected function getTargetEntity()
+    {
+        $entityRoutingHelper = $this->get('oro_entity.routing_helper');
+        $targetEntityClass   = $entityRoutingHelper->getEntityClassName($this->getRequest(), 'targetActivityClass');
+        $targetEntityId      = $entityRoutingHelper->getEntityId($this->getRequest(), 'targetActivityId');
+        if (!$targetEntityClass || !$targetEntityId) {
+            return null;
+        }
+
+        return $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
     }
 }

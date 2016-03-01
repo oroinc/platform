@@ -9,27 +9,31 @@
         : {{ 'oro.note.note_updated_by'|trans|json_encode|raw }};
     %>
     <%= _.template(template, { interpolate: /\{\{(.+?)\}\}/g })({
-        user: '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>',
+        user: owner_url ? '<a class="user" href="' + owner_url + '">' +  _.escape(owner) + '</a>' :  '<span class="user">' + _.escape(owner) + '</span>',
         date: '<i class="date">' + createdAt + '</i>',
-        editor: '<a class="user" href="' + editor_url + '">' +  _.escape(editor) + '</a>',
+        editor: editor_url ? '<a class="user" href="' + editor_url + '">' +  _.escape(editor) + '</a>' : _.escape(editor),
         editor_date: '<i class="date">' + updatedAt + '</i>'
     }) %>
 {% endblock %}
 
 {% block activityActions %}
     {% set action %}
-    <a href="#" class="action item-edit-button"
-       title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName})|raw }}">
-        <i class="icon-edit hide-text">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName})|raw }}</i>
-    </a>
+        <% if (editable) { %>
+        <a href="#" class="action item-edit-button"
+           title="{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName})|raw }}">
+            <i class="icon-edit hide-text">{{ 'oro.note.note_update'|trans({'{{ entity }}': entityName})|raw }}</i>
+        </a>
+        <% } %>
     {% endset %}
     {% set actions = [action] %}
 
     {% set action %}
-    <a href="#" class="action item-remove-button"
-       title="{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName})|raw }}">
-        <i class="icon-trash hide-text">{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName})|raw }}</i>
-    </a>
+        <% if (removable) { %>
+        <a href="#" class="action item-remove-button"
+           title="{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName})|raw }}">
+            <i class="icon-trash hide-text">{{ 'oro.note.note_delete'|trans({'{{ entity }}': entityName})|raw }}</i>
+        </a>
+        <% } %>
     {% endset %}
     {% set actions = actions|merge([action]) %}
 

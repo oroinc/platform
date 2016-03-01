@@ -33,13 +33,14 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
     {
         $userManager = $this->container->get('oro_user.manager');
         $organization = $manager->getRepository('OroOrganizationBundle:Organization')->getFirst();
-        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(array('role' => 'ROLE_ADMINISTRATOR'));
+        $role = $manager->getRepository('OroUserBundle:Role')->findOneBy(['role' => 'ROLE_ADMINISTRATOR']);
 
         $user = $userManager->createUser();
         $user->setUsername('simple_user')
             ->setPlainPassword('simple_password')
             ->setEmail('simple_user@example.com')
             ->setOrganization($organization)
+            ->addOrganization($organization)
             ->setEnabled(true)
             ->addRole($role);
         $folder = new EmailFolder();
@@ -48,7 +49,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $folder->setType('sent');
         $origin = new InternalEmailOrigin();
         $origin->setName('simple_user_origin_name');
-        $origin->setIsActive(true);
+        $origin->setActive(true);
         $origin->addFolder($folder);
         $origin->setOwner($user);
         $origin->setOrganization($organization);
@@ -59,8 +60,11 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $user2 = $userManager->createUser();
         $user2->setUsername('simple_user2')
             ->setPlainPassword('simple_password2')
+            ->setFirstName('Elley')
+            ->setLastName('Towards')
             ->setEmail('simple_user2@example.com')
             ->setOrganization($organization)
+            ->addOrganization($organization)
             ->setEnabled(true);
         $folder2 = new EmailFolder();
         $folder2->setName('sent');
@@ -68,7 +72,7 @@ class LoadUserData extends AbstractFixture implements ContainerAwareInterface
         $folder2->setType('sent');
         $origin2 = new InternalEmailOrigin();
         $origin2->setName('simple_user_origin_name_2');
-        $origin2->setIsActive(true);
+        $origin2->setActive(true);
         $origin2->addFolder($folder2);
         $origin2->setOwner($user2);
         $origin2->setOrganization($organization);

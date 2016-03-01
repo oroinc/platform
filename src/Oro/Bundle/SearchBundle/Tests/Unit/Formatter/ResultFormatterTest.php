@@ -40,13 +40,23 @@ class ResultFormatterTest extends \PHPUnit_Framework_TestCase
      */
     protected function prepareEntityManager()
     {
-        $this->entityManager = $this->getMock(
-            'Doctrine\ORM\EntityManager',
-            array('getMetadataFactory', 'getRepository'),
-            array(),
-            '',
-            false
-        );
+        $configuration = $this->getMockBuilder('Doctrine\ORM\Configuration')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configuration->expects($this->any())
+            ->method('getDefaultQueryHints')
+            ->will($this->returnValue([]));
+        $configuration->expects($this->any())
+            ->method('isSecondLevelCacheEnabled')
+            ->will($this->returnValue(false));
+
+        $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+            ->disableOriginalConstructor()
+            ->setMethods(array('getMetadataFactory', 'getRepository', 'getConfiguration'))
+            ->getMock();
+        $this->entityManager->expects($this->any())
+            ->method('getConfiguration')
+            ->will($this->returnValue($configuration));
     }
 
     /**

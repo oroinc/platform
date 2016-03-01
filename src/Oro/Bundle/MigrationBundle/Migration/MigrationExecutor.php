@@ -96,7 +96,7 @@ class MigrationExecutor
         foreach ($migrations as $item) {
             $migration = $item->getMigration();
             if (!empty($failedMigrations) && !$migration instanceof FailIndependentMigration) {
-                $this->logger->notice(sprintf('> %s - skipped', get_class($migration)));
+                $this->logger->info(sprintf('> %s - skipped', get_class($migration)));
                 continue;
             }
 
@@ -128,7 +128,7 @@ class MigrationExecutor
     ) {
         $result = true;
 
-        $this->logger->notice(sprintf('> %s', get_class($migration)));
+        $this->logger->info(sprintf('> %s', get_class($migration)));
         $toSchema = clone $schema;
         $this->setExtensions($migration);
         try {

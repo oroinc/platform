@@ -3,9 +3,9 @@
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Entity\Manager;
 
 use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 use Doctrine\ORM\Query;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
@@ -14,7 +14,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\SoapBundle\Event\GetListBefore;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 
@@ -27,7 +26,7 @@ class AssociationManagerTest extends OrmTestCase
     private $configManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    private $eventDispatcher;
+    private $aclHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     private $doctrineHelper;
@@ -54,13 +53,13 @@ class AssociationManagerTest extends OrmTestCase
             ]
         );
 
-        $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->eventDispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->aclHelper     = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $doctrine              = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $doctrine            = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $doctrine->expects($this->any())
@@ -71,9 +70,16 @@ class AssociationManagerTest extends OrmTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $aclHelperLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $aclHelperLink->expects($this->any())
+            ->method('getService')
+            ->willReturn($this->aclHelper);
+
         $this->associationManager = new AssociationManager(
             $this->configManager,
-            $this->eventDispatcher,
+            $aclHelperLink,
             $this->doctrineHelper,
             $this->entityNameResolver
         );
@@ -361,20 +367,18 @@ class AssociationManagerTest extends OrmTestCase
         $joins              = ['phones'];
         $associationTargets = [$targetClass1 => 'targets_1', $targetClass2 => 'targets_2'];
 
-        $this->eventDispatcher->expects($this->at(0))
-            ->method('dispatch')
+        $this->aclHelper->expects($this->at(0))
+            ->method('apply')
             ->willReturnCallback(
-                function ($eventName, GetListBefore $event) {
-                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 10));
-                    $event->setCriteria($updatedCriteria);
+                function (QueryBuilder $qb) {
+                    return $qb->andWhere('target.age = 10')->getQuery();
                 }
             );
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
+        $this->aclHelper->expects($this->at(1))
+            ->method('apply')
             ->willReturnCallback(
-                function ($eventName, GetListBefore $event) {
-                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 100));
-                    $event->setCriteria($updatedCriteria);
+                function (QueryBuilder $qb) {
+                    return $qb->andWhere('target.age = 100')->getQuery();
                 }
             );
 
@@ -398,20 +402,20 @@ class AssociationManagerTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT entity.id1 AS id, entity.sclr2 AS entity, entity.sclr3 AS title '
+            'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.sclr_3 AS title '
             . 'FROM ('
-            . 'SELECT DISTINCT t0_.id AS id0, t1_.id AS id1, '
-            . '\'' . $targetClass1 . '\' AS sclr2, '
-            . 't1_.firstName || \' \' || t1_.lastName AS sclr3 '
+            . 'SELECT DISTINCT t0_.id AS id_0, t1_.id AS id_1, '
+            . '\'' . $targetClass1 . '\' AS sclr_2, '
+            . 't1_.firstName || \' \' || t1_.lastName || \'\' AS sclr_3 '
             . 'FROM test_owner1 t0_ '
             . 'INNER JOIN test_owner1_to_target1 t2_ ON t0_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t1_ ON t1_.id = t2_.target_id '
             . 'LEFT JOIN test_phone t3_ ON t0_.id = t3_.owner_id '
             . 'WHERE (t0_.name = \'test\' AND t3_.phone = \'123-456\') AND t1_.age = 10'
             . ' UNION ALL '
-            . 'SELECT DISTINCT t0_.id AS id0, t1_.id AS id1, '
-            . '\'' . $targetClass2 . '\' AS sclr2, '
-            . 't1_.firstName || \' \' || t1_.lastName AS sclr3 '
+            . 'SELECT DISTINCT t0_.id AS id_0, t1_.id AS id_1, '
+            . '\'' . $targetClass2 . '\' AS sclr_2, '
+            . 't1_.firstName || \' \' || t1_.lastName || \'\' AS sclr_3 '
             . 'FROM test_owner1 t0_ '
             . 'INNER JOIN test_owner1_to_target2 t2_ ON t0_.id = t2_.owner_id '
             . 'INNER JOIN test_target2 t1_ ON t1_.id = t2_.target_id '
@@ -431,20 +435,18 @@ class AssociationManagerTest extends OrmTestCase
         $joins             = [];
         $associationOwners = [$ownerClass1 => 'targets_1', $ownerClass2 => 'targets_1'];
 
-        $this->eventDispatcher->expects($this->at(0))
-            ->method('dispatch')
+        $this->aclHelper->expects($this->at(0))
+            ->method('apply')
             ->willReturnCallback(
-                function ($eventName, GetListBefore $event) {
-                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 10));
-                    $event->setCriteria($updatedCriteria);
+                function (QueryBuilder $qb) {
+                    return $qb->andWhere('target.age = 10')->getQuery();
                 }
             );
-        $this->eventDispatcher->expects($this->at(1))
-            ->method('dispatch')
+        $this->aclHelper->expects($this->at(1))
+            ->method('apply')
             ->willReturnCallback(
-                function ($eventName, GetListBefore $event) {
-                    $updatedCriteria = $event->getCriteria()->andWhere(Criteria::expr()->eq('target.age', 100));
-                    $event->setCriteria($updatedCriteria);
+                function (QueryBuilder $qb) {
+                    return $qb->andWhere('target.age = 100')->getQuery();
                 }
             );
 
@@ -468,19 +470,19 @@ class AssociationManagerTest extends OrmTestCase
         );
 
         $this->assertEquals(
-            'SELECT entity.id1 AS id, entity.sclr2 AS entity, entity.name3 AS title '
+            'SELECT entity.id_1 AS id, entity.sclr_2 AS entity, entity.name_3 AS title '
             . 'FROM ('
-            . 'SELECT t0_.id AS id0, t1_.id AS id1, '
-            . '\'' . $ownerClass1 . '\' AS sclr2, '
-            . 't1_.name AS name3 '
+            . 'SELECT t0_.id AS id_0, t1_.id AS id_1, '
+            . '\'' . $ownerClass1 . '\' AS sclr_2, '
+            . 't1_.name AS name_3 '
             . 'FROM test_owner1 t1_ '
             . 'INNER JOIN test_owner1_to_target1 t2_ ON t1_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t0_ ON t0_.id = t2_.target_id '
             . 'WHERE t1_.name = \'test\' AND t0_.age = 10'
             . ' UNION ALL '
-            . 'SELECT t0_.id AS id0, t1_.id AS id1, '
-            . '\'' . $ownerClass2 . '\' AS sclr2, '
-            . 't1_.name AS name3 '
+            . 'SELECT t0_.id AS id_0, t1_.id AS id_1, '
+            . '\'' . $ownerClass2 . '\' AS sclr_2, '
+            . 't1_.name AS name_3 '
             . 'FROM test_owner2 t1_ '
             . 'INNER JOIN test_owner2_to_target1 t2_ ON t1_.id = t2_.owner_id '
             . 'INNER JOIN test_target1 t0_ ON t0_.id = t2_.target_id '

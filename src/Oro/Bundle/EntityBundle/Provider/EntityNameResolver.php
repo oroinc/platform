@@ -22,6 +22,8 @@ class EntityNameResolver
     /**
      * @param string $defaultFormat The default representation format
      * @param array  $config        The configuration of representation formats
+     *
+     * @throws \InvalidArgumentException if default format is not specified or does not exist
      */
     public function __construct($defaultFormat, array $config)
     {
@@ -125,7 +127,7 @@ class EntityNameResolver
             if (empty($this->providers)) {
                 $this->sorted = [];
             } else {
-                ksort($this->providers);
+                krsort($this->providers);
                 $this->sorted = call_user_func_array('array_merge', $this->providers);
             }
         }

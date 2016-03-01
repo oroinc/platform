@@ -1,0 +1,23 @@
+{
+    "name": "oro/api-bundle",
+    "type": "symfony-bundle",
+    "description": "BAP API Bundle",
+    "keywords": ["BAP", "API", "REST", "SOAP"],
+    "homepage": "https://github.com/laboro/ApiBundle",
+    "license": "MIT",
+    "require": {
+        "php": ">=5.3.3",
+        "oro/config": "dev-master",
+        "oro/chain-processor": "dev-master"
+    },
+    "autoload": {
+        "psr-0": { "Oro\\Bundle\\ApiBundle": "" }
+    },
+    "target-dir": "Oro/Bundle/ApiBundle",
+    "minimum-stability": "dev",
+    "extra": {
+        "branch-alias": {
+            "dev-master": "1.0-dev"
+        }
+    }
+}

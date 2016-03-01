@@ -4,6 +4,8 @@
 {% set hasExportTemplateProcessor = exportTemplateProcessor is defined and exportTemplateProcessor is not empty %}
 {% set exportAllowed = hasExportProcessor and resource_granted('oro_importexport_export') %}
 {% set importAllowed = hasImportProcessor and resource_granted('oro_importexport_import') %}
+{% set refreshPageOnSuccess = refreshPageOnSuccess is defined and refreshPageOnSuccess == true %}
+{% set importLabel = importLabel|default('oro.importexport.import.label'|trans) %}
 
 {% if exportAllowed or importAllowed %}
     {% if options is not defined %}
@@ -41,7 +43,7 @@
                 <a type="button"
                    class="btn import-btn icons-holder-text no-hash"
                    href="{{ path('oro_importexport_import_form', defaultRouteParams|merge({'entity': entity_class})) }}">
-                    <i class="icon-download-alt hide-text">{{ 'oro.importexport.import.label'|trans }}</i>{{ 'oro.importexport.import.label'|trans }}
+                    <i class="icon-download-alt hide-text">{{ importLabel }}</i>{{ importLabel }}
                 </a>
                 {% if hasExportTemplateProcessor %}
                     <a type="button"
@@ -69,7 +71,7 @@
 
                 var widget = new DialogWidget({
                     'url': this.href,
-                    'title': {{ importTitle|default('oro.importexport.import.label'|trans)|json_encode|raw }},
+                    'title': {{ importTitle|default(importLabel)|json_encode|raw }},
                     'stateEnabled': false,
                     'incrementalPosition': false,
                     'dialogOptions': {
@@ -81,11 +83,19 @@
                 });
                 widget.render();
 
-                {% if dataGridName is defined %}
-                var datagridName = {{ dataGridName|json_encode|raw }};
+                {% if dataGridName is defined or refreshPageOnSuccess %}
                 widget.on('importComplete', function (data) {
                     if (data.success) {
-                        mediator.trigger('datagrid:doReset:' + datagridName);
+                        {% if refreshPageOnSuccess %}
+                            {% if afterRefreshPageMessage is defined and afterRefreshPageMessage is not empty %}
+                                mediator.once('page:afterChange', function() {
+                                    mediator.execute('showFlashMessage', 'warning', {{ afterRefreshPageMessage|json_encode|raw }});
+                                });
+                            {% endif %}
+                            mediator.execute('refreshPage');
+                        {% elseif dataGridName is defined %}
+                            mediator.trigger('datagrid:doReset:' + {{ dataGridName|json_encode|raw }});
+                        {% endif %}
                     }
                 });
                 {% endif %}

@@ -40,9 +40,11 @@
 
                 {{ form_widget(form.websocket) }}
             </div>
-
-            {{ form_rest(form) }}
         </div>
+
+        {% placeholder install_additional_configuration_fields with {'form' : form} %}
+
+        {{ form_rest(form) }}
 
         <div class="button-set">
             <div class="pull-right">

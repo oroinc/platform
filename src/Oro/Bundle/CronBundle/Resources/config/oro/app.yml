@@ -1,0 +1,4 @@
+doctrine:
+    dbal:
+        types:
+            jms_job_safe_object: JMS\JobQueueBundle\Entity\Type\SafeObjectType

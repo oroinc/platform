@@ -181,6 +181,11 @@ class BlockFactory implements BlockFactoryInterface
             $views[$id]                = $view;
         }
 
+        $viewsCollection = new ArrayCollection($views);
+        foreach ($views as $view) {
+            $view->blocks = $viewsCollection;
+        }
+
         // finish the root view
         $this->finishBlockView($rootView, $rootId);
         // finish child views
@@ -204,15 +209,16 @@ class BlockFactory implements BlockFactoryInterface
 
         // resolve options
         $resolvedOptions = $this->optionsResolver->resolveOptions($blockType, $options);
-        $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
 
         // point the block builder state to the current block
         $this->blockBuilder->initialize($id);
         // iterate from parent to current
         foreach ($types as $type) {
+            $this->registry->normalizeOptions($type->getName(), $resolvedOptions, $this->context, $this->dataAccessor);
             $type->buildBlock($this->blockBuilder, $resolvedOptions);
             $this->registry->buildBlock($type->getName(), $this->blockBuilder, $resolvedOptions);
         }
+        $this->rawLayout->setProperty($id, RawLayout::RESOLVED_OPTIONS, $resolvedOptions);
     }
 
     /**

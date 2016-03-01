@@ -5,7 +5,6 @@ namespace Oro\Bundle\PlatformBundle\Tests\Functional;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class PlatformControllerTest extends WebTestCase

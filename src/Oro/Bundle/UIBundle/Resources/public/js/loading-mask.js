@@ -1,15 +1,14 @@
-/*jslint browser:true, nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
     'oroui/js/mediator',
     './app/views/base/view'
-], function ($, _, __, mediator, BaseView) {
+], function($, _, __, mediator, BaseView) {
     'use strict';
 
     var LoadingMaskView;
+    var console = window.console;
 
     /**
      * Loading mask widget
@@ -50,12 +49,12 @@ define([
          * @param {Object} options
          * @param {Boolean} [options.liveUpdate] Update position of loading animation on window scroll and resize
          */
-        initialize: function (options) {
-            var updateProxy,
-                options = options || {};
+        initialize: function(options) {
+            options = options || {};
 
-            if (mediator.execute('retrieveOption', 'debug') && window.console) {
-                console.warn('Module "oroui/js/loading-mask" is deprecated, use "oroui/js/app/views/loading-mask-view" instead');
+            if (mediator.execute('retrieveOption', 'debug') && console) {
+                console.warn('Module "oroui/js/loading-mask" is deprecated, ' +
+                    'use "oroui/js/app/views/loading-mask-view" instead');
             }
 
             if (_.has(options, 'liveUpdate')) {
@@ -63,7 +62,7 @@ define([
             }
 
             if (this.liveUpdate) {
-                updateProxy = $.proxy(this.updatePos, this);
+                var updateProxy = $.proxy(this.updatePos, this);
                 $(window)
                     .on('resize.' + this.cid, updateProxy)
                     .on('scroll.' + this.cid, updateProxy);
@@ -75,7 +74,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.loadingElement) {
                 this.loadingElement.data('loading-mask-visible', false);
                 this.loadingElement.removeClass('hide-overlays');
@@ -89,7 +88,7 @@ define([
          *
          * @return {*}
          */
-        show: function () {
+        show: function() {
             this.$el.show();
             if (this.loadingElement) {
                 this.loadingElement.addClass('hide-overlays');
@@ -105,7 +104,7 @@ define([
          * @return {*}
          * @protected
          */
-        updatePos: function () {
+        updatePos: function() {
             if (!this.displayed) {
                 return this;
             }
@@ -147,7 +146,7 @@ define([
          * @return {*}
          * @protected
          */
-        resetPos: function () {
+        resetPos: function() {
             this.$('.loading-wrapper').css('height', '100%');
             return this;
         },
@@ -157,7 +156,7 @@ define([
          *
          * @return {*}
          */
-        hide: function () {
+        hide: function() {
             this.$el.hide();
             if (this.loadingElement) {
                 this.loadingElement.removeClass('hide-overlays');
@@ -172,7 +171,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             this.$el.empty();
             this.$el.append(this.template({
                 loadingHint: this.loadingHint

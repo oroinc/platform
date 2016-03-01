@@ -16,6 +16,7 @@ parameters:
     oro_dashboard.widget_config_value.provider.class: Oro\Bundle\DashboardBundle\Provider\ConfigValueProvider
     oro_dashboard.datetime.helper.class: Oro\Bundle\DashboardBundle\Helper\DateHelper
     oro_dashboard.event_listener.widget_configuration_load.class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
+    oro_dashboard.event_listener.widget_items_load_data.class: Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener
 
     oro_dashboard.widget_config_value.date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
     oro_dashboard.widget_config_value.previous_date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter
@@ -27,6 +28,19 @@ parameters:
     oro_dashboard.form.type.widget_widget_title.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetTitleType
     oro_dashboard.form.type.widget_previous_date_rang.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetPreviousDateRangeType
     oro_dashboard.form.type.widget_items_choice.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsChoiceType
+    oro_dashboard.form.type.widget_items.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemsType
+    oro_dashboard.form.type.widget_item.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetItemType
+    oro_dashboard.event_listener.widget_items_form_subscriber.class: Oro\Bundle\DashboardBundle\Form\EventListener\WidgetItemsFormSubscriber
+    oro_dashboard.form.type.widget_user_multiselect.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetUserMultiselect
+    oro_dashboard.widget_config_value.widget_user_multiselect.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetUserMultiselectConverter
+    oro_dashboard.form.type.widget_date.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateType
+    oro_dashboard.form.type.widget_business_unit_select.class: Oro\Bundle\DashboardBundle\Form\Type\WidgetBusinessUnitSelect
+    oro_dashboard.widget_config_value.widget_business_unit_select.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetBusinessUnitSelectConverter
+
+    # BigNumber
+    oro_dashboard.provider.big_number.processor.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberProcessor
+    oro_dashboard.provider.big_number.formatter.class:   Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberFormatter
+    oro_dashboard.provider.big_number.date_helper.class: Oro\Bundle\DashboardBundle\Provider\BigNumber\BigNumberDateHelper
 
 services:
     oro_datagrid.datagrid.name_strategy:
@@ -48,6 +62,7 @@ services:
             - @doctrine.orm.entity_manager
             - @oro_dashboard.widget_config_value.provider
             - @translator
+            - @event_dispatcher
         calls:
             - [setRequest, ["@?request="]]
 
@@ -102,7 +117,6 @@ services:
         arguments:
             - @oro_dashboard.config_provider
             - @form.factory
-            - @oro_form.validator.constraint_factory
 
     oro_dashboard.datetime.helper:
         class: %oro_dashboard.datetime.helper.class%
@@ -118,6 +132,12 @@ services:
             - @oro_datagrid.datagrid.builder
         tags:
             - { name: kernel.event_listener, event: oro_dashboard.widget_configuration_load, method: onWidgetConfigurationLoad }
+
+    oro_dashboard.event_listener.widget_items_load_data:
+        class: %oro_dashboard.event_listener.widget_items_load_data.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItemsByItemsChoice }
+            - { name: kernel.event_listener, event: oro_dashboard.widget_items_load_data, method: filterItems }
 
     oro_dashboard.form.type.widget_date_range:
         class: %oro_dashboard.form.type.widget_date_range.class%
@@ -146,6 +166,24 @@ services:
         tags:
             - { name: form.type, alias: "oro_type_widget_items_choice" }
 
+    oro_dashboard.form.type.widget_item:
+        class: %oro_dashboard.form.type.widget_item.class%
+        tags:
+            - { name: form.type, alias: oro_type_widget_item }
+
+    oro_dashboard.form.type.widget_items:
+        class: %oro_dashboard.form.type.widget_items.class%
+        arguments:
+            - @oro_dashboard.event_listener.widget_items_form_subscriber
+        tags:
+            - { name: form.type, alias: oro_type_widget_items }
+
+    oro_dashboard.event_listener.widget_items_form_subscriber:
+        class: %oro_dashboard.event_listener.widget_items_form_subscriber.class%
+        arguments:
+            - @oro_dashboard.widget_configs
+            - @translator
+
     oro_dashboard.widget_config_value.provider:
         class: %oro_dashboard.widget_config_value.provider.class%
 
@@ -155,15 +193,13 @@ services:
             - @oro_locale.formatter.date_time
             - @oro_filter.expression.date.compiler
             - @translator
+            - @oro_dashboard.datetime.helper
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_date_range" }
 
     oro_dashboard.widget_config_value.previous_date_range.converter:
           class: %oro_dashboard.widget_config_value.previous_date_range.converter.class%
-          arguments:
-              - @oro_locale.formatter.date_time
-              - @oro_filter.expression.date.compiler
-              - @translator
+          parent: oro_dashboard.widget_config_value.date_range.converter
           tags:
               - { name: oro_dashboard.value.converter, alias: "oro_type_widget_previous_date_range" }
 
@@ -176,3 +212,56 @@ services:
         class: %oro_dashboard.widget_config_value.widget_items_choice.converter.class%
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_items_choice" }
+
+    oro_dashboard.form.type.widget_user_multiselect:
+        class: %oro_dashboard.form.type.widget_user_multiselect.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: form.type, alias: "oro_type_widget_user_multiselect" }
+
+    oro_dashboard.widget_config_value.widget_user_multiselect.converter:
+        class: %oro_dashboard.widget_config_value.widget_user_multiselect.converter.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_user_multiselect" }
+
+    oro_dashboard.form.type.widget_date:
+        class: %oro_dashboard.form.type.widget_date.class%
+        tags:
+            - { name: form.type, alias: "oro_type_widget_date" }
+
+    oro_dashboard.form.type.widget_business_unit_select:
+        class: %oro_dashboard.form.type.widget_business_unit_select.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+            - %oro_organization.business_unit.entity.class%
+        tags:
+            - { name: form.type, alias: "oro_type_widget_business_unit_select" }
+
+    oro_dashboard.widget_config_value.widget_business_unit_select.converter:
+        class: %oro_dashboard.widget_config_value.widget_business_unit_select.converter.class%
+        arguments:
+            - @=service('doctrine.orm.entity_manager').getRepository(parameter('oro_organization.business_unit.entity.class'))
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_business_unit_select" }
+
+    # BigNumber
+    oro_dashboard.provider.big_number.processor:
+        class: %oro_dashboard.provider.big_number.processor.class%
+        arguments:
+            - @oro_dashboard.provider.big_number.formatter
+            - @oro_dashboard.provider.big_number.date_helper
+
+    oro_dashboard.provider.big_number.formatter:
+        class: %oro_dashboard.provider.big_number.formatter.class%
+        arguments:
+            - @oro_locale.formatter.number
+
+    oro_dashboard.provider.big_number.date_helper:
+        class: %oro_dashboard.provider.big_number.date_helper.class%
+        arguments:
+            - @doctrine
+            - @oro_security.acl_helper
+            - @oro_locale.settings

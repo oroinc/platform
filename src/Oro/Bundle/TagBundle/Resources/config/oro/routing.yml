@@ -12,3 +12,13 @@ oro_tag_api:
         _format:  json
     defaults:
         version:  latest
+
+oro_taggable_api:
+    resource:     "@OroTagBundle/Controller/Api/Rest/TaggableController.php"
+    type:         rest
+    prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest

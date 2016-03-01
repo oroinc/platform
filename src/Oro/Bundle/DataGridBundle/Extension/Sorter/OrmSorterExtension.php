@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Sorter;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
@@ -36,7 +35,7 @@ class OrmSorterExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         $columns      = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
-        $isApplicable = $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) === OrmDatasource::TYPE
+        $isApplicable = $config->getDatasourceType() === OrmDatasource::TYPE
             && is_array($columns);
 
         return $isApplicable;

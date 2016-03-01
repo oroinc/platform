@@ -6,6 +6,7 @@ use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Criteria;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class PdoPgsql extends BaseDriver
@@ -54,7 +55,7 @@ class PdoPgsql extends BaseDriver
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $stringQuery = '(TsvectorTsquery(' . $joinAlias . '.value, :non_value' . $index . ')) = TRUE';
+        $stringQuery = '(TsvectorTsquery(' . $joinAlias . '.value, :value' . $index . ')) = TRUE';
 
         if ($useFieldName) {
             $stringQuery .= ' AND ' . $joinAlias . '.field = :field' . $index;
@@ -107,12 +108,9 @@ class PdoPgsql extends BaseDriver
             foreach ($searchArray as $key => $string) {
                 $searchArray[$key] = '!' . $string;
             }
-        }
-
-        $qb->setParameter('value' . $index, implode(' & ', $searchArray));
-
-        if (!$notContains) {
-            $qb->setParameter('non_value' . $index, implode(' | ', $searchArray));
+            $qb->setParameter('value' . $index, implode(' & ', $searchArray));
+        } else {
+            $qb->setParameter('value' . $index, implode(' | ', $searchArray));
         }
     }
 
@@ -126,13 +124,8 @@ class PdoPgsql extends BaseDriver
     {
         $joinAlias = $this->getJoinAlias(Query::TYPE_TEXT, $index);
 
-        $qb->select(
-            [
-                'search as item',
-                'TsRank(' . $joinAlias . '.value, :value' . $index . ') AS rankField'
-            ]
-        );
-        $qb->orderBy('rankField', 'DESC');
+        $qb->addSelect(sprintf('TsRank(%s.value, :value%s) as rankField%s', $joinAlias, $index, $index))
+            ->addOrderBy(sprintf('rankField%s', $index), Criteria::DESC);
     }
 
     /**

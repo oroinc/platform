@@ -12,9 +12,13 @@ class PrepareEntityMapEventTest extends \PHPUnit_Framework_TestCase
         $entity = new Product();
         $class = get_class($entity);
         $data = [];
-        $event = new PrepareEntityMapEvent($entity, $class, $data);
+        $entityMapping = [
+            'alias' => 'test'
+        ];
+        $event = new PrepareEntityMapEvent($entity, $class, $data, $entityMapping);
         $this->assertSame($entity, $event->getEntity());
         $this->assertSame($class, $event->getClassName());
+        $this->assertSame($entityMapping, $event->getEntityMapping());
         $this->assertSame($data, $event->getData());
         $newData = [];
         $event->setData($newData);

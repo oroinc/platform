@@ -8,12 +8,17 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailBodyLoaderPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailOwnerConfigurationPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailSynchronizerPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailTemplateVariablesPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\MailboxProcessPass;
 use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFlagManagerLoaderPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailFolderLoaderPass;
+use Oro\Bundle\EmailBundle\DependencyInjection\Compiler\EmailRecipientsProviderPass;
 
 class OroEmailBundle extends Bundle
 {
@@ -48,9 +53,12 @@ class OroEmailBundle extends Bundle
         $container->addCompilerPass(new EmailOwnerConfigurationPass());
         $this->addDoctrineOrmMappingsPass($container);
         $container->addCompilerPass(new EmailBodyLoaderPass());
+        $container->addCompilerPass(new EmailFlagManagerLoaderPass());
         $container->addCompilerPass(new EmailSynchronizerPass());
         $container->addCompilerPass(new EmailTemplateVariablesPass());
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
+        $container->addCompilerPass(new EmailRecipientsProviderPass());
+        $container->addCompilerPass(new MailboxProcessPass());
     }
 
     /**

@@ -23,6 +23,9 @@ class FormattersPass implements CompilerPassInterface
         if ($extension) {
             $properties = $container->findTaggedServiceIds(self::TAG_NAME);
             foreach ($properties as $serviceId => $tags) {
+                if ($container->hasDefinition($serviceId)) {
+                    $container->getDefinition($serviceId)->setPublic(false);
+                }
                 $tagAttrs = reset($tags);
                 $extension->addMethodCall('registerProperty', [$tagAttrs['type'], new Reference($serviceId)]);
             }

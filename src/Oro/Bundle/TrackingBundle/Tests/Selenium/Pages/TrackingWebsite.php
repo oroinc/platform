@@ -15,12 +15,7 @@ class TrackingWebsite extends AbstractPageEntity
 {
     protected $owner = "//div[starts-with(@id,'s2id_oro_tracking_website_owner')]/a";
 
-    public function __construct($testCase, $redirect = true)
-    {
-        parent::__construct($testCase, $redirect);
-    }
-
-    /**
+     /**
      * @param string $name
      * @return $this
      */
@@ -86,7 +81,6 @@ class TrackingWebsite extends AbstractPageEntity
         return new TrackingWebsites($this->test, false);
     }
 
-
     /**
      * @param string $required
      * @param string $optional
@@ -96,13 +90,13 @@ class TrackingWebsite extends AbstractPageEntity
     public function assertTitles($required, $optional, $message = '')
     {
         try {
-            PHPUnit_Framework_Assert::assertEquals(
+            PHPUnit_Framework_Assert::assertContains(
                 $optional,
                 $this->test->title(),
                 $message
             );
         } catch (\PHPUnit_Framework_ExpectationFailedException $e) {
-            PHPUnit_Framework_Assert::assertEquals(
+            PHPUnit_Framework_Assert::assertContains(
                 $required,
                 $this->test->title(),
                 $message

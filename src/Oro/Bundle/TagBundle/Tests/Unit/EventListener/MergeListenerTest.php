@@ -4,33 +4,33 @@ namespace Oro\Bundle\TagBundle\Tests\Unit\EventListener;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Oro\Bundle\EntityMergeBundle\Event\EntityDataEvent;
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
+use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
+
+use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\EventListener\MergeListener;
+use Oro\Bundle\TagBundle\Helper\TaggableHelper;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\NotTaggableEntityStub;
 use Oro\Bundle\TagBundle\Tests\Unit\Stub\TaggableEntityStub;
 
 class MergeListenerTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var MergeListener
-     */
+    /** @var MergeListener */
     protected $listener;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityMetadata */
     protected $entityMetadata;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TagManager */
     protected $manager;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityData */
     protected $entityData;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|TaggableHelper */
+    protected $helper;
 
     protected function setUp()
     {
@@ -38,7 +38,11 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->listener = new MergeListener($this->manager);
+        $this->helper = $this->getMockBuilder('Oro\Bundle\TagBundle\Helper\TaggableHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->listener = new MergeListener($this->manager, $this->helper);
 
         $this->entityMetadata = $this
             ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
@@ -64,6 +68,11 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnBuildMetadata()
     {
+        $this->helper
+            ->expects($this->once())
+            ->method('isTaggable')
+            ->willReturn(true);
+
         $this->entityMetadata
             ->expects($this->once())
             ->method('addFieldMetadata');
@@ -75,6 +84,11 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
 
     public function testOnCreateEntityData()
     {
+        $this->helper
+            ->expects($this->once())
+            ->method('isTaggable')
+            ->willReturn(true);
+
         $this->entityData
             ->expects($this->any())
             ->method('getEntities')
@@ -111,11 +125,21 @@ class MergeListenerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->once())
             ->method('saveTagging');
 
+        $this->helper
+            ->expects($this->once())
+            ->method('isTaggable')
+            ->willReturn(true);
+
         $this->listener->afterMergeEntity($event);
     }
 
     public function testNotTaggable()
     {
+        $this->helper
+            ->expects($this->once())
+            ->method('isTaggable')
+            ->willReturn(false);
+
         $this->entityMetadata = $this
             ->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata')
             ->setMethods(['getClassName', 'addFieldMetadata'])

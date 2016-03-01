@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Authorization\Voter\VoterInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailBody;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
 
 class EmailVoter implements VoterInterface
 {
@@ -80,6 +81,19 @@ class EmailVoter implements VoterInterface
             foreach ($emailUsers as $emailUser) {
                 if ($this->container->get('oro_security.security_facade')->isGranted($attribute, $emailUser)) {
                     return self::ACCESS_GRANTED;
+                }
+                if ($mailbox = $emailUser->getMailboxOwner() !== null
+                    && $token instanceof UsernamePasswordOrganizationToken
+                ) {
+                    $manager = $this->container->get('oro_email.mailbox.manager');
+                    $mailboxes = $manager->findAvailableMailboxes(
+                        $token->getUser(),
+                        $token->getOrganizationContext()
+                    );
+
+                    if (in_array($mailbox, $mailboxes)) {
+                        return self::ACCESS_GRANTED;
+                    }
                 }
             }
         }

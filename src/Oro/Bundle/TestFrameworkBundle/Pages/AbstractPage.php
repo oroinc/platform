@@ -9,9 +9,11 @@ use PHPUnit_Framework_Assert;
  * Class AbstractPage
  *
  * @package Oro\Bundle\TestFrameworkBundle\Pages
+ *
  */
 abstract class AbstractPage
 {
+    const URL = null;
     protected $redirectUrl = null;
 
     /** @var \PHPUnit_Extensions_Selenium2TestCase */
@@ -24,11 +26,12 @@ abstract class AbstractPage
     public function __construct($testCase, $redirect = true)
     {
         $this->test = $testCase;
-        // @codingStandardsIgnoreStart
-        $this->test->currentWindow()->size(array('width' => intval(viewportWIDTH), 'height' => intval(viewportHEIGHT)));
-        // @codingStandardsIgnoreEnd
-        if (!is_null($this->redirectUrl) && $redirect) {
-            $this->test->url($this->redirectUrl);
+        $url = static::URL;
+        if (is_null($url)) {
+            $url = $this->redirectUrl;
+        }
+        if (!is_null($url) && $redirect) {
+            $this->test->url($url);
             $this->waitPageToLoad();
             $this->waitForAjax();
         }
@@ -77,18 +80,18 @@ abstract class AbstractPage
         $jsCode = <<<JS
             if (!window.onerror) {
                 window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
-                    $('body').append(
+                    var html =
                         '<div style="background: rgba(255,255,200,0.7); color: rgb(0,0,255); ' +
                             'position: absolute; top: 15px; left: 15px; right: 15px; ' +
                             'z-index: 999999; padding: 10px; border: 1px solid red;  border-radius: 5px;' +
                             'box-shadow: 0 0 40px rgba(0,0,0,0.5); white-space: pre">' +
-                            '<h5>Js error occured</h5>' +
-                            errorMsg + '\\n' +
-                            'at ' + url + ':' + lineNumber + ':' + column +
-                            '<h5>Stack trace:</h5>' +
-                            errorObj.stack +
-                        '</div>'
-                    );
+                            '<h5>Js error occured</h5>' + errorMsg + '\\n' +
+                            'at ' + url + ':' + lineNumber + ':' + column;
+                    if (errorObj && errorObj.stack) {
+                        html += '<h5>Stack trace:</h5>' + errorObj.stack;
+                    }
+                    html += '</div>';
+                    $('body').append(html);
 
                     // Tell browser to run its own error handler as well
                     return false;
@@ -236,12 +239,29 @@ JS;
         $renderedMessages = array();
         /** @var \PHPUnit_Extensions_Selenium2TestCase_Element $messageElement */
         foreach ($this->test->elements($messageCssSelector) as $messageElement) {
-            $renderedMessages[] = trim($messageElement->attribute('innerHTML'));
+            $renderedMessages[] = $this->trimHTML(trim($messageElement->attribute('innerHTML')));
         }
 
         PHPUnit_Framework_Assert::assertContains($expectedMessage, $renderedMessages, $message);
 
         return $this;
+    }
+
+    /**
+     * Method trims html tags form string, used in assertMessage function
+     * @param $value
+     * @return string
+     */
+    protected function trimHTML($value)
+    {
+        $config = \HTMLPurifier_Config::createDefault();
+        $config->set('Cache.DefinitionImpl', null);
+        $config->set('HTML.AllowedElements', '');
+        $config->set('HTML.AllowedAttributes', '');
+        $config->set('URI.AllowedSchemes', []);
+        $purifier = new \HTMLPurifier($config);
+
+        return $purifier->purify($value);
     }
 
     /**
@@ -345,6 +365,18 @@ JS;
         $this->test->byXPath("//div[@class='top-action-box']//button[@class='btn minimize-button gold-icon']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
+        return $this;
+    }
+
+    public function closeWidgetWindow()
+    {
+        $widgetCloseButton =
+            "//div[starts-with(@class,'ui-dialog-titlebar ui-widget-header')]//button|span[contains(., 'close')]";
+        while ($this->isElementPresent($widgetCloseButton)) {
+            $this->test->byXPath($widgetCloseButton)->click();
+            $this->waitForAjax();
+        }
+
         return $this;
     }
 }

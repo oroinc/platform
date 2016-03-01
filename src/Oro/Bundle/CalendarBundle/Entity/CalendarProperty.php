@@ -31,6 +31,9 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  *          "note"={
  *              "immutable"=true
  *          },
+ *          "comment"={
+ *              "immutable"=true
+ *          },
  *          "activity"={
  *              "immutable"=true
  *          },
@@ -255,5 +258,13 @@ class CalendarProperty extends ExtendCalendarProperty
         $this->backgroundColor = $backgroundColor;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
     }
 }

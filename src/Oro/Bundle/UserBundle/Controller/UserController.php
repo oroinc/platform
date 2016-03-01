@@ -50,8 +50,9 @@ class UserController extends Controller
      */
     public function updateProfileAction()
     {
+        $entity = $this->getUser();
         return $this->update(
-            $this->getUser(),
+            $entity,
             'oro_user_profile_update',
             array('route' => 'oro_user_profile_view'),
             'oro_user_profile_view'
@@ -213,7 +214,7 @@ class UserController extends Controller
         return array(
             'entity'      => $user,
             'userApi'     => $this->getUserApi($user),
-            'viewProfile' => true
+            'viewProfile' => (bool)$this->getRequest()->query->get('viewProfile', false)
         );
     }
 

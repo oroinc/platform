@@ -7,7 +7,6 @@ use Oro\Bundle\CalendarBundle\Tests\Functional\DataFixtures\LoadCalendarEventDat
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class AjaxCalendarEventControllerTest extends WebTestCase

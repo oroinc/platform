@@ -25,7 +25,8 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         // view annotations
         $this->assertEquals(
             [
-                'Oro\\Bundle\\LayoutBundle\\EventListener\\LayoutListener'
+                'Oro\\Bundle\\LayoutBundle\\EventListener\\LayoutListener',
+                'Oro\\Bundle\\LayoutBundle\\EventListener\\ThemeListener'
             ],
             $extension->getClassesToCompile(),
             'Failed asserting that @Layout annotation is enabled'
@@ -204,9 +205,14 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new OroLayoutExtension();
         $extension->load([], $container);
 
-        $expectedResult = ['base', 'oro-black'];
-        $result         = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getThemeNames();
-        $this->assertSame(sort($expectedResult), sort($result));
+        $expectedThemeNames = ['base', 'oro-black'];
+
+        $themes = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getAllThemes();
+        $themeNames = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getThemeNames();
+
+        $this->assertSame(sort($expectedThemeNames), sort($themeNames));
+        $this->assertSame('Oro Black theme', $themes['oro-black']->getLabel());
+        $this->assertSame('Oro Black theme description', $themes['oro-black']->getDescription());
     }
 
     public function testLoadingLayoutUpdates()
@@ -268,9 +274,16 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $updateResources = $container->getParameter('oro_layout.theme_updates_resources');
-        ksort($updateResources);
+        $this->normalizeResources($updateResources);
+        $this->normalizeResources($expectedResult);
+        $this->assertEquals($expectedResult, $updateResources);
+    }
+
+    protected function normalizeResources(array &$resources)
+    {
+        ksort($resources);
         array_walk(
-            $updateResources,
+            $resources,
             function (&$resource) {
                 ksort($resource);
                 array_walk(
@@ -281,6 +294,5 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
                 );
             }
         );
-        $this->assertEquals($expectedResult, $updateResources);
     }
 }

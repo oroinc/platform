@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Twig;
 
 use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
@@ -96,10 +95,12 @@ class DataGridExtension extends \Twig_Extension
             $metaData->offsetGetByPath('[options][urlParams]') ? : [],
             $params
         );
+
+        $route = $metaData->offsetGetByPath('[options][route]');
         $metaData->offsetAddToArray(
             'options',
             [
-                'url'       => $this->generateUrl($grid, $params),
+                'url' => $this->generateUrl($grid, $route, $params),
                 'urlParams' => $params,
             ]
         );
@@ -156,18 +157,19 @@ class DataGridExtension extends \Twig_Extension
      */
     public function buildGridInputName($name)
     {
-        return $this->manager->getDatagridUniqueName($name);
+        return $this->nameStrategy->getGridUniqueName($name);
     }
 
     /**
      * @param DatagridInterface $grid
+     * @param string $route
      * @param array $params
      * @return string
      */
-    protected function generateUrl(DatagridInterface $grid, $params)
+    protected function generateUrl(DatagridInterface $grid, $route, $params)
     {
         $gridFullName = $this->nameStrategy->buildGridFullName($grid->getName(), $grid->getScope());
-        return $this->router->generate(self::ROUTE, ['gridName' => $gridFullName, $gridFullName => $params]);
+        return $this->router->generate($route ?: self::ROUTE, ['gridName' => $gridFullName, $gridFullName => $params]);
     }
 
     /**
@@ -180,9 +182,8 @@ class DataGridExtension extends \Twig_Extension
         $gridConfig = $this->manager->getConfigurationForGrid($gridName);
 
         if ($gridConfig) {
-            $acl     = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
-            $aclSKip = $gridConfig->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
-            if (!$aclSKip && $acl && !$this->securityFacade->isGranted($acl)) {
+            $aclResource = $gridConfig->getAclResource();
+            if ($aclResource && !$this->securityFacade->isGranted($aclResource)) {
                 return false;
             } else {
                 return true;

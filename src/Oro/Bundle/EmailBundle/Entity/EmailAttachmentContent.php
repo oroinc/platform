@@ -137,4 +137,12 @@ class EmailAttachmentContent
     {
         $this->id = null;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }

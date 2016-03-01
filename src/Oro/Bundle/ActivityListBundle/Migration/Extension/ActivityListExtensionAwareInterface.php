@@ -10,7 +10,7 @@ interface ActivityListExtensionAwareInterface
     /**
      * Sets the ActivityExtension
      *
-     * @param ActivityListExtension $activityListExtension
+     * @param ActivityListExtension $activityListListExtension
      */
-    public function setActivityListExtension(ActivityListExtension $activityListExtension);
+    public function setActivityListExtension(ActivityListExtension $activityListListExtension);
 }

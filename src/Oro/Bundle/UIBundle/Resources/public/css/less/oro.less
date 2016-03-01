@@ -62,7 +62,7 @@ h1, h2, h3, h4, h5, h6 {
 .dropdown-menu {
   margin-top:-1px;
   .border-radius(3px);
-  z-index: 900;
+  z-index: @oroZindexDropdown;
   li.dropdown {
     position: relative;
     & > a{
@@ -82,6 +82,16 @@ h1, h2, h3, h4, h5, h6 {
     & > i[class^="icon-"] {
       min-width: 17px;
     }
+  }
+}
+.dropdown-menu__floating {
+  margin-top: 0;
+  > li > a, > li > button {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    font-size: 12px;
+    color: #444;
+    text-transform: capitalize;
   }
 }
 .dark {
@@ -112,11 +122,27 @@ label, input, button, select, textarea { font-size:13px;}
     label.control-label {
       float:left;
       width:160px;
-      padding-top:7px;
+      padding-top: 7px;
       color: #777;
       font-weight: normal;
       font-size: 13px;
       text-align:right;
+    }
+    .control-label.wrap {
+      float:left;
+      padding-top: 6px;
+      color: #777;
+      font-weight: normal;
+      font-size: 13px;
+      line-height: 20px;
+      text-align: right;
+      .tooltip-icon {
+        margin-right: 5px;
+        cursor: pointer;
+      }
+      label {
+        display: inline;
+      }
     }
     .controls {
       margin-left:170px;
@@ -125,12 +151,17 @@ label, input, button, select, textarea { font-size:13px;}
         margin-top: 10px;
       }
       .control-label {
-        padding-top:7px;
+        padding-top: 7px;
         width: 100%;
         word-wrap: break-word;
-        &.html-content {
+        padding-left: 5px; // to get nice hover background
+        box-sizing: border-box;
+        &.html-property {
           overflow: auto;
         }
+      }
+      .control-label.wrap {
+        width: 130px;
       }
       label.control-label {
         width: auto;
@@ -272,7 +303,11 @@ i.color {
     max-width: 100%;
     .controls {
       margin-left: 240px;
+      div.control-label {
+        text-align: left;
+      }
     }
+    div.control-label,
     label.control-label {
       width: 230px;
       text-align: right;
@@ -352,21 +387,15 @@ body .select2-container {
 .label-info,
 .badge-info { background:#92b2d6; }
 
-// FontAwesome
-[class^="icon-"],
-[class*=" icon-"] {
-  display:inline-block !important;
-}
-[class^='icon-'].hide-text:after,
-[class^='icon-'].hide-text:before {
-  padding:0;
-  text-indent:0;
-  font-size:14px;
-  line-height:1.3em;
-  color:#666;
-  font-family: 'FontAwesome';
+.widget-content > .label-info:first-child {
+  margin-bottom: 10px;
 }
 
+.ui-sortable-handle {
+  cursor: move;
+  cursor: -moz-grab;
+  cursor: -webkit-grab;
+}
 .dropdown-menu {
   .divider {
     border-bottom-color:#eee;
@@ -830,16 +859,32 @@ footer {
   cursor: auto;
 }
 .ui-dialog-content {
-  margin: @verticalPadding/2 @horizontalPadding/2;
+  padding: @verticalPadding/2 @horizontalPadding/2 0 @verticalPadding/2;
+  margin: 0 auto;
   position: relative;
   min-width: 250px;
+  width: 100% !important;
+  height: calc(~"100% - 81px") !important;
   .ui-resizable-handle {
     cursor: move;
   }
 }
-.ui-dialog .widget-actions-section .btn,
-.ui-dialog .widget-actions-section a.action {
-  margin-left: 5px;
+.ui-dialog:not(.ui-dialog-buttons){
+  .ui-dialog-content{
+    border-radius: 0 0 3px 3px;
+  }
+}
+.ui-dialog.ui-resizable:not(.ui-dialog-buttons) {
+  .ui-dialog-content{
+    height: calc(~"100% - 50px") !important;
+    border-radius: 0 0 3px 3px;
+    border-bottom: 1px solid #e5e5e5;
+  }
+}
+.ui-dialog .widget-actions-section {
+  .btn, .action {
+    margin-left: 5px;
+  }
 }
 .ui-dialog .ui-resizable-se {
   height: 14px;
@@ -1245,8 +1290,24 @@ footer {
   .nav-pills {
     padding:0 10px;
   }
-  .launchers-dropdown-menu{
-    min-width: 35px;
+  /* fix for IE10 in Win8, otherwise breaks actions column */
+  .dropdown:not(.open) {
+    .launchers-dropdown-menu {
+      min-width: 0;
+      display: block;
+      height: 0;
+      width: 0;
+      overflow: hidden;
+      border-width: 0;
+    }
+  }
+}
+.launchers-dropdown-menu {
+  min-width: 35px;
+}
+.launchers-list {
+  &.nav > li:first-child > a {
+    margin-left: 2px;
   }
   .launcher-item {
     [class^='icon-']:before {
@@ -1266,17 +1327,6 @@ footer {
       &:focus {
         background:#fff;
       }
-    }
-  }
-  /* fix for IE10 in Win8, otherwise breaks actions column */
-  .dropdown:not(.open) {
-    .launchers-dropdown-menu {
-      min-width: 0;
-      display: block;
-      height: 0;
-      width: 0;
-      overflow: hidden;
-      border-width: 0;
     }
   }
 }
@@ -1321,11 +1371,7 @@ footer {
     height: 24px;
     line-height: 24px;
   }
-  > .row > .pull-left{
-    margin-top: 10px;
-    margin-bottom: 5px;
-  }
-  > .row > .pull-right{
+  > .row > div{
     margin-top: 10px;
     margin-bottom: 5px;
   }
@@ -1405,6 +1451,30 @@ footer {
 
 .modal {
   .border-radius(8px 8px 6px 6px);
+  .modal-header {
+    padding: 10px 5px 10px 20px;
+    .border-radius(6px 6px 0 0);
+    .box-shadow(0 0 6px 0 rgba(0, 0, 0, 0.5));
+    .close {
+      font-size: 25px;
+      height: 32px;
+      width: 32px;
+      margin-top: -6px;
+      color: @white;
+      text-shadow: 2px 0px 2px rgba(111, 123, 148, 1);
+      opacity: 0.9;
+      text-align: center;
+      line-height: 32px;
+      &:hover,
+      &:focus {
+        color: @white;
+        opacity: 0.6;
+      }
+    }
+    h3 {
+      font: bold 16px/18px @baseFontFamily;
+    }
+  }
 }
 
 .oro-modal-danger {
@@ -1414,32 +1484,11 @@ footer {
   .modal-header {
     background-color: #fdcece;
     border-bottom: 1px solid #d59c9c;
-    padding: 14px 15px 14px 20px;
-    .border-radius(6px 6px 0 0);
-    -webkit-box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
-    box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
-
   }
   .modal-body {
     color: @bodyColor;
     font-size: 14px;
     padding-left: 20px;
-  }
-  .modal-header .close {
-    margin-top: -6px;
-    color: @white;
-    font-size: 25px;
-    text-shadow: 2px 0px 2px rgba(111, 123, 148, 1);
-    opacity: 0.9;
-    height: 32px;
-    width: 32px;
-    text-align: center;
-    line-height: 32px;
-    &:hover,
-    &:focus {
-      color: @white;
-      opacity: 0.6;
-    }
   }
   .modal-footer {
     background: none;
@@ -1449,40 +1498,21 @@ footer {
     box-shadow:  none;
     padding: 15px 15px 35px;
   }
-  .modal-header h3 {
-    font:bold 16px/18px @baseFontFamily;
-  }
 }
-.oro-modal-normal{
+.oro-modal-normal {
   background-color: #fff;
   width: 700px;
-  height: 450px;
+  margin-left: -350px;
   top: 20%;
   .modal-header{
     background-color: #303944;
     border-bottom: 1px solid #303944;
-    .border-radius(6px 6px 0 0);
-    -webkit-box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
-    box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
     color: #fff;
   }
   .modal-body{
     color: @bodyColor;
     font-size: 14px;
     padding-left: 20px;
-    height: 87%;
-    overflow: hidden;
-  }
-  .modal-header .close{
-    color: @white;
-    font-size: 25px;
-    text-shadow: 2px 0px 2px rgba(111, 123, 148, 1);
-    opacity: 0.9;
-    &:hover,
-    &:focus {
-      color: @white;
-      opacity: 0.6;
-    }
   }
 }
 .modal-primary {
@@ -1493,18 +1523,11 @@ footer {
     background-color: #fcfcfc;
     #gradient > .vertical(#fcfcfc, #ebebeb);
     border-bottom: 1px solid #b2b2b2;
-    padding: 14px 15px 14px 20px;
-    .border-radius(6px 6px 0 0);
-    -webkit-box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
-    box-shadow:  0px 0px 6px 0px rgba(0, 0, 0, 0.5);
   }
   .modal-body {
     color: @bodyColor;
     font-size: 14px;
     padding-left: 20px;
-  }
-  .modal-header .close {
-    font-size: 25px;
   }
   .modal-footer {
     background: none;
@@ -1513,9 +1536,6 @@ footer {
     -webkit-box-shadow:  none;
     box-shadow:  none;
     padding: 15px 15px 35px;
-  }
-  .modal-header h3 {
-    font:bold 16px/18px @baseFontFamily;
   }
 }
 .dropup:after,
@@ -1576,8 +1596,8 @@ footer {
   .ui-dialog-titlebar {
     margin:-1px -1px 0 -1px;
     border-bottom: 1px solid #000;
-    background-color: #47505a;
-    #gradient > .vertical(#47505a, #363e47);
+    background-color: @titleBackgroundStart;
+    #gradient > .vertical(@titleBackgroundStart, @titleBackgroundEnd);
     padding: 6px 15px;
   }
   .ui-dialog-title {
@@ -1715,6 +1735,7 @@ footer {
 }
 .ui-dialog.ui-widget-content {
   border: 1px solid #bbb;
+  background-color: #fafafa;
 }
 .user-info-state {
   clear: right;
@@ -1791,18 +1812,22 @@ footer {
   border-radius: 0;
   border: solid #ddd;
   border-width: 0 1px 1px;
-  padding: 10px;
+  padding: 5px 10px 10px;
   overflow: hidden;
 }
 .tags-overlay .well{
   -webkit-box-shadow: none;
   box-shadow: none;
+  padding-top: 4px;
 }
 .tags-overlay .tag-list,
 .tag-view  .tag-list {
   margin-bottom: 0;
   li {
-    padding-top: 3px;
+    padding: 5px 5px 0 0;
+  }
+  a:hover span.label {
+    background:#e4e4e4;
   }
   span.label {
     background:#eee;
@@ -1813,19 +1838,11 @@ footer {
     padding:4px 6px;
     border:none;
     color:@bodyColor;
-    &:hover {
-      background:#e4e4e4;
-    }
-    &.with-button {
-      position: relative;
-      padding-right: 20px;
-    }
     .select2-search-choice-close {
-      background:none;
-      width:0;
-      height:0;
-      top:5px;
-      right:15px;
+      position: relative;
+      display: inline-block;
+      right: -2px;
+      top: 0;
       &:before {
         width:20px;
         content: "\f00d";
@@ -1848,14 +1865,16 @@ footer {
   &.customer-simple {
     padding:0 4px 0 0;
   }
+  .top-row {
+    overflow: hidden;
+  }
   .sub-title {
     font-size: 17px;
     color: #999;
-    float: left;
+    display: inline-block;
     margin-bottom: 3px;
   }
   .separator {
-    float: left;
     padding: 0 3px;
     color: #999;
     font-size: 18px;
@@ -1865,7 +1884,8 @@ footer {
     font-size: 19px;
     min-height: 15px;
     line-height: 22px;
-    float: left;
+    display: inline-block;
+    float: none !important;
     font: bold 17px/18px Helvetica, Arial, sans-serif;
 
   }
@@ -1896,6 +1916,7 @@ footer {
     color: #777;
     li {
       padding: 0 10px;
+      margin-bottom: 4px;
       border-left: 1px solid #e6e6e6;
       font-size: 11px;
       line-height: 14px;
@@ -2018,7 +2039,7 @@ ul.inline-extra {
   text-decoration: none !important;
 }
 .navbar-extra-right {
-  padding-right: 20px;
+  padding-right: 23px;
   .title-buttons-container {
     .btn-group{
       margin-left: 8px;
@@ -2072,7 +2093,7 @@ body .mce-tinymce { width: 292px }
 textarea {
   height: 150px;
   resize: vertical;
-  text-align: justify;
+  text-align: left;
   vertical-align: top;
 }
 .scrollspy-title {
@@ -2103,17 +2124,17 @@ textarea {
 }
 .horizontal .oro-clearfix input[type="checkbox"],
 .horizontal .oro-clearfix input[type="radio"] {
-  margin: -4px 10px 0 0;
+  margin: -4px 6px 0 0;
 }
 .horizontal .oro-clearfix .label {
   float: left;
 }
 .controls {
   .horizontal {
-    padding-top: 5px;
+    padding-top: 7px;
   }
   > input[type=checkbox]:only-child {
-    margin-top: 6px;
+    margin-top: 10px;
   }
 }
 .btn-group > .btn-small {
@@ -2224,11 +2245,10 @@ select {
   line-height: 26px;
 }
 div.selector {
-  line-height: 28px;
+  line-height: 30px;
   height: 30px;
   position: relative;
   width: 235px;
-  font-size: 12px;
   border: 1px solid #ddd;
   #gradient > .vertical(#ffffff, #f3f3f3);
   -webkit-border-radius: 3px;
@@ -2238,19 +2258,19 @@ div.selector {
 }
 
 div.selector span {
-  height: 28px;
+  height: 30px;
   display: block;
-  line-height: 28px;
+  line-height: 30px;
   .box-sizing(border-box);
-  padding: 0 5px;
+  padding: 0 5px 0 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
   &:after {
-    margin:2px 2px 0 0;
+    margin: 3px 2px 0 0;
     display:inline-block;
-    font:15px 'FontAwesome';
+    font:16px 'FontAwesome';
     content: "\f0dd";
     position: absolute;
     right: 5px;
@@ -2313,6 +2333,12 @@ div.selector.disabled span {
 .row-fluid.row-fluid-divider {
   background: url("../../img/vertical-separator.png") repeat-y 50% 0;
 }
+/* fix incorrect aligment of fluid divider line in Firefox */
+@-moz-document url-prefix() {
+  .row-fluid.row-fluid-divider {
+    background-position: calc(~"50% - 1px") 0;
+  }
+}
 h5.user-fieldset {
   font-weight:bold;
   font-size:15px;
@@ -2370,74 +2396,6 @@ div.uploader.focus,
 }
 .alert-error > ul{
   margin-bottom: 0;
-}
-#flash-messages,
-.flash-messages {
-  position: relative;
-  .alert {
-    margin: 3px 0 0;
-    background-color: @warningBackground;
-    background-image: url('../../img/warning-ico.png');
-    background-position: 10px 48%;
-    background-repeat: no-repeat;
-    padding: 3px 35px 1px 37px;
-    border:1px solid rgba(241,216,103,.3);
-    text-shadow: 0 1px 0 rgba(255,255,255,.5);
-    .close {
-      font-size: 18px;
-      color: @warningClose;
-      opacity: 1;
-    }
-  }
-  .alert-success {
-    background-color: @successBackground;
-    background-image: url('../../img/sucsses-ico.png');
-    border:1px solid rgba(77,161,36,.3);
-    color: @successText;
-    .close {
-      color: @successClose;
-    }
-  }
-  .alert-danger,
-  .alert-error {
-    background-image: url('../../img/error-ico.png');
-    background-color: @errorBackground;
-    border:1px solid rgba(203,17,17,.3);
-    color: @errorText;
-    .close {
-      color: @errorClose;
-    }
-  }
-  .alert-warning {
-    background-image: none;
-    padding-left: 20px;
-  }
-  .alert-info {
-    background-color: @infoBackground;
-    border-color: @infoBorder;
-    color: @infoText;
-    background-image: none;
-    padding-left: 20px;
-    .close {
-      color: @infoClose;
-    }
-  }
-  .alert-empty {
-    display: none;
-  }
-}
-.flash-messages-frame {
-  position: absolute;
-  left: 25%;
-  z-index: 500;
-  width: 50%;
-
-  .box-sizing(border-box);
-  padding: 0 10px;
-  opacity: 0.9;
-}
-.flash-messages-holder {
-  /*width: 100%; ticket/BAP-1733*/
 }
 .oro-multiselect {
   display: inline-block;
@@ -2613,6 +2571,25 @@ label.radio.error {
       color:#888;
     }
   }
+  .addAfterRow {
+    &:after {
+      content: "\f067";
+    }
+    text-indent:-999;
+    font-size:0;
+    line-height:0;
+    margin: 0 0 0 0;
+    &:after {
+      display:inline-block;
+      font:14px/1em 'FontAwesome';
+      color:#ddd;
+      content: "\f067";
+      text-indent:0;
+    }
+    &:hover:after {
+      color:#888;
+    }
+  }
   .row-oro.oro-multiselect-holder {
     margin: 0 0 5px;
   }
@@ -2655,7 +2632,7 @@ label.radio.error {
   float: left;
   background: none;
   margin: 0;
-  padding: 6px 15px 0 20px;
+  padding: 6px 15px 6px 20px;
 }
 .breadcrumb > li.active,
 .breadcrumb > li {
@@ -2784,7 +2761,6 @@ iframe.email-body {
   &>div {
     display: inline-block;
     margin-right: 20px;
-    min-width: 250px;
   }
   input[type="checkbox"]{
     margin: 0;
@@ -2860,7 +2836,7 @@ span.validation-failed {
     .nav-tabs > .active > a,
     .nav-tabs > .active > a:hover,
     .nav-tabs > .active > a:focus{
-      background: none;
+      background: #fff;
     }
   }
 }
@@ -2944,57 +2920,85 @@ span.validation-failed {
   font-style: normal;
 }
 .oro-tabs {
+  .nav-tabs {
+    padding-left: 1px; // compensate tabs margin-left: -1px
+    margin-bottom: -1px; // should overlay tab-content's top border
+    border-bottom: 1px solid #ddd;
+    float: left;
+  }
   .nav-tabs > li > a,
   .nav-tabs > li > a:hover,
-  .nav-tabs > li > a:focus {
+  .nav-tabs > li > a:focus,
+  .nav-tabs-dropdown > li.dropdown.open > a {
     color: @gray;
     background-color: #fafafa;
     border-bottom: 1px solid #ddd;
     border-top: 1px solid #ddd;
     border-right: 1px solid #ddd;
-    border-left: none;
+    border-left: 1px solid #ddd;
     border-radius: 0px;
     margin-right: 0px;
+    margin-left: -1px;
+    height: 38px;
+  }
+
+  .nav-tabs-dropdown {
+    height: 38px;
+    overflow: hidden;
+    .dropdown-toggle:focus {
+      font-weight: normal;
+    }
+
+    li.dropdown.open .caret {
+      border-top-color: @linkColor !important;
+      border-bottom-color: @linkColor !important;
+    }
+
+    li.dropdown.open.active .caret {
+      border-top-color: @gray !important;
+      border-bottom-color: @gray !important;
+    }
   }
 
   .nav-tabs > .active > a,
   .nav-tabs > .active > a:hover,
-  .nav-tabs > .active > a:focus {
+  .nav-tabs > .active > a:focus,
+  .nav-tabs > li.dropdown.open.active > a {
+    color: @gray;
     border-bottom: 1px solid #fff;
-    background-color: transparent;
-  }
-
-  .nav-tabs > li:first-child > a,
-  .nav-tabs > li:first-child > a:hover,
-  .nav-tabs > li:first-child > a:focus {
-    border-left: 1px solid #ddd;
-  }
-
-  .nav-tabs {
-    margin-bottom: 0px;
-    border-bottom: 1px solid #ddd;
+    border-right-color: #ddd;
+    border-top-color: #ddd;
+    background-color: #fff;
+    outline: none;
   }
 
   .tab-content {
-    border-bottom: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-left: 1px solid #ddd;
+    overflow: initial;
+    border: 1px solid #ddd;
+    clear: both;
   }
 
   .tab-pane {
     min-height: 104px;
   }
 }
-.tab-content{
-  .oro-tabs{
-    .nav-tabs{
-      & > li{
-        & > a{
-          margin-top: -1px;
-        }
-      }
-    }
-  }
+
+.nav-tabs {
+  padding-left: 1px; // compensate tabs margin-left: -1px
+  margin-bottom: -1px; // should overlay tab-content's top border
+  border-bottom: 1px solid #ddd;
+  float: left;
+}
+.tab-content {
+  border-top: 1px solid #ddd;
+  clear: both;
+}
+.nav-tabs > li > a.widget-component-processing{
+  background: #ccc !important;
+  border-bottom: 1px solid transparent !important;
+  /* following two lines allow this tab handle overlay .tab-content while it is loading */
+  position: relative;
+  z-index: 1;
 }
 // capitalize buttons, labels, titles, breadcrumb for English language
 .lang-en {
@@ -3023,12 +3027,12 @@ span.validation-failed {
 .popover {
   max-width: 315px; /* little increase to fit usual content */
   .popover-content {
-    padding: 6px 8px;
+    padding: 13px 30px 13px 15px;
+    height: 100%;
   }
   .oro-popover-content {
     overflow-y: auto;
-    margin-right: 15px;
-    max-height: 60px;
+    height: 100%;
   }
   .popover-close {
     position: absolute;
@@ -3177,5 +3181,21 @@ label .popover-content {
   &.in {
     // fixes expand in FF
     min-height: 1px;
+  }
+}
+.icon-with-counter {
+  position: relative;
+  white-space: nowrap;
+  .item-counter {
+    font-size: 9px;
+    width: auto;
+    display: inline-block;
+    border-radius: 8px;
+    position: relative;
+    margin-left: -7px;
+    margin-right: -5px;
+    top: -1px;
+    line-height: 10px;
+    padding: 0 3px;
   }
 }

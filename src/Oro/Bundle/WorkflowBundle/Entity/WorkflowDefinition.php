@@ -46,7 +46,7 @@ class WorkflowDefinition implements DomainObjectInterface
      * @var string
      *
      * @ORM\Id
-     * @ORM\Column(type="string", length=255, unique=true)
+     * @ORM\Column(type="string", length=255)
      */
     protected $name;
 

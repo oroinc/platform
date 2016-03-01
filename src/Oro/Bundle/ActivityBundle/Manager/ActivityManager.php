@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActivityBundle\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActivityBundle\Event\ActivityEvent;
@@ -15,6 +14,7 @@ use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
@@ -172,6 +172,35 @@ class ActivityManager
     }
 
     /**
+     * Removes all activity entity associations and associates with the given target entities
+     * If some target entity has no association with the given activity entity it will be skipped
+     *
+     * @param ActivityInterface $activityEntity
+     * @param object|object[]   $targetEntities
+     *
+     * @return bool TRUE if at least one association was changed; otherwise, FALSE
+     */
+    public function setActivityTargets(ActivityInterface $activityEntity, array $targetEntities)
+    {
+        $hasChanges = false;
+
+        $oldTargetEntities = $activityEntity->getActivityTargetEntities();
+
+        foreach ($oldTargetEntities as $oldTargetEntity) {
+            if (!in_array($oldTargetEntity, $targetEntities)) {
+                $this->removeActivityTarget($activityEntity, $oldTargetEntity);
+                $hasChanges = true;
+            }
+        }
+
+        if ($this->addActivityTargets($activityEntity, $targetEntities)) {
+            $hasChanges = true;
+        }
+
+        return $hasChanges;
+    }
+
+    /**
      * Removes an association of the given target entity with the activity entity
      * If the target entity has no association with the given activity entity it will be skipped
      *
@@ -270,13 +299,15 @@ class ActivityManager
      * Returns a query builder that could be used for fetching the list of entities
      * associated with the given activity
      *
-     * @param string      $activityClassName The FQCN of the activity entity
-     * @param mixed       $filters           Criteria is used to filter activity entities
-     *                                       e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
-     * @param array|null  $joins             Additional associations required to filter activity entities
-     * @param int|null    $limit             The maximum number of items per page
-     * @param int|null    $page              The page number
-     * @param string|null $orderBy           The ordering expression for the result
+     * @param string        $activityClassName The FQCN of the activity entity
+     * @param mixed         $filters           Criteria is used to filter activity entities
+     *                                         e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null    $joins             Additional associations required to filter activity entities
+     * @param int|null      $limit             The maximum number of items per page
+     * @param int|null      $page              The page number
+     * @param string|null   $orderBy           The ordering expression for the result
+     * @param callable|null $callback          A callback function which can be used to modify child queries
+     *                                         function (QueryBuilder $qb, $targetEntityClass)
      *
      * @return SqlQueryBuilder|null SqlQueryBuilder object or NULL if the given entity type has no activity associations
      */
@@ -286,7 +317,8 @@ class ActivityManager
         $joins = null,
         $limit = null,
         $page = null,
-        $orderBy = null
+        $orderBy = null,
+        $callback = null
     ) {
         $targets = $this->getActivityTargets($activityClassName);
         if (empty($targets)) {
@@ -300,7 +332,8 @@ class ActivityManager
             $targets,
             $limit,
             $page,
-            $orderBy
+            $orderBy,
+            $callback
         );
     }
 
@@ -328,13 +361,15 @@ class ActivityManager
      * Returns a query builder that could be used for fetching the list of activity entities
      * associated with the given target entity
      *
-     * @param string      $targetClassName The FQCN of the activity entity
-     * @param mixed       $filters         Criteria is used to filter activity entities
-     *                                     e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
-     * @param array|null  $joins           Additional associations required to filter activity entities
-     * @param int|null    $limit           The maximum number of items per page
-     * @param int|null    $page            The page number
-     * @param string|null $orderBy         The ordering expression for the result
+     * @param string        $targetClassName The FQCN of the activity entity
+     * @param mixed         $filters         Criteria is used to filter activity entities
+     *                                       e.g. ['age' => 20, ...] or \Doctrine\Common\Collections\Criteria
+     * @param array|null    $joins           Additional associations required to filter activity entities
+     * @param int|null      $limit           The maximum number of items per page
+     * @param int|null      $page            The page number
+     * @param string|null   $orderBy         The ordering expression for the result
+     * @param callable|null $callback        A callback function which can be used to modify child queries
+     *                                       function (QueryBuilder $qb, $ownerEntityClass)
      *
      * @return SqlQueryBuilder|null SqlQueryBuilder object or NULL if the given entity type has no activity associations
      */
@@ -344,7 +379,8 @@ class ActivityManager
         $joins = null,
         $limit = null,
         $page = null,
-        $orderBy = null
+        $orderBy = null,
+        $callback = null
     ) {
         $activities = $this->getActivities($targetClassName);
         if (empty($activities)) {
@@ -358,7 +394,8 @@ class ActivityManager
             $activities,
             $limit,
             $page,
-            $orderBy
+            $orderBy,
+            $callback
         );
     }
 
@@ -373,17 +410,17 @@ class ActivityManager
     {
         $result = [];
 
-        $config = $this->activityConfigProvider->getConfig($entityClass);
-        $activityClassNames = $config->get('activities', false, []);
+        $activityClassNames = $this->activityConfigProvider
+            ->getConfig($entityClass)
+            ->get('activities', false, []);
         foreach ($activityClassNames as $activityClassName) {
-            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
+            $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
+            if (!$this->isActivityAssociationEnabled($activityClassName, $associationName)) {
                 continue;
             }
 
             $entityConfig   = $this->entityConfigProvider->getConfig($activityClassName);
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
-
-            $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
 
             $item = [
                 'className'       => $activityClassName,
@@ -418,17 +455,18 @@ class ActivityManager
     {
         $result = [];
 
-        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+        $activityClassNames = $this->activityConfigProvider
+            ->getConfig($entityClass)
+            ->get('activities', false, []);
         foreach ($activityClassNames as $activityClassName) {
-            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
+            $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
+            if (!$this->isActivityAssociationEnabled($activityClassName, $associationName)) {
                 continue;
             }
 
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
             $buttonWidget   = $activityConfig->get('action_button_widget');
             if (!empty($buttonWidget)) {
-                $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
-
                 $item = [
                     'className'       => $activityClassName,
                     'associationName' => $associationName,
@@ -527,22 +565,19 @@ class ActivityManager
     }
 
     /**
-     * @param string $entityClass
      * @param string $activityClassName
+     * @param string $activityAssociationName
      *
      * @return bool
      */
-    protected function isActivityAssociationEnabled($entityClass, $activityClassName)
+    protected function isActivityAssociationEnabled($activityClassName, $activityAssociationName)
     {
-        $extendConfig = $this->extendConfigProvider->getConfig($activityClassName);
-        $relations    = $extendConfig->get('relation', false, []);
-        $relationKey  = ExtendHelper::buildRelationKey(
-            $activityClassName,
-            ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND),
-            RelationType::MANY_TO_MANY,
-            $entityClass
-        );
+        if (!$this->extendConfigProvider->hasConfig($activityClassName, $activityAssociationName)) {
+            return false;
+        }
 
-        return isset($relations[$relationKey]);
+        return ExtendHelper::isFieldAccessible(
+            $this->extendConfigProvider->getConfig($activityClassName, $activityAssociationName)
+        );
     }
 }

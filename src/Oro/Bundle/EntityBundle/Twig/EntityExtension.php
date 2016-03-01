@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityBundle\Twig;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\EntityBundle\ORM\EntityIdAccessor;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 
@@ -19,19 +20,25 @@ class EntityExtension extends \Twig_Extension
     /** @var EntityNameResolver */
     protected $entityNameResolver;
 
+    /** @var EntityAliasResolver */
+    protected $entityAliasResolver;
+
     /**
      * @param EntityIdAccessor    $entityIdAccessor
      * @param EntityRoutingHelper $entityRoutingHelper
      * @param EntityNameResolver  $entityNameResolver
+     * @param EntityAliasResolver $entityAliasResolver
      */
     public function __construct(
         EntityIdAccessor $entityIdAccessor,
         EntityRoutingHelper $entityRoutingHelper,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        EntityAliasResolver $entityAliasResolver
     ) {
         $this->entityIdAccessor    = $entityIdAccessor;
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->entityNameResolver  = $entityNameResolver;
+        $this->entityAliasResolver = $entityAliasResolver;
     }
 
     /**
@@ -41,6 +48,7 @@ class EntityExtension extends \Twig_Extension
     {
         return [
             new \Twig_SimpleFunction('oro_class_name', [$this, 'getClassName']),
+            new \Twig_SimpleFunction('oro_class_alias', [$this, 'getClassAlias']),
             new \Twig_SimpleFunction('oro_action_params', [$this, 'getActionParams'])
         ];
     }
@@ -75,6 +83,27 @@ class EntityExtension extends \Twig_Extension
         return $escape
             ? $this->entityRoutingHelper->getUrlSafeClassName($className)
             : $className;
+    }
+
+    /**
+     * Get class alias of specified entity
+     *
+     * @param object $object
+     * @param bool   $isPlural
+     *
+     * @return null|string
+     */
+    public function getClassAlias($object, $isPlural = false)
+    {
+        if (!is_object($object)) {
+            return null;
+        }
+
+        $className = ClassUtils::getRealClass($object);
+
+        return $isPlural
+            ? $this->entityAliasResolver->getPluralAlias($className)
+            : $this->entityAliasResolver->getAlias($className);
     }
 
     /**

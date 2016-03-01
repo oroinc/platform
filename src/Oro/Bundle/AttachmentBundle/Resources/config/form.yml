@@ -1,4 +1,5 @@
 parameters:
+    oro_attachment.form.type.class:                       Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType
     oro_attachment.form.type.file_config.class:           Oro\Bundle\AttachmentBundle\Form\Type\FileConfigType
     oro_attachment.form.type.file.class:                  Oro\Bundle\AttachmentBundle\Form\Type\FileType
     oro_attachment.form.type.image.class:                 Oro\Bundle\AttachmentBundle\Form\Type\ImageType
@@ -7,6 +8,11 @@ parameters:
     oro_attachment.form.handler.attachment.class:         Oro\Bundle\AttachmentBundle\Form\Handler\AttachmentHandler
 
 services:
+    oro_attachment.form.type:
+        class: %oro_attachment.form.type.class%
+        tags:
+            - { name: form.type, alias: oro_attachment }
+
     oro_attachment.form.type.file_config:
         class: %oro_attachment.form.type.file_config.class%
         arguments:

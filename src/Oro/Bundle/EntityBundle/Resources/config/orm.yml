@@ -1,10 +1,13 @@
 parameters:
-    doctrine.orm.entity_manager.class:                         Oro\Bundle\EntityBundle\ORM\OroEntityManager
+    doctrine.orm.entity_manager.class: Oro\Bundle\EntityBundle\ORM\OroEntityManager
+    doctrine.orm.configuration.class:  Oro\Bundle\EntityBundle\ORM\OrmConfiguration
 
     oro_entity.doctrine_helper.class:                          Oro\Bundle\EntityBundle\ORM\DoctrineHelper
     oro_entity.entity_identifier_accessor.class:               Oro\Bundle\EntityBundle\ORM\EntityIdAccessor
     oro_entity.orm.entity_class_resolver.class:                Oro\Bundle\EntityBundle\ORM\EntityClassResolver
-    oro_entity.orm.query.filter_collection.class:              Oro\Bundle\EntityBundle\ORM\Query\FilterCollection
+    oro_entity.orm.native_query_executor_helper.class:         Oro\Bundle\EntityBundle\ORM\NativeQueryExecutorHelper
+    oro_entity.orm.insert_from_select_query_executor.class:    Oro\Bundle\EntityBundle\ORM\InsertFromSelectQueryExecutor
+    oro_entity.query_hint_resolver.class:                      Oro\Component\DoctrineUtils\ORM\QueryHintResolver
 
 services:
     oro_entity.doctrine_helper:
@@ -22,6 +25,15 @@ services:
         arguments:
             - @doctrine
 
-    oro_entity.orm.sql_filter_collection:
-        class:             %oro_entity.orm.query.filter_collection.class%
-        arguments:         ["@doctrine.orm.entity_manager"]
+    oro_entity.query_hint_resolver:
+        class: %oro_entity.query_hint_resolver.class%
+
+    oro_entity.orm.native_query_executor_helper:
+        class: %oro_entity.orm.native_query_executor_helper.class%
+        arguments:
+            - @doctrine
+
+    oro_entity.orm.insert_from_select_query_executor:
+        class: %oro_entity.orm.insert_from_select_query_executor.class%
+        arguments:
+            - @oro_entity.orm.native_query_executor_helper

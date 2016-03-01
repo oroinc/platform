@@ -1,15 +1,13 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
+    'jquery',
     'underscore',
     'backbone',
     'chaplin'
-], function (_, Backbone, Chaplin) {
+], function($, _, Backbone, Chaplin) {
     'use strict';
 
-    var BaseComponent, componentOptions;
-
-    componentOptions = ['model', 'collection', 'name'];
+    var BaseComponent;
+    var componentOptions = ['model', 'collection', 'name'];
 
     /**
      * Base component's constructor
@@ -17,7 +15,7 @@ define([
      * @export oroui/js/app/components/base/component
      * @class oroui.app.components.base.Component
      */
-    BaseComponent = function (options) {
+    BaseComponent = function(options) {
         this.cid = _.uniqueId('component');
         _.extend(this, _.pick(options, componentOptions));
         this.initialize(options);
@@ -63,14 +61,14 @@ define([
          *
          * @param {Object=} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             // should be defined in descendants
         },
 
         /**
          * Disposes the component
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -79,11 +77,13 @@ define([
             this.stopListening();
             this.off();
             // dispose and remove all own properties
-            _.each(this, function (item, name) {
-                if (item && typeof item.dispose === 'function') {
+            _.each(this, function(item, name) {
+                if (item && typeof item.dispose === 'function' && !item.disposed) {
                     item.dispose();
                 }
-                delete this[name];
+                if (['cid'].indexOf(name) === -1) {
+                    delete this[name];
+                }
             }, this);
             this.disposed = true;
 
@@ -95,7 +95,7 @@ define([
          *
          * @protected
          */
-        _deferredInit: function () {
+        _deferredInit: function() {
             this.deferredInit = $.Deferred();
         },
 
@@ -104,7 +104,7 @@ define([
          *
          * @protected
          */
-        _resolveDeferredInit: function () {
+        _resolveDeferredInit: function() {
             if (this.deferredInit) {
                 this.deferredInit.resolve(this);
             }

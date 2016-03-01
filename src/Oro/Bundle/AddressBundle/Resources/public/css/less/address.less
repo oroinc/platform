@@ -1,4 +1,4 @@
-@import "../../../oroui/css/less/mixins";
+@import "oroui/css/less/mixins";
 
 .map-box {
   .map-address-list {
@@ -20,7 +20,7 @@
       width: 100%;
       height: auto;
     }
-    .map-visual-frame {
+    .map-visual-frame, .map-visual {
       max-height: 50vh;
     }
   }
@@ -36,7 +36,9 @@
     text-align: center;
   }
   .map-item {
-    cursor:pointer;
+    &:not(.active) {
+      cursor: pointer;
+    }
     address {
       margin-bottom:0;
       line-height:1.5em;

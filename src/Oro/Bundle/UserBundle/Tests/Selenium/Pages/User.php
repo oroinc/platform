@@ -8,8 +8,8 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageEntity;
  * Class User
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method Users openUsers() openUsers(string)
- * @method User openUser() openUser(string)
+ * @method Users openUsers(string $bundlePath)
+ * @method User openUser(string $bundlePath)
  */
 class User extends AbstractPageEntity
 {
@@ -53,6 +53,8 @@ class User extends AbstractPageEntity
     protected $tags;
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $inviteUser;
+    /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
+    protected $encryption;
 
     public function init($new = false)
     {
@@ -67,6 +69,7 @@ class User extends AbstractPageEntity
             ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_enabled']"));
         $this->firstName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_firstName']");
         $this->lastName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_lastName']");
+        $this->middleName = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_middleName']");
         $this->email = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_email']");
         $this->groups = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_groups']");
         $this->roles = $this->test->byXpath("//*[@data-ftid='oro_user_user_form_roles']");
@@ -167,6 +170,13 @@ class User extends AbstractPageEntity
         return $this->lastName->value();
     }
 
+    public function setMiddleName($name)
+    {
+        $this->middleName->clear();
+        $this->middleName->value($name);
+        return $this;
+    }
+
     public function setEmail($email)
     {
         $this->email->clear();
@@ -244,17 +254,22 @@ class User extends AbstractPageEntity
                 if ($condition != '') {
                     $condition .= ' or ';
                 }
-                $condition .= "normalize-space(text()) = '{$role}'";
+                $condition .= "contains(., '{$role}')";
             }
             $element = $this->roles->element(
-                $this->test->using('xpath')->value("div[label[{$condition}]]/input")
+                $this->test->using('xpath')->value(
+                    "//div[@data-ftid='oro_user_user_form_roles']/div[label[{$condition}]]/input"
+                )
             );
             $this->test->moveto($element);
             $element->click();
         } else {
             foreach ($roles as $role) {
                 $element = $this->roles->element(
-                    $this->test->using('xpath')->value("div[label[normalize-space(text()) = '{$role}']]/input")
+                    $this->test->using('xpath')->value(
+                        "//div[@data-ftid='oro_user_user_form_roles']".
+                        "/div[label[contains(normalize-space(text()), '{$role}')]]/input"
+                    )
                 );
                 $this->test->moveto($element);
                 $element->click();
@@ -351,6 +366,91 @@ class User extends AbstractPageEntity
             "//div[@class='ui-dialog ui-widget ui-widget-content ui-corner-all ui-front ui-draggable ui-resizable " .
             "ui-dialog-normal']"
         );
+
+        return $this;
+    }
+
+    /**
+     * Method configure user IMAP sync
+     * @param array $imapSetting
+     * @return $this
+     */
+    public function setImap($imapSetting)
+    {
+        $this->test->byXpath(
+            "//div[@class='control-group imap-config check-connection control-group-checkbox']" .
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_useImap']"
+        )->click();
+        $this->waitForAjax();
+        $this->test->byXPath(
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_imapHost']"
+        )->value($imapSetting['host']);
+        $this->test->byXPath(
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_imapPort']"
+        )->value($imapSetting['port']);
+        $this->test->byXPath(
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_user']"
+        )->value($imapSetting['user']);
+        $this->test->byXPath(
+            "//input[@data-ftid='oro_user_user_form_imapConfiguration_password']"
+        )->value($imapSetting['password']);
+        $this->encryption = $this->test
+            ->select($this->test->byXpath("//*[@data-ftid='oro_user_user_form_imapConfiguration_imapEncryption']"));
+        $this->encryption->selectOptionByLabel($imapSetting['encryption']);
+        $this->test->byXPath("//button[@id='oro_user_user_form_imapConfiguration_check_connection']")->click();
+        $this->waitForAjax();
+        $this->waitPageToLoad();
+        $this->test->byXPath(
+            "//div[@class='control-group folder-tree "
+            . "control-group-oro_email_email_folder_tree']//input[@class='check-all']"
+        )->click();
+
+        return $this;
+    }
+
+    /**
+     * @param $value
+     * @return $this
+     */
+    public function setSignature($value)
+    {
+        $this->test->waitUntil(
+            function (\PHPUnit_Extensions_Selenium2TestCase $testCase) {
+                return $testCase->execute(
+                    [
+                        'script' => 'return tinyMCE.activeEditor.initialized',
+                        'args' => [],
+                    ]
+                );
+            },
+            intval(MAX_EXECUTION_TIME)
+        );
+
+        $this->test->execute(
+            [
+                'script' => sprintf('tinyMCE.activeEditor.setContent(\'%s\')', $value),
+                'args' => [],
+            ]
+        );
+
+        return $this;
+    }
+
+    /**
+     * Method changes password using actions menu form user view page
+     * @param $newPassword
+     * @return $this
+     */
+    public function changePassword($newPassword)
+    {
+        $passwordField = "//*[@data-ftid='oro_set_password_form_password']";
+        $this->runActionInGroup('Change password');
+        $this->waitForAjax();
+        $this->test->byXPath($passwordField)->clear();
+        $this->test->byXPath($passwordField)->value($newPassword);
+        $this->test->byXPath("//div[@class='widget-actions-section']//button[@type='submit']")->click();
+        $this->waitForAjax();
+        $this->assertMessage('The password has been changed');
 
         return $this;
     }

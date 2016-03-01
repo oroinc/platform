@@ -1,11 +1,10 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backgrid',
-    './footer-cell'
-], function (_, Backgrid, FooterCell) {
-    "use strict";
+    './footer-cell',
+    '../row'
+], function(_, Backgrid, FooterCell, Row) {
+    'use strict';
 
     var FooterRow;
 
@@ -20,21 +19,23 @@ define([
         /** @property */
         footerCell: FooterCell,
 
-        requiredOptions: ["columns", "collection", "footerCell"],
+        requiredOptions: ['columns', 'collection', 'footerCell'],
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options || {};
             FooterRow.__super__.initialize.apply(this, arguments);
+
+            this.listenTo(this.columns, 'sort', this.updateCellsOrder);
         },
 
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            _.each(this.cells, function (cell) {
+            _.each(this.cells, function(cell) {
                 cell.dispose();
             });
             delete this.cells;
@@ -42,14 +43,16 @@ define([
             FooterRow.__super__.dispose.call(this);
         },
 
-        makeCell: function (column, options) {
-            var FooterCell = column.get("footerCell") || options.footerCell || this.footerCell;
+        makeCell: function(column, options) {
+            var FooterCell = column.get('footerCell') || options.footerCell || this.footerCell;
             return new FooterCell({
                 column: column,
                 collection: this.collection,
                 rowName: this.options.rowName
             });
-        }
+        },
+
+        updateCellsOrder: Row.prototype.updateCellsOrder
     });
 
     return FooterRow;

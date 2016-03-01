@@ -1,0 +1,3 @@
+oro_translation_api:
+    resource: Oro\Bundle\TranslationBundle\Controller\Api\Rest\TranslationController
+    type:     rest

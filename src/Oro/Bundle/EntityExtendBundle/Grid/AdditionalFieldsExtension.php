@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class AdditionalFieldsExtension extends AbstractFieldsExtension
 {
@@ -50,9 +50,7 @@ class AdditionalFieldsExtension extends AbstractFieldsExtension
                 continue;
             }
             $extendConfig = $extendConfigProvider->getConfig($entityClassName, $fieldName);
-            if (!$extendConfig->is('state', ExtendScope::STATE_NEW)
-                && !$extendConfig->is('is_deleted')
-            ) {
+            if (ExtendHelper::isFieldAccessible($extendConfig)) {
                 $fields[] = $extendConfig->getId();
             }
         }

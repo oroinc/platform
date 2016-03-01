@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\SearchBundle\Extension\Pager;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
@@ -29,7 +28,7 @@ class SearchPagerExtension extends OrmPagerExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         // enabled by default for search datasource
-        return $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == SearchDatasource::TYPE;
+        return $config->getDatasourceType() == SearchDatasource::TYPE;
     }
 
     /**

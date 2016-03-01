@@ -14,7 +14,7 @@
         data: data,
         options: options,
         config: config,
-        date: (options.settings.quarterDate is defined) ? options.settings.quarterDate|oro_format_date : ''
+        date: (options.settings.quarterDate is defined) ? options.settings.quarterDate|oro_format_date({timeZone: oro_timezone()}) : ''
     } %}
 
 

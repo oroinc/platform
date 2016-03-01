@@ -9,6 +9,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
+use Symfony\Component\HttpFoundation\AcceptHeader;
+
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\EmailBundle\Model\ExtendEmail;
@@ -40,8 +42,9 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *              "action_button_widget"="oro_send_email_button",
  *              "action_link_widget"="oro_send_email_link"
  *          },
- *          "comment"={
- *              "applicable"=true
+ *          "grid"={
+ *              "default"="email-grid",
+ *              "context"="email-for-context-grid"
  *          }
  *      }
  * )
@@ -220,10 +223,22 @@ class Email extends ExtendEmail
      * @var ArrayCollection
      *
      * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="email",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     *      cascade={"remove"}, orphanRemoval=true)
      * @JMS\Exclude
      */
     protected $emailUsers;
+
+    /**
+     * @var string
+     * @ORM\Column(type="text", nullable=true)
+     */
+    protected $acceptLanguageHeader;
+
+    /**
+     * @var boolean
+     * @ORM\Column(name="body_synced", type="boolean", nullable=true, options={"default"=false})
+     */
+    protected $bodySynced;
 
     public function __construct()
     {
@@ -637,6 +652,7 @@ class Email extends ExtendEmail
      */
     public function setEmailBody(EmailBody $emailBody)
     {
+        $emailBody->setEmail($this);
         $this->emailBody = $emailBody;
 
         return $this;
@@ -731,6 +747,8 @@ class Email extends ExtendEmail
     }
 
     /**
+     * todo: remove this method
+     *
      * @param EmailFolder $emailFolder
      *
      * @return EmailUser|null
@@ -739,7 +757,12 @@ class Email extends ExtendEmail
     {
         $emailUsers = $this->getEmailUsers()->filter(function ($entry) use ($emailFolder) {
             /** @var EmailUser $entry */
-            return $entry->getFolder() === $emailFolder;
+            if ($entry->getFolders()) {
+                foreach ($entry->getFolders() as $folder) {
+                    return $folder === $emailFolder;
+                }
+            }
+            return false;
         });
         if ($emailUsers != null && count($emailUsers) > 0) {
             return $emailUsers->first();
@@ -773,6 +796,62 @@ class Email extends ExtendEmail
         if ($this->emailUsers->contains($emailUser)) {
             $this->emailUsers->removeElement($emailUser);
         }
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAcceptLanguageHeader()
+    {
+        return $this->acceptLanguageHeader;
+    }
+
+    /**
+     * @param string $acceptLanguageHeader
+     */
+    public function setAcceptLanguageHeader($acceptLanguageHeader = null)
+    {
+        $this->acceptLanguageHeader = $acceptLanguageHeader;
+    }
+
+    /**
+     * @return array
+     */
+    public function getAcceptedLocales()
+    {
+        if (!$this->acceptLanguageHeader) {
+            return [];
+        }
+
+        return array_keys(AcceptHeader::fromString($this->acceptLanguageHeader)->all());
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getSubject();
+    }
+
+    /**
+     * @return boolean
+     */
+    public function isBodySynced()
+    {
+        return $this->bodySynced;
+    }
+
+    /**
+     * @param $bodySynced
+     *
+     * @return Email
+     */
+    public function setBodySynced($bodySynced)
+    {
+        $this->bodySynced = $bodySynced;
 
         return $this;
     }

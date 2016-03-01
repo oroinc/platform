@@ -3,8 +3,6 @@
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Model;
 
 use Oro\Bundle\DashboardBundle\Entity\Widget;
-use Oro\Bundle\DashboardBundle\Entity\WidgetState;
-use Oro\Bundle\DashboardBundle\Event\WidgetConfigurationLoadEvent;
 use Oro\Bundle\DashboardBundle\Model\WidgetConfigs;
 use Oro\Bundle\DashboardBundle\Model\WidgetOptionBag;
 
@@ -29,6 +27,9 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $eventDispatcher;
 
     public function setUp()
     {
@@ -60,13 +61,16 @@ class WidgetConfigsTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
+
         $this->widgetConfigs = new WidgetConfigs(
             $this->configProvider,
             $securityFacade,
             $resolver,
             $this->em,
             $this->valueProvider,
-            $this->translator
+            $this->translator,
+            $this->eventDispatcher
         );
 
         $this->widgetRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')

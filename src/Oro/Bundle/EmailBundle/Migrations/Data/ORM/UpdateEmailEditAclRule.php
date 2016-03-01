@@ -6,13 +6,17 @@ use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\Persistence\ObjectManager;
 
+use Oro\Bundle\UserBundle\Entity\Role;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 
-class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
+class UpdateEmailEditAclRule extends AbstractFixture implements
+    ContainerAwareInterface,
+    DependentFixtureInterface,
+    VersionedFixtureInterface
 {
     /**
      * @var ContainerInterface
@@ -30,6 +34,14 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
     public function getDependencies()
     {
         return ['Oro\Bundle\SecurityBundle\Migrations\Data\ORM\LoadAclRoles'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '1.1';
     }
 
     /**
@@ -58,24 +70,41 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
         }
     }
 
+    /**
+     * Email permissions are added for all roles, as EmailUser is checked anyway by EmailVoter.
+     * In Order to remove this permission entirely, parent acl should be set (but it's not currently implemented).
+     * @link https://github.com/laboro/platform/pull/6833/files#r53224943
+     *
+     * @param AclManager $manager
+     */
     protected function updateUserRole(AclManager $manager)
     {
-        $sid = $manager->getSid($this->getRole(LoadRolesData::ROLE_ADMINISTRATOR));
-
         $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
-        $maskBuilder = $manager->getMaskBuilder($oid)
-            ->add('VIEW_SYSTEM')
-            ->add('CREATE_SYSTEM')
-            ->add('EDIT_SYSTEM');
-        $manager->setPermission($sid, $oid, $maskBuilder->get());
+        $extension = $manager->getExtensionSelector()->select($oid);
+        $maskBuilders = $extension->getAllMaskBuilders();
+
+        $roles = $this->getRoles();
+        foreach ($roles as $role) {
+            $sid = $manager->getSid($role);
+
+            foreach ($maskBuilders as $maskBuilder) {
+                foreach (['VIEW_SYSTEM', 'CREATE_SYSTEM', 'EDIT_SYSTEM'] as $permission) {
+                    if ($maskBuilder->hasMask('MASK_' . $permission)) {
+                        $maskBuilder->add($permission);
+                    }
+                }
+
+                $manager->setPermission($sid, $oid, $maskBuilder->get());
+            }
+        }
     }
 
     /**
      * @param string $roleName
-     * @return Role
+     * @return Role|null
      */
-    protected function getRole($roleName)
+    protected function getRoles()
     {
-        return $this->objectManager->getRepository('OroUserBundle:Role')->findOneBy(['role' => $roleName]);
+        return $this->objectManager->getRepository('OroUserBundle:Role')->findAll();
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Event;
 
+use Doctrine\ORM\Query;
 use Symfony\Component\EventDispatcher\Event;
 
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
@@ -28,13 +29,20 @@ class OrmResultAfter extends Event implements GridEventInterface
     protected $records;
 
     /**
+     * @var Query
+     */
+    protected $query;
+
+    /**
      * @param DatagridInterface $datagrid
      * @param array             $records
+     * @param Query             $query
      */
-    public function __construct(DatagridInterface $datagrid, array $records = array())
+    public function __construct(DatagridInterface $datagrid, array $records = array(), Query $query = null)
     {
         $this->datagrid = $datagrid;
         $this->records  = $records;
+        $this->query    = $query;
     }
 
     /**
@@ -51,5 +59,13 @@ class OrmResultAfter extends Event implements GridEventInterface
     public function getRecords()
     {
         return $this->records;
+    }
+
+    /**
+     * @return Query
+     */
+    public function getQuery()
+    {
+        return $this->query;
     }
 }

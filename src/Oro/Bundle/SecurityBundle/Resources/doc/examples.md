@@ -206,8 +206,8 @@ If user **Robert** will login into the **Second organization**, he should see th
 
 | Access level       | Data                            |
 |:------------------ | :------------------------------ |
-| **Business Unit**  | Account C                       |
-| **Division**       | Account C                       |
+| **Business Unit**  | Account D, Account E            |
+| **Division**       | Account C, Account D, Account E |
 | **Organization**   | Account C, Account D, Account E |
    
 ###Mark

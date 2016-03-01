@@ -2,16 +2,15 @@
 
 namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
-use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
+use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
@@ -52,7 +51,7 @@ class OrmFilterExtension extends AbstractExtension
             return false;
         }
 
-        return $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
+        return $config->getDatasourceType() == OrmDatasource::TYPE;
     }
 
     /**
@@ -111,8 +110,12 @@ class OrmFilterExtension extends AbstractExtension
         $filters       = $this->getFiltersToApply($config);
         $values        = $this->getValuesToApply($config);
         $initialValues = $this->getValuesToApply($config, false);
+        $lazy          = $data->offsetGetOr(MetadataObject::LAZY_KEY, true);
 
         foreach ($filters as $filter) {
+            if (!$lazy) {
+                $filter->resolveOptions();
+            }
             $value        = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
             $initialValue = isset($initialValues[$filter->getName()]) ? $initialValues[$filter->getName()] : false;
 

@@ -143,7 +143,15 @@ class RendererTest extends LayoutTestCase
             ->add('head', 'root', 'head', ['title' => 'Test'])
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }', 'scoped' => true])
-            ->add('external_style', 'head', 'style', ['src' => 'test.css', 'scoped' => new Condition\False()])
+            ->add(
+                'external_style',
+                'head',
+                'style',
+                [
+                    'src' => ['@asset' => 'test.css'],
+                    'scoped' => new Condition\False()
+                ]
+            )
             ->add(
                 'script',
                 'head',
@@ -155,7 +163,15 @@ class RendererTest extends LayoutTestCase
                 ]
             )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
-            ->add('content', 'root', 'body')
+            ->add(
+                'content',
+                'root',
+                'body',
+                [
+                    'class_prefix' => 'content',
+                    'attr' => ['class' => '{{ class_prefix }}-body']
+                ]
+            )
             ->add('list', 'content', 'list')
             ->add(
                 'list_item_1',
@@ -272,6 +288,13 @@ class RendererTest extends LayoutTestCase
                 ['type' => 'input', 'action' => 'submit', 'name' => 'btn2', 'text' => 'Btn2'],
                 'button'
             )
+            ->add(
+                'input_text',
+                'content',
+                'input',
+                ['name' => 'search'],
+                'button'
+            )
             // test manipulations of 'class' attribute
             ->appendOption('content', 'attr.class', ['@join' => [' ', 'class1', 'class2']])
             ->replaceOption('content', 'attr.class', 'class1', ['@value' => ['$context.body_class']])
@@ -288,7 +311,12 @@ class RendererTest extends LayoutTestCase
         /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->getContainer()->get('form.factory');
 
-        $form = $formFactory->createNamedBuilder('form_for_layout_renderer_test')
+        $form = $formFactory->createNamedBuilder(
+            'form_for_layout_renderer_test',
+            'form',
+            null,
+            ['csrf_protection' => false]
+        )
             ->add('user', new UserNameType())
             ->add('jobTitle', 'text', ['label' => 'Job Title', 'required' => false])
             ->add(
@@ -322,14 +350,15 @@ class RendererTest extends LayoutTestCase
         <style type="text/css" scoped="scoped">
             body { color: red; }
         </style>
-        <link rel="stylesheet" type="text/css" href="test.css"/>
+        <link rel="stylesheet" type="text/css" href="/test.css"/>
         <script type="text/javascript" async="async">
             alert('test');
         </script>
         <link rel="stylesheet" href="test.css"/>
     </head>
-<body class="test-body class2">
+<body class="content-body test-body class2">
     <button name="btn1"><i class="icon-plus hide-text"></i>Btn1</button>
+    <input type="text" name="search"/>
     <input type="submit" name="btn2" value="Btn2"/>
     <ul>
         <li>Hi World!</li>
@@ -354,8 +383,28 @@ HTML;
     protected function getTwigFormLayoutResult()
     {
         $expected = <<<HTML
-<fieldset>
-    <legend>Additional Info</legend>
+<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test">
+    <div>
+        <label class="required">User</label>
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+            <div>
+                <label for="form_for_layout_renderer_test_user_firstName" class="required">First Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_firstName"
+                    name="form_for_layout_renderer_test[user][firstName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+            </div>
+            <div>
+                <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_lastName"
+                    name="form_for_layout_renderer_test[user][lastName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+            </div>
+        </div>
+    </div>
     <div>
         <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
         <input type="text"
@@ -370,7 +419,7 @@ HTML;
                 id="form_for_layout_renderer_test_gender_placeholder"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_placeholder"
-                value="" checked="checked"/>
+                value=""/>
             <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"
@@ -386,26 +435,7 @@ HTML;
             <label for="form_for_layout_renderer_test_gender_1">Female</label>
         </div>
     </div>
-</fieldset>
-<fieldset>
-    <legend>General Info</legend>
-    <div>
-        <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_lastName"
-            name="form_for_layout_renderer_test[user][lastName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_lastName"/>
-    </div>
-    <div>
-        <label for="form_for_layout_renderer_test_user_firstName" class="required">First Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_firstName"
-            name="form_for_layout_renderer_test[user][firstName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_firstName"/>
-    </div>
-</fieldset>
+</div>
 HTML;
 
         return $expected;
@@ -417,8 +447,28 @@ HTML;
     protected function getPhpFormLayoutResult()
     {
         $expected = <<<HTML
-<fieldset>
-    <legend>Additional Info</legend>
+<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test">
+    <div>
+        <label class="required">User</label>
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+            <div>
+                <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_firstName"
+                    name="form_for_layout_renderer_test[user][firstName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+            </div>
+            <div>
+                <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_lastName"
+                    name="form_for_layout_renderer_test[user][lastName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+            </div>
+        </div>
+    </div>
     <div>
         <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
         <input type="text"
@@ -433,7 +483,7 @@ HTML;
                 id="form_for_layout_renderer_test_gender_placeholder"
                 name="form_for_layout_renderer_test[gender]"
                 data-ftid="form_for_layout_renderer_test_gender_placeholder"
-                value="" checked="checked"/>
+                value=""/>
             <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"
@@ -449,26 +499,7 @@ HTML;
             <label for="form_for_layout_renderer_test_gender_1">Female</label>
         </div>
     </div>
-</fieldset>
-<fieldset>
-    <legend>General Info</legend>
-    <div>
-        <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_lastName"
-            name="form_for_layout_renderer_test[user][lastName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_lastName"/>
-    </div>
-    <div>
-        <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_firstName"
-            name="form_for_layout_renderer_test[user][firstName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_firstName"/>
-    </div>
-</fieldset>
+</div>
 HTML;
 
         return $expected;

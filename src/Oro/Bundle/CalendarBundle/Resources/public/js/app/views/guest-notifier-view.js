@@ -1,7 +1,9 @@
-/*jslint nomen: true*/
-/*global define*/
-define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view', 'oroui/js/modal'
-    ], function (_, __, BaseView, Modal) {
+define([
+    'underscore',
+    'orotranslation/js/translator',
+    'oroui/js/app/views/base/view',
+    'oroui/js/modal'
+], function(_, __, BaseView, Modal) {
     'use strict';
 
     var GuestNotifierView = BaseView.extend({
@@ -17,13 +19,13 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/v
         /**
          * @constructor
          */
-        initialize: function () {
+        initialize: function() {
             this.$form = this.$el.closest('form');
             this.formInitialState = this.getFormState();
             this.isModalShown = false;
 
-            this.$form.parent().on('submit.' + this.cid, _.bind(function (e) {
-                if (!this.isModalShown && this.getFormState() != this.formInitialState) {
+            this.$form.parent().on('submit.' + this.cid, _.bind(function(e) {
+                if (!this.isModalShown && this.getFormState() !== this.formInitialState) {
                     this.getConfirmDialog().open();
                     this.isModalShown = true;
                     e.preventDefault();
@@ -34,7 +36,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/v
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (!this.disposed) {
                 if (this.$form) {
                     this.$form.parent().off('.' + this.cid);
@@ -47,26 +49,26 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/v
             GuestNotifierView.__super__.dispose.call(this);
         },
 
-        getConfirmDialog: function () {
+        getConfirmDialog: function() {
             if (!this.confirmModal) {
                 this.confirmModal = GuestNotifierView.createConfirmNotificationDialog();
-                this.listenTo(this.confirmModal, 'ok', _.bind(function () {
+                this.listenTo(this.confirmModal, 'ok', _.bind(function() {
                     this.$form.find('input[name*="[notifyInvitedUsers]"]').val(true);
                     this.$form.submit();
                     this.isModalShown = false;
                 }, this));
-                this.listenTo(this.confirmModal, 'cancel', _.bind(function () {
+                this.listenTo(this.confirmModal, 'cancel', _.bind(function() {
                     this.$form.submit();
                     this.isModalShown = false;
                 }, this));
-                this.listenTo(this.confirmModal, 'close', _.bind(function () {
+                this.listenTo(this.confirmModal, 'close', _.bind(function() {
                     this.isModalShown = false;
                 }, this));
             }
             return this.confirmModal;
         },
 
-        getFormState: function () {
+        getFormState: function() {
             this.disableExclusions(true);
             var result = this.$form.serialize();
             this.disableExclusions(false);
@@ -74,17 +76,17 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/v
             return result;
         },
 
-        disableExclusions: function (state) {
-            _.each(this.exclusions, function (selector) {
+        disableExclusions: function(state) {
+            _.each(this.exclusions, function(selector) {
                 this.$form.find(selector).attr('disabled', state);
             }, this);
         }
     }, {
-        createConfirmNotificationDialog: function () {
+        createConfirmNotificationDialog: function() {
             return new Modal({
                 title: __('Notify guests title'),
                 okText: __('Notify'),
-                cancelText: __("Don't notify"),
+                cancelText: __('Don\'t notify'),
                 content: __('Notify guests message'),
                 className: 'modal modal-primary',
                 okButtonClass: 'btn-primary btn-large',

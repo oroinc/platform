@@ -1,11 +1,10 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
+    'backbone',
     'underscore',
     'backgrid',
     'oro/datagrid/cell/action-cell',
     '../header-cell/action-header-cell'
-], function (_, Backgrid, ActionCell, ActionHeaderCell) {
+], function(Backbone, _, Backgrid, ActionCell, ActionHeaderCell) {
     'use strict';
 
     var ActionColumn;
@@ -28,13 +27,13 @@ define([
             headerCell: ActionHeaderCell,
             datagrid: null,
             actions: [],
-            massActions: []
+            massActions: new Backbone.Collection()
         }, Backgrid.Column.prototype.defaults),
 
         /**
          * {@inheritDoc}
          */
-        initialize: function (attributes) {
+        initialize: function(attributes) {
             var attrs = attributes || {};
             if (!attrs.cell) {
                 attrs.cell = this.defaults.cell;
@@ -42,7 +41,7 @@ define([
             if (!attrs.name) {
                 attrs.name = this.defaults.name;
             }
-            if (_.isEmpty(attrs.actions) && _.isEmpty(attrs.massActions)) {
+            if (_.isEmpty(attrs.actions) && attrs.massActions.length) {
                 this.set('renderable', false);
             }
             ActionColumn.__super__.initialize.apply(this, arguments);

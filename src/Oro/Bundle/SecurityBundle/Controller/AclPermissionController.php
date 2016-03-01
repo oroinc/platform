@@ -11,6 +11,7 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchAfter;
 use Oro\Bundle\SecurityBundle\Event\OrganizationSwitchBefore;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -33,7 +34,10 @@ class AclPermissionController extends Controller
     public function aclAccessLevelsAction($oid)
     {
         if (strpos($oid, 'entity:') === 0) {
-            $oid = 'entity:' . $this->get('oro_entity.routing_helper')->resolveEntityClass(substr($oid, 7));
+            $entity = substr($oid, 7);
+            if ($entity !== ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+                $oid = 'entity:' . $this->get('oro_entity.routing_helper')->resolveEntityClass($entity);
+            }
         }
 
         $levels = $this

@@ -1055,7 +1055,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                                 'vars' => [
                                     'id'    => 'logo',
                                     'title' => '',
-                                    'attr'  => ['class' => 'test_class1 test_class2']
+                                    'attr'  => ['class' => 'test_class1']
                                 ]
                             ]
                         ]
@@ -1598,6 +1598,21 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
                 ]
             ],
             $blockThemes
+        );
+    }
+
+    public function testSetFormTheme()
+    {
+        $this->layoutManipulator
+            ->add('root', null, 'root')
+            ->setFormTheme(['MyBundle:Layout:form_theme1.html.twig', 'MyBundle:Layout:form_theme2.html.twig']);
+
+        $this->getLayoutView();
+
+        $formThemes = $this->rawLayoutBuilder->getRawLayout()->getFormThemes();
+        $this->assertSame(
+            ['MyBundle:Layout:form_theme1.html.twig', 'MyBundle:Layout:form_theme2.html.twig'],
+            $formThemes
         );
     }
 

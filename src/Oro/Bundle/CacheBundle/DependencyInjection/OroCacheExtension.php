@@ -6,13 +6,14 @@ use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 
 /**
  * This is the class that loads and manages your bundle configuration
  *
  * To learn more see {@link http://symfony.com/doc/current/cookbook/bundles/extension.html}
  */
-class OroCacheExtension extends Extension
+class OroCacheExtension extends Extension implements PrependExtensionInterface
 {
     /**
      * {@inheritDoc}
@@ -24,5 +25,19 @@ class OroCacheExtension extends Extension
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        $validationConfig = [
+            'validation' => [
+                'cache' => 'oro_cache.validation_cache.doctrine'
+            ]
+        ];
+
+        $container->prependExtensionConfig('framework', $validationConfig);
     }
 }

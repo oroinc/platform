@@ -4,8 +4,10 @@ oro:
     custom_entity:
         owner.label:          Owner
         owner.description:    ""
+        organization.label:   Organization
 
     business_unit:
+        label: Business Unit
         menu:
             list.description: List of business units
         controller:
@@ -30,7 +32,7 @@ oro:
         name.label:        Name
         description.label: Description
         enabled.label:     Status
-        business_units.label: Bussines units
+        business_units.label: Business units
         users.label:       Users
         form:
             choose_organization: Choose an organization...
@@ -53,3 +55,5 @@ oro:
         controller:
             message:
                 saved: Organization saved
+        menu.list.description: Edit organization info
+

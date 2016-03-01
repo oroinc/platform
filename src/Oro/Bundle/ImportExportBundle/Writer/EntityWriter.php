@@ -2,20 +2,21 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Doctrine\ORM\EntityManager;
-
 use Akeneo\Bundle\BatchBundle\Step\StepExecutionAwareInterface;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 use Akeneo\Bundle\BatchBundle\Entity\StepExecution;
 
+use Symfony\Component\Security\Core\Util\ClassUtils;
+
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
 
 class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
 {
     const SKIP_CLEAR = 'writer_skip_clear';
 
-    /** @var EntityManager */
-    protected $entityManager;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
 
     /** @var EntityDetachFixer */
     protected $detachFixer;
@@ -26,13 +27,24 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
     /** @var ContextRegistry */
     protected $contextRegistry;
 
+    /** @var string */
+    private $className;
+
+    /** @var array */
+    private $config;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     * @param EntityDetachFixer $detachFixer
+     * @param ContextRegistry $contextRegistry
+     */
     public function __construct(
-        EntityManager $entityManager,
+        DoctrineHelper $doctrineHelper,
         EntityDetachFixer $detachFixer,
         ContextRegistry $contextRegistry
     ) {
-        $this->entityManager   = $entityManager;
-        $this->detachFixer     = $detachFixer;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->detachFixer = $detachFixer;
         $this->contextRegistry = $contextRegistry;
     }
 
@@ -41,18 +53,17 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
      */
     public function write(array $items)
     {
+        $entityManager = $this->doctrineHelper->getEntityManager($this->getClassName($items));
         foreach ($items as $item) {
-            $this->entityManager->persist($item);
+            $entityManager->persist($item);
             $this->detachFixer->fixEntityAssociationFields($item, 1);
         }
-        $this->entityManager->flush();
+        $entityManager->flush();
 
-        $configuration = $this->contextRegistry
-            ->getByStepExecution($this->stepExecution)
-            ->getConfiguration();
+        $configuration = $this->getConfig();
 
         if (empty($configuration[self::SKIP_CLEAR])) {
-            $this->entityManager->clear();
+            $entityManager->clear();
         }
     }
 
@@ -62,5 +73,46 @@ class EntityWriter implements ItemWriterInterface, StepExecutionAwareInterface
     public function setStepExecution(StepExecution $stepExecution)
     {
         $this->stepExecution = $stepExecution;
+    }
+
+    /**
+     * @param array $items
+     * @return string
+     */
+    protected function getClassName(array $items)
+    {
+        if (!$this->className) {
+            $config = $this->getConfig();
+
+            if (array_key_exists('entityName', $config)) {
+                $this->className = $config['entityName'];
+
+                return $this->className;
+            }
+        }
+
+        if (!$this->className && array_key_exists(0, $items)) {
+            $this->className = ClassUtils::getRealClass($items[0]);
+
+            return $this->className;
+        }
+
+        if (!$this->className) {
+            throw new \RuntimeException('entityName not resolved');
+        }
+
+        return $this->className;
+    }
+
+    /**
+     * @return array
+     */
+    public function getConfig()
+    {
+        if (null === $this->config) {
+            $this->config = $this->contextRegistry->getByStepExecution($this->stepExecution)->getConfiguration();
+        }
+
+        return $this->config;
     }
 }

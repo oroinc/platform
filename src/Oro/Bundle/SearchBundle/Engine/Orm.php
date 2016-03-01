@@ -4,33 +4,29 @@ namespace Oro\Bundle\SearchBundle\Engine;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
+use Oro\Bundle\EntityBundle\ORM\OroEntityManager;
+
+use Oro\Bundle\SearchBundle\Entity\Item;
 use Oro\Bundle\SearchBundle\Entity\Repository\SearchIndexRepository;
 use Oro\Bundle\SearchBundle\Query\Mode;
 use Oro\Bundle\SearchBundle\Query\Query;
 use Oro\Bundle\SearchBundle\Query\Result\Item as ResultItem;
-use Oro\Bundle\SearchBundle\Entity\Item;
 
 class Orm extends AbstractEngine
 {
-    /**
-     * @var SearchIndexRepository
-     */
-    protected $indexRepository;
+    /** @var SearchIndexRepository */
+    private $indexRepository;
 
-    /**
-     * @var ObjectMapper
-     */
+    /** @var OroEntityManager */
+    private $indexManager;
+
+    /** @var ObjectMapper */
     protected $mapper;
 
-    /**
-     * @var array
-     */
-    protected $drivers = array();
+    /** @var array */
+    protected $drivers = [];
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $needFlush = true;
 
     /**
@@ -44,7 +40,7 @@ class Orm extends AbstractEngine
     /**
      * {@inheritdoc}
      */
-    public function reindex($class = null)
+    public function reindex($class = null, $offset = null, $limit = null)
     {
         if (null === $class) {
             $this->clearAllSearchIndexes();
@@ -58,8 +54,10 @@ class Orm extends AbstractEngine
                 $entityNames = $this->mapper->getRegisteredDescendants($class);
             }
 
-            foreach ($entityNames as $class) {
-                $this->clearSearchIndexForEntity($class);
+            if ((null === $offset && null === $limit) || ($offset === 0 && $limit)) {
+                foreach ($entityNames as $class) {
+                    $this->clearSearchIndexForEntity($class);
+                }
             }
         }
 
@@ -67,7 +65,7 @@ class Orm extends AbstractEngine
         $recordsCount = 0;
 
         while ($class = array_shift($entityNames)) {
-            $itemsCount    = $this->reindexSingleEntity($class);
+            $itemsCount = $this->reindexSingleEntity($class, $offset, $limit);
             $recordsCount += $itemsCount;
         }
 
@@ -86,16 +84,16 @@ class Orm extends AbstractEngine
 
         if (!$realTime) {
             $this->scheduleIndexation($entities);
+
             return true;
         }
 
-        $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
         $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
 
         $hasDeletedEntities = !empty($existingItems);
         foreach ($existingItems as $items) {
             foreach ($items as $item) {
-                $itemEntityManager->remove($item);
+                $this->getIndexManager()->remove($item);
             }
         }
 
@@ -118,6 +116,7 @@ class Orm extends AbstractEngine
 
         if (!$realTime) {
             $this->scheduleIndexation($entities);
+
             return true;
         }
 
@@ -136,7 +135,6 @@ class Orm extends AbstractEngine
      */
     protected function saveItemData(array $entities)
     {
-        $itemEntityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
         $existingItems = $this->getIndexRepository()->getItemsForEntities($entities);
 
         $hasSavedEntities = false;
@@ -147,7 +145,7 @@ class Orm extends AbstractEngine
             }
 
             $class = $this->doctrineHelper->getEntityClass($entity);
-            $id = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+            $id    = $this->doctrineHelper->getSingleEntityIdentifier($entity);
 
             $item = null;
             if ($id && !empty($existingItems[$class][$id])) {
@@ -168,7 +166,7 @@ class Orm extends AbstractEngine
                 ->setChanged(false)
                 ->saveItemData($data);
 
-            $itemEntityManager->persist($item);
+            $this->getIndexManager()->persist($item);
 
             $hasSavedEntities = true;
         }
@@ -189,7 +187,8 @@ class Orm extends AbstractEngine
      */
     public function flush()
     {
-        $this->registry->getManager()->flush();
+        $this->getIndexManager()->flush();
+        $this->getIndexManager()->clear();
     }
 
     /**
@@ -197,9 +196,9 @@ class Orm extends AbstractEngine
      */
     protected function doSearch(Query $query)
     {
-        $results = array();
+        $results       = [];
         $searchResults = $this->getIndexRepository()->search($query);
-        if (($query->getMaxResults() > 0 || $query->getFirstResult() > 0)) {
+        if (($query->getCriteria()->getMaxResults() > 0 || $query->getCriteria()->getFirstResult() > 0)) {
             $recordsCount = $this->getIndexRepository()->getRecordsCount($query);
         } else {
             $recordsCount = count($searchResults);
@@ -225,16 +224,15 @@ class Orm extends AbstractEngine
                     $item['recordId'],
                     $item['title'],
                     null,
-                    null,
                     $this->mapper->getEntityConfig($item['entity'])
                 );
             }
         }
 
-        return array(
-            'results' => $results,
+        return [
+            'results'       => $results,
             'records_count' => $recordsCount
-        );
+        ];
     }
 
     /**
@@ -263,10 +261,31 @@ class Orm extends AbstractEngine
      */
     protected function getIndexRepository()
     {
-        $this->indexRepository = $this->registry->getRepository('OroSearchBundle:Item');
+        if ($this->indexRepository) {
+            return $this->indexRepository;
+        }
+
+        $this->indexRepository = $this->getIndexManager()->getRepository('OroSearchBundle:Item');
         $this->indexRepository->setDriversClasses($this->drivers);
+        $this->indexRepository->setRegistry($this->registry);
 
         return $this->indexRepository;
+    }
+
+    /**
+     * Get search index repository
+     *
+     * @return OroEntitymanager
+     */
+    protected function getIndexManager()
+    {
+        if ($this->indexManager) {
+            return $this->indexManager;
+        }
+
+        $this->indexManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
+
+        return $this->indexManager;
     }
 
     /**
@@ -276,29 +295,19 @@ class Orm extends AbstractEngine
      */
     protected function clearSearchIndexForEntity($entityName)
     {
-        $itemsCount    = 0;
-        $entityManager = $this->registry->getManagerForClass('OroSearchBundle:Item');
-        $queryBuilder  = $this->getIndexRepository()->createQueryBuilder('item')
-            ->where('item.entity = :entity')
-            ->setParameter('entity', $entityName);
+        $query = <<<EOF
+DELETE FROM oro_search_index_integer  WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
+DELETE FROM oro_search_index_datetime WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
+DELETE FROM oro_search_index_decimal  WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
+DELETE FROM oro_search_index_text     WHERE item_id IN (SELECT DISTINCT id FROM oro_search_item WHERE entity = ?);
+DELETE FROM oro_search_item           WHERE entity = ?;
+EOF;
 
-        $iterator = new BufferedQueryResultIterator($queryBuilder);
-        $iterator->setBufferSize(static::BATCH_SIZE);
-
-        foreach ($iterator as $entity) {
-            $itemsCount++;
-            $entityManager->remove($entity);
-
-            if (0 == $itemsCount % static::BATCH_SIZE) {
-                $entityManager->flush();
-                $entityManager->clear();
-            }
-        }
-
-        if ($itemsCount % static::BATCH_SIZE > 0) {
-            $entityManager->flush();
-            $entityManager->clear();
-        }
+        $this->getIndexManager()->getConnection()->executeQuery(
+            $query,
+            [$entityName, $entityName, $entityName, $entityName, $entityName],
+            [\PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR, \PDO::PARAM_STR]
+        );
     }
 
     /**

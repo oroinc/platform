@@ -4,11 +4,11 @@
         {{ parent() }}
         <script type="text/javascript" src="{{ asset('bundles/oroinstaller/lib/jquery-2.0.3.min.js') }}"></script>
         <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/loader.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/util.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/lib/util.js') }}"></script>
         <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/package.manager.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/bootstrap.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/bootbox.min.js') }}"></script>
-        <script type="text/javascript" src="{{ asset('bundles/orodistribution/js/jquery.cookie.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/lib/bootstrap.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/lib/bootbox.min.js') }}"></script>
+        <script type="text/javascript" src="{{ asset('bundles/orodistribution/lib/jquery.cookie.js') }}"></script>
 
         <script type="text/javascript">
 
@@ -108,7 +108,9 @@
                         {% block menu %} {% endblock %}
                     </div>
                 </div>
-
+                <div class="alert alert-warning">
+                    {{ 'oro.distribution.settings.recommendation'|trans|raw }}
+                </div>
                 <div class="body">
                     {% block body %} {% endblock %}
                 </div>

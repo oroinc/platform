@@ -174,4 +174,19 @@ class Config
 
         return null;
     }
+
+    public function removeValue($section, $name)
+    {
+        /** @var ArrayCollection $values */
+        $values = $this->getValues()->filter(
+            function (ConfigValue $item) use ($name, $section) {
+                return $item->getName() == $name && $item->getSection() == $section;
+            }
+        );
+
+        if ($values->first() !== false) {
+            $value = $values->first();
+            $this->getValues()->removeElement($value);
+        }
+    }
 }

@@ -1,26 +1,21 @@
-/*jslint nomen:true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var _, $, defaults;
-    _ = require('underscore');
-    $ = require('oroentity/js/field-choice');
+    var _ = require('underscore');
+    var $ = require('oroentity/js/field-choice');
     require('oroquerydesigner/js/function-choice');
 
-    defaults = {
+    var defaults = {
         showItems: ['column', 'label', 'function', 'sorting', 'action']
     };
 
-    return function (options) {
-        var $form, $fields, $functions, $label;
-
+    return function(options) {
         options = $.extend({}, defaults, options);
 
-        $form = options._sourceElement;
-        $fields = $form.find('[data-purpose=column-selector]');
-        $functions = $form.find('[data-purpose=function-selector]');
-        $label = $form.find('[data-purpose=label]');
+        var $form = options._sourceElement;
+        var $fields = $form.find('[data-purpose=column-selector]');
+        var $functions = $form.find('[data-purpose=function-selector]');
+        var $label = $form.find('[data-purpose=label]');
 
         if (_.contains(options.showItems, 'function')) {
             $functions.functionChoice({
@@ -29,7 +24,7 @@ define(function (require) {
         }
 
         $fields
-            .on('change', function (e) {
+            .on('change', function(e) {
                 if (e.added) {
                     // update label input on field change
                     $label.val(e.added.text).trigger('change');

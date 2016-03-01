@@ -7,11 +7,9 @@ use Symfony\Component\Form\FormBuilderInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 
 /**
  * @SuppressWarnings(PHPMD.NPathComplexity)
@@ -19,42 +17,32 @@ use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
  */
 class ConfigScopeType extends AbstractType
 {
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $items;
 
-    /**
-     * @var ConfigInterface
-     */
+    /** @var ConfigInterface */
     protected $config;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var AbstractConfigModel
-     */
+    /** @var ConfigModel */
     protected $configModel;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $jsRequireOptions;
 
     /**
-     * @param $items
-     * @param $config
-     * @param $configModel
-     * @param $configManager
+     * @param array             $items
+     * @param ConfigInterface   $config
+     * @param ConfigManager     $configManager
+     * @param ConfigModel       $configModel
      */
     public function __construct(
         $items,
         ConfigInterface $config,
         ConfigManager $configManager,
-        AbstractConfigModel $configModel
+        ConfigModel $configModel
     ) {
         $this->items         = $items;
         $this->config        = $config;
@@ -72,12 +60,9 @@ class ConfigScopeType extends AbstractType
                 $options = isset($config['form']['options']) ? $config['form']['options'] : array();
 
                 $options['config_id']     = $this->config->getId();
-                $options['config_is_new'] = $this->configModel->getId() == false;
+                $options['config_is_new'] = !$this->configModel->getId();
 
-                /**
-                 * Disable field on editAction
-                 */
-                if (isset($config['options']['create_only']) && $this->configModel->getId()) {
+                if ($this->isDisabledItem($config)) {
                     $options['disabled'] = true;
                     $this->appendClassAttr($options, 'disabled-' . $config['form']['type']);
                 }
@@ -120,7 +105,7 @@ class ConfigScopeType extends AbstractType
                             }
 
                             //check if requirement property is set in this form
-                            if ($className == $this->config->getId()->getClassName()) {
+                            if ($className === $this->config->getId()->getClassName()) {
                                 if ($fieldName) {
                                     if ($this->config->getId() instanceof FieldConfigId
                                         && $this->config->getId()->getFieldName() == $fieldName
@@ -155,7 +140,7 @@ class ConfigScopeType extends AbstractType
                 }
 
                 if (isset($config['constraints'])) {
-                    $options['constraints'] = $this->parseValidator($config['constraints']);
+                    $options['constraints'] = $config['constraints'];
                 }
 
                 $this->setAttr($options, 'data-property_id', $this->config->getId()->toString() . $code);
@@ -174,52 +159,36 @@ class ConfigScopeType extends AbstractType
     }
 
     /**
-     * @param $name
-     * @param $options
-     * @return mixed
+     * @param array $config
      *
-     * TODO: use ConstraintFactory here, https://magecore.atlassian.net/browse/BAP-2270
+     * @return bool
      */
-    protected function newConstraint($name, $options)
+    protected function isDisabledItem(array $config)
     {
-        if (strpos($name, '\\') !== false && class_exists($name)) {
-            $className = (string) $name;
-        } else {
-            $className = 'Symfony\\Component\\Validator\\Constraints\\' . $name;
+        $createOnly = isset($config['options']['create_only']) && $config['options']['create_only'];
+
+        // disable config attribute if its value cannot be changed
+        if ($createOnly && $this->configModel->getId()) {
+            return true;
         }
 
-        return new $className($options);
+        // disable field config attribute if its value cannot be changed for some field types
+        // an attribute marked as create only should not be disabled on create field page
+        if ($this->config->getId() instanceof FieldConfigId
+            && !empty($config['options']['immutable_type'])
+            && in_array($this->config->getId()->getFieldType(), $config['options']['immutable_type'], true)
+            && (!$createOnly || $this->configModel->getId())
+        ) {
+            return true;
+        }
+
+        return false;
     }
 
     /**
-     * @param array $nodes
-     * @return array
+     * @param array  $options
+     * @param string $cssClass
      */
-    protected function parseValidator(array $nodes)
-    {
-        $values = array();
-
-        foreach ($nodes as $name => $childNodes) {
-            if (is_numeric($name) && is_array($childNodes) && count($childNodes) == 1) {
-                $options = current($childNodes);
-
-                if (is_array($options)) {
-                    $options = $this->parseValidator($options);
-                }
-
-                $values[] = $this->newConstraint(key($childNodes), $options);
-            } else {
-                if (is_array($childNodes)) {
-                    $childNodes = $this->parseValidator($childNodes);
-                }
-
-                $values[$name] = $childNodes;
-            }
-        }
-
-        return $values;
-    }
-
     protected function appendClassAttr(array &$options, $cssClass)
     {
         if (isset($options['attr']['class'])) {
@@ -229,6 +198,11 @@ class ConfigScopeType extends AbstractType
         }
     }
 
+    /**
+     * @param array  $options
+     * @param string $name
+     * @param mixed  $value
+     */
     protected function setAttr(array &$options, $name, $value)
     {
         if (!isset($options['attr'])) {

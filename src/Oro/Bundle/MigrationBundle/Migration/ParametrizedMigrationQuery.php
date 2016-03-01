@@ -31,12 +31,15 @@ abstract class ParametrizedMigrationQuery implements MigrationQuery, ConnectionA
      */
     protected function logQuery(LoggerInterface $logger, $query, array $params = [], array $types = [])
     {
-        $logger->notice($query);
+        $logger->info($query);
         if (!empty($params)) {
             $resolvedParams = $this->resolveParams($params, $types);
-            $logger->notice('Parameters:');
+            $logger->info('Parameters:');
             foreach ($resolvedParams as $key => $val) {
-                $logger->notice(sprintf('[%s] = %s', $key, $val));
+                if (is_array($val)) {
+                    $val = implode(',', $val);
+                }
+                $logger->info(sprintf('[%s] = %s', $key, $val));
             }
         }
     }

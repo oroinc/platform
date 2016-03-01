@@ -16,8 +16,8 @@ services:
         arguments:
             - @oro_datagrid.datagrid.manager.link
             - @translator
-            - @oro_locale.formatter.number
-            - @oro_locale.formatter.date_time
+            - @oro_datagrid.columns.helper
+            - @oro_importexport.formatter.formatter_provider
 
     oro_datagrid.importexport.export_reader:
         class: %oro_datagrid.importexport.export_reader.class%

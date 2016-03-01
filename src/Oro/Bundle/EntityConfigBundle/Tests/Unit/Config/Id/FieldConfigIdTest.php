@@ -6,33 +6,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class FieldConfigIdTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider emptyNameProvider
-     * @expectedException \InvalidArgumentException
-     */
-    public function testEmptyScope($scope)
-    {
-        new FieldConfigId($scope, 'Test\Class', 'testField', 'int');
-    }
-
-    /**
-     * @dataProvider emptyNameProvider
-     * @expectedException \InvalidArgumentException
-     */
-    public function testEmptyClassName($className)
-    {
-        new FieldConfigId('testScope', $className, 'testField', 'int');
-    }
-
-    /**
-     * @dataProvider emptyNameProvider
-     * @expectedException \InvalidArgumentException
-     */
-    public function testEmptyFieldName($fieldName)
-    {
-        new FieldConfigId('testScope', 'Test\Class', $fieldName, 'int');
-    }
-
     public function testFieldConfigId()
     {
         $fieldId = new FieldConfigId('testScope', 'Test\Class', 'testField', 'string');
@@ -68,13 +41,5 @@ class FieldConfigIdTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('testScope', $fieldId->getScope());
         $this->assertEquals('testField', $fieldId->getFieldName());
         $this->assertEquals('string', $fieldId->getFieldType());
-    }
-
-    public function emptyNameProvider()
-    {
-        return [
-            [null],
-            [''],
-        ];
     }
 }

@@ -20,4 +20,4 @@ bundles:
     - { name: Genemu\Bundle\FormBundle\GenemuFormBundle, priority: -155 }
     - { name: A2lix\TranslationFormBundle\A2lixTranslationFormBundle, priority: -150 }
     - { name: Lexik\Bundle\MaintenanceBundle\LexikMaintenanceBundle, priority: -145 }
-    - Oro\Bundle\PlatformBundle\OroPlatformBundle
+    - { name: Oro\Bundle\PlatformBundle\OroPlatformBundle, priority: -200 }

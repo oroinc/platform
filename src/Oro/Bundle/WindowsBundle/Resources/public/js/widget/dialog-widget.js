@@ -1,18 +1,19 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var DialogWidget,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        __ = require('orotranslation/js/translator'),
-        tools = require('oroui/js/tools'),
-        error = require('oroui/js/error'),
-        messenger = require('oroui/js/messenger'),
-        mediator = require('oroui/js/mediator'),
-        layout = require('oroui/js/layout'),
-        AbstractWidget = require('oroui/js/widget/abstract-widget'),
-        StateModel = require('orowindows/js/dialog/state/model');
+    var DialogWidget;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var tools = require('oroui/js/tools');
+    var error = require('oroui/js/error');
+    var messenger = require('oroui/js/messenger');
+    var mediator = require('oroui/js/mediator');
+    var layout = require('oroui/js/layout');
+    var AbstractWidget = require('oroui/js/widget/abstract-widget');
+    var StateModel = require('orowindows/js/dialog/state/model');
+    var DialogManager = require('orowindows/js/widget/dialog-manager');
+    var dialogManager = new DialogManager();
     require('jquery.dialog.extended');
 
     /**
@@ -45,10 +46,14 @@ define(function (require) {
          */
         _isEmbedded: false,
 
+        events: {
+            'content:changed': 'resetDialogPosition'
+        },
+
         listen: {
             'adoptedFormResetClick': 'remove',
-            'widgetRender': '_initAdjustHeight',
-            'contentLoad': 'onContentUpdated',
+            'widgetRender': 'onWidgetRender',
+            'widgetReady': 'onContentUpdated',
             'page:request mediator': 'onPageChange'
         },
 
@@ -81,7 +86,14 @@ define(function (require) {
             dialogOptions.beforeClose = _.bind(this.closeHandler, this, dialogOptions.close);
             dialogOptions.close = undefined;
 
+            dialogManager.add(this);
+
             this.initializeWidget(options);
+        },
+
+        onWidgetRender: function(content) {
+            this._initAdjustHeight(content);
+            this._setMaxSize();
         },
 
         setTitle: function(title) {
@@ -113,7 +125,7 @@ define(function (require) {
          *
          * @param {Function|undefined} onClose External onClose handler
          */
-        closeHandler: function (onClose) {
+        closeHandler: function(onClose) {
             if (_.isFunction(onClose)) {
                 onClose();
             }
@@ -127,6 +139,7 @@ define(function (require) {
             if (this.disposed) {
                 return;
             }
+            dialogManager.remove(this);
             if (this.model) {
                 this.model.destroy({
                     error: _.bind(function(model, xhr) {
@@ -154,7 +167,7 @@ define(function (require) {
          *
          * @returns {boolean}
          */
-        isEmbedded: function () {
+        isEmbedded: function() {
             // modal dialogs has same life cycle as embedded widgets
             return this._isEmbedded || this.options.dialogOptions.modal;
         },
@@ -162,7 +175,7 @@ define(function (require) {
         /**
          * Handles content load event and sets focus on first form input
          */
-        onContentUpdated: function () {
+        onContentUpdated: function() {
             this.$('form:first').focusFirstInput();
         },
 
@@ -212,7 +225,7 @@ define(function (require) {
          * Handles page change
          *  - closes dialogs with not tracked state (eg. modal dialogs)
          */
-        onPageChange: function () {
+        onPageChange: function() {
             if (!this.options.stateEnabled) {
                 this.remove();
             }
@@ -234,6 +247,14 @@ define(function (require) {
 
         getWidget: function() {
             return this.widget;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        getLayoutElement: function() {
+            // covers not only widget body, but whole .ui-dialog, including .ui-dialog-buttonpane
+            return this.widget.parent();
         },
 
         getActionsElement: function() {
@@ -261,13 +282,10 @@ define(function (require) {
         /**
          * Show dialog
          */
-        show: function () {
+        show: function() {
             var dialogOptions;
             if (!this.widget) {
                 dialogOptions = _.extend({}, this.options.dialogOptions);
-                if (typeof dialogOptions.position === 'undefined') {
-                    dialogOptions.position = this._getWindowPlacement();
-                }
                 dialogOptions.stateChange = _.bind(this.handleStateChange, this);
                 if (dialogOptions.state !== 'minimized') {
                     dialogOptions.dialogClass = 'invisible ' + (dialogOptions.dialogClass || '');
@@ -275,13 +293,12 @@ define(function (require) {
                 this.widget = $('<div/>');
                 this._bindDialogEvents();
                 this.widget.html(this.$el).dialog(dialogOptions);
-                this.widget.attr('data-layout', 'separate');
+                this.getLayoutElement().attr('data-layout', 'separate');
             } else {
                 this.widget.html(this.$el);
             }
             this.loadingElement = this.$el.closest('.ui-dialog');
             DialogWidget.__super__.show.apply(this);
-            this.widget.dialog('adjustContentSize');
 
             this._fixDialogMinHeight(true);
             this.widget.on('dialogmaximize dialogrestore', _.bind(function() {
@@ -294,20 +311,38 @@ define(function (require) {
             }, this));
         },
 
-        _afterLayoutInit: function () {
+        _afterLayoutInit: function() {
+            this.resetDialogPosition();
             this.widget.closest('.invisible').removeClass('invisible');
-            this.renderDeferred.resolve();
-            delete this.renderDeferred;
+            if (this.deferredRender) {
+                this._resolveDeferredRender();
+            }
         },
 
         _initAdjustHeight: function(content) {
             this.widget.off('.adjust-height-events');
             var scrollableContent = content.find('.scrollable-container');
+            var resizeEvents = [
+                'dialogresize.adjust-height-events',
+                'dialogmaximize.adjust-height-events',
+                'dialogrestore.adjust-height-events'
+            ].join(' ');
             if (scrollableContent.length) {
                 scrollableContent.css('overflow', 'auto');
-                this.widget.on('dialogresize.adjust-height-events dialogmaximize.adjust-height-events dialogrestore.adjust-height-events', _.bind(this._fixScrollableHeight, this));
+                this.widget.on(resizeEvents, _.bind(this._fixScrollableHeight, this));
                 this._fixScrollableHeight();
             }
+        },
+        _setMaxSize: function() {
+            this.widget.off('.set-max-size-events');
+            this.widget.on('dialogresizestart.set-max-size-events', _.bind(function() {
+                var dialog = this.widget.closest('.ui-dialog');
+                var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
+                dialog.css({
+                    maxWidth: containerEl.clientWidth,
+                    maxHeight: containerEl.clientHeight
+                });
+            }, this));
         },
 
         _fixDialogMinHeight: function(isEnabled) {
@@ -319,62 +354,119 @@ define(function (require) {
             }
         },
 
-        _fixBorderShifting: function() {
-            var dialogWidget = this.widget.dialog('widget');
-            var widthShift
-                = parseInt(dialogWidget.css('border-left-width')) + parseInt(dialogWidget.css('border-right-width'));
-            var heightShift
-                = parseInt(dialogWidget.css('border-top-width')) + parseInt(dialogWidget.css('border-bottom-width'));
-            this.widget.width(this.widget.width() - widthShift);
-            this.widget.height(this.widget.height() - heightShift);
-            this._fixScrollableHeight();
-        },
-
         _fixScrollableHeight: function() {
             var widget = this.widget;
             if (!tools.isMobile()) {
-                widget.find('.scrollable-container').each(_.bind(function(i, el){
+                // on mobile devices without setting these properties modal dialogs cannot be scrolled
+                widget.find('.scrollable-container').each(_.bind(function(i, el) {
                     var $el = $(el);
                     var height = widget.height() - $el.position().top;
                     if (height) {
                         $el.outerHeight(height);
                     }
-                },this));
+                }, this));
             }
             layout.updateResponsiveLayout();
         },
 
         /**
-         * Get next window position based
-         *
-         * @returns {{my: string, at: string, of: (*|jQuery|HTMLElement), within: (*|jQuery|HTMLElement)}}
-         * @private
+         * Resets dialog position to default
          */
-        _getWindowPlacement: function() {
-            var prototype = DialogWidget.prototype;
+        resetDialogPosition: function() {
+            if (this.options.position) {
+                this.setPosition(_.extend(this.options.position, {
+                    of: '#container',
+                    collision: 'fit'
+                }));
+            }
             if (!this.options.incrementalPosition) {
-                return {
+                this.setPosition({
                     my: 'center center',
-                    at: prototype.defaultPos
-                };
-            }
-            var offset = 'center+' + prototype.windowX + ' center+' + prototype.windowY;
-
-            prototype.openedWindows++;
-            if (prototype.openedWindows % prototype.windowsPerRow === 0) {
-                var rowNum = prototype.openedWindows / prototype.windowsPerRow;
-                prototype.windowX = rowNum * prototype.windowsPerRow * prototype.windowOffsetX;
-                prototype.windowY = 0;
-
+                    at: this.defaultPos,
+                    of: '#container',
+                    collision: 'fit'
+                });
             } else {
-                prototype.windowX += prototype.windowOffsetX;
-                prototype.windowY += prototype.windowOffsetY;
+                dialogManager.updateIncrementalPosition(this);
             }
+        },
 
-            return {
-                my: offset,
-                at: prototype.defaultPos
-            };
+        internalSetDialogPosition: function(position, leftShift, topShift) {
+            if (!leftShift) {
+                leftShift = 0;
+            }
+            if (!topShift) {
+                topShift = 0;
+            }
+            if (!this.widget) {
+                throw new Error('this function must be called only after dialog is created');
+            }
+            var dialog = this.widget.closest('.ui-dialog');
+            dialog.position(position);
+            // must update manually 'cause $.position call gives side effects
+            dialog.css({
+                top: parseInt(dialog.css('top')) + topShift,
+                left: parseInt(dialog.css('left')) + leftShift
+            });
+        },
+
+        setPosition: function(position, leftShift, topShift) {
+            if (!this.widget) {
+                throw new Error('this function must be called only after dialog is created');
+            }
+            var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
+            var dialog = this.widget.closest('.ui-dialog');
+            this.internalSetDialogPosition(position, leftShift, topShift);
+            /*
+             * Left and Width adjustments
+             * **************************
+             */
+            // containerEl.offsetLeft will only work if offsetParent is document.body
+            var left = parseFloat(dialog.css('left')) - containerEl.offsetLeft;
+            var width = parseFloat(dialog.css('width'));
+            var minWidth = parseFloat(dialog.css('min-width'));
+            if (left < 0) {
+                dialog.css('left', containerEl.offsetLeft);
+                left = 0;
+            }
+            if (left + width > containerEl.clientWidth) {
+                if (containerEl.clientWidth - left < this.options.dialogOptions.minWidth &&
+                    this.options.dialogOptions.minWidth <= containerEl.clientWidth) {
+                    dialog.css('left', containerEl.clientWidth - this.options.dialogOptions.minWidth +
+                        containerEl.offsetLeft);
+                    dialog.css('width', this.options.dialogOptions.minWidth);
+                    return;
+                }
+                dialog.css('width', containerEl.clientWidth - left);
+                if (minWidth > containerEl.clientWidth - left) {
+                    dialog.css('min-width', containerEl.clientWidth - left);
+                }
+            }
+            /*
+             * Top and Height adjustments
+             * **************************
+             */
+            // containerEl.offsetTop will only work if offsetParent is document.body
+            var top = parseFloat(dialog.css('top')) - containerEl.offsetTop;
+            var height = parseFloat(dialog.css('height'));
+            var minHeight = parseFloat(dialog.css('min-height'));
+            if (top < 0) {
+                dialog.css('top', containerEl.offsetTop);
+                top = 0;
+            }
+            if (top + height > containerEl.clientHeight) {
+                if (containerEl.clientHeight - top < this.options.dialogOptions.minHeight &&
+                    this.options.dialogOptions.minHeight <= containerEl.clientHeight) {
+                    dialog.css('top', containerEl.clientHeight - this.options.dialogOptions.minHeight +
+                        containerEl.offsetTop);
+                    dialog.css('height', this.options.dialogOptions.minHeight);
+                    return;
+                }
+                dialog.css('height', containerEl.clientHeight - top);
+                if (minHeight > containerEl.clientHeight - top) {
+                    dialog.css('min-height', containerEl.clientHeight - top);
+                }
+            }
         },
 
         /**
@@ -382,7 +474,7 @@ define(function (require) {
          *
          * @returns {string}
          */
-        getState: function () {
+        getState: function() {
             return this.widget.dialog('state');
         },
 
@@ -392,15 +484,15 @@ define(function (require) {
          *
          * @protected
          */
-        _bindDialogEvents: function () {
+        _bindDialogEvents: function() {
             var self = this;
-            this.widget.on('dialogbeforeclose', function () {
+            this.widget.on('dialogbeforeclose', function() {
                 mediator.trigger('widget_dialog:close', self);
             });
-            this.widget.on('dialogopen', function () {
+            this.widget.on('dialogopen', function() {
                 mediator.trigger('widget_dialog:open', self);
             });
-            this.widget.on('dialogstatechange', function (event, data) {
+            this.widget.on('dialogstatechange', function(event, data) {
                 if (data.state !== data.oldState) {
                     mediator.trigger('widget_dialog:stateChange', self);
                 }
@@ -412,25 +504,24 @@ define(function (require) {
             });
         },
 
-        onResizeStart: function (event) {
+        onResizeStart: function(event) {
             this.$el.css({overflow: 'hidden'});
-            this.getComponentManager().forEachComponent(function (component) {
+            this.forEachComponent(function(component) {
                 component.trigger('parentResizeStart', event, this);
-            }, this);
+            });
         },
 
-        onResize: function (event) {
-            this.getComponentManager().forEachComponent(function (component) {
+        onResize: function(event) {
+            this.forEachComponent(function(component) {
                 component.trigger('parentResize', event, this);
-            }, this);
+            });
         },
 
-        onResizeStop: function (event) {
+        onResizeStop: function(event) {
             this.$el.css({overflow: ''});
-            this._fixBorderShifting();
-            this.getComponentManager().forEachComponent(function (component) {
+            this.forEachComponent(function(component) {
                 component.trigger('parentResizeStop', event, this);
-            }, this);
+            });
         }
     });
 

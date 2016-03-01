@@ -35,7 +35,7 @@ services:
     oro_platform.version.cache:
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_platform.version.cache" ] ]
+            - [ setNamespace, [ 'oro_platform_version' ] ]
 
     oro_platform.composer.version_helper:
         class: %oro_platform.composer.version_helper.class%

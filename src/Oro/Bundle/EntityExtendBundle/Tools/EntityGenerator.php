@@ -102,7 +102,8 @@ class EntityGenerator
             $class->setAbstract(true);
         }
 
-        foreach ($this->getExtensions() as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             if ($extension->supports($schema)) {
                 $extension->generate($schema, $class);
             }

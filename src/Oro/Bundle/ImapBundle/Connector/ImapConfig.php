@@ -30,19 +30,32 @@ class ImapConfig
     private $password;
 
     /**
+     * @var string
+     */
+    private $accessToken;
+
+    /**
      * @param string $host The host name of IMAP server
      * @param string $port The port of IMAP server
      * @param string $ssl The SSL type to be used to connect to IMAP server. Can be empty string, 'ssl' or 'tls'
      * @param string $user The user name
      * @param string $password The user password
+     * @param string $accessToken The Access Token for authenticating to Gmail with OAuth2
      */
-    public function __construct($host = null, $port = null, $ssl = null, $user = null, $password = null)
-    {
+    public function __construct(
+        $host = null,
+        $port = null,
+        $ssl = null,
+        $user = null,
+        $password = null,
+        $accessToken = null
+    ) {
         $this->host = $host;
         $this->port = $port;
         $this->ssl = $ssl;
         $this->user = $user;
         $this->password = $password;
+        $this->accessToken = $accessToken;
     }
 
     /**
@@ -143,5 +156,21 @@ class ImapConfig
     public function setPassword($password)
     {
         $this->password = $password;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccessToken()
+    {
+        return $this->accessToken;
+    }
+
+    /**
+     * @param string $accessToken
+     */
+    public function setAccessToken($accessToken)
+    {
+        $this->accessToken = $accessToken;
     }
 }

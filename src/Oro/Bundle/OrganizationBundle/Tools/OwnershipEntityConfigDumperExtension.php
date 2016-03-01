@@ -106,7 +106,8 @@ class OwnershipEntityConfigDumperExtension extends AbstractEntityConfigDumperExt
             'manyToOne',
             $this->ownershipMetadataProvider->getOrganizationClass()
         );
-        if (!isset($entityConfig->get('relation')[$relationKey])) {
+        $relations   = $entityConfig->get('relation', false, []);
+        if (!isset($relations[$relationKey])) {
             $this->relationBuilder->addManyToOneRelation(
                 $entityConfig,
                 $targetEntityClassName,

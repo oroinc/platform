@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\DataGridBundle\Datasource\Orm\QueryConverter;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
@@ -19,7 +20,7 @@ class YamlConverter implements QueryConverterInterface
     /**
      * {@inheritdoc}
      */
-    public function parse($value, QueryBuilder $qb)
+    public function parse($value, ManagerRegistry $doctrine)
     {
         if (!is_array($value)) {
             $value = Yaml::parse($value);
@@ -33,6 +34,7 @@ class YamlConverter implements QueryConverterInterface
             throw new InvalidConfigurationException('Missing mandatory "from" section');
         }
 
+        $qb = $this->createQueryBuilder($doctrine, $value);
         foreach ((array)$value['from'] as $from) {
             $qb->from($from['table'], $from['alias']);
         }
@@ -92,6 +94,17 @@ class YamlConverter implements QueryConverterInterface
     public function dump(QueryBuilder $input)
     {
         return '';
+    }
+
+    /**
+     * @param ManagerRegistry $doctrine
+     * @param array           $definition
+     *
+     * @return QueryBuilder
+     */
+    protected function createQueryBuilder(ManagerRegistry $doctrine, array $definition)
+    {
+        return $doctrine->getManagerForClass($definition['from'][0]['table'])->createQueryBuilder();
     }
 
     /**

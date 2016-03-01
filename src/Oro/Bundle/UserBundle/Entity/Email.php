@@ -4,13 +4,14 @@ namespace Oro\Bundle\UserBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Entity\EmailInterface;
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 
 /**
  * @ORM\Entity()
  * @ORM\Table(name="oro_user_email")
+ * @Config()
  */
 class Email implements EmailInterface
 {
@@ -34,6 +35,9 @@ class Email implements EmailInterface
      *  defaultValues={
      *    "importexport"={
      *       "identity"=true
+     *    },
+     *    "dataaudit"={
+     *       "auditable"=true
      *    }
      *   }
      * )
@@ -92,7 +96,7 @@ class Email implements EmailInterface
     /**
      * Set user
      *
-     * @param  User  $user
+     * @param  User $user
      * @return Email
      */
     public function setUser(User $user = null)
@@ -110,5 +114,13 @@ class Email implements EmailInterface
     public function getUser()
     {
         return $this->user;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string) $this->getEmail();
     }
 }

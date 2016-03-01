@@ -27,7 +27,7 @@ class AjaxMassAction extends AbstractMassAction
             $options['route_parameters'] = [];
         }
 
-        if (empty($options['confirmation'])) {
+        if (!isset($options['confirmation'])) {
             $options['confirmation'] = true;
         }
 

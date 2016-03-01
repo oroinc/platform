@@ -93,7 +93,7 @@ class NoteApiHandler
                     ->is('state', ExtendScope::STATE_ACTIVE)
             ) {
                 $note[$fieldName] = $association['id'];
-                unset ($note['entityId']);
+                unset($note['entityId']);
                 $request->request->set('note', $note);
             } else {
                 throw new \SoapFault(

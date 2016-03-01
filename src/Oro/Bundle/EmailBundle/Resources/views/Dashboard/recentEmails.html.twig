@@ -1,6 +1,16 @@
 {% extends 'OroDashboardBundle:Dashboard:tabbedWidget.html.twig' %}
 {% import 'OroEmailBundle::macros.html.twig' as Email %}
 
+{% if unreadMailCount > 10 %}
+    {% set unreadMailCount %}
+        <div class="email-mail-count-circle">10+</div>
+    {% endset %}
+{% else %}
+    {% set unreadMailCount %}
+        <div class="email-mail-count-circle">{{ unreadMailCount }}</div>
+    {% endset %}
+{% endif %}
+
 {% block content %}
     {% set tabs = [{
         'url': path(
@@ -17,6 +27,15 @@
         ),
         'name': 'sent',
         'label': 'oro.dashboard.recent_emails.sent'|trans
+    },
+    {
+        'url': path(
+            'oro_email_dashboard_recent_emails',
+            {'widget': widgetName, 'activeTab': 'new', 'contentType': 'tab'}
+        ),
+        'name': 'unread',
+        'label': 'oro.dashboard.recent_emails.unread'|trans,
+        'afterHtml': unreadMailCount
     }] %}
 
     {{ parent() }}

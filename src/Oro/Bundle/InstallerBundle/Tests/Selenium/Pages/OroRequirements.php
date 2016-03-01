@@ -43,8 +43,8 @@ class OroRequirements extends AbstractPage
 
     public function next()
     {
-        $this->test->moveto($this->test->byXpath("//a[@class = 'button next primary']"));
-        $this->test->byXpath("//a[@class = 'button next primary']")->click();
+        $this->test->moveto($this->test->byXpath("//a[@id = 'next-button']"));
+        $this->test->byXpath("//a[@id = 'next-button']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
         $this->assertTitle('Configuration - Oro Application installation');

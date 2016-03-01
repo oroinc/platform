@@ -41,7 +41,7 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
      * @param array     $activityClasses
      * @param \DateTime $dateFrom
      * @param \DateTime $dateTo
-     * @param integer   $andWhereCount  Number of andWhere() calls
+     * @param integer   $andWhereCount Number of andWhere() calls
      * @param integer   $setParameterCount Number of setParameter() calls
      */
     public function testGetActivityListQueryBuilder(
@@ -71,12 +71,16 @@ class ActivityListRepositoryTest extends \PHPUnit_Framework_TestCase
             ->method('where')
             ->will($this->returnSelf());
 
-        $qb->expects($this->once())
-            ->method('join')
+        $qb->expects($this->exactly(2))
+            ->method('leftJoin')
             ->will($this->returnSelf());
 
         $qb->expects($this->once())
             ->method('orderBy')
+            ->will($this->returnSelf());
+
+        $qb->expects($this->once())
+            ->method('groupBy')
             ->will($this->returnSelf());
 
         $qb->expects($this->any())

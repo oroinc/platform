@@ -5,7 +5,7 @@ namespace Oro\Bundle\PlatformBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\Yaml\Parser;
 
-use Oro\Bundle\DistributionBundle\DependencyInjection\OroContainerBuilder;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension;
 
 class OroCronExtensionTest extends \PHPUnit_Framework_TestCase
@@ -99,7 +99,7 @@ class OroCronExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedConfig = $originalConfig;
         $expectedConfig[0]['firewalls']['oauth'] = $additionalConfig['firewalls']['oauth'];
 
-        $containerBuilder = new OroContainerBuilder();
+        $containerBuilder = new ExtendedContainerBuilder();
         $containerBuilder->setExtensionConfig('security', $originalConfig);
 
         $platformExtension = new OroPlatformExtension();

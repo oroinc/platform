@@ -8,42 +8,23 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Dashboard Management
  *
  * @package Oro\Bundle\DashboardBundle\Tests\Selenium\Pages
- * @method Dashboards openDashboards() openDashboards(string)
+ * @method Dashboards openDashboards(string $bundlePath)
+ * @method Dashboard add() add()
  * {@inheritdoc}
  */
 class Dashboards extends AbstractPageFilteredGrid
 {
+    const NEW_ENTITY_BUTTON = "//a[@title = 'Create Dashboard']";
     const URL = 'dashboard';
 
-    public function __construct($testCase, $redirect = true)
+    public function entityView()
     {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-
+        return new Dashboard($this->test);
     }
 
-    /**
-     * @return Dashboard
-     */
-    public function add()
+    public function entityNew()
     {
-        $this->test->byXpath("//a[@title = 'Create Dashboard']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
-        $dashboard = new Dashboard($this->test);
-        return $dashboard->init();
-    }
-
-    /**
-     * @param array $entityData
-     *
-     * @return Dashboard
-     */
-    public function open($entityData = array())
-    {
-        $page = parent::open($entityData);
-
-        return new Dashboard($page->test);
+        return new Dashboard($this->test);
     }
 
     public function edit()

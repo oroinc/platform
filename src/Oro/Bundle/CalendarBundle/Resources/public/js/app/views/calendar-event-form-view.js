@@ -1,11 +1,9 @@
-/*jslint nomen: true*/
-/*global define*/
 define([
     'jquery',
     'oroui/js/mediator',
     'oroui/js/app/views/base/view',
     'oroform/js/app/views/datepair-view'
-], function ($, mediator, BaseView, DatepairView) {
+], function($, mediator, BaseView, DatepairView) {
     'use strict';
 
     var CalendarEventFormView;
@@ -16,28 +14,40 @@ define([
          */
         options: {},
 
+        events: {
+            'change input[name$="[contexts]"]': 'onContextChange',
+            'select2-data-loaded input[name$="[contexts]"]': 'onContextChange'
+        },
+
         /**
          * @constructor
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options || {};
             this.render();
         },
 
-        render: function () {
+        render: function() {
             var self = this;
-            this.initLayout().done(function () {
+            var renderDeferred = this.renderDeferred = $.Deferred();
+            this.initLayout().done(function() {
                 self.handleLayoutInit();
+                renderDeferred.resolve();
             });
         },
 
-        handleLayoutInit: function () {
-            var opts, datepair;
+        handleLayoutInit: function() {
+            var opts;
+            var datepair;
             opts = this.options;
             datepair = new DatepairView(opts);
             this.subview('datepair', datepair);
+        },
+
+        onContextChange: function() {
+            this.$el.trigger('content:changed');
         }
     });
 

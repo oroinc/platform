@@ -14,31 +14,30 @@ use Oro\Bundle\FormBundle\Form\Type\OroEntityCreateOrSelectType;
  */
 class EntityCreateOrSelectTransformer implements DataTransformerInterface
 {
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $className;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $defaultMode;
+
+    /** @var bool */
+    protected $editable;
 
     /**
      * @param DoctrineHelper $doctrineHelper
      * @param string $className
      * @param string $defaultMode
+     * @param bool $editable
      */
-    public function __construct(DoctrineHelper $doctrineHelper, $className, $defaultMode)
+    public function __construct(DoctrineHelper $doctrineHelper, $className, $defaultMode, $editable = false)
     {
         $this->doctrineHelper = $doctrineHelper;
         $this->className = $className;
         $this->defaultMode = $defaultMode;
+        $this->editable = $editable;
     }
 
     /**
@@ -58,7 +57,12 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
             $identifier = $this->doctrineHelper->getSingleEntityIdentifier($value);
             if ($identifier) {
                 $existingEntity = $value;
-                $mode = OroEntityCreateOrSelectType::MODE_VIEW;
+                $mode = $this->editable ?
+                    OroEntityCreateOrSelectType::MODE_EDIT :
+                    OroEntityCreateOrSelectType::MODE_VIEW;
+                if ($mode === OroEntityCreateOrSelectType::MODE_EDIT) {
+                    $newEntity = $value;
+                }
             } else {
                 $newEntity = $value;
                 $mode = OroEntityCreateOrSelectType::MODE_CREATE;
@@ -74,6 +78,7 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
 
     /**
      * {@inheritDoc}
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function reverseTransform($value)
     {
@@ -99,6 +104,7 @@ class EntityCreateOrSelectTransformer implements DataTransformerInterface
                 break;
 
             case OroEntityCreateOrSelectType::MODE_VIEW:
+            case OroEntityCreateOrSelectType::MODE_EDIT:
                 if (!array_key_exists('existing_entity', $value)) {
                     throw new TransformationFailedException('Data parameter "existing_entity" is required');
                 }

@@ -78,7 +78,7 @@ datagrid:
             id: ~  # Identifier property must be passed to frontend
 ```
 
-When this done we have to create form fields that wil contain assigned/removed user ids and process it on backend
+When this done we have to create form fields that will contain assigned/removed user ids and process it on backend
 For example fields are:
 ``` twig
     form_widget(form.appendUsers, {'id': 'groupAppendUsers'}),
@@ -100,6 +100,110 @@ datagrid:
                 selectors:
                     included: '#groupAppendUsers'  # field selectors
                     excluded: '#groupRemoveUsers'
+```
+
+#### Problem:
+*Let's take previous problem, when we need to fill some form field dependent on grid state.
+For example "_grid should show users for group that currently editing and user should be able to select some parameter from dropwown for users in this group_"*
+#### Solution:
+For solving this problem we have to create form field that will contain changeset of edited user fields and process it on backend
+For example fields are:
+``` twig
+    form_widget(form.changeset, {'id': 'changeset'}),
+```
+
+Next step: modify query. We'll add additional field `enabled` that user will be able to change.
+``` yml
+datagrid:
+    acme-demo-grid:
+        source:
+            type: orm
+            query:
+                select:
+                    - u.id
+                    - u.username
+                    - CASE WHEN u.enabled = true THEN 'enabled' ELSE 'disabled' END as enabled
+                from:
+                    { table: AcmeDemoBundle:User, alias:u }
+            bind_parameters:
+                - groupId
+        options:
+            entityHint: user
+        properties:
+            id: ~
+        columns:
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                editable: true
+                choices:
+                   enabled: Active
+                   disabled: Inactive
+```
+
+Similarly Symfony2 ``choice Field Type`` approach editable cell may be rendered as one of several different HTML fields, depending on the ``expanded`` and ``multiple`` options.
+Currently supported ``select tag``, ``select tag (with multiple attribute)`` and ``radio buttons``.
+
+Example for radio buttons:
+
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        columns:
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                editable: true
+                expanded: true
+                multiple: false
+                choices:
+                   enabled: Active
+                   disabled: Inactive
+```
+By default ``expanded`` and ``multiple`` are ``false`` and their presence in config may be omitted.
+
+Last step: need to set "cellSelection" option, it will add behavior of selecting rows on frontend:
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # previous configuration
+        options:
+            cellSelection:
+                dataField: id
+                columnName:
+                    - enabled
+                selector: '#changeset'
+```
+
+#### Problem:
+*Let's take previous problem, but in additional we need to fill selector in addiction to enum values.*
+#### Solution:
+For solving this problem we have to use ``@oro_entity_extend.enum_value_provider->getEnumChoicesByCode('enum_code')``
+instead of choice array using
+```yml
+    choices:
+       enabled: Active
+       disabled: Inactive
+```
+
+Example:
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        columns:
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                editable: true
+                choices: @oro_entity_extend.enum_value_provider->getEnumChoicesByCode('user_status')
 ```
 
 #### Problem:
@@ -134,28 +238,32 @@ datagrid:
 #### Problem:
 *I'm developing grid that should not be under ACL control*
 #### Solution:
-- set option 'skip_acl_check' to TRUE
+- set option 'skip_acl_apply' to TRUE
 
 Example:
 ``` yml
 datagrid:
     acme-demo-grid:
         ... # some configuration
-        options:
-            skip_acl_check: true
+        source:
+            skip_acl_apply: true
+            ... # some configuration of source
 ```
 
 #### Problem:
-*I want to implement some custom security verification/logic without any default acl, even if some "acl_resource" have been defined *
+*I want to implement some custom security verification/logic without any default ACL, even if some "acl_resource" have been defined *
 *e.g. i'm extending some existing grid but with custom acl logic*
 #### Solution:
-- configure grid (set option 'skip_acl_check' to TRUE)
+- configure grid (set option 'skip_acl_apply' to TRUE)
+- override option 'acl_resource' and to make it false
 ``` yml
 datagrid:
     acme-demo-grid:
         ... # some configuration
-        options:
-            skip_acl_check: true
+        acl_resource: false
+        source:
+            skip_acl_apply: true
+            ... # some configuration of source
 ```
 - declare own grid listener
 ```
@@ -169,3 +277,18 @@ my_bundle.event_listener.my_grid_listener:
 - as an example see:
     - Oro/Bundle/UserBundle/Resources/config/datagrid.yml (owner-users-select-grid)
     - Oro/Bundle/UserBundle/EventListener/OwnerUserGridListener.php (service name: "oro_user.event_listener.owner_user_grid_listener")
+
+#### Problem:
+*I want to have a grid secured by ACL resource but skip applying of ACL to DQL query of the grid.*
+#### Solution:
+- configure grid with option 'skip_acl_apply' set to TRUE, it will ignore applying of ACL to source query of the grid
+- configure grid with option 'acl_resource' set to name of some ACL resource, it will check permission to this ACL resouce before datagrid data will be loaded 
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        acl_resource: 'acme_demo_entity_view'
+        source:
+            skip_acl_apply: true
+            
+```

@@ -1,4 +1,24 @@
 {% macro calendar_event_view_template(id) %}
+
+<script type="text/template" id="activity-context-activity-list">
+    <div class="context-item" style="border: none" data-cid="<%= entity.cid %>">
+        <span data-id="<%= entity.get('targetId') %>">
+            <span class="<%= entity.get('icon') %>"></span>
+
+            <% if (entity.get('link')) { %>
+                <a href="<%= entity.get('link') %>">
+                    <span class="context-label"><%= entity.get('title') %></span>
+                </a>
+            <% } else { %>
+                <span class="context-label"><%= entity.get('title') %></span>
+            <% } %>
+            <% if (editable) { %>
+                <i class="icon-remove"></i>
+            <% } %>
+        </span>
+    </div>
+</script>
+
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div class="widget-content">
@@ -9,6 +29,10 @@
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
+                <div class="activity-context-activity">
+                {{ UI.renderAttribute('oro.activity.contexts.label'|trans, '<div class="activity-context-activity-items"></div>') }}
+                </div>
+                {% placeholder calendar_event_widget_view_additional_properties %}
             </div>
             <div class="widget-actions form-actions" style="display: none;">
                 <% if (id != null && removable) { %>
@@ -26,6 +50,7 @@
                 <% if (id == null || (id != null && editable)) { %>
                 <button class="btn" type="button" data-action-name="edit">{{ 'oro.ui.edit'|trans }}</button>
                 <% } %>
+                {% placeholder calendar_event_widget_view_actions_jstemplate %}
             </div>
         </div>
     </div>
@@ -49,6 +74,9 @@
             form_row(form.notifyInvitedUsers)
         ]
     %}
+    {% for child in form.children if child.vars.extra_field is defined and child.vars.extra_field %}
+        {% set data = data|merge([form_row(child)]) %}
+    {% endfor %}
     <div class="widget-content">
         <div class="alert alert-error" style="display: none;"></div>
         <form id="{{ form.vars.id }}" name="{{ form.vars.name }}" action="#">

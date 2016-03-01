@@ -10,6 +10,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages;
  */
 abstract class AbstractPageFilteredGrid extends AbstractPageGrid
 {
+    use FilteredGridTrait;
     /**
      * Remove filter
      *
@@ -20,7 +21,7 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
     {
         $this->test->byXPath(
             "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "[a[contains(.,'{$filterName}')]]/a[contains(., 'Close')]"
+            . "[*[contains(@class,'filter-criteria-selector')][contains(.,'{$filterName}')]]/a[contains(., 'Close')]"
         )->click();
         $this->waitForAjax();
         return $this;
@@ -35,13 +36,12 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
     public function addFilter($filterName)
     {
         $addFilter = $this->test->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//button//a[@id='add-filter-button']"
+            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//button//a[@class='add-filter-button']"
         );
         //expand filter list
         $addFilter->click();
         $filter = $this->test->byXPath(
-            "{$this->filtersPath}//input[@title[normalize-space(.)='{$filterName}']]" .
-            "[@name='multiselect_add-filter-select']"
+            "{$this->filtersPath}//input[@title[normalize-space(.)='{$filterName}']][@type='checkbox']"
         );
         if (!$filter->selected()) {
             $filter->click();
@@ -49,45 +49,6 @@ abstract class AbstractPageFilteredGrid extends AbstractPageGrid
         $this->waitForAjax();
         //hide filter list
         $addFilter->click();
-        $this->waitForAjax();
-        return $this;
-    }
-
-    /**
-     * Apply specific filter for current grid
-     *
-     * @param string $filterName
-     * @param string $value
-     * @param string $condition
-     * @return $this
-     */
-    public function filterBy($filterName, $value = '', $condition = '')
-    {
-        $this->test->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "/a[contains(.,'{$filterName}')]"
-        )->click();
-
-        $criteria = $this->test->byXPath(
-            "{$this->filtersPath}//div[contains(@class, 'filter-box')]//div[contains(@class, 'filter-item')]"
-            . "[a[contains(.,'{$filterName}')]]/div[contains(@class, 'filter-criteria')]"
-        );
-        $input = $criteria->element($this->test->using('xpath')->value("div/div/input[@name='value']"));
-
-        $input->clear();
-        $input->value($value);
-
-        //select criteria
-        if ($condition != '') {
-            //expand condition list
-            $criteria->element($this->test->using('xpath')->value("div/div/button[@class ='btn dropdown-toggle']"))
-                ->click();
-
-            $criteria->element($this->test->using('xpath')->value("div/div/ul/li/a[text()='{$condition}']"))
-                ->click();
-        }
-        $criteria->element($this->test->using('xpath')->value("div/div/button[contains(@class, 'filter-update')]"))
-            ->click();
         $this->waitForAjax();
         return $this;
     }

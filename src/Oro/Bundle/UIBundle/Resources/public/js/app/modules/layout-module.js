@@ -1,8 +1,7 @@
-/*global require*/
 require([
     'oroui/js/mediator',
     'oroui/js/app/controllers/base/controller'
-], function (mediator, BaseController) {
+], function(mediator, BaseController) {
     'use strict';
 
     /**
@@ -10,7 +9,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oroui/js/layout'
-    ], function (layout) {
+    ], function(layout) {
         mediator.setHandler('layout:init', layout.init, layout);
         mediator.setHandler('layout:dispose', layout.unstyleForm, layout);
         mediator.setHandler('layout:getPreferredLayout', layout.getPreferredLayout, layout);

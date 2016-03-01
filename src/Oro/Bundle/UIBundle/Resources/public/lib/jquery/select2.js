@@ -40,7 +40,6 @@ the specific language governing permissions and limitations under the Apache Lic
 
 (function ($, undefined) {
     "use strict";
-    /*global document, window, jQuery, console */
 
     if (window.Select2 !== undefined) {
         return;
@@ -2945,7 +2944,7 @@ the specific language governing permissions and limitations under the Apache Lic
                     self.updateSelection(data);
                     self.clearSearch();
                     if (triggerChange) {
-                        self.triggerChange(this.buildChangeDetails(oldData, this.data()));
+                        self.triggerChange(self.buildChangeDetails(oldData, self.data()));
                     }
                 });
             }

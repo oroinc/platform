@@ -1,7 +1,5 @@
-/*jslint nomen: true, vars: true*/
-/*global define, requirejs*/
 
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var $ = require('jquery');
@@ -28,7 +26,7 @@ define(function (require) {
             sidebar: null
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             options.content = _.template(widgetAddTemplate)({
                 'availableWidgets': options.sidebar.getAvailableWidgets()
@@ -38,7 +36,7 @@ define(function (require) {
             Modal.prototype.initialize.apply(this, arguments);
         },
 
-        open: function () {
+        open: function() {
             var view = this;
             var position = this.options.sidebar.getPosition();
 
@@ -47,12 +45,12 @@ define(function (require) {
             var selected = null;
 
             view.$el.find('ol').selectable({
-                selected: function (event, ui) {
+                selected: function(event, ui) {
                     selected = ui.selected;
                 }
             });
 
-            view.once('ok', function () {
+            view.once('ok', function() {
                 if (!selected) {
                     view.close();
                     return;
@@ -70,14 +68,11 @@ define(function (require) {
                     placement = 'right';
                 }
 
-                var widget = new WidgetContainerModel({
+                var widget = new WidgetContainerModel(_.extend({}, widgetData, {
                     widgetName: widgetName,
                     position: widgets.length,
                     placement: placement
-                });
-                widget.update(widgetData);
-                widget.set('settings', $.extend(true, {}, widgetData.settings));
-
+                }));
                 widgets.push(widget);
 
                 widget.save();

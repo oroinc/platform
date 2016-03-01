@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\OptionsResolver\Options;
+use Doctrine\Common\Inflector\Inflector;
+
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\EntityBundle\Form\Type\EntityChoiceType;
-use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 use Oro\Bundle\WorkflowBundle\Form\Type\ApplicableEntitiesType;
 
 class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
@@ -63,11 +64,6 @@ class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $notExtendedClass = 'NotExtendedClass';
         $notConfigurableClass = 'NotConfigurableClass';
 
-        $workflowAwareItem = new ChoiceListItem($workflowAwareClass);
-        $extendedItem = new ChoiceListItem($extendedClass);
-        $notExtendedItem = new ChoiceListItem($notExtendedClass);
-        $notConfigurableItem = new ChoiceListItem($notConfigurableClass);
-
         // asserts
         $this->entityConnector->expects($this->any())->method('isWorkflowAware')
             ->will(
@@ -86,7 +82,9 @@ class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
         $notExtendedEntityConfig->expects($this->any())->method('is')->with('is_extend')
             ->will($this->returnValue(false));
 
-        $extendConfigProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $hasConfigMap = array(
             array($workflowAwareClass, null, false),
             array($extendedClass, null, true),
@@ -106,32 +104,21 @@ class ApplicableEntitiesTypeTest extends AbstractWorkflowAttributesTypeTestCase
             ->will($this->returnValue($extendConfigProvider));
 
         // test
-        $inputClasses = array(
-            $workflowAwareClass => $workflowAwareItem,
-            $extendedClass => $extendedItem,
-            $notExtendedClass => $notExtendedItem,
-            $notConfigurableClass => $notConfigurableItem,
+        $inputChoices = array(
+            $workflowAwareClass => Inflector::tableize($workflowAwareClass),
+            $extendedClass => Inflector::tableize($extendedClass),
+            $notExtendedClass => Inflector::tableize($notExtendedClass),
+            $notConfigurableClass => Inflector::tableize($notConfigurableClass)
         );
-        $expectedClasses = array(
-            $workflowAwareClass => $workflowAwareItem,
-            $extendedClass => $extendedItem,
+        $expectedChoices = array(
+            $workflowAwareClass => Inflector::tableize($workflowAwareClass),
+            $extendedClass => Inflector::tableize($extendedClass)
         );
 
-        $resolver = $this->getMock('Symfony\Component\OptionsResolver\OptionsResolverInterface');
-        $resolver->expects($this->once())->method('setNormalizers')
-            ->will(
-                $this->returnCallback(
-                    function (array $normalizers) use ($inputClasses, $expectedClasses) {
-                        $this->assertCount(1, $normalizers);
-                        $this->assertArrayHasKey('choices', $normalizers);
-                        $this->assertTrue(is_callable($normalizers['choices']), 'Choices normalizer is not callable');
-                        $this->assertEquals(
-                            $expectedClasses,
-                            call_user_func($normalizers['choices'], new Options(), $inputClasses)
-                        );
-                    }
-                )
-            );
+        $resolver = new OptionsResolver();
+        $resolver->setDefaults(array('choices' => $inputChoices));
         $this->formType->setDefaultOptions($resolver);
+        $result = $resolver->resolve(array());
+        $this->assertEquals($expectedChoices, $result['choices']);
     }
 }

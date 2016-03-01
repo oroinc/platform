@@ -8,15 +8,11 @@ use Symfony\Bundle\FrameworkBundle\Templating\DelegatingEngine;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ConfigBundle\Manager\UserConfigManager;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\TagBundle\Entity\TagManager;
-use Oro\Bundle\TagBundle\Form\Handler\TagHandlerInterface;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
@@ -27,13 +23,10 @@ use Oro\Bundle\UserBundle\Entity\UserManager;
  *
  * @SuppressWarnings(PHPMD.ExcessiveParameterList)
  */
-class UserHandler extends AbstractUserHandler implements TagHandlerInterface
+class UserHandler extends AbstractUserHandler
 {
     /** @var DelegatingEngine */
     protected $templating;
-
-    /** ConfigManager */
-    protected $cm;
 
     /** @var \Swift_Mailer */
     protected $mailer;
@@ -41,61 +34,53 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     /** @var FlashBagInterface */
     protected $flashBag;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var LoggerInterface */
     protected $logger;
 
-    /** @var TagManager */
-    protected $tagManager;
-
     /** @var BusinessUnitManager */
     protected $businessUnitManager;
 
-    /** @var UserConfigManager */
+    /** @var ConfigManager */
     protected $userConfigManager;
 
     /** @var SecurityFacade */
     protected $securityFacade;
 
     /**
-     * @param FormInterface     $form
-     * @param Request           $request
-     * @param UserManager       $manager
-     * @param UserConfigManager $userConfigManager
-     * @param ConfigManager     $cm
-     * @param DelegatingEngine  $templating
-     * @param \Swift_Mailer     $mailer
+     * @param FormInterface $form
+     * @param Request $request
+     * @param UserManager $manager
+     * @param ConfigManager $userConfigManager
+     * @param DelegatingEngine $templating
+     * @param \Swift_Mailer $mailer
      * @param FlashBagInterface $flashBag
-     * @param Translator        $translator
-     * @param LoggerInterface   $logger
-     * @param ServiceLink       $serviceLink
+     * @param TranslatorInterface $translator
+     * @param LoggerInterface $logger
+     * @param SecurityFacade $securityFacade
      */
     public function __construct(
-        FormInterface     $form,
-        Request           $request,
-        UserManager       $manager,
-        UserConfigManager $userConfigManager = null,
-        ConfigManager     $cm = null,
-        DelegatingEngine  $templating = null,
-        \Swift_Mailer     $mailer = null,
+        FormInterface $form,
+        Request $request,
+        UserManager $manager,
+        ConfigManager $userConfigManager = null,
+        DelegatingEngine $templating = null,
+        \Swift_Mailer $mailer = null,
         FlashBagInterface $flashBag = null,
-        Translator        $translator = null,
-        LoggerInterface   $logger = null,
-        ServiceLink       $serviceLink = null
+        TranslatorInterface $translator = null,
+        LoggerInterface $logger = null,
+        SecurityFacade $securityFacade = null
     ) {
         parent::__construct($form, $request, $manager);
         $this->userConfigManager = $userConfigManager;
-        $this->templating        = $templating;
-        $this->cm                = $cm;
-        $this->mailer            = $mailer;
-        $this->flashBag          = $flashBag;
-        $this->translator        = $translator;
-        $this->logger            = $logger;
-        if ($serviceLink !== null) {
-            $this->securityFacade = $serviceLink->getService();
-        }
+        $this->templating = $templating;
+        $this->mailer = $mailer;
+        $this->flashBag = $flashBag;
+        $this->translator = $translator;
+        $this->logger = $logger;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -122,14 +107,6 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function setTagManager(TagManager $tagManager)
-    {
-        $this->tagManager = $tagManager;
-    }
-
-    /**
      * @param BusinessUnitManager $businessUnitManager
      */
     public function setBusinessUnitManager(BusinessUnitManager $businessUnitManager)
@@ -143,7 +120,6 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
     protected function onSuccess(User $user)
     {
         $this->manager->updateUser($user);
-        $this->tagManager->saveTagging($user);
 
         if ($this->form->has('inviteUser')
             && $this->form->has('plainPassword')
@@ -164,27 +140,35 @@ class UserHandler extends AbstractUserHandler implements TagHandlerInterface
         // Reloads the user to reset its username. This is needed when the
         // username or password have been changed to avoid issues with the
         // security layer.
+        // Additional checking for userConfigManager !== null is added because of API
+        // to avoid "Call to a member function on a non-object".
         $this->manager->reloadUser($user);
-        if ($this->form->has('signature')) {
-            $this->userConfigManager->saveUserConfigSignature($this->form->get('signature')->getData());
+        if ($this->form->has('signature') && $this->userConfigManager !== null) {
+            $signature = $this->form->get('signature')->getData();
+            if ($signature) {
+                $this->userConfigManager->set('oro_email.signature', $signature);
+            } else {
+                $this->userConfigManager->reset('oro_email.signature');
+            }
+            $this->userConfigManager->flush();
         }
     }
 
     /**
      * Send invite email to new user
      *
-     * @param User   $user
+     * @param User $user
      * @param string $plainPassword
      *
      * @throws \RuntimeException
      */
     protected function sendInviteMail(User $user, $plainPassword)
     {
-        if (in_array(null, [$this->cm, $this->mailer, $this->templating], true)) {
+        if (in_array(null, [$this->userConfigManager, $this->mailer, $this->templating], true)) {
             throw new \RuntimeException('Unable to send invitation email, unmet dependencies detected.');
         }
-        $senderEmail = $this->cm->get('oro_notification.email_notification_sender_email');
-        $senderName  = $this->cm->get('oro_notification.email_notification_sender_name');
+        $senderEmail = $this->userConfigManager->get('oro_notification.email_notification_sender_email');
+        $senderName = $this->userConfigManager->get('oro_notification.email_notification_sender_name');
 
         $message = \Swift_Message::newInstance()
             ->setSubject('Invite user')

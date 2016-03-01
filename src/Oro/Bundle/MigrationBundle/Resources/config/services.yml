@@ -7,10 +7,9 @@ parameters:
     oro_migration.migration.pre_up.listener.class:       Oro\Bundle\MigrationBundle\EventListener\PreUpMigrationListener
     oro_migration.migrations.extension_manager.class:    Oro\Bundle\MigrationBundle\Migration\MigrationExtensionManager
     oro_migration.migration.extension.rename.class:      Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
-    oro_migration.listener.release_data_fixture.class:   Oro\Bundle\MigrationBundle\EventListener\ReleaseDataFixtureListener
     oro_migration.tools.schema_dumper.class:             Oro\Bundle\MigrationBundle\Tools\SchemaDumper
     oro_migration.twig.schema_dumper.class:              Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension
-    oro_migration.migration.extension.data_strore.class: Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension
+    oro_migration.migration.extension.data_storage.class: Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension
 services:
     oro_migration.db_id_name_generator:
         class: %oro_migration.db_id_name_generator.class%
@@ -44,18 +43,8 @@ services:
 
     oro_migration.migration.pre_up.listener:
         class: %oro_migration.migration.pre_up.listener.class%
-        arguments:
-            - @kernel
         tags:
             - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
-
-    oro_migration.listener.release_data_fixture:
-        class: %oro_migration.listener.release_data_fixture.class%
-        arguments:
-            - @kernel
-        tags:
-            - { name: kernel.event_listener, event: oro_migration.pre_up, method: onPreUp }
-            - { name: kernel.event_listener, event: oro_migration.post_up, method: onPostUp }
 
     oro_migration.migrations.extension_manager:
         class: %oro_migration.migrations.extension_manager.class%
@@ -65,8 +54,8 @@ services:
         tags:
             - { name: oro_migration.extension, extension_name: rename }
 
-    oro_migration.migration.extension.data_strore:
-        class: %oro_migration.migration.extension.data_strore.class%
+    oro_migration.migration.extension.data_storage:
+        class: %oro_migration.migration.extension.data_storage.class%
         tags:
             - { name: oro_migration.extension, extension_name: data_store }
 
@@ -82,3 +71,8 @@ services:
             - @doctrine
         tags:
             - { name: twig.extension }
+
+    oro_migration.listener.console_command_listener:
+        class: Oro\Bundle\MigrationBundle\EventListener\ConsoleCommandListener
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }

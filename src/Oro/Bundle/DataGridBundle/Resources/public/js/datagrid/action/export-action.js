@@ -1,10 +1,8 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     './abstract-action'
-], function ($, _, AbstractAction) {
+], function($, _, AbstractAction) {
     'use strict';
 
     var ExportAction;
@@ -24,7 +22,7 @@ define([
         /**
          * {@inheritdoc}
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.launcherOptions = {
                 runAction: false
             };
@@ -40,12 +38,12 @@ define([
         /**
          * {@inheritdoc}
          */
-        createLauncher: function (options) {
+        createLauncher: function(options) {
             var launcher = ExportAction.__super__.createLauncher.apply(this, arguments);
             // update 'href' attribute for each export type
-            this.listenTo(launcher, 'expand', function (launcher) {
+            this.listenTo(launcher, 'expand', function(launcher) {
                 var fetchData = this.collection.getFetchData();
-                _.each(launcher.$el.find('.dropdown-menu a'), function (el) {
+                _.each(launcher.$el.find('.dropdown-menu a'), function(el) {
                     var $el = $(el);
                     $el.attr('href', this.getLink(_.extend({format: $el.data('key')}, fetchData)));
                 }, this);

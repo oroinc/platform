@@ -38,8 +38,8 @@ class CustomEntity extends AbstractPageEntity
     {
         $relation = $this->test->select(
             $this->test->byXPath(
-                "//div[@class='control-group extend-rel-target-field']/label[normalize-space(text())=" .
-                "'{$data}']/following-sibling::div/select"
+                "//div[contains(@class,'control-group') and contains(@class,'extend-rel-target-field')]"
+                . "[div/label[normalize-space(text())='{$data}']]/div/select"
             )
         );
         foreach ($fields as $field) {
@@ -55,8 +55,8 @@ class CustomEntity extends AbstractPageEntity
     public function addRelation($fieldName)
     {
         $this->test->byXPath(
-            "//div[@class='control-group']/label[normalize-space(text()) = " .
-            "'{$fieldName}']/following-sibling::div//button[@class='btn btn-medium add-btn']"
+            "//div[contains(@class,'control-group')][div/label[normalize-space(text()) = '{$fieldName}']]" .
+            "/div//button[@class='btn btn-medium add-btn']"
         )->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
@@ -97,8 +97,7 @@ class CustomEntity extends AbstractPageEntity
     public function setStringField($fieldName, $value)
     {
         $field = $this->test->byXPath(
-            "//div[@class='control-group']/label[normalize-space(text()) = '{$fieldName}']" .
-            "/following-sibling::div/input"
+            "//div[contains(@class,'control-group')][div/label[normalize-space(text()) = '{$fieldName}']]/div/input"
         );
         $field->clear();
         $field->value($value);
@@ -120,7 +119,9 @@ class CustomEntity extends AbstractPageEntity
             $field->clear();
             $field->value($option);
             if ($flag < count($options)-1) {
-                $this->test->byXPath("//div[@class='control-group']//a[normalize-space(text()) = 'Add']")->click();
+                $this->test->byXPath(
+                    "//div[contains(@class,'control-group-collection')]//a[normalize-space(text()) = 'Add']"
+                )->click();
                 $this->waitForAjax();
                 $flag++;
             }

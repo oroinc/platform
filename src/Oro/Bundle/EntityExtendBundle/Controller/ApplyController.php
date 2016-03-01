@@ -36,7 +36,7 @@ class ApplyController extends Controller
         /** @var EntityProcessor $entityProcessor */
         $entityProcessor = $this->get('oro_entity_extend.extend.entity_processor');
 
-        if (!$entityProcessor->updateDatabase(true)) {
+        if (!$entityProcessor->updateDatabase(true, true)) {
             throw new HttpException(500, 'Update failed');
         }
 

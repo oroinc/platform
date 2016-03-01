@@ -1,15 +1,14 @@
 <?php
 
-namespace Oro\Bundle\OrganizationBundle\Tests\Form\EventListener;
+namespace Oro\Bundle\OrganizationBundle\Tests\Unit\Form\EventListener;
 
-use Oro\Bundle\TagBundle\Entity\Tag;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\OrganizationBundle\Form\EventListener\OwnerFormSubscriber;
+use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
@@ -17,7 +16,7 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $managerRegistry;
+    protected $doctrineHelper;
 
     /**
      * @var string
@@ -41,14 +40,15 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->getMockForAbstractClass();
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->defaultOwner = new User();
 
         $isAssignGranted = true;
         $this->subscriber = new OwnerFormSubscriber(
-            $this->managerRegistry,
+            $this->doctrineHelper,
             $this->fieldName,
             $this->fieldLabel,
             $isAssignGranted,
@@ -58,7 +58,7 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->managerRegistry);
+        unset($this->doctrineHelper);
         unset($this->defaultOwner);
         unset($this->subscriber);
     }
@@ -84,7 +84,7 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
         $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
         $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(false));
-        $this->managerRegistry->expects($this->never())->method('getManagerForClass');
+        $this->doctrineHelper->expects($this->never())->method('isManageableEntity');
 
         $event = new FormEvent($form, new \DateTime());
         $this->subscriber->postSetData($event);
@@ -95,7 +95,7 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
         $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
         $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(true));
-        $this->managerRegistry->expects($this->never())->method('getManagerForClass');
+        $this->doctrineHelper->expects($this->never())->method('isManageableEntity');
 
         $event = new FormEvent($form, array(1, 2, 3));
         $this->subscriber->postSetData($event);
@@ -108,8 +108,8 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')->disableOriginalConstructor()->getMock();
         $form->expects($this->once())->method('getParent')->will($this->returnValue(false));
         $form->expects($this->once())->method('has')->with($this->fieldName)->will($this->returnValue(true));
-        $this->managerRegistry->expects($this->once())->method('getManagerForClass')
-            ->with(get_class($data))->will($this->returnValue(null));
+        $this->doctrineHelper->expects($this->once())->method('isManageableEntity')
+            ->with(get_class($data))->will($this->returnValue(false));
 
         $event = new FormEvent($form, $data);
         $this->subscriber->postSetData($event);
@@ -161,7 +161,7 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
 
         $isAssignGranted = false;
         $this->subscriber = new OwnerFormSubscriber(
-            $this->managerRegistry,
+            $this->doctrineHelper,
             $this->fieldName,
             $this->fieldLabel,
             $isAssignGranted, // assign is not granted
@@ -183,7 +183,9 @@ class OwnerFormSubscriberTest extends \PHPUnit_Framework_TestCase
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')->disableOriginalConstructor()->getMock();
         $entityManager->expects($this->once())->method('getClassMetadata')
             ->with($entityClass)->will($this->returnValue($classMetadata));
-        $this->managerRegistry->expects($this->once())->method('getManagerForClass')
+        $this->doctrineHelper->expects($this->once())->method('isManageableEntity')
+            ->with($entityClass)->will($this->returnValue(true));
+        $this->doctrineHelper->expects($this->once())->method('getEntityManager')
             ->with($entityClass)->will($this->returnValue($entityManager));
     }
 

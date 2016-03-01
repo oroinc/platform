@@ -8,7 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * The aim of this class is to help getting an email address from an object.
@@ -20,7 +20,7 @@ class EmailHolderHelper
 {
     const GET_EMAIL_METHOD = 'getEmail';
 
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $extendConfigProvider;
 
     /**
@@ -34,9 +34,9 @@ class EmailHolderHelper
     protected $sortedTargetEntities;
 
     /**
-     * @param ConfigProviderInterface $extendConfigProvider
+     * @param ConfigProvider $extendConfigProvider
      */
-    public function __construct(ConfigProviderInterface $extendConfigProvider)
+    public function __construct(ConfigProvider $extendConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;
     }

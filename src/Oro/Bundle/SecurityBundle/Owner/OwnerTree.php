@@ -6,7 +6,7 @@ namespace Oro\Bundle\SecurityBundle\Owner;
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * This class represents a tree of owners
  */
-class OwnerTree
+class OwnerTree implements OwnerTreeInterface
 {
     /**
      * An associative array to store owning organization of an user
@@ -109,9 +109,6 @@ class OwnerTree
      */
     protected $organizationUserIds;
 
-    /**
-     * Constructor
-     */
     public function __construct()
     {
         $this->clear();
@@ -138,7 +135,7 @@ class OwnerTree
     /**
      * Gets the owning organization id for the given user id
      *
-     * @param  int|string      $userId
+     * @param  int|string $userId
      * @return int|string|null
      */
     public function getUserOrganizationId($userId)
@@ -151,20 +148,20 @@ class OwnerTree
     /**
      * Gets all organization ids assigned to the given user id
      *
-     * @param  int|string      $userId
+     * @param  int|string $userId
      * @return int|string|null
      */
     public function getUserOrganizationIds($userId)
     {
         return isset($this->userOrganizationIds[$userId])
             ? $this->userOrganizationIds[$userId]
-            : array();
+            : [];
     }
 
     /**
      * Gets the owning business unit id for the given user id
      *
-     * @param  int|string      $userId
+     * @param  int|string $userId
      * @return int|string|null
      */
     public function getUserBusinessUnitId($userId)
@@ -186,12 +183,12 @@ class OwnerTree
         if ($organizationId) {
             return isset($this->userOrganizationBusinessUnitIds[$userId][$organizationId])
                 ? $this->userOrganizationBusinessUnitIds[$userId][$organizationId]
-                : array();
+                : [];
         }
 
         return isset($this->userBusinessUnitIds[$userId])
             ? $this->userBusinessUnitIds[$userId]
-            : array();
+            : [];
     }
 
     /**
@@ -204,13 +201,13 @@ class OwnerTree
     {
         return isset($this->businessUnitUserIds[$businessUnitId])
             ? $this->businessUnitUserIds[$businessUnitId]
-            : array();
+            : [];
     }
 
     /**
      * Gets the owning organization id for the given business unit id
      *
-     * @param  int|string      $businessUnitId
+     * @param  int|string $businessUnitId
      * @return int|string|null
      */
     public function getBusinessUnitOrganizationId($businessUnitId)
@@ -230,7 +227,7 @@ class OwnerTree
     {
         return isset($this->organizationBusinessUnitIds[$organizationId])
             ? $this->organizationBusinessUnitIds[$organizationId]
-            : array();
+            : [];
     }
 
     /**
@@ -241,8 +238,9 @@ class OwnerTree
      */
     public function getOrganizationUserIds($organizationId)
     {
-        $result = array();
-        foreach ($this->getOrganizationBusinessUnitIds($organizationId) as $buId) {
+        $result = [];
+        $buIds  = $this->getOrganizationBusinessUnitIds($organizationId);
+        foreach ($buIds as $buId) {
             $userIds = $this->getBusinessUnitUserIds($buId);
             if (!empty($userIds)) {
                 $result = array_merge($result, $userIds);
@@ -262,19 +260,19 @@ class OwnerTree
     {
         return isset($this->subordinateBusinessUnitIds[$businessUnitId])
             ? $this->subordinateBusinessUnitIds[$businessUnitId]
-            : array();
+            : [];
     }
 
     /**
      * Gets all user business unit ids with subordinate business unit ids
      *
-     * @param  int         $userId
-     * @param  int|string  $organizationId
+     * @param  int        $userId
+     * @param  int|string $organizationId
      * @return array  of int|string
      */
     public function getUserSubordinateBusinessUnitIds($userId, $organizationId = null)
     {
-        $buIds = $this->getUserBusinessUnitIds($userId, $organizationId);
+        $buIds       = $this->getUserBusinessUnitIds($userId, $organizationId);
         $resultBuIds = array_merge($buIds, []);
         foreach ($buIds as $buId) {
             $diff = array_diff(
@@ -298,7 +296,8 @@ class OwnerTree
     public function getBusinessUnitsIdByUserOrganizations($userId)
     {
         $resultBuIds = [];
-        foreach ($this->getUserOrganizationIds($userId) as $orgId) {
+        $orgIds      = $this->getUserOrganizationIds($userId);
+        foreach ($orgIds as $orgId) {
             $buIds = $this->getOrganizationBusinessUnitIds($orgId);
             if (!empty($buIds)) {
                 $resultBuIds = array_merge($resultBuIds, $buIds);
@@ -313,23 +312,33 @@ class OwnerTree
      *
      * @param int|string      $businessUnitId
      * @param int|string|null $owningOrganizationId
+     *
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addLocalEntity method
      */
     public function addBusinessUnit($businessUnitId, $owningOrganizationId)
     {
-        $this->businessUnitOwningOrganizationId[$businessUnitId] = $owningOrganizationId;
+        $this->addLocalEntity($businessUnitId, $owningOrganizationId);
+    }
 
-        if ($owningOrganizationId !== null) {
-            if (!isset($this->organizationBusinessUnitIds[$owningOrganizationId])) {
-                $this->organizationBusinessUnitIds[$owningOrganizationId] = array();
+    /**
+     * {@inheritdoc}
+     */
+    public function addLocalEntity($localLevelEntityId, $globalLevelEntityId = null)
+    {
+        $this->businessUnitOwningOrganizationId[$localLevelEntityId] = $globalLevelEntityId;
+
+        if ($globalLevelEntityId !== null) {
+            if (!isset($this->organizationBusinessUnitIds[$globalLevelEntityId])) {
+                $this->organizationBusinessUnitIds[$globalLevelEntityId] = [];
             }
-            $this->organizationBusinessUnitIds[$owningOrganizationId][] = $businessUnitId;
+            $this->organizationBusinessUnitIds[$globalLevelEntityId][] = $localLevelEntityId;
         }
 
-        $this->businessUnitUserIds[$businessUnitId] = array();
+        $this->businessUnitUserIds[$localLevelEntityId] = [];
         foreach ($this->userOwningBusinessUnitId as $userId => $buId) {
-            if ($businessUnitId === $buId) {
-                $this->businessUnitUserIds[$businessUnitId][] = $userId;
-                $this->userOwningOrganizationId[$userId] = $owningOrganizationId;
+            if ($localLevelEntityId === $buId) {
+                $this->businessUnitUserIds[$localLevelEntityId][] = $userId;
+                $this->userOwningOrganizationId[$userId]          = $globalLevelEntityId;
             }
         }
     }
@@ -339,24 +348,68 @@ class OwnerTree
      *
      * @param int|string      $businessUnitId
      * @param int|string|null $parentBusinessUnitId
+     *
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addDeepEntity method
      */
     public function addBusinessUnitRelation($businessUnitId, $parentBusinessUnitId)
     {
-        if ($parentBusinessUnitId !== null) {
-            foreach ($this->subordinateBusinessUnitIds as $key => $val) {
-                if (in_array($parentBusinessUnitId, $val, true)) {
-                    $this->subordinateBusinessUnitIds[$key][] = $businessUnitId;
-                }
+        $this->addDeepEntity($businessUnitId, $parentBusinessUnitId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addDeepEntity($localLevelEntityId, $deepLevelEntityId)
+    {
+        if ($deepLevelEntityId !== null) {
+            if (!isset($this->subordinateBusinessUnitIds[$deepLevelEntityId])) {
+                $this->subordinateBusinessUnitIds[$deepLevelEntityId] = [];
             }
-            if (!isset($this->subordinateBusinessUnitIds[$parentBusinessUnitId])) {
-                $this->subordinateBusinessUnitIds[$parentBusinessUnitId] = array();
-            }
-            $this->subordinateBusinessUnitIds[$parentBusinessUnitId][] = $businessUnitId;
+            $this->subordinateBusinessUnitIds[$deepLevelEntityId][] = $localLevelEntityId;
         }
 
-        if (!isset($this->subordinateBusinessUnitIds[$businessUnitId])) {
-            $this->subordinateBusinessUnitIds[$businessUnitId] = array();
+        if (!isset($this->subordinateBusinessUnitIds[$localLevelEntityId])) {
+            $this->subordinateBusinessUnitIds[$localLevelEntityId] = [];
         }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function buildTree()
+    {
+        $subordinateBusinessUnitIds = $this->subordinateBusinessUnitIds;
+        foreach ($subordinateBusinessUnitIds as &$deepLevelEntityIds) {
+            if (!empty($deepLevelEntityIds)) {
+                /**
+                 * We have to add some element to the end of array and remove it after processing,
+                 * otherwise the last element of the original array will not be processed.
+                 */
+                $deepLevelEntityIds[] = 'EndOfArray';
+                foreach ($deepLevelEntityIds as $position => $deepLevelEntityId) {
+                    if ($deepLevelEntityId === 'EndOfArray') {
+                        $deepLevelEntityIds = array_slice($deepLevelEntityIds, 0, -1);
+                        break;
+                    }
+                    if (!empty($subordinateBusinessUnitIds[$deepLevelEntityId])) {
+                        $diff = array_diff(
+                            $subordinateBusinessUnitIds[$deepLevelEntityId],
+                            $deepLevelEntityIds
+                        );
+                        if ($diff) {
+                            array_splice(
+                                $deepLevelEntityIds,
+                                $position,
+                                1,
+                                array_merge([$deepLevelEntityId], $diff)
+                            );
+                        }
+                    }
+                }
+            }
+        }
+
+        $this->subordinateBusinessUnitIds = $subordinateBusinessUnitIds;
     }
 
     /**
@@ -364,30 +417,40 @@ class OwnerTree
      *
      * @param int|string      $userId
      * @param int|string|null $owningBusinessUnitId
+     *
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addBasicEntity method
      */
     public function addUser($userId, $owningBusinessUnitId)
     {
-        $this->userOwningBusinessUnitId[$userId] = $owningBusinessUnitId;
+        $this->addBasicEntity($userId, $owningBusinessUnitId);
+    }
 
-        if ($owningBusinessUnitId !== null) {
-            if (isset($this->businessUnitUserIds[$owningBusinessUnitId])) {
-                $this->businessUnitUserIds[$owningBusinessUnitId][] = $userId;
+    /**
+     * {@inheritdoc}
+     */
+    public function addBasicEntity($basicLevelEntityId, $localLevelEntityId = null)
+    {
+        $this->userOwningBusinessUnitId[$basicLevelEntityId] = $localLevelEntityId;
+
+        if ($localLevelEntityId !== null) {
+            if (isset($this->businessUnitUserIds[$localLevelEntityId])) {
+                $this->businessUnitUserIds[$localLevelEntityId][] = $basicLevelEntityId;
             }
 
-            $this->userOrganizationIds[$userId] = array();
-            if (isset($this->businessUnitOwningOrganizationId[$owningBusinessUnitId])) {
-                $this->userOwningOrganizationId[$userId] =
-                    $this->businessUnitOwningOrganizationId[$owningBusinessUnitId];
+            $this->userOrganizationIds[$basicLevelEntityId] = [];
+            if (isset($this->businessUnitOwningOrganizationId[$localLevelEntityId])) {
+                $this->userOwningOrganizationId[$basicLevelEntityId] =
+                    $this->businessUnitOwningOrganizationId[$localLevelEntityId];
             } else {
-                $this->userOwningOrganizationId[$userId] = null;
+                $this->userOwningOrganizationId[$basicLevelEntityId] = null;
             }
         } else {
-            $this->userOwningOrganizationId[$userId] = null;
-            $this->userOrganizationIds[$userId] = array();
+            $this->userOwningOrganizationId[$basicLevelEntityId] = null;
+            $this->userOrganizationIds[$basicLevelEntityId]      = [];
         }
 
-        $this->userBusinessUnitIds[$userId] = array();
-        $this->userOrganizationBusinessUnitIds[$userId] = array();
+        $this->userBusinessUnitIds[$basicLevelEntityId]             = [];
+        $this->userOrganizationBusinessUnitIds[$basicLevelEntityId] = [];
     }
 
     /**
@@ -398,32 +461,48 @@ class OwnerTree
     {
         return isset($this->assignedBusinessUnitUserIds[$buId])
             ? $this->assignedBusinessUnitUserIds[$buId]
-            : array();
+            : [];
     }
 
     /**
      * Add a business unit to the given user
      *
-     * @param  int|string $userId
+     * @param  int|string      $userId
      * @param  int|string|null $organizationId
-     * @param  int|string $businessUnitId
+     * @param  int|string      $businessUnitId
      * @throws \LogicException
+     *
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addLocalEntityToBasic method
      */
     public function addUserBusinessUnit($userId, $organizationId, $businessUnitId)
     {
-        if (!isset($this->userOrganizationBusinessUnitIds[$userId]) || !isset($this->userBusinessUnitIds[$userId])) {
-            throw new \LogicException(sprintf('First call addUser for userId: %s.', (string)$userId));
+        $this->addLocalEntityToBasic($userId, $businessUnitId, $organizationId);
+    }
+
+    /**
+     * Pay attention that now local level entity is second and global entity is third
+     *
+     * {@inheritdoc}
+     */
+    public function addLocalEntityToBasic($basicLevelEntityId, $localLevelEntityId, $globalLevelEntityId)
+    {
+        if (!isset($this->userOrganizationBusinessUnitIds[$basicLevelEntityId])
+            || !isset($this->userBusinessUnitIds[$basicLevelEntityId])
+        ) {
+            throw new \LogicException(
+                sprintf('First call OwnerTreeInterface::addBasicEntity for userId: %s.', (string) $basicLevelEntityId)
+            );
         }
-        if ($businessUnitId !== null) {
-            if (!isset($this->assignedBusinessUnitUserIds[$businessUnitId])) {
-                $this->assignedBusinessUnitUserIds[$businessUnitId] = [];
+        if ($localLevelEntityId !== null) {
+            if (!isset($this->assignedBusinessUnitUserIds[$localLevelEntityId])) {
+                $this->assignedBusinessUnitUserIds[$localLevelEntityId] = [];
             }
-            $this->assignedBusinessUnitUserIds[$businessUnitId][] = $userId;
-            $this->userBusinessUnitIds[$userId][] = $businessUnitId;
-            if (!isset($this->userOrganizationBusinessUnitIds[$userId][$organizationId])) {
-                $this->userOrganizationBusinessUnitIds[$userId][$organizationId] = [];
+            $this->assignedBusinessUnitUserIds[$localLevelEntityId][] = $basicLevelEntityId;
+            $this->userBusinessUnitIds[$basicLevelEntityId][]         = $localLevelEntityId;
+            if (!isset($this->userOrganizationBusinessUnitIds[$basicLevelEntityId][$globalLevelEntityId])) {
+                $this->userOrganizationBusinessUnitIds[$basicLevelEntityId][$globalLevelEntityId] = [];
             }
-            $this->userOrganizationBusinessUnitIds[$userId][$organizationId][] = $businessUnitId;
+            $this->userOrganizationBusinessUnitIds[$basicLevelEntityId][$globalLevelEntityId][] = $localLevelEntityId;
         }
     }
 
@@ -432,10 +511,20 @@ class OwnerTree
      *
      * @param int|string $userId
      * @param int|string $organizationId
+     *
+     * @deprecated 1.8.0:2.1.0 use OwnerTree::addGlobalEntity method
      */
     public function addUserOrganization($userId, $organizationId)
     {
-        $this->userOrganizationIds[$userId][] = $organizationId;
+        $this->addGlobalEntity($userId, $organizationId);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function addGlobalEntity($basicLevelEntityId, $globalLevelEntityId)
+    {
+        $this->userOrganizationIds[$basicLevelEntityId][] = $globalLevelEntityId;
     }
 
     /**
@@ -443,15 +532,15 @@ class OwnerTree
      */
     public function clear()
     {
-        $this->userOwningOrganizationId = array();
-        $this->businessUnitOwningOrganizationId = array();
-        $this->organizationBusinessUnitIds = array();
-        $this->userOwningBusinessUnitId = array();
-        $this->subordinateBusinessUnitIds = array();
-        $this->userOrganizationIds = array();
-        $this->userBusinessUnitIds = array();
-        $this->businessUnitUserIds = array();
-        $this->userOrganizationBusinessUnitIds = array();
-        $this->assignedBusinessUnitUserIds = array();
+        $this->userOwningOrganizationId         = [];
+        $this->businessUnitOwningOrganizationId = [];
+        $this->organizationBusinessUnitIds      = [];
+        $this->userOwningBusinessUnitId         = [];
+        $this->subordinateBusinessUnitIds       = [];
+        $this->userOrganizationIds              = [];
+        $this->userBusinessUnitIds              = [];
+        $this->businessUnitUserIds              = [];
+        $this->userOrganizationBusinessUnitIds  = [];
+        $this->assignedBusinessUnitUserIds      = [];
     }
 }

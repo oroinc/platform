@@ -5,6 +5,8 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler;
 
+use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+
 class ProcessFactory
 {
     /**
@@ -13,11 +15,18 @@ class ProcessFactory
     protected $actionAssembler;
 
     /**
-     * @param ActionAssembler $actionAssembler
+     * @var ConditionFactory
      */
-    public function __construct(ActionAssembler $actionAssembler)
+    protected $conditionFactory;
+
+    /**
+     * @param ActionAssembler $actionAssembler
+     * @param ConditionFactory $conditionFactory
+     */
+    public function __construct(ActionAssembler $actionAssembler, ConditionFactory $conditionFactory)
     {
         $this->actionAssembler = $actionAssembler;
+        $this->conditionFactory = $conditionFactory;
     }
 
     /**
@@ -28,6 +37,6 @@ class ProcessFactory
      */
     public function create(ProcessDefinition $processDefinition)
     {
-        return new Process($this->actionAssembler, $processDefinition);
+        return new Process($this->actionAssembler, $this->conditionFactory, $processDefinition);
     }
 }

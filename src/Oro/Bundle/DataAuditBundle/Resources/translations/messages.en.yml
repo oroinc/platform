@@ -4,6 +4,39 @@ oro:
         change_history:         "Change History"
         change_history.title:   "%item% change history"
 
+        action:
+            create: "Create"
+            update: "Update"
+            remove: "Remove"
+
+        auditfield:
+            entity_label:         Audit Field
+            entity_plural_label:  Audit Fields
+            data_type.label:      Data Type
+            field.label:          Field
+            id.label:             Id
+            new_array.label:      New Array
+            new_boolean.label:    New Boolean
+            new_date.label:       New Date
+            new_datetime.label:   New DateTime
+            new_datetimetz.label: New DateTime with timezone
+            new_float.label:      New Float
+            new_integer.label:    New Integer
+            new_object.label:     New Object
+            new_text.label:       New Text
+            new_time.label:       New Time
+            old_array.label:      Old Array
+            old_boolean.label:    Old Boolean
+            old_date.label:       Old Date
+            old_datetime.label:   Old DateTime
+            old_datetimetz.label: Old DateTime with timezone
+            old_float.label:      Old Float
+            old_integer.label:    Old Integer
+            old_object.label:     Old Object
+            old_text.label:       Old Text
+            old_time.label:       Old Time
+            visible.label:        Visible
+
         menu:
             audit_list.label:       "Data Audit"
             audit_list.description: "Data Audit"

@@ -1,18 +1,18 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     './base/bookmark-component',
     '../views/bookmark-button-view',
     'oroui/js/app/views/base/collection-view',
     '../views/bookmark-item-view'
-], function (_, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
+], function(_, BaseBookmarkComponent, ButtonView, CollectionView, ItemView) {
     'use strict';
 
     var FavoriteComponent;
 
     FavoriteComponent = BaseBookmarkComponent.extend({
-        _createSubViews: function () {
+        typeName: 'favorite',
+
+        _createSubViews: function() {
             this._createButtonView();
             this._createTabView();
         },
@@ -22,11 +22,9 @@ define([
          *
          * @protected
          */
-        _createButtonView: function () {
-            var options, collection;
-
-            options = this._options.buttonOptions || {};
-            collection = this.collection;
+        _createButtonView: function() {
+            var options = this._options.buttonOptions || {};
+            var collection = this.collection;
 
             _.extend(options, {
                 autoRender: true,
@@ -41,12 +39,10 @@ define([
          *
          * @protected
          */
-        _createTabView: function () {
-            var options, collection, TabItemView;
-
-            options = this._options.tabOptions || {};
-            collection = this.collection;
-            TabItemView = ItemView.extend({
+        _createTabView: function() {
+            var options = this._options.tabOptions || {};
+            var collection = this.collection;
+            var TabItemView = ItemView.extend({
                 template: this._options.tabItemTemplate
             });
 
@@ -59,8 +55,8 @@ define([
             this.tabs = new CollectionView(options);
         },
 
-        actualizeAttributes: function (model) {
-            model.set('type', 'favorite');
+        actualizeAttributes: function(model) {
+            model.set('type', this.typeName);
             model.set('position', this.collection.length);
 
             var url = model.get('url');

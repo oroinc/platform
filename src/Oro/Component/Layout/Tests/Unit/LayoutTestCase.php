@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Layout\Tests\Unit;
 
+use Oro\Component\Layout\ArrayCollection;
 use Oro\Component\Layout\BlockView;
 
 class LayoutTestCase extends \PHPUnit_Framework_TestCase
@@ -13,7 +14,15 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
      */
     protected function assertBlockView(array $expected, BlockView $actual, $ignoreAuxiliaryVariables = true)
     {
-        $this->completeView($expected);
+        $views = [];
+        $collectViews = function (BlockView $view) use (&$collectViews, &$views) {
+            $views[$view->vars['id']] = $view;
+            array_walk($view->children, $collectViews);
+        };
+        $collectViews($actual);
+        $views = new ArrayCollection($views);
+
+        $this->completeView($expected, ['blocks' => $views]);
         $actualArray = $this->convertBlockViewToArray($actual, $ignoreAuxiliaryVariables);
 
         // compare hierarchy
@@ -28,10 +37,11 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $view
+     * @param array $vars
      *
      * @return array
      */
-    protected function completeView(array &$view)
+    protected function completeView(array &$view, $vars)
     {
         if (!isset($view['vars'])) {
             $view['vars'] = [];
@@ -45,7 +55,15 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
         if (!isset($view['children'])) {
             $view['children'] = [];
         }
-        array_walk($view['children'], [$this, 'completeView']);
+        if (!isset($view['vars']['class_prefix'])) {
+            $view['vars']['class_prefix'] = null;
+        }
+
+        $view['vars'] = array_merge($vars, $view['vars']);
+
+        foreach ($view['children'] as &$child) {
+            $this->completeView($child, $vars);
+        }
     }
 
     /**
@@ -112,5 +130,27 @@ class LayoutTestCase extends \PHPUnit_Framework_TestCase
                 $this->buildViewHierarchy($result[$childId], $childView);
             }
         }
+    }
+
+    /**
+     * @param array $addViews
+     * @param bool $root
+     * @return array
+     */
+    protected function setLayoutBlocks($addViews, $root = true)
+    {
+        $views = $addViews;
+        foreach ($views as $view) {
+            $views = array_merge($views, $this->setLayoutBlocks($view->children, false));
+        }
+
+        if ($root) {
+            $viewsCollection = new ArrayCollection($views);
+            foreach ($views as $view) {
+                $view->blocks = $viewsCollection;
+            }
+        }
+
+        return $views;
     }
 }

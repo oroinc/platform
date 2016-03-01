@@ -303,4 +303,12 @@ class BaseCartItem
     {
         return $this->taxPercent;
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getName();
+    }
 }

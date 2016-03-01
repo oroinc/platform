@@ -4,29 +4,22 @@ namespace Oro\Bundle\AttachmentBundle\EntityConfig;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper;
 
+/**
+ * @deprecated since 1.9. Use {@see Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper} instead
+ */
 class AttachmentConfig
 {
-    /**
-     * @var ConfigProvider
-     */
-    protected $attachmentConfigProvider;
+    /** @var AttachmentAssociationHelper */
+    protected $attachmentAssociationHelper;
 
     /**
-     * @var ConfigProvider
+     * @param AttachmentAssociationHelper $attachmentAssociationHelper
      */
-    protected $entityConfigProvider;
-
-    /**
-     * @param ConfigProvider $attachmentConfigProvider
-     * @param ConfigProvider $entityConfigProvider
-     */
-    public function __construct(ConfigProvider $attachmentConfigProvider, ConfigProvider $entityConfigProvider)
+    public function __construct(AttachmentAssociationHelper $attachmentAssociationHelper)
     {
-        $this->attachmentConfigProvider = $attachmentConfigProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
+        $this->attachmentAssociationHelper = $attachmentAssociationHelper;
     }
 
     /**
@@ -34,21 +27,14 @@ class AttachmentConfig
      *
      * @param object $entity
      * @return bool
+     * @deprecated since 1.9. Use {@see Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper} instead
      */
     public function isAttachmentAssociationEnabled($entity)
     {
-        if (null === $entity || !is_object($entity)) {
+        if (!is_object($entity)) {
             return false;
         }
 
-        $className = ClassUtils::getClass($entity);
-
-        return
-            $this->attachmentConfigProvider->hasConfig($className)
-            && $this->attachmentConfigProvider->getConfig($className)->is('enabled')
-            && $this->entityConfigProvider->hasConfig(
-                AttachmentScope::ATTACHMENT,
-                ExtendHelper::buildAssociationName($className)
-            );
+        return $this->attachmentAssociationHelper->isAttachmentAssociationEnabled(ClassUtils::getClass($entity));
     }
 }

@@ -1,13 +1,11 @@
-/*global define*/
-define(['underscore', './cell-formatter', 'orolocale/js/formatter/number'
-    ], function (_, CellFormatter, formatter) {
+define(['underscore', 'orotranslation/js/translator', './cell-formatter', 'orolocale/js/formatter/number'
+    ], function(_, __, CellFormatter, formatter) {
     'use strict';
-
 
     function getFormatter(style) {
         var functionName = 'format' + style.charAt(0).toUpperCase() + style.slice(1);
         if (!_.isFunction(formatter[functionName])) {
-            throw new Error("Formatter doesn't support '" + style + "' number style");
+            throw new Error('Formatter doesn\'t support "' + style + '" number style');
         }
         return formatter[functionName];
     }
@@ -34,21 +32,23 @@ define(['underscore', './cell-formatter', 'orolocale/js/formatter/number'
         /**
          * @inheritDoc
          */
-        fromRaw: function (rawData) {
-            var formattedData = '';
-            if (rawData !== null && rawData !== '') {
-                formattedData = this.formatter.call(this, rawData);
+        fromRaw: function(rawData) {
+            if (rawData === void 0 || rawData === null || rawData === '') {
+                return '';
             }
-            return formattedData;
+            if (isNaN(rawData)) {
+                return __('oro.datagrid.not_number');
+            }
+            return this.formatter.call(this, rawData);
         },
 
         /**
          * @inheritDoc
          */
-        toRaw: function (formattedData) {
+        toRaw: function(formattedData) {
             var rawData = null;
             if (formattedData !== null && formattedData !== '') {
-                rawData = formatter.unformat(formattedData)
+                rawData = formatter.unformat(formattedData);
             }
             return rawData;
         }

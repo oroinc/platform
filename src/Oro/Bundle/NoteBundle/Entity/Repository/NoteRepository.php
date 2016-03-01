@@ -19,18 +19,10 @@ class NoteRepository extends EntityRepository
      */
     public function getAssociatedNotesQueryBuilder($entityClassName, $entityId, $page = null, $limit = null)
     {
-        $qb = $this->createQueryBuilder('note')
-            ->select('partial note.{id, message, owner, createdAt, updatedBy, updatedAt}, c, u')
-            ->innerJoin(
-                $entityClassName,
-                'e',
-                'WITH',
-                sprintf('note.%s = e', ExtendHelper::buildAssociationName($entityClassName))
-            )
+        $qb = $this->getBaseAssociatedNotesQB($entityClassName, $entityId);
+        $qb->select('partial note.{id, message, owner, createdAt, updatedBy, updatedAt}, c, u')
             ->leftJoin('note.owner', 'c')
-            ->leftJoin('note.updatedBy', 'u')
-            ->where('e.id = :entity_id')
-            ->setParameter('entity_id', $entityId);
+            ->leftJoin('note.updatedBy', 'u');
 
         if (null !== $page) {
             $qb->setFirstResult($this->getOffset($page) * $limit);
@@ -55,5 +47,25 @@ class NoteRepository extends EntityRepository
         }
 
         return $page;
+    }
+
+    /**
+     * @param $entityClassName
+     * @param $entityId
+     * @return QueryBuilder
+     */
+    public function getBaseAssociatedNotesQB($entityClassName, $entityId)
+    {
+        $ids = is_array($entityId) ? $entityId : [$entityId];
+        $queryBuilder = $this->createQueryBuilder('note')
+            ->innerJoin(
+                $entityClassName,
+                'e',
+                'WITH',
+                sprintf('note.%s = e', ExtendHelper::buildAssociationName($entityClassName))
+            );
+        $queryBuilder->where($queryBuilder->expr()->in('e.id', $ids));
+
+        return $queryBuilder;
     }
 }

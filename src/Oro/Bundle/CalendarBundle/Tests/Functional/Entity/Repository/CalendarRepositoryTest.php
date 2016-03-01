@@ -7,7 +7,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class CalendarRepositoryTest extends WebTestCase
 {

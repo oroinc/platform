@@ -43,10 +43,26 @@ config:
         'oroform/js/validator/notnull': 'bundles/oroform/js/validator/notnull.js'
         'oroform/js/validator/number': 'bundles/oroform/js/validator/number.js'
         'oroform/js/validator/range': 'bundles/oroform/js/validator/range.js'
+        'oroform/js/validator/open-range': 'bundles/oroform/js/validator/open-range.js'
         'oroform/js/validator/regex': 'bundles/oroform/js/validator/regex.js'
         'oroform/js/validator/repeated': 'bundles/oroform/js/validator/repeated.js'
         'oroform/js/validator/time': 'bundles/oroform/js/validator/time.js'
+        'oroform/js/validator/type': 'bundles/oroform/js/validator/type.js'
         'oroform/js/validator/url': 'bundles/oroform/js/validator/url.js'
+
+        #inline editing
+        'oroform/js/tools/frontend-type-map': 'bundles/oroform/js/tools/frontend-type-map.js'
+        'oroform/js/app/components/inline-editable-view-component': 'bundles/oroform/js/app/components/inline-editable-view-component.js'
+        'oroform/js/app/views/editor/text-editor-view': 'bundles/oroform/js/app/views/editor/text-editor-view.js'
+        'oroform/js/app/views/editor/date-editor-view': 'bundles/oroform/js/app/views/editor/date-editor-view.js'
+        'oroform/js/app/views/editor/datetime-editor-view': 'bundles/oroform/js/app/views/editor/datetime-editor-view.js'
+        'oroform/js/app/views/editor/number-editor-view': 'bundles/oroform/js/app/views/editor/number-editor-view.js'
+        'oroform/js/app/views/editor/percent-editor-view': 'bundles/oroform/js/app/views/editor/percent-editor-view.js'
+        'oroform/js/app/views/editor/related-id-relation-editor-view': 'bundles/oroform/js/app/views/editor/related-id-relation-editor-view.js'
+        'oroform/js/app/views/editor/related-id-select-editor-view': 'bundles/oroform/js/app/views/editor/related-id-select-editor-view.js'
+        'oroform/js/app/views/editor/select-editor-view': 'bundles/oroform/js/app/views/editor/select-editor-view.js'
+        'oroform/js/app/views/editor/abstract-relation-editor-view': 'bundles/oroform/js/app/views/editor/abstract-relation-editor-view.js'
+        'oroform/js/app/views/editor/multi-checkbox-editor-view': 'bundles/oroform/js/app/views/editor/multi-checkbox-editor-view.js'
 
         'oroform/js/formatter/field': 'bundles/oroform/js/formatter/field.js'
 
@@ -60,14 +76,17 @@ config:
         'oroform/js/optional-validation-handler': 'bundles/oroform/js/optional-validation-handler.js'
 
         'oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view': 'bundles/oroform/js/app/views/wysiwig-editor/wysiwyg-editor-view.js'
+        'oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view': 'bundles/oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view.js'
         'oroform/js/app/views/simple-color-picker-view': 'bundles/oroform/js/app/views/simple-color-picker-view.js'
         'oroform/js/app/views/simple-color-choice-view': 'bundles/oroform/js/app/views/simple-color-choice-view.js'
         'oroform/js/app/views/color-table-view': 'bundles/oroform/js/app/views/color-table-view.js'
         'oroform/js/app/views/datepair-view': 'bundles/oroform/js/app/views/datepair-view.js'
+        'oro/autocomplete-component': 'bundles/oroform/js/app/components/autocomplete-component.js'
         'oro/select2-component': 'bundles/oroform/js/app/components/select2-component.js'
         'oro/select2-autocomplete-component': 'bundles/oroform/js/app/components/select2-autocomplete-component.js'
         'oro/select2-relation-component': 'bundles/oroform/js/app/components/select2-relation-component.js'
         'oro/select2-grid-component': 'bundles/oroform/js/app/components/select2-grid-component.js'
+        'oroform/js/app/components/create-or-select-choice-component': 'bundles/oroform/js/app/components/create-or-select-choice-component.js'
 build:
     paths:
         'tinymce/tinymce.min': 'empty:'

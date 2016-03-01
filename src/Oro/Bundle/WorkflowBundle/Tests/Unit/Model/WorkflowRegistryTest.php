@@ -45,11 +45,14 @@ class WorkflowRegistryTest extends \PHPUnit_Framework_TestCase
         return $managerRegistry;
     }
 
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
     protected function createConfigurationProviderMock()
     {
-        $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface')
+        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
             ->getMock();
-        return $provider;
     }
 
     /**

@@ -1,9 +1,9 @@
 define(function(require) {
     'use strict';
 
-    var PieChartComponent,
-        Flotr = require('flotr2'),
-        BaseChartComponent = require('orochart/js/app/components/base-chart-component');
+    var PieChartComponent;
+    var Flotr = require('flotr2');
+    var BaseChartComponent = require('orochart/js/app/components/base-chart-component');
 
     /**
      * @class orochart.app.components.PieChartComponent
@@ -22,7 +22,7 @@ define(function(require) {
             this.options.settings.ratio = options.ratio;
         },
 
-        setChartSize: function () {
+        setChartSize: function() {
             var isChanged = false;
             var $container = this.$container;
             var isLegendWrapped = $container.hasClass('wrapped-chart-legend');
@@ -54,7 +54,7 @@ define(function(require) {
             return isChanged;
         },
 
-        setChartContainerSize: function () {
+        setChartContainerSize: function() {
             // there's nothing to do with container
         },
 
@@ -70,8 +70,10 @@ define(function(require) {
             var settings = this.options.settings;
             var chartData = [];
 
-            for(var i in data){
-                chartData.push({data: [[0, data[i]['fraction']]], label: data[i]['label']});
+            for (var i in data) {
+                if (data.hasOwnProperty(i)) {
+                    chartData.push({data: [[0, data[i].fraction]], label: data[i].label});
+                }
             }
 
             Flotr.draw(
@@ -83,35 +85,35 @@ define(function(require) {
                     fontSize: settings.chartFontSize,
                     shadowSize: 0,
                     HtmlText: true,
-                    xaxis : {
-                        showLabels : false
+                    xaxis: {
+                        showLabels: false
                     },
-                    yaxis : {
-                        showLabels : false
+                    yaxis: {
+                        showLabels: false
                     },
-                    grid : {
+                    grid: {
                         color: settings.chartFontColor,
-                        verticalLines : false,
-                        horizontalLines : false,
+                        verticalLines: false,
+                        horizontalLines: false,
                         outlineWidth: 0
                     },
-                    pie : {
-                        show : true,
-                        explode : 0,
+                    pie: {
+                        show: true,
+                        explode: 0,
                         sizeRatio: 0.8,
-                        startAngle: Math.PI/3.5
+                        startAngle: Math.PI / 3.5
                     },
-                    mouse : {
-                        track : true,
+                    mouse: {
+                        track: true,
                         relative: true,
                         lineColor: settings.chartHighlightColor,
-                        trackFormatter: function (obj) {
+                        trackFormatter: function(obj) {
                             return obj.series.label +
                                 '&nbsp;&nbsp;&nbsp;' + parseFloat(obj.fraction * 100).toFixed(2) + ' %';
                         }
                     },
-                    legend : {
-                        position : 'ne',
+                    legend: {
+                        position: 'ne',
                         container: $legend.get(0),
                         labelBoxWidth: 20,
                         labelBoxHeight: 13,

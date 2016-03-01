@@ -63,6 +63,8 @@ class CreateIndexedConfigValues implements Migration, OrderedMigrationInterface,
             'oro_entity_config_value',
             'oro_entity_config_index_value'
         );
+
+        $queries->addPostQuery(new UpdateModuleAndEntityFieldsQuery());
     }
 
     /**

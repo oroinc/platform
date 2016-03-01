@@ -6,6 +6,7 @@ use Oro\Bundle\EmailBundle\Provider\EntityVariablesProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,6 +17,9 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $entityConfigProvider;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $extendConfigProvider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrine;
@@ -41,6 +45,9 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $this->entityConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
@@ -50,10 +57,25 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configManager->expects($this->any())
+            ->method('getProvider')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        ['entity', $this->entityConfigProvider],
+                        ['email', $this->emailConfigProvider],
+                        ['extend', $this->extendConfigProvider],
+                    ]
+                )
+            );
+
         $this->provider = new EntityVariablesProvider(
             $translator,
-            $this->emailConfigProvider,
-            $this->entityConfigProvider,
+            $configManager,
             $this->doctrine,
             $this->formatterManager
         );
@@ -88,6 +110,9 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $field5EntityConfig = new Config(new FieldConfigId('entity', self::TEST_ENTITY_NAME, 'field5', 'string'));
         $field5EntityConfig->set('label', 'field5_label');
 
+        $entityExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
+        $entityExtendConfig->set('is_extend', true);
+
         $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -103,10 +128,14 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
             ->with(self::TEST_ENTITY_NAME)
             ->will($this->returnValue($em));
 
-        $this->emailConfigProvider->expects($this->once())
+        $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(self::TEST_ENTITY_NAME)
             ->will($this->returnValue(true));
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue($entityExtendConfig));
         $this->emailConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with(self::TEST_ENTITY_NAME)
@@ -193,6 +222,12 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $entity2field1EntityConfig = new Config(new FieldConfigId('entity', $entity2Class, 'email', 'string'));
         $entity2field1EntityConfig->set('label', 'email_label');
 
+        $entity1ExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
+        $entity1ExtendConfig->set('is_extend', true);
+
+        $entity2ExtendConfig = new Config(new EntityConfigId('extend', $entity2Class));
+        $entity2ExtendConfig->set('is_extend', true);
+
         $classMetadata1 = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -233,13 +268,23 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                     ]
                 )
             );
-        $this->emailConfigProvider->expects($this->exactly(2))
+        $this->extendConfigProvider->expects($this->exactly(2))
             ->method('hasConfig')
             ->will(
                 $this->returnValueMap(
                     [
                         [self::TEST_ENTITY_NAME, null, true],
                         [$entity2Class, null, true],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->exactly(2))
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, null, $entity1ExtendConfig],
+                        [$entity2Class, null, $entity2ExtendConfig],
                     ]
                 )
             );
@@ -291,10 +336,17 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $field5Config = new Config(new FieldConfigId('email', self::TEST_ENTITY_NAME, 'field5', 'string'));
         $field5Config->set('available_in_template', true);
 
-        $this->emailConfigProvider->expects($this->once())
+        $entityExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
+        $entityExtendConfig->set('is_extend', true);
+
+        $this->extendConfigProvider->expects($this->once())
             ->method('hasConfig')
             ->with(self::TEST_ENTITY_NAME)
             ->will($this->returnValue(true));
+        $this->extendConfigProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(self::TEST_ENTITY_NAME)
+            ->will($this->returnValue($entityExtendConfig));
         $this->emailConfigProvider->expects($this->once())
             ->method('getConfigs')
             ->with(self::TEST_ENTITY_NAME)
@@ -324,6 +376,22 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
         $entity2field1Config = new Config(new FieldConfigId('email', $entity2Class, 'email', 'string'));
         $entity2field1Config->set('available_in_template', true);
 
+        $entity1ExtendConfig = new Config(new EntityConfigId('extend', self::TEST_ENTITY_NAME));
+        $entity1ExtendConfig->set('is_extend', true);
+
+        $entity2ExtendConfig = new Config(new EntityConfigId('extend', $entity2Class));
+        $entity2ExtendConfig->set('is_extend', true);
+
+        $entity3Class        = 'Extend\Entity\SomeEntity1';
+        $entity3ExtendConfig = new Config(new EntityConfigId('extend', $entity3Class));
+        $entity3ExtendConfig->set('is_extend', true);
+        $entity3ExtendConfig->set('state', ExtendScope::STATE_NEW);
+
+        $entity4Class        = 'Extend\Entity\SomeEntity2';
+        $entity4ExtendConfig = new Config(new EntityConfigId('extend', $entity4Class));
+        $entity4ExtendConfig->set('is_extend', true);
+        $entity4ExtendConfig->set('is_deleted', true);
+
         $this->entityConfigProvider->expects($this->once())
             ->method('getIds')
             ->will(
@@ -331,19 +399,12 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         new EntityConfigId('entity', self::TEST_ENTITY_NAME),
                         new EntityConfigId('entity', $entity2Class),
+                        new EntityConfigId('entity', $entity3Class),
+                        new EntityConfigId('entity', $entity4Class),
                     ]
                 )
             );
-        $this->emailConfigProvider->expects($this->exactly(2))
-            ->method('hasConfig')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [self::TEST_ENTITY_NAME, null, true],
-                        [$entity2Class, null, true],
-                    ]
-                )
-            );
+
         $this->emailConfigProvider->expects($this->exactly(2))
             ->method('getConfigs')
             ->will(
@@ -351,6 +412,31 @@ class EntityVariablesProviderTest extends \PHPUnit_Framework_TestCase
                     [
                         [self::TEST_ENTITY_NAME, false, [$entity1field1Config]],
                         [$entity2Class, false, [$entity2field1Config]],
+                    ]
+                )
+            );
+
+        $this->extendConfigProvider->expects($this->exactly(4))
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, null, true],
+                        [$entity2Class, null, true],
+                        [$entity3Class, null, true],
+                        [$entity4Class, null, true],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->exactly(4))
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::TEST_ENTITY_NAME, null, $entity1ExtendConfig],
+                        [$entity2Class, null, $entity2ExtendConfig],
+                        [$entity3Class, null, $entity3ExtendConfig],
+                        [$entity4Class, null, $entity4ExtendConfig],
                     ]
                 )
             );

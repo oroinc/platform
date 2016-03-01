@@ -102,29 +102,29 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
             $associationNames = $metadata->getAssociationNames();
             foreach ($associationNames as $associationName) {
                 $targetClassName = $metadata->getAssociationTargetClass($associationName);
-                if ($metadata->isSingleValuedAssociation($associationName)
-                    && isset($this->dictionaries[$targetClassName])
-                ) {
-                    $fields              = $this->dictionaries[$targetClassName];
+                if (isset($this->dictionaries[$targetClassName])) {
+                    $fields = $this->dictionaries[$targetClassName];
                     $isCombinedLabelName = count($fields) > 1;
-                    foreach ($fields as $fieldName => $fieldType) {
+                    $fieldNames = array_keys($fields);
+                    foreach ($fieldNames as $fieldName) {
                         $virtualFieldName = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
-                        $label            = $isCombinedLabelName
+                        $fieldName = Inflector::tableize($fieldName);
+                        $label = $isCombinedLabelName
                             ? $virtualFieldName
                             : Inflector::tableize($associationName);
-                        $label            = ConfigHelper::getTranslationKey('entity', 'label', $className, $label);
-
+                        $label = ConfigHelper::getTranslationKey('entity', 'label', $className, $label);
                         $this->virtualFields[$className][$virtualFieldName] = [
                             'query' => [
                                 'select' => [
-                                    'expr'        => sprintf('target.%s', $fieldName),
-                                    'return_type' => $fieldType,
-                                    'label'       => $label
+                                    'expr'                => 'target.' . $fieldName,
+                                    'label'               => $label,
+                                    'return_type'         => 'dictionary',
+                                    'related_entity_name' => $targetClassName
                                 ],
-                                'join'   => [
+                                'join' => [
                                     'left' => [
                                         [
-                                            'join'  => sprintf('entity.%s', $associationName),
+                                            'join'  => 'entity.' . $associationName,
                                             'alias' => 'target'
                                         ]
                                     ]
@@ -147,24 +147,24 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
             $configs            = $this->groupingConfigProvider->getConfigs();
             foreach ($configs as $config) {
                 $groups = $config->get('groups');
-                if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups)) {
+                if (!empty($groups) && in_array(GroupingScope::GROUP_DICTIONARY, $groups, true)) {
                     $className  = $config->getId()->getClassName();
                     $metadata   = $this->getManagerForClass($className)->getClassMetadata($className);
-                    $fieldNames = null;
-                    if ($this->dictionaryConfigProvider->hasConfig($className)) {
-                        $fieldNames = $this->dictionaryConfigProvider->getConfig($className)->get('virtual_fields');
-                    }
-                    if (null === $fieldNames) {
-                        $fieldNames = array_filter(
-                            $metadata->getFieldNames(),
-                            function ($fieldName) use (&$metadata) {
-                                return !$metadata->isIdentifier($fieldName);
+                    $fields     = [];
+                    $fieldNames = $this->dictionaryConfigProvider->hasConfig($className)
+                        ? $this->dictionaryConfigProvider->getConfig($className)->get('virtual_fields', false, [])
+                        : [];
+                    if (!empty($fieldNames)) {
+                        foreach ($fieldNames as $fieldName) {
+                            $fields[$fieldName] = $metadata->getTypeOfField($fieldName);
+                        }
+                    } else {
+                        $fieldNames = $metadata->getFieldNames();
+                        foreach ($fieldNames as $fieldName) {
+                            if (!$metadata->isIdentifier($fieldName)) {
+                                $fields[$fieldName] = $metadata->getTypeOfField($fieldName);
                             }
-                        );
-                    }
-                    $fields = [];
-                    foreach ($fieldNames as $fieldName) {
-                        $fields[$fieldName] = $metadata->getTypeOfField($fieldName);
+                        }
                     }
                     $this->dictionaries[$className] = $fields;
                 }

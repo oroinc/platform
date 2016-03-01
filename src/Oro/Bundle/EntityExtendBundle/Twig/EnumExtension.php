@@ -89,7 +89,7 @@ class EnumExtension extends \Twig_Extension
     {
         $values = $this->getEnumValues($enumValueEntityClassOrEnumCode);
 
-        return !empty($values[$enumValueId])
+        return isset($values[$enumValueId])
             ? $values[$enumValueId]
             : $enumValueId;
     }

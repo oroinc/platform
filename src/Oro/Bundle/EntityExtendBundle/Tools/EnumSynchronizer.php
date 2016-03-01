@@ -19,6 +19,9 @@ use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class EnumSynchronizer
 {
     /** @var ConfigManager */
@@ -69,7 +72,7 @@ class EnumSynchronizer
                 /** @var FieldConfigId $fieldConfigId */
                 $fieldConfigId = $fieldConfig->getId();
                 if ($fieldConfig->is('is_deleted')
-                    || !in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'])
+                    || !in_array($fieldConfigId->getFieldType(), ['enum', 'multiEnum'], true)
                 ) {
                     continue;
                 }
@@ -118,10 +121,10 @@ class EnumSynchronizer
      */
     public function applyEnumNameTrans($enumCode, $enumName, $locale)
     {
-        if (empty($enumCode)) {
+        if (strlen($enumCode) === 0) {
             throw new \InvalidArgumentException('$enumCode must not be empty.');
         }
-        if (empty($enumName)) {
+        if (strlen($enumName) === 0) {
             throw new \InvalidArgumentException('$enumName must not be empty.');
         }
         if (empty($locale)) {
@@ -222,11 +225,14 @@ class EnumSynchronizer
             ->setHint(TranslatableListener::HINT_TRANSLATABLE_LOCALE, $locale)
             ->getResult();
 
+        $ids = [];
         /** @var AbstractEnumValue[] $changes */
         $changes = [];
         foreach ($values as $value) {
-            $optionKey = $this->getEnumOptionKey($value->getId(), $options);
+            $id        = $value->getId();
+            $optionKey = $this->getEnumOptionKey($id, $options);
             if ($optionKey !== null) {
+                $ids[] = $id;
                 if ($this->setEnumValueProperties($value, $options[$optionKey])) {
                     $changes[] = $value;
                 }
@@ -236,11 +242,15 @@ class EnumSynchronizer
                 $changes[] = $value;
             }
         }
+
         foreach ($options as $option) {
+            $id    = $this->generateEnumValueId($option['label'], $ids);
+            $ids[] = $id;
             $value = $enumRepo->createEnumValue(
                 $option['label'],
                 $option['priority'],
-                $option['is_default']
+                $option['is_default'],
+                $id
             );
             $em->persist($value);
             $changes[] = $value;
@@ -256,6 +266,28 @@ class EnumSynchronizer
             // mark translation cache dirty
             $this->dbTranslationMetadataCache->updateTimestamp($locale);
         }
+    }
+
+    /**
+     * @param string   $name
+     * @param string[] $existingIds
+     *
+     * @return string
+     */
+    protected function generateEnumValueId($name, array $existingIds)
+    {
+        $id = ExtendHelper::buildEnumValueId($name);
+        if (in_array($id, $existingIds, true)) {
+            $prefix  = substr($id, 0, ExtendHelper::MAX_ENUM_VALUE_ID_LENGTH - 6) . '_';
+            $counter = 1;
+            $id = $prefix . $counter;
+            while (in_array($id, $existingIds, true)) {
+                $counter++;
+                $id = $prefix . $counter;
+            }
+        }
+
+        return $id;
     }
 
     /**

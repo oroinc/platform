@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ImapBundle\Manager;
 
+use Symfony\Component\HttpFoundation\AcceptHeader;
+use Symfony\Component\HttpFoundation\AcceptHeaderItem;
+
 use Zend\Mail\Headers;
 use Zend\Mail\Header\HeaderInterface;
 use Zend\Mail\Header\AbstractAddressList;
@@ -119,6 +122,46 @@ class ImapEmailManager
     }
 
     /**
+     * Retrieve emails by the given uid criteria
+     *
+     * @param string $query
+     *
+     * @return ImapEmailIterator
+     */
+    public function getEmailsUidBased($query = null)
+    {
+        return new ImapEmailIterator(
+            $this->connector->findItemsUidBased($query),
+            $this
+        );
+    }
+
+    /**
+     * @param \DateTime $startDate
+     *
+     * @return ImapEmailIterator
+     */
+    public function getUnseenEmailUIDs($startDate)
+    {
+        $query = sprintf(
+            'UNSEEN SINCE %s',
+            $startDate->format('d-M-Y')
+        );
+
+        return $this->connector->findUIDs($query);
+    }
+
+    /**
+     * Returns UIDs for currently selected folder
+     *
+     * @return array
+     */
+    public function getEmailUIDs()
+    {
+        return $this->connector->findUIDs('ALL');
+    }
+
+    /**
      * Retrieve email by its UID
      *
      * @param int $uid The UID of an email message
@@ -167,7 +210,8 @@ class ImapEmailManager
                 ->setXMessageId($this->getString($headers, 'X-GM-MSG-ID'))
                 ->setXThreadId($this->getString($headers, 'X-GM-THR-ID'))
                 ->setMessageId($this->getMessageId($headers, 'Message-ID'))
-                ->setMultiMessageId($this->getMultiMessageId($headers, 'Message-ID'));
+                ->setMultiMessageId($this->getMultiMessageId($headers, 'Message-ID'))
+                ->setAcceptLanguageHeader($this->getAcceptLanguageHeader($headers));
 
             foreach ($this->getRecipients($headers, 'To') as $val) {
                 $email->addToRecipient($val);
@@ -191,6 +235,35 @@ class ImapEmailManager
                 $e
             );
         }
+    }
+
+    /**
+     * Returns Accept-Language header from headers.
+     *
+     * @param Headers $headers
+     *
+     * @return string
+     */
+    protected function getAcceptLanguageHeader(Headers $headers)
+    {
+        $header = $headers->get('Accept-Language');
+
+        if ($header === false) {
+            return '';
+        } elseif (!$header instanceof \ArrayIterator) {
+            $header = new \ArrayIterator([$header]);
+        }
+
+        $items = [];
+        $header->rewind();
+        while ($header->valid()) {
+            $items[] = AcceptHeaderItem::fromString($header->current()->getFieldValue());
+            $header->next();
+        }
+
+        $acceptHeader = new AcceptHeader($items);
+
+        return $acceptHeader->__toString();
     }
 
     /**

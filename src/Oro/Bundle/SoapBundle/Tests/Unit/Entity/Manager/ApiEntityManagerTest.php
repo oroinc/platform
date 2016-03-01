@@ -114,15 +114,6 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
             ->method('dispatch');
         $manager->setEventDispatcher($eventDispatcher);
 
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrineHelper->expects($this->once())
-            ->method('normalizeCriteria')
-            ->with($this->identicalTo($criteria))
-            ->willReturn(new Criteria());
-        $manager->setDoctrineHelper($doctrineHelper);
-
         $result = $manager->getList(3, 1, $criteria);
 
         $this->assertSame($result[0], $entity);
@@ -176,15 +167,6 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
         $eventDispatcher->expects($this->once())
             ->method('dispatch');
         $manager->setEventDispatcher($eventDispatcher);
-
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $doctrineHelper->expects($this->once())
-            ->method('normalizeCriteria')
-            ->with($this->identicalTo($criteria))
-            ->willReturn($criteria);
-        $manager->setDoctrineHelper($doctrineHelper);
 
         $result = $manager->getList(3, 1, $criteria);
         $this->assertSame($result[0], $entity);

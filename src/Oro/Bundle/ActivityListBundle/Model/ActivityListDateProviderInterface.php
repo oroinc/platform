@@ -5,18 +5,18 @@ namespace Oro\Bundle\ActivityListBundle\Model;
 interface ActivityListDateProviderInterface
 {
     /**
-     * Get date from entity. Can be useful on SYNC with external servers
+     * Get created at from entity.
      *
      * @param object $entity
-     *
-     * @return \DateTime
+     * @return \DateTime|null
      */
-    public function getDate($entity);
+    public function getCreatedAt($entity);
 
     /**
-     * Can be updated date field on update activity entity
+     * Get updated at from entity.
      *
-     * @return bool
+     * @param object $entity
+     * @return \DateTime|null
      */
-    public function isDateUpdatable();
+    public function getUpdatedAt($entity);
 }

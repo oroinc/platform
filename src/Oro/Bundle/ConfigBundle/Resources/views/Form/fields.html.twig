@@ -20,6 +20,14 @@
     {% endif %}
 {% endblock %}
 
+{% block oro_config_form_field_type_row %}
+    {% if form.vars.label is not defined or not form.vars.label %}
+        {{ form_row(form.value) }}
+    {% else %}
+        {{ form_row(form) }}
+    {% endif %}
+{% endblock %}
+
 {% block oro_config_parent_scope_checkbox_type_row %}
     {{ form_widget(form) }}
     {{ form_label(form) }}

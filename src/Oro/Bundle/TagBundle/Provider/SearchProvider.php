@@ -4,6 +4,8 @@ namespace Oro\Bundle\TagBundle\Provider;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Translation\TranslatorInterface;
+
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Query;
@@ -13,7 +15,6 @@ use Oro\Bundle\SearchBundle\Query\Result\Item;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Provider\ResultStatisticsProvider;
 use Oro\Bundle\TagBundle\Security\SecurityProvider;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class SearchProvider extends ResultStatisticsProvider
 {
@@ -33,12 +34,12 @@ class SearchProvider extends ResultStatisticsProvider
     protected $securityProvider;
 
     /**
-     * @param EntityManager    $em
-     * @param ObjectMapper     $mapper
-     * @param SecurityProvider $securityProvider
-     * @param Indexer          $indexer
-     * @param ConfigManager    $configManager
-     * @param Translator       $translator
+     * @param EntityManager       $em
+     * @param ObjectMapper        $mapper
+     * @param SecurityProvider    $securityProvider
+     * @param Indexer             $indexer
+     * @param ConfigManager       $configManager
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         EntityManager $em,
@@ -46,7 +47,7 @@ class SearchProvider extends ResultStatisticsProvider
         SecurityProvider $securityProvider,
         Indexer $indexer,
         ConfigManager $configManager,
-        Translator $translator
+        TranslatorInterface $translator
     ) {
         $this->em = $em;
         $this->mapper = $mapper;
@@ -80,7 +81,6 @@ class SearchProvider extends ResultStatisticsProvider
                 $this->em,
                 $entityName,
                 $item['recordId'],
-                null,
                 null,
                 null,
                 $this->mapper->getEntityConfig($entityName)

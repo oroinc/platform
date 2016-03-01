@@ -17,9 +17,13 @@ class GroupsTest extends Selenium2TestCase
 
     protected $defaultGroups = array(
         'header' => array('NAME' => 'NAME', 'ROLES' => 'ROLES', '' => 'ACTION'),
-        'Administrators' => array('Administrators' => 'Administrators', 'Administrator' => 'ROLES', '...' => 'ACTION'),
-        'Marketing' => array('Marketing' => 'Marketing', 'Manager' => 'ROLES', '...' => 'ACTION'),
-        'Sales' => array('Sales' => 'Sales', 'Manager' => 'ROLES', '...' => 'ACTION')
+        'Administrators' => array(
+            'Administrators' => 'Administrators',
+            'Administrator'  => 'ROLES',
+            "Edit\nDelete"   => 'ACTION'
+        ),
+        'Marketing' => array('Marketing' => 'Marketing', 'Manager' => 'ROLES', "Edit\nDelete" => 'ACTION'),
+        'Sales' => array('Sales' => 'Sales', 'Manager' => 'ROLES', "Edit\nDelete" => 'ACTION')
     );
 
     public function testGroupsGrid()
@@ -42,7 +46,7 @@ class GroupsTest extends Selenium2TestCase
         foreach ($headers as $header) {
             /** @var \PHPUnit_Extensions_Selenium2TestCase_Element $header */
             $content = $header->text();
-            $this->assertArrayHasKey($content, $this->defaultGroups['header']);
+            static::assertArrayHasKey($content, $this->defaultGroups['header']);
         }
 
         $checks = 0;
@@ -57,12 +61,12 @@ class GroupsTest extends Selenium2TestCase
                     $id = $content;
                 }
                 if (array_key_exists($id, $this->defaultGroups)) {
-                    $this->assertArrayHasKey($content, $this->defaultGroups[$id]);
+                    static::assertArrayHasKey($content, $this->defaultGroups[$id]);
                 }
             }
-            $checks = $checks + 1;
+            $checks++;
         }
-        $this->assertGreaterThanOrEqual(count($this->defaultGroups)-1, $checks);
+        static::assertGreaterThanOrEqual(count($this->defaultGroups)-1, $checks);
     }
 
     public function testGroupAdd()
@@ -80,7 +84,7 @@ class GroupsTest extends Selenium2TestCase
             ->assertMessage('Group saved')
             ->close();
 
-        $this->assertTrue($groups->entityExists(array('name' => $this->newGroup['NAME'] . $randomPrefix)));
+        static::assertTrue($groups->entityExists(array('name' => $this->newGroup['NAME'] . $randomPrefix)));
 
         return $randomPrefix;
     }
@@ -94,7 +98,7 @@ class GroupsTest extends Selenium2TestCase
         $login = $this->login();
         /** @var Groups $login */
         $groups = $login->openGroups('Oro\Bundle\UserBundle');
-        $groups->deleteEntity(array('name' => $this->newGroup['NAME'] . $randomPrefix));
-        $this->assertFalse($groups->entityExists(array('name' => $this->newGroup['NAME'] . $randomPrefix)));
+        $groups->delete(array('name' => $this->newGroup['NAME'] . $randomPrefix));
+        static::assertFalse($groups->entityExists(array('name' => $this->newGroup['NAME'] . $randomPrefix)));
     }
 }

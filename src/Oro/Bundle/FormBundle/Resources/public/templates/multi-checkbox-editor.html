@@ -1,0 +1,16 @@
+<div class="inline-editor__fields">
+    <select multiple>
+        <% _.each(options, function (option) { %>
+        <option value="<%= option.id %>" title="<%- option.text %>"
+        <% if (_.indexOf(value, option.id) !== -1) { %> selected="selected"<% } %>>
+        <%- option.text %>
+        </option>
+        <% }); %>
+    </select>
+</div>
+<div class="inline-editor__actions">
+    <button class="inline-editor__action-item" type="submit"
+            title="<%= _.__('oro.form.inlineEditing.action.save') %>"><i class="icon-check"></i></button>
+    <button class="inline-editor__action-item" data-action="cancel"
+            title="<%= _.__('oro.form.inlineEditing.action.cancel') %>"><i class="icon-ban-circle"></i></button>
+</div>

@@ -1,3 +1,6 @@
+@dotMenuDropdownMinHeight: 168px;
+@dotMenuDropdownMaxHeight: 330px;
+
 .list-bar-wrapper {
   background-image: none;
   background-color: @logoBackgroundColor;
@@ -102,8 +105,8 @@
       > .tab-content {
         border-left: 1px solid darken(#ecf1f9,8%);
         background-color: #fff;
-        min-height: 167px;
-        max-height: 330px;
+        min-height: @dotMenuDropdownMinHeight;
+        max-height: @dotMenuDropdownMaxHeight;
         overflow: auto;
         z-index:99;
         .tab-pane {
@@ -122,10 +125,10 @@
     }
   }
   .extra-list {
-    padding: 5px 0px;
+    padding: 6px 0;
     li {
       border-bottom:1px solid #f2f2f2;
-      padding: 3px 24px 3px 12px;
+      padding: 3px 27px 3px 15px;
       font-size: 12px;
       &:last-child {
         border-bottom:none;
@@ -137,7 +140,7 @@
       }
       .close {
         position: absolute;
-        right: 10px;
+        right: 13px;
       }
     }
     > li:hover {
@@ -145,7 +148,8 @@
     }
   }
   .dot-menu-empty-message {
-    padding: 8px 12px;
+    padding: @dotMenuDropdownMinHeight/2-10px 15px 15px;
+    text-align: center;
     color:lighten(@bodyColor,30%);
     font-style:italic;
   }
@@ -159,10 +163,11 @@
     display: block;
     position: absolute;
     top: 0;
-    left: 0;
+    right: 100%;
     height: 100%;
-    width: 0;
-    .box-shadow(0 0 20px 20px fade(@logoBackgroundColor, 90%));
+    width: 32px;
+    background-image: linear-gradient(to left,@logoBackgroundColor,transparent);
+    pointer-events: none;
   }
   a.dropdown-toggle {
     position: relative;

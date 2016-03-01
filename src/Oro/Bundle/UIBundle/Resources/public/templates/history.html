@@ -1,0 +1,4 @@
+<div>
+    <button type="button" class="btn btn-default undo-btn"<% if (!states || index < 1) { %> disabled<% } %>><i class="icon-reply"></i> <%= _.__('Undo') %></button>
+    <button type="button" class="btn btn-default redo-btn"<% if (!states || index + 1 >= states.length) { %> disabled<% } %>><i class="icon-share-alt"></i> <%= _.__('Redo') %></button>
+</div>

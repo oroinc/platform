@@ -6,7 +6,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
 use Oro\Bundle\ImapBundle\Sync\ImapEmailSynchronizationProcessor;
 
@@ -51,76 +51,6 @@ class ImapEmailSynchronizationProcessorTest extends \PHPUnit_Framework_TestCase
         $this->imapManager   = $this->getMockBuilder('Oro\Bundle\ImapBundle\Manager\ImapEmailManager')
             ->disableOriginalConstructor()
             ->getMock();
-    }
-
-    public function testSyncFolders()
-    {
-        $origin              = new ImapEmailOrigin();
-        /** @var ImapEmailFolder[] $existingImapFolders */
-        $existingImapFolders = [
-            // existing with UIDVALIDITY equal
-            $this->createImapFolder('existing', 'existing', 4),
-            // existing with new UIDVALIDITY
-            $this->createImapFolder('Test', 'Test', 15, 1),
-        ];
-        /** @var Folder[] $remoteFolders */
-        $remoteFolders       = [
-            // UIDVALIDITY => Folder
-            1 => $this->createRemoteFolder('Inbox', '[Gmail]\Inbox', ['\Inbox']),
-            3 => $this->createRemoteFolder('Sent', '[Gmail]\Sent', ['\Sent']),
-            4 => $this->createRemoteFolder('existing', 'existing'),
-        ];
-
-        $this->logger->expects($this->any())
-            ->method('notice');
-
-        // load existing imap folders
-        $repo = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailFolderRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $repo->expects($this->once())
-            ->method('getFoldersByOrigin')
-            ->with($origin)
-            ->will($this->returnValue($existingImapFolders));
-
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with('OroImapBundle:ImapEmailFolder')
-            ->will($this->returnValue($repo));
-
-        $this->em->expects($this->any())
-            ->method('persist');
-        $this->em->expects($this->once())
-            ->method('flush');
-
-        $processor = $this->getProcessorMock(['getFolders']);
-
-        $processor->expects($this->once())
-            ->method('getFolders')
-            ->will($this->returnValue($remoteFolders));
-
-        // get UIDVALIDITY expectations
-        $imapManagerCallIndex = 0;
-        foreach ($remoteFolders as $uidValidity => $folder) {
-            $this->imapManager->expects($this->at($imapManagerCallIndex++))
-                ->method('selectFolder')
-                ->with($folder->getGlobalName());
-            $this->imapManager->expects($this->at($imapManagerCallIndex++))
-                ->method('getUidValidity')
-                ->will($this->returnValue($uidValidity));
-        }
-
-        $imapFolders = ReflectionUtil::callProtectedMethod($processor, 'syncFolders', [$origin]);
-
-        $expectedImapFolder1 = $this->createImapFolder('Inbox', '[Gmail]\Inbox', 1);
-        $expectedImapFolder1->getFolder()->setType(FolderType::INBOX)->setOrigin($origin);
-        $expectedImapFolder2 = $this->createImapFolder('Sent', '[Gmail]\Sent', 3);
-        $expectedImapFolder2->getFolder()->setType(FolderType::SENT)->setOrigin($origin);
-        $expectedImapFolder3 = $this->createImapFolder('existing', 'existing', 4);
-        $this->assertEquals(
-            [$expectedImapFolder1, $expectedImapFolder2, $expectedImapFolder3],
-            $imapFolders
-        );
     }
 
     public function testGetFolders()

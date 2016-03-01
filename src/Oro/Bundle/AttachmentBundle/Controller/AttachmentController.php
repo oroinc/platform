@@ -11,7 +11,6 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
-use Oro\Bundle\AttachmentBundle\Form\Type\AttachmentType;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 
@@ -64,7 +63,7 @@ class AttachmentController extends Controller
         $attachmentEntity->setTarget($entity);
 
         $form       = $this->createForm(
-            new AttachmentType(),
+            $this->container->get('oro_attachment.form.type'),
             $attachmentEntity,
             ['parentEntityClass' => $entityClass, 'checkEmptyFile' => true]
         );
@@ -94,7 +93,7 @@ class AttachmentController extends Controller
     {
         $formAction = $this->getRequest()->getUri();
         $form       = $this->createForm(
-            new AttachmentType(),
+            $this->container->get('oro_attachment.form.type'),
             $attachment,
             [
                 'parentEntityClass' => ClassUtils::getRealClass($attachment->getTarget()),

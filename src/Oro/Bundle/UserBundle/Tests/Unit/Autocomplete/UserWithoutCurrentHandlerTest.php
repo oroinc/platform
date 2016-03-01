@@ -132,9 +132,8 @@ class UserWithoutCurrentHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('getResult')
             ->will($this->returnValue([]));
 
-        $this->aclHelper->expects($this->once())
-            ->method('apply')
-            ->with($queryBuilder, 'VIEW')
+        $queryBuilder->expects($this->once())
+            ->method('getQuery')
             ->will($this->returnValue($query));
 
         $this->repository->expects($this->once())

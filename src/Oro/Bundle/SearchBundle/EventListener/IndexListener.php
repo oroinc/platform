@@ -118,7 +118,7 @@ class IndexListener implements OptionalListenerInterface
             $this->getEntitiesWithUpdatedIndexedFields($unitOfWork)
         );
         foreach ($savedEntities as $hash => $entity) {
-            if ($this->isSupported($entity) && empty($this->savedEntities[$hash])) {
+            if (empty($this->savedEntities[$hash]) && $this->isSupported($entity)) {
                 $this->savedEntities[$hash] = $entity;
             }
         }
@@ -127,7 +127,7 @@ class IndexListener implements OptionalListenerInterface
         // deleted entities should be processed as references because on postFlush they are already deleted
         $deletedEntities = $unitOfWork->getScheduledEntityDeletions();
         foreach ($deletedEntities as $hash => $entity) {
-            if ($this->isSupported($entity) && empty($this->deletedEntities[$hash])) {
+            if (empty($this->deletedEntities[$hash]) && $this->isSupported($entity)) {
                 $this->deletedEntities[$hash] = $entityManager->getReference(
                     $this->doctrineHelper->getEntityClass($entity),
                     $this->doctrineHelper->getSingleEntityIdentifier($entity)

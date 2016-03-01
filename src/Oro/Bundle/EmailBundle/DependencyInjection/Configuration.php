@@ -31,6 +31,14 @@ class Configuration implements ConfigurationInterface
                     ->treatNullLike([])
                     ->prototype('scalar')->end()
                 ->end()
+                ->arrayNode('flash_notification')
+                    ->addDefaultsIfNotSet()
+                    ->children()
+                        ->integerNode('max_emails_display')
+                            ->defaultValue(4)
+                        ->end()
+                    ->end()
+                ->end()
             ->end()
         ->end();
 
@@ -39,7 +47,12 @@ class Configuration implements ConfigurationInterface
             [
                 'signature' => ['value' => ''],
                 'append_signature' => ['value' => true],
+                'default_button_reply' => ['value' => true],
                 'use_threads_in_emails' => ['value' => true],
+                'minimum_input_length' => ['value' => 2],
+                'show_recent_emails_in_user_bar' => ['value' => true],
+                'attachment_sync_enable' => ['value' => true],
+                'attachment_sync_max_size' => ['value' => 0]
             ]
         );
 

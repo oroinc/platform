@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     './pagination',
     'jquery.numeric'
-], function ($, _, Pagination) {
+], function($, _, Pagination) {
     'use strict';
 
     var PaginationInput;
@@ -23,10 +21,10 @@ define([
 
         /** @property */
         events: {
-            "click a": "onChangePage",
-            "blur input": "onChangePageByInput",
-            "change input": "onChangePageByInput",
-            'keyup input': function (e) {
+            'click a': 'onChangePage',
+            'blur input': 'onChangePageByInput',
+            'change input': 'onChangePageByInput',
+            'keyup input': function(e) {
                 if (e.which === 13) {
                     // fix for IE 8, bacause change event is not fired when enter is pressed
                     this.onChangePageByInput(e);
@@ -42,7 +40,7 @@ define([
          *
          * @param {Event} e
          */
-        onChangePageByInput: function (e) {
+        onChangePageByInput: function(e) {
             e.preventDefault();
 
             var pageIndex = parseInt($(e.target).val(), 10);
@@ -54,13 +52,13 @@ define([
                 return;
             }
 
-            pageIndex = state.firstPage == 0 ? pageIndex - 1  : pageIndex;
+            pageIndex = state.firstPage === 0 ? pageIndex - 1  : pageIndex;
             if (pageIndex < state.firstPage) {
                 pageIndex = state.firstPage;
-                $(e.target).val(state.firstPage == 0 ? state.firstPage + 1 : state.firstPage);
+                $(e.target).val(state.firstPage === 0 ? state.firstPage + 1 : state.firstPage);
             } else if (state.lastPage <= pageIndex) {
                 pageIndex = state.lastPage;
-                $(e.target).val(state.firstPage == 0 ? state.lastPage + 1 : state.lastPage);
+                $(e.target).val(state.firstPage === 0 ? state.lastPage + 1 : state.lastPage);
             }
 
             if (state.currentPage !== pageIndex) {
@@ -74,7 +72,7 @@ define([
          *
          * @return Array.<Object> an array of page handle objects hashes
          */
-        makeHandles: function () {
+        makeHandles: function() {
             var handles = [];
 
             handles.push({
@@ -86,9 +84,9 @@ define([
         /**
          * Render pagination view and add validation for input with positive integer value
          */
-        render: function () {
+        render: function() {
             PaginationInput.__super__.render.apply(this, arguments);
-            this.$('input').numeric({ decimal: false, negative: false });
+            this.$('input').numeric({decimal: false, negative: false});
             return this;
         }
     });

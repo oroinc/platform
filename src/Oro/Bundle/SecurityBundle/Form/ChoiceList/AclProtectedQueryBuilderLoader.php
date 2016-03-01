@@ -89,6 +89,14 @@ class AclProtectedQueryBuilderLoader implements EntityLoaderInterface
         $metadata = $qb->getEntityManager()->getClassMetadata($entity);
         if (in_array($metadata->getTypeOfField($identifier), ['integer', 'bigint', 'smallint'])) {
             $parameterType = Connection::PARAM_INT_ARRAY;
+
+            // the same workaround as in Symfony:
+            // {@see \Symfony\Bridge\Doctrine\Form\ChoiceList\ORMQueryBuilderLoader::getEntitiesByIds }
+            // Filter out non-integer values (e.g. ""). If we don't, some
+            // databases such as PostgreSQL fail.
+            $values = array_values(array_filter($values, function ($v) {
+                return (string) $v === (string) (int) $v;
+            }));
         } else {
             $parameterType = Connection::PARAM_STR_ARRAY;
         }

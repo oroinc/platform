@@ -1,7 +1,8 @@
-/*global define*/
 define([
-    'jquery', 'underscore', 'flotr2'
-], function ($, _, Flotr) {
+    'jquery',
+    'underscore',
+    'flotr2'
+], function($, _, Flotr) {
     'use strict';
 
     Flotr.addType('funnel', {
@@ -22,7 +23,7 @@ define([
         shapes: [],
         stacked: false,
 
-        draw: function (options) {
+        draw: function(options) {
             var shape;
 
             shape = this.calculateShape(options);
@@ -34,19 +35,16 @@ define([
             }
         },
 
-        hit: function (options) {
-            var s1, s2, s3, i,
-                self   = this,
-                args   = options.args,
-                mouse  = args[0],
-                x      = mouse.relX,
-                y      = mouse.relY;
-
-            for (i in self.shapes) {
-                var
-                    belongSide = true,
-                    seg        = self.shapes[i]; //Current funnel's segment
-
+        hit: function(options) {
+            var s1;
+            var s2;
+            var s3;
+            var args = options.args;
+            var mouse = args[0];
+            var x = mouse.relX;
+            var y = mouse.relY;
+            var fullRectangle = !_.every(this.shapes, function(seg, i) {
+                var belongSide = true;
                 /**
                  *  left/right rectangle side case
                  *  detect mouse is in figure
@@ -60,7 +58,8 @@ define([
                     s1 = (seg.x1 - x) * (seg.y4 - seg.y1) - (seg.x1 - seg.x1) * (seg.y1 - y);
                     s2 = (seg.x1 - x) * (seg.y4 - seg.y4) - (seg.x4 - seg.x1) * (seg.y4 - y);
                     s3 = (seg.x4 - x) * (seg.y1 - seg.y4) - (seg.x1 - seg.x4) * (seg.y4 - y);
-                    if (s1 === 0 || s2 === 0 || s3 === 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)){
+                    if (s1 === 0 || s2 === 0 || s3 === 0 ||
+                        (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) {
                         belongSide = false;
                     }
                 }
@@ -70,33 +69,42 @@ define([
                     s1 = (seg.x3 - x) * (seg.y2 - seg.y3) - (seg.x2 - seg.x3) * (seg.y3 - y);
                     s2 = (seg.x2 - x) * (seg.y3 - seg.y2) - (seg.x2 - seg.x2) * (seg.y2 - y);
                     s3 = (seg.x2 - x) * (seg.y3 - seg.y3) - (seg.x3 - seg.x2) * (seg.y3 - y);
-                    if (s1 === 0 || s2 === 0 || s3 === 0 || (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)){
+                    if (s1 === 0 || s2 === 0 || s3 === 0 ||
+                        (s1 > 0 && s2 > 0 && s3 > 0) || (s1 < 0 && s2 < 0 && s3 < 0)) {
                         belongSide = false;
                     }
                 }
 
                 // full rectangle case
-                if (y >= seg.y1 && y <= seg.y3 && x >= seg.x1 && x <= seg.x2 && belongSide != false) {
-                    if (self.stacked === i) return;
+                if (y >= seg.y1 && y <= seg.y3 && x >= seg.x1 && x <= seg.x2 && belongSide !== false) {
+                    if (this.stacked === i) {
+                        return false;
+                    }
 
-                    self.stacked = i;
-                    self.clearHit(options);
-                    self.drawHit(options, i);
+                    this.stacked = i;
+                    this.clearHit(options);
+                    this.drawHit(options, i);
 
-                    return;
+                    return false;
                 }
+
+                return true;
+            }, this);
+
+            if (fullRectangle) {
+                return;
             }
 
-            self.stacked = false;
-            self.clearHit(options);
+            this.stacked = false;
+            this.clearHit(options);
         },
 
-        drawHit: function (options, i) {
-            var context = options.context,
-                shape = this.shapes[i];
+        drawHit: function(options, i) {
+            var context = options.context;
+            var shape = this.shapes[i];
             context.save();
-            context.lineJoin    = 'round';
-            context.lineWidth   = options.lineWidth;
+            context.lineJoin = 'round';
+            context.lineWidth = options.lineWidth;
             context.strokeStyle = '#FF3F19';
             context.beginPath();
             context.moveTo(shape.x1 + options.lineWidth * 2, shape.y1);
@@ -108,10 +116,10 @@ define([
             context.restore();
         },
 
-        clearHit: function (options) {
+        clearHit: function(options) {
             var context = options.context;
             context.save();
-            _.each(this.shapes, function (shape) {
+            _.each(this.shapes, function(shape) {
                 context.clearRect(
                     shape.x1 - options.lineWidth * 2,
                     shape.y1 - options.lineWidth,
@@ -127,13 +135,13 @@ define([
          * @param shape
          * @param options
          */
-        plot: function (shape, options) {
+        plot: function(shape, options) {
             var context = options.context;
             context.save();
-            context.lineJoin    = 'round';
-            context.lineWidth   = options.lineWidth;
+            context.lineJoin = 'round';
+            context.lineWidth = options.lineWidth;
             context.strokeStyle = shape.color;
-            context.fillStyle   = Flotr.Color.parse(shape.color).alpha(options.fillOpacity).toString();
+            context.fillStyle = Flotr.Color.parse(shape.color).alpha(options.fillOpacity).toString();
             context.translate(0.5, 0.5);
             context.beginPath();
             context.moveTo(shape.x1, shape.y1);
@@ -151,20 +159,21 @@ define([
          * @param options
          * @returns {Object}
          */
-        calculateShape: function (options) {
-            var shape, leftHeight, width, AD, BC,
-                value = options.data[0],
-                index = options.index,
-                series = this.allSeries[index],
-                total = this.total(),
-                shift = options.explode || 0,
-                shiftX = options.marginX || 0,
-                shiftY = options.marginY || 0,
-                frameWidth = options.width - shiftX,
-                frameHeight = options.height - shiftY * 2 - shift,
-                extraHeight = options.extraHeight || 0;
+        calculateShape: function(options) {
+            var shape;
+            var leftHeight;
+            var width;
+            var AD;
+            var BC;
+            var index = options.index;
+            var series = this.allSeries[index];
+            var shift = options.explode || 0;
+            var shiftX = options.marginX || 0;
+            var shiftY = options.marginY || 0;
+            var frameWidth = options.width - shiftX;
+            var frameHeight = options.height - shiftY * 2 - shift;
 
-            leftHeight = index > 0 ? this.shapes[index - 1].leftHeight : frameHeight + extraHeight;
+            leftHeight = index > 0 ? this.shapes[index - 1].leftHeight : frameHeight + (options.extraHeight || 0);
             width = index > 0 ? this.shapes[index - 1].bottomWidth : frameWidth;
             if (shift > 0 && index !== 0) {
                 if (!series.isNozzle) {
@@ -175,7 +184,7 @@ define([
 
             shape = {};
             shape.color = series.color = options.colors[index];
-            shape.height = Math.round(frameHeight / total * value);
+            shape.height = Math.round(frameHeight / this.total() * options.data[0]);
             if (shift > 0 && shape.height > shift) {
                 shape.height -= shift;
             }
@@ -184,14 +193,14 @@ define([
              * Each segment calculate
              *
              *    D    D0            A                 D1
-             *     ------------------------------------  AB  - funnel segment size (height) OR height of previous segment -> "prevStepHeight"
-             *     \   |            |                /   AP  - full height (with margins) -> "marginHeight"
-             *      \  |            |               /    DD1 - full width (OR full width of previous segment) "prevStepWidth"
-             *       \ |            |              /     DD0 - "prevStepWidthDelta"
-             *        \|            |             /
-             *         \            | B          /       On any calculation step we should know BC
-             *        C -------------------------          to correctly render segment of funnel
-             *           \          |          /
+             *     ------------------------------------  AB  - funnel segment size (height)
+             *     \   |            |                /         OR height of previous segment -> "prevStepHeight"
+             *      \  |            |               /    AP  - full height (with margins) -> "marginHeight"
+             *       \ |            |              /     DD1 - full width
+             *        \|            |             /            (OR full width of previous segment) "prevStepWidth"
+             *         \            | B          /       DD0 - "prevStepWidthDelta"
+             *        C -------------------------        On any calculation step we should know BC
+             *           \          |          /         to correctly render segment of funnel
              *            \         |         /
              *             \        |        /
              *              \       |       /
@@ -228,25 +237,25 @@ define([
          * @param options
          */
         renderLabel: function(shape, options) {
-            var context = options.context,
-                index = options.index,
-                series = this.allSeries[index],
-                $prev = $(options.element).find('.flotr-grid-label').last(),
-                distX = options.width - options.marginX * 0.8,
-                distY = !$prev[0] ? options.marginY :
-                    $prev.position().top + $prev.outerHeight(true) + options.fontSize * 1.2,
-                style = {
-                    size : options.fontSize * 1.2,
-                    color : options.fontColor,
-                    weight : 1.5
+            var context = options.context;
+            var index = options.index;
+            var series = this.allSeries[index];
+            var $prev = $(options.element).find('.flotr-grid-label').last();
+            var distX = options.width - options.marginX * 0.8;
+            var distY = !$prev[0] ? options.marginY :
+                $prev.position().top + $prev.outerHeight(true) + options.fontSize * 1.2;
+            var style = {
+                    size: options.fontSize * 1.2,
+                    color: options.fontColor,
+                    weight: 1.5
                 };
-            options.htmlText   = true;
-            style.textAlign    = 'left';
+            options.htmlText = true;
+            style.textAlign = 'left';
             style.textBaseline = 'top';
-            style.wordWrap     = 'break-word';
+            style.wordWrap = 'break-word';
 
-            var html = [],
-                divStyle =
+            var html = [];
+            var divStyle =
                     style.textBaseline + ':' + (distY - style.size)  + 'px;' +
                     style.textAlign + ':' + (distX + 10) + 'px;';
 
@@ -275,7 +284,7 @@ define([
          * @param data
          * @param options
          */
-        extendRange: function (series, data, options) {
+        extendRange: function(series, data, options) {
             if (data[0] <= 0) {
                 // normalize min value
                 data[0] = 0.0001;
@@ -298,12 +307,12 @@ define([
          *
          * @returns {number}
          */
-        total: function () {
-            var sum = this._sum,
-                total = 0;
+        total: function() {
+            var sum = this._sum;
+            var total = 0;
 
             if (!this._total) {
-                _.each(this.allSeries, function (series) {
+                _.each(this.allSeries, function(series) {
                     if (series.isNozzle) {
                         // nozzle is always === 10% of sum
                         series.data[0] = sum * 0.1;

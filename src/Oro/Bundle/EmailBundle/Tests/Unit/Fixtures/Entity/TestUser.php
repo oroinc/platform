@@ -2,15 +2,17 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity;
 
-use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
+use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareInterface, EmailHolderInterface
 {
+    private $id;
+
     private $email;
 
     private $firstName;
@@ -62,10 +64,17 @@ class TestUser implements UserInterface, EmailOwnerInterface, OrganizationAwareI
 
     public function getId()
     {
+        return $this->id;
+    }
+
+    public function setId($id)
+    {
+        $this->id = $id;
     }
 
     public function getFullname($format = '')
     {
+        return $this->firstName . ' ' . $this->lastName;
     }
 
     public function getRoles()

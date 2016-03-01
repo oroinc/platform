@@ -27,6 +27,11 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
     protected $fieldHelper;
 
     /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $extendConfigProvider;
+
+    /**
      * @var ImportStrategyHelper
      */
     protected $helper;
@@ -47,12 +52,18 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->helper = new ImportStrategyHelper(
             $this->managerRegistry,
             $this->validator,
             $this->translator,
             $this->fieldHelper
         );
+
+        $this->helper->setConfigProvider($this->extendConfigProvider);
     }
 
     /**

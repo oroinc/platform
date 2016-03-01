@@ -13,7 +13,11 @@
                     startStep: entity.startStep.name | default(null),
                     stepsDisplayOrdered: entity.stepsDisplayOrdered,
                 },
-                system_entities: system_entities
+                system_entities: system_entities,
+                chartOptions: {},
+                connectionOptions: {
+                    detachable: true
+                }
             }
         }
     %}
@@ -32,9 +36,9 @@
 {% oro_title_set({params : {"%workflow_definition.label%": entity.label} }) %}
 {# API REST route for POST used both for create and update #}
 {% if entity.name %}
-    {% set formAction = path('oro_workflow_api_rest_workflowdefinition_post', {workflowDefinition: entity.name}) %}
+    {% set formAction = path('oro_api_workflow_definition_post', {workflowDefinition: entity.name}) %}
 {% else %}
-    {% set formAction = path('oro_workflow_api_rest_workflowdefinition_post') %}
+    {% set formAction = path('oro_api_workflow_definition_post') %}
 {% endif %}
 
 {% block head_script %}
@@ -301,12 +305,16 @@
 
     <script type="text/template" id="step-list-template">
         <div class="grid-container steps-list">
+            <input name="oro_workflow_definition_form[steps]" type="hidden" value=''>
+            <input name="oro_workflow_definition_form[transitions]" type="hidden" value=''>
             <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
-                    <th class="label-column"><span>{{ "Step"|trans }}</span></th>
-                    <th><span>{{ "Transitions"|trans }}</span></th>
-                    <th><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">{{ "Position"|trans }}</span></th>
-                    <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                    <tr>
+                        <th class="label-column"><span>{{ "Step"|trans }}</span></th>
+                        <th><span>{{ "Transitions"|trans }}</span></th>
+                        <th><span title="{{ "oro.workflow.workflowdefinition.step.order.tooltip"|trans({}, "tooltips") }}">{{ "Position"|trans }}</span></th>
+                        <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                    </tr>
                 </thead>
                 <tbody class="item-container"></tbody>
             </table>
@@ -382,10 +390,12 @@
         <div class="grid-container form-options-list">
             <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
-                <th><span>{{ "Entity field"|trans }}</span></th>
-                <th><span>{{ "Label"|trans }}</span></th>
-                <th><span>{{ "Required"|trans }}</span></th>
-                <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                    <tr>
+                        <th><span>{{ "Entity field"|trans }}</span></th>
+                        <th><span>{{ "Label"|trans }}</span></th>
+                        <th><span>{{ "Required"|trans }}</span></th>
+                        <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                    </tr>
                 </thead>
                 <tbody class="item-container"></tbody>
             </table>
@@ -424,9 +434,11 @@
         <div class="grid-container transition-list">
             <table class="grid table-hover table table-bordered table-condensed" style="margin-bottom: 10px">
                 <thead>
-                <th><span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans({}, "tooltips") }}">{{ "Transition name"|trans }}</span></th>
-                <th><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">{{ "To step"|trans }}</span></th>
-                <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                    <tr>
+                        <th><span title="{{ "oro.workflow.workflowdefinition.transition.name.tooltip"|trans({}, "tooltips") }}">{{ "Transition name"|trans }}</span></th>
+                        <th><span title="{{ "oro.workflow.workflowdefinition.transition.step_to.tooltip"|trans({}, "tooltips") }}">{{ "To step"|trans }}</span></th>
+                        <th class="action-column"><span>{{ "Actions"|trans }}</span></th>
+                    </tr>
                 </thead>
                 <tbody class="item-container">
                 <tr class="no-rows-message">
@@ -479,32 +491,33 @@
     }] %}
 
     {% set stepsListWidget %}
-    <div class="clearfix">
-        <div class="workflow-definition-buttons">
-            <div class="pull-right">
-                <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
-                <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
-            </div>
+
+    <div class="workflow-definition-buttons clearfix">
+        <div class="pull-right">
+            <button type="button" class="btn btn-primary add-transition-btn"><i class="icon-plus"></i> {{ 'Add transition'|trans }}</button>
+            <button type="button" class="btn btn-primary add-step-btn"><i class="icon-plus"></i> {{ 'Add step'|trans }}</button>
+            <button type="button" class="btn btn-primary refresh-btn"><i class="icon-refresh"></i> {{ 'Auto sort'|trans }}</button>
         </div>
+        <div class="pull-right workflow-history-container"></div>
     </div>
 
-    <div role="tabpanel" class="workflow-step-editor oro-tabs">
-
-        <!-- Nav tabs -->
-        <ul class="nav nav-tabs" role="tablist">
-            <li role="presentation" class="active"><a href="#chart-editor" aria-controls="chart-editor" role="tab" data-toggle="tab">Chart editor</a></li>
-            <li role="presentation"><a href="#table-editor" aria-controls="table" role="tab-editor" data-toggle="tab">Table editor</a></li>
-        </ul>
-
-        <!-- Tab panes -->
-        <div class="tab-content">
-            <div role="tabpanel" class="tab-pane active" id="chart-editor">
-                <div class="workflow-flowchart clearfix"></div>
-            </div>
-            <div role="tabpanel" class="tab-pane" id="table-editor">
+    <div class="workflow-step-editor row-fluid clearfix">
+        <div class="{% if isMobileVersion() %}span12{% else %}span5{% endif %}">
+            <div class="workflow-table-container">
                 <div class="workflow-definition-steps-list-container clearfix"></div>
             </div>
         </div>
+        {% if not isMobileVersion() %}
+        <div class="span7">
+            <div class="workflow-flowchart-container">
+                <div class="workflow-flowchart-controls clearfix"></div>
+                <div class="workflow-flowchart-wrapper" {{ UI.renderPageComponentAttributes({
+                    'module': 'oroui/js/app/components/view-component',
+                    'options': {'view': 'oroui/js/app/views/zoomable-area-view', 'autozoom': 'true'}
+                }) }}><div class="workflow-flowchart clearfix"></div></div>
+            </div>
+        </div>
+        {% endif %}
     </div>
     {% endset %}
 
@@ -512,7 +525,6 @@
         'title' : 'Designer'|trans,
         'subblocks': [
             {
-                'title': 'Workflow steps and transitions'|trans,
                 'data': [stepsListWidget]
             }
         ]

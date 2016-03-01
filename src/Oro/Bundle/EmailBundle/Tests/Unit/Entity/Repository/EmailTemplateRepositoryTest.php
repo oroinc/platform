@@ -73,7 +73,9 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repository->getEntityTemplatesQueryBuilder(
             'Oro\Bundle\UserBundle\Entity\User',
             new Organization(),
-            true
+            true,
+            true,
+            false
         );
     }
 
@@ -111,7 +113,9 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
         $this->repository->getEntityTemplatesQueryBuilder(
             'Oro\Bundle\UserBundle\Entity\User',
             new Organization(),
-            true
+            true,
+            true,
+            false
         );
     }
 
@@ -148,7 +152,10 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
 
         $this->repository->getEntityTemplatesQueryBuilder(
             'Oro\Bundle\UserBundle\Entity\User',
-            new Organization()
+            new Organization(),
+            false,
+            true,
+            false
         );
     }
 
@@ -187,6 +194,7 @@ class EmailTemplateRepositoryTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\UserBundle\Entity\User',
             new Organization(),
             true,
+            false,
             false
         );
     }

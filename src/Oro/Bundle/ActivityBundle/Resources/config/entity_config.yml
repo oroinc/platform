@@ -8,12 +8,19 @@ oro_entity_config:
                         require_schema_update: true
                         priority:           250
                     form:
-                        type:               oro_entity_extend_multiple_association_choice
+                        type:               oro_activity_multiple_association_choice
                         options:
                             block:          associations
                             required:       false
                             label:          oro.activity.activities
                             association_class: activity
+                            tooltip:        oro.activity.entity_config.activity.entity.items.activities.tooltip
+
+                # target entity classes whose activities will be shown in current entity
+                # if entity one has relation with entity two and for both enabled activity
+                # we can configure entity one using this option for show activities from related entity two
+                inheritance_targets: # array of strings
+                    options: []
 
                 # this attribute can be used to prohibit changing activity state (no matter whether
                 # it is enabled or not) for the entity
@@ -51,11 +58,27 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                # this attribute can be used to change page,
+                # which will display "activity list" and activity buttons.
+                # Possible values in \Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope
+                # Can be used as bitmask
+                show_on_page: # string
+                    options:
+                        default_value:      '\Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE'
+
                 # the widget name of the activity action that is used for render a link in dropdown menu
                 # this widget should be defined in placeholders.yml
                 # this attribute can be defined for activity entity
                 # please note that an activity should provide both action_link_widget and action_link_widget,
                 # because actions can be rendered as a button as a dropdown menu
                 action_link_widget: # string
+                    options:
+                        auditable:          false
+
+    grid:
+        entity:
+            items:
+                # grid name that used for rendering entity context
+                context: # string
                     options:
                         auditable:          false

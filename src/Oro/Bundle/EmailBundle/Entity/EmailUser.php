@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Entity;
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 
 use Doctrine\ORM\Mapping as ORM;
+use Doctrine\Common\Collections\ArrayCollection;
 
 use JMS\Serializer\Annotation as JMS;
 
@@ -19,7 +20,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  * @ORM\Table(
  *      name="oro_email_user"
  * )
- * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository")
  *
@@ -27,7 +27,6 @@ use Oro\Bundle\UserBundle\Entity\User;
  *      defaultValues={
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW;CREATE;EDIT",
  *              "group_name"=""
  *          },
  *          "ownership"={
@@ -42,6 +41,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  */
 class EmailUser
 {
+    const ENTITY_CLASS = 'Oro\Bundle\EmailBundle\Entity\EmailUser';
+
     /**
      * @var integer
      *
@@ -86,6 +87,15 @@ class EmailUser
     protected $owner;
 
     /**
+     * @var Mailbox
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\EmailBundle\Entity\Mailbox", inversedBy="emailUsers")
+     * @ORM\JoinColumn(name="mailbox_owner_id", referencedColumnName="id", onDelete="SET NULL")
+     * @JMS\Exclude
+     */
+    protected $mailboxOwner;
+
+    /**
      * @var \DateTime
      *
      * @ORM\Column(name="received", type="datetime")
@@ -104,22 +114,94 @@ class EmailUser
     protected $seen = false;
 
     /**
-     * @var EmailFolder $folder
+     * @var EmailOrigin
      *
-     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="emailUsers", cascade={"persist", "remove"})
-     * @ORM\JoinColumn(name="folder_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="emailUsers")
+     * @ORM\JoinColumn(name="origin_id", referencedColumnName="id")
      * @JMS\Exclude
      */
-    protected $folder;
+    protected $origin;
 
     /**
-     * @var Email $email
+     * @var ArrayCollection|EmailFolder[]
      *
-     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist", "remove"})
+     * @ORM\ManyToMany(
+     *      targetEntity="EmailFolder",
+     *      inversedBy="emailUsers",
+     *      cascade={"persist"}
+     * )
+     * @ORM\JoinTable(name="oro_email_user_folders",
+     *     joinColumns={@ORM\JoinColumn(name="email_user_id", referencedColumnName="id", onDelete="CASCADE")},
+     *     inverseJoinColumns={@ORM\JoinColumn(name="folder_id", referencedColumnName="id", onDelete="CASCADE")},
+     * )
+     * @JMS\Exclude
+     */
+    protected $folders;
+
+    /**
+     * @var Email
+     *
+     * @ORM\ManyToOne(targetEntity="Email", inversedBy="emailUsers", cascade={"persist"})
      * @ORM\JoinColumn(name="email_id", referencedColumnName="id", nullable=false, onDelete="CASCADE")
      * @JMS\Exclude
      */
     protected $email;
+
+    /**
+     * @var int
+     *
+     * @ORM\Column(type="integer", options={"default"=0})
+     */
+    protected $unsyncedFlagCount = 0;
+
+    public function __construct()
+    {
+        $this->folders = new ArrayCollection();
+    }
+
+    /**
+     * @return ArrayCollection|EmailFolder[]
+     */
+    public function getFolders()
+    {
+        return $this->folders;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
+    public function addFolder(EmailFolder $folder)
+    {
+        $this->folders->add($folder);
+
+        return $this;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     *
+     * @deprecated since 1.9. Use EmailUser::addFolder instead
+     */
+    public function setFolder(EmailFolder $folder)
+    {
+        return $this->addFolder($folder);
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
+    public function removeFolder(EmailFolder $folder)
+    {
+        $this->folders->removeElement($folder);
+
+        return $this;
+    }
 
     /**
      * Get id
@@ -237,28 +319,6 @@ class EmailUser
     }
 
     /**
-     * Get email folder
-     *
-     * @return EmailFolder
-     */
-    public function getFolder()
-    {
-        return $this->folder;
-    }
-
-    /**
-     * @param EmailFolder $folder
-     *
-     * @return $this
-     */
-    public function setFolder($folder)
-    {
-        $this->folder = $folder;
-
-        return $this;
-    }
-
-    /**
      * Get email
      *
      * @return Email
@@ -290,5 +350,135 @@ class EmailUser
     public function beforeSave()
     {
         $this->createdAt = new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @return Mailbox|null
+     */
+    public function getMailboxOwner()
+    {
+        return $this->mailboxOwner;
+    }
+
+    /**
+     * @param Mailbox|null $mailboxOwner
+     *
+     * @return $this
+     */
+    public function setMailboxOwner(Mailbox $mailboxOwner = null)
+    {
+        $this->mailboxOwner = $mailboxOwner;
+
+        return $this;
+    }
+
+    /**
+     * Get email user origin
+     *
+     * @return EmailOrigin
+     */
+    public function getOrigin()
+    {
+        return $this->origin;
+    }
+
+    /**
+     * Set email user origin
+     *
+     * @param EmailOrigin $origin
+     *
+     * @return EmailUser
+     */
+    public function setOrigin(EmailOrigin $origin)
+    {
+        $this->origin = $origin;
+
+        return $this;
+    }
+
+    /**
+     * @return int
+     */
+    public function getUnsyncedFlagCount()
+    {
+        return $this->unsyncedFlagCount;
+    }
+
+    /**
+     * @return $this
+     */
+    public function incrementUnsyncedFlagCount()
+    {
+        $this->unsyncedFlagCount++;
+
+        return $this;
+    }
+
+    /**
+     * @return $this
+     */
+    public function decrementUnsyncedFlagCount()
+    {
+        $this->unsyncedFlagCount = max([0, $this->unsyncedFlagCount - 1]);
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isOutgoing()
+    {
+        $directions = $this->getFolderDirections();
+        if (in_array(EmailFolder::DIRECTION_OUTGOING, $directions)) {
+            return true;
+        }
+
+        if (in_array(EmailFolder::DIRECTION_INCOMING, $directions)) {
+            return false;
+        }
+
+        return $this->getEmail() &&
+            $this->getEmail()->getFromEmailAddress() &&
+            $this->getEmail()->getFromEmailAddress()->getOwner() === $this->getOwner();
+    }
+
+    /**
+     * @return bool
+     */
+    public function isIncoming()
+    {
+        $directions = $this->getFolderDirections();
+        if (in_array(EmailFolder::DIRECTION_INCOMING, $directions)) {
+            return true;
+        }
+
+        if (in_array(EmailFolder::DIRECTION_OUTGOING, $directions)) {
+            return false;
+        }
+
+        return $this->getEmail() &&
+            $this->getEmail()->getFromEmailAddress() &&
+            $this->getEmail()->getFromEmailAddress()->getOwner() !== $this->getOwner();
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
+
+    /**
+     * @return string[]
+     */
+    protected function getFolderDirections()
+    {
+        return array_unique(
+            $this->folders->map(function (EmailFolder $folder) {
+                return $folder->getDirection();
+            })->toArray()
+        );
     }
 }

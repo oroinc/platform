@@ -7,14 +7,17 @@ use Symfony\Component\PropertyAccess\PropertyAccessor;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 
 class FieldHelper
 {
-    /** @var ConfigProviderInterface */
+    const HAS_CONFIG = 'has_config';
+
+    const IDENTITY_ONLY_WHEN_NOT_EMPTY = -1;
+
+    /** @var ConfigProvider */
     protected $configProvider;
 
     /** @var EntityFieldProvider */
@@ -29,14 +32,23 @@ class FieldHelper
     /** @var array */
     protected $fieldsCache = [];
 
+    /** @var array */
+    protected $relationsCache = [];
+
+    /** @var array */
+    protected $fieldsConfigCache = [];
+
+    /** @var array */
+    protected $identityFieldsCache = [];
+
     /**
-     * @param EntityFieldProvider     $fieldProvider
-     * @param ConfigProviderInterface $configProvider
-     * @param FieldTypeHelper         $fieldTypeHelper
+     * @param EntityFieldProvider $fieldProvider
+     * @param ConfigProvider      $configProvider
+     * @param FieldTypeHelper     $fieldTypeHelper
      */
     public function __construct(
         EntityFieldProvider $fieldProvider,
-        ConfigProviderInterface $configProvider,
+        ConfigProvider $configProvider,
         FieldTypeHelper $fieldTypeHelper
     ) {
         $this->fieldProvider   = $fieldProvider;
@@ -45,6 +57,8 @@ class FieldHelper
     }
 
     /**
+     * @see \Oro\Bundle\EntityBundle\Provider\EntityFieldProvider::getFields
+     *
      * @param string $entityName
      * @param bool   $withRelations
      * @param bool   $withVirtualFields
@@ -81,6 +95,35 @@ class FieldHelper
     }
 
     /**
+     * @see \Oro\Bundle\EntityBundle\Provider\EntityFieldProvider::getRelations
+     *
+     * @param string $entityName
+     * @param bool $withEntityDetails
+     * @param bool $applyExclusions
+     * @param bool $translate
+     * @return array
+     */
+    public function getRelations(
+        $entityName,
+        $withEntityDetails = false,
+        $applyExclusions = true,
+        $translate = true
+    ) {
+        $args = func_get_args();
+        $cacheKey = implode(':', $args);
+        if (!array_key_exists($cacheKey, $this->relationsCache)) {
+            $this->relationsCache[$cacheKey] = $this->fieldProvider->getRelations(
+                $entityName,
+                $withEntityDetails,
+                $applyExclusions,
+                $translate
+            );
+        }
+
+        return $this->relationsCache[$cacheKey];
+    }
+
+    /**
      * @param string $entityName
      * @param string $fieldName
      * @param string $parameter
@@ -89,16 +132,36 @@ class FieldHelper
      */
     public function getConfigValue($entityName, $fieldName, $parameter, $default = null)
     {
+        $key = $this->getCacheKey($entityName, $fieldName);
+
+        if (array_key_exists($key, $this->fieldsConfigCache)
+            && array_key_exists($parameter, $this->fieldsConfigCache[$key])
+        ) {
+            return $this->fieldsConfigCache[$key][$parameter];
+        }
+
         if (!$this->configProvider->hasConfig($entityName, $fieldName)) {
-            return $default;
+            $this->fieldsConfigCache[$key][self::HAS_CONFIG] = false;
+            $this->fieldsConfigCache[$key][$parameter] = $default;
+
+            return $this->fieldsConfigCache[$key][$parameter];
         }
 
-        $fieldConfig = $this->configProvider->getConfig($entityName, $fieldName);
-        if (!$fieldConfig->has($parameter)) {
-            return $default;
-        }
+        $this->fieldsConfigCache[$key][self::HAS_CONFIG] = true;
+        $this->fieldsConfigCache[$key][$parameter] = $this->configProvider->getConfig($entityName, $fieldName)
+            ->get($parameter, false, $default);
 
-        return $fieldConfig->get($parameter);
+        return $this->fieldsConfigCache[$key][$parameter];
+    }
+
+    /**
+     * @param string $entityName
+     * @param string $fieldName
+     * @return string
+     */
+    protected function getCacheKey($entityName, $fieldName)
+    {
+        return $entityName . ':' . $fieldName;
     }
 
     /**
@@ -108,6 +171,11 @@ class FieldHelper
      */
     public function hasConfig($className, $fieldName = null)
     {
+        $key = $this->getCacheKey($className, $fieldName);
+        if (array_key_exists($key, $this->fieldsConfigCache)) {
+            return !empty($this->fieldsConfigCache[$key][self::HAS_CONFIG]);
+        }
+
         return $this->configProvider->hasConfig($className, $fieldName);
     }
 
@@ -128,10 +196,7 @@ class FieldHelper
      */
     public function processRelationAsScalar($className, $fieldName)
     {
-        /** @var Config $fieldConfig */
-        $fieldConfig = $this->configProvider->getConfig($className, $fieldName);
-
-        return $fieldConfig->is('process_as_scalar');
+        return (bool)$this->getConfigValue($className, $fieldName, 'process_as_scalar', false);
     }
 
     /**
@@ -240,19 +305,62 @@ class FieldHelper
     public function getIdentityValues($entity)
     {
         $entityName = ClassUtils::getClass($entity);
-        $fields = $this->getFields($entityName, true);
+        $identityFieldNames = $this->getIdentityFieldNames($entityName);
 
-        $identityValues = [];
-        foreach ($fields as $field) {
-            $fieldName = $field['name'];
-            if (!$this->getConfigValue($entityName, $fieldName, 'excluded', false)
-                && $this->getConfigValue($entityName, $fieldName, 'identity', false)
-            ) {
-                $identityValues[$fieldName] = $this->getObjectValue($entity, $fieldName);
+        return $this->getFieldsValues($entity, $identityFieldNames);
+    }
+
+    /**
+     * Checks if a field should be used as an identity even if it has empty value
+     *
+     * @param string $entityName
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    public function isRequiredIdentityField($entityName, $fieldName)
+    {
+        $value = $this->getConfigValue($entityName, $fieldName, 'identity', false);
+
+        return $value && self::IDENTITY_ONLY_WHEN_NOT_EMPTY !== $value;
+    }
+
+    /**
+     * @param string $entityName
+     * @return string[]
+     */
+    public function getIdentityFieldNames($entityName)
+    {
+        if (!array_key_exists($entityName, $this->identityFieldsCache)) {
+            $this->identityFieldsCache[$entityName] = [];
+
+            $fields = $this->getFields($entityName, true);
+            foreach ($fields as $field) {
+                $fieldName = $field['name'];
+                if (!$this->getConfigValue($entityName, $fieldName, 'excluded', false)
+                    && $this->getConfigValue($entityName, $fieldName, 'identity', false)
+                ) {
+                    $this->identityFieldsCache[$entityName][] = $fieldName;
+                }
             }
         }
 
-        return $identityValues;
+        return $this->identityFieldsCache[$entityName];
+    }
+
+    /**
+     * @param object $entity
+     * @param array $fieldNames
+     * @return array
+     */
+    public function getFieldsValues($entity, $fieldNames)
+    {
+        $values = [];
+        foreach ($fieldNames as $fieldName) {
+            $values[$fieldName] = $this->getObjectValue($entity, $fieldName);
+        }
+
+        return $values;
     }
 
     /**

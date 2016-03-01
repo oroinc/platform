@@ -1,19 +1,28 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'oroui/js/app/views/base/page-region-view'
-], function (PageRegionView) {
+], function(PageRegionView) {
     'use strict';
 
     var MostViewedView;
 
     MostViewedView = PageRegionView.extend({
-        template: function (data) {
-            return data.mostviewed;
-        },
-        pageItems: ['mostviewed'],
+        template: function() {},
+        pageItems: [],
+        dataItems: null,
 
-        render: function () {
+        initialize: function(options) {
+            this.dataItems = options.dataItems || 'mostviewed';
+            this.pageItems = [this.dataItems];
+
+            var self = this;
+            this.template = function(data) {
+                return data[self.dataItems];
+            };
+
+            MostViewedView.__super__.initialize.apply(this, arguments);
+        },
+
+        render: function() {
             // does not update view is data is from cache
             if (!this.actionArgs || this.actionArgs.options.fromCache === true) {
                 return this;

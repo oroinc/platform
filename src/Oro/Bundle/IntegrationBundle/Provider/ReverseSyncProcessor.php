@@ -16,11 +16,13 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
      * @param Integration $integration Integration object
      * @param string      $connector   Connector name
      * @param array       $parameters  Connector additional parameters
+     *
+     * @return bool
      */
     public function process(Integration $integration, $connector, array $parameters)
     {
         if (!$integration->isEnabled()) {
-            return;
+            return false;
         }
 
         try {
@@ -32,10 +34,10 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
                 throw new LogicException('This connector does not support reverse sync.');
             }
 
-        } catch (\Exception $e) {
-            $this->logger->error($e->getMessage());
+        } catch (\Exception $exception) {
+            $this->logger->error($exception->getMessage(), ['exception' => $exception]);
 
-            return;
+            return false;
         }
 
         $processorAliases = $this->processorRegistry->getProcessorAliasesByEntity(
@@ -55,12 +57,14 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
                 ),
         ];
 
-        $this->processExport($realConnector->getExportJobName(), $configuration);
+        return $this->processExport($realConnector->getExportJobName(), $configuration);
     }
 
     /**
      * @param string $jobName
-     * @param array $configuration
+     * @param array  $configuration
+     *
+     * @return bool
      */
     protected function processExport($jobName, array $configuration)
     {
@@ -97,18 +101,7 @@ class ReverseSyncProcessor extends AbstractSyncProcessor
 
             $this->logger->error($exceptions);
         }
-    }
 
-    /**
-     * Clone object here because it will be modified and changes should not be shared between
-     *
-     * @param Integration $integration
-     * @param string      $connector
-     *
-     * @return TwoWaySyncConnectorInterface
-     */
-    protected function getRealConnector(Integration $integration, $connector)
-    {
-        return clone $this->registry->getConnectorType($integration->getType(), $connector);
+        return $isSuccess;
     }
 }

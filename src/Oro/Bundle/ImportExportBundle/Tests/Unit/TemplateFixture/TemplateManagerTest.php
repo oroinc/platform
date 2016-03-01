@@ -95,12 +95,17 @@ class TemplateManagerTest extends \PHPUnit_Framework_TestCase
             $fixture,
             $this->templateManager->getEntityRepository('Test\Entity2')
         );
+    }
 
-        $this->setExpectedException(
-            'Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException',
-            'The template repository for "Test\Entity3" was not registered.'
+    public function testGetEntityRepositoryForUnknownEntityType()
+    {
+        $repository = $this->templateManager->getEntityFixture('Test\Entity1');
+
+        $this->assertInstanceOf(
+            'Oro\Bundle\ImportExportBundle\TemplateFixture\EmptyFixture',
+            $repository
         );
-        $this->templateManager->getEntityRepository('Test\Entity3');
+        $this->assertEquals('Test\Entity1', $repository->getEntityClass());
     }
 
     public function testGetEntityFixture()
@@ -124,12 +129,17 @@ class TemplateManagerTest extends \PHPUnit_Framework_TestCase
             $fixture,
             $this->templateManager->getEntityFixture('Test\Entity2')
         );
+    }
 
-        $this->setExpectedException(
-            'Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException',
-            'The template fixture for "Test\Entity1" was not registered.'
+    public function testGetEntityFixtureForUnknownEntityType()
+    {
+        $fixture = $this->templateManager->getEntityFixture('Test\Entity1');
+
+        $this->assertInstanceOf(
+            'Oro\Bundle\ImportExportBundle\TemplateFixture\EmptyFixture',
+            $fixture
         );
-        $this->templateManager->getEntityFixture('Test\Entity1');
+        $this->assertEquals('Test\Entity1', $fixture->getEntityClass());
     }
 
     public function testFrozenTemplateManager()

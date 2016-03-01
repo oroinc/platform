@@ -1,29 +1,13 @@
-/*global define*/
-define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/translator', 'routing'],
-    function (_, modal, mediator, __, routing) {
+define(function(require) {
     'use strict';
 
-    /**
-     * @extends oro.Modal
-     */
-    var WidgetPickerDialog = modal.extend({
-        open: function() {
-            Backbone.BootstrapModal.prototype.open.apply(this, arguments);
-            var addWidgetControls = $('.add-widget-button');
-            var collapseControls = $('.dashboard-picker-collapse');
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var routing = require('routing');
+    var mediator = require('oroui/js/mediator');
+    var WidgetPickerModal = require('orodashboard/js/widget-picker-modal');
 
-            collapseControls.unbind('click', this.options.collapseCallback);
-            collapseControls.bind('click', {}, this.options.collapseCallback);
-
-            addWidgetControls.unbind('click', this.options.clickAddToDashboardCallback);
-            addWidgetControls.bind('click', {controls: addWidgetControls}, this.options.clickAddToDashboardCallback);
-        }
-    });
-
-    /**
-     * @export  orodashboard/js/widget-picker
-     * @class   orodashboard.WidgetPicker
-     */
     return {
         /**
          * @property {integer}
@@ -44,88 +28,24 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
          * @param {integer} dashboardId
          */
         init: function(dashboardId) {
+            this.targetColumn = 0;
             this.dashboardId = dashboardId;
-
-            this.dialog = new WidgetPickerDialog({
-                content: $('#available-dashboard-widgets').html(),
-                className: 'modal dashboard-widgets-wrapper',
-                title: __('oro.dashboard.add_dashboard_widgets.title'),
-                clickAddToDashboardCallback: _.bind(this._onClickAddToDashboard, this),
-                collapseCallback: this._collapseDelegate
-            });
-
             $('.dashboard-widgets-add').bind('click', _.bind(this._onClickAddWidget, this));
         },
 
-        /**
-         * @private
-         */
-        _collapseDelegate: function(){
-            var $this = $(this);
-            var container = $this.parents('.dashboard-widget-container');
-            $this.toggleClass('collapsed-state');
-            container.find('.dashboard-widgets-description').fadeToggle();
-        },
-
-        /**
-         * @param {Event} event
-         * @private
-         */
-        _onClickAddToDashboard: function(event){
-            var $control = $(event.target);
-            if ($control.hasClass('disabled')) {
-                return;
-            }
-            var widgetContainer = $control.parents('.dashboard-widget-container');
-            var controls = event.data.controls;
-            var self = this;
-            this._startLoading(controls, widgetContainer);
-            $.post(
+        loadWidget: function(widgetName) {
+            return $.post(
                 routing.generate('oro_api_post_dashboard_widget_add_widget'),
                 {
-                    widgetName: $control.data('widget-name'),
+                    widgetName: widgetName,
                     dashboardId: this.dashboardId,
                     targetColumn: this.targetColumn
                 },
-                function (response) {
+                function(response) {
                     mediator.trigger('dashboard:widget:add', response);
-                    self._endLoading(controls, widgetContainer);
-                }, 'json'
+                },
+                'json'
             );
-        },
-
-        /**
-         * @param {jQuery} controls collection
-         * @param {jQuery} widgetContainer current widget container
-         * @private
-         */
-        _startLoading: function(controls, widgetContainer){
-            controls.addClass('disabled');
-            var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
-            widgetButtonWrapper.addClass('loading-content');
-            widgetButtonWrapper.find('.add-widget-button').hide();
-        },
-
-        /**
-         * @param {jQuery} controls collection
-         * @param {jQuery} widgetContainer current widget container
-         * @private
-         */
-        _endLoading: function(controls, widgetContainer){
-            controls.removeClass('disabled');
-            var widgetButtonWrapper = widgetContainer.find('.dashboard-widgets-pick-wrapper');
-            widgetButtonWrapper.removeClass('loading-content');
-            //fix case if modal window closed after press and before loading complete
-            widgetButtonWrapper.find('.add-widget-button').css('display', 'inline-block');
-            var previous = widgetContainer.css('background-color');
-            var animateFinish = function () {
-                animateFinish = function() {
-                    widgetContainer.css({backgroundColor: ''});
-                };
-                widgetContainer.animate({backgroundColor: previous}, animateFinish);
-            };
-
-            widgetContainer.animate({backgroundColor: "#F5F55B"}, 50, animateFinish);
         },
 
         /**
@@ -135,8 +55,16 @@ define(['underscore', 'oroui/js/modal', 'oroui/js/mediator', 'orotranslation/js/
         _onClickAddWidget: function(event) {
             event.preventDefault();
             var columnIndex = $(event.target).closest('.dashboard-column').index();
-            this.targetColumn = (columnIndex == -1) ? 0 : columnIndex;
-            this.dialog.open();
+            this.targetColumn = (columnIndex === -1) ? 0 : columnIndex;
+
+            var dialog = new WidgetPickerModal({
+                content: $('#available-dashboard-widgets').html(),
+                className: 'modal oro-modal-normal dashboard-widgets-wrapper',
+                title: __('oro.dashboard.add_dashboard_widgets.title'),
+                loadWidget: _.bind(this.loadWidget, this),
+                cancelText: __('Close')
+            });
+            dialog.open();
         }
     };
 });

@@ -58,6 +58,9 @@ class RawLayout
     /** @var array */
     protected $blockThemes = [];
 
+    /** @var array */
+    protected $formThemes = [];
+
     public function __construct()
     {
         $this->hierarchy = new HierarchyCollection();
@@ -507,6 +510,41 @@ class RawLayout
         } else {
             $this->blockThemes[$id] = array_merge($this->blockThemes[$id], (array)$themes);
         }
+    }
+
+    /**
+     * Returns all registered themes to be used for rendering forms
+     *
+     * Example of returned data:
+     *  [
+     *      'MyBundle:Layout:div_form_layout.html.twig',
+     *      'AcmeBundle:Layout:div_form_layout.html.twig'
+     *  ]
+     *
+     * @return array
+     */
+    public function getFormThemes()
+    {
+        return $this->formThemes;
+    }
+
+    /**
+     * Sets the theme(s) to be used for rendering the layout item and its children
+     *
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     *
+     * @return self
+     */
+    public function setFormTheme($themes)
+    {
+        if (empty($themes)) {
+            throw new Exception\InvalidArgumentException('The theme must not be empty.');
+        }
+        if (!is_string($themes) && !is_array($themes)) {
+            throw new Exception\UnexpectedTypeException($themes, 'string or array of strings', 'themes');
+        }
+
+        $this->formThemes = array_merge($this->formThemes, (array)$themes);
     }
 
     /**

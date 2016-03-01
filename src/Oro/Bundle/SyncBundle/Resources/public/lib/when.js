@@ -78,8 +78,7 @@ define(function (require) {
 		 * @return {Promise} new Promise
 		 */
 		then: function(onFulfilled, onRejected, onProgress) {
-			/*jshint unused:false*/
-			var args, sendMessage;
+						var args, sendMessage;
 
 			args = arguments;
 			sendMessage = this._message;
@@ -832,8 +831,7 @@ define(function (require) {
 
 	// Prefer setImmediate or MessageChannel, cascade to node,
 	// vertx and finally setTimeout
-	/*global setImmediate,MessageChannel,process*/
-	if (typeof setImmediate === 'function') {
+		if (typeof setImmediate === 'function') {
 		nextTick = setImmediate.bind(global);
 	} else if(typeof MessageChannel !== 'undefined') {
 		var channel = new MessageChannel();
@@ -874,8 +872,7 @@ define(function (require) {
 	// 1. It does not check if reduceFunc is a Callable
 	reduceArray = arrayProto.reduce ||
 		function(reduceFunc /*, initialValue */) {
-			/*jshint maxcomplexity: 7*/
-			var arr, args, reduced, len, i;
+						var arr, args, reduced, len, i;
 
 			i = 0;
 			arr = Object(this);

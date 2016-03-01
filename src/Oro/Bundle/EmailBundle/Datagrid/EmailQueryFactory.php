@@ -2,10 +2,14 @@
 
 namespace Oro\Bundle\EmailBundle\Datagrid;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EmailQueryFactory
 {
@@ -18,16 +22,28 @@ class EmailQueryFactory
     /** @var string */
     protected $fromEmailExpression;
 
+    /** @var Registry */
+    protected $mailboxManager;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
      * @param EmailOwnerProviderStorage $emailOwnerProviderStorage
      * @param EntityNameResolver        $entityNameResolver
+     * @param MailboxManager            $mailboxManager
+     * @param SecurityFacade            $securityFacade
      */
     public function __construct(
         EmailOwnerProviderStorage $emailOwnerProviderStorage,
-        EntityNameResolver $entityNameResolver
+        EntityNameResolver $entityNameResolver,
+        MailboxManager $mailboxManager,
+        SecurityFacade $securityFacade
     ) {
         $this->emailOwnerProviderStorage = $emailOwnerProviderStorage;
         $this->entityNameResolver        = $entityNameResolver;
+        $this->mailboxManager            = $mailboxManager;
+        $this->securityFacade            = $securityFacade;
     }
 
     /**
@@ -45,14 +61,44 @@ class EmailQueryFactory
     }
 
     /**
+     * Apply custom ACL checks
+     *
      * @param QueryBuilder $qb
-     * @param string $userId
      */
-    public function filterQueryByUserId(QueryBuilder $qb, $userId)
+    public function applyAcl(QueryBuilder $qb)
     {
-        if ($userId) {
-            $qb->andWhere('eu.owner = :owner')->setParameter('owner', $userId);
+        $user = $this->securityFacade->getLoggedUser();
+        $organization = $this->getOrganization();
+
+        $mailboxIds = $this->mailboxManager->findAvailableMailboxIds($user, $organization);
+
+        $exprs = [$qb->expr()->eq('eu.owner', ':owner')];
+        if ($organization) {
+            $exprs[] = $qb->expr()->eq('eu.organization ', ':organization');
+            $qb->setParameter('organization', $organization->getId());
         }
+        $uoCheck = call_user_func_array([$qb->expr(), 'andX'], $exprs);
+
+        if (!empty($mailboxIds)) {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $uoCheck,
+                    $qb->expr()->in('eu.mailboxOwner', ':mailboxIds')
+                )
+            );
+            $qb->setParameter('mailboxIds', $mailboxIds);
+        } else {
+            $qb->andWhere($uoCheck);
+        }
+        $qb->setParameter('owner', $user->getId());
+    }
+
+    /**
+     * @return Organization|null
+     */
+    protected function getOrganization()
+    {
+        return $this->securityFacade->getOrganization();
     }
 
     /**
@@ -78,9 +124,9 @@ class EmailQueryFactory
 
         $expression = '';
         foreach ($expressionsByOwner as $alias => $expressionPart) {
-            $expression .= sprintf('WHEN %s.%s IS NOT NULL THEN %s', $emailFromTableAlias, $alias, $expressionPart);
+            $expression .= sprintf('WHEN %s.%s IS NOT NULL THEN %s ', $emailFromTableAlias, $alias, $expressionPart);
         }
-        $expression = sprintf('CASE %s ELSE \'\' END', $expression);
+        $expression = sprintf('CASE %sELSE \'\' END', $expression);
 
         // if has owner then use expression to expose formatted name, use email otherwise
         return sprintf(

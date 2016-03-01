@@ -1,4 +1,3 @@
-/*global define*/
 define([
     'jquery',
     'underscore',
@@ -8,7 +7,7 @@ define([
     'oroui/js/modal',
     'oroui/js/app/views/base/view',
     'base64'
-], function ($, _, routing, __, mediator, Modal, BaseView) {
+], function($, _, routing, __, mediator, Modal, BaseView, base64) {
     'use strict';
 
     var PageStateView;
@@ -31,7 +30,7 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function () {
+        initialize: function() {
             var confirmModal;
 
             this._initialState = null;
@@ -55,7 +54,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -71,26 +70,27 @@ define([
          *
          * @param {Array} queue
          */
-        beforePageRefresh: function (queue) {
-            var deferred, confirmModal, self,
-                preservedState;
+        beforePageRefresh: function(queue) {
+            var deferred;
+            var confirmModal;
+            var self;
             if (!this.model.get('data')) {
                 // data is not set, nothing to compare with
                 return;
             }
-            preservedState = JSON.parse(this.model.get('data'));
+            var preservedState = JSON.parse(this.model.get('data'));
             if (this._isStateChanged(preservedState)) {
                 self = this;
                 confirmModal = this.subview('confirmModal');
                 deferred = $.Deferred();
 
-                deferred.always(function () {
+                deferred.always(function() {
                     self.stopListening(confirmModal);
                 });
-                this.listenTo(confirmModal, 'ok', function () {
+                this.listenTo(confirmModal, 'ok', function() {
                     deferred.resolve({resetChanges: true});
                 });
-                this.listenTo(confirmModal, 'cancel', function () {
+                this.listenTo(confirmModal, 'cancel', function() {
                     deferred.reject();
                 });
 
@@ -104,16 +104,9 @@ define([
          * if page changes is not preserved and the state is changed from initial
          * (excludes cancel action)
          */
-        beforePageChange: function (e) {
-            var action = $(e.target).data('action'),
-                href = $(e.target).attr('href');
-            if (
-                action !== 'cancel' &&
-                    !this._isStateTraceRequired() &&
-                    this._isStateChanged() &&
-                    !mediator.execute('compareUrl', href) && // link to same page
-                    href.substr(0, 11) !== 'javascript:' // javascript code link
-            ) {
+        beforePageChange: function(e) {
+            var action = $(e.target).data('action');
+            if (action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },
@@ -121,7 +114,7 @@ define([
         /**
          * Clear page state timer and model on page request is started
          */
-        onPageRequest: function () {
+        onPageRequest: function() {
             this._initialState = null;
             this._resetChanges = false;
             this._switchOffTrace();
@@ -132,7 +125,7 @@ define([
          * @param {Object} attributes
          * @param {Object} args
          */
-        onPageUpdate: function (attributes, args) {
+        onPageUpdate: function(attributes, args) {
             var options;
             options = (args || {}).options;
             this._resetChanges = Boolean(options && options.resetChanges);
@@ -142,7 +135,7 @@ define([
          * Handles window unload event and shows confirm dialog
          * if page changes is not preserved and the state is changed from initial
          */
-        onWindowUnload: function () {
+        onWindowUnload: function() {
             if (!this._isStateTraceRequired() && this._isStateChanged()) {
                 return __('oro.ui.leave_page_with_unsaved_data_confirm');
             }
@@ -151,10 +144,10 @@ define([
         /**
          * Fetches model's attributes from cache on page changes is done
          */
-        afterPageChange: function () {
+        afterPageChange: function() {
             var options;
 
-            if (this._hasForm()){
+            if (this._hasForm()) {
                 this._initialState = this._collectFormsData();
             }
             if (!this._hasForm() || !this._isStateTraceRequired()) {
@@ -173,7 +166,7 @@ define([
         /**
          * Switch on/off form state trace
          */
-        toggleStateTrace: function () {
+        toggleStateTrace: function() {
             var switchOn = this._isStateTraceRequired();
             if (switchOn) {
                 this._switchOnTrace({initial: true});
@@ -187,7 +180,7 @@ define([
          * @param {Object=} options
          * @protected
          */
-        _switchOnTrace: function (options) {
+        _switchOnTrace: function(options) {
             var attributes;
             attributes = mediator.execute('pageCache:state:fetch', 'form');
             if (attributes && attributes.id) {
@@ -201,7 +194,7 @@ define([
          * Switch off form state trace
          * @protected
          */
-        _switchOffTrace: function () {
+        _switchOffTrace: function() {
             this.$el.off('change.page-state');
             this.model.clear({silent: true});
         },
@@ -212,12 +205,18 @@ define([
          * @param {Object=} options
          * @protected
          */
-        _loadState: function (options) {
-            var url, self;
-            self = this;
+        _loadState: function(options) {
+            var self = this;
+            var checkIdRoute = 'oro_api_get_pagestate_checkid';
+            var pageStateRoutes = this.$el.find('#pagestate-routes');
+            if (pageStateRoutes.data()) {
+                this.model.postRoute = pageStateRoutes.data('pagestate-put-route');
+                this.model.putRoute = pageStateRoutes.data('pagestate-put-route');
+                checkIdRoute = pageStateRoutes.data('pagestate-checkid-route');
+            }
 
-            url = routing.generate('oro_api_get_pagestate_checkid', {'pageId': this._combinePageId()});
-            $.get(url).done(function (data) {
+            var url = routing.generate(checkIdRoute, {'pageId': this._combinePageId()});
+            $.get(url).done(function(data) {
                 var attributes;
                 attributes = {
                     pageId: data.pagestate.pageId || self._combinePageId(),
@@ -237,7 +236,7 @@ define([
          * @param {Object=} options
          * @protected
          */
-        _initStateTracer: function (attributes, options) {
+        _initStateTracer: function(attributes, options) {
             var currentData;
             options = options || {};
             currentData = JSON.stringify(this._collectFormsData());
@@ -255,7 +254,7 @@ define([
          * Updates state in cache on model sync
          * @protected
          */
-        _updateCache: function () {
+        _updateCache: function() {
             var attributes;
             attributes = {};
             _.extend(attributes, this.model.getAttributes());
@@ -267,7 +266,7 @@ define([
          * @returns {boolean}
          * @protected
          */
-        _hasForm: function () {
+        _hasForm: function() {
             return Boolean(this.$('form[data-collect=true]').length);
         },
 
@@ -275,7 +274,7 @@ define([
          * Handles model save
          * @protected
          */
-        _saveModel: function () {
+        _saveModel: function() {
             // page state is the same -- nothing to save
             if (this.model.get('pagestate').data === this.model.get('data')) {
                 return;
@@ -295,15 +294,13 @@ define([
          *  - updates model
          * @protected
          */
-        _collectState: function () {
-            var pageId, data;
-
-            pageId = this._combinePageId();
+        _collectState: function() {
+            var pageId = this._combinePageId();
             if (!pageId) {
                 return;
             }
 
-            data = JSON.stringify(this._collectFormsData());
+            var data = JSON.stringify(this._collectFormsData());
 
             if (data === this.model.get('data')) {
                 return;
@@ -320,10 +317,10 @@ define([
          * @returns {Array}
          * @protected
          */
-        _collectFormsData: function () {
+        _collectFormsData: function() {
             var data;
             data = [];
-            $('form[data-collect=true]').each(function (index, el) {
+            $('form[data-collect=true]').each(function(index, el) {
                 var items = $(el)
                     .find('input, textarea, select')
                     .not(':input[type=button],   :input[type=submit], :input[type=reset], ' +
@@ -334,10 +331,10 @@ define([
 
                 // collect select2 selected data
                 items = $(el).find('.select2[type=hidden], .select2[type=select]');
-                _.each(items, function (item) {
-                    var $item, itemData, selectedData;
-                    $item = $(item);
-                    itemData = {name: item.name, value: $item.val()};
+                _.each(items, function(item) {
+                    var selectedData;
+                    var $item = $(item);
+                    var itemData = {name: item.name, value: $item.val()};
 
                     if ($item.data('select2')) {
                         // select2 is already initialized
@@ -357,7 +354,7 @@ define([
          * Reads data from model and restores page forms
          * @protected
          */
-        _restoreState: function () {
+        _restoreState: function() {
             var data;
             data = this.model.get('data');
 
@@ -372,11 +369,11 @@ define([
          * @param {Array} data
          * @protected
          */
-        _restoreForms: function (data) {
-            $.each(data, function (index, el) {
+        _restoreForms: function(data) {
+            $.each(data, function(index, el) {
                 var form = $('form[data-collect=true]').eq(index);
 
-                $.each(el, function (i, input) {
+                $.each(el, function(i, input) {
                     var element = form.find('[name="' + input.name + '"]');
                     switch (element.prop('type')) {
                     case 'checkbox':
@@ -404,10 +401,10 @@ define([
          * @returns {string}
          * @protected
          */
-        _combinePageId: function () {
+        _combinePageId: function() {
             var route;
             route = this._parseCurrentURL();
-            return base64_encode(route.path);
+            return base64.encode(route.path);
         },
 
         /**
@@ -415,10 +412,9 @@ define([
          * @returns {Object}
          * @protected
          */
-        _parseCurrentURL: function () {
-            var route, _ref;
-            route = mediator.execute('currentUrl');
-            _ref = route.split('?');
+        _parseCurrentURL: function() {
+            var route = mediator.execute('currentUrl');
+            var _ref = route.split('?');
             route = {
                 path: _ref[0],
                 query: _ref[1] || ''
@@ -430,7 +426,7 @@ define([
          * Defines if page is in cache and state trace is required
          * @protected
          */
-        _isStateTraceRequired: function () {
+        _isStateTraceRequired: function() {
             return Boolean(this.collection.getCurrentModel());
         },
 
@@ -441,7 +437,7 @@ define([
          * @returns {boolean}
          * @protected
          */
-        _isStateChanged: function (state) {
+        _isStateChanged: function(state) {
             state = state || this._collectFormsData();
             return this._initialState !== null && this._isDifferentFromInitialState(state);
         },
@@ -455,11 +451,10 @@ define([
          * @returns {boolean}
          * @protected
          */
-        _isDifferentFromInitialState: function (state) {
-            var isSame,
-                initialState = this._initialState;
-            isSame = initialState && _.every(initialState, function (form, i) {
-                return _.isArray(state[i]) && _.every(form, function (field, j) {
+        _isDifferentFromInitialState: function(state) {
+            var initialState = this._initialState;
+            var isSame = initialState && _.every(initialState, function(form, i) {
+                return _.isArray(state[i]) && _.every(form, function(field, j) {
                     return _.isObject(state[i][j]) &&
                         state[i][j].name === field.name && state[i][j].value === field.value;
                 });

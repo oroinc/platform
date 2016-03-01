@@ -1,8 +1,7 @@
-/*global require*/
-require([
+define([
     'oroui/js/mediator',
     'oroui/js/app/controllers/base/controller'
-], function (mediator, BaseController) {
+], function(mediator, BaseController) {
     'use strict';
 
     /**
@@ -10,9 +9,10 @@ require([
      */
     BaseController.loadBeforeAction([
         'oroui/js/messenger'
-    ], function (messenger) {
+    ], function(messenger) {
         mediator.setHandler('addMessage', messenger.addMessage, messenger);
         mediator.setHandler('showMessage', messenger.notificationMessage, messenger);
+        mediator.setHandler('showProcessingMessage', messenger.showProcessingMessage, messenger);
         mediator.setHandler('showFlashMessage', messenger.notificationFlashMessage, messenger);
         mediator.setHandler('showErrorMessage', messenger.showErrorMessage, messenger);
     });

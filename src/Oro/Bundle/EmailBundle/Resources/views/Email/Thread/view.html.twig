@@ -1,6 +1,6 @@
 {% extends "OroUIBundle:actions:view.html.twig" %}
+{% import "OroActivityBundle::macros.html.twig" as AC %}
 {% import "OroEmailBundle::actions.html.twig" as Actions %}
-{% import "OroEmailBundle::macros.html.twig" as EA %}
 
 {% oro_title_set({params : {"%subject%": entity.subject} }) %}
 
@@ -19,7 +19,14 @@
 {% endblock pageActions %}
 
 {% block navButtons %}
-    {{ Actions.addContextButton(entity) }}
+    {% set buttonsHtml %}
+        {# Button for add context on the activity list item view page #}
+        {{ AC.addContextButton(entity) }}
+        {{ Actions.addMarkUnreadButton(entity) }}
+    {% endset %}
+    {{ UI.pinnedDropdownButton({
+        'html': buttonsHtml
+    }) }}
 {% endblock navButtons %}
 
 {% block breadcrumb %}
@@ -30,8 +37,9 @@
 {% endblock breadcrumb %}
 
 {% block stats %}
-    <li class="context-data email-context-activity-block">
-        {{ EA.email_contexts(entity) }}
+    {# Display contexts targets in the activity view page #}
+    <li class="context-data activity-context-activity-block">
+        {{ AC.activity_contexts(entity) }}
     </li>
 {% endblock %}
 
@@ -45,6 +53,13 @@
                 'alias': 'thread-view',
                 'contextsRendered': true
             }) }}
+        </div>
+        <div class="widget-content email-activity-widget">
+            <h4 class="scrollspy-title">{{ 'oro.activity.sections.activities'|trans }}</h4>
+            <div class="scrollspy-nav-target"></div>
+            <div class="responsive-section">
+                {% placeholder view_content_data_activities with {entity: entity} %}
+            </div>
         </div>
     </div>
 {% endblock content_data %}

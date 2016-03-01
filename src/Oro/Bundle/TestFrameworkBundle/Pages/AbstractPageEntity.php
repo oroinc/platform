@@ -8,8 +8,10 @@ namespace Oro\Bundle\TestFrameworkBundle\Pages;
  * @package Oro\Bundle\TestFrameworkBundle\Pages
  * {@inheritdoc}
  */
-abstract class AbstractPageEntity extends AbstractPageFilteredGrid
+abstract class AbstractPageEntity extends AbstractPage
 {
+    use FilteredGridTrait;
+
     /** @var string */
     protected $owner;
 
@@ -40,7 +42,7 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
      */
     public function toGrid()
     {
-        $this->test->byXPath("//div[@class='customer-content pull-left']/div[1]//a")->click();
+        $this->test->byXPath("//div[@class='customer-content']/div[1]//a")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 
@@ -237,11 +239,16 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
     public function checkEntityFieldData($fieldName, $value)
     {
         $this->assertElementPresent(
-            "//div[@class='control-group']/label[contains(., '{$fieldName}')]".
-            "/following-sibling::div[contains(., '{$value}')]",
-            "Field '{$fieldName}' data are not equals '{$value}'"
+            "//div[contains(@class,'control-group')]/label[contains(., '{$fieldName}')]".
+            "/following-sibling::div/div",
+            "Field '{$fieldName}' is not found"
         );
+        $actualValue = $this->test->byXPath(
+            "//div[contains(@class,'control-group')]/label[contains(., '{$fieldName}')]".
+            "/following-sibling::div/div"
+        )->text();
 
+        \PHPUnit_Framework_Assert::assertEquals($value, $actualValue, "Field '{$fieldName}' has incorrect value");
         return $this;
     }
 
@@ -253,6 +260,8 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
      */
     public function verifyActivity($activityType, $activityName)
     {
+        $this->test->moveto($this->test->byXPath("//*[@class='container-fluid accordion']"));
+        $this->filterByMultiselect('Activity Type', [$activityType]);
         $this->assertElementPresent(
             "//*[@class='container-fluid accordion']".
             "//*[@class='message-item message'][contains(., '{$activityName}')]".
@@ -274,13 +283,43 @@ abstract class AbstractPageEntity extends AbstractPageFilteredGrid
         $this->filterBy($filterName, $entityName);
         $this->assertElementPresent(
             "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".
-            "//preceding-sibling::td/input"
+            "//preceding-sibling::td/input",
+            "{$entityName} is not found in embedded grid"
         );
         $this->test->byXPath(
             "//div[@class='container-fluid grid-scrollable-container']//td[contains(., '{$entityName}')]".
             "//preceding-sibling::td/input"
         )->click();
 
+        return $this;
+    }
+
+
+    /**
+     * Method implement entity pagination switching
+     * Method can get 'Next', 'Previous', 'Last', 'First' as values
+     * @param string $value
+     * @return $this
+     */
+    public function switchEntityPagination($value)
+    {
+        $this->assertElementPresent("//div[@id='entity-pagination']", 'Pagination not available at entity view page');
+        switch ($value) {
+            case 'Next':
+                $this->test->byXPath("//div[@class='pagination']//i[@class='icon-chevron-right hide-text']")->click();
+                break;
+            case 'Previous':
+                $this->test->byXPath("//div[@class='pagination']//i[@class='icon-chevron-left hide-text']")->click();
+                break;
+            case 'Last':
+                $this->test->byXPath("//div[@class='pagination']//a[normalize-space()='Last']")->click();
+                break;
+            case 'First':
+                $this->test->byXPath("//div[@class='pagination']//a[normalize-space()='First']")->click();
+                break;
+        }
+        $this->waitPageToLoad();
+        $this->waitForAjax();
         return $this;
     }
 }

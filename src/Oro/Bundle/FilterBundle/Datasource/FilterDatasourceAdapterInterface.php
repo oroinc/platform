@@ -2,11 +2,20 @@
 
 namespace Oro\Bundle\FilterBundle\Datasource;
 
+use Doctrine\DBAL\Platforms\AbstractPlatform;
+
 /**
  * Allows a filter to modify a data source
  */
 interface FilterDatasourceAdapterInterface
 {
+    /**
+     * Gets the DatabasePlatform for the adapter.
+     *
+     * @return AbstractPlatform
+     */
+    public function getDatabasePlatform();
+
     /**
      * Adds a restriction to a data source.
      *

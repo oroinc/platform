@@ -8,10 +8,14 @@ oro.user.form.choose_gender: Choose a gender...
 oro.user.gender.male: Male
 oro.user.gender.female: Female
 
+Username: Username
+Password: Password
+"Remember me on this computer": Remember me on this computer
+"Forgot your password?": Forgot your password?
+"Log in": Log in
 Login: Login
 Logout: Logout
 Login page: Login page
-"Bad credentials": "Invalid user name or password."
 "Forgot Password": "Forgot Password"
 "Password Reset": "Password Reset"
 "Reset password": "Reset password"
@@ -22,6 +26,10 @@ Login page: Login page
 "Business Unit": "Business Unit"
 "User": "User"
 "None": "None"
+"There is no active user with username or email address \"%username%\".": "There is no active user with username or email address \"%username%\"."
+"Username or Email": "Username or Email"
+"Return to Login": "Return to Login"
+"Request": "Request"
 
 User account is locked.: User account is locked
 User account is disabled.: User account is disabled
@@ -39,6 +47,7 @@ oro:
         form:
             access_settings.label: Business Units
             signature.label: Email Signature
+            choose_role: Choose a role...
         menu:
             system_tab.label: System
             user_list.description: List of system users
@@ -73,6 +82,13 @@ oro:
         current_status.label:        Current status
         groups.label:                Groups
         email.label:                 Primary Email
+        email:
+            entity_label:            User Email
+            entity_plural_label:     User Emails
+            entity_description:      Represent user emails
+            email.label:             Email
+            id.label:                Id
+            user.label:              User
         phone.label:                 Phone
         email_origins.label:         Email Origins
         emails.label:                Emails
@@ -102,6 +118,7 @@ oro:
         statuses.label:              Statuses
         username.label:              Username
         organization.label:          Organization
+        business_unit.label:         Business Unit
 
         # extended field added in migrations
         title.label:                 Title
@@ -156,3 +173,10 @@ oro:
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email
             password_reseted.message: Your password was successfully reset. You may login now.
+        user_bar_settings:
+            title: User bar
+        image.tooltip: The avatar must be in BMP, JPEG or PNG formats, and file must be less than %file_size% in size
+        invite.tooltip: When this option is selected, an invitation email will be send
+        api.tooltip_text: >
+            API key could be used for authentication in third party software.
+            Please keep your regular password in secret.

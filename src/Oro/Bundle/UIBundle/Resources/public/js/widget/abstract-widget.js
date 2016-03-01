@@ -1,16 +1,15 @@
-/*jshint devel:true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var AbstractWidget,
-        document = window.document,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view'),
-        mediator = require('oroui/js/mediator'),
-        LoadingMask = require('oroui/js/app/views/loading-mask-view'),
-        __ = require('orotranslation/js/translator');
+    var AbstractWidget;
+    var document = window.document;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var mediator = require('oroui/js/mediator');
+    var LoadingMask = require('oroui/js/app/views/loading-mask-view');
+    var __ = require('orotranslation/js/translator');
     require('jquery.form');
 
     /**
@@ -32,7 +31,7 @@ define(function (require) {
             loadingMaskEnabled: true,
             loadingElement: null,
             container: null,
-            submitHandler: function () {
+            submitHandler: function() {
                 this.trigger('adoptedFormSubmit', this.form, this);
             }
         },
@@ -64,20 +63,20 @@ define(function (require) {
          * @param {string} title
          */
         setTitle: function(title) {
-            console.warn('Implement setTitle');
+            throw new Error('Implement setTitle');
         },
 
         /**
          * Get actions container element
          */
         getActionsElement: function() {
-            console.warn('Implement getActionsElement');
+            throw new Error('Implement getActionsElement');
         },
 
         /**
          * Remove widget
          */
-        remove: function () {
+        remove: function() {
             if (!this.disposing) {
                 // If remove method was called directly -- execute dispose first
                 this.dispose();
@@ -124,7 +123,7 @@ define(function (require) {
          *
          * @returns {boolean}
          */
-        isActual: function () {
+        isActual: function() {
             return !this.disposed &&
                 (this.loading || $.contains(document.documentElement, this.el));
         },
@@ -134,7 +133,7 @@ define(function (require) {
          *
          * @returns {boolean}
          */
-        isEmbedded: function () {
+        isEmbedded: function() {
             return this._isEmbedded;
         },
 
@@ -185,7 +184,7 @@ define(function (require) {
          * @private
          */
 
-        _showLoading: function () {
+        _showLoading: function() {
             this.subview('loadingMask', new LoadingMask({
                 container: this._getLoadingElement()
             }));
@@ -197,7 +196,7 @@ define(function (require) {
          *
          * @private
          */
-        _hideLoading: function () {
+        _hideLoading: function() {
             this.removeSubview('loadingMask');
         },
 
@@ -229,12 +228,7 @@ define(function (require) {
          * @private
          */
         _getUniqueIdentifier: function() {
-            /*jslint bitwise:true */
-            return 'xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx'.replace(/[xy]/g, function(c) {
-                var r = Math.random() * 16 | 0,
-                    v = c === 'x' ? r : (r & 0x3 | 0x8);
-                return v.toString(16);
-            });
+            return tools.createRandomUUID();
         },
 
         /**
@@ -243,21 +237,21 @@ define(function (require) {
          * @private
          */
         _initSectionActions: function() {
-            var widget = this,
-                sections = this.widget.find('[data-section]');
-            sections.each(function (i, sectionEl) {
-                var $sectionEl = $(sectionEl),
-                    sectionName = $sectionEl.attr('data-section'),
-                    actions = $sectionEl.find('[action-name], [data-action-name]');
+            var widget = this;
+            var sections = this.widget.find('[data-section]');
+            sections.each(function(i, sectionEl) {
+                var $sectionEl = $(sectionEl);
+                var sectionName = $sectionEl.attr('data-section');
+                var actions = $sectionEl.find('[action-name], [data-action-name]');
                 if ($sectionEl.attr('action-name') || $sectionEl.attr('data-action-name')) {
                     actions.push($sectionEl);
                 }
                 if (!widget.actions[sectionName]) {
                     widget.actions[sectionName] = {};
                 }
-                actions.each(function (i, actionEl) {
-                    var $actionEl = $(actionEl),
-                        actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
+                actions.each(function(i, actionEl) {
+                    var $actionEl = $(actionEl);
+                    var actionName = $actionEl.attr('action-name') || $actionEl.attr('data-action-name');
                     widget.actions[sectionName][actionName] = $actionEl;
                     widget.trigger('widget:add:action:' + sectionName + ':' + actionName, $actionEl);
                 });
@@ -276,7 +270,7 @@ define(function (require) {
             if (adoptedActionsContainer.length > 0) {
                 var self = this;
                 var form = adoptedActionsContainer.closest('form');
-                var actions = adoptedActionsContainer.find('button, input, a');
+                var actions = adoptedActionsContainer.find('button, input, a, [data-action-name]');
 
                 if (form.length > 0) {
                     this.form = form;
@@ -285,7 +279,7 @@ define(function (require) {
                 _.each(actions, function(action, idx) {
                     var $action = $(action);
                     var actionId = $action.data('action-name') || 'adopted_action_' + idx;
-                    switch (action.type.toLowerCase()) {
+                    switch (action.type && action.type.toLowerCase()) {
                         case 'submit':
                             var submitReplacement = $('<input type="submit"/>');
                             submitReplacement.css({
@@ -318,7 +312,7 @@ define(function (require) {
             if (this.options.actionsEl !== undefined) {
                 if (typeof this.options.actionsEl === 'string') {
                     return this.$el.find(this.options.actionsEl);
-                } else if (_.isElement(this.options.actionsEl )) {
+                } else if (_.isElement(this.options.actionsEl)) {
                     return this.options.actionsEl;
                 }
             }
@@ -454,13 +448,13 @@ define(function (require) {
          * @param {string} section section name
          */
         removeAction: function(key, section) {
-            var self = this,
-                remove = function(actions, key) {
-                    if (_.isElement(self.actions[key])) {
-                        self.actions[key].remove();
-                    }
-                    delete self.actions[key];
-                };
+            var self = this;
+            function remove(actions, key) {
+                if (_.isElement(self.actions[key])) {
+                    self.actions[key].remove();
+                }
+                delete self.actions[key];
+            }
             if (this.hasAction(key, section)) {
                 if (section !== undefined) {
                     remove(this.actions[section], key);
@@ -568,7 +562,7 @@ define(function (require) {
          *
          * @private
          */
-        _bindSubmitHandler: function () {
+        _bindSubmitHandler: function() {
             this.$el.parent().on('submit', _.bind(function(e) {
                 if (!e.isDefaultPrevented()) {
                     this.options.submitHandler.call(this);
@@ -621,6 +615,7 @@ define(function (require) {
          * Render widget
          */
         render: function() {
+            this._deferredRender();
             var loadAllowed = !this.options.elementFirst ||
                     (this.options.elementFirst && !this.firstRun) ||
                         (this.$el && this.$el.length && this.$el.html().length === 0);
@@ -637,7 +632,7 @@ define(function (require) {
          *
          * @param {String} content
          */
-        setContent: function (content) {
+        setContent: function(content) {
             var widgetContent = $(content).filter('.widget-content:first');
 
             this.actionsEl = null;
@@ -701,7 +696,7 @@ define(function (require) {
             }
 
             var failContent = '<div class="widget-content">' +
-                '<div class="alert alert-error">'+message+'</div>' +
+                '<div class="alert alert-error">' + message + '</div>' +
                 '</div>';
 
             this._onContentLoad(failContent);
@@ -717,10 +712,10 @@ define(function (require) {
             delete this.loading;
             this.disposePageComponents();
             this.setContent(content, true);
-            if (this.renderDeferred) {
-                this.renderDeferred
+            if (this.deferredRender) {
+                this.deferredRender
                     .done(_.bind(this._triggerContentLoadEvents, this, content))
-                    .fail(function () {
+                    .fail(function() {
                         throw new Error('Widget rendering failed');
                     });
             } else {
@@ -728,7 +723,7 @@ define(function (require) {
             }
         },
 
-        _triggerContentLoadEvents: function (content) {
+        _triggerContentLoadEvents: function(content) {
             this.trigger('contentLoad', content, this);
             mediator.trigger('widget:contentLoad', this.widget);
             mediator.trigger('layout:adjustHeight');
@@ -737,7 +732,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        getLayoutElement: function () {
+        getLayoutElement: function() {
             return this.widget;
         },
 
@@ -752,20 +747,21 @@ define(function (require) {
             this.show();
             this._renderInContainer();
             this.trigger('renderComplete', this.$el, this);
-            this.renderDeferred = $.Deferred();
             this.initLayout()
-                .done(_.bind(function () {
+                .done(_.bind(function() {
                     if (this.disposed) {
                         return;
                     }
                     this._afterLayoutInit();
+                    this.trigger('widgetReady', this);
                 }, this));
         },
 
-        _afterLayoutInit: function () {
+        _afterLayoutInit: function() {
             this.widget.removeClass('invisible');
-            this.renderDeferred.resolve();
-            delete this.renderDeferred;
+            if (this.deferredRender) {
+                this._resolveDeferredRender();
+            }
         },
 
         /**

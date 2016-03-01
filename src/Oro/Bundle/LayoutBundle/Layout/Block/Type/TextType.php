@@ -17,6 +17,7 @@ class TextType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
+        $resolver->setDefaults(['escape' => true]);
         $resolver->setRequired(['text']);
     }
 
@@ -26,6 +27,7 @@ class TextType extends AbstractType
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         $view->vars['text'] = $options['text'];
+        $view->vars['escape'] = $options['escape'];
     }
 
     /**

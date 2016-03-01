@@ -4,6 +4,8 @@ namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
 use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
@@ -14,30 +16,57 @@ use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInter
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
 
-class ConsoleContextListener
+class ConsoleContextListener implements ContainerAwareInterface
 {
     const OPTION_USER         = 'current-user';
     const OPTION_ORGANIZATION = 'current-organization';
 
     /**
+     * @var ContainerInterface
+     */
+    private $container;
+
+    /**
      * @var ManagerRegistry
      */
-    protected $registry;
+    private $registry;
 
     /**
      * @var SecurityContextInterface
      */
-    protected $securityContext;
+    private $securityContext;
 
     /**
      * @var UserManager
      */
-    protected $userManager;
+    private $userManager;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setContainer(ContainerInterface $container = null)
+    {
+        $this->container = $container;
+    }
+
+    /**
+     * @return ContainerInterface
+     */
+    protected function getContainer()
+    {
+        if (!$this->container) {
+            throw new \InvalidArgumentException('ContainerInterface is not injected');
+        }
+
+        return $this->container;
+    }
 
     /**
      * @param ManagerRegistry $registry
      * @param SecurityContextInterface $securityContext
      * @param UserManager $userManager
+     *
+     * @deprecated since 1.8, inject @service_container via setContainer instead
      */
     public function __construct(
         ManagerRegistry $registry,
@@ -82,10 +111,10 @@ class ConsoleContextListener
             return;
         }
 
-        $token = $this->securityContext->getToken();
+        $token = $this->getSecurityContext()->getToken();
         if (!$token) {
             $token = new ConsoleToken();
-            $this->securityContext->setToken($token);
+            $this->getSecurityContext()->setToken($token);
         }
 
         $this->setUser($user, $token);
@@ -108,9 +137,9 @@ class ConsoleContextListener
 
         $userId = filter_var($user, FILTER_VALIDATE_INT);
         if ($userId) {
-            $userEntity = $this->registry->getRepository('OroUserBundle:User')->find($userId);
+            $userEntity = $this->getRegistry()->getRepository('OroUserBundle:User')->find($userId);
         } else {
-            $userEntity = $this->userManager->findUserByUsernameOrEmail($user);
+            $userEntity = $this->getUserManager()->findUserByUsernameOrEmail($user);
         }
 
         if ($userEntity) {
@@ -133,7 +162,7 @@ class ConsoleContextListener
             return;
         }
 
-        $organizationRepository = $this->registry->getRepository('OroOrganizationBundle:Organization');
+        $organizationRepository = $this->getRegistry()->getRepository('OroOrganizationBundle:Organization');
 
         $organizationId = filter_var($organization, FILTER_VALIDATE_INT);
         if ($organizationId) {
@@ -163,5 +192,41 @@ class ConsoleContextListener
                 sprintf('Can\'t find organization with identifier %s', $organization)
             );
         }
+    }
+
+    /**
+     * @return ManagerRegistry
+     */
+    protected function getRegistry()
+    {
+        if (!$this->registry) {
+            $this->registry = $this->getContainer()->get('doctrine');
+        }
+
+        return $this->registry;
+    }
+
+    /**
+     * @return SecurityContextInterface
+     */
+    protected function getSecurityContext()
+    {
+        if (!$this->securityContext) {
+            $this->securityContext = $this->getContainer()->get('security.context');
+        }
+
+        return $this->securityContext;
+    }
+
+    /**
+     * @return UserManager
+     */
+    protected function getUserManager()
+    {
+        if (!$this->userManager) {
+            $this->userManager = $this->getContainer()->get('oro_user.manager');
+        }
+
+        return $this->userManager;
     }
 }

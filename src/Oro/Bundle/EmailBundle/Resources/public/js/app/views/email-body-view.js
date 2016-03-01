@@ -1,10 +1,10 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailBodyView,
-        $ = require('jquery'),
-        _ = require('underscore'),
-        BaseView = require('oroui/js/app/views/base/view');
+    var EmailBodyView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BaseView = require('oroui/js/app/views/base/view');
 
     EmailBodyView = BaseView.extend({
         autoRender: true,
@@ -30,7 +30,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, _.pick(options, ['bodyContent', 'styles']));
             this.$frame = this.$el;
             this.$frame.on('emailShown', _.bind(this._updateHeight, this));
@@ -41,7 +41,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -55,14 +55,14 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        render: function () {
-            var $content,
-                content = this.bodyContent;
+        render: function() {
+            var $content;
+            var content = this.bodyContent;
             try {
                 $content = $(content);
             } catch (e) {
                 // if content can not be processed as HTML, output it as plain text
-                content = content.replace(/[&<>]/g, function (c) {
+                content = content.replace(/[&<>]/g, function(c) {
                     return '&#' + c.charCodeAt(0) + ';';
                 });
                 $content = $('<div class="plain-text">' + content +  '</div>');
@@ -77,7 +77,7 @@ define(function (require) {
         /**
          * Fixes issue when iframe get empty after DOM-manipulation
          */
-        reattachBody: function () {
+        reattachBody: function() {
             this.undelegateEvents();
             this.$frame.contents().find('html').replaceWith(this.$el);
             this.delegateEvents();
@@ -88,13 +88,13 @@ define(function (require) {
          *
          * @protected
          */
-        _injectStyles: function () {
+        _injectStyles: function() {
             var $head;
             if (!this.styles) {
                 return;
             }
             $head = this.$('head');
-            _.each(this.styles, function (src) {
+            _.each(this.styles, function(src) {
                 $('<link/>', {rel: 'stylesheet', href: src}).appendTo($head);
             });
         },
@@ -104,10 +104,10 @@ define(function (require) {
          *
          * @protected
          */
-        _updateHeight: function () {
-            var $frame = this.$frame,
-                $el = this.$el;
-            _.delay(function () {
+        _updateHeight: function() {
+            var $frame = this.$frame;
+            var $el = this.$el;
+            _.delay(function() {
                 $frame.height(0);
                 $frame.height($el[0].scrollHeight);
             }, 50);
@@ -118,19 +118,18 @@ define(function (require) {
          *
          * @protected
          */
-        _markEmailExtraBody: function () {
+        _markEmailExtraBody: function() {
             var $extraBodies = this.$('body>.quote, body>.gmail_extra')
                 .not('.email-extra-body')
                 .addClass('email-extra-body');
             $('<div class="email-extra-body-toggle"></div>').insertBefore($extraBodies);
         },
 
-
         /**
          * Handles click on email extra-body toggle button
          * @param {jQuery.Event} e
          */
-        onEmailExtraBodyToggle: function (e) {
+        onEmailExtraBodyToggle: function(e) {
             this.$(e.currentTarget)
                 .next()
                 .toggleClass('in');

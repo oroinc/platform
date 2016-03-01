@@ -1,0 +1,5 @@
+<div class="error-holder">
+<% _.each(messages, function(message, forField) { %>
+    <span for="<%= forField %>" class="validation-failed"><%= message %></span>
+<% }) %>
+</div>

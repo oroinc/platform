@@ -1,3 +1,40 @@
-nelmio_api_doc:
-    motd:
-        template: OroUserBundle::ApiDoc/motd.html.twig
+security:
+    providers:
+        chain_provider:
+            chain:
+                providers:                  [in_memory, oro_user]
+        oro_user:
+            id:                             oro_user.security.provider
+        in_memory:
+            memory:
+                users:                      []
+
+    encoders:
+        Oro\Bundle\UserBundle\Entity\User: sha512
+
+    firewalls:
+        login:
+            pattern:                        ^/user/(login|reset-request|send-email|check-email)$
+            provider:                       chain_provider
+            anonymous:                      true
+
+        reset_password:
+            pattern:                        ^/user/reset/*
+            provider:                       chain_provider
+            anonymous:                      true
+
+        main:
+            pattern:                        ^/
+            provider:                       chain_provider
+            organization-form-login:
+                csrf_provider:              form.csrf_provider
+                check_path:                 oro_user_security_check
+                login_path:                 oro_user_security_login
+            logout:
+                path:                       oro_user_security_logout
+            organization-remember-me:
+                key:                        %secret%
+                name:                       BAPRM
+                lifetime:                   1209600   # stay logged for two weeks
+                httponly:                   true
+            anonymous:                      false

@@ -62,6 +62,14 @@ services:
             - %oro_calendar.calendar_event.entity.class%
             - @doctrine.orm.entity_manager
 
+    oro_calendar.calendar_event_guest.manager.api:
+        class: Oro\Bundle\CalendarBundle\Manager\CalendarEventGuestApiEntityManager
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - %oro_calendar.calendar_event.entity.class%
+            - @doctrine.orm.entity_manager
+            - @oro_entity.entity_name_resolver
+
     oro_calendar.calendar_property.manager.api:
         class: %oro_calendar.calendar_property.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
@@ -101,6 +109,7 @@ services:
             - oro_assign_calendar_event_link
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
+            - { name: oro_ui.update_action_provider, group: activity }
 
     oro_calendar.calendar_event_manager:
         class: %oro_calendar.calendar_event_manager.class%
@@ -128,6 +137,7 @@ services:
             - @oro_entity.doctrine_helper
             - @oro_entity.entity_name_resolver
             - @oro_calendar.calendar_event_normalizer.user
+        public: false
         tags:
             - { name: oro_calendar.calendar_provider, alias: user }
 
@@ -138,6 +148,7 @@ services:
             - @oro_calendar.calendar_event_normalizer.system
             - @oro_calendar.system_calendar_config
             - @oro_security.security_facade
+        public: false
         tags:
             - { name: oro_calendar.calendar_provider, alias: system }
 
@@ -148,6 +159,7 @@ services:
             - @oro_calendar.calendar_event_normalizer.public
             - @oro_calendar.system_calendar_config
             - @oro_security.security_facade
+        public: false
         tags:
             - { name: oro_calendar.calendar_provider, alias: public }
 
@@ -191,7 +203,8 @@ services:
         class: %oro_calendar.activity_list.provider.class%
         arguments:
            - @oro_entity.doctrine_helper
-           - @doctrine
+           - @oro_activity.association_helper
+           - @oro_comment.association_helper
         tags:
            - {name: oro_activity_list.provider, priority: 50}
 
@@ -241,3 +254,12 @@ services:
         class: %oro_calendar.system_calendar_event.datagrid_helper.class%
         arguments:
             - @oro_security.security_facade
+
+    oro_calendar.workflow.action.create_calendar_event:
+        class: Oro\Bundle\CalendarBundle\Workflow\Action\CreateCalendarEventAction
+        arguments:
+            - @oro_workflow.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_workflow.action, alias: create_calendar_event }
+

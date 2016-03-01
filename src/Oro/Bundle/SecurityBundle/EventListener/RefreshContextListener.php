@@ -2,49 +2,46 @@
 
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
-use Symfony\Component\Security\Core\SecurityContextInterface;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\Proxy;
-use Doctrine\ORM\Event\OnClearEventArgs;
+use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\OnClearEventArgs;
+use Doctrine\ORM\EntityNotFoundException;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+
+use Oro\Bundle\EntityBundle\ORM\Event\PreCloseEventArgs;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class RefreshContextListener
 {
-    /**
-     * @var ServiceLink
-     */
-    protected $securityContextLink;
+    /** @var TokenStorageInterface */
+    protected $securityTokenStorage;
+
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
+    /** @var bool */
+    protected $isClosing = false;
 
     /**
-     * @var ManagerRegistry
+     * @param TokenStorageInterface $securityTokenStorage
+     * @param ManagerRegistry       $doctrine
      */
-    protected $registry;
+    public function __construct(TokenStorageInterface $securityTokenStorage, ManagerRegistry $doctrine)
+    {
+        $this->securityTokenStorage = $securityTokenStorage;
+        $this->doctrine             = $doctrine;
+    }
 
     /**
-     * @var DoctrineHelper
+     * @param PreCloseEventArgs $event
      */
-    protected $doctrineHelper;
-
-    /**
-     * @param ServiceLink $securityContextLink
-     * @param ManagerRegistry $registry
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(
-        ServiceLink $securityContextLink,
-        ManagerRegistry $registry,
-        DoctrineHelper $doctrineHelper
-    ) {
-        $this->securityContextLink = $securityContextLink;
-        $this->registry = $registry;
-        $this->doctrineHelper = $doctrineHelper;
+    public function preClose(PreCloseEventArgs $event)
+    {
+        $this->isClosing = true;
     }
 
     /**
@@ -52,56 +49,104 @@ class RefreshContextListener
      */
     public function onClear(OnClearEventArgs $event)
     {
-        /** @var SecurityContextInterface $securityContext */
-        $securityContext = $this->securityContextLink->getService();
-        $className = $event->getEntityClass();
+        if ($this->isClosing) {
+            $this->isClosing = false;
 
-        $token = $securityContext->getToken();
+            return;
+        }
+
+        $token = $this->securityTokenStorage->getToken();
         if (!$token) {
             return;
         }
 
-        $user = $token->getUser();
-        if (is_object($user) && (!$className || $className == ClassUtils::getClass($user))) {
-            $user = $this->refreshEntity($user);
-            if ($user) {
-                $token->setUser($user);
-            }
-        }
+        $this->checkUser($event, $token);
 
-        if ($token instanceof OrganizationContextTokenInterface) {
-            $organization = $token->getOrganizationContext();
-            if (is_object($organization) && (!$className || $className == ClassUtils::getClass($organization))) {
-                /** @var Organization $organization */
-                $organization = $this->refreshEntity($organization);
-                if ($organization) {
-                    $token->setOrganizationContext($organization);
-                }
-            }
+        $token = $this->securityTokenStorage->getToken();
+        if ($token && $token instanceof OrganizationContextTokenInterface) {
+            $this->checkOrganization($event, $token);
         }
     }
 
     /**
-     * @param object $entity
+     * @param OnClearEventArgs $event
+     * @param TokenInterface   $token
+     */
+    protected function checkUser(OnClearEventArgs $event, TokenInterface $token)
+    {
+        $user = $token->getUser();
+        if (!is_object($user)) {
+            return;
+        }
+        $userClass = ClassUtils::getClass($user);
+        if ($event->getEntityClass() && $event->getEntityClass() !== $userClass) {
+            return;
+        }
+        $em = $event->getEntityManager();
+        if ($em !== $this->doctrine->getManagerForClass($userClass)) {
+            return;
+        }
+        $user = $this->refreshEntity($user, $userClass, $em);
+        if ($user) {
+            $token->setUser($user);
+        } else {
+            $this->securityTokenStorage->setToken(null);
+        }
+    }
+
+    /**
+     * @param OnClearEventArgs                  $event
+     * @param OrganizationContextTokenInterface $token
+     */
+    protected function checkOrganization(OnClearEventArgs $event, OrganizationContextTokenInterface $token)
+    {
+        $organization = $token->getOrganizationContext();
+        if (!is_object($organization)) {
+            return;
+        }
+        $organizationClass = ClassUtils::getClass($organization);
+        if ($event->getEntityClass() && $event->getEntityClass() !== $organizationClass) {
+            return;
+        }
+        $em = $event->getEntityManager();
+        if ($em !== $this->doctrine->getManagerForClass($organizationClass)) {
+            return;
+        }
+        $organization = $this->refreshEntity($organization, $organizationClass, $em);
+        if (!$organization) {
+            return;
+        }
+        $token->setOrganizationContext($organization);
+    }
+
+    /**
+     * @param object        $entity
+     * @param string        $entityClass
+     * @param EntityManager $em
+     *
      * @return object|null
      */
-    protected function refreshEntity($entity)
+    protected function refreshEntity($entity, $entityClass, EntityManager $em)
     {
-        $entityClass = ClassUtils::getClass($entity);
-        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+        $identifierValues = $em->getClassMetadata($entityClass)->getIdentifierValues($entity);
+        if (count($identifierValues) !== 1) {
+            return null;
+        }
 
-        /** @var EntityManager $entityManager */
-        $entityManager = $this->registry->getManagerForClass($entityClass);
-
+        $entityId = current($identifierValues);
         if (!$entityId) {
             return null;
         }
 
         if ($entity instanceof Proxy && !$entity->__isInitialized()) {
             // We cannot use $entity->__load(); because of bug BAP-7851
-            return $entityManager->find($entityClass, $entityId);
+            return $em->find($entityClass, $entityId);
         }
 
-        return $entityManager->merge($entity);
+        try {
+            return $em->merge($entity);
+        } catch (EntityNotFoundException $e) {
+            return null;
+        }
     }
 }

@@ -36,7 +36,10 @@ class CollectionType extends AbstractType
                 'handle_primary'       => $options['handle_primary'],
                 'show_form_when_empty' => $options['show_form_when_empty'],
                 'prototype_name'       => $options['prototype_name'],
-                'add_label'            => $options['add_label']
+                'add_label'            => $options['add_label'],
+                'allow_add_after'      => $options['allow_add_after'],
+                'row_count_add'        => $options['row_count_add'],
+                'row_count_initial'    => $options['row_count_initial'],
             ]
         );
     }
@@ -49,6 +52,7 @@ class CollectionType extends AbstractType
         $resolver->setDefaults(
             [
                 'allow_add'            => true,
+                'allow_add_after'      => false,
                 'allow_delete'         => true,
                 'by_reference'         => false,
                 'prototype'            => true,
@@ -56,7 +60,9 @@ class CollectionType extends AbstractType
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
                 'handle_primary'       => true,
                 'show_form_when_empty' => true,
-                'add_label'            => ''
+                'add_label'            => '',
+                'row_count_add'        => 1,
+                'row_count_initial'    => 1,
             ]
         );
         $resolver->setRequired(['type']);

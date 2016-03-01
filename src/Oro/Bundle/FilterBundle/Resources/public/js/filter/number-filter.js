@@ -1,10 +1,8 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     './choice-filter',
     'orofilter/js/formatter/number-formatter'
-], function (_, ChoiceFilter, NumberFormatter) {
+], function(_, ChoiceFilter, NumberFormatter) {
     'use strict';
 
     var NumberFilter;
@@ -29,7 +27,7 @@ define([
          * @param {*} [options.formatter] Object with methods fromRaw and toRaw or
          *      a string name of formatter (e.g. "integer", "decimal")
          */
-        initialize: function (options) {
+        initialize: function(options) {
             // init formatter options if it was not initialized so far
             if (_.isUndefined(this.formatterOptions)) {
                 this.formatterOptions = {};
@@ -41,7 +39,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -52,25 +50,49 @@ define([
         /**
          * @inheritDoc
          */
-        _formatRawValue: function (value) {
-            if (value.value === '') {
-                value.value = undefined;
-            } else {
-                value.value = this.formatter.toRaw(String(value.value));
-            }
-            return value;
+        _formatRawValue: function(value) {
+            var formatted = _.clone(value);
+
+            formatted.value = this._toRawValue(value.value);
+
+            return formatted;
         },
 
         /**
          * @inheritDoc
          */
-        _formatDisplayValue: function (value) {
-            if (value.value && _.isString(value.value)) {
-                value.value = parseFloat(value.value);
+        _formatDisplayValue: function(value) {
+            var formatted = _.clone(value);
+
+            formatted.value = this._toDisplayValue(value.value);
+
+            return formatted;
+        },
+
+        /**
+         * @param {*} value
+         * @return {*}
+         */
+        _toRawValue: function(value) {
+            if (value === '') {
+                value = undefined;
+            } else {
+                value = this.formatter.toRaw(String(value));
+            }
+            return value;
+        },
+
+        /**
+         * @param {*} value
+         * @return {*}
+         */
+        _toDisplayValue: function(value) {
+            if (value && _.isString(value)) {
+                value = parseFloat(value);
             }
 
-            if (_.isNumber(value.value)) {
-                value.value = this.formatter.fromRaw(value.value);
+            if (_.isNumber(value)) {
+                value = this.formatter.fromRaw(value);
             }
             return value;
         }

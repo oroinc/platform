@@ -33,20 +33,10 @@ class RecentEmailGridListener
         $datagrid   = $event->getDatagrid();
         $datasource = $datagrid->getDatasource();
         if ($datasource instanceof OrmDatasource) {
-            $parameters = $datagrid->getParameters();
-            $userId = $parameters->get('userId');
             $queryBuilder = $datasource->getQueryBuilder();
 
-            $this->emailQueryFactory->filterQueryByUserId($queryBuilder, $parameters->get('userId'));
+            $this->emailQueryFactory->applyAcl($queryBuilder);
             $this->emailQueryFactory->prepareQuery($queryBuilder);
-
-            // bind 'origin_ids' parameter
-            $originIds    = [];
-            $emailOrigins = $this->emailGridHelper->getEmailOrigins($userId);
-            foreach ($emailOrigins as $emailOrigin) {
-                $originIds[] = $emailOrigin->getId();
-            }
-            $queryBuilder->setParameter('origin_ids', $originIds);
         }
     }
 }

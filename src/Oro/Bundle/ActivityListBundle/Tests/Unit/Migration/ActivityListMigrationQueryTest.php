@@ -31,6 +31,9 @@ class ActivityListMigrationQueryTest extends \PHPUnit_Framework_TestCase
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $configManager;
+
     public function setUp()
     {
         $this->schema                = new Schema();
@@ -57,12 +60,17 @@ class ActivityListMigrationQueryTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->migrationQuery = new ActivityListMigrationQuery(
             $this->schema,
             $this->provider,
             $this->activityListExtension,
             $this->metadataHelper,
-            $this->nameGenerator
+            $this->nameGenerator,
+            $this->configManager
         );
     }
 

@@ -10,7 +10,8 @@ use Oro\Component\Config\Tests\Unit\Fixtures\TestService;
 class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
 {
     const STATIC_CLASS = 'Oro\Component\Config\Tests\Unit\Resolver\SystemAwareResolverTest';
-    const CONST1       = 'const1';
+    const CONST1 = 'const1';
+    const CONST2 = 'const2';
 
     /** @var SystemAwareResolver */
     protected $resolver;
@@ -76,10 +77,15 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider resolveProvider
+     * @param $config
+     * @param $expected
      */
     public function testResolve($config, $expected)
     {
-        $result = $this->resolver->resolve($config, array('testVar' => 'test context var'));
+        $result = $this->resolver->resolve($config, array(
+            'testVar' => 'test context var',
+            'testArray' => ['param' => 'param from array'],
+        ));
         $this->assertEquals($expected, $result);
     }
 
@@ -186,6 +192,65 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
                 array('root' => array('node' => '@test.service')),
                 array('root' => array('node' => new \stdClass())),
             ),
+            'service call with two parameters (const and $testVar$)' => array(
+                array(
+                    'root' => array(
+                        'node' => '@test.service1->func3(' . self::STATIC_CLASS . '::CONST1, $testVar$)'
+                    )
+                ),
+                array('root' => array('node' => 'func3 + const1 + test context var')),
+            ),
+            'service call with two parameters ($testVar$ and const)' => array(
+                array(
+                    'root' => array(
+                        'node' => '@test.service1->func3($testVar$, ' . self::STATIC_CLASS . '::CONST1)'
+                    )
+                ),
+                array('root' => array('node' => 'func3 + test context var + const1')),
+            ),
+            'service call with two parameters ($testArray.param$ and const)' => array(
+                array(
+                    'root' => array(
+                        'node' => '@test.service1->func3($testArray.param$, ' . self::STATIC_CLASS . '::CONST1)'
+                    )
+                ),
+                array('root' => array('node' => 'func3 + param from array + const1')),
+            ),
+            'service call with two parameters (const and const the same)' => array(
+                array(
+                    'root' => array(
+                        'node' => '@test.service1->func3(' . self::STATIC_CLASS . '::CONST1, ' .
+                            self::STATIC_CLASS . '::CONST1)'
+                    )
+                ),
+                array('root' => array('node' => 'func3 + const1 + const1')),
+            ),
+            'service call with two parameters (const and const different)' => array(
+                array(
+                    'root' => array(
+                        'node' => '@test.service1->func3(' . self::STATIC_CLASS . '::CONST1, ' .
+                            self::STATIC_CLASS . '::CONST2)'
+                    )
+                ),
+                array('root' => array('node' => 'func3 + const1 + const2')),
+            ),
+            'service call with three parameters (const, $testVar$, const)' => array(
+                array(
+                    'root' => array(
+                        'node' => '@test.service1->func4(' . self::STATIC_CLASS . '::CONST1, $testVar$, ' .
+                            self::STATIC_CLASS . '::CONST2)'
+                    )
+                ),
+                array('root' => array('node' => 'func4 + const1 + test context var + const2')),
+            ),
+            'service call with one parameter (const)'                => array(
+                array(
+                    'root' => array(
+                        'node' => '@test.service1->func2(' . self::STATIC_CLASS . '::CONST1)'
+                    )
+                ),
+                array('root' => array('node' => 'func2 + const1')),
+            )
         );
     }
 }

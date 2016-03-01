@@ -26,6 +26,9 @@ application/msword
 application/vnd.ms-excel
 application/pdf
 application/zip
+image/gif
+image/jpeg
+image/png
 EOF;
         $mimeTypesImage
             = <<<EOF

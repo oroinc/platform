@@ -1,5 +1,3 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'oroui/js/mediator',
@@ -13,7 +11,7 @@ define([
      * @export  oroworkflow/js/transition-executor
      * @class   oro.WorkflowTransitionExecutor
      */
-    return function (element, data) {
+    return function(element, data) {
         mediator.execute('showLoading');
         $.getJSON(element.data('transition-url'), data ? {'data': data} : null)
             .done(TransitionEventHandlers.getOnSuccess(element))

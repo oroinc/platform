@@ -1,34 +1,47 @@
-define(function (require) {
+define(function(require) {
     'use strict';
-    var FullScreenPlugin,
-        _ = require('underscore'),
-        BasePlugin = require('oroui/js/app/plugins/base/plugin'),
-        mediator = require('oroui/js/mediator'),
-        tools = require('oroui/js/tools'),
-        FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
+
+    var FullScreenPlugin;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var BasePlugin = require('oroui/js/app/plugins/base/plugin');
+    var mediator = require('oroui/js/mediator');
+    var tools = require('oroui/js/tools');
+    var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
 
     FullScreenPlugin = BasePlugin.extend({
-        enable: function () {
+        enable: function() {
             this.listenTo(this.main, 'shown', this.updateLayout, this);
             this.listenTo(this.main, 'rendered', this.updateLayout, this);
+            if (this.main.filterManager) {
+                this.listenFilterManager();
+            } else {
+                this.listenTo(this.main, 'filterManager:connected', this.listenFilterManager, this);
+            }
             this.listenTo(mediator, 'layout:reposition', this.updateLayout, this);
             this.updateLayout();
             FullScreenPlugin.__super__.enable.call(this);
         },
 
-        disable: function () {
+        disable: function() {
             clearTimeout(this.updateLayoutTimeoutId);
             this.setLayout('default');
             FullScreenPlugin.__super__.disable.call(this);
+        },
+
+        listenFilterManager: function() {
+            var debouncedLayoutUpdate = _.debounce(_.bind(this.updateLayout, this), 10);
+            this.listenTo(this.main.filterManager, 'afterUpdateList', debouncedLayoutUpdate);
+            this.listenTo(this.main.filterManager, 'updateFilter', debouncedLayoutUpdate);
         },
 
         /**
          * Returns css expression for fullscreen layout
          * @returns {string}
          */
-        getCssHeightCalcExpression: function () {
-            var documentHeight = $(document).height(),
-                availableHeight = mediator.execute('layout:getAvailableHeight',
+        getCssHeightCalcExpression: function() {
+            var documentHeight = $(document).height();
+            var availableHeight = mediator.execute('layout:getAvailableHeight',
                     this.main.$grid.parents('.grid-scrollable-container:first'));
             return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
         },
@@ -36,7 +49,7 @@ define(function (require) {
         /**
          * Chooses layout on resize or during creation
          */
-        updateLayout: function () {
+        updateLayout: function() {
             var layout;
             if (!this.main.rendered || !this.main.$grid.parents('body').length || !this.main.$el.is(':visible')) {
                 // not ready to apply layout
@@ -57,7 +70,7 @@ define(function (require) {
         /**
          * Sets layout and perform all required operations
          */
-        setLayout: function (newLayout) {
+        setLayout: function(newLayout) {
             if (newLayout === this.main.layout) {
                 if (newLayout === 'fullscreen') {
                     this.main.$grid.parents('.grid-scrollable-container').css({
@@ -82,7 +95,7 @@ define(function (require) {
                     this.main.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: ''
                     });
-                    mediator.execute('layout:enablePageScroll', this.main.$el);
+                    mediator.execute('layout:enablePageScroll');
                     break;
                 default:
                     throw new Error('Unknown grid layout');

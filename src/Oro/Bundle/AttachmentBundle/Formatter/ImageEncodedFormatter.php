@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Formatter;
 
-use Symfony\Component\HttpKernel\Config\FileLocator;
+use Symfony\Component\Config\FileLocatorInterface;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 use Oro\Bundle\UIBundle\Formatter\FormatterInterface;
@@ -16,14 +16,14 @@ class ImageEncodedFormatter implements FormatterInterface
     /** @var AttachmentManager */
     protected $manager;
 
-    /** @var FileLocator */
+    /** @var FileLocatorInterface */
     protected $fileLocator;
 
     /**
      * @param AttachmentManager $manager
-     * @param FileLocator       $fileLocator
+     * @param FileLocatorInterface $fileLocator
      */
-    public function __construct(AttachmentManager $manager, FileLocator $fileLocator)
+    public function __construct(AttachmentManager $manager, FileLocatorInterface $fileLocator)
     {
         $this->manager     = $manager;
         $this->fileLocator = $fileLocator;

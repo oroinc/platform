@@ -21,12 +21,12 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 class ActivityTargetController extends RestGetController
 {
     /**
-     * Returns entity types which can be associated with at least one activity type.
+     * Get types of entities which can be associated with at least one activity type.
      *
-     * @Get("/activities/targets", name="")
+     * @Get("/activities/targets")
      *
      * @ApiDoc(
-     *      description="Returns entity types which can be associated with at least one activity type",
+     *      description="Get types of entities which can be associated with at least one activity type",
      *      resource=true
      * )
      *
@@ -40,14 +40,14 @@ class ActivityTargetController extends RestGetController
     }
 
     /**
-     * Returns activity types which can be associated with the specified entity type.
+     * Get types of activities which can be added to the specified entity type.
      *
      * @param string $entity The type of the target entity.
      *
-     * @Get("/activities/targets/{entity}", name="")
+     * @Get("/activities/targets/{entity}")
      *
      * @ApiDoc(
-     *      description="Returns activity types which can be associated with the specified entity type",
+     *      description="Get types of activities which can be added to the specified entity type",
      *      resource=true
      * )
      *
@@ -64,12 +64,12 @@ class ActivityTargetController extends RestGetController
     }
 
     /**
-     * Returns the list of activities associated with the specified entity.
+     * Get activities for the specified entity.
      *
      * @param string $entity The type of the target entity.
      * @param mixed  $id     The id of the target entity.
      *
-     * @Get("/activities/targets/{entity}/{id}", name="")
+     * @Get("/activities/targets/{entity}/{id}")
      *
      * @QueryParam(
      *      name="page",
@@ -85,7 +85,7 @@ class ActivityTargetController extends RestGetController
      * )
      *
      * @ApiDoc(
-     *      description="Returns the list of activities associated with the specified entity",
+     *      description="Get activities for the specified entity",
      *      resource=true
      * )
      *

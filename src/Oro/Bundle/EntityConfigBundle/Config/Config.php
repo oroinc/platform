@@ -7,27 +7,24 @@ use Oro\Bundle\EntityConfigBundle\Exception\RuntimeException;
 
 /**
  * The aim of this class is to store configuration data for each configurable object (entity or field).
+ * IMPORTANT: A performance of this class is very crucial, be careful during a refactoring.
  */
 class Config implements ConfigInterface
 {
-    /**
-     * @var ConfigIdInterface
-     */
+    /** @var ConfigIdInterface */
     protected $id;
 
-    /**
-     * @var array
-     */
-    protected $values = array();
+    /** @var array */
+    protected $values;
 
     /**
-     * Constructor.
-     *
      * @param ConfigIdInterface $id
+     * @param array             $values
      */
-    public function __construct(ConfigIdInterface $id)
+    public function __construct(ConfigIdInterface $id, array $values = [])
     {
-        $this->id = $id;
+        $this->id     = $id;
+        $this->values = $values;
     }
 
     /**
@@ -43,7 +40,7 @@ class Config implements ConfigInterface
      */
     public function get($code, $strict = false, $default = null)
     {
-        if ($this->has($code)) {
+        if (array_key_exists($code, $this->values)) {
             return $this->values[$code];
         }
 
@@ -79,7 +76,7 @@ class Config implements ConfigInterface
      */
     public function has($code)
     {
-        return isset($this->values[$code]) || array_key_exists($code, $this->values);
+        return array_key_exists($code, $this->values);
     }
 
     /**
@@ -115,6 +112,14 @@ class Config implements ConfigInterface
     /**
      * {@inheritdoc}
      */
+    public function getValues()
+    {
+        return $this->values;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function setValues($values)
     {
         $this->values = $values;
@@ -127,7 +132,7 @@ class Config implements ConfigInterface
      */
     public function serialize()
     {
-        return serialize(array($this->id, $this->values));
+        return serialize([$this->id, $this->values]);
     }
 
     /**
@@ -147,10 +152,7 @@ class Config implements ConfigInterface
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        $result         = new Config($data['id']);
-        $result->values = $data['values'];
-
-        return $result;
+        return new Config($data['id'], $data['values']);
     }
     // @codingStandardsIgnoreEnd
 

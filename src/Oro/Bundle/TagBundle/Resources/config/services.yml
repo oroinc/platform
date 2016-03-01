@@ -3,20 +3,8 @@ parameters:
     oro_tag.tagging.entity.class: Oro\Bundle\TagBundle\Entity\Tagging
     oro_tag.tag_listener.class: Oro\Bundle\TagBundle\EventListener\TagListener
 
-    oro_tag.tag.form.type.tag.class: Oro\Bundle\TagBundle\Form\Type\TagType
-    oro_tag.tag.form.type.tag.api.class: Oro\Bundle\TagBundle\Form\Type\TagApiType
-    oro_tag.tag.form.handler.tag.class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
-
     oro_tag.tag.manager.api.class:  Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_tag.tag.manager.class:  Oro\Bundle\TagBundle\Entity\TagManager
-
-    oro_tag.autocomplete.tag.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
-    oro_tag.form.type.entity_tags_selector.class: Oro\Bundle\TagBundle\Form\Type\EntityTagsSelectType
-    oro_tag.form.type.tag_select.class: Oro\Bundle\TagBundle\Form\Type\TagSelectType
-    oro_tag.form.type.tag_autocomplete.class: Oro\Bundle\TagBundle\Form\Type\TagAutocompleteType
-    oro_tag.form.type.entity_tags_filter.class: Oro\Bundle\TagBundle\Form\Type\EntityTagsFilterType
-    oro_tag.form.subscriber.tag_select.class: Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber
-    oro_tag.form.transformer.tag_select.class: Oro\Bundle\TagBundle\Form\Transformer\TagTransformer
 
     oro_tag.provider.search_provider.class: Oro\Bundle\TagBundle\Provider\SearchProvider
     oro_tag.provider.virtual_relation.tags.class: Oro\Bundle\TagBundle\Provider\TagVirtualRelationProvider
@@ -29,10 +17,6 @@ parameters:
 
     oro_tag.event_listener.merge_listener.class: Oro\Bundle\TagBundle\EventListener\MergeListener
 
-    oro_tag.grid.extension.tag_filter.class: Oro\Bundle\TagBundle\EventListener\TagsGridListener
-
-    oro_tag.filter.tags.class: Oro\Bundle\TagBundle\Filter\TagsFilter
-
 services:
     oro_tag.tag.manager:
         class: %oro_tag.tag.manager.class%
@@ -40,35 +24,17 @@ services:
             - @doctrine.orm.entity_manager
             - %oro_tag.tag.entity.class%
             - %oro_tag.tagging.entity.class%
-            - @oro_search.mapper
             - @oro_security.security_facade
             - @router
 
     oro_tag.docrine.event.listener:
         class: %oro_tag.tag_listener.class%
+        arguments:
+            - @oro_tag.helper.taggable_helper
         calls:
-            - [ setContainer, [ @service_container ] ]
+            - [setContainer, [@service_container]]
         tags:
             - { name: doctrine.event_listener, event: preRemove }
-
-    oro_tag.form.tag:
-        class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
-        arguments: ["oro_tag_tag_form", "oro_tag_tag"]
-
-    oro_tag.form.handler.tag:
-        class: %oro_tag.tag.form.handler.tag.class%
-        scope: request
-        arguments:
-            - @oro_tag.form.tag
-            - @request
-            - @doctrine.orm.entity_manager
-
-    oro_tag.form.type.tag:
-        class: %oro_tag.tag.form.type.tag.class%
-        tags:
-            - { name: form.type, alias: oro_tag_tag }
 
     oro_tag.provider.search_provider:
         class: %oro_tag.provider.search_provider.class%
@@ -88,66 +54,12 @@ services:
             - %oro_tag.tag.entity.class%
             - @doctrine.orm.entity_manager
 
-    oro_tag.form.type.tag.api:
-        class: %oro_tag.tag.form.type.tag.api.class%
-        tags:
-            - { name: form.type, alias: oro_tag_tag }
-
-    oro_tag.form.tag.api:
-        class: Symfony\Component\Form\Form
-        factory_method: createNamed
-        factory_service: form.factory
-        arguments: ["oro_tag_tag_form", "oro_tag_tag", null]
-
-    oro_tag.form.handler.api:
-        class: %oro_tag.tag.form.handler.tag.class%
-        scope: request
-        arguments:
-            - @oro_tag.form.type.tag.api
-            - @request
-            - @doctrine.orm.entity_manager
-
-    # Autocomplete search handler
-    oro_tag.autocomplete.tag.search_handler:
-        class: %oro_tag.autocomplete.tag.search_handler.class%
-        parent: oro_form.autocomplete.search_handler
-        arguments:
-            - %oro_tag.tag.entity.class%
-            - ["name"]
-        tags:
-            - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_assign_unassign }
-
-    # Autocomplete form type
-    oro_tag.form.type.tag_autocomplete:
-        class: %oro_tag.form.type.tag_autocomplete.class%
-        arguments:
-            - @oro_security.security_facade
-        tags:
-            - { name: form.type, alias: oro_tag_autocomplete }
-
-    oro_tag.form.type.tag_select:
-        class: %oro_tag.form.type.tag_select.class%
-        arguments:
-            - @oro_tag.form.subscriber.tag_select
-            - @oro_tag.form.transformer.tag_select
-        tags:
-            - { name: form.type, alias: oro_tag_select }
-
-    oro_tag.form.subscriber.tag_select:
-        class: %oro_tag.form.subscriber.tag_select.class%
-        arguments:
-            - @oro_tag.tag.manager
-            - @oro_tag.form.transformer.tag_select
-
-    oro_tag.form.transformer.tag_select:
-        class: %oro_tag.form.transformer.tag_select.class%
-        arguments: [@oro_tag.tag.manager]
-
     # Twig extension
     oro_tag.twig.tag.extension:
         class: %oro_tag.twig.tag.extension.class%
         arguments:
             - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
         tags:
             - { name: twig.extension }
 
@@ -160,6 +72,7 @@ services:
         class: %oro_tag.event_listener.search_results_grid_listener.class%
         arguments:
           - @oro_tag.security_provider
+          - @oro_entity.entity_alias_resolver
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.tag-results-grid, method: onBuildAfter }
 
@@ -173,38 +86,30 @@ services:
         class: %oro_tag.event_listener.merge_listener.class%
         arguments:
           - @oro_tag.tag.manager
+          - @oro_tag.helper.taggable_helper
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata }
           - { name: kernel.event_listener, event: oro.entity_merge.create_entity_data, method: onCreateEntityData }
           - { name: kernel.event_listener, event: oro.entity_merge.after_merge_entity, method: afterMergeEntity }
 
-    oro_tag.grid.extension.tag_filter:
-        class: %oro_tag.grid.extension.tag_filter.class%
-        arguments:
-            - @oro_entity.orm.entity_class_resolver
-        tags:
-            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before, method: onBuildBefore }
-
-    oro_tag.form.type.entity_tags_selector:
-        class: %oro_tag.form.type.entity_tags_selector.class%
-        arguments:
-            - @oro_security.acl_helper
-            - @doctrine
-        tags:
-            - { name: form.type, alias: oro_tag_entity_tags_selector }
-
-    oro_tag.form.type.entity_tags_filter:
-        class: %oro_tag.form.type.entity_tags_filter.class%
-        tags:
-            - { name: form.type, alias: oro_type_tag_filter }
-
     oro_tag.provider.virtual_relation.tags:
         class: %oro_tag.provider.virtual_relation.tags.class%
+        arguments:
+            - @oro_tag.helper.taggable_helper
+            - @oro_entity.doctrine_helper
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 150 }
 
+    oro_tag.virtual_field_provider:
+        class: Oro\Bundle\TagBundle\Provider\TagVirtualFieldProvider
+        arguments:
+            - @oro_tag.helper.taggable_helper
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: oro_entity.virtual_field_provider, priority: 150 }
+
     oro_tag.filter.tags:
-        class: %oro_tag.filter.tags.class%
+        class: Oro\Bundle\TagBundle\Filter\EntityTagsFilter
         arguments:
             - @form.factory
             - @oro_filter.filter_utility
@@ -212,3 +117,95 @@ services:
             - @oro_security.acl_helper
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tag }
+
+    oro_tag.grid.tags_extension:
+        class: Oro\Bundle\TagBundle\Grid\TagsExtension
+        arguments:
+            - @oro_tag.tag.manager
+            - @oro_datagrid.grid_configuration.helper
+            - @oro_tag.helper.taggable_helper
+            - @oro_entity.routing_helper
+            - @oro_security.security_facade
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_tag.grid.tags_report_extension:
+        class: Oro\Bundle\TagBundle\Grid\TagsReportExtension
+        arguments:
+            - @oro_tag.tag.manager
+            - @oro_datagrid.grid_configuration.helper
+            - @oro_tag.helper.taggable_helper
+            - @oro_entity.routing_helper
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_tag.extension.grid.formatter.tag_search_result_property:
+        class: Oro\Bundle\TagBundle\Grid\Formatter\TagSearchResultProperty
+        arguments:
+            - @twig
+            - @oro_entity_config.provider.entity
+            - OroTagBundle:Search:searchResultItem.html.twig
+        calls:
+            - [setMappingProvider, [@oro_search.provider.search_mapping]]
+        tags:
+            - { name:  oro_datagrid.extension.formatter.property, type: tag-search-result }
+
+    oro_tag.provider.statistic:
+        class: Oro\Bundle\TagBundle\Provider\StatisticProvider
+        arguments:
+            - @doctrine.orm.entity_manager
+            - @oro_tag.security_provider
+            - @oro_entity_config.provider.entity
+            - @oro_entity.entity_alias_resolver
+
+    oro_tag.extension.tag_search_results:
+        class: Oro\Bundle\TagBundle\Grid\Extension\TagSearchResultsExtension
+        arguments:
+            - @oro_search.formatter.result_formatter
+            - @doctrine.orm.entity_manager
+            - @oro_search.mapper
+            - @event_dispatcher
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_tag.view.eventlistener.tag_field:
+        class: Oro\Bundle\TagBundle\EventListener\TagFieldListener
+        arguments:
+            - @oro_tag.helper.taggable_helper
+        tags:
+            - { name: kernel.event_listener, event: entity_view.render.before, method: addTagField }
+
+    oro_tag.model.accessor.tag_merge:
+        class: Oro\Bundle\TagBundle\Model\Accessor\TagMergeAccessor
+        arguments:
+            - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
+        tags:
+            - { name: oro_entity_merge.accessor }
+
+    oro_tag.helper.taggable_helper:
+        class: Oro\Bundle\TagBundle\Helper\TaggableHelper
+        arguments:
+            - @oro_entity_config.provider.tag
+
+    oro_tag.eventlistener.entity_config:
+        class: Oro\Bundle\TagBundle\EventListener\EntityConfigListener
+        arguments:
+            - @oro_tag.tag.manager
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.post_flush, method: postFlush }
+
+    oro_tag.formatter.tags_formatter:
+        class: Oro\Bundle\TagBundle\Formatter\TagsTypeFormatter
+        tags:
+            - { name: oro_importexport.formatter.formatter, data_type: tags, format_type: excel }
+
+    oro_tag.filter.tags_report:
+        class: Oro\Bundle\TagBundle\Filter\TagsReportFilter
+        arguments:
+            - @form.factory
+            - @oro_filter.filter_utility
+            - @doctrine
+            - @oro_security.acl_helper
+        tags:
+            - { name: oro_filter.extension.orm_filter.filter, type: tags-report }

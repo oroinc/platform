@@ -10,3 +10,4 @@ Usage:
  - [Email templates](./Resources/doc/email_templates.md)
  - [Workflow Transition Actions](./Resources/doc/reference/workflow/workflow-entities/transition-actions.md)
  - [Email ownership](./Resources/doc/reference/security/ownership.md)
+ - [System Mailboxes](./Resources/doc/reference/mailboxes.md)

@@ -8,9 +8,7 @@ use Symfony\Component\DomCrawler\Crawler;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
- * @dbReindex
  */
 class ControllersRoleTest extends WebTestCase
 {
@@ -43,6 +41,9 @@ class ControllersRoleTest extends WebTestCase
         $this->assertContains("Role saved", $crawler->html());
     }
 
+    /**
+     * @depends testCreate
+     */
     public function testUpdate()
     {
         $response = $this->client->requestGrid(
@@ -72,6 +73,9 @@ class ControllersRoleTest extends WebTestCase
         $this->assertContains("Role saved", $crawler->html());
     }
 
+    /**
+     * @depends testUpdate
+     */
     public function testGridData()
     {
         $response = $this->client->requestGrid(

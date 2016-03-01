@@ -16,16 +16,60 @@
         {% endblock  %}
         <div class="navigation clearfix navbar-extra navbar-extra-right">
             <div class="row">
-                <div class="pull-left pull-left-extra">
+                {% set actionButtons %}
+                <div class="pull-right">
+                    <div class="pull-right title-buttons-container">
+                        {% block navButtonContainer %}
+                            {% placeholder view_navButtons_before with {entity: entity} %}
+                            {% block navButtons %}{% endblock navButtons %}
+                            {% placeholder view_navButtons_after with {entity: entity} %}
+                        {% endblock navButtonContainer%}
+                    </div>
+                    <div class="pull-right user-info-state">
+                        <div class="inline-decorate-container">
+                            <ul class="inline-decorate">
+                                {% block pageActions %}
+                                    {% placeholder view_pageActions_before with {entity: entity} %}
+
+                                    {% block ownerLink %}
+                                        {% if isDesktopVersion() and entity is not null %}
+                                            {% set ownerLink = UI.entityOwnerLink(entity) %}
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
+                                        {% endif %}
+                                    {% endblock ownerLink %}
+
+                                    {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : entity.id|default %}
+                                    {% if audit_entity_id %}
+                                        {% placeholder change_history_block with {
+                                            'entity': entity,
+                                            'entity_class': audit_entity_class|default(null),
+                                            'id': audit_entity_id,
+                                            'title': audit_title|default(entity.__toString is defined ? entity : null),
+                                            'audit_path': audit_path|default('oro_dataaudit_history'),
+                                            'audit_show_change_history': audit_show_change_history|default(false)
+                                        } %}
+                                    {% endif %}
+
+                                    {% placeholder view_pageActions_after with {entity: entity} %}
+                                {% endblock pageActions %}
+                            </ul>
+                        </div>
+                    </div>
+                </div>
+                {% endset %}
+                {%  if not isMobileVersion() %}
+                   {{ actionButtons }}
+                {%  endif %}
+                <div class="pull-left-extra">
                 {% block pageHeader %}
-                    <div class="clearfix customer-info well-small{% if avatar is not defined %} customer-simple{% endif %}">
+                    <div class="customer-info well-small{% if avatar is not defined %} customer-simple{% endif %}">
                         {% if avatar is defined %}
                             <div class="visual">
                                 <img src="{{ avatar ? avatar : asset('bundles/oroui/img/info-user.png') }}" alt="{{ breadcrumbs.entityTitle }}"/>
                             </div>
                         {% endif %}
-                        <div class="customer-content pull-left">
-                            <div class="clearfix">
+                        <div class="customer-content">
+                            <div class="top-row">
                                 {% block breadcrumbs %}
                                     <div class="pull-left">
                                         {% if breadcrumbs.indexLabel is defined %}
@@ -55,20 +99,18 @@
                                     {% block breadcrumbMessage %}{% endblock breadcrumbMessage %}
                                 {% endblock breadcrumbs %}
                             </div>
-                            <div class="clearfix">
+                            <div>
                                 <ul class="inline">
                                     {% placeholder page_header_stats_before with {entity: entity} %}
                                     {% block stats %}
-                                        <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
-                                        <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
+                                        <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.createdAt is defined and breadcrumbs.entity.createdAt ? breadcrumbs.entity.createdAt|oro_format_datetime : 'N/A' }}</li>
+                                        <li>{{ 'oro.ui.updated_at'|trans }}: {{ breadcrumbs.entity.updatedAt is defined and breadcrumbs.entity.updatedAt ? breadcrumbs.entity.updatedAt|oro_format_datetime : 'N/A' }}</li>
                                     {% endblock stats %}
                                     {% placeholder page_header_stats_after with {entity: entity} %}
 
-                                    {% if isMobileVersion() %}
+                                    {% if isMobileVersion() and entity is not null %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                        {% if ownerLink %}
-                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
-                                        {% endif %}
+                                        <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                     {% endif %}
                                 </ul>
                             </div>
@@ -76,47 +118,9 @@
                     </div>
                 {% endblock pageHeader %}
                 </div>
-                <div class="pull-right">
-                    <div class="pull-right title-buttons-container">
-                        {% block navButtonContainer %}
-                            {% placeholder view_navButtons_before with {entity: entity} %}
-                            {% block navButtons %}{% endblock navButtons %}
-                            {% placeholder view_navButtons_after with {entity: entity} %}
-                        {% endblock navButtonContainer%}
-                    </div>
-                    <div class="pull-right user-info-state">
-                        <div class="inline-decorate-container">
-                            <ul class="inline-decorate">
-                                {% block pageActions %}
-                                    {% placeholder view_pageActions_before with {entity: entity} %}
-
-                                    {% block ownerLink %}
-                                        {% if isDesktopVersion() %}
-                                            {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                            {% if ownerLink %}
-                                                <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
-                                            {% endif %}
-                                        {% endif %}
-                                    {% endblock ownerLink %}
-
-                                    {% set audit_entity_id = audit_entity_id is defined ? audit_entity_id : entity.id|default %}
-                                    {% if audit_entity_id %}
-                                        {% placeholder change_history_block with {
-                                            'entity': entity,
-                                            'entity_class': audit_entity_class|default(null),
-                                            'id': audit_entity_id,
-                                            'title': audit_title|default(entity.__toString is defined ? entity : null),
-                                            'audit_path': audit_path|default('oro_dataaudit_history'),
-                                            'audit_show_change_history': audit_show_change_history|default(false)
-                                        } %}
-                                    {% endif %}
-
-                                    {% placeholder view_pageActions_after with {entity: entity} %}
-                                {% endblock pageActions %}
-                            </ul>
-                        </div>
-                    </div>
-                </div>
+                {%  if isMobileVersion() %}
+                    {{ actionButtons }}
+                {%  endif %}
             </div>
         </div>
         {% placeholder page_title_after with {entity: entity} %}
@@ -125,6 +129,7 @@
     <div class="layout-content scrollable-container">
         {% block content_data %}
             {% if data is defined and data.dataBlocks is defined %}
+                {% set data = oro_view_process(data, entity) %}
                 {% set dataBlocks = data.dataBlocks %}
 
                 {%- set activitiesData -%}

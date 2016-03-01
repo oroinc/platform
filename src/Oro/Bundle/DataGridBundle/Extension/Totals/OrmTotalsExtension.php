@@ -3,10 +3,13 @@
 namespace Oro\Bundle\DataGridBundle\Extension\Totals;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Query\Expr\GroupBy;
+use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
@@ -20,15 +23,13 @@ use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 use Oro\Bundle\LocaleBundle\Formatter\NumberFormatter;
 
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\TranslationBundle\Translation\Translator;
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OrmTotalsExtension extends AbstractExtension
 {
-    /** @var  Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var QueryBuilder */
@@ -46,8 +47,14 @@ class OrmTotalsExtension extends AbstractExtension
     /** @var array */
     protected $groupParts = [];
 
+    /**
+     * @param TranslatorInterface $translator
+     * @param NumberFormatter     $numberFormatter
+     * @param DateTimeFormatter   $dateTimeFormatter
+     * @param AclHelper           $aclHelper
+     */
     public function __construct(
-        Translator $translator,
+        TranslatorInterface $translator,
         NumberFormatter $numberFormatter,
         DateTimeFormatter $dateTimeFormatter,
         AclHelper $aclHelper
@@ -59,15 +66,15 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        return $config->offsetGetByPath(Builder::DATASOURCE_TYPE_PATH) == OrmDatasource::TYPE;
+        return $config->getDatasourceType() === OrmDatasource::TYPE;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function processConfigs(DatagridConfiguration $config)
     {
@@ -86,7 +93,7 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
@@ -94,16 +101,16 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $onlyOnePage  = !isset($result['options'], $result['options']['totalRecords']) ||
-            $result['options']['totalRecords'] == count($result['data']);
+        $onlyOnePage  = !isset($result['options']['totalRecords']) ||
+            $result['options']['totalRecords'] === count($result['data']);
 
-        $totals       = $config->offsetGetByPath(Configuration::TOTALS_PATH);
         $totalData = [];
-        if (null != $totals && !empty($result['data'])) {
+        $totals    = $config->offsetGetByPath(Configuration::TOTALS_PATH);
+        if (null !== $totals && !empty($result['data'])) {
             foreach ($totals as $rowName => $rowConfig) {
                 if ($onlyOnePage && $rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY]) {
                     unset($totals[$rowName]);
@@ -116,7 +123,7 @@ class OrmTotalsExtension extends AbstractExtension
                         $result,
                         $rowConfig['columns'],
                         $rowConfig[Configuration::TOTALS_PER_PAGE_ROW_KEY],
-                        $config->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)
+                        $config->isDatasourceSkipAclApply()
                     )
                 );
             }
@@ -127,7 +134,7 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $metaData)
     {
@@ -139,7 +146,7 @@ class OrmTotalsExtension extends AbstractExtension
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function getPriority()
     {
@@ -158,9 +165,14 @@ class OrmTotalsExtension extends AbstractExtension
             $groupParts   = [];
             $groupByParts = $this->masterQB->getDQLPart('groupBy');
             if (!empty($groupByParts)) {
-                /** @var GroupBy $groupByPart */
+                /** @var Expr\GroupBy $groupByPart */
                 foreach ($groupByParts as $groupByPart) {
-                    $groupParts = array_merge($groupParts, $groupByPart->getParts());
+                    foreach ($groupByPart->getParts() as $part) {
+                        $groupParts = array_merge(
+                            $groupParts,
+                            array_map('trim', explode(',', $part))
+                        );
+                    }
                 }
             }
             $this->groupParts = $groupParts;
@@ -179,30 +191,31 @@ class OrmTotalsExtension extends AbstractExtension
      */
     protected function getTotalData($rowConfig, $data)
     {
-        $totalData = [];
-        if (!empty($data)) {
-            $totalData['columns'] = [];
-            foreach ($rowConfig['columns'] as $field => $total) {
-                $totalData['columns'][$field] = [];
-                if (isset($data[$field])) {
-                    $totalValue = $data[$field];
-                    if (isset($total[Configuration::TOTALS_FORMATTER_KEY])) {
-                        $totalValue = $this->applyFrontendFormatting(
-                            $totalValue,
-                            $total[Configuration::TOTALS_FORMATTER_KEY]
-                        );
-                    }
-                    $totalData['columns'][$field]['total'] = $totalValue;
-                }
-                if (isset($total[Configuration::TOTALS_LABEL_KEY])) {
-                    $totalData['columns'][$field][Configuration::TOTALS_LABEL_KEY] = $this->
-                        translator
-                        ->trans($total[Configuration::TOTALS_LABEL_KEY]);
-                }
-            };
+        if (empty($data)) {
+            return [];
         }
 
-        return $totalData;
+        $columns = [];
+        foreach ($rowConfig['columns'] as $field => $total) {
+            $column = [];
+            if (isset($data[$field])) {
+                $totalValue = $data[$field];
+                if (isset($total[Configuration::TOTALS_FORMATTER_KEY])) {
+                    $totalValue = $this->applyFrontendFormatting(
+                        $totalValue,
+                        $total[Configuration::TOTALS_FORMATTER_KEY]
+                    );
+                }
+                $column['total'] = $totalValue;
+            }
+            if (isset($total[Configuration::TOTALS_LABEL_KEY])) {
+                $column[Configuration::TOTALS_LABEL_KEY] =
+                    $this->translator->trans($total[Configuration::TOTALS_LABEL_KEY]);
+            }
+            $columns[$field] = $column;
+        };
+
+        return ['columns' => $columns];
     }
 
     /**
@@ -237,11 +250,11 @@ class OrmTotalsExtension extends AbstractExtension
                     ];
                 } else {
                     $selectParts = $this->masterQB->getDQLPart('select');
-                    /** @var Select $selectPart */
+                    /** @var Expr\Select $selectPart */
                     foreach ($selectParts as $selectPart) {
                         foreach ($selectPart->getParts() as $part) {
                             if (preg_match('/^(.*)\sas\s(.*)$/i', $part, $matches)) {
-                                if (count($matches) == 3 && $groupPart == $matches[2]) {
+                                if (count($matches) === 3 && $groupPart === $matches[2]) {
                                     $rootIds[] = [
                                         'fieldAlias' => $matches[1],
                                         'alias'      => $matches[2]
@@ -284,19 +297,21 @@ class OrmTotalsExtension extends AbstractExtension
             }
         };
 
-        $query = clone $this->masterQB;
-        $query
+        $queryBuilder = clone $this->masterQB;
+        $queryBuilder
             ->select($totalQueries)
             ->resetDQLPart('groupBy');
 
-        $parameters = $query->getParameters();
+        $parameters = $queryBuilder->getParameters();
         if ($parameters->count()) {
-            $query->resetDQLPart('where')
+            $queryBuilder->resetDQLPart('where')
                 ->resetDQLPart('having')
                 ->setParameters(new ArrayCollection());
         }
 
-        $this->addPageLimits($query, $pageData, $perPage);
+        $this->addPageLimits($queryBuilder, $pageData, $perPage);
+
+        $query = $queryBuilder->getQuery();
 
         if (!$skipAclWalkerCheck) {
             $query = $this->aclHelper->apply($query);
@@ -322,8 +337,8 @@ class OrmTotalsExtension extends AbstractExtension
         $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
 
         if (!$perPage) {
-            $query = clone $this->masterQB;
-            $data = $query
+            $queryBuilder = clone $this->masterQB;
+            $data = $queryBuilder
                 ->getQuery()
                 ->setFirstResult(null)
                 ->setMaxResults(null)
@@ -332,7 +347,7 @@ class OrmTotalsExtension extends AbstractExtension
             $data = $pageData['data'];
         }
         foreach ($rootIdentifiers as $identifier) {
-            $ids = ArrayUtils::arrayColumn($data, $identifier['alias']);
+            $ids = ArrayUtil::arrayColumn($data, $identifier['alias']);
 
             $field = isset($identifier['entityAlias'])
                 ? $identifier['entityAlias'] . '.' . $identifier['fieldAlias']
@@ -357,30 +372,32 @@ class OrmTotalsExtension extends AbstractExtension
      */
     protected function applyFrontendFormatting($val = null, $formatter = null)
     {
-        if (null != $formatter) {
-            switch ($formatter) {
-                case PropertyInterface::TYPE_DATE:
-                    $val = $this->dateTimeFormatter->formatDate($val);
-                    break;
-                case PropertyInterface::TYPE_DATETIME:
-                    $val = $this->dateTimeFormatter->format($val);
-                    break;
-                case PropertyInterface::TYPE_TIME:
-                    $val = $this->dateTimeFormatter->formatTime($val);
-                    break;
-                case PropertyInterface::TYPE_DECIMAL:
-                    $val = $this->numberFormatter->formatDecimal($val);
-                    break;
-                case PropertyInterface::TYPE_INTEGER:
-                    $val = $this->numberFormatter->formatDecimal($val);
-                    break;
-                case PropertyInterface::TYPE_PERCENT:
-                    $val = $this->numberFormatter->formatPercent($val);
-                    break;
-                case PropertyInterface::TYPE_CURRENCY:
-                    $val = $this->numberFormatter->formatCurrency($val);
-                    break;
-            }
+        if (null === $formatter) {
+            return $val;
+        }
+
+        switch ($formatter) {
+            case PropertyInterface::TYPE_DATE:
+                $val = $this->dateTimeFormatter->formatDate($val);
+                break;
+            case PropertyInterface::TYPE_DATETIME:
+                $val = $this->dateTimeFormatter->format($val);
+                break;
+            case PropertyInterface::TYPE_TIME:
+                $val = $this->dateTimeFormatter->formatTime($val);
+                break;
+            case PropertyInterface::TYPE_DECIMAL:
+                $val = $this->numberFormatter->formatDecimal($val);
+                break;
+            case PropertyInterface::TYPE_INTEGER:
+                $val = $this->numberFormatter->formatDecimal($val);
+                break;
+            case PropertyInterface::TYPE_PERCENT:
+                $val = $this->numberFormatter->formatPercent($val);
+                break;
+            case PropertyInterface::TYPE_CURRENCY:
+                $val = $this->numberFormatter->formatCurrency($val);
+                break;
         }
 
         return $val;

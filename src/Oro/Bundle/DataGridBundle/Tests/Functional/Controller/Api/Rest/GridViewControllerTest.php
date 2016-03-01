@@ -10,7 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class GridViewControllerTest extends WebTestCase
 {

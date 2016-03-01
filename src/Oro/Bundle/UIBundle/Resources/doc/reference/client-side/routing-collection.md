@@ -1,6 +1,42 @@
 <a name="module_RoutingCollection"></a>
 ## RoutingCollection
-RoutingCollection is an abstraction of collection which uses Oro routing system.It keeps itself in actual state when route or state changes.Basic usage:```javascriptvar CommentCollection = RoutingCollection.extend({    routeDefaults: {        routeName: 'oro_api_comment_get_items',        routeQueryParameters: ['page', 'limit']    },    stateDefaults: {        page: 1,        limit: 10    },    // provide access to route    setPage: function (pageNo) {        this._route.set({page: pageNo});    }});var commentCollection = new CommentCollection([], {    routeParameters: {        // specify required parameters        relationId: 123,        relationClass: 'Some_Class'    }});// load first page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=1)commentCollection.fetch();// load second page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2)commentCollection.setPage(2)```
+RoutingCollection is an abstraction of collection which uses Oro routing system.
+
+It keeps itself in actual state when route or state changes.
+
+Basic usage:
+```javascript
+var CommentCollection = RoutingCollection.extend({
+    routeDefaults: {
+        routeName: 'oro_api_comment_get_items',
+        routeQueryParameterNames: ['page', 'limit']
+    },
+
+    stateDefaults: {
+        page: 1,
+        limit: 10
+    },
+
+    // provide access to route
+    setPage: function (pageNo) {
+        this._route.set({page: pageNo});
+    }
+});
+
+var commentCollection = new CommentCollection([], {
+    routeParameters: {
+        // specify required parameters
+        relationId: 123,
+        relationClass: 'Some_Class'
+    }
+});
+
+// load first page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=1)
+commentCollection.fetch();
+
+// load second page (api/rest/latest/relation/Some_Class/123/comment?limit=10&page=2)
+commentCollection.setPage(2)
+```
 
 **Augment**: BaseCollection  
 
@@ -27,13 +63,22 @@ RoutingCollection is an abstraction of collection which uses Oro routing system.
 
 <a name="module_RoutingCollection#_route"></a>
 ### routingCollection._route : <code>RouteModel</code>
-Route object which used to generate urls. Collection will reload whenever route is changed.Attributes will be available at the view as <%= route.page %>Access to route attributes should be realized in descendants. (e.g. `setPage()` or `setPerPage()`)
+Route object which used to generate urls. Collection will reload whenever route is changed.
+Attributes will be available at the view as <%= route.page %>
+
+Access to route attributes should be realized in descendants. (e.g. `setPage()` or `setPerPage()`)
 
 **Kind**: instance property of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 **Access:** protected  
 <a name="module_RoutingCollection#_state"></a>
 ### routingCollection._state : <code>BaseModel</code>
-State of the collection. Must contain both settings and server response parts such as totalItemsQuantity of itemson server. Attributes will be available at the view as `<%= state.totalItemsQuantity %>`.The `stateChange` event is fired when state is changed.Override `parse()` function to add values from server response to the state
+State of the collection. Must contain both settings and server response parts such as
+totalItemsQuantity of items
+on server. Attributes will be available at the view as `<%= state.totalItemsQuantity %>`.
+
+The `stateChange` event is fired when state is changed.
+
+Override `parse()` function to add values from server response to the state
 
 **Kind**: instance property of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 **Access:** protected  
@@ -74,7 +119,8 @@ Creates route. Merges attributes from all routeDefaults objects/functions in cla
 
 <a name="module_RoutingCollection#_mergeAllPropertyVersions"></a>
 ### routingCollection._mergeAllPropertyVersions(attrName) ⇒ <code>Object</code>
-Utility function. Extends `Chaplin.utils.getAllPropertyVersions` with merge and `_.result()` like call,if property is function
+Utility function. Extends `Chaplin.utils.getAllPropertyVersions` with merge and `_.result()` like call,
+if property is function
 
 **Kind**: instance method of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 **Access:** protected  
@@ -104,7 +150,8 @@ Returns collection state
 **Kind**: instance method of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 <a name="module_RoutingCollection#checkUrlChange"></a>
 ### routingCollection.checkUrlChange()
-Fetches collection if url is changed.Callback for state and route changes.
+Fetches collection if url is changed.
+Callback for state and route changes.
 
 **Kind**: instance method of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 <a name="module_RoutingCollection#serializeExtraData"></a>
@@ -112,7 +159,8 @@ Fetches collection if url is changed.Callback for state and route changes.
 **Kind**: instance method of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 <a name="module_RoutingCollection#_onErrorResponse"></a>
 ### routingCollection._onErrorResponse()
-Default error response handler functionIt will show error messages for all HTTP error codes except 400.
+Default error response handler function
+It will show error messages for all HTTP error codes except 400.
 
 **Kind**: instance method of <code>[RoutingCollection](#module_RoutingCollection)</code>  
 **Access:** protected  

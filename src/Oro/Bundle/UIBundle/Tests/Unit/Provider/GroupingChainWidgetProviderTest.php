@@ -2,17 +2,21 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Provider;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider;
+use Oro\Bundle\UIBundle\Provider\LabelProviderInterface;
+use Oro\Bundle\UIBundle\Provider\WidgetProviderInterface;
 
 class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|WidgetProviderInterface */
     protected $highPriorityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|WidgetProviderInterface */
     protected $lowPriorityProvider;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|WidgetProviderInterface */
     protected $unsupportedProvider;
 
     protected function setUp()
@@ -27,7 +31,7 @@ class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSupports()
     {
-        $chainProvider = $this->getChainProvider();
+        $chainProvider = $this->getChainProvider(false, false);
         $this->assertTrue($chainProvider->supports(new \stdClass()));
     }
 
@@ -176,12 +180,14 @@ class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param bool $withGroupNameProvider
+     * @param bool $setEventDispatcher
      * @return GroupingChainWidgetProvider
      */
-    protected function getChainProvider($withGroupNameProvider = false)
+    protected function getChainProvider($withGroupNameProvider = false, $setEventDispatcher = true)
     {
         $groupNameProvider = null;
         if ($withGroupNameProvider) {
+            /** @var \PHPUnit_Framework_MockObject_MockObject|LabelProviderInterface $groupNameProvider */
             $groupNameProvider = $this->getMock('Oro\Bundle\UIBundle\Provider\LabelProviderInterface');
             $groupNameProvider->expects($this->any())
                 ->method('getLabel')
@@ -194,7 +200,17 @@ class GroupingChainWidgetProviderTest extends \PHPUnit_Framework_TestCase
                 );
         }
 
-        $chainProvider = new GroupingChainWidgetProvider($groupNameProvider);
+        if ($setEventDispatcher) {
+            /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface $eventDispatcher */
+            $eventDispatcher = $this->getMock('\Symfony\Component\EventDispatcher\EventDispatcherInterface');
+            $eventDispatcher->expects($this->once())
+                ->method('dispatch');
+        }
+
+        $chainProvider = new GroupingChainWidgetProvider(
+            $groupNameProvider,
+            isset($eventDispatcher) ? $eventDispatcher : null
+        );
 
         $chainProvider->addProvider($this->lowPriorityProvider);
         $chainProvider->addProvider($this->highPriorityProvider);

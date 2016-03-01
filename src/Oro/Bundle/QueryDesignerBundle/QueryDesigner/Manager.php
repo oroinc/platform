@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
@@ -16,7 +16,7 @@ class Manager implements FunctionProviderInterface
     /** @var FilterInterface[] */
     protected $filters = [];
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var EntityHierarchyProvider */
@@ -28,13 +28,13 @@ class Manager implements FunctionProviderInterface
      * @param array                   $config
      * @param ConfigurationResolver   $resolver
      * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param Translator              $translator
+     * @param TranslatorInterface     $translator
      */
     public function __construct(
         array $config,
         ConfigurationResolver $resolver,
         EntityHierarchyProvider $entityHierarchyProvider,
-        Translator $translator
+        TranslatorInterface $translator
     ) {
         $resolver->resolve($config);
         $this->config                  = ConfigurationObject::create($config);
@@ -217,11 +217,16 @@ class Manager implements FunctionProviderInterface
                     $hintText    = empty($function['hint_label'])
                         ? null // if a label is empty it means that this function should inherit a label
                         : $this->translator->trans($function['hint_label']);
-                    $functions[] = [
+                    $func = [
                         'name'  => $function['name'],
                         'label' => $nameText,
                         'title' => $hintText,
                     ];
+                    if (isset($function['return_type'])) {
+                        $func['return_type'] = $function['return_type'];
+                    }
+
+                    $functions[] = $func;
                 }
                 $attr['functions'] = $functions;
                 $result[$name]     = $attr;

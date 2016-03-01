@@ -124,7 +124,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo('oro_sso.google_sso_domains'))
+            ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue([]));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
@@ -171,7 +171,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo('oro_sso.google_sso_domains'))
+            ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue([]));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
@@ -215,7 +215,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo('oro_sso.google_sso_domains'))
+            ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue([]));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
@@ -265,7 +265,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo('oro_sso.google_sso_domains'))
+            ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue(['example.com']));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');
@@ -318,7 +318,7 @@ class OAuthUserProviderTest extends \PHPUnit_Framework_TestCase
         $this->cm
             ->expects($this->at(1))
             ->method('get')
-            ->with($this->equalTo('oro_sso.google_sso_domains'))
+            ->with($this->equalTo('oro_sso.domains'))
             ->will($this->returnValue(['google.com']));
 
         $userResponse = $this->getMock('HWI\Bundle\OAuthBundle\OAuth\Response\UserResponseInterface');

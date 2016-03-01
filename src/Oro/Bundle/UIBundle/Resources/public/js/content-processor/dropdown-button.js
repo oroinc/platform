@@ -1,5 +1,4 @@
-/*global define*/
-define(['jquery', 'jquery-ui'], function ($) {
+define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
     'use strict';
 
     /**
@@ -14,27 +13,37 @@ define(['jquery', 'jquery-ui'], function ($) {
             excludeButtons: '.dropdown-toggle',
             mainButtons: '.main-group:not(.more-group)',
             useMainButtonsClone: false,
+            truncateLength: null,
             moreLabel: '',
             groupContainer: '<div class="btn-group pull-right"></div>',
             minItemQuantity: 1,
             moreButtonAttrs: {}
         },
 
-        _create: function () {
-            var $elems, $main, $more,
-                $group = $(this.options.groupContainer);
+        _create: function() {
+            var $more;
+            var $group = $(this.options.groupContainer);
 
             // replaces button's separators
             this.element.find(this.options.separator).replaceWith('<li class="divider"></li>');
 
-            $elems = this._collectButtons();
+            var $elems = this._collectButtons();
             if ($elems.length <= 1) {
                 return;
             }
 
-            $main = this._mainButtons($elems);
+            var $main = this._mainButtons($elems);
             if (this.options.useMainButtonsClone) {
                 $main = $main.clone(true);
+                if (this.options.truncateLength) {
+                    var self = this;
+                    // set text value string
+                    $main.contents().each(function() {
+                        if (this.nodeType === Node.TEXT_NODE) {
+                            this.nodeValue = _.trunc(this.nodeValue, self.options.truncateLength, false, '...');
+                        }
+                    });
+                }
             }
             $group.append($main);
 
@@ -57,7 +66,7 @@ define(['jquery', 'jquery-ui'], function ($) {
          * @returns {*}
          * @private
          */
-        _collectButtons: function () {
+        _collectButtons: function() {
             return this.element
                 .find(this.options.includeButtons)
                 .not(this.options.excludeButtons)
@@ -72,7 +81,7 @@ define(['jquery', 'jquery-ui'], function ($) {
          * @returns {jQuery}
          * @private
          */
-        _mainButtons: function ($buttons) {
+        _mainButtons: function($buttons) {
             var $main = $buttons.filter(this.options.mainButtons);
             if (!$main.length) {
                 $main = $buttons.first();
@@ -86,7 +95,7 @@ define(['jquery', 'jquery-ui'], function ($) {
          * @returns {string}
          * @private
          */
-        _moreButton: function () {
+        _moreButton: function() {
             var $button = $('<a href="#"/>');
             $button
                 .attr(this.options.moreButtonAttrs)
@@ -105,12 +114,12 @@ define(['jquery', 'jquery-ui'], function ($) {
          * @returns {*}
          * @private
          */
-        _dropdownMenu: function ($buttons) {
+        _dropdownMenu: function($buttons) {
             return $('<ul class="dropdown-menu"></ul>')
                 .append($buttons)
                 .find('.btn')
                 .wrap('<li></li>')
-                .removeClass(function (index, css) {
+                .removeClass(function(index, css) {
                     return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
                 }).end();
         }

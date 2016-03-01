@@ -1,9 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     './../base/page-region-view'
-], function (_, PageRegionView) {
+], function(_, PageRegionView) {
     'use strict';
 
     var BreadcrumbView;
@@ -14,7 +12,7 @@ define([
         },
         pageItems: ['breadcrumb'],
 
-        template: function (data) {
+        template: function(data) {
             return data.breadcrumb;
         },
 
@@ -37,7 +35,7 @@ define([
          *
          * @param {Object} menuView
          */
-        onMenuUpdate: function (menuView) {
+        onMenuUpdate: function(menuView) {
             var breadcrumbs = menuView.getActiveItems();
             if (breadcrumbs.length) {
                 this.data = {
@@ -54,7 +52,7 @@ define([
          * @returns {Object}
          * @override
          */
-        getTemplateData: function () {
+        getTemplateData: function() {
             return this.data;
         }
     });

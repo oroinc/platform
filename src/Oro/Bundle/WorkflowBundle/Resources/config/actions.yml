@@ -18,9 +18,12 @@ parameters:
     oro_workflow.action.assign_active_user.class: Oro\Bundle\WorkflowBundle\Model\Action\AssignActiveUser
     oro_workflow.action.format_name.class: Oro\Bundle\WorkflowBundle\Model\Action\FormatName
     oro_workflow.action.traverse.class: Oro\Bundle\WorkflowBundle\Model\Action\Traverse
+    oro_workflow.action.translate.class: Oro\Bundle\WorkflowBundle\Model\Action\TranslateAction
     oro_workflow.action.flash_message.class: Oro\Bundle\WorkflowBundle\Model\Action\FlashMessage
     oro_workflow.workflow.action.remove_entity.class:  Oro\Bundle\WorkflowBundle\Model\Action\RemoveEntity
     oro_workflow.workflow.action.assign_constant_value.class:  Oro\Bundle\WorkflowBundle\Model\Action\AssignConstantValue
+    oro_workflow.workflow.action.copy_tagging.class:  Oro\Bundle\WorkflowBundle\Model\Action\CopyTagging
+    oro_workflow.workflow.action.transit_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow
 
 services:
     oro_workflow.action_factory:
@@ -158,6 +161,14 @@ services:
         tags:
             - { name: oro_workflow.action, alias: traverse|foreach }
 
+    oro_workflow.action.translate:
+        class: %oro_workflow.action.translate.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @translator
+        tags:
+            - { name: oro_workflow.action, alias: translate|trans }
+
     oro_workflow.action.flash_message:
         class: %oro_workflow.action.flash_message.class%
         arguments:
@@ -182,3 +193,20 @@ services:
             - @oro_workflow.context_accessor
         tags:
             - { name: oro_workflow.action, alias: assign_constant_value }
+
+    oro_workflow.workflow.action.copy_tagging.class:
+        class: %oro_workflow.workflow.action.copy_tagging.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
+        tags:
+            - { name: oro_workflow.action, alias: copy_tagging }
+
+    oro_workflow.workflow.action.transit_workflow:
+        class: %oro_workflow.workflow.action.transit_workflow.class%
+        arguments:
+            - @oro_workflow.context_accessor
+            - @oro_workflow.manager
+        tags:
+            - { name: oro_workflow.action, alias: transit_workflow }

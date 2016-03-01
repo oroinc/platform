@@ -9,18 +9,12 @@ use Symfony\Component\Config\Definition\Exception\Exception;
  * Class Calendars
  *
  * @package Oro\Bundle\CalendarBundle\Tests\Selenium\Pages
- * @method Calendars openCalendars() openCalendars(string)
+ * @method Calendars openCalendars(string $bundlePath)
  * {@inheritdoc}
  */
 class Calendars extends AbstractPage
 {
     const URL = 'calendar/default';
-
-    public function __construct($testCase, $redirect = true)
-    {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
-    }
 
     /**
      * @return Calendar

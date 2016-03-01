@@ -2,3 +2,8 @@
     width: auto;
     height: auto;
 }
+.sidebar-widget-setup .control-group:last-child,
+.sidebar-widget-setup .control-group:last-child textarea,
+.sidebar-widget-setup .control-group:last-child input[type=text] {
+    margin-bottom: 0;
+}

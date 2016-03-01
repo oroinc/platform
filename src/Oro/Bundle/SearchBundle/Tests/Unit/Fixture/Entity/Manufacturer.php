@@ -76,14 +76,14 @@ class Manufacturer
     }
 
     /**
-     * Add products
+     * Add product
      *
-     * @param  \Oro\Bundle\SearchBundle\Tests\Fixture\Entity\Product $products
+     * @param  Product $product
      * @return Manufacturer
      */
-    public function addProduct(Product $products)
+    public function addProduct(Product $product)
     {
-        $this->products[] = $products;
+        $this->products[] = $product;
 
         return $this;
     }
@@ -91,11 +91,11 @@ class Manufacturer
     /**
      * Remove products
      *
-     * @param \Oro\Bundle\SearchBundle\Tests\Fixture\Entity\Product $products
+     * @param Product $product
      */
-    public function removeProduct(Product $products)
+    public function removeProduct(Product $product)
     {
-        $this->products->removeElement($products);
+        $this->products->removeElement($product);
     }
 
     /**

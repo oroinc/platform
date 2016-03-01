@@ -4,3 +4,15 @@ parameters:
 services:
     oro_cache.oro_data_cache_manager:
         class: %oro_cache.oro_data_cache_manager.class%
+
+    oro_cache.provider.validation:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'validation' ] ]
+
+    oro_cache.validation_cache.doctrine:
+        public: false
+        class: Symfony\Component\Validator\Mapping\Cache\DoctrineCache
+        arguments:
+            - @oro_cache.provider.validation

@@ -44,10 +44,10 @@ class RoutingOptionsResolverPassTest extends \PHPUnit_Framework_TestCase
         $resolver3     = new Definition();
         $resolver4     = new Definition();
 
-        $resolver1->addTag(RoutingOptionsResolverPass::RESOLVER_TAG_NAME, ['priority' => 100]);
-        $resolver2->addTag(RoutingOptionsResolverPass::RESOLVER_TAG_NAME, ['priority' => -100]);
+        $resolver1->addTag(RoutingOptionsResolverPass::RESOLVER_TAG_NAME, ['priority' => -100]);
+        $resolver2->addTag(RoutingOptionsResolverPass::RESOLVER_TAG_NAME, ['priority' => 100]);
         $resolver3->addTag(RoutingOptionsResolverPass::RESOLVER_TAG_NAME);
-        $resolver4->addTag(RoutingOptionsResolverPass::RESOLVER_TAG_NAME, ['priority' => 100]);
+        $resolver4->addTag(RoutingOptionsResolverPass::RESOLVER_TAG_NAME, ['priority' => -100]);
 
         $container->addDefinitions(
             [

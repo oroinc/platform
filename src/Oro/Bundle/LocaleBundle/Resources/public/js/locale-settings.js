@@ -1,6 +1,5 @@
-/*global define*/
 define(['underscore', 'orolocale/js/locale-settings/data'
-    ], function (_, settings) {
+    ], function(_, settings) {
     'use strict';
 
     /**
@@ -127,9 +126,9 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                         6: 'Friday',
                         7: 'Saturday'
                     },
-                    abbreviated: { 1: 'Sun', 2: 'Mon', 3: 'Tue', 4: 'Wed', 5: 'Thu', 6: 'Fri', 7: 'Sat' },
-                    short:       { 1: 'Su',  2: 'Mo',  3: 'Tu',  4: 'We',  5: 'Th',  6: 'Fr',  7: 'Sa' },
-                    narrow:      { 1: 'S',   2: 'M',   3: 'T',   4: 'W',   5: 'T',   6: 'F',   7: 'S' }
+                    abbreviated: {1: 'Sun', 2: 'Mon', 3: 'Tue', 4: 'Wed', 5: 'Thu', 6: 'Fri', 7: 'Sat'},
+                    short:       {1: 'Su',  2: 'Mo',  3: 'Tu',  4: 'We',  5: 'Th',  6: 'Fr',  7: 'Sa'},
+                    narrow:      {1: 'S',   2: 'M',   3: 'T',   4: 'W',   5: 'T',   6: 'F',   7: 'S'}
                 },
                 months: {
                     wide: {
@@ -160,8 +159,9 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                         11: 'Nov',
                         12: 'Dec'
                     },
-                    narrow:{
-                        1: 'J', 2: 'F', 3: 'M', 4: 'A', 5: 'M', 6: 'J', 7: 'J', 8: 'A', 9: 'S', 10: 'O', 11: 'N', 12: 'D'
+                    narrow: {
+                        1: 'J', 2: 'F', 3: 'M', 4: 'A', 5: 'M', 6: 'J',
+                        7: 'J', 8: 'A', 9: 'S', 10: 'O', 11: 'N', 12: 'D'
                     }
                 },
                 first_dow: 1
@@ -169,11 +169,13 @@ define(['underscore', 'orolocale/js/locale-settings/data'
         },
 
         _deepExtend: function(target, source) {
-            for (var prop in source) if (source.hasOwnProperty(prop)) {
-                if (_.isObject(target[prop])) {
-                    target[prop] = this._deepExtend(target[prop], source[prop]);
-                } else {
-                    target[prop] = source[prop];
+            for (var prop in source) {
+                if (source.hasOwnProperty(prop)) {
+                    if (_.isObject(target[prop])) {
+                        target[prop] = this._deepExtend(target[prop], source[prop]);
+                    } else {
+                        target[prop] = source[prop];
+                    }
                 }
             }
             return target;
@@ -206,7 +208,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
                 currencyCode = this.settings.currency;
             }
             if (this.settings.currency_data.hasOwnProperty(currencyCode)) {
-                return this.settings.currency_data[currencyCode].symbol
+                return this.settings.currency_data[currencyCode].symbol;
             }
             return currencyCode;
         },
@@ -214,7 +216,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
         /**
          * @return {string} name of system tynezone
          */
-        getTimeZone: function () {
+        getTimeZone: function() {
             return this.settings.timezone;
         },
 
@@ -228,7 +230,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          *
          * @returns {number}
          */
-        getTimeZoneShift: function () {
+        getTimeZoneShift: function() {
             return this._timezone_shift;
         },
 
@@ -238,11 +240,11 @@ define(['underscore', 'orolocale/js/locale-settings/data'
          * @param tz {string} timezone specification, just like "+08:00"
          * @returns {number} shift in minutes
          */
-        calculateTimeZoneShift: function (tz) {
-            var matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/),
-                sign = Number(matches[1] + '1'),
-                hours = Number(matches[2]),
-                minutes = Number(matches[3]);
+        calculateTimeZoneShift: function(tz) {
+            var matches = tz.match(/^(\+|\-)(\d{2}):?(\d{2})$/);
+            var sign = Number(matches[1] + '1');
+            var hours = Number(matches[2]);
+            var minutes = Number(matches[3]);
             return sign * (hours * 60 + minutes);
         },
 
@@ -318,7 +320,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
             width = (width && this.settings.calendar.months.hasOwnProperty(width)) ? width : 'wide';
             var result = this.settings.calendar.months[width];
             if (asArray) {
-                result = _.map(result, function(v) { return v });
+                result = _.map(result, function(v) { return v; });
             }
             return result;
         },
@@ -336,7 +338,7 @@ define(['underscore', 'orolocale/js/locale-settings/data'
             width = (width && this.settings.calendar.dow.hasOwnProperty(width)) ? width : 'wide';
             var result = this.settings.calendar.dow[width];
             if (asArray) {
-                result = _.map(result, function(v) { return v });
+                result = _.map(result, function(v) { return v; });
             }
             return result;
         },

@@ -1,7 +1,5 @@
-/* jshint devel:true */
-/*global define*/
 define(['underscore', 'backbone', 'oro/dialog-widget'
-    ], function (_, Backbone, DialogWidget) {
+    ], function(_, Backbone, DialogWidget) {
     'use strict';
 
     /**
@@ -50,7 +48,7 @@ define(['underscore', 'backbone', 'oro/dialog-widget'
                 dialogOptions: {
                     'allowMinimize': true,
                     'width': 675,
-                    'autoResize':true
+                    'autoResize': true
                 }
             });
             widget.render();
@@ -74,8 +72,8 @@ define(['underscore', 'backbone', 'oro/dialog-widget'
 
         render: function() {
             var data = this.model.toJSON();
-            data['hasDefault'] = this.options.hasDefault;
-            data['name'] = this.options.name;
+            data.hasDefault = this.options.hasDefault;
+            data.name = this.options.name;
             this.$el.append(this.template(data));
             this.$el.find('a.entity-info').click(_.bind(this.viewDetails, this));
             this.toggleDefault();

@@ -44,10 +44,10 @@ class EntityAliasProviderPassTest extends \PHPUnit_Framework_TestCase
         $provider3 = new Definition();
         $provider4 = new Definition();
 
-        $provider1->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME, ['priority' => 100]);
-        $provider2->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME, ['priority' => -100]);
+        $provider1->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME, ['priority' => -100]);
+        $provider2->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME, ['priority' => 100]);
         $provider3->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME);
-        $provider4->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME, ['priority' => 100]);
+        $provider4->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME, ['priority' => -150]);
 
         $container->addDefinitions(
             [

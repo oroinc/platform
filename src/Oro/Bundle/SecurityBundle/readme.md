@@ -44,7 +44,7 @@ Also the following permissions are supported:
  - **ASSIGN**: Controls whether a user is allowed to change an owner of a record. For example assign a record to another user.
  - **SHARE**: Controls whether the user can share a record with another user.
 
- `*` **NOTE: SHARE functionality isn't implemented yet, so SHARE permissions are not used**
+ `*` **NOTE: SHARE functionality is implemented in Enterprise Edition**
 
 - [Implementation](./Resources/doc/implementation.md)
 - [UI](./Resources/doc/ui.md)
@@ -53,3 +53,8 @@ Also the following permissions are supported:
 - [Custom listeners] (./Resources/doc/custom-listeners.md)
 - [Examples](./Resources/doc/examples.md)
 
+Permissions
+-----------
+
+The `OroSecurityBundle` provides possibility to use custom permissions for entities.
+See [Permissions](./Resources/doc/permissions.md) for details.

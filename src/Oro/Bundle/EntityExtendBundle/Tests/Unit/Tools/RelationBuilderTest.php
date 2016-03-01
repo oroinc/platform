@@ -45,7 +45,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToOne'),
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
@@ -78,10 +77,10 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($extendFieldConfig));
-        $extendConfigProvider->expects($this->at(1))
+        $this->configManager->expects($this->at(3))
             ->method('persist')
             ->with($this->identicalTo($extendFieldConfig));
-        $extendConfigProvider->expects($this->at(2))
+        $this->configManager->expects($this->at(6))
             ->method('persist')
             ->with($this->identicalTo($extendConfig));
 
@@ -90,7 +89,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($testFieldConfig));
-        $testConfigProvider->expects($this->once())
+        $this->configManager->expects($this->at(5))
             ->method('persist')
             ->with($this->identicalTo($testFieldConfig));
 
@@ -152,7 +151,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToMany'),
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
@@ -187,10 +185,10 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($extendFieldConfig));
-        $extendConfigProvider->expects($this->at(1))
+        $this->configManager->expects($this->at(3))
             ->method('persist')
             ->with($this->identicalTo($extendFieldConfig));
-        $extendConfigProvider->expects($this->at(2))
+        $this->configManager->expects($this->at(6))
             ->method('persist')
             ->with($this->identicalTo($extendConfig));
 
@@ -199,7 +197,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($testFieldConfig));
-        $testConfigProvider->expects($this->once())
+        $this->configManager->expects($this->at(5))
             ->method('persist')
             ->with($this->identicalTo($testFieldConfig));
 
@@ -261,7 +259,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToOne'),
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
@@ -296,10 +293,10 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($extendFieldConfig));
-        $extendConfigProvider->expects($this->at(1))
+        $this->configManager->expects($this->at(3))
             ->method('persist')
             ->with($this->identicalTo($extendFieldConfig));
-        $extendConfigProvider->expects($this->at(2))
+        $this->configManager->expects($this->at(6))
             ->method('persist')
             ->with($this->identicalTo($extendConfig));
 
@@ -308,7 +305,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($testFieldConfig));
-        $testConfigProvider->expects($this->once())
+        $this->configManager->expects($this->at(5))
             ->method('persist')
             ->with($this->identicalTo($testFieldConfig));
 
@@ -371,7 +368,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'field_id'        => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToMany'),
                     'owner'           => true,
                     'target_entity'   => self::TARGET_CLASS,
@@ -408,10 +404,10 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($extendFieldConfig));
-        $extendConfigProvider->expects($this->at(1))
+        $this->configManager->expects($this->at(3))
             ->method('persist')
             ->with($this->identicalTo($extendFieldConfig));
-        $extendConfigProvider->expects($this->at(2))
+        $this->configManager->expects($this->at(6))
             ->method('persist')
             ->with($this->identicalTo($extendConfig));
 
@@ -420,7 +416,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($testFieldConfig));
-        $testConfigProvider->expects($this->once())
+        $this->configManager->expects($this->at(5))
             ->method('persist')
             ->with($this->identicalTo($testFieldConfig));
 
@@ -518,7 +514,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($extendFieldConfig));
-        $extendConfigProvider->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($extendFieldConfig));
 
@@ -601,7 +597,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($extendFieldConfig));
-        $extendConfigProvider->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($extendFieldConfig));
 
@@ -692,7 +688,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($extendFieldConfig));
-        $extendConfigProvider->expects($this->once())
+        $this->configManager->expects($this->at(3))
             ->method('persist')
             ->with($this->identicalTo($extendFieldConfig));
 
@@ -701,7 +697,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($testFieldConfig));
-        $testConfigProvider->expects($this->once())
+        $this->configManager->expects($this->at(5))
             ->method('persist')
             ->with($this->identicalTo($testFieldConfig));
 
@@ -802,7 +798,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($extendFieldConfig));
-        $extendConfigProvider->expects($this->once())
+        $this->configManager->expects($this->at(3))
             ->method('persist')
             ->with($this->identicalTo($extendFieldConfig));
 
@@ -811,7 +807,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::SOURCE_CLASS, $relationName)
             ->will($this->returnValue($testFieldConfig));
-        $testConfigProvider->expects($this->once())
+        $this->configManager->expects($this->at(5))
             ->method('persist')
             ->with($this->identicalTo($testFieldConfig));
 
@@ -859,7 +855,6 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             'relation',
             [
                 $relationKey => [
-                    'assign'          => false,
                     'target_field_id' => new FieldConfigId('extend', self::SOURCE_CLASS, $relationName, 'manyToOne'),
                     'owner'           => false,
                     'target_entity'   => self::SOURCE_CLASS,
@@ -873,7 +868,7 @@ class RelationBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getConfig')
             ->with(self::TARGET_CLASS)
             ->will($this->returnValue($extendConfig));
-        $extendConfigProvider->expects($this->once())
+        $this->configManager->expects($this->once())
             ->method('persist')
             ->with($this->identicalTo($extendConfig));
 

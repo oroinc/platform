@@ -1,0 +1,12 @@
+query_designer:
+    filters:
+        tag:
+            applicable: [{type: tag}]
+            type:       tags-report
+            options:
+                null_value: ':empty:'
+                populate_default: true
+                default_value: Any
+                class: ''
+            init_module: orotag/js/tags-report-filter-initialized
+            query_type: [report, segment]

@@ -13,6 +13,7 @@ use Oro\Component\PropertyAccess\Tests\Unit\Fixtures\Ticket5775Object;
 /**
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 {
@@ -24,6 +25,20 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->propertyAccessor = new PropertyAccessor();
+    }
+
+    public function getPathsWithUnexpectedType()
+    {
+        return array(
+            array('', 'foobar'),
+            array('foo', 'foobar'),
+            array(null, 'foobar'),
+            array(123, 'foobar'),
+            array((object) array('prop' => null), 'prop.foobar'),
+            array((object) array('prop' => (object) array('subProp' => null)), 'prop.subProp.foobar'),
+            array(array('index' => null), '[index][foobar]'),
+            array(array('index' => array('subIndex' => null)), '[index][subIndex][foobar]'),
+        );
     }
 
     public function getPathsWithMissingProperty()
@@ -65,6 +80,15 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider getValidPropertyPathsWhenIndexExceptionsDisabled
+     */
+    public function testGetValueWhenIndexExceptionsDisabled($objectOrArray, $path, $value)
+    {
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->assertSame($value, $this->propertyAccessor->getValue($objectOrArray, $path));
+    }
+
+    /**
      * @expectedException \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      */
     public function testGetValueThrowsExceptionForInvalidPropertyPathType()
@@ -83,11 +107,20 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getPathsWithMissingIndex
+     */
+    public function testGetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled($objectOrArray, $path)
+    {
+        // When exceptions are disabled, non-existing indices can be read. In this case, null is returned
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->assertNull($this->propertyAccessor->getValue($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     public function testGetValueThrowsExceptionIfIndexNotFound($objectOrArray, $path)
     {
-        $this->propertyAccessor = new PropertyAccessor();
         $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
@@ -142,48 +175,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    // @codingStandardsIgnoreStart
     /**
+     * @dataProvider getPathsWithUnexpectedType
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on
      */
-    // @codingStandardsIgnoreEnd
-    public function testGetValueThrowsExceptionIfNotObjectOrArray()
+    public function testGetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $this->propertyAccessor->getValue('baz', 'foobar');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testGetValueThrowsExceptionIfNull()
-    {
-        $this->propertyAccessor->getValue(null, 'foobar');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testGetValueThrowsExceptionIfEmpty()
-    {
-        $this->propertyAccessor->getValue('', 'foobar');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testGetValueNestedExceptionMessage()
-    {
-        $this->propertyAccessor->getValue((object)array('foobar' => null), 'foobar.baz');
+        $this->propertyAccessor->getValue($objectOrArray, $path);
     }
 
     /**
@@ -218,6 +217,17 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
      */
     public function testSetValueThrowsNoExceptionIfIndexNotFound($objectOrArray, $path)
     {
+        $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
+
+        $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testSetValueThrowsNoExceptionIfIndexNotFoundAndIndexExceptionsDisabled($objectOrArray, $path)
+    {
+        $this->propertyAccessor = new PropertyAccessor(false, true);
         $this->propertyAccessor->setValue($objectOrArray, $path, 'Updated');
 
         $this->assertSame('Updated', $this->propertyAccessor->getValue($objectOrArray, $path));
@@ -280,56 +290,14 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('Updated', $author->__call('getMagicCallProperty', array()));
     }
 
-    // @codingStandardsIgnoreStart
     /**
+     * @dataProvider getPathsWithUnexpectedType
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on
      */
-    // @codingStandardsIgnoreEnd
-    public function testSetValueThrowsExceptionIfNotObjectOrArray()
+    public function testSetValueThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $value = 'baz';
-
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testSetValueThrowsExceptionIfNull()
-    {
-        $value = null;
-
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testSetValueThrowsExceptionIfEmpty()
-    {
-        $value = '';
-
-        $this->propertyAccessor->setValue($value, 'foobar', 'bam');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testSetValueNestedExceptionMessage()
-    {
-        $value = (object)array('foobar' => null);
-
-        $this->propertyAccessor->setValue($value, 'foobar.baz', 'bam');
+        $this->propertyAccessor->setValue($objectOrArray, $path, 'value');
     }
 
     /**
@@ -468,64 +436,159 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($author->__call('getMagicCallProperty', array()));
     }
 
-    // @codingStandardsIgnoreStart
     /**
+     * @dataProvider getPathsWithUnexpectedType
      * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
+     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on
      */
-    // @codingStandardsIgnoreEnd
-    public function testRemoveThrowsExceptionIfNotObjectOrArray()
+    public function testRemoveThrowsExceptionIfNotObjectOrArray($objectOrArray, $path)
     {
-        $value = 'baz';
-
-        $this->propertyAccessor->remove($value, 'foobar');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar" at property "foobar".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testRemoveThrowsExceptionIfNull()
-    {
-        $value = null;
-
-        $this->propertyAccessor->remove($value, 'foobar');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "string" while trying to traverse path "foobar" at property "foobar".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testRemoveThrowsExceptionIfEmpty()
-    {
-        $value = '';
-
-        $this->propertyAccessor->remove($value, 'foobar');
-    }
-
-    // @codingStandardsIgnoreStart
-    /**
-     * @expectedException \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
-     * @expectedExceptionMessage PropertyAccessor requires a graph of objects or arrays to operate on, but it found type "NULL" while trying to traverse path "foobar.baz" at property "baz".
-     */
-    // @codingStandardsIgnoreEnd
-    public function testRemoveNestedExceptionMessage()
-    {
-        $value = (object)array('foobar' => null);
-
-        $this->propertyAccessor->remove($value, 'foobar.baz');
+        $this->propertyAccessor->remove($objectOrArray, $path);
     }
 
     public function testGetValueWhenArrayValueIsNull()
     {
-        $this->propertyAccessor = new PropertyAccessor();
         $this->assertNull(
             $this->propertyAccessor->getValue(array('index' => array('nullable' => null)), 'index.nullable')
         );
+    }
+
+    public function testGetValueWhenArrayValueIsNullAndIndexExceptionsDisabled()
+    {
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->assertNull(
+            $this->propertyAccessor->getValue(array('index' => array('nullable' => null)), 'index.nullable')
+        );
+    }
+
+    /**
+     * @dataProvider getValidPropertyPaths
+     */
+    public function testIsReadable($objectOrArray, $path)
+    {
+        $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getValidPropertyPathsWhenIndexExceptionsDisabled
+     */
+    public function testIsReadableWhenIndexExceptionsDisabled($objectOrArray, $path)
+    {
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingProperty
+     */
+    public function testIsReadableReturnsFalseIfPropertyNotFound($objectOrArray, $path)
+    {
+        $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testIsReadableReturnsFalseIfIndexNotFound($objectOrArray, $path)
+    {
+        // Non-existing indices cannot be read
+        $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testIsReadableReturnsTrueIfIndexNotFoundAndIndexExceptionsDisabled($objectOrArray, $path)
+    {
+        // When exceptions are disabled, non-existing indices can be read.
+        // In this case, null is returned by getValue method
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->assertTrue($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    public function testIsReadableRecognizesMagicGet()
+    {
+        $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicGet('John'), 'magicProperty'));
+    }
+
+    public function testIsReadableDoesNotRecognizeMagicCallByDefault()
+    {
+        $this->assertFalse($this->propertyAccessor->isReadable(new TestClassMagicCall('John'), 'magicCallProperty'));
+    }
+
+    public function testIsReadableRecognizesMagicCallIfEnabled()
+    {
+        $this->propertyAccessor = new PropertyAccessor(true);
+
+        $this->assertTrue($this->propertyAccessor->isReadable(new TestClassMagicCall('John'), 'magicCallProperty'));
+    }
+
+    /**
+     * @dataProvider getPathsWithUnexpectedType
+     */
+    public function testIsReadableReturnsFalseIfNotObjectOrArray($objectOrArray, $path)
+    {
+        $this->assertFalse($this->propertyAccessor->isReadable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getValidPropertyPaths
+     */
+    public function testIsWritable($objectOrArray, $path)
+    {
+        $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingProperty
+     */
+    public function testIsWritableReturnsFalseIfPropertyNotFound($objectOrArray, $path)
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testIsWritableReturnsTrueIfIndexNotFound($objectOrArray, $path)
+    {
+        // Non-existing indices can be written. Arrays are created on-demand.
+        $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
+    }
+
+    /**
+     * @dataProvider getPathsWithMissingIndex
+     */
+    public function testIsWritableReturnsTrueIfIndexNotFoundAndIndexExceptionsDisabled($objectOrArray, $path)
+    {
+        // Non-existing indices can be written even if exceptions are enabled
+        $this->propertyAccessor = new PropertyAccessor(false, true);
+        $this->assertTrue($this->propertyAccessor->isWritable($objectOrArray, $path));
+    }
+
+    public function testIsWritableRecognizesMagicSet()
+    {
+        $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicGet('John'), 'magicProperty'));
+    }
+
+    public function testIsWritableDoesNotRecognizeMagicCallByDefault()
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable(new TestClassMagicCall('John'), 'magicCallProperty'));
+    }
+
+    public function testIsWritableRecognizesMagicCallIfEnabled()
+    {
+        $this->propertyAccessor = new PropertyAccessor(true);
+
+        $this->assertTrue($this->propertyAccessor->isWritable(new TestClassMagicCall('John'), 'magicCallProperty'));
+    }
+
+    /**
+     * @dataProvider getPathsWithUnexpectedType
+     */
+    public function testIsWritableReturnsFalseIfNotObjectOrArray($objectOrArray, $path)
+    {
+        $this->assertFalse($this->propertyAccessor->isWritable($objectOrArray, $path));
     }
 
     public function getValidPropertyPaths()
@@ -547,6 +610,7 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array((object)array('property' => array('firstName' => 'John')), 'property[firstName]', 'John'),
             array(array('index' => (object)array('firstName' => 'John')), 'index.firstName', 'John'),
             array((object)array('property' => (object)array('firstName' => 'John')), 'property.firstName', 'John'),
+
             // Accessor methods
             array(new TestClass('John'), 'publicProperty', 'John'),
             array(new TestClass('John'), 'publicAccessor', 'John'),
@@ -554,14 +618,46 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
             array(new TestClass('John'), 'publicAccessorWithRequiredAndDefaultValue', 'John'),
             array(new TestClass('John'), 'publicIsAccessor', 'John'),
             array(new TestClass('John'), 'publicHasAccessor', 'John'),
+            array(new TestClass('John'), 'publicGetSetter', 'John'),
+
             // Methods are camelized
             array(new TestClass('John'), 'public_accessor', 'John'),
             array(new TestClass('John'), '_public_accessor', 'John'),
+
             // Special chars
             array(array('%!@$§' => 'John'), '%!@$§', 'John'),
             array(array('%!@$§.' => 'John'), '[%!@$§.]', 'John'),
             array(array('index' => array('%!@$§.' => 'John')), 'index[%!@$§.]', 'John'),
             array((object)array('%!@$§' => 'John'), '%!@$§', 'John'),
+            array((object) array('property' => (object) array('%!@$§' => 'John')), 'property.%!@$§', 'John'),
+
+            // Nested objects and arrays
+            array(array('foo' => new TestClass('bar')), '[foo].publicGetSetter', 'bar'),
+            array(new TestClass(array('foo' => 'bar')), 'publicGetSetter[foo]', 'bar'),
+            array(new TestClass(new TestClass('bar')), 'publicGetter.publicGetSetter', 'bar'),
+            array(
+                new TestClass(new TestClass(new TestClass('bar'))),
+                'publicGetter.publicGetter.publicGetSetter', 'bar'
+            ),
+        );
+    }
+
+    public function getValidPropertyPathsWhenIndexExceptionsDisabled()
+    {
+        return array_merge(
+            $this->getValidPropertyPaths(),
+            array(
+                // Missing indices
+                array(array('index' => array()), '[index][firstName]', null),
+                array(array('root' => array('index' => array())), '[root][index][firstName]', null),
+
+                // Nested objects and arrays
+                array(new TestClass(array('foo' => new TestClass('bar'))), 'publicGetter[foo].publicGetSetter', 'bar'),
+                array(
+                    new TestClass(array('foo' => array('baz' => new TestClass('bar')))),
+                    'publicGetter[foo][baz].publicGetSetter', 'bar'
+                ),
+            )
         );
     }
 
@@ -600,5 +696,13 @@ class PropertyAccessorTest extends \PHPUnit_Framework_TestCase
         $this->propertyAccessor->setValue($object, 'property', 'foobar');
 
         $this->assertEquals('foobar', $object->getProperty());
+    }
+
+    public function testSetValueDeepWithMagicGetter()
+    {
+        $obj = new TestClassMagicGet('foo');
+        $obj->publicProperty = array('foo' => array('bar' => 'some_value'));
+        $this->propertyAccessor->setValue($obj, 'publicProperty[foo][bar]', 'Updated');
+        $this->assertSame('Updated', $obj->publicProperty['foo']['bar']);
     }
 }

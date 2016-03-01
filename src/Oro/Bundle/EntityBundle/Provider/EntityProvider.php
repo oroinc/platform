@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Provider;
 
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
@@ -26,7 +26,7 @@ class EntityProvider
     protected $entityClassResolver;
 
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
@@ -39,13 +39,13 @@ class EntityProvider
      * @param ConfigProvider      $entityConfigProvider
      * @param ConfigProvider      $extendConfigProvider
      * @param EntityClassResolver $entityClassResolver
-     * @param Translator          $translator
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ConfigProvider $entityConfigProvider,
         ConfigProvider $extendConfigProvider,
         EntityClassResolver $entityClassResolver,
-        Translator $translator
+        TranslatorInterface $translator
     ) {
         $this->entityConfigProvider = $entityConfigProvider;
         $this->extendConfigProvider = $extendConfigProvider;

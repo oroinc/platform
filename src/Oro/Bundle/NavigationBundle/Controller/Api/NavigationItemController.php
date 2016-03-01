@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\NavigationBundle\Controller\Api;
 
+use Doctrine\Common\Persistence\ObjectRepository;
 use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\HttpFoundation\Response;
@@ -12,7 +13,7 @@ use FOS\RestBundle\Controller\Annotations\RouteResource;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\AbstractUser;
 use Oro\Bundle\NavigationBundle\Entity\Builder\ItemFactory;
 use Oro\Bundle\NavigationBundle\Entity\Repository\NavigationRepositoryInterface;
 
@@ -176,12 +177,13 @@ class NavigationItemController extends FOSRestController
     /**
      * Validate permissions on pinbar
      *
-     * @param  User $user
+     * @param  AbstractUser $user
      * @return bool
      */
-    protected function validatePermissions(User $user)
+    protected function validatePermissions(AbstractUser $user)
     {
-        return $user->getId() == ($this->getUser() ? $this->getUser()->getId() : 0);
+        return is_a($user, $this->getUserClass(), true) &&
+            ($user->getId() === ($this->getUser() ? $this->getUser()->getId() : 0));
     }
 
     /**
@@ -191,7 +193,7 @@ class NavigationItemController extends FOSRestController
      */
     protected function getManager()
     {
-        return $this->getDoctrine()->getManagerForClass('OroNavigationBundle:PinbarTab');
+        return $this->getDoctrine()->getManagerForClass($this->getPinbarTabClass());
     }
 
     /**
@@ -212,13 +214,34 @@ class NavigationItemController extends FOSRestController
      */
     protected function getStateUrl($url)
     {
-        $state = $this
-            ->getDoctrine()
-            ->getRepository('OroNavigationBundle:PageState')
-            ->findOneByPageId(base64_encode($url));
+        $state = $this->getPageStateRepository()->findOneByPageId(base64_encode($url));
 
         return is_null($state)
             ? $url
             : $url . (strpos($url, '?') ? '&restore=1' : '?restore=1');
+    }
+
+    /**
+     * @return ObjectRepository
+     */
+    protected function getPageStateRepository()
+    {
+        return $this->getDoctrine()->getRepository('OroNavigationBundle:PageState');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getPinbarTabClass()
+    {
+        return $this->getParameter('oro_navigation.entity.pinbar_tab.class');
+    }
+
+    /**
+     * @return string
+     */
+    protected function getUserClass()
+    {
+        return $this->getParameter('oro_user.entity.class');
     }
 }

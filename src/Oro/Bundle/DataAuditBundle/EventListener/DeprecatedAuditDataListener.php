@@ -6,17 +6,32 @@ use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Oro\Bundle\DataAuditBundle\Entity\Audit;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 
-class DeprecatedAuditDataListener
+class DeprecatedAuditDataListener implements OptionalListenerInterface
 {
     /** @var Audit[] */
     protected $brokenAudits = [];
+
+    /** @var bool */
+    protected $enabled = true;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setEnabled($enabled = true)
+    {
+        $this->enabled = $enabled;
+    }
 
     /**
      * @param OnFlushEventArgs $args
      */
     public function onFlush(OnFlushEventArgs $args)
     {
+        if (!$this->enabled) {
+            return;
+        }
         $uow = $args->getEntityManager()->getUnitOfWork();
 
         $entities = array_merge(
@@ -36,7 +51,7 @@ class DeprecatedAuditDataListener
      */
     public function postFlush(PostFlushEventArgs $args)
     {
-        if (!$this->brokenAudits) {
+        if (!$this->enabled || !$this->brokenAudits) {
             return;
         }
 

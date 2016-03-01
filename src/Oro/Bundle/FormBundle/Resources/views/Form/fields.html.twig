@@ -142,6 +142,7 @@
 
 {% block form_label %}
     {% spaceless %}
+    {% if label is not sameas(false) %}
         {% if not compound %}
             {% set label_attr = label_attr|merge({'for': id}) %}
         {% endif %}
@@ -152,22 +153,26 @@
             {% set label_attr = label_attr|merge({'class': (label_attr.class|default('') ~ ' validation-error')|trim}) %}
         {% endif %}
         {% if label is empty %}
-            {% set label = name|humanize %}
+            {% if label_format is not empty -%}
+                {% set label = label_format|replace({'%name%': name, '%id%': id}) %}
+            {% else %}
+                {% set label = name|humanize %}
+            {% endif %}
         {% endif %}
         {% set isRadioLabel = form.parent.vars.expanded|default(false) and checked is defined %}
-        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
-            {% if tooltip is defined and tooltip %}
-                {% import 'OroUIBundle::macros.html.twig' as ui %}
-                {{ ui.tooltip(
-                    tooltip,
-                    tooltip_parameters|default({}),
-                    tooltip_placement|default(null),
-                    tooltip_details_enabled|default(false),
-                    tooltip_details_link|default(null),
-                    tooltip_details_anchor|default(null)
-                ) }}
-            {%- endif -%}
+        {% if tooltip is defined and tooltip %}
+            {% import 'OroUIBundle::macros.html.twig' as ui %}
+            {{ ui.tooltip(
+                tooltip,
+                tooltip_parameters|default({}),
+                tooltip_placement|default(null),
+                tooltip_details_enabled|default(false),
+                tooltip_details_link|default(null),
+                tooltip_details_anchor|default(null)
+            ) }}
+        {%- endif -%}
 
+        <label{% for attrname, attrvalue in label_attr %} {{ attrname }}="{{ attrvalue }}"{% endfor %}>
             {%- if translatable_label is defined and not translatable_label -%}
                 {{ label }}
             {%- elseif raw_label is defined and raw_label -%}
@@ -177,6 +182,7 @@
             {%- endif -%}
             <em>{% if required and not isRadioLabel %}*{% else %}&nbsp;{% endif %}</em>
         </label>
+    {%- endif -%}
     {% endspaceless %}
 {% endblock form_label %}
 
@@ -297,17 +303,22 @@
         {% set name = widget.vars.prototype.vars.name %}
         {% set disabled = widget.vars.disabled %}
         {% set allow_delete = widget.vars.allow_delete %}
+        {% set allow_add_after = widget.vars.allow_add_after %}
     {% else %}
         {% set form = widget %}
         {% set name = widget.vars.full_name %}
         {% set disabled = widget.parent.vars.disabled %}
         {% set allow_delete = widget.parent.vars.allow_delete %}
+        {% set allow_add_after = widget.parent.vars.allow_add_after %}
     {% endif %}
     <div data-content="{{ name }}" data-validation-optional-group>
         <div class="row-oro oro-multiselect-holder{% if not allow_delete %} not-removable{% endif %}">
             {{ form_widget(form, {disabled: disabled}) }}
             {% if allow_delete %}
             <button class="removeRow btn btn-action btn-link" type="button" data-related="{{ name }}">×</button>
+            {% endif %}
+            {% if allow_add_after %}
+            <button class="addAfterRow btn btn-action btn-link" type="button" data-related="{{ name }}">+</button>
             {% endif %}
         </div>
     </div>
@@ -322,13 +333,15 @@
         {% set id = id ~ '_collection' %}
         <div class="row-oro">
             {% set prototype_name = form.vars.prototype_name %}
-            <div {{ block('widget_container_attributes') }} data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
+            <div {{ block('widget_container_attributes') }} data-last-index="{{ form.children|length}}" data-row-count-add="{{ form.vars.row_count_add }}" data-prototype-name="{{ prototype_name }}"{% if prototype_html is defined %} data-prototype="{{ prototype_html|escape }}"{% endif %}>
                 {% if form.children|length %}
                     {% for child in form.children %}
                         {{ _self.oro_collection_item_prototype(child) }}
                     {% endfor %}
                 {% elseif show_form_when_empty and prototype_html is defined %}
-                    {{ prototype_html|replace({(prototype_name): '0'})|raw }}
+                    {% for i in 0..(form.vars.row_count_initial - 1) %}
+                        {{ prototype_html|replace({(prototype_name): i})|raw }}
+                    {% endfor %}
                 {% endif %}
             </div>
             {% if allow_add %}
@@ -382,7 +395,9 @@
             id="{{ viewsContainerId }}"
         >
             {% if label is not sameas(false) %}
-                {{ form_label(form, '' , { label_attr: label_attr|merge({ class: 'control-label' })}) }}
+                <div class="control-label wrap">
+                    {{ form_label(form, '' , { label_attr: label_attr}) }}
+                </div>
             {% endif %}
             <div class="controls{% if errors|length > 0 %} validation-error{% endif %}">
                 {{ form_widget(form) }}
@@ -391,6 +406,19 @@
         </div>
     {% endspaceless %}
 {% endblock %}
+
+{% block oro_autocomplete_widget %}
+    {% if autocomplete.selection_template_twig is defined and autocomplete.selection_template_twig %}
+        {% set componentOptions = componentOptions|merge({
+            selection_template: include(autocomplete.selection_template_twig)
+        }) %}
+    {% endif %}
+    {% set attr = attr|merge({
+        'data-page-component-module': componentModule,
+        'data-page-component-options': componentOptions|json_encode
+    }) %}
+    {{ form_widget(form, {attr: attr}) }}
+{% endblock oro_autocomplete_widget %}
 
 {% block oro_entity_create_or_select_widget %}
     {% set currentMode = form.mode.vars.value|default('create') %}
@@ -487,6 +515,27 @@
     </script>
 {% endblock %}
 
+{% block oro_entity_create_or_select_choice_widget %}
+    <div class="create-select-entity-choice-container"
+         data-page-component-module="oroform/js/app/components/create-or-select-choice-component"
+         data-page-component-options="{{ {
+             modeSelector: '#' ~ form.mode.vars.id,
+             newEntitySelector: '.new-entity',
+             existingEntitySelector: '.existing-entity',
+             existingEntityInputSelector: '#' ~ form.existing_entity.vars.id,
+             editable: form.vars.editable|default(false),
+             editRoute: form.vars.edit_route|default(null)
+         }|json_encode }}">
+        <div class="existing-entity">
+            {{ form_widget(form.existing_entity) }}
+        </div>
+        <div class="new-entity">
+            {{ form_widget(form.new_entity) }}
+        </div>
+        {{ form_widget(form.mode) }}
+    </div>
+{% endblock %}
+
 {% block oro_entity_create_or_select_inline_widget %}
     {% set isButtonsEnabled = not disabled and not read_only %}
     <div id="{{ id }}-el"
@@ -517,7 +566,8 @@
                 $(function() {
                     {% set urlParts = {
                         grid: {
-                            route: 'oro_datagrid_widget',
+                            route: form.vars.grid_widget_route|default('oro_datagrid_widget'),
+                            gridWidgetView: form.vars.grid_view_widget_route|default('oro_datagrid_widget'),
                             parameters: {
                                 gridName     : form.vars.grid_name,
                                 params       : form.vars.grid_parameters,
@@ -619,4 +669,20 @@
     }|merge(attr) %}
     {% set type = 'hidden' %}
     {{ block('form_widget_simple') }}
+{% endblock %}
+
+{% block oro_resizeable_rich_text_widget %}
+    {% set options = {
+        'view': 'oroform/js/app/views/wysiwig-editor/wysiwyg-dialog-view',
+        'editorComponentName': form.vars.attr['data-page-component-name'] is defined ?
+        form.vars.attr['data-page-component-name'] : form.vars.attr['data-ftid']
+    } %}
+
+    <div data-page-component-module="oroui/js/app/components/view-component"
+         data-page-component-name="wrap_{{ form.vars.attr['data-page-component-name'] is defined ?
+            form.vars.attr['data-page-component-name'] : form.vars.attr['data-ftid'] }}"
+         data-page-component-options="{{ options|json_encode }}"
+         data-layout="separate" >
+        {{ form_widget(form) }}
+    </div>
 {% endblock %}

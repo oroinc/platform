@@ -4,7 +4,7 @@ oro:
             export:  "Export entities"
             general: "General import/action operations"
             import:  "Import entities"
-            
+
         export:
             label: Export
 
@@ -12,12 +12,18 @@ oro:
             block_title:    "Import & Export"
             excluded.label: "Exclude Column"
             full.label:     "Export Fields"
+            full.tooltip:   "All fields of the related entity will be exported"
             header.label:   "Column Name"
+            header.tooltip: "If blank Label will be used"
             identity.label: "Use as Identity Field"
+            identity.only_when_not_empty: "Only when not empty"
+            identity.always: "Always"
+            identity.tooltip: "If set to \"Only when not empty\", the field may be omitted in the identity when it has no value."
             order.label:    "Column Position"
-            
+
         import:
             error:          "Errors occurred during file import."
+            errors_found:   "Errors found: %errors%"
             error %number%: "Error in row #%number%."
             label:          Import
             success:        "File was successfully imported."

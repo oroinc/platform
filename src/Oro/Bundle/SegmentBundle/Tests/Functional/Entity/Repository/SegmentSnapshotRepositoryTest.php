@@ -12,7 +12,6 @@ use Oro\Bundle\SegmentBundle\Entity\Repository\SegmentSnapshotRepository;
 
 /**
  * @dbIsolation
- * @dbReindex
  */
 class SegmentSnapshotRepositoryTest extends WebTestCase
 {

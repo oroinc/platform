@@ -6,7 +6,7 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 
@@ -23,7 +23,7 @@ class WorkflowRegistry
     protected $workflowAssembler;
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $configProvider;
 
@@ -33,14 +33,14 @@ class WorkflowRegistry
     protected $workflowByName = array();
 
     /**
-     * @param ManagerRegistry $managerRegistry
+     * @param ManagerRegistry   $managerRegistry
      * @param WorkflowAssembler $workflowAssembler
-     * @param ConfigProviderInterface $configProvider
+     * @param ConfigProvider    $configProvider
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         WorkflowAssembler $workflowAssembler,
-        ConfigProviderInterface $configProvider
+        ConfigProvider $configProvider
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->workflowAssembler = $workflowAssembler;

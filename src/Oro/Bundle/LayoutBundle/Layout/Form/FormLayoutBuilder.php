@@ -195,7 +195,11 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
             $id,
             $parentId ?: $this->builder->getId(),
             FormFieldType::NAME,
-            ['form_name' => $this->options['form_name'], 'field_path' => $fieldPath]
+            [
+                'form' => $this->options['form'],
+                'form_name' => $this->options['form_name'],
+                'field_path' => $fieldPath,
+            ]
         );
     }
 

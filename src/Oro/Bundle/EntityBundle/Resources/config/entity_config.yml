@@ -22,11 +22,11 @@ oro_entity_config:
                         options:
                             label:          oro.entity.entity_config.entity.entity.items.icon
                             block:          general
+                            required:       false
                 label:
                     options:
                         translatable:       true
                         priority:           20
-                        indexed:            true
                     constraints:
                         - NotBlank:         ~
                         - Length:
@@ -35,7 +35,6 @@ oro_entity_config:
                     grid:
                         type:               html
                         label:              oro.entity.entity_config.entity.entity.items.label
-                        filter_type:        string
                         required:           true
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
                     form:
@@ -89,7 +88,6 @@ oro_entity_config:
                     options:
                         translatable:       true
                         priority:           10
-                        indexed:            true
                     constraints:
                         - NotBlank:         ~
                         - Length:
@@ -98,12 +96,9 @@ oro_entity_config:
                     grid:
                         type:               html
                         label:              oro.entity.entity_config.entity.field.items.label
-                        filter_type:        string
                         required:           true
-                        sortable:           false
-                        filterable:         false
-                        show_filter:        false
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
+                        sortable:           true
                     form:
                         type:               text
                         options:
@@ -122,6 +117,7 @@ oro_entity_config:
                         type:               textarea
                         options:
                             label:          oro.entity.entity_config.entity.field.items.description
+                            tooltip:        oro.entity.entity_config.entity.field.items.description.tooltip
                             block:          general
                             required:       false
 
@@ -131,6 +127,7 @@ oro_entity_config:
                 is_visible:
                     options:
                         require_schema_update: true
+                        value_type:         integer
                         default_value:      true
                         allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
                         required_property:
@@ -141,13 +138,19 @@ oro_entity_config:
                     form:
                         type:               oro_entity_extend_choice
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                0: 'No'
+                                1: oro.entity.entity_config.datagrid.field.items.is_visible.shown
+                                3: oro.entity.entity_config.datagrid.field.items.is_visible.hidden
+                                2: oro.entity.entity_config.datagrid.field.items.is_visible.mandatory
                             empty_value:    false
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.is_visible
+                            tooltip:        oro.entity.entity_config.datagrid.field.items.is_visible.tooltip
 
                 show_filter:
                     options:
+                        value_type:         boolean
                         allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
                         required_property:
                             config_id:
@@ -184,6 +187,7 @@ oro_entity_config:
                 # is form enabled for specific field
                 is_enabled:
                     options:
+                        value_type:         boolean
                         default_value:      true
                         required_property:
                             config_id:
@@ -204,6 +208,7 @@ oro_entity_config:
             items:
                 is_displayable:
                     options:
+                        value_type:         boolean
                         default_value:      true
                         required_property:
                             config_id:
@@ -220,6 +225,7 @@ oro_entity_config:
                             label:          oro.entity.entity_config.view.field.items.is_displayable
                 priority:
                     options:
+                        value_type:         integer
                         required_property:
                             config_id:
                                 scope:      extend

@@ -1,11 +1,10 @@
-/*global define*/
-/*jslint nomen: true*/
-define([
-    'underscore',
-    'orotranslation/js/translator',
-    'oroui/js/mediator'
-], function (_, __, mediator) {
+define(function(require) {
     'use strict';
+
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var mediator = require('oroui/js/mediator');
+    var EntityError = require('./entity-error');
 
     function Util(entity, data) {
         this.init(entity, data);
@@ -19,11 +18,12 @@ define([
      * @returns {Object}
      * @static
      */
-    Util.filterFields = function (fields, exclude) {
-        fields = _.filter(fields, function (item) {
+    Util.filterFields = function(fields, exclude) {
+        fields = _.filter(fields, function(item) {
             var result;
-            result = !_.some(exclude, function (rule) {
-                var result, cut;
+            result = !_.some(exclude, function(rule) {
+                var result;
+                var cut;
                 // exclude can be a property name
                 if (_.isString(rule)) {
                     result = _.intersection(
@@ -33,7 +33,7 @@ define([
                 } else {
                     // or exclude can be an object with data to compare
                     cut = _.pick(item, _.keys(rule));
-                    result  = _.isEqual(cut, rule);
+                    result = _.isEqual(cut, rule);
                 }
 
                 return result;
@@ -43,16 +43,15 @@ define([
         return fields;
     };
 
-    Util.errorHandler = (function () {
-        var message, handler;
-        message = __('oro.entity.not_exist');
-        handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
+    Util.errorHandler = (function() {
+        var message = __('oro.entity.not_exist');
+        var handler = _.bind(mediator.execute, mediator, 'showErrorMessage', message);
         return _.throttle(handler, 100, {trailing: false});
     }());
 
     Util.prototype = {
 
-        init: function (entity, data) {
+        init: function(entity, data) {
             this.entity = entity;
             this.data = data || {};
         },
@@ -86,15 +85,15 @@ define([
          * @param {boolean?} trim - flag, allows to omit last item if it's a field
          * @returns {Array.<Object>}
          */
-        pathToEntityChain: function (path, trim) {
-            var chain, data, self = this;
-            data = this.data;
+        pathToEntityChain: function(path, trim) {
+            var self = this;
+            var data = this.data;
 
             if (!data[this.entity]) {
                 return [];
             }
 
-            chain = [{
+            var chain = [{
                 entity: data[this.entity],
                 path: '',
                 basePath: ''
@@ -105,8 +104,10 @@ define([
             }
 
             try {
-                _.each(path.split('+'), function (item, i) {
-                    var fieldName, entityName, pos;
+                _.each(path.split('+'), function(item, i) {
+                    var fieldName;
+                    var entityName;
+                    var pos;
 
                     if (i === 0) {
                         // first item is always just a field name
@@ -140,11 +141,11 @@ define([
                 });
             } catch (e) {
                 Util.errorHandler();
-                chain = [];
+                throw new EntityError('Can not build entity chain by given path "' + path + '"');
             }
 
             // if last item in the chain is a field -- cut it off
-            if (trim && chain[chain.length - 1].entity === undefined) {
+            if (trim && chain[chain.length - 1].entity === void 0) {
                 chain = chain.slice(0, -1);
             }
 
@@ -181,12 +182,12 @@ define([
          * @param {number=} end - number of chain-items which need to be ignored
          * @returns {string}
          */
-        entityChainToPath: function (chain, end) {
+        entityChainToPath: function(chain, end) {
             var path;
             end = end || chain.length;
 
             try {
-                chain = _.map(chain.slice(1, end), function (item) {
+                chain = _.map(chain.slice(1, end), function(item) {
                     var result = item.field.name;
                     if (item.entity) {
                         result += '+' + item.entity.name;
@@ -210,17 +211,22 @@ define([
          *      account+OroCRM\[...]\Account::contacts+OroCRM\[...]\Contact::firstName
          * @returns {Object}
          */
-        getApplicableConditions: function (fieldId) {
-            var chain, result, entity;
-            result = {};
+        getApplicableConditions: function(fieldId) {
+            var result = {};
+            var chain;
+            var entity;
 
             if (!fieldId) {
                 return result;
             }
 
-            chain = this.pathToEntityChain(fieldId);
-            entity = chain[chain.length - 1];
+            try {
+                chain = this.pathToEntityChain(fieldId);
+            } catch (e) {
+                return result;
+            }
 
+            entity = chain[chain.length - 1];
             if (entity) {
                 result = {
                     parent_entity: null,
@@ -247,9 +253,9 @@ define([
          * @param {string} path
          * @returns {string}
          */
-        getPropertyPathByPath: function (path) {
+        getPropertyPathByPath: function(path) {
             var propertyPathParts = [];
-            _.each(path.split('+'), function (item, i) {
+            _.each(path.split('+'), function(item, i) {
                 var part;
                 if (i === 0) {
                     // first item is always just a field name
@@ -279,18 +285,17 @@ define([
          * @param {string} pathData
          * @returns {string}
          */
-        getPathByPropertyPath: function (pathData) {
-            var entityData, fieldIdParts;
+        getPathByPropertyPath: function(pathData) {
+            var fieldIdParts;
             if (!_.isArray(pathData)) {
                 pathData = pathData.split('.');
             }
 
-            entityData = this.data[this.entity];
+            var entityData = this.data[this.entity];
             try {
-                fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function (fieldName) {
-                    var fieldPartId, fieldsData;
-                    fieldPartId = fieldName;
-                    fieldsData = null;
+                fieldIdParts = _.map(pathData.slice(0, pathData.length - 1), function(fieldName) {
+                    var fieldPartId = fieldName;
+                    var fieldsData = null;
                     if (entityData.hasOwnProperty('fieldsIndex')) {
                         fieldsData = entityData.fieldsIndex;
                     } else if (
@@ -314,7 +319,7 @@ define([
                 fieldIdParts.push(pathData[pathData.length - 1]);
             } catch (e) {
                 Util.errorHandler();
-                fieldIdParts = [];
+                throw new EntityError('Can not define entity path by given property path "' + pathData + '"');
             }
             return fieldIdParts.join('::');
         }

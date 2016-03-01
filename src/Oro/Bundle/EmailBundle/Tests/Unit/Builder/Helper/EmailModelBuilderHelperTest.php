@@ -14,8 +14,8 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
-use Symfony\Component\Security\Core\SecurityContext;
 use Symfony\Component\Templating\EngineInterface;
 
 class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
@@ -41,9 +41,9 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
     protected $entityNameResolver;
 
     /**
-     * @var SecurityContext|\PHPUnit_Framework_MockObject_MockObject
+     * @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $securityContext;
+    protected $securityFacade;
 
     /**
      * @var EmailAddressManager|\PHPUnit_Framework_MockObject_MockObject
@@ -77,7 +77,7 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->securityContext = $this->getMockBuilder('Symfony\Component\Security\Core\SecurityContext')
+        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -95,15 +95,20 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->templating = $this->getMock('Symfony\Component\Templating\EngineInterface');
 
+        $mailboxManager = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Manager\MailboxManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->helper = new EmailModelBuilderHelper(
             $this->entityRoutingHelper,
             $this->emailAddressHelper,
             $this->entityNameResolver,
-            $this->securityContext,
+            $this->securityFacade,
             $this->emailAddressManager,
             $this->entityManager,
             $this->emailCacheManager,
-            $this->templating
+            $this->templating,
+            $mailboxManager
         );
     }
 
@@ -167,17 +172,9 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $token->expects($this->once())
-            ->method('getUser')
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
             ->willReturn($owner);
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
         $this->assertEquals($expected, $emailAddress);
@@ -251,17 +248,9 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
 
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $token->expects($this->once())
-            ->method('getUser')
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
             ->willReturn($otherOwner);
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
 
         $this->helper->preciseFullEmailAddress($emailAddress, $ownerClass, $ownerId, true);
         $this->assertEquals($expected, $emailAddress);
@@ -372,8 +361,8 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetUserTokenIsNull()
     {
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
             ->willReturn(null);
 
         $result = $this->helper->getUser();
@@ -386,41 +375,20 @@ class EmailModelBuilderHelperTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider getUserProvider
      */
-    public function testGetUserTokenIsNotNull($user, $expected)
+    public function testGetUser($user)
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-
-        $this->securityContext->expects($this->once())
-            ->method('getToken')
-            ->willReturn($token);
-
-        $token->expects($this->once())
-            ->method('getUser')
+        $this->securityFacade->expects($this->once())
+            ->method('getLoggedUser')
             ->willReturn($user);
 
         $result = $this->helper->getUser();
-        $this->assertEquals($expected, $result);
+        $this->assertSame($user, $result);
     }
 
     public function getUserProvider()
     {
-        $user = $result = new User();
-        $positive = [
-            $user,
-            $result,
-        ];
-
-        $user = new \stdClass();
-        $result = null;
-
-        $negative = [
-            $user,
-            $result,
-        ];
-
         return [
-            $positive,
-            $negative,
+            [new User()],
         ];
     }
 

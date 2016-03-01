@@ -3,7 +3,10 @@
 namespace Oro\Bundle\MigrationBundle\Event;
 
 use Doctrine\DBAL\Connection;
+
 use Symfony\Component\EventDispatcher\Event;
+
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 
 class MigrationEvent extends Event
@@ -61,7 +64,7 @@ class MigrationEvent extends Event
      */
     public function getData($sql, array $params = array(), $types = array())
     {
-        $this->ensureConnected();
+        $this->connection->connect();
 
         return $this->connection->fetchAll($sql, $params, $types);
     }
@@ -74,28 +77,6 @@ class MigrationEvent extends Event
      */
     public function isTableExist($tableName)
     {
-        $result = false;
-        try {
-            $this->ensureConnected();
-
-            $result = $this->connection->isConnected()
-                && (bool)array_intersect(
-                    [$tableName],
-                    $this->connection->getSchemaManager()->listTableNames()
-                );
-        } catch (\PDOException $e) {
-        }
-
-        return $result;
-    }
-
-    /**
-     * Makes sure that the connection is open
-     */
-    protected function ensureConnected()
-    {
-        if (!$this->connection->isConnected()) {
-            $this->connection->connect();
-        }
+        return SafeDatabaseChecker::tablesExist($this->connection, $tableName);
     }
 }

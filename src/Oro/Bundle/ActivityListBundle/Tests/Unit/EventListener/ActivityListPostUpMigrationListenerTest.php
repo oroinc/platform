@@ -22,11 +22,16 @@ class ActivityListPostUpMigrationListenerTest extends \PHPUnit_Framework_TestCas
         $nameGenerator = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\ExtendDbIdentifierNameGenerator')
             ->disableOriginalConstructor()
             ->getMock();
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $listener = new ActivityListPostUpMigrationListener(
             $provider,
             $activityListExtension,
             $metadataHelper,
-            $nameGenerator
+            $nameGenerator,
+            $configManager
         );
         $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
             ->disableOriginalConstructor()

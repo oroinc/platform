@@ -6,6 +6,10 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationAwareInterface;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
+use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class Email
@@ -14,7 +18,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
  *
  * @package Oro\Bundle\EmailBundle\Form\Model
  */
-class Email
+class Email implements OrganizationAwareInterface
 {
     const MAIL_TYPE_DIRECT  = 'direct';
     const MAIL_TYPE_REPLY   = 'reply';
@@ -73,6 +77,12 @@ class Email
 
     /** @var array */
     protected $attachmentsAvailable;
+
+    /** @var  Organization */
+    protected $organization;
+
+    /** @var User */
+    protected $campaignOwner;
 
     /**
      * Constructor
@@ -516,5 +526,44 @@ class Email
         $this->contexts = $contexts;
 
         return $this;
+    }
+
+    /**
+     * Get organization
+     *
+     * @return OrganizationInterface
+     */
+    public function getOrganization()
+    {
+        return $this->organization;
+    }
+
+    /**
+     * Set organization
+     *
+     * @param OrganizationInterface $organization
+     * @return $this
+     */
+    public function setOrganization(OrganizationInterface $organization)
+    {
+        $this->organization = $organization;
+
+        return $this;
+    }
+
+    /**
+     * @return User
+     */
+    public function getCampaignOwner()
+    {
+        return $this->campaignOwner;
+    }
+
+    /**
+     * @param User $user
+     */
+    public function setCampaignOwner(User $user = null)
+    {
+        $this->campaignOwner = $user;
     }
 }

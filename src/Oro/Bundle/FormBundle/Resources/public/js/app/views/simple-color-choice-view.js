@@ -1,7 +1,5 @@
-/*jslint nomen: true*/
-/*global define*/
 define(['underscore', 'oroui/js/app/views/base/view', 'jquery.simplecolorpicker'
-    ], function (_, BaseView) {
+    ], function(_, BaseView) {
     'use strict';
 
     var SimpleColorChoiceView = BaseView.extend({
@@ -14,7 +12,7 @@ define(['underscore', 'oroui/js/app/views/base/view', 'jquery.simplecolorpicker'
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.$el.simplecolorpicker(_.defaults(_.omit(options, ['el']), {
                 emptyColor: '#FFFFFF'
             }));
@@ -22,7 +20,7 @@ define(['underscore', 'oroui/js/app/views/base/view', 'jquery.simplecolorpicker'
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -32,11 +30,11 @@ define(['underscore', 'oroui/js/app/views/base/view', 'jquery.simplecolorpicker'
             SimpleColorChoiceView.__super__.dispose.call(this);
         },
 
-        enable: function () {
+        enable: function() {
             this.$el.simplecolorpicker('enable');
         },
 
-        disable: function () {
+        disable: function() {
             this.$el.simplecolorpicker('enable', false);
         }
     });

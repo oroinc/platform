@@ -1,10 +1,8 @@
-/*jslint nomen:true */
-/*global define*/
-define(['underscore', '../content-manager'], function (_, ContentManager) {
+define(['underscore', '../content-manager'], function(_, ContentManager) {
     'use strict';
 
     var methods = {
-        initHandler: function (deferred, metadata) {
+        initHandler: function(deferred, metadata) {
             if (metadata.options && _.isArray(metadata.options.contentTags)) {
                 ContentManager.tagContent(metadata.options.contentTags);
             }
@@ -20,7 +18,7 @@ define(['underscore', '../content-manager'], function (_, ContentManager) {
          *
          * @param name
          */
-        allowTracking: function (name) {
+        allowTracking: function(name) {
             if (_.indexOf(this.allowedTracking, name) === -1) {
                 this.allowedTracking.push(name);
             }
@@ -37,7 +35,7 @@ define(['underscore', '../content-manager'], function (_, ContentManager) {
          * @param {Object} [options.data] data for grid's collection
          * @param {Object} [options.metadata] configuration for the grid
          */
-        init: function (deferred, options) {
+        init: function(deferred, options) {
             if (_.indexOf(this.allowedTracking, options.gridName) !== -1) {
                 methods.initHandler(deferred, options.metadata);
             }

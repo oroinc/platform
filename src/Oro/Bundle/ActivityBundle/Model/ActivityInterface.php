@@ -51,4 +51,12 @@ interface ActivityInterface
      * @return self This object
      */
     public function removeActivityTarget($target);
+
+    /**
+     * Gets full target entities list associated with activity
+     * Please use this method carefully because of the performance reasons
+     *
+     * @return object[]
+     */
+    public function getActivityTargetEntities();
 }

@@ -1,7 +1,7 @@
 datagrid:
     embedded-forms-grid:
+        acl_resource: oro_embedded_form_view
         source:
-            acl_resource: oro_embedded_form_view
             type: orm
             query:
                 select:

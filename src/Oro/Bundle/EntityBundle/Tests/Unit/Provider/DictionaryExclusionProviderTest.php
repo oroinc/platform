@@ -40,51 +40,6 @@ class DictionaryExclusionProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testIsIgnoredRelationFalse()
     {
-        $this->metadata
-            ->expects($this->once())
-            ->method('isSingleValuedAssociation')
-            ->with('testClass')
-            ->will($this->returnValue(false));
-
         $this->assertFalse($this->dictionaryExclusionProvider->isIgnoredRelation($this->metadata, 'testClass'));
-    }
-
-    public function testIsIgnoredRelationWithoutGroupsFalse()
-    {
-        $this->mockMetadata('testClass', 'parentClass');
-        $this->assertFalse($this->dictionaryExclusionProvider->isIgnoredRelation($this->metadata, 'testClass'));
-    }
-
-    public function testIsIgnoredRelationTrue()
-    {
-        $this->mockMetadata('testClass', 'parentClass', ['dictionary', 'activity', 'etc']);
-        $this->assertTrue($this->dictionaryExclusionProvider->isIgnoredRelation($this->metadata, 'testClass'));
-    }
-
-    protected function mockMetadata($entityClass, $parentClass, $groups = [])
-    {
-        $this->metadata
-            ->expects($this->once())
-            ->method('isSingleValuedAssociation')
-            ->with($entityClass)
-            ->will($this->returnValue(true));
-        $this->metadata
-            ->expects($this->once())
-            ->method('getAssociationTargetClass')
-            ->with($entityClass)
-            ->will($this->returnValue($parentClass));
-
-        $config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
-        $config
-            ->expects($this->once())
-            ->method('get')
-            ->with('groups')
-            ->will($this->returnValue($groups));
-
-        $this->groupingConfigProvider
-            ->expects($this->once())
-            ->method('getConfig')
-            ->with($parentClass)
-            ->will($this->returnValue($config));
     }
 }

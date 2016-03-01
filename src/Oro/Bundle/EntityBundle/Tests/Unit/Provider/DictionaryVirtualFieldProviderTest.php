@@ -65,7 +65,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationTargetClass')
             ->with('testRel')
             ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary1'));
-        $entityMetadata->expects($this->once())
+        $entityMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with('testRel')
             ->will($this->returnValue(true));
@@ -83,16 +83,14 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'        => 'target.name',
-                    'return_type' => 'string',
-                    'label'       => 'acme.test.testentity.test_rel.label'
+                    'expr' => 'target.name',
+                    'label' => 'acme.test.testentity.test_rel.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary1'
                 ],
-                'join'   => [
+                'join' => [
                     'left' => [
-                        [
-                            'join'  => 'entity.testRel',
-                            'alias' => 'target'
-                        ]
+                        ['join' => 'entity.testRel', 'alias' => 'target']
                     ]
                 ]
             ],
@@ -114,7 +112,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationTargetClass')
             ->with('testRel')
             ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary2'));
-        $entityMetadata->expects($this->once())
+        $entityMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with('testRel')
             ->will($this->returnValue(true));
@@ -133,37 +131,35 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             true,
             $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
+
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'        => 'target.id',
-                    'return_type' => 'integer',
-                    'label'       => 'acme.test.testentity.test_rel_id.label'
+                    'expr' => 'target.id',
+                    'label' => 'acme.test.testentity.test_rel_id.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary2'
                 ],
-                'join'   => [
+                'join' => [
                     'left' => [
-                        [
-                            'join'  => 'entity.testRel',
-                            'alias' => 'target'
-                        ]
+                        ['join' => 'entity.testRel', 'alias' => 'target']
                     ]
                 ]
             ],
             $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_id')
         );
+
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'        => 'target.name',
-                    'return_type' => 'string',
-                    'label'       => 'acme.test.testentity.test_rel_name.label'
+                    'expr' => 'target.name',
+                    'label' => 'acme.test.testentity.test_rel_name.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary2'
                 ],
-                'join'   => [
+                'join' => [
                     'left' => [
-                        [
-                            'join'  => 'entity.testRel',
-                            'alias' => 'target'
-                        ]
+                        ['join' => 'entity.testRel', 'alias' => 'target']
                     ]
                 ]
             ],
@@ -185,7 +181,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationTargetClass')
             ->with('testRel')
             ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary3'));
-        $entityMetadata->expects($this->once())
+        $entityMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with('testRel')
             ->will($this->returnValue(true));
@@ -200,19 +196,18 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             true,
             $this->provider->isVirtualField($entityClassName, 'test_rel_name')
         );
+
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'        => 'target.name',
-                    'return_type' => 'string',
-                    'label'       => 'acme.test.testentity.test_rel.label'
+                    'expr' => 'target.name',
+                    'label' => 'acme.test.testentity.test_rel.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary3'
                 ],
-                'join'   => [
+                'join' => [
                     'left' => [
-                        [
-                            'join'  => 'entity.testRel',
-                            'alias' => 'target'
-                        ]
+                        ['join' => 'entity.testRel', 'alias' => 'target']
                     ]
                 ]
             ],
@@ -234,7 +229,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getAssociationTargetClass')
             ->with('testRel')
             ->will($this->returnValue('Acme\TestBundle\Entity\Dictionary4'));
-        $entityMetadata->expects($this->once())
+        $entityMetadata->expects($this->any())
             ->method('isSingleValuedAssociation')
             ->with('testRel')
             ->will($this->returnValue(true));
@@ -257,37 +252,35 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
             true,
             $this->provider->isVirtualField($entityClassName, 'test_rel_label')
         );
+
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'        => 'target.code',
-                    'return_type' => 'string',
-                    'label'       => 'acme.test.testentity.test_rel_code.label'
+                    'expr' => 'target.code',
+                    'label' => 'acme.test.testentity.test_rel_code.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary4'
                 ],
-                'join'   => [
+                'join' => [
                     'left' => [
-                        [
-                            'join'  => 'entity.testRel',
-                            'alias' => 'target'
-                        ]
+                        ['join' => 'entity.testRel', 'alias' => 'target']
                     ]
                 ]
             ],
             $this->provider->getVirtualFieldQuery($entityClassName, 'test_rel_code')
         );
+
         $this->assertEquals(
             [
                 'select' => [
-                    'expr'        => 'target.label',
-                    'return_type' => 'string',
-                    'label'       => 'acme.test.testentity.test_rel_label.label'
+                    'expr' => 'target.label',
+                    'label' => 'acme.test.testentity.test_rel_label.label',
+                    'return_type' => 'dictionary',
+                    'related_entity_name' => 'Acme\TestBundle\Entity\Dictionary4'
                 ],
-                'join'   => [
+                'join' => [
                     'left' => [
-                        [
-                            'join'  => 'entity.testRel',
-                            'alias' => 'target'
-                        ]
+                        ['join' => 'entity.testRel', 'alias' => 'target']
                     ]
                 ]
             ],
@@ -297,6 +290,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function initialize($metadata)
     {
@@ -418,9 +412,7 @@ class DictionaryVirtualFieldProviderTest extends \PHPUnit_Framework_TestCase
     protected function createEntityConfig($scope, $className, $values = [])
     {
         $config = new Config(new EntityConfigId($scope, $className));
-        foreach ($values as $code => $val) {
-            $config->set($code, $val);
-        }
+        $config->setValues($values);
 
         return $config;
     }

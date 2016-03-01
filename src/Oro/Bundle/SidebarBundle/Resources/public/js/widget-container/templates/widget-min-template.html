@@ -1,13 +1,10 @@
-<div class="sidebar-widget-header">
-    <span class="sidebar-widget-header-title">
-        <a href="#" class="sidebar-widget-header-toggle">
-            <i class="icon-caret-right"></i>
-        </a>
-        <% if (iconClass) { %>
-            <i class="<%= iconClass %>" title="<%= title %>"></i>
-        <% } else { %>
-            <img src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
-        <% } %>
-        <span  class="widget-title"><%= title %></span>
-    </span>
+<div class="sidebar-widget sidebar-widget-collapsed">
+    <div class="sidebar-widget-header">
+        <span class="sidebar-widget-header-title">
+            <a href="#" class="sidebar-widget-header-toggle">
+                <i class="icon-caret-right"></i>
+            </a>
+            <span  class="widget-title" title="<%= title %>"><div class="sidebar-widget-header-icon"><%= icon %></div> <%= title %></span>
+        </span>
+    </div>
 </div>

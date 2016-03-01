@@ -131,7 +131,8 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email1->setMessageId('email1');
         $email1->setFromEmailAddress($addr);
         $emailUser1 = new EmailUser();
-        $emailUser1->setFolder($folder);
+        $emailUser1->addFolder($folder);
+        $emailUser1->setOrigin($origin);
         $email1->addEmailUser($emailUser1);
         $this->addEmailRecipient($email1, $addr);
         $this->addEmailRecipient($email1, $newAddr);
@@ -142,7 +143,8 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email2->setMessageId('email2');
         $email2->setFromEmailAddress($newAddr);
         $emailUser2 = new EmailUser();
-        $emailUser2->setFolder($newFolder);
+        $emailUser2->addFolder($newFolder);
+        $emailUser2->setOrigin($origin);
         $email2->addEmailUser($emailUser2);
         $this->addEmailRecipient($email2, $addr);
         $this->addEmailRecipient($email2, $newAddr);
@@ -153,7 +155,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email3->setMessageId('some_email');
         $email3->setFromEmailAddress($newAddr);
         $emailUser3 = new EmailUser();
-        $emailUser3->setFolder($folder);
+        $emailUser3->addFolder($folder);
         $email3->addEmailUser($emailUser3);
         $this->addEmailRecipient($email3, $addr);
         $this->addEmailRecipient($email3, $newAddr);
@@ -164,7 +166,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $email4->setMessageId('some_email');
         $email4->setFromEmailAddress($newAddr);
         $emailUser4 = new EmailUser();
-        $emailUser4->setFolder($folder);
+        $emailUser4->addFolder($folder);
         $email4->addEmailUser($emailUser4);
         $this->addEmailRecipient($email4, $addr);
         $this->addEmailRecipient($email4, $newAddr);
@@ -175,7 +177,7 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
         $existingEmail->setMessageId('some_email');
         $existingEmail->setFromEmailAddress($newAddr);
         $emailUser5 = new EmailUser();
-        $emailUser5->setFolder($dbFolder);
+        $emailUser5->addFolder($dbFolder);
         $existingEmail->addEmailUser($emailUser5);
         $this->addEmailRecipient($existingEmail, $addr);
         $this->addEmailRecipient($existingEmail, $newAddr);
@@ -237,10 +239,10 @@ class EmailEntityBatchProcessorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertCount(1, $email1->getEmailUsers());
         $this->assertCount(1, $email2->getEmailUsers());
-        $this->assertTrue($origin === $emailUser1->getFolder()->getOrigin());
-        $this->assertTrue($origin === $emailUser2->getFolder()->getOrigin());
-        $this->assertSame($newFolder, $emailUser2->getFolder());
-        $this->assertSame($dbFolder, $emailUser1->getFolder());
+        $this->assertTrue($origin === $emailUser1->getOrigin());
+        $this->assertTrue($origin === $emailUser2->getOrigin());
+        $this->assertSame($newFolder, $emailUser2->getFolders()->first());
+        $this->assertSame($dbFolder, $emailUser1->getFolders()->first());
         $this->assertTrue($dbAddr === $email1->getFromEmailAddress());
         $this->assertNull($email1->getFromEmailAddress()->getOwner());
         $this->assertTrue($newAddr === $email2->getFromEmailAddress());

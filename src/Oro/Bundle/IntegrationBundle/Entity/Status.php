@@ -199,10 +199,14 @@ class Status
 
     /**
      * @param array $data
+     *
+     * @return Status
      */
     public function setData(array $data)
     {
         $this->data = $data;
+
+        return $this;
     }
 
     /**
@@ -211,5 +215,13 @@ class Status
     public function getData()
     {
         return $this->data;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getCode();
     }
 }

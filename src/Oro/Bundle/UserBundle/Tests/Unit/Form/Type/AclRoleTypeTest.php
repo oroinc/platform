@@ -24,7 +24,7 @@ class AclRoleTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(1))->method('add')
             ->with(
                 'field',
-                $this->isInstanceOf('Oro\Bundle\SecurityBundle\Form\Type\PrivilegeCollectionType'),
+                'oro_acl_collection',
                 $this->contains(array('privileges_config' => 'field_config'))
             );
         $this->formType->buildForm($builder, array());

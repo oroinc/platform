@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Command;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -28,7 +29,14 @@ class UpdateUserCommand extends CreateUserCommand
             ->addOption('user-email', null, InputOption::VALUE_REQUIRED, 'User email')
             ->addOption('user-firstname', null, InputOption::VALUE_REQUIRED, 'User first name')
             ->addOption('user-lastname', null, InputOption::VALUE_REQUIRED, 'User last name')
-            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password');
+            ->addOption('user-password', null, InputOption::VALUE_REQUIRED, 'User password')
+            ->addOption(
+                'user-organizations',
+                null,
+                InputOption::VALUE_IS_ARRAY | InputOption::VALUE_REQUIRED,
+                'User organizations'
+            )
+        ;
     }
 
     /**
@@ -37,6 +45,7 @@ class UpdateUserCommand extends CreateUserCommand
     protected function execute(InputInterface $input, OutputInterface $output)
     {
         $username = $input->getArgument('user-name');
+        /** @var User $user */
         $user     = $this->getUserManager()->findUserByUsername($username);
         $options  = $input->getOptions();
 

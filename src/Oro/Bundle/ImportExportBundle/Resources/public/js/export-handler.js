@@ -1,6 +1,5 @@
-/*global define*/
 define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
-    ], function (_, __, messenger) {
+    ], function(_, __, messenger) {
     'use strict';
 
     /**
@@ -13,7 +12,7 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
          *
          * @returns {Object}
          */
-        startExportNotificationMessage: function () {
+        startExportNotificationMessage: function() {
             return messenger.notificationMessage(
                 'info',
                 __('Export started, please wait...')
@@ -25,8 +24,9 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
          *
          * @param {Object} data
          */
-        handleExportResponse: function (data) {
-            var message, messageType;
+        handleExportResponse: function(data) {
+            var message;
+            var messageType;
             if (data.success) {
                 if (data.readsCount > 0) {
                     message = __(
@@ -53,5 +53,5 @@ define(['underscore', 'orotranslation/js/translator', 'oroui/js/messenger'
             }
             messenger.notificationMessage(messageType, message);
         }
-    }
+    };
 });

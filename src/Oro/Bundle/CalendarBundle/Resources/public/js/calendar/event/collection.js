@@ -1,6 +1,8 @@
-/*global define*/
-define(['backbone', 'routing', 'orocalendar/js/calendar/event/model'
-    ], function (Backbone, routing, EventModel) {
+define([
+    'backbone',
+    'routing',
+    'orocalendar/js/calendar/event/model'
+], function(Backbone, routing, EventModel) {
     'use strict';
 
     /**
@@ -31,7 +33,7 @@ define(['backbone', 'routing', 'orocalendar/js/calendar/event/model'
          * @param {string} start A date/time specifies the begin of a range. RFC 3339 string
          * @param {string} end   A date/time specifies the end of a range. RFC 3339 string
          */
-        setRange: function (start, end) {
+        setRange: function(start, end) {
             this.url = routing.generate(
                 this.route,
                 {calendar: this.calendar, start: start, end: end, subordinate: this.subordinate}
@@ -43,7 +45,7 @@ define(['backbone', 'routing', 'orocalendar/js/calendar/event/model'
          *
          * @param {int} calendarId
          */
-        setCalendar: function (calendarId) {
+        setCalendar: function(calendarId) {
             this.calendar = calendarId;
         },
 
@@ -52,7 +54,7 @@ define(['backbone', 'routing', 'orocalendar/js/calendar/event/model'
          *
          * @return {int} The calendar id
          */
-        getCalendar: function () {
+        getCalendar: function() {
             return this.calendar;
         }
     });

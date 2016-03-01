@@ -11,20 +11,31 @@ use Oro\Bundle\OrganizationBundle\Entity\Repository\BusinessUnitRepository;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class BusinessUnitManager
 {
-    /**
-     * @var EntityManager
-     */
-    private $em;
+    /** @var EntityManager */
+    protected $em;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var AclHelper */
+    protected $aclHelper;
 
     /**
      * @param EntityManager $em
      */
-    public function __construct(EntityManager $em)
-    {
+    public function __construct(
+        EntityManager $em,
+        SecurityFacade $securityFacade,
+        AclHelper $aclHelper
+    ) {
         $this->em = $em;
+        $this->securityFacade = $securityFacade;
+        $this->aclHelper = $aclHelper;
     }
 
     /**
@@ -170,6 +181,16 @@ class BusinessUnitManager
         }
 
         return $choices;
+    }
+
+    /**
+     * @param BusinessUnit $rootBusinessUnit
+     *
+     * @return string
+     */
+    protected function getBusinessUnitName(BusinessUnit $rootBusinessUnit)
+    {
+        return  $rootBusinessUnit->getName();
     }
 
     /**

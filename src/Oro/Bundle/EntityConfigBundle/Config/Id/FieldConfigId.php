@@ -4,38 +4,26 @@ namespace Oro\Bundle\EntityConfigBundle\Config\Id;
 
 class FieldConfigId implements ConfigIdInterface
 {
-    /**
-     * @var string
-     */
-    protected $scope;
+    /** @var string */
+    private $scope;
+
+    /** @var string */
+    private $className;
+
+    /** @var string */
+    private $fieldName;
+
+    /** @var string|null */
+    private $fieldType;
 
     /**
-     * @var string
+     * @param string      $scope
+     * @param string      $className
+     * @param string      $fieldName
+     * @param string|null $fieldType
      */
-    protected $className;
-
-    /**
-     * @var string
-     */
-    protected $fieldName;
-
-    /**
-     * @var string
-     */
-    protected $fieldType;
-
     public function __construct($scope, $className, $fieldName, $fieldType = null)
     {
-        if (empty($scope)) {
-            throw new \InvalidArgumentException('$scope must not be empty');
-        }
-        if (empty($className)) {
-            throw new \InvalidArgumentException('$className must not be empty');
-        }
-        if (empty($fieldName)) {
-            throw new \InvalidArgumentException('$fieldName must not be empty');
-        }
-
         $this->scope     = $scope;
         $this->className = $className;
         $this->fieldName = $fieldName;
@@ -49,7 +37,6 @@ class FieldConfigId implements ConfigIdInterface
     {
         return $this->className;
     }
-
 
     /**
      * @return string
@@ -68,7 +55,7 @@ class FieldConfigId implements ConfigIdInterface
     }
 
     /**
-     * @return string
+     * @return string|null
      */
     public function getFieldType()
     {
@@ -77,13 +64,10 @@ class FieldConfigId implements ConfigIdInterface
 
     /**
      * @param string $fieldType
-     * @return $this
      */
     public function setFieldType($fieldType)
     {
         $this->fieldType = $fieldType;
-
-        return $this;
     }
 
     /**
@@ -91,7 +75,7 @@ class FieldConfigId implements ConfigIdInterface
      */
     public function toString()
     {
-        return sprintf('field_%s_%s_%s', $this->scope, strtr($this->className, '\\', '-'), $this->fieldName);
+        return sprintf('field_%s_%s_%s', $this->scope, str_replace('\\', '-', $this->className), $this->fieldName);
     }
 
     /**
@@ -99,14 +83,7 @@ class FieldConfigId implements ConfigIdInterface
      */
     public function serialize()
     {
-        return serialize(
-            array(
-                $this->className,
-                $this->scope,
-                $this->fieldName,
-                $this->fieldType,
-            )
-        );
+        return serialize([$this->className, $this->scope, $this->fieldName, $this->fieldType]);
     }
 
     /**
@@ -114,12 +91,7 @@ class FieldConfigId implements ConfigIdInterface
      */
     public function unserialize($serialized)
     {
-        list(
-            $this->className,
-            $this->scope,
-            $this->fieldName,
-            $this->fieldType,
-            ) = unserialize($serialized);
+        list($this->className, $this->scope, $this->fieldName, $this->fieldType) = unserialize($serialized);
     }
 
     /**

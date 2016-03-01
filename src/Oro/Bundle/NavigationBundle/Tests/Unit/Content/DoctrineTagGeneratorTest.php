@@ -6,7 +6,6 @@ use Doctrine\ORM\UnitOfWork;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\NewEntityStub;
@@ -14,7 +13,8 @@ use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\PersistentCollectionStub
 
 class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_ENTITY_NAME       = 'Oro\\Bundle\\NavigationBundle\\Tests\\Unit\\Content\\Stub\\EntityStub';
+    const TEST_ENTITY_NAME = 'Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\EntityStub';
+    const TEST_NEW_ENTITY_NAME = 'Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\NewEntityStub';
     const TEST_ASSOCIATION_FIELD = 'testField';
 
     /** @var  DoctrineTagGenerator */
@@ -26,31 +26,31 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|UnitOfWork */
     protected $uow;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|EntityClassResolver */
-    protected $resolver;
-
     protected function setUp()
     {
-        $this->em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->em  = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()->getMock();
-        $this->uow      = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
-            ->disableOriginalConstructor()->getMock();
-        $this->resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+        $this->uow = $this->getMockBuilder('Doctrine\ORM\UnitOfWork')
             ->disableOriginalConstructor()->getMock();
 
-        $this->em->expects($this->any())->method('getUnitOfWork')
+        $this->em->expects($this->any())
+            ->method('getUnitOfWork')
             ->will($this->returnValue($this->uow));
-        $entityClass = self::TEST_ENTITY_NAME;
-        $this->resolver->expects($this->any())->method('isEntity')
-            ->will(
-                $this->returnCallback(
-                    function ($class) use ($entityClass) {
-                        return $class === $entityClass;
-                    }
-                )
+
+        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $doctrine->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturnCallback(
+                function ($class) {
+                    return in_array($class, [self::TEST_ENTITY_NAME, self::TEST_NEW_ENTITY_NAME], true)
+                        ? $this->em
+                        : null;
+                }
             );
 
-        $this->generator = new DoctrineTagGenerator($this->em, $this->resolver);
+        $this->generator = new DoctrineTagGenerator($doctrine);
     }
 
     protected function tearDown()
@@ -122,8 +122,16 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     public function generateDataProvider()
     {
         return [
-            'Should not generate any tags for new entity'                           => [new NewEntityStub(), false, 0],
-            'Should not generate only collection tag for new entity'                => [new NewEntityStub(), true, 1],
+            'Should not generate any tags for new entity'                           => [
+                new NewEntityStub(),
+                false,
+                0
+            ],
+            'Should not generate only collection tag for new entity'                => [
+                new NewEntityStub(),
+                true,
+                1
+            ],
             'Should generate one tag for managed entity'                            => [
                 new EntityStub(),
                 false,
@@ -181,11 +189,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(['someIdentifierValue']));
 
         $metadata = new ClassMetadata(self::TEST_ENTITY_NAME);
-        $this->em->expects($this->once())->method('getClassMetadata')->with(self::TEST_ENTITY_NAME)
-            ->will($this->returnValue($metadata));
-
         $metadata->associationMappings = $mappings;
-
         foreach ($associations as $name => $dataValue) {
             $field = $this->getMockBuilder('\ReflectionProperty')
                 ->disableOriginalConstructor()->getMock();
@@ -194,7 +198,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
             $metadata->reflFields[$name] = $field;
         }
 
-        $result = $reflection->invoke($this->generator, $testData);
+        $result = $reflection->invoke($this->generator, $testData, $metadata);
 
         $this->assertInternalType('array', $result, 'Should always return array');
         $this->assertCount($expectedCount, $result, 'Should not generate collection tag for associations');
@@ -207,12 +211,12 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'should not return any data when no association on entity' => [[], [], 0],
-            'should collect one to one associations' => [
+            'should collect one to one associations'                   => [
                 [self::TEST_ASSOCIATION_FIELD => new EntityStub()],
                 [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_ONE]],
                 1
             ],
-            'should collect all collection associations' => [
+            'should collect all collection associations'               => [
                 [
                     self::TEST_ASSOCIATION_FIELD => new PersistentCollectionStub([
                         new EntityStub(),
@@ -222,7 +226,7 @@ class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
                 [self::TEST_ASSOCIATION_FIELD => ['type' => ClassMetadata::ONE_TO_MANY]],
                 2
             ],
-            'should process all associated values' => [
+            'should process all associated values'                     => [
                 [
                     self::TEST_ASSOCIATION_FIELD . '_1' => new PersistentCollectionStub([
                         new EntityStub(),

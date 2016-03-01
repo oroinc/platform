@@ -5,7 +5,7 @@ services:
     oro_workflow.cache.provider.process_trigger:
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_workflow.process_trigger" ] ]
+            - [ setNamespace, [ 'oro_process_trigger' ] ]
 
     oro_workflow.cache.process_trigger:
         class: %oro_workflow.cache.process_trigger.class%

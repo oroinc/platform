@@ -19,7 +19,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDescription()
     {
-        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.bin';
         $options     = ['test'];
 
         $this->commandExecutor->expects($this->once())
@@ -32,7 +32,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
                 $this->returnCallback(
                     function ($command, $params, $logger) {
                         if ($logger instanceof ArrayLogger) {
-                            $logger->notice('test message');
+                            $logger->info('test message');
                         }
 
                         return 0;
@@ -52,7 +52,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
     public function testExecute()
     {
         $logger = new ArrayLogger();
-        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.yml';
+        $optionsPath = realpath(__DIR__ . '/../Fixtures') . '/test_options.bin';
         $options     = ['test'];
 
         $this->commandExecutor->expects($this->once())
@@ -65,7 +65,7 @@ class UpdateExtendConfigMigrationQueryTest extends \PHPUnit_Framework_TestCase
                 $this->returnCallback(
                     function ($command, $params, $logger) {
                         if ($logger instanceof ArrayLogger) {
-                            $logger->notice('test message');
+                            $logger->info('test message');
                         }
 
                         return 0;

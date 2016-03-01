@@ -7,14 +7,16 @@
                     <ul class="dropdown-menu">
                         <li>
                             <div class="filter-container">
-                                <a id="reset-filter-button" href="javascript:void(0);">{{ 'Reset'|trans|e('html')|raw }}</a>
-                                <select id="add-filter-select" multiple>
+                                <a class="reset-filter-button" href="javascript:void(0);">{{ 'Reset'|trans|e('html')|raw }}</a>
+                                <select data-action="add-filter-select" multiple>
                                     <% _.each(filters, function (filter, name) { %>
-                                    <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                                    <option title="<%- _.escape(filter.label) %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
                                     <%- filter.label %>
                                     </option>
                                     <% }); %>
                                 </select>
+                                <span class="filter-items"></span>
+                                <div class="filter-items-hint"></div>
                             </div>
                         </li>
                     </ul>
@@ -23,13 +25,17 @@
         {% else %}
             <div class="filter-box oro-clearfix-width">
                 <div class="filter-container">
-                    <select id="add-filter-select" multiple>
+                    <select data-action="add-filter-select" multiple>
                         <% _.each(filters, function (filter, name) { %>
-                        <option title="<%- filter.label %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
+                        <option title="<%- _.escape(filter.label) %>" value="<%- name %>" <% if (filter.enabled) { %>selected<% } %>>
                         <%- filter.label %>
                         </option>
                         <% }); %>
                     </select>
+                    <span class="filter-items"></span>
+                    <div class="filter-items-hint">
+                        <a class="reset-filter-button" href="javascript:void(0);">{{ 'oro.filter.reset.label'|trans|e('html')|raw }}</a>
+                    </div>
                 </div>
             </div>
         {% endif %}

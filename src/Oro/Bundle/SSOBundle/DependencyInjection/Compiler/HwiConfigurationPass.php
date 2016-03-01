@@ -28,5 +28,10 @@ class HwiConfigurationPass implements CompilerPassInterface
                 new Reference('oro_config.global'),
             ]);
         }
+
+        if ($container->hasDefinition('hwi_oauth.authentication.provider.oauth')) {
+            $definition = $container->getDefinition('hwi_oauth.authentication.provider.oauth');
+            $definition->addMethodCall('setTokenFactory', [new Reference('oro_sso.token.factory.oauth')]);
+        }
     }
 }

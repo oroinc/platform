@@ -31,7 +31,7 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
                 )
             )
         )
-            ->add('from', new Expr\From('Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem', 'ni'))
+            ->add('from', new Expr\From($this->_entityName, 'ni'))
             ->add(
                 'where',
                 $qb->expr()->andx(
@@ -45,7 +45,7 @@ class HistoryItemRepository extends EntityRepository implements NavigationReposi
         if (isset($options['orderBy'])) {
             $orderBy = (array) $options['orderBy'];
         }
-        $fields = $this->_em->getClassMetadata('OroNavigationBundle:NavigationHistoryItem')->getFieldNames();
+        $fields = $this->_em->getClassMetadata($this->_entityName)->getFieldNames();
         foreach ($orderBy as $order) {
             if (isset($order['field']) && in_array($order['field'], $fields)) {
                 $qb->addOrderBy(

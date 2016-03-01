@@ -5,6 +5,7 @@ namespace Oro\Bundle\EmailBundle\Datagrid;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Sync\EmailSynchronizationManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -103,5 +104,43 @@ class EmailGridHelper
         }
 
         return $this->emailOrigins;
+    }
+
+    /**
+     * Returns callback for configuration of grid/actions visibility per row
+     *
+     * @return callable
+     */
+    public function getActionConfigurationClosure()
+    {
+        return function (ResultRecordInterface $record) {
+            if ($record->getValue('is_new')) {
+                return array('mark_as_unread' => false);
+            } else {
+                return array('mark_as_read' => false);
+            }
+        };
+    }
+
+    /**
+     * Returns callback for row of emails grid per row
+     *
+     * @return callable
+     */
+    public function getReadedRowClosure($gridName, $keyName, $node)
+    {
+        if (!array_key_exists('className', $node)) {
+            return false;
+        }
+
+        $className = $node['className'];
+
+        return function (ResultRecordInterface $record) use ($className) {
+            if ($record->getValue('is_new') === '0') {
+                return $className;
+            } else {
+                return '';
+            }
+        };
     }
 }

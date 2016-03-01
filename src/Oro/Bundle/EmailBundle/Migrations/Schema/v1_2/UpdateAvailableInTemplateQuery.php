@@ -32,7 +32,6 @@ class UpdateAvailableInTemplateQuery extends ParametrizedMigrationQuery
         'float'     => true,
         'money'     => true,
         'percent'   => true,
-        'optionSet' => true,
         'file'      => true,
         'image'     => true,
         'ref-one'   => true,

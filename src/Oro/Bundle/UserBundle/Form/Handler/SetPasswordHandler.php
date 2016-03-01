@@ -7,7 +7,7 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserManager;
@@ -28,7 +28,7 @@ class SetPasswordHandler
     /** @var Request */
     protected $request;
 
-    /** @var Translator */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var FormInterface */
@@ -41,17 +41,17 @@ class SetPasswordHandler
     protected $userManager;
 
     /**
-     * @param LoggerInterface $logger
-     * @param Request         $request
-     * @param Translator      $translator
-     * @param FormInterface   $form
-     * @param Processor       $mailerProcessor
-     * @param UserManager     $userManager
+     * @param LoggerInterface     $logger
+     * @param Request             $request
+     * @param TranslatorInterface $translator
+     * @param FormInterface       $form
+     * @param Processor           $mailerProcessor
+     * @param UserManager         $userManager
      */
     public function __construct(
         LoggerInterface $logger,
         Request         $request,
-        Translator      $translator,
+        TranslatorInterface $translator,
         FormInterface   $form,
         Processor       $mailerProcessor,
         UserManager     $userManager

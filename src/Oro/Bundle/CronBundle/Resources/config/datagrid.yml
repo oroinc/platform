@@ -1,8 +1,8 @@
 datagrid:
     jobs-grid:
+        acl_resource: oro_jobs
         source:
             type: orm
-            acl_resource: oro_jobs
             query:
                 select:
                     - partial j.{id, command, args, state, runtime, memoryUsageReal, priority, createdAt}
@@ -52,8 +52,8 @@ datagrid:
         filters:
             columns:
                 command:
-                    type: string
-                    data_name: j.command
+                    type: command_with_args
+                    data_name: j.command, j.args
                 state:
                     type: choice
                     data_name: j.state
@@ -89,7 +89,46 @@ datagrid:
                 label:        oro.grid.action.view
                 link:         view_link
                 icon:         eye-open
-                acl_recource: oro_jobs
+                acl_resource: oro_jobs
                 rowAction:    true
         options:
             entityHint: job
+
+    oro-cron-schedules-grid:
+        acl_resource: oro_cron_schedule_view
+        options:
+            entityHint: schedule
+        source:
+            type: orm
+            query:
+                select:
+                    - s.command
+                    - s.arguments
+                    - s.definition
+                from:
+                    - { table: OroCronBundle:Schedule , alias: s }
+        columns:
+            command:
+                label: oro.cron.schedule.command.label
+                type: twig
+                template: OroCronBundle:Schedule:Datagrid/command.html.twig
+                frontend_type: html
+            definition:
+                label: oro.cron.schedule.definition.label
+                type: twig
+                template: OroCronBundle:Schedule:Datagrid/definition.html.twig
+                frontend_type: html
+        sorters:
+            columns:
+                command:
+                    data_name: s.command
+                definition:
+                    data_name: s.definition
+        filters:
+            columns:
+                command:
+                    type: command_with_args
+                    data_name: s.command, s.arguments
+                definition:
+                    type: string
+                    data_name: s.definition

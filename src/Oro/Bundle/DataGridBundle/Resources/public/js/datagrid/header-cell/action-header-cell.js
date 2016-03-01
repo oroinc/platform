@@ -1,29 +1,28 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'backbone',
     'backgrid',
-    '../actions-panel'
-], function (_, Backbone, Backgrid, ActionsPanel) {
-    "use strict";
+    '../actions-panel',
+    'oroui/js/app/views/base/view'
+], function(_, Backbone, Backgrid, ActionsPanel, BaseView) {
+    'use strict';
 
-    var $, ActionHeaderCell;
-    $ = Backbone.$;
+    var ActionHeaderCell;
+    var $ = Backbone.$;
 
     /**
      *
      *
      * @export  orodatagrid/js/datagrid/header-cell/action-header-cell
      * @class   orodatagrid.datagrid.headerCell.ActionHeaderCell
-     * @extends Backbone.View
+     * @extends oroui/js/app/views/base/view
      */
-    ActionHeaderCell = Backbone.View.extend({
+    ActionHeaderCell = BaseView.extend({
         /** @property */
-        className: 'action-column',
+        className: 'action-column renderable',
 
         /** @property */
-        tagName: "th",
+        tagName: 'th',
 
         /** @property */
         template: '#template-datagrid-action-header-cell',
@@ -32,53 +31,52 @@ define([
             controls: '[data-toggle=dropdown]'
         },
 
-        initialize: function (options) {
-            var datagrid;
+        initialize: function(options) {
+            ActionHeaderCell.__super__.initialize.apply(this, arguments);
 
             this.column = options.column;
             if (!(this.column instanceof Backgrid.Column)) {
                 this.column = new Backgrid.Column(this.column);
             }
 
-            this.subviews = [];
             this.createActionsPanel();
 
-            datagrid = this.column.get('datagrid');
+            var datagrid = this.column.get('datagrid');
             this.listenTo(datagrid, 'enable', this.enable);
             this.listenTo(datagrid, 'disable', this.disable);
+            this.listenTo(datagrid.massActions, 'reset', this.rebuildAndRender);
         },
 
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
-            delete this.actionsPanel;
             delete this.column;
             ActionHeaderCell.__super__.dispose.apply(this, arguments);
         },
 
-        createActionsPanel: function () {
-            var actions = [],
-                datagrid = this.column.get('datagrid');
+        createActionsPanel: function() {
+            var actions = [];
+            var datagrid = this.column.get('datagrid');
 
-            _.each(this.column.get('massActions'), function (Action) {
-                var action = new Action({
-                    datagrid: datagrid
-                });
-                actions.push(action);
+            this.column.get('massActions').each(function(Action) {
+                var ActionModule = Action.get('module');
+
+                actions.push(
+                    new ActionModule({
+                        datagrid: datagrid
+                    })
+                );
             });
 
-            this.actionsPanel = new ActionsPanel();
-            this.actionsPanel.setActions(actions);
-
-            this.subviews.push(this.actionsPanel);
+            this.subview('actionsPanel', new ActionsPanel({'actions': actions}));
         },
 
-        render: function () {
-            var panel = this.actionsPanel;
+        render: function() {
+            var panel = this.subview('actionsPanel');
             this.$el.empty();
             if (panel.haveActions()) {
                 this.$el.append($(this.template).text());
@@ -89,13 +87,20 @@ define([
             return this;
         },
 
-        enable: function () {
-            this.actionsPanel.enable();
+        rebuildAndRender: function(massActions) {
+            this.column.set('massActions', massActions);
+
+            this.createActionsPanel();
+            this.render();
+        },
+
+        enable: function() {
+            this.subview('actionsPanel').enable();
             this.$(this.options.controls).removeClass('disabled');
         },
 
-        disable: function () {
-            this.actionsPanel.disable();
+        disable: function() {
+            this.subview('actionsPanel').disable();
             this.$(this.options.controls).addClass('disabled');
         }
     });

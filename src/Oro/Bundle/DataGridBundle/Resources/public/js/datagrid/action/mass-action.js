@@ -1,12 +1,10 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'oroui/js/messenger',
     'orotranslation/js/translator',
     'oroui/js/modal',
     './abstract-action'
-], function (_, messenger, __, Modal, AbstractAction) {
+], function(_, messenger, __, Modal, AbstractAction) {
     'use strict';
 
     var MassAction;
@@ -30,13 +28,13 @@ define([
             empty_selection: 'Please, select items to perform mass action.'
         },
 
-        initialize: function (options) {
+        initialize: function(options) {
             MassAction.__super__.initialize.apply(this, arguments);
 
-            var extended_options = {};
-            extended_options[this.datagrid.name] = this.datagrid.collection.urlParams || {};
+            var extendedOptions = {};
+            extendedOptions[this.datagrid.name] = this.datagrid.collection.urlParams || {};
 
-            _.extend(this.route_parameters, extended_options, {
+            _.extend(this.route_parameters, extendedOptions, {
                 gridName: this.datagrid.name,
                 actionName: this.name
             });
@@ -45,13 +43,25 @@ define([
         /**
          * Ask a confirmation and execute mass action.
          */
-        execute: function () {
+        execute: function() {
+            if (this.checkSelectionState()) {
+                MassAction.__super__.execute.call(this);
+            }
+        },
+
+        /**
+         * Checks if any records are selected.
+         *
+         * @returns {boolean}
+         */
+        checkSelectionState: function() {
             var selectionState = this.datagrid.getSelectionState();
             if (_.isEmpty(selectionState.selectedModels) && selectionState.inset) {
                 messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
-            } else {
-                MassAction.__super__.execute.call(this);
+                return false;
             }
+
+            return true;
         },
 
         /**
@@ -60,15 +70,13 @@ define([
          * @returns {Object}
          * @private
          */
-        getActionParameters: function () {
-            var selectionState, collection, idValues, params;
-            selectionState = this.datagrid.getSelectionState();
-            collection = this.datagrid.collection;
-            idValues = _.map(selectionState.selectedModels, function (model) {
+        getActionParameters: function() {
+            var selectionState = this.datagrid.getSelectionState();
+            var collection = this.datagrid.collection;
+            var idValues = _.map(selectionState.selectedModels, function(model) {
                 return model.get(this.identifierFieldName);
             }, this);
-
-            params = {
+            var params = {
                 inset: selectionState.inset ? 1 : 0,
                 values: idValues.join(',')
             };
@@ -78,7 +86,7 @@ define([
             return params;
         },
 
-        _onAjaxSuccess: function (data, textStatus, jqXHR) {
+        _onAjaxSuccess: function(data, textStatus, jqXHR) {
             this.datagrid.resetSelectionState();
             MassAction.__super__._onAjaxSuccess.apply(this, arguments);
         }

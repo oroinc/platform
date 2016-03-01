@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
+use Oro\Bundle\EntityMergeBundle\Data\EntityData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\EntityMetadata;
@@ -22,19 +25,23 @@ class MergeType extends AbstractType
             'masterEntity',
             'entity',
             array(
-                'label'    => 'oro.entity_merge.form.master_record',
-                'class'    => $metadata->getClassName(),
-                'choices'  => $options['entities'],
-                'multiple' => false,
-                'tooltip'  => 'oro.entity_merge.form.master_record_tooltip',
-                'expanded' => true
+                'label'                   => 'oro.entity_merge.form.master_record',
+                'class'                   => $metadata->getClassName(),
+                'data_class'              => $metadata->getClassName(),
+                'choices'                 => $options['entities'],
+                'multiple'                => false,
+                'tooltip'                 => 'oro.entity_merge.form.master_record.tooltip',
+                'expanded'                => true,
+                'choices_as_values'       => true,
+                'ownership_disabled'      => true,
+                'dynamic_fields_disabled' => true,
             )
         );
         $builder->add('fields', 'form');
         $fields = $builder->get('fields');
 
         foreach ($metadata->getFieldsMetadata() as $fieldMetadata) {
-            if ($fieldMetadata->is('display', true)) {
+            if ($fieldMetadata->is('display')) {
                 $fields->add(
                     $fieldMetadata->getFieldName(),
                     'oro_entity_merge_field',
@@ -46,6 +53,16 @@ class MergeType extends AbstractType
                 );
             }
         }
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var EntityData $entityData */
+            $entityData = $event->getData();
+            if (!$entityData->getMasterEntity()) {
+                $entities = $entityData->getEntities();
+                $masterEntity = reset($entities);
+                $entityData->setMasterEntity($masterEntity);
+            }
+        });
     }
 
     /**

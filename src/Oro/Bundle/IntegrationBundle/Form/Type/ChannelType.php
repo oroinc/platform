@@ -5,32 +5,31 @@ namespace Oro\Bundle\IntegrationBundle\Form\Type;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\IntegrationBundle\Form\EventListener\ChannelFormSubscriber as IntegrationFormSubscriber;
-use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultUserOwnerSubscriber;
-use Oro\Bundle\IntegrationBundle\Form\EventListener\OrganizationSubscriber;
+use Oro\Bundle\IntegrationBundle\Form\EventListener\DefaultOwnerSubscriber;
 
 class ChannelType extends AbstractType
 {
     const NAME            = 'oro_integration_channel_form';
     const TYPE_FIELD_NAME = 'type';
 
-    /** @var DefaultUserOwnerSubscriber */
-    protected $defaultUserOwnerSubscriber;
+    /** @var DefaultOwnerSubscriber */
+    protected $defaultOwnerSubscriber;
 
     /** @var IntegrationFormSubscriber */
     protected $integrationFormSubscriber;
 
     /**
-     * @param DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber
-     * @param IntegrationFormSubscriber  $integrationFormSubscriber
+     * @param DefaultOwnerSubscriber    $defaultOwnerSubscriber
+     * @param IntegrationFormSubscriber $integrationFormSubscriber
      */
     public function __construct(
-        DefaultUserOwnerSubscriber $defaultUserOwnerSubscriber,
+        DefaultOwnerSubscriber $defaultOwnerSubscriber,
         IntegrationFormSubscriber $integrationFormSubscriber
     ) {
-        $this->defaultUserOwnerSubscriber = $defaultUserOwnerSubscriber;
+        $this->defaultOwnerSubscriber = $defaultOwnerSubscriber;
         $this->integrationFormSubscriber  = $integrationFormSubscriber;
     }
 
@@ -40,7 +39,7 @@ class ChannelType extends AbstractType
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
         $builder->addEventSubscriber($this->integrationFormSubscriber);
-        $builder->addEventSubscriber($this->defaultUserOwnerSubscriber);
+        $builder->addEventSubscriber($this->defaultOwnerSubscriber);
 
         $builder->add(
             self::TYPE_FIELD_NAME,
@@ -77,13 +76,14 @@ class ChannelType extends AbstractType
             ]
         );
 
+        // add default owner
         $builder->add(
             'defaultUserOwner',
             'oro_user_organization_acl_select',
             [
                 'required' => true,
                 'label'    => 'oro.integration.integration.default_user_owner.label',
-                'tooltip'  => 'oro.integration.integration.default_user_owner.tooltip'
+                'tooltip'  => 'oro.integration.integration.default_user_owner.description',
             ]
         );
     }
@@ -91,7 +91,7 @@ class ChannelType extends AbstractType
     /**
      * {@inheritdoc}
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults(
             [

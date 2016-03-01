@@ -11,8 +11,9 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use Symfony\Component\HttpFoundation\Response;
 
-use Oro\Bundle\ActivityBundle\Entity\Manager\ActivitySearchApiEntityManager;
 use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\ChainParameterFilter;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\EntityClassParameterFilter;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter;
 
 /**
@@ -22,11 +23,11 @@ use Oro\Bundle\SoapBundle\Request\Parameters\Filter\StringToArrayParameterFilter
 class ActivitySearchController extends RestGetController
 {
     /**
-     * Searches entities associated with the specified type of an activity entity.
+     * Searches entities associated with the specified type of activity.
      *
      * @param string $activity The type of the activity entity.
      *
-     * @Get("/activities/{activity}/relations/search", name="")
+     * @Get("/activities/{activity}/relations/search")
      *
      * @QueryParam(
      *      name="page",
@@ -54,7 +55,7 @@ class ActivitySearchController extends RestGetController
      * )
      *
      * @ApiDoc(
-     *      description="Searches entities associated with the specified type of an activity entity",
+     *      description="Searches entities associated with the specified type of activity",
      *      resource=true
      * )
      *
@@ -73,7 +74,12 @@ class ActivitySearchController extends RestGetController
         ];
         $from    = $this->getRequest()->get('from', null);
         if ($from) {
-            $filter          = new StringToArrayParameterFilter();
+            $filter          = new ChainParameterFilter(
+                [
+                    new StringToArrayParameterFilter(),
+                    new EntityClassParameterFilter($this->get('oro_entity.entity_class_name_helper'))
+                ]
+            );
             $filters['from'] = $filter->filter($from, null);
         }
 
@@ -81,9 +87,7 @@ class ActivitySearchController extends RestGetController
     }
 
     /**
-     * Gets the API entity manager
-     *
-     * @return ActivitySearchApiEntityManager
+     * {@inheritdoc}
      */
     public function getManager()
     {

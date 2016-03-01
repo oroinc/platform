@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\ORM\Walker;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 use Doctrine\ORM\Query\AST\SelectStatement;
@@ -11,7 +12,6 @@ use Doctrine\ORM\Query\AST\RangeVariableDeclaration;
 use Doctrine\ORM\Query\AST\Join;
 use Doctrine\ORM\Query\AST\ConditionalPrimary;
 use Doctrine\ORM\Query\AST\IdentificationVariableDeclaration;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -50,14 +50,22 @@ class AclHelper
     /** @var EventDispatcherInterface */
     protected $eventDispatcher;
 
+    /** @var AclConditionalFactorBuilder */
+    protected $aclConditionFactorBuilder;
+
     /**
      * @param OwnershipConditionDataBuilder $builder
      * @param EventDispatcherInterface      $eventDispatcher
+     * @param AclConditionalFactorBuilder   $aclConditionFactorBuilder
      */
-    public function __construct(OwnershipConditionDataBuilder $builder, EventDispatcherInterface $eventDispatcher)
-    {
-        $this->builder         = $builder;
+    public function __construct(
+        OwnershipConditionDataBuilder $builder,
+        EventDispatcherInterface $eventDispatcher,
+        AclConditionalFactorBuilder $aclConditionFactorBuilder
+    ) {
+        $this->builder = $builder;
         $this->eventDispatcher = $eventDispatcher;
+        $this->aclConditionFactorBuilder = $aclConditionFactorBuilder;
     }
 
     /**
@@ -69,13 +77,22 @@ class AclHelper
      *
      * @return Criteria
      */
-    public function applyAclToCriteria($className, Criteria $criteria, $permission)
+    public function applyAclToCriteria($className, Criteria $criteria, $permission, $mapField = [])
     {
         $conditionData = $this->builder->getAclConditionData($className, $permission);
         if (!empty($conditionData)) {
             $entityField = $value = $pathExpressionType = $organizationField = $organizationValue = $ignoreOwner = null;
             list($entityField, $value, $pathExpressionType, $organizationField, $organizationValue, $ignoreOwner)
                 = $conditionData;
+
+            if (isset($mapField[$organizationField])) {
+                $organizationField = $mapField[$organizationField];
+            }
+
+            if (isset($mapField[$entityField])) {
+                $entityField = $mapField[$entityField];
+            }
+
             if (!is_null($organizationField) && !is_null($organizationValue)) {
                 $criteria->andWhere(Criteria::expr()->in($organizationField, [$organizationValue]));
             }
@@ -102,6 +119,7 @@ class AclHelper
     public function apply($query, $permission = 'VIEW', $checkRelations = true)
     {
         $this->entityAliases = [];
+
         if ($query instanceof QueryBuilder) {
             $query = $query->getQuery();
         }
@@ -110,22 +128,24 @@ class AclHelper
 
         $ast = $query->getAST();
         if ($ast instanceof SelectStatement) {
-            list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission, $query);
-            $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : array());
+            list ($whereConditions, $joinConditions) = $this->processSelect($ast, $permission);
+            $conditionStorage = new AclConditionStorage($whereConditions, $checkRelations ? $joinConditions : []);
             if ($ast->whereClause) {
-                $this->processSubselects($ast, $conditionStorage, $permission, $query);
+                $this->processSubselects($ast, $conditionStorage, $permission);
             }
 
             // We have access level check conditions. So mark query for acl walker.
             if (!$conditionStorage->isEmpty()) {
-                $query->setHint(
-                    Query::HINT_CUSTOM_TREE_WALKERS,
-                    array_merge(
-                        $query->getHints(),
-                        array(self::ORO_ACL_WALKER)
-                    )
-                );
+                $walkers = $query->getHint(Query::HINT_CUSTOM_TREE_WALKERS);
+                if (false === $walkers) {
+                    $walkers = [self::ORO_ACL_WALKER];
+                    $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
+                } elseif (!in_array(self::ORO_ACL_WALKER, $walkers, true)) {
+                    $walkers[] = self::ORO_ACL_WALKER;
+                    $query->setHint(Query::HINT_CUSTOM_TREE_WALKERS, $walkers);
+                }
                 $query->setHint(AclWalker::ORO_ACL_CONDITION, $conditionStorage);
+                $query->setHint(AclWalker::ORO_ACL_FACTOR_BUILDER, $this->aclConditionFactorBuilder);
             }
         }
 
@@ -207,7 +227,7 @@ class AclHelper
      * @param Subselect|SelectStatement $select
      * @param string                    $permission
      *
-     * @return array
+     * @return array [whereConditions, joinConditions]
      */
     protected function processSelect($select, $permission)
     {

@@ -68,11 +68,13 @@ class SearchAdvancedController extends FOSRestController
      *
      *  from demo_product where name ~ samsung and double price > 100
      *
-     *  integer count != 10
+     *  where integer count != 10
      *
-     *  all_text !~ test_string
+     *  where all_text !~ test_string
      *
-     *  from (demo_products, demo_categories) where description ~ test order_by name offset 5 max_results 10
+     *  from demo_products where description ~ test order_by name offset 5
+     *
+     *  from (demo_products, demo_categories) where description ~ test offset 5 max_results 10
      *
      *  integer count !in (1, 3, 5)
      *

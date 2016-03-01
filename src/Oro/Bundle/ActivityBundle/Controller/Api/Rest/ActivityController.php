@@ -20,12 +20,12 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestGetController;
 class ActivityController extends RestGetController
 {
     /**
-     * Returns activity types.
+     * Get activity types.
      *
-     * @Get("/activities", name="")
+     * @Get("/activities")
      *
      * @ApiDoc(
-     *      description="Returns activity types",
+     *      description="Get activity types",
      *      resource=true
      * )
      *
@@ -39,14 +39,14 @@ class ActivityController extends RestGetController
     }
 
     /**
-     * Returns entity types which can be associated with the specified activity type.
+     * Get entity types which can be associated with the specified activity type.
      *
      * @param string $activity The type of the activity entity.
      *
-     * @Get("/activities/{activity}", name="")
+     * @Get("/activities/{activity}")
      *
      * @ApiDoc(
-     *      description="Returns entity types which can be associated with the specified activity type",
+     *      description="Get entity types which can be associated with the specified activity type",
      *      resource=true
      * )
      *

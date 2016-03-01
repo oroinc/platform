@@ -1,5 +1,4 @@
-/*global define*/
-define(['jquery'], function ($) {
+define(['jquery'], function($) {
     'use strict';
 
     $.ajaxSetup({
@@ -7,45 +6,44 @@ define(['jquery'], function ($) {
             'X-CSRF-Header': 1
         }
     });
-    $.expr[':'].parents = function (a, i, m) {
+    $.expr[':'].parents = function(a, i, m) {
         return $(a).parents(m[3]).length < 1;
     };
 
     $.fn.extend({
-        // http://stackoverflow.com/questions/4609405/set-focus-after-last-character-in-text-box
-        focusAndSetCaretAtEnd: function () {
-            if (!this.length)
-                return;
-            var elem = this[0], elemLen = elem.value.length;
-            // For IE Only
-            if (document.selection) {
-                // Set focus
-                $(elem).focus();
-                // Use IE Ranges
-                var oSel = document.selection.createRange();
-                // Reset position to 0 & then set at end
-                oSel.moveStart('character', -elemLen);
-                oSel.moveStart('character', elemLen);
-                oSel.moveEnd('character', 0);
-                oSel.select();
-            }
-            else if (elem.selectionStart || elem.selectionStart == '0') {
-                // Firefox/Chrome
-                elem.selectionStart = elemLen;
-                elem.selectionEnd = elemLen;
-                $(elem).focus();
-            } // if
+        /**
+         * Sets cursor to end of input
+         */
+        setCursorPosition: function(index) {
+            return this.each(function() {
+                var el = this;
+                if ('selectionStart' in el) {
+                    try {
+                        el.selectionEnd = el.selectionStart = index === 'end' ? el.value.length : index;
+                    } catch (ex) {
+                        // avoid exeption when use these actions with unsupported input types (email, number etc)
+                    }
+                }
+            });
+        },
+
+        /**
+         * Sets cursor to end of input
+         */
+        setCursorToEnd: function() {
+            return this.setCursorPosition('end');
         },
 
         /**
          * Sets focus on first form field
          */
-        focusFirstInput: function () {
-            var $autoFocus,
-                $input = this.find(':input:visible, [data-focusable]')
+        focusFirstInput: function() {
+            var $input = this.find(':input:visible, [data-focusable]')
                     .not(':checkbox, :radio, :button, :submit, :disabled, :file');
-            $autoFocus = $input.filter('[autofocus]');
-            ($autoFocus.length ? $autoFocus : $input).first().focus();
+            var $autoFocus = $input.filter('[autofocus]');
+            if ($autoFocus.length || $input.length) {
+                ($autoFocus.length ? $autoFocus : $input).first().setCursorToEnd().focus();
+            }
         },
 
         focus: (function(orig) {
@@ -64,7 +62,7 @@ define(['jquery'], function ($) {
         /**
          * source http://stackoverflow.com/questions/13607252/getting-border-width-in-jquery
          */
-        getBorders: function (el) {
+        getBorders: function(el) {
             var computed = window.getComputedStyle(el || this[0], null);
             function convertBorderToPx(cssValue) {
                 switch (cssValue) {
@@ -92,25 +90,124 @@ define(['jquery'], function ($) {
         },
 
         /**
-         * Returns current cursor position in <textarea> or <input>
+         * Inserts string in <textarea> or <input> at the cursor position and sets cursor after inserted data
          *
          * @returns {number}
          */
-        getCursorPosition: function() {
-            var el = $(this).get(0);
-            var pos = 0;
-            if('selectionStart' in el) {
-                pos = el.selectionStart;
-            } else if('selection' in document) {
-                el.focus();
-                var Sel = document.selection.createRange();
-                var SelLength = document.selection.createRange().text.length;
-                Sel.moveStart('character', -el.value.length);
-                pos = Sel.text.length - SelLength;
-            }
-            return pos;
-        }
+        insertAtCursor: function(str) {
+            return this.each(function() {
+                var start;
+                var end;
+                var el = this;
+                var value = el.value;
+                if ('selectionStart' in el) {
+                    // avoid exeption when use these actions with unsupported input types (email, number etc)
+                    try {
+                        start = el.selectionStart;
+                        end = el.selectionEnd;
+                        el.value = value.substr(0, start) + str + value.substr(end);
+                        el.selectionEnd = el.selectionStart = start + str.length;
+                    } catch (ex) {
+                        el.value += str;
+                    }
+                } else {
+                    el.value += str;
+                }
+            });
+        },
 
+        /**
+         * Thanks http://stackoverflow.com/questions/290254/how-to-order-events-bound-with-jquery
+         */
+        bindFirst: function(eventType, selector, eventData, handler) {
+            var indexOfDot = eventType.indexOf('.');
+            var eventNameSpace = indexOfDot > 0 ? eventType.substring(indexOfDot) : '';
+
+            eventType = indexOfDot > 0 ? eventType.substring(0, indexOfDot) : eventType;
+            handler = handler !== undefined ? handler : (eventData !== undefined ? eventData : selector);
+            eventData = typeof eventData !== 'function' ? eventData : undefined;
+            selector = typeof selector !== 'function' ? selector : undefined;
+
+            return this.each(function() {
+                var $this = $(this);
+                var currentAttrListener = this['on' + eventType];
+
+                if (currentAttrListener) {
+                    $this.bind(eventType, function(e) {
+                        return currentAttrListener(e.originalEvent);
+                    });
+
+                    this['on' + eventType] = null;
+                }
+
+                $this.on(eventType + eventNameSpace, selector, eventData, handler);
+
+                var allEvents = $this.data('events') || $._data($this[0], 'events');
+                var typeEvents = allEvents[eventType];
+                var newEvent = typeEvents.pop();
+                typeEvents.unshift(newEvent);
+            });
+        },
+
+        /**
+         * Temporarily adds class to element
+         */
+        addClassTemporarily: function(className, delay) {
+            delay = delay || 0;
+            return this.each(function() {
+                var $el = $(this);
+                $el.addClass(className);
+                setTimeout(function() {
+                    $el.removeClass(className);
+                }, delay);
+            });
+        },
+
+        formFieldValues: function(data) {
+            var els = this.find(':input').get();
+
+            if (arguments.length === 0) {
+                // return all data
+                data = {};
+                $.each(els, function() {
+                    if (this.name && !this.disabled && (
+                            this.checked ||
+                            /select|textarea/i.test(this.nodeName) ||
+                            /text|hidden|password/i.test(this.type))
+                    ) {
+                        if (data[this.name] === void 0) {
+                            data[this.name] = [];
+                        }
+                        data[this.name].push($(this).val());
+                    }
+                });
+                return data;
+            } else {
+                $.each(els, function() {
+                    if (this.name && data[this.name]) {
+                        var names = data[this.name];
+                        var $this = $(this);
+                        if (Object.prototype.toString.call(names) !== '[object Array]') {
+                            names = [names]; //backwards compat to old version of this code
+                        }
+                        if (this.type === 'checkbox' || this.type === 'radio') {
+                            var val = $this.val();
+                            var found = false;
+                            for (var i = 0; i < names.length; i++) {
+                                if (names[i] === val) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            $this.attr('checked', found);
+                        } else {
+                            $this.val(names[0]);
+                        }
+                    }
+                });
+                return this;
+            }
+        }
     });
 
     return $;

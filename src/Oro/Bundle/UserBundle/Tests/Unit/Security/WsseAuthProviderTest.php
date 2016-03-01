@@ -12,6 +12,7 @@ use Escape\WSSEAuthenticationBundle\Security\Core\Authentication\Token\Token;
 
 use Oro\Bundle\UserBundle\Entity\UserApi;
 use Oro\Bundle\UserBundle\Security\WsseAuthProvider;
+use Oro\Bundle\UserBundle\Security\WsseTokenFactory;
 
 class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,11 +37,22 @@ class WsseAuthProviderTest extends \PHPUnit_Framework_TestCase
         $cache = new ArrayCache();
 
         $this->provider = new WsseAuthProvider($this->userProvider, $this->encoder, $cache);
+        $this->provider->setTokenFactory(new WsseTokenFactory());
     }
 
     protected function tearDown()
     {
         unset($this->userProvider, $this->encoder, $this->provider);
+    }
+
+    /**
+     * @expectedException \Symfony\Component\Security\Core\Exception\AuthenticationException
+     * @expectedExceptionMessage Token Factory is not set in WsseAuthProvider.
+     */
+    public function testAuthenticateIfTokenFactoryIsNotSet()
+    {
+        $provider = new WsseAuthProvider($this->userProvider, $this->encoder, new ArrayCache());
+        $provider->authenticate(new Token());
     }
 
     /**

@@ -14,7 +14,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
@@ -32,19 +32,19 @@ class OroJquerySelect2HiddenType extends AbstractType
     protected $searchRegistry;
 
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $configProvider;
 
     /**
-     * @param EntityManager           $entityManager
-     * @param SearchRegistry          $registry
-     * @param ConfigProviderInterface $configProvider
+     * @param EntityManager  $entityManager
+     * @param SearchRegistry $registry
+     * @param ConfigProvider $configProvider
      */
     public function __construct(
         EntityManager $entityManager,
         SearchRegistry $registry,
-        ConfigProviderInterface $configProvider
+        ConfigProvider $configProvider
     ) {
         $this->entityManager  = $entityManager;
         $this->searchRegistry = $registry;
@@ -59,7 +59,7 @@ class OroJquerySelect2HiddenType extends AbstractType
         $defaultConfig = [
             'placeholder'        => 'oro.form.choose_value',
             'allowClear'         => true,
-            'minimumInputLength' => 1,
+            'minimumInputLength' => 0,
         ];
 
         $resolver
@@ -89,8 +89,8 @@ class OroJquerySelect2HiddenType extends AbstractType
                             return $entityClass;
                         }
 
-                        if ($autoCompleteAlias = $options->get('autocomplete_alias')) {
-                            $searchHandler = $this->searchRegistry->getSearchHandler($autoCompleteAlias);
+                        if (!empty($options['autocomplete_alias'])) {
+                            $searchHandler = $this->searchRegistry->getSearchHandler($options['autocomplete_alias']);
 
                             return $searchHandler->getEntityName();
                         }
@@ -98,10 +98,8 @@ class OroJquerySelect2HiddenType extends AbstractType
                         throw new InvalidConfigurationException('The option "entity_class" must be set.');
                     },
                     'transformer'        => function (Options $options, $value) {
-                        if (!$value) {
-                            if ($className = $options->get('entity_class')) {
-                                $value = $this->createDefaultTransformer($className);
-                            }
+                        if (!$value && !empty($options['entity_class'])) {
+                            $value = $this->createDefaultTransformer($options['entity_class']);
                         }
 
                         if (!$value instanceof DataTransformerInterface) {
@@ -127,10 +125,8 @@ class OroJquerySelect2HiddenType extends AbstractType
         $resolver->setNormalizers(
             [
                 'converter' => function (Options $options, $value) {
-                    if (!$value) {
-                        if ($autoCompleteAlias = $options->get('autocomplete_alias')) {
-                            $value = $this->searchRegistry->getSearchHandler($autoCompleteAlias);
-                        }
+                    if (!$value && !empty($options['autocomplete_alias'])) {
+                        $value = $this->searchRegistry->getSearchHandler($options['autocomplete_alias']);
                     }
 
                     if (!$value) {
@@ -161,7 +157,8 @@ class OroJquerySelect2HiddenType extends AbstractType
                 'configs' => function (Options $options, $configs) use ($defaultConfig) {
                     $result = array_replace_recursive($defaultConfig, $configs);
 
-                    if ($autoCompleteAlias = $options->get('autocomplete_alias')) {
+                    if (!empty($options['autocomplete_alias'])) {
+                        $autoCompleteAlias = $options['autocomplete_alias'];
                         $result['autocomplete_alias'] = $autoCompleteAlias;
                         if (empty($result['properties'])) {
                             $searchHandler        = $this->searchRegistry->getSearchHandler($autoCompleteAlias);
@@ -198,7 +195,7 @@ class OroJquerySelect2HiddenType extends AbstractType
      */
     public function createDefaultTransformer($entityClass)
     {
-        return $value = new EntityToIdTransformer($this->entityManager, $entityClass);
+        return new EntityToIdTransformer($this->entityManager, $entityClass);
     }
 
     /**

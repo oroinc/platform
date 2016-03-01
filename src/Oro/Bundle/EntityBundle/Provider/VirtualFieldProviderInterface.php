@@ -9,6 +9,7 @@ interface VirtualFieldProviderInterface
      *
      * @param string $className
      * @param string $fieldName
+     *
      * @return bool
      */
     public function isVirtualField($className, $fieldName);
@@ -18,6 +19,7 @@ interface VirtualFieldProviderInterface
      *
      * @param string $className
      * @param string $fieldName
+     *
      * @return array
      */
     public function getVirtualFieldQuery($className, $fieldName);
@@ -26,7 +28,8 @@ interface VirtualFieldProviderInterface
      * Gets virtual field names for given class
      *
      * @param string $className
-     * @return [string]
+     *
+     * @return string[]
      */
     public function getVirtualFields($className);
 }

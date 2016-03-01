@@ -1,6 +1,5 @@
-/*global define*/
 define(['backbone', './model'
-    ], function (Backbone, TagModel) {
+    ], function(Backbone, TagModel) {
     'use strict';
 
     /**
@@ -19,7 +18,7 @@ define(['backbone', './model'
          */
         getFilteredCollection: function(type) {
             var filtered = this.filter(function(tag) {
-                return type === "owner" ? tag.get("owner") : true;
+                return type === 'owner' ? tag.get('owner') : true;
             });
 
             return new TagCollection(filtered);
@@ -33,7 +32,7 @@ define(['backbone', './model'
         addItem: function(value) {
             // check if exists tag
             var exist = this.where({name: value.name});
-            if (exist.length && exist[0].get('owner') == false) {
+            if (exist.length && exist[0].get('owner') === false) {
                 // adding to owner
                 exist[0].set('owner', true);
                 this.trigger('add');

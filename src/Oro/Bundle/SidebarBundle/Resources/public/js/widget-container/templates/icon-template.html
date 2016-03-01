@@ -1,5 +1,11 @@
 <% if (iconClass) { %>
-    <i class="<%= iconClass %>" title="<%= title %>"></i>
+    <i class="<%= iconClass %><% if (typeof itemsCounter !== 'undefined' && itemsCounter > 0) { %> icon-with-counter highlight<% } %>"
+       title="<%= title %>">
+        <% if (typeof itemsCounter !== 'undefined' && itemsCounter > 0) { %>
+            <span class="item-counter"><%=(itemsCounter > 99 ? '99+' : itemsCounter) %></span>
+        <% } %>
+        <span class="icon-refresh"></span>
+    </i>
 <% } else { %>
     <img src="<%= icon %>" alt="<%= title %>" title="<%= title %>"/>
 <% } %>

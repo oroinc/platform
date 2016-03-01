@@ -23,10 +23,16 @@ class Theme
     protected $screenshot;
 
     /** @var string */
+    protected $description;
+
+    /** @var string */
     protected $directory;
 
     /** @var string[] */
     protected $groups = [];
+
+    /** @var array */
+    protected $data = [];
 
     /**
      * @param string $name
@@ -129,6 +135,22 @@ class Theme
     /**
      * @return string
      */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+    }
+
+    /**
+     * @return string
+     */
     public function getDirectory()
     {
         return null === $this->directory ? $this->name : $this->directory;
@@ -156,5 +178,45 @@ class Theme
     public function getGroups()
     {
         return $this->groups;
+    }
+
+    /**
+     * @param array $data
+     */
+    public function setData(array $data)
+    {
+        $this->data = $data;
+    }
+
+    /**
+     * @return array
+     */
+    public function getData()
+    {
+        return $this->data;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $value
+     * @return $this
+     */
+    public function setDataByKey($key, $value)
+    {
+        $this->data[$key] = $value;
+        return $this;
+    }
+
+    /**
+     * @param string $key
+     * @param mixed $default
+     * @return mixed|null
+     */
+    public function getDataByKey($key, $default = null)
+    {
+        if (array_key_exists($key, $this->data)) {
+            return $this->data[$key];
+        }
+        return $default;
     }
 }

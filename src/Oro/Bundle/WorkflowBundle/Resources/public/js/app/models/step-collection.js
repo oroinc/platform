@@ -1,10 +1,9 @@
-/* global define */
 define(function(require) {
     'use strict';
 
-    var StepCollection,
-        BaseCollection = require('oroui/js/app/models/base/collection'),
-        StepModel = require('./step-model');
+    var StepCollection;
+    var BaseCollection = require('oroui/js/app/models/base/collection');
+    var StepModel = require('./step-model');
 
     StepCollection = BaseCollection.extend({
         model: StepModel,

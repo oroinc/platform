@@ -20,7 +20,8 @@ class Acceptor
      */
     public function processConfiguration()
     {
-        foreach ($this->getExtensions() as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             $extension->processConfigs($this->getConfig());
         }
     }
@@ -30,7 +31,8 @@ class Acceptor
      */
     public function acceptDatasource(DatasourceInterface $datasource)
     {
-        foreach ($this->getExtensions() as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             $extension->visitDatasource($this->getConfig(), $datasource);
         }
     }
@@ -40,7 +42,8 @@ class Acceptor
      */
     public function acceptResult(ResultsObject $result)
     {
-        foreach ($this->getExtensions() as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             $extension->visitResult($this->getConfig(), $result);
         }
     }
@@ -50,7 +53,8 @@ class Acceptor
      */
     public function acceptMetadata(MetadataObject $data)
     {
-        foreach ($this->getExtensions() as $extension) {
+        $extensions = $this->getExtensions();
+        foreach ($extensions as $extension) {
             $extension->visitMetadata($this->getConfig(), $data);
         }
     }

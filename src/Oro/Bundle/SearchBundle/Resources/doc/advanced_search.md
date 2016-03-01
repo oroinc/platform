@@ -71,8 +71,7 @@ If direction is not assigned then will be used `ASC` direction.
 Field types
 -----------
 
-Some keywords (`and`, `or`, `order_by`) contain field type parameter in syntax.
-By default, if type is not set, it will be used text type. Supported field types:
+User should specify field type in query string. By default, if type is not set, it will be used text type. Supported field types:
 * **text**
 * **integer**
 * **decimal**
@@ -136,6 +135,16 @@ Examples:
 ```
 integer count !in (1, 3, 5)
 decimal price !in (2.1, 55, 45.4)
+```
+
+###Query brackets.
+
+User can combine operators in search query with brackets.
+
+Examples:
+
+```
+from oro_test where (owner ~ john and (integer count > 10 or float price = 10)) or (owner ~ mary and (integer count > 5 or float price = 150))
 ```
 
 Query examples

@@ -26,18 +26,15 @@ oro_entity_config:
             items:
                 auditable:
                     options:
+                        value_type:         boolean
                         priority:           60
                         default_value:      false
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many, ref-one]
-                        indexed:            true
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, array, simple_array, json_array, ref-many, ref-one]
                     grid:
                         type:               boolean
                         label:              oro.dataaudit.entity_config.field.items.auditable
-                        filter_type:        boolean
                         required:           true
                         sortable:           true
-                        filterable:         false
-                        show_filter:        false
                     form:
                         type:               choice
                         options:

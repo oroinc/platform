@@ -63,7 +63,7 @@ class CalendarOwnerAssignmentCheckerTest extends OrmTestCase
             $this->em
         );
 
-        $expectedSql = 'SELECT o0_.id AS id0'
+        $expectedSql = 'SELECT o0_.id AS id_0'
             . ' FROM oro_calendar o1_'
             . ' INNER JOIN oro_user o0_ ON o1_.user_owner_id = o0_.id'
             . ' WHERE o0_.id = ? AND'
@@ -81,7 +81,7 @@ class CalendarOwnerAssignmentCheckerTest extends OrmTestCase
     {
         return [
             [[], false],
-            [[['id0' => '1']], true]
+            [[['id_0' => '1']], true]
         ];
     }
 }

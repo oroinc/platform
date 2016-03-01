@@ -11,6 +11,7 @@ parameters:
     oro_ui.label_provider.action_button_group.class:       Oro\Bundle\UIBundle\Provider\ActionButtonGroupLabelProvider
     oro_ui.widget_provider.action_button.class:            Oro\Bundle\UIBundle\Provider\ActionButtonWidgetProvider
     oro_ui.widget_provider.view_actions.class:             Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
+    oro_ui.widget_provider.update_actions.class:           Oro\Bundle\UIBundle\Provider\GroupingChainWidgetProvider
     oro_ui.content_provider.manager.class:                 Oro\Bundle\UIBundle\ContentProvider\ContentProviderManager
 
     oro_ui.provider.widget_context.class:                  Oro\Bundle\UIBundle\Provider\WidgetContextProvider
@@ -18,6 +19,7 @@ parameters:
     oro_ui.view.content_provider.listener.class:           Oro\Bundle\UIBundle\EventListener\ContentProviderListener
 
     oro_ui.html_tag_helper.class:                          Oro\Bundle\UIBundle\Tools\HtmlTagHelper
+    oro_ui.user_agent_provider.class:                      Oro\Bundle\UIBundle\Provider\UserAgentProvider
 
     ## Formatters
     oro_ui.formatter.class:                                Oro\Bundle\UIBundle\Formatter\FormatterManager
@@ -46,6 +48,17 @@ services:
         scope: request
         arguments: [@request, @router, @oro_security.security_facade]
 
+    oro_ui.dynamic_asset_version_manager:
+        class: Oro\Bundle\UIBundle\Asset\DynamicAssetVersionManager
+        arguments:
+            - @oro_ui.dynamic_asset_version.cache
+
+    oro_ui.dynamic_asset_version.cache:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_dynamic_asset_version' ] ]
+
     oro_ui.view.listener:
         class: %oro_ui.view.listener.class%
         arguments:
@@ -56,7 +69,7 @@ services:
     oro_ui.view.content_provider.listener:
         class: %oro_ui.view.content_provider.listener.class%
         arguments:
-            - @oro_ui.content_provider.manager
+            - @service_container
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
 
@@ -89,6 +102,15 @@ services:
         class: %oro_ui.widget_provider.view_actions.class%
         arguments:
             - @oro_ui.label_provider.action_button_group
+            - @event_dispatcher
+            - %oro_ui.widget_provider.view_actions.page_type%
+
+    oro_ui.widget_provider.update_actions:
+        class: %oro_ui.widget_provider.update_actions.class%
+        arguments:
+            - @oro_ui.label_provider.action_button_group
+            - @event_dispatcher
+            - %oro_ui.widget_provider.update_actions.page_type%
 
     oro_ui.content_provider.manager:
         class: %oro_ui.content_provider.manager.class%
@@ -103,6 +125,11 @@ services:
         arguments:
             - @oro_form.provider.html_tag_provider
             - %kernel.cache_dir%
+
+    oro_ui.user_agent_provider:
+        class: %oro_ui.user_agent_provider.class%
+        arguments:
+            - @service_container
 
     ## Formatters
     oro_ui.formatter:

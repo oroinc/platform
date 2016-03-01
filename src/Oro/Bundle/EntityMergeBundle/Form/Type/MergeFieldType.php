@@ -2,12 +2,15 @@
 
 namespace Oro\Bundle\EntityMergeBundle\Form\Type;
 
+use Oro\Bundle\EntityMergeBundle\Data\FieldData;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Translation\Translator;
+use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\OptionsResolver\Options;
 
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
@@ -16,14 +19,14 @@ use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
 class MergeFieldType extends AbstractType
 {
     /**
-     * @var Translator
+     * @var TranslatorInterface
      */
     protected $translator;
 
     /**
-     * @param Translator $translator
+     * @param TranslatorInterface $translator
      */
-    public function __construct(Translator $translator)
+    public function __construct(TranslatorInterface $translator)
     {
         $this->translator = $translator;
     }
@@ -40,10 +43,14 @@ class MergeFieldType extends AbstractType
             'sourceEntity',
             'entity',
             array(
-                'class' => $metadata->getEntityMetadata()->getClassName(),
-                'choices' => $options['entities'],
-                'multiple' => false,
-                'expanded' => true,
+                'class'                   => $metadata->getEntityMetadata()->getClassName(),
+                'data_class'              => $metadata->getEntityMetadata()->getClassName(),
+                'choices'                 => $options['entities'],
+                'multiple'                => false,
+                'expanded'                => true,
+                'choices_as_values'       => true,
+                'ownership_disabled'      => true,
+                'dynamic_fields_disabled' => true,
             )
         );
 
@@ -58,7 +65,7 @@ class MergeFieldType extends AbstractType
                     'multiple' => false,
                     'expanded' => false,
                     'label'    => 'oro.entity_merge.form.strategy',
-                    'tooltip'  => 'oro.entity_merge.form.strategy_tooltip'
+                    'tooltip'  => 'oro.entity_merge.form.strategy.tooltip'
                 )
             );
         } else {
@@ -68,6 +75,14 @@ class MergeFieldType extends AbstractType
                 array('data' => $mergeModes ? MergeModes::REPLACE : current($mergeModes))
             );
         }
+
+        $builder->addEventListener(FormEvents::PRE_SET_DATA, function (FormEvent $event) {
+            /** @var FieldData $fieldData */
+            $fieldData = $event->getData();
+            if (!$fieldData->getSourceEntity()) {
+                $fieldData->setSourceEntity($fieldData->getEntityData()->getMasterEntity());
+            }
+        });
     }
 
     /**

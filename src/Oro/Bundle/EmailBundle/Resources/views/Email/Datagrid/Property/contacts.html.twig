@@ -1,7 +1,9 @@
 {% import 'OroEmailBundle::macros.html.twig' as EA %}
 
-{% set folder = record.getValue('folder') %}
+{% set folders = record.getValue('folders') %}
 {% set thread = record.getValue('email.thread') %}
+{% set isNew = record.getValue('is_new') %}
+
 {% if thread is not null  %}
     {% set recipients = oro_get_email_thread_recipients(thread) %}
 {% else %}
@@ -9,12 +11,12 @@
 {% endif %}
 
 <span class="nowrap">
-{% if folder is not null %}
-    {% if folder.type == 'sent' %}
+{% if folders is not null %}
+    {% if record.getValue('outgoing') %}
         <span class="icon grid">
             <i class="icon-signout"></i>
         </span>
-    {% elseif folder.type == 'inbox' %}
+    {% else %}
         <span class="icon grid">
             <i class="icon-signin"></i>
         </span>
@@ -22,19 +24,40 @@
 {% endif %}
 
 {% if (recipients|length > 0 and recipients|length < 3) %}
-    <strong>{{ EA.email_participants_name(recipients, true, false) }}</strong>
+    {% if isNew == 1 %}
+        <strong>
+    {% endif %}
+        {{ EA.email_participants_name(recipients, true, false) }}
+    {% if isNew == 1 %}
+        </strong>
+    {% endif %}
 {% else %}
-    <strong>
-        {% set firstEmail = recipients[0] %}
-        {% set lastEmail = recipients[recipients|length - 1] %}
-        {{
-            EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
-        }}..{{
-            EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
-        }}
-    </strong>
+        {% if isNew == 1 %}
+            <strong>
+        {% endif %}
+
+        {% if recipients|length > 0 %}
+            {% set firstEmail = recipients|first %}
+            {% set lastEmail = recipients|last %}
+            {{
+                EA.email_participant_name_or_me(firstEmail.emailAddress, firstEmail.name, true, false)
+            }}..{{
+                EA.email_participant_name_or_me(lastEmail.emailAddress, lastEmail.name, true, false)
+            }}
+        {% endif %}
+        {% if isNew == 1 %}
+            </strong>
+        {% endif %}
+
 {% endif %}
 {% if thread is not null and thread.emails|length > 1 %}
-    <strong>({{ thread.emails|length }})</strong>
+    {% if isNew == 1 %}
+        <strong>
+    {% endif %}
+        ({{ thread.emails|length }})
+    {% if isNew == 1 %}
+        </strong>
+    {% endif %}
+
 {% endif %}
 </span>

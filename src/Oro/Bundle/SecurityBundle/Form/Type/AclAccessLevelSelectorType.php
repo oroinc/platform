@@ -12,6 +12,8 @@ use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 
 class AclAccessLevelSelectorType extends AbstractType
 {
+    const NAME = 'oro_acl_access_level_selector';
+
     /**
      * {@inheritdoc}
      */
@@ -25,7 +27,7 @@ class AclAccessLevelSelectorType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_acl_access_level_selector';
+        return self::NAME;
     }
 
     /**
@@ -49,5 +51,7 @@ class AclAccessLevelSelectorType extends AbstractType
             $view->vars['identity'] = $parentData->getIdentity()->getId();
             $view->vars['level_label'] = AccessLevel::getAccessLevelName($form->getData());
         }
+
+        $view->vars['translation_prefix'] = 'oro.security.access-level.';
     }
 }

@@ -18,7 +18,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "acme_test.cache" ] ]
+            - [ setNamespace, [ 'acme_test' ] ]
 ```
 
 Also each of these abstract services can be re-declared in the application configuration file, for example:
@@ -29,3 +29,8 @@ services:
         class:                Oro\Bundle\CacheBundle\Provider\PhpFileCache
         arguments:            [%kernel.cache_dir%/oro_data]
 ```
+
+Caching of Symfony Validation rules
+-----------------------------------
+
+By default, rules for [Symfony Validation Component](http://symfony.com/doc/current/book/validation.html) are cached using `oro.cache.abstract` service. But you can change this to make validation caching suit some custom requirements. To do this you need to redefine `oro_cache.provider.validation` service.

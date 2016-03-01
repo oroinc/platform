@@ -4,18 +4,13 @@ namespace Oro\Bundle\ImportExportBundle\Converter;
 
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\TemplateFixture\TemplateManager;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
 {
-    /**
-     * @var TemplateManager
-     */
+    /** @var TemplateManager */
     protected $templateManager;
 
-    /**
-     * @var FieldHelper
-     */
+    /** @var FieldHelper */
     protected $fieldHelper;
 
     /**
@@ -33,7 +28,7 @@ class TemplateFixtureRelationCalculator implements RelationCalculatorInterface
      */
     public function getMaxRelatedEntities($entityName, $fieldName)
     {
-        $maxFields = 0;
+        $maxFields = 1;
         $fixtures = $this->templateManager->getEntityFixture($entityName)->getData();
         foreach ($fixtures as $fixture) {
             try {

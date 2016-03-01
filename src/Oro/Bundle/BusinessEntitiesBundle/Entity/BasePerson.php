@@ -430,4 +430,12 @@ class BasePerson implements FullNameInterface, EmailHolderInterface
             $this->addresses = clone $this->addresses;
         }
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getLastName() . (string)$this->getFirstName();
+    }
 }

@@ -1,6 +1,5 @@
-/*global define*/
 define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
-    ], function (_, Backbone, AbstractWidget) {
+    ], function(_, Backbone, AbstractWidget) {
     'use strict';
 
     var $ = Backbone.$;
@@ -52,7 +51,7 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
                 this._getTitleContainer().closest(this.options.titleBlock).show();
             }
             this.options.title = title;
-            this._getTitleContainer().html(this.options.title).attr('title', this.options.title);
+            this._getTitleContainer().text(this.options.title).attr('title', this.options.title);
         },
 
         getActionsElement: function() {
@@ -109,15 +108,22 @@ define(['underscore', 'backbone', 'oroui/js/widget/abstract-widget'
 
         _delegateWidgetEvents: function(events) {
             var delegateEventSplitter = /^(\S+)\s*(.*)$/;
-            if (!(events || (events = _.result(this, 'widgetEvents')))) return;
+            if (!(events || (events = _.result(this, 'widgetEvents')))) {
+                return;
+            }
             this._undelegateWidgetEvents();
             for (var key in events) {
                 if (events.hasOwnProperty(key)) {
                     var method = events[key];
-                    if (!_.isFunction(method)) method = this[events[key]];
-                    if (!method) throw new Error('Method "' + events[key] + '" does not exist');
+                    if (!_.isFunction(method)) {
+                        method = this[events[key]];
+                    }
+                    if (!method) {
+                        throw new Error('Method "' + events[key] + '" does not exist');
+                    }
                     var match = key.match(delegateEventSplitter);
-                    var eventName = match[1], selector = match[2];
+                    var eventName = match[1];
+                    var selector = match[2];
                     method = _.bind(method, this);
                     eventName += '.delegateWidgetEvents' + this.cid;
                     if (selector === '') {

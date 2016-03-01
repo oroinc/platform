@@ -4,8 +4,9 @@ oro_entity_config:
             items:
                 available_in_template:
                     options:
+                        value_type:         boolean
                         default_value:      true
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, optionSet, enum, multiEnum, file, image, ref-one, manyToOne]
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, file, image, ref-one, manyToOne]
                     form:
                         type:               choice
                         options:

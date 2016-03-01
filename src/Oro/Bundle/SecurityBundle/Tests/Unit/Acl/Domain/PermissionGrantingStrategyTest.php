@@ -2,24 +2,27 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
-use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\UserSecurityIdentity;
-use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy;
 use Symfony\Component\Security\Acl\Exception\NoAceFoundException;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\PermissionGrantingStrategyContext;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
-use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\OwnershipMetadataProviderStub;
-use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap;
-use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
-use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
-use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
+
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
-use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
+use Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy;
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
+use Oro\Bundle\SecurityBundle\Acl\Permission\MaskBuilder;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionMap;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
+use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\TestEntity;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\Entity\User;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain\Fixtures\PermissionGrantingStrategyContext;
+use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
 use Oro\Bundle\SecurityBundle\Tests\Unit\TestHelper;
 
 class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
@@ -38,10 +41,16 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
      * @var PermissionGrantingStrategy
      */
     private $strategy;
+
     /**
      * @var UserSecurityIdentity
      */
     private $sid;
+
+    /**
+     * @var RoleSecurityIdentity
+     */
+    private $rsid;
 
     /**
      * @var PermissionGrantingStrategyContext
@@ -54,6 +63,11 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
     /** @var OwnershipMetadataProviderStub */
     private $metadataProvider;
 
+    /**
+     * @var ContainerInterface
+     */
+    protected $container;
+
     protected function setUp()
     {
         if (!class_exists('Doctrine\DBAL\DriverManager')) {
@@ -64,6 +78,7 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $this->metadataProvider = new OwnershipMetadataProviderStub($this);
         $objectIdAccessor = new ObjectIdAccessor();
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|OwnerTreeProvider $treeProviderMock */
         $treeProviderMock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
             ->disableOriginalConstructor()
             ->getMock();
@@ -72,17 +87,62 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             ->method('getTree')
             ->will($this->returnValue($this->ownerTree));
 
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $configProvider->expects($this->any())
+            ->method('hasConfig')
+            ->willReturn(false);
+
+        $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $this->container->expects($this->any())
+            ->method('get')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [
+                            'oro_security.ownership_tree_provider.chain',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $treeProviderMock,
+                        ],
+                        [
+                            'oro_security.owner.metadata_provider.chain',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $this->metadataProvider,
+                        ],
+                        [
+                            'oro_security.acl.object_id_accessor',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $objectIdAccessor,
+                        ],
+                        [
+                            'oro_security.owner.entity_owner_accessor',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            new EntityOwnerAccessor($this->metadataProvider),
+                        ],
+                        [
+                            'oro_entity_config.provider.security',
+                            ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                            $configProvider
+                        ],
+                    ]
+                )
+            );
+
         $decisionMaker = new EntityOwnershipDecisionMaker(
             $treeProviderMock,
             $objectIdAccessor,
             new EntityOwnerAccessor($this->metadataProvider),
             $this->metadataProvider
         );
-        $this->strategy = new PermissionGrantingStrategy(
-            $decisionMaker,
-            $this->metadataProvider
+        $decisionMaker->setContainer($this->container);
+
+        $this->strategy = new PermissionGrantingStrategy($decisionMaker, $this->metadataProvider);
+        $this->selector = TestHelper::get($this)->createAclExtensionSelector(
+            $this->metadataProvider,
+            $this->ownerTree,
+            $decisionMaker
         );
-        $this->selector = TestHelper::get($this)->createAclExtensionSelector($this->metadataProvider);
         $this->context = new PermissionGrantingStrategyContext($this->selector);
         $contextLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
@@ -93,7 +153,10 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy->setContext($contextLink);
 
         $user = new User(1);
+        $user->setUsername('TestUser');
         $this->sid = new UserSecurityIdentity('TestUser', get_class($user));
+
+        $this->rsid = new RoleSecurityIdentity('TestRole');
 
         $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
         $token->expects($this->any())
@@ -140,11 +203,11 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
             ->get();
 
         $acl = $this->getAcl(ObjectIdentity::fromDomainObject($obj));
-        $acl->insertClassAce($this->sid, $aceMask);
-        $this->assertTrue($this->strategy->isGranted($acl, $masks, array($this->sid)));
+        $acl->insertClassAce($this->rsid, $aceMask);
+        $this->assertTrue($this->strategy->isGranted($acl, $masks, array($this->rsid)));
 
         $this->metadataProvider->setMetadata(get_class($obj), $this->getOrganizationMetadata());
-        $this->assertFalse($this->strategy->isGranted($acl, $masks, array($this->sid)));
+        $this->assertFalse($this->strategy->isGranted($acl, $masks, array($this->rsid)));
         $this->metadataProvider->setMetadata(get_class($obj), $this->getBusinessUnitMetadata());
         $this->metadataProvider->setMetadata(get_class($obj), $this->getUserMetadata());
     }
@@ -199,11 +262,23 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
 
         $acl->insertClassAce($this->sid, 1, 1, false);
         $acl->insertClassAce($this->sid, 1, 2);
-        $this->assertFalse($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
+        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
 
         $acl->insertObjectAce($this->sid, 1, 0, false);
         $acl->insertObjectAce($anotherSid, 1, 1);
-        $this->assertFalse($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
+        $this->assertTrue($this->strategy->isGranted($acl, array(1), array($this->sid, $anotherSid)));
+
+        // change the order of ACEs should not change result
+        $acl1 = $this->getAcl();
+        $acl1->insertClassAce($anotherSid, 1);
+
+        $acl1->insertClassAce($this->sid, 1, 1);
+        $acl1->insertClassAce($this->sid, 1, 2, false);
+        $this->assertTrue($this->strategy->isGranted($acl1, array(1), array($this->sid, $anotherSid)));
+
+        $acl1->insertObjectAce($anotherSid, 1, 0);
+        $acl1->insertObjectAce($this->sid, 1, 1, false);
+        $this->assertTrue($this->strategy->isGranted($acl1, array(1), array($this->sid, $anotherSid)));
     }
 
     public function testIsGrantedCallsAuditLoggerOnGrant()

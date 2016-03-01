@@ -3,8 +3,8 @@ datagrid:
         options:
             entityHint: transactional email
             entity_pagination: true
+        acl_resource: oro_notification_emailnotification_view
         source:
-            acl_resource: oro_notification_emailnotification_view
             type: orm
             query:
                 select:
@@ -23,6 +23,7 @@ datagrid:
                         - { join: e.recipientList, alias: recipientList }
                         - { join: recipientList.users, alias: recipientUsersList }
                         - { join: recipientList.groups, alias: recipientGroupsList }
+                groupBy: e.id, eventName, eventId, ownerRecipient, emailRecipient, templateName
 
         columns:
             entityName:

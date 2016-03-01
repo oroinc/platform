@@ -1,17 +1,14 @@
-/*jslint browser:true, nomen:true, white:true, eqeq:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'oroui/js/tools',
     'chaplin'
-], function ($, _, tools, Chaplin) {
+], function($, _, tools, Chaplin) {
     'use strict';
 
-    var utils, location, original = {};
-
-    utils = Chaplin.utils;
-    location = window.location;
+    var original = {};
+    var utils = Chaplin.utils;
+    var location = window.location;
     original.viewDispose = Chaplin.View.prototype.dispose;
 
     /**
@@ -22,10 +19,9 @@ define([
      * @returns {string}
      */
     Chaplin.Layout.prototype.adjustTitle = function(subtitle, raw) {
+        var title;
         if (!raw) {
-            var title,
-                _this = this;
-            if (subtitle == null) {
+            if (!subtitle) {
                 subtitle = '';
             }
             title = this.settings.titleTemplate({
@@ -40,7 +36,7 @@ define([
         return title;
     };
 
-    Chaplin.View.prototype.dispose = function () {
+    Chaplin.View.prototype.dispose = function() {
         if (this.disposed) {
             return;
         }
@@ -54,7 +50,8 @@ define([
      * @override
      */
     Chaplin.Router.prototype.route = function(pathDesc, params, options) {
-        var handler, path;
+        var handler;
+        var path;
         if (typeof pathDesc === 'object') {
             path = pathDesc.url;
             if (!params && pathDesc.params) {
@@ -62,7 +59,7 @@ define([
             }
         }
         params = params ? _.isArray(params) ? params.slice() : _.extend({}, params) : {};
-        if (path != null) {
+        if (path !== null && path !== void 0) {
             path = path.replace(this.removeRoot, '');
             handler = this.findHandler(function(handler) {
                 return handler.route.test(path);
@@ -85,7 +82,7 @@ define([
             _.defaults(options, {
                 changeURL: true
             });
-            handler.callback(path != null ? path : params, options);
+            handler.callback(path !== null && path !== void 0 ? path : params, options);
             return true;
         } else {
             throw new Error('Router#route: request was not routed');
@@ -115,8 +112,12 @@ define([
      * @override
      */
     Chaplin.Layout.prototype.registerGlobalRegions = function(instance) {
-        var name, selector, version, _i, _len, _ref;
-        _ref = utils.getAllPropertyVersions(instance, 'regions');
+        var name;
+        var selector;
+        var version;
+        var _i;
+        var _len;
+        var _ref = utils.getAllPropertyVersions(instance, 'regions');
 
         if (instance.hasOwnProperty('regions')) {
             _ref.push(instance.regions);
@@ -125,6 +126,9 @@ define([
         for (_i = 0, _len = _ref.length; _i < _len; _i++) {
             version = _ref[_i];
             for (name in version) {
+                if (!version.hasOwnProperty(name)) {
+                    continue;
+                }
                 selector = version[name];
                 this.registerGlobalRegion(instance, name, selector);
             }
@@ -139,10 +143,17 @@ define([
      *  - process links with redirect options
      * @override
      */
+    // jshint -W071
     Chaplin.Layout.prototype.openLink = _.wrap(Chaplin.Layout.prototype.openLink, function(func, event) {
-        var el, $el, href, options, payload, external, isAnchor, skipRouting, type;
-        el = event.currentTarget;
-        $el = $(el);
+        var href;
+        var options;
+        var payload;
+        var external;
+        var isAnchor;
+        var skipRouting;
+        var type;
+        var el = event.currentTarget;
+        var $el = $(el);
 
         if (event.isDefaultPrevented() || $el.parents('.sf-toolbar').length || tools.isErrorPage()) {
             return;
@@ -162,7 +173,12 @@ define([
         }
 
         payload = {prevented: false, target: el};
-        Chaplin.mediator.publish('openLink:before', payload);
+
+        // jshint -W107
+        // not link to same page and not javascript code link
+        if (href && !Chaplin.mediator.execute('compareUrl', href) && href.substr(0, 11) !== 'javascript:') {
+            Chaplin.mediator.publish('openLink:before', payload);
+        }
 
         if (payload.prevented !== false) {
             event.preventDefault();
@@ -176,12 +192,13 @@ define([
         el = $ ? event.currentTarget : event.delegateTarget;
         isAnchor = el.nodeName === 'A';
         href = el.getAttribute('href') || el.getAttribute('data-href') || null;
-        if (!(href != null) || href === '' || href.charAt(0) === '#') {
+        if (!(href !== null && href !== void 0) || href === '' || href.charAt(0) === '#') {
             return;
         }
         skipRouting = this.settings.skipRouting;
         type = typeof skipRouting;
-        if (type === 'function' && !skipRouting(href, el) || type === 'string' && ($ ? $(el).is(skipRouting) : Backbone.utils.matchesSelector(el, skipRouting))) {
+        if (type === 'function' && !skipRouting(href, el) ||
+                type === 'string' && ($ ? $(el).is(skipRouting) : $.find.matchesSelector(el, skipRouting))) {
             return;
         }
         external = isAnchor && this.isExternalLink(el);
@@ -201,11 +218,28 @@ define([
     });
 
     /**
+     * Since IE removes content form child elements when parent node is emptied
+     * we need re-render item subviews manually
+     * (see https://jsfiddle.net/3hrfhppe/)
+     */
+
+    if (/(MSIE\s|Trident\/|Edge\/)/.test(window.navigator.userAgent)) {
+        Chaplin.CollectionView.prototype.insertView = _.wrap(
+            Chaplin.CollectionView.prototype.insertView, function(func, item, view) {
+                if (view.el.childNodes.length === 0) {
+                    view.render();
+                }
+                return func.apply(this, _.rest(arguments));
+            }
+        );
+    }
+
+    /**
      * In case it's an error page blocks application's navigation and turns on full redirect
      * @override
      */
-    utils.redirectTo = _.wrap(utils.redirectTo, function (func, pathDesc, params, options) {
-        if (typeof pathDesc === 'object' && pathDesc.url != null && tools.isErrorPage()) {
+    utils.redirectTo = _.wrap(utils.redirectTo, function(func, pathDesc, params, options) {
+        if (typeof pathDesc === 'object' && pathDesc.url !== null && pathDesc.url !== void 0 && tools.isErrorPage()) {
             options = params || {};
             options.fullRedirect = true;
             Chaplin.mediator.execute('redirectTo', pathDesc, options);

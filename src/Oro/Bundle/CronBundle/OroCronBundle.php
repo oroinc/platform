@@ -11,6 +11,19 @@ use Oro\Bundle\CronBundle\DependencyInjection\Compiler\JobSerializerMetadataPass
 
 class OroCronBundle extends Bundle
 {
+    public function __construct()
+    {
+        // Change alias for JMSJobQueueBundle class to set custom JobQueueBundle loader
+        // We should create custom JobQueueBundle loader to avoid unnecessary get
+        // all doctrine connections on each request
+        if (!class_exists('JMS\JobQueueBundle\JMSJobQueueBundle', false)) {
+            class_alias(
+                'Oro\Bundle\CronBundle\JobQueue\JMSJobQueueBundle',
+                'JMS\JobQueueBundle\JMSJobQueueBundle'
+            );
+        }
+    }
+
     /**
      * {@inheritdoc}
      */

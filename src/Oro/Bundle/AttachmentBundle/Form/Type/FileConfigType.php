@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\AttachmentBundle\Form\Type;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvents;
@@ -9,7 +10,6 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -19,8 +19,8 @@ class FileConfigType extends AbstractType
 {
     const NAME = 'oro_attachment_file_config';
 
-    /** @var ConfigProvider */
-    protected $extendConfigProvider;
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var Config */
     protected $config;
@@ -30,7 +30,7 @@ class FileConfigType extends AbstractType
      */
     public function __construct(ConfigManager $configManager)
     {
-        $this->extendConfigProvider = $configManager->getProvider('extend');
+        $this->configManager = $configManager;
     }
 
     /**
@@ -41,25 +41,18 @@ class FileConfigType extends AbstractType
         $builder->addEventListener(
             FormEvents::POST_SUBMIT,
             function () use ($options) {
-                /** @var FieldConfigId $configId */
-                $configId = $options['config_id'];
+                /** @var FieldConfigId $fieldConfigId */
+                $fieldConfigId = $options['config_id'];
 
-                $relationKey = ExtendHelper::buildRelationKey(
-                    $configId->getClassName(),
-                    $configId->getFieldName(),
-                    'manyToOne',
-                    'Oro\Bundle\AttachmentBundle\Entity\File'
-                );
-
-                /** @var Config $entityExtendConfig */
-                $entityExtendConfig = $this->extendConfigProvider->getConfig($configId->getClassName());
-                if ($this->isApplicable($entityExtendConfig, $relationKey)) {
-                    if ($entityExtendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
-                        $entityExtendConfig->set('state', ExtendScope::STATE_UPDATE);
-
-                        $this->extendConfigProvider->persist($entityExtendConfig);
-                        $this->extendConfigProvider->flush();
-                    }
+                $entityConfig = $this->configManager
+                    ->getProvider('extend')
+                    ->getConfig($fieldConfigId->getClassName());
+                if ($entityConfig->is('state', ExtendScope::STATE_ACTIVE)
+                    && !$this->hasRelation($entityConfig, $this->getRelationKey($fieldConfigId))
+                ) {
+                    $entityConfig->set('state', ExtendScope::STATE_UPDATE);
+                    $this->configManager->persist($entityConfig);
+                    $this->configManager->flush();
                 }
             }
         );
@@ -87,17 +80,30 @@ class FileConfigType extends AbstractType
     }
 
     /**
-     * @param  Config $entityConfig
-     * @param  string $relationKey
+     * @param FieldConfigId $fieldConfigId
+     *
+     * @return string
+     */
+    protected function getRelationKey(FieldConfigId $fieldConfigId)
+    {
+        return ExtendHelper::buildRelationKey(
+            $fieldConfigId->getClassName(),
+            $fieldConfigId->getFieldName(),
+            'manyToOne',
+            'Oro\Bundle\AttachmentBundle\Entity\File'
+        );
+    }
+
+    /**
+     * @param ConfigInterface $entityConfig
+     * @param string          $relationKey
+     *
      * @return bool
      */
-    protected function isApplicable($entityConfig, $relationKey)
+    protected function hasRelation(ConfigInterface $entityConfig, $relationKey)
     {
-        return
-            $entityConfig->has('relation')
-            && (
-                !isset($entityConfig->get('relation')[$relationKey])
-                || $entityConfig->get('relation')[$relationKey]['assign'] === false
-            );
+        $relations = $entityConfig->get('relation', false, []);
+
+        return isset($relations[$relationKey]);
     }
 }

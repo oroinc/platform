@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\TagBundle\Tests\Unit\Entity;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\UserBundle\Entity\User;

@@ -1,8 +1,7 @@
-/*global require*/
-require([
+define([
     'oroui/js/mediator',
     'oroui/js/app/controllers/base/controller'
-], function (mediator, BaseController) {
+], function(mediator, BaseController) {
     'use strict';
 
     /**
@@ -10,7 +9,7 @@ require([
      */
     BaseController.loadBeforeAction([
         'oroui/js/widget-manager'
-    ], function (manager) {
+    ], function(manager) {
         mediator.setHandler('widgets:getByIdAsync', manager.getWidgetInstance, manager);
         mediator.setHandler('widgets:getByAliasAsync', manager.getWidgetInstanceByAlias, manager);
 

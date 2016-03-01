@@ -61,12 +61,9 @@ oro_entity_config:
                     grid:
                         type:               string
                         label:              oro.entity_extend.entity_config.extend.entity.items.state
-                        filter_type:        choice
                         choices:            {system: '', new: 'New', active: 'Active', updated: 'Requires update', deleted: 'To be deleted'}
                         required:           true
                         sortable:           true
-                        filterable:         false
-                        show_filter:        false
 
                 is_deleted:
                     options:
@@ -120,6 +117,10 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                pk_columns:
+                    options:
+                        auditable:          false
+
         field:
             grid_action:
                 -
@@ -160,30 +161,22 @@ oro_entity_config:
                         priority:           20
                         default_value:      'System'
                         auditable:          false
-                        indexed:            true
                     grid:
                         type:               string
                         label:              oro.entity_extend.entity_config.extend.field.items.owner
-                        filter_type:        string
                         required:           true
                         sortable:           true
-                        filterable:         false
-                        show_filter:        false
 
                 state:
                     options:
                         priority:           25
                         default_value:      'Active'
-                        indexed:            true
                     grid:
                         type:               string
                         label:              oro.entity_extend.entity_config.extend.field.items.state
-                        filter_type:        choice
                         choices:            { new: 'New', applied: 'Applied', updated: 'Requires update', deleted: 'To be deleted'}
                         required:           true
                         sortable:           true
-                        filterable:         false
-                        show_filter:        false
 
                 is_extend:
                     options:
@@ -193,6 +186,7 @@ oro_entity_config:
                 length:
                     options:
                         require_schema_update: true
+                        value_type:         integer
                         default_value:      255
                         allowed_type:       [string]
                         required_property:
@@ -216,6 +210,7 @@ oro_entity_config:
                 precision:
                     options:
                         require_schema_update: true
+                        value_type:         integer
                         default_value:      2
                         allowed_type:       [decimal]
                         required_property:
@@ -238,6 +233,7 @@ oro_entity_config:
                 scale:
                     options:
                         require_schema_update: true
+                        value_type:         integer
                         default_value:      2
                         allowed_type:       [decimal]
                         required_property:
@@ -261,10 +257,10 @@ oro_entity_config:
                     options:
                         default_value:      false
                         auditable:          false
-                        indexed:            true
                     grid:
                         type:               boolean
                         label:              oro.entity_extend.entity_config.extend.field.items.is_deleted
+                        sortable:           true
                         renderable:         false
                         query:
                             operator:       '!='
@@ -347,39 +343,6 @@ oro_entity_config:
                 cascade: # array of strings
                     options:
                         auditable:          false
-
-                # OptionSet form type fields
-                # @deprecated since 1.4, will be removed in 2.0
-                set_expanded:
-                    options:
-                        allowed_type:       [optionSet]
-                        create_only:        true
-                    form:
-                        type:               choice
-                        options:
-                            required:       false
-                            choices:        ['No', 'Yes']
-                            empty_value:    false
-                            label:          oro.entity_extend.entity_config.extend.field.items.set_expanded
-                            attr:
-                                class:      is-option-set-expanded
-                            block:          general
-                            subblock:       properties
-
-                # @deprecated since 1.4, will be removed in 2.0
-                set_options:
-                    options:
-                        allowed_type:       [optionSet]
-                        auditable:          false
-                    form:
-                        type:               oro_entity_option_set_collection
-                        options:
-                            required:       false
-                            label:          oro.entity_extend.entity_config.extend.field.items.set_options
-                            block:          general
-                            subblock:       properties
-                            type:           oro_entity_option_set
-                            tooltip:        oro.entity_extend.field.option_set.option.tooltip
 
     enum:
         entity:
@@ -473,6 +436,7 @@ oro_entity_config:
                 # is used to store enum values
                 enum_options: # array
                     options:
+                        value_type:         enum
                         allowed_type:       [enum, multiEnum]
                         auditable:          false
                     form:
@@ -489,6 +453,12 @@ oro_entity_config:
             items:
                 # Indicates what custom entity can be searchable
                 searchable:
+                    options:
+                        required_property:
+                            config_id:
+                                scope:      extend
+                            code:           owner
+                            value:          Custom
                     form:
                         type:               choice
                         options:
@@ -496,11 +466,13 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
+                            tooltip:        oro.entity_extend.entity_config.search.entity.items.searchable.tooltip
         field:
             items:
                 # Indicates what custom field could be searchable
                 searchable:
                     options:
+                        value_type:         boolean
                         allowed_type:       [string, text, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum, manyToOne, manyToMany, ref-many, oneToMany]
                         required_property:
                             config_id:
@@ -514,9 +486,11 @@ oro_entity_config:
                             empty_value:    false
                             block:          other
                             label:          oro.entity_extend.entity_config.search.field.items.searchable
+                            tooltip:        oro.entity_extend.entity_config.search.field.items.searchable.tooltip
                 # Indicates what custom text field is a part of search result title
                 title_field:
                     options:
+                        value_type:         boolean
                         allowed_type:       [string]
                         required_property:
                             config_id:

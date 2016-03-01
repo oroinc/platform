@@ -1,8 +1,7 @@
-/*global define*/
 define([
     'chaplin',
     './model'
-], function (Chaplin, BaseModel) {
+], function(Chaplin, BaseModel) {
     'use strict';
 
     var BaseCollection;
@@ -13,7 +12,7 @@ define([
         /**
          * Returns additional parameters to be merged into serialized object
          */
-        serializeExtraData: function () {
+        serializeExtraData: function() {
             return {};
         }
     });

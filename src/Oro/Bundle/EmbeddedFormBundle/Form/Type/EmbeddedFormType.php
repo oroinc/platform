@@ -28,7 +28,7 @@ class EmbeddedFormType extends AbstractType
                 'textarea',
                 [
                     'label'   => 'oro.embeddedform.css.label',
-                    'tooltip' => 'oro.embeddedform.css.tooltip'
+                    'tooltip' => 'oro.embeddedform.css.description'
                 ]
             )
             ->add(
@@ -36,7 +36,7 @@ class EmbeddedFormType extends AbstractType
                 'textarea',
                 [
                     'label'   => 'oro.embeddedform.success_message.label',
-                    'tooltip' => 'oro.embeddedform.success_message.tooltip'
+                    'tooltip' => 'oro.embeddedform.success_message.description'
                 ]
             );
     }

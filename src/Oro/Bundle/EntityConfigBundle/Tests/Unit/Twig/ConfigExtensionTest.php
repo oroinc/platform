@@ -20,11 +20,15 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+        $this->configManager   = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $router                = $this->getMock('Symfony\Component\Routing\RouterInterface');
+        $entityClassNameHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->twigExtension = new ConfigExtension($this->configManager);
+        $this->twigExtension = new ConfigExtension($this->configManager, $router, $entityClassNameHelper);
     }
 
     protected function tearDown()
@@ -36,7 +40,7 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->twigExtension->getFunctions();
-        $this->assertCount(6, $functions);
+        $this->assertCount(7, $functions);
 
         /** @var \Twig_SimpleFunction $function */
         $function = $functions[0];
@@ -73,6 +77,12 @@ class ConfigExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('\Twig_SimpleFunction', $function);
         $this->assertEquals('oro_entity_metadata_value', $function->getName());
         $this->assertEquals(array($this->twigExtension, 'getClassMetadataValue'), $function->getCallable());
+
+        /** @var \Twig_SimpleFunction $function */
+        $function = $functions[6];
+        $this->assertInstanceOf('\Twig_SimpleFunction', $function);
+        $this->assertEquals('oro_entity_view_link', $function->getName());
+        $this->assertEquals(array($this->twigExtension, 'getViewLink'), $function->getCallable());
     }
 
     public function testGetName()

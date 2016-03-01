@@ -26,9 +26,13 @@
     </div>
 {% endmacro %}
 
-{% macro tooltip(tooltip, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
+{% macro tooltip(tooltip_raw, tooltip_parameters, tooltip_placement, details_enabled, details_link, details_anchor) %}
     {% set tooltip_parameters = tooltip_parameters|default({}) %}
-    {% set tooltip = tooltip|trans(tooltip_parameters, "tooltips") %}
+    {# deprecated tooltips domain since 1.9:1:11 for tooltips use instead 'messages' translation domain #}
+    {% set tooltip = tooltip_raw|trans(tooltip_parameters, "messages") %}
+    {% if (tooltip == tooltip_raw) %}
+        {% set tooltip = tooltip_raw|trans(tooltip_parameters, "tooltips") %}
+    {% endif %}
     {% if tooltip is not empty %}
         {% set details_anchor = details_anchor|default(null) %}
         {% set details_link = details_link|default(null) %}
@@ -119,7 +123,7 @@
         data  - property data
 #}
 {% macro renderHtmlProperty(title, data) %}
-    {{ _self.renderAttribute(title, '<div class="control-label html-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -133,7 +137,7 @@
         {% set data = data|striptags('<a>')|raw|nl2br %}
     {% endif %}
 
-    {{ _self.renderAttribute(title, '<div class="control-label html-content">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
+    {{ _self.renderAttribute(title, '<div class="control-label html-property">' ~ data|default('oro.ui.empty'|trans) ~ '</div>') }}
 {% endmacro %}
 
 {#
@@ -492,7 +496,9 @@
         {% if (parameters.dataId is defined) %}
         data-id="{{ parameters.dataId }}"
         {% endif %}
-        {% if (parameters.dataUrl is defined) %}
+        {% if (parameters.dataUrlRaw is defined) %}
+        data-url="{{ parameters.dataUrlRaw|raw }}"
+        {% elseif (parameters.dataUrl is defined) %}
         data-url="{{ parameters.dataUrl }}"
         {% endif %}
         {% if (parameters.successMessage is defined) %}
@@ -513,6 +519,9 @@
                 }) %}
             {% endif %}
             {{ _self.renderWidgetAttributes(options) }}
+        {% endif %}
+        {% if parameters.pageComponent is defined %}
+            {{ _self.renderPageComponentAttributes(parameters.pageComponent) }}
         {% endif %}
         {% if parameters.dataAttributes is defined and parameters.dataAttributes|length %}
             {{ _self.renderAttributes(parameters.dataAttributes) }}
@@ -539,6 +548,9 @@
     {% if pageComponent.options is defined %}
         data-page-component-options="{{ pageComponent.options|json_encode }}"
     {% endif %}
+    {% if pageComponent.name is defined %}
+        data-page-component-name="{{ pageComponent.name }}"
+    {% endif %}
     {% if pageComponent.layout is defined %}
         data-layout="{{ pageComponent.layout }}"
     {% endif %}
@@ -550,10 +562,14 @@
     Parameters: options array for widget
 #}
 {% macro renderWidgetAttributes(options) %}
-    {{ _self.renderPageComponentAttributes({
+    {% set pageComponent = {
         module:  "oroui/js/app/components/widget-component",
         options: options
-    }) }}
+    }  %}
+    {% if options.options.pageComponentName is defined %}
+        {% set pageComponent = pageComponent|merge({name: options.options.pageComponentName}) %}
+    {% endif %}
+    {{ _self.renderPageComponentAttributes(pageComponent) }}
 {% endmacro %}
 {#
     @deprecated
@@ -631,7 +647,12 @@
 {% macro buttonType(parameters) %}
     <div class="btn-group">
         <button type="{{ parameters.type }}" class="btn {% if (parameters.class is defined) %}{{ parameters.class }}{% endif %}{% if (parameters.action is defined) %} action-button{% endif %}"
-                {% if (parameters.action is defined) %}data-action="{{ parameters.action }}"{% endif %}>
+                {% if (parameters.action is defined) %}data-action="{{ parameters.action }}"{% endif %}
+                {% if parameters.data is defined %}
+                    {% for dataItemName,dataItemValue in parameters.data %}
+                        data-{{ dataItemName }}="{{ dataItemValue|e('html_attr')|raw }}"
+                    {% endfor %}
+                {% endif %}>
             {{ parameters.label }}
         </button>
     </div>
@@ -842,32 +863,41 @@
         entity - entity record
         renderLabel - need render default label
 #}
-{% macro entityOwnerLink(entity, renderLabel = true) %}
-    {%- if entity.owner is defined and entity.owner %}
-        {% if resource_granted('VIEW', entity.owner)  %}
+{%- macro entityOwnerLink(entity, renderLabel = true) -%}
+    {% spaceless %}
+        {%- if entity %}
             {% set ownerType = oro_get_owner_type(entity) %}
-            {% if (ownerType == 'USER') %}
-                {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
-                {% set ownerName = entity.owner|oro_format_name %}
-            {% elseif (ownerType == 'BUSINESS_UNIT') %}
-                {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
-                {% set ownerName = entity.owner.name %}
-            {% elseif (ownerType == 'ORGANIZATION') %}
-                {% set ownerName = entity.owner.name %}
-            {% endif %}
-            {% if ownerName is defined %}
-                {% if renderLabel %}
-                    {{ oro_field_config_value(oro_class_name(entity), 'owner', 'label')|trans }}:
+            {%- if ownerType %}
+                {% set owner = oro_get_entity_owner(entity) %}
+                {% if owner %}
+                    {% if (ownerType == 'USER') %}
+                        {% set ownerPath = path('oro_user_view', {'id': owner.id}) %}
+                        {% set ownerName = owner|oro_format_name %}
+                    {% elseif (ownerType == 'BUSINESS_UNIT') %}
+                        {% set ownerPath = path('oro_business_unit_view', {'id': owner.id}) %}
+                        {% set ownerName = owner.name %}
+                    {% endif %}
+                    {% if ownerName is defined %}
+                        {% if renderLabel %}
+                            {% set entityClassName = oro_class_name(entity) %}
+                            {{ oro_field_config_value(
+                                    entityClassName,
+                                    oro_entity_config_value(entityClassName, 'owner_field_name', 'ownership'),
+                                    'label'
+                                )|trans
+                            }}:
+                        {% endif %}
+                        {% if ownerPath is defined and resource_granted('VIEW', entity.owner) %}
+                            {{ _self.renderUrl(ownerPath, ownerName) }}
+                        {% else %}
+                            {{ ownerName }}
+                        {% endif %}
+                    {% endif %}
                 {% endif %}
-                {% if ownerPath is defined %}
-                    <a href="{{ ownerPath }}">{{ ownerName }}</a>
-                {% else %}
-                    {{ ownerName }}
-                {% endif %}
-            {% endif %}
-        {% endif %}
-    {% endif -%}
-{% endmacro %}
+            {% endif -%}
+        {% endif -%}
+    {% endspaceless %}
+{%- endmacro -%}
 
 {%- macro renderUrl(url, title, class) -%}
     {% spaceless %}
@@ -878,7 +908,8 @@
             {% set class = '' %}
         {% endif %}
         {% if url is not empty %}
-            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}">{{ title }}</a>
+            <a href="{{ url|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="{{ class }}"
+                    {% if (not oro_is_url_local(url)) %} target="_blank"{% endif %}>{{ title }}</a>
         {% endif %}
     {% endspaceless %}
 {%- endmacro -%}
@@ -888,9 +919,30 @@
         {% set title = phone %}
     {% endif %}
     {% if phone is not empty %}
-        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}">{{ title }}</a>
+        <a href="tel:{{ phone|escape('html_attr') }}" title="{{ title|escape('html_attr') }}" class="phone">{{ title }}</a>
     {% endif %}
 {%- endmacro -%}
+
+{#
+    Render phone number with related actions block
+    Parameters:
+        phone - PhoneInterface object or string
+        entity - related entity record
+#}
+{% macro renderPhoneWithActions(phone, entity) -%}
+    {% if phone is not empty %}
+        {%- set actions %}
+            {%- placeholder phone_actions with {phone: phone, entity: entity} -%}
+        {% endset -%}
+        {% set actions = actions|trim %}
+        <span class="inline-actions-element{% if actions is empty %} inline-actions-element_no-actions{% endif %}">
+            <span class="inline-actions-element_wrapper">{{ _self.renderPhone(phone) }}</span>
+            {% if actions is not empty -%}
+                <span class="inline-actions-element_actions phone-actions">{{ actions|raw }}</span>
+            {%- endif %}
+        </span>
+    {% endif %}
+{%- endmacro %}
 
 {% macro getApplicableForUnderscore(str) %}
     {{ str|replace({
@@ -903,8 +955,26 @@
 
 {%- macro renderList(elements) -%}
     <ul class="extra-list">
-        {% for element in elements %}
+        {%- for element in elements %}
             <li class="extra-list-element">{{ element }}</li>
-        {% endfor %}
+        {% endfor -%}
     </ul>
 {% endmacro %}
+
+{%- macro entityViewLink(entity, label, route, permission) -%}
+    {% if entity %}
+        {% if route and resource_granted(permission|default('VIEW'), entity) %}
+            {{ _self.renderUrl(path(route, {'id': entity.id}), label) }}
+        {% else %}
+            {{ label|escape }}
+        {% endif %}
+    {% endif %}
+{%- endmacro -%}
+
+{%- macro entityViewLinks(entities, labelProperty, route, permission) -%}
+    {% set links = [] %}
+    {% for entity in entities %}
+        {% set links = links|merge([_self.entityViewLink(entity, attribute(entity, labelProperty), route, permission)]) %}
+    {% endfor %}
+    {{ _self.renderList(links) }}
+{%- endmacro -%}

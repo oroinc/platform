@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
     './empty-filter'
-], function ($, _, __, EmptyFilter) {
+], function($, _, __, EmptyFilter) {
     'use strict';
 
     var TextFilter;
@@ -51,13 +49,6 @@ define([
         criteriaSelector: '.filter-criteria',
 
         /**
-         * Element enclosing a criteria dropdown
-         *
-         * @property {string|jQuery|HTMLElement}
-         */
-        limitCriteriaTo: '#container:visible, body',
-
-        /**
          * Selectors for filter criteria elements
          *
          * @property {Object}
@@ -80,8 +71,7 @@ define([
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter',
-            'click .reset-filter': '_onClickResetFilter'
+            'click .disable-filter': '_onClickDisableFilter'
         },
 
         /**
@@ -89,7 +79,7 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
                 this.emptyValue = {
@@ -103,7 +93,7 @@ define([
         /**
          * Makes sure the criteria popup dialog is closed
          */
-        ensurePopupCriteriaClosed: function () {
+        ensurePopupCriteriaClosed: function() {
             if (this.popupCriteriaShowed) {
                 this._hideCriteria();
                 this.applyValue();
@@ -116,7 +106,7 @@ define([
          * @param {Event} e
          * @protected
          */
-        _onReadCriteriaInputKey: function (e) {
+        _onReadCriteriaInputKey: function(e) {
             if (e.which === 13) {
                 this._hideCriteria();
                 this.applyValue();
@@ -129,7 +119,7 @@ define([
          * @param {Event} e
          * @private
          */
-        _onClickUpdateCriteria: function (e) {
+        _onClickUpdateCriteria: function(e) {
             this.trigger('updateCriteriaClick', this);
             this._hideCriteria();
             this.applyValue();
@@ -140,7 +130,7 @@ define([
          *
          * @private
          */
-        _onClickCloseCriteria: function () {
+        _onClickCloseCriteria: function() {
             this._hideCriteria();
             this._updateDOMValue();
         },
@@ -150,7 +140,7 @@ define([
          *
          * @param {Event} e
          */
-        _onClickDisableFilter: function (e) {
+        _onClickDisableFilter: function(e) {
             e.preventDefault();
             this.disable();
         },
@@ -161,7 +151,7 @@ define([
          * @param {Event} e
          * @protected
          */
-        _onClickOutsideCriteria: function (e) {
+        _onClickOutsideCriteria: function(e) {
             var elem = this.$(this.criteriaSelector);
 
             if (elem.get(0) !== e.target && !elem.has(e.target).length) {
@@ -175,7 +165,7 @@ define([
          *
          * @return {*}
          */
-        render: function () {
+        render: function() {
             var $filter = $(this.template());
             this._wrap($filter);
             return this;
@@ -187,7 +177,7 @@ define([
          * @param {Element|jQuery|string}  $filter
          * @private
          */
-        _wrap: function ($filter) {
+        _wrap: function($filter) {
             this._appendFilter($filter);
         },
 
@@ -197,7 +187,7 @@ define([
          * @param {Element|jQuery|string} $filter
          * @private
          */
-        _appendFilter: function ($filter) {
+        _appendFilter: function($filter) {
             this.$el.append($filter);
         },
 
@@ -206,12 +196,12 @@ define([
          *
          * @protected
          */
-        _showCriteria: function () {
+        _showCriteria: function() {
             this.$(this.criteriaSelector).show();
             this._alignCriteria();
             this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
-            setTimeout(_.bind(function () {
+            setTimeout(_.bind(function() {
                 this.popupCriteriaShowed = true;
             }, this), 100);
         },
@@ -221,12 +211,22 @@ define([
          *
          * @private
          */
-        _alignCriteria: function () {
-            var $container = $(this.limitCriteriaTo),
-                $criteria = this.$(this.criteriaSelector),
-                shift = $container.prop('clientWidth') + $container.offset().left -
-                    this.$el.offset().left - $criteria.outerWidth();
-            $criteria.css('margin-left', shift < 0 ? shift : 0);
+        _alignCriteria: function() {
+            var $container = this._findDropdownFitContainer();
+            if ($container === null) {
+                return;
+            }
+            var $dropdown = this.$(this.criteriaSelector);
+            var rect = $dropdown.get(0).getBoundingClientRect();
+            var containerRect = $container.get(0).getBoundingClientRect();
+            var shift = rect.right - (containerRect.left + $container.prop('clientWidth'));
+            if (shift > 0) {
+                /**
+                 * reduce shift to avoid overlaping left edge of container
+                 */
+                shift -= Math.max(0, containerRect.left - (rect.left - shift));
+                $dropdown.css('margin-left', -shift);
+            }
         },
 
         /**
@@ -234,10 +234,10 @@ define([
          *
          * @protected
          */
-        _hideCriteria: function () {
+        _hideCriteria: function() {
             this.$(this.criteriaSelector).hide();
             this._setButtonPressed(this.$(this.criteriaSelector), false);
-            setTimeout(_.bind(function () {
+            setTimeout(_.bind(function() {
                 if (!this.disposed) {
                     this.popupCriteriaShowed = false;
                 }
@@ -249,14 +249,14 @@ define([
          *
          * @protected
          */
-        _focusCriteria: function () {
+        _focusCriteria: function() {
             this.$(this.criteriaSelector + ' input').focus().select();
         },
 
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function (value) {
+        _writeDOMValue: function(value) {
             this._setInputValue(this.criteriaValueSelectors.value, value.value);
             return this;
         },
@@ -264,32 +264,10 @@ define([
         /**
          * @inheritDoc
          */
-        _readDOMValue: function () {
+        _readDOMValue: function() {
             return {
                 value: this._getInputValue(this.criteriaValueSelectors.value)
             };
-        },
-
-        /**
-         * @inheritDoc
-         */
-        _onValueUpdated: function (newValue, oldValue) {
-            TextFilter.__super__._onValueUpdated.apply(this, arguments);
-            this._updateCriteriaHint();
-        },
-
-        /**
-         * Updates criteria hint element with actual criteria hint value
-         *
-         * @protected
-         * @return {*}
-         */
-        _updateCriteriaHint: function () {
-            this.$(this.criteriaHintSelector)
-                .html(_.escape(this._getCriteriaHint()))
-                .closest('.filter-criteria-selector')
-                .toggleClass('filter-default-value', this.isEmptyValue());
-            return this;
         },
 
         /**
@@ -298,7 +276,7 @@ define([
          * @return {String}
          * @protected
          */
-        _getCriteriaHint: function () {
+        _getCriteriaHint: function() {
             var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
 
             if (!value.value) {

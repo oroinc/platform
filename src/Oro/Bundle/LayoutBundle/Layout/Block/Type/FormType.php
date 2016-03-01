@@ -11,6 +11,7 @@ use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockBuilderInterface;
 
+use Oro\Bundle\LayoutBundle\Layout\Form\ConfigurableFormAccessorInterface;
 use Oro\Bundle\LayoutBundle\Layout\Form\FormLayoutBuilderInterface;
 
 /**
@@ -58,37 +59,29 @@ class FormType extends AbstractFormType
                 //   ]
                 // ]
                 'groups'            => [],
-                'form_prefix'       => null,
-                'form_field_prefix' => null,
-                'form_group_prefix' => null
+                'form_prefix'       => function (Options $options, $value) {
+                    return null === $value ? $options['form_name'] : $value;
+                },
+                'form_field_prefix' => function (Options $options, $value) {
+                    return null === $value ? $options['form_prefix'] . '_' : $value;
+                },
+                'form_group_prefix' => function (Options $options, $value) {
+                    return null === $value ? $options['form_prefix'] . ':group_' : $value;
+                },
+                'split_to_fields'   => false
             ]
         );
+        $resolver
+            ->setOptional(['form_data']);
+
         $resolver->setAllowedTypes(
             [
                 'preferred_fields'  => 'array',
                 'groups'            => 'array',
                 'form_prefix'       => 'string',
                 'form_field_prefix' => 'string',
-                'form_group_prefix' => 'string'
-            ]
-        );
-        $resolver->setNormalizers(
-            [
-                'form_prefix'       => function (Options $options, $value) {
-                    return $value === null
-                        ? $options['form_name']
-                        : $value;
-                },
-                'form_field_prefix' => function (Options $options, $value) {
-                    return $value === null
-                        ? $options['form_prefix'] . '_'
-                        : $value;
-                },
-                'form_group_prefix' => function (Options $options, $value) {
-                    return $value === null
-                        ? $options['form_prefix'] . ':group_'
-                        : $value;
-                }
+                'form_group_prefix' => 'string',
+                'split_to_fields'   => 'bool',
             ]
         );
     }
@@ -99,8 +92,9 @@ class FormType extends AbstractFormType
     public function buildBlock(BlockBuilderInterface $builder, array $options)
     {
         $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
-
-        $this->formLayoutBuilder->build($formAccessor, $builder, $options);
+        if ($options['split_to_fields']) {
+            $this->formLayoutBuilder->build($formAccessor, $builder, $options);
+        }
     }
 
     /**
@@ -108,9 +102,20 @@ class FormType extends AbstractFormType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        $view->vars['form_data'] = isset($options['form_data']) ? $options['form_data'] : null;
 
-        $view->vars['form'] = $formAccessor->getView();
+        $formAccessor = $this->getFormAccessor($block->getContext(), $options);
+        if ($formAccessor instanceof ConfigurableFormAccessorInterface) {
+            $formAccessor->setFormData($view->vars['form_data']);
+        }
+        $formView = $formAccessor->getView();
+        if (!isset($view->vars['class_prefix'])) {
+            $view->vars['class_prefix'] = $block->getId();
+        }
+        $this->setClassPrefixToFormView($formView, $view->vars['class_prefix']);
+        $view->vars['form'] = $formView;
+
+        $view->vars['split_to_fields'] = $options['split_to_fields'];
     }
 
     /**
@@ -118,23 +123,20 @@ class FormType extends AbstractFormType
      */
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
+        if (!$options['split_to_fields']) {
+            return;
+        }
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
         // prevent form fields rendering by form_rest() method,
         // if the corresponding layout block has been removed
-        $rootView = null;
         foreach ($formAccessor->getProcessedFields() as $formFieldPath => $blockId) {
             if (isset($view[$blockId])) {
                 $this->checkExistingFieldView($view, $view[$blockId], $formFieldPath);
                 continue;
             }
-            if ($rootView === null) {
-                $rootView = $view->parent !== null
-                    ? $this->getRootView($view)
-                    : false;
-            }
-            if ($rootView !== false && isset($rootView[$blockId])) {
-                $this->checkExistingFieldView($view, $rootView[$blockId], $formFieldPath);
+            if (isset($view->blocks[$blockId])) {
+                $this->checkExistingFieldView($view, $view->blocks[$blockId], $formFieldPath);
                 continue;
             }
 
@@ -156,21 +158,6 @@ class FormType extends AbstractFormType
     public function getParent()
     {
         return ContainerType::NAME;
-    }
-
-    /**
-     * @param BlockView $view
-     *
-     * @return BlockView
-     */
-    protected function getRootView(BlockView $view)
-    {
-        $result = $view;
-        while ($result->parent) {
-            $result = $result->parent;
-        }
-
-        return $result;
     }
 
     /**
@@ -209,6 +196,23 @@ class FormType extends AbstractFormType
             if ($childView->vars['form'] !== $formFieldView) {
                 $formFieldView->setRendered();
             }
+        }
+    }
+
+    /**
+     * Sets class_prefix to FormView and it's childs recursively
+     *
+     * @param FormView $formView
+     * @param string   $classPrefix
+     */
+    protected function setClassPrefixToFormView(FormView $formView, $classPrefix)
+    {
+        $formView->vars['class_prefix'] = $classPrefix;
+        if (empty($formView->children)) {
+            return;
+        }
+        foreach ($formView->children as $child) {
+            $this->setClassPrefixToFormView($child, $classPrefix);
         }
     }
 }

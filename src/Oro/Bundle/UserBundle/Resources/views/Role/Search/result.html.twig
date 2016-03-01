@@ -1,0 +1,16 @@
+{#
+    Available variables:
+    * entity       - user entity Oro\Bundle\TagBundle\Entity\Role
+    * indexer_item - indexer item Oro\Bundle\SearchBundle\Query\Result\Item
+#}
+{% extends 'OroSearchBundle:Search:searchResultItem.html.twig' %}
+
+{% set showImage = false %}
+
+{% if entity %}
+    {% set recordUrl = indexer_item.recordUrl %}
+{% endif %}
+
+{% set title = entity.label|default('N/A') %}
+{% set entityType = oro_entity_config_value(indexer_item.entityName, 'label')|trans %}
+

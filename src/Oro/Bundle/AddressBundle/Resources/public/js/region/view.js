@@ -1,6 +1,9 @@
-/* global define */
-define(['underscore', 'backbone', 'jquery.select2'],
-function(_, Backbone) {
+define([
+        'underscore',
+        'backbone',
+        'jquery.select2',
+        'jquery.validate'
+], function(_, Backbone) {
     'use strict';
 
     var $ = Backbone.$;
@@ -29,6 +32,7 @@ function(_, Backbone) {
             this.$simpleEl.attr('type', 'text');
 
             this.showSelect = options.showSelect;
+            this.regionRequired = options.regionRequired;
 
             this.template = _.template($('#region-chooser-template').html());
 
@@ -47,11 +51,16 @@ function(_, Backbone) {
          */
         displaySelect2: function(display) {
             if (display) {
-                this.addRequiredFlag(this.$simpleEl);
+                if (this.regionRequired) {
+                    this.addRequiredFlag(this.$simpleEl);
+                }
                 this.target.select2('container').show();
             } else {
                 this.target.select2('container').hide();
-                this.removeRequiredFlag(this.$simpleEl);
+                if (this.regionRequired) {
+                    this.removeRequiredFlag(this.$simpleEl);
+                }
+                this.target.validate().hideElementErrors(this.target);
             }
         },
 
@@ -60,7 +69,7 @@ function(_, Backbone) {
             if (!label.hasClass('required')) {
                 label
                     .addClass('required')
-                    .append('<em>*</em>');
+                    .find('em').html('*');
             }
         },
 
@@ -69,7 +78,7 @@ function(_, Backbone) {
             if (label.hasClass('required')) {
                 label
                     .removeClass('required')
-                    .find('em').remove();
+                    .find('em').html('&nbsp;');
             }
         },
 
@@ -81,7 +90,7 @@ function(_, Backbone) {
          * Trigger change event
          */
         sync: function() {
-            if (this.target.val() == '' && this.$el.val() != '') {
+            if (this.target.val() === '' && this.$el.val() !== '') {
                 this.$el.trigger('change');
             }
         },
@@ -92,7 +101,8 @@ function(_, Backbone) {
          * @param e {Object}
          */
         selectionChanged: function(e) {
-            if($(e.currentTarget).val()){
+            this.$el.trigger('value:changing');
+            if ($(e.currentTarget).val()) {
                 var countryId = $(e.currentTarget).val();
                 this.collection.setCountryId(countryId);
                 this.collection.fetch({reset: true});
@@ -107,9 +117,9 @@ function(_, Backbone) {
                 this.displaySelect2(true);
                 this.uniform.show();
 
-                this.target.val('').trigger('change');
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
+                this.target.val(this.target.data('selected-data') || '').trigger('change');
 
                 this.$simpleEl.hide();
                 this.$simpleEl.val('');
@@ -120,6 +130,7 @@ function(_, Backbone) {
                 this.uniform.hide();
                 this.$simpleEl.show();
             }
+            this.$el.trigger('value:changed');
         }
     });
 });

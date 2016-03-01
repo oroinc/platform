@@ -1,12 +1,12 @@
 datagrid:
     business-unit-grid:
+        extended_entity_name: %oro_organization.business_unit.entity.class%
         options:
             entityHint: business unit
-            skip_acl_check: true
             entity_pagination: true
         source:
-            acl_resource: oro_business_unit_view
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - u.id
@@ -16,7 +16,7 @@ datagrid:
                     - u.createdAt
                     - owner.name as ownerName
                 from:
-                    - { table: OroOrganizationBundle:BusinessUnit, alias: u }
+                    - { table: %oro_organization.business_unit.entity.class%, alias: u }
                 join:
                     left:
                         owner:
@@ -116,8 +116,8 @@ datagrid:
 
     bu-update-users-grid:
         extends: user-relation-grid
+        acl_resource: oro_business_unit_update
         source:
-            acl_resource: oro_business_unit_update
             query:
                 select:
                     - >
@@ -129,7 +129,9 @@ datagrid:
                         THEN true ELSE false END
                       END) as hasCurrentBusinessUnit
             bind_parameters:
-                - business_unit_id
+                -
+                    name: business_unit_id
+                    default: null
         columns:
             hasCurrentBusinessUnit:
                 label: oro.business_unit.datagrid.has_business_unit
@@ -139,10 +141,16 @@ datagrid:
                 label: oro.user.first_name.label
             lastName:
                 label: oro.user.last_name.label
-            username:
-                label: oro.user.username.label
             email:
                 label: oro.user.email.label
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
         filters:
             columns:
                 hasCurrentBusinessUnit:
@@ -154,12 +162,20 @@ datagrid:
                 lastName:
                     type: string
                     data_name: u.lastName
-                username:
-                    type: string
-                    data_name: u.username
                 email:
                     type: string
                     data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                'false': Inactive
+                                'true':  Active
         sorters:
             columns:
                 hasCurrentBusinessUnit:
@@ -181,8 +197,8 @@ datagrid:
         extends: user-relation-grid
         options:
             entityHint: user
+        acl_resource: oro_business_unit_view
         source:
-            acl_resource: oro_business_unit_view
             query:
                 where:
                     and:
@@ -194,10 +210,16 @@ datagrid:
                 label: oro.user.first_name.label
             lastName:
                 label: oro.user.last_name.label
-            username:
-                label: oro.user.username.label
             email:
                 label: oro.user.email.label
+            username:
+                label: oro.user.username.label
+            enabled:
+                label: oro.user.enabled.label
+                frontend_type: select
+                choices:
+                   - Inactive
+                   - Active
         sorters:
             default:
                 lastName: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_ASC
@@ -210,9 +232,17 @@ datagrid:
                 lastName:
                     type: string
                     data_name: u.lastName
-                username:
-                    type: string
-                    data_name: u.username
                 email:
                     type: string
                     data_name: u.email
+                username:
+                    type: string
+                    data_name: u.username
+                enabled:
+                    type: choice
+                    data_name: u.enabled
+                    options:
+                        field_options:
+                            choices:
+                                'false': Inactive
+                                'true':  Active

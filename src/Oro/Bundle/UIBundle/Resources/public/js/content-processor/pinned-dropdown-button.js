@@ -1,6 +1,4 @@
-/*jslint nomen:true*/
-/*global define */
-define(['./dropdown-button', 'oroui/js/persistent-storage'], function ($, persistentStorage) {
+define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persistentStorage) {
     'use strict';
 
     $.widget('oroui.pinnedDropdownButtonProcessor', $.oroui.dropdownButtonProcessor, {
@@ -12,7 +10,7 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function ($, persis
 
         keyPreffix: 'pinned-dropdown-button-processor-',
 
-        _create: function () {
+        _create: function() {
             this._super();
             this._on({
                 'click [data-button-index]': this._onButtonClick
@@ -25,9 +23,9 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function ($, persis
          * @returns {*}
          * @private
          */
-        _collectButtons: function () {
+        _collectButtons: function() {
             var $buttons = this._super();
-            $buttons.filter(':not(.divider)').each(function (i) {
+            $buttons.filter(':not(.divider)').each(function(i) {
                 $(this).attr('data-button-index', '').data('button-index', i);
             });
             return $buttons;
@@ -40,10 +38,9 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function ($, persis
          * @returns {jQuery}
          * @private
          */
-        _mainButtons: function ($buttons) {
-            var index, key;
-            key = this._getStorageKey();
-            index = key ? persistentStorage.getItem(key) || 0 : 0;
+        _mainButtons: function($buttons) {
+            var key = this._getStorageKey();
+            var index = key ? persistentStorage.getItem(key) || 0 : 0;
             return $($buttons.get(index)) || this._superApply(arguments);
         },
 
@@ -53,7 +50,7 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function ($, persis
          * @param e
          * @private
          */
-        _onButtonClick: function (e) {
+        _onButtonClick: function(e) {
             var key = this._getStorageKey();
             if (key) {
                 persistentStorage.setItem(key, $(e.target).data('button-index') || 0);
@@ -66,7 +63,7 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function ($, persis
          * @returns {string}
          * @private
          */
-        _getStorageKey: function () {
+        _getStorageKey: function() {
             return this.options.groupKey ? this.keyPreffix + this.options.groupKey : '';
         }
     });

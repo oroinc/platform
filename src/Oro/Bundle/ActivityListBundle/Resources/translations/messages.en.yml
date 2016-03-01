@@ -46,7 +46,15 @@ oro:
         pagination:
             page: Page:
             total: of {{ pages }} | Total of {{ records }} records
+            total_mobile: of {{ pages }} | Total: {{ records }}
 
         condition_builder:
             criteria:
                 activity: Activity
+        activity_owners.label: Activity Owners
+        merge.items.label: 'Item|Items'
+
+    entity_merge:
+        merge_modes:
+            activity_unite: Append
+            activity_replace: Replace

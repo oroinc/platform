@@ -70,8 +70,9 @@ class TransactionEmailsTest extends Selenium2TestCase
         /** @var TransactionEmails $login */
         $login = $this->login();
         $login->openTransactionEmails('Oro\Bundle\NotificationBundle')
-            ->delete('Recipient email', $email)
-            ->assertTitle('All - Notification Rules - Emails - System')
-            ->assertMessage('Item deleted');
+            ->filterBy('Recipient email', $email)
+            ->delete([$email])
+            ->assertMessage('Item deleted')
+            ->assertTitle('All - Notification Rules - Emails - System');
     }
 }

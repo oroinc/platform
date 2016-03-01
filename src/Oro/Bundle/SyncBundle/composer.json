@@ -7,7 +7,7 @@
     "license": "MIT",
     "require": {
         "php": ">=5.3.3",
-        "symfony/symfony": "2.3.*",
+        "symfony/symfony": "2.7.*",
         "jdare/clank-bundle": "dev-master",
         "oro/platform-bundle": "dev-master",
         "oro/requirejs-bundle": "dev-master"

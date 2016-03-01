@@ -4,6 +4,7 @@ parameters:
     oro_organization.form.type.business_unit_tree_type.class:        Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeType
     oro_organization.form.type.business_unit_tree_select_type.class: Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitTreeSelectType
     oro_organization.form.type.business_unit.api.class:              Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitApiType
+    oro_organization.form.type.businesS_unit_select.class:           Oro\Bundle\OrganizationBundle\Form\Type\BusinessUnitSelectType
 
     oro_organization.form.type.organization.class:                   Oro\Bundle\OrganizationBundle\Form\Type\OrganizationType
     oro_organization.form.handler.organization.class:                Oro\Bundle\OrganizationBundle\Form\Handler\OrganizationHandler
@@ -76,6 +77,15 @@ services:
             - @oro_organization.form.business_unit.api
             - @request
             - @doctrine.orm.entity_manager
+
+    oro_organization.form.type.businesS_unit_select:
+        class: %oro_organization.form.type.business_unit_select.class%
+        arguments:
+            - @doctrine
+            - @oro_security.security_facade
+        tags:
+            - { name: form.type, alias: oro_business_unit_select }
+
     #
     # Organization
     #
@@ -121,12 +131,13 @@ services:
     oro_organization.form.extension.owner:
         class: %oro_organization.form.extension.owner.class%
         arguments:
-            - @doctrine
+            - @oro_entity.doctrine_helper
             - @oro_security.owner.ownership_metadata_provider
             - @oro_organization.business_unit_manager
             - @oro_security.security_facade
             - @?security.acl.voter.basic_permissions
             - @oro_security.ownership_tree_provider
+            - @oro_security.owner.entity_owner_accessor
         tags:
             - { name: form.type_extension, alias: form }
     #

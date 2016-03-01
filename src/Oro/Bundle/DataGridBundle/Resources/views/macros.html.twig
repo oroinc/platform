@@ -9,6 +9,12 @@
 {% macro renderGrid(name, params = {}, renderParams = {}) %}
     {% set datagrid = oro_datagrid_build(name, params) %}
     {% if datagrid %}
+        {% if app.request.get('_widgetContainer') == 'dialog' %}
+            {% set renderParams = {'enableViews': false}|merge(renderParams) %}
+        {% endif %}
+        {% if params._grid_view._disabled is defined and params._grid_view._disabled %}
+            {% set renderParams = renderParams|merge({'enableViews': false}) %}
+        {% endif %}
         {% set metaData = oro_datagrid_metadata(datagrid, params) %}
         {% if renderParams.routerEnabled is defined %}
             {% set metadataOptions = metaData.options is defined ? metaData.options : {} %}
@@ -37,6 +43,7 @@
 
         <div id="{{ gridId }}"
              data-page-component-module="orodatagrid/js/app/components/datagrid-component"
+             data-page-component-name="{{ options.gridName }}"
              data-page-component-options="{{ options|json_encode }}"
              {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}></div>
     {% endif %}

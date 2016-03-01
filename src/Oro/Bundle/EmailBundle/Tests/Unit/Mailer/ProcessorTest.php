@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
@@ -11,9 +10,13 @@ use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Tests\Unit\Fixtures\Entity\TestUser;
-use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 /**
  * Class ProcessorTest
@@ -55,6 +58,18 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     /** @var SecurityFacade|\PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $userEmailOrigin;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $mailerTransport;
+
+    /** @var EmailOriginHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $emailOriginHelper;
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     protected function setUp()
     {
         $this->em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -63,9 +78,15 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->mailer = $this->getMockBuilder('\Swift_Mailer')
+        $this->mailer = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\DirectMailer')
+             ->disableOriginalConstructor()
+            ->getMock();
+        $this->mailerTransport = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->mailer->expects($this->any())
+            ->method('getTransport')
+            ->will($this->returnValue($this->mailerTransport));
         $this->emailEntityBuilder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder')
             ->disableOriginalConstructor()
             ->getMock();
@@ -84,6 +105,23 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->setMethods(['getLoggedUser', 'getOrganization'])
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->emailOriginHelper = $this->getMockBuilder('Oro\Bundle\EmailBundle\Tools\EmailOriginHelper')
+            ->setMethods(['setEmailModel', 'findEmailOrigin'])
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->userEmailOrigin = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+        $this->userEmailOrigin->expects($this->any())
+            ->method('getSmtpHost')
+            ->will($this->returnValue('abc'));
+
+        $this->userEmailOrigin->expects($this->any())
+            ->method('getSmtpPort')
+            ->will($this->returnValue(25));
 
         $this->securityFacadeLink = $this
             ->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
@@ -104,6 +142,26 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with('OroEmailBundle:Email')
             ->will($this->returnValue($this->em));
 
+        $folder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->userEmailOrigin->expects($this->any())
+            ->method('getFolder')
+            ->with(FolderType::SENT)
+            ->will($this->returnValue($folder));
+
+        $emailOriginRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $emailOriginRepo->expects($this->any())
+            ->method('findOneBy')
+            ->with(['internalName' => InternalEmailOrigin::BAP])
+            ->will($this->returnValue($this->userEmailOrigin));
+        $this->em->expects($this->any())
+            ->method('getRepository')
+            ->with('OroEmailBundle:InternalEmailOrigin')
+            ->will($this->returnValue($emailOriginRepo));
+
         $this->emailProcessor = new Processor(
             $this->doctrineHelper,
             $this->mailer,
@@ -112,7 +170,9 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             $this->emailOwnerProvider,
             $this->emailActivityManager,
             $this->securityFacadeLink,
-            $this->dispatcher
+            $this->dispatcher,
+            new Mcrypt(),
+            $this->emailOriginHelper
         );
     }
 
@@ -212,6 +272,17 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $message = new \Swift_Message();
 
+        $this->emailOriginHelper->expects(self::once())
+            ->method('setEmailModel');
+
+        $this->emailOriginHelper->expects(self::once())
+            ->method('findEmailOrigin')
+            ->will(self::returnValue($this->userEmailOrigin));
+
+        $this->userEmailOrigin->expects($this->once())
+            ->method('isSmtpConfigured')
+            ->will($this->returnValue(true));
+
         $this->mailer->expects($this->once())
             ->method('createMessage')
             ->will($this->returnValue($message));
@@ -220,34 +291,11 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($message)
             ->will($this->returnValue(true));
 
-        $origin = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $folder = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailFolder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $origin->expects($this->any())
-            ->method('getFolder')
-            ->with(FolderType::SENT)
-            ->will($this->returnValue($folder));
-
-        $emailOriginRepo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailOriginRepo->expects($this->once())
-            ->method('findOneBy')
-            ->with(['internalName' => InternalEmailOrigin::BAP])
-            ->will($this->returnValue($origin));
-        $this->em->expects($this->once())
-            ->method('getRepository')
-            ->with('OroEmailBundle:InternalEmailOrigin')
-            ->will($this->returnValue($emailOriginRepo));
-
         $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['setFolder', 'getEmail'])
+            ->setMethods(['addFolder', 'getEmail'])
             ->getMock();
         $emailUser->expects($this->once())
-            ->method('setFolder');
+            ->method('addFolder');
         $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
             ->disableOriginalConstructor()
             ->getMock();
@@ -401,123 +449,6 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
         ];
-    }
-
-    public function testCreateUserInternalOrigin()
-    {
-        $processor = new \ReflectionClass('Oro\Bundle\EmailBundle\Mailer\Processor');
-        $method = $processor->getMethod('createUserInternalOrigin');
-        $method->setAccessible(true);
-
-        $origin = $method->invokeArgs($this->emailProcessor, [$this->getTestUser(), $this->getTestOrganization()]);
-        $testOrigin = $this->getTestOrigin();
-        $testOrigin->getOwner()->addEmailOrigin($testOrigin);
-
-        $this->assertEquals($testOrigin, $origin);
-    }
-
-    public function testProcessOwnerUserWithoutOrigin()
-    {
-        $this->processWithOwner($this->getTestUser());
-    }
-
-    public function testProcessOwnerUserWithOrigin()
-    {
-        $user   = $this->getTestUser();
-        $origin = $this->getTestOrigin();
-
-        $user->addEmailOrigin($origin);
-
-        $this->processWithOwner($user, true);
-    }
-
-    /**
-     * @param      $user
-     * @param bool $withOrigin
-     */
-    protected function processWithOwner($user, $withOrigin = false)
-    {
-        $message = $this->getMockForAbstractClass('\Swift_Message');
-
-        $this->mailer->expects($this->once())
-            ->method('createMessage')
-            ->will($this->returnValue($message));
-        $this->mailer->expects($this->once())
-            ->method('send')
-            ->with($message)
-            ->will($this->returnValue(true));
-
-        $this->emailOwnerProvider->expects($this->once())
-            ->method('findEmailOwner')
-            ->with($this->em, 'test_user@test.com')
-            ->will($this->returnValue($user));
-
-        $emailUser = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailUser')
-            ->setMethods(['setFolder', 'getEmail'])
-            ->getMock();
-        $emailUser->expects($this->once())
-            ->method('setFolder');
-        $email = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Email')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $emailUser->expects($this->any())
-            ->method('getEmail')
-            ->willReturn($email);
-        $this->emailEntityBuilder->expects($this->once())
-            ->method('emailUser')
-            ->with('test', 'Test User <test_user@test.com>', ['test2@test.com'])
-            ->will($this->returnValue($emailUser));
-        $body = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailBody')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->emailEntityBuilder->expects($this->once())
-            ->method('body')
-            ->with('test body', false, true)
-            ->will($this->returnValue($body));
-
-        $batch = $this->getMock('Oro\Bundle\EmailBundle\Builder\EmailEntityBatchInterface');
-        $this->emailEntityBuilder->expects($this->once())
-            ->method('getBatch')
-            ->will($this->returnValue($batch));
-        $batch->expects($this->once())
-            ->method('persist')
-            ->with($this->identicalTo($this->em));
-        $this->em->expects($this->once())
-            ->method('flush');
-
-        if (!$withOrigin) {
-            $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
-                ->setConstructorArgs(
-                    [
-                        $this->doctrineHelper,
-                        $this->mailer,
-                        new EmailAddressHelper(),
-                        $this->emailEntityBuilder,
-                        $this->emailOwnerProvider,
-                        $this->emailActivityManager,
-                        $this->securityFacadeLink,
-                        $this->dispatcher
-                    ]
-                )
-                ->setMethods(['createUserInternalOrigin'])
-                ->getMock();
-
-            $this->emailProcessor->expects($this->once())
-                ->method('createUserInternalOrigin')
-                ->with($user)
-                ->will($this->returnValue($this->getTestOrigin()));
-        }
-
-        $model = $this->createEmailModel(
-            [
-                'from' => 'Test User <test_user@test.com>',
-                'to' => ['test2@test.com'],
-                'subject' => 'test',
-                'body' => 'test body'
-            ]
-        );
-
-        $this->emailProcessor->process($model);
     }
 
     protected function getTestUser()

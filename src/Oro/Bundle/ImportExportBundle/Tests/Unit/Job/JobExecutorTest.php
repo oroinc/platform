@@ -460,11 +460,4 @@ class JobExecutorTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(array('Error 1'), $this->executor->getJobFailureExceptions($code));
     }
-
-    public function testSkipClear()
-    {
-        $this->assertFalse($this->executor->isSkipClear());
-        $this->executor->setSkipClear(true);
-        $this->assertTrue($this->executor->isSkipClear());
-    }
 }

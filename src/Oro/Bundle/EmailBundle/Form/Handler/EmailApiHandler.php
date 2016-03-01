@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Form\Handler;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormInterface;
@@ -21,6 +20,7 @@ use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
 use Oro\Bundle\EmailBundle\Form\Model\EmailApi as EmailModel;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Form\Handler\ApiFormHandler;
 use Oro\Bundle\UserBundle\Entity\User;
@@ -129,8 +129,8 @@ class EmailApiHandler extends ApiFormHandler
         $email = $model->getEntity();
 
         // Subject
-        if ($model->getSubject()) {
-            $this->processString($email, 'Subject', $model->getSubject());
+        if ($model->getSubject() || !$email->getId()) {
+            $this->processString($email, 'Subject', (string)$model->getSubject());
         }
         // From
         if ($model->getFrom()) {
@@ -149,9 +149,9 @@ class EmailApiHandler extends ApiFormHandler
             $this->processRecipients($email, EmailRecipient::BCC, $model->getBcc());
         }
         // Body
-        if ($model->getBody()) {
+        if ($model->getBody() || !$email->getId()) {
             $this->processBody($email, $model->getBody(), $model->getBodyType());
-        } elseif ($model->getBodyType()) {
+        } elseif (null !== $model->getBodyType()) {
             $this->processBodyType($email, $model->getBodyType());
         }
         // CreatedAt
@@ -274,13 +274,12 @@ class EmailApiHandler extends ApiFormHandler
             /** @var User $originOwner */
             $originOwner = $this->securityFacade->getLoggedUser();
             $organization = $this->securityFacade->getOrganization();
-            $originName  = 'API_User_' . $originOwner->getId();
+            $originName   = InternalEmailOrigin::BAP . '_User_' . $originOwner->getId();
 
             $origins = $originOwner->getEmailOrigins()->filter(
                 function ($item) use ($originName, $organization) {
                     return
                         $item instanceof InternalEmailOrigin
-                        && $item->getName() === $originName
                         && $item->getOrganization() === $organization;
                 }
             );
@@ -342,7 +341,8 @@ class EmailApiHandler extends ApiFormHandler
             $emailUser->setEmail($email);
             $emailUser->setOwner($apiOrigin->getOwner());
             $emailUser->setOrganization($apiOrigin->getOrganization());
-            $emailUser->setFolder($folder);
+            $emailUser->addFolder($folder);
+            $emailUser->setOrigin($origin);
 
             $emailUserList[] = $emailUser;
         }
@@ -415,9 +415,9 @@ class EmailApiHandler extends ApiFormHandler
     }
 
     /**
-     * @param Email  $email
-     * @param string $content
-     * @param string $type
+     * @param Email       $email
+     * @param string|null $content
+     * @param bool|null   $type
      */
     protected function processBody(Email $email, $content, $type)
     {
@@ -451,8 +451,8 @@ class EmailApiHandler extends ApiFormHandler
     }
 
     /**
-     * @param Email  $email
-     * @param string $type
+     * @param Email $email
+     * @param bool  $type
      */
     protected function processBodyType(Email $email, $type)
     {

@@ -20,27 +20,30 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(
- *  defaultValues={
- *      "entity"={
- *          "icon"="icon-file"
- *      },
- *      "ownership"={
+ *      defaultValues={
+ *          "entity"={
+ *              "icon"="icon-file"
+ *          },
+ *          "ownership"={
  *              "owner_type"="USER",
  *              "owner_field_name"="owner",
  *              "owner_column_name"="owner_id",
  *              "organization_field_name"="organization",
  *              "organization_column_name"="organization_id"
- *      },
- *      "security"={
- *          "type"="ACL"
- *      },
- *      "note"={
- *          "immutable"=true
- *      },
- *      "activity"={
- *          "immutable"=true
+ *          },
+ *          "security"={
+ *              "type"="ACL"
+ *          },
+ *          "note"={
+ *              "immutable"=true
+ *          },
+ *          "comment"={
+ *              "immutable"=true
+ *          },
+ *          "activity"={
+ *              "immutable"=true
+ *          }
  *      }
- *  }
  * )
  */
 class Attachment extends ExtendAttachment

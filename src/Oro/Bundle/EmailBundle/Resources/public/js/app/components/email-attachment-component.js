@@ -1,12 +1,11 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailAttachmentComponent,
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        EmailAttachmentSelectView = require('oroemail/js/app/views/email-attachment-select-view'),
-        EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection'),
-        EmailAttachmentCollectionView = require('oroemail/js/app/views/email-attachment-collection-view');
+    var EmailAttachmentComponent;
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var EmailAttachmentSelectView = require('oroemail/js/app/views/email-attachment-select-view');
+    var EmailAttachmentCollection = require('oroemail/js/app/models/email-attachment-collection');
+    var EmailAttachmentCollectionView = require('oroemail/js/app/views/email-attachment-collection-view');
 
     /**
      * @exports EmailAttachmentComponent
@@ -68,7 +67,7 @@ define(function (require) {
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -103,7 +102,8 @@ define(function (require) {
             if (!this.popupView) {
                 this.popupView = new EmailAttachmentSelectView({
                     el: this.$popupContentEl,
-                    collection: this.popupCollection
+                    collection: this.popupCollection,
+                    attachedCollection: this.collection
                 });
                 this.popupView.showHideFilter();
                 this.popupView.showHideGroups();
@@ -126,12 +126,12 @@ define(function (require) {
 
         /**
          * Looks for the control element relatively from the source element
-         * 
+         *
          * @param {jQuery} $sourceElement
          * @param {string} selector
          * @returns {jQuery}
          */
-        findControlElement: function ($sourceElement, selector) {
+        findControlElement: function($sourceElement, selector) {
             return $sourceElement.parent().find(selector);
         }
     });

@@ -55,3 +55,12 @@ oro:
         form:
             name.label: Name
             type.label: Type
+
+        import:
+            title: Import Entity Fields
+            label: Import Fields
+            message:
+                invalid_field_name: Invalid field name.
+                invalid_field_type: Invalid field type.
+                change_type_not_allowed: Changing type of existing fields is not allowed.
+                require_update_schema: "Please, click 'Update Schema' to apply changes"

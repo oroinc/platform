@@ -31,18 +31,20 @@ class WidgetConfigurationLoadListener
     public function onWidgetConfigurationLoad(WidgetConfigurationLoadEvent $event)
     {
         $configuration = $event->getConfiguration();
-        if (!isset(
-                $configuration['route'],
-                $configuration['route_parameters'],
-                $configuration['route_parameters']['gridName'])
-                || $configuration['route'] !== 'oro_dashboard_grid'
+        if (!isset($configuration['route'], $configuration['route_parameters']['gridName'])
+            || $configuration['route'] !== 'oro_dashboard_grid'
         ) {
             return;
         }
         $gridName = $configuration['route_parameters']['gridName'];
 
+        // pass gridParams, grid may depend on them to be successfully built
+        $gridParams = empty($configuration['route_parameters']['params'])
+            ? []
+            : $configuration['route_parameters']['params'];
+
         $gridConfiguration = $this->datagridManagerLink->getService()->getConfigurationForGrid($gridName);
-        $datagrid = $this->datagridBuilder->build($gridConfiguration, new ParameterBag());
+        $datagrid = $this->datagridBuilder->build($gridConfiguration, new ParameterBag($gridParams));
         $metadata = $datagrid->getMetadata();
 
         $choices = $metadata->offsetGetByPath('[gridViews][choices]', []);

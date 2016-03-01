@@ -7,7 +7,8 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\ProcessBuilder;
 
-use Oro\Bundle\EntityBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+use Doctrine\Bundle\DoctrineBundle\DependencyInjection\Compiler\DoctrineOrmMappingsPass;
+
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\ConfigLoaderPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityExtendPass;
 use Oro\Bundle\EntityExtendBundle\DependencyInjection\Compiler\EntityManagerPass;
@@ -29,6 +30,12 @@ class OroEntityExtendBundle extends Bundle
     /** @var string */
     private $cacheDir;
 
+    /** @var string */
+    private $phpExecutable;
+
+    /**
+     * @param KernelInterface $kernel
+     */
     public function __construct(KernelInterface $kernel)
     {
         $this->kernel   = $kernel;
@@ -74,10 +81,43 @@ class OroEntityExtendBundle extends Bundle
         if (!CommandExecutor::isCurrentCommand('oro:entity-extend:cache:', true)) {
             ExtendClassLoadingUtils::ensureDirExists(ExtendClassLoadingUtils::getEntityCacheDir($this->cacheDir));
             if (!file_exists(ExtendClassLoadingUtils::getAliasesPath($this->cacheDir))) {
+                $this->checkConfigs();
                 $this->initializeCache();
             }
             $this->ensureAliasesSet();
         }
+    }
+
+    private function checkConfigs()
+    {
+        // We have to check the extend entity configs in separate process to prevent conflicts
+        // with 'class_alias' function is used in 'oro:entity-extend:cache:warmup' command.
+        $pb = ProcessBuilder::create()
+            ->setTimeout(self::CACHE_GENERATION_TIMEOUT)
+            ->add($this->getPhpExecutable())
+            ->add($this->kernel->getRootDir() . '/console')
+            ->add('oro:entity-extend:cache:check')
+            ->add('--env')
+            ->add($this->kernel->getEnvironment())
+            ->add('--cache-dir')
+            ->add($this->cacheDir);
+
+        $attempts = 0;
+        do {
+            if (!CommandExecutor::isCommandRunning('oro:entity-extend:cache:check')) {
+                // if configs were checked there is no need to check them again
+                if ($attempts > 0) {
+                    return;
+                }
+
+                $pb->getProcess()->run();
+
+                return;
+            } else {
+                $attempts++;
+                sleep(self::CACHE_CHECKOUT_INTERVAL);
+            }
+        } while ($attempts < self::CACHE_CHECKOUT_ATTEMPTS);
     }
 
     private function initializeCache()
@@ -88,7 +128,7 @@ class OroEntityExtendBundle extends Bundle
         // but in this moment we are exactly doing this for the current process.
         $pb = ProcessBuilder::create()
             ->setTimeout(self::CACHE_GENERATION_TIMEOUT)
-            ->add(CommandExecutor::getPhpExecutable())
+            ->add($this->getPhpExecutable())
             ->add($this->kernel->getRootDir() . '/console')
             ->add('oro:entity-extend:cache:warmup')
             ->add('--env')
@@ -119,5 +159,19 @@ class OroEntityExtendBundle extends Bundle
         if (!CommandExecutor::isCurrentCommand('oro:entity-extend:update-config')) {
             ExtendClassLoadingUtils::setAliases($this->cacheDir);
         }
+    }
+
+    /**
+     * Finds the PHP executable.
+     *
+     * @return string
+     */
+    private function getPhpExecutable()
+    {
+        if (null === $this->phpExecutable) {
+            $this->phpExecutable = CommandExecutor::getPhpExecutable();
+        }
+
+        return $this->phpExecutable;
     }
 }

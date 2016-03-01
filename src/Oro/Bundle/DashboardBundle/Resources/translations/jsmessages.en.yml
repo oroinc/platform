@@ -12,4 +12,4 @@ oro:
       move: Move
       remove: Delete
       configure: Configure
-      delete_confirmation: Are you shure want to remove widget?
+      delete_confirmation: Are you sure you want to remove this widget?

@@ -2,18 +2,16 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Selenium\Pages;
 
-use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPage;
-
 /**
  * Class Configuration
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method LanguageSettings openLanguageSettings() openLanguageSettings(string $bundlePath,  boolean $directLoad)
+ * @method LanguageSettings openLanguageSettings(string $bundlePath,  boolean $directLoad)
  * {@inheritdoc}
  */
-class LanguageSettings extends AbstractPage
+class LanguageSettings extends Configuration
 {
-    protected $redirectUrl = '/config/system/platform/language_settings';
+    const URL = '/config/system/platform/language_settings';
 
     /**
      * @param $language string
@@ -47,6 +45,7 @@ class LanguageSettings extends AbstractPage
             );
         $this->test->moveto($element);
         $element->click();
+        $this->waitForAjax();
         $this->waitPageToLoad();
         $this->waitForAjax();
 

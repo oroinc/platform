@@ -13,6 +13,8 @@ use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
 class UserMultiSelectType extends AbstractType
 {
+    const NAME = 'oro_user_multiselect';
+
     /**
      * @var EntityManager
      */
@@ -28,6 +30,10 @@ class UserMultiSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        // The event listener fixes transformation from empty string to array with empty string.
+        // The case is affected by Genemu\Bundle\FormBundle\Form\JQuery\DataTransformer::reverseTransform()
+        // Example: explode(',', '') => array(0=>'').
+        // @todo remove after vendor fixation
         $builder->addEventListener(
             FormEvents::PRE_SUBMIT,
             function (FormEvent $event) {
@@ -72,6 +78,6 @@ class UserMultiSelectType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_user_multiselect';
+        return self::NAME;
     }
 }

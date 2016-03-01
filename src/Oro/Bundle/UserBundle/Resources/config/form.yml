@@ -8,6 +8,7 @@ parameters:
     oro_user.form.type.status.class:            Oro\Bundle\UserBundle\Form\Type\StatusType
     oro_user.form.type.user_select.class:       Oro\Bundle\UserBundle\Form\Type\UserSelectType
     oro_user.form.type.user_multiselect.class:  Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType
+    oro_user.form.type.role_multiselect.class:  Oro\Bundle\UserBundle\Form\Type\RoleMultiSelectType
     oro_user.form.type.gender.class:            Oro\Bundle\UserBundle\Form\Type\GenderType
     oro_user.form.type.email.class:             Oro\Bundle\UserBundle\Form\Type\EmailType
     oro_user.form.type.change_password.class:   Oro\Bundle\UserBundle\Form\Type\ChangePasswordType
@@ -79,7 +80,7 @@ services:
             - @security.context
             - @oro_security.security_facade
             - @request
-            - @oro_config.user_config_manager
+            - @oro_config.user
         tags:
             - { name: form.type, alias: oro_user_user }
 
@@ -90,7 +91,7 @@ services:
             - @security.context
             - @oro_security.security_facade
             - @request
-            - @oro_config.user_config_manager
+            - @oro_config.user
         tags:
             - { name: form.type, alias: user }
 
@@ -166,6 +167,13 @@ services:
         tags:
             - { name: form.type, alias: oro_user_multiselect }
 
+    oro_user.form.type.role_multiselect:
+        class: %oro_user.form.type.role_multiselect.class%
+        arguments:
+            - @doctrine.orm.entity_manager
+        tags:
+            - { name: form.type, alias: oro_role_multiselect }
+
     oro_user.form.type.organization_user_multiselect:
         class: %oro_user.form.type.organization_user_multiselect.class%
         arguments:
@@ -187,16 +195,13 @@ services:
             - @oro_user.form.user
             - @request
             - @oro_user.manager
-            - @oro_config.user_config_manager
-            - @oro_config.global
+            - @oro_config.user
             - @templating
             - @oro_email.direct_mailer
             - @session.flash_bag
             - @translator
             - @logger
-            - @oro_security.security_facade.link
-        tags:
-            - { name: oro_tag.tag_manager }
+            - @oro_security.security_facade
         calls:
             - [setBusinessUnitManager, ["@oro_organization.business_unit_manager"]]
 
@@ -207,8 +212,6 @@ services:
             - @oro_user.form.user.api
             - @request
             - @oro_user.manager
-        tags:
-            - { name: oro_tag.tag_manager }
 
     oro_user.form.handler.role.api:
         class:                        %oro_user.form.handler.role.class%
@@ -235,15 +238,21 @@ services:
         scope:                        request
         arguments:                    ["@oro_user.form.status", "@request", "@doctrine.orm.entity_manager", "@oro_user.manager"]
 
-    oro_user.form.handler.acl_role:
+    oro_user.form.handler.abstract.acl_role:
         class:                        %oro_user.form.handler.acl_role.class%
         scope:                        prototype
-        arguments:                    ["@form.factory", %oro_user.privileges%]
+        arguments:                    ["@form.factory", @security.acl.cache.doctrine, %oro_user.privileges%]
         calls:
             - [setAclManager, ["@oro_security.acl.manager"]]
             - [setAclPrivilegeRepository, ["@oro_security.acl.privilege_repository"]]
-            - [setEntityManager, ["@doctrine.orm.entity_manager"]]
+            - [setManagerRegistry, ["@doctrine"]]
+
+    oro_user.form.handler.acl_role:
+        parent: oro_user.form.handler.abstract.acl_role
+        scope: prototype
+        calls:
             - [setRequest, ["@request"]]
+            - [addExtensionFilter, ['action', '']]    # only default group actions are allowed
 
     oro_user.form.handler.set_password:
         class: %oro_user.form.handler.set_password.class%

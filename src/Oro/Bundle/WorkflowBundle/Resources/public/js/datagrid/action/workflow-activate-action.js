@@ -1,8 +1,7 @@
-/*global define*/
 define([
     'oro/datagrid/action/model-action',
     'oroworkflow/js/activation-handler'
-], function (ModelAction, ActivationHandler) {
+], function(ModelAction, ActivationHandler) {
     'use strict';
 
     var WorkflowActivateAction;
@@ -15,17 +14,17 @@ define([
      * @extends oro.datagrid.action.ModelAction
      */
     WorkflowActivateAction = ModelAction.extend({
-        execute: function () {
+        execute: function() {
             var datagrid = this.datagrid;
 
-            this.on('activation_start', function () {
+            this.on('activation_start', function() {
                 datagrid.showLoading();
             });
-            this.on('activation_success', function () {
+            this.on('activation_success', function() {
                 datagrid.hideLoading();
                 datagrid.collection.fetch({reset: true});
             });
-            this.on('activation_error', function (xhr) {
+            this.on('activation_error', function(xhr) {
                 datagrid.hideLoading();
             });
 

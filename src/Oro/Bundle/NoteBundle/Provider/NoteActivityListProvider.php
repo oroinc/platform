@@ -4,37 +4,61 @@ namespace Oro\Bundle\NoteBundle\Provider;
 
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListProviderInterface;
+use Oro\Bundle\ActivityListBundle\Entity\ActivityOwner;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListDateProviderInterface;
+use Oro\Bundle\ActivityListBundle\Model\ActivityListUpdatedByProviderInterface;
 use Oro\Bundle\CommentBundle\Model\CommentProviderInterface;
+use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\NoteBundle\Entity\Note;
+use Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper;
 
-class NoteActivityListProvider implements ActivityListProviderInterface, CommentProviderInterface
+class NoteActivityListProvider implements
+    ActivityListProviderInterface,
+    CommentProviderInterface,
+    ActivityListDateProviderInterface,
+    ActivityListUpdatedByProviderInterface
 {
     const ACTIVITY_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
+    const ACL_CLASS = 'Oro\Bundle\NoteBundle\Entity\Note';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
+    /** @var ServiceLink */
+    protected $entityOwnerAccessorLink;
+
+    /** @var NoteAssociationHelper */
+    protected $noteAssociationHelper;
+
+    /** @var CommentAssociationHelper */
+    protected $commentAssociationHelper;
+
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DoctrineHelper           $doctrineHelper
+     * @param ServiceLink              $entityOwnerAccessorLink
+     * @param NoteAssociationHelper    $noteAssociationHelper
+     * @param CommentAssociationHelper $commentAssociationHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ServiceLink $entityOwnerAccessorLink,
+        NoteAssociationHelper $noteAssociationHelper,
+        CommentAssociationHelper $commentAssociationHelper
+    ) {
+        $this->doctrineHelper           = $doctrineHelper;
+        $this->entityOwnerAccessorLink  = $entityOwnerAccessorLink;
+        $this->noteAssociationHelper    = $noteAssociationHelper;
+        $this->commentAssociationHelper = $commentAssociationHelper;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function isApplicableTarget(ConfigIdInterface $configId, ConfigManager $configManager)
+    public function isApplicableTarget($entityClass, $accessible = true)
     {
-        $provider = $configManager->getProvider('note');
-
-        return $provider->hasConfigById($configId)
-            && $provider->getConfigById($configId)->has('enabled')
-            && $provider->getConfigById($configId)->get('enabled');
+        return $this->noteAssociationHelper->isNoteAssociationEnabled($entityClass, $accessible);
     }
 
     /**
@@ -58,6 +82,14 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getAclClass()
+    {
+        return self::ACL_CLASS;
+    }
+
+    /**
      * @param Note $entity
      *
      * {@inheritdoc}
@@ -73,6 +105,42 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     public function getDescription($entity)
     {
         return null;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getOwner($entity)
+    {
+        /** @var $entity Note */
+        return $entity->getOwner();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedBy($entity)
+    {
+        /** @var $entity Note */
+        return $entity->getUpdatedBy();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCreatedAt($entity)
+    {
+        /** @var $entity Note */
+        return $entity->getCreatedAt();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getUpdatedAt($entity)
+    {
+        /** @var $entity Note */
+        return $entity->getUpdatedAt();
     }
 
     /**
@@ -131,11 +199,28 @@ class NoteActivityListProvider implements ActivityListProviderInterface, Comment
     /**
      * {@inheritdoc}
      */
-    public function hasComments(ConfigManager $configManager, $entity)
+    public function isCommentsEnabled($entityClass)
     {
-        $config = $configManager->getProvider('comment')->getConfig($entity);
+        return $this->commentAssociationHelper->isCommentAssociationEnabled($entityClass);
+    }
 
-        return $config->is('enabled');
+    /**
+     * {@inheritdoc}
+     */
+    public function getActivityOwners($entity, ActivityList $activityList)
+    {
+        $organization = $this->getOrganization($entity);
+        $owner = $this->entityOwnerAccessorLink->getService()->getOwner($entity);
+
+        if (!$organization || !$owner) {
+            return [];
+        }
+
+        $activityOwner = new ActivityOwner();
+        $activityOwner->setActivity($activityList);
+        $activityOwner->setOrganization($organization);
+        $activityOwner->setUser($owner);
+        return [$activityOwner];
     }
 
     /**

@@ -1,6 +1,17 @@
+html& {
+  overflow-x: hidden;
+  overflow-y: auto;
+  &.lock-page-scroll {
+    overflow: hidden;
+  }
+}
 & {
   min-width: inherit;
   font-size: @baseFontSize;
+}
+
+#page.hidden-page {
+  display: none;
 }
 
 .btn-group > .dropdown-menu li a {
@@ -15,37 +26,8 @@
   width: auto;
 }
 
-.form-horizontal .control-group {
-  max-width: auto;
-  margin: 0 0 7px;
-}
-
-.form-horizontal .control-group label.control-label {
-  float: none;
-  text-align: left;
-}
-
-.form-horizontal .control-group .controls {
-  margin-left: 0px;
-}
-
 .dot-menu, #bookmark-buttons, #breadcrumb {
   display: none !important;
-}
-#flash-messages,
-.flash-messages {
-  .flash-messages-frame {
-    left: 50%;
-    min-width: 300px;
-  }
-  .flash-messages-holder {
-    position: absolute;
-    left: -50%;
-    width: 100%;
-  }
-  .alert .close {
-    font-size: 25px;
-  }
 }
 
 .scrollspy-nav, .scrollspy-nav-target {
@@ -72,26 +54,6 @@
 #footer {
   display: none;
 }
-
-.modal {
-  min-width: 100%;
-  height: 100%;
-  max-width: 100%;
-  top:0;
-  left: 0;
-  overflow-x: hidden;
-  overflow-y: auto;
-  border-radius: 0;
-  margin: 0;
-  .modal-header, .modal-footer {
-    width: 100%;
-  }
-  .modal-body {
-    max-height: 100%;
-    overflow: auto;
-  }
-}
-
 fieldset {
   min-width: 100%;
 }

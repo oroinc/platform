@@ -1,0 +1,5 @@
+{% if value %}
+    {{ value|json_encode|raw }}
+{%  else  %}
+    []
+{% endif %}

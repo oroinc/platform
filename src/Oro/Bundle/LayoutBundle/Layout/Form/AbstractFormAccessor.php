@@ -51,6 +51,23 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
     }
 
     /**
+     * @param FormAction $action
+     */
+    public function setAction(FormAction $action)
+    {
+        $this->action = $action;
+    }
+
+    /**
+     * @param string $route
+     * @param array $routeParams
+     */
+    public function setActionRoute($route, array $routeParams = [])
+    {
+        $this->action = FormAction::createByRoute($route, $routeParams);
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getMethod()
@@ -61,6 +78,14 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
     }
 
     /**
+     * @param string|null $method
+     */
+    public function setMethod($method)
+    {
+        $this->method = $method;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function getEnctype()
@@ -68,6 +93,14 @@ abstract class AbstractFormAccessor implements FormAccessorInterface
         $this->ensureParamsInitialized();
 
         return $this->enctype;
+    }
+
+    /**
+     * @param string|null $enctype
+     */
+    public function setEnctype($enctype)
+    {
+        $this->enctype = $enctype;
     }
 
     /**

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 
@@ -11,6 +10,7 @@ use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
 class EntityAliasResolver implements WarmableInterface
 {
@@ -38,6 +38,9 @@ class EntityAliasResolver implements WarmableInterface
     /** @var string */
     private $duplicateAliasHelpMessage;
 
+    /** @var bool */
+    private $allAliasesLoaded = false;
+
     /**
      * @param ManagerRegistry $doctrine
      * @param bool            $debug
@@ -46,6 +49,18 @@ class EntityAliasResolver implements WarmableInterface
     {
         $this->doctrine = $doctrine;
         $this->debug    = $debug;
+    }
+
+    /**
+     * Checks whether the given entity class has an alias.
+     *
+     * @param string $entityClass The FQCN of an entity
+     *
+     * @return bool
+     */
+    public function hasAlias($entityClass)
+    {
+        return null !== $this->findEntityAlias($entityClass);
     }
 
     /**
@@ -61,7 +76,7 @@ class EntityAliasResolver implements WarmableInterface
     public function getAlias($entityClass)
     {
         $entityAlias = $this->findEntityAlias($entityClass);
-        if (!$entityAlias) {
+        if (null === $entityAlias) {
             throw new EntityAliasNotFoundException(
                 sprintf('An alias for "%s" entity not found.', $entityClass)
             );
@@ -83,7 +98,7 @@ class EntityAliasResolver implements WarmableInterface
     public function getPluralAlias($entityClass)
     {
         $entityAlias = $this->findEntityAlias($entityClass);
-        if (!$entityAlias) {
+        if (null === $entityAlias) {
             throw new EntityAliasNotFoundException(
                 sprintf('A plural alias for "%s" entity not found.', $entityClass)
             );
@@ -214,8 +229,11 @@ class EntityAliasResolver implements WarmableInterface
                 break;
             }
         }
+        if (false === $entityAlias) {
+            $entityAlias = null;
+        }
 
-        if ($entityAlias) {
+        if (null !== $entityAlias) {
             if ($this->validateDuplicates($entityClass, $entityAlias)) {
                 $this->aliases[$entityClass] = $entityAlias;
 
@@ -284,33 +302,17 @@ class EntityAliasResolver implements WarmableInterface
      */
     protected function ensureAllAliasesLoaded()
     {
-        foreach ($this->getAllEntityClasses() as $entityClass) {
-            if (!isset($this->aliases[$entityClass])) {
-                $this->findEntityAlias($entityClass);
+        if ($this->allAliasesLoaded) {
+            return;
+        }
+
+        $allMetadata = SafeDatabaseChecker::getAllMetadata($this->doctrine->getManager());
+        foreach ($allMetadata as $metadata) {
+            if (!$metadata->isMappedSuperclass && !isset($this->aliases[$metadata->name])) {
+                $this->findEntityAlias($metadata->name);
             }
         }
-    }
-
-    /**
-     * @return string[]
-     */
-    protected function getAllEntityClasses()
-    {
-        $metadataFactory = $this->doctrine->getManager()->getMetadataFactory();
-
-        $metadata = array_filter(
-            $metadataFactory->getAllMetadata(),
-            function (ClassMetadata $metadata) use ($metadataFactory) {
-                return !$metadata->isMappedSuperclass;
-            }
-        );
-
-        return array_map(
-            function (ClassMetadata $metadata) {
-                return $metadata->name;
-            },
-            $metadata
-        );
+        $this->allAliasesLoaded = true;
     }
 
     /**

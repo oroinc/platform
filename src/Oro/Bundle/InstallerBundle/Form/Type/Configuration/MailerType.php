@@ -18,7 +18,6 @@ class MailerType extends AbstractType
                 'choice',
                 array(
                     'label'         => 'form.configuration.mailer.transport',
-                    'preferred_choices' => array('mail'),
                     'choices'       => array(
                         'mail'      => 'PHP mail',
                         'smtp'      => 'SMTP',
@@ -57,13 +56,12 @@ class MailerType extends AbstractType
                 array(
                     'label'         => 'form.configuration.mailer.encryption',
                     'required'      => false,
-                    'preferred_choices' => array(''),
                     'choices'       => array(
-                        ''          => 'None',
                         'ssl'       => 'SSL',
                         'tls'       => 'TLS',
                     ),
                     'client_validation' => false,
+                    'placeholder'   => 'None'
                 )
             )
             ->add(

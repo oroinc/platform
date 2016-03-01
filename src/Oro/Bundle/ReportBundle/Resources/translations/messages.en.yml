@@ -25,6 +25,19 @@ oro:
                 Max:
                     name: Max
                     hint: Maximum value
+            date:
+                Count:
+                    name: Count
+                    hint: Number of items
+                Min:
+                    name: Min
+                    hint: Minimum value
+                Max:
+                    name: Max
+                    hint: Maximum value
+
+        filter:
+            boolean.select_value.label: Select Value
 
     report:
         menu:
@@ -70,6 +83,15 @@ oro:
             hasChart:
                 label:   Report design
                 tooltip: Add chart to the report
+
+        action:
+            view_sql.label: View SQL query of a report/segment
+        system_configuration:
+            groups:
+                report_settings.title: Reports settings
+            fields:
+                display_sql_query.label: Display SQL in Reports and Segments
+                display_sql_query.tooltip: Displays SQL query of a report or segment on its View page
 
 "New Report": New Report
 "Manage Custom Reports": Manage Custom Reports

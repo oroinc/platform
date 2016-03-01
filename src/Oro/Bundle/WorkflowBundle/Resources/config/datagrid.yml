@@ -3,9 +3,9 @@ datagrid:
         options:
             entityHint: processes
             export:     false
+        acl_resource: oro_process_definition_view
         source:
-            type:         orm
-            acl_resource: oro_process_definition_view
+            type: orm
             query:
                 select:
                     - process.name
@@ -43,11 +43,11 @@ datagrid:
                 params: [ name ]
             activate_link:
                 type:   url
-                route:  oro_workflow_api_rest_process_activate
+                route:  oro_api_process_activate
                 params: [ processDefinition ]
             deactivate_link:
                 type:   url
-                route:  oro_workflow_api_rest_process_deactivate
+                route:  oro_api_process_deactivate
                 params: [ processDefinition ]
         sorters:
             columns:
@@ -100,9 +100,9 @@ datagrid:
         options:
             entityHint: workflowssss
             export:     false
+        acl_resource: oro_workflow_definition_view
         source:
             type: orm
-            acl_resource: oro_workflow_definition_view
             query:
                 select:
                     - w.name as id
@@ -158,11 +158,11 @@ datagrid:
                 params:     [ workflowDefinition ]
             activate_link:
                 type:       url
-                route:      oro_workflow_api_rest_workflow_activate
+                route:      oro_api_workflow_activate
                 params:     [ workflowDefinition ]
             deactivate_link:
                 type:       url
-                route:      oro_workflow_api_rest_workflow_deactivate
+                route:      oro_api_workflow_deactivate
                 params:     [ entityClass ]
         sorters:
             columns:

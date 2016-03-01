@@ -31,8 +31,22 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->stepExecutionMock = $this->getMockBuilder('Akeneo\\Bundle\\BatchBundle\\Entity\\StepExecution')
-            ->setMethods(['getExecutionContext'])
+            ->setMethods(['getExecutionContext', 'getJobExecution'])
             ->disableOriginalConstructor()->getMock();
+
+        $jobExecution = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobExecution');
+        $jobInstance = $this->getMock('Akeneo\Bundle\BatchBundle\Entity\JobInstance');
+        $jobExecution->expects($this->any())
+            ->method('getJobInstance')
+            ->will($this->returnValue($jobInstance));
+
+        $this->stepExecutionMock->expects($this->any())
+            ->method('getJobExecution')
+            ->will($this->returnValue($jobExecution));
+
+        $jobInstance->expects($this->any())
+            ->method('getAlias')
+            ->will($this->returnValue('alias'));
 
         $this->transportSettings = $this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport');
         $this->transportMock     = $this->getMock('Oro\\Bundle\\IntegrationBundle\\Provider\\TransportInterface');

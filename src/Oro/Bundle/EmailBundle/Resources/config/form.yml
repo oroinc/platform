@@ -1,5 +1,11 @@
 parameters:
     oro_email.form.subscriber.emailtemplate.class:        Oro\Bundle\EmailBundle\Form\EventListener\BuildTemplateFormSubscriber
+    oro_email.form.subscriber.autoresponserule.class:     Oro\Bundle\EmailBundle\Form\EventListener\AutoResponseRuleSubscriber
+    oro_email.form.type.autoresponserule.class:           Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleType
+    oro_email.form.type.autoresponserule_condition.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseRuleConditionType
+    oro_email.form.type.autoresponse_template.class:      Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateType
+    oro_email.form.type.autoresponse_template_choice.class: Oro\Bundle\EmailBundle\Form\Type\AutoResponseTemplateChoiceType
+    oro_email.form.extension.mailbox_unbound_rules.class: Oro\Bundle\EmailBundle\Form\Extension\MailboxUnboudRulesExtension
     oro_email.form.type.emailtemplate.class:              Oro\Bundle\EmailBundle\Form\Type\EmailTemplateType
     oro_email.form.type.emailtemplate_select.class:       Oro\Bundle\EmailBundle\Form\Type\EmailTemplateSelectType
     oro_email.form.type.emailtemplate_translation.class:  Oro\Bundle\EmailBundle\Form\Type\EmailTemplateTranslationType
@@ -14,15 +20,63 @@ parameters:
     oro_email.form.type.email_address.api.class:          Oro\Bundle\EmailBundle\Form\Type\EmailAddressApiType
     oro_email.form.type.attachment.class:                 Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentType
     oro_email.form.type.attachments.class:                Oro\Bundle\EmailBundle\Form\Type\EmailAttachmentsType
-    oro_email.form.type.contexts_select.class:            Oro\Bundle\EmailBundle\Form\Type\ContextsSelectType
     oro_email.form.type.email_link_to_scope.class:        Oro\Bundle\EmailBundle\Form\Type\EmailLinkToScopeType
+    oro_email.form.type.mailbox_grid.class:               Oro\Bundle\EmailBundle\Form\Type\MailboxGridType
+    oro_email.form.type.mailbox.class:                    Oro\Bundle\EmailBundle\Form\Type\MailboxType
+    oro_email.form.handler.mailbox.class:                 Oro\Bundle\EmailBundle\Form\Handler\MailboxHandler
     oro_email.form.factory.class:                         Oro\Bundle\EmailBundle\Form\Model\Factory
+    oro_email.form.type.email_folder_tree.class:          Oro\Bundle\EmailBundle\Form\Type\EmailFolderTreeType
+    oro_email.form.type.filter.originfolder.class:        Oro\Bundle\EmailBundle\Form\Type\Filter\ChoiceOriginFolderFilterType
+    oro_email.form.type.email_address_from.class:         Oro\Bundle\EmailBundle\Form\Type\EmailAddressFromType
+    oro_email.form.type.email_address_recipients.class:   Oro\Bundle\EmailBundle\Form\Type\EmailAddressRecipientsType
 
 services:
     oro_email.form.subscriber.emailtemplate:
         class: %oro_email.form.subscriber.emailtemplate.class%
         arguments:
             - @security.context
+
+    oro_email.form.subscriber.autoresponserule:
+        class: %oro_email.form.subscriber.autoresponserule.class%
+        arguments:
+            - @oro_security.security_facade
+
+    oro_email.form.type.autoresponserule:
+        class: %oro_email.form.type.autoresponserule.class%
+        arguments:
+            - @oro_email.form.subscriber.autoresponserule
+        tags:
+            - { name: form.type, alias: oro_email_autoresponserule }
+
+    oro_email.form.type.autoresponserule_condition:
+        class: %oro_email.form.type.autoresponserule_condition.class%
+        tags:
+            - { name: form.type, alias: oro_email_autoresponserule_condition }
+
+    oro_email.form.type.autoresponse_template:
+        class: %oro_email.form.type.autoresponse_template.class%
+        arguments:
+            - @oro_config.global
+            - @oro_config.user
+            - @oro_locale.settings
+            - @doctrine
+        tags:
+            - { name: form.type, alias: oro_email_autoresponse_template }
+
+    oro_email.form.type.autoresponse_template_choice:
+        class: %oro_email.form.type.autoresponse_template_choice.class%
+        arguments:
+            - @oro_security.security_facade
+            - @translator
+        tags:
+            - { name: form.type, alias: oro_email_autoresponse_template_choice }
+
+    oro_email.form.extension.mailbox_unbound_rules:
+        class: %oro_email.form.extension.mailbox_unbound_rules.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: form.type_extension, alias: oro_email_mailbox }
 
     oro_email.form.emailtemplate:
         class: Symfony\Component\Form\Form
@@ -80,6 +134,8 @@ services:
         class: %oro_email.form.type.email.class%
         arguments:
             - @security.context
+            - @oro_email.email_renderer
+            - @oro_email.email.model.builder.helper
         tags:
             - { name: form.type, alias: oro_email_email }
 
@@ -137,17 +193,61 @@ services:
         tags:
             - { name: form.type, alias: oro_email_attachments }
 
-    oro_email.form.type.contexts_select:
-        class: %oro_email.form.type.contexts_select.class%
-        arguments:
-            - @doctrine.orm.entity_manager
-        tags:
-            - { name: form.type, alias: oro_email_contexts_select }
-
     oro_email.form.type.email_link_to_scope:
         class: %oro_email.form.type.email_link_to_scope.class%
         tags:
             - { name: form.type, alias: oro_email_link_to_scope }
 
+    oro_email.form.type.mailbox_grid:
+        class: %oro_email.form.type.mailbox_grid.class%
+        tags:
+            - { name: form.type, alias: oro_email_mailbox_grid }
+
+    oro_email.form.type.mailbox:
+        class: %oro_email.form.type.mailbox.class%
+        arguments:
+            - @oro_email.mailbox.process_storage
+            - @oro_security.encoder.mcrypt
+            - @oro_config.user
+        tags:
+            - { name: form.type, alias: oro_email_mailbox }
+
+    oro_email.form.handler.mailbox:
+        class: %oro_email.form.handler.mailbox.class%
+        scope: request
+        arguments:
+            - @form.factory
+            - @request
+            - @doctrine
+            - @oro_email.mailbox.process_storage
+            - @event_dispatcher
+
     oro_email.form.factory:
         class: %oro_email.form.factory.class%
+
+    oro_email.form.type.email_folder_tree:
+        class: %oro_email.form.type.email_folder_tree.class%
+        tags:
+            - { name: form.type, alias: oro_email_email_folder_tree }
+
+    oro_email.form.type.filter.originfolder:
+        class: %oro_email.form.type.filter.originfolder.class%
+        arguments: ["@translator"]
+        tags:
+            - { name: form.type, alias: oro_type_originfolder_filter }
+
+    oro_email.form.type.email_address_from:
+        class: %oro_email.form.type.email_address_from.class%
+        arguments:
+            - @oro_security.security_facade
+            - @oro_email.related_emails.provider
+            - @oro_email.mailbox.manager
+        tags:
+            - { name: form.type, alias: oro_email_email_address_from }
+
+    oro_email.form.type.email_address_recipients:
+        class: %oro_email.form.type.email_address_recipients.class%
+        arguments:
+            - @oro_config.global
+        tags:
+            - { name: form.type, alias: oro_email_email_address_recipients }

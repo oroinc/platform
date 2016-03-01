@@ -21,5 +21,7 @@ class OroSoapExtension extends Extension
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
         $loader->load('services.yml');
+
+        $this->addClassesToCompile(['Oro\Bundle\SoapBundle\EventListener\LocaleListener']);
     }
 }

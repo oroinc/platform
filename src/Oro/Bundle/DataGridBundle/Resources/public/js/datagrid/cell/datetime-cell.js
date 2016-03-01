@@ -1,9 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     './string-cell',
     'orodatagrid/js/datagrid/formatter/datetime-formatter'
-], function (StringCell, DatagridDateTimeFormatter) {
+], function(StringCell, DatagridDateTimeFormatter) {
     'use strict';
 
     var DateTimeCell;
@@ -34,7 +32,7 @@ define([
         /**
          * @inheritDoc
          */
-        initialize: function (options) {
+        initialize: function(options) {
             DateTimeCell.__super__.initialize.apply(this, arguments);
             this.formatter = this.createFormatter();
         },
@@ -44,7 +42,7 @@ define([
          *
          * @return {orodatagrid.datagrid.formatter.DateTimeFormatter}
          */
-        createFormatter: function () {
+        createFormatter: function() {
             return new this.formatterPrototype({type: this.type});
         }
     });

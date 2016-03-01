@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\CronBundle\Entity;
+namespace Oro\Bundle\CronBundle\Tests\Unit\Entity;
+
+use Oro\Bundle\CronBundle\Entity\Schedule;
 
 class ScheduleTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var Schedule
-     */
+    /** @var Schedule */
     protected $object;
 
     protected function setUp()
@@ -14,32 +14,82 @@ class ScheduleTest extends \PHPUnit_Framework_TestCase
         $this->object = new Schedule();
     }
 
+    protected function tearDown()
+    {
+        unset($this->object);
+    }
+
+    public function testConstructor()
+    {
+        $this->assertAttributes([]);
+    }
+
     public function testGetId()
     {
         $this->assertNull($this->object->getId());
+
+        $testValue = 42;
+        $reflectionProperty = new \ReflectionProperty('Oro\Bundle\CronBundle\Entity\Schedule', 'id');
+        $reflectionProperty->setAccessible(true);
+        $reflectionProperty->setValue($this->object, $testValue);
+
+        $this->assertEquals($testValue, $this->object->getId());
     }
 
-    public function testCommand()
+    /**
+     * @dataProvider setGetDataProvider
+     *
+     * @param string $propertyName
+     * @param mixed $testValue
+     * @param mixed $defaultValue
+     * @param mixed $expectedValue
+     */
+    public function testSetGetEntity($propertyName, $testValue, $defaultValue = null, $expectedValue = null)
     {
-        $object  = $this->object;
-        $command = 'oro:test';
+        $setter = 'set' . ucfirst($propertyName);
+        $getter = 'get' . ucfirst($propertyName);
 
-        $this->assertEmpty($object->getCommand());
-
-        $object->setCommand($command);
-
-        $this->assertEquals($command, $object->getCommand());
+        $this->assertEquals($defaultValue, $this->object->$getter());
+        $this->assertSame($this->object, $this->object->$setter($testValue));
+        $this->assertSame($expectedValue !== null ? $expectedValue : $testValue, $this->object->$getter());
     }
 
-    public function testDefinition()
+    /**
+     * @return array
+     */
+    public function setGetDataProvider()
     {
-        $object = $this->object;
-        $def    = '*/5 * * * *';
+        return [
+            'command' => [
+                'propertyName' => 'command',
+                'testValue' => 'oro:test'
+            ],
+            'arguments' => [
+                'propertyName' => 'arguments',
+                'testValue' => ['test' => 'value', 'some' => 'data'],
+                'defaultValue' => [],
+                'expectedValue' => ['data', 'value'],
+            ],
+            'definition' => [
+                'propertyName' => 'definition',
+                'testValue' => '*/5 * * * *'
+            ]
+        ];
+    }
 
-        $this->assertEmpty($object->getDefinition());
+    public function testSetArguments()
+    {
+        $this->object->setArguments(['test' => 'value', 'some' => 'data']);
 
-        $object->setDefinition($def);
+        $this->assertAttributes(['data', 'value']);
+    }
 
-        $this->assertEquals($def, $object->getDefinition());
+    /**
+     * @param array $attributes
+     */
+    protected function assertAttributes(array $attributes = [])
+    {
+        $this->assertAttributeEquals($attributes, 'arguments', $this->object);
+        $this->assertAttributeEquals(md5(json_encode($attributes)), 'argumentsHash', $this->object);
     }
 }

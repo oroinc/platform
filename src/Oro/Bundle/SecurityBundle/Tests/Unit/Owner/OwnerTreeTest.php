@@ -15,6 +15,7 @@ class OwnerTreeTest extends \PHPUnit_Framework_TestCase
         foreach ($src as $item) {
             $tree->addBusinessUnitRelation($item[0], $item[1]);
         }
+        $tree->buildTree();
 
         foreach ($expected as $buId => $sBuIds) {
             $this->assertEquals(

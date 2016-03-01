@@ -1,12 +1,11 @@
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var EmailAttachmentSelectView,
-        $ = require('jquery'),
-        routing = require('routing'),
-        EmailAttachmentListRowView = require('oroemail/js/app/views/email-attachment-list-row-view'),
-        BaseCollectionView = require('oroui/js/app/views/base/collection-view');
+    var EmailAttachmentSelectView;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var EmailAttachmentListRowView = require('oroemail/js/app/views/email-attachment-list-row-view');
+    var BaseCollectionView = require('oroui/js/app/views/base/collection-view');
 
     EmailAttachmentSelectView = BaseCollectionView.extend({
         itemView: EmailAttachmentListRowView,
@@ -14,6 +13,7 @@ define(function (require) {
         fallbackSelector: '.no-items',
         isShowed: false,
         fileNameFilter: '',
+        attachedCollection: null,
 
         events: {
             'click .cancel':                 'cancelClick',
@@ -22,8 +22,17 @@ define(function (require) {
             'input input.filter':            'filterChange'
         },
 
+        initialize: function(options) {
+            if (!_.has(options, 'attachedCollection')) {
+                throw new Error('Required option "attachedCollection" not found.');
+            }
+
+            EmailAttachmentSelectView.__super__.initialize.apply(this, arguments);
+            this.attachedCollection = options.attachedCollection;
+        },
+
         resolveListSelector: function(model) {
-            if (model.get('type') == 1) {
+            if (model.get('type') === 1) {
                 return '.entity-attachments-list';
             } else {
                 return '.thread-attachments-list';
@@ -100,6 +109,7 @@ define(function (require) {
         },
 
         show: function() {
+            this.resetCheckedModels();
             this.$el.show();
             this.isShowed = true;
         },
@@ -107,6 +117,16 @@ define(function (require) {
         hide: function() {
             this.$el.hide();
             this.isShowed = false;
+        },
+
+        resetCheckedModels: function() {
+            this.collection.each(function(model) {
+                var newValue = Boolean(this.attachedCollection.get(model.get('id')));
+                if (model.get('checked') !== newValue) {
+                    model.set('checked', newValue);
+                    this.renderItem(model);
+                }
+            }, this);
         }
     });
 

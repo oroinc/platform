@@ -454,7 +454,7 @@ class Item
      */
     public function setTitle($title)
     {
-        $this->title = $title;
+        $this->title = substr($title, 0, 255);
 
         return $this;
     }
@@ -469,6 +469,9 @@ class Item
         return $this->title;
     }
 
+    /**
+     * @return string
+     */
     public function getRecordText()
     {
         $recordText = '';
@@ -543,13 +546,14 @@ class Item
     }
 
     /**
-     * @param $fields
-     * @param $fieldName
+     * @param Collection $fields
+     * @param string $fieldName
      */
-    protected function deleteArrayFields($fields, $fieldName)
+    protected function deleteArrayFields(Collection $fields, $fieldName)
     {
         $fieldsToDelete = $fields->filter(
             function ($valueEntity) use ($fieldName) {
+                /** @var IndexInteger|IndexText|IndexDatetime|IndexDecimal $valueEntity */
                 return $valueEntity->getField() === $fieldName;
             }
         );

@@ -10,7 +10,7 @@ use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 class UpdateActivityButtonConfigQuery extends ParametrizedMigrationQuery
 {
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function getDescription()
     {
@@ -21,7 +21,7 @@ class UpdateActivityButtonConfigQuery extends ParametrizedMigrationQuery
     }
 
     /**
-     * {inheritdoc}
+     * {@inheritdoc}
      */
     public function execute(LoggerInterface $logger)
     {

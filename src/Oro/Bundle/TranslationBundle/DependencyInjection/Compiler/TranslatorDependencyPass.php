@@ -12,9 +12,14 @@ class TranslatorDependencyPass implements CompilerPassInterface
      */
     public function process(ContainerBuilder $container)
     {
-        $container->getDefinition('translator.default')->addMethodCall(
+        $translatorDef = $container->getDefinition('translator.default');
+        $translatorDef->addMethodCall(
             'setDatabaseMetadataCache',
             [$container->getDefinition('oro_translation.database_translation.metadata.cache')]
+        );
+        $translatorDef->addMethodCall(
+            'setResourceCache',
+            [$container->getDefinition('oro_translation.resource.cache')]
         );
     }
 }

@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActivityListBundle\Migration;
 use Doctrine\DBAL\Schema\Comparator;
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\ActivityListBundle\Migration\Extension\ActivityListExtension;
@@ -33,25 +34,31 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
     /** @var ExtendDbIdentifierNameGenerator */
     protected $nameGenerator;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /**
      * @param Schema                          $schema
      * @param ActivityListChainProvider       $provider
      * @param ActivityListExtension           $activityListExtension
      * @param EntityMetadataHelper            $metadataHelper
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
+     * @param ConfigManager                   $configManager
      */
     public function __construct(
         Schema $schema,
         ActivityListChainProvider $provider,
         ActivityListExtension $activityListExtension,
         EntityMetadataHelper $metadataHelper,
-        ExtendDbIdentifierNameGenerator $nameGenerator
+        ExtendDbIdentifierNameGenerator $nameGenerator,
+        ConfigManager $configManager
     ) {
         $this->schema                = $schema;
         $this->provider              = $provider;
         $this->activityListExtension = $activityListExtension;
         $this->metadataHelper        = $metadataHelper;
         $this->nameGenerator         = $nameGenerator;
+        $this->configManager         = $configManager;
     }
 
     /**
@@ -79,7 +86,10 @@ class ActivityListMigrationQuery extends ParametrizedMigrationQuery
      */
     protected function runActivityLists(LoggerInterface $logger, $dryRun = false)
     {
-        $targetEntities   = $this->provider->getTargetEntityClasses(true);
+        // @todo: this workaround should be removed in BAP-9156
+        $this->configManager->clear();
+
+        $targetEntities   = $this->provider->getTargetEntityClasses(false);
         $toSchema         = clone $this->schema;
         $hasSchemaChanges = false;
         foreach ($targetEntities as $targetEntity) {

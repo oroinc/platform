@@ -293,6 +293,17 @@ class ConfigFieldGridController extends Controller
             return new Response('', Codes::HTTP_FORBIDDEN);
         }
 
+        $fieldNameValidationHelper = $this->get('oro_entity_extend.extend.field_name_validation_helper');
+        if (!$fieldNameValidationHelper->canFieldBeRestored($field)) {
+            return new JsonResponse(
+                [
+                    'message'    => 'This field cannot be restored because a field with similar name exists.',
+                    'successful' => false
+                ],
+                Codes::HTTP_OK
+            );
+        }
+
         // TODO: property_exists works only for regular fields, not for relations and option sets. Need better approach
         $isFieldExist = class_exists($field->getEntity()->getClassName())
             && property_exists(
@@ -336,7 +347,7 @@ class ConfigFieldGridController extends Controller
                 }
             }
             if ($hasChanges) {
-                $configProvider->persist($config);
+                $configManager->persist($config);
                 $indexedValues = $configProvider->getPropertyConfig()->getIndexedValues($config->getId());
                 $fieldModel->fromArray($config->getId()->getScope(), $config->all(), $indexedValues);
             }

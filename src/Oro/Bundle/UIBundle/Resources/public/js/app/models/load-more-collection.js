@@ -1,9 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 /** @lends LoadMoreCollection */
-define(['./base/routing-collection'
-], function (RoutingCollection) {
+define(function(require) {
     'use strict';
+
+    var $ = require('jquery');
+    var RoutingCollection = require('./base/routing-collection');
 
     /**
      * Collection with "load more" functionality support. Any add/remove actions will be considered like already done
@@ -42,23 +42,23 @@ define(['./base/routing-collection'
         /**
          * @inheritDoc
          */
-        parse: function (response) {
+        parse: function(response) {
             this._state.set('totalItemsQuantity', response.count || 0);
-            return LoadMoreCollection.__super__.parse.apply(this, arguments);;
+            return LoadMoreCollection.__super__.parse.apply(this, arguments);
         },
 
         /**
          * Loads additional state.loadMoreItemsQuantity items to this collection
          * @returns {$.Promise} promise
          */
-        loadMore: function () {
+        loadMore: function() {
             var loadDeferred;
             this._route.set({
                 limit: this._route.get('limit') + this._state.get('loadMoreItemsQuantity')
             });
             loadDeferred = $.Deferred();
             if (this.isSyncing()) {
-                this.once('sync', function () {
+                this.once('sync', function() {
                     loadDeferred.resolve(this);
                 });
             } else {
@@ -70,7 +70,7 @@ define(['./base/routing-collection'
         /**
          * @inheritDoc
          */
-        _onAdd: function () {
+        _onAdd: function() {
             // ignore add events during syncing
             if (this.isSyncing()) {
                 return;
@@ -86,7 +86,7 @@ define(['./base/routing-collection'
         /**
          * @inheritDoc
          */
-        _onRemove: function () {
+        _onRemove: function() {
             // ignore remove events during syncing
             if (this.isSyncing()) {
                 return;
@@ -99,6 +99,6 @@ define(['./base/routing-collection'
             });
         }
     });
-    
+
     return LoadMoreCollection;
 });

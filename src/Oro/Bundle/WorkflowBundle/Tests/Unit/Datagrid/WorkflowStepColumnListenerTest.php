@@ -40,7 +40,9 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $this->configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $this->workflowManager = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\WorkflowManager')
             ->disableOriginalConstructor()
@@ -249,8 +251,6 @@ class WorkflowStepColumnListenerTest extends \PHPUnit_Framework_TestCase
                             'label' => 'oro.workflow.workflowstep.grid.label'
                         ),
                     ),
-                    'filters' => array(),
-                    'sorters' => array(),
                 ),
             ),
             'full configuration' => array(

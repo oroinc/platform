@@ -42,6 +42,32 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
         $this->entityAliasResolver = new EntityAliasResolver($this->doctrine, true);
     }
 
+    public function testHasAliasForUnknownEntity()
+    {
+        $this->assertFalse(
+            $this->entityAliasResolver->hasAlias('Test\UnknownEntity')
+        );
+    }
+
+    public function testHasAliasCacheForUnknownEntity()
+    {
+        $entityAliasProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
+        $entityAliasProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with('Test\UnknownEntity')
+            ->willReturn(null);
+        $this->entityAliasResolver->addProvider($entityAliasProvider);
+
+        $this->assertFalse(
+            $this->entityAliasResolver->hasAlias('Test\UnknownEntity')
+        );
+
+        // test that the result is cached
+        $this->assertFalse(
+            $this->entityAliasResolver->hasAlias('Test\UnknownEntity')
+        );
+    }
+
     /**
      * @expectedException \Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException
      * @expectedExceptionMessage An alias for "Test\UnknownEntity" entity not found.
@@ -182,6 +208,11 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
             [],
             $this->entityAliasResolver->getAll()
         );
+        // test that a result of getAllMetadata is cached
+        $this->assertSame(
+            [],
+            $this->entityAliasResolver->getAll()
+        );
     }
 
     public function testWarmUp()
@@ -191,11 +222,41 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $this->entityAliasResolver->warmUp('cache/dir');
+        // test that a result of getAllMetadata is cached
+        $this->entityAliasResolver->warmUp('cache/dir');
+    }
+
+    public function testHasAlias()
+    {
+        $this->initialiseAliases(0);
+
+        $this->assertTrue(
+            $this->entityAliasResolver->hasAlias('Test\Entity1')
+        );
+    }
+
+    public function testHasAliasCache()
+    {
+        $entityAliasProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
+        $entityAliasProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with('Test\Entity1')
+            ->willReturn(new EntityAlias('entity1_alias', 'entity1_plural_alias'));
+        $this->entityAliasResolver->addProvider($entityAliasProvider);
+
+        $this->assertTrue(
+            $this->entityAliasResolver->hasAlias('Test\Entity1')
+        );
+
+        // test that the result is cached
+        $this->assertTrue(
+            $this->entityAliasResolver->hasAlias('Test\Entity1')
+        );
     }
 
     public function testGetAlias()
     {
-        $this->initialiseAliases();
+        $this->initialiseAliases(0);
 
         $this->assertEquals(
             'entity1_alias',
@@ -226,7 +287,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetPluralAlias()
     {
-        $this->initialiseAliases();
+        $this->initialiseAliases(0);
 
         $this->assertEquals(
             'entity1_plural_alias',
@@ -257,7 +318,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClassByAlias()
     {
-        $this->initialiseAliases();
+        $this->initialiseAliases(1);
 
         $this->assertEquals(
             'Test\Entity1',
@@ -292,7 +353,7 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClassByPluralAlias()
     {
-        $this->initialiseAliases();
+        $this->initialiseAliases(1);
 
         $this->assertEquals(
             'Test\Entity1',
@@ -327,8 +388,16 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAll()
     {
-        $this->initialiseAliases();
+        $this->initialiseAliases(1);
 
+        $this->assertEquals(
+            [
+                'Test\Entity1' => new EntityAlias('entity1_alias', 'entity1_plural_alias'),
+                'Test\Entity2' => new EntityAlias('entity2_alias', 'entity2_plural_alias')
+            ],
+            $this->entityAliasResolver->getAll()
+        );
+        // test that a result of getAllMetadata is cached
         $this->assertEquals(
             [
                 'Test\Entity1' => new EntityAlias('entity1_alias', 'entity1_plural_alias'),
@@ -694,9 +763,55 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    protected function initialiseAliases()
+    public function testHasAliasForDisabledAlias()
     {
         $this->metadataFactory->expects($this->any())
+            ->method('getAllMetadata')
+            ->willReturn([new ClassMetadata('Test\Entity1')]);
+
+        $entityAliasProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
+        $entityAliasProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with('Test\Entity1')
+            ->willReturn(false);
+
+        $this->entityAliasResolver->addProvider($entityAliasProvider);
+
+        $this->assertFalse(
+            $this->entityAliasResolver->hasAlias('Test\Entity1')
+        );
+    }
+
+    public function testHasAliasCacheForDisabledAlias()
+    {
+        $this->metadataFactory->expects($this->any())
+            ->method('getAllMetadata')
+            ->willReturn([new ClassMetadata('Test\Entity1')]);
+
+        $entityAliasProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
+        $entityAliasProvider->expects($this->once())
+            ->method('getEntityAlias')
+            ->with('Test\Entity1')
+            ->willReturn(false);
+
+        $this->entityAliasResolver->addProvider($entityAliasProvider);
+
+        $this->assertFalse(
+            $this->entityAliasResolver->hasAlias('Test\Entity1')
+        );
+
+        // test that the result is cached
+        $this->assertFalse(
+            $this->entityAliasResolver->hasAlias('Test\Entity1')
+        );
+    }
+
+    /**
+     * @param int $expectedCallsOfGetAllMetadata
+     */
+    protected function initialiseAliases($expectedCallsOfGetAllMetadata)
+    {
+        $this->metadataFactory->expects($this->exactly($expectedCallsOfGetAllMetadata))
             ->method('getAllMetadata')
             ->willReturn(
                 [

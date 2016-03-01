@@ -5,7 +5,6 @@ namespace Oro\Bundle\AddressBundle\Tests\Functional\API;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  */
 class RestApiTest extends WebTestCase

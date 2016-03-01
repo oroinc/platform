@@ -6,15 +6,6 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 
 class EntityConfigIdTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @dataProvider emptyNameProvider
-     * @expectedException \InvalidArgumentException
-     */
-    public function testEmptyScope($scope)
-    {
-        new EntityConfigId($scope, 'Test\Class');
-    }
-
     public function testEntityConfigId()
     {
         $entityId = new EntityConfigId('testScope', 'Test\Class');
@@ -41,13 +32,5 @@ class EntityConfigIdTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals('Test\Class', $entityId->getClassName());
         $this->assertEquals('testScope', $entityId->getScope());
-    }
-
-    public function emptyNameProvider()
-    {
-        return [
-            [null],
-            [''],
-        ];
     }
 }

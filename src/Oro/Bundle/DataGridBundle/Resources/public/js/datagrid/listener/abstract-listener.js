@@ -1,10 +1,8 @@
-/*jslint browser: true, nomen: true*/
-/*global define*/
 define([
     'underscore',
     'jquery',
     'backbone'
-], function (_, $, Backbone) {
+], function(_, $, Backbone) {
     'use strict';
 
     var AbstractListener;
@@ -17,7 +15,7 @@ define([
      * @extends Backbone.Model
      */
     AbstractListener = Backbone.Model.extend({
-        /** @param {String} Column name of cells that will be listened for changing their values */
+        /** @param {String|Array} Column name of cells that will be listened for changing their values */
         columnName: 'id',
 
         /** @param {String} Model field that contains data */
@@ -28,7 +26,7 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             if (!_.has(options, 'columnName')) {
                 throw new Error('Data column name is not specified');
             }
@@ -52,7 +50,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -65,7 +63,7 @@ define([
         /**
          * Set datagrid instance
          */
-        setDatagridAndSubscribe: function () {
+        setDatagridAndSubscribe: function() {
             this.gridEvents = this.getGridEvents();
             this.$gridContainer.on(this.gridEvents);
         },
@@ -75,7 +73,7 @@ define([
          *
          * @returns {Object}
          */
-        getGridEvents: function () {
+        getGridEvents: function() {
             var events = {};
             events['datagrid:change:' + this.gridName] = _.bind(this._onModelEdited, this);
             return events;
@@ -84,10 +82,11 @@ define([
         /**
          * Process cell editing
          *
+         * @param {$.Event} e
          * @param {Backbone.Model} model
          * @protected
          */
-        _onModelEdited: function (e, model) {
+        _onModelEdited: function(e, model) {
             if (!model.hasChanged(this.columnName)) {
                 return;
             }
@@ -107,7 +106,7 @@ define([
          * @protected
          * @abstract
          */
-        _processValue: function (value, model) {
+        _processValue: function(value, model) {
             throw new Error('_processValue method is abstract and must be implemented');
         }
     });

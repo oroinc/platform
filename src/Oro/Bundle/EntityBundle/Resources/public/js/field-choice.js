@@ -1,6 +1,4 @@
-/*global define*/
-/*jslint nomen: true*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var $ = require('jquery');
@@ -14,7 +12,7 @@ define(function (require) {
         options: {
             entity: null,
             data: {},
-            dataFilter: function (entityName, entityFields) {
+            dataFilter: function(entityName, entityFields) {
                 return entityFields;
             },
             select2: {
@@ -31,9 +29,9 @@ define(function (require) {
             fieldsLoaderSelector: ''
         },
 
-        _create: function () {
+        _create: function() {
             this._on({
-                change: function (e) {
+                change: function(e) {
                     if (e.added) {
                         this.element.trigger('changed', e.added.id);
                     }
@@ -44,56 +42,60 @@ define(function (require) {
             this._bindFieldsLoader();
         },
 
-        _init: function () {
-            var instance, select2Options,
-                self = this;
+        _init: function() {
+            var instance;
+            var select2Options;
+            var self = this;
 
             this._processSelect2Options();
             this.updateData(this.options.entity, this.options.data);
 
             select2Options = $.extend({
-                initSelection: function (element, callback) {
-                    var id, chain, opts, match;
+                initSelection: function(element, callback) {
                     instance = element.data('select2');
-                    opts = instance.opts;
-                    id = element.val();
-                    match = null;
-                    chain = self.util.pathToEntityChain(id, true);
-                    instance.pagePath = chain[chain.length - 1].basePath;
+                    var opts = instance.opts;
+                    var id = element.val();
+                    var match = null;
+                    var chain;
+                    try {
+                        chain = self.util.pathToEntityChain(id, true);
+                        instance.pagePath = chain[chain.length - 1].basePath;
+                    } catch (e) {
+                        instance.pagePath = '';
+                    }
                     opts.query({
-                        matcher: function (term, text, el) {
-                            var is_match = id === opts.id(el);
-                            if (is_match) {
+                        matcher: function(term, text, el) {
+                            var isMatch = id === opts.id(el);
+                            if (isMatch) {
                                 match = el;
                             }
-                            return is_match;
+                            return isMatch;
                         },
-                        callback: !$.isFunction(callback) ? $.noop : function () {
+                        callback: !$.isFunction(callback) ? $.noop : function() {
                             callback(match);
                         }
                     });
                 },
-                id: function (result) {
-                    return result.id !== undefined ? result.id : result.pagePath;
+                id: function(result) {
+                    return result.id !== void 0 ? result.id : result.pagePath;
                 },
-                data: function () {
-                    var pagePath, results;
-                    pagePath = (instance && instance.pagePath) || '';
-                    results = self._select2Data(pagePath);
+                data: function() {
+                    var pagePath = (instance && instance.pagePath) || '';
+                    var results = self._select2Data(pagePath);
                     return {
                         more: false,
                         pagePath: pagePath,
                         results: results
                     };
                 },
-                formatBreadcrumbItem: function (item) {
+                formatBreadcrumbItem: function(item) {
                     var label;
                     label = item.field ? item.field.label : item.entity.label;
                     return label;
                 },
-                breadcrumbs: function (pagePath) {
+                breadcrumbs: function(pagePath) {
                     var chain = self.util.pathToEntityChain(pagePath, true);
-                    $.each(chain, function (i, item) {
+                    $.each(chain, function(i, item) {
                         item.pagePath = item.basePath;
                     });
                     return chain;
@@ -104,7 +106,7 @@ define(function (require) {
             instance = this.element.data('select2');
         },
 
-        _setOption: function (key, value) {
+        _setOption: function(key, value) {
             if ($.isPlainObject(value)) {
                 $.extend(this.options[key], value);
             } else {
@@ -113,29 +115,33 @@ define(function (require) {
             return this;
         },
 
-        _getCreateOptions: function () {
+        _getCreateOptions: function() {
             return $.extend(true, {}, this.options);
         },
 
-        _processSelect2Options: function () {
-            var template,
-                options = this.options.select2;
+        _processSelect2Options: function() {
+            var template;
+            var options = this.options.select2;
 
             if (options.formatSelectionTemplate) {
                 template = _.template(options.formatSelectionTemplate);
-                options.formatSelection = $.proxy(function (item) {
-                    return this.formatChoice(item.id, template);
+                options.formatSelection = $.proxy(function(item) {
+                    var result;
+                    if (item !== null) {
+                        result = this.formatChoice(item.id, template);
+                    }
+                    return result;
                 }, this);
             }
         },
 
-        _bindFieldsLoader: function () {
+        _bindFieldsLoader: function() {
             if (!this.options.fieldsLoaderSelector) {
                 return;
             }
             this.$fieldsLoader = $(this.options.fieldsLoaderSelector);
             this._on(this.$fieldsLoader, {
-                fieldsloaderupdate: function (e, data) {
+                fieldsloaderupdate: function(e, data) {
                     this.setValue('');
                     this.updateData($(e.target).val(), data);
                 }
@@ -143,7 +149,7 @@ define(function (require) {
             this.updateData(this.$fieldsLoader.val(), this.$fieldsLoader.data('fields'));
         },
 
-        updateData: function (entity, data) {
+        updateData: function(entity, data) {
             data = data || {};
             this.options.entity = entity;
             this.options.data = data;
@@ -155,11 +161,11 @@ define(function (require) {
             this.util.init(entity, data);
         },
 
-        setValue: function (value) {
+        setValue: function(value) {
             this.element.select2('val', value, true);
         },
 
-        formatChoice: function (value, template) {
+        formatChoice: function(value, template) {
             var data;
             if (value) {
                 try {
@@ -169,11 +175,11 @@ define(function (require) {
             return data ? template(data) : value;
         },
 
-        splitFieldId: function (fieldId) {
+        splitFieldId: function(fieldId) {
             return this.util.pathToEntityChain(fieldId);
         },
 
-        getApplicableConditions: function (fieldId) {
+        getApplicableConditions: function(fieldId) {
             return this.util.getApplicableConditions(fieldId);
         },
 
@@ -183,17 +189,22 @@ define(function (require) {
          * @returns {Array}
          * @private
          */
-        _select2Data: function (path) {
-            var fields = [], relations = [], results = [],
-                chain, entityName, entityFields,
-                entityData = this.options.data,
-                util = this.util;
+        _select2Data: function(path) {
+            var fields = [];
+            var relations = [];
+            var results = [];
+            var chain;
+            var entityName;
+            var entityFields;
+            var entityData = this.options.data;
+            var util = this.util;
             if ($.isEmptyObject(entityData)) {
                 return results;
             }
 
-            chain = this.util.pathToEntityChain(path, true);
-            if (!chain.length) {
+            try {
+                chain = this.util.pathToEntityChain(path, true);
+            } catch (e) {
                 return results;
             }
 
@@ -205,10 +216,10 @@ define(function (require) {
                 entityFields = Util.filterFields(entityFields, this.options.exclude);
             }
 
-            $.each(entityFields, function () {
-                var field = this, item, chainItem;
-                chainItem = {field: field};
-                item = {
+            $.each(entityFields, function() {
+                var field = this;
+                var chainItem = {field: field};
+                var item = {
                     id: util.entityChainToPath(chain.concat(chainItem)),
                     text: field.label
                 };
@@ -225,14 +236,14 @@ define(function (require) {
 
             if (!_.isEmpty(fields)) {
                 results.push({
-                    text: __("oro.entity.field_choice.fields"),
+                    text: __('oro.entity.field_choice.fields'),
                     children: fields
                 });
             }
 
             if (!_.isEmpty(relations)) {
                 results.push({
-                    text: __("oro.entity.field_choice.relations"),
+                    text: __('oro.entity.field_choice.relations'),
                     children: relations
                 });
             }

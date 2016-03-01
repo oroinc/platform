@@ -8,11 +8,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 
-use Oro\Bundle\SecurityBundle\Form\Type\AclPrivilegeIdentityType;
-use Oro\Bundle\SecurityBundle\Form\Type\AclPermissionType;
-
 class AclPrivilegeType extends AbstractType
 {
+    const NAME = 'oro_acl_privilege';
+
     /**
      * {@inheritdoc}
      */
@@ -28,7 +27,7 @@ class AclPrivilegeType extends AbstractType
 
         $builder->add(
             'permissions',
-            new PermissionCollectionType(),
+            PermissionCollectionType::NAME,
             array(
                 'type' => new AclPermissionType(),
                 'allow_add' => true,
@@ -67,6 +66,6 @@ class AclPrivilegeType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_acl_privilege';
+        return self::NAME;
     }
 }

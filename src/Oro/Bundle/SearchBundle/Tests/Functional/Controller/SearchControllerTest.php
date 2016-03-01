@@ -5,7 +5,6 @@ namespace Oro\Bundle\SearchBundle\Tests\Functional\Controller;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
- * @outputBuffering enabled
  * @dbIsolation
  * @dbReindex
  */

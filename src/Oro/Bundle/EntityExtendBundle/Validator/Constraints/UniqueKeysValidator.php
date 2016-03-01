@@ -5,7 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class UniqueKeysValidator extends ConstraintValidator
 {
@@ -15,7 +15,7 @@ class UniqueKeysValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         /** @var UniqueKeys $constraint */
-        $names = ArrayUtils::arrayColumn($value, 'name');
+        $names = ArrayUtil::arrayColumn($value, 'name');
         if ($names && $names != array_unique($names)) {
             $this->context->addViolation(
                 $constraint->message
@@ -24,7 +24,7 @@ class UniqueKeysValidator extends ConstraintValidator
             return;
         }
 
-        $keys = ArrayUtils::arrayColumn($value, 'key');
+        $keys = ArrayUtil::arrayColumn($value, 'key');
         if ($keys && $keys != array_unique($keys, SORT_REGULAR)) {
             $this->context->addViolation(
                 $constraint->message

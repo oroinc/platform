@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Configuration;
 
+use Cron\CronExpression;
 use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -37,6 +38,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
         $order = $this->getConfigurationOption($configuration, 'order', 0);
         $excludeDefinitions = $this->getConfigurationOption($configuration, 'exclude_definitions', array());
         $actionsConfiguration = $this->getConfigurationOption($configuration, 'actions_configuration', array());
+        $preConditionsConfiguration = $this->getConfigurationOption($configuration, 'pre_conditions', array());
 
         $definition = new ProcessDefinition();
         $definition
@@ -46,7 +48,8 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
             ->setEnabled($enabled)
             ->setExecutionOrder($order)
             ->setExcludeDefinitions($excludeDefinitions)
-            ->setActionsConfiguration($actionsConfiguration);
+            ->setActionsConfiguration($actionsConfiguration)
+            ->setPreConditionsConfiguration($preConditionsConfiguration);
 
         return $definition;
     }
@@ -81,11 +84,10 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
      */
     public function buildProcessTrigger(array $configuration, ProcessDefinition $definition)
     {
-        $this->assertConfigurationOptions($configuration, array('event'));
-        $event = $configuration['event'];
-        if (!in_array($event, ProcessTrigger::getAllowedEvents())) {
-            throw new InvalidParameterException(sprintf('Event "%s" is not allowed', $event));
-        }
+        $event = $this->getConfigurationOption($configuration, 'event', null);
+        $cron = $this->getCronExpression($configuration);
+
+        $this->validateEventAndCronParameters($event, $cron);
 
         $field     = $this->getConfigurationOption($configuration, 'field', null);
         $priority  = $this->getConfigurationOption($configuration, 'priority', Job::PRIORITY_DEFAULT);
@@ -96,7 +98,7 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
             throw new InvalidParameterException('Time shift parameter must be either integer or DateInterval');
         }
 
-        if ($field && $event != ProcessTrigger::EVENT_UPDATE) {
+        if ($field && $event !== ProcessTrigger::EVENT_UPDATE) {
             throw new InvalidParameterException('Field is only allowed for update event');
         }
 
@@ -106,7 +108,8 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
             ->setField($field)
             ->setPriority($priority)
             ->setQueued($queued)
-            ->setDefinition($definition);
+            ->setDefinition($definition)
+            ->setCron($cron);
 
         if ($timeShift instanceof \DateInterval) {
             $trigger->setTimeShiftInterval($timeShift);
@@ -115,5 +118,36 @@ class ProcessConfigurationBuilder extends AbstractConfigurationBuilder
         }
 
         return $trigger;
+    }
+
+    /**
+     * @param array $configuration
+     * @return string|null
+     */
+    protected function getCronExpression(array $configuration)
+    {
+        $cron = $this->getConfigurationOption($configuration, 'cron', null);
+        if ($cron !== null) {
+            // validate cron expression
+            CronExpression::factory($cron);
+        }
+
+        return $cron;
+    }
+
+    /**
+     * @param string $event
+     * @param string $cron
+     * @throws InvalidParameterException
+     */
+    protected function validateEventAndCronParameters($event, $cron)
+    {
+        if ($cron && $event) {
+            throw new InvalidParameterException('Only one parameter "event" or "cron" must be configured.');
+        }
+
+        if (!$cron && !in_array($event, ProcessTrigger::getAllowedEvents(), true)) {
+            throw new InvalidParameterException(sprintf('Event "%s" is not allowed', $event));
+        }
     }
 }

@@ -4,7 +4,6 @@ namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\Templating\Helper\CoreAssetsHelper;
 
 use Oro\Bundle\FormBundle\Form\Type\DownloadLinksType;
 
@@ -13,12 +12,14 @@ class DownloadLinksTypeTest extends \PHPUnit_Framework_TestCase
     /** @var DownloadLinksType */
     protected $type;
 
-    /** @var CoreAssetsHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $assetHelper;
 
     protected function setUp()
     {
-        $this->assetHelper = $this->getMock('Symfony\Component\Templating\Helper\CoreAssetsHelper', [], [], '', false);
+        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
+            ->disableOriginalConstructor()
+            ->getMock();
         $this->type        = new DownloadLinksType($this->assetHelper);
     }
 

@@ -34,7 +34,7 @@ class SearchListenerTest extends \PHPUnit_Framework_TestCase
                 'organization' => null
             ]
         ];
-        $event = new PrepareEntityMapEvent($entity, get_class($entity), $data);
+        $event = new PrepareEntityMapEvent($entity, get_class($entity), $data, []);
         $this->listener->prepareEntityMapEvent($event);
         $this->assertEquals($expected, $event->getData());
     }

@@ -19,15 +19,22 @@ parameters:
     oro_datagrid.event_listener.datasource_bind_parameters.class: Oro\Bundle\DataGridBundle\EventListener\DatasourceBindParametersListener
     oro_datagrid.event_listener.ormdatasource_acl.class:          Oro\Bundle\DataGridBundle\EventListener\OrmDatasourceAclListener
     oro_datagrid.event_listener.row_selection.class:              Oro\Bundle\DataGridBundle\EventListener\RowSelectionListener
+    oro_datagrid.event_listener.cell_selection.class:             Oro\Bundle\DataGridBundle\EventListener\CellSelectionListener
     oro_datagrid.twig.datagrid.class:                             Oro\Bundle\DataGridBundle\Twig\DataGridExtension
     oro_datagrid.event_listener.grid_views_load.class:            Oro\Bundle\DataGridBundle\EventListener\GridViewsLoadListener
     oro_datagrid.form.type.grid_view_type.class:                  Oro\Bundle\DataGridBundle\Form\Type\GridViewType
-    oro_datagrid.form.type.filter_type.class:                     Oro\Bundle\DataGridBundle\Form\Type\FilterType
     oro_datagrid.form.type.sorting_type.class:                    Oro\Bundle\DataGridBundle\Form\Type\GridSortingType
-    oro_datagrid.grid_view.manager.api.class:                     Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
+    oro_datagrid.grid_view.manager.api.class:                     Oro\Bundle\DataGridBundle\Entity\Manager\GridViewApiEntityManager
     oro_datagrid.grid_view.entity.class:                          Oro\Bundle\DataGridBundle\Entity\GridView
     oro_datagrid.grid_view.form.handler.api.class:                Oro\Bundle\DataGridBundle\Form\Handler\GridViewApiHandler
+    oro_datagrid.columns.helper.class:                            Oro\Bundle\DataGridBundle\Tools\ColumnsHelper
 
+    oro_datagrid.datagrid.inline_edit_column_options_guesser.class:          Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptionsGuesser
+    oro_datagrid.datagrid.inline_edit_column_options.text_guesser.class:     Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\TextGuesser
+    oro_datagrid.datagrid.inline_edit_column_options.choices_guesser.class:  Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\ChoicesGuesser
+    oro_datagrid.datagrid.inline_edit_column_options.relation_guesser.class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\RelationGuesser
+    oro_datagrid.datagrid.inline_edit_column_options.multi_select_guesser.class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiSelectGuesser
+    oro_datagrid.datagrid.inline_edit_column_options.multi_relation_guesser.class: Oro\Bundle\DataGridBundle\Extension\InlineEditing\InlineEditColumnOptions\MultiRelationGuesser
 services:
     oro_datagrid.datagrid.manager:
         class: %oro_datagrid.datagrid.manager.class%
@@ -117,6 +124,18 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
 
+    oro_datagrid.event_listener.cell_selection:
+        class: %oro_datagrid.event_listener.cell_selection.class%
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter, priority: 255 }
+
+    oro_datagrid.event_listener.mixin:
+        class: Oro\Bundle\DataGridBundle\EventListener\MixinListener
+        arguments:
+            - @oro_datagrid.mixin_configuration.helper
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre, method: onPreBuild, priority: 255 }
+
     oro_datagrid.event_listener.grid_views_load:
         class: %oro_datagrid.event_listener.grid_views_load.class%
         arguments:
@@ -137,12 +156,19 @@ services:
         tags:
             - { name: form.type, alias: oro_datagrid_sorting }
 
+    oro_datagrid.grid_view.manager:
+        class: Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager
+        arguments:
+            - @oro_security.acl_helper
+            - @doctrine
+
     oro_datagrid.grid_view.manager.api:
         class: %oro_datagrid.grid_view.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_datagrid.grid_view.entity.class%
             - @doctrine.orm.entity_manager
+            - @oro_datagrid.grid_view.manager
 
     oro_datagrid.form.grid_view.api:
         class:                        Symfony\Component\Form\Form
@@ -158,4 +184,62 @@ services:
             - @oro_datagrid.form.grid_view.api
             - @request
             - @doctrine
+            - @oro_datagrid.grid_view.manager
+            - @security.token_storage
         scope: request
+
+    oro_datagrid.datagrid.inline_edit_column_options_guesser:
+        class: %oro_datagrid.datagrid.inline_edit_column_options_guesser.class%
+        arguments:
+            - @validator
+
+    oro_datagrid.datagrid.inline_edit_column_options.text_guesser:
+        class: %oro_datagrid.datagrid.inline_edit_column_options.text_guesser.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 100 }
+
+    oro_datagrid.datagrid.inline_edit_column_options.choices_guesser:
+        class: %oro_datagrid.datagrid.inline_edit_column_options.choices_guesser.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_security.acl_helper
+        tags:
+            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 90 }
+
+    oro_datagrid.datagrid.inline_edit_column_options.multi_select_guesser:
+        class: %oro_datagrid.datagrid.inline_edit_column_options.multi_select_guesser.class%
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_security.acl_helper
+        tags:
+            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 92 }
+
+    oro_datagrid.datagrid.inline_edit_column_options.relation_guesser:
+        class: %oro_datagrid.datagrid.inline_edit_column_options.relation_guesser.class%
+        tags:
+            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 95 }
+
+    oro_datagrid.datagrid.inline_edit_column_options.multi_relation_guesser:
+        class: %oro_datagrid.datagrid.inline_edit_column_options.multi_relation_guesser.class%
+        tags:
+            - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 97 }
+
+    oro_datagrid.handler.export:
+        class: Oro\Bundle\DataGridBundle\Handler\ExportHandler
+        arguments:
+            - @oro_importexport.file.mime_type_guesser
+
+    oro_datagrid.columns.helper:
+        class: %oro_datagrid.columns.helper.class%
+
+    oro_datagrid.grid_configuration.helper:
+        class: Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper
+        arguments:
+            - @oro_entity.orm.entity_class_resolver
+
+    oro_datagrid.mixin_configuration.helper:
+        class: Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper
+        arguments:
+             - @oro_datagrid.configuration.provider

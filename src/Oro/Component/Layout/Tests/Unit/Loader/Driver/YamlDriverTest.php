@@ -12,10 +12,39 @@ use Oro\Component\Layout\Loader\Visitor\VisitorCollection;
 
 class YamlDriverTest extends \PHPUnit_Framework_TestCase
 {
+    protected $cacheDir;
+
+    public function setUp()
+    {
+        parent::setUp();
+
+        $this->cacheDir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . 'layouts';
+
+        $fs = new Filesystem();
+        $fs->remove($this->cacheDir);
+    }
+
+    public function tearDown()
+    {
+        parent::tearDown();
+
+        $fs = new Filesystem();
+        $fs->remove($this->cacheDir);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     */
+    public function testEmptyCacheDirException()
+    {
+        $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
+        $this->getLoader($generator);
+    }
+
     public function testLoadInDebugMode()
     {
         $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
-        $loader    = $this->getLoader($generator);
+        $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
@@ -28,11 +57,8 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
     public function testLoadInProductionMode()
     {
-        $fs  = new Filesystem();
-        $dir = rtrim(sys_get_temp_dir(), DIRECTORY_SEPARATOR) . DIRECTORY_SEPARATOR . time();
-
         $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
-        $loader    = $this->getLoader($generator, false, $dir);
+        $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $generator->expects($this->once())->method('generate')->willReturnCallback([$this, 'buildClass']);
 
@@ -41,15 +67,13 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
 
         $update = $loader->load($path);
         $this->assertInstanceOf('Oro\Component\Layout\LayoutUpdateInterface', $update);
-        $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($dir)));
-
-        $fs->remove($dir);
+        $this->assertCount(1, $files = iterator_to_array(new \FilesystemIterator($this->cacheDir)));
     }
 
     public function testPassElementVisitor()
     {
         $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
-        $loader    = $this->getLoader($generator);
+        $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $path     = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/_header.yml';
         $path     = str_replace('/', DIRECTORY_SEPARATOR, $path);
@@ -73,7 +97,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
     public function testPassesParsedYamlContentToGenerator()
     {
         $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
-        $loader    = $this->getLoader($generator);
+        $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $path = rtrim(__DIR__, DIRECTORY_SEPARATOR) . '/../Stubs/Updates/layout_update4.yml';
         $path = str_replace('/', DIRECTORY_SEPARATOR, $path);
@@ -98,7 +122,7 @@ class YamlDriverTest extends \PHPUnit_Framework_TestCase
     public function testProcessSyntaxExceptions()
     {
         $generator = $this->getMock('Oro\Component\Layout\Loader\Generator\LayoutUpdateGeneratorInterface');
-        $loader    = $this->getLoader($generator);
+        $loader    = $this->getLoader($generator, false, $this->cacheDir);
 
         $exception = new SyntaxException(
             'action name should start with "@" symbol, current name "add"',

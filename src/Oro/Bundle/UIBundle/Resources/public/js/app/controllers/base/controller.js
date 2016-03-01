@@ -1,13 +1,11 @@
-/*jslint nomen:true*/
-/*global define, require*/
-define([
-    'jquery',
-    'chaplin',
-    'oroui/js/mediator'
-], function ($, Chaplin, mediator) {
+define(function(require) {
     'use strict';
 
-    var BaseController, reuses, promiseLoads;
+    var $ = require('jquery');
+    var Chaplin = require('chaplin');
+    var BaseController;
+    var reuses;
+    var promiseLoads;
 
     BaseController = Chaplin.Controller.extend({
         /**
@@ -17,14 +15,13 @@ define([
          *
          * @override
          */
-        beforeAction: function (params, route, options) {
-            var i, self;
-
+        beforeAction: function(params, route, options) {
             BaseController.__super__.beforeAction.apply(this, arguments);
 
-            self = this;
+            var self = this;
 
-            return $.when.apply($, promiseLoads).then(function () {
+            return $.when.apply($, promiseLoads).then(function() {
+                var i;
                 // if it's first time route
                 if (!route.previous) {
                     // initializes page cache
@@ -44,7 +41,7 @@ define([
          * @returns {string}
          * @private
          */
-        _combineRouteUrl: function (route) {
+        _combineRouteUrl: function(route) {
             var url;
             url = Chaplin.mediator.execute('combineFullUrl', route.path, route.query);
             return url;
@@ -59,11 +56,10 @@ define([
              *
              * @param {Object} route
              */
-            init: function (route) {
-                var path, query, userName;
-                path = route.path;
-                query = route.query;
-                userName = Chaplin.mediator.execute('retrieveOption', 'userName') || false;
+            init: function(route) {
+                var path = route.path;
+                var query = route.query;
+                var userName = Chaplin.mediator.execute('retrieveOption', 'userName') || false;
                 Chaplin.mediator.execute({
                     name: 'pageCache:init',
                     silent: true
@@ -76,7 +72,7 @@ define([
              * @param {string=} path
              * @returns {Object|undefined}
              */
-            get: function (path) {
+            get: function(path) {
                 return Chaplin.mediator.execute({
                     name: 'pageCache:get',
                     silent: true
@@ -96,7 +92,7 @@ define([
      * Collects compositions to reuse before controller action
      * @static
      */
-    BaseController.addToReuse = function () {
+    BaseController.addToReuse = function() {
         var args = Array.prototype.slice.call(arguments, 0);
         reuses.push(args);
     };
@@ -110,11 +106,10 @@ define([
      * @returns {jQuery.Deferred}
      * @static
      */
-    BaseController.loadBeforeAction = function (modules, initCallback) {
-        var deferredLoad, callback;
-        deferredLoad = $.Deferred();
+    BaseController.loadBeforeAction = function(modules, initCallback) {
+        var deferredLoad = $.Deferred();
         promiseLoads.push(deferredLoad.promise());
-        callback = function () {
+        var callback = function() {
             var args;
             args = Array.prototype.slice.call(arguments, 0);
             initCallback.apply(null, args);

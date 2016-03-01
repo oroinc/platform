@@ -4,16 +4,14 @@ namespace Oro\Bundle\EntityBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
-class OroEntityExtension extends Extension implements PrependExtensionInterface
+class OroEntityExtension extends Extension
 {
     /**
      * {@inheritdoc}
@@ -41,36 +39,20 @@ class OroEntityExtension extends Extension implements PrependExtensionInterface
         $container->setParameter('oro_entity.entity_alias_exclusions', $config['entity_alias_exclusions']);
         $container->setParameter('oro_entity.entity_name_formats', $config['entity_name_formats']);
         $container->setParameter('oro_entity.entity_name_format.default', 'full');
-    }
 
-    /**
-     * Enable ATTR_EMULATE_PREPARES for PostgreSQL connections to avoid https://bugs.php.net/bug.php?id=36652
-     *
-     * @param ContainerBuilder $container
-     */
-    public function prepend(ContainerBuilder $container)
-    {
-        $dbDriver = $container->getParameter('database_driver');
-        if ($dbDriver == DatabaseDriverInterface::DRIVER_POSTGRESQL) {
-            $doctrineConfig = $container->getExtensionConfig('doctrine');
-            $doctrineConnectionOptions = [];
-            foreach ($doctrineConfig as $config) {
-                if (isset($config['dbal']['connections'])) {
-                    foreach (array_keys($config['dbal']['connections']) as $connectionName) {
-                        // Enable ATTR_EMULATE_PREPARES for PostgreSQL
-                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['options'] = [
-                            \PDO::ATTR_EMULATE_PREPARES => true
-                        ];
-                        // Add support of "oid" and "name" Db types for EnterpriseDB
-                        $doctrineConnectionOptions['dbal']['connections'][$connectionName]['mapping_types'] = [
-                            'oid' => 'integer',
-                            'name' => 'string'
-                        ];
-                    }
-                }
+        $loader->load('collectors.yml');
+        $hydrators = [];
+        foreach ($container->getParameter('oro_entity.orm.hydrators') as $key => $value) {
+            if (defined($key)) {
+                $key = constant($key);
             }
-            $container->prependExtensionConfig('doctrine', $doctrineConnectionOptions);
+            $value['loggingClass'] = 'OroLoggingHydrator\Logging' . $value['name'];
+
+            $hydrators[$key] = $value;
         }
+        $container->setParameter('oro_entity.orm.hydrators', $hydrators);
+
+        $this->addClassesToCompile(['Oro\Bundle\EntityBundle\ORM\OroEntityManager']);
     }
 
     /**

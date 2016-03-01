@@ -7,6 +7,7 @@ parameters:
     oro_dataaudit.listener.deprecated_audit_data_listener.class: Oro\Bundle\DataAuditBundle\EventListener\DeprecatedAuditDataListener
 
     oro_dataaudit.loggable.loggable_manager.class:  Oro\Bundle\DataAuditBundle\Loggable\LoggableManager
+    oro_dataaudit.loggable.audit_entity_mapper.class: Oro\Bundle\DataAuditBundle\Loggable\AuditEntityMapper
 
     oro_dataaudit.loggable.entity.class:            Oro\Bundle\DataAuditBundle\Entity\Audit
     oro_dataaudit.loggable.entity_field.class:      Oro\Bundle\DataAuditBundle\Entity\AuditField
@@ -21,6 +22,7 @@ parameters:
     oro_dataaudit.audit.manager.api.class:          Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
 
     oro_dataaudit.filter.audit.class:               Oro\Bundle\DataAuditBundle\Filter\AuditFilter
+    oro_dataaudit.migration.extension.audit_field.class: Oro\Bundle\DataAuditBundle\Migration\Extension\AuditFieldExtension
 
 services:
     oro_dataaudit.filter.audit:
@@ -39,6 +41,13 @@ services:
             - %oro_dataaudit.loggable.entity_field.class%
             - @oro_entity_config.provider.dataaudit
             - @security.context.link
+            - @oro_dataaudit.loggable.audit_entity_mapper
+
+    oro_dataaudit.loggable.audit_entity_mapper:
+        class: %oro_dataaudit.loggable.audit_entity_mapper.class%
+        calls:
+            - [addAuditEntryClass, [%oro_user.entity.class%, %oro_dataaudit.loggable.entity.class%]]
+            - [addAuditEntryFieldClass, [%oro_user.entity.class%, %oro_dataaudit.loggable.entity_field.class%]]
 
     oro_dataaudit.metadata.metadata_factory:
         class:                                      %oro_dataaudit.metadata.metadata_factory.class%
@@ -62,7 +71,7 @@ services:
 
     oro_dataaudit.listener.kernel_listener:
         class:                                      %oro_dataaudit.listener.kernel_listener.class%
-        arguments:                                  [@oro_dataaudit.loggable.loggable_manager, @security.context]
+        arguments:                                  [@service_container]
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
 
@@ -110,3 +119,8 @@ services:
         arguments:
             - %oro_dataaudit.loggable.entity.class%
             - @doctrine.orm.entity_manager
+
+    oro_dataaudit.migration.extension.audit_field:
+        class: %oro_dataaudit.migration.extension.audit_field.class%
+        tags:
+            - { name: oro_migration.extension, extension_name: audit_field }

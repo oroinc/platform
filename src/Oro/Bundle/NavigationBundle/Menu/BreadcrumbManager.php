@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\NavigationBundle\Menu;
 
 use Symfony\Component\Routing\Router;
@@ -8,7 +9,7 @@ use Knp\Menu\Provider\MenuProviderInterface;
 use Knp\Menu\Util\MenuManipulator;
 use Knp\Menu\Matcher\Matcher;
 
-class BreadcrumbManager
+class BreadcrumbManager implements BreadcrumbManagerInterface
 {
     /**
      * @var Matcher
@@ -37,13 +38,7 @@ class BreadcrumbManager
         $this->router = $router;
     }
 
-    /**
-     * Get breadcrumbs for current menu item
-     *
-     * @param $menuName
-     * @param bool $isInverse
-     * @return array
-     */
+    /** {@inheritdoc} */
     public function getBreadcrumbs($menuName, $isInverse = true)
     {
         $menu = $this->getMenu($menuName);
@@ -52,24 +47,15 @@ class BreadcrumbManager
         if ($currentItem) {
             return $this->getBreadcrumbArray($menuName, $currentItem, $isInverse);
         }
+
+        return null;
     }
 
-    /**
-     * Retrieves item in the menu, eventually using the menu provider.
-     *
-     * @param ItemInterface|string $menu
-     * @param array $pathName
-     * @param array $options
-     *
-     * @return ItemInterface
-     *
-     * @throws \LogicException
-     * @throws \InvalidArgumentException when the path is invalid
-     */
-    public function getMenu($menu, array $pathName = array(), array $options = array())
+    /** {@inheritdoc} */
+    public function getMenu($menu, array $pathName = [], array $options = [])
     {
         if (!$menu instanceof ItemInterface) {
-            $menu = $this->provider->get((string) $menu, array_merge($options, array('check_access' => false)));
+            $menu = $this->provider->get((string) $menu, array_merge($options, ['check_access' => false]));
         }
         foreach ($pathName as $child) {
             $menu = $menu->getChild($child);
@@ -81,12 +67,7 @@ class BreadcrumbManager
         return $menu;
     }
 
-    /**
-     * Find current menu item
-     *
-     * @param $menu
-     * @return null|ItemInterface
-     */
+    /** {@inheritdoc} */
     public function getCurrentMenuItem($menu)
     {
         foreach ($menu as $item) {
@@ -107,14 +88,14 @@ class BreadcrumbManager
      *
      * @param ItemInterface $menu
      * @param string $route
-     * @return ItemInterface
+     * @return ItemInterface|null
      */
     public function getMenuItemByRoute($menu, $route)
     {
         foreach ($menu as $item) {
             /** @var $item ItemInterface */
 
-            $routes = (array)$item->getExtra('routes', array());
+            $routes = (array)$item->getExtra('routes', []);
             if ($this->match($routes, $route)) {
                 return $item;
             }
@@ -127,18 +108,11 @@ class BreadcrumbManager
                 return $currentChild;
             }
         }
+
+        return null;
     }
 
-
-
-    /**
-     * Return breadcrumb array
-     *
-     * @param $menuName
-     * @param $item
-     * @param bool $isInverse
-     * @return array
-     */
+    /** {@inheritdoc} */
     public function getBreadcrumbArray($menuName, $item, $isInverse = true)
     {
         $manipulator = new MenuManipulator();
@@ -154,16 +128,10 @@ class BreadcrumbManager
         return $breadcrumbs;
     }
 
-    /**
-     * Get menu item breadcrumbs list
-     *
-     * @param ItemInterface $menu
-     * @param string $route
-     * @return array
-     */
+    /** {@inheritdoc} */
     public function getBreadcrumbLabels($menu, $route)
     {
-        $labels = array();
+        $labels = [];
         $menuItem = $this->getMenuItemByRoute($this->getMenu($menu), $route);
         if ($menuItem) {
             $breadcrumb = $this->getBreadcrumbArray($menu, $menuItem, false);
@@ -214,5 +182,11 @@ class BreadcrumbManager
         } else {
             return false;
         }
+    }
+
+    /** {@inheritdoc} */
+    public function supports($route = null)
+    {
+        return true;
     }
 }

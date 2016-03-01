@@ -1,49 +1,43 @@
-/*jslint nomen: true, vars: true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var _ = require('underscore'),
-        Backbone = require('backbone'),
+    var WidgetContainerIconView;
+    var Backbone = require('backbone');
+    var iconTemplate = require('tpl!./templates/icon-template.html');
+    var BaseView = require('oroui/js/app/views/base/view');
 
-        iconTemplate = require('text!./templates/icon-template.html'),
-        constants    = require('../constants');
-
-    /**
-     * @export  orosidebar/js/widget-container/icon-view
-     * @class   orosidebar.widgetContainer.IconView
-     * @extends Backbone.View
-     */
-    return Backbone.View.extend({
+    WidgetContainerIconView = BaseView.extend({
         className: 'sidebar-icon',
+        template: iconTemplate,
 
         events: {
             'click': 'onClick'
         },
 
-        initialize: function () {
-            var view = this;
-            view.template = _.template(iconTemplate);
-            view.listenTo(view.model, 'change', view.render);
+        listen: {
+            'change model': 'render',
+            'start-loading model': 'onLoadingStart',
+            'end-loading model': 'onLoadingEnd'
         },
 
-        render: function () {
-            var view  = this,
-                model = view.model;
+        render: function() {
+            WidgetContainerIconView.__super__.render.call(this);
 
-            view.$el.html(view.template(model.toJSON()));
-            view.$el.attr('data-cid', model.cid);
+            this.$el.attr('data-cid', this.model.cid);
+            this.$el.toggleClass('sidebar-highlight', this.model.get('highlighted'));
 
-            if (model.get('state') === constants.WIDGET_MAXIMIZED_HOVER) {
-                view.$el.addClass('sidebar-icon-active');
-            } else {
-                view.$el.removeClass('sidebar-icon-active');
-            }
-
-            return view;
+            return this;
         },
 
-        onClick: function (e) {
+        onLoadingStart: function() {
+            this.$el.addClass('loading');
+        },
+
+        onLoadingEnd: function() {
+            this.$el.removeClass('loading');
+        },
+
+        onClick: function(e) {
             e.stopPropagation();
             e.preventDefault();
 
@@ -56,4 +50,6 @@ define(function (require) {
             Backbone.trigger('showWidgetHover', this.model.cid, cord);
         }
     });
+
+    return WidgetContainerIconView;
 });

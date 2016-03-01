@@ -1,0 +1,8 @@
+doctrine:
+    orm:
+        entity_managers:
+            config:
+                mappings:
+                    OroConfigBundle:
+                        mapping:   true
+                        is_bundle: true

@@ -3,7 +3,9 @@
 namespace Oro\Bundle\TrackingBundle\Command;
 
 use Akeneo\Bundle\BatchBundle\Job\BatchStatus;
+use Akeneo\Bundle\BatchBundle\Job\DoctrineJobRepository;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
@@ -85,19 +87,23 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
             $fileName = $file->getFilename();
 
             $options = [
-                'entityName'     => $this->getContainer()->getParameter('oro_tracking.tracking_data.class'),
-                'processorAlias' => 'oro_tracking.processor.data',
-                'file'           => $pathName
+                ProcessorRegistry::TYPE_IMPORT => [
+                    'entityName' => $this->getContainer()->getParameter('oro_tracking.tracking_data.class'),
+                    'processorAlias' => 'oro_tracking.processor.data',
+                    'file' => $pathName,
+                ],
             ];
 
             if ($this->isFileProcessed($options)) {
+                $output->writeln(sprintf('<info>"%s" already processed</info>', $fileName));
+
                 continue;
             }
 
             $jobResult = $this->getJobExecutor()->executeJob(
                 ProcessorRegistry::TYPE_IMPORT,
                 'import_log_to_database',
-                ['import' => $options]
+                $options
             );
 
             if ($jobResult->isSuccessful()) {
@@ -132,26 +138,26 @@ class ImportLogsCommand extends ContainerAwareCommand implements CronCommandInte
      */
     protected function isFileProcessed(array $options)
     {
-        $className = 'Akeneo\Bundle\BatchBundle\Entity\JobExecution';
+        /** @var DoctrineJobRepository $repo */
+        $repo = $this->getContainer()->get('akeneo_batch.job_repository');
 
-        $qb = $this
-            ->getContainer()
-            ->get('doctrine')
-            ->getManagerForClass($className)
-            ->getRepository($className)
+        $manager = $repo->getJobManager();
+
+        $qb = $manager
+            ->getRepository('Akeneo\Bundle\BatchBundle\Entity\JobExecution')
             ->createQueryBuilder('je');
 
         /** @var QueryBuilder $qb */
         $result = $qb
             ->select('COUNT(je) as jobs')
             ->leftJoin('je.jobInstance', 'ji')
-            ->where('je.status NOT IN (:statuses)')
-            ->setParameter(
-                'statuses',
-                [BatchStatus::STARTING, BatchStatus::STARTED]
-            )
+            ->where($qb->expr()->lt('je.status', ':status'))
+            ->setParameter('status', BatchStatus::FAILED)
             ->andWhere('ji.rawConfiguration = :rawConfiguration')
-            ->setParameter('rawConfiguration', serialize($options))
+            ->setParameter(
+                'rawConfiguration',
+                $manager->getConnection()->convertToDatabaseValue($options, Type::TARRAY)
+            )
             ->getQuery()
             ->getOneOrNullResult();
 

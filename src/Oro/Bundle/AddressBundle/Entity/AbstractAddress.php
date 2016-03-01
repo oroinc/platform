@@ -7,8 +7,10 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\Mapping as ORM;
 
-use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegion;
+use Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\FormBundle\Entity\EmptyItem;
 use Oro\Bundle\LocaleBundle\Model\AddressInterface;
@@ -764,19 +766,17 @@ abstract class AbstractAddress implements EmptyItem, FullNameInterface, AddressI
         $this->updated = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
-    public function isRegionValid(ExecutionContext $context)
+    /**
+     * @param ExecutionContextInterface $context
+     * @deprecated since 1.9  Use \Oro\Bundle\AddressBundle\Validator\Constraints\ValidRegionValidator instead
+     */
+    public function isRegionValid(ExecutionContextInterface $context)
     {
-        if ($this->getCountry() && $this->getCountry()->hasRegions() && !$this->region && !$this->regionText) {
-            // do not allow saving text region in case when region was checked from list
-            // except when in base data region text existed
-            // another way region_text field will be null, logic are placed in form listener
-            $propertyPath = $context->getPropertyPath() . '.region';
-            $context->addViolationAt(
-                $propertyPath,
-                'Region is required for country %country%',
-                array('%country%' => $this->getCountry()->getName())
-            );
-        }
+        // Use validator instead of duplicate code
+        $constraint = new ValidRegion();
+        $validator = new ValidRegionValidator();
+        $validator->initialize($context);
+        $validator->validate($this, $constraint);
     }
 
     /**

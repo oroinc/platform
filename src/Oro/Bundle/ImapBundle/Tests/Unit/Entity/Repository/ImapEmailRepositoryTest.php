@@ -6,7 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
@@ -50,9 +50,8 @@ class ImapEmailRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT imap_email '
             . 'FROM Oro\Bundle\ImapBundle\Entity\ImapEmail imap_email '
-            . 'INNER JOIN imap_email.email email '
-            . 'INNER JOIN email.emailUsers email_users '
-            . 'INNER JOIN email_users.folder folder '
+            . 'INNER JOIN imap_email.imapFolder imapFolder '
+            . 'INNER JOIN imapFolder.folder folder '
             . 'WHERE folder = :folder AND imap_email.uid IN (:uids)',
             $query->getDQL()
         );
@@ -63,7 +62,7 @@ class ImapEmailRepositoryTest extends OrmTestCase
 
     public function testGetEmailsByMessageIdsQueryBuilder()
     {
-        $origin     = new ImapEmailOrigin();
+        $origin     = new UserEmailOrigin();
         $messageIds = ['msg1', 'msg2'];
 
         /** @var ImapEmailRepository $repo */
@@ -78,8 +77,8 @@ class ImapEmailRepositoryTest extends OrmTestCase
             . 'INNER JOIN imap_email.imapFolder imap_folder '
             . 'INNER JOIN imap_email.email email '
             . 'INNER JOIN email.emailUsers email_users '
-            . 'INNER JOIN email_users.folder folder '
-            . 'WHERE folder.origin = :origin AND email.messageId IN (:messageIds)',
+            . 'INNER JOIN email_users.folders folders '
+            . 'WHERE folders.origin = :origin AND email.messageId IN (:messageIds)',
             $query->getDQL()
         );
 

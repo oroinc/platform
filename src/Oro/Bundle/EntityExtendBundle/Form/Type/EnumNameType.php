@@ -6,7 +6,7 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Validator\Constraints as Assert;
-use Symfony\Component\Validator\ExecutionContext;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -63,7 +63,7 @@ class EnumNameType extends AbstractType
                         'message' => self::INVALID_NAME_MESSAGE
                     ]
                 );
-                $callback = function ($value, ExecutionContext $context) {
+                $callback = function ($value, ExecutionContextInterface $context) {
                     if (!empty($value)) {
                         $code = ExtendHelper::buildEnumCode($value, false);
                         if (empty($code)) {

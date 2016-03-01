@@ -1,9 +1,14 @@
-/*global define*/
-define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view', 'routing', 'oroui/js/mediator', 'bootstrap'
-    ], function ($, _, __, BaseView, routing, mediator) {
+define(function(require) {
     'use strict';
 
     var ShortcutsView;
+    var $ = require('jquery');
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
+    var BaseView = require('oroui/js/app/views/base/view');
+    var routing = require('routing');
+    require('bootstrap');
+
     /**
      * @export  oronavigation/js/app/views/shortcuts-view
      * @class   oronavigation.shortcuts.View
@@ -36,68 +41,69 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
             this.$el.val('');
 
             this.$el.typeahead({
-                source:_.bind(this.source, this),
-                matcher: function (item) {
-                    return ~item.key.toLowerCase().indexOf(this.query.toLowerCase())
+                source: _.bind(this.source, this),
+                matcher: function(item) {
+                    return item.key.toLowerCase().indexOf(this.query.toLowerCase()) !== -1;
                 },
-                sorter: function (items) {
-                    var beginswith = []
-                        , caseSensitive = []
-                        , caseInsensitive = []
-                        , item;
+                sorter: function(items) {
+                    var beginswith = [];
+                    var caseSensitive = [];
+                    var caseInsensitive = [];
+                    var item;
 
-                    while (item = items.shift()) {
-                        if (!item.key.toLowerCase().indexOf(this.query.toLowerCase())) {
-                            beginswith.push(item)
-                        } else if (~item.key.indexOf(this.query)) {
+                    while ((item = items.shift()) !== undefined) {
+                        if (item.key.toLowerCase().indexOf(this.query.toLowerCase()) === 0) {
+                            beginswith.push(item);
+                        } else if (item.key.indexOf(this.query) !== -1) {
                             caseSensitive.push(item);
                         } else {
                             caseInsensitive.push(item);
                         }
                     }
 
-                    return beginswith.concat(caseSensitive, caseInsensitive)
+                    return beginswith.concat(caseSensitive, caseInsensitive);
                 },
-                render: function (items) {
+                render: function(items) {
                     var that = this;
-                    items = $(items).map(function (i, item) {
+                    items = $(items).map(function(i, item) {
                         var view;
 
                         if (item.item.dialog) {
-                            var config = item.item.dialog_config,
-                                options = {
-                                    "type": config.widget.type,
-                                    "multiple": config.widget.multiple,
-                                    "refresh-widget-alias": config.widget.refreshWidgetAlias,
-                                    'reload-grid-name': config.widget.reloadGridName,
-                                    "options": {
-                                        "alias": config.widget.options.alias,
-                                        "dialogOptions": {
-                                            "title": __(config.widget.options.dialogOptions.title),
-                                            "allowMaximize": config.widget.options.dialogOptions.allowMaximize,
-                                            "allowMinimize": config.widget.options.dialogOptions.allowMinimize,
-                                            "dblclick": config.widget.options.dialogOptions.dblclick,
-                                            "maximizedHeightDecreaseBy": config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
-                                            "width": config.widget.options.dialogOptions.width
-                                        }
-                                    },
-                                    "createOnEvent": "click"
+                            var config = item.item.dialog_config;
+                            var options = {
+                                type: config.widget.type,
+                                multiple: config.widget.multiple,
+                                'refresh-widget-alias': config.widget.refreshWidgetAlias,
+                                'reload-grid-name': config.widget.reloadGridName,
+                                options: {
+                                    alias: config.widget.options.alias,
+                                    dialogOptions: {
+                                        title: __(config.widget.options.dialogOptions.title),
+                                        allowMaximize: config.widget.options.dialogOptions.allowMaximize,
+                                        allowMinimize: config.widget.options.dialogOptions.allowMinimize,
+                                        dblclick: config.widget.options.dialogOptions.dblclick,
+                                        maximizedHeightDecreaseBy:
+                                            config.widget.options.dialogOptions.maximizedHeightDecreaseBy,
+                                        width: config.widget.options.dialogOptions.width
+                                    }
                                 },
-                                dataUrl = routing.generate(config.dataUrl,
-                                    {
-                                        entityClass: self.entityClass,
-                                        entityId: self.entityId
-                                    });
+                                createOnEvent: 'click'
+                            };
+                            var dataUrl = routing.generate(config.dataUrl, {
+                                entityClass: self.entityClass,
+                                entityId: self.entityId
+                            });
 
                             view = $(that.options.item).attr('data-value', item.key).data('isDialog', item.item.dialog);
                             view.find('a')
-                                .attr('href', 'javascript: void(0);')
+                                .attr('href', '#')
                                 .attr('class', config.aCss)
                                 .attr('data-url', dataUrl)
                                 .attr('title', __(config.label))
                                 .attr('data-page-component-module', 'oroui/js/app/components/widget-component')
                                 .attr('data-page-component-options', JSON.stringify(options))
-                                .html('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>' + that.highlighter(item.key));
+                                .html('<i class="' + config.iCss + ' hide-text">' + item.key + '</i>' +
+                                    that.highlighter(item.key));
                         } else {
                             view = $(that.options.item).attr('data-value', item.key);
                             view.find('a').html(that.highlighter(item.key));
@@ -108,13 +114,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
 
                     items.first().addClass('active');
                     this.$menu.html(items);
-                    return this
-                }, 'click': function (e) {
+                    return this;
+                }, 'click': function(e) {
                     e.stopPropagation();
                     e.preventDefault();
                     if (!this.$menu.find('.active').data('isDialog')) {
                         this.select();
-                        this.$element.focus()
+                        this.$element.focus();
                     }
                 }
             });
@@ -131,7 +137,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
                 process(this.cache[query]);
                 this.render();
             } else {
-                var url = routing.generate(this.sourceUrl, { 'query': query });
+                var url = routing.generate(this.sourceUrl, {'query': query});
                 $.get(url, _.bind(function(data) {
                     this.data = data;
                     var result = [];
@@ -149,20 +155,20 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
         },
 
         onChange: function() {
-            var key = this.$el.val(),
-                dataItem;
+            var key = this.$el.val();
+            var dataItem;
             this.$el.val('');
             if (!_.isUndefined(this.data[key])) {
                 dataItem = this.data[key];
                 if (!dataItem.dialog) {
-                    this.$form.attr("action", dataItem.url).submit();
+                    this.$form.attr('action', dataItem.url).submit();
                 } else {
                     this.$el.parent().find('li.active > a').click();
                 }
             }
         },
 
-        getLayoutElement: function () {
+        getLayoutElement: function() {
             return this.$el.closest('.shortcuts');
         },
 

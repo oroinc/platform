@@ -1,7 +1,5 @@
-/*jslint nomen:true*/
-/*global define, console*/
 define(['oroui/js/app/views/base/view'
-    ], function (BaseView) {
+    ], function(BaseView) {
     'use strict';
 
     /**
@@ -11,11 +9,11 @@ define(['oroui/js/app/views/base/view'
      */
     return BaseView.extend({
 
-        initialize: function (options) {
+        initialize: function(options) {
             this.connectionsView = options.connectionsView;
         },
 
-        execute: function (model) {
+        execute: function(model) {
             this.connectionsView.toggleCalendar(model);
         }
     });

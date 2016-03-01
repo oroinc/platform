@@ -5,8 +5,6 @@
  */
 //Not using strict: uneven strict support in browsers, #392, and causes
 //problems with requirejs.exec()/transpiler plugins that may not be strict.
-/*jslint regexp: true, nomen: true, sloppy: true */
-/*global window, navigator, document, importScripts, setTimeout, opera */
 
 var requirejs, require, define;
 (function (global) {
@@ -1020,8 +1018,7 @@ var requirejs, require, define;
                     //Allow plugins to load other code without having to know the
                     //context or how to 'complete' the load.
                     load.fromText = bind(this, function (text, textAlt) {
-                        /*jslint evil: true */
-                        var moduleName = map.name,
+                                                var moduleName = map.name,
                             moduleMap = makeModuleMap(moduleName),
                             hasInteractive = useInteractive;
 
@@ -2067,8 +2064,7 @@ var requirejs, require, define;
      * @param {String} text the text to execute/evaluate.
      */
     req.exec = function (text) {
-        /*jslint evil: true */
-        return eval(text);
+                return eval(text);
     };
 
     //Set up with config info.

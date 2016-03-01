@@ -2,22 +2,29 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\File;
 
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub\ImportEntity;
+use Oro\Bundle\WorkflowBundle\Field\FieldProvider;
 
 class FieldHelperTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var array
      */
-    protected $config = array(
-        'TestEntity' => array(
-            'testField' => array(
+    protected $config = [
+        'TestEntity' => [
+            'testField' => [
                 'testParameter' => 1,
-            ),
-        ),
-    );
+            ],
+        ],
+        'TestEntityScalar' => [
+            'ScalarField' => [
+                'process_as_scalar' => true,
+            ],
+        ],
+    ];
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -43,7 +50,7 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|FieldProvider
      */
     protected function prepareFieldProvider()
     {
@@ -53,11 +60,13 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject
+     * @return \PHPUnit_Framework_MockObject_MockObject|ConfigProvider
      */
     protected function prepareConfigProvider()
     {
-        $configProvider = $this->getMock('Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface');
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
         $configProvider->expects($this->any())->method('hasConfig')
             ->with($this->isType('string'), $this->isType('string'))
             ->will(
@@ -84,10 +93,10 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
                         $entityConfig->expects($this->any())->method('get')->with($this->isType('string'))
                             ->will(
                                 $this->returnCallback(
-                                    function ($parameter) use ($entityName, $fieldName) {
+                                    function ($parameter, $isStrict, $default) use ($entityName, $fieldName) {
                                         return isset($this->config[$entityName][$fieldName][$parameter])
                                             ? $this->config[$entityName][$fieldName][$parameter]
-                                            : null;
+                                            : $default;
                                     }
                                 )
                             );
@@ -104,11 +113,14 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
     {
         $entityName = 'TestEntity';
         $withRelations = true;
-        $expectedFields = array(array('name' => 'field'));
+        $expectedFields = [['name' => 'field']];
 
         $this->fieldProvider->expects($this->once())->method('getFields')->with($entityName, $withRelations)
             ->will($this->returnValue($expectedFields));
 
+        $this->assertEquals($expectedFields, $this->helper->getFields($entityName, $withRelations));
+
+        // do not call twice
         $this->assertEquals($expectedFields, $this->helper->getFields($entityName, $withRelations));
     }
 
@@ -118,18 +130,21 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      * @param string $fieldName
      * @param string $parameter
      * @param mixed|null $default
+     * @param bool $hasConfig
      * @dataProvider getConfigValueDataProvider
      */
-    public function testGetConfigValue($expected, $entityName, $fieldName, $parameter, $default = null)
+    public function testGetConfigValue($expected, $entityName, $fieldName, $parameter, $default, $hasConfig = true)
     {
         if (!is_null($expected)) {
             $this->assertTrue($this->helper->hasConfig($entityName, $fieldName));
         }
 
-        $this->assertSame(
-            $expected,
-            $this->helper->getConfigValue($entityName, $fieldName, $parameter, $default)
-        );
+        $value = $this->helper->getConfigValue($entityName, $fieldName, $parameter, $default);
+        $this->assertSame($expected, $value);
+        $this->assertSame($value, $this->helper->getConfigValue($entityName, $fieldName, $parameter, $default));
+
+        // has config from caches
+        $this->assertEquals($hasConfig, $this->helper->hasConfig($entityName, $fieldName));
     }
 
     /**
@@ -137,27 +152,30 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function getConfigValueDataProvider()
     {
-        return array(
-            'unknown entity or field' => array(
+        return [
+            'unknown entity or field' => [
                 'expected' => null,
                 'entityName' => 'UnknownEntity',
                 'fieldName' => 'unknownField',
                 'parameter' => 'someParameter',
-            ),
-            'no parameter with default' => array(
+                'default' => null,
+                'hasConfig' => false
+            ],
+            'no parameter with default' => [
                 'expected' => false,
                 'entityName' => 'TestEntity',
                 'fieldName' => 'testField',
                 'parameter' => 'unknownParameter',
                 'default' => false,
-            ),
-            'existing parameter' => array(
+            ],
+            'existing parameter' => [
                 'expected' => 1,
                 'entityName' => 'TestEntity',
                 'fieldName' => 'testField',
                 'parameter' => 'testParameter',
-            ),
-        );
+                'default' => null,
+            ],
+        ];
     }
 
     /**
@@ -175,27 +193,27 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function relationDataProvider()
     {
-        return array(
-            'no relation type' => array(
+        return [
+            'no relation type' => [
                 'expected' => false,
-                'field' => array(
+                'field' => [
                     'related_entity_name' => 'TestEntity',
-                ),
-            ),
-            'no related entity name' => array(
+                ],
+            ],
+            'no related entity name' => [
                 'expected' => false,
-                'field' => array(
+                'field' => [
                     'relation_type' => 'ref-one',
-                ),
-            ),
-            'valid relation' => array(
+                ],
+            ],
+            'valid relation' => [
                 'expected' => true,
-                'field' => array(
+                'field' => [
                     'relation_type' => 'ref-one',
                     'related_entity_name' => 'TestEntity',
-                ),
-            )
-        );
+                ],
+            ]
+        ];
     }
 
     /**
@@ -213,29 +231,29 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function singleRelationDataProvider()
     {
-        return array(
-            'single relation ref-one' => array(
+        return [
+            'single relation ref-one' => [
                 'expected' => true,
-                'field' => array(
+                'field' => [
                     'relation_type' => 'ref-one',
                     'related_entity_name' => 'TestEntity',
-                ),
-            ),
-            'single relation manyToOne' => array(
+                ],
+            ],
+            'single relation manyToOne' => [
                 'expected' => true,
-                'field' => array(
+                'field' => [
                     'relation_type' => 'manyToOne',
                     'related_entity_name' => 'TestEntity',
-                ),
-            ),
-            'multiple relation' => array(
+                ],
+            ],
+            'multiple relation' => [
                 'expected' => false,
-                'field' => array(
+                'field' => [
                     'relation_type' => 'ref-many',
                     'related_entity_name' => 'TestEntity',
-                ),
-            )
-        );
+                ],
+            ]
+        ];
     }
 
     /**
@@ -253,36 +271,36 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function multipleRelationDataProvider()
     {
-        return array(
-            'multiple relation ref-many' => array(
+        return [
+            'multiple relation ref-many' => [
                 'expected' => true,
-                'field' => array(
+                'field' => [
                     'relation_type' => 'ref-many',
                     'related_entity_name' => 'TestEntity',
-                ),
-            ),
-            'multiple relation oneToMany' => array(
+                ],
+            ],
+            'multiple relation oneToMany' => [
                 'expected' => true,
-                'field' => array(
+                'field' => [
                     'relation_type' => 'oneToMany',
                     'related_entity_name' => 'TestEntity',
-                ),
-            ),
-            'multiple relation manyToMany' => array(
+                ],
+            ],
+            'multiple relation manyToMany' => [
                 'expected' => true,
-                'field' => array(
+                'field' => [
                     'relation_type' => 'manyToMany',
                     'related_entity_name' => 'TestEntity',
-                ),
-            ),
-            'single relation' => array(
+                ],
+            ],
+            'single relation' => [
                 'expected' => false,
-                'field' => array(
+                'field' => [
                     'relation_type' => 'ref-one',
                     'related_entity_name' => 'TestEntity',
-                ),
-            )
-        );
+                ],
+            ]
+        ];
     }
 
     /**
@@ -300,24 +318,24 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function dateTimeDataProvider()
     {
-        return array(
-            'date' => array(
+        return [
+            'date' => [
                 'expected' => true,
-                'field' => array('type' => 'date'),
-            ),
-            'time' => array(
+                'field' => ['type' => 'date'],
+            ],
+            'time' => [
                 'expected' => true,
-                'field' => array('type' => 'time'),
-            ),
-            'datetime' => array(
+                'field' => ['type' => 'time'],
+            ],
+            'datetime' => [
                 'expected' => true,
-                'field' => array('type' => 'datetime'),
-            ),
-            'string' => array(
+                'field' => ['type' => 'datetime'],
+            ],
+            'string' => [
                 'expected' => false,
-                'field' => array('type' => 'string'),
-            ),
-        );
+                'field' => ['type' => 'string'],
+            ],
+        ];
     }
 
     /**
@@ -405,47 +423,50 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
 
     public function getItemDataDataProvider()
     {
-        return array(
-            'not an array' => array(
+        return [
+            'not an array' => [
                 'data' => new \stdClass(),
                 'fieldName' => 'field',
-                'expected' => array(),
-            ),
-            'null field' => array(
-                'data' => array('field' => 'value'),
+                'expected' => [],
+            ],
+            'null field' => [
+                'data' => ['field' => 'value'],
                 'fieldName' => null,
-                'expected' => array('field' => 'value'),
-            ),
-            'existing field' => array(
-                'data' => array('field' => array('value')),
+                'expected' => ['field' => 'value'],
+            ],
+            'existing field' => [
+                'data' => ['field' => ['value']],
                 'fieldName' => 'field',
-                'expected' => array('value'),
-            ),
-            'not existing field' => array(
-                'data' => array(),
+                'expected' => ['value'],
+            ],
+            'not existing field' => [
+                'data' => [],
                 'fieldName' => 'field',
-                'expected' => array(),
-            ),
-        );
+                'expected' => [],
+            ],
+        ];
     }
 
     public function testGetIdentityValues()
     {
-        $this->config['stdClass'] = array(
-            'excludedField' => array('excluded' => true),
-            'identityField' => array('identity' => true),
-            'regularField'  => array(),
-        );
+        $this->config['stdClass'] = [
+            'excludedField' => ['excluded' => true],
+            'identityField' => ['identity' => true],
+            'onlyWhenNotEmptyIdentityField' => ['identity' => true],
+            'regularField'  => [],
+        ];
 
-        $fields = array(
-            array('name' => 'excludedField'),
-            array('name' => 'identityField'),
-            array('name' => 'regularField'),
-        );
+        $fields = [
+            ['name' => 'excludedField'],
+            ['name' => 'identityField'],
+            ['name' => 'onlyWhenNotEmptyIdentityField'],
+            ['name' => 'regularField'],
+        ];
 
         $entity = new \stdClass();
         $entity->excludedField = 'excludedValue';
         $entity->identityField = 'identityValue';
+        $entity->onlyWhenNotEmptyIdentityField = 'onlyWhenNotEmptyIdentityValue';
         $entity->regularField  = 'regularValue';
 
         $this->fieldProvider->expects($this->once())
@@ -453,9 +474,58 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             ->with(get_class($entity), true)
             ->will($this->returnValue($fields));
 
+        $value = $this->helper->getIdentityValues($entity);
         $this->assertEquals(
-            array('identityField' => 'identityValue'),
-            $this->helper->getIdentityValues($entity, $fields)
+            [
+                'identityField' => 'identityValue',
+                'onlyWhenNotEmptyIdentityField' => 'onlyWhenNotEmptyIdentityValue'
+            ],
+            $value
         );
+        $this->assertSame($value, $this->helper->getIdentityValues($entity));
+    }
+
+    /**
+     * @dataProvider isRequiredIdentityFieldProvider
+     */
+    public function testIsRequiredIdentityField($identityValue, $expectedResult)
+    {
+        $this->config['stdClass'] = [
+            'testField' => ['identity' => $identityValue]
+        ];
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->helper->isRequiredIdentityField('stdClass', 'testField')
+        );
+    }
+
+    public function isRequiredIdentityFieldProvider()
+    {
+        return [
+            [false, false],
+            [true, true],
+            [FieldHelper::IDENTITY_ONLY_WHEN_NOT_EMPTY, false],
+        ];
+    }
+
+    public function testProcessAsScalar()
+    {
+        $this->assertFalse($this->helper->processRelationAsScalar('TestEntity', 'testField'));
+        $this->assertTrue($this->helper->processRelationAsScalar('TestEntityScalar', 'ScalarField'));
+    }
+
+    public function testGetRelations()
+    {
+        $entityName = 'TestEntity';
+        $expectedRelations = [['name' => 'field']];
+
+        $this->fieldProvider->expects($this->once())->method('getRelations')->with($entityName)
+            ->will($this->returnValue($expectedRelations));
+
+        $this->assertEquals($expectedRelations, $this->helper->getRelations($entityName));
+
+        // do not call twice
+        $this->assertEquals($expectedRelations, $this->helper->getRelations($entityName));
     }
 }

@@ -14,6 +14,9 @@ class ImapMessageIterator implements \Iterator, \Countable
     /** @var int[]|null */
     private $ids;
 
+    /** @var bool using message uids */
+    private $uidMode;
+
     /** @var bool */
     private $reverse = false;
 
@@ -40,11 +43,13 @@ class ImapMessageIterator implements \Iterator, \Countable
      *
      * @param Imap       $imap
      * @param int[]|null $ids
+     * @param bool       $uidMode
      */
-    public function __construct(Imap $imap, array $ids = null)
+    public function __construct(Imap $imap, array $ids = null, $uidMode = false)
     {
         $this->imap = $imap;
         $this->ids  = $ids;
+        $this->uidMode  = $uidMode;
     }
 
     /**
@@ -212,7 +217,23 @@ class ImapMessageIterator implements \Iterator, \Countable
     {
         return $this->ids === null
             ? $pos
-            : $this->ids[$pos];
+            : $this->convertUidToId($this->ids[$pos]);
+    }
+
+    /**
+     * Convert uid to id if using uid
+     *
+     * @param int $uid
+     *
+     * @return int
+     */
+    protected function convertUidToId($uid)
+    {
+        if ($this->uidMode) {
+            return $this->imap->getNumberByUniqueId($uid);
+        } else {
+            return $uid;
+        }
     }
 
     /**

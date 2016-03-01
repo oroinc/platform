@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Unit\Query;
 
+use Oro\Bundle\SearchBundle\Query\Criteria\Comparison;
 use Oro\Bundle\SearchBundle\Query\Query;
 
 class QueryTest extends \PHPUnit_Framework_TestCase
@@ -68,9 +69,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $query->setMappingConfig($this->config);
         $query->from('Oro\Bundle\DataBundle\Entity\Product');
         $query->andWhere('all_data', '=', 'test', 'string');
-        $queryParams = $query->getOptions();
-        $this->assertEquals('and', $queryParams[0]['type']);
-        $this->assertEquals('all_data', $queryParams[0]['fieldName']);
+
+        $whereExpression = $query->getCriteria()->getWhereExpression();
+        $this->assertEquals('string.all_data', $whereExpression->getField());
+        $this->assertEquals(Comparison::EQ, $whereExpression->getOperator());
+        $this->assertEquals('test', $whereExpression->getValue()->getValue());
     }
 
     public function testGetMaxResults()
@@ -86,9 +89,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $query->setMappingConfig($this->config);
         $query->from('Oro\Bundle\DataBundle\Entity\Product');
         $query->orWhere('all_data', '=', 'test', 'string');
-        $queryParams = $query->getOptions();
-        $this->assertEquals('or', $queryParams[0]['type']);
-        $this->assertEquals('all_data', $queryParams[0]['fieldName']);
+
+        $whereExpression = $query->getCriteria()->getWhereExpression();
+        $this->assertEquals('string.all_data', $whereExpression->getField());
+        $this->assertEquals(Comparison::EQ, $whereExpression->getOperator());
+        $this->assertEquals('test', $whereExpression->getValue()->getValue());
     }
 
     public function testWhere()
@@ -97,9 +102,11 @@ class QueryTest extends \PHPUnit_Framework_TestCase
         $query->setMappingConfig($this->config);
         $query->from('Oro\Bundle\DataBundle\Entity\Product');
         $query->where('or', 'all_data', '=', 'test', 'string');
-        $queryParams = $query->getOptions();
-        $this->assertEquals('or', $queryParams[0]['type']);
-        $this->assertEquals('all_data', $queryParams[0]['fieldName']);
+
+        $whereExpression = $query->getCriteria()->getWhereExpression();
+        $this->assertEquals('string.all_data', $whereExpression->getField());
+        $this->assertEquals(Comparison::EQ, $whereExpression->getOperator());
+        $this->assertEquals('test', $whereExpression->getValue()->getValue());
     }
 
     public function testGetEntityByAlias()

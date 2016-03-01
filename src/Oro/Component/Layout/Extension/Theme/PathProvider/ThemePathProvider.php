@@ -40,7 +40,9 @@ class ThemePathProvider implements PathProviderInterface, ContextAwareInterface
         $themeName = $this->context->getOr('theme');
         if ($themeName) {
             $themePaths = [];
-            foreach ($this->getThemesHierarchy($themeName) as $theme) {
+
+            $themes = $this->getThemesHierarchy($themeName);
+            foreach ($themes as $theme) {
                 $existingPaths[] = $themePaths[] = $theme->getDirectory();
             }
 

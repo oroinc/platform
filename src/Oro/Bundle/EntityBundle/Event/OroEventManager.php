@@ -98,7 +98,8 @@ class OroEventManager extends ContainerAwareEventManager
      */
     protected function preDispatch($event)
     {
-        foreach ($this->getListeners($event) as $listener) {
+        $listeners = $this->getListeners($event);
+        foreach ($listeners as $listener) {
             $unmodifiedListener = $listener;
             if (is_string($listener)) {
                 $listener = $this->serviceContainer->get($listener);

@@ -1,0 +1,148 @@
+parameters:
+    oro_tag.tag.form.type.tag.class: Oro\Bundle\TagBundle\Form\Type\TagType
+    oro_tag.tag.form.type.tag.api.class: Oro\Bundle\TagBundle\Form\Type\TagApiType
+    oro_tag.tag.form.handler.tag.class: Oro\Bundle\TagBundle\Form\Handler\TagHandler
+
+    oro_tag.form.type.entity_tags_selector.class: Oro\Bundle\TagBundle\Form\Type\EntityTagsSelectType
+    oro_tag.form.type.tag_select.class: Oro\Bundle\TagBundle\Form\Type\TagSelectType
+    oro_tag.form.type.entity_tags_filter.class: Oro\Bundle\TagBundle\Form\Type\EntityTagsFilterType
+
+    oro_tag.form.subscriber.tag_select.class: Oro\Bundle\TagBundle\Form\EventSubscriber\TagSubscriber
+    oro_tag.form.transformer.tag_select.class: Oro\Bundle\TagBundle\Form\Transformer\TagTransformer
+
+    oro_tag.autocomplete.tag.search_handler.class: Oro\Bundle\FormBundle\Autocomplete\SearchHandler
+
+services:
+    oro_tag.form.tag:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments: ["oro_tag_tag_form", "oro_tag_tag"]
+
+    oro_tag.form.handler.tag:
+        class: %oro_tag.tag.form.handler.tag.class%
+        scope: request
+        arguments:
+            - @oro_tag.form.tag
+            - @request
+            - @doctrine.orm.entity_manager
+
+    oro_tag.form.type.tag:
+        class: %oro_tag.tag.form.type.tag.class%
+        tags:
+            - { name: form.type, alias: oro_tag_tag }
+
+    oro_tag.form.type.tag_select:
+        class: %oro_tag.form.type.tag_select.class%
+        arguments:
+            - @oro_security.security_facade
+            - @oro_tag.form.transformer.tag_select
+            - @oro_tag.form.subscriber.tag_select
+        tags:
+            - { name: form.type, alias: oro_tag_select }
+
+    oro_tag.form.subscriber.tag_select:
+        class: %oro_tag.form.subscriber.tag_select.class%
+        arguments:
+            - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
+
+    oro_tag.form.transformer.tag_select:
+        class: %oro_tag.form.transformer.tag_select.class%
+        arguments: [@oro_tag.tag.manager]
+
+    oro_tag.form.type.entity_tags_selector:
+        class: %oro_tag.form.type.entity_tags_selector.class%
+        arguments:
+            - @oro_security.acl_helper
+            - @doctrine
+        tags:
+            - { name: form.type, alias: oro_tag_entity_tags_selector }
+
+    oro_tag.form.type.entity_tags_filter:
+        class: %oro_tag.form.type.entity_tags_filter.class%
+        tags:
+            - { name: form.type, alias: oro_type_tag_filter }
+
+
+    # Entity configuration choice
+    oro_tag.form.type.tag_config_choice:
+        class: Oro\Bundle\TagBundle\Form\Type\TagConfigChoiceType
+        arguments:
+            - @oro_entity_extend.association_type_helper
+        tags:
+            - { name: form.type, alias: oro_tag_config_choice }
+
+
+    # Autocomplete
+    oro_tag.autocomplete.tag.search_handler:
+        class: Oro\Bundle\TagBundle\Autocomplete\SearchHandler
+        parent: oro_form.autocomplete.search_handler
+        arguments:
+            - %oro_tag.tag.entity.class%
+            - ["name"]
+            - @oro_security.security_facade
+        tags:
+            - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_assign_unassign }
+
+    # API
+    oro_tag.form.type.tag.api:
+        class: %oro_tag.tag.form.type.tag.api.class%
+        tags:
+            - { name: form.type, alias: oro_tag_tag }
+
+    oro_tag.form.tag.api:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments: ["oro_tag_tag_form", "oro_tag_tag", null]
+
+    oro_tag.form.handler.api:
+        class: %oro_tag.tag.form.handler.tag.class%
+        scope: request
+        arguments:
+            - @oro_tag.form.type.tag.api
+            - @request
+            - @doctrine.orm.entity_manager
+
+    oro_tag.form.handler.taggable.api:
+        class: Oro\Bundle\TagBundle\Form\Handler\TagEntityApiHandler
+        scope: request
+        arguments:
+            - @oro_tag.form.taggable.api
+            - @request
+            - @doctrine.orm.entity_manager
+            - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
+
+    oro_tag.form.type.taggable.api:
+        class: Oro\Bundle\TagBundle\Form\Type\TagEntityApiType
+        tags:
+            - { name: form.type, alias: oro_tag_tag_api }
+
+    oro_tag.form.tag_collection.api:
+        class: Oro\Bundle\TagBundle\Form\Type\TagCollectionApiType
+        tags:
+            - { name: form.type, alias: oro_tag_collection_api }
+
+    oro_tag.form.tag_standalone_collection.api:
+        parent: oro_form.type.api
+        arguments:
+            - oro_tag_standalone_collection_api
+            - @oro_tag.form.tag_collection.api
+        tags:
+            - { name: form.type, alias: oro_tag_standalone_collection_api }
+
+    oro_tag.form.taggable.api:
+        class: Symfony\Component\Form\Form
+        factory_method: createNamed
+        factory_service: form.factory
+        arguments:
+            - tags
+            - 'oro_tag_standalone_collection_api'
+
+    oro_tag.form.type.filter.tags_report:
+        class: Oro\Bundle\TagBundle\Form\Type\Filter\TagsReportFilterType
+        arguments: ["@translator"]
+        tags:
+            - { name: form.type, alias: oro_type_tags_report_filter }

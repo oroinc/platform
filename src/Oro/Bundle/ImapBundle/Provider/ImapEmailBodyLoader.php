@@ -12,10 +12,12 @@ use Oro\Bundle\EmailBundle\Builder\EmailBodyBuilder;
 use Oro\Bundle\EmailBundle\Exception\EmailBodyNotFoundException;
 use Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
-use Oro\Bundle\ImapBundle\Entity\ImapEmailOrigin;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Entity\ImapEmail;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class ImapEmailBodyLoader implements EmailBodyLoaderInterface
 {
@@ -27,16 +29,28 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
     /** @var Mcrypt */
     protected $encryptor;
 
+    /** @var ImapEmailGoogleOauth2Manager */
+    protected $imapEmailGoogleOauth2Manager;
+
+    /** @var ConfigManager */
+    protected $configManager;
+
     /**
-     * Constructor
-     *
      * @param ImapConnectorFactory $connectorFactory
      * @param Mcrypt $encryptor
+     * @param ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
+     * @param ConfigManager $configManager
      */
-    public function __construct(ImapConnectorFactory $connectorFactory, Mcrypt $encryptor)
-    {
+    public function __construct(
+        ImapConnectorFactory $connectorFactory,
+        Mcrypt $encryptor,
+        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager,
+        ConfigManager $configManager
+    ) {
         $this->connectorFactory = $connectorFactory;
         $this->encryptor = $encryptor;
+        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
+        $this->configManager = $configManager;
     }
 
     /**
@@ -44,7 +58,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
      */
     public function supports(EmailOrigin $origin)
     {
-        return $origin instanceof ImapEmailOrigin;
+        return $origin instanceof UserEmailOrigin;
     }
 
     /**
@@ -52,15 +66,16 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
      */
     public function loadEmailBody(EmailFolder $folder, Email $email, EntityManager $em)
     {
-        /** @var ImapEmailOrigin $origin */
+        /** @var UserEmailOrigin $origin */
         $origin = $folder->getOrigin();
 
         $config = new ImapConfig(
-            $origin->getHost(),
-            $origin->getPort(),
-            $origin->getSsl(),
+            $origin->getImapHost(),
+            $origin->getImapPort(),
+            $origin->getImapEncryption(),
             $origin->getUser(),
-            $this->encryptor->decryptData($origin->getPassword())
+            $this->encryptor->decryptData($origin->getPassword()),
+            $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($origin)
         );
 
         $manager = new ImapEmailManager($this->connectorFactory->createImapConnector($config));
@@ -80,7 +95,7 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
             throw new EmailBodyNotFoundException($email);
         }
 
-        $builder = new EmailBodyBuilder();
+        $builder = new EmailBodyBuilder($this->configManager);
         $builder->setEmailBody(
             $loadedEmail->getBody()->getContent(),
             $loadedEmail->getBody()->getBodyIsText()
@@ -91,7 +106,8 @@ class ImapEmailBodyLoader implements EmailBodyLoaderInterface
                 $attachment->getContent(),
                 $attachment->getContentType(),
                 $attachment->getContentTransferEncoding(),
-                $attachment->getContentId()
+                $attachment->getContentId(),
+                $attachment->getFileSize()
             );
         }
 

@@ -157,14 +157,16 @@ class TabExtension extends \Twig_Extension
     /**
      * @param \Twig_Environment $environment
      * @param array $tabs
+     * @param array $options
      * @return string
      */
-    public function tabPanel(\Twig_Environment $environment, $tabs)
+    public function tabPanel(\Twig_Environment $environment, $tabs, array $options = [])
     {
         return $environment->render(
             self::TEMPLATE,
             [
-                'tabs' => $tabs
+                'tabs' => $tabs,
+                'options' => $options,
             ]
         );
     }

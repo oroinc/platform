@@ -65,6 +65,11 @@ class Product
     private $manufacturer;
 
     /**
+     * @ORM\MayToMany(targetEntity="Category", inversedBy="products")
+     */
+    private $categories;
+
+    /**
      * Get id
      *
      * @return integer
@@ -118,6 +123,7 @@ class Product
     {
         return $this->description;
     }
+
     /**
      * Constructor
      */
@@ -236,5 +242,39 @@ class Product
     public function setRecordId($id)
     {
         $this->id = $id;
+    }
+
+    /**
+     * Add category
+     *
+     * @param Category $category
+     *
+     * @return Product
+     */
+    public function addCategory(Category $category)
+    {
+        $this->categories[] = $category;
+
+        return $this;
+    }
+
+    /**
+     * Remove category
+     *
+     * @param Category $category
+     */
+    public function removeCategory(Category $category)
+    {
+        $this->categories->removeElement($category);
+    }
+
+    /**
+     * Get categories
+     *
+     * @return \Doctrine\Common\Collections\Collection
+     */
+    public function getCategories()
+    {
+        return $this->categories;
     }
 }

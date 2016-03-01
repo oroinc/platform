@@ -1,6 +1,3 @@
-/*jshint browser:true*/
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     'oroui/js/mediator',
@@ -9,19 +6,22 @@ define([
     '../views/pin-bar-view',
     '../views/pin-dropdown-view',
     '../views/pin-item-view'
-], function (_, mediator, BaseBookmarkComponent, ButtonView, PinBarView, DropdownView, ItemView) {
+], function(_, mediator, BaseBookmarkComponent, ButtonView, PinBarView, DropdownView, ItemView) {
     'use strict';
 
     var PinComponent;
 
     PinComponent = BaseBookmarkComponent.extend({
+        typeName: 'pinbar',
+
         listen: {
             'add collection': 'onAdd',
             'remove collection': 'onRemove',
-            'pagestate:change mediator': 'onPageStateChange'
+            'pagestate:change mediator': 'onPageStateChange',
+            'page:afterChange mediator': 'onPageAfterChange'
         },
 
-        _createSubViews: function () {
+        _createSubViews: function() {
             this._createButtonView();
             this._createBarView();
             this._createDropdownView();
@@ -32,11 +32,9 @@ define([
          *
          * @protected
          */
-        _createButtonView: function () {
-            var options, collection;
-
-            options = this._options.buttonOptions || {};
-            collection = this.collection;
+        _createButtonView: function() {
+            var options = this._options.buttonOptions || {};
+            var collection = this.collection;
 
             _.extend(options, {
                 autoRender: true,
@@ -51,12 +49,10 @@ define([
          *
          * @protected
          */
-        _createBarView: function () {
-            var options, collection, BarItemView;
-
-            options = this._options.barOptions || {};
-            collection = this.collection;
-            BarItemView = ItemView.extend({
+        _createBarView: function() {
+            var options = this._options.barOptions || {};
+            var collection = this.collection;
+            var BarItemView = ItemView.extend({
                 template: this._options.barItemTemplate
             });
 
@@ -74,13 +70,11 @@ define([
          *
          * @protected
          */
-        _createDropdownView: function () {
-            var options, collection, pinBar, DropdownItemView;
-
-            options = this._options.dropdownOptions || {};
-            collection = this.collection;
-            pinBar = this.pinBar;
-            DropdownItemView = ItemView.extend({
+        _createDropdownView: function() {
+            var options = this._options.dropdownOptions || {};
+            var collection = this.collection;
+            var pinBar = this.pinBar;
+            var DropdownItemView = ItemView.extend({
                 template: this._options.dropdownItemTemplate
             });
 
@@ -88,25 +82,29 @@ define([
                 autoRender: true,
                 collection: collection,
                 itemView: DropdownItemView,
-                filterer: function (item) {
+                filterer: function(item) {
                     return !pinBar.isVisibleItem(item);
                 },
-                position: function () {
-                    return {
-                        left: Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
-                    };
+                position: function() {
+                    if (pinBar.el) {
+                        return {
+                            left: Math.ceil(pinBar.el.offsetLeft) + Math.ceil(pinBar.el.offsetWidth)
+                        };
+                    } else {
+                        return null;
+                    }
                 }
             });
 
             this.dropdown = new DropdownView(options);
         },
 
-        actualizeAttributes: function (model) {
-            model.set('type', 'pinbar');
+        actualizeAttributes: function(model) {
+            model.set('type', this.typeName);
             model.set('position', 0);
         },
 
-        onAdd: function (model) {
+        onAdd: function(model) {
             mediator.execute({name: 'pageCache:add', silent: true});
             if (model.get('url') !== mediator.execute('currentUrl')) {
                 // if URL was changed on server, applies this changes for current page
@@ -114,7 +112,7 @@ define([
             }
         },
 
-        onRemove: function (model) {
+        onRemove: function(model) {
             var url;
             url = model.get('url');
             mediator.execute({name: 'pageCache:remove', silent: true}, url);
@@ -124,13 +122,24 @@ define([
             }
         },
 
-        onPageStateChange: function () {
-            var model, url;
-            model = this.collection.getCurrentModel();
+        onPageStateChange: function() {
+            var url;
+            var model = this.collection.getCurrentModel();
             if (model) {
                 url = mediator.execute('currentUrl');
                 if (model.get('url') !== url) {
                     model.set('url', url);
+                    model.save();
+                }
+            }
+        },
+
+        onPageAfterChange: function() {
+            var model = this.collection.getCurrentModel();
+            if (model) {
+                model.set(this.button.getItemAttrs());
+                // if title changed (template and/or it's parameters) -- update it
+                if (model.hasChanged('title')) {
                     model.save();
                 }
             }

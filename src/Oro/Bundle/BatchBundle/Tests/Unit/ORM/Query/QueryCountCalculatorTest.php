@@ -20,19 +20,21 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $dql
-     * @param string $expectedCountQuery
-     * @param array  $sqlParameters
+     * @param string $expectedSql
+     * @param array  $sqlParams
      * @param array  $types
-     * @param array  $queryParameters
+     * @param array  $queryParams
+     * @param array  $useWalker
      *
      * @dataProvider getCountDataProvider
      */
     public function testCalculateCount(
         $dql,
-        $expectedCountQuery,
-        array $sqlParameters = [],
+        $expectedSql,
+        array $sqlParams = [],
         array $types = [],
-        array $queryParameters = []
+        array $queryParams = [],
+        $useWalker = null
     ) {
         /** @var $entityManager EntityManager|\PHPUnit_Framework_MockObject_MockObject */
         /** @var $connection Connection|\PHPUnit_Framework_MockObject_MockObject */
@@ -41,21 +43,21 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
 
         $query = new Query($entityManager);
         $query->setDQL($dql);
-        $query->setParameters($queryParameters);
+        $query->setParameters($queryParams);
 
         $connection->expects($this->once())
             ->method('executeQuery')
-            ->with($expectedCountQuery, $sqlParameters, $types)
+            ->with($expectedSql, $sqlParams, $types)
             ->will($this->returnValue($statement));
 
         $statement->expects($this->any())
             ->method('fetch')
-            ->will($this->onConsecutiveCalls(['sclr0' => self::TEST_COUNT], false));
+            ->will($this->onConsecutiveCalls(['sclr_0' => self::TEST_COUNT], false));
         $statement->expects($this->any())
             ->method('fetchColumn')
             ->will($this->returnValue(self::TEST_COUNT));
 
-        $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query));
+        $this->assertEquals(self::TEST_COUNT, QueryCountCalculator::calculateCount($query, $useWalker));
     }
 
     /**
@@ -64,30 +66,63 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     public function getCountDataProvider()
     {
         return [
-            'empty'               => [
-                'dql'                => 'SELECT e FROM Stub:Entity e',
-                'expectedCountQuery' => 'SELECT count(@0_.a) AS sclr0 FROM  @0_',
+            'empty'                                  => [
+                'dql'         => 'SELECT e FROM Stub:Entity e',
+                'expectedSql' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_',
             ],
-            'empty with group by' => [
-                'dql'                => 'SELECT e FROM Stub:Entity e GROUP BY e.b',
-                'expectedCountQuery' => 'SELECT COUNT(*) FROM ' .
-                    '(SELECT @0_.a AS a0, @0_.b AS b1 FROM  @0_ GROUP BY @0_.b) AS e',
+            'empty with group by'                    => [
+                'dql'         => 'SELECT e FROM Stub:Entity e GROUP BY e.b',
+                'expectedSql' => 'SELECT COUNT(*)' .
+                    ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ GROUP BY t0_.b) AS e',
             ],
-            'single parameters'   => [
-                'dql'                => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
-                'expectedCountQuery' => 'SELECT count(@0_.a) AS sclr0 FROM  @0_ WHERE @0_.a = ? AND @0_.b = ?',
-                'sqlParameters'      => [1, 2],
-                'types'              => [Type::INTEGER, Type::INTEGER],
-                'queryParameters'    => ['a' => 1, 'b' => 2],
+            'single parameters'                      => [
+                'dql'         => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
+                'expectedSql' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
+                'sqlParams'   => [1, 2],
+                'types'       => [Type::INTEGER, Type::INTEGER],
+                'queryParams' => ['a' => 1, 'b' => 2],
             ],
-            'multiple parameters' => [
-                'dql'
-                    => 'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
-                'expectedCountQuery'
-                    => 'SELECT DISTINCT count(DISTINCT @0_.a) AS sclr0 FROM  @0_ WHERE @0_.a = ? AND @0_.b = ?',
-                'sqlParameters'      => [3, 3],
-                'types'              => [Type::INTEGER, Type::INTEGER],
-                'queryParameters'    => ['value' => 3],
+            'single parameters (disable walker)'     => [
+                'dql'         => 'SELECT e FROM Stub:Entity e WHERE e.a = :a AND e.b = :b',
+                'expectedSql' => 'SELECT COUNT(*)'
+                    . ' FROM (SELECT t0_.a AS a_0, t0_.b AS b_1 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?) AS e',
+                'sqlParams'   => [1, 2],
+                'types'       => [Type::INTEGER, Type::INTEGER],
+                'queryParams' => ['a' => 1, 'b' => 2],
+                'useWalker'   => false
+            ],
+            'multiple parameters'                    => [
+                'dql'         => 'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
+                'expectedSql' => 'SELECT DISTINCT count(DISTINCT t0_.a) AS sclr_0'
+                    . ' FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
+                'sqlParams'   => [3, 3],
+                'types'       => [Type::INTEGER, Type::INTEGER],
+                'queryParams' => ['value' => 3],
+            ],
+            'multiple parameters (disable walker)'   => [
+                'dql'         => 'SELECT DISTINCT e.a FROM Stub:Entity e WHERE e.a = :value AND e.b = :value',
+                'expectedSql' => 'SELECT COUNT(*)'
+                    . ' FROM (SELECT DISTINCT t0_.a AS a_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?) AS e',
+                'sqlParams'   => [3, 3],
+                'types'       => [Type::INTEGER, Type::INTEGER],
+                'queryParams' => ['value' => 3],
+                'useWalker'   => false
+            ],
+            'positional parameters'                  => [
+                'dql'         => 'SELECT e.a FROM Stub:Entity e WHERE e.a = ?1 AND e.b = ?0',
+                'expectedSql' => 'SELECT count(t0_.a) AS sclr_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?',
+                'sqlParams'   => [4, 3],
+                'types'       => [Type::INTEGER, Type::INTEGER],
+                'queryParams' => [3, 4],
+            ],
+            'positional parameters (disable walker)' => [
+                'dql'         => 'SELECT e.a FROM Stub:Entity e WHERE e.a = ?1 AND e.b = ?0',
+                'expectedSql' => 'SELECT COUNT(*)'
+                    . ' FROM (SELECT t0_.a AS a_0 FROM  t0_ WHERE t0_.a = ? AND t0_.b = ?) AS e',
+                'sqlParams'   => [4, 3],
+                'types'       => [Type::INTEGER, Type::INTEGER],
+                'queryParams' => [3, 4],
+                'useWalker'   => false
             ],
         ];
     }
@@ -98,7 +133,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider getSqlCountDataProvider
      */
-    public function testCalculateCountForSqlQuery($sql, $useWalker)
+    public function testCalculateCountForSqlQuery($sql, $useWalker = null)
     {
         /** @var $entityManager EntityManager|\PHPUnit_Framework_MockObject_MockObject */
         /** @var $statement Statement|\PHPUnit_Framework_MockObject_MockObject */
@@ -143,6 +178,9 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     public function getSqlCountDataProvider()
     {
         return [
+            [
+                'sql' => 'SELECT id FROM test'
+            ],
             [
                 'sql'       => 'SELECT id FROM test',
                 'useWalker' => false
@@ -234,7 +272,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Bundle\EntityBundle\ORM\SqlQuery, "integer" given
+     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Component\DoctrineUtils\ORM\SqlQuery, "integer" given
      */
     // @codingStandardsIgnoreEnd
     public function testCalculateCountForInvalidQueryType()
@@ -245,7 +283,7 @@ class QueryCountCalculatorTest extends \PHPUnit_Framework_TestCase
     // @codingStandardsIgnoreStart
     /**
      * @expectedException \InvalidArgumentException
-     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Bundle\EntityBundle\ORM\SqlQuery, "integer" given
+     * @expectedExceptionMessage Expected instance of Doctrine\ORM\Query or Oro\Component\DoctrineUtils\ORM\SqlQuery, "integer" given
      */
     // @codingStandardsIgnoreEnd
     public function testCalculateCountForInvalidQueryTypeAndUseWalker()

@@ -46,7 +46,7 @@ class WidgetTitleType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        if (!isset($view->vars['value'], $view->vars['value']['useDefault'] )) {
+        if (!isset($view->vars['value'], $view->vars['value']['useDefault'])) {
             $form->get('useDefault')->setData(true);
         }
     }

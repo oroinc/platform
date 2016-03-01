@@ -2,62 +2,11 @@
 
 namespace Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Component\DependencyInjection\ServiceLink as BaseServiceLink;
 
 /**
- * This class contain link to the service
- * It may be useful if you get circular reference error in DI
+ * @deprecated since 1.9. Use {@see Oro\Component\DependencyInjection\ServiceLink} instead
  */
-class ServiceLink
+class ServiceLink extends BaseServiceLink
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var string
-     */
-    protected $serviceId;
-
-    /**
-     * @var string
-     */
-    protected $isOptional;
-
-    /**
-     * @var mixed
-     */
-    protected $service = false;
-
-    /**
-     * Constructor
-     *
-     * @param ContainerInterface $container
-     * @param string $serviceId
-     * @param bool $isOptional
-     */
-    public function __construct(ContainerInterface $container, $serviceId, $isOptional = false)
-    {
-        $this->container = $container;
-        $this->serviceId = $serviceId;
-        $this->isOptional = $isOptional;
-    }
-
-    /**
-     * Gets a service this link refers to
-     *
-     * @return object
-     */
-    public function getService()
-    {
-        // try to get a service and save it to internal cache
-        if ($this->service === false) {
-            $this->service = !$this->isOptional || $this->container->has($this->serviceId)
-                ? $this->container->get($this->serviceId)
-                : null;
-        }
-
-        return $this->service;
-    }
 }

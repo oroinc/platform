@@ -5,7 +5,7 @@ namespace Oro\Bundle\EmailBundle\Workflow\Action;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityNotFoundException;
 
-use Symfony\Component\Validator\Validator;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 use Symfony\Component\Validator\Exception\ValidatorException;
 use Symfony\Component\Validator\Constraints\Email as EmailConstraints;
 
@@ -31,7 +31,7 @@ class SendEmailTemplate extends AbstractSendEmail
     /** @var ObjectManager */
     protected $objectManager;
 
-    /** @var Validator */
+    /** @var ValidatorInterface */
     protected $validator;
 
     /**
@@ -41,7 +41,7 @@ class SendEmailTemplate extends AbstractSendEmail
      * @param EntityNameResolver $entityNameResolver
      * @param EmailRenderer      $renderer
      * @param ObjectManager      $objectManager
-     * @param Validator          $validator
+     * @param ValidatorInterface $validator
      */
     public function __construct(
         ContextAccessor $contextAccessor,
@@ -50,7 +50,7 @@ class SendEmailTemplate extends AbstractSendEmail
         EntityNameResolver $entityNameResolver,
         EmailRenderer $renderer,
         ObjectManager $objectManager,
-        Validator $validator
+        ValidatorInterface $validator
     ) {
         parent::__construct($contextAccessor, $emailProcessor, $emailAddressHelper, $entityNameResolver);
 
@@ -126,12 +126,11 @@ class SendEmailTemplate extends AbstractSendEmail
         }
         $templateData = $this->renderer->compileMessage($emailTemplate, ['entity' => $entity]);
 
-        $type = $emailTemplate->getType() == 'txt' ? 'text/plain' : 'text/html';
         list ($subjectRendered, $templateRendered) = $templateData;
 
         $emailModel->setSubject($subjectRendered);
         $emailModel->setBody($templateRendered);
-        $emailModel->setType($type);
+        $emailModel->setType($emailTemplate->getType());
 
         $emailUser = $this->emailProcessor->process($emailModel);
 
@@ -150,7 +149,7 @@ class SendEmailTemplate extends AbstractSendEmail
         $emailConstraint = new EmailConstraints();
         $emailConstraint->message = 'Invalid email address';
         if ($email) {
-            $errorList = $this->validator->validateValue(
+            $errorList = $this->validator->validate(
                 $email,
                 $emailConstraint
             );

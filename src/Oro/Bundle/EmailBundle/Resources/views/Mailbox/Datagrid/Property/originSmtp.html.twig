@@ -1,0 +1,6 @@
+{% set origin = record.getValue('origin') %}
+{% if origin is not null and origin.isSmtpConfigured() %}
+    {{ 'Yes'|trans }}
+{% else %}
+    {{ 'No'|trans }}
+{% endif %}

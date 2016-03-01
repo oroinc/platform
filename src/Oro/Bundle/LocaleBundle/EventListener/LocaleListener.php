@@ -7,52 +7,42 @@ use Doctrine\DBAL\DBALException;
 use Gedmo\Translatable\TranslatableListener;
 use Symfony\Component\Console\ConsoleEvents;
 use Symfony\Component\Console\Event\ConsoleCommandEvent;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpKernel\Event\GetResponseEvent;
 use Symfony\Component\HttpKernel\KernelEvents;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Routing\RequestContextAwareInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class LocaleListener implements EventSubscriberInterface
 {
-    /**
-     * @var LocaleSettings
-     */
-    protected $localeSettings;
+    /** @var LocaleSettings */
+    private $localeSettings = false;
+
+    /** @var TranslatableListener */
+    private $translatableListener = false;
+
+    /** @var bool */
+    private $isInstalled = null;
+
+    /** @var RequestContextAwareInterface */
+    private $router = false;
+
+    /** @var TranslatorInterface */
+    private $translator = false;
+
+    /** @var ContainerInterface */
+    private $container;
 
     /**
-     * @var TranslatableListener
+     * @param ContainerInterface $container
      */
-    protected $translatableListener;
-
-    /**
-     * @var bool
-     */
-    protected $isInstalled;
-
-    /**
-     * @var RequestContextAwareInterface
-     */
-    protected $router;
-
-    /**
-     * @param LocaleSettings               $localeSettings
-     * @param TranslatableListener         $translatableListener
-     * @param bool|null|string             $installed
-     * @param RequestContextAwareInterface $router
-     */
-    public function __construct(
-        LocaleSettings $localeSettings,
-        TranslatableListener $translatableListener,
-        $installed,
-        RequestContextAwareInterface $router = null
-    ) {
-        $this->localeSettings       = $localeSettings;
-        $this->translatableListener = $translatableListener;
-        $this->isInstalled          = !empty($installed);
-        $this->router               = $router;
+    public function __construct(ContainerInterface $container)
+    {
+        $this->container = $container;
     }
 
     /**
@@ -64,18 +54,20 @@ class LocaleListener implements EventSubscriberInterface
             return;
         }
 
-        if ($this->isInstalled) {
+        if ($this->getIsInstalled()) {
+            $language = $this->getLocaleSettings()->getLanguage();
+            $locale   = $this->getLocaleSettings()->getLocale();
+
             if (!$request->attributes->get('_locale')) {
-                $request->setLocale($this->localeSettings->getLanguage());
-                if (null !== $this->router) {
-                    $this->router->getContext()->setParameter('_locale', $this->localeSettings->getLanguage());
+                $request->setLocale($language);
+                if (null !== $this->getRouter()) {
+                    $this->getRouter()->getContext()->setParameter('_locale', $language);
                 }
             }
-            $this->setPhpDefaultLocale($this->localeSettings->getLocale());
+            $this->setPhpDefaultLocale($locale);
 
-            $this->translatableListener->setTranslatableLocale(
-                $this->localeSettings->getLanguage()
-            );
+            $this->getTranslatableListener()->setTranslatableLocale($language);
+            $this->getTranslator()->setLocale($language);
         }
     }
 
@@ -108,17 +100,17 @@ class LocaleListener implements EventSubscriberInterface
             return;
         }
 
-        if ($this->isInstalled) {
+        if ($this->getIsInstalled()) {
             try {
-                $locale = $this->localeSettings->getLocale();
-                $language = $this->localeSettings->getLanguage();
+                $locale   = $this->getLocaleSettings()->getLocale();
+                $language = $this->getLocaleSettings()->getLanguage();
             } catch (DBALException $exception) {
                 // application is not installed
                 return;
             }
 
             $this->setPhpDefaultLocale($locale);
-            $this->translatableListener->setTranslatableLocale($language);
+            $this->getTranslatableListener()->setTranslatableLocale($language);
         }
     }
 
@@ -127,10 +119,70 @@ class LocaleListener implements EventSubscriberInterface
      */
     public static function getSubscribedEvents()
     {
-        return array(
-            // must be registered after Symfony's original LocaleListener
-            KernelEvents::REQUEST  => array(array('onKernelRequest', -15)),
-            ConsoleEvents::COMMAND => array(array('onConsoleCommand')),
-        );
+        return [
+            // must be registered after authentication
+            KernelEvents::REQUEST  => [['onKernelRequest', 7]],
+            ConsoleEvents::COMMAND => [['onConsoleCommand']],
+        ];
+    }
+
+    /**
+     * @return LocaleSettings
+     */
+    protected function getLocaleSettings()
+    {
+        if ($this->localeSettings === false) {
+            $this->localeSettings = $this->container->get('oro_locale.settings');
+        }
+
+        return $this->localeSettings;
+    }
+
+    /**
+     * @return TranslatableListener
+     */
+    protected function getTranslatableListener()
+    {
+        if ($this->translatableListener === false) {
+            $this->translatableListener = $this->container->get('stof_doctrine_extensions.listener.translatable');
+        }
+
+        return $this->translatableListener;
+    }
+
+    /**
+     * @return bool
+     */
+    protected function getIsInstalled()
+    {
+        if ($this->isInstalled === null) {
+            $this->isInstalled = $this->container->getParameter('installed');
+        }
+
+        return $this->isInstalled;
+    }
+
+    /**
+     * @return RequestContextAwareInterface
+     */
+    protected function getRouter()
+    {
+        if ($this->router === false) {
+            $this->router = $this->container->get('router', ContainerInterface::NULL_ON_INVALID_REFERENCE);
+        }
+
+        return $this->router;
+    }
+
+    /**
+     * @return TranslatorInterface
+     */
+    protected function getTranslator()
+    {
+        if ($this->translator === false) {
+            $this->translator = $this->container->get('translator');
+        }
+
+        return $this->translator;
     }
 }

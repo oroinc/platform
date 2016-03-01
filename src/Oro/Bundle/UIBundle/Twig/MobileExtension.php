@@ -2,24 +2,19 @@
 
 namespace Oro\Bundle\UIBundle\Twig;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
-use Oro\Bundle\UIBundle\Provider\UserAgent;
+use Oro\Bundle\UIBundle\Provider\UserAgentProvider;
 
 class MobileExtension extends \Twig_Extension
 {
-    /** @var ContainerInterface */
-    protected $container;
-
-    /** @var UserAgent[] */
-    protected $cache = [];
+    /** @var UserAgentProvider */
+    protected $userAgentProvider;
 
     /**
-     * @param ContainerInterface $container
+     * @param UserAgentProvider $userAgentProvider
      */
-    public function __construct(ContainerInterface $container)
+    public function __construct(UserAgentProvider $userAgentProvider)
     {
-        $this->container = $container;
+        $this->userAgentProvider = $userAgentProvider;
     }
 
     /**
@@ -52,18 +47,7 @@ class MobileExtension extends \Twig_Extension
      */
     public function isMobile()
     {
-        $request   = $this->container->get('request');
-        $userAgent = $request->headers->get('User-Agent');
-
-        if (isset($this->cache[$userAgent])) {
-            $agent = $this->cache[$userAgent];
-        } else {
-            $agent = new UserAgent($userAgent);
-
-            $this->cache[$userAgent] = $agent;
-        }
-
-        return $agent->isMobile();
+        return $this->userAgentProvider->getUserAgent()->isMobile();
     }
 
 
@@ -74,6 +58,6 @@ class MobileExtension extends \Twig_Extension
      */
     public function isDesktop()
     {
-        return !$this->isMobile();
+        return $this->userAgentProvider->getUserAgent()->isDesktop();
     }
 }

@@ -28,6 +28,24 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider buildToManyRelationTargetFieldNameProvider
+     */
+    public function testBuildToManyRelationTargetFieldName($entityClassName, $fieldName, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            ExtendHelper::buildToManyRelationTargetFieldName($entityClassName, $fieldName)
+        );
+    }
+
+    public static function buildToManyRelationTargetFieldNameProvider()
+    {
+        return [
+            ['Oro\Bundle\TestBundle\Entity\Test', 'testField', 'test_testField'],
+        ];
+    }
+
+    /**
      * @dataProvider buildAssociationNameProvider
      */
     public function testBuildAssociationName($targetEntityClassName, $associationKind, $expected)
@@ -64,6 +82,14 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetRelationType()
+    {
+        $this->assertEquals(
+            'manyToOne',
+            ExtendHelper::getRelationType('manyToOne|Test\Entity|Test\TargetEntity|testField')
+        );
+    }
+
     /**
      * @dataProvider buildEnumCodeProvider
      */
@@ -80,7 +106,11 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
         return [
             ['test', 'test'],
             ['Test', 'test'],
-            ['tēstà', function_exists('iconv') ? 'testa' : 'tst'],
+            ['tēstà', 'testa'],
+            ['pièce de résistance', 'piece_de_resistance'],
+            ['Smörgåsbord', 'smorgasbord'],
+            ['Тест', 'test'],
+            ['Тестовые Буквы йёЙЁ', 'testovye_bukvy_jeje'],
             ['test123', 'test123'],
             ['test 123', 'test_123'],
             [' test 123 ', 'test_123'],
@@ -129,20 +159,22 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider generateEnumCodeProvider
      */
-    public function testGenerateEnumCode($entityClassName, $fieldName, $expectedEnumCode)
+    public function testGenerateEnumCode($entityClassName, $fieldName, $maxEnumCodeSize, $expectedEnumCode)
     {
         $this->assertEquals(
             $expectedEnumCode,
-            ExtendHelper::generateEnumCode($entityClassName, $fieldName)
+            ExtendHelper::generateEnumCode($entityClassName, $fieldName, $maxEnumCodeSize)
         );
     }
 
     public static function generateEnumCodeProvider()
     {
         return [
-            ['Test\Entity', 'field1', 'entity_field1_489d47b1'],
-            ['Oro\Bundle\EntityExtendBundle\Entity\EnumValue', 'foreignKey', 'enum_value_foreign_key_5e7e84e3'],
-            ['Oro\Bundle\EntityExtendBundle\Entity\EnumValue', 'foreign_key', 'enum_value_foreign_key_f1145bcc'],
+            ['Test\Entity', 'field1', null, 'entity_field1_489d47b1'],
+            ['Test\Entity', 'testField1', null, 'entity_test_field1_3940a34c'],
+            ['Test\Entity', 'test_field_1', null, 'entity_test_field_1_7e9aa412'],
+            ['Test\Entity', 'test_field_1', 21, 'entity_7e9aa412'],
+            ['Test\Entity1234567', 'testField1', 21, 'enum_de837b64_7d0f22a1'],
         ];
     }
 
@@ -186,9 +218,16 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     public static function buildEnumValueIdProvider()
     {
         return [
+            ['0', '0'],
+            ['10', '10'],
+            ['1.0', '10'],
             ['test', 'test'],
             ['Test', 'test'],
-            ['tēstà', function_exists('iconv') ? 'testa' : 'tst'],
+            ['tēstà', 'testa'],
+            ['pièce de résistance', 'piece_de_resistance'],
+            ['Smörgåsbord', 'smorgasbord'],
+            ['Тест', 'test'],
+            ['Тестовые Буквы йёЙЁ', 'testovye_bukvy_jeje'],
             ['test123', 'test123'],
             ['test 123', 'test_123'],
             [' test 123 ', 'test_123'],

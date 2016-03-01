@@ -8,8 +8,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\UIBundle\Formatter\FormatterManager;
 
 class EntityVariablesProvider implements EntityVariablesProviderInterface
@@ -17,11 +18,8 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var ConfigProvider */
-    protected $emailConfigProvider;
-
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
+    /** @var ConfigManager */
+    protected $configManager;
 
     /** @var FormatterManager */
     protected $formatterManager;
@@ -30,24 +28,23 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
     protected $doctrine;
 
     /**
+     * EntityVariablesProvider constructor.
+     *
      * @param TranslatorInterface $translator
-     * @param ConfigProvider      $emailConfigProvider
-     * @param ConfigProvider      $entityConfigProvider
+     * @param ConfigManager       $configManager
      * @param ManagerRegistry     $doctrine
      * @param FormatterManager    $formatterManager
      */
     public function __construct(
         TranslatorInterface $translator,
-        ConfigProvider $emailConfigProvider,
-        ConfigProvider $entityConfigProvider,
+        ConfigManager $configManager,
         ManagerRegistry $doctrine,
         FormatterManager $formatterManager
     ) {
-        $this->translator           = $translator;
-        $this->emailConfigProvider  = $emailConfigProvider;
-        $this->entityConfigProvider = $entityConfigProvider;
-        $this->doctrine             = $doctrine;
-        $this->formatterManager     = $formatterManager;
+        $this->translator       = $translator;
+        $this->configManager    = $configManager;
+        $this->doctrine         = $doctrine;
+        $this->formatterManager = $formatterManager;
     }
 
     /**
@@ -62,7 +59,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
         // process all entities
         $result    = [];
-        $entityIds = $this->entityConfigProvider->getIds();
+        $entityIds = $this->configManager->getProvider('entity')->getIds();
         foreach ($entityIds as $entityId) {
             $className  = $entityId->getClassName();
             $entityData = $this->getEntityVariableDefinitions($className);
@@ -86,7 +83,7 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
 
         // process all entities
         $result    = [];
-        $entityIds = $this->entityConfigProvider->getIds();
+        $entityIds = $this->configManager->getProvider('entity')->getIds();
         foreach ($entityIds as $entityId) {
             $className  = $entityId->getClassName();
             $entityData = $this->getEntityVariableGetters($className);
@@ -105,17 +102,21 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
      */
     protected function getEntityVariableDefinitions($entityClass)
     {
-        $entityClass = ClassUtils::getRealClass($entityClass);
-        if (!$this->emailConfigProvider->hasConfig($entityClass)) {
+        $entityClass          = ClassUtils::getRealClass($entityClass);
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        if (!$extendConfigProvider->hasConfig($entityClass)
+            || !ExtendHelper::isEntityAccessible($extendConfigProvider->getConfig($entityClass))
+        ) {
             return [];
         }
 
         $result = [];
 
-        $em           = $this->doctrine->getManagerForClass($entityClass);
-        $metadata     = $em->getClassMetadata($entityClass);
-        $reflClass    = new \ReflectionClass($entityClass);
-        $fieldConfigs = $this->emailConfigProvider->getConfigs($entityClass);
+        $em                   = $this->doctrine->getManagerForClass($entityClass);
+        $metadata             = $em->getClassMetadata($entityClass);
+        $reflClass            = new \ReflectionClass($entityClass);
+        $entityConfigProvider = $this->configManager->getProvider('entity');
+        $fieldConfigs         = $this->configManager->getProvider('email')->getConfigs($entityClass);
         foreach ($fieldConfigs as $fieldConfig) {
             if (!$fieldConfig->is('available_in_template')) {
                 continue;
@@ -130,14 +131,16 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
                 continue;
             }
 
+            $fieldLabel = $entityConfigProvider->getConfig($entityClass, $fieldName)->get('label');
+
             $var = [
                 'type'  => $fieldId->getFieldType(),
-                'label' => $this->translator->trans($this->getFieldLabel($entityClass, $fieldName))
+                'label' => $this->translator->trans($fieldLabel)
             ];
 
             if ($metadata->hasAssociation($fieldName)) {
                 $targetClass = $metadata->getAssociationTargetClass($fieldName);
-                if ($this->entityConfigProvider->hasConfig($targetClass)) {
+                if ($entityConfigProvider->hasConfig($targetClass)) {
                     $var['related_entity_name'] = $targetClass;
                 }
             }
@@ -160,14 +163,17 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
      */
     protected function getEntityVariableGetters($entityClass)
     {
-        $entityClass = ClassUtils::getRealClass($entityClass);
-        if (!$this->emailConfigProvider->hasConfig($entityClass)) {
+        $entityClass          = ClassUtils::getRealClass($entityClass);
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        if (!$extendConfigProvider->hasConfig($entityClass)
+            || !ExtendHelper::isEntityAccessible($extendConfigProvider->getConfig($entityClass))
+        ) {
             return [];
         }
 
         $result       = [];
         $reflClass    = new \ReflectionClass($entityClass);
-        $fieldConfigs = $this->emailConfigProvider->getConfigs($entityClass);
+        $fieldConfigs = $this->configManager->getProvider('email')->getConfigs($entityClass);
         foreach ($fieldConfigs as $fieldConfig) {
             if (!$fieldConfig->is('available_in_template')) {
                 continue;
@@ -218,16 +224,5 @@ class EntityVariablesProvider implements EntityVariablesProviderInterface
         }
 
         return [null, null];
-    }
-
-    /**
-     * @param string $className
-     * @param string $fieldName
-     *
-     * @return string
-     */
-    protected function getFieldLabel($className, $fieldName)
-    {
-        return $this->entityConfigProvider->getConfig($className, $fieldName)->get('label');
     }
 }

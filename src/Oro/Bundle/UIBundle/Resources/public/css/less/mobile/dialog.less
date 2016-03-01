@@ -13,7 +13,7 @@
 .ui-dialog {
   width: 100% !important;
   height: auto !important;
-  min-height: 100vh !important;
+  min-height: 100% !important;
   box-sizing: border-box;
   background: #fafafa;
   position: inherit !important;
@@ -22,6 +22,16 @@
   border: none;
   border-radius: 0 !important;
   box-shadow: none !important;
+  max-width: 100vw;
+  min-width: initial !important;
+  &.ui-dialog-on-background {
+    display: none !important;
+  }
+  &.ui-resizable:not(.ui-dialog-buttons) {
+    &:after {
+      display: none;
+    }
+  }
   .ui-widget-header {
     .ui-dialog-titlebar-buttonpane [class*='ui-dialog-titlebar-']:first-child:before {
       font-size: 18px;
@@ -37,6 +47,7 @@
     z-index: 99999;
     border-radius: 0;
     padding: 12px;
+    margin: 0;
     .ui-dialog-title {
       font-size: 1.2em;
       font-weight: normal;
@@ -50,7 +61,7 @@
     height: auto !important;
     margin: 0 !important;
     background: white;
-    padding: 54px 10px 10px 10px;
+    padding: 54px 10px 0 10px;
   }
   .ui-resizable-handle {
     display: none !important;

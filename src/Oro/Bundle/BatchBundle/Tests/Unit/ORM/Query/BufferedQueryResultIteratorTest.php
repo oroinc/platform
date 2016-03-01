@@ -38,8 +38,8 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     public function testCountMethod()
     {
         $records = [
-            ['a0' => '1'],
-            ['a0' => '2'],
+            ['a_0' => '1'],
+            ['a_0' => '2'],
         ];
         $actualSql = '';
 
@@ -49,7 +49,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
                 $this->returnCallback(
                     function ($sql) use (&$records, &$actualSql) {
                         $actualSql = $sql;
-                        return $this->createFetchStatementMock([['sclr0' => count($records)]]);
+                        return $this->createFetchStatementMock([['sclr_0' => count($records)]]);
                     }
                 )
             );
@@ -62,7 +62,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals(count($records), $iterator->count());
         $this->assertEquals(
-            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_',
             $actualSql
         );
     }
@@ -70,8 +70,8 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     public function testCountMethodWithExplicitlySetBufferSize()
     {
         $records = [
-            ['a0' => '1'],
-            ['a0' => '2'],
+            ['a_0' => '1'],
+            ['a_0' => '2'],
         ];
         $actualSql = '';
 
@@ -81,7 +81,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
                 $this->returnCallback(
                     function ($sql) use (&$records, &$actualSql) {
                         $actualSql = $sql;
-                        return $this->createFetchStatementMock([['sclr0' => count($records)]]);
+                        return $this->createFetchStatementMock([['sclr_0' => count($records)]]);
                     }
                 )
             );
@@ -95,7 +95,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals(count($records), $iterator->count());
         $this->assertEquals(
-            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_',
             $actualSql
         );
     }
@@ -125,7 +125,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals($maxResults, $iterator->count());
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
             $actualSql
         );
     }
@@ -156,7 +156,7 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
 
         $this->assertEquals($maxResults, $iterator->count());
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
             $actualSql
         );
     }
@@ -164,14 +164,14 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     public function testIteratorWithDefaultParameters()
     {
         $records = [
-            ['a0' => '1'],
-            ['a0' => '2'],
-            ['a0' => '3'],
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
         ];
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createFetchStatementMock([['sclr0' => count($records)]]),
+            $this->createFetchStatementMock([['sclr_0' => count($records)]]),
             $this->createFetchStatementMock([$records[0], $records[1], $records[2]])
         ];
 
@@ -199,16 +199,16 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $count = 0;
         foreach ($iterator as $record) {
             $this->assertInstanceOf('Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity', $record);
-            $this->assertEquals($records[$count]['a0'], $record->a);
+            $this->assertEquals($records[$count]['a_0'], $record->a);
             $count++;
         }
         $this->assertEquals(count($records), $count);
         $this->assertEquals(
-            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT '
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT '
             . BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE . ' OFFSET 0',
             $actualSqls[1]
         );
@@ -217,9 +217,9 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     public function testIteratorWithMaxResultsSource()
     {
         $records = [
-            ['a0' => '1'],
-            ['a0' => '2'],
-            ['a0' => '3'],
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
         ];
         $maxResults = 2;
         $actualSqls = [];
@@ -252,17 +252,17 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $count = 0;
         foreach ($iterator as $record) {
             $this->assertInstanceOf('Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity', $record);
-            $this->assertEquals($records[$count]['a0'], $record->a);
+            $this->assertEquals($records[$count]['a_0'], $record->a);
             $count++;
         }
         $this->assertEquals($maxResults, $count);
         $this->assertCount(2, $actualSqls);
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET 0',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 0',
             $actualSqls[1]
         );
     }
@@ -270,10 +270,10 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     public function testIteratorWithMaxResultsSourceAndExplicitlySetBufferSize()
     {
         $records = [
-            ['a0' => '1'],
-            ['a0' => '2'],
-            ['a0' => '3'],
-            ['a0' => '4'],
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
+            ['a_0' => '4'],
         ];
         $maxResults = 3;
         $actualSqls = [];
@@ -308,21 +308,21 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $count = 0;
         foreach ($iterator as $record) {
             $this->assertInstanceOf('Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity', $record);
-            $this->assertEquals($records[$count]['a0'], $record->a);
+            $this->assertEquals($records[$count]['a_0'], $record->a);
             $count++;
         }
         $this->assertEquals($maxResults, $count);
         $this->assertCount(3, $actualSqls);
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT ' . $maxResults . ') AS e',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET 0',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 0',
             $actualSqls[1]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET 2',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 2',
             $actualSqls[2]
         );
     }
@@ -330,10 +330,10 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     public function testIteratorWithMaxResultsSourceAndFirstResultAndExplicitlySetBufferSize()
     {
         $records = [
-            ['a0' => '1'],
-            ['a0' => '2'],
-            ['a0' => '3'],
-            ['a0' => '4'],
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
+            ['a_0' => '4'],
         ];
         $firstResult = 1;
         $maxResults = 3;
@@ -371,23 +371,23 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $index = $firstResult;
         foreach ($iterator as $record) {
             $this->assertInstanceOf('Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity', $record);
-            $this->assertEquals($records[$index]['a0'], $record->a);
+            $this->assertEquals($records[$index]['a_0'], $record->a);
             $count++;
             $index++;
         }
         $this->assertEquals($maxResults, $count);
         $this->assertCount(3, $actualSqls);
         $this->assertEquals(
-            'SELECT COUNT(*) FROM (SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT '
+            'SELECT COUNT(*) FROM (SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT '
             . $maxResults . ' OFFSET ' . $firstResult . ') AS e',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET ' . $firstResult,
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET ' . $firstResult,
             $actualSqls[1]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET ' . ($firstResult + $maxResults - 1),
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET ' . ($firstResult + $maxResults - 1),
             $actualSqls[2]
         );
     }
@@ -395,14 +395,14 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     public function testIteratorWithObjectHydrationMode()
     {
         $records = [
-            ['a0' => '1'],
-            ['a0' => '2'],
-            ['a0' => '3'],
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
         ];
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createFetchStatementMock([['sclr0' => count($records)]]),
+            $this->createFetchStatementMock([['sclr_0' => count($records)]]),
             $this->createFetchStatementMock([$records[0], $records[1]]),
             $this->createFetchStatementMock([$records[2]])
         ];
@@ -432,21 +432,21 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $count = 0;
         foreach ($iterator as $record) {
             $this->assertInstanceOf('Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity', $record);
-            $this->assertEquals($records[$count]['a0'], $record->a);
+            $this->assertEquals($records[$count]['a_0'], $record->a);
             $count++;
         }
         $this->assertEquals(count($records), $count);
         $this->assertCount(3, $actualSqls);
         $this->assertEquals(
-            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET 0',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 0',
             $actualSqls[1]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET 2',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 2',
             $actualSqls[2]
         );
     }
@@ -454,14 +454,14 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     public function testIteratorWithArrayHydrationMode()
     {
         $records = [
-            ['a0' => '1'],
-            ['a0' => '2'],
-            ['a0' => '3'],
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
         ];
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createFetchStatementMock([['sclr0' => count($records)]]),
+            $this->createFetchStatementMock([['sclr_0' => count($records)]]),
             $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
         ];
 
@@ -488,16 +488,16 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $this->assertEquals(count($records), $iterator->count());
         $count = 0;
         foreach ($iterator as $record) {
-            $this->assertEquals($records[$count]['a0'], $record['a']);
+            $this->assertEquals($records[$count]['a_0'], $record['a']);
             $count++;
         }
         $this->assertEquals(count($records), $count);
         $this->assertEquals(
-            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT '
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT '
             . BufferedQueryResultIterator::DEFAULT_BUFFER_SIZE . ' OFFSET 0',
             $actualSqls[1]
         );
@@ -506,14 +506,14 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
     public function testIteratorInReverseDirection()
     {
         $records = [
-            ['a0' => '1'],
-            ['a0' => '2'],
-            ['a0' => '3'],
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
         ];
         $actualSqls = [];
         $statementCounter = 0;
         $statements = [
-            $this->createFetchStatementMock([['sclr0' => count($records)]]),
+            $this->createFetchStatementMock([['sclr_0' => count($records)]]),
             $this->createFetchStatementMock([$records[0], $records[1]]),
             $this->createFetchStatementMock([$records[2]])
         ];
@@ -543,22 +543,112 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
         $count = 0;
         foreach ($iterator as $record) {
             $this->assertInstanceOf('Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity', $record);
-            $this->assertEquals($records[$count]['a0'], $record->a);
+            $this->assertEquals($records[$count]['a_0'], $record->a);
             $count++;
         }
         $this->assertEquals(count($records), $count);
         $this->assertCount(3, $actualSqls);
         $this->assertEquals(
-            'SELECT count(e0_.a) AS sclr0 FROM Entity e0_',
+            'SELECT count(e0_.a) AS sclr_0 FROM Entity e0_',
             $actualSqls[0]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET 2',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 2',
             $actualSqls[1]
         );
         $this->assertEquals(
-            'SELECT e0_.a AS a0, e0_.b AS b1 FROM Entity e0_ LIMIT 2 OFFSET 0',
+            'SELECT e0_.a AS a_0, e0_.b AS b_1 FROM Entity e0_ LIMIT 2 OFFSET 0',
             $actualSqls[2]
         );
+    }
+
+    /**
+     * @dataProvider pageCallbackDataProvider
+     */
+    public function testPageCallback(array $statements, $bufferSize, $expectedPages)
+    {
+        $statementCounter = 0;
+
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
+            ->method('query')
+            ->will(
+                $this->returnCallback(
+                    function ($sql) use (&$statements, &$statementCounter, &$actualSqls) {
+                        $actualSqls[$statementCounter] = $sql;
+                        $statement = $statements[$statementCounter];
+                        $statementCounter++;
+                        return $statement;
+                    }
+                )
+            );
+
+        $source = $this->em->createQueryBuilder()
+            ->select('o')
+            ->from('Stub:Entity', 'o');
+
+        $iterator = (new BufferedQueryResultIterator($source))
+            ->setBufferSize($bufferSize);
+        $pages = 0;
+        $iterator->setPageCallback(function () use (&$pages) {
+            $pages++;
+        });
+
+        $this->assertEquals(0, $pages);
+        iterator_to_array($iterator);
+        $this->assertEquals($expectedPages, $pages);
+    }
+
+    public function pageCallbackDataProvider()
+    {
+        $records = [
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
+        ];
+
+        return [
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => 0]]),
+                ],
+                $bufferSize = 1,
+                $pages = 0,
+            ],
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0]]),
+                    $this->createFetchStatementMock([$records[1]]),
+                    $this->createFetchStatementMock([$records[2]]),
+                ],
+                $bufferSize = 1,
+                $pages = 3,
+            ],
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0], $records[1]]),
+                    $this->createFetchStatementMock([$records[2]]),
+                ],
+                $bufferSize = 2,
+                $pages = 2,
+            ],
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
+                ],
+                $bufferSize = 3,
+                $pages = 1,
+            ],
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0], $records[1], $records[2]]),
+                ],
+                $bufferSize = 5,
+                $pages = 1,
+            ],
+        ];
     }
 }

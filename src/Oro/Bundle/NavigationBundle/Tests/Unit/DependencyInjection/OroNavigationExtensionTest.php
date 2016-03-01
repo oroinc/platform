@@ -52,14 +52,11 @@ class OroNavigationExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->hasDefinition('oro_menu.twig.extension'));
         $menuBuilder = $container->getDefinition('oro_menu.twig.extension');
         $data = $menuBuilder->getMethodCalls();
+
+        $actualCall = end($data);
         $this->assertEquals(
-            array(
-                array(
-                    'setMenuConfiguration',
-                    array($expectedMenu)
-                )
-            ),
-            $data,
+            ['setMenuConfiguration', [$expectedMenu]],
+            $actualCall,
             'Unexpected menu for twig'
         );
 

@@ -3,7 +3,7 @@
 namespace Oro\Bundle\EntityMergeBundle\EventListener\Metadata;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 
 use Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata;
@@ -71,28 +71,30 @@ class EntityConfigHelper
         $className = $fieldMetadata->getSourceClassName();
         $fieldName = $fieldMetadata->getSourceFieldName();
 
-        if ($this->isExtendField($className, $fieldName)) {
+        $extendConfig = $this->getFieldExtendConfig($className, $fieldName);
+        if ($extendConfig && $extendConfig->is('is_extend')) {
             $fieldMetadata->set('property_path', $fieldName);
+            $fieldMetadata->set('display', true);
         }
     }
 
     /**
-     * Is field extend.
-     *
      * @param string $className
      * @param string $fieldName
-     * @return bool
+     *
+     * @return ConfigInterface|null
      */
-    protected function isExtendField($className, $fieldName)
+    protected function getFieldExtendConfig($className, $fieldName)
     {
         $extendConfig = $this->getExtendConfigProvider();
 
-        return $extendConfig->hasConfig($className, $fieldName) &&
-            $extendConfig->getConfig($className, $fieldName)->is('is_extend');
+        return $extendConfig->hasConfig($className, $fieldName) ?
+            $extendConfig->getConfig($className, $fieldName) :
+            null;
     }
 
     /**
-     * @return ConfigProviderInterface
+     * @return ConfigProvider
      */
     protected function getExtendConfigProvider()
     {

@@ -4,9 +4,6 @@ parameters:
     oro_entity_extend.type.relation.class:                      Oro\Bundle\EntityExtendBundle\Form\Type\RelationType
     oro_entity_extend.type.target_field_type.class:             Oro\Bundle\EntityExtendBundle\Form\Type\TargetFieldType
 
-    oro_entity_extend.type.option_set.class:                    Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetType
-    oro_entity_extend.type.option_set_collection.class:         Oro\Bundle\EntityExtendBundle\Form\Type\OptionSetCollectionType
-
     oro_entity_extend.type.integer.class:                       Oro\Bundle\EntityExtendBundle\Form\Type\IntegerType
     oro_entity_extend.type.text.class:                          Oro\Bundle\EntityExtendBundle\Form\Type\TextType
     oro_entity_extend.type.textarea.class:                      Oro\Bundle\EntityExtendBundle\Form\Type\TextareaType
@@ -31,7 +28,6 @@ parameters:
     oro_entity_extend.entity_config_type.extension.enum.class:  Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension
     oro_entity_extend.type.enum_choice.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType
     oro_entity_extend.type.enum_select.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType
-    oro_entity_extend.type.enum_filter.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType
 
     oro_entity_extend.form.guesser.extend_field.class:          Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser
 
@@ -49,6 +45,7 @@ services:
             - @oro_entity_config.config_manager
             - @translator
             - @oro_entity_extend.db_id_name_generator
+            - @oro_entity_extend.field_type_provider
         tags:
             - { name: form.type, alias: oro_entity_extend_field_type }
 
@@ -64,21 +61,8 @@ services:
         class: %oro_entity_extend.type.target_field_type.class%
         arguments:
             - @oro_entity_config.config_manager
-            - @oro_entity.entity_field_provider
         tags:
             - { name: form.type, alias: oro_entity_target_field_type}
-
-    oro_entity_extend.type.option_set:
-        class:                                                  %oro_entity_extend.type.option_set.class%
-        tags:
-            - { name: form.type, alias: oro_entity_option_set }
-
-    oro_entity_extend.type.option_set_collection:
-        class:                                                  %oro_entity_extend.type.option_set_collection.class%
-        arguments:
-            - @oro_entity_config.config_manager
-        tags:
-            - { name: form.type, alias: oro_entity_option_set_collection }
 
     oro_entity_extend.type.integer:
         class: %oro_entity_extend.type.integer.class%
@@ -233,14 +217,6 @@ services:
         tags:
             - { name: form.type, alias: oro_enum_select }
 
-    oro_entity_extend.type.enum_filter:
-        class: %oro_entity_extend.type.enum_filter.class%
-        arguments:
-            - @translator
-            - @doctrine
-        tags:
-            - { name: form.type, alias: oro_enum_filter }
-
     oro_entity_extend.form.guesser.extend_field:
         class: %oro_entity_extend.form.guesser.extend_field.class%
         arguments:
@@ -272,7 +248,6 @@ services:
             - [addExtendTypeMapping, ["manyToOne", "oro_entity_select"]]
             - [addExtendTypeMapping, ["oneToMany", "oro_entity_extend_multiple_entity"]]
             - [addExtendTypeMapping, ["manyToMany", "oro_entity_extend_multiple_entity"]]
-            - [addExtendTypeMapping, ["optionSet", "oro_option_select"]]
             - [addExtendTypeMapping, ["enum", "oro_enum_select"]]
             - [addExtendTypeMapping, ["multiEnum", "oro_enum_choice"]]
         tags:

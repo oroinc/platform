@@ -90,10 +90,6 @@ class EntityClassResolverTest extends \PHPUnit_Framework_TestCase
         $this->doctrine->expects($this->exactly(2))
             ->method('getManagers')
             ->will($this->returnValue(array('default' => $em)));
-        $this->doctrine->expects($this->exactly(2))
-            ->method('getManager')
-            ->with($this->equalTo('default'))
-            ->will($this->returnValue($em));
 
         $this->assertTrue($this->resolver->isKnownEntityClassNamespace('Acme\Bundle\SomeBundle\Entity'));
         $this->assertFalse($this->resolver->isKnownEntityClassNamespace('Acme\Bundle\AnotherBundle\Entity'));

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\LocaleBundle\DQL;
 
+use Oro\Bundle\EntityBundle\ORM\QueryUtils;
 use Oro\Bundle\LocaleBundle\Formatter\NameFormatter;
 
 class DQLNameFormatter
@@ -50,10 +51,18 @@ class DQLNameFormatter
      */
     public function getFormattedNameDQL($alias, $className, $locale = null)
     {
-        $nameFormat = $this->nameFormatter->getNameFormat();
-        $nameParts  = $this->extractNamePartsPaths($className, $alias);
+        $nameParts  = array_fill_keys(array_keys($this->namePartsMap), null);
+        $interfaces = class_implements($className);
+        foreach ($this->namePartsMap as $part => $metadata) {
+            if (in_array($metadata['interface'], $interfaces, true)) {
+                $nameParts[$part] = $alias . '.' . $metadata['suggestedFieldName'];
+            }
+        }
 
-        return $this->buildExpression($nameFormat, $nameParts);
+        return $this->buildExpression(
+            $this->nameFormatter->getNameFormat(),
+            $nameParts
+        );
     }
 
     /**
@@ -63,44 +72,71 @@ class DQLNameFormatter
      * @throws \LogicException
      * @return string
      */
-    private function buildExpression($nameFormat, array $nameParts)
+    protected function buildExpression($nameFormat, array $nameParts)
     {
-        $parts = $stack = [];
-        preg_match_all('/%(\w+)%([^%]*)/', $nameFormat, $matches);
+        $parts    = [];
+        $prefix   = '';
+        $suffixes = [];
+        preg_match_all('/([^%]*)%(\w+)%([^%]*)/', $nameFormat, $matches);
         if (!empty($matches[0])) {
-            foreach ($matches[0] as $idx => $match) {
-                $key              = $matches[1][$idx];
-                $prependSeparator = isset($matches[2], $matches[2][$idx]) ? $matches[2][$idx] : '';
-                $lowerCaseKey     = strtolower($key);
+            foreach ($matches[2] as $i => $key) {
+                if ($i === 0 && !empty($matches[1][$i])) {
+                    $prefix = $matches[1][$i];
+                }
+                $lowerCaseKey = strtolower($key);
                 if (isset($nameParts[$lowerCaseKey])) {
                     $value = $nameParts[$lowerCaseKey];
                     if ($key !== $lowerCaseKey) {
                         $value = sprintf('UPPER(%s)', $nameParts[$lowerCaseKey]);
                     }
 
-                    $parts[] = $value;
-                    if (strlen($prependSeparator) !== 0) {
-                        $parts[] = sprintf("'%s'", $prependSeparator);
-                    }
+                    $parts[]    = $value;
+                    $suffixes[] = $matches[3][$i];
                 }
             }
         } else {
             throw new \LogicException('Unexpected name format given');
         }
 
-        for ($i = count($parts) - 1; $i >= 0; $i--) {
-            if (count($stack) === 0) {
-                array_push($stack, $parts[$i]);
-            } else {
-                array_push($stack, sprintf('CONCAT(%s, %s)', $parts[$i], array_pop($stack)));
-            }
-        }
+        return $this->buildConcatExpression($parts, $prefix, $suffixes);
+    }
 
-        if (empty($stack)) {
+    /**
+     * @param string[] $parts
+     * @param string   $prefix
+     * @param string[] $separators
+     *
+     * @return string
+     */
+    protected function buildConcatExpression($parts, $prefix, $separators)
+    {
+        $count = count($parts);
+        if ($count > 1 || (!empty($prefix) && $count === 1)) {
+            $items = [];
+            if (!empty($prefix)) {
+                $items[] = sprintf('\'%s\'', $prefix);
+            }
+            for ($i = 0; $i < $count; $i++) {
+                if (empty($separators[$i])) {
+                    $items[] = sprintf(
+                        'CASE WHEN NULLIF(%1$s, \'\') IS NULL THEN \'\' ELSE %1$s END',
+                        $parts[$i]
+                    );
+                } else {
+                    $items[] = sprintf(
+                        'CASE WHEN NULLIF(%1$s, \'\') IS NULL THEN \'\' ELSE CONCAT(%1$s, \'%2$s\') END',
+                        $parts[$i],
+                        $separators[$i]
+                    );
+                }
+            }
+
+            return QueryUtils::buildConcatExpr($items);
+        } elseif ($count === 1) {
+            return reset($parts);
+        } else {
             return '';
         }
-
-        return array_pop($stack);
     }
 
     /**
@@ -117,7 +153,7 @@ class DQLNameFormatter
         $interfaces = class_implements($className);
 
         foreach ($this->namePartsMap as $part => $metadata) {
-            if (in_array($metadata['interface'], $interfaces)) {
+            if (in_array($metadata['interface'], $interfaces, true)) {
                 $format           = 'CASE WHEN %1$s.%2$s IS NOT NULL THEN %1$s.%2$s ELSE \'\' END';
                 $nameParts[$part] = sprintf($format, $relationAlias, $metadata['suggestedFieldName']);
             }

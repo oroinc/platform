@@ -17,11 +17,46 @@ class ChannelRepository extends EntityRepository
     const BUFFER_SIZE = 100;
 
     /**
-     * @param string $commandName
+     * @info Check if task is running
+     *
+     * @param string   $commandName
      * @param int|null $integrationId
+     *
      * @return int
      */
     public function getRunningSyncJobsCount($commandName, $integrationId = null)
+    {
+        $qb = $this->getSyncJobsCountQueryBuilder($commandName, $integrationId);
+        $qb->andWhere('j.state=:stateName');
+        $qb->setParameter('stateName', Job::STATE_RUNNING);
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @info Check if task is pending or running
+     *
+     * @param string   $commandName
+     * @param int|null $integrationId
+     *
+     * @return int
+     */
+    public function getExistingSyncJobsCount($commandName, $integrationId = null)
+    {
+        $qb = $this->getSyncJobsCountQueryBuilder($commandName, $integrationId);
+        $qb->andWhere($qb->expr()->in('j.state', ':states'));
+        $qb->setParameter('states', [Job::STATE_RUNNING, Job::STATE_PENDING, Job::STATE_NEW]);
+
+        return (int)$qb->getQuery()->getSingleScalarResult();
+    }
+
+    /**
+     * @param string   $commandName
+     * @param int|null $integrationId
+     *
+     * @return QueryBuilder
+     */
+    protected function getSyncJobsCountQueryBuilder($commandName, $integrationId = null)
     {
         /** @var QueryBuilder $qb */
         $qb = $this->getEntityManager()
@@ -29,18 +64,16 @@ class ChannelRepository extends EntityRepository
             ->createQueryBuilder('j')
             ->select('count(j.id)')
             ->andWhere('j.command=:commandName')
-            ->andWhere('j.state=:stateName')
-            ->setParameter('commandName', $commandName)
-            ->setParameter('stateName', Job::STATE_RUNNING);
+            ->setParameter('commandName', $commandName);
 
         if ($integrationId) {
             $qb->andWhere(
                 $qb->expr()->orX(
-                    $qb->expr()->like('j.args', ':integrationIdType1'),
-                    $qb->expr()->like('j.args', ':integrationIdType2'),
+                    $qb->expr()->like('cast(j.args as text)', ':integrationIdType1'),
+                    $qb->expr()->like('cast(j.args as text)', ':integrationIdType2'),
                     $qb->expr()->andX(
-                        $qb->expr()->notLike('j.args', ':noIntegrationIdType1'),
-                        $qb->expr()->notLike('j.args', ':noIntegrationIdType2')
+                        $qb->expr()->notLike('cast(j.args as text)', ':noIntegrationIdType1'),
+                        $qb->expr()->notLike('cast(j.args as text)', ':noIntegrationIdType2')
                     )
                 )
             )
@@ -50,6 +83,85 @@ class ChannelRepository extends EntityRepository
                 ->setParameter('noIntegrationIdType2', '%-i=%');
         }
 
+        return $qb;
+    }
+
+    /**
+     * @param string[]|string      $commandName
+     * @param string[]|string|null $arguments
+     * @param string[]|string|null $states
+     *
+     * @return QueryBuilder
+     */
+    protected function getQBSyncJobs($commandName, $arguments = null, $states = null)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getEntityManager()
+            ->getRepository('JMSJobQueueBundle:Job')
+            ->createQueryBuilder('j');
+
+        if (is_array($commandName)) {
+            $qb->andWhere('j.command in (:commandName)');
+        } else {
+            $qb->andWhere('j.command=:commandName');
+        }
+
+        if (!empty($states)) {
+            if (is_array($states)) {
+                $qb->andWhere('j.state in (:stateName)');
+            } else {
+                $qb->andWhere('j.state=:stateName');
+            }
+        }
+
+        $qb->setParameter('stateName', $states)
+            ->setParameter('commandName', $commandName);
+
+        if (!empty($arguments)) {
+            if (is_array($arguments)) {
+                $orX = $qb->expr()->orX();
+                foreach ($arguments as $key => $argument) {
+                    $orX->add($qb->expr()->like('cast(j.args as text)', ':args_' . $key));
+                    $qb->setParameter('args_' . $key, '%' . $argument . '%');
+                }
+
+                $qb->andWhere($orX);
+            } else {
+                $qb->andWhere($qb->expr()->like('cast(j.args as text)', ':args'))
+                    ->setParameter('args', '%' . $arguments . '%');
+            }
+        }
+
+        return $qb;
+    }
+
+    /**
+     * @param string[]|string      $commandName
+     * @param string[]|string|null $arguments
+     * @param string[]|string|null $states
+     *
+     * @return QueryBuilder
+     */
+    protected function getQBSyncJobsCount($commandName, $arguments = null, $states = null)
+    {
+        $qb = $this->getQBSyncJobs($commandName, $arguments, $states);
+        $qb->select('count(j.id)');
+
+        return $qb;
+    }
+
+    /**
+     * @param string               $commandName
+     * @param string[]|string|null $arguments
+     * @param string[]|string|null $states
+     *
+     * @return int
+     */
+    public function getSyncJobsCount($commandName, $states = null, $arguments = null)
+    {
+        /** @var QueryBuilder $qb */
+        $qb = $this->getQBSyncJobsCount($commandName, $arguments, $states);
+
         return (int)$qb->getQuery()->getSingleScalarResult();
     }
 
@@ -57,8 +169,9 @@ class ChannelRepository extends EntityRepository
      * Returns latest status for integration's connector and code if it exists.
      *
      * @param Integration $integration
-     * @param string $connector
-     * @param int|null $code
+     * @param string      $connector
+     * @param int|null    $code
+     *
      * @return Status|null
      */
     public function getLastStatusForConnector(Integration $integration, $connector, $code = null)
@@ -73,8 +186,9 @@ class ChannelRepository extends EntityRepository
 
     /**
      * @param Integration $integration
-     * @param string $connector
-     * @param int|null $code
+     * @param string      $connector
+     * @param int|null    $code
+     *
      * @return Status[]|\Iterator
      */
     public function getConnectorStatuses(Integration $integration, $connector, $code = null)
@@ -89,8 +203,9 @@ class ChannelRepository extends EntityRepository
 
     /**
      * @param Integration $integration
-     * @param string $connector
-     * @param int|null $code
+     * @param string      $connector
+     * @param int|null    $code
+     *
      * @return QueryBuilder
      */
     public function getConnectorStatusesQueryBuilder(Integration $integration, $connector, $code = null)
@@ -135,7 +250,7 @@ class ChannelRepository extends EntityRepository
         $integrations = $qb->getQuery()->getResult();
 
         if ($isReadOnly) {
-            $unitOfWork  = $this->getEntityManager()->getUnitOfWork();
+            $unitOfWork = $this->getEntityManager()->getUnitOfWork();
 
             foreach ($integrations as $integration) {
                 $unitOfWork->markReadOnly($integration);
@@ -166,12 +281,25 @@ class ChannelRepository extends EntityRepository
     }
 
     /**
-     * Adds status to integration, manual persist of newly created statuses
+     * Adds status to integration, manual persist of newly created statuses and do flush.
+     *
+     * @deprecated 1.9.0:1.11.0 Use $this->addStatusAndFlush() instead
      *
      * @param Integration $integration
-     * @param Status  $status
+     * @param Status      $status
      */
     public function addStatus(Integration $integration, Status $status)
+    {
+        $this->addStatusAndFlush($integration, $status);
+    }
+
+    /**
+     * Adds status to integration, manual persist of newly created statuses and do flush.
+     *
+     * @param Integration $integration
+     * @param Status      $status
+     */
+    public function addStatusAndFlush(Integration $integration, Status $status)
     {
         if ($this->getEntityManager()->isOpen()) {
             $integration = $this->getOrLoadById($integration->getId());

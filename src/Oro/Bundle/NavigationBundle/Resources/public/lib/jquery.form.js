@@ -8,7 +8,6 @@
  * Dual licensed under the MIT and GPL licenses.
  * https://github.com/malsup/form#copyright-and-license
  */
-/*global ActiveXObject */
 ;(function($) {
 "use strict";
 
@@ -76,7 +75,6 @@ $.fn.attr2 = function() {
  * an HTML form using AJAX.
  */
 $.fn.ajaxSubmit = function(options) {
-    /*jshint scripturl:true */
 
     // fast fail if nothing selected (http://dev.jquery.com/ticket/2752)
     if (!this.length) {
@@ -721,8 +719,7 @@ $.fn.ajaxSubmit = function(options) {
             return (doc && doc.documentElement && doc.documentElement.nodeName != 'parsererror') ? doc : null;
         };
         var parseJSON = $.parseJSON || function(s) {
-            /*jslint evil:true */
-            return window['eval']('(' + s + ')');
+                        return window['eval']('(' + s + ')');
         };
 
         var httpData = function( xhr, type, s ) { // mostly lifted from jq1.4.4
@@ -802,8 +799,7 @@ $.fn.ajaxForm = function(options) {
 
 // private event handlers
 function doAjaxSubmit(e) {
-    /*jshint validthis:true */
-    var options = e.data;
+        var options = e.data;
     if (!e.isDefaultPrevented()) { // if event has been canceled, don't proceed
         e.preventDefault();
         $(this).ajaxSubmit(options);
@@ -811,8 +807,7 @@ function doAjaxSubmit(e) {
 }
 
 function captureSubmittingElement(e) {
-    /*jshint validthis:true */
-    var target = e.target;
+        var target = e.target;
     var $el = $(target);
     if (!($el.is("[type=submit],[type=image]"))) {
         // is this a child element of the submit el?  (ex: a span within a button)

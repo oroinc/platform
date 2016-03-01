@@ -19,4 +19,12 @@ class EmailTemplateTranslation extends AbstractPersonalTranslation
      * @ORM\JoinColumn(name="object_id", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $object;
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }

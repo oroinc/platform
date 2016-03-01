@@ -4,6 +4,7 @@
 "Yes, Proceed": "Yes, Proceed"
 "Field successfully deleted": "Field successfully deleted"
 "Field was restored": "Field was restored"
+"This field cannot be restored because a field with similar name exists.": "This field cannot be restored because a field with similar name exists."
 
 oro:
     entity_extend:

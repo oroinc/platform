@@ -4,7 +4,7 @@ namespace Oro\Bundle\UIBundle\Twig;
 
 use Twig_Environment;
 use Symfony\Component\Form\FormView;
-use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\UIBundle\Event\Events;
 use Oro\Bundle\UIBundle\Event\BeforeFormRenderEvent;
@@ -14,14 +14,14 @@ class FormExtension extends \Twig_Extension
     const EXTENSION_NAME = 'oro_form_process';
 
     /**
-     * @var EventDispatcher
+     * @var EventDispatcherInterface
      */
     protected $eventDispatcher;
 
     /**
-     * @param EventDispatcher $eventDispatcher
+     * @param EventDispatcherInterface $eventDispatcher
      */
-    public function __construct(EventDispatcher $eventDispatcher)
+    public function __construct(EventDispatcherInterface $eventDispatcher)
     {
         $this->eventDispatcher = $eventDispatcher;
     }

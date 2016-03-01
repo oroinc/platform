@@ -4,10 +4,16 @@ oro:
             title:       Recent Emails
             inbox:       Inbox
             sent:        Sent
+            unread:      Unread Emails
             view_all:    View All
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        imap.folder.checkAll: All
+        autocomplete:
+            recently_used: Recently used
+            contexts: Contexts
+        filter.inactive: inactive
         controller.emailtemplate.saved.message: "Template saved"
         form:
             choose_template:                     ""
@@ -19,6 +25,11 @@ oro:
             no_attachments:                      No available attachments
             thread_attachments:                  Thread Attachments
             record_attachments:                  Record Attachments
+
+            tooltip:
+                attachment_sync:
+                    enable: Enable load attachments on email sync.
+                    max_size: Maximum sync attacment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
 
         variable.not.found:                     N/A
 
@@ -45,6 +56,28 @@ oro:
                         auto.label: Auto
                         manual.label: Manual
 
+            reply_configuration:
+                label: Reply
+                default_button.label: Default Reply Button
+
+            email_autocomplete_configuration:
+                label: Autocomplete
+                minimum_input_length:
+                    label: Minumum number of characters for autocomplete
+
+            mailbox_configuration:
+                label: System Mailboxes
+                add_mailbox.label: Add Mailbox
+
+            show_recent_emails_in_user_bar:
+                label: Show recent emails
+
+            attachment_sync:
+                enable:
+                    label: Enable attachment sync
+                max_size:
+                    label: Maximum sync attachment size, Mb
+
         emailtemplate:
             entity_label:        Template
             entity_plural_label: Templates
@@ -60,9 +93,11 @@ oro:
             subject.label:       Subject
             content.label:       Content
             entity_name.label:   Entity name
+            entity_name.tooltip: Choose an entity this template is related to or keep it empty if this template is not related to any entity.
             type.label:          Type
             translations.label:  Translations
             organization.label:  Organization
+            visible.label:       Visible
 
             # sections for email template variables
             variables:
@@ -98,7 +133,13 @@ oro:
             compose: Compose
             shortcut_compose_email.label: Compose email
             shortcut_compose_email.description: Compose email
-
+            mark_read.label: Mark read
+            mark_unread.label: Mark unread
+        notification:
+            menu_item.hint: Recent Emails
+            mark_read.label: Mark all as Read
+            empty: You don't have any emails yet
+            new_email: You have a new email
         datagrid:
             emailtemplate:
                 action:
@@ -119,11 +160,20 @@ oro:
             emails:
                 action:
                     view: "View"
+                    mark_as_read: "Mark As Read"
+                    mark_as_unread: "Mark As Unread"
+                    enable_to_change_status: "Enable to change status"
 
             emailfolder:
                 view:
                     inbox: Inbox
                     sent: Sent Mail
+            filters:
+                new: Unread emails
+            mark:
+                success_message: "{0} No entities were marked|{1} One entity was marked|]1,Inf[ %count% entities were marked"
+            mailbox:
+                view: Mailbox: %mailbox%
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
@@ -132,7 +182,20 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        folders.tooltip:          If a folder is uncheked, all the data saved in it will be deleted
+        retrieve_folders.label:   Retrieve Folders
+        message_type:
+            label:                Message type
+        folder_type:
+            label:                Folder type
+            sent:                 Sent
+            inbox:                Inbox
+            other:                Other
+            spam:                 Spam
+            trash:                Trash
+            drafts:               Drafts
         contact.label:            Contact
+        mailbox.label:            Mailbox
         date.label:               Date
         date_time.label:          Date/Time
         from_email_address.label: From
@@ -156,6 +219,8 @@ oro:
             no_subject.label:     (no subject)
         to.label:                 To
         cc_bcc.label:             Cc/Bcc
+        cc.label:                 Cc
+        bcc.label:                Bcc
         x_message_id.label:       xMessage Id
         x_thread_id.label:        xThread Id
         template.label:           Apply template
@@ -166,21 +231,21 @@ oro:
         seen.label:               Is Seen
         thread_id.label:          Thread ID
         show_details.tooltip:     Show details
-        add_context.label:        Add Context
-        add_context_entity.label: Add Context Entity
         contexts:
-            label:                Context
-            placeholder:          Add Context
-            added:                The context has been added
-            added.already:        The context has already been added
-            type.not_supported:   The context type is not supported
-            removed:              The context has been removed
+            tooltip:              Context is any record or records that have meaningful relation to an email conversation. When you add context of a record to the email conversation, it will be displayed in the Activity list of that record.
         not_found:                Email with id "%id%" can not be found
         forbidden:                Action forbidden
         empty_body:               Empty body
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
+        body_synced.label:        Email body synced
+        status:
+            label:                Status
+            unread.label:         Unread
+            read.label:           Read
+        accept_language_header:
+            label: Accept-Language
 
         entity_config:
             email:
@@ -189,7 +254,9 @@ oro:
                         available_in_template: Available in email templates
 
         reply:                    Reply
+        reply_all:                Reply All
         forward:                  Forward
+        view:                     View email
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
         load_more_emails:         "%quantity% older messages"
@@ -201,9 +268,62 @@ oro:
             folder.label:             Folder
             id.label:                 Id
             organization.label:       Organization
-            owner.label:              Owner
+            owner.label:              User Owner
+            mailbox_owner.label:      Mailbox Owner
             received_at.label:        Received At
             seen.label:               Seen
+            folders.label:            Folders
+            origin.label:             Email Origin
+            unsynced_flag_count.label: Unsynced Flag Count
+        mailbox:
+            entity_label:             Mailbox
+            entity_plural_label:      Mailboxes
+            id.label:                 Id
+            label.label:              Mailbox Label
+            general.label:            General
+            email.label:              Email
+            authorized_roles.label:   Authorized Roles
+            authorized_users.label:   Authorized Users
+            email_users.label:        Email Users
+            origin.label:             Synchronization
+            organization.label:       Organization
+            action:
+                create:               Add Mailbox
+                new:                  New Mailbox
+                saved:                "%mailbox% has been saved."
+            process:
+                label:                Email Processing
+                type.label:           Action
+                default.label:        Do Nothing
+            access:
+                label:                Access Management
+            auto_response_rules.label: Auto Response Rules
+            process_settings.label: Process Settings
+        autoresponserule:
+            entity_plural_label: Autoresponse Rules
+            name.label:          Name
+            active.label:        Active
+            status.label:        Status
+            conditions.label:    Conditions
+            template.label:      Response Template
+            action:
+                add.label:    Add Rule
+                add.title:    Add Autoresponse Rule
+                update.title: Update Autoresponse Rule
+            status:
+                active:   Active
+                inactive: Inactive
+            form:
+                template:
+                    visible.label: Save Response as Email Template
+
+        action:
+            sync: Sync emails
+            processing: Processing
+            message:
+                success: Email sync completed.
+                error: Email sync failed.
+                processing: Email sync started, please wait...
 
 "%subject% - Email": "%subject% - Email"
 "Subject": "Subject"

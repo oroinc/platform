@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Form\Type;
 
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormView;
@@ -32,14 +33,23 @@ class OroDateType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults(
-            array(
+            [
                 'model_timezone' => 'UTC',
                 'view_timezone'  => 'UTC',
                 'format'         => 'yyyy-MM-dd', // ISO format
                 'widget'         => 'single_text',
                 'placeholder'    => 'oro.form.click_here_to_select',
                 'years'          => [],
-            )
+            ]
+        );
+
+        // remove buggy 'placeholder' normalizer. The placeholder must be a string if 'widget' === 'single_text'
+        $resolver->setNormalizers(
+            [
+                'placeholder' => function (Options $options, $placeholder) {
+                    return $placeholder;
+                }
+            ]
         );
     }
 

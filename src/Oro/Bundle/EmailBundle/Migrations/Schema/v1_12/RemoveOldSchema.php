@@ -34,7 +34,6 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
     public static function removeOldSchema(Schema $schema)
     {
         self::removeOldRelations($schema);
-        self::updateEmailUserTableFields($schema);
     }
 
     protected static function removeOldRelations(Schema $schema)
@@ -50,13 +49,14 @@ class RemoveOldSchema implements Migration, OrderedMigrationInterface
         if ($emailBodyTable->hasColumn('email_id')) {
             $emailBodyTable->dropColumn('email_id');
         }
-    }
 
-    protected static function updateEmailUserTableFields(Schema $schema)
-    {
+        /** Drop indexes */
         $emailUserTable = $schema->getTable('oro_email_user');
-
-        $emailUserTable->changeColumn('folder_id', ['notnull' => true]);
-        $emailUserTable->changeColumn('email_id', ['notnull' => true]);
+        if ($emailUserTable->hasForeignKey('FK_91F5CFF6162CB942')) {
+            $emailUserTable->removeForeignKey('FK_91F5CFF6162CB942');
+        }
+        if ($emailUserTable->hasForeignKey('FK_91F5CFF6A832C1C9')) {
+            $emailUserTable->removeForeignKey('FK_91F5CFF6A832C1C9');
+        }
     }
 }

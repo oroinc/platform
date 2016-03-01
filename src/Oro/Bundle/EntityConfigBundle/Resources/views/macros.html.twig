@@ -44,7 +44,7 @@
 
     {% if type == 'text' and value %}
         {% set value %}
-            {{ value|raw|nl2br }}
+            {{ value|nl2br }}
         {% endset %}
     {% elseif type == 'boolean' %}
         {% set value = value ? 'Yes'|trans : 'No'|trans %}

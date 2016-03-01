@@ -2,71 +2,23 @@
 
 namespace Oro\Bundle\UIBundle\Tests\Unit\Placeholder;
 
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\UIBundle\Placeholder\PlaceholderProvider;
+use Oro\Component\Config\Resolver\ResolverInterface;
 
 class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
 {
+    const TEST_PLACEHOLDER = 'test_placeholder';
+
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ResolverInterface
      */
     protected $resolver;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|SecurityFacade
      */
     protected $securityFacade;
-
-    /**
-     * @var PlaceholderProvider
-     */
-    protected $provider;
-
-    protected $placeholders = [
-        'placeholders' => [
-            'test_placeholder' => [
-                'items' => ['item1', 'item2', 'item3', 'item4', 'item5', 'item6', 'item7', 'item8', 'item9']
-            ]
-        ],
-        'items'        => [
-            'item1' => [
-                'template' => 'template1'
-            ],
-            'item2' => [
-                'template'   => 'template2',
-                'applicable' => '@service->isApplicable($entity$)',
-                'data'       => '@service->getData($entity$)'
-            ],
-            'item3' => [
-                'template'   => 'template3',
-                'applicable' => '@service->isApplicable($entity$)',
-                'data'       => '@service->getData($entity$)'
-            ],
-            'item4' => [
-                'template'   => 'template4',
-                'applicable' => true
-            ],
-            'item5' => [
-                'template'   => 'template5',
-                'applicable' => false
-            ],
-            'item6' => [
-                'template' => 'template6',
-                'acl'      => 'acl_ancestor'
-            ],
-            'item7' => [
-                'template' => 'template7',
-                'acl'      => 'acl_ancestor'
-            ],
-            'item8' => [
-                'template' => 'template8',
-                'acl'      => ['acl_ancestor1', 'acl_ancestor2']
-            ],
-            'item9' => [
-                'template' => 'template9',
-                'acl'      => ['acl_ancestor1', 'acl_ancestor2']
-            ],
-        ]
-    ];
 
     protected function setUp()
     {
@@ -74,117 +26,245 @@ class PlaceholderProviderTest extends \PHPUnit_Framework_TestCase
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->provider = new PlaceholderProvider($this->placeholders, $this->resolver, $this->securityFacade);
     }
 
-    /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
-     */
-    public function testGetPlaceholderItems()
+    public function testOnlyTemplateDefined()
     {
-        $placeholderName = 'test_placeholder';
+        $items = ['placeholder_item' => [
+                'template' => 'template'
+        ]];
 
         $variables = ['foo' => 'bar'];
 
-        $items = $this->placeholders['items'];
+        $provider = $this->createProvider($items);
 
-        $index          = 0;
-        $isGrantedIndex = 0;
-
-        // item1
-        $this->resolver->expects($this->at($index++))
+        $this->resolver->expects($this->at(0))
             ->method('resolve')
-            ->with($items['item1'], $variables)
-            ->will($this->returnValue($items['item1']));
+            ->with($items['placeholder_item'], $variables)
+            ->will($this->returnValue($items['placeholder_item']));
+        $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
-        // item2
-        $this->resolver->expects($this->at($index++))
+        $this->assertSame(
+            [['template' => 'template']],
+            $actual
+        );
+    }
+
+    public function testTemplateAndDataDefined()
+    {
+        $items = ['placeholder_item' => [
+            'template' => 'template',
+            'data' => '@service->getData($entity$)'
+        ]];
+
+        $variables = ['foo' => 'bar'];
+
+        $provider = $this->createProvider($items);
+        $this->resolver->expects($this->at(0))
             ->method('resolve')
-            ->with(['applicable' => $items['item2']['applicable']], $variables)
+            ->with($items['placeholder_item'], $variables)
+            ->will($this->returnValue($items['placeholder_item']));
+
+        $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
+
+        $this->assertSame(
+            [$items['placeholder_item']],
+            $actual
+        );
+    }
+
+    public function testApplicableStringConditionSuccess()
+    {
+        $items = ['placeholder_item' => [
+            'template' => 'template',
+            'applicable' => '@service1->isApplicable($entity$)'
+        ]];
+
+        $variables = ['foo' => 'bar'];
+
+        $provider = $this->createProvider($items);
+        $this->resolver->expects($this->at(0))
+            ->method('resolve')
+            ->with(['applicable' => $items['placeholder_item']['applicable']], $variables)
             ->will($this->returnValue(['applicable' => true]));
-        unset($items['item2']['applicable']);
-        $this->resolver->expects($this->at($index++))
+        unset($items['placeholder_item']['applicable']);
+        $this->resolver->expects($this->at(1))
             ->method('resolve')
-            ->with($items['item2'], $variables)
-            ->will($this->returnValue($items['item2']));
+            ->with($items['placeholder_item'], $variables)
+            ->will($this->returnValue($items['placeholder_item']));
 
-        // item3
-        $this->resolver->expects($this->at($index++))
+
+        $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
+
+        $this->assertSame(
+            [$items['placeholder_item']],
+            $actual
+        );
+    }
+
+    public function testApplicableArrayConditionsSuccess()
+    {
+        $items = ['placeholder_item' => [
+            'template' => 'template',
+            'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
+        ]];
+
+        $variables = ['foo' => 'bar'];
+
+        $provider = $this->createProvider($items);
+        $this->resolver->expects($this->at(0))
             ->method('resolve')
-            ->with(['applicable' => $items['item3']['applicable']], $variables)
+            ->with(['applicable' => $items['placeholder_item']['applicable'][0]], $variables)
+            ->will($this->returnValue(['applicable' => true]));
+        $this->resolver->expects($this->at(1))
+            ->method('resolve')
+            ->with(['applicable' => $items['placeholder_item']['applicable'][1]], $variables)
+            ->will($this->returnValue(['applicable' => true]));
+        unset($items['placeholder_item']['applicable']);
+        $this->resolver->expects($this->at(2))
+            ->method('resolve')
+            ->with($items['placeholder_item'], $variables)
+            ->will($this->returnValue($items['placeholder_item']));
+
+
+        $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
+
+        $this->assertSame(
+            [$items['placeholder_item']],
+            $actual
+        );
+    }
+
+    public function testApplicableArrayConditionsFail()
+    {
+        $items = ['placeholder_item' => [
+            'template' => 'template',
+            'applicable' => ['@service1->isApplicable($entity$)', '@service1->isApplicable($entity$)']
+        ]];
+
+        $variables = ['foo' => 'bar'];
+
+        $provider = $this->createProvider($items);
+        $this->resolver->expects($this->at(0))
+            ->method('resolve')
+            ->with(['applicable' => $items['placeholder_item']['applicable'][0]], $variables)
             ->will($this->returnValue(['applicable' => false]));
 
-        // item4
-        $this->resolver->expects($this->at($index++))
-            ->method('resolve')
-            ->with(['applicable' => $items['item4']['applicable']], $variables)
-            ->will($this->returnValue(['applicable' => $items['item4']['applicable']]));
-        unset($items['item4']['applicable']);
-        $this->resolver->expects($this->at($index++))
-            ->method('resolve')
-            ->with($items['item4'], $variables)
-            ->will($this->returnValue($items['item4']));
 
-        // item5
-        $this->resolver->expects($this->at($index++))
-            ->method('resolve')
-            ->with(['applicable' => $items['item5']['applicable']], $variables)
-            ->will($this->returnValue(['applicable' => $items['item5']['applicable']]));
+        $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
 
-        // item6
-        $this->securityFacade->expects($this->at($isGrantedIndex++))
+        $this->assertSame([], $actual);
+    }
+
+    public function testAclConditionStringSuccess()
+    {
+        $items = ['placeholder_item' => [
+            'template' => 'template',
+            'acl' => 'acl_ancestor'
+        ]];
+
+        $variables = ['foo' => 'bar'];
+
+        $provider = $this->createProvider($items);
+        $this->securityFacade->expects($this->at(0))
+            ->method('isGranted')
+            ->with('acl_ancestor')
+            ->will($this->returnValue(true));
+
+
+        $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
+        unset($items['placeholder_item']['acl']);
+        $this->assertSame([], $actual);
+    }
+
+    public function testAclConditionStringFail()
+    {
+        $items = ['placeholder_item' => [
+            'template' => 'template',
+            'acl' => 'acl_ancestor'
+        ]];
+
+        $variables = ['foo' => 'bar'];
+
+        $provider = $this->createProvider($items);
+        $this->securityFacade->expects($this->at(0))
             ->method('isGranted')
             ->with('acl_ancestor')
             ->will($this->returnValue(false));
 
-        // item7
-        $this->securityFacade->expects($this->at($isGrantedIndex++))
-            ->method('isGranted')
-            ->with('acl_ancestor')
-            ->will($this->returnValue(true));
-        unset($items['item7']['acl']);
-        $this->resolver->expects($this->at($index++))
-            ->method('resolve')
-            ->with($items['item7'], $variables)
-            ->will($this->returnValue($items['item7']));
 
-        // item8
-        $this->securityFacade->expects($this->at($isGrantedIndex++))
+        $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
+        unset($items['placeholder_item']['acl']);
+        $this->assertSame([], $actual);
+    }
+
+    public function testAclConditionArraySuccess()
+    {
+        $items = ['placeholder_item' => [
+            'template' => 'template',
+            'acl' => ['acl_ancestor1', 'acl_ancestor2']
+        ]];
+
+        $variables = ['foo' => 'bar'];
+
+        $provider = $this->createProvider($items);
+
+        $this->securityFacade->expects($this->at(0))
             ->method('isGranted')
             ->with('acl_ancestor1')
             ->will($this->returnValue(true));
-        $this->securityFacade->expects($this->at($isGrantedIndex++))
+        $this->securityFacade->expects($this->at(1))
             ->method('isGranted')
             ->with('acl_ancestor2')
             ->will($this->returnValue(true));
-        unset($items['item8']['acl']);
-        $this->resolver->expects($this->at($index++))
+        unset($items['placeholder_item']['acl']);
+        $this->resolver->expects($this->at(0))
             ->method('resolve')
-            ->with($items['item8'], $variables)
-            ->will($this->returnValue($items['item8']));
+            ->with($items['placeholder_item'], $variables)
+            ->will($this->returnValue($items['placeholder_item']));
 
-        // item9
-        $this->securityFacade->expects($this->at($isGrantedIndex++))
+
+        $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
+        unset($items['placeholder_item']['acl']);
+        $this->assertSame([$items['placeholder_item']], $actual);
+    }
+
+    public function testAclConditionArrayFail()
+    {
+        $items = ['placeholder_item' => [
+            'template' => 'template',
+            'acl' => ['acl_ancestor1', 'acl_ancestor2']
+        ]];
+
+        $variables = ['foo' => 'bar'];
+
+        $provider = $this->createProvider($items);
+        $this->securityFacade->expects($this->at(0))
             ->method('isGranted')
             ->with('acl_ancestor1')
-            ->will($this->returnValue(true));
-        $this->securityFacade->expects($this->at($isGrantedIndex++))
-            ->method('isGranted')
-            ->with('acl_ancestor2')
             ->will($this->returnValue(false));
 
-        $expected = [
-            $items['item1'],
-            $items['item2'],
-            $items['item4'],
-            $items['item7'],
-            $items['item8']
+
+        $actual = $provider->getPlaceholderItems(self::TEST_PLACEHOLDER, $variables);
+        unset($items['placeholder_item']['acl']);
+        $this->assertSame([], $actual);
+    }
+
+    /**
+     * @param array $items
+     * @return PlaceholderProvider
+     */
+    protected function createProvider(array $items)
+    {
+        $placeholders = [
+            'placeholders' => [
+                self::TEST_PLACEHOLDER => [
+                    'items' => array_keys($items)
+                ]
+            ],
+            'items' => $items
         ];
 
-        $this->assertEquals(
-            $expected,
-            $this->provider->getPlaceholderItems($placeholderName, $variables)
-        );
+        return new PlaceholderProvider($placeholders, $this->resolver, $this->securityFacade);
     }
 }

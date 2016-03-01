@@ -34,4 +34,12 @@ class EnumValueTranslation extends AbstractTranslation
      * @ORM\Column(type="string", length=4)
      */
     protected $field;
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }

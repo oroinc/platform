@@ -9,30 +9,24 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
-use Oro\Bundle\FormBundle\Form\Type\ChoiceListItem;
 
 class EntityFieldChoiceType extends AbstractType
 {
     const NAME = 'oro_entity_field_choice';
 
-    /**
-     * @var EntityProvider
-     */
+    /** @var EntityProvider */
     protected $entityProvider;
 
-    /**
-     * @var EntityFieldProvider
-     */
+    /** @var EntityFieldProvider */
     protected $entityFieldProvider;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var array */
+    protected $itemsCache;
+
     /**
-     * Constructor
-     *
      * @param EntityProvider      $entityProvider
      * @param EntityFieldProvider $entityFieldProvider
      * @param TranslatorInterface $translator
@@ -52,17 +46,6 @@ class EntityFieldChoiceType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $that    = $this;
-        $choices = function (Options $options) use ($that) {
-            return empty($options['entity']) || $options['skip_load_data']
-                ? [] // return empty list if entity is not specified or skip_load_data = true
-                : $that->getChoices(
-                    $options['entity'],
-                    $options['with_relations'],
-                    $options['with_virtual_fields']
-                );
-        };
-
         $defaultConfigs = [
             'placeholder'             => 'oro.entity.form.choose_entity_field',
             'result_template_twig'    => 'OroEntityBundle:Choice:entity_field/result.html.twig',
@@ -70,30 +53,38 @@ class EntityFieldChoiceType extends AbstractType
             'component'               => 'entity-field-choice'
         ];
 
-        $configsNormalizer = function (Options $options, $configs) use (&$defaultConfigs, $that) {
-            return $that->configsNormalizer($options, $configs, $defaultConfigs);
-        };
-        $attrNormalizer    = function (Options $options, $attr) use ($that) {
-            return $that->attrNormalizer($options, $attr);
-        };
-
         $resolver->setDefaults(
             [
-                'entity'              => null,
-                'with_relations'      => false,
-                'with_virtual_fields' => false,
-                'choices'             => $choices,
-                'empty_value'         => '',
-                'skip_load_entities'  => false,
-                'skip_load_data'      => false,
-                'configs'             => $defaultConfigs,
-                'translatable_options' => false,
+                'entity'               => null,
+                'with_relations'       => false,
+                'with_virtual_fields'  => false,
+                'choices'              => function (Options $options) {
+                    return empty($options['entity']) || $options['skip_load_data']
+                        ? [] // return empty list if entity is not specified or skip_load_data = true
+                        : $this->getChoices(
+                            $options['entity'],
+                            $options['with_relations'],
+                            $options['with_virtual_fields']
+                        );
+                },
+                'choice_attr'          => function ($choice) {
+                    return $this->getChoiceAttributes($choice);
+                },
+                'empty_value'          => '',
+                'skip_load_entities'   => false,
+                'skip_load_data'       => false,
+                'configs'              => $defaultConfigs,
+                'translatable_options' => false
             ]
         );
         $resolver->setNormalizers(
             [
-                'configs' => $configsNormalizer,
-                'attr'    => $attrNormalizer,
+                'configs' => function (Options $options, $configs) use ($defaultConfigs) {
+                    return $this->configsNormalizer($options, $configs, $defaultConfigs);
+                },
+                'attr'    => function (Options $options, $attr) {
+                    return $this->attrNormalizer($options, $attr);
+                }
             ]
         );
     }
@@ -104,9 +95,10 @@ class EntityFieldChoiceType extends AbstractType
      * @param Options $options
      * @param array   $configs
      * @param array   $defaultConfigs
+     *
      * @return array
      */
-    protected function configsNormalizer(Options $options, &$configs, &$defaultConfigs)
+    protected function configsNormalizer(Options $options, $configs, $defaultConfigs)
     {
         $configs = array_merge($defaultConfigs, $configs);
         if ($options['multiple'] && $configs['placeholder'] === $defaultConfigs['placeholder']) {
@@ -124,9 +116,10 @@ class EntityFieldChoiceType extends AbstractType
      *
      * @param Options $options
      * @param array   $attr
+     *
      * @return array
      */
-    protected function attrNormalizer(Options $options, &$attr)
+    protected function attrNormalizer(Options $options, $attr)
     {
         $attr['data-entity'] = $options['entity'];
 
@@ -134,35 +127,53 @@ class EntityFieldChoiceType extends AbstractType
     }
 
     /**
+     * Returns a list of entity fields
+     *
+     * @param string $entityName        Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations     Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields Indicates whether virtual fields should be returned as well.
+     *
+     * @return array [{field name} => [{attr1} => {val1}, ...], ...]
+     */
+    protected function getEntityFields($entityName, $withRelations, $withVirtualFields)
+    {
+        if (null === $this->itemsCache) {
+            $this->itemsCache = [];
+
+            $fields = $this->entityFieldProvider->getFields(
+                $entityName,
+                $withRelations,
+                $withVirtualFields,
+                true
+            );
+            foreach ($fields as $field) {
+                $fieldName = $field['name'];
+                unset($field['name']);
+                $this->itemsCache[$fieldName] = $field;
+            }
+        }
+
+        return $this->itemsCache;
+    }
+
+    /**
      * Returns a list of choices
      *
-     * @param string $entityName           Entity name. Can be full class name or short form: Bundle:Entity.
-     * @param bool   $withRelations        Indicates whether association fields should be returned as well.
-     * @param bool   $withVirtualFields    Indicates whether virtual fields should be returned as well.
-     * @return array of entity fields
-     *                                  key = field name, value = ChoiceListItem
+     * @param string $entityName        Entity name. Can be full class name or short form: Bundle:Entity.
+     * @param bool   $withRelations     Indicates whether association fields should be returned as well.
+     * @param bool   $withVirtualFields Indicates whether virtual fields should be returned as well.
+     *
+     * @return array
      */
     protected function getChoices($entityName, $withRelations, $withVirtualFields)
     {
         $choiceFields    = [];
         $choiceRelations = [];
-        $fields          = $this->entityFieldProvider->getFields(
-            $entityName,
-            $withRelations,
-            $withVirtualFields,
-            true
-        );
-        foreach ($fields as $field) {
-            $attributes = [];
-            foreach ($field as $key => $val) {
-                if (!in_array($key, ['name', 'related_entity_fields'])) {
-                    $attributes['data-' . $key] = $val;
-                }
-            }
+        foreach ($this->getEntityFields($entityName, $withRelations, $withVirtualFields) as $fieldName => $field) {
             if (!isset($field['relation_type'])) {
-                $choiceFields[$field['name']] = new ChoiceListItem($field['label'], $attributes);
+                $choiceFields[$fieldName] = $field['label'];
             } else {
-                $choiceRelations[$field['name']] = new ChoiceListItem($field['label'], $attributes);
+                $choiceRelations[$fieldName] = $field['label'];
             }
         }
 
@@ -177,6 +188,28 @@ class EntityFieldChoiceType extends AbstractType
         $choices[$this->translator->trans('oro.entity.form.entity_related')] = $choiceRelations;
 
         return $choices;
+    }
+
+    /**
+     * Returns a list of choice attributes for the given entity field
+     *
+     * @param string $fieldName
+     *
+     * @return array
+     */
+    protected function getChoiceAttributes($fieldName)
+    {
+        $attributes = [];
+        if (null !== $this->itemsCache) {
+            foreach ($this->itemsCache[$fieldName] as $key => $val) {
+                if ($key === 'related_entity_fields') {
+                    continue;
+                }
+                $attributes['data-' . $key] = $val;
+            }
+        }
+
+        return $attributes;
     }
 
     /**

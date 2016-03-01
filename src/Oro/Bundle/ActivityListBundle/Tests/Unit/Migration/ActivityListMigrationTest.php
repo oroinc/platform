@@ -25,9 +25,18 @@ class ActivityListMigrationTest extends \PHPUnit_Framework_TestCase
         $schema = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Migration\Schema\ExtendSchema')
             ->disableOriginalConstructor()
             ->getMock();
+        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
 
         $queries   = new QueryBag();
-        $migration = new ActivityListMigration($provider, $activityListExtension, $metadataHelper, $nameGenerator);
+        $migration = new ActivityListMigration(
+            $provider,
+            $activityListExtension,
+            $metadataHelper,
+            $nameGenerator,
+            $configManager
+        );
 
         $migration->up($schema, $queries);
         $postQuery = $queries->getPostQueries()[0];

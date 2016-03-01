@@ -97,79 +97,49 @@ class AssociationTypeHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testIsAssociationOwningSideEntityForNotOwningSideEntity()
+    /**
+     * @dataProvider isActivitySupport
+     */
+    public function testIsActivitySupport($dictionaryOptions, $expected)
     {
-        $className        = 'Test\Entity1';
-        $associationClass = 'Test\Entity';
+        $className = 'Test\Entity';
 
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($associationClass)
-            ->will($this->returnValue($associationClass));
-
-        $this->assertFalse(
-            $this->typeHelper->isAssociationOwningSideEntity($className, $associationClass)
-        );
-    }
-
-    public function testIsAssociationOwningSideEntityWithClassName()
-    {
-        $className        = 'Test\Entity';
-        $associationClass = 'Test\Entity';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($associationClass)
-            ->will($this->returnValue($className));
-
-        $this->assertTrue(
-            $this->typeHelper->isAssociationOwningSideEntity($className, $associationClass)
-        );
-    }
-
-    public function testIsAssociationOwningSideEntityWithEntityName()
-    {
-        $className        = 'Test\Entity';
-        $associationClass = 'Test:Entity';
-
-        $this->entityClassResolver->expects($this->once())
-            ->method('getEntityClass')
-            ->with($associationClass)
-            ->will($this->returnValue($className));
-
-        $this->assertTrue(
-            $this->typeHelper->isAssociationOwningSideEntity($className, $associationClass)
-        );
-    }
-
-    public function testIsAssociationOwningSideEntityWithGroupName()
-    {
-        $config1 = new Config(new EntityConfigId('grouping', 'Test\Entity1'));
-        $config1->set('groups', ['some_group', 'another_group']);
-        $config2 = new Config(new EntityConfigId('grouping', 'Test\Entity2'));
-        $config2->set('groups', ['another_group']);
-        $config3 = new Config(new EntityConfigId('grouping', 'Test\Entity3'));
-
-        $configs = [$config1, $config2, $config3];
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->once())
+            ->method('get')
+            ->with('activity_support')
+            ->will($this->returnValue($dictionaryOptions));
 
         $configProvider = $this->getConfigProviderMock();
         $this->configManager->expects($this->once())
             ->method('getProvider')
-            ->with('grouping')
+            ->with('dictionary')
             ->will($this->returnValue($configProvider));
         $configProvider->expects($this->once())
-            ->method('getConfigs')
-            ->will($this->returnValue($configs));
+            ->method('hasConfig')
+            ->with($className)
+            ->will($this->returnValue(true));
+        $configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($className)
+            ->will($this->returnValue($config));
 
-        $this->assertTrue(
-            $this->typeHelper->isAssociationOwningSideEntity('Test\Entity1', 'some_group')
+        $this->assertEquals(
+            $expected,
+            $this->typeHelper->isSupportActivityEnabled($className)
         );
-        $this->assertFalse(
-            $this->typeHelper->isAssociationOwningSideEntity('Test\Entity', 'some_group')
-        );
-        $this->assertFalse(
-            $this->typeHelper->isAssociationOwningSideEntity('Test\Entity2', 'some_group')
-        );
+    }
+
+    public function isActivitySupport()
+    {
+        return [
+            [null, false],
+            [['some'], false],
+            ['true', true],
+            ['false', false],
+        ];
     }
 
     public function testGetOwningSideEntities()

@@ -2,15 +2,21 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\MappingException as ORMMappingException;
 use Doctrine\Common\Persistence\Mapping\MappingException as PersistenceMappingException;
 
+use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class AssociationBuilder
 {
+    /** @var ManagerRegistry */
+    protected $doctrine;
+
     /** @var ConfigManager */
     protected $configManager;
 
@@ -18,13 +24,16 @@ class AssociationBuilder
     protected $relationBuilder;
 
     /**
+     * @param ManagerRegistry $doctrine
      * @param ConfigManager   $configManager
      * @param RelationBuilder $relationBuilder
      */
     public function __construct(
+        ManagerRegistry $doctrine,
         ConfigManager $configManager,
         RelationBuilder $relationBuilder
     ) {
+        $this->doctrine        = $doctrine;
         $this->configManager   = $configManager;
         $this->relationBuilder = $relationBuilder;
     }
@@ -38,42 +47,54 @@ class AssociationBuilder
     {
         $relationName = ExtendHelper::buildAssociationName($targetEntityClass, $associationKind);
 
-        $entityConfigProvider = $this->configManager->getProvider('entity');
-        $targetEntityConfig   = $entityConfigProvider->getConfig($targetEntityClass);
-
-        $label       = $targetEntityConfig->get(
-            'label',
-            false,
-            ConfigHelper::getTranslationKey('entity', 'label', $targetEntityClass, $relationName)
-        );
-        $description = ConfigHelper::getTranslationKey('entity', 'description', $targetEntityClass, $relationName);
+        $extendConfigProvider = $this->configManager->getProvider('extend');
 
         $targetEntityPrimaryKeyColumns = $this->getPrimaryKeyColumnNames($targetEntityClass);
 
         // add relation to owning entity
         $this->relationBuilder->addManyToManyRelation(
-            $this->configManager->getProvider('extend')->getConfig($sourceEntityClass),
+            $extendConfigProvider->getConfig($sourceEntityClass),
             $targetEntityClass,
             $relationName,
             $targetEntityPrimaryKeyColumns,
             $targetEntityPrimaryKeyColumns,
-            $targetEntityPrimaryKeyColumns,
-            [
-                'extend' => [
-                    'without_default' => true,
-                ],
-                'entity' => [
-                    'label'       => $label,
-                    'description' => $description,
-                ],
-                'view'   => [
-                    'is_displayable' => true
-                ],
-                'form'   => [
-                    'is_enabled' => true
-                ]
-            ]
+            $targetEntityPrimaryKeyColumns
         );
+
+        // update attributes for new association
+        $fieldConfig = $extendConfigProvider->getConfig($sourceEntityClass, $relationName);
+        if ($fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+            $targetEntityConfig = $this->configManager->getProvider('entity')->getConfig($targetEntityClass);
+            $this->relationBuilder->updateFieldConfigs(
+                $sourceEntityClass,
+                $relationName,
+                [
+                    'extend' => [
+                        'without_default' => true,
+                    ],
+                    'entity' => [
+                        'label'       => $this->getAssociationLabel(
+                            'plural_label',
+                            $sourceEntityClass,
+                            $relationName,
+                            $targetEntityConfig
+                        ),
+                        'description' => $this->getAssociationLabel(
+                            'description',
+                            $sourceEntityClass,
+                            $relationName,
+                            $targetEntityConfig
+                        ),
+                    ],
+                    'view'   => [
+                        'is_displayable' => true
+                    ],
+                    'form'   => [
+                        'is_enabled' => true
+                    ]
+                ]
+            );
+        }
     }
 
     /**
@@ -85,38 +106,50 @@ class AssociationBuilder
     {
         $relationName = ExtendHelper::buildAssociationName($targetEntityClass, $associationKind);
 
-        $entityConfigProvider = $this->configManager->getProvider('entity');
-        $targetEntityConfig   = $entityConfigProvider->getConfig($targetEntityClass);
-
-        $label       = $targetEntityConfig->get(
-            'label',
-            false,
-            ConfigHelper::getTranslationKey('entity', 'label', $targetEntityClass, $relationName)
-        );
-        $description = ConfigHelper::getTranslationKey('entity', 'description', $targetEntityClass, $relationName);
+        $extendConfigProvider = $this->configManager->getProvider('extend');
 
         $targetEntityPrimaryKeyColumns = $this->getPrimaryKeyColumnNames($targetEntityClass);
-        $targetFieldName               = array_shift($targetEntityPrimaryKeyColumns);
+        $targetFieldName               = reset($targetEntityPrimaryKeyColumns);
 
         // add relation to owning entity
         $this->relationBuilder->addManyToOneRelation(
-            $this->configManager->getProvider('extend')->getConfig($sourceEntityClass),
+            $extendConfigProvider->getConfig($sourceEntityClass),
             $targetEntityClass,
             $relationName,
-            $targetFieldName,
-            [
-                'entity' => [
-                    'label'       => $label,
-                    'description' => $description,
-                ],
-                'view'   => [
-                    'is_displayable' => false
-                ],
-                'form'   => [
-                    'is_enabled' => false
-                ]
-            ]
+            $targetFieldName
         );
+
+        // update attributes for new association
+        $fieldConfig = $extendConfigProvider->getConfig($sourceEntityClass, $relationName);
+        if ($fieldConfig->is('state', ExtendScope::STATE_NEW)) {
+            $targetEntityConfig = $this->configManager->getProvider('entity')->getConfig($targetEntityClass);
+            $this->relationBuilder->updateFieldConfigs(
+                $sourceEntityClass,
+                $relationName,
+                [
+                    'entity' => [
+                        'label'       => $this->getAssociationLabel(
+                            'label',
+                            $sourceEntityClass,
+                            $relationName,
+                            $targetEntityConfig
+                        ),
+                        'description' => $this->getAssociationLabel(
+                            'description',
+                            $sourceEntityClass,
+                            $relationName,
+                            $targetEntityConfig
+                        ),
+                    ],
+                    'view'   => [
+                        'is_displayable' => false
+                    ],
+                    'form'   => [
+                        'is_enabled' => false
+                    ]
+                ]
+            );
+        }
     }
 
     /**
@@ -127,10 +160,10 @@ class AssociationBuilder
     protected function getPrimaryKeyColumnNames($entityClass)
     {
         try {
-            return $this->configManager
-                ->getEntityManager()
-                ->getClassMetadata($entityClass)
-                ->getIdentifierColumnNames();
+            /** @var EntityManager $em */
+            $em = $this->doctrine->getManagerForClass($entityClass);
+
+            return $em->getClassMetadata($entityClass)->getIdentifierColumnNames();
         } catch (\ReflectionException $e) {
             // ignore entity not found exception
             return ['id'];
@@ -142,5 +175,28 @@ class AssociationBuilder
         } catch (PersistenceMappingException $e) {
             return ['id'];
         }
+    }
+
+    /**
+     * @param string          $labelKey
+     * @param string          $entityClass
+     * @param string          $relationName
+     * @param ConfigInterface $targetEntityConfig
+     *
+     * @return string
+     */
+    protected function getAssociationLabel($labelKey, $entityClass, $relationName, ConfigInterface $targetEntityConfig)
+    {
+        $label = $targetEntityConfig->get($labelKey);
+        if (!$label) {
+            $label = ConfigHelper::getTranslationKey(
+                'entity',
+                $labelKey,
+                $entityClass,
+                $relationName
+            );
+        }
+
+        return $label;
     }
 }

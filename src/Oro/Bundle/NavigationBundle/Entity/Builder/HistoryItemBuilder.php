@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\NavigationBundle\Entity\Builder;
 
-use Oro\Bundle\NavigationBundle\Entity\Builder\AbstractBuilder;
 use Oro\Bundle\NavigationBundle\Entity\NavigationHistoryItem;
 
 class HistoryItemBuilder extends AbstractBuilder
@@ -15,7 +14,7 @@ class HistoryItemBuilder extends AbstractBuilder
      */
     public function buildItem($params)
     {
-        return new NavigationHistoryItem($params);
+        return new $this->className($params);
     }
 
     /**
@@ -26,6 +25,6 @@ class HistoryItemBuilder extends AbstractBuilder
      */
     public function findItem($itemId)
     {
-        return $this->getEntityManager()->find('OroNavigationBundle:NavigationHistoryItem', $itemId);
+        return $this->getEntityManager()->find($this->className, $itemId);
     }
 }

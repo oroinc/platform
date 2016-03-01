@@ -4,9 +4,6 @@
     uniqueConstraints:
         oro_email_address_uq:
             columns:        [ email ]
-    indexes:
-        oro_email_address_idx:
-            columns:        [ email ]
     lifecycleCallbacks:
         prePersist:         [ beforeSave ]
         preUpdate:          [ beforeUpdate ]

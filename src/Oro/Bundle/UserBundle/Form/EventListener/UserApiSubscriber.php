@@ -46,5 +46,11 @@ class UserApiSubscriber implements EventSubscriberInterface
         if (!$data->getId()) {
             $form->add('plainPassword', 'password');
         }
+
+        // for api form create imap config subform without buttons
+        if ($form->has('imapConfiguration')) {
+            $form->remove('imapConfiguration');
+            $form->add('imapConfiguration', 'oro_imap_configuration', ['add_check_button' => false]);
+        }
     }
 }

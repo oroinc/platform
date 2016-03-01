@@ -1,11 +1,10 @@
-/* global define */
 define(function(require) {
     'use strict';
 
-    var StepModel,
-        _ = require('underscore'),
-        TransitionCollection = require('./transition-collection'),
-        BaseModel = require('oroui/js/app/models/base/model');
+    var StepModel;
+    var _ = require('underscore');
+    var TransitionCollection = require('./transition-collection');
+    var BaseModel = require('oroui/js/app/models/base/model');
 
     StepModel = BaseModel.extend({
         defaults: {
@@ -30,7 +29,7 @@ define(function(require) {
             this.workflow = workflow;
         },
 
-        getAllowedTransitions: function (workflowModel) {
+        getAllowedTransitions: function(workflowModel) {
             if (!workflowModel) {
                 workflowModel = this.workflow;
             }
@@ -44,7 +43,7 @@ define(function(require) {
                 if (_.isArray(allowedTransitionsAttr)) {
                     _.each(
                         allowedTransitionsAttr,
-                        function (transitionName) {
+                        function(transitionName) {
                             this.allowedTransitions.add(workflowModel.getTransitionByName(transitionName));
                         },
                         this
@@ -77,7 +76,7 @@ define(function(require) {
         destroy: function(options) {
             if (this.workflow) {
                 //Need to manually destroy collection elements to trigger all appropriate events
-                var removeTransitions = function (models) {
+                var removeTransitions = function(models) {
                     if (models.length) {
                         for (var i = models.length - 1; i > -1; i--) {
                             models[i].destroy();

@@ -4,14 +4,11 @@ namespace Oro\Bundle\DataAuditBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AuditableFilter
 {
-    /**
-     * @var ConfigProvider
-     */
+    /** @var ConfigProvider */
     protected $configProvider;
 
     /**
@@ -23,28 +20,21 @@ class AuditableFilter
     }
 
     /**
-     * @param mixed  $entity
-     * @param string $entityClass
-     * @param bool   $show
+     * @param mixed $entity
+     * @param bool  $show
+     *
      * @return bool
      */
-    public function isEntityAuditable($entity, $entityClass, $show)
+    public function isEntityAuditable($entity, $show)
     {
-        if (!is_object($entity) || $show) {
+        if ($show || !is_object($entity)) {
             return $show;
         }
 
-        $classEmpty = empty($entityClass);
+        $className = ClassUtils::getClass($entity);
 
-        if ($classEmpty && $entity instanceof EntityConfigModel) {
-            $className = $entity->getClassName();
-        } elseif ($classEmpty) {
-            $className = ClassUtils::getClass($entity);
-        } else {
-            $className = str_replace('_', '\\', $entityClass);
-        }
-
-        return $this->configProvider->hasConfig($className)
-        && $this->configProvider->getConfig($className)->is('auditable');
+        return
+            $this->configProvider->hasConfig($className)
+            && $this->configProvider->getConfig($className)->is('auditable');
     }
 }

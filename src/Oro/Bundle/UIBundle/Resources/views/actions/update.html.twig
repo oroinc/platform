@@ -132,6 +132,76 @@
         <div class="layout-content">
             {% block content_data %}
                 {% set data = oro_form_process(data, form) %}
+
+                {% if entity and data is defined and data.dataBlocks is defined %}
+                    {% set dataBlocks = data.dataBlocks %}
+
+                    {%- set activitiesData -%}
+                        {% placeholder update_content_data_activities with {entity: entity} %}
+                    {%- endset -%}
+
+                    {% if activitiesData is not empty %}
+                        {% set dataBlocks = dataBlocks|merge([{
+                            'title': 'oro.activity.sections.activities'|trans,
+                            'subblocks': [
+                                {
+                                    'spanClass': 'empty',
+                                    'data': [activitiesData]
+                                }
+                            ]
+                        }]) %}
+                    {% endif %}
+
+                    {%- set communicationsData -%}
+                        {% placeholder update_content_data_communications with {entity: entity} %}
+                    {%- endset -%}
+
+                    {% if communicationsData is not empty %}
+                        {% set dataBlocks = dataBlocks|merge([{
+                            'title': 'Communications'|trans,
+                            'subblocks': [
+                                {
+                                    'spanClass': 'empty',
+                                    'data': [communicationsData]
+                                }
+                            ]
+                        }]) %}
+                    {% endif %}
+
+                    {%- set additionalInformationData -%}
+                        {% placeholder update_content_data_additional_information with {entity: entity} %}
+                    {%- endset -%}
+
+                    {% if additionalInformationData is not empty %}
+                        {% set dataBlocks = dataBlocks|merge([{
+                            'title': 'Additional Information'|trans,
+                            'subblocks': [
+                                {
+                                    'spanClass': 'empty',
+                                    'data': [additionalInformationData]
+                                }
+                            ]
+                        }]) %}
+                    {% endif %}
+
+                    {%- set commentsData -%}
+                        {% placeholder update_content_data_comments with {entity: entity} %}
+                    {%- endset -%}
+
+                    {% if commentsData is not empty %}
+                        {% set dataBlocks = dataBlocks|merge([{
+                            'title': 'oro.comment.entity_plural_label'|trans,
+                            'subblocks': [
+                                {
+                                    'spanClass': 'responsive-cell activity-list-widget',
+                                    'data': [commentsData]
+                                }
+                            ]
+                        }]) %}
+                    {% endif  %}
+
+                    {% set data = data|merge({'dataBlocks': dataBlocks}) %}
+                {% endif  %}
                 {{ UI.scrollData(id, data, form) }}
             {% endblock content_data %}
         </div>

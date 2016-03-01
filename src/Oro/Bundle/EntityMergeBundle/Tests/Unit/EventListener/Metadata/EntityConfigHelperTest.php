@@ -24,7 +24,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->configManager = $this
-            ->getMockBuilder('Oro\\Bundle\\EntityConfigBundle\\Config\\ConfigManager')
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -36,7 +36,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetConfigForExtendField()
     {
         $scope = 'merge';
-        $className = 'Namespace\\Entity';
+        $className = 'Namespace\Entity';
         $fieldName = 'test';
 
         $mergeConfigProvider = $this->createConfigProvider();
@@ -64,7 +64,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
     public function testGetConfigByFieldMetadataForNotExtendField()
     {
         $scope = 'merge';
-        $className = 'Namespace\\Entity';
+        $className = 'Namespace\Entity';
         $fieldName = 'test';
 
         $fieldMetadata = $this->createFieldMetadata();
@@ -99,7 +99,7 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testPrepareFieldMetadataPropertyPathWithExtendField()
     {
-        $className = 'Namespace\\Entity';
+        $className = 'Namespace\Entity';
         $fieldName = 'test';
 
         $this->configManager->expects($this->once())
@@ -127,14 +127,17 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ->with($className, $fieldName)
             ->will($this->returnValue($extendConfig));
 
-        $extendConfig->expects($this->once())
+        $extendConfig->expects($this->any())
             ->method('is')
             ->with('is_extend')
             ->will($this->returnValue(true));
 
-        $fieldMetadata->expects($this->once())
+        $fieldMetadata->expects($this->exactly(2))
             ->method('set')
-            ->with('property_path', $fieldName);
+            ->withConsecutive(
+                ['property_path', $fieldName],
+                ['display', true]
+            );
 
         $this->helper->prepareFieldMetadataPropertyPath($fieldMetadata);
     }
@@ -169,18 +172,20 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
 
     protected function createFieldMetadata()
     {
-        return $this->getMockBuilder('Oro\\Bundle\\EntityMergeBundle\\Metadata\\FieldMetadata')
+        return $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();
     }
 
     protected function createConfig()
     {
-        return $this->getMock('Oro\\Bundle\\EntityConfigBundle\\Config\\ConfigInterface');
+        return $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
     }
 
     protected function createConfigProvider()
     {
-        return $this->getMock('Oro\\Bundle\\EntityConfigBundle\\Provider\\ConfigProviderInterface');
+        return $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

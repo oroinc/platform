@@ -1,12 +1,11 @@
-/*global define*/
 define(['underscore', 'orotranslation/js/translator'
-    ], function (_, __) {
+    ], function(_, __) {
     'use strict';
 
     var defaultParam = {
-        exactMessage: '',
-        maxMessage: '',
-        minMessage: ''
+        exactMessage: 'oro.form.number.exect',
+        maxMessage: 'oro.form.number.max',
+        minMessage: 'oro.form.number.min'
     };
 
     /**
@@ -40,14 +39,14 @@ define(['underscore', 'orotranslation/js/translator'
      */
     return [
         'Number',
-        function (value, element, param) {
+        function(value, element, param) {
             var result = between(Number(value), param.min, param.max);
             return result === true;
         },
-        function (param, element, value, placeholders) {
-            var result,
-                message,
-                number;
+        function(param, element, value, placeholders) {
+            var result;
+            var message;
+            var number;
             param = _.extend({}, defaultParam, param);
             value = _.isUndefined(value) ? this.elementValue(element) : value;
             result = between(Number(value), param.min, param.max);

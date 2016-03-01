@@ -24,6 +24,7 @@ class OroEntityCreateOrSelectType extends AbstractType
     const MODE_CREATE = 'create';
     const MODE_GRID   = 'grid';
     const MODE_VIEW   = 'view';
+    const MODE_EDIT   = 'edit'; // this mode is fully supported in choice type only
 
     /**
      * @var DoctrineHelper

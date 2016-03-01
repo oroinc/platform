@@ -14,7 +14,7 @@
     {% if transitionData['transition-url'] is not defined or not transitionData['transition-url'] %}
         {% set transitionData = transitionData|merge({'transition-url':
             path(
-                'oro_workflow_api_rest_workflow_transit',
+                'oro_api_workflow_transit',
                 {
                     workflowItemId: workflowItem.id,
                     transitionName: transition.name
@@ -67,7 +67,7 @@
             'use strict';
 
             $(function() {
-                var container = $('#{{ blockId }}');
+                var container = $('#{{ blockId }}').closest('.page-title');
                 {% for data in transitionsData %}
                 (function(transitionBtn) {
                     if (transitionBtn.data('enabled')) {

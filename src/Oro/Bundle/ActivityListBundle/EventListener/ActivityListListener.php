@@ -13,10 +13,16 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 class ActivityListListener
 {
     /** @var array */
+    protected $insertedOwnerEntities = [];
+
+    /** @var array */
     protected $insertedEntities = [];
 
     /** @var array */
     protected $updatedEntities = [];
+
+    /** @var array */
+    protected $updatedOwnerEntities = [];
 
     /** @var array */
     protected $deletedEntities = [];
@@ -49,12 +55,18 @@ class ActivityListListener
         $entityManager = $args->getEntityManager();
         $unitOfWork    = $entityManager->getUnitOfWork();
 
+        $this->collectInsertedOwnerEntities($unitOfWork->getScheduledEntityInsertions());
         $this->collectInsertedEntities($unitOfWork->getScheduledEntityInsertions());
+        $this->collectUpdatesOwnerEntities($unitOfWork);
         $this->collectUpdates($unitOfWork);
         $this->collectDeletedEntities($unitOfWork->getScheduledEntityDeletions());
 
         if ($this->activityListManager->processUpdatedEntities($this->updatedEntities, $entityManager)) {
             $this->updatedEntities = [];
+        }
+
+        if ($this->activityListManager->processFillOwners($this->updatedOwnerEntities, $entityManager)) {
+            $this->updatedOwnerEntities = [];
         }
     }
 
@@ -75,6 +87,10 @@ class ActivityListListener
             $this->insertedEntities = [];
             $entityManager->flush();
         }
+        if ($this->activityListManager->processFillOwners($this->insertedOwnerEntities, $entityManager)) {
+            $this->insertedOwnerEntities = [];
+            $entityManager->flush();
+        }
     }
 
     /**
@@ -86,7 +102,9 @@ class ActivityListListener
     {
         if (!empty($entities)) {
             foreach ($entities as $hash => $entity) {
-                if ($this->activityListManager->isSupportedEntity($entity) && empty($this->deletedEntities[$hash])) {
+                if (empty($this->deletedEntities[$hash])
+                    && $this->activityListManager->isSupportedEntity($entity)
+                ) {
                     $this->deletedEntities[$hash] = [
                         'class' => $this->doctrineHelper->getEntityClass($entity),
                         'id'    => $this->doctrineHelper->getSingleEntityIdentifier($entity)
@@ -105,7 +123,9 @@ class ActivityListListener
     {
         $entities = $uof->getScheduledEntityUpdates();
         foreach ($entities as $hash => $entity) {
-            if ($this->activityListManager->isSupportedEntity($entity) && empty($this->updatedEntities[$hash])) {
+            if (empty($this->updatedEntities[$hash])
+                && $this->activityListManager->isSupportedEntity($entity)
+            ) {
                 $this->updatedEntities[$hash] = $entity;
             }
         }
@@ -117,11 +137,42 @@ class ActivityListListener
             /** @var $collection PersistentCollection */
             $ownerEntity = $collection->getOwner();
             $entityHash  = spl_object_hash($ownerEntity);
-            if ($this->activityListManager->isSupportedEntity($ownerEntity)
+            if (empty($this->updatedEntities[$entityHash])
+                && $this->activityListManager->isSupportedEntity($ownerEntity)
                 && $this->doctrineHelper->getSingleEntityIdentifier($ownerEntity) !== null
-                && empty($this->updatedEntities[$entityHash])
             ) {
                 $this->updatedEntities[$entityHash] = $ownerEntity;
+            }
+        }
+    }
+
+    /**
+     * Collect updated activities owner entities
+     *
+     * @param UnitOfWork $uof
+     */
+    protected function collectUpdatesOwnerEntities(UnitOfWork $uof)
+    {
+        $entities = $uof->getScheduledEntityUpdates();
+        foreach ($entities as $hash => $entity) {
+            if ($this->activityListManager->isSupportedOwnerEntity($entity)
+                && empty($this->updatedOwnerEntities[$hash])) {
+                $this->updatedOwnerEntities[$hash] = $entity;
+            }
+        }
+        $updatedCollections = array_merge(
+            $uof->getScheduledCollectionUpdates(),
+            $uof->getScheduledCollectionDeletions()
+        );
+        foreach ($updatedCollections as $hash => $collection) {
+            /** @var $collection PersistentCollection */
+            $ownerEntity = $collection->getOwner();
+            $entityHash  = spl_object_hash($ownerEntity);
+            if ($this->activityListManager->isSupportedOwnerEntity($ownerEntity)
+                && $this->doctrineHelper->getSingleEntityIdentifier($ownerEntity) !== null
+                && empty($this->updatedOwnerEntities[$entityHash])
+            ) {
+                $this->updatedOwnerEntities[$entityHash] = $ownerEntity;
             }
         }
     }
@@ -134,8 +185,25 @@ class ActivityListListener
     protected function collectInsertedEntities(array $entities)
     {
         foreach ($entities as $hash => $entity) {
-            if ($this->activityListManager->isSupportedEntity($entity) && empty($this->insertedEntities[$hash])) {
+            if (empty($this->insertedEntities[$hash])
+                && $this->activityListManager->isSupportedEntity($entity)
+            ) {
                 $this->insertedEntities[$hash] = $entity;
+            }
+        }
+    }
+
+    /**
+     * Collect inserted owners activity entities
+     *
+     * @param array $entities
+     */
+    protected function collectInsertedOwnerEntities(array $entities)
+    {
+        foreach ($entities as $hash => $entity) {
+            if ($this->activityListManager->isSupportedOwnerEntity($entity)
+                && empty($this->insertedOwnerEntities[$hash])) {
+                $this->insertedOwnerEntities[$hash] = $entity;
             }
         }
     }

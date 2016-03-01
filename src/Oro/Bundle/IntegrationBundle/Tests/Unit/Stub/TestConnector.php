@@ -2,10 +2,21 @@
 
 namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Stub;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Entity\Status;
 use Oro\Bundle\IntegrationBundle\Provider\AbstractConnector;
+use Oro\Bundle\IntegrationBundle\Provider\AllowedConnectorInterface;
+use Oro\Bundle\IntegrationBundle\Provider\OrderedConnectorInterface;
 
-class TestConnector extends AbstractConnector
+class TestConnector extends AbstractConnector implements OrderedConnectorInterface, AllowedConnectorInterface
 {
+    public $order;
+    public $type;
+    public $label;
+    public $job;
+    public $entityName;
+    public $allowed;
+
     /**
      * Returns type name, the same as registered in service tag
      *
@@ -13,7 +24,7 @@ class TestConnector extends AbstractConnector
      */
     public function getType()
     {
-        // TODO: Implement getType() method.
+        return $this->type;
     }
 
     /**
@@ -23,7 +34,7 @@ class TestConnector extends AbstractConnector
      */
     public function getLabel()
     {
-        // TODO: Implement getLabel() method.
+        return $this->label;
     }
 
     /**
@@ -33,7 +44,7 @@ class TestConnector extends AbstractConnector
      */
     public function getImportJobName()
     {
-        // TODO: Implement getImportJobName() method.
+        return $this->job;
     }
 
     /**
@@ -43,7 +54,7 @@ class TestConnector extends AbstractConnector
      */
     public function getImportEntityFQCN()
     {
-        // TODO: Implement getImportEntityFQCN() method.
+        return $this->entityName;
     }
 
     /**
@@ -54,5 +65,26 @@ class TestConnector extends AbstractConnector
     protected function getConnectorSource()
     {
         return new TestIterator();
+    }
+
+    /**
+     * @param Channel  $integration
+     * @param Status[] $processedConnectorsStatuses Array of connector sync statuses which was processed before
+     *
+     * @return bool
+     */
+    public function isAllowed(Channel $integration, array $processedConnectorsStatuses)
+    {
+        return $this->allowed;
+    }
+
+    /**
+     * Get the order of this connector
+     *
+     * @return integer
+     */
+    public function getOrder()
+    {
+        return $this->order;
     }
 }

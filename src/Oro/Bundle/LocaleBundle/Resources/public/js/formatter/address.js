@@ -1,6 +1,5 @@
-/*global define*/
-define(['../locale-settings', './name'
-    ], function (localeSettings, nameFormatter) {
+define(['jquery', '../locale-settings', './name'
+    ], function($, localeSettings, nameFormatter) {
     'use strict';
 
     /**
@@ -21,7 +20,7 @@ define(['../locale-settings', './name'
          * @param {string} newLine
          * @returns {string}
          */
-        format: function (address, country, newLine) {
+        format: function(address, country, newLine) {
             if (!country) {
                 if (localeSettings.isFormatAddressByAddressCountry()) {
                     country = address.country_iso2;
@@ -32,14 +31,14 @@ define(['../locale-settings', './name'
             newLine = newLine || '<br/>';
 
             var format = this.getAddressFormat(country);
-            var formatted = format.replace(/%(\w+)%/g, function (pattern, key) {
+            var formatted = format.replace(/%(\w+)%/g, function(pattern, key) {
                 var lowerCaseKey = key.toLowerCase();
                 var value = '';
                 if ('name' === lowerCaseKey) {
                     value = nameFormatter.format(address, localeSettings.getCountryLocale(country));
-                } else if ('street' == lowerCaseKey) {
+                } else if ('street' === lowerCaseKey) {
                     value = address.street + ' ' + (address.street2 || '');
-                } else if ('street1' == lowerCaseKey) {
+                } else if ('street1' === lowerCaseKey) {
                     value = address.street;
                 } else {
                     value = address[lowerCaseKey];
@@ -51,9 +50,11 @@ define(['../locale-settings', './name'
             });
 
             var addressLines = formatted
-                .replace(/ *(\\n)+/g, '\\n')
-                .split("\\n");
-            if (typeof newLine == 'function') {
+                .split('\\n');
+            addressLines = addressLines.filter(function(element) {
+                return $.trim(element) !== '';
+            });
+            if (typeof newLine === 'function') {
                 for (var i = 0; i < addressLines.length; i++) {
                     addressLines[i] = newLine(addressLines[i]);
                 }
@@ -68,11 +69,11 @@ define(['../locale-settings', './name'
          * @param {string} country ISO2 code
          * @returns {*}
          */
-        getAddressFormat: function (country) {
+        getAddressFormat: function(country) {
             if (!this.formats.hasOwnProperty(country)) {
                 country = localeSettings.getCountry();
             }
             return this.formats[country];
         }
-    }
+    };
 });

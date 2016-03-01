@@ -7,6 +7,7 @@ use HWI\Bundle\OAuthBundle\Security\Core\Exception\OAuthAwareExceptionInterface;
 use HWI\Bundle\OAuthBundle\Security\Core\User\OAuthAwareUserProviderInterface;
 use HWI\Bundle\OAuthBundle\Security\Http\ResourceOwnerMap;
 
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -33,6 +34,11 @@ class OAuthProvider extends HWIOAuthProvider
     protected $userChecker;
 
     /**
+     * @var OAuthTokenFactoryInterface
+     */
+    protected $tokenFactory;
+
+    /**
      * @param OAuthAwareUserProviderInterface $userProvider User provider
      * @param ResourceOwnerMap $resourceOwnerMap Resource owner map
      * @param UserCheckerInterface $userChecker User checker
@@ -42,22 +48,32 @@ class OAuthProvider extends HWIOAuthProvider
         ResourceOwnerMap $resourceOwnerMap,
         UserCheckerInterface $userChecker
     ) {
+        parent::__construct($userProvider, $resourceOwnerMap, $userChecker);
         $this->userProvider = $userProvider;
         $this->resourceOwnerMap = $resourceOwnerMap;
         $this->userChecker = $userChecker;
     }
 
     /**
-     * Attempts to authenticate a TokenInterface object.
+     * @param OAuthTokenFactoryInterface $tokenFactory
+     */
+    public function setTokenFactory(OAuthTokenFactoryInterface $tokenFactory)
+    {
+        $this->tokenFactory = $tokenFactory;
+    }
+
+    /**
+     * {@inheritDoc}
      *
-     * @param OAuthToken $token The TokenInterface instance to authenticate
-     *
-     * @return TokenInterface An authenticated TokenInterface instance, never null
-     *
-     * @throws AuthenticationException if the authentication fails
+     * @throws OAuthAwareExceptionInterface
      */
     public function authenticate(TokenInterface $token)
     {
+        if (null === $this->tokenFactory) {
+            throw new AuthenticationException('Token Factory is not set in OAuthProvider.');
+        }
+
+        /* @var OAuthToken $token */
         $resourceOwner = $this->resourceOwnerMap->getResourceOwnerByName($token->getResourceOwnerName());
 
         try {
@@ -72,7 +88,7 @@ class OAuthProvider extends HWIOAuthProvider
 
         $organization = $this->guessOrganization($user, $token);
 
-        $token = new OAuthToken($token->getRawToken(), $user->getRoles());
+        $token = $this->tokenFactory->create($token->getRawToken(), $user->getRoles());
         $token->setResourceOwnerName($resourceOwner->getName());
         $token->setOrganizationContext($organization);
         $token->setUser($user);
@@ -89,7 +105,7 @@ class OAuthProvider extends HWIOAuthProvider
      * @param User $user
      * @param TokenInterface $token
      *
-     * @return type
+     * @return Organization
      *
      * @throws BadCredentialsException
      */

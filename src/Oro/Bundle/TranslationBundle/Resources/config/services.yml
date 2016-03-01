@@ -19,12 +19,13 @@ parameters:
     oro_translation.twig.translation.extension.class:           Oro\Bundle\TranslationBundle\Twig\TranslationExtension
     oro_translation.twig.translation_status.extension.class:    Oro\Bundle\TranslationBundle\Twig\TranslationStatusExtension
     oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
+    oro_translation.event_listener.language_change.class:       Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener
 
 services:
     oro_translation.controller:
         class: %oro_translation.controller.class%
         arguments:
-            - @translator
+            - @translator.default
             - @templating
             - OroTranslationBundle:Translation:translation.js.twig
             - ""
@@ -59,12 +60,14 @@ services:
         class: %oro_translation.guzzle_client.class%
         arguments:
             - %oro_translation.api.crowdin.endpoint%
+        lazy: true
 
     # guzzle http client for oro proxy
     oro_translation.guzzle_oro_client:
         class: %oro_translation.guzzle_client.class%
         arguments:
             - %oro_translation.api.oro_service.endpoint%
+        lazy: true
 
     oro_translation.uploader.crowdin_adapter:
         class: %oro_translation.crowdin.adapter.class%
@@ -77,6 +80,7 @@ services:
             - @oro_translation.guzzle_oro_client
         calls:
             - [ setApiKey, [ %oro_translation.api.oro_service.key% ] ]
+            - [ setLogger, [ @logger ] ]
 
     oro_translation.database_translation.metadata.cache:
         class: %oro_translation.dynamic_translation.metadata.cache.class%
@@ -87,7 +91,7 @@ services:
         public: false
         parent: oro.cache.abstract
         calls:
-            - [ setNamespace, [ "oro_database_translation_metadata.cache" ] ]
+            - [ setNamespace, [ 'oro_db_trans_metadata' ] ]
 
     oro_translation.database_translation.persister:
         class: %oro_translation.database_translation.persister.class%
@@ -98,7 +102,7 @@ services:
     oro_translation.database_translation.loader:
         class: %oro_translation.database_translation.loader.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - @doctrine
         tags:
             - { name: translation.loader, alias: oro_database_translation }
 
@@ -106,9 +110,13 @@ services:
         class: %oro_translation.empty_array.loader.class%
 
     oro_translation.cache:
-          parent: oro.cache.abstract
-          calls:
-              - [setNamespace, ['oro_translation.cache']]
+        parent: oro.cache.abstract
+        calls:
+            - [setNamespace, [ 'oro_trans' ] ]
+
+    oro_translation.resource.cache:
+        public: false
+        class: Doctrine\Common\Cache\ArrayCache
 
     oro_translation.js_dumper:
         class: %oro_translation.js_dumper.class%
@@ -146,3 +154,20 @@ services:
             - %kernel.bundles%
             - %kernel.root_dir%
             - %oro_distribution.composer_cache_home%
+
+    oro_translation.query_hint.translatable:
+        public: false
+        abstract: true
+        tags:
+            -
+                name: oro_entity.query_hint
+                hint: oro_translation.translatable
+                alias: HINT_TRANSLATABLE
+                output_walker: %oro_translation.translation_walker.class%
+
+    oro_translation.event_listener.language_change:
+        class: %oro_translation.event_listener.language_change.class%
+        arguments:
+            - @oro_translation.database_translation.metadata.cache
+        tags:
+            - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }

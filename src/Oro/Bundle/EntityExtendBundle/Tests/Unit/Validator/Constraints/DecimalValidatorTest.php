@@ -64,10 +64,9 @@ class DecimalValidatorTest extends \PHPUnit_Framework_TestCase
             [['precision' => null, 'scale' => 2   ], 42.42,       false],
             [['precision' => null, 'scale' => 2   ], 42.423,      true ],
             [['precision' => null, 'scale' => null], 42,          false],
-            [['precision' => null, 'scale' => null], 4242424242,  false],
+            [['precision' => null, 'scale' => null], 2147483646,  false],
             [['precision' => null, 'scale' => null], 42.42,       true ],
             [['precision' => null, 'scale' => null], 42.423,      true ],
-            [['precision' => null, 'scale' => null], 42424242424, true ],
         ];
     }
 }

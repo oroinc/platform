@@ -1,11 +1,9 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
     'orotranslation/js/translator',
     'oro/filter/abstract-filter'
-], function ($, _, __, AbstractFilter) {
+], function($, _, __, AbstractFilter) {
     'use strict';
 
     var SegmentFilter;
@@ -65,7 +63,7 @@ define([
          *
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             _.extend(this, options);
 
             // init empty value object if it was not initialized so far
@@ -83,7 +81,7 @@ define([
          *
          * @return {*}
          */
-        render: function ($segmentChoice) {
+        render: function($segmentChoice) {
             var data = this.choices[this.getValue().value];
             if (data !== undefined) {
                 data.text = data.label;
@@ -97,7 +95,7 @@ define([
         /**
          * @inheritDoc
          */
-        _writeDOMValue: function (value) {
+        _writeDOMValue: function(value) {
             this._setInputValue(this.inputSelector, value.value);
             return this;
         },
@@ -105,13 +103,13 @@ define([
         /**
          * @inheritDoc
          */
-        _readDOMValue: function () {
+        _readDOMValue: function() {
             return {
                 value: this._getInputValue(this.inputSelector)
             };
         },
 
-        getValue: function () {
+        getValue: function() {
             return {
                 type: null,
                 value: this.value.value

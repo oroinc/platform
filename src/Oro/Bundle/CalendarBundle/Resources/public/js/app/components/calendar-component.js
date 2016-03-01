@@ -1,13 +1,11 @@
-/*jslint nomen: true*/
-/*global define*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
-    var _ = require('underscore'),
-        BaseComponent = require('oroui/js/app/components/base/component'),
-        Calendar = require('orocalendar/js/calendar-view'),
-        EventCollection = require('orocalendar/js/calendar/event/collection'),
-        ConnectionCollection = require('orocalendar/js/calendar/connection/collection');
+    var _ = require('underscore');
+    var BaseComponent = require('oroui/js/app/components/base/component');
+    var CalendarView = require('orocalendar/js/calendar-view');
+    var EventCollection = require('orocalendar/js/calendar/event/collection');
+    var ConnectionCollection = require('orocalendar/js/calendar/connection/collection');
 
     /**
      * Creates calendar
@@ -33,7 +31,7 @@ define(function (require) {
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.options = options;
             if (!this.options.el) {
                 this.options.el = this.options._sourceElement;
@@ -45,7 +43,7 @@ define(function (require) {
             this.prepareOptions();
             this.renderCalendar();
         },
-        prepareOptions: function () {
+        prepareOptions: function() {
             var options = this.options;
             options.collection = this.eventCollection;
             options.scrollToCurrentTime = true;
@@ -64,8 +62,8 @@ define(function (require) {
             delete options.eventsOptions.leftHeader;
             delete options.eventsOptions.rightHeader;
         },
-        renderCalendar: function () {
-            this.calendar = new Calendar(this.options);
+        renderCalendar: function() {
+            this.calendar = new CalendarView(this.options);
             this.calendar.render();
         }
     });

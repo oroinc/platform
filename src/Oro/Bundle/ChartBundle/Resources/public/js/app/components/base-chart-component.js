@@ -1,11 +1,11 @@
 define(function(require) {
     'use strict';
 
-    var BaseChartComponent,
-        _ = require('underscore'),
-        $ = require('jquery'),
-        chartTemplate = require('text!orochart/js/templates/base-chart-template.html'),
-        BaseComponent = require('oroui/js/app/components/base/component');
+    var BaseChartComponent;
+    var _ = require('underscore');
+    var $ = require('jquery');
+    var chartTemplate = require('text!orochart/js/templates/base-chart-template.html');
+    var BaseComponent = require('oroui/js/app/components/base/component');
 
     /**
      * @class orochart.app.components.BaseChartComponent
@@ -15,6 +15,7 @@ define(function(require) {
     BaseChartComponent = BaseComponent.extend({
         template: _.template(chartTemplate),
 
+        aspectRatio: 0.4,
         /**
          *
          * @constructor
@@ -69,7 +70,7 @@ define(function(require) {
         update: function() {
             var isChanged = this.setChartSize();
 
-            if(isChanged) {
+            if (isChanged) {
                 this.draw();
                 this.fixSize();
             }
@@ -87,7 +88,7 @@ define(function(require) {
 
             if (chartWidth > 0 && chartWidth !== $chart.width()) {
                 $chart.width(chartWidth);
-                $chart.height(Math.min(Math.round(chartWidth * 0.4), 350));
+                $chart.height(Math.min(Math.round(chartWidth * this.aspectRatio), 350));
                 return true;
             }
             return false;
@@ -111,9 +112,9 @@ define(function(require) {
 
             $labels.each(function(index, element) {
                 var height = $(element).height();
-                if(height > labelMaxHeight) {
+                if (height > labelMaxHeight) {
                     labelMaxHeight = height;
-                } else if(height < labelMinHeight) {
+                } else if (height < labelMinHeight) {
                     labelMinHeight = height;
                 }
             });

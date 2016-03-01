@@ -1,25 +1,24 @@
-/*global define, describe, it, expect, spyOn, beforeEach, afterEach*/
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var $ = require('oroui/js/items-manager/table');
     var Backbone = require('backbone');
 
-    describe('oroui/js/items-manager/table', function () {
+    describe('oroui/js/items-manager/table', function() {
         var $el;
 
-        beforeEach(function () {
+        beforeEach(function() {
             $el = $('<div>');
             $('body').append($el);
         });
 
-        afterEach(function () {
+        afterEach(function() {
             $el.remove();
             $el = null;
         });
 
-        it('is $ widget', function () {
-            expect(function () {
+        it('is $ widget', function() {
+            expect(function() {
                 $el.itemsManagerTable({
                     itemTemplate: '',
                     collection: new Backbone.Collection()
@@ -27,8 +26,8 @@ define(function (require) {
             }).not.toThrow();
         });
 
-        it('throws exception if itemTemplate not provided', function () {
-            expect(function () {
+        it('throws exception if itemTemplate not provided', function() {
+            expect(function() {
                 $el.itemsManagerTable({
                     itemTemplate: undefined,
                     collection: new Backbone.Collection()
@@ -36,8 +35,8 @@ define(function (require) {
             }).toThrow(new Error('itemTemplate option required'));
         });
 
-        it('throws exception if collection not provided', function () {
-            expect(function () {
+        it('throws exception if collection not provided', function() {
+            expect(function() {
                 $el.itemsManagerTable({
                     itemTemplate: '',
                     collection: undefined
@@ -45,29 +44,29 @@ define(function (require) {
             }).toThrow(new Error('collection option required'));
         });
 
-        it('renders each item in collection', function () {
+        it('renders each item in collection', function() {
             $el.itemsManagerTable({
                 itemTemplate: '<div></div>',
                 collection: new Backbone.Collection([
-                    { name: 'a' }, { name: 'b' }, { name: 'c' }
+                    {name: 'a'}, {name: 'b'}, {name: 'c'}
                 ])
             });
 
             expect($el.find('div')).toHaveLength(3);
         });
 
-        it('renders attribute of model', function () {
+        it('renders attribute of model', function() {
             $el.itemsManagerTable({
                 itemTemplate: '<div><%= name %></div>',
                 collection: new Backbone.Collection([
-                    { name: 'a' }
+                    {name: 'a'}
                 ])
             });
 
             expect($el.find('div')).toContainText('a');
         });
 
-        it('handles adding model to the collection', function () {
+        it('handles adding model to the collection', function() {
             var collection = new Backbone.Collection();
 
             $el.itemsManagerTable({
@@ -75,14 +74,14 @@ define(function (require) {
                 collection: collection
             });
 
-            collection.add(new Backbone.Model({ name: 'a' }));
+            collection.add(new Backbone.Model({name: 'a'}));
 
             expect($el.find('div')).toHaveLength(1);
         });
 
-        it('handles removing model from the collection', function () {
+        it('handles removing model from the collection', function() {
             var collection = new Backbone.Collection([
-                { name: 'a' }, { name: 'b' }
+                {name: 'a'}, {name: 'b'}
             ]);
 
             $el.itemsManagerTable({
@@ -95,9 +94,9 @@ define(function (require) {
             expect($el.find('div')).toHaveLength(1);
         });
 
-        it('handles model changing', function () {
+        it('handles model changing', function() {
             var collection = new Backbone.Collection([
-                { name: 'a' }
+                {name: 'a'}
             ]);
 
             $el.itemsManagerTable({
@@ -110,9 +109,9 @@ define(function (require) {
             expect($el.find('div')).toContainText('b');
         });
 
-        it('handles collection reset', function () {
+        it('handles collection reset', function() {
             var collection = new Backbone.Collection([
-                { name: 'a' }, { name: 'b' }, { name: 'c' }
+                {name: 'a'}, {name: 'b'}, {name: 'c'}
             ]);
 
             $el.itemsManagerTable({
@@ -125,14 +124,14 @@ define(function (require) {
             expect($el).toBeEmpty();
         });
 
-        it('provides render hook', function () {
+        it('provides render hook', function() {
             var collection = new Backbone.Collection([
-                { name: '<script>alert(\'a\')</script>' }
+                {name: '<script>alert(\'a\')</script>'}
             ]);
 
             $el.itemsManagerTable({
                 itemTemplate: '<div><%- name %></div>',
-                itemRender: function (tmpl, data) {
+                itemRender: function(tmpl, data) {
                     data.name = data.name.replace('<script>', '...').replace('</script>', '...');
                     return tmpl(data);
                 },
@@ -142,9 +141,9 @@ define(function (require) {
             expect($el.find('div')).toContainText('...alert(\'a\')...');
         });
 
-        it('translates action click event into model event with params: model, data-attributes', function () {
+        it('translates action click event into model event with params: model, data-attributes', function() {
             var collection = new Backbone.Collection([
-                { name: 'a' }
+                {name: 'a'}
             ]);
 
             $el.itemsManagerTable({
@@ -152,7 +151,7 @@ define(function (require) {
                 collection: collection
             });
 
-            collection.onActionFoo = function () {};
+            collection.onActionFoo = function() {};
             spyOn(collection, 'onActionFoo');
             collection.on('action:foo', collection.onActionFoo, collection);
 
@@ -161,18 +160,18 @@ define(function (require) {
             expect(collection.onActionFoo).toHaveBeenCalledWith(collection.at(0), $el.find('div').data());
         });
 
-        it('does not translate action click event into model event if corresponding handler provided', function () {
+        it('does not translate action click event into model event if corresponding handler provided', function() {
             var collection = new Backbone.Collection([
-                { name: 'a' }
+                {name: 'a'}
             ]);
 
             $el.itemsManagerTable({
                 itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="foo"></div>',
                 collection: collection,
-                fooHandler: function () {}
+                fooHandler: function() {}
             });
 
-            collection.onActionFoo = function () {};
+            collection.onActionFoo = function() {};
             spyOn(collection, 'onActionFoo');
             collection.on('action:foo', collection.onActionFoo, collection);
 
@@ -181,15 +180,16 @@ define(function (require) {
             expect(collection.onActionFoo).not.toHaveBeenCalled();
         });
 
-        it('handles action click event with params: model, data-attributes, if corresponding handler provided', function () {
+        it('handles action click event with params: model, ' +
+            'data-attributes, if corresponding handler provided', function() {
             var collection = new Backbone.Collection([
-                { name: 'a' }
+                {name: 'a'}
             ]);
 
             var options = {
                 itemTemplate: '<div data-cid="<%= cid %>" data-collection-action="bar"></div>',
                 collection: collection,
-                barHandler: function () {}
+                barHandler: function() {}
             };
 
             spyOn(options, 'barHandler');

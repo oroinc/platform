@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config\Tree;
 
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-
 use Oro\Bundle\ConfigBundle\Config\Tree\FieldNodeDefinition;
 
 class FieldNodeDefinitionTest extends \PHPUnit_Framework_TestCase
@@ -66,67 +63,5 @@ class FieldNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         // should set default definition values
         $this->assertEquals(0, $node->getPriority());
         $this->assertInternalType('array', $node->getOptions());
-    }
-
-    /**
-     * @dataProvider constraintsProvider
-     *
-     * @param array $definition
-     * @param array $expected
-     */
-    public function testPrepareValidators($definition, $expected)
-    {
-        $node = new FieldNodeDefinition(self::TEST_NAME, $definition);
-        $result = $node->getOptions();
-
-        $this->assertArrayHasKey('constraints', $result);
-        $this->assertEquals($expected, $result['constraints']);
-    }
-
-    /**
-     * @return array
-     */
-    public function constraintsProvider()
-    {
-        $notBlank = new NotBlank();
-        $length = new Length(array('min' => 1, 'max' => 2));
-
-        return array(
-            'constraints empty' => array(
-                'definition' => array(
-                    'options' =>array(
-                        'constraints' => array()
-                    )
-                ),
-                'expected' => array()
-            ),
-            'constraints comes as strings' => array(
-                'definition' => array(
-                    'options' =>array(
-                        'constraints' => array(
-                            array(
-                                'NotBlank' => null
-                            )
-                        )
-                    )
-                ),
-                'expected' => array($notBlank)
-            ),
-            'constraints comes as full class names' => array(
-                'definition' => array(
-                    'options' =>array(
-                        'constraints' => array(
-                            array(
-                                'Symfony\Component\Validator\Constraints\Length' => array(
-                                    'min' => 1,
-                                    'max' => 2,
-                                )
-                            )
-                        )
-                    )
-                ),
-                'expected' => array($length)
-            )
-        );
     }
 }

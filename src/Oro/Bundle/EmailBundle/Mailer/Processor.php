@@ -7,26 +7,28 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\HttpFoundation\File\MimeType\ExtensionGuesser;
 
+use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
 use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachment;
 use Oro\Bundle\EmailBundle\Entity\EmailAttachmentContent;
-use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
-use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
-use Oro\Bundle\EmailBundle\Builder\EmailEntityBuilder;
-use Oro\Bundle\EmailBundle\Model\FolderType;
-use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
 use Oro\Bundle\EmailBundle\Entity\EmailFolder;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
+use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
+use Oro\Bundle\EmailBundle\Model\FolderType;
+use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
+use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
@@ -35,6 +37,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
  * @package Oro\Bundle\EmailBundle\Mailer
  *
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class Processor
 {
@@ -44,7 +47,7 @@ class Processor
     /** @var  DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var \Swift_Mailer */
+    /** @var DirectMailer */
     protected $mailer;
 
     /** @var EmailAddressHelper */
@@ -68,45 +71,60 @@ class Processor
     /** @var array */
     protected $origins = [];
 
+    /** @var Mcrypt */
+    protected $encryptor;
+
+    /** @var EmailOriginHelper */
+    protected $emailOriginHelper;
+
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     *
      * @param DoctrineHelper           $doctrineHelper
-     * @param \Swift_Mailer            $mailer
+     * @param DirectMailer             $mailer
      * @param EmailAddressHelper       $emailAddressHelper
      * @param EmailEntityBuilder       $emailEntityBuilder
      * @param EmailOwnerProvider       $emailOwnerProvider
      * @param EmailActivityManager     $emailActivityManager
      * @param ServiceLink              $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
+     * @param Mcrypt                   $encryptor
+     * @param EmailOriginHelper        $emailOriginHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        \Swift_Mailer $mailer,
+        DirectMailer $mailer,
         EmailAddressHelper $emailAddressHelper,
         EmailEntityBuilder $emailEntityBuilder,
         EmailOwnerProvider $emailOwnerProvider,
         EmailActivityManager $emailActivityManager,
         ServiceLink $serviceLink,
-        EventDispatcherInterface $eventDispatcher
+        EventDispatcherInterface $eventDispatcher,
+        Mcrypt $encryptor,
+        EmailOriginHelper $emailOriginHelper
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->mailer               = $mailer;
         $this->emailAddressHelper   = $emailAddressHelper;
         $this->emailEntityBuilder   = $emailEntityBuilder;
-        $this->emailOwnerProvider   = $emailOwnerProvider;
+        $this->emailOwnerProvider   = $emailOwnerProvider; # can be removed to EOH
         $this->emailActivityManager = $emailActivityManager;
         $this->securityFacade       = $serviceLink->getService();
         $this->eventDispatcher      = $eventDispatcher;
+        $this->encryptor            = $encryptor;
+        $this->emailOriginHelper    = $emailOriginHelper;
     }
 
     /**
      * Process email model sending.
      *
      * @param EmailModel $model
+     * @param EmailOrigin $origin Origin to send email with
      *
      * @return EmailUser
      * @throws \Swift_SwiftException
      */
-    public function process(EmailModel $model)
+    public function process(EmailModel $model, $origin = null)
     {
         $this->assertModel($model);
         $messageDate     = new \DateTime('now', new \DateTimeZone('UTC'));
@@ -131,27 +149,14 @@ class Processor
 
         $messageId = '<' . $message->generateId() . '>';
 
-        if (!$this->mailer->send($message)) {
-            throw new \Swift_SwiftException('An email was not delivered.');
+        if ($origin === null) {
+            $this->emailOriginHelper->setEmailModel($model);
+            $origin = $this->getEmailOrigin($model->getFrom(), $model->getOrganization());
         }
+        $this->processSend($message, $origin);
 
-        $origin = $this->getEmailOrigin($model->getFrom());
-
-        $emailUser = $this->emailEntityBuilder->emailUser(
-            $model->getSubject(),
-            $model->getFrom(),
-            $model->getTo(),
-            $messageDate,
-            $messageDate,
-            $messageDate,
-            Email::NORMAL_IMPORTANCE,
-            $model->getCc(),
-            $model->getBcc(),
-            $origin->getOwner(),
-            $origin->getOrganization()
-        );
-
-        $emailUser->setFolder($origin->getFolder(FolderType::SENT));
+        $emailUser = $this->createEmailUser($model, $messageDate, $origin);
+        $emailUser->addFolder($this->getFolder($model->getFrom(), $origin));
         $emailUser->getEmail()->setEmailBody(
             $this->emailEntityBuilder->body($message->getBody(), $model->getType() === 'html', true)
         );
@@ -178,6 +183,85 @@ class Processor
         $this->eventDispatcher->dispatch(EmailBodyAdded::NAME, $event);
 
         return $emailUser;
+    }
+
+    /**
+     * @param EmailModel  $model
+     * @param \DateTime   $messageDate
+     * @param EmailOrigin $origin
+     *
+     * @return EmailUser
+     */
+    protected function createEmailUser(EmailModel $model, $messageDate, EmailOrigin $origin)
+    {
+        $emailUser = $this->emailEntityBuilder->emailUser(
+            $model->getSubject(),
+            $model->getFrom(),
+            $model->getTo(),
+            $messageDate,
+            $messageDate,
+            $messageDate,
+            Email::NORMAL_IMPORTANCE,
+            $model->getCc(),
+            $model->getBcc(),
+            $origin->getOwner(),
+            $origin->getOrganization()
+        );
+        $emailUser->setOrigin($origin);
+
+        if ($origin instanceof UserEmailOrigin) {
+            if ($origin->getMailbox() !== null) {
+                $emailUser->setOwner(null);
+                $emailUser->setMailboxOwner($origin->getMailbox());
+            }
+        }
+
+        return $emailUser;
+    }
+
+    /**
+     * Get origin's folder
+     *
+     * @param string $email
+     * @param EmailOrigin $origin
+     * @return EmailFolder
+     */
+    protected function getFolder($email, EmailOrigin $origin)
+    {
+        $folder = $origin->getFolder(FolderType::SENT);
+
+        //In case when 'useremailorigin' origin doesn't have folder, get folder from internal origin
+        if (!$folder && $origin instanceof UserEmailOrigin) {
+            $originKey = InternalEmailOrigin::BAP.$email;
+            if (array_key_exists($originKey, $this->origins)) {
+                unset($this->origins[$originKey]);
+            }
+            $origin = $this->getEmailOrigin($email, null, InternalEmailOrigin::BAP, false);
+            return $origin->getFolder(FolderType::SENT);
+        }
+
+        return $folder;
+    }
+
+    /**
+     * Process send email message. In case exist custom smtp host/port use it
+     *
+     * @param \Swift_Message  $message
+     * @param UserEmailOrigin $emailOrigin
+     * @throws \Swift_SwiftException
+     */
+    public function processSend($message, $emailOrigin)
+    {
+        if ($emailOrigin instanceof UserEmailOrigin) {
+            /* Modify transport smtp settings */
+            if ($emailOrigin->isSmtpConfigured()) {
+                $this->mailer->prepareSmtpTransport($emailOrigin);
+            }
+        }
+
+        if (!$this->mailer->send($message)) {
+            throw new \Swift_SwiftException('An email was not delivered.');
+        }
     }
 
     /**
@@ -236,7 +320,7 @@ class Processor
                 },
                 $body
             );
-            $message->setBody($body, 'text/html');
+            $message->setBody($body);
         }
     }
 
@@ -288,79 +372,36 @@ class Processor
     /**
      * Find existing email origin entity by email string or create and persist new one.
      *
-     * @param string $email
-     * @param string $originName
+     * @param string                $email
+     * @param OrganizationInterface $organization
+     * @param string                $originName
+     * @param boolean               $enableUseUserEmailOrigin
      *
      * @return EmailOrigin
      */
-    public function getEmailOrigin($email, $originName = InternalEmailOrigin::BAP)
-    {
-        $originKey    = $originName . $email;
-        $organization = $this->securityFacade !== null && $this->securityFacade->getOrganization()
-            ? $this->securityFacade->getOrganization()
-            : null;
+    public function getEmailOrigin(
+        $email,
+        OrganizationInterface $organization = null,
+        $originName = InternalEmailOrigin::BAP,
+        $enableUseUserEmailOrigin = true
+    ) {
+        $originKey = $originName . $email;
+        if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
+            $organization = $this->securityFacade->getOrganization();
+        }
         if (!array_key_exists($originKey, $this->origins)) {
             $emailOwner = $this->emailOwnerProvider->findEmailOwner(
                 $this->getEntityManager(),
                 $this->emailAddressHelper->extractPureEmailAddress($email)
             );
 
-            if ($emailOwner instanceof User) {
-                $origins = $emailOwner->getEmailOrigins()->filter(
-                    function ($item) use ($organization) {
-                        return
-                            $item instanceof InternalEmailOrigin
-                            && (!$organization || $item->getOrganization() === $organization);
-                    }
-                );
+            $origin = $this->emailOriginHelper
+                ->findEmailOrigin($emailOwner, $organization, $originName, $enableUseUserEmailOrigin);
 
-                $origin = $origins->isEmpty() ? null : $origins->first();
-                if ($origin === null) {
-                    $origin = $this->createUserInternalOrigin($emailOwner, $organization);
-                }
-            } else {
-                $origin = $this->getEntityManager()
-                    ->getRepository('OroEmailBundle:InternalEmailOrigin')
-                    ->findOneBy(['internalName' => $originName]);
-            }
             $this->origins[$originKey] = $origin;
         }
 
         return $this->origins[$originKey];
-    }
-
-    /**
-     * @param User                  $emailOwner
-     * @param OrganizationInterface $organization
-     *
-     * @return InternalEmailOrigin
-     */
-    protected function createUserInternalOrigin(User $emailOwner, OrganizationInterface $organization = null)
-    {
-        $organization = $organization
-            ? $organization
-            : $emailOwner->getOrganization();
-        $originName   = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
-
-        $outboxFolder = new EmailFolder();
-        $outboxFolder
-            ->setType(FolderType::SENT)
-            ->setName(FolderType::SENT)
-            ->setFullName(FolderType::SENT);
-
-        $origin = new InternalEmailOrigin();
-        $origin
-            ->setName($originName)
-            ->addFolder($outboxFolder)
-            ->setOwner($emailOwner)
-            ->setOrganization($organization);
-
-        $emailOwner->addEmailOrigin($origin);
-
-        $this->getEntityManager()->persist($origin);
-        $this->getEntityManager()->persist($emailOwner);
-
-        return $origin;
     }
 
     /**

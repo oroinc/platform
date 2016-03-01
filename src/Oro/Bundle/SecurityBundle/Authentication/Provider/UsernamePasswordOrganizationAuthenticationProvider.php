@@ -2,21 +2,41 @@
 
 namespace Oro\Bundle\SecurityBundle\Authentication\Provider;
 
+use Symfony\Component\Security\Core\Exception\AuthenticationException;
 use Symfony\Component\Security\Core\Exception\BadCredentialsException;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\Authentication\Provider\DaoAuthenticationProvider;
 
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\Authentication\Guesser\UserOrganizationGuesser;
-use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationToken;
+use Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface;
 
 class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticationProvider
 {
+    /**
+     * @var UsernamePasswordOrganizationTokenFactoryInterface
+     */
+    protected $tokenFactory;
+
+    /**
+     * @param UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory
+     */
+    public function setTokenFactory(UsernamePasswordOrganizationTokenFactoryInterface $tokenFactory)
+    {
+        $this->tokenFactory = $tokenFactory;
+    }
+
     /**
      * {@inheritdoc}
      */
     public function authenticate(TokenInterface $token)
     {
+        if (null === $this->tokenFactory) {
+            throw new AuthenticationException(
+                'Token Factory is not set in UsernamePasswordOrganizationAuthenticationProvider.'
+            );
+        }
+
         $guesser = new UserOrganizationGuesser();
         /**  @var TokenInterface $token */
         $authenticatedToken = parent::authenticate($token);
@@ -33,7 +53,7 @@ class UsernamePasswordOrganizationAuthenticationProvider extends DaoAuthenticati
             );
         }
 
-        $authenticatedToken = new UsernamePasswordOrganizationToken(
+        $authenticatedToken = $this->tokenFactory->create(
             $authenticatedToken->getUser(),
             $authenticatedToken->getCredentials(),
             $authenticatedToken->getProviderKey(),

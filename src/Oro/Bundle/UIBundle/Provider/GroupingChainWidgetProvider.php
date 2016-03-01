@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\UIBundle\Provider;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
 use Doctrine\Common\Util\ClassUtils;
+
+use Oro\Bundle\UIBundle\Event\BeforeGroupingChainWidgetEvent;
+use Oro\Bundle\UIBundle\Event\Events;
 
 /**
  * This provider calls all registered leaf providers in a chain, merges and does grouping of widgets returned
@@ -16,12 +21,22 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
     /** @var LabelProviderInterface */
     protected $groupNameProvider;
 
+    /** @var  EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
-     * @param LabelProviderInterface $groupNameProvider
+     * @param LabelProviderInterface   $groupNameProvider
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param int|null                 $pageType
      */
-    public function __construct(LabelProviderInterface $groupNameProvider = null)
-    {
+    public function __construct(
+        LabelProviderInterface $groupNameProvider = null,
+        EventDispatcherInterface $eventDispatcher = null,
+        $pageType = null
+    ) {
         $this->groupNameProvider = $groupNameProvider;
+        $this->eventDispatcher   = $eventDispatcher;
+        $this->pageType          = $pageType;
     }
 
     /**
@@ -53,6 +68,12 @@ class GroupingChainWidgetProvider implements WidgetProviderInterface
     public function getWidgets($object)
     {
         $widgets = $this->getWidgetsOrderedByPriority($object);
+
+        if ($this->eventDispatcher) {
+            $beforeGroupingChainWidgetEvent = new BeforeGroupingChainWidgetEvent($this->pageType, $widgets, $object);
+            $this->eventDispatcher->dispatch(Events::BEFORE_GROUPING_CHAIN_WIDGET, $beforeGroupingChainWidgetEvent);
+            $widgets = $beforeGroupingChainWidgetEvent->getWidgets();
+        }
 
         $result = [];
         foreach ($widgets as $widget) {

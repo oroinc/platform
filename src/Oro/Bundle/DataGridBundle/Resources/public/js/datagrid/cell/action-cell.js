@@ -1,11 +1,15 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'jquery',
     'underscore',
-    'backgrid'
-], function ($, _, Backgrid) {
+    'backgrid',
+    'module'
+], function($, _, Backgrid, module) {
     'use strict';
+
+    var config = module.config();
+    config = _.extend({
+        showCloseButton: false
+    }, config);
 
     var ActionCell;
 
@@ -19,23 +23,43 @@ define([
     ActionCell = Backgrid.Cell.extend({
 
         /** @property */
-        className: "action-cell",
+        className: 'action-cell',
 
         /** @property {Array} */
         actions: undefined,
 
+        /** @property Integer */
+        actionsHideCount: 3,
+
         /** @property {Array} */
         launchers: undefined,
+
+        /** @property Boolean */
+        showCloseButton: config.showCloseButton,
 
         /** @property */
         template: _.template(
             '<div class="more-bar-holder">' +
                 '<div class="dropdown">' +
                     '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
-                    '<ul class="dropdown-menu pull-right launchers-dropdown-menu"></ul>' +
+                    '<ul class="dropdown-menu dropdown-menu__action-cell pull-right launchers-dropdown-menu" ' +
+                        'data-options="{&quot;html&quot;: true}"></ul>' +
                 '</div>' +
             '</div>'
         ),
+
+        /** @property */
+        closeButtonTemplate: _.template(
+            '<li class="dropdown-close"><i class="icon-remove hide-text">' + _.__('Close') + '</i></li>'
+        ),
+
+        /** @property */
+        simpleTemplate: _.template(
+            '<div class="more-bar-holder action-row"></div>'
+        ),
+
+        /** @property */
+        launchersContainerSelector: '.launchers-dropdown-menu',
 
         /** @property */
         launchersListTemplate: _.template(
@@ -47,27 +71,42 @@ define([
         ),
 
         /** @property */
-        launcherItemTemplate:_.template(
+        simpleLaunchersListTemplate: _.template(
+            '<% if (withIcons) { %>' +
+                '<ul class="nav nav-pills icons-holder launchers-list"></ul>' +
+            '<% } else { %>' +
+                '<ul class="unstyled launchers-list"></ul>' +
+            '<% } %>'
+        ),
+
+        /** @property */
+        launcherItemTemplate: _.template(
             '<li class="launcher-item"></li>'
         ),
 
         /** @property */
         events: {
-            'click': '_toggleDropdown',
-            'mouseover .dropdown-toggle': '_toggleDropdown',
-            'mouseleave .dropdown-menu': '_toggleDropdown'
+            'click': '_showDropdown',
+            'mouseover .dropdown-toggle': '_showDropdown',
+            'mouseleave .dropdown-menu': '_hideDropdown',
+            'click .dropdown-close .icon-remove': '_hideDropdown'
         },
 
         /**
          * Initialize cell actions and launchers
          */
-        initialize: function () {
+        initialize: function(options) {
+            var opts = options || {};
             this.subviews = [];
+
+            if (!_.isEmpty(opts.actionsHideCount)) {
+                this.actionsHideCount = opts.actionsHideCount;
+            }
 
             ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();
-            _.each(this.actions, function (action) {
-                this.listenTo(action, 'run', this.onActionRun);
+            _.each(this.actions, function(action) {
+                this.listenTo(action, 'preExecute', this.onActionRun);
             }, this);
 
             this.launchers = this.createLaunchers();
@@ -77,7 +116,7 @@ define([
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (this.disposed) {
                 return;
             }
@@ -93,8 +132,8 @@ define([
          *
          * @param {oro.datagrid.action.AbstractAction} action
          */
-        onActionRun: function (action) {
-            this.$('.dropdown.open').removeClass('open');
+        onActionRun: function(action) {
+            this.$('.dropdown.open .dropdown-toggle').trigger('tohide.bs.dropdown');
         },
 
         /**
@@ -102,13 +141,12 @@ define([
          *
          * @return {Array}
          */
-        createActions: function () {
-            var result, actions, config;
-            result = [];
-            actions = this.column.get('actions');
-            config = this.model.get('action_configuration');
+        createActions: function() {
+            var result = [];
+            var actions = this.column.get('actions');
+            var config = this.model.get('action_configuration');
 
-            _.each(actions, function (action, name) {
+            _.each(actions, function(action, name) {
                 // filter available actions for current row
                 if (!config || config[name] !== false) {
                     result.push(this.createAction(action));
@@ -124,7 +162,7 @@ define([
          * @param {Function} Action
          * @protected
          */
-        createAction: function (Action) {
+        createAction: function(Action) {
             return new Action({
                 model: this.model,
                 datagrid: this.column.get('datagrid')
@@ -136,13 +174,12 @@ define([
          *
          * @protected
          */
-        createLaunchers: function () {
+        createLaunchers: function() {
             var result = [];
 
-            _.each(this.actions, function (action) {
-                var options, launcher;
-                options = {};
-                launcher = action.createLauncher(options);
+            _.each(this.actions, function(action) {
+                var options = {};
+                var launcher = action.createLauncher(options);
                 result.push(launcher);
             }, this);
 
@@ -152,18 +189,30 @@ define([
         /**
          * Render cell with actions
          */
-        render: function () {
-            var launchers, $listsContainer;
+        render: function() {
+            var launchers;
+            var $listsContainer;
             // don't render anything if list of launchers is empty
             if (_.isEmpty(this.launchers)) {
                 this.$el.empty();
 
                 return this;
             }
+
+            if (this.launchers.length < this.actionsHideCount) {
+                this.template = this.simpleTemplate;
+                this.launchersListTemplate = this.simpleLaunchersListTemplate;
+                this.launchersContainerSelector = '.more-bar-holder';
+            }
+
             this.$el.empty().append(this.template());
 
             launchers = this.getLaunchersByIcons();
-            $listsContainer = this.$('.launchers-dropdown-menu');
+            $listsContainer = this.$(this.launchersContainerSelector);
+
+            if (this.showCloseButton && this.launchers.length >= this.actionsHideCount) {
+                $listsContainer.append(this.closeButtonTemplate());
+            }
 
             if (launchers.withIcons.length) {
                 this.renderLaunchersList(launchers.withIcons, {withIcons: true})
@@ -189,12 +238,11 @@ define([
          * @param {Object=} params
          * @return {jQuery} Rendered element wrapped with jQuery
          */
-        renderLaunchersList: function (launchers, params) {
-            var result, $launchersList;
+        renderLaunchersList: function(launchers, params) {
             params = params || {};
-            result = $(this.launchersListTemplate(params));
-            $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
-            _.each(launchers, function (launcher) {
+            var result = $(this.launchersListTemplate(params));
+            var $launchersList = result.filter('.launchers-list').length ? result : $('.launchers-list', result);
+            _.each(launchers, function(launcher) {
                 $launchersList.append(this.renderLauncherItem(launcher));
             }, this);
 
@@ -208,11 +256,10 @@ define([
          * @param {Object=} params
          * @return {jQuery} Rendered element wrapped with jQuery
          */
-        renderLauncherItem: function (launcher, params) {
-            var result, $launcherItem;
+        renderLauncherItem: function(launcher, params) {
             params = params || {};
-            result = $(this.launcherItemTemplate(params));
-            $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
+            var result = $(this.launcherItemTemplate(params));
+            var $launcherItem = result.filter('.launcher-item').length ? result : $('.launcher-item', result);
             $launcherItem.append(launcher.render().$el);
             return result;
         },
@@ -223,13 +270,13 @@ define([
          * @return {Object}
          * @protected
          */
-        getLaunchersByIcons: function () {
+        getLaunchersByIcons: function() {
             var launchers = {
                 withIcons: [],
                 withoutIcons: []
             };
 
-            _.each(this.launchers, function (launcher) {
+            _.each(this.launchers, function(launcher) {
                 if (launcher.icon) {
                     launchers.withIcons.push(launcher);
                 } else {
@@ -241,13 +288,28 @@ define([
         },
 
         /**
-         * Open/close dropdown
+         * Show dropdown
          *
          * @param {Event} e
          * @protected
          */
-        _toggleDropdown: function (e) {
-            this.$('.dropdown-toggle').dropdown('toggle');
+        _showDropdown: function(e) {
+            if (!this.$('.dropdown-toggle').parent().hasClass('open')) {
+                this.$('.dropdown-toggle').dropdown('toggle');
+            }
+            e.stopPropagation();
+        },
+
+        /**
+         * Hide dropdown
+         *
+         * @param {Event} e
+         * @protected
+         */
+        _hideDropdown: function(e) {
+            if (this.$('.dropdown-toggle').parent().hasClass('open')) {
+                this.$('.dropdown-toggle').dropdown('toggle');
+            }
             e.stopPropagation();
         }
     });

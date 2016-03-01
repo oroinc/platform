@@ -89,9 +89,9 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
     protected $attachment;
 
     /**
-     * @var Attachment|\PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject
      */
-    protected $attachmentConfig;
+    protected $attachmentAssociationHelper;
 
     protected function setUp()
     {
@@ -158,7 +158,8 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->attachmentConfig = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig')
+        $this->attachmentAssociationHelper = $this
+            ->getMockBuilder('Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -171,7 +172,7 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
                     $this->kernel,
                     $this->securityFacadeLink,
                     $this->configFileValidator,
-                    $this->attachmentConfig
+                    $this->attachmentAssociationHelper
                 ]
             )
             ->getMock();

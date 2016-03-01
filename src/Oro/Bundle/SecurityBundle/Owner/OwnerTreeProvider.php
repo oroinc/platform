@@ -5,26 +5,75 @@ namespace Oro\Bundle\SecurityBundle\Owner;
 use Doctrine\Common\Cache\CacheProvider;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
+use Oro\Bundle\UserBundle\Entity\User;
+
 /**
  * Class OwnerTreeProvider
  * @package Oro\Bundle\SecurityBundle\Owner
  */
-class OwnerTreeProvider
+class OwnerTreeProvider extends AbstractOwnerTreeProvider
 {
+    /**
+     * @deprecated 1.8.0:2.1.0 use AbstractOwnerTreeProvider::CACHE_KEY instead
+     */
     const CACHE_KEY = 'data';
 
-    /** @var EntityManager */
+    /**
+     * @var EntityManager
+     *
+     * @deprecated 1.8.0:2.1.0 use AbstractOwnerTreeProvider::getManagerForClass instead
+     */
     protected $em;
 
-    /** @var OwnerTree */
-    protected $tree;
-
     /** @var CacheProvider */
-    protected $cache;
+    private $cache;
+
+    /** @var OwnershipMetadataProvider */
+    private $ownershipMetadataProvider;
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCache()
+    {
+        if (!$this->cache) {
+            $this->cache = $this->getContainer()->get('oro_security.ownership_tree_provider.cache');
+        }
+
+        return $this->cache;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getTreeData()
+    {
+        return new OwnerTree();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function supports()
+    {
+        return $this->getContainer()->get('oro_security.security_facade')->getLoggedUser() instanceof User;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getTree()
+    {
+        return parent::getTree();
+    }
 
     /**
      * @param EntityManager $em
      * @param CacheProvider $cache
+     *
+     * @deprecated 1.8.0:2.1.0 use AbstractOwnerTreeProvider::getContainer instead
      */
     public function __construct(EntityManager $em, CacheProvider $cache)
     {
@@ -33,102 +82,51 @@ class OwnerTreeProvider
     }
 
     /**
-     * Get ACL tree
-     *
-     * @return OwnerTree
-     * @throws \Exception
+     * {@inheritdoc}
      */
-    public function getTree()
+    protected function fillTree(OwnerTreeInterface $tree)
     {
-        $this->ensureTreeLoaded();
+        $userClass         = $this->getOwnershipMetadataProvider()->getBasicLevelClass();
+        $businessUnitClass = $this->getOwnershipMetadataProvider()->getLocalLevelClass();
 
-        if ($this->tree === null) {
-            throw new \Exception('ACL tree cache was not warmed');
-        }
+        /** @var User[] $users */
+        $users = $this->getManagerForClass($userClass)->getRepository($userClass)->findAll();
 
-        return $this->tree;
-    }
-
-    /**
-     * Clear the owner tree cache
-     */
-    public function clear()
-    {
-        $this->cache->deleteAll();
-    }
-
-    /**
-     * Warmup owner tree cache
-     */
-    public function warmUpCache()
-    {
-        $this->ensureTreeLoaded();
-    }
-
-    /**
-     * Makes sure that tree data are loaded and cached
-     */
-    protected function ensureTreeLoaded()
-    {
-        if ($this->tree === null) {
-            $treeData = null;
-            if ($this->cache) {
-                $treeData = $this->cache->fetch(self::CACHE_KEY);
-            }
-            if ($treeData) {
-                $this->tree = $treeData;
-            } else {
-                $this->loadTree();
-            }
-        }
-    }
-
-    /**
-     * Loads tree data and save them in cache
-     */
-    protected function loadTree()
-    {
-        $treeData = new OwnerTree();
-        if ($this->checkDatabase()) {
-            $this->fillTree($treeData);
-        }
-
-        if ($this->cache) {
-            $this->cache->save(self::CACHE_KEY, $treeData);
-        }
-
-        $this->tree = $treeData;
-    }
-
-    /**
-     * @param OwnerTree $tree
-     */
-    protected function fillTree(OwnerTree $tree)
-    {
-        $users         = $this->em->getRepository('Oro\Bundle\UserBundle\Entity\User')->findAll();
-        $businessUnits = $this->em->getRepository('Oro\Bundle\OrganizationBundle\Entity\BusinessUnit')->findAll();
+        /** @var BusinessUnit[] $businessUnits */
+        $businessUnitsRepo = $this->getManagerForClass($businessUnitClass)->getRepository($businessUnitClass);
+        $businessUnits     = $businessUnitsRepo
+            ->createQueryBuilder('bu')
+            ->select([
+                'bu.id',
+                'IDENTITY(bu.organization) organization',
+                'IDENTITY(bu.owner) owner' //aka parent business unit
+            ])
+            ->getQuery()
+            ->getArrayResult();
 
         foreach ($businessUnits as $businessUnit) {
-            if ($businessUnit->getOrganization()) {
-                /** @var \Oro\Bundle\OrganizationBundle\Entity\BusinessUnit $businessUnit */
-                $tree->addBusinessUnit($businessUnit->getId(), $businessUnit->getOrganization()->getId());
-                if ($businessUnit->getOwner()) {
-                    $tree->addBusinessUnitRelation($businessUnit->getId(), $businessUnit->getOwner()->getId());
+            if (!empty($businessUnit['organization'])) {
+                $tree->addLocalEntity($businessUnit['id'], (int)$businessUnit['organization']);
+                if ($businessUnit['owner']) {
+                    $tree->addDeepEntity($businessUnit['id'], $businessUnit['owner']);
                 }
             }
         }
 
+        $tree->buildTree();
+
         foreach ($users as $user) {
-            /** @var \Oro\Bundle\UserBundle\Entity\User $user */
             $owner = $user->getOwner();
-            $tree->addUser($user->getId(), $owner ? $owner->getId() : null);
+            $tree->addBasicEntity($user->getId(), $owner ? $owner->getId() : null);
             foreach ($user->getOrganizations() as $organization) {
-                $tree->addUserOrganization($user->getId(), $organization->getId());
-                foreach ($user->getBusinessUnits() as $businessUnit) {
-                    $organizationId   = $organization->getId();
+                $organizationId = $organization->getId();
+                $tree->addGlobalEntity($user->getId(), $organizationId);
+
+                $userBusinessUnits = $user->getBusinessUnits();
+                foreach ($userBusinessUnits as $businessUnit) {
                     $buOrganizationId = $businessUnit->getOrganization()->getId();
                     if ($organizationId == $buOrganizationId) {
-                        $tree->addUserBusinessUnit($user->getId(), $organizationId, $businessUnit->getId());
+                        $tree->addLocalEntityToBasic($user->getId(), $businessUnit->getId(), $organizationId);
                     }
                 }
             }
@@ -136,28 +134,15 @@ class OwnerTreeProvider
     }
 
     /**
-     * Check if user table exists in db
-     *
-     * @return bool
+     * {@inheritdoc}
      */
-    protected function checkDatabase()
+    protected function getOwnershipMetadataProvider()
     {
-        $tableName = $this->em->getClassMetadata('Oro\Bundle\UserBundle\Entity\User')->getTableName();
-        $result    = false;
-        try {
-            $conn = $this->em->getConnection();
-
-            if (!$conn->isConnected()) {
-                $this->em->getConnection()->connect();
-            }
-
-            $result = $conn->isConnected() && (bool)array_intersect(
-                array($tableName),
-                $this->em->getConnection()->getSchemaManager()->listTableNames()
-            );
-        } catch (\PDOException $e) {
+        if (!$this->ownershipMetadataProvider) {
+            $this->ownershipMetadataProvider = $this->getContainer()
+                ->get('oro_security.owner.ownership_metadata_provider');
         }
 
-        return $result;
+        return $this->ownershipMetadataProvider;
     }
 }

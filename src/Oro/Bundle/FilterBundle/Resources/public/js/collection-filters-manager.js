@@ -1,9 +1,7 @@
-/*jslint nomen:true*/
-/*global define*/
 define([
     'underscore',
     './filters-manager'
-], function (_, FiltersManager) {
+], function(_, FiltersManager) {
     'use strict';
 
     var CollectionFiltersManager;
@@ -24,7 +22,7 @@ define([
          * @param {Object} [options.filters]
          * @param {String} [options.addButtonHint]
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this.collection = options.collection;
 
             this.listenTo(this.collection, {
@@ -36,9 +34,10 @@ define([
             CollectionFiltersManager.__super__.initialize.apply(this, arguments);
         },
 
-        render: function () {
+        render: function() {
             CollectionFiltersManager.__super__.render.apply(this, arguments);
             this._onUpdateCollectionState(this.collection);
+            this._onCollectionReset(this.collection);
             return this;
         },
 
@@ -48,7 +47,7 @@ define([
          * @param {oro.filter.AbstractFilter} filter
          * @protected
          */
-        _onFilterUpdated: function (filter) {
+        _onFilterUpdated: function(filter) {
             if (this.ignoreFiltersUpdateEvents) {
                 return;
             }
@@ -63,7 +62,7 @@ define([
          *
          * @protected
          */
-        _beforeCollectionFetch: function (collection) {
+        _beforeCollectionFetch: function(collection) {
             collection.state.filters = this._createState();
         },
 
@@ -72,9 +71,10 @@ define([
          *
          * @param {oro.PageableCollection} collection
          */
-        _onUpdateCollectionState: function (collection) {
+        _onUpdateCollectionState: function(collection) {
             this.ignoreFiltersUpdateEvents = true;
             this._applyState(collection.state.filters || {});
+            this._resetHintContainer();
             this.ignoreFiltersUpdateEvents = false;
         },
 
@@ -83,10 +83,9 @@ define([
          *
          * @protected
          */
-        _onCollectionReset: function (collection) {
-            var hasRecords, hasFiltersState;
-            hasRecords = collection.state.totalRecords > 0;
-            hasFiltersState = !_.isEmpty(collection.state.filters);
+        _onCollectionReset: function(collection) {
+            var hasRecords = collection.state.totalRecords > 0;
+            var hasFiltersState = !_.isEmpty(collection.state.filters);
             if (hasRecords || hasFiltersState) {
                 this.$el.show();
             } else {
@@ -100,9 +99,9 @@ define([
          * @return {Object}
          * @protected
          */
-        _createState: function () {
+        _createState: function() {
             var state = {};
-            _.each(this.filters, function (filter, name) {
+            _.each(this.filters, function(filter, name) {
                 var shortName = '__' + name;
                 if (filter.enabled) {
                     if (!filter.isEmpty()) {
@@ -125,13 +124,13 @@ define([
          * @protected
          * @return {*}
          */
-        _applyState: function (state) {
-            var toEnable  = [],
-                toDisable = [];
+        _applyState: function(state) {
+            var toEnable = [];
+            var toDisable = [];
 
-            _.each(this.filters, function (filter, name) {
-                var shortName = '__' + name,
-                    filterState;
+            _.each(this.filters, function(filter, name) {
+                var shortName = '__' + name;
+                var filterState;
                 if (_.has(state, name)) {
                     filterState = state[name];
                     if (!_.isObject(filterState)) {
@@ -150,11 +149,6 @@ define([
                     }
                 } else {
                     filter.reset();
-                    if (filter.defaultEnabled) {
-                        toEnable.push(filter);
-                    } else {
-                        toDisable.push(filter);
-                    }
                 }
             }, this);
 

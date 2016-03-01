@@ -8,11 +8,12 @@ use FOS\RestBundle\Controller\FOSRestController;
 use FOS\RestBundle\Util\Codes;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\User\UserInterface;
 
+use Oro\Bundle\SidebarBundle\Entity\AbstractSidebarState;
 use Oro\Bundle\SidebarBundle\Entity\Repository\SidebarStateRepository;
-use Oro\Bundle\SidebarBundle\Entity\SidebarState;
 
 /**
  * @RouteResource("sidebars")
@@ -32,9 +33,7 @@ class SidebarController extends FOSRestController
      */
     public function getAction($position)
     {
-        /** @var SidebarStateRepository $sidebarStateRepository */
-        $sidebarStateRepository = $this->getDoctrine()->getRepository('OroSidebarBundle:SidebarState');
-        $item = $sidebarStateRepository->getState($this->getUser(), $position);
+        $item = $this->getRepository()->getState($this->getUser(), $position);
 
         return $this->handleView(
             $this->view($item, Codes::HTTP_OK)
@@ -48,13 +47,16 @@ class SidebarController extends FOSRestController
      *  description="Add Sidebar State",
      *  resource=true
      * )
+     * @param Request $request
      * @return Response
      */
-    public function postAction()
+    public function postAction(Request $request)
     {
-        $entity = new SidebarState();
-        $entity->setPosition($this->getRequest()->get('position'));
-        $entity->setState($this->getRequest()->get('state'));
+        $stateClass = $this->getSidebarStateClass();
+        /** @var AbstractSidebarState $entity */
+        $entity = new $stateClass();
+        $entity->setPosition($request->get('position'));
+        $entity->setState($request->get('state'));
         $entity->setUser($this->getUser());
 
         $manager = $this->getManager();
@@ -71,23 +73,23 @@ class SidebarController extends FOSRestController
      *
      * @param int $stateId Sidebar state instance id
      *
+     * @param Request $request
+     * @return Response
      * @ApiDoc(
      *  description="Update Sidebar State",
      *  resource=true
      * )
-     * @return Response
      */
-    public function putAction($stateId)
+    public function putAction($stateId, Request $request)
     {
-        /** @var \Oro\Bundle\SidebarBundle\Entity\SidebarState $entity */
-        $entity = $this->getManager()->find('OroSidebarBundle:SidebarState', (int)$stateId);
+        $entity = $this->getManager()->find($this->getSidebarStateClass(), (int)$stateId);
         if (!$entity) {
             return $this->handleView($this->view([], Codes::HTTP_NOT_FOUND));
         }
         if (!$this->validatePermissions($entity->getUser())) {
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         }
-        $entity->setState($this->getRequest()->get('state', $entity->getState()));
+        $entity->setState($request->get('state', $entity->getState()));
 
         $em = $this->getManager();
         $em->persist($entity);
@@ -114,6 +116,22 @@ class SidebarController extends FOSRestController
      */
     protected function getManager()
     {
-        return $this->getDoctrine()->getManagerForClass('OroSidebarBundle:SidebarState');
+        return $this->getDoctrine()->getManagerForClass($this->getSidebarStateClass());
+    }
+
+    /**
+     * @return SidebarStateRepository
+     */
+    protected function getRepository()
+    {
+        return $this->getManager()->getRepository($this->getSidebarStateClass());
+    }
+
+    /**
+     * @return string
+     */
+    protected function getSidebarStateClass()
+    {
+        return $this->getParameter('oro_sidebar.entity.sidebar_state.class');
     }
 }

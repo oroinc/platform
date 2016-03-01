@@ -136,7 +136,7 @@ class MutableAclProviderTest extends \PHPUnit_Framework_TestCase
                 'ROLE_OLD',
                 'UPDATE acl_security_identities SET identifier = \'ROLE_TEST\' WHERE '
                 . 'identifier = \'ROLE_OLD\' AND username = 0'
-            ),
+            )
         );
     }
 

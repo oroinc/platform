@@ -2,80 +2,96 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Audit;
 
-use Symfony\Component\Security\Core\SecurityContext;
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
+use Doctrine\ORM\EntityManager;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
-use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
-
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigLogDiff;
-use Oro\Bundle\EntityConfigBundle\Entity\ConfigLog;
-
-use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLog;
+use Oro\Bundle\EntityConfigBundle\Audit\Entity\ConfigLogDiff;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 /**
- * Audit config data
+ * Audit entity config changes
  */
 class AuditManager
 {
-    /**
-     * @var ServiceLink
-     */
-    protected $configManagerLink;
+    /** @var TokenStorageInterface */
+    protected $securityTokenStorage;
+
+    /** @var ManagerRegistry */
+    protected $doctrine;
 
     /**
-     * @var ServiceLink
+     * @param TokenStorageInterface $securityTokenStorage
+     * @param ManagerRegistry       $doctrine
      */
-    protected $securityLink;
-
-    /**
-     * @param ServiceLink $configManagerLink
-     * @param ServiceLink $securityLink
-     */
-    public function __construct(ServiceLink $configManagerLink, ServiceLink $securityLink)
+    public function __construct(TokenStorageInterface $securityTokenStorage, ManagerRegistry $doctrine)
     {
-        $this->configManagerLink = $configManagerLink;
-        $this->securityLink      = $securityLink;
+        $this->securityTokenStorage = $securityTokenStorage;
+        $this->doctrine               = $doctrine;
     }
 
     /**
-     * Log all changed Config
+     * Creates an audit entity contains all changed configs
+     *
+     * @param ConfigManager $configManager
+     *
+     * @return ConfigLog|null
      */
-    public function log()
+    public function buildEntity(ConfigManager $configManager)
     {
-        if (!$this->getUser()) {
-            return;
+        $user = $this->getUser();
+        if (null === $user) {
+            return null;
         }
 
         $log = new ConfigLog();
-        $log->setUser($this->getUser());
-
-        foreach ($this->getConfigManager()->getUpdateConfig() as $config) {
-            if ($diff = $this->computeChanges($config, $log)) {
+        foreach ($configManager->getUpdateConfig() as $config) {
+            $diff = $this->computeChanges($config, $configManager);
+            if (null !== $diff) {
                 $log->addDiff($diff);
             }
         }
 
-        if ($log->getDiffs()->count()) {
-            $this->getConfigManager()->getEntityManager()->persist($log);
+        if ($log->getDiffs()->isEmpty()) {
+            return null;
         }
+
+        $log->setUser($user);
+
+        return $log;
+    }
+
+    /**
+     * @param ConfigLog $entity
+     */
+    public function save(ConfigLog $entity)
+    {
+        $this->getEntityManager()->persist($entity);
+        $this->getEntityManager()->flush($entity);
     }
 
     /**
      * @param ConfigInterface $config
-     * @return \Oro\Bundle\EntityConfigBundle\Entity\ConfigLogDiff
+     * @param ConfigManager   $configManager
+     *
+     * @return ConfigLogDiff
      */
-    protected function computeChanges(ConfigInterface $config)
+    protected function computeChanges(ConfigInterface $config, ConfigManager $configManager)
     {
-        $changes = $this->getConfigManager()->getConfigChangeSet($config);
+        $configId       = $config->getId();
+        $internalValues = $configManager
+            ->getProvider($configId->getScope())
+            ->getPropertyConfig()
+            ->getNotAuditableValues($configId);
 
-        $configId        = $config->getId();
-        $configContainer = $this->getConfigManager()->getProvider($configId->getScope())->getPropertyConfig();
-        $internalValues  = $configContainer->getNotAuditableValues($configId);
-
-        $changes = array_diff_key($changes, $internalValues);
-        if (!count($changes)) {
+        $changes = array_diff_key($configManager->getConfigChangeSet($config), $internalValues);
+        if (empty($changes)) {
             return null;
         }
 
@@ -83,7 +99,6 @@ class AuditManager
         $diff->setScope($configId->getScope());
         $diff->setDiff($changes);
         $diff->setClassName($configId->getClassName());
-
         if ($configId instanceof FieldConfigId) {
             $diff->setFieldName($configId->getFieldName());
         }
@@ -92,24 +107,32 @@ class AuditManager
     }
 
     /**
-     * @return UserInterface
+     * @return UserInterface|null
      */
     protected function getUser()
     {
-        /** @var SecurityContext $security */
-        $security = $this->securityLink->getService();
-        if (!$security->getToken() || !$security->getToken()->getUser()) {
-            return false;
+        $token = $this->securityTokenStorage->getToken();
+        if (null === $token) {
+            return null;
+        }
+        $user = $token->getUser();
+        if (!$user instanceof UserInterface) {
+            return null;
         }
 
-        return $security->getToken()->getUser();
+        $className = ClassUtils::getClass($user);
+
+        $id = $this->getEntityManager()->getClassMetadata($className)->getIdentifierValues($user);
+        $id = reset($id);
+
+        return $this->getEntityManager()->getReference($className, $id);
     }
 
     /**
-     * @return ConfigManager
+     * @return EntityManager
      */
-    protected function getConfigManager()
+    protected function getEntityManager()
     {
-        return $this->configManagerLink->getService();
+        return $this->doctrine->getManager();
     }
 }

@@ -50,6 +50,40 @@ class SearchMappingProviderTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testGetEntityAliases()
+    {
+        $this->assertEquals(
+            ['Oro\TestBundle\Entity\TestEntity' => 'test_entity'],
+            $this->provider->getEntityAliases(['Oro\TestBundle\Entity\TestEntity'])
+        );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The search alias for the entity "Oro\TestBundle\Entity\UnknownEntity" not found.
+     */
+    public function testGetEntityAliasesForUnknownEntity()
+    {
+        $this->provider->getEntityAliases(
+            ['Oro\TestBundle\Entity\TestEntity', 'Oro\TestBundle\Entity\UnknownEntity']
+        );
+    }
+
+    public function testGetEntityAlias()
+    {
+        $this->assertEquals(
+            'test_entity',
+            $this->provider->getEntityAlias('Oro\TestBundle\Entity\TestEntity')
+        );
+    }
+
+    public function testGetEntityAliasForUnknownEntity()
+    {
+        $this->assertNull(
+            $this->provider->getEntityAlias('Oro\TestBundle\Entity\UnknownEntity')
+        );
+    }
+
     public function testGetEntityClasses()
     {
         $this->assertEquals(

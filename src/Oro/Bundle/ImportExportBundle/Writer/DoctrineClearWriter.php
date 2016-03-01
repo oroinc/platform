@@ -2,19 +2,23 @@
 
 namespace Oro\Bundle\ImportExportBundle\Writer;
 
-use Doctrine\ORM\EntityManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
 class DoctrineClearWriter implements ItemWriterInterface
 {
     /**
-     * @var EntityManager
+     * @var ManagerRegistry
      */
-    protected $entityManager;
+    protected $registry;
 
-    public function __construct(EntityManager $entityManager)
+    /**
+     * @param ManagerRegistry $registry
+     */
+    public function __construct(ManagerRegistry $registry)
     {
-        $this->entityManager = $entityManager;
+        $this->registry = $registry;
     }
 
     /**
@@ -22,6 +26,6 @@ class DoctrineClearWriter implements ItemWriterInterface
      */
     public function write(array $items)
     {
-        $this->entityManager->clear();
+        $this->registry->getManager()->clear();
     }
 }

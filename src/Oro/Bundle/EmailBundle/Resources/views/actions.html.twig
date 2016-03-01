@@ -18,6 +18,8 @@
                     entityClass: oro_class_name(entity, true),
                     entityId: entity.id
             }),
+            'class': parameters.cssClass is defined ? parameters.cssClass : '',
+            'iCss': parameters.iCss is defined ? parameters.iCss : '',
             'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
             'label': email,
             'widget': {
@@ -28,6 +30,41 @@
                     'alias': 'email-dialog',
                     'dialogOptions' : {
                         'title' : 'oro.email.send_email'|trans,
+                        'allowMaximize': true,
+                        'allowMinimize': true,
+                        'dblclick': 'maximize',
+                        'maximizedHeightDecreaseBy': 'minimize-bar',
+                        'width': 1000
+                    }
+                }
+            }
+        }) -}}
+    {% endif %}
+{% endmacro -%}
+
+{% macro replyAllButton(emailEntity, parameters = {}) -%}
+    {% if resource_granted('oro_email_email_create') %}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {%- set routeParameters = {
+        id: emailEntity.id
+        } -%}
+        {%- if parameters.routeParameters is defined %}
+            {%- set routeParameters = routeParameters|merge(parameters.routeParameters) -%}
+        {% endif -%}
+        {{- UI.clientButton({
+            'dataUrl': path('oro_email_email_reply_all', routeParameters),
+            'aCss': parameters.aCss is defined ? parameters.aCss ~ ' no-hash' : 'no-hash',
+            'iCss': parameters.iCss is defined ? parameters.iCss ~ ' icon-reply-all' : 'icon-reply-all',
+            'label': 'oro.email.reply_all'|trans,
+            'widget': {
+                'type': 'dialog',
+                'multiple': false,
+                'refresh-widget-alias': 'activity-list-widget',
+                'reload-widget-alias': 'thread-view',
+                'options': {
+                    'alias': 'reply-all-dialog',
+                    'dialogOptions' : {
+                        'title' : 'oro.email.reply_all'|trans,
                         'allowMaximize': true,
                         'allowMinimize': true,
                         'dblclick': 'maximize',
@@ -110,40 +147,6 @@
     {% endif %}
 {% endmacro -%}
 
-{% macro addContextButton(emailEntity, parameters) -%}
-    {% if resource_granted('oro_email_email_edit', emailEntity) %}
-        {% import 'OroUIBundle::macros.html.twig' as UI %}
-        {{ UI.clientButton({
-            'dataUrl': path(
-                'oro_email_context', {
-                    id: emailEntity.id
-            }),
-            'aCss': 'no-hash',
-            'iCss': 'icon-link hide-text',
-            'dataId': emailEntity.id,
-            'label' : 'oro.email.add_context.label'|trans,
-            'widget' : {
-                'type' : 'dialog',
-                'multiple' : true,
-                'refresh-widget-alias': 'activity-list-widget',
-                'options' : {
-                    'alias': 'email-context-dialog',
-                    'dialogOptions' : {
-                        'title' : 'oro.email.add_context_entity.label'|trans,
-                        'allowMaximize': true,
-                        'allowMinimize': true,
-                        'modal': true,
-                        'dblclick': 'maximize',
-                        'maximizedHeightDecreaseBy': 'minimize-bar',
-                        'width': 1000,
-                        'height': 600
-                    }
-                }
-            }
-        }) }}
-    {% endif %}
-{% endmacro %}
-
 {% macro createEmailButton(parameters = {}) -%}
     {% if resource_granted('oro_email_email_create') %}
         {% import 'OroUIBundle::macros.html.twig' as UI %}
@@ -167,6 +170,29 @@
                     }
                 }
             }
+        }) }}
+    {% endif %}
+{% endmacro %}
+
+{% macro addMarkUnreadButton(emailEntity) -%}
+    {% if resource_granted('oro_email_email_user_edit', emailEntity) %}
+        {% import 'OroUIBundle::macros.html.twig' as UI %}
+        {{ UI.clientButton({
+            'dataUrl': path(
+                'oro_email_mark_seen', {
+                    id: emailEntity.id,
+                    status: 0
+                }),
+            'dataAttributes': {
+                'page-component-module': 'oroemail/js/app/components/mark-unread-button',
+                'page-component-options': {
+                    'redirect': path('oro_email_user_emails'),
+                }|json_encode,
+            },
+            'aCss': 'no-hash',
+            'iCss': 'icon-minus hide-text',
+            'dataId': emailEntity.id,
+            'label' : 'oro.email.menu.mark_unread.label'|trans
         }) }}
     {% endif %}
 {% endmacro %}

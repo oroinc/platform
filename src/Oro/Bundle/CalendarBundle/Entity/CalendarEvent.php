@@ -11,6 +11,8 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderData;
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
+use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository")
@@ -35,7 +37,6 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW;CREATE;EDIT;DELETE",
  *              "group_name"=""
  *          },
  *          "grouping"={
@@ -57,16 +58,19 @@ use Oro\Bundle\ReminderBundle\Model\ReminderData;
  *          "attachment"={
  *              "immutable"=true
  *          },
- *          "comment"={
- *              "applicable"=true
+ *          "grid"={
+ *              "default"="calendar-event-grid",
+ *              "context"="calendar-event-for-context-grid"
  *          }
  *      }
  * )
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
-class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
+class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, DatesAwareInterface
 {
+    use DatesAwareTrait;
+
     const NOT_RESPONDED        = 'not_responded';
     const TENTATIVELY_ACCEPTED = 'tentatively_accepted';
     const ACCEPTED             = 'accepted';
@@ -236,34 +240,6 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
      * @var Collection
      */
     protected $reminders;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="created_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.created_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $createdAt;
-
-    /**
-     * @var \DateTime
-     *
-     * @ORM\Column(name="updated_at", type="datetime")
-     * @ConfigField(
-     *      defaultValues={
-     *          "entity"={
-     *              "label"="oro.ui.updated_at"
-     *          }
-     *      }
-     * )
-     */
-    protected $updatedAt;
 
     /**
      * @var string
@@ -687,57 +663,6 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface
     protected function isValid($invitationStatus)
     {
         return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->invitationStatuses);
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getCreatedAt()
-    {
-        return $this->createdAt;
-    }
-
-    /**
-     * @param \DateTime $createdAt
-     */
-    public function setCreatedAt($createdAt)
-    {
-        $this->createdAt = $createdAt;
-    }
-
-    /**
-     * @return \DateTime
-     */
-    public function getUpdatedAt()
-    {
-        return $this->updatedAt;
-    }
-
-    /**
-     * @param \DateTime $updatedAt
-     */
-    public function setUpdatedAt($updatedAt)
-    {
-        $this->updatedAt = $updatedAt;
-    }
-
-    /**
-     * @ORM\PrePersist
-     */
-    public function prePersist()
-    {
-        $now = new \DateTime('now', new \DateTimeZone('UTC'));
-
-        $this->createdAt = $this->createdAt ? : $now;
-        $this->updatedAt = $now;
-    }
-
-    /**
-     * @ORM\PreUpdate
-     */
-    public function preUpdate()
-    {
-        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**

@@ -85,6 +85,13 @@ class OroNavigationExtension extends Extension
             ->replaceArgument(0, $config[self::NAVIGATION_ELEMENTS_KEY]);
 
         $container->prependExtensionConfig($this->getAlias(), array_intersect_key($config, array_flip(['settings'])));
+
+        $this->addClassesToCompile(
+            [
+                'Oro\Bundle\NavigationBundle\Event\AddMasterRequestRouteListener',
+                'Oro\Bundle\NavigationBundle\Event\RequestTitleListener'
+            ]
+        );
     }
 
     /**

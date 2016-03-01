@@ -2,9 +2,11 @@
 
 {% block form_row %}
     {% spaceless %}
-        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}">
+        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}">
             {% if label is not sameas(false) %}
-            {{ form_label(form, '' , { label_attr: label_attr|merge({ class: 'control-label' })}) }}
+                <div class="control-label wrap">
+                    {{ form_label(form, '' , { label_attr: label_attr}) }}
+                </div>
             {% endif %}
             <div class="controls{% if errors|length > 0 %} validation-error{% endif %}">
                 {{ form_widget(form) }}
@@ -94,8 +96,13 @@
 
 {% block choice_widget_option_attributes %}
 {% spaceless %}
+    {# @deprecated since 1.8. Remove together with Oro\Bundle\FormBundle\Form\Type\ChoiceListItem #}
     {% if choice.label.attr is defined and choice.label.attr|length > 0 %}
         {% for attrname, attrvalue in choice.label.attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
+    {% endif %}
+
+    {% if choice.attr is defined and choice.attr|length > 0 %}
+        {% for attrname, attrvalue in choice.attr %}{{ attrname }}="{{ attrvalue }}" {% endfor %}
     {% endif %}
 {% endspaceless %}
 {% endblock choice_widget_option_attributes %}

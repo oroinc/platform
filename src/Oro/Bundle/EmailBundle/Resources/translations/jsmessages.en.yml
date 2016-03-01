@@ -1,12 +1,17 @@
 oro:
     email:
+        menu:
+            mark_unread:
+                success.message: Message has been marked as unread
+                error.message: Error mark message as unread
         emailtemplate:
             load_failed: Error occured while loading template.
             variable_title: '{{ variable_label }}. Click to insert variable or drag it.'
             reference_title: '{{ variable_label }}. Click to go to related variables.'
             change_entity_confirmation: The template data can contain variables related to the previous selected entity. Do you want to clear all template data?
             apply_template_confirmation_title: Apply Template Confirmation
-            apply_template_confirmation_content: Body content will be replaced by an other template. Are you sure you want to proceed?
+            apply_template_confirmation_content: The body content will be replaced by a template. Are you sure you want to proceed?
+            cannot_insert_variable: Cannot insert variable, please put the cursor into the subject or the content of the template.
         thread:
             load_error: Sorry, email thread was not loaded correctly.
             no_signature: You don't have a signature yet. Please add it in <a href="{{ url }}">My Profile</a>.
@@ -20,13 +25,37 @@ oro:
         to: To
         attachment:
             added: Attachment added
-        contexts:
-            added:   The context has been added
-            removed: The context has been removed
         send_email: Send email
         menu.shortcut_compose_email.label: Compose email
+        action:
+            success_mark_read: "Email has been market as read"
+            success_mark_unread: "Email has been market as unread"
+            error: Error has occurred
+        error:
+            get_email_last: "Getting last emails failed"
+            mark_as_read: "Marking all as read failed"
+        recent_emails_widget:
+            title_all_folders: RECENT EMEILS
+            settings: Recent Emails Widget Settings
+            mailbox_folder: Mailbox Folder
+            all_folders: ALL
+            mark_visible_read.label: Mark Visible as Read
+            amount_of_emails: Amount of Emails to Display
+            default_action: Default Action
+            default_action_hint: Default action for widget in a state of extended sidebar
+            reply_all: Reply All
+            reply: Reply
+            forward: Forward
+        notification:
+            menu_item.hint: Recent Emails
+            mark_read.label: Mark all as Read
+            user_emails.label: My emails
+            empty: You don't have any emails yet
+            new_email: You have a new email
+            more_unread: More Unread
 "The email was sent": "The email was sent"
 "Preview": "Preview"
 "Yes, Proceed": "Yes, Proceed"
 "Not Found": "Not Found"
 "Successfully removed": "Successfully removed"
+"Read": Read

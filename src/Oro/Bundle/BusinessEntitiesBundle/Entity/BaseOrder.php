@@ -566,4 +566,12 @@ class BaseOrder
             $this->items = clone $this->items;
         }
     }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getId();
+    }
 }

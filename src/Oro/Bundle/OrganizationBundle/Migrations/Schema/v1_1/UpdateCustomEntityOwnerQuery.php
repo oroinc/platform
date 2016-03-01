@@ -6,7 +6,7 @@ use Psr\Log\LoggerInterface;
 
 use Doctrine\DBAL\Types\Type;
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigModelManager;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\MigrationBundle\Migration\ArrayLogger;
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
@@ -66,7 +66,7 @@ class UpdateCustomEntityOwnerQuery extends ParametrizedMigrationQuery
 
                 $updateQueries[] = [
                     'UPDATE oro_entity_config_field SET data = :data, mode = :mode WHERE id = :id',
-                    ['id' => $id, 'mode' => ConfigModelManager::MODE_DEFAULT, 'data' => $data],
+                    ['id' => $id, 'mode' => ConfigModel::MODE_DEFAULT, 'data' => $data],
                     ['id' => Type::INTEGER, 'mode' => Type::STRING, 'data' => Type::TARRAY]
                 ];
                 $updateQueries[] = [

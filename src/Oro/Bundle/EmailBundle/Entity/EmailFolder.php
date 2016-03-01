@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use DateTime;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -9,6 +11,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as JMS;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Oro\Bundle\EmailBundle\Model\FolderType;
 
 /**
  * Email Folder
@@ -21,6 +25,14 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
  */
 class EmailFolder
 {
+    const SYNC_ENABLED_TRUE = true;
+    const SYNC_ENABLED_FALSE = false;
+    const SYNC_ENABLED_IGNORE = null;
+
+    const DIRECTION_INCOMING = 'incoming';
+    const DIRECTION_OUTGOING = 'outgoing';
+    const DIRECTION_BOTH = 'both';
+
     /**
      * @var integer
      *
@@ -59,6 +71,37 @@ class EmailFolder
     protected $type;
 
     /**
+     * @var bool
+     *
+     * @ORM\Column(name="sync_enabled", type="boolean", options={"default"=false})
+     * @Soap\ComplexType("boolean")
+     * @JMS\Type("boolean")
+     */
+    protected $syncEnabled = false;
+
+    /**
+     * @var EmailFolder $folder
+     *
+     * @ORM\ManyToOne(targetEntity="EmailFolder", inversedBy="subFolders")
+     * @ORM\JoinColumn(
+     *  name="parent_folder_id", referencedColumnName="id",
+     *  nullable=true, onDelete="CASCADE")
+     * @JMS\Exclude
+     */
+    protected $parentFolder;
+
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(
+     *  targetEntity="EmailFolder",
+     *  mappedBy="parentFolder",
+     *  cascade={"persist", "remove"},
+     *  orphanRemoval=true)
+     */
+    protected $subFolders;
+
+    /**
      * @var EmailOrigin
      *
      * @ORM\ManyToOne(targetEntity="EmailOrigin", inversedBy="folders")
@@ -68,26 +111,37 @@ class EmailFolder
     protected $origin;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(name="synchronized", type="datetime", nullable=true)
      */
     protected $synchronizedAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(name="outdated_at", type="datetime", nullable=true)
      */
     protected $outdatedAt;
 
     /**
-     * @var ArrayCollection
+     * @var ArrayCollection|EmailUser[]
      *
-     * @ORM\OneToMany(targetEntity="EmailUser", mappedBy="folder",
-     *      cascade={"persist", "remove"}, orphanRemoval=true)
+     * @ORM\ManyToMany(
+     *      targetEntity="EmailUser",
+     *      mappedBy="folders",
+     *      cascade={"persist", "remove"},
+     *      orphanRemoval=true
+     * )
+     * @JMS\Exclude
      */
     protected $emailUsers;
+
+    public function __construct()
+    {
+        $this->subFolders = new ArrayCollection();
+        $this->emailUsers = new ArrayCollection();
+    }
 
     /**
      * Get id
@@ -172,6 +226,125 @@ class EmailFolder
     }
 
     /**
+     * Is folder checked for sync
+     *
+     * @return bool
+     */
+    public function isSyncEnabled()
+    {
+        return $this->syncEnabled;
+    }
+
+    /**
+     * Set folder checked for sync
+     *
+     * @param boolean $syncEnabled
+     *
+     * @return $this
+     */
+    public function setSyncEnabled($syncEnabled)
+    {
+        $this->syncEnabled = (bool)$syncEnabled;
+
+        return $this;
+    }
+
+    /**
+     * Get sub folders
+     *
+     * @return EmailFolder[]|ArrayCollection
+     */
+    public function getSubFolders()
+    {
+        return $this->subFolders;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasSubFolders()
+    {
+        return !$this->subFolders->isEmpty();
+    }
+
+    /**
+     * @param ArrayCollection|array $folders
+     *
+     * @return $this
+     */
+    public function setSubFolders($folders)
+    {
+        $this->subFolders->clear();
+
+        foreach ($folders as $folder) {
+            $this->addSubFolder($folder);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Add sub folder
+     *
+     * @param  EmailFolder $folder
+     *
+     * @return EmailOrigin
+     */
+    public function addSubFolder(EmailFolder $folder)
+    {
+        $this->subFolders->add($folder);
+
+        $exParentFolder = $folder->getParentFolder();
+        if ($exParentFolder !== null && $exParentFolder !== $this) {
+            if ($exParentFolder->getSubFolders()->contains($folder)) {
+                $exParentFolder->getSubFolders()->removeElement($folder);
+            }
+        }
+
+        $folder->setParentFolder($this);
+
+        return $this;
+    }
+
+    /**
+     * @param EmailFolder $folder
+     *
+     * @return $this
+     */
+    public function removeSubFolder(EmailFolder $folder)
+    {
+        if ($this->subFolders->contains($folder)) {
+            $this->subFolders->removeElement($folder);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Get parent folder
+     *
+     * @return EmailFolder
+     */
+    public function getParentFolder()
+    {
+        return $this->parentFolder;
+    }
+
+    /**
+     * Set parent folder
+     *
+     * @param  EmailFolder $folder
+     *
+     * @return EmailOrigin
+     */
+    public function setParentFolder(EmailFolder $folder)
+    {
+        $this->parentFolder = $folder;
+
+        return $this;
+    }
+
+    /**
      * Get email folder origin
      *
      * @return EmailOrigin
@@ -192,13 +365,19 @@ class EmailFolder
     {
         $this->origin = $origin;
 
+        if (!$this->subFolders->isEmpty()) {
+            foreach ($this->subFolders as $subFolder) {
+                $subFolder->setOrigin($origin);
+            }
+        }
+
         return $this;
     }
 
     /**
      * Get date/time when emails in this folder were synchronized
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getSynchronizedAt()
     {
@@ -208,7 +387,7 @@ class EmailFolder
     /**
      * Set date/time when emails in this folder were synchronized
      *
-     * @param \DateTime $synchronizedAt
+     * @param DateTime $synchronizedAt
      *
      * @return EmailOrigin
      */
@@ -220,7 +399,7 @@ class EmailFolder
     }
 
     /**
-     * @param \DateTime $outdatedAt
+     * @param DateTime $outdatedAt
      *
      * @return EmailFolder
      */
@@ -232,7 +411,7 @@ class EmailFolder
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
     public function getOutdatedAt()
     {
@@ -245,6 +424,22 @@ class EmailFolder
     public function isOutdated()
     {
         return $this->outdatedAt !== null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDirection()
+    {
+        if (in_array($this->type, FolderType::outcomingTypes())) {
+            return static::DIRECTION_OUTGOING;
+        }
+
+        if (in_array($this->type, FolderType::incomingTypes())) {
+            return static::DIRECTION_INCOMING;
+        }
+
+        return static::DIRECTION_BOTH;
     }
 
     /**

@@ -1,0 +1,22 @@
+<% obj.attributesTemplate = function(attributes) {
+_.each(attributes, function(attribute, name) { %>
+<%= name %><% if (!_.isNull(attribute)) { %>="<%= attribute %>"<% } %>
+<% });
+} %>
+<div class="<%= wrapperClassName %> dropdown">
+    <a class="action btn
+            <%= className ? " " + className : "" %>
+            <%= !enabled ? " disabled" : "" %>
+            dropdown-toggle"
+        <%= attributesTemplate(attributes) %>
+        title="<%= title %>"
+        data-toggle="dropdown">
+        <% if (icon) { %>
+            <i class="icon-<%= icon %>"></i>
+        <% } else { %>
+            <% if (iconClassName) { %><i class="<%= iconClassName %>"></i><% } %>
+        <% } %>
+        <%= label %>
+    </a>
+    <div class="dropdown-menu"></div>
+</div>

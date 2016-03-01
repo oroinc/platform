@@ -8,7 +8,7 @@ use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 /**
  * The aim of this class is to help getting a phone number from an object.
@@ -22,7 +22,7 @@ class PhoneProvider implements PhoneProviderInterface
 {
     const GET_PHONE_METHOD = 'getPhone';
 
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $extendConfigProvider;
 
     /**
@@ -42,9 +42,9 @@ class PhoneProvider implements PhoneProviderInterface
     protected $phoneProviders = [];
 
     /**
-     * @param ConfigProviderInterface $extendConfigProvider
+     * @param ConfigProvider $extendConfigProvider
      */
-    public function __construct(ConfigProviderInterface $extendConfigProvider)
+    public function __construct(ConfigProvider $extendConfigProvider)
     {
         $this->extendConfigProvider = $extendConfigProvider;
     }

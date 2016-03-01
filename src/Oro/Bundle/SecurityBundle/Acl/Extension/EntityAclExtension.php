@@ -2,52 +2,59 @@
 
 namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
-use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 use Symfony\Component\Security\Acl\Model\ObjectIdentityInterface;
 use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Util\ClassUtils;
 
+use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
-use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
-use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadata;
-use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\SecurityBundle\Acl\Exception\InvalidAclMaskException;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Annotation\Acl as AclAnnotation;
+use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
+use Oro\Bundle\SecurityBundle\Entity\Permission;
+use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
+use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
+use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class EntityAclExtension extends AbstractAclExtension
 {
-    /**
-     * @var ObjectIdAccessor
-     */
+    const NAME = 'entity';
+
+    /** @var ObjectIdAccessor */
     protected $objectIdAccessor;
 
-    /**
-     * @var EntityClassResolver
-     */
+    /** @var EntityClassResolver */
     protected $entityClassResolver;
 
-    /**
-     * @var OwnershipMetadataProvider
-     */
+    /** @var MetadataProviderInterface */
     protected $metadataProvider;
 
-    /**
-     * @var EntitySecurityMetadataProvider
-     */
+    /** @var EntitySecurityMetadataProvider */
     protected $entityMetadataProvider;
 
-    /**
-     * @var OwnershipDecisionMakerInterface
-     */
+    /** @var AccessLevelOwnershipDecisionMakerInterface */
     protected $decisionMaker;
+
+    /** @var EntityOwnerAccessor */
+    protected $entityOwnerAccessor;
+
+    /** @var PermissionManager */
+    protected $permissionManager;
+
+    /** @var AclGroupProviderInterface */
+    protected $groupProvider;
 
     /**
      * key = Permission
@@ -55,92 +62,64 @@ class EntityAclExtension extends AbstractAclExtension
      *
      * @var int[]
      */
-    protected $permissionToMaskBuilderIdentity = array();
+    protected $permissionToMaskBuilderIdentity;
+
+    /** @var array */
+    protected $maskBuilderIdentityToPermissions;
 
     /**
-     * key = The identity of a permission mask builder
-     * value = The full class name of a permission mask builder
-     *
-     * @var string[]
-     */
-    protected $maskBuilderClassNames = array();
-
-    /**
-     * Constructor
-     *
-     * @param ObjectIdAccessor                $objectIdAccessor
-     * @param EntityClassResolver             $entityClassResolver
-     * @param EntitySecurityMetadataProvider  $entityMetadataProvider
-     * @param OwnershipMetadataProvider       $metadataProvider
-     * @param OwnershipDecisionMakerInterface $decisionMaker
+     * @param ObjectIdAccessor $objectIdAccessor
+     * @param EntityClassResolver $entityClassResolver
+     * @param EntitySecurityMetadataProvider $entityMetadataProvider
+     * @param MetadataProviderInterface $metadataProvider
+     * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
+     * @param PermissionManager $permissionManager
+     * @param AclGroupProviderInterface $groupProvider
      */
     public function __construct(
         ObjectIdAccessor $objectIdAccessor,
         EntityClassResolver $entityClassResolver,
         EntitySecurityMetadataProvider $entityMetadataProvider,
-        OwnershipMetadataProvider $metadataProvider,
-        OwnershipDecisionMakerInterface $decisionMaker
+        MetadataProviderInterface $metadataProvider,
+        AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
+        PermissionManager $permissionManager,
+        AclGroupProviderInterface $groupProvider
     ) {
         $this->objectIdAccessor       = $objectIdAccessor;
         $this->entityClassResolver    = $entityClassResolver;
         $this->entityMetadataProvider = $entityMetadataProvider;
         $this->metadataProvider       = $metadataProvider;
         $this->decisionMaker          = $decisionMaker;
+        $this->permissionManager      = $permissionManager;
+        $this->groupProvider          = $groupProvider;
+    }
 
-        $this->maskBuilderClassNames[EntityMaskBuilder::IDENTITY]
-            = 'Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder';
+    /**
+     * {@inheritdoc}
+     */
+    public function getMasks($permission)
+    {
+        $this->buildPermissionsMap();
 
-        $this->permissionToMaskBuilderIdentity['VIEW']   = EntityMaskBuilder::IDENTITY;
-        $this->permissionToMaskBuilderIdentity['CREATE'] = EntityMaskBuilder::IDENTITY;
-        $this->permissionToMaskBuilderIdentity['EDIT']   = EntityMaskBuilder::IDENTITY;
-        $this->permissionToMaskBuilderIdentity['DELETE'] = EntityMaskBuilder::IDENTITY;
-        $this->permissionToMaskBuilderIdentity['ASSIGN'] = EntityMaskBuilder::IDENTITY;
-        $this->permissionToMaskBuilderIdentity['SHARE']  = EntityMaskBuilder::IDENTITY;
+        return parent::getMasks($permission);
+    }
 
-        $this->map = array(
-            'VIEW'   => array(
-                EntityMaskBuilder::MASK_VIEW_BASIC,
-                EntityMaskBuilder::MASK_VIEW_LOCAL,
-                EntityMaskBuilder::MASK_VIEW_DEEP,
-                EntityMaskBuilder::MASK_VIEW_GLOBAL,
-                EntityMaskBuilder::MASK_VIEW_SYSTEM,
-            ),
-            'CREATE' => array(
-                EntityMaskBuilder::MASK_CREATE_BASIC,
-                EntityMaskBuilder::MASK_CREATE_LOCAL,
-                EntityMaskBuilder::MASK_CREATE_DEEP,
-                EntityMaskBuilder::MASK_CREATE_GLOBAL,
-                EntityMaskBuilder::MASK_CREATE_SYSTEM,
-            ),
-            'EDIT'   => array(
-                EntityMaskBuilder::MASK_EDIT_BASIC,
-                EntityMaskBuilder::MASK_EDIT_LOCAL,
-                EntityMaskBuilder::MASK_EDIT_DEEP,
-                EntityMaskBuilder::MASK_EDIT_GLOBAL,
-                EntityMaskBuilder::MASK_EDIT_SYSTEM,
-            ),
-            'DELETE' => array(
-                EntityMaskBuilder::MASK_DELETE_BASIC,
-                EntityMaskBuilder::MASK_DELETE_LOCAL,
-                EntityMaskBuilder::MASK_DELETE_DEEP,
-                EntityMaskBuilder::MASK_DELETE_GLOBAL,
-                EntityMaskBuilder::MASK_DELETE_SYSTEM,
-            ),
-            'ASSIGN' => array(
-                EntityMaskBuilder::MASK_ASSIGN_BASIC,
-                EntityMaskBuilder::MASK_ASSIGN_LOCAL,
-                EntityMaskBuilder::MASK_ASSIGN_DEEP,
-                EntityMaskBuilder::MASK_ASSIGN_GLOBAL,
-                EntityMaskBuilder::MASK_ASSIGN_SYSTEM,
-            ),
-            'SHARE'  => array(
-                EntityMaskBuilder::MASK_SHARE_BASIC,
-                EntityMaskBuilder::MASK_SHARE_LOCAL,
-                EntityMaskBuilder::MASK_SHARE_DEEP,
-                EntityMaskBuilder::MASK_SHARE_GLOBAL,
-                EntityMaskBuilder::MASK_SHARE_SYSTEM,
-            ),
-        );
+    /**
+     * {@inheritdoc}
+     */
+    public function hasMasks($permission)
+    {
+        $this->buildPermissionsMap();
+
+        return parent::hasMasks($permission);
+    }
+
+    /**
+     * @param EntityOwnerAccessor $entityOwnerAccessor
+     */
+    public function setEntityOwnerAccessor(EntityOwnerAccessor $entityOwnerAccessor)
+    {
+        $this->entityOwnerAccessor = $entityOwnerAccessor;
     }
 
     /**
@@ -148,35 +127,18 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getAccessLevelNames($object)
     {
-        $minLevel = AccessLevel::BASIC_LEVEL;
-        $maxLevel = AccessLevel::SYSTEM_LEVEL;
-
         if ($this->getObjectClassName($object) === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             /**
              * In community version root entity should not have GLOBAL(Organization) access level
              */
-            return AccessLevel::getAccessLevelNames($minLevel, $maxLevel, [AccessLevel::GLOBAL_LEVEL]);
+            return AccessLevel::getAccessLevelNames(
+                AccessLevel::BASIC_LEVEL,
+                AccessLevel::SYSTEM_LEVEL,
+                [AccessLevel::GLOBAL_LEVEL]
+            );
         } else {
-            $metadata = $this->getMetadata($object);
-            if (!$metadata->hasOwner()) {
-                return array(
-                    AccessLevel::NONE_LEVEL   => AccessLevel::NONE_LEVEL_NAME,
-                    AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
-                );
-            }
-            if ($metadata->isUserOwned()) {
-                $maxLevel = AccessLevel::GLOBAL_LEVEL;
-                $minLevel = AccessLevel::BASIC_LEVEL;
-            } elseif ($metadata->isBusinessUnitOwned()) {
-                $maxLevel = AccessLevel::GLOBAL_LEVEL;
-                $minLevel = AccessLevel::LOCAL_LEVEL;
-            } elseif ($metadata->isOrganizationOwned()) {
-                $maxLevel = AccessLevel::GLOBAL_LEVEL;
-                $minLevel = AccessLevel::GLOBAL_LEVEL;
-            }
+            return $this->getMetadata($object)->getAccessLevelNames();
         }
-
-        return AccessLevel::getAccessLevelNames($minLevel, $maxLevel);
     }
 
     /**
@@ -186,6 +148,11 @@ class EntityAclExtension extends AbstractAclExtension
     {
         if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE && $id === $this->getExtensionKey()) {
             return true;
+        }
+
+        $delim = strpos($type, '@');
+        if ($delim !== false) {
+            $type = ltrim(substr($type, $delim + 1), ' ');
         }
 
         if ($id === $this->getExtensionKey()) {
@@ -202,7 +169,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getExtensionKey()
     {
-        return 'entity';
+        return self::NAME;
     }
 
     /**
@@ -217,13 +184,13 @@ class EntityAclExtension extends AbstractAclExtension
 
         $permissions = $permission === null
             ? $this->getPermissions($mask, true)
-            : array($permission);
+            : [$permission];
 
         foreach ($permissions as $permission) {
             $validMasks = $this->getValidMasks($permission, $object);
             if (($mask | $validMasks) === $validMasks) {
-                $identity = $this->permissionToMaskBuilderIdentity[$permission];
-                foreach ($this->permissionToMaskBuilderIdentity as $p => $i) {
+                $identity = $this->getIdentityForPermission($permission);
+                foreach ($this->getPermissionsToIdentityMap() as $p => $i) {
                     if ($identity === $i) {
                         $this->validateMaskAccessLevel($p, $mask, $object);
                     }
@@ -244,10 +211,10 @@ class EntityAclExtension extends AbstractAclExtension
         if (is_string($val)) {
             return $this->fromDescriptor($val);
         } elseif ($val instanceof AclAnnotation) {
-            return new ObjectIdentity(
-                $val->getType(),
-                $this->entityClassResolver->getEntityClass($val->getClass())
-            );
+            $class = $this->entityClassResolver->getEntityClass($val->getClass());
+            $group = $val->getGroup();
+
+            return new ObjectIdentity($val->getType(), !empty($group) ? $group . '@' . $class : $class);
         }
 
         return $this->fromDomainObject($val);
@@ -262,10 +229,9 @@ class EntityAclExtension extends AbstractAclExtension
             $permission = 'VIEW';
         }
 
-        $identity             = $this->permissionToMaskBuilderIdentity[$permission];
-        $maskBuilderClassName = $this->maskBuilderClassNames[$identity];
+        $identity = $this->getIdentityForPermission($permission);
 
-        return new $maskBuilderClassName();
+        return new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
     }
 
     /**
@@ -273,9 +239,9 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getAllMaskBuilders()
     {
-        $result = array();
-        foreach ($this->maskBuilderClassNames as $maskBuilderClassName) {
-            $result[] = new $maskBuilderClassName();
+        $result = [];
+        foreach ($this->getPermissionsForIdentity() as $identity => $permissions) {
+            $result[] = new EntityMaskBuilder($identity, $permissions);
         }
 
         return $result;
@@ -286,13 +252,16 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getMaskPattern($mask)
     {
-        $maskBuilderClassName = $this->maskBuilderClassNames[$this->getServiceBits($mask)];
+        $identity    = $this->getServiceBits($mask);
+        $maskBuilder = new EntityMaskBuilder($identity, $this->getPermissionsForIdentity($identity));
 
-        return $maskBuilderClassName::getPatternFor($mask);
+        return $maskBuilder->getPatternFor($mask);
     }
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function adaptRootMask($rootMask, $object)
     {
@@ -305,7 +274,7 @@ class EntityAclExtension extends AbstractAclExtension
                 $mask           = $rootMask & $permissionMask;
                 $accessLevel    = $this->getAccessLevel($mask);
                 if (!$metadata->hasOwner()) {
-                    if ($identity === EntityMaskBuilder::IDENTITY
+                    if ($identity === $this->getIdentityForPermission('ASSIGN')
                         && ($permission === 'ASSIGN' || $permission === 'SHARE')
                     ) {
                         $rootMask &= ~$this->removeServiceBits($mask);
@@ -313,12 +282,12 @@ class EntityAclExtension extends AbstractAclExtension
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_SYSTEM');
                     }
-                } elseif ($metadata->isOrganizationOwned()) {
+                } elseif ($metadata->isGlobalLevelOwned()) {
                     if ($accessLevel < AccessLevel::GLOBAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_GLOBAL');
                     }
-                } elseif ($metadata->isBusinessUnitOwned()) {
+                } elseif ($metadata->isLocalLevelOwned()) {
                     if ($accessLevel < AccessLevel::LOCAL_LEVEL) {
                         $rootMask &= ~$this->removeServiceBits($mask);
                         $rootMask |= $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_LOCAL');
@@ -335,7 +304,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getServiceBits($mask)
     {
-        return $mask & BaseEntityMaskBuilder::SERVICE_BITS;
+        return $mask & EntityMaskBuilder::SERVICE_BITS;
     }
 
     /**
@@ -343,7 +312,7 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function removeServiceBits($mask)
     {
-        return $mask & BaseEntityMaskBuilder::REMOVE_SERVICE_BITS;
+        return $mask & EntityMaskBuilder::REMOVE_SERVICE_BITS;
     }
 
     /**
@@ -351,7 +320,6 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function getAccessLevel($mask, $permission = null, $object = null)
     {
-
         if (0 === $this->removeServiceBits($mask)) {
             return AccessLevel::NONE_LEVEL;
         }
@@ -362,6 +330,8 @@ class EntityAclExtension extends AbstractAclExtension
             $mask           = $mask & $permissionMask;
         }
 
+        $mask = $this->removeServiceBits($mask);
+
         $result = AccessLevel::NONE_LEVEL;
         foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
             if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $accessLevel))) {
@@ -369,33 +339,32 @@ class EntityAclExtension extends AbstractAclExtension
             }
         }
 
-        if ($object && $result === AccessLevel::SYSTEM_LEVEL) {
-            $result = $this->fixMaxAccessLevel($result, $object);
-        }
-
-        return $result;
+        return $this->metadataProvider->getMaxAccessLevel($result, $this->getObjectClassName($object));
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getPermissions($mask = null, $setOnly = false)
+    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
+        $map = $this->getPermissionsToIdentityMap($byCurrentGroup);
+
         if ($mask === null) {
-            return array_keys($this->permissionToMaskBuilderIdentity);
+            return array_keys($map);
         }
 
-        $result = array();
+        $result = [];
         if (!$setOnly) {
             $identity = $this->getServiceBits($mask);
-            foreach ($this->permissionToMaskBuilderIdentity as $permission => $id) {
+            foreach ($map as $permission => $id) {
                 if ($id === $identity) {
                     $result[] = $permission;
                 }
             }
         } elseif (0 !== $this->removeServiceBits($mask)) {
             $identity = $this->getServiceBits($mask);
-            foreach ($this->permissionToMaskBuilderIdentity as $permission => $id) {
+            $mask = $this->removeServiceBits($mask);
+            foreach ($map as $permission => $id) {
                 if ($id === $identity) {
                     if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $permission))) {
                         $result[] = $permission;
@@ -413,25 +382,45 @@ class EntityAclExtension extends AbstractAclExtension
     public function getAllowedPermissions(ObjectIdentity $oid)
     {
         if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            $result = array_keys($this->permissionToMaskBuilderIdentity);
+            $result = array_keys($this->getPermissionsToIdentityMap());
         } else {
             $config = $this->entityMetadataProvider->getMetadata($oid->getType());
             $result = $config->getPermissions();
             if (empty($result)) {
-                $result = array_keys($this->map);
+                $result = array_keys($this->getPermissionsToIdentityMap());
             }
 
             $metadata = $this->getMetadata($oid);
             if (!$metadata->hasOwner()) {
-                foreach ($result as $key => $value) {
-                    if (in_array($value, array('ASSIGN', 'SHARE'))) {
-                        unset($result[$key]);
-                    }
-                }
+                $result = array_diff($result, ['ASSIGN', 'SHARE']);
             }
         }
 
-        return $result;
+        $allowed = $this->getPermissionsForType($oid->getType());
+
+        return array_values(array_intersect($result, $allowed));
+    }
+
+    /**
+     * @param string $type
+     * @return array
+     */
+    protected function getPermissionsForType($type)
+    {
+        $group = $this->groupProvider->getGroup();
+
+        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+            $permissions = $this->permissionManager->getPermissionsForGroup($group);
+        } else {
+            $permissions = $this->permissionManager->getPermissionsForEntity($type, $group);
+        }
+
+        return array_map(
+            function (Permission $permission) {
+                return $permission->getName();
+            },
+            $permissions
+        );
     }
 
     /**
@@ -449,13 +438,21 @@ class EntityAclExtension extends AbstractAclExtension
      */
     public function decideIsGranting($triggeredMask, $object, TokenInterface $securityToken)
     {
-        $accessLevel = $this->getAccessLevel($triggeredMask);
-        if ($accessLevel === AccessLevel::SYSTEM_LEVEL) {
+        // check whether we check permissions for a domain object
+        if ($object === null || !is_object($object) || $object instanceof ObjectIdentityInterface) {
             return true;
         }
 
-        // check whether we check permissions for a domain object
-        if ($object === null || !is_object($object) || $object instanceof ObjectIdentityInterface) {
+        $organization = null;
+        if ($securityToken instanceof OrganizationContextTokenInterface) {
+            if ($this->isAccessDeniedByOrganizationContext($object, $securityToken)) {
+                return false;
+            }
+            $organization = $securityToken->getOrganizationContext();
+        }
+
+        $accessLevel = $this->getAccessLevel($triggeredMask);
+        if (AccessLevel::SYSTEM_LEVEL === $accessLevel) {
             return true;
         }
 
@@ -464,21 +461,16 @@ class EntityAclExtension extends AbstractAclExtension
             return true;
         }
 
-        $organization = null;
-        if ($securityToken instanceof OrganizationContextTokenInterface) {
-            $organization = $securityToken->getOrganizationContext();
-        }
-
         $result = false;
         if (AccessLevel::BASIC_LEVEL === $accessLevel) {
-            $result = $this->decisionMaker->isAssociatedWithUser(
+            $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                 $securityToken->getUser(),
                 $object,
                 $organization
             );
         } else {
-            if ($metadata->isUserOwned()) {
-                $result = $this->decisionMaker->isAssociatedWithUser(
+            if ($metadata->isBasicLevelOwned()) {
+                $result = $this->decisionMaker->isAssociatedWithBasicLevelEntity(
                     $securityToken->getUser(),
                     $object,
                     $organization
@@ -486,21 +478,21 @@ class EntityAclExtension extends AbstractAclExtension
             }
             if (!$result) {
                 if (AccessLevel::LOCAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
+                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         false,
                         $organization
                     );
                 } elseif (AccessLevel::DEEP_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithBusinessUnit(
+                    $result = $this->decisionMaker->isAssociatedWithLocalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         true,
                         $organization
                     );
                 } elseif (AccessLevel::GLOBAL_LEVEL === $accessLevel) {
-                    $result = $this->decisionMaker->isAssociatedWithOrganization(
+                    $result = $this->decisionMaker->isAssociatedWithGlobalLevelEntity(
                         $securityToken->getUser(),
                         $object,
                         $organization
@@ -513,33 +505,16 @@ class EntityAclExtension extends AbstractAclExtension
     }
 
     /**
-     * Fix Access Level for given object. Change it from SYSTEM_LEVEL to GLOBAL_LEVEL
-     * if object have owner type OWNER_TYPE_BUSINESS_UNIT, OWNER_TYPE_USER or OWNER_TYPE_ORGANIZATION
-     *
      * @param int   $accessLevel Current object access level
      * @param mixed $object      Object for test
      *
      * @return int
+     *
+     * @deprecated since 1.8, use MetadataProviderInterface::getMaxAccessLevel instead
      */
     protected function fixMaxAccessLevel($accessLevel, $object)
     {
-        $metadata = $this->getMetadata($object);
-        if ($metadata->hasOwner()) {
-            $checkOwnerType = in_array(
-                $metadata->getOwnerType(),
-                [
-                    OwnershipMetadata::OWNER_TYPE_BUSINESS_UNIT,
-                    OwnershipMetadata::OWNER_TYPE_USER,
-                    OwnershipMetadata::OWNER_TYPE_ORGANIZATION
-                ]
-            );
-            if ($checkOwnerType) {
-                $accessLevel = AccessLevel::GLOBAL_LEVEL;
-            }
-        }
-
-        return $accessLevel;
-
+        return $this->metadataProvider->getMaxAccessLevel($accessLevel, $this->getObjectClassName($object));
     }
 
     /**
@@ -552,14 +527,13 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function fromDescriptor($descriptor)
     {
-        $type = $id = null;
-        $this->parseDescriptor($descriptor, $type, $id);
+        $type = $id = $group = null;
+        $this->parseDescriptor($descriptor, $type, $id, $group);
+
+        $type = $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type));
 
         if ($id === $this->getExtensionKey()) {
-            return new ObjectIdentity(
-                $id,
-                $this->entityClassResolver->getEntityClass(ClassUtils::getRealClass($type))
-            );
+            return new ObjectIdentity($id, !empty($group) ? $group . '@' . $type : $type);
         }
 
         throw new \InvalidArgumentException(
@@ -584,7 +558,7 @@ class EntityAclExtension extends AbstractAclExtension
         try {
             return new ObjectIdentity(
                 $this->objectIdAccessor->getId($domainObject),
-                ClassUtils::getClass($domainObject)
+                ClassUtils::getRealClass($domainObject)
             );
         } catch (\InvalidArgumentException $invalid) {
             throw new InvalidDomainObjectException($invalid->getMessage(), 0, $invalid);
@@ -602,11 +576,17 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function validateMaskAccessLevel($permission, $mask, $object)
     {
-        $identity = $this->permissionToMaskBuilderIdentity[$permission];
+        $identity = $this->getIdentityForPermission($permission);
         if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $permission))) {
-            $maskAccessLevels = array();
+            $maskAccessLevels = [];
+            $clearedMask = $this->removeServiceBits($mask);
+
             foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
-                if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'MASK_' . $permission . '_' . $accessLevel))) {
+                $levelMask = $this->removeServiceBits(
+                    $this->getMaskBuilderConst($identity, sprintf('MASK_%s_%s', $permission, $accessLevel))
+                );
+
+                if (0 !== ($clearedMask & $levelMask)) {
                     $maskAccessLevels[] = $accessLevel;
                 }
             }
@@ -631,9 +611,9 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function getValidMasks($permission, $object)
     {
-        if ($object instanceof ObjectIdentity && $object->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            $identity = $this->permissionToMaskBuilderIdentity[$permission];
+        $identity = $this->getIdentityForPermission($permission);
 
+        if ($object instanceof ObjectIdentity && $object->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL')
@@ -644,25 +624,31 @@ class EntityAclExtension extends AbstractAclExtension
 
         $metadata = $this->getMetadata($object);
         if (!$metadata->hasOwner()) {
-            if ($this->permissionToMaskBuilderIdentity[$permission] === EntityMaskBuilder::IDENTITY) {
-                return EntityMaskBuilder::GROUP_CRUD_SYSTEM;
+            $maskBuilder = $this->getMaskBuilder($permission);
+            $maskBuilder->reset()->add($maskBuilder->getMask('GROUP_SYSTEM'));
+
+            if ($maskBuilder->hasMask('MASK_ASSIGN_SYSTEM')) {
+                $maskBuilder->remove('ASSIGN_SYSTEM');
             }
 
-            return $this->permissionToMaskBuilderIdentity[$permission];
+            if ($maskBuilder->hasMask('MASK_SHARE_SYSTEM')) {
+                $maskBuilder->remove('SHARE_SYSTEM');
+            }
+
+            return $maskBuilder->get();
         }
 
-        $identity = $this->permissionToMaskBuilderIdentity[$permission];
-        if ($metadata->isOrganizationOwned()) {
+        if ($metadata->isGlobalLevelOwned()) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL');
-        } elseif ($metadata->isBusinessUnitOwned()) {
+        } elseif ($metadata->isLocalLevelOwned()) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL')
                 | $this->getMaskBuilderConst($identity, 'GROUP_DEEP')
                 | $this->getMaskBuilderConst($identity, 'GROUP_LOCAL');
-        } elseif ($metadata->isUserOwned()) {
+        } elseif ($metadata->isBasicLevelOwned()) {
             return
                 $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
                 | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL')
@@ -671,7 +657,7 @@ class EntityAclExtension extends AbstractAclExtension
                 | $this->getMaskBuilderConst($identity, 'GROUP_BASIC');
         }
 
-        return $this->permissionToMaskBuilderIdentity[$permission];
+        return $this->getIdentityForPermission($permission);
     }
 
     /**
@@ -679,7 +665,7 @@ class EntityAclExtension extends AbstractAclExtension
      *
      * @param mixed $object
      *
-     * @return OwnershipMetadata
+     * @return OwnershipMetadataInterface
      */
     protected function getMetadata($object)
     {
@@ -698,10 +684,10 @@ class EntityAclExtension extends AbstractAclExtension
         if ($object instanceof ObjectIdentity) {
             $className = $object->getType();
         } elseif (is_string($object)) {
-            $className = $id = null;
-            $this->parseDescriptor($object, $className, $id);
+            $className = $id = $group = null;
+            $this->parseDescriptor($object, $className, $id, $group);
         } else {
-            $className = ClassUtils::getClass($object);
+            $className = ClassUtils::getRealClass($object);
         }
 
         return $className;
@@ -717,8 +703,147 @@ class EntityAclExtension extends AbstractAclExtension
      */
     protected function getMaskBuilderConst($maskBuilderIdentity, $constName)
     {
-        $maskBuilderClassName = $this->maskBuilderClassNames[$maskBuilderIdentity];
+        $maskBuilder = new EntityMaskBuilder(
+            $maskBuilderIdentity,
+            $this->getPermissionsForIdentity($maskBuilderIdentity)
+        );
 
-        return $maskBuilderClassName::getConst($constName);
+        return $maskBuilder->getMask($constName);
+    }
+
+    /**
+     * Check organization. If user try to access entity what was created in organization this user do not have access -
+     *  deny access. We should check organization for all the entities what have ownership
+     *  (USER, BUSINESS_UNIT, ORGANIZATION ownership types)
+     *
+     * @param mixed $object
+     * @param OrganizationContextTokenInterface $securityToken
+     * @return bool
+     */
+    protected function isAccessDeniedByOrganizationContext($object, OrganizationContextTokenInterface $securityToken)
+    {
+        try {
+            // try to get entity organization value
+            $objectOrganization = $this->entityOwnerAccessor->getOrganization($object);
+
+            // check entity organization with current organization
+            if ($objectOrganization
+                && $objectOrganization->getId() !== $securityToken->getOrganizationContext()->getId()
+            ) {
+                return true;
+            }
+        } catch (InvalidEntityException $e) {
+            // in case if entity has no organization field (none ownership type)
+        }
+
+        return false;
+    }
+
+    protected function loadPermissions()
+    {
+        if (null !== $this->permissionToMaskBuilderIdentity && null !== $this->maskBuilderIdentityToPermissions) {
+            return;
+        }
+
+        $allPermissions = $this->permissionManager->getPermissionsMap();
+        $permissionChunks = array_chunk(array_keys($allPermissions), EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
+
+        foreach ($permissionChunks as $permissions) {
+            foreach ($permissions as $permission) {
+                $pk = $allPermissions[$permission];
+
+                $identity = $this->getIdentityForPrimaryKey($pk);
+                $number = $this->getPermissionNumber($pk);
+
+                $this->permissionToMaskBuilderIdentity[$permission] = $identity;
+                $this->maskBuilderIdentityToPermissions[$identity][$number] = $permission;
+            }
+        }
+    }
+
+    protected function buildPermissionsMap()
+    {
+        if ($this->map !== null) {
+            return;
+        }
+
+        $this->map = [];
+
+        $permissions = array_keys($this->getPermissionsToIdentityMap());
+        foreach ($permissions as $permission) {
+            $maskBuilder = $this->getMaskBuilder($permission);
+            $masks = [];
+
+            foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
+                $masks[] = $maskBuilder->getMask(sprintf('MASK_%s_%s', $permission, $accessLevel));
+            }
+
+            $this->map[$permission] = $masks;
+        }
+    }
+
+    /**
+     * @param bool $byCurrentGroup
+     * @return array|int[]
+     */
+    protected function getPermissionsToIdentityMap($byCurrentGroup = false)
+    {
+        $this->loadPermissions();
+        $map = $this->permissionToMaskBuilderIdentity;
+
+        if ($byCurrentGroup) {
+            $permissions = $this->permissionManager->getPermissionsMap($this->groupProvider->getGroup());
+
+            $map = array_intersect_key($map, $permissions);
+        }
+
+        return $map;
+    }
+
+    /**
+     * @param int $pk
+     * @return int
+     */
+    protected function getIdentityForPrimaryKey($pk)
+    {
+        $identity = (int) (($pk - 1) / EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
+
+        return $identity << (count(AccessLevel::$allAccessLevelNames) * EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
+    }
+
+    /**
+     * @param string $permission
+     * @return int
+     */
+    protected function getIdentityForPermission($permission)
+    {
+        $identities = $this->getPermissionsToIdentityMap();
+
+        return $identities[$permission];
+    }
+
+    /**
+     * @param int $pk
+     * @return int
+     */
+    protected function getPermissionNumber($pk)
+    {
+        $map = range(0, EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK - 1);
+        array_unshift($map, array_pop($map));
+
+        return $map[$pk % EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK];
+    }
+
+    /**
+     * @param int|null $identity
+     * @return array
+     */
+    protected function getPermissionsForIdentity($identity = null)
+    {
+        $this->loadPermissions();
+
+        return $identity === null
+            ? $this->maskBuilderIdentityToPermissions
+            : $this->maskBuilderIdentityToPermissions[$identity];
     }
 }

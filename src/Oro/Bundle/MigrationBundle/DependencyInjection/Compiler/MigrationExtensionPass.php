@@ -43,6 +43,9 @@ class MigrationExtensionPass implements CompilerPassInterface
         $taggedServices = $container->findTaggedServiceIds(self::TAG);
         $extensions     = [];
         foreach ($taggedServices as $id => $tagAttributes) {
+            if ($container->hasDefinition($id)) {
+                $container->getDefinition($id)->setPublic(false);
+            }
             $priority = 0;
             $extensionName = null;
             foreach ($tagAttributes as $attributes) {

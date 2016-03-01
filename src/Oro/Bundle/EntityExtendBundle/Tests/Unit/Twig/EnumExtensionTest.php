@@ -92,6 +92,56 @@ class EnumExtensionTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testTransEnumWhenLabelIsZero()
+    {
+        $enumValueEntityClass = 'Test\EnumValue';
+
+        $values = [
+            new TestEnumValue('val1', '0')
+        ];
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->with($enumValueEntityClass)
+            ->will($this->returnValue($repo));
+        $repo->expects($this->once())
+            ->method('findAll')
+            ->will($this->returnValue($values));
+
+        $this->assertEquals(
+            '0',
+            $this->extension->transEnum('val1', $enumValueEntityClass)
+        );
+    }
+
+    public function testTransEnumWhenIdIsZero()
+    {
+        $enumValueEntityClass = 'Test\EnumValue';
+
+        $values = [
+            new TestEnumValue('0', 'Value 1')
+        ];
+
+        $repo = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrine->expects($this->once())
+            ->method('getRepository')
+            ->with($enumValueEntityClass)
+            ->will($this->returnValue($repo));
+        $repo->expects($this->once())
+            ->method('findAll')
+            ->will($this->returnValue($values));
+
+        $this->assertEquals(
+            'Value 1',
+            $this->extension->transEnum('0', $enumValueEntityClass)
+        );
+    }
+
     public function testSortEnum()
     {
         $enumValueEntityClass = 'Test\EnumValue';

@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\OrganizationBundle\Migrations\Schema\v1_2;
 
+use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Schema\Schema;
+use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\MigrationBundle\Migration\Migration;
+use Oro\Bundle\MigrationBundle\Migration\ParametrizedSqlMigrationQuery;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SecurityBundle\Migrations\Schema\UpdateOwnershipTypeQuery;
 
@@ -70,27 +73,40 @@ class OroOrganizationBundle implements Migration
 
         if ($schema->hasTable('oro_entity_config_index_value') && $schema->hasTable('oro_entity_config_field')) {
             $queries->addPostQuery(
-                'DELETE FROM oro_entity_config_index_value
-                 WHERE entity_id IS NULL AND field_id IN(
-                   SELECT oecf.id FROM oro_entity_config_field AS oecf
-                   WHERE
-                    (oecf.field_name = \'precision\' OR oecf.field_name = \'currency\')
-                    AND
-                    oecf.entity_id = (
-                      SELECT oec.id
-                      FROM oro_entity_config AS oec
-                      WHERE oec.class_name = \'Oro\\\\Bundle\\\\OrganizationBundle\\\\Entity\\\\Organization\'
-                    )
-                 );
-                 DELETE FROM oro_entity_config_field
-                   WHERE
-                    field_name IN (\'precision\', \'currency\')
-                    AND
-                    entity_id IN (
-                      SELECT id
-                      FROM oro_entity_config
-                      WHERE class_name = \'Oro\\\\Bundle\\\\OrganizationBundle\\\\Entity\\\\Organization\'
-                    )'
+                new ParametrizedSqlMigrationQuery(
+                    'DELETE FROM oro_entity_config_index_value '
+                    . 'WHERE entity_id IS NULL AND field_id IN ('
+                    . 'SELECT oecf.id FROM oro_entity_config_field AS oecf '
+                    . 'WHERE oecf.field_name IN (:field_names) '
+                    . 'AND oecf.entity_id = ('
+                    . 'SELECT oec.id FROM oro_entity_config AS oec WHERE oec.class_name = :class_name'
+                    . '))',
+                    [
+                        'field_names' => ['precision', 'currency'],
+                        'class_name'  => 'Oro\Bundle\OrganizationBundle\Entity\Organization',
+                    ],
+                    [
+                        'field_names' => Connection::PARAM_STR_ARRAY,
+                        'class_name'  => Type::STRING
+                    ]
+                )
+            );
+            $queries->addPostQuery(
+                new ParametrizedSqlMigrationQuery(
+                    'DELETE FROM oro_entity_config_field '
+                    . 'WHERE field_name IN (:field_names) '
+                    . 'AND entity_id IN ('
+                    . 'SELECT id FROM oro_entity_config WHERE class_name = :class_name'
+                    . ')',
+                    [
+                        'field_names' => ['precision', 'currency'],
+                        'class_name'  => 'Oro\Bundle\OrganizationBundle\Entity\Organization',
+                    ],
+                    [
+                        'field_names' => Connection::PARAM_STR_ARRAY,
+                        'class_name'  => Type::STRING
+                    ]
+                )
             );
         }
     }

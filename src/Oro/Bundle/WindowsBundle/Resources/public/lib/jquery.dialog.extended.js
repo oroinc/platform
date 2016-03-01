@@ -12,7 +12,7 @@
  *   jQuery UI Dialog 1.10.2
  *
  */
-define(['jquery', 'orotranslation/js/translator'], function ($, __) {
+define(['jquery', 'underscore', 'orotranslation/js/translator'], function ($, _, __) {
     'use strict';
     $.widget( "ui.dialog", $.ui.dialog, {
         version: "2.0.0",
@@ -83,7 +83,6 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
             this._initButtons();
             this._initializeContainer();
             this._initializeState(this.options.state);
-            this.adjustContentSize();
         },
 
         _destroy: function () {
@@ -306,6 +305,14 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
             return this;
         },
 
+        _size: function() {
+            var cssProperties = _.pick(this.options, ['width', 'height', 'minWidth']);
+            this.uiDialog.css(cssProperties);
+            if ( this.uiDialog.is( ":data(ui-resizable)" ) ) {
+                this.uiDialog.resizable( "option", "minHeight", this._minHeight() );
+            }
+        },
+
         _moveToVisible: function() {
             var $widget = this.widget();
             if ($widget.length > 0) {
@@ -314,17 +321,7 @@ define(['jquery', 'orotranslation/js/translator'], function ($, __) {
                     position: [offset.left, offset.top]
                 });
             }
-            this.adjustContentSize();
             return this;
-        },
-
-        adjustContentSize: function () {
-            var viewportHeight = $(window).height(),
-                dialogHeight = this.widget().outerHeight(),
-                widgetHeight = this.element.innerHeight(),
-                maxHeight = viewportHeight + widgetHeight - dialogHeight;
-            this.element.css('max-height', maxHeight);
-            this._position();
         },
 
         _getTitleBarHeight: function() {

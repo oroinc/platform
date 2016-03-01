@@ -1,25 +1,24 @@
-/*jshint browser:true*/
-/*jslint nomen: true*/
-/*global define, require*/
 define([
     'jquery',
     'underscore',
+    'orotranslation/js/translator',
+    'routing',
     'oroui/js/tools',
     'oroui/js/mediator',
     './map-filter-module-name',
     './collection-filters-manager'
-], function ($, _, tools,  mediator, mapFilterModuleName, FiltersManager) {
+], function($, _, __, routing, tools, mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
 
     var methods = {
         /**
          * Reads data from container, collects required modules and runs filters builder
          */
-        initBuilder: function () {
+        initBuilder: function() {
             var modules;
             _.defaults(this.metadata, {filters: {}});
             modules = methods.collectModules.call(this);
-            tools.loadModules(modules, function (modules) {
+            tools.loadModules(modules, function(modules) {
                 this.modules = modules;
                 methods.build.call(this);
             }, this);
@@ -28,30 +27,34 @@ define([
         /**
          * Collects required modules
          */
-        collectModules: function () {
+        collectModules: function() {
             var modules = {};
-            _.each(this.metadata.filters || {}, function (filter) {
+            _.each(this.metadata.filters || {}, function(filter) {
                 var type = filter.type;
                 modules[type] = mapFilterModuleName(type);
             });
             return modules;
         },
 
-        build: function () {
-            var options, filtersList;
+        build: function() {
             if (!this.collection || !this.modules) {
                 return;
             }
 
-            options = methods.combineOptions.call(this);
+            var filtersList;
+            var options = methods.combineOptions.call(this);
             options.collection = this.collection;
+            options.el = $('<div/>').prependTo(this.$el);
             filtersList = new FiltersManager(options);
-            this.$el.prepend(filtersList.render().$el);
+            filtersList.render();
             mediator.trigger('datagrid_filters:rendered', this.collection, this.$el);
             this.metadata.state.filters = this.metadata.state.filters || [];
             if (this.collection.length === 0 && this.metadata.state.filters.length === 0) {
                 filtersList.$el.hide();
             }
+
+            this.grid.filterManager = filtersList;
+            this.grid.trigger('filterManager:connected');
 
             this.deferred.resolve(filtersList);
         },
@@ -61,21 +64,60 @@ define([
          *
          * @returns {Object}
          */
-        combineOptions: function () {
-            var filters = {},
-                modules = this.modules,
-                collection = this.collection;
-            _.each(this.metadata.filters, function (options) {
+        combineOptions: function() {
+            var filters = {};
+            var modules = this.modules;
+            var collection = this.collection;
+            _.each(this.metadata.filters, function(options) {
                 if (_.has(options, 'name') && _.has(options, 'type')) {
                     // @TODO pass collection only for specific filters
                     if (options.type === 'selectrow') {
                         options.collection = collection;
                     }
+                    if (options.lazy) {
+                        options.loader = methods.createFilterLoader.call(this, options.name);
+                    }
                     var Filter = modules[options.type].extend(options);
                     filters[options.name] = new Filter();
                 }
+            }, this);
+            methods.loadFilters.call(this, this.metadata.options.gridName);
+
+            return {
+                filters: filters
+            };
+        },
+
+        loadFilters: function(gridName) {
+            var filterNames = _.map(this.filterLoaders, _.property('name'));
+            if (!filterNames.length) {
+                return;
+            }
+
+            var url = routing.generate('oro_datagrid_filter_metadata', {
+                gridName: gridName,
+                filterNames: _.map(this.filterLoaders, _.property('name'))
             });
-            return {filters: filters};
+
+            var self = this;
+            $.get(url)
+                .done(function(data) {
+                    _.each(self.filterLoaders, function(loader) {
+                        loader.success.call(this, data[loader.name]);
+                    });
+                })
+                .fail(function() {
+                    mediator.execute('showFlashMessage', 'error', __('oro.ui.unexpected_error'));
+                });
+        },
+
+        createFilterLoader: function(filterName) {
+            return _.bind(function(success) {
+                this.filterLoaders.push({
+                    name: filterName,
+                    success: success
+                });
+            }, this);
         }
     };
 
@@ -91,9 +133,10 @@ define([
          * @param {Object} [options.data] data for grid's collection
          * @param {Object} [options.metadata] configuration for the grid
          */
-        init: function (deferred, options) {
+        init: function(deferred, options) {
             var self;
             self = {
+                filterLoaders: [],
                 deferred: deferred,
                 $el: options.$el,
                 gridName: options.gridName,
@@ -104,10 +147,11 @@ define([
 
             methods.initBuilder.call(self);
 
-            options.gridPromise.done(function (grid) {
+            options.gridPromise.done(function(grid) {
                 self.collection = grid.collection;
+                self.grid = grid;
                 methods.build.call(self);
-            }).fail(function () {
+            }).fail(function() {
                 deferred.reject();
             });
         }

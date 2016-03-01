@@ -5,8 +5,7 @@ namespace Oro\Bundle\DataAuditBundle\Migrations\Schema\v1_3;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Query\QueryBuilder;
 use Doctrine\DBAL\Types\Type;
-
-use LogicException;
+use Doctrine\DBAL\Types\ConversionException;
 
 use PDO;
 
@@ -14,6 +13,7 @@ use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ConnectionAwareInterface;
 use Oro\Bundle\MigrationBundle\Migration\MigrationQuery;
+use Oro\Bundle\DataAuditBundle\Model\AuditFieldTypeRegistry;
 
 class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 {
@@ -21,29 +21,6 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
 
     /** @var Connection */
     private $connection;
-
-    /** @var string[] */
-    protected static $typeMap = [
-        'boolean'   => 'boolean',
-        'text'      => 'text',
-        'string'    => 'text',
-        'guid'      => 'text',
-        'manyToOne' => 'text',
-        'enum'      => 'text',
-        'multiEnum' => 'text',
-        'ref-many'  => 'text',
-        'ref-one'   => 'text',
-        'smallint'  => 'integer',
-        'integer'   => 'integer',
-        'bigint'    => 'integer',
-        'decimal'   => 'float',
-        'float'     => 'float',
-        'money'     => 'float',
-        'percent'   => 'float',
-        'date'      =>  'date',
-        'time'      => 'time',
-        'datetime'  => 'datetime',
-    ];
 
     /**
      * {@inheritdoc}
@@ -88,18 +65,81 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
      */
     private function processRow(array $row)
     {
-        $fields = Type::getType(Type::TARRAY)
-            ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
-        foreach ($fields as $field => $values) {
-            $fieldType = $this->getFieldType($row['entity_id'], $field);
-            $dataType = $this->normalizeDataTypeName($fieldType);
+        $data = $row['data'];
 
-            $data = [
+        try {
+            $data = Type::getType(Type::TARRAY)
+                ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
+        } catch (ConversionException $ex) {
+        }
+
+        if (is_array($data)) {
+            $this->processArrayData($row, $data);
+        } else {
+            if (!is_scalar($data)) {
+                $data = serialize($data);
+            }
+            $this->processTextData($row, $data);
+        }
+    }
+
+    /**
+     * @param array $row
+     * @param string $data
+     */
+    private function processTextData(array $row, $data)
+    {
+        $dataType = AuditFieldTypeRegistry::getAuditType('text');
+
+        $dbData = [
+            'audit_id' => $row['id'],
+            'data_type' => $dataType,
+            'field' => '__unknown__',
+            sprintf('old_%s', $dataType) => $data,
+            sprintf('new_%s', $dataType) => $data,
+            'visible' => false,
+        ];
+
+        $types = [
+            'integer',
+            'string',
+            'string',
+            $dataType,
+            $dataType,
+            'boolean',
+        ];
+
+        $this->connection->insert('oro_audit_field', $dbData, $types);
+    }
+
+    /**
+     * @param array $row
+     * @param array $data
+     */
+    private function processArrayData(array $row, array $data)
+    {
+        foreach ($data as $field => $values) {
+            $visible = true;
+
+            $fieldType = $this->getFieldType($row['entity_id'], $field);
+            $dataType = null;
+            if (!AuditFieldTypeRegistry::hasType($fieldType)
+                || !array_key_exists('old', $values)
+                || !array_key_exists('new', $values)
+            ) {
+                $dataType = 'array';
+                $visible  = false;
+            } else {
+                $dataType = AuditFieldTypeRegistry::getAuditType($fieldType);
+            }
+
+            $dbData = [
                 'audit_id' => $row['id'],
                 'data_type' => $dataType,
                 'field' => $field,
-                sprintf('old_%s', $dataType) => $this->parseValue($values['old']),
-                sprintf('new_%s', $dataType) => $this->parseValue($values['new']),
+                sprintf('old_%s', $dataType) => $this->parseValue($values, 'old'),
+                sprintf('new_%s', $dataType) => $this->parseValue($values, 'new'),
+                'visible' => $visible,
             ];
 
             $types = [
@@ -107,21 +147,28 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
                 'string',
                 'string',
                 $dataType,
-                $dataType
+                $dataType,
+                'boolean',
             ];
 
-            $this->connection->insert('oro_audit_field', $data, $types);
+            $this->connection->insert('oro_audit_field', $dbData, $types);
         }
     }
 
     /**
-     * @param mixed $value
+     * @param mixed $values
+     * @param string $key
      *
      * @return mixed
      */
-    private function parseValue($value)
+    private function parseValue($values, $key)
     {
-        if (isset($value['value'])) {
+        if (!array_key_exists($key, $values)) {
+            return $values;
+        }
+
+        $value = $values[$key];
+        if (is_array($value) && array_key_exists('value', $value)) {
             return $value['value'];
         }
 
@@ -132,7 +179,7 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
      * @param int $entityId
      * @param string $field
      *
-     * @return string
+     * @return string|false
      */
     private function getFieldType($entityId, $field)
     {
@@ -169,19 +216,5 @@ class MigrateAuditFieldQuery implements MigrationQuery, ConnectionAwareInterface
             ->select('a.id AS id, a.data AS data, ec.id AS entity_id')
             ->from('oro_audit', 'a')
             ->join('a', 'oro_entity_config', 'ec', 'a.object_class = ec.class_name');
-    }
-
-    /**
-     * @param string $dataType
-     *
-     * @return string|null
-     */
-    private function normalizeDataTypeName($dataType)
-    {
-        if (isset(static::$typeMap[$dataType])) {
-            return static::$typeMap[$dataType];
-        }
-
-        throw new LogicException(sprintf('Cannot normalize type "%s".', $dataType));
     }
 }

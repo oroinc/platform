@@ -6,11 +6,12 @@
     "license": "MIT",
     "require": {
         "php": ">=5.4",
-        "symfony/symfony": "2.3.*",
+        "symfony/symfony": "2.7.*",
         "oro/config-bundle": "dev-master",
         "oro/migration-bundle": "dev-master",
         "hwi/oauth-bundle": "~0.3",
-        "oro/ui-bundle": "dev-master"
+        "oro/ui-bundle": "dev-master",
+        "oro/google-integration-bundle": "dev-master"
     },
     "autoload": {
         "psr-4": { "Oro\\Bundle\\SSOBundle": "" }

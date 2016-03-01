@@ -3,19 +3,19 @@
 namespace Oro\Bundle\WorkflowBundle\Datagrid;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class ActionPermissionProvider
 {
     /**
-     * @var ConfigProviderInterface
+     * @var ConfigProvider
      */
     protected $configProvider;
 
     /**
-     * @param ConfigProviderInterface $configProvider
+     * @param ConfigProvider $configProvider
      */
-    public function __construct(ConfigProviderInterface $configProvider)
+    public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;
     }

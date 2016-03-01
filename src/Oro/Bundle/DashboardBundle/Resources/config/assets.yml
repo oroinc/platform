@@ -1,3 +1,3 @@
 css:
     'orodashboard':
-        - 'bundles/orodashboard/css/less/dashboard.less'
+        - 'bundles/orodashboard/css/less/main.less'

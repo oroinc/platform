@@ -59,7 +59,7 @@ class EmailRecipient
      * @var Email
      *
      * @ORM\ManyToOne(targetEntity="Email", inversedBy="recipients")
-     * @ORM\JoinColumn(name="email_id", referencedColumnName="id")
+     * @ORM\JoinColumn(name="email_id", referencedColumnName="id", onDelete="CASCADE")
      * @JMS\Exclude
      */
     protected $email;
@@ -164,5 +164,13 @@ class EmailRecipient
         $this->email = $email;
 
         return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function __toString()
+    {
+        return (string)$this->getName();
     }
 }

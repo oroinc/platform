@@ -1,7 +1,6 @@
-/*global define*/
 define([
     './string-cell'
-], function (StringCell) {
+], function(StringCell) {
     'use strict';
 
     var TimeCell;

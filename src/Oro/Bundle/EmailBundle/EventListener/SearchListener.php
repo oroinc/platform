@@ -33,7 +33,7 @@ class SearchListener
                     $organizationsId[] = $owner->getOrganization()->getId();
                 }
             }
-            if (!isset ($data['integer'])) {
+            if (!isset($data['integer'])) {
                 $data['integer'] = [];
             }
             if (!empty($organizationsId)) {

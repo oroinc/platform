@@ -1,8 +1,6 @@
-/*jslint nomen: true*/
-/*global define*/
 define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/views/base/view',
     'oroui/js/tools/color-util', 'jquery.simplecolorpicker', 'jquery.minicolors'
-    ], function ($, _, __, BaseView, colorUtil) {
+    ], function($, _, __, BaseView, colorUtil) {
     'use strict';
 
     var BaseSimpleColorPickerView = BaseView.extend({
@@ -21,7 +19,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          * @constructor
          * @param {Object} options
          */
-        initialize: function (options) {
+        initialize: function(options) {
             this._processOptions(options);
             this.pickerActionsTemplate = _.template(options.pickerActionsTemplate);
             this.$parent = this.$el.parent();
@@ -39,14 +37,14 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          * @param {Object} options
          * @private
          */
-        _processOptions: function (options) {
+        _processOptions: function(options) {
             _.defaults(options, this.defaults);
         },
 
         /**
          * @inheritDoc
          */
-        dispose: function () {
+        dispose: function() {
             if (!this.disposed) {
                 if (this.$el && this.$el.data('simplecolorpicker')) {
                     this.$el.simplecolorpicker('destroy');
@@ -64,11 +62,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
             BaseSimpleColorPickerView.__super__.dispose.call(this);
         },
 
-        enable: function () {
+        enable: function() {
             this.$el.simplecolorpicker('enable');
         },
 
-        disable: function () {
+        disable: function() {
             this.$el.simplecolorpicker('enable', false);
         },
 
@@ -77,7 +75,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          * @returns {Object}
          * @private
          */
-        _getSimpleColorPickerOptions: function (options) {
+        _getSimpleColorPickerOptions: function(options) {
             return _.omit(options, ['el', 'pickerActionsTemplate']);
         },
 
@@ -86,19 +84,19 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          * @returns {Object}
          * @private
          */
-        _getPickerOptions: function (options) {
+        _getPickerOptions: function(options) {
             return _.defaults(options, {
                 control: 'wheel',
                 letterCase: 'uppercase',
                 defaultValue: this.$picker.data('color') || '#FFFFFF',
-                change: _.bind(function (hex, opacity) {
+                change: _.bind(function(hex, opacity) {
                     if (this.$current) {
                         this.$current.data('color', hex);
                         this.$current.css('color', colorUtil.getContrastColor(hex));
                         this.$el.val(hex);
                     }
                 }, this),
-                hide: _.bind(function () {
+                hide: _.bind(function() {
                     if (this.$current) {
                         delete this.$current;
                     }
@@ -110,23 +108,23 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          * @private
          * @abstract
          */
-        _getPicker: function () {
+        _getPicker: function() {
             throw new Error('Method _getPicker is abstract and must be implemented');
         },
 
         /**
          * @private
          */
-        _preparePicker: function () {
+        _preparePicker: function() {
             this.$picker.siblings('.minicolors').css({'position': 'static', 'display': 'block'});
         },
 
         /**
          * @private
          */
-        _addPickerActions: function () {
+        _addPickerActions: function() {
             this.$picker.parent().find('.minicolors-panel').append(this.pickerActionsTemplate({__: __}));
-            this.$parent.on('click.' + this.cid, 'button[data-action=cancel]', _.bind(function (e) {
+            this.$parent.on('click.' + this.cid, 'button[data-action=cancel]', _.bind(function(e) {
                 e.preventDefault();
                 this.$picker.minicolors('hide');
             }, this));
@@ -135,13 +133,13 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
         /**
          * @private
          */
-        _addPickerHandlers: function () {
-            this.$parent.on('click.' + this.cid, 'span.color', _.bind(function (e) {
+        _addPickerHandlers: function() {
+            this.$parent.on('click.' + this.cid, 'span.color', _.bind(function(e) {
                 if (!this.$el.is(':disabled')) {
                     this.$current = $(e.currentTarget);
                 }
             }, this));
-            this.$picker.on('click.' + this.cid, _.bind(function (e) {
+            this.$picker.on('click.' + this.cid, _.bind(function(e) {
                 if (!this.$el.is(':disabled')) {
                     this.$picker.parent().find('.minicolors-panel').css(this._getPickerPos(this.$picker));
                     this.$picker.minicolors('show');
@@ -149,10 +147,11 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
             }, this));
             // stop propagation of some events to avoid showing a minicolors picker before a user clicks on a swatch
             // it is required because we need to set a picker position before show it
-            this.$picker.on('mousedown.' + this.cid + ' touchstart.' + this.cid + ' focus.' + this.cid, _.bind(function (e) {
-                e.preventDefault();
-                e.stopPropagation();
-            }, this));
+            this.$picker.on('mousedown.' + this.cid + ' touchstart.' + this.cid + ' focus.' + this.cid,
+                _.bind(function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+                }, this));
         },
 
         /**
@@ -160,15 +159,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/app/vi
          * @returns {{left: int, top: int}}
          * @private
          */
-        _getPickerPos: function ($swatch) {
-            var $panel = this.$picker.parent().find('.minicolors-panel'),
-                pos = $swatch.position(),
-                x = pos.left + $swatch.offsetParent().scrollLeft() + 5,
-                y = pos.top + $swatch.offsetParent().scrollTop() + $swatch.outerHeight() + 3,
-                w = $panel.outerWidth(),
-                h = $panel.outerHeight() + 39,
-                width = $swatch.offsetParent().width(),
-                height = $swatch.offsetParent().height();
+        _getPickerPos: function($swatch) {
+            var $panel = this.$picker.parent().find('.minicolors-panel');
+            var pos = $swatch.position();
+            var x = pos.left + $swatch.offsetParent().scrollLeft() + 5;
+            var y = pos.top + $swatch.offsetParent().scrollTop() + $swatch.outerHeight() + 3;
+            var w = $panel.outerWidth();
+            var h = $panel.outerHeight() + 39;
+            var width = $swatch.offsetParent().width();
+            var height = $swatch.offsetParent().height();
             if (x > width - w) {
                 x -= w;
             }

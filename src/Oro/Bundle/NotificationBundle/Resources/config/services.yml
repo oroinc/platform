@@ -110,7 +110,7 @@ services:
             - @doctrine.orm.entity_manager
 
     # Event listeners
-    oro_notification.docrine.event.listener:
+    oro_notification.doctrine.event.listener:
         class: %oro_notification.doctrine_listener.class%
         arguments:
             - @oro_notification.entity_spool

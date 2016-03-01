@@ -8,30 +8,24 @@ use Oro\Bundle\TestFrameworkBundle\Pages\AbstractPageFilteredGrid;
  * Class Groups
  *
  * @package Oro\Bundle\UserBundle\Tests\Selenium\Pages
- * @method Groups openGroups() openGroups(string)
+ * @method Groups openGroups(string $bundlePath)
+ * @method Group add()
+ * @method Group open(array $filter)
  * {@inheritdoc}
  */
 class Groups extends AbstractPageFilteredGrid
 {
+    const NEW_ENTITY_BUTTON = "//a[@title='Create Group']";
     const URL = 'user/group';
 
-    public function __construct($testCase, $redirect = true)
-    {
-        $this->redirectUrl = self::URL;
-        parent::__construct($testCase, $redirect);
 
-    }
-
-    public function add()
+    public function entityNew()
     {
-        $this->test->byXpath("//a[@title = 'Create Group']")->click();
-        $this->waitPageToLoad();
-        $this->waitForAjax();
         return new Group($this->test);
     }
 
-    public function open($entityData = array())
+    public function entityView()
     {
-        return;
+        return new Group($this->test);
     }
 }

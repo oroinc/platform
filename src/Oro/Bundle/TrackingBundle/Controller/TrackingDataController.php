@@ -29,7 +29,7 @@ class TrackingDataController extends Controller
             ProcessorRegistry::TYPE_IMPORT,
             'import_request_to_database',
             [
-                'import' => [
+                ProcessorRegistry::TYPE_IMPORT => [
                     'entityName'     => $this->container->getParameter('oro_tracking.tracking_data.class'),
                     'processorAlias' => 'oro_tracking.processor.data',
                     'data'           => $request->query->all(),
@@ -44,7 +44,8 @@ class TrackingDataController extends Controller
             $response['errors'] = $jobResult->getFailureExceptions();
         }
 
-        if ($validationErrors = $jobResult->getContext()->getErrors()) {
+        $validationErrors = $jobResult->getContext()->getErrors();
+        if ($validationErrors) {
             $isSuccessful = false;
 
             $response['validation'] = $validationErrors;

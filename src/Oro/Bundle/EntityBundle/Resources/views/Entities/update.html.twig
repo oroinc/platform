@@ -14,12 +14,23 @@
 {% set audit_title  = (entity_config.get('label')|trans)|default('N/A') %}
 
 {% block navButtons %}
-    {{ UI.cancelButton(path('oro_entity_index', {entityName: entity_name})) }}
-    {% if resource_granted('EDIT', 'entity:'~entity_class) %}
-        {% set html = UI.saveAndCloseButton() %}
-        {% set html = html ~ UI.saveAndStayButton() %}
-        {{ UI.dropdownSaveButton({'html': html}) }}
+    {% if entity.id and resource_granted('DELETE', entity) %}
+        {{ UI.deleteButton({
+            'dataUrl': path('oro_entity_delete', {'entityName': entity_class, 'id': entity.id}),
+            'dataRedirect': path('oro_entity_index', {'entityName': entity_class}),
+            'aCss': 'no-hash remove-button',
+            'dataId': entity.id,
+            'id': 'btn-remove-account',
+            'entity_label': entity_config.get('label')|default('N/A')|trans
+        }) }}
+        {{ UI.buttonSeparator() }}
     {% endif %}
+    {{ UI.cancelButton(path('oro_entity_index', {entityName: entity_name})) }}
+    {% set html = UI.saveAndCloseButton() %}
+    {% if entity.id or resource_granted('EDIT', 'entity:'~entity_class) %}
+        {% set html = html ~ UI.saveAndStayButton() %}
+    {% endif %}
+    {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock navButtons %}
 
 {% block pageHeader %}

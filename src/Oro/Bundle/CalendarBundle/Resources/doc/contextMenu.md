@@ -68,7 +68,7 @@ In JavaScript module developer can use default method **execute**. This method w
 ``` js
 ...
 execute: function (model, actionSyncObject) {
-    var removingMsg = messenger.notificationMessage('warning', __('Removing the calendar, please wait ...')),
+    var removingMsg = messenger.notificationMessage('warning', __('oro.calendar.flash_message.calendar_removing')),
         $connection = this.connectionsView.findItem(model);
     try {
         $connection.hide();
@@ -76,7 +76,7 @@ execute: function (model, actionSyncObject) {
             wait: true,
             success: _.bind(function () {
                 removingMsg.close();
-                messenger.notificationFlashMessage('success', __('The calendar was removed.'));
+                messenger.notificationFlashMessage('success', __('oro.calendar.flash_message.calendar_removed'));
                 actionSyncObject.resolve();
             }, this),
             error: _.bind(function (model, response) {
