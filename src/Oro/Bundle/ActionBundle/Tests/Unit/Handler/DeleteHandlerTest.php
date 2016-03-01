@@ -3,10 +3,9 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Handler;
 
 use Oro\Bundle\ActionBundle\Handler\DeleteHandler;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SoapBundle\Handler\DeleteHandler as BaseDeleteHandler;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\SoapBundle\Handler\DeleteHandler as BaseDeleteHandler;
 
 class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -65,6 +64,6 @@ class DeleteHandlerTest extends \PHPUnit_Framework_TestCase
             ->method('handleDelete')
             ->with($id, $this->apiEntityManager);
 
-        $this->assertNull($this->handler->handleDelete($entity));
+        $this->handler->handleDelete($entity);
     }
 }
