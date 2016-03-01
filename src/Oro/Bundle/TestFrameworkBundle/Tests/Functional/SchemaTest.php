@@ -33,8 +33,9 @@ class SchemaTest extends WebTestCase
         /** @var EntityManager $em */
         foreach ($registry->getManagers() as $em) {
             $validator = new SchemaValidator($em);
-            $validateMapping = $validator->validateMapping();
-            $this->assertEmpty($validateMapping, implode("\n", $validateMapping));
+
+            $errors = call_user_func_array('array_merge', $validator->validateMapping());
+            $this->assertEmpty($errors, implode("\n", $errors));
         }
     }
 

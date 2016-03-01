@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\SearchBundle\Tests\Functional\EventListener;
 
+use Doctrine\ORM\EntityManagerInterface;
+
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Console\ConsoleEvents;
@@ -23,6 +25,13 @@ class UpdateSchemaDoctrineListenerTest extends WebTestCase
         }
     }
 
+    protected function tearDown()
+    {
+        $this->getContainer()->get('oro_search.fulltext_index_manager')->createIndexes();
+
+        parent::tearDown();
+    }
+
     /**
      * @dataProvider commandDataProvider
      * @param string $platform
@@ -32,8 +41,16 @@ class UpdateSchemaDoctrineListenerTest extends WebTestCase
      */
     public function testCommand($platform, $commandName, array $params, $expectedContent)
     {
-        if ($this->getContainer()->getParameter('database_driver') !== $platform) {
+        $databaseDriver = $this->getContainer()->getParameter('database_driver');
+        if ($databaseDriver !== $platform) {
             $this->markTestSkipped(sprintf('TestCase for %s only', $platform));
+        }
+
+        // emulate doctrine:schema:update drops index
+        if ($databaseDriver === DatabaseDriverInterface::DRIVER_MYSQL) {
+            /** @var EntityManagerInterface $em */
+            $em = $this->getContainer()->get('doctrine')->getManager('search');
+            $em->getConnection()->executeQuery('DROP INDEX value ON oro_search_index_text');
         }
 
         /** @var KernelInterface $kernel */
@@ -44,13 +61,16 @@ class UpdateSchemaDoctrineListenerTest extends WebTestCase
         $application->doRun(new ArrayInput(['help']), new BufferedOutput());
 
         $command = $application->find($commandName);
-        $bufferedOutput = new BufferedOutput();
+
+        $output = new BufferedOutput();
+        $input = new ArrayInput($params, $command->getDefinition());
+
         $this->getContainer()->get('event_dispatcher')->dispatch(
             ConsoleEvents::TERMINATE,
-            new ConsoleTerminateEvent($command, new ArrayInput($params), $bufferedOutput, 0)
+            new ConsoleTerminateEvent($command, $input, $output, 0)
         );
 
-        $this->assertEquals($expectedContent, $bufferedOutput->fetch());
+        $this->assertEquals($expectedContent, $output->fetch());
     }
 
     /**
@@ -63,7 +83,7 @@ class UpdateSchemaDoctrineListenerTest extends WebTestCase
                 'platform' => DatabaseDriverInterface::DRIVER_MYSQL,
                 'commandName' => 'doctrine:mapping:info',
                 'params' => [],
-                'expectedContent' => 'OK',
+                'expectedContent' => '',
             ],
             'otherCommand psql' => [
                 'platform' => DatabaseDriverInterface::DRIVER_POSTGRESQL,
@@ -75,7 +95,7 @@ class UpdateSchemaDoctrineListenerTest extends WebTestCase
                 'platform' => DatabaseDriverInterface::DRIVER_MYSQL,
                 'commandName' => 'doctrine:schema:update',
                 'params' => [],
-                'expectedContent' => 'Please run the operation by passing one - or both - of the following options:',
+                'expectedContent' => '',
             ],
             'commandWithoutOption psql' => [
                 'platform' => DatabaseDriverInterface::DRIVER_POSTGRESQL,
@@ -99,13 +119,13 @@ class UpdateSchemaDoctrineListenerTest extends WebTestCase
                 'platform' => DatabaseDriverInterface::DRIVER_MYSQL,
                 'commandName' => 'doctrine:schema:update',
                 'params' => ['--force' => true],
-                'expectedContent' => 'Schema update and create index completed.',
+                'expectedContent' => "Schema update and create index completed.\nIndexes were created.\n",
             ],
             'commandWithForceOption' => [
                 'platform' => DatabaseDriverInterface::DRIVER_POSTGRESQL,
                 'commandName' => 'doctrine:schema:update',
                 'params' => ['--force' => true],
-                'expectedContent' => '',
+                'expectedContent' => "Schema update and create index completed.\n",
             ],
         ];
     }

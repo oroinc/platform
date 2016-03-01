@@ -46,7 +46,7 @@ class UpdateSchemaDoctrineListener
                 $output = $event->getOutput();
                 $input  = $event->getInput();
 
-                if ($input->hasOption('force')) {
+                if ($input->getOption('force')) {
                     $result = $this->fulltextIndexManager->createIndexes();
 
                     $output->writeln('Schema update and create index completed.');

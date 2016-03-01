@@ -93,7 +93,7 @@ class UpdateSchemaDoctrineListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->input
             ->expects($this->once())
-            ->method('hasOption')
+            ->method('getOption')
             ->with('force')
             ->will($this->returnValue(false));
 
@@ -113,7 +113,7 @@ class UpdateSchemaDoctrineListenerTest extends \PHPUnit_Framework_TestCase
     {
         $this->input
             ->expects($this->once())
-            ->method('hasOption')
+            ->method('getOption')
             ->with('force')
             ->will($this->returnValue(true));
 
