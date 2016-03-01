@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
+use Doctrine\ORM\ORMException;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -54,12 +55,14 @@ class OrmRelatedTestCase extends OrmTestCase
             );
         $this->doctrine->expects($this->any())
             ->method('getAliasNamespace')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Test', 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity']
-                    ]
-                )
+            ->willReturnCallback(
+                function ($alias) {
+                    if ('Test' !== $alias) {
+                        throw ORMException::unknownEntityNamespace($alias);
+                    }
+
+                    return 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity';
+                }
             );
 
         $this->doctrineHelper = new DoctrineHelper($this->doctrine);

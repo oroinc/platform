@@ -33,13 +33,13 @@ class DoctrineHelperTest extends OrmRelatedTestCase
         $criteria = new Criteria(new EntityClassResolver($this->doctrine));
         $criteria
             ->addInnerJoin(
-                'user.category',
+                'category',
                 $this->getEntityClass('Category')
             )
-            ->setAlias('category');
+            ->setAlias('user_category');
         $criteria
             ->addLeftJoin(
-                'user.products',
+                'products',
                 $this->getEntityClass('Product'),
                 Join::WITH,
                 '{entity}.name IS NULL',
@@ -54,6 +54,14 @@ class DoctrineHelperTest extends OrmRelatedTestCase
                 '{entity}.name = {root}.name'
             )
             ->setAlias('product_owner');
+        $criteria
+            ->addLeftJoin(
+                'products.category',
+                '{products}.category',
+                Join::WITH,
+                '{entity}.name = {category}.name'
+            )
+            ->setAlias('product_category');
 
         $qb->expects($this->once())
             ->method('getRootAliases')
@@ -61,13 +69,40 @@ class DoctrineHelperTest extends OrmRelatedTestCase
 
         $qb->expects($this->at(1))
             ->method('innerJoin')
-            ->with($this->getEntityClass('Category'), 'category', null, null, null);
+            ->with(
+                $this->getEntityClass('Category'),
+                'user_category',
+                null,
+                null,
+                null
+            );
         $qb->expects($this->at(2))
             ->method('leftJoin')
-            ->with($this->getEntityClass('Product'), 'products', Join::WITH, 'products.name IS NULL', 'idx_name');
+            ->with(
+                $this->getEntityClass('Product'),
+                'products',
+                Join::WITH,
+                'products.name IS NULL',
+                'idx_name'
+            );
         $qb->expects($this->at(3))
             ->method('leftJoin')
-            ->with($this->getEntityClass('User'), 'product_owner', Join::WITH, 'product_owner.name = user.name', null);
+            ->with(
+                $this->getEntityClass('User'),
+                'product_owner',
+                Join::WITH,
+                'product_owner.name = user.name',
+                null
+            );
+        $qb->expects($this->at(4))
+            ->method('leftJoin')
+            ->with(
+                'products.category',
+                'product_category',
+                Join::WITH,
+                'product_category.name = user_category.name',
+                null
+            );
 
         $qb->expects($this->once())
             ->method('addCriteria')
