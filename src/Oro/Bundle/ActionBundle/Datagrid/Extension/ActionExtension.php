@@ -143,7 +143,7 @@ class ActionExtension extends AbstractExtension
         foreach ($this->actions as $action) {
             $actionName = strtolower($action->getName());
             if (!array_key_exists($actionName, $actionsConfig)) {
-                $actionsConfig[$action->getName()] = $this->getRowsActionsConfig($action);
+                $actionsConfig[$actionName] = $this->getRowsActionsConfig($action);
             }
         }
 
