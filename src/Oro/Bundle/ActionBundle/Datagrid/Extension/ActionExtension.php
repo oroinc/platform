@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Datagrid\Extension;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -67,8 +68,9 @@ class ActionExtension extends AbstractExtension
 
         $this->processActionsConfig($config);
         $this->processMassActionsConfig($config);
+
         $this->actionConfiguration = $config->offsetGetOr(DatagridActionExtension::ACTION_CONFIGURATION_KEY, []);
-        $config->offsetSet(DatagridActionExtension::ACTION_CONFIGURATION_KEY, [$this, 'getActionsPermissions']);
+        $config->offsetSet(DatagridActionExtension::ACTION_CONFIGURATION_KEY, [$this, 'getRowConfiguration']);
 
         return true;
     }
@@ -78,26 +80,57 @@ class ActionExtension extends AbstractExtension
      *
      * @return array
      */
-    public function getActionsPermissions(ResultRecordInterface $record)
+    public function getRowConfiguration(ResultRecordInterface $record)
     {
-        $actionsOld = [];
-        // process own permissions of the datagrid
-        if ($this->actionConfiguration && is_callable($this->actionConfiguration)) {
-            $actionsOld = call_user_func($this->actionConfiguration, $record);
-            $actionsOld = is_array($actionsOld) ? $actionsOld : [];
-        };
-
         $actionData = $this->contextHelper->getActionData([
             'entityId' => $record->getValue('id'),
             'entityClass' => $this->datagridContext['entityClass'],
+            'datagrid' => $this->datagridContext['datagrid'],
         ]);
 
         $actionsNew = [];
         foreach ($this->actions as $action) {
-            $actionsNew[$action->getName()] = $action->isAvailable($actionData);
+            $actionsNew[$action->getName()] = $this->getRowActionsConfig($action, $actionData);
         }
 
-        return array_merge($actionsOld, $actionsNew);
+        return array_merge($this->getParentRowConfiguration($record), $actionsNew);
+    }
+
+    /**
+     * @param ResultRecordInterface $record
+     * @return array
+     */
+    protected function getParentRowConfiguration(ResultRecordInterface $record)
+    {
+        if (empty($this->actionConfiguration)) {
+            return [];
+        }
+
+        $rowActions = [];
+
+        if (is_callable($this->actionConfiguration)) {
+            $rowActions = call_user_func($this->actionConfiguration, $record);
+        } elseif (is_array($this->actionConfiguration)) {
+            $rowActions = $this->actionConfiguration;
+        }
+
+        return is_array($rowActions) ? $rowActions : [];
+    }
+
+    /**
+     * @param Action $action
+     * @param ActionData $actionData
+     * @return bool|array
+     */
+    protected function getRowActionsConfig(Action $action, ActionData $actionData)
+    {
+        if (!$action->isAvailable($actionData)) {
+            return false;
+        }
+
+        return [
+            'translates' => $actionData->getScalarValues(),
+        ];
     }
 
     /**
@@ -108,7 +141,7 @@ class ActionExtension extends AbstractExtension
         $actionsConfig = $config->offsetGetOr('actions', []);
 
         foreach ($this->actions as $action) {
-            if (!array_key_exists($action->getName(), $actionsConfig)) {
+            if (!array_key_exists(strtolower($action->getName()), $actionsConfig)) {
                 $buttonOptions = $action->getDefinition()->getButtonOptions();
                 $frontendOptions = $action->getDefinition()->getFrontendOptions();
                 $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
@@ -134,7 +167,6 @@ class ActionExtension extends AbstractExtension
                     ]
                 ];
             }
-
         }
 
         $config->offsetSet('actions', $actionsConfig);
