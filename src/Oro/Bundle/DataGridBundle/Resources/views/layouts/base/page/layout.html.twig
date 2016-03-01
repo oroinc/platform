@@ -58,7 +58,7 @@
 
 {% block _datagrid_toolbar_sorting_widget %}
     {% set attr = attr|merge({
-    class: attr.class|default('') ~ " sorting pull-left form-horizontal"
+        class: attr.class|default('') ~ " sorting pull-left form-horizontal"
     }) %}
     <div{{ block('block_attributes') }}></div>
 {% endblock %}
