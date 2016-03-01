@@ -78,6 +78,9 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
                     ->prototype('scalar')
                     ->end()
                 ->end()
+                ->booleanNode('for_all_datagrids')
+                    ->defaultFalse()
+                ->end()
                 ->arrayNode('datagrids')
                     ->prototype('scalar')
                     ->end()
@@ -218,7 +221,14 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
         $node
             ->addDefaultsIfNotSet()
             ->children()
-                ->scalarNode('confirmation')->end()
+                ->variableNode('confirmation')
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(function ($value) {
+                            return !empty($value) ? ['message' => $value] : [];
+                        })
+                    ->end()
+                ->end()
                 ->arrayNode('options')
                     ->prototype('variable')
                     ->end()
@@ -264,7 +274,7 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
 
         return $node;
     }
-    
+
     /**
      * @return NodeDefinition
      */

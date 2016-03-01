@@ -12,6 +12,7 @@ use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
 
 class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -38,7 +39,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $contextHelper->expects($this->any())
             ->method('getActionData')
-            ->willReturn(new ActionData(['data' => ['param']]));
+            ->willReturn(new ActionData(['data' => ['param'], 'key1' => 'value1', 'key2' => 2]));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper $applicationHelper */
         $applicationHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
@@ -105,21 +106,33 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param DatagridConfiguration $datagridConfig
      * @param ResultRecord $record
      * @param $actions
      * @param array $expectedActions
+     * @param array $context
+     * @param array $groups
      *
-     * @dataProvider getActionsPermissionsProvider
+     * @dataProvider getRowConfigurationProvider
      */
-    public function testGetActionsPermissions(ResultRecord $record, $actions, array $expectedActions)
-    {
+    public function testGetRowConfiguration(
+        DatagridConfiguration $datagridConfig,
+        ResultRecord $record,
+        $actions,
+        array $groups = null,
+        array $expectedActions
+    ) {
         $this->manager->expects($this->any())
             ->method('getActions')
             ->willReturn($actions);
 
-        $this->extension->isApplicable(DatagridConfiguration::create(['name' => 'datagrid_name']));
+        if (null !== $groups) {
+            $this->extension->setActionGroups($groups);
+        }
 
-        $this->assertEquals($expectedActions, $this->extension->getActionsPermissions($record));
+        $this->extension->isApplicable($datagridConfig);
+
+        $this->assertEquals($expectedActions, $this->extension->getRowConfiguration($record));
     }
 
     /**
@@ -143,9 +156,18 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
+        $action3 = $this->createAction(
+            'action3',
+            true,
+            [
+                'getName' => 'action3',
+                'getLabel' => 'Action 3 label'
+            ]
+        );
+
         return [
             'applicable with provider' => [
-                'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => [$action1],
                 'expected' => true,
                 'expectedConfiguration' => [
@@ -153,15 +175,34 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             'applicable with single mass action' => [
-                'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => [$action2],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_action' => ['label' => 'test_mass_action_label']]
                 ]
             ],
+            'applicable with single action' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
+                'actions' => [$action3],
+                'expected' => true,
+                'expectedConfiguration' => [
+                    'actions' => ['action3' => $this->getRowActionConfig('action3', 'datagrid1', 'Action 3 label')],
+                ]
+            ],
+            'should not replace existing default action' => [
+                'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
+                'actions' => [$action3, $action2],
+                'expected' => true,
+                'expectedConfiguration' => [
+                    'actions' => [
+                        'action3' => ['label' => 'default action3'],
+                        'test_action' => $this->getRowActionConfig('test_action'),
+                    ]
+                ]
+            ],
             'not applicable' => [
-                'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
+                'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
                 'actions' => [],
                 'expected' => false
             ]
@@ -171,7 +212,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function getActionsPermissionsProvider()
+    public function getRowConfigurationProvider()
     {
         $actionAllowed1 = $this->createAction('action1', true);
         $actionAllowed2 = $this->createAction('action2', true);
@@ -179,20 +220,107 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         return [
             'no actions' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 1]),
                 'actions' => [],
                 'expectedActions' => [],
+                'groups' => null,
+            ],
+            'no actions and group1' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
+                'record' => new ResultRecord(['id' => 1]),
+                'actions' => [],
+                'expectedActions' => [],
+                'groups' => ['group1'],
             ],
             '2 allowed actions' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 2]),
                 'actions' => [$actionAllowed1, $actionAllowed2],
-                'expectedActions' => ['action1' => true, 'action2' => true],
+                'groups' => null,
+                'expectedActions' => [
+                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action2' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                ],
             ],
             '1 allowed action' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 3]),
                 'actions' => [$actionAllowed1, $actionNotAllowed],
-                'expectedActions' => ['action1' => true, 'action3' => false],
+                'groups' => null,
+                'expectedActions' => [
+                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action3' => false
+                ],
             ],
+            '1 allowed action and array parent config' => [
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid_name',
+                    DatagridActionExtension::ACTION_CONFIGURATION_KEY => [
+                        'view' => ['key1' => 'value1'],
+                        'update' => false,
+                    ],
+                ]),
+                'record' => new ResultRecord(['id' => 4]),
+                'actions' => [$actionAllowed1, $actionNotAllowed],
+                'groups' => null,
+                'expectedActions' => [
+                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action3' => false,
+                    'view' => ['key1' => 'value1'],
+                    'update' => false,
+                ],
+            ],
+            '1 allowed action and callable parent config' => [
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid_name',
+                    DatagridActionExtension::ACTION_CONFIGURATION_KEY => function () {
+                        return [
+                            'view' => ['key2' => 'value2'],
+                            'update' => true,
+                        ];
+                    },
+                ]),
+                'record' => new ResultRecord(['id' => 4]),
+                'actions' => [$actionAllowed1, $actionNotAllowed],
+                'groups' => null,
+                'expectedActions' => [
+                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action3' => false,
+                    'view' => ['key2' => 'value2'],
+                    'update' => true,
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @param string $action
+     * @param string $datagrid
+     * @param string $label
+     * @return array
+     */
+    protected function getRowActionConfig($action, $datagrid = null, $label = null)
+    {
+        return [
+            'type' => 'action-widget',
+            'label' => $label,
+            'rowAction' => false,
+            'link' => '#',
+            'icon' => 'edit',
+            'options' => [
+                'actionName' => $action,
+                'entityClass' => null,
+                'datagrid' => $datagrid,
+                'confirmation' => '',
+                'showDialog' => null,
+                'executionRoute' => null,
+                'dialogRoute' => null,
+                'dialogOptions' => [
+                    'title' => $label,
+                    'dialogOptions' => []
+                ]
+            ]
         ];
     }
 

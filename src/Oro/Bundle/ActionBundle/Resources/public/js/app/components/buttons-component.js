@@ -50,10 +50,12 @@ define(function(require) {
                     dialogOptions: $element.data('dialog-options'),
                     redirectUrl: $element.data('page-url'),
                     url: $element.attr('href'),
-                    confirmation: Boolean($element.data('confirmation')),
+                    confirmation: !_.isEmpty($element.data('confirmation')),
                     messages: {
-                        confirm_content: $element.data('confirmation')
-                    }
+                        confirm_title: $element.data('confirmation').title,
+                        confirm_content: $element.data('confirmation').message
+                    },
+                    translates: $element.data('translates') || {}
                 };
 
                 $element.data('action-manager', new ActionManager(options));

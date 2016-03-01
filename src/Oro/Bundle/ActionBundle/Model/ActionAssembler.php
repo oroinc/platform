@@ -89,6 +89,7 @@ class ActionAssembler extends AbstractAssembler
             ->setForAllEntities($this->getOption($options, 'for_all_entities', false))
             ->setEntities($this->filterEntities($this->getOption($options, 'entities', [])))
             ->setExcludeEntities($this->filterEntities($this->getOption($options, 'exclude_entities', [])))
+            ->setForAllDatagrids($this->getOption($options, 'for_all_datagrids', false))
             ->setDatagrids($this->getOption($options, 'datagrids', []))
             ->setRoutes($this->getOption($options, 'routes', []))
             ->setGroups($this->getOption($options, 'groups', []))

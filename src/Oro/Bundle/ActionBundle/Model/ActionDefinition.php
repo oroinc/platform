@@ -35,6 +35,9 @@ class ActionDefinition
     /** @var array */
     private $excludeEntities = [];
 
+    /** @var bool */
+    private $forAllDatagrids = false;
+
     /** @var array */
     private $datagrids = [];
 
@@ -219,6 +222,25 @@ class ActionDefinition
     public function setExcludeEntities(array $excludeEntities)
     {
         $this->excludeEntities = $excludeEntities;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForAllDatagrids()
+    {
+        return $this->forAllDatagrids;
+    }
+
+    /**
+     * @param bool $forAllDatagrids
+     * @return $this
+     */
+    public function setForAllDatagrids($forAllDatagrids)
+    {
+        $this->forAllDatagrids = $forAllDatagrids;
 
         return $this;
     }
