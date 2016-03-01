@@ -144,8 +144,11 @@ class ContextHelper
         $array = [];
         foreach ($properties as $property) {
             $array[$property] = $this->getPropertyAccessor()->getValue($context, sprintf('[%s]', $property));
+            if (is_array($array[$property])) {
+                ksort($array[$property]);
+            }
         }
-        array_multisort($array);
+        ksort($array);
 
         return md5(json_encode($array, JSON_NUMERIC_CHECK));
     }

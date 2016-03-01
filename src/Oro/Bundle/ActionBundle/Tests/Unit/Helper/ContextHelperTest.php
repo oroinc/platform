@@ -204,11 +204,11 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         $context1 = [
             'route' => 'test_route',
             'entityClass' => 'stdClass',
-            'entityId' => ['params' => ['id1' => '42', 'id2' => 100, 'id3' => 'test']]
+            'entityId' => ['id1' => '42', 'id2' => 100, 'id3' => 'test']
         ];
 
         $context2 = [
-            'entityId' => ['params' => ['id3' => 'test', 'id2' => '100', 'id1' => 42]],
+            'entityId' => ['id3' => 'test', 'id2' => '100', 'id1' => 42],
             'route' => 'test_route',
             'extra_parameter' => new \stdClass(),
             'entityClass' => 'stdClass'

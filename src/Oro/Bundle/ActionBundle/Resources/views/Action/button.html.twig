@@ -1,6 +1,8 @@
 {% set linkTitle = params.frontendOptions.title|default(params.label)|trans %}
 {% set linkLabel = params.label %}
 
+{% set translates = actionData.getScalarValues()|default({}) %}
+
 {% block button %}
     {% if onlyLink is not defined %}<div class="pull-left btn-group icons-holder">{% endif %}
         {% block link %}
@@ -19,7 +21,8 @@
                     data-dialog-url="{{ params.actionUrl }}"
                     data-dialog-options="{{ dialogOptions|json_encode }}"
                 {% endif %}
-                data-confirmation="{{ params.frontendOptions.confirmation|default('') }}"
+                data-translates="{{ translates|json_encode }}"
+                data-confirmation="{{ params.frontendOptions.confirmation|default({})|json_encode }}"
                 {% if params.buttonOptions.page_component_module is defined %}data-page-component-module={{ params.buttonOptions.page_component_module }}{% endif %}
                 {% if params.buttonOptions.page_component_options is defined %}data-page-component-options={{ params.buttonOptions.page_component_options|json_encode }}{% endif %}
                 {% if params.buttonOptions.data is defined %}

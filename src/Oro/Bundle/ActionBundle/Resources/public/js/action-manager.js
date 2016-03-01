@@ -30,7 +30,8 @@ define(function(require) {
             confirmation: false,
             showDialog: false,
             dialogOptions: {},
-            messages: {}
+            messages: {},
+            translates: {}
         },
 
         /**
@@ -161,18 +162,18 @@ define(function(require) {
          * @return {oroui.Modal}
          */
         showConfirmDialog: function(callback) {
-            var messages = _.extend(this.messages, this.options.messages);
+            var messages = _.defaults(this.options.messages, this.messages);
 
             if (!this.confirmModal) {
                 this.confirmModal = (new this.confirmModalConstructor({
-                    title: __(messages.confirm_title),
-                    content: __(messages.confirm_content),
-                    okText: __(messages.confirm_ok),
-                    cancelText: __(messages.confirm_cancel)
+                    title: __(messages.confirm_title, $.extend({}, this.options.translates)),
+                    content: __(messages.confirm_content, $.extend({}, this.options.translates)),
+                    okText: __(messages.confirm_ok, $.extend({}, this.options.translates)),
+                    cancelText: __(messages.confirm_cancel, $.extend({}, this.options.translates))
                 }));
                 Backbone.listenTo(this.confirmModal, 'ok', callback);
             } else {
-                this.confirmModal.setContent(__(messages.confirm_content));
+                this.confirmModal.setContent(__(messages.confirm_content, $.extend({}, this.options.translates)));
             }
 
             this.confirmModal.open();
