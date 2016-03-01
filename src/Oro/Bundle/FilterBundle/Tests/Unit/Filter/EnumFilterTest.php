@@ -27,7 +27,8 @@ class EnumFilterTest extends \PHPUnit_Framework_TestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary'
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
+                'options'                        => []
             ],
             'params',
             $this->filter
@@ -43,7 +44,8 @@ class EnumFilterTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'null_value'                     => ':empty:'
+                'null_value'                     => ':empty:',
+                'options'                        => []
             ],
             'params',
             $this->filter
