@@ -11,9 +11,12 @@ use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\SecurityBundle\Acl\Persistence\AclManager;
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadRolesData;
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 
-class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareInterface, DependentFixtureInterface
+class UpdateEmailEditAclRule extends AbstractFixture implements
+    ContainerAwareInterface,
+    DependentFixtureInterface,
+    VersionedFixtureInterface
 {
     /**
      * @var ContainerInterface
@@ -31,6 +34,14 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
     public function getDependencies()
     {
         return ['Oro\Bundle\SecurityBundle\Migrations\Data\ORM\LoadAclRoles'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getVersion()
+    {
+        return '1.1';
     }
 
     /**
@@ -60,20 +71,31 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
     }
 
     /**
+     * Email permissions are added for all roles, as EmailUser is checked anyway by EmailVoter.
+     * In Order to remove this permission entirely, parent acl should be set (but it's not currently implemented).
+     * @link https://github.com/laboro/platform/pull/6833/files#r53224943
+     *
      * @param AclManager $manager
      */
     protected function updateUserRole(AclManager $manager)
     {
-        $role = $this->getRole(LoadRolesData::ROLE_ADMINISTRATOR);
-        if ($role) {
+        $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
+        $extension = $manager->getExtensionSelector()->select($oid);
+        $maskBuilders = $extension->getAllMaskBuilders();
+
+        $roles = $this->getRoles();
+        foreach ($roles as $role) {
             $sid = $manager->getSid($role);
 
-            $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
-            $maskBuilder = $manager->getMaskBuilder($oid)
-                ->add('VIEW_SYSTEM')
-                ->add('CREATE_SYSTEM')
-                ->add('EDIT_SYSTEM');
-            $manager->setPermission($sid, $oid, $maskBuilder->get());
+            foreach ($maskBuilders as $maskBuilder) {
+                foreach (['VIEW_SYSTEM', 'CREATE_SYSTEM', 'EDIT_SYSTEM'] as $permission) {
+                    if ($maskBuilder->hasMask('MASK_' . $permission)) {
+                        $maskBuilder->add($permission);
+                    }
+                }
+
+                $manager->setPermission($sid, $oid, $maskBuilder->get());
+            }
         }
     }
 
@@ -81,8 +103,8 @@ class UpdateEmailEditAclRule extends AbstractFixture implements ContainerAwareIn
      * @param string $roleName
      * @return Role|null
      */
-    protected function getRole($roleName)
+    protected function getRoles()
     {
-        return $this->objectManager->getRepository('OroUserBundle:Role')->findOneBy(['role' => $roleName]);
+        return $this->objectManager->getRepository('OroUserBundle:Role')->findAll();
     }
 }

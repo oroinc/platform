@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Filter;
 
 /**
- * Represents input option that is used to filter data requested by API.
+ * Represents input option that is used to filter data requested by Data API.
  */
 class FilterValue
 {

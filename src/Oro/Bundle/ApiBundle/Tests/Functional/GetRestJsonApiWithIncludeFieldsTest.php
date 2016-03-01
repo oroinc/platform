@@ -109,7 +109,7 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
                 'params'  => [
                     'include' => 'organization',
                     'fields'  => [
-                        'users' => 'username,firstName,lastName,email,organization',
+                        'users' => 'username,firstName,lastName,email,organization,owner,roles',
                         'owner' => 'name,phone,website,email,fax',
                         'organization' => 'enabled',
                         'roles' => 'name'

@@ -295,6 +295,7 @@ define([
         'oroform/js/validator/notnull',
         'oroform/js/validator/number',
         'oroform/js/validator/range',
+        'oroform/js/validator/open-range',
         'oroform/js/validator/regex',
         'oroform/js/validator/repeated',
         'oroform/js/validator/time',

@@ -7,7 +7,7 @@ use Symfony\Component\Routing\Route;
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 
-use Oro\Bundle\ApiBundle\Provider\PublicResourcesLoader;
+use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -27,7 +27,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var bool */
     protected $isApplicationInstalled;
 
-    /** @var PublicResourcesLoader */
+    /** @var ResourcesLoader */
     protected $resourcesLoader;
 
     /** @var EntityAliasResolver */
@@ -49,17 +49,17 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     private $supportedEntities;
 
     /**
-     * @param bool|string|null      $isApplicationInstalled
-     * @param PublicResourcesLoader $resourcesLoader
-     * @param EntityAliasResolver   $entityAliasResolver
-     * @param DoctrineHelper        $doctrineHelper
-     * @param ValueNormalizer       $valueNormalizer
-     * @param string                $formats
-     * @param string                $defaultFormat
+     * @param bool|string|null    $isApplicationInstalled
+     * @param ResourcesLoader     $resourcesLoader
+     * @param EntityAliasResolver $entityAliasResolver
+     * @param DoctrineHelper      $doctrineHelper
+     * @param ValueNormalizer     $valueNormalizer
+     * @param string              $formats
+     * @param string              $defaultFormat
      */
     public function __construct(
         $isApplicationInstalled,
-        PublicResourcesLoader $resourcesLoader,
+        ResourcesLoader $resourcesLoader,
         EntityAliasResolver $entityAliasResolver,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer,
