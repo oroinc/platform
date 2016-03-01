@@ -65,7 +65,7 @@ class BigNumberDateHelper
         $end = new \DateTime('last Saturday', new \DateTimeZone($this->localeSettings->getTimeZone()));
 
         $start = clone $end;
-        $start->modify('-7 days');
+        $start->modify('-6 days');
         $end->setTime(23, 59, 59);
 
         if ($weeksDiff) {
