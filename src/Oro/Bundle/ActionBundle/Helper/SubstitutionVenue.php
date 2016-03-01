@@ -114,6 +114,10 @@ class SubstitutionVenue
         return iterator_to_array(new \CallbackFilterIterator(new \ArrayIterator($array), $filter));
     }
 
+    /**
+     * @param string $name
+     * @return bool
+     */
     protected function isReplacement($name)
     {
         return in_array($name, $this->map, true);
