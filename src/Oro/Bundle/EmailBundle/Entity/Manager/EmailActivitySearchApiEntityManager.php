@@ -63,11 +63,10 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
     protected function prepareSearchEmailCriteria(SearchQueryBuilder $searchQueryBuilder, $emails = [])
     {
         $searchCriteria = $searchQueryBuilder->getCriteria();
-        foreach ($emails as $email) {
-            $searchCriteria->orWhere(
-                $searchCriteria->expr()->contains('email', $email)
-            );
-        }
+        $emailString = implode(' ', $emails);
+        $searchCriteria->andWhere(
+            $searchCriteria->expr()->contains('email', $emailString)
+        );
     }
 
     /**
