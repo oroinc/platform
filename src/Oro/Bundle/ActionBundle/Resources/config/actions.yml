@@ -3,24 +3,10 @@ actions:
         label: CRUD_ACTION
         groups:
             - navButtons
-        prefunctions:
-            - @call_service_method:
-                service: oro_action.helper.entity_config
-                method: getRoutes
-                method_parameters: [$.data, ['name', 'update', 'delete']]
-                attribute: $.routes
-            - @call_service_method:
-                service: oro_action.helper.entity_config
-                method: getConfigValue
-                method_parameters: [$.data, 'label']
-                attribute: $.entityLabel
-            - @trans:
-                id: $.entityLabel
-                attribute: $.translates[entityLabel]
         button_options:
             template: OroActionBundle:Action:crud-button.html.twig
 
-    EDIT:
+    UPDATE:
         extends: CRUD_ACTION
         acl_resource: [EDIT, $.data]
         order: 10
@@ -29,6 +15,12 @@ actions:
         groups:
             - view_navButtons
             - datagridRowAction
+        prefunctions:
+            - @call_service_method:
+                service: oro_entity_config.helper.entity_config
+                method: getRoutes
+                method_parameters: [$.data, ['update']]
+                attribute: $.routes
         preconditions:
             @and:
                 - @not_blank: $.routes[update]
@@ -52,41 +44,36 @@ actions:
             - view_navButtons
             - update_navButtons
             - datagridRowAction
+        prefunctions:
+            - @call_service_method:
+                service: oro_entity_config.helper.entity_config
+                method: getRoutes
+                method_parameters: [$.data, ['name', 'delete']]
+                attribute: $.routes
+            - @call_service_method:
+                service: oro_entity_config.helper.entity_config
+                method: getConfigValue
+                method_parameters: [$.data, 'label']
+                attribute: $.entityLabel
+            - @trans:
+                id: $.entityLabel
+                attribute: $.entityLabel
         preconditions:
             @and:
                 - @not_blank: $.routes[name]
                 - @not_blank: $.routes[delete]
         functions:
             - @call_service_method:
-                service: service_container
-                method: get
-                method_parameters: ['oro_action.api_manager']
-                attribute: $.api_manager
-            - @call_method:
-                object: $.api_manager
-                method: setClass
-                method_parameters:
-                    - $.context[entityClass]
-            - @call_service_method:
-                service: oro_soap.handler.delete
+                service: oro_action.handler.delete
                 method: handleDelete
-                method_parameters: [$id, $.api_manager]
+                method_parameters: [$.data]
 
             - @flash_message:
                 message: oro.action.delete_message
                 type: 'info'
                 message_parameters:
-                    entityLabel: $.translates[entityLabel]
-            - @tree:
-                conditions:
-                    @not_blank: $.context[datagrid]
-                actions:
-                    - @refresh_grid: $.context[datagrid]
-            - @tree:
-                conditions:
-                    @blank: $.context[datagrid]
-                actions:
-                    - @redirect: {route: $.routes[name]}
+                    entityLabel: $.entityLabel
+            - @redirect: {route: $.routes[name]}
         label: oro.action.delete
         frontend_options:
             title: oro.action.delete_entity

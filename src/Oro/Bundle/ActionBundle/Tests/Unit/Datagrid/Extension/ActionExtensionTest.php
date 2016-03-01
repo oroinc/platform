@@ -8,11 +8,11 @@ use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\ActionBundle\Model\ActionTranslates;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
 
 class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,11 +39,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $contextHelper->expects($this->any())
             ->method('getActionData')
-            ->willReturn(new ActionData([
-                'data' => ['param'],
-                'context' => [],
-                'translates' => new ActionTranslates()
-            ]));
+            ->willReturn(new ActionData(['data' => ['param'], 'key1' => 'value1', 'key2' => 2]));
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper $applicationHelper */
         $applicationHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
@@ -110,33 +106,29 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param DatagridConfiguration $datagridConfig
      * @param ResultRecord $record
      * @param $actions
      * @param array $expectedActions
      * @param array $context
      * @param array $groups
      *
-     * @dataProvider getActionsPermissionsProvider
+     * @dataProvider getRowConfigurationProvider
      */
-    public function testGetActionsPermissions(
+    public function testGetRowConfiguration(
+        DatagridConfiguration $datagridConfig,
         ResultRecord $record,
         $actions,
-        array $expectedActions,
-        array $context,
-        array $groups = null
+        array $expectedActions
     ) {
         $this->manager->expects($this->any())
             ->method('getActions')
             ->with($context, false)
             ->willReturn($actions);
 
-        if (null !== $groups) {
-            $this->extension->setActionGroups($groups);
-        }
+        $this->extension->isApplicable($datagridConfig);
 
-        $this->extension->isApplicable(DatagridConfiguration::create(['name' => 'datagrid_name']));
-
-        $this->assertEquals($expectedActions, $this->extension->getActionsPermissions($record));
+        $this->assertEquals($expectedActions, $this->extension->getRowConfiguration($record));
     }
 
     /**
@@ -188,7 +180,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function getActionsPermissionsProvider()
+    public function getRowConfigurationProvider()
     {
         $actionAllowed1 = $this->createAction('action1', true);
         $actionAllowed2 = $this->createAction('action2', true);
@@ -196,6 +188,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
         return [
             'no actions' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 1]),
                 'actions' => [],
                 'expectedActions' => [],
@@ -210,18 +203,58 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 'groups' => ['group1'],
             ],
             '2 allowed actions' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 2]),
                 'actions' => [$actionAllowed1, $actionAllowed2],
-                'expectedActions' => ['action1' => ['translates' => []], 'action2' => ['translates' => []]],
-                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
-                'groups' => null,
+                'expectedActions' => [
+                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action2' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                ],
             ],
             '1 allowed action' => [
+                'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 3]),
                 'actions' => [$actionAllowed1, $actionNotAllowed],
-                'expectedActions' => ['action1' => ['translates' => []], 'action3' => false],
-                'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
-                'groups' => null,
+                'expectedActions' => [
+                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action3' => false
+                ],
+            ],
+            '1 allowed action and array parent config' => [
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid_name',
+                    DatagridActionExtension::ACTION_CONFIGURATION_KEY => [
+                        'view' => ['key1' => 'value1'],
+                        'update' => false,
+                    ],
+                ]),
+                'record' => new ResultRecord(['id' => 4]),
+                'actions' => [$actionAllowed1, $actionNotAllowed],
+                'expectedActions' => [
+                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action3' => false,
+                    'view' => ['key1' => 'value1'],
+                    'update' => false,
+                ],
+            ],
+            '1 allowed action and callable parent config' => [
+                'config' => DatagridConfiguration::create([
+                    'name' => 'datagrid_name',
+                    DatagridActionExtension::ACTION_CONFIGURATION_KEY => function () {
+                        return [
+                            'view' => ['key2' => 'value2'],
+                            'update' => true,
+                        ];
+                    },
+                ]),
+                'record' => new ResultRecord(['id' => 4]),
+                'actions' => [$actionAllowed1, $actionNotAllowed],
+                'expectedActions' => [
+                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action3' => false,
+                    'view' => ['key2' => 'value2'],
+                    'update' => true,
+                ],
             ],
         ];
     }

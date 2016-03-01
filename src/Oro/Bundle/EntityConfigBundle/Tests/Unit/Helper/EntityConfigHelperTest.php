@@ -1,10 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
+namespace Oro\Bundle\EntityConfigBundle\Tests\Unit\Helper;
 
-use Oro\Bundle\ActionBundle\Helper\EntityConfigHelper;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -23,9 +21,6 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ConfigInterface */
     protected $config;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|AclGroupProviderInterface */
     protected $groupProvider;
@@ -48,13 +43,9 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->config = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->groupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
 
-        $this->helper = new EntityConfigHelper($this->configProvider, $this->doctrineHelper, $this->groupProvider);
+        $this->helper = new EntityConfigHelper($this->configProvider, $this->groupProvider);
     }
 
     /**
@@ -65,8 +56,8 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRoutes(array $inputData, array $expectedData)
     {
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')
+        $this->configProvider->expects($this->once())
+            ->method('getClassName')
             ->with($inputData['class'])
             ->willReturn($inputData['class']);
 
@@ -97,11 +88,6 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetConfigValue(array $inputData, $expectedData)
     {
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')
-            ->with($inputData['class'])
-            ->willReturn($inputData['class']);
-
         $this->configProvider->expects($this->once())
             ->method('getConfig')
             ->with($inputData['class'])
@@ -130,10 +116,10 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'auto generated routes' => [
                 'input' => [
-                    'class' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                    'class' => 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1',
                     'routes' => ['name', 'view', 'unknown'],
                     'group' => null,
-                    'metadata' => $this->getEntityMetadata('Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1', []),
+                    'metadata' => $this->getEntityMetadata('Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1', []),
                 ],
                 'expected' => [
                     'name' => 'oro_testentity1_index',
@@ -143,11 +129,11 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ],
             'custom routes with default group' => [
                 'input' => [
-                    'class' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
+                    'class' => 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2',
                     'routes' => ['route1', 'route2', 'unknown'],
                     'group' => null,
                     'metadata' => $this->getEntityMetadata(
-                        'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
+                        'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity2',
                         $config
                     ),
                 ],
@@ -159,11 +145,11 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
             ],
             'custom routes with group "group1"' => [
                 'input' => [
-                    'class' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                    'class' => 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity3',
                     'routes' => ['route1', 'route2', 'unknown'],
                     'group' => 'group1',
                     'metadata' => $this->getEntityMetadata(
-                        'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                        'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity3',
                         $config
                     ),
                 ],

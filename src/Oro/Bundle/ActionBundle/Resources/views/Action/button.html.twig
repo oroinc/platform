@@ -1,7 +1,7 @@
 {% set linkTitle = params.frontendOptions.title|default(params.label)|trans %}
 {% set linkLabel = params.label %}
 
-{% set translates = actionData.translates ? actionData.translates.toArray() : {} %}
+{% set translates = actionData.getScalarValues()|default({}) %}
 
 {% block button %}
     {% if onlyLink is not defined %}<div class="pull-left btn-group icons-holder">{% endif %}
