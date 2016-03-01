@@ -141,35 +141,46 @@ class ActionExtension extends AbstractExtension
         $actionsConfig = $config->offsetGetOr('actions', []);
 
         foreach ($this->actions as $action) {
-            if (!array_key_exists(strtolower($action->getName()), $actionsConfig)) {
-                $buttonOptions = $action->getDefinition()->getButtonOptions();
-                $frontendOptions = $action->getDefinition()->getFrontendOptions();
-                $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
-                $confirmation = !empty($frontendOptions['confirmation']) ? $frontendOptions['confirmation'] : '';
-                $actionsConfig[$action->getName()] = [
-                    'type' => 'action-widget',
-                    'label' => $action->getDefinition()->getLabel(),
-                    'rowAction' => false,
-                    'link' => '#',
-                    'icon' => $icon,
-                    'options' => [
-                        'actionName' => $action->getName(),
-                        'entityClass' => $this->datagridContext['entityClass'],
-                        'datagrid' => $this->datagridContext['datagrid'],
-                        'confirmation' => $confirmation,
-                        'showDialog' => $action->hasForm(),
-                        'executionRoute' => $this->applicationHelper->getExecutionRoute(),
-                        'dialogRoute' => $this->applicationHelper->getDialogRoute(),
-                        'dialogOptions' => [
-                            'title' => $action->getDefinition()->getLabel(),
-                            'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
-                        ]
-                    ]
-                ];
+            $actionName = strtolower($action->getName());
+            if (!array_key_exists($actionName, $actionsConfig)) {
+                $actionsConfig[$action->getName()] = $this->getRowsActionsConfig($action);
             }
         }
 
         $config->offsetSet('actions', $actionsConfig);
+    }
+
+    /**
+     * @param Action $action
+     * @return array
+     */
+    protected function getRowsActionsConfig(Action $action)
+    {
+        $buttonOptions = $action->getDefinition()->getButtonOptions();
+        $frontendOptions = $action->getDefinition()->getFrontendOptions();
+        $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
+        $confirmation = !empty($frontendOptions['confirmation']) ? $frontendOptions['confirmation'] : '';
+
+        return [
+            'type' => 'action-widget',
+            'label' => $action->getDefinition()->getLabel(),
+            'rowAction' => false,
+            'link' => '#',
+            'icon' => $icon,
+            'options' => [
+                'actionName' => $action->getName(),
+                'entityClass' => $this->datagridContext['entityClass'],
+                'datagrid' => $this->datagridContext['datagrid'],
+                'confirmation' => $confirmation,
+                'showDialog' => $action->hasForm(),
+                'executionRoute' => $this->applicationHelper->getExecutionRoute(),
+                'dialogRoute' => $this->applicationHelper->getDialogRoute(),
+                'dialogOptions' => [
+                    'title' => $action->getDefinition()->getLabel(),
+                    'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
+                ]
+            ]
+        ];
     }
 
     /**
