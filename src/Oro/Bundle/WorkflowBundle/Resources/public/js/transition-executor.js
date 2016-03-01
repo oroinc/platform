@@ -2,7 +2,7 @@ define([
     'jquery',
     'oroui/js/mediator',
     'oroworkflow/js/transition-event-handlers',
-], function ($, mediator, TransitionEventHandlers) {
+], function($, mediator, TransitionEventHandlers) {
     'use strict';
 
     /**

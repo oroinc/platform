@@ -4,7 +4,7 @@ define([
     'oroui/js/messenger',
     'orotranslation/js/translator',
     'oroui/js/mediator'
-], function (messenger, __, mediator) {
+], function(messenger, __, mediator) {
     'use strict';
 
     /**
@@ -14,8 +14,8 @@ define([
      * @class   oro.WorkflowTransitionEventHandlers
      */
     return {
-        getOnSuccess: function (element) {
-            return function (response) {
+        getOnSuccess: function(element) {
+            return function(response) {
                 mediator.execute('hideLoading');
                 function doRedirect(redirectUrl) {
                     mediator.execute('redirectTo', {url: redirectUrl});
@@ -25,7 +25,7 @@ define([
                 }
 
                 /** Handle redirectUrl result parameter for RedirectAction */
-                element.one('transitions_success', function (e, response) {
+                element.one('transitions_success', function(e, response) {
                     if (
                         response.workflowItem &&
                             response.workflowItem.result &&
@@ -40,8 +40,8 @@ define([
                 element.trigger('transitions_success', [response]);
             };
         },
-        getOnFailure: function (element) {
-            return function (jqxhr, textStatus, error) {
+        getOnFailure: function(element) {
+            return function(jqxhr, textStatus, error) {
                 mediator.execute('hideLoading');
                 element.one('transitions_failure', function() {
                     messenger.notificationFlashMessage('error', __('Could not perform transition'));
