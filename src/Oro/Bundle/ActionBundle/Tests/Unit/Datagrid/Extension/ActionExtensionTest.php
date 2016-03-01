@@ -223,15 +223,15 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 1]),
                 'actions' => [],
-                'expectedActions' => [],
                 'groups' => null,
+                'expectedActions' => [],
             ],
             'no actions and group1' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
                 'record' => new ResultRecord(['id' => 1]),
                 'actions' => [],
-                'expectedActions' => [],
                 'groups' => ['group1'],
+                'expectedActions' => [],
             ],
             '2 allowed actions' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid_name']),
