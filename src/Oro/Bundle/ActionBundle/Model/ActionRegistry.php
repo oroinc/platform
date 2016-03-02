@@ -61,14 +61,18 @@ class ActionRegistry
 
             if ($this->isEntityClassMatched($entityClass, $definition) ||
                 $action->hasUnboundSubstitution() ||
-                ($route && in_array($route, $definition->getRoutes(), true)) ||
-                $this->isDatagridMatched($datagrid, $definition)
+                $this->isDatagridMatched($datagrid, $definition) ||
+                ($route && in_array($route, $definition->getRoutes(), true))
             ) {
-                $actions[$action->getName()] = $action;
+                $actions[$action->getName()] = clone $action;
             }
         }
 
-        $this->substitution->apply($actions);
+        $this->substitution->apply($actions, function ($target, $replacement, $targetName, $replacementName) {
+            if ($replacement instanceof Action) {
+                $replacement->setOriginName($targetName);
+            }
+        });
 
         return $actions;
     }
@@ -81,7 +85,7 @@ class ActionRegistry
     {
         $this->loadActions();
 
-        return array_key_exists($name, $this->actions) ? $this->actions[$name] : null;
+        return array_key_exists($name, $this->actions) ? clone $this->actions[$name] : null;
     }
 
     /**
