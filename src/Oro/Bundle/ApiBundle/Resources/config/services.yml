@@ -78,16 +78,20 @@ services:
             - @oro_api.processor_bag
             - customize_data_item
 
-    oro_api.public_resources_loader:
-        class: Oro\Bundle\ApiBundle\Provider\PublicResourcesLoader
+    oro_api.resources_loader:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesLoader
         arguments:
-            - @oro_api.collect_public_resources.processor
+            - @oro_api.collect_resources.processor
 
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false
         arguments:
             - []
+
+    oro_api.config_loader_factory:
+        class: Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory
+        public: false
 
     oro_api.config_provider:
         class: Oro\Bundle\ApiBundle\Provider\ConfigProvider
@@ -98,11 +102,6 @@ services:
         class: Oro\Bundle\ApiBundle\Provider\MetadataProvider
         arguments:
             - @oro_api.get_metadata.processor
-
-    oro_api.field_config_provider:
-        class: Oro\Bundle\ApiBundle\Provider\FieldConfigProvider
-        arguments:
-            - @oro_api.get_field_config.processor
 
     oro_api.relation_config_provider:
         class: Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
@@ -196,7 +195,7 @@ services:
         public: false
         arguments:
             - %installed%
-            - @oro_api.public_resources_loader
+            - @oro_api.resources_loader
             - @oro_entity.entity_alias_resolver
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer

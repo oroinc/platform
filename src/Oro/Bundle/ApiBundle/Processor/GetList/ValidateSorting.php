@@ -6,10 +6,10 @@ use Symfony\Component\HttpKernel\Exception\NotAcceptableHttpException;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * Validates that requested sorting is supported.
@@ -34,7 +34,7 @@ class ValidateSorting implements ProcessorInterface
             if ($filter instanceof SortFilter) {
                 $this->validateSortValue(
                     $this->getSortFilterValue($filterValues, $filterKey),
-                    $context->hasConfigOfSorters() ? $context->getConfigOfSorters() : null
+                    $context->getConfigOfSorters()
                 );
             }
         }
@@ -63,17 +63,17 @@ class ValidateSorting implements ProcessorInterface
     }
 
     /**
-     * @param array|null $orderBy
-     * @param array|null $sorters
+     * @param array|null         $orderBy
+     * @param SortersConfig|null $sorters
      */
-    protected function validateSortValue($orderBy, $sorters)
+    protected function validateSortValue($orderBy, SortersConfig $sorters = null)
     {
         if (!empty($orderBy)) {
-            $sortFields = !empty($sorters) && !empty($sorters[ConfigUtil::FIELDS])
-                ? $sorters[ConfigUtil::FIELDS]
-                : [];
             foreach ($orderBy as $field => $direction) {
-                if (!array_key_exists($field, $sortFields)) {
+                if (null === $sorters
+                    || !$sorters->hasField($field)
+                    || $sorters->getField($field)->isExcluded()
+                ) {
                     throw new NotAcceptableHttpException(
                         sprintf('Sorting by "%s" is not supported.', $field)
                     );

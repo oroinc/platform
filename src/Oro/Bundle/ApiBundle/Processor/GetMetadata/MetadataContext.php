@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 
@@ -47,7 +48,7 @@ class MetadataContext extends ApiContext
     /**
      * Gets the configuration of an entity.
      *
-     * @return array|null
+     * @return EntityDefinitionConfig|null
      */
     public function getConfig()
     {
@@ -57,11 +58,15 @@ class MetadataContext extends ApiContext
     /**
      * Sets the configuration of an entity.
      *
-     * @param array $config
+     * @param EntityDefinitionConfig $definition
      */
-    public function setConfig($config)
+    public function setConfig(EntityDefinitionConfig $definition = null)
     {
-        $this->set(self::CONFIG, $config);
+        if (null !== $definition) {
+            $this->set(self::CONFIG, $definition);
+        } else {
+            $this->remove(self::CONFIG);
+        }
     }
 
     /**
