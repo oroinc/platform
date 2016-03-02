@@ -9,6 +9,7 @@ Table of Contents
  - [Configuration](#configuration)
  - [Action Diagram](#action-diagram)
  - [Configuration Validation](#configuration-validation)
+ - [Default Actions](#default-actions)
 
 What are Actions?
 -----------------
@@ -178,3 +179,43 @@ php app/console oro:action:configuration:validate
 ```
 
 **Note:** All configurations apply automatically after their changes on dev environment.
+
+
+Default Actions
+---------------
+
+**Oro Action Bundle** define several system default actions for common purpose. Those are basic CRUD-called actions for entities:
+ 
+ - `UPDATE` - action to edit entity 
+ - `DELETE` - action for entity deletion
+ 
+ You can find them in `Resources/config/action.yml` file under **Oro Action Bundle** directory.
+
+Cases
+-----
+
+**How I can disable CRUD default action for my Bundle?**
+
+Suppose you need to disable default `DELETE` action for your new entity `YourBundle/Entity/Special`.
+Here the case that describe the way you can do this in `actions.yml` under your bundle config resources directory:
+
+```
+actions:
+    DELETE:
+        exclude_entities: ['YourBundle/Entity/Special']
+```
+
+**How I can modify CRUD default action for my Bundle?**
+If you need to customize somehow a default (or any other) action. Suppose to change basically its `label`, you can do thing like that:
+ 
+```
+actions:
+    my_special_entity_custom_edit:
+        extends: UPDATE                         # this is for keeping all other properties same as in default
+        label: 'Modify me'                      # custom label
+        substitute_action: UPDATE               # replace UPDATE action with current one
+        entities: ['YourBundle/Entity/Special'] # replacement will occur only if this action will be matched by entity
+```
+
+See [substitution](./configuration-reference.md#substitution-of-action) section in [config documentation](./configuration-reference.md) for more details.
+

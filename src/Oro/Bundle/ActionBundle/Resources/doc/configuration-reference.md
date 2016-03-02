@@ -202,14 +202,20 @@ actions:                                             # root elements
 
 Matching and Filter Mechanism
 =============================
-
 There are config fields responsible for matching and filtering actions that corresponds to actual context call (e.g. request, place in template, etc.)
-Filters are presents in single property `groups` for now. Matching properties are: among wildcards: `for_all_entities` and `for_all_datagrids`, also with simple elements comparisons: `entities`, `routes`, `datagrids`, 
-and `exclude_entities` - as reverse helper useful with wildcard `for_all_entities` when it is defined to `true`.
+Filtering
+---------
+Filters are presents in single property `groups` for now
 
-How it works? Filters discards all non matched actions and applied first before matchers. 
-Then, matchers, in turn, collect all actions among filtered where any of comparison met though `OR` statement. E.g. 
+Matching
+--------
+Matching properties are: `for_all_entities` and `for_all_datagrids` as wildcards. 
+And simple elements comparisons: `entities`, `routes`, `datagrids` and `exclude_entities` - as reverse helper useful with wildcard `for_all_entities` when it is defined to `true`.
+
+How it works? **Filters** discards all non matched actions and applied first before matchers. 
+Then, **matchers**, in turn, collect all actions, among filtered, where any of comparison met though `OR` statement. E.g. 
  if `datagrid` `OR` `route` will be met in context and present in action config then that action will be added to result list.
+Afterwards 
 
 Substitution of Action
 ======================
