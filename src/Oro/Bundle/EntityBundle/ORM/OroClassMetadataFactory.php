@@ -9,6 +9,8 @@ use Oro\Bundle\EntityBundle\DataCollector\OrmLogger;
 
 class OroClassMetadataFactory extends ClassMetadataFactory
 {
+    const ALL_METADATA_KEY = 'oro_entity.all_metadata';
+
     /** @var EntityManagerInterface|null */
     protected $entityManager;
 
@@ -39,7 +41,20 @@ class OroClassMetadataFactory extends ClassMetadataFactory
             $logger->startGetAllMetadata();
         }
 
-        $result = parent::getAllMetadata();
+        $cacheDriver = $this->getCacheDriver();
+        if ($cacheDriver) {
+            $result = $cacheDriver->fetch(static::ALL_METADATA_KEY);
+            if ($result === false) {
+                $result = parent::getAllMetadata();
+                $cacheDriver->save(static::ALL_METADATA_KEY, $result);
+            } else {
+                foreach ($result as $cached) {
+                    $this->wakeupReflection($cached, $this->getReflectionService());
+                }
+            }
+        } else {
+            $result = parent::getAllMetadata();
+        }
 
         if ($logger) {
             $logger->stopGetAllMetadata();

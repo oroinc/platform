@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Provider\Filter;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\LocaleBundle\DQL\DQLNameFormatter;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
@@ -37,10 +38,29 @@ class ChoiceTreeUserProvider
      */
     public function getList()
     {
-        $qb = $this->registry->getManager()->getRepository(static::CLASS_NAME)->createQueryBuilder('u')
-            ->select('u.id')
-            ->addSelect(sprintf('%s AS name', $this->dqlNameFormatter->getFormattedNameDQL('u', static::CLASS_NAME)));
+        $qb = $this->createListQb();
 
         return $this->aclHelper->apply($qb)->getArrayResult();
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldBeLazy()
+    {
+        $qb = $this->createListQb()
+            ->select('COUNT(1)');
+
+        return $this->aclHelper->apply($qb)->getSingleScalarResult() >= 100;
+    }
+
+    /**
+     * @return QueryBuilder
+     */
+    protected function createListQb()
+    {
+        return $this->registry->getManager()->getRepository(static::CLASS_NAME)->createQueryBuilder('u')
+            ->select('u.id')
+            ->addSelect(sprintf('%s AS name', $this->dqlNameFormatter->getFormattedNameDQL('u', static::CLASS_NAME)));
     }
 }

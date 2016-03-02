@@ -7,9 +7,10 @@ use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+
+use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Model\ContextAccessor;
 
 /**
  * Run batch job
