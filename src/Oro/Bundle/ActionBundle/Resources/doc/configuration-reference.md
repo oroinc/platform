@@ -209,8 +209,9 @@ Filters are presents in single property `groups` for now
 
 Matching
 --------
-Matching properties are: `for_all_entities` and `for_all_datagrids` as wildcards. 
-And simple elements comparisons: `entities`, `routes`, `datagrids` and `exclude_entities` - as reverse helper useful with wildcard `for_all_entities` when it is defined to `true`.
+Matching properties are: 
+- `for_all_entities` and `for_all_datagrids` as wildcards. 
+- And elements comparisons: `entities`, `routes`, `datagrids` and `exclude_entities` - as reverse helper useful with wildcard `for_all_entities` when it is defined to `true`.
 
 How it works? **Filters** discards all non matched actions and applied first before matchers. 
 Then, **matchers**, in turn, collect all actions, among filtered, where any of comparison met though `OR` statement. E.g. 
@@ -223,9 +224,9 @@ Substitution of Action
 When parameter `substitute_action` is defined and it corresponds to other action name that should be displayed (e.g. matched by context)
 substitution happens. In other words, action that define substitution will be positioned in UI instead of action that
 defined in parameter.
-For replacement action (e.g. action that have `substitute_action` parameter) same [matching and filter mechanisms](#matching-and-filter-mechanism) are applied as for normal action with one difference:
-if no matching or filtering criteria are specified than that action will be matched automatically.
-But after all - actions that did not make any replacement will be cleared from result list.
+For replacement action (e.g. action that have `substitute_action` parameter) same [matching and filter mechanisms](#matching-and-filter-mechanism) are applied as for normal action
+with one important difference: **if no matching or filtering criteria are specified than that action will be matched automatically - always**.
+But after all - actions that did not make any replacement (in context) will be cleared from final result list.
 
 
 Button Options Configuration

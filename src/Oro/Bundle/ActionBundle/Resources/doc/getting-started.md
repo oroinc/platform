@@ -184,26 +184,27 @@ php app/console oro:action:configuration:validate
 Default Actions
 ---------------
 
-**Oro Action Bundle** define several system default actions for common purpose. Those are basic CRUD-called actions for entities:
+**Oro Action Bundle** define several system wide default actions for common purpose. Those are basic CRUD-called actions for entities:
  
  - `UPDATE` - action to edit entity 
  - `DELETE` - action for entity deletion
  
  You can find them in `Resources/config/action.yml` file under **Oro Action Bundle** directory.
 
-Cases
------
+### Questions and Answers
 
 **How I can disable CRUD default action for my Bundle?**
 
-Suppose you need to disable default `DELETE` action for your new entity `YourBundle/Entity/Special`.
-Here the case that describe the way you can do this in `actions.yml` under your bundle config resources directory:
+Suppose you need to disable default `DELETE` action for your new entity `MyEntity`.
+Here the case which describe the way. You can do this in `actions.yml` under your bundle config resources directory:
 
 ```
 actions:
     DELETE:
-        exclude_entities: ['YourBundle/Entity/Special']
+        exclude_entities: ['MyEntity']
 ```
+This will merge addition special condition to default action during config compilation. 
+So that default action `DELETE` will not be matched for your entity and will not be displayed as well.
 
 **How I can modify CRUD default action for my Bundle?**
 If you need to customize somehow a default (or any other) action. Suppose to change basically its `label`, you can do thing like that:
@@ -214,8 +215,12 @@ actions:
         extends: UPDATE                         # this is for keeping all other properties same as in default
         label: 'Modify me'                      # custom label
         substitute_action: UPDATE               # replace UPDATE action with current one
-        entities: ['YourBundle/Entity/Special'] # replacement will occur only if this action will be matched by entity
+        entities: ['MyEntity']                  # replacement will occur only if this action will be matched by entity
+        for_all_entities: false                 # overriding extended property for `entities` field matching only
 ```
+Here is custom modification through substitution mechanism. When action pointed in `substitute_action` field will be replaced by current one.
+Additionally there present limitation in field `entities` that will pick this custom action for substitution of default one only when context will be matched by that entity.
+For those who need to make full replacement of action instead of extended copy of it - `extends` field can be omitted and own, totally custom, body defined.  
 
 See [substitution](./configuration-reference.md#substitution-of-action) section in [config documentation](./configuration-reference.md) for more details.
 
