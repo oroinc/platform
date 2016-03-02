@@ -59,7 +59,6 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
         $value['part'] = DateModifierInterface::PART_VALUE;
 
         if (!isset($value['value']['start']) && !isset($value['value']['end'])) {
-
             /** @var \DateTime $start */
             /** @var \DateTime $end */
             list($start, $end) = $this->dateHelper->getDateTimeInterval();
