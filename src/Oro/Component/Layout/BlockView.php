@@ -25,4 +25,17 @@ class BlockView extends FormView
         parent::__construct($parent);
         unset($this->vars['value']);
     }
+
+    /**
+     * @param string $name
+     * @param mixed $value
+     */
+    public function addToVars($name, $value)
+    {
+        $this->vars[$name] = $value;
+
+        foreach ($this->children as $child) {
+            $child->addToVars($name, $value);
+        }
+    }
 }
