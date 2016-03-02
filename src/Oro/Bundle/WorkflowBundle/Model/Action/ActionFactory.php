@@ -2,64 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
+use Oro\Component\Action\Action\ActionFactory as BaseActionFactory;
 
-use Oro\Component\ConfigExpression\ExpressionInterface;
-
-class ActionFactory
+/**
+ * @deprecated since 1.10. Use {@see Oro\Component\Action\Action\ActionFactory} instead
+ */
+class ActionFactory extends BaseActionFactory
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
-
-    /**
-     * @var array
-     */
-    protected $types;
-
-    /**
-     * @param ContainerInterface $container
-     * @param array $types
-     */
-    public function __construct(ContainerInterface $container, array $types = array())
-    {
-        $this->container = $container;
-        $this->types = $types;
-    }
-
-    /**
-     * @param string $type
-     * @param array $options
-     * @param ExpressionInterface $condition
-     * @throws \RunTimeException
-     * @return ActionInterface
-     */
-    public function create($type, array $options = array(), ExpressionInterface $condition = null)
-    {
-        if (!$type) {
-            throw new \RunTimeException('The action type must be defined');
-        }
-
-        $id = isset($this->types[$type]) ? $this->types[$type] : false;
-
-        if (!$id) {
-            throw new \RunTimeException(sprintf('No attached service to action type named `%s`', $type));
-        }
-
-        /** @var ActionInterface $action */
-        $action = $this->container->get($id);
-
-        if (!$action instanceof ActionInterface) {
-            throw new \RunTimeException(sprintf('The service `%s` must implement `ActionInterface`', $id));
-        }
-
-        $action->initialize($options);
-
-        if ($condition) {
-            $action->setCondition($condition);
-        }
-
-        return $action;
-    }
 }
