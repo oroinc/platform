@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Action\RunAction;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
+
 use Oro\Component\Action\Model\ContextAccessor;
 
 class RunActionTest extends \PHPUnit_Framework_TestCase

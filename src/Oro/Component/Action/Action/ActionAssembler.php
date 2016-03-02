@@ -3,8 +3,8 @@
 namespace Oro\Component\Action\Action;
 
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
-use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 use Oro\Component\Action\Model\AbstractAssembler;
+use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionAssembler extends AbstractAssembler
 {
@@ -27,10 +27,8 @@ class ActionAssembler extends AbstractAssembler
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      */
-    public function __construct(
-        ActionFactory $actionFactory,
-        ConditionFactory $conditionFactory
-    ) {
+    public function __construct(ActionFactory $actionFactory, ConditionFactory $conditionFactory)
+    {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory  = $conditionFactory;
     }

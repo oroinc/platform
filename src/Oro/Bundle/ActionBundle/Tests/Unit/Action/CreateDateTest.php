@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ActionBundle\Action\CreateDate;
+use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+
 use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
 
@@ -23,7 +26,7 @@ class CreateDateTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|LocaleSettings
      */
     protected $localeSettings;
 
@@ -39,6 +42,8 @@ class CreateDateTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue(self::TIMEZONE));
 
         $this->action = new CreateDate($this->contextAccessor, $this->localeSettings);
+
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -47,9 +52,7 @@ class CreateDateTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->contextAccessor);
-        unset($this->localeSettings);
-        unset($this->action);
+        unset($this->contextAccessor, $this->localeSettings, $this->action);
     }
 
     /**

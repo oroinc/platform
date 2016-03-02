@@ -6,8 +6,9 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 use Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction;
-use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
 {

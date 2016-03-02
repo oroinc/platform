@@ -5,11 +5,13 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
+
 use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
 use Oro\Component\Action\Action\ActionInterface as FunctionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
+
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class Action

@@ -4,9 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\Action\Action\Configurable;
-use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
+
+use Oro\Component\Action\Action\Configurable;
 
 class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 {

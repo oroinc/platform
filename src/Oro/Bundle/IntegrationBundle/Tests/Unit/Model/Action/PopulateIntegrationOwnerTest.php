@@ -5,6 +5,7 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Unit\Model\Action;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\IntegrationBundle\Model\Action\PopulateIntegrationOwner;
+
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Model\ContextAccessor;
 

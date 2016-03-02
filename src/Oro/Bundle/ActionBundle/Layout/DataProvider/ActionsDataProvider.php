@@ -14,12 +14,12 @@ use Oro\Component\Layout\DataProviderInterface;
 class ActionsDataProvider implements DataProviderInterface
 {
     /**
-     * @var  ActionManager
+     * @var ActionManager
      */
     protected $actionManager;
 
     /**
-     * @var  RestrictHelper
+     * @var RestrictHelper
      */
     protected $restrictHelper;
 

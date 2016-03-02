@@ -6,8 +6,9 @@ use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\TransitionAssembler;
-use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
+
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
+use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 
 class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 {

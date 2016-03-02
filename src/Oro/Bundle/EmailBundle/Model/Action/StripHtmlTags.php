@@ -3,8 +3,9 @@
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Oro\Component\Action\Exception\InvalidParameterException;
+
 use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\ContextAccessor;
 
 /**

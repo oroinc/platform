@@ -2,7 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 use Oro\Bundle\ActionBundle\Action\FormatName;
+use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class FormatNameTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,12 +17,12 @@ class FormatNameTest extends \PHPUnit_Framework_TestCase
     protected $action;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ContextAccessor
      */
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|EntityNameResolver
      */
     protected $entityNameResolver;
 
@@ -30,6 +35,8 @@ class FormatNameTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->action = new FormatName($this->contextAccessor, $this->entityNameResolver);
+
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();

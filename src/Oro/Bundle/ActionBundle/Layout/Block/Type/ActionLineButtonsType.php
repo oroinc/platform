@@ -6,20 +6,20 @@ use Doctrine\Common\Util\ClassUtils;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\Block\Type\AbstractType;
 use Oro\Component\Layout\Exception\LogicException;
-
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 
 class ActionLineButtonsType extends AbstractType
 {
     const NAME = 'action_line_buttons';
 
     /**
-     * @var  ApplicationsHelper
+     * @var ApplicationsHelper
      */
     protected $applicationsHelper;
 

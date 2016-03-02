@@ -2,9 +2,8 @@
 
 namespace Oro\Component\Action\Action;
 
-use Oro\Component\ConfigExpression\ExpressionInterface;
-
 use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\ConfigExpression\ExpressionInterface;
 
 interface ActionInterface
 {

@@ -7,14 +7,13 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 
 use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
 use Oro\Component\Action\Action\ActionInterface as FunctionInterface;
-use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
-
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 /**

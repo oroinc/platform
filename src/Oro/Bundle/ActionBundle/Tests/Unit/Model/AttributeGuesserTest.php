@@ -9,6 +9,9 @@ use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -63,9 +66,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->managerRegistry);
-        unset($this->entityConfigProvider);
-        unset($this->guesser);
+        unset($this->managerRegistry, $this->entityConfigProvider, $this->guesser);
     }
 
     /**

@@ -3,8 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\ProcessFactory;
-use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+
+use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ProcessFactoryTest extends \PHPUnit_Framework_TestCase

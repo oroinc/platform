@@ -8,7 +8,7 @@ use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 
 class RestrictHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var  RestrictHelper */
+    /** @var RestrictHelper */
     protected $helper;
 
     public function setUp()

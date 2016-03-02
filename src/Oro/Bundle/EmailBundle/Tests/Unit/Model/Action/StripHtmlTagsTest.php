@@ -4,6 +4,7 @@ namespace Oro\Bundle\EmailBundle\Tests\Unit\Model\Action;
 
 use Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags;
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
+
 use Oro\Component\Action\Model\ContextAccessor;
 
 class StripHtmlTagsTest extends \PHPUnit_Framework_TestCase

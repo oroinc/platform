@@ -7,8 +7,9 @@ use Doctrine\Common\Util\ClassUtils;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ImportExportBundle\Job\JobExecutor;
-use Oro\Component\Action\Exception\InvalidParameterException;
+
 use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\ContextAccessor;
 
 /**

@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\Action\Action\CreateEntity;
@@ -21,7 +24,7 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
      */
     protected $registry;
 
@@ -34,6 +37,8 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->action = new CreateEntity($this->contextAccessor, $this->registry);
+
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -42,9 +47,7 @@ class CreateEntityTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->contextAccessor);
-        unset($this->registry);
-        unset($this->action);
+        unset($this->contextAccessor, $this->registry, $this->action);
     }
 
     /**
