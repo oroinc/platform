@@ -62,6 +62,23 @@ class JoinTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @dataProvider indexByNormalizationDataProvider
+     */
+    public function testIndexByNormalization($indexBy)
+    {
+        $join = new Join(Join::LEFT_JOIN, 'Test\Entity', Join::WITH, 'condition', $indexBy);
+        $this->assertNull($join->getIndexBy());
+    }
+
+    public function indexByNormalizationDataProvider()
+    {
+        return [
+            [null],
+            [''],
+        ];
+    }
+
     public function testSetJoinType()
     {
         $join = new Join(Join::LEFT_JOIN, 'Test\Entity');
