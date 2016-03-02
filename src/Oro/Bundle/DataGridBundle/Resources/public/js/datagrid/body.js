@@ -55,14 +55,7 @@ define([
             this.columns = options.columns;
 
             this.row = options.row || Row;
-            this.rows = this.collection.map(function(model) {
-                var rowOptions = {
-                    columns: this.columns,
-                    model: model
-                };
-                this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
-                return new this.row(rowOptions);
-            }, this);
+            this.createRows();
 
             this.emptyText = options.emptyText;
             this._unshiftEmptyRowMayBe();
@@ -93,6 +86,17 @@ define([
             Body.__super__.dispose.call(this);
         },
 
+        createRows: function() {
+            this.rows = this.collection.map(function(model) {
+                var rowOptions = {
+                    columns: this.columns,
+                    model: model
+                };
+                this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
+                return new this.row(rowOptions);
+            }, this);
+        },
+
         /**
          * @inheritDoc
          */
@@ -103,8 +107,26 @@ define([
                 row.dispose();
             });
             this.rows = [];
-            Body.__super__.refresh.apply(this, arguments);
+            this.backgridRefresh();
             this._listenToRowsEvents(this.rows);
+            return this;
+        },
+
+        /**
+         * Create this function instead of original Body.__super__.refresh to customize options for subviews
+         */
+        backgridRefresh: function() {
+            for (var i = 0; i < this.rows.length; i++) {
+                this.rows[i].remove();
+            }
+
+            this.createRows();
+            this._unshiftEmptyRowMayBe();
+
+            this.render();
+
+            this.collection.trigger('backgrid:refresh', this);
+
             return this;
         },
 
