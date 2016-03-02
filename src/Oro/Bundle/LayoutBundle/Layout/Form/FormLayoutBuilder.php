@@ -159,9 +159,8 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
      *
      * @param FormInterface $form
      * @param string        $parentFieldPath
-     * @param string|null   $parentId
      */
-    protected function processForm(FormInterface $form, $parentFieldPath = null, $parentId = null)
+    protected function processForm(FormInterface $form, $parentFieldPath = null)
     {
         $fieldName = $form->getName();
         $fieldPath = $parentFieldPath !== null
@@ -172,8 +171,15 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
         }
 
         $id = $this->getFieldId($fieldPath);
-        $this->addField($fieldPath, $id, $parentId);
+        $this->addField($fieldPath, $id);
         $this->processedFields[$fieldPath] = $id;
+
+        if ($this->isCompoundField($form)) {
+            /** @var FormInterface $child */
+            foreach ($form as $child) {
+                $this->processForm($child, $fieldPath);
+            }
+        }
     }
 
     /**

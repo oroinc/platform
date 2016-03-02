@@ -53,7 +53,6 @@ class FormFieldType extends AbstractFormType
             $formView = $view->vars['form'];
             $formView->setRendered();
         }
-        parent::finishView($view, $block, $options);
     }
 
     /**

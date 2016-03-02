@@ -142,8 +142,6 @@ class FormType extends AbstractFormType
 
             $this->getFormFieldView($view, $formFieldPath)->setRendered();
         }
-
-        parent::finishView($view, $block, $options);
     }
 
     /**

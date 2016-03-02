@@ -67,7 +67,7 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
     /**
      * {@inheritdoc}
      */
-    protected function addField($fieldPath, $id, $parentId = null, $form = false)
+    protected function addField($fieldPath, $id, $parentId = null)
     {
         $groupName = $this->findGroupName($fieldPath);
         if ($groupName) {
@@ -75,7 +75,7 @@ class GroupingFormLayoutBuilder extends FormLayoutBuilder
 
             $parentId = $this->groups[$groupName]['id'];
         }
-        parent::addField($fieldPath, $id, $parentId, $form);
+        parent::addField($fieldPath, $id, $parentId);
     }
 
     /**
