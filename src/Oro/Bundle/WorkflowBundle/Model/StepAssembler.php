@@ -6,7 +6,9 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Model\AbstractAssembler;
 
 class StepAssembler extends AbstractAssembler
 {

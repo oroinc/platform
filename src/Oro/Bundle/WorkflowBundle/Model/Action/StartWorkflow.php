@@ -4,9 +4,11 @@ namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+
+use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Action\AbstractAction;
 
 class StartWorkflow extends AbstractAction
 {

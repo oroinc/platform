@@ -6,11 +6,10 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
-
-use Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition;
 
 /**
  * Check For Active integration of given type

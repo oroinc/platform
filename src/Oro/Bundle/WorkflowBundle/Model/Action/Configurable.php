@@ -2,62 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Component\ConfigExpression\ExpressionInterface;
+use Oro\Component\Action\Action\Configurable as BaseConfigurable;
 
-class Configurable implements ActionInterface
+/**
+ * @deprecated since 1.10. Use {@see Oro\Component\Action\Action\Configurable} instead
+ */
+class Configurable extends BaseConfigurable
 {
-    const ALIAS = 'configurable';
-
-    /**
-     * @var ActionAssembler
-     */
-    protected $assembler;
-
-    /**
-     * @var ActionInterface
-     */
-    protected $action;
-
-    /**
-     * @var array
-     */
-    protected $configuration = [];
-
-    /**
-     * @param ActionAssembler $assembler
-     */
-    public function __construct(ActionAssembler $assembler)
-    {
-        $this->assembler = $assembler;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function initialize(array $configuration)
-    {
-        $this->configuration = $configuration;
-        return $this;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    public function execute($context)
-    {
-        if (!$this->action) {
-            $this->action = $this->assembler->assemble($this->configuration);
-        }
-
-        $this->action->execute($context);
-    }
-
-    /**
-     * Configurable action is always allowed
-     *
-     * {@inheritDoc}
-     */
-    public function setCondition(ExpressionInterface $condition)
-    {
-    }
 }
