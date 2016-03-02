@@ -21,4 +21,18 @@ class ExecuteActionEvents
      * @var string
      */
     const HANDLE_AFTER = 'oro_action.action.handle_before';
+
+    /**
+     * @deprecated since 1.10. Use {@see Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE} instead
+     *
+     * @var string
+     */
+    const DEPRECATED_HANDLE_BEFORE = 'oro_workflow.action.handle_before';
+
+    /**
+     * @deprecated since 1.10. Use {@see Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER} instead
+     *
+     * @var string
+     */
+    const DEPRECATED_HANDLE_AFTER = 'oro_workflow.action.handle_after';
 }
