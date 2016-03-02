@@ -102,7 +102,12 @@
     {% if method is defined and method not in ['GET', 'POST'] -%}
         {% set form_method = 'POST' %}
     {%- endif -%}
-    <form{{ block('block_attributes') }}{% if action is not same as(null) %} action="{{ action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
+    {% if attr.block_attributes is not defined %}
+        {% set attr = attr|merge({
+            'block_attributes': 'block_attributes'
+        }) %}
+    {% endif %}
+    <form{{ block(attr.block_attributes) }}{% if action is not same as(null) %} action="{{ action }}"{% endif %}{% if method is defined %} method="{{ form_method|default(method)|lower }}"{% endif %}{% if enctype is defined %} enctype="{{ enctype }}"{% endif %}>
     {%- if form_method is defined -%}
         <input type="hidden" name="_method" value="{{ method }}" />
     {%- endif -%}
