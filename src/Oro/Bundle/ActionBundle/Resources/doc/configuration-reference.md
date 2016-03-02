@@ -203,13 +203,13 @@ actions:                                             # root elements
 Matching and Filter Mechanism
 =============================
 
-There are config fields responsible for matching and filtering actions that corresponds to actual context call (e.g. request or place in template, etc.)
-Filters are presents in single property `groups` for now. Match properties are: among wildcards - `for_all_entities`, `for_all_datagrids` and simple comparisons: `entities`, `routes`, `datagrids`, 
-also `exclude_entities` - as reverse helper useful with wildcard `for_all_entities` defined to `true`.
+There are config fields responsible for matching and filtering actions that corresponds to actual context call (e.g. request, place in template, etc.)
+Filters are presents in single property `groups` for now. Matching properties are: among wildcards: `for_all_entities` and `for_all_datagrids`, also with simple elements comparisons: `entities`, `routes`, `datagrids`, 
+and `exclude_entities` - as reverse helper useful with wildcard `for_all_entities` when it is defined to `true`.
 
-To be clear, filters discards all non matched actions and applied first before matchers. 
-Then, matchers, in turn, collect all actions where any of comparison met though `OR` statement. E.g. 
- if `datagrid` `OR` `route` will be met in context as present in action config then that action will be added to list.
+How it works? Filters discards all non matched actions and applied first before matchers. 
+Then, matchers, in turn, collect all actions among filtered where any of comparison met though `OR` statement. E.g. 
+ if `datagrid` `OR` `route` will be met in context and present in action config then that action will be added to result list.
 
 Substitution of Action
 ======================
@@ -217,9 +217,9 @@ Substitution of Action
 When parameter `substitute_action` is defined and it corresponds to other action name that should be displayed (e.g. matched by context)
 substitution happens. In other words, action that define substitution will be positioned in UI instead of action that
 defined in parameter.
-For substitutor-action (e.g. action that have `substitute_action` parameter) same matching and filter mechanisms are applied as for normal action with one difference:
+For replacement action (e.g. action that have `substitute_action` parameter) same [matching and filter mechanisms](#matching-and-filter-mechanism) are applied as for normal action with one difference:
 if no matching or filtering criteria are specified than that action will be matched automatically.
-But after all - actions that did not make any replacement will be cleared from output.
+But after all - actions that did not make any replacement will be cleared from result list.
 
 
 Button Options Configuration
