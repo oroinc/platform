@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Model\Action;
+namespace Oro\Component\Action\Action;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\Action\Model\ContextAccessor;
 
 /**
  * Flush entity

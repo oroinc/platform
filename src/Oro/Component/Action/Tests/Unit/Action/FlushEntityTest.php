@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
+namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
@@ -10,8 +10,9 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\WorkflowBundle\Model\Action\FlushEntity;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+
+use Oro\Component\Action\Action\FlushEntity;
+use Oro\Component\Action\Model\ContextAccessor;
 
 class FlushEntityTest extends \PHPUnit_Framework_TestCase
 {
