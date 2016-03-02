@@ -49,7 +49,8 @@ define([
 
         /**
          * Create this function instead of original Body.__super__.initialize to customize options for subviews
-         * @param options
+         *
+         * @param {Object} options
          */
         backgridInitialize: function(options) {
             this.columns = options.columns;
