@@ -176,7 +176,7 @@ class EntityMetadataTest extends OrmRelatedTestCase
         $this->assertEmpty($entityMetadata->getFields());
     }
 
-    public function testRenameFieldAssociationProperty()
+    public function testRenameFieldAssociation()
     {
         $entityMetadata = new EntityMetadata();
 
