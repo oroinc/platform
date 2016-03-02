@@ -71,7 +71,6 @@ define([
             var original = this.get('original');
             var included = this.get('included');
             var excluded = this.get('excluded');
-            id = parseInt(id);
 
             var isActive = model.get(this.columnName);
             var originallyActive;
@@ -165,7 +164,7 @@ define([
             }
             _.each(this.grid.collection.models, function(model) {
                 var isActive = model.get(columnName);
-                var modelId = parseInt(model.id);
+                var modelId = model.id;
                 if (!isActive && _.contains(included, modelId)) {
                     model.set(columnName, true);
                 }

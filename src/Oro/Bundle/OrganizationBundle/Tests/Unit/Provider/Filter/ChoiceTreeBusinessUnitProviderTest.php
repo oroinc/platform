@@ -99,10 +99,10 @@ class ChoiceTreeBusinessUnitProviderTest extends \PHPUnit_Framework_TestCase
         $this->qb->expects($this->once())
             ->method('getArrayResult')
             ->willReturn($result);
-        $this->qb->expects($this->once())
+        $this->qb->expects($this->any())
             ->method('expr')
             ->willReturn($expression);
-        $this->qb->expects($this->once())
+        $this->qb->expects($this->any())
             ->method('setParameter');
 
         $tokenStorage = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');

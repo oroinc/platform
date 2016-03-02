@@ -23,6 +23,9 @@ abstract class AbstractFilter implements FilterInterface
     /** @var Form */
     protected $form;
 
+    /** @var array */
+    protected $unresolvedOptions = [];
+
     /**
      * Constructor
      *
@@ -42,6 +45,17 @@ abstract class AbstractFilter implements FilterInterface
     {
         $this->name   = $name;
         $this->params = $params;
+
+        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
+        $this->unresolvedOptions = array_filter($options, 'is_callable');
+        if (!isset($options['lazy']) || !$options['lazy']) {
+            $this->resolveOptions();
+        } else {
+            $unresolvedKeys = array_keys($this->unresolvedOptions);
+            foreach ($unresolvedKeys as $key) {
+                unset($this->params[FilterUtility::FORM_OPTIONS_KEY][$key]);
+            }
+        }
     }
 
     /**
@@ -89,8 +103,27 @@ abstract class AbstractFilter implements FilterInterface
         );
         $metadata = $this->mapParams($metadata);
         $metadata = array_merge($defaultMetadata, $metadata);
+        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
+        $metadata['lazy'] = isset($options['lazy']) ? $options['lazy'] : false;
 
         return $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveOptions()
+    {
+        $this->params[FilterUtility::FORM_OPTIONS_KEY] = array_merge(
+            $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []),
+            array_map(
+                function ($cb) {
+                    return call_user_func($cb);
+                },
+                $this->unresolvedOptions
+            )
+        );
+        $this->unresolvedOptions = [];
     }
 
     /**
