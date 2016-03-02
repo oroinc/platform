@@ -120,6 +120,7 @@ services:
             - @oro_workflow.manager
         tags:
             - { name: oro_workflow.action, alias: start_workflow }
+            - { name: oro_action.function, alias: start_workflow }
 
     oro_workflow.action.redirect:
         class: %oro_workflow.action.redirect.class%
