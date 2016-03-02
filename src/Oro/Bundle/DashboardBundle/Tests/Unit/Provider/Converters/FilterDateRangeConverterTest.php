@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\DashboardBundle\Tests\Unit\Provider\Converters;
 
-use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter;
+use Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter;
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
-class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
+class FilterDateRangeConverterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var FilterDateTimeRangeConverter */
+    /** @var FilterDateRangeConverter */
     protected $converter;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -51,7 +51,7 @@ class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->dateHelper    = new DateHelper($settings, $doctrine, $aclHelper);
 
-        $this->converter = new FilterDateTimeRangeConverter(
+        $this->converter = new FilterDateRangeConverter(
             $this->formatter,
             $this->converter,
             $this->translator,
@@ -126,7 +126,7 @@ class FilterDateTimeRangeConverterTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $this->assertEquals(FilterDateTimeRangeConverter::MIN_DATE, $result['start']->format('Y-m-d'));
+        $this->assertEquals(FilterDateRangeConverter::MIN_DATE, $result['start']->format('Y-m-d'));
         $this->assertEquals($value, $result['end']);
     }
 
