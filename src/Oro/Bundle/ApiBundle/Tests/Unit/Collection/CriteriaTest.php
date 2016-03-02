@@ -9,6 +9,9 @@ use Oro\Bundle\ApiBundle\Collection\Join;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CriteriaTest extends OrmRelatedTestCase
 {
     const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';

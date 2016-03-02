@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Collection;
 
 use Oro\Bundle\ApiBundle\Collection\Join;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class JoinTest extends \PHPUnit_Framework_TestCase
 {
     public function testConstructorWithAllParameters()
