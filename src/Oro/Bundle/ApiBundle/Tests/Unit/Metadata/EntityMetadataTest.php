@@ -105,19 +105,16 @@ class EntityMetadataTest extends OrmRelatedTestCase
         $this->assertCount(count($this->classMetadata->getFieldNames()), $entityMetadata->getFields());
 
         $entityMetadata->removeField('id');
-        $entityMetadata->renameField('name', 'newName');
 
         $this->assertCount(1, $entityMetadata->getFields());
-        $this->assertEquals($this->getMetadata('Field', 'name', 'newName'), $entityMetadata->getField('newName'));
-
         $this->assertFalse($entityMetadata->hasProperty('id'));
-        $this->assertTrue($entityMetadata->hasProperty('newName'));
+        $this->assertFalse($entityMetadata->hasField('id'));
 
         $this->assertSame(
             [
                 'identifiers' => [],
                 'fields'      => [
-                    'newName' => [
+                    'name' => [
                         'dataType' => 'string'
                     ]
                 ]
@@ -125,19 +122,13 @@ class EntityMetadataTest extends OrmRelatedTestCase
             $entityMetadata->toArray()
         );
 
-        $entityMetadata->renameProperty('newName', 'name');
-
-        $this->assertFalse($entityMetadata->hasProperty('newName'));
-        $this->assertFalse($entityMetadata->hasField('newName'));
-        $this->assertTrue($entityMetadata->hasProperty('name'));
-        $this->assertTrue($entityMetadata->hasField('name'));
-
         $entityMetadata->removeProperty('name');
 
         $this->assertFalse($entityMetadata->hasProperty('name'));
         $this->assertFalse($entityMetadata->hasField('name'));
 
         $this->assertEmpty($entityMetadata->getFields());
+        $this->assertEmpty($entityMetadata->getAssociations());
     }
 
     public function testAssociations()
@@ -151,7 +142,6 @@ class EntityMetadataTest extends OrmRelatedTestCase
          */
         foreach ($this->classMetadata->getAssociationNames() as $index => $associationName) {
             $this->assertCount($index, $entityMetadata->getAssociations());
-
             $this->assertFalse($entityMetadata->hasAssociation($associationName));
             $this->assertNull($entityMetadata->getAssociation($associationName));
 
@@ -163,41 +153,104 @@ class EntityMetadataTest extends OrmRelatedTestCase
         $this->assertCount(count($this->classMetadata->getAssociationNames()), $entityMetadata->getAssociations());
 
         $entityMetadata->removeAssociation('category');
-        $entityMetadata->renameAssociation('groups', 'newGroups');
 
         $this->assertCount(2, $entityMetadata->getAssociations());
-        $this->assertEquals(
-            $this->getMetadata('Association', 'groups', 'newGroups'),
-            $entityMetadata->getAssociation('newGroups')
-        );
-
-        $this->assertFalse($entityMetadata->hasProperty('category'));
-        $this->assertTrue($entityMetadata->hasProperty('newGroups'));
-
+        $this->assertFalse($entityMetadata->hasAssociation('category'));
         $this->assertSame(
             [
                 'identifiers' => [],
                 'associations'      => [
+                    'groups' => [],
                     'products' => [],
-                    'newGroups' => [],
                 ]
             ],
             $entityMetadata->toArray()
         );
 
-        $entityMetadata->renameProperty('products', 'newProducts');
+        $entityMetadata->removeProperty('products');
 
         $this->assertFalse($entityMetadata->hasProperty('products'));
         $this->assertFalse($entityMetadata->hasAssociation('products'));
-        $this->assertTrue($entityMetadata->hasProperty('newProducts'));
-        $this->assertTrue($entityMetadata->hasAssociation('newProducts'));
 
-        $entityMetadata->removeProperty('newProducts');
-
-        $this->assertFalse($entityMetadata->hasProperty('newProducts'));
-        $this->assertFalse($entityMetadata->hasAssociation('newProducts'));
-
+        $this->assertCount(1, $entityMetadata->getAssociations());
         $this->assertEmpty($entityMetadata->getFields());
+    }
+
+    public function testRenameFieldAssociationProperty()
+    {
+        $entityMetadata = new EntityMetadata();
+
+        foreach ($this->classMetadata->getFieldNames() as $index => $fieldName) {
+            $entityMetadata->addField($this->getMetadata('Field', $fieldName));
+        }
+
+        /**
+         * Rename Field
+         */
+        $this->assertTrue($entityMetadata->hasField('name'));
+
+        $entityMetadata->renameField('name', 'newName');
+
+        $this->assertFalse($entityMetadata->hasField('name'));
+        $this->assertFalse($entityMetadata->hasProperty('name'));
+        $this->assertTrue($entityMetadata->hasField('newName'));
+        $this->assertTrue($entityMetadata->hasProperty('newName'));
+        $this->assertEquals(
+            $this->getMetadata('Field', 'name', 'newName'),
+            $entityMetadata->getField('newName')
+        );
+
+        /**
+         * Rename Field via property
+         */
+        $this->assertTrue($entityMetadata->hasProperty('id'));
+
+        $entityMetadata->renameProperty('id', 'newId');
+
+        $this->assertFalse($entityMetadata->hasField('id'));
+        $this->assertFalse($entityMetadata->hasProperty('id'));
+        $this->assertTrue($entityMetadata->hasField('newId'));
+        $this->assertTrue($entityMetadata->hasProperty('newId'));
+        $this->assertEquals(
+            $this->getMetadata('Field', 'id', 'newId'),
+            $entityMetadata->getField('newId')
+        );
+
+        foreach ($this->classMetadata->getAssociationNames() as $index => $associationName) {
+            $entityMetadata->addAssociation($this->getMetadata('Association', $associationName));
+        }
+
+        /**
+         * Rename Association
+         */
+        $this->assertTrue($entityMetadata->hasAssociation('groups'));
+
+        $entityMetadata->renameAssociation('groups', 'newGroups');
+
+        $this->assertFalse($entityMetadata->hasAssociation('groups'));
+        $this->assertFalse($entityMetadata->hasProperty('groups'));
+        $this->assertTrue($entityMetadata->hasAssociation('newGroups'));
+        $this->assertTrue($entityMetadata->hasProperty('newGroups'));
+        $this->assertEquals(
+            $this->getMetadata('Association', 'groups', 'newGroups'),
+            $entityMetadata->getAssociation('newGroups')
+        );
+
+        /**
+         * Rename Association via property
+         */
+        $this->assertTrue($entityMetadata->hasProperty('products'));
+
+        $entityMetadata->renameProperty('products', 'newProducts');
+
+        $this->assertFalse($entityMetadata->hasAssociation('products'));
+        $this->assertFalse($entityMetadata->hasProperty('products'));
+        $this->assertTrue($entityMetadata->hasAssociation('newProducts'));
+        $this->assertTrue($entityMetadata->hasProperty('newProducts'));
+        $this->assertEquals(
+            $this->getMetadata('Association', 'products', 'newProducts'),
+            $entityMetadata->getAssociation('newProducts')
+        );
     }
 
     /**
