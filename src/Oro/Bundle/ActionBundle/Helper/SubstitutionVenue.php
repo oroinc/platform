@@ -3,11 +3,8 @@
 namespace Oro\Bundle\ActionBundle\Helper;
 
 use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
-use Psr\Log\LoggerAwareInterface;
-use Psr\Log\LoggerInterface;
-use Psr\Log\NullLogger;
 
-class SubstitutionVenue implements LoggerAwareInterface
+class SubstitutionVenue
 {
     const SUBSTITUTION_PATH_MAX_DEPTH = 10;
 
@@ -23,11 +20,9 @@ class SubstitutionVenue implements LoggerAwareInterface
     /* @var int */
     private $maxDepth;
 
-    /** @var LoggerInterface */
-    private $logger;
+    /** @var SubstitutionVisitorInterface[] */
+    private $visitors = [];
 
-    /** @var callable */
-    private $substitutionLogging;
 
     /**
      * SubstitutionVenue constructor.
@@ -43,35 +38,27 @@ class SubstitutionVenue implements LoggerAwareInterface
         $this->clearUnboundedSubstitutions = $clearUnboundedSubstitutions;
         $this->maxDepth = $substitutionMapMaxDepth;
         $this->ignoreCircularReferences = $ignoreCircularReferences;
-        $this->logger = new NullLogger();
-        $this->substitutionLogging = function ($target, $replacement, $targetName, $replacementName) {
-            $this->logger->debug(
-                sprintf('Action substitution. "%s" substituted by "%s"', $targetName, $replacementName)
-            );
-        };
     }
 
     /**
      * Create result array with substituted values if found. Does not apply changes to argument.
      * @param array $things associative array of named elements that can be matched in map and replaced if condition met
-     * @param callable $modifier
      * @return array
      */
-    public function substitute(array $things, callable $modifier = null)
+    public function substitute(array $things)
     {
-        $this->apply($things, $modifier);
+        $this->apply($things);
 
         return $things;
     }
 
     /**
      * @param array $things
-     * @param callable $modifier function that will be invoked during concrete substitution
      */
-    public function apply(array &$things, callable $modifier = null)
+    public function apply(array &$things)
     {
 
-        $bounded = $this->replace($things, $modifier);
+        $bounded = $this->replace($things);
 
         if ($this->clearUnboundedSubstitutions) {
             $this->clearUnbounded($things, $bounded);
@@ -79,12 +66,20 @@ class SubstitutionVenue implements LoggerAwareInterface
     }
 
     /**
+     * Adds visitor
+     * @param SubstitutionVisitorInterface $visitor
+     */
+    public function addVisitor(SubstitutionVisitorInterface $visitor)
+    {
+        $this->visitors[] = $visitor;
+    }
+
+    /**
      * @param array $things
-     * @param callable $modifier
      * @return array list of replacements that was participated in this substitution
      * @throws CircularReferenceException
      */
-    protected function replace(array &$things, callable $modifier)
+    protected function replace(array &$things)
     {
         $scopeMap = $this->getScopedMap($things);
 
@@ -103,14 +98,7 @@ class SubstitutionVenue implements LoggerAwareInterface
             unset($keysIndex[$replacementPos]);
             $targetPos = array_search($target, $keysIndex, true);
             $keysIndex[$targetPos] = $replacement;
-            //outer modifications callback
-            call_user_func(
-                $this->wrapModifier($modifier),
-                $valuesIndex[$targetPos],
-                $valuesIndex[$replacementPos],
-                $target,
-                $replacement
-            );
+            $this->informVisitors($valuesIndex[$targetPos], $valuesIndex[$replacementPos], $target, $replacement);
             $valuesIndex[$targetPos] = $valuesIndex[$replacementPos];
             unset($valuesIndex[$replacementPos]);
         }
@@ -121,19 +109,16 @@ class SubstitutionVenue implements LoggerAwareInterface
     }
 
     /**
-     * @param callable|null $modifier
-     * @return callable|\Closure
+     * @param mixed $target the value of target
+     * @param mixed $replacement the value of replacement
+     * @param string $targetKey the key of target in substitution map
+     * @param string $replacementKey the key of replacement in substitution map
+     * @return null|void
      */
-    private function wrapModifier(callable $modifier = null)
+    protected function informVisitors($target, $replacement, $targetKey, $replacementKey)
     {
-        if ($modifier) {
-            return function () use ($modifier) {
-                $args = func_get_args();
-                call_user_func_array($this->substitutionLogging, $args);
-                call_user_func_array($modifier, $args);
-            };
-        } else {
-            return $this->substitutionLogging;
+        foreach ($this->visitors as $visitor) {
+            $visitor->visit($target, $replacement, $targetKey, $replacementKey);
         }
     }
 
@@ -252,12 +237,5 @@ class SubstitutionVenue implements LoggerAwareInterface
         }
     }
 
-    /**
-     * @param LoggerInterface $logger
-     * @return null|void
-     */
-    public function setLogger(LoggerInterface $logger)
-    {
-        $this->logger = $logger;
-    }
+
 }

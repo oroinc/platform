@@ -286,4 +286,9 @@ class Action
         $this->originName = $originName;
         return $this;
     }
+
+    public function __clone()
+    {
+        $this->definition = clone $this->definition;
+    }
 }

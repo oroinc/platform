@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
+use Oro\Bundle\ActionBundle\Helper\ActionSubstitutionVisitor;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\SubstitutionVenue;
 
@@ -68,11 +69,7 @@ class ActionRegistry
             }
         }
 
-        $this->substitution->apply($actions, function ($target, $replacement, $targetName, $replacementName) {
-            if ($replacement instanceof Action) {
-                $replacement->setOriginName($targetName);
-            }
-        });
+        $this->substitution->apply($actions);
 
         return $actions;
     }
@@ -130,6 +127,10 @@ class ActionRegistry
             } else {
                 unset($this->actions[$replacementName]); //if nothing to replace no need to keep the action
             }
+        }
+
+        if (0 !== count($substitutionMap)) {
+            $this->substitution->addVisitor(new ActionSubstitutionVisitor());
         }
 
         $this->substitution->setMap($substitutionMap);
