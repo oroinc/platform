@@ -3,11 +3,13 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\WorkflowBundle\Model\Action\FlushEntity;
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 
@@ -43,27 +45,14 @@ class FlushEntityTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @expectedExceptionMessage Options not supported
+     * @dataProvider executeDataProvider
+     * @param array $data
+     * @param array $options
+     * @param mixed $entity
      */
-    public function testInitializeException()
+    public function testExecute(array $data, array $options, $entity)
     {
-        $options = ['test'];
-        $this->action->initialize($options);
-    }
-
-    public function testExecute()
-    {
-        $entity = new \stdClass();
-        $context = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionData')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $context->expects($this->once())
-            ->method('getEntity')
-            ->willReturn($entity);
-
-        $this->action->initialize([]);
+        $context = new ActionData($data);
 
         /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $em */
         $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
@@ -83,6 +72,33 @@ class FlushEntityTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getClass($entity))
             ->willReturn($em);
 
+        $this->action->initialize($options);
         $this->action->execute($context);
+    }
+
+    /**
+     * @return array
+     */
+    public function executeDataProvider()
+    {
+        $entity = new \stdClass();
+
+        return [
+            [
+                ['data' => $entity],
+                [],
+                $entity
+            ],
+            [
+                ['attribute' => $entity],
+                [new PropertyPath('attribute')],
+                $entity
+            ],
+            [
+                ['attribute' => $entity],
+                ['entity' => new PropertyPath('attribute')],
+                $entity
+            ],
+        ];
     }
 }

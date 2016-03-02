@@ -7,16 +7,32 @@ use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
 use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
 
+/**
+ * Flush entity
+ *
+ * Usage:
+ * Flush context entity
+ *
+ * @flush_entity: ~
+ *
+ * Flush entity stored in some attribute
+ *
+ * @flush_entity: $.someEntity
+ *
+ * Or
+ *
+ * @flush_entity:
+ *     entity: $.someEntity
+ */
 class FlushEntity extends AbstractAction
 {
     const OPTION_KEY_ENTITY = 'entity';
 
     /**
-     * @var array
+     * @var mixed
      */
-    protected $options;
+    protected $entity;
 
     /**
      * @var ManagerRegistry
@@ -39,8 +55,10 @@ class FlushEntity extends AbstractAction
      */
     public function initialize(array $options)
     {
-        if (count($options)) {
-            throw new InvalidParameterException('Options not supported');
+        if (array_key_exists(self::OPTION_KEY_ENTITY, $options)) {
+            $this->entity = $options[self::OPTION_KEY_ENTITY];
+        } elseif (count($options) === 1) {
+            $this->entity = reset($options);
         }
 
         return $this;
@@ -51,11 +69,24 @@ class FlushEntity extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $entity = $context->getEntity();
+        $entity = $this->getEntity($context);
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass(ClassUtils::getClass($entity));
         $entityManager->persist($entity);
         $entityManager->flush($entity);
+    }
+
+    /**
+     * @param mixed $context
+     * @return object|null
+     */
+    protected function getEntity($context)
+    {
+        if ($this->entity) {
+            return $this->contextAccessor->getValue($context, $this->entity);
+        } else {
+            return $context->getEntity();
+        }
     }
 }
