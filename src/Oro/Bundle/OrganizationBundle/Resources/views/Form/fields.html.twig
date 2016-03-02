@@ -123,7 +123,7 @@
                         {% set disable = 'disabled="disabled"' %}
                     {% endif %}
                 {% else %}
-                    {% if not (choice.value in business_unit_ids) or (entityId and entityId == choice.value) %}
+                    {% if not (business_unit_ids[choice.value] is defined) or (entityId and entityId == choice.value) %}
                         {% set disable = 'disabled="disabled"' %}
                     {% endif %}
                 {% endif %}
