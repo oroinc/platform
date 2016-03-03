@@ -32,12 +32,6 @@ class Action
     /** @var ActionDefinition */
     private $definition;
 
-    /**
-     * Actions can be substituted by other actions. This variable keeps original action name.
-     * @var string
-     */
-    private $originName;
-
     /** @var FunctionInterface[] */
     private $functions = [];
 
@@ -143,7 +137,7 @@ class Action
     public function isAllowed(ActionData $data, Collection $errors = null)
     {
         return $this->isPreConditionAllowed($data, $errors) &&
-        $this->evaluateConditions($data, ActionDefinition::CONDITIONS, $errors);
+            $this->evaluateConditions($data, ActionDefinition::CONDITIONS, $errors);
     }
 
     /**
@@ -267,28 +261,5 @@ class Action
                 $this->definition->isForAllEntities()
             )
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getOriginName()
-    {
-        return $this->originName;
-    }
-
-    /**
-     * @param string $originName
-     * @return $this
-     */
-    public function setOriginName($originName)
-    {
-        $this->originName = $originName;
-        return $this;
-    }
-
-    public function __clone()
-    {
-        $this->definition = clone $this->definition;
     }
 }

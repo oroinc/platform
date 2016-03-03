@@ -38,7 +38,7 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
                     'replacement' => ['replacementActionBody']
                 ],
                 [
-                    'replacement' => ['replacementActionBody']
+                    'target' => ['replacementActionBody']
                 ]
             ],
             'deep' => [
@@ -56,7 +56,7 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
                     'replacement4' => ['replacement4ActionBody']
                 ],
                 [
-                    'replacement4' => ['replacement4ActionBody']
+                    'target' => ['replacement4ActionBody']
                 ]
             ],
             'deep broken by context' => [
@@ -73,7 +73,7 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
                     'replacement4' => ['replacement4ActionBody']
                 ],
                 [
-                    'replacement2' => ['replacement2ActionBody']
+                    'target' => ['replacement2ActionBody']
                 ]
             ],
             'deep broken by substitutions will cause to deal with replacement3 as with normal target' => [
@@ -90,8 +90,8 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
                     'replacement4' => ['replacement4ActionBody']
                 ],
                 [
-                    'replacement2' => ['replacement2ActionBody'],
-                    'replacement4' => ['replacement4ActionBody']
+                    'target' => ['replacement2ActionBody'],
+                    'replacement3' => ['replacement4ActionBody']
                 ]
             ],
             'no targets' => [
@@ -168,7 +168,7 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
                     'someOtherReplacement' => ['matched replacement']
                 ],
                 [
-                    'replacement' => ['replacementActionBody'],
+                    'target' => ['replacementActionBody'],
                     'someOtherReplacement' => ['matched replacement']
                 ]
             ],
@@ -188,7 +188,7 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
                     'replacement6' => ['replacement4ActionBody']
                 ],
                 [
-                    'replacement3' => ['replacement3ActionBody'],
+                    'target' => ['replacement3ActionBody'],
                     'replacement6' => ['replacement4ActionBody'],
                     'replacement1' => ['replacement1ActionBody'],
                     'replacement2' => ['replacement2ActionBody'],

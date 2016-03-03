@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
-use Oro\Bundle\ActionBundle\Helper\ActionSubstitutionVisitor;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\SubstitutionVenue;
 
@@ -65,7 +64,7 @@ class ActionRegistry
                 $this->isDatagridMatched($datagrid, $definition) ||
                 ($route && in_array($route, $definition->getRoutes(), true))
             ) {
-                $actions[$action->getName()] = clone $action;
+                $actions[$action->getName()] = $action;
             }
         }
 
@@ -82,7 +81,7 @@ class ActionRegistry
     {
         $this->loadActions();
 
-        return array_key_exists($name, $this->actions) ? clone $this->actions[$name] : null;
+        return array_key_exists($name, $this->actions) ? $this->actions[$name] : null;
     }
 
     /**
@@ -127,10 +126,6 @@ class ActionRegistry
             } else {
                 unset($this->actions[$replacementName]); //if nothing to replace no need to keep the action
             }
-        }
-
-        if (0 !== count($substitutionMap)) {
-            $this->substitution->addVisitor(new ActionSubstitutionVisitor());
         }
 
         $this->substitution->setMap($substitutionMap);

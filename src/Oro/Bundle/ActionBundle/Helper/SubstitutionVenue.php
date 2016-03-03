@@ -20,10 +20,6 @@ class SubstitutionVenue
     /* @var int */
     private $maxDepth;
 
-    /** @var SubstitutionVisitorInterface[] */
-    private $visitors = [];
-
-
     /**
      * SubstitutionVenue constructor.
      * @param bool $clearUnboundedSubstitutions result of substitution will be cleared form unused replacers
@@ -66,15 +62,6 @@ class SubstitutionVenue
     }
 
     /**
-     * Adds visitor
-     * @param SubstitutionVisitorInterface $visitor
-     */
-    public function addVisitor(SubstitutionVisitorInterface $visitor)
-    {
-        $this->visitors[] = $visitor;
-    }
-
-    /**
      * @param array $things
      * @return array list of replacements that was participated in this substitution
      * @throws CircularReferenceException
@@ -97,8 +84,6 @@ class SubstitutionVenue
             $replacementPos = array_search($replacement, $keysIndex, true);
             unset($keysIndex[$replacementPos]);
             $targetPos = array_search($target, $keysIndex, true);
-            $keysIndex[$targetPos] = $replacement;
-            $this->informVisitors($valuesIndex[$targetPos], $valuesIndex[$replacementPos], $target, $replacement);
             $valuesIndex[$targetPos] = $valuesIndex[$replacementPos];
             unset($valuesIndex[$replacementPos]);
         }
@@ -107,21 +92,6 @@ class SubstitutionVenue
 
         return $bounded;
     }
-
-    /**
-     * @param mixed $target the value of target
-     * @param mixed $replacement the value of replacement
-     * @param string $targetKey the key of target in substitution map
-     * @param string $replacementKey the key of replacement in substitution map
-     * @return null|void
-     */
-    protected function informVisitors($target, $replacement, $targetKey, $replacementKey)
-    {
-        foreach ($this->visitors as $visitor) {
-            $visitor->visit($target, $replacement, $targetKey, $replacementKey);
-        }
-    }
-
 
     /**
      * @param array $scope
@@ -236,6 +206,4 @@ class SubstitutionVenue
             }
         }
     }
-
-
 }

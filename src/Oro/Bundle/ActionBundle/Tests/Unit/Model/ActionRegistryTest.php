@@ -235,7 +235,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' =>  null,
                 'group' => null,
-                'expected' => ['action13', 'action14', 'action16']
+                'expected' => ['action13', 'action14']
             ],
             'action17 matched by group but no substitution and no appearance' => [
                 'entityClass' => null,
@@ -249,7 +249,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' =>  null,
                 'group' => 'limited',
-                'expected' => ['action19']
+                'expected' => ['action18']
             ]
         ];
     }
