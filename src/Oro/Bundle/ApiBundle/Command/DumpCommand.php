@@ -48,7 +48,7 @@ class DumpCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $requestType = $input->getOption('request-type');
+        $requestType = new RequestType($input->getOption('request-type'));
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
@@ -79,11 +79,11 @@ class DumpCommand extends ContainerAwareCommand
 
     /**
      * @param ApiResource $resource
-     * @param string[]    $requestType
+     * @param RequestType $requestType
      *
      * @return array
      */
-    protected function getResourceAttributes(ApiResource $resource, array $requestType)
+    protected function getResourceAttributes(ApiResource $resource, RequestType $requestType)
     {
         $result = [];
 

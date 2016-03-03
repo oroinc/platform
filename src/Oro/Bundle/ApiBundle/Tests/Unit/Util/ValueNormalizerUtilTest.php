@@ -12,7 +12,7 @@ class ValueNormalizerUtilTest extends \PHPUnit_Framework_TestCase
     {
         $entityClass = 'Test\Class';
         $entityType  = 'test_class';
-        $requestType = [RequestType::REST];
+        $requestType = new RequestType([RequestType::REST]);
 
         $valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
@@ -34,7 +34,7 @@ class ValueNormalizerUtilTest extends \PHPUnit_Framework_TestCase
     public function testConvertToEntityTypeWhenExceptionOccurred()
     {
         $entityClass = 'Test\Class';
-        $requestType = [RequestType::REST];
+        $requestType = new RequestType([RequestType::REST]);
 
         $valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
@@ -50,7 +50,7 @@ class ValueNormalizerUtilTest extends \PHPUnit_Framework_TestCase
     public function testConvertToEntityTypeWhenIgnoreException()
     {
         $entityClass = 'Test\Class';
-        $requestType = [RequestType::REST];
+        $requestType = new RequestType([RequestType::REST]);
 
         $valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()

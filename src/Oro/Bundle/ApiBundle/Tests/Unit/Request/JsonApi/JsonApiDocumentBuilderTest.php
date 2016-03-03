@@ -26,7 +26,7 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
             ->willReturnCallback(
                 function ($value, $dataType, $requestType, $isArrayAllowed) {
                     $this->assertEquals(DataType::ENTITY_TYPE, $dataType);
-                    $this->assertEquals([RequestType::JSON_API], $requestType);
+                    $this->assertEquals(new RequestType([RequestType::JSON_API]), $requestType);
                     $this->assertFalse($isArrayAllowed);
 
                     if (false !== strpos($value, 'WithoutAlias')) {

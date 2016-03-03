@@ -28,7 +28,7 @@ class GetRestJsonApiTest extends ApiTestCase
      */
     protected function getRequestType()
     {
-        return [RequestType::REST, RequestType::JSON_API];
+        return new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -41,7 +41,7 @@ class GetRestJsonApiTest extends ApiTestCase
         $entityAlias = $this->valueNormalizer->normalizeValue(
             $entityClass,
             DataType::ENTITY_TYPE,
-            [RequestType::REST, RequestType::JSON_API]
+            $this->getRequestType()
         );
 
         /**

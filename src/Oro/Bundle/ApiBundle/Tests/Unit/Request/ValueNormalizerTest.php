@@ -103,7 +103,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRequirement($expectedValue, $dataType, $requestType)
     {
-        $result = $this->valueNormalizer->getRequirement($dataType, $requestType);
+        $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType));
         $this->assertSame($expectedValue, $result);
     }
 
@@ -125,7 +125,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetArrayRequirement($expectedValue, $dataType, $requestType)
     {
-        $result = $this->valueNormalizer->getRequirement($dataType, $requestType, true);
+        $result = $this->valueNormalizer->getRequirement($dataType, new RequestType($requestType), true);
         $this->assertSame($expectedValue, $result);
     }
 
@@ -180,7 +180,12 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     public function testNormalizeValue($expectedValue, $value, $dataType, $requestType, $isArrayAllowed = false)
     {
-        $result = $this->valueNormalizer->normalizeValue($value, $dataType, $requestType, $isArrayAllowed);
+        $result = $this->valueNormalizer->normalizeValue(
+            $value,
+            $dataType,
+            new RequestType($requestType),
+            $isArrayAllowed
+        );
         if (is_object($expectedValue)) {
             $this->assertInstanceOf(get_class($expectedValue), $result);
             $this->assertEquals(get_class($expectedValue), get_class($result));
@@ -377,7 +382,7 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
     public function testNormalizeInvalidValue($expectedExceptionMessage, $value, $dataType, $requestType)
     {
         $this->setExpectedException('\UnexpectedValueException', $expectedExceptionMessage);
-        $this->valueNormalizer->normalizeValue($value, $dataType, $requestType, true);
+        $this->valueNormalizer->normalizeValue($value, $dataType, new RequestType($requestType), true);
     }
 
     public function normalizeInvalidValueProvider()

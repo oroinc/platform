@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Parser;
 
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
@@ -40,7 +41,7 @@ abstract class ApiTestCase extends WebTestCase
     }
 
     /**
-     * @return string[]
+     * @return RequestType
      */
     abstract protected function getRequestType();
 

@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+use Oro\Component\ChainProcessor\ToArrayInterface;
+
 /**
- * Supported types of Data API requests.
+ * Represents the type of Data API requests.
  */
-final class RequestType
+class RequestType implements ToArrayInterface
 {
     /**
      * REST API request
@@ -17,4 +19,80 @@ final class RequestType
      * @see http://jsonapi.org
      */
     const JSON_API = 'json_api';
+
+    /** @var string[] */
+    protected $types = [];
+
+    /** @var string */
+    private $str;
+
+    /**
+     * @param string[] $types
+     */
+    public function __construct(array $types)
+    {
+        $this->types = $types;
+    }
+
+    /**
+     * @param string $type
+     */
+    public function add($type)
+    {
+        if (!in_array($type, $this->types, true)) {
+            $this->types[] = $type;
+            $this->str     = null;
+        }
+    }
+
+    /**
+     * @param string $type
+     */
+    public function remove($type)
+    {
+        $key = array_search($type, $this->types, true);
+        if (false !== $key) {
+            unset($this->types[$key]);
+            $this->types = array_values($this->types);
+            $this->str   = null;
+        }
+    }
+
+    /**
+     * @param string $type
+     *
+     * @return bool
+     */
+    public function has($type)
+    {
+        return in_array($type, $this->types, true);
+    }
+
+    /**
+     * @return bool
+     */
+    public function isEmpty()
+    {
+        return empty($this->types);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function toArray()
+    {
+        return $this->types;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function __toString()
+    {
+        if (null === $this->str) {
+            $this->str = implode(',', $this->types);
+        }
+
+        return $this->str;
+    }
 }

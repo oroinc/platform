@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\RelationConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\RelationConfigProcessor;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class RelationConfigProvider extends AbstractConfigProvider
 {
@@ -28,12 +29,12 @@ class RelationConfigProvider extends AbstractConfigProvider
      *
      * @param string                 $className   The FQCN of an entity
      * @param string                 $version     The version of a config
-     * @param string[]               $requestType The request type, for example "rest", "soap", etc.
+     * @param RequestType            $requestType The request type, for example "rest", "soap", etc.
      * @param ConfigExtraInterface[] $extras      Requests for additional configuration data
      *
      * @return Config
      */
-    public function getRelationConfig($className, $version, array $requestType = [], array $extras = [])
+    public function getRelationConfig($className, $version, RequestType $requestType, array $extras = [])
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');

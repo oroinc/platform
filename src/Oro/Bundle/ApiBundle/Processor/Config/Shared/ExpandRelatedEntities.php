@@ -8,9 +8,9 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -70,7 +70,7 @@ class ExpandRelatedEntities implements ProcessorInterface
      * @param string                 $entityClass
      * @param string[]               $expandedEntities
      * @param string                 $version
-     * @param string[]               $requestType
+     * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
     protected function completeAssociations(
@@ -78,7 +78,7 @@ class ExpandRelatedEntities implements ProcessorInterface
         $entityClass,
         $expandedEntities,
         $version,
-        array $requestType,
+        RequestType $requestType,
         array $extras
     ) {
         $metadata     = $this->doctrineHelper->getEntityMetadataForClass($entityClass);

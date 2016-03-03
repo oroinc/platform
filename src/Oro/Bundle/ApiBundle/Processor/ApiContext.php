@@ -3,20 +3,21 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Component\ChainProcessor\Context as BaseContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 abstract class ApiContext extends BaseContext
 {
-    /** a list of types the current request belongs, for example "rest", "soap", etc. */
+    /** the request type */
     const REQUEST_TYPE = 'requestType';
 
     /** API version */
     const VERSION = 'version';
 
     /**
-     * Gets a list of types the current request belongs, for example "rest", "soap", etc.
+     * Gets the current request type.
      * A request can belong to several types, e.g. "rest" and "json_api".
      *
-     * @return string[]
+     * @return RequestType
      */
     public function getRequestType()
     {
@@ -24,7 +25,7 @@ abstract class ApiContext extends BaseContext
 
         return null !== $requestTypes
             ? $requestTypes
-            : [];
+            : new RequestType([]);
     }
 
     /**
@@ -32,17 +33,19 @@ abstract class ApiContext extends BaseContext
      * A request can belong to several types, e.g. "rest" and "json_api".
      * This method adds the given type(s) to a list of already set types.
      *
-     * @param string|string[] $requestType
+     * @param RequestType|string|string[] $requestType
      */
     public function setRequestType($requestType)
     {
-        $types = $this->getRequestType();
-        foreach ((array)$requestType as $type) {
-            if (!in_array($type, $types, true)) {
-                $types[] = $type;
+        if ($requestType instanceof RequestType) {
+            $this->set(self::REQUEST_TYPE, $requestType);
+        } else {
+            $type = $this->getRequestType();
+            foreach ((array)$requestType as $item) {
+                $type->add($item);
             }
+            $this->set(self::REQUEST_TYPE, $type);
         }
-        $this->set(self::REQUEST_TYPE, $types);
     }
 
     /**

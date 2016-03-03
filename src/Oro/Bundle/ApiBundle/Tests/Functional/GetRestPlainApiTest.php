@@ -22,7 +22,7 @@ class GetRestPlainApiTest extends ApiTestCase
      */
     protected function getRequestType()
     {
-        return [RequestType::REST];
+        return new RequestType([RequestType::REST]);
     }
 
     /**
@@ -35,7 +35,7 @@ class GetRestPlainApiTest extends ApiTestCase
         $entityAlias = $this->valueNormalizer->normalizeValue(
             $entityClass,
             DataType::ENTITY_TYPE,
-            [RequestType::REST]
+            $this->getRequestType()
         );
 
         /**

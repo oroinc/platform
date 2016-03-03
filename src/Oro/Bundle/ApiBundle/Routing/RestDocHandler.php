@@ -62,6 +62,9 @@ class RestDocHandler implements HandlerInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var RequestType */
+    protected $requestType;
+
     /**
      * @param RestDocViewDetector              $docViewDetector
      * @param ActionProcessorBag               $processorBag
@@ -84,6 +87,7 @@ class RestDocHandler implements HandlerInterface
         $this->entityAliasResolver     = $entityAliasResolver;
         $this->doctrineHelper          = $doctrineHelper;
         $this->valueNormalizer         = $valueNormalizer;
+        $this->requestType             = new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -260,7 +264,7 @@ class RestDocHandler implements HandlerInterface
                     'description' => $filter->getDescription(),
                     'requirement' => $this->valueNormalizer->getRequirement(
                         $filter->getDataType(),
-                        [RequestType::REST, RequestType::JSON_API],
+                        $this->requestType,
                         $filter->isArrayAllowed()
                     )
                 ];

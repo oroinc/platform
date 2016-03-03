@@ -12,6 +12,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
@@ -54,7 +55,7 @@ class DumpMetadataCommand extends ContainerAwareCommand
         $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
 
         $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'), true);
-        $requestType = $input->getOption('request-type');
+        $requestType = new RequestType($input->getOption('request-type'));
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
@@ -68,13 +69,13 @@ class DumpMetadataCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string   $entityClass
-     * @param string   $version
-     * @param string[] $requestType
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
      *
      * @return array
      */
-    protected function getMetadata($entityClass, $version, array $requestType)
+    protected function getMetadata($entityClass, $version, RequestType $requestType)
     {
         /** @var MetadataProvider $configProvider */
         $metadataProvider = $this->getContainer()->get('oro_api.metadata_provider');

@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
@@ -69,13 +70,13 @@ class FilterFieldsByExtra implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      * @param array                  $fieldFilters
-     * @param string[]               $requestType
+     * @param RequestType            $requestType
      */
     protected function filterFields(
         EntityDefinitionConfig $definition,
         $entityClass,
         array $fieldFilters,
-        array $requestType
+        RequestType $requestType
     ) {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
@@ -113,11 +114,11 @@ class FilterFieldsByExtra implements ProcessorInterface
     /**
      * @param ClassMetadata $metadata
      * @param array         $fieldFilters
-     * @param string[]      $requestType
+     * @param RequestType   $requestType
      *
      * @return string[]|null
      */
-    protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters, array $requestType)
+    protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters, RequestType $requestType)
     {
         $allowedFields = null;
         if ($metadata->inheritanceType === ClassMetadata::INHERITANCE_TYPE_NONE) {
@@ -143,12 +144,12 @@ class FilterFieldsByExtra implements ProcessorInterface
     }
 
     /**
-     * @param string   $entityClass
-     * @param string[] $requestType
+     * @param string      $entityClass
+     * @param RequestType $requestType
      *
      * @return string|null
      */
-    protected function convertToEntityType($entityClass, array $requestType)
+    protected function convertToEntityType($entityClass, RequestType $requestType)
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,

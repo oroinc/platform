@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class DebugCommand extends ContainerAwareCommand
 {
@@ -46,7 +47,7 @@ class DebugCommand extends ContainerAwareCommand
         if (empty($action)) {
             $this->dumpActions($output);
         } else {
-            $this->dumpProcessors($output, $action, $input->getOption('request-type'));
+            $this->dumpProcessors($output, $action, new RequestType($input->getOption('request-type')));
         }
     }
 
@@ -84,9 +85,9 @@ class DebugCommand extends ContainerAwareCommand
     /**
      * @param OutputInterface $output
      * @param string          $action
-     * @param string[]        $requestType
+     * @param RequestType     $requestType
      */
-    protected function dumpProcessors(OutputInterface $output, $action, array $requestType)
+    protected function dumpProcessors(OutputInterface $output, $action, RequestType $requestType)
     {
         $output->writeln('The processors are displayed in the order they are executed.');
 
