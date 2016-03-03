@@ -69,6 +69,15 @@ class RequestType implements ToArrayInterface
     }
 
     /**
+     * @param string[] $types
+     */
+    public function set(array $types)
+    {
+        $this->types = $types;
+        $this->str   = null;
+    }
+
+    /**
      * @return bool
      */
     public function isEmpty()

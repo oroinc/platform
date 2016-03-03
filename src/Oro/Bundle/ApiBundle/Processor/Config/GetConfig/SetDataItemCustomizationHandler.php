@@ -179,7 +179,7 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
         /** @var CustomizeDataItemContext $customizationContext */
         $customizationContext = $this->customizationProcessor->createContext();
         $customizationContext->setVersion($context->getVersion());
-        $customizationContext->setRequestType($context->getRequestType());
+        $customizationContext->getRequestType()->set($context->getRequestType()->toArray());
 
         return $customizationContext;
     }

@@ -30,17 +30,6 @@ abstract class ApiContext extends BaseContext
     }
 
     /**
-     * Sets the current request type.
-     * A request can belong to several types, e.g. "rest" and "json_api".
-     *
-     * @param RequestType $requestType
-     */
-    public function setRequestType(RequestType $requestType)
-    {
-        $this->set(self::REQUEST_TYPE, $requestType);
-    }
-
-    /**
      * Gets API version
      *
      * @return string

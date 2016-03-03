@@ -33,7 +33,7 @@ class ResourcesLoader
         /** @var CollectResourcesContext $context */
         $context = $this->processor->createContext();
         $context->setVersion($version);
-        $context->setRequestType($requestType);
+        $context->getRequestType()->set($requestType->toArray());
 
         $this->processor->process($context);
 

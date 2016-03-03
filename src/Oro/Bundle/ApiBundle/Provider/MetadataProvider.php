@@ -48,7 +48,7 @@ class MetadataProvider
         $context = $this->processor->createContext();
         $context->setClassName($className);
         $context->setVersion($version);
-        $context->setRequestType($requestType);
+        $context->getRequestType()->set($requestType->toArray());
         if (!empty($extras)) {
             $context->setExtras($extras);
         }
