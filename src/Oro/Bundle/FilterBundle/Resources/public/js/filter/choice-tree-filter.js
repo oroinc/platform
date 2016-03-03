@@ -6,6 +6,7 @@ define(function(require) {
     var TextFilter = require('oro/filter/choice-filter');
     var $ = require('jquery');
     var tools = require('oroui/js/tools');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
 
     var availableModes = {
         all: 'all',
@@ -114,10 +115,44 @@ define(function(require) {
 
         checkedItems: {},
 
+        loadedMetadata: true,
+
+        initialize: function() {
+            ChoiceTreeFilter.__super__.initialize.apply(this, arguments);
+            if (this.lazy) {
+                this.loadedMetadata = false;
+                this.loader(
+                    _.bind(function(metadata) {
+                        this.data = metadata.data;
+                        this._updateCriteriaHint();
+                        this.loadedMetadata = true;
+                        if (this.subview('loading')) {
+                            this.subview('loading').hide();
+                        }
+                    }, this)
+                );
+            }
+        },
+
+        render: function() {
+            var result = ChoiceTreeFilter.__super__.render.apply(this, arguments);
+            if (!this.loadedMetadata) {
+                this.subview('loading', new LoadingMaskView({
+                    container: this.$el
+                }));
+                this.subview('loading').show();
+            }
+            return result;
+        },
+
         /**
          * @inheritDoc
          */
         _renderCriteria: function() {
+            if (!this.loadedMetadata) {
+                return;
+            }
+
             var value = _.extend({}, this.emptyValue, this.value);
             var searchQuery = this.SearchQuery ? this.SearchQuery : undefined;
             var selectedChoiceLabel = '';

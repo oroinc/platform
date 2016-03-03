@@ -116,6 +116,7 @@ class AclConfigurationPass implements CompilerPassInterface
 
     /**
      * @param ContainerBuilder $container
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     protected function configureDefaultAclVoter(ContainerBuilder $container)
     {
