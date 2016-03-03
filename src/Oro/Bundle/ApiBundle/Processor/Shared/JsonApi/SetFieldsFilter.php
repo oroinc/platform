@@ -8,6 +8,7 @@ use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
@@ -68,9 +69,9 @@ class SetFieldsFilter implements ProcessorInterface
     /**
      * @param FilterCollection $filters
      * @param string           $entityClass
-     * @param string[]         $requestType
+     * @param RequestType      $requestType
      */
-    protected function addFilter(FilterCollection $filters, $entityClass, array $requestType)
+    protected function addFilter(FilterCollection $filters, $entityClass, RequestType $requestType)
     {
         $entityType = $this->convertToEntityType($entityClass, $requestType);
         if ($entityType) {
@@ -88,12 +89,12 @@ class SetFieldsFilter implements ProcessorInterface
     }
 
     /**
-     * @param string   $entityClass
-     * @param string[] $requestType
+     * @param string      $entityClass
+     * @param RequestType $requestType
      *
      * @return string|null
      */
-    protected function convertToEntityType($entityClass, array $requestType)
+    protected function convertToEntityType($entityClass, RequestType $requestType)
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,

@@ -41,6 +41,9 @@ class JsonApiDocumentBuilder
     /** @var array */
     protected $result = [];
 
+    /** @var RequestType */
+    protected $requestType;
+
     /**
      * @param ValueNormalizer              $valueNormalizer
      * @param EntityIdTransformerInterface $entityIdTransformer
@@ -57,6 +60,7 @@ class JsonApiDocumentBuilder
             $this->objectAccessor,
             $this->entityIdTransformer
         );
+        $this->requestType      = new RequestType([RequestType::JSON_API]);
     }
 
     /**
@@ -360,7 +364,7 @@ class JsonApiDocumentBuilder
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
             $entityClass,
-            [RequestType::JSON_API],
+            $this->requestType,
             $throwException
         );
     }

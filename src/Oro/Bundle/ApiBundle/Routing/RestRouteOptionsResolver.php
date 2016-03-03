@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Routing;
 
-use Oro\Bundle\ApiBundle\Request\DataType;
 use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -42,6 +42,9 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var string[] */
     protected $defaultFormat;
 
+    /** @var RequestType */
+    protected $requestType;
+
     /** @var array */
     private $supportedEntities;
 
@@ -67,6 +70,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         $this->valueNormalizer        = $valueNormalizer;
         $this->formats                = $formats;
         $this->defaultFormat          = $defaultFormat;
+        $this->requestType            = new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -97,10 +101,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     protected function getSupportedEntities()
     {
         if (null === $this->supportedEntities) {
-            $resources = $this->resourcesLoader->getResources(
-                Version::LATEST,
-                [RequestType::REST, RequestType::JSON_API]
-            );
+            $resources = $this->resourcesLoader->getResources(Version::LATEST, $this->requestType);
 
             $this->supportedEntities = [];
             foreach ($resources as $resource) {
@@ -108,7 +109,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 $pluralAlias = $this->valueNormalizer->normalizeValue(
                     $className,
                     DataType::ENTITY_TYPE,
-                    [RequestType::REST, RequestType::JSON_API]
+                    $this->requestType
                 );
                 if (!empty($pluralAlias)) {
                     $this->supportedEntities[] = [
@@ -208,10 +209,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     protected function getIdFieldRequirement($fieldType)
     {
-        $result = $this->valueNormalizer->getRequirement(
-            $fieldType,
-            [RequestType::REST, RequestType::JSON_API]
-        );
+        $result = $this->valueNormalizer->getRequirement($fieldType, $this->requestType);
 
         if (ValueNormalizer::DEFAULT_REQUIREMENT === $result) {
             $result = '[^\.]+';

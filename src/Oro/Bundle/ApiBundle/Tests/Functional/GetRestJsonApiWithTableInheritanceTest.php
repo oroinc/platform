@@ -39,7 +39,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
      */
     protected function getRequestType()
     {
-        return [RequestType::REST, RequestType::JSON_API];
+        return new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -65,7 +65,7 @@ class GetRestJsonApiWithTableInheritanceTest extends ApiTestCase
         $entityAlias = $this->valueNormalizer->normalizeValue(
             self::ENTITY_CLASS,
             DataType::ENTITY_TYPE,
-            [RequestType::REST, RequestType::JSON_API]
+            $this->getRequestType()
         );
 
         // test get list request

@@ -33,7 +33,7 @@ class MetadataProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->context = new MetadataContext();
         $this->context->setClassName(self::TEST_CLASS_NAME);
         $this->context->setVersion(self::TEST_VERSION);
-        $this->context->setRequestType(self::TEST_REQUEST_TYPE);
+        $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
 
         $this->configExtensionRegistry = new ConfigExtensionRegistry();
         $this->configExtensionRegistry->addExtension(new FiltersConfigExtension());

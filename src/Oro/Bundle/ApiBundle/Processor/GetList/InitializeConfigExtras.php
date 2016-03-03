@@ -21,12 +21,8 @@ class InitializeConfigExtras implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $context->setConfigExtras(
-            [
-                new VirtualFieldsConfigExtra(),
-                new FiltersConfigExtra(),
-                new SortersConfigExtra()
-            ]
-        );
+        $context->addConfigExtra(new VirtualFieldsConfigExtra());
+        $context->addConfigExtra(new FiltersConfigExtra());
+        $context->addConfigExtra(new SortersConfigExtra());
     }
 }

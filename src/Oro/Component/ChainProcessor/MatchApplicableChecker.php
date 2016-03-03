@@ -43,6 +43,10 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
      */
     protected function isMatch($value, $contextValue)
     {
+        if ($contextValue instanceof ToArrayInterface) {
+            return $this->isMatchAnyInArray($value, $contextValue->toArray());
+        }
+
         return is_array($contextValue)
             ? $this->isMatchAnyInArray($value, $contextValue)
             : $this->isMatchAnyWithScalar($value, $contextValue);

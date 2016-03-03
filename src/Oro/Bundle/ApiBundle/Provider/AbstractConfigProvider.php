@@ -6,6 +6,7 @@ use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 abstract class AbstractConfigProvider
 {
@@ -13,16 +14,19 @@ abstract class AbstractConfigProvider
      * @param ConfigContext          $context
      * @param string                 $className
      * @param string                 $version
-     * @param string[]               $requestType
+     * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
-    protected function initContext(ConfigContext $context, $className, $version, array $requestType, array $extras)
-    {
+    protected function initContext(
+        ConfigContext $context,
+        $className,
+        $version,
+        RequestType $requestType,
+        array $extras
+    ) {
         $context->setClassName($className);
         $context->setVersion($version);
-        if (!empty($requestType)) {
-            $context->setRequestType($requestType);
-        }
+        $context->getRequestType()->set($requestType->toArray());
         if (!empty($extras)) {
             $context->setExtras($extras);
         }
@@ -31,14 +35,14 @@ abstract class AbstractConfigProvider
     /**
      * @param string                 $className
      * @param string                 $version
-     * @param string[]               $requestType
+     * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      *
      * @return string
      */
-    protected function buildCacheKey($className, $version, array $requestType, array $extras)
+    protected function buildCacheKey($className, $version, RequestType $requestType, array $extras)
     {
-        $cacheKey = implode('', $requestType) . '|' . $version . '|' . $className;
+        $cacheKey = (string)$requestType . '|' . $version . '|' . $className;
         foreach ($extras as $extra) {
             $part = $extra->getCacheKeyPart();
             if (!empty($part)) {

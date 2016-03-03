@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
 
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultSorting;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
@@ -33,8 +32,8 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessForJSONAPIRequest()
     {
-        $this->context->remove(GetListContext::REQUEST_TYPE);
-        $this->context->setRequestType([RequestType::JSON_API]);
+        $this->context->getRequestType()->clear();
+        $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -50,8 +49,9 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
         $filters->add('sort', $sortFilter);
         $this->context->set('filters', $filters);
 
-        $this->context->remove(GetListContext::REQUEST_TYPE);
-        $this->context->setRequestType([RequestType::REST, RequestType::JSON_API]);
+        $this->context->getRequestType()->clear();
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
         $this->processor->process($this->context);
 

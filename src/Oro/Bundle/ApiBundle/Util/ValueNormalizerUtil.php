@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Util;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 class ValueNormalizerUtil
@@ -12,7 +13,7 @@ class ValueNormalizerUtil
      *
      * @param ValueNormalizer $valueNormalizer
      * @param string          $entityClass
-     * @param string[]        $requestType
+     * @param RequestType     $requestType
      * @param bool            $throwException
      *
      * @return string|null
@@ -22,7 +23,7 @@ class ValueNormalizerUtil
     public static function convertToEntityType(
         ValueNormalizer $valueNormalizer,
         $entityClass,
-        array $requestType,
+        RequestType $requestType,
         $throwException = true
     ) {
         try {

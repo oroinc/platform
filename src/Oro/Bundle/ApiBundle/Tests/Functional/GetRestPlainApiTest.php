@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\RestRequest;
 
 class GetRestPlainApiTest extends ApiTestCase
 {
@@ -22,7 +23,7 @@ class GetRestPlainApiTest extends ApiTestCase
      */
     protected function getRequestType()
     {
-        return [RequestType::REST];
+        return new RequestType([RequestType::REST]);
     }
 
     /**
@@ -35,7 +36,7 @@ class GetRestPlainApiTest extends ApiTestCase
         $entityAlias = $this->valueNormalizer->normalizeValue(
             $entityClass,
             DataType::ENTITY_TYPE,
-            [RequestType::REST]
+            $this->getRequestType()
         );
 
         /**
@@ -54,18 +55,40 @@ class GetRestPlainApiTest extends ApiTestCase
         $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
 
         // test get request
-        $content = $this->jsonToArray($response->getContent());
-        list($id, $recordExist) = $this->getGetRequestConfig($entityClass, $content);
+        $id = $this->getGetEntityId($entityClass, $this->jsonToArray($response->getContent()));
+        if (null !== $id) {
+            $this->client->request(
+                'GET',
+                $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
+            );
+            $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 200, $entityAlias, 'get');
+        }
+    }
 
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
-        );
-        $this->assertApiResponseStatusCodeEquals(
-            $this->client->getResponse(),
-            $recordExist ? 200 : 404,
-            $entityAlias,
-            'get'
-        );
+    /**
+     * @param string $entityClass
+     * @param array  $content
+     *
+     * @return mixed
+     */
+    protected function getGetEntityId($entityClass, $content)
+    {
+        if (count($content) !== 1) {
+            return null;
+        }
+
+        $idFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
+        if (count($idFields) === 1) {
+            // single identifier
+            return $content[0][reset($idFields)];
+        } else {
+            // combined identifier
+            $requirements = [];
+            foreach ($idFields as $field) {
+                $requirements[$field] = $content[0][$field];
+            }
+
+            return implode(RestRequest::ARRAY_DELIMITER, $requirements);
+        }
     }
 }

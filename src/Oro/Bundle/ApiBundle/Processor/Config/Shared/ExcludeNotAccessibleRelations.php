@@ -11,6 +11,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
@@ -71,9 +72,9 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
-     * @param string[]               $requestType
+     * @param RequestType            $requestType
      */
-    protected function updateRelations(EntityDefinitionConfig $definition, $entityClass, array $requestType)
+    protected function updateRelations(EntityDefinitionConfig $definition, $entityClass, RequestType $requestType)
     {
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $fields   = $definition->getFields();
@@ -97,11 +98,11 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
 
     /**
      * @param ClassMetadata $targetMetadata
-     * @param string[]      $requestType
+     * @param RequestType   $requestType
      *
      * @return bool
      */
-    protected function isResourceForRelatedEntityAccessible(ClassMetadata $targetMetadata, array $requestType)
+    protected function isResourceForRelatedEntityAccessible(ClassMetadata $targetMetadata, RequestType $requestType)
     {
         if ($this->isResourceAccessible($targetMetadata->name, $requestType)) {
             return true;
@@ -119,12 +120,12 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     }
 
     /**
-     * @param string   $entityClass
-     * @param string[] $requestType
+     * @param string      $entityClass
+     * @param RequestType $requestType
      *
      * @return bool
      */
-    protected function isResourceAccessible($entityClass, array $requestType)
+    protected function isResourceAccessible($entityClass, RequestType $requestType)
     {
         $result = false;
 
@@ -150,12 +151,12 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     }
 
     /**
-     * @param string   $entityClass
-     * @param string[] $requestType
+     * @param string      $entityClass
+     * @param RequestType $requestType
      *
      * @return string|null
      */
-    protected function getEntityResourceUri($entityClass, array $requestType)
+    protected function getEntityResourceUri($entityClass, RequestType $requestType)
     {
         $uri        = null;
         $entityType = $this->convertToEntityType($entityClass, $requestType);
@@ -181,12 +182,12 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     }
 
     /**
-     * @param string   $entityClass
-     * @param string[] $requestType
+     * @param string      $entityClass
+     * @param RequestType $requestType
      *
      * @return string|null
      */
-    protected function convertToEntityType($entityClass, array $requestType)
+    protected function convertToEntityType($entityClass, RequestType $requestType)
     {
         return ValueNormalizerUtil::convertToEntityType(
             $this->valueNormalizer,
