@@ -2,8 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
+
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
@@ -15,11 +17,11 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowStep;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 use Oro\Bundle\WorkflowBundle\Model\Step;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Bundle\WorkflowBundle\Model\AttributeGuesser;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTestCase
 {
@@ -163,7 +165,7 @@ abstract class AbstractWorkflowAttributesTypeTestCase extends FormIntegrationTes
 
     protected function createAttributeGuesserMock()
     {
-        return $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\AttributeGuesser')
+        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeGuesser')
             ->disableOriginalConstructor()
             ->setMethods(array('guessClassAttributeForm'))
             ->getMock();
