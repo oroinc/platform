@@ -37,8 +37,24 @@ class TestConfigSection implements ConfigExtraInterface, ConfigExtraSectionInter
     /**
      * {@inheritdoc}
      */
+    public function isInheritable()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getConfigType()
     {
         return $this->name;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheKeyPart()
+    {
+        return null;
     }
 }

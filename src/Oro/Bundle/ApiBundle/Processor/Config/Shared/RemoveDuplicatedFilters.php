@@ -18,12 +18,6 @@ class RemoveDuplicatedFilters extends RemoveDuplicates
     {
         /** @var ConfigContext $context */
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
-        }
-
         $this->removeDuplicatedFields($context->getFilters(), $context->getClassName());
     }
 }

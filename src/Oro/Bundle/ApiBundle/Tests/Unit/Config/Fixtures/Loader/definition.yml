@@ -304,25 +304,3 @@ extra_sections:
         another_section:
             exclusion_policy: none
             extra: true
-
-definition_section:
-    config:
-        definition:
-            exclusion_policy: all
-            disable_partial_load: false
-            fields:
-                field1:
-                    definition:
-                        exclusion_policy: all
-                        disable_partial_load: false
-                        exclude: true
-                field2:
-                    definition:
-                        exclude: false
-    expected:
-        exclusion_policy: all
-        fields:
-            field1:
-                exclusion_policy: all
-                exclude: true
-            field2: ~

@@ -34,7 +34,7 @@ class CreateEntity extends CreateObject
      */
     protected function createObject($context)
     {
-        $entityClassName = $this->getObjectClassName();
+        $entityClassName = $this->getObjectClassName($context);
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass($entityClassName);
