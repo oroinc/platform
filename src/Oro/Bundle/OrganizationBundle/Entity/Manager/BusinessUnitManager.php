@@ -214,7 +214,7 @@ class BusinessUnitManager
     {
         return array_reduce(
             $tree,
-            function($count, $node) {
+            function ($count, $node) {
                 return $count + (isset($node['children']) ? $this->getTreeNodesCount($node['children']) : 0);
             },
             count($tree)
