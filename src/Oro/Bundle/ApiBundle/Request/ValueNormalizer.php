@@ -20,11 +20,36 @@ class ValueNormalizer
     protected $requirements = [];
 
     /**
+     * List of data types, values of such types will be cached locally.
+     *
+     * @var array
+     */
+    protected $cachedDataTypes = [
+        DataType::ENTITY_TYPE         => true,
+        DataType::ENTITY_CLASS        => true,
+        DataType::ENTITY_ALIAS        => true,
+        DataType::ENTITY_PLURAL_ALIAS => true,
+    ];
+
+    /** @var array */
+    private $cachedData = [];
+
+    /**
      * @param NormalizeValueProcessor $processor
      */
     public function __construct(NormalizeValueProcessor $processor)
     {
         $this->processor = $processor;
+    }
+
+    /**
+     * Enables local cache for given data type values.
+     *
+     * @param string $dataType
+     */
+    public function enableCacheForDataType($dataType)
+    {
+        $this->cachedDataTypes[$dataType] = true;
     }
 
     /**
@@ -39,9 +64,18 @@ class ValueNormalizer
      */
     public function normalizeValue($value, $dataType, RequestType $requestType, $isArrayAllowed = false)
     {
-        $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
+        if (!array_key_exists($dataType, $this->cachedDataTypes)) {
+            $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
 
-        return $context->getResult();
+            return $context->getResult();
+        }
+
+        if (!isset($this->cachedData[$dataType][$value])) {
+            $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
+            $this->cachedData[$dataType][$value] = $context->getResult();
+        }
+
+        return $this->cachedData[$dataType][$value];
     }
 
     /**
