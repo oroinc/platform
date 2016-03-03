@@ -62,17 +62,19 @@ class ValueNormalizer
     public function normalizeValue($value, $dataType, RequestType $requestType, $isArrayAllowed = false)
     {
         if (!isset($this->cachedData[$dataType])) {
-            $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
-
-            return $context->getResult();
+            return $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
         }
 
-        if (!array_key_exists($value, $this->cachedData[$dataType])) {
-            $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
-            $this->cachedData[$dataType][$value] = $context->getResult();
+        if (array_key_exists($value, $this->cachedData[$dataType])) {
+            return $this->cachedData[$dataType][$value];
+
         }
 
-        return $this->cachedData[$dataType][$value];
+        $result = $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
+
+        $this->cachedData[$dataType][$value] = $result;
+
+        return $result;
     }
 
     /**
@@ -120,5 +122,21 @@ class ValueNormalizer
         }
 
         return $context;
+    }
+
+    /**
+     * @param string      $dataType
+     * @param RequestType $requestType
+     * @param mixed       $value
+     * @param bool        $isArrayAllowed
+     *
+     * @return mixed|null
+     * @throws \Exception
+     */
+    protected function getNormalizedValue($dataType, RequestType $requestType, $value, $isArrayAllowed)
+    {
+        $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
+
+        return $context->getResult();
     }
 }
