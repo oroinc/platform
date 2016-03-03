@@ -12,9 +12,9 @@ use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 use Oro\Component\Action\Exception\AssemblerException;
-use Oro\Component\Action\Model\AbstractAssembler;
+use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 
-class WorkflowAssembler extends AbstractAssembler
+class WorkflowAssembler extends BaseAbstractAssembler
 {
     /**
      * @var ContainerInterface

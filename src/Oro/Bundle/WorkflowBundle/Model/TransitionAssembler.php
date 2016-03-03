@@ -12,10 +12,10 @@ use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Exception\AssemblerException;
-use Oro\Component\Action\Model\AbstractAssembler;
+use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-class TransitionAssembler extends AbstractAssembler
+class TransitionAssembler extends BaseAbstractAssembler
 {
     /**
      * @var FormOptionsAssembler
