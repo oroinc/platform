@@ -67,7 +67,6 @@ class ValueNormalizer
 
         if (array_key_exists($value, $this->cachedData[$dataType])) {
             return $this->cachedData[$dataType][$value];
-
         }
 
         $result = $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
@@ -130,13 +129,10 @@ class ValueNormalizer
      * @param mixed       $value
      * @param bool        $isArrayAllowed
      *
-     * @return mixed|null
-     * @throws \Exception
+     * @return mixed
      */
     protected function getNormalizedValue($dataType, RequestType $requestType, $value, $isArrayAllowed)
     {
-        $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
-
-        return $context->getResult();
+        return $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed)->getResult();
     }
 }
