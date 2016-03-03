@@ -206,6 +206,22 @@ class BusinessUnitManager
     }
 
     /**
+     * @param array $tree
+     *
+     * @return int
+     */
+    public function getTreeNodesCount($tree)
+    {
+        return array_reduce(
+            $tree,
+            function($count, $node) {
+                return $count + (isset($node['children']) ? $this->getTreeNodesCount($node['children']) : 0);
+            },
+            count($tree)
+        );
+    }
+
+    /**
      * @param BusinessUnit $rootBusinessUnit
      *
      * @return string
