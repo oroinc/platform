@@ -6,17 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
+use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
-use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class ActionGroupTest extends \PHPUnit_Framework_TestCase
 {
-    use EntityTestCaseTrait;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
     protected $actionFactory;
 
@@ -39,7 +37,11 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->actionGroup = new ActionGroup($this->actionFactory, $this->conditionFactory);
+        $this->actionGroup = new ActionGroup(
+            $this->actionFactory,
+            $this->conditionFactory,
+            new ActionGroupDefinition()
+        );
 
         $this->data = new ActionData();
     }
@@ -47,18 +49,6 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset($this->actionFactory, $this->conditionFactory);
-    }
-
-    public function testGettersAndSetters()
-    {
-        static::assertPropertyAccessors(
-            $this->actionGroup,
-            [
-                ['name', 'test'],
-                ['actions', ['config1', 'config2']],
-                ['conditions', ['config1', 'config2']],
-            ]
-        );
     }
 
     /**
@@ -77,9 +67,9 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         $actionName,
         $exceptionMessage = ''
     ) {
-        $this->actionGroup->setName($actionName);
-        $this->actionGroup->setActions(['action1']);
-        $this->actionGroup->setConditions(['condition1']);
+        $this->actionGroup->getDefinition()->setName($actionName);
+        $this->actionGroup->getDefinition()->setActions(['action1']);
+        $this->actionGroup->getDefinition()->setConditions(['condition1']);
 
         $this->actionFactory->expects($this->any())
             ->method('create')
@@ -138,7 +128,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     public function testIsAllowed(ActionData $data, $condition, $expectedConditionFactory, $allowed)
     {
         if ($condition) {
-            $this->actionGroup->setConditions(['condition1']);
+            $this->actionGroup->getDefinition()->setConditions(['condition1']);
         }
 
         $this->conditionFactory->expects($expectedConditionFactory)
