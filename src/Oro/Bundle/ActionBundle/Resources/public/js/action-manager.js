@@ -11,7 +11,6 @@ define(function(require) {
     var widgetManager = require('oroui/js/widget-manager');
     var Backbone = require('backbone');
     var DialogWidget = require('oro/dialog-widget');
-    var DeleteConfirmation = require('oroui/js/delete-confirmation');
 
     var ActionManager = function(options) {
         this.initialize(options);
@@ -28,6 +27,7 @@ define(function(require) {
             dialogUrl: '',
             url: '',
             confirmation: false,
+            confirmComponent: 'oroui/js/delete-confirmation',
             showDialog: false,
             dialogOptions: {},
             messages: {},
@@ -52,13 +52,15 @@ define(function(require) {
         /**
          * @type {Function}
          */
-        confirmModalConstructor: DeleteConfirmation,
+        confirmModalConstructor: null,
 
         /**
          * @inheritDoc
          */
         initialize: function(options) {
-            this.options = _.defaults(options || {}, this.options);
+            this.options = _.defaults(_.pick(options, _.identity) || {}, this.options);
+
+            this.confirmModalConstructor = require(this.options.confirmComponent);
         },
 
         /**
@@ -76,15 +78,20 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         doExecute: function(e) {
-            if (this.options.showDialog) {
-                var widget = new DialogWidget(this._getDialogOptions(this.options));
+            if (this.options.hasDialog) {
+                var options = this._getDialogOptions(this.options);
+                if (this.options.showDialog) {
+                    var widget = new DialogWidget(options);
 
-                Backbone.listenTo(widget, 'formSave', _.bind(function(response) {
-                    widget.remove();
-                    this.doResponse(response, e);
-                }, this));
+                    Backbone.listenTo(widget, 'formSave', _.bind(function(response) {
+                        widget.remove();
+                        this.doResponse(response, e);
+                    }, this));
 
-                widget.render();
+                    widget.render();
+                } else {
+                    this.doRedirect(options.url);
+                }
             } else if (this.options.redirectUrl) {
                 this.doRedirect(this.options.redirectUrl);
             } else {
@@ -164,17 +171,13 @@ define(function(require) {
         showConfirmDialog: function(callback) {
             var messages = _.defaults(this.options.messages, this.messages);
 
-            if (!this.confirmModal) {
-                this.confirmModal = (new this.confirmModalConstructor({
-                    title: __(messages.confirm_title, $.extend({}, this.options.translates)),
-                    content: __(messages.confirm_content, $.extend({}, this.options.translates)),
-                    okText: __(messages.confirm_ok, $.extend({}, this.options.translates)),
-                    cancelText: __(messages.confirm_cancel, $.extend({}, this.options.translates))
-                }));
-                Backbone.listenTo(this.confirmModal, 'ok', callback);
-            } else {
-                this.confirmModal.setContent(__(messages.confirm_content, $.extend({}, this.options.translates)));
-            }
+            this.confirmModal = (new this.confirmModalConstructor({
+                title: __(messages.confirm_title, $.extend({}, this.options.translates)),
+                content: __(messages.confirm_content, $.extend({}, this.options.translates)),
+                okText: __(messages.confirm_ok, $.extend({}, this.options.translates)),
+                cancelText: __(messages.confirm_cancel, $.extend({}, this.options.translates))
+            }));
+            Backbone.listenTo(this.confirmModal, 'ok', callback);
 
             this.confirmModal.open();
         },

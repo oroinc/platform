@@ -15,7 +15,7 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Model\ContextAccessor;
 
 class WorkflowAttributesType extends AbstractType
 {
@@ -269,7 +269,7 @@ class WorkflowAttributesType extends AbstractType
                 'workflow' => 'Oro\Bundle\WorkflowBundle\Model\Workflow',
                 'attribute_fields' => 'array',
                 'attribute_default_values' => 'array',
-                'init_actions' => 'Oro\Component\ConfigExpression\Action\ActionInterface',
+                'init_actions' => 'Oro\Component\Action\Action\ActionInterface',
             )
         );
     }

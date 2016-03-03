@@ -10,8 +10,8 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownStepException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
-use Oro\Component\ConfigExpression\Exception\AssemblerException;
-use Oro\Component\ConfigExpression\Model\AbstractAssembler;
+use Oro\Component\Action\Exception\AssemblerException;
+use Oro\Component\Action\Model\AbstractAssembler;
 
 class WorkflowAssembler extends AbstractAssembler
 {

@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
-use Oro\Component\ConfigExpression\Condition\AbstractConfigurableCondition;
+use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
@@ -17,7 +17,7 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 /**
  * Checks whether an access to a resource is granted.
  */
-class AclGranted extends AbstractConfigurableCondition implements ContextAccessorAwareInterface
+class AclGranted extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
 

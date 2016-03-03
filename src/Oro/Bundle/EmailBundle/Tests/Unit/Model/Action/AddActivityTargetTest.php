@@ -9,7 +9,7 @@ use Oro\Bundle\EmailBundle\Entity\Email;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget;
 use Oro\Bundle\UserBundle\Entity\User;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Model\ContextAccessor;
 
 class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
 {
@@ -30,7 +30,7 @@ class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->contextAccessor = $this->getMock('Oro\Component\ConfigExpression\Model\ContextAccessor');
+        $this->contextAccessor = $this->getMock('Oro\Component\Action\Model\ContextAccessor');
 
         $this->emailActivityManager = $this->getMockBuilder(
             'Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager'
@@ -155,7 +155,7 @@ class AddActivityTargetTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Component\ConfigExpression\Exception\InvalidParameterException
+     * @expectedException \Oro\Component\Action\Exception\InvalidParameterException
      */
     public function testInitializeWithMissingRequiredOption()
     {

@@ -1,32 +1,31 @@
 parameters:
-    oro_workflow.action_factory.class: Oro\Component\ConfigExpression\Action\ActionFactory
+    oro_workflow.action_factory.class: Oro\Component\Action\Action\ActionFactory
 
-    oro_workflow.action.tree.class: Oro\Component\ConfigExpression\Action\TreeExecutor
-    oro_workflow.action.configurable.class: Oro\Component\ConfigExpression\Action\Configurable
-    oro_workflow.action.assign_value.class: Oro\Component\ConfigExpression\Action\AssignValue
-    oro_workflow.action.unset_value.class: Oro\Component\ConfigExpression\Action\UnsetValue
-    oro_workflow.action.create_object.class: Oro\Component\ConfigExpression\Action\CreateObject
-    oro_workflow.action.create_date.class: Oro\Component\ConfigExpression\Action\CreateDate
-    oro_workflow.action.create_datetime.class: Oro\Component\ConfigExpression\Action\CreateDateTime
-    oro_workflow.action.create_entity.class: Oro\Component\ConfigExpression\Action\CreateEntity
+    oro_workflow.action.tree.class: Oro\Component\Action\Action\TreeExecutor
+    oro_workflow.action.configurable.class: Oro\Component\Action\Action\Configurable
+    oro_workflow.action.assign_value.class: Oro\Component\Action\Action\AssignValue
+    oro_workflow.action.unset_value.class: Oro\Component\Action\Action\UnsetValue
+    oro_workflow.action.create_object.class: Oro\Component\Action\Action\CreateObject
+    oro_workflow.action.create_date.class: Oro\Bundle\ActionBundle\Action\CreateDate
+    oro_workflow.action.create_datetime.class: Oro\Component\Action\Action\CreateDateTime
+    oro_workflow.action.create_entity.class: Oro\Component\Action\Action\CreateEntity
     oro_workflow.action.create_related_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
-    oro_workflow.action.request_entity.class: Oro\Component\ConfigExpression\Action\RequestEntity
-    oro_workflow.action.call_method.class: Oro\Component\ConfigExpression\Action\CallMethod
+    oro_workflow.action.request_entity.class: Oro\Component\Action\Action\RequestEntity
+    oro_workflow.action.call_method.class: Oro\Component\Action\Action\CallMethod
     oro_workflow.action.start_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow
-    oro_workflow.action.redirect.class: Oro\Component\ConfigExpression\Action\Redirect
-    oro_workflow.action.format_string.class: Oro\Component\ConfigExpression\Action\FormatString
-    oro_workflow.action.assign_active_user.class: Oro\Component\ConfigExpression\Action\AssignActiveUser
-    oro_workflow.action.format_name.class: Oro\Component\ConfigExpression\Action\FormatName
-    oro_workflow.action.traverse.class: Oro\Component\ConfigExpression\Action\Traverse
-    oro_workflow.action.translate.class: Oro\Component\ConfigExpression\Action\TranslateAction
-    oro_workflow.action.flash_message.class: Oro\Component\ConfigExpression\Action\FlashMessage
-    oro_workflow.workflow.action.remove_entity.class:  Oro\Component\ConfigExpression\Action\RemoveEntity
-    oro_workflow.workflow.action.assign_constant_value.class:  Oro\Component\ConfigExpression\Action\AssignConstantValue
-    oro_workflow.workflow.action.copy_tagging.class:  Oro\Component\ConfigExpression\Action\CopyTagging
+    oro_workflow.action.redirect.class: Oro\Component\Action\Action\Redirect
+    oro_workflow.action.format_string.class: Oro\Component\Action\Action\FormatString
+    oro_workflow.action.assign_active_user.class: Oro\Component\Action\Action\AssignActiveUser
+    oro_workflow.action.format_name.class: Oro\Bundle\ActionBundle\Action\FormatName
+    oro_workflow.action.traverse.class: Oro\Component\Action\Action\Traverse
+    oro_workflow.action.translate.class: Oro\Component\Action\Action\TranslateAction
+    oro_workflow.action.flash_message.class: Oro\Component\Action\Action\FlashMessage
+    oro_workflow.workflow.action.remove_entity.class:  Oro\Component\Action\Action\RemoveEntity
+    oro_workflow.workflow.action.assign_constant_value.class:  Oro\Component\Action\Action\AssignConstantValue
     oro_workflow.workflow.action.transit_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow
-    oro_workflow.workflow.action.call_service_method.class: Oro\Component\ConfigExpression\Action\CallServiceMethod
+    oro_workflow.workflow.action.call_service_method.class: Oro\Component\Action\Action\CallServiceMethod
     oro_workflow.workflow.action.run_action.class: Oro\Bundle\ActionBundle\Action\RunAction
-    oro_workflow.workflow.action.find_entities.class: Oro\Component\ConfigExpression\Action\FindEntities
+    oro_workflow.workflow.action.find_entities.class: Oro\Component\Action\Action\FindEntities
 
 services:
     oro_workflow.action_factory:
@@ -196,15 +195,6 @@ services:
             - @oro_action.context_accessor
         tags:
             - { name: oro_workflow.action, alias: assign_constant_value }
-
-    oro_workflow.workflow.action.copy_tagging.class:
-        class: %oro_workflow.workflow.action.copy_tagging.class%
-        arguments:
-            - @oro_action.context_accessor
-            - @oro_tag.tag.manager
-            - @oro_tag.helper.taggable_helper
-        tags:
-            - { name: oro_workflow.action, alias: copy_tagging }
 
     oro_workflow.workflow.action.transit_workflow:
         class: %oro_workflow.workflow.action.transit_workflow.class%

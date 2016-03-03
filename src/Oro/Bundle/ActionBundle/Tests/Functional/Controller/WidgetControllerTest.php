@@ -399,7 +399,7 @@ class WidgetControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'entityId' => null,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => 'data-page-url="'
+                'expected' => 'data-dialog-show=""'
             ]
         ];
     }

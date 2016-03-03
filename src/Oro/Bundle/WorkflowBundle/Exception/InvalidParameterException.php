@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\WorkflowBundle\Exception;
 
-use Oro\Component\ConfigExpression\Exception\InvalidParameterException as BaseInvalidParameterException;
+use Oro\Component\Action\Exception\InvalidParameterException as BaseInvalidParameterException;
 
 /**
- * @deprecated since 1.10. Use {@see Oro\Component\ConfigExpression\Exception\InvalidParameterException} instead
+ * @deprecated since 1.10. Use {@see Oro\Component\Action\Exception\InvalidParameterException} instead
  */
 class InvalidParameterException extends BaseInvalidParameterException
 {

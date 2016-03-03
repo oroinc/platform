@@ -38,7 +38,7 @@ class FunctionPassTest extends AbstractPassTest
 
         $definition->expects($this->once())
             ->method('getClass')
-            ->willReturn('Oro\Component\ConfigExpression\Tests\Unit\Action\Stub\DispatcherAwareAction');
+            ->willReturn('Oro\Component\Action\Tests\Unit\Action\Stub\DispatcherAwareAction');
         $definition->expects($this->once())
             ->method('addMethodCall')
             ->with('setDispatcher');

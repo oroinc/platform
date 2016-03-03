@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\Type;
 
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Model\ContextAccessor;
 use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;

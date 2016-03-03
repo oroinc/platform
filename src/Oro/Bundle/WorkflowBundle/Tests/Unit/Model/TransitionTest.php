@@ -53,7 +53,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ),
             'postAction' => array(
                 'postAction',
-                $this->getMock('Oro\Component\ConfigExpression\Action\ActionInterface')
+                $this->getMock('Oro\Component\Action\Action\ActionInterface')
             )
         );
     }
@@ -235,7 +235,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->with($workflowItem)
             ->will($this->returnValue($conditionAllowed));
 
-        $postAction = $this->getMock('Oro\Component\ConfigExpression\Action\ActionInterface');
+        $postAction = $this->getMock('Oro\Component\Action\Action\ActionInterface');
         $postAction->expects($this->never())
             ->method('execute');
 
@@ -299,7 +299,7 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
             ->with($workflowItem)
             ->will($this->returnValue(true));
 
-        $postAction = $this->getMock('Oro\Component\ConfigExpression\Action\ActionInterface');
+        $postAction = $this->getMock('Oro\Component\Action\Action\ActionInterface');
         $postAction->expects($this->once())
             ->method('execute')
             ->with($workflowItem);

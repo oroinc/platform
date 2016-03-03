@@ -45,6 +45,8 @@ class ActionControllerTest extends WebTestCase
     protected function tearDown()
     {
         $this->cacheProvider->delete(ActionConfigurationProvider::ROOT_NODE_NAME);
+
+        parent::tearDown();
     }
 
     /**

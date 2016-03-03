@@ -6,7 +6,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 use Oro\Bundle\IntegrationBundle\Model\Action\RemoveFieldsChangesAction;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
 
 class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
@@ -36,7 +36,7 @@ class RemoveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
     {
         if ($message) {
             $this->setExpectedException(
-                'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'Oro\Component\Action\Exception\InvalidParameterException',
                 $message
             );
         }

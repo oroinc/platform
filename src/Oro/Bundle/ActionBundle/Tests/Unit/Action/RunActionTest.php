@@ -8,7 +8,7 @@ use Oro\Bundle\ActionBundle\Action\RunAction;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+use Oro\Component\Action\Model\ContextAccessor;
 
 class RunActionTest extends \PHPUnit_Framework_TestCase
 {
@@ -57,7 +57,7 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->assertInstanceOf(
-            'Oro\Component\ConfigExpression\Action\ActionInterface',
+            'Oro\Component\Action\Action\ActionInterface',
             $this->function->initialize($options)
         );
 
@@ -86,14 +86,14 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'inputData' => [],
-                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Action name parameter is required'
             ],
             [
                 'inputData' => [
                     'action' => self::ACTION_NAME
                 ],
-                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Entity class parameter is required',
             ],
             [
@@ -101,7 +101,7 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
                     'action' => self::ACTION_NAME,
                     'entity_class' => 'entityClass'
                 ],
-                'expectedException' => 'Oro\Component\ConfigExpression\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Entity id parameter is required',
             ]
         ];

@@ -7,8 +7,6 @@ use Doctrine\Common\Collections\Collection;
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
 use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
-use Oro\Bundle\ActionBundle\Model\Attribute;
-
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
 class FormOptionsAssembler

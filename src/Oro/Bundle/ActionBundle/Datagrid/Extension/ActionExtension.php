@@ -71,7 +71,10 @@ class ActionExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         $this->datagridContext = $this->getDatagridContext($config);
-        $this->actions = $this->actionManager->getActions($this->datagridContext, false);
+        $this->actions = $this->getActions(
+            $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []),
+            $this->datagridContext
+        );
 
         if (0 === count($this->actions)) {
             return false;
@@ -87,11 +90,33 @@ class ActionExtension extends AbstractExtension
     }
 
     /**
+     * @param array $actionsConfig
+     * @param array $datagridContext
+     * @return Action[]
+     */
+    protected function getActions(array $actionsConfig, array $datagridContext)
+    {
+        $result = [];
+
+        $actions = $this->actionManager->getActions($datagridContext, false);
+
+        foreach ($actions as $action) {
+            $actionName = strtolower($action->getName());
+            if (!array_key_exists($actionName, $actionsConfig)) {
+                $result[$actionName] = $action;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @param ResultRecordInterface $record
+     * @param array $config
      *
      * @return array
      */
-    public function getRowConfiguration(ResultRecordInterface $record)
+    public function getRowConfiguration(ResultRecordInterface $record, array $config)
     {
         $actionData = $this->contextHelper->getActionData([
             'entityId' => $record->getValue('id'),
@@ -100,18 +125,19 @@ class ActionExtension extends AbstractExtension
         ]);
 
         $actionsNew = [];
-        foreach ($this->actions as $action) {
-            $actionsNew[$action->getName()] = $this->getRowActionsConfig($action, $actionData);
+        foreach ($this->actions as $actionName => $action) {
+            $actionsNew[$actionName] = $this->getRowActionsConfig($action, $actionData);
         }
 
-        return array_merge($this->getParentRowConfiguration($record), $actionsNew);
+        return array_merge($this->getParentRowConfiguration($record, $config), $actionsNew);
     }
 
     /**
      * @param ResultRecordInterface $record
+     * @param array $config
      * @return array
      */
-    protected function getParentRowConfiguration(ResultRecordInterface $record)
+    protected function getParentRowConfiguration(ResultRecordInterface $record, array $config)
     {
         if (empty($this->actionConfiguration)) {
             return [];
@@ -120,7 +146,7 @@ class ActionExtension extends AbstractExtension
         $rowActions = [];
 
         if (is_callable($this->actionConfiguration)) {
-            $rowActions = call_user_func($this->actionConfiguration, $record);
+            $rowActions = call_user_func($this->actionConfiguration, $record, $config);
         } elseif (is_array($this->actionConfiguration)) {
             $rowActions = $this->actionConfiguration;
         }
@@ -149,23 +175,21 @@ class ActionExtension extends AbstractExtension
      */
     protected function processActionsConfig(DatagridConfiguration $config)
     {
-        $actionsConfig = $config->offsetGetOr('actions', []);
+        $actionsConfig = $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []);
 
-        foreach ($this->actions as $action) {
-            $actionName = strtolower($action->getName());
-            if (!array_key_exists($actionName, $actionsConfig)) {
-                $actionsConfig[$actionName] = $this->getRowsActionsConfig($action);
-            }
+        foreach ($this->actions as $actionName => $action) {
+            $actionsConfig[$actionName] = $this->getRowsActionsConfig($action, $actionName);
         }
 
-        $config->offsetSet('actions', $actionsConfig);
+        $config->offsetSet(DatagridActionExtension::ACTION_KEY, $actionsConfig);
     }
 
     /**
      * @param Action $action
+     * @param string $actionName
      * @return array
      */
-    protected function getRowsActionsConfig(Action $action)
+    protected function getRowsActionsConfig(Action $action, $actionName)
     {
         $buttonOptions = $action->getDefinition()->getButtonOptions();
         $frontendOptions = $action->getDefinition()->getFrontendOptions();
@@ -179,11 +203,12 @@ class ActionExtension extends AbstractExtension
             'link' => '#',
             'icon' => $icon,
             'options' => [
-                'actionName' => $action->getName(),
+                'actionName' => $actionName,
                 'entityClass' => $this->datagridContext['entityClass'],
                 'datagrid' => $this->datagridContext['datagrid'],
                 'confirmation' => $confirmation,
-                'showDialog' => $action->hasForm(),
+                'hasDialog' => $action->hasForm(),
+                'showDialog' => !empty($frontendOptions['show_dialog']),
                 'executionRoute' => $this->applicationHelper->getExecutionRoute(),
                 'dialogRoute' => $this->applicationHelper->getDialogRoute(),
                 'dialogOptions' => [

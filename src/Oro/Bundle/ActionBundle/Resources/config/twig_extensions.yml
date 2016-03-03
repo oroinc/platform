@@ -8,6 +8,6 @@ services:
             - @oro_action.manager
             - @oro_action.helper.applications
             - @oro_entity.doctrine_helper
-            - @request_stack
+            - @oro_action.helper.context
         tags:
             - { name: twig.extension }

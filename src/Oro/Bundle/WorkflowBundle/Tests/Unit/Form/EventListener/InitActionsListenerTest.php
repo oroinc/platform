@@ -29,7 +29,7 @@ class InitActionsListenerTest extends \PHPUnit_Framework_TestCase
         $workflowItem = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Entity\WorkflowItem')
             ->disableOriginalConstructor()
             ->getMock();
-        $action = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
+        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->getMock();
         $action->expects($this->once())
             ->method('execute')

@@ -10,10 +10,10 @@ use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 
-use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
-use Oro\Component\ConfigExpression\Action\ActionInterface as FunctionInterface;
+use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionInterface as FunctionInterface;
 use Oro\Bundle\ActionBundle\Model\Attribute;
-use Oro\Component\ConfigExpression\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
@@ -49,7 +49,7 @@ class ActionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
+        $this->functionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -620,7 +620,7 @@ class ActionTest extends \PHPUnit_Framework_TestCase
         ActionData $data
     ) {
         /* @var $function FunctionInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $function = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
+        $function = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -643,7 +643,7 @@ class ActionTest extends \PHPUnit_Framework_TestCase
         $returnValue
     ) {
         /* @var $condition ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject */
-        $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\Condition\Configurable')
+        $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
             ->disableOriginalConstructor()
             ->getMock();
 

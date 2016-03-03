@@ -7,8 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Component\ConfigExpression\Exception\AssemblerException;
-use Oro\Component\ConfigExpression\Model\AbstractAssembler;
+use Oro\Component\Action\Exception\AssemblerException;
+use Oro\Component\Action\Model\AbstractAssembler;
 
 class AttributeAssembler extends AbstractAssembler
 {

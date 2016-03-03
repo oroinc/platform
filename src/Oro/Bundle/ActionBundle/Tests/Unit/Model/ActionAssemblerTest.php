@@ -11,7 +11,7 @@ use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
@@ -108,11 +108,15 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFunctions('functions', ['config_post_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
-            ->setOrder(77);
+            ->setOrder(77)
+            ->setFormType(ActionType::NAME);
 
         $definition3 = clone $definition2;
         $definition3
             ->setName('maximum_name_and_acl')
+            ->setEnabled(false)
+            ->setApplications(['application1'])
+            ->setAttributes(['config_attr'])
             ->setForAllEntities(true)
             ->setExcludeEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'])
             ->setConditions('preconditions', [
@@ -121,7 +125,14 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                     ['config_pre_cond']
                 ]
              ])
-            ->setConditions('conditions', ['config_cond']);
+            ->setConditions('conditions', ['config_cond'])
+            ->setFunctions('prefunctions', ['config_pre_func'])
+            ->setFunctions('form_init', ['config_form_init_func'])
+            ->setFunctions('functions', ['config_post_func'])
+            ->setFormOptions(['config_form_options'])
+            ->setFrontendOptions(['config_frontend_options'])
+            ->setOrder(77)
+            ->setFormType(ActionType::NAME);
 
         return [
             'no data' => [
@@ -221,7 +232,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getFunctionFactory()
     {
-        return $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
+        return $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
     }

@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\EmailBundle\Model\Condition;
 
-use Oro\Component\ConfigExpression\Condition\AbstractConfigurableCondition;
+use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception;
 
-class HasCount extends AbstractConfigurableCondition implements ContextAccessorAwareInterface
+class HasCount extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
 

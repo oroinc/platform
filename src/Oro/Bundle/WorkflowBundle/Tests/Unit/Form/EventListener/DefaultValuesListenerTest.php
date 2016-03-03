@@ -24,7 +24,7 @@ class DefaultValuesListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Component\ConfigExpression\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
 

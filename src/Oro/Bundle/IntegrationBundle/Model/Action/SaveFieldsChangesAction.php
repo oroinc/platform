@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Model\Action;
 
-use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
+use Oro\Component\Action\Exception\InvalidParameterException;
 
 /**
  * actions:
