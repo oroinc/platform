@@ -152,9 +152,9 @@ class ActionExtension extends AbstractExtension
         $actionsConfig = $config->offsetGetOr('actions', []);
 
         foreach ($this->actions as $action) {
-            $actionOriginName = strtolower($action->getName());
-            if (!array_key_exists($actionOriginName, $actionsConfig)) {
-                $actionsConfig[$actionOriginName] = $this->getRowsActionsConfig($action);
+            $actionName = strtolower($action->getName());
+            if (!array_key_exists($actionName, $actionsConfig)) {
+                $actionsConfig[$actionName] = $this->getRowsActionsConfig($action);
             }
         }
 
