@@ -186,16 +186,16 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
         ActionData $data
     ) {
-        /* @var $function ActionInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $function = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
+        /* @var $action ActionInterface|\PHPUnit_Framework_MockObject_MockObject */
+        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $function->expects($expects)
+        $action->expects($expects)
             ->method('execute')
             ->with($data);
 
-        return $function;
+        return $action;
     }
 
     /**
