@@ -14,7 +14,8 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\ActionBundle\Model\Attribute;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class ActionType extends AbstractType
 {

@@ -1,0 +1,86 @@
+{% macro get_action_attributes(dialogRoute, executionRoute, action, entityClass, entityId, cssClasses) %}
+    {% spaceless %}
+    {% set context = {
+        'route': app.request.get('route', app.request.get('_route')),
+        'entityClass': entityClass,
+        'entityId': entityId
+    } %}
+    {% set fromUrl = app.request.requestUri %}
+    {% set actionUrl = action.hasDialog ? path(dialogRoute|default('oro_action_widget_form'), {actionName: action.name, fromUrl: fromUrl}|merge(context)) : null %}
+    {% if cssClasses is null %}
+        {% set cssClasses = action.buttonOptions.class|default('icons-holder-text') ~ " "  ~ params.buttonOptions.aCss|default('') %}
+    {% endif %}
+    {% if executionRoute is not empty %}
+        {% set actionPath = path(executionRoute|default('oro_api_action_execute_actions'), {actionName: action.name}|merge(context)) %}
+    {% endif %}
+    {% set dialogOptions = {
+        'title': action.title,
+        'dialogOptions': action.frontendOptions.options|default({}),
+    } %}
+    href="{{ actionPath|default('javascript:void(0);') }}"
+    class="action-button {{ cssClasses }}"
+    title="{{ action.title }}"
+    data-dialog-show="{{ action.frontendOptions.show_dialog|default(false) }}"
+    data-dialog-url="{{ actionUrl }}"
+    data-dialog-options="{{ dialogOptions|json_encode }}"
+    data-translates="{{ action.translates|default({})|json_encode }}"
+    data-confirmation="{{ action.frontendOptions.confirmation|default({})|json_encode() }}"
+    {% if action.buttonOptions.page_component_module is defined %}data-page-component-module={{ action.buttonOptions.page_component_module }}{% endif %}
+    {% if action.buttonOptions.page_component_options is defined %}data-page-component-options={{ action.buttonOptions.page_component_options|json_encode }}{% endif %}
+    {% if action.buttonOptions.data is defined %}
+        {% for dataName,dataValue in action.buttonOptions.data %}
+            data-{{ dataName }}="{{ dataValue|e('html_attr')|raw }}"
+        {% endfor %}
+    {% endif %}
+    {% endspaceless %}
+{% endmacro %}
+
+{% block action_line_buttons_widget %}
+    {% set attr = attr|merge({ class: attr.class|default('') ~ " row-fluid"}) %}
+    <div{{ block('block_attributes') }}>
+        {% for action in actions %}
+            <div class="btn-group icons-holder">
+                <a {{ _self.get_action_attributes(dialogRoute, executionRoute, action, entityClass, entityId) }}>
+                    {% if action.icon is not empty %}
+                        <i class="{{ action.icon }} {{ action.buttonOptions.iCss|default('') }} hide-text">{{ action.label }}</i>
+                    {% endif %}
+                    {{ action.label|trim }}
+                </a>
+            </div>
+        {% endfor %}
+    </div>
+{% endblock %}
+
+{% block action_combined_buttons_widget %}
+    {% set actionsCount = actions|length %}
+    {% if actionsCount > 0 %}
+        {% set action = actions|first %}
+        {% set attr = attr|merge({ class: attr.class|default('') ~ " btn-group"}) %}
+        {% set primaryButtonCss = 'btn btn-primary ' ~ action.buttonOptions.class|default('') ~ " "  ~ params.buttonOptions.aCss|default('') %}
+        <div{{ block('block_attributes') }}>
+            <a {{ _self.get_action_attributes(dialogRoute, executionRoute, action, entityClass, entityId, primaryButtonCss) }}>
+                {% if action.icon is not empty %}
+                    <i class="{{ action.icon }} {{ action.buttonOptions.iCss|default('') }} hide-text">{{ action.label }}</i>
+                {% endif %}
+                {{ action.label|trim }}
+            </a>
+
+            {% if actionsCount > 1 %}
+            <a href="#" class="btn btn-primary dropdown-toggle" data-toggle="dropdown"><span class="caret"></span></a>
+
+            <ul class="dropdown-menu">
+                {% for action in actions|slice(1) %}
+                    <li>
+                        <a {{ _self.get_action_attributes(dialogRoute, executionRoute, action, entityClass, entityId) }}>
+                            {% if action.icon is not empty %}
+                                <i class="{{ action.icon }} {{ action.buttonOptions.iCss|default('') }} hide-text">{{ action.label }}</i>
+                            {% endif %}
+                            {{ action.label|trim }}
+                        </a>
+                    </li>
+                {% endfor %}
+            </ul>
+            {% endif %}
+        </div>
+    {% endif %}
+{% endblock %}

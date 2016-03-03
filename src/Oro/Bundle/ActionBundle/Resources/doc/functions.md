@@ -3,74 +3,9 @@ Functions
 
 Table of Contents
 -----------------
- - [Call Service Method](#call-service-method)
- - [Find Entities](#find-entities)
  - [Run Action](#run-action)
-
-Call Service Method
--------------------
-
-**Class:** Oro\Component\ConfigExpression\Action\CallServiceMethod
-
-**Alias:** call_service_method
-
-**Description:** Triggers call method from service with parameters.
-
-**Parameters:**
- - attribute - attribute where method result value should be set (optional)
- - service - service name
- - method - name of method to call
- - method_parameters - list of parameters that will be passed to method call.
-
-**Configuration Example**
-```
-- @call_service_method:
-    conditions:
-        # optional condition configuration
-    parameters:
-        attribute: $.em
-        service: doctrine
-        method: getManagerForClass
-        method_parameters: ['Acme\Bundle\DemoBundle\Entity\User']
-
-OR
-
-- @call_method:
-    attribute: $.em
-    service: doctrine
-    method: getManagerForClass
-    method_parameters: ['Acme\Bundle\DemoBundle\Entity\User']
-```
-
-Find Entities
--------------
-
-**Class:** Oro\Component\ConfigExpression\Action\FindEntities
-
-**Alias:** find_entities
-
-**Description:** Returns entities by filter.
-
-**Parameters:**
- - attribute - attribute where method result value should be set
- - class - entity class
- - where - array of SQL-expressions for where-conditions (optional if `order_by` set)
- - query_parameters - list of parameters that will be passed to query (optional).
- - order_by - list of fields with order for sorting results (optional if `where` set).
-
-**Configuration Example**
-```
-- @find_entities:
-    class: Acme\Bundle\DemoBundle\Entity\User
-    attribute: $.users
-    where:
-        and:
-            - e.age < :age
-            - e.loginCount > :cnt
-    query_parameters:
-        age: 10
-        cnt: 0
-```
+ - [Format Name](#format-name)
+ - [Create Date](#create-date)
 
 Run Action
 ----------
@@ -94,4 +29,54 @@ Run Action
     action: acme_demo_action
     entity_class: Acme\Bundle\DemoBundle\Entity\User
     entity_id: $.user.id
+```
+
+
+Format Name
+-----------
+
+**Class:** Oro\Bundle\ActionBundle\Action\FormatName
+
+**Alias:** format_name
+
+**Description:** Format entity name based on locale settings.
+
+**Parameters:**
+ - attribute - target path where result of action will be saved;
+ - object - entity;
+
+**Configuration Example**
+```
+- @format_name:
+    attribute: $.result.formattedCustomerName
+    object: $cart.customer
+```
+
+
+Create Date
+-----------
+
+**Class:** Oro\Bundle\ActionBundle\Action\CreateDate
+
+**Alias:** create_date
+
+**Description:** Create DateTime object based on date string
+
+**Parameters:**
+ - date - (optional) date as string. Current date by default;
+ - attribute - target path where result of action will be saved;
+
+**Configuration Example**
+```
+- @create_date:
+    attribute: $sales_funnel_start_date
+
+OR
+
+- @create_date:
+    conditions:
+            # optional condition configuration
+    parameters:
+        attribute: $sales_funnel_start_date
+        date: '2014-04-01' # must use quotes because date parameter requires string value
 ```

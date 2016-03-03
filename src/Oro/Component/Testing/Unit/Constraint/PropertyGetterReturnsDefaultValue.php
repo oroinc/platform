@@ -3,12 +3,10 @@
 namespace Oro\Component\Testing\Unit\Constraint;
 
 /**
- * Constraint that asserts that a get*() or is*() getter
- * returns default property value.
+ * Constraint that asserts that a get*() or is*() getter returns default property value.
  */
 class PropertyGetterReturnsDefaultValue extends \PHPUnit_Framework_Constraint
 {
-
     /**
      * @var string
      */

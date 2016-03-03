@@ -547,6 +547,7 @@ services:
             - [setLogger, [@logger]]
         tags:
             - { name: oro_workflow.action, alias: send_email_template }
+            - { name: oro_action.function, alias: send_email_template }
 
     oro_email.helper.datagrid.emails:
         class: %oro_email.helper.datagrid.emails.class%
@@ -687,7 +688,7 @@ services:
         class: %oro_email.related_emails.provider.class%
         arguments:
             - @doctrine
-            - @oro_entity_config.provider.entity
+            - @oro_entity_config.config_manager
             - @oro_security.security_facade
             - @oro_locale.formatter.name
             - @oro_email.email.address.helper

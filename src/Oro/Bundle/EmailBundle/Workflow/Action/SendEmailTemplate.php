@@ -14,8 +14,9 @@ use Oro\Bundle\EmailBundle\Form\Model\Email;
 use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Component\ConfigExpression\Exception\InvalidParameterException;
-use Oro\Component\ConfigExpression\Model\ContextAccessor;
+
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Model\ContextAccessor;
 
 /**
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)

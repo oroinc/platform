@@ -66,9 +66,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->managerRegistry);
-        unset($this->entityConfigProvider);
-        unset($this->guesser);
+        unset($this->managerRegistry, $this->entityConfigProvider, $this->guesser);
     }
 
     /**

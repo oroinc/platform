@@ -4,8 +4,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\Attribute;
 
 use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 

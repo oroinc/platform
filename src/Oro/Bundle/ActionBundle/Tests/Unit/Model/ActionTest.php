@@ -11,9 +11,9 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 
-use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
-use Oro\Component\ConfigExpression\Action\ActionInterface as FunctionInterface;
-use Oro\Component\ConfigExpression\Condition\Configurable as ConfigurableCondition;
+use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionInterface as FunctionInterface;
+use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 /**
@@ -48,7 +48,7 @@ class ActionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
+        $this->functionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -359,108 +359,6 @@ class ActionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider contextBoundAndSubstitutionProvider
-     *
-     * @param array $groups
-     * @param array $datagrigs
-     * @param array $entities
-     * @param array $excludeEntities
-     * @param bool $isForAllEntities
-     * @param string $substitution
-     * @param bool $expected
-     */
-    public function testIsUnboundSubstitution(
-        array $groups,
-        array $datagrigs,
-        array $entities,
-        array $excludeEntities,
-        $isForAllEntities,
-        $substitution,
-        $expected
-    ) {
-        $this->definition->expects($this->any())->method('getGroups')->willReturn($groups);
-        $this->definition->expects($this->any())->method('getDatagrids')->willReturn($datagrigs);
-        $this->definition->expects($this->any())->method('getEntities')->willReturn($entities);
-        $this->definition->expects($this->any())->method('getExcludeEntities')->willReturn($excludeEntities);
-        $this->definition->expects($this->any())->method('isForAllEntities')->willReturn($isForAllEntities);
-        $this->definition->expects($this->once())->method('getSubstituteAction')->willReturn($substitution);
-
-        $this->assertEquals($expected, $this->action->hasUnboundSubstitution());
-    }
-
-    /**
-     * @return  array
-     */
-    public function contextBoundAndSubstitutionProvider()
-    {
-        return [
-            'no substitution' => [
-                [],
-                [],
-                [],
-                [],
-                false,
-                null,
-                false
-            ],
-            'is unbound substitution' => [
-                [],
-                [],
-                [],
-                [],
-                false,
-                'action1',
-                true
-            ],
-            'is bound to groups' => [
-                ['group1'],
-                [],
-                [],
-                [],
-                false,
-                'action1',
-                false
-            ],
-            'is bound to datagrids' => [
-                [],
-                ['datagrid1'],
-                [],
-                [],
-                false,
-                'action1',
-                false
-            ],
-            'is bound to entity' => [
-                [],
-                [],
-                ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
-                [],
-                false,
-                'action1',
-                false
-            ],
-            'is bound to entity exclusion' => [
-                [],
-                [],
-                [],
-                ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
-                false,
-                'action1',
-                false
-            ],
-            'has case for all entities' => [
-                [],
-                [],
-                [],
-                [],
-                true,
-                'action1',
-                false
-            ],
-        ];
-    }
-
-    /**
      * @param array $inputData
      * @param array $expectedData
      *
@@ -721,7 +619,7 @@ class ActionTest extends \PHPUnit_Framework_TestCase
         ActionData $data
     ) {
         /* @var $function FunctionInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $function = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionInterface')
+        $function = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -744,7 +642,7 @@ class ActionTest extends \PHPUnit_Framework_TestCase
         $returnValue
     ) {
         /* @var $condition ConfigurableCondition|\PHPUnit_Framework_MockObject_MockObject */
-        $condition = $this->getMockBuilder('Oro\Component\ConfigExpression\Condition\Configurable')
+        $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
             ->disableOriginalConstructor()
             ->getMock();
 

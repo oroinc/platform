@@ -6,18 +6,17 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;
-
-use Oro\Component\ConfigExpression\Condition\AbstractConfigurableCondition;
 
 /**
  * Check For Active integration of given type
  * Usage:
  * @has_active_integration: 'some_type'
  */
-class HasActiveIntegration extends AbstractConfigurableCondition implements ContextAccessorAwareInterface
+class HasActiveIntegration extends AbstractCondition implements ContextAccessorAwareInterface
 {
     use ContextAccessorAwareTrait;
 

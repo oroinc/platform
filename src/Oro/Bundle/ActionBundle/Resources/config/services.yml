@@ -1,8 +1,8 @@
 parameters:
-    oro_action.context_accessor.class: Oro\Component\ConfigExpression\Model\ContextAccessor
     oro_action.handler.delete.class: Oro\Bundle\ActionBundle\Handler\DeleteHandler
     oro_action.helper.context.class: Oro\Bundle\ActionBundle\Helper\ContextHelper
     oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
+    oro_action.helper.restrict.class: Oro\Bundle\ActionBundle\Helper\RestrictHelper
     oro_action.registry.class: Oro\Bundle\ActionBundle\Model\ActionRegistry
     oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager
     oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
@@ -14,11 +14,11 @@ parameters:
     oro_action.datagrid.action_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\ActionExtension
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
+    oro_action.layout.block_type.action_line_buttons.class: Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType
+    oro_action.layout.block_type.action_combined_buttons.class: Oro\Bundle\ActionBundle\Layout\Block\Type\ActionCombinedButtonsType
+    oro_action.layout.data_provider.actions_data_rpovider.class: Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider
 
 services:
-    oro_action.context_accessor:
-        class: %oro_action.context_accessor.class%
-
     oro_action.handler.delete:
         class: %oro_action.handler.delete.class%
         arguments:
@@ -30,12 +30,16 @@ services:
         class: %oro_action.helper.context.class%
         arguments:
             - @oro_entity.doctrine_helper
+            - @property_accessor
             - @request_stack
 
     oro_action.helper.applications:
         class: %oro_action.helper.applications.class%
         arguments:
             - @security.token_storage
+
+    oro_action.helper.restrict:
+        class: %oro_action.helper.restrict.class%
 
     oro_action.registry:
         class: %oro_action.registry.class%
@@ -143,3 +147,26 @@ services:
 
     oro_action.datagrid.mass_action_provider.registry:
         class: %oro_action.datagrid.mass_action_provider.registry.class%
+
+    oro_action.layout.block_type.action_line_buttons:
+        class: %oro_action.layout.block_type.action_line_buttons.class%
+        arguments:
+            - @oro_action.helper.applications
+            - @oro_entity.doctrine_helper
+        tags:
+            - { name: layout.block_type, alias: action_line_buttons }
+
+    oro_action.layout.block_type.action_combined_buttons:
+        class: %oro_action.layout.block_type.action_combined_buttons.class%
+        tags:
+            - { name: layout.block_type, alias: action_combined_buttons }
+
+    oro_action.layout.data_provider.actions_data_rpovider:
+        class: %oro_action.layout.data_provider.actions_data_rpovider.class%
+        arguments:
+            - @oro_action.manager
+            - @oro_action.helper.restrict
+            - @translator
+            - @oro_action.helper.context
+        tags:
+            - { name: layout.data_provider, alias: actions }

@@ -16,7 +16,9 @@ define(function(require) {
         options: {
             datagrid: null,
             confirmation: null,
+            confirmComponent: null,
             showDialog: null,
+            hasDialog: null,
             executionRoute: null,
             dialogRoute: null,
             dialogOptions: {
@@ -47,10 +49,12 @@ define(function(require) {
 
             var options = _.extend({
                 showDialog: this.options.showDialog,
+                hasDialog: this.options.hasDialog,
                 dialogUrl: routing.generate(this.options.dialogRoute, routeParams),
                 dialogOptions: this.options.dialogOptions,
                 url: routing.generate(this.options.executionRoute, routeParams),
                 confirmation: !_.isEmpty(this.options.confirmation),
+                confirmComponent: this.options.confirmComponent,
                 messages: {
                     confirm_title: this.options.confirmation.title,
                     confirm_content: this.options.confirmation.message

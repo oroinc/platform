@@ -13,8 +13,8 @@ use Oro\Bundle\ActionBundle\Model\ActionRegistry;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Component\ConfigExpression\Action\ActionFactory as FunctionFactory;
 
+use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 /**
@@ -44,10 +44,6 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -140,6 +136,21 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 'actions' => [],
                 'expectedActions' => []
             ],
+            'route1' => [
+                'entityClass' => null,
+                'route' => 'route1',
+                'datagrid' => null,
+                'group' => null,
+                'context' => ['route' => 'route1'],
+                'actions' => [
+                    'action2' => $this->getActions('action2'),
+                    'action4' => $this->getActions('action4'),
+                ],
+                'expectedActions' => [
+                    'action4',
+                    'action2',
+                ]
+            ],
             'entity1 without id' => [
                 'entityClass' => null,
                 'route' => null,
@@ -148,6 +159,49 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 'context' => ['entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                 'actions' => [],
                 'expectedActions' => []
+            ],
+            'entity1' => [
+                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                'route' => null,
+                'datagrid' => null,
+                'group' => null,
+                'context' => [
+                    'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                    'entityId' => 1,
+                ],
+                'actions' => [
+                    'action3' => $this->getActions('action3'),
+                    'action4' => $this->getActions('action4'),
+                    'action6' => $this->getActions('action6'),
+                ],
+                'expectedActions' => [
+                    'action4',
+                    'action3',
+                    'action6'
+                ]
+            ],
+            'route1 & entity1' => [
+                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                'route' => 'route1',
+                'datagrid' => null,
+                'group' => null,
+                'context' => [
+                    'route' => 'route1',
+                    'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
+                    'entityId' => 1,
+                ],
+                'actions' => [
+                    'action2' => $this->getActions('action2'),
+                    'action3' => $this->getActions('action3'),
+                    'action4' => $this->getActions('action4'),
+                    'action6' => $this->getActions('action6'),
+                ],
+                'expectedActions' => [
+                        'action4',
+                        'action3',
+                        'action2',
+                        'action6'
+                ]
             ],
             'full context' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
@@ -269,13 +323,41 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 'context' => [],
                 'actionData' => new ActionData(),
             ],
-            'entity' => [
+            'route1' => [
+                'context' => [
+                    'route' => 'route1'
+                ],
+                'actionData' => new ActionData(),
+            ],
+            'route1 without entity id' => [
                 'context' => [
                     'route' => 'route1',
+                    'entityClass' => 'stdClass'
+                ],
+                'actionData' => new ActionData(),
+            ],
+            'entity' => [
+                'context' => [
                     'entityClass' => 'stdClass',
                     'entityId' => 1,
                     'datagrid' => 'grid1',
                     'group' => 'group1'
+                ],
+                'actionData' => new ActionData(),
+            ],
+            'route1 and entity' => [
+                'context' => [
+                    'route' => 'route1',
+                    'entityClass' => 'stdClass',
+                    'entityId' => 1
+                ],
+                'actionData' => new ActionData(),
+            ],
+            'route1 and entity with action data and entity' => [
+                'context' => [
+                    'route' => 'route1',
+                    'entityClass' => 'stdClass',
+                    'entityId' => 1
                 ],
                 'actionData' => new ActionData(['data' => new \stdClass]),
             ],
@@ -574,7 +656,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->setFrontendOptions($frontendOptions);
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory */
-        $functionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\Action\ActionFactory')
+        $functionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 

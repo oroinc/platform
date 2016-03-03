@@ -41,6 +41,7 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider invalidOptionsDataProvider
      *
      * @param array $configuration
+     * @param string $exception
      * @param string $message
      */
     public function testAssembleRequiredOptionException(array $configuration, $exception, $message)
