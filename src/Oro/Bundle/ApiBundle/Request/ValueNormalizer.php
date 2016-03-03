@@ -20,11 +20,33 @@ class ValueNormalizer
     protected $requirements = [];
 
     /**
+     * List of data types, values of such types will be cached locally.
+     *
+     * @var array
+     */
+    protected $cachedData = [
+        DataType::ENTITY_TYPE         => [],
+        DataType::ENTITY_CLASS        => [],
+        DataType::ENTITY_ALIAS        => [],
+        DataType::ENTITY_PLURAL_ALIAS => [],
+    ];
+
+    /**
      * @param NormalizeValueProcessor $processor
      */
     public function __construct(NormalizeValueProcessor $processor)
     {
         $this->processor = $processor;
+    }
+
+    /**
+     * Enables local cache for given data type values.
+     *
+     * @param string $dataType
+     */
+    public function enableCacheForDataType($dataType)
+    {
+        $this->cachedData[$dataType] = [];
     }
 
     /**
@@ -39,9 +61,20 @@ class ValueNormalizer
      */
     public function normalizeValue($value, $dataType, RequestType $requestType, $isArrayAllowed = false)
     {
-        $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
+        if (!isset($this->cachedData[$dataType])) {
+            return $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
+        }
 
-        return $context->getResult();
+        if (array_key_exists($value, $this->cachedData[$dataType])) {
+            return $this->cachedData[$dataType][$value];
+
+        }
+
+        $result = $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
+
+        $this->cachedData[$dataType][$value] = $result;
+
+        return $result;
     }
 
     /**
@@ -89,5 +122,21 @@ class ValueNormalizer
         }
 
         return $context;
+    }
+
+    /**
+     * @param string      $dataType
+     * @param RequestType $requestType
+     * @param mixed       $value
+     * @param bool        $isArrayAllowed
+     *
+     * @return mixed|null
+     * @throws \Exception
+     */
+    protected function getNormalizedValue($dataType, RequestType $requestType, $value, $isArrayAllowed)
+    {
+        $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
+
+        return $context->getResult();
     }
 }
