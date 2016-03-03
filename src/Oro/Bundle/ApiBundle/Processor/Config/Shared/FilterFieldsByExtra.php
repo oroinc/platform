@@ -2,30 +2,41 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
+/**
+ * Excludes fields according to requested fieldset.
+ * For example, in JSON.API the "fields[TYPE]" parameter can be used to request only specific fields.
+ */
 class FilterFieldsByExtra implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EntityClassTransformerInterface */
-    protected $entityClassTransformer;
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
 
     /**
-     * @param DoctrineHelper                  $doctrineHelper
-     * @param EntityClassTransformerInterface $entityClassTransformer
+     * @param DoctrineHelper  $doctrineHelper
+     * @param ValueNormalizer $valueNormalizer
      */
-    public function __construct(DoctrineHelper $doctrineHelper, EntityClassTransformerInterface $entityClassTransformer)
-    {
-        $this->doctrineHelper         = $doctrineHelper;
-        $this->entityClassTransformer = $entityClassTransformer;
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        ValueNormalizer $valueNormalizer
+    ) {
+        $this->doctrineHelper  = $doctrineHelper;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -35,99 +46,116 @@ class FilterFieldsByExtra implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        /** @var array|null $definition */
         $definition = $context->getResult();
-        if (empty($definition) || !is_array($definition[ConfigUtil::FIELDS])) {
-            // nothing to do
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
             return;
         }
-        $fieldsDefinition = $definition[ConfigUtil::FIELDS];
 
         $entityClass = $context->getClassName();
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            // only manageable entities are supported
             return;
         }
 
-        $filterFieldsConfig = $context->get(FilterFieldsConfigExtra::NAME);
-
-        $this->filterFields($entityClass, $fieldsDefinition, $filterFieldsConfig);
-        $this->filterAssociations($entityClass, $fieldsDefinition, $filterFieldsConfig);
-
-        $context->setResult(
-            [
-                ConfigUtil::EXCLUSION_POLICY => ConfigUtil::EXCLUSION_POLICY_ALL,
-                ConfigUtil::FIELDS           => $fieldsDefinition
-            ]
+        $this->filterFields(
+            $definition,
+            $entityClass,
+            $context->get(FilterFieldsConfigExtra::NAME),
+            $context->getRequestType()
         );
     }
 
     /**
-     * @param string $entityClass
-     * @param array  $fieldsDefinition
-     * @param array  $filterFieldsConfig
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     * @param array                  $fieldFilters
+     * @param RequestType            $requestType
      */
-    protected function filterFields($entityClass, &$fieldsDefinition, &$filterFieldsConfig)
-    {
-        $entityAlias           = $this->entityClassTransformer->transform($entityClass);
-        $rootEntityIdentifiers = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-        if (array_key_exists($entityAlias, $filterFieldsConfig)) {
-            $allowedFields = $filterFieldsConfig[$entityAlias];
-            foreach ($fieldsDefinition as $name => &$def) {
-                if (isset($def[ConfigUtil::DEFINITION][ConfigUtil::FIELDS])
-                    && array_key_exists($name, $filterFieldsConfig)
-                ) {
-                    continue;
-                }
+    protected function filterFields(
+        EntityDefinitionConfig $definition,
+        $entityClass,
+        array $fieldFilters,
+        RequestType $requestType
+    ) {
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
 
-                if (!in_array($name, $allowedFields, true)
-                    && !in_array($name, $rootEntityIdentifiers, true)
-                    && !ConfigUtil::isMetadataProperty($name)
+        $allowedFields = $this->getAllowedFields($metadata, $fieldFilters, $requestType);
+        if (null !== $allowedFields) {
+            $idFieldNames = $metadata->getIdentifierFieldNames();
+            $fields       = $definition->getFields();
+            foreach ($fields as $fieldName => $field) {
+                if (!$field->isExcluded()
+                    && !in_array($fieldName, $allowedFields, true)
+                    && !in_array($fieldName, $idFieldNames, true)
+                    && !ConfigUtil::isMetadataProperty($field->getPropertyPath() ?: $fieldName)
                 ) {
-                    $def[ConfigUtil::DEFINITION][ConfigUtil::EXCLUDE] = true;
+                    $field->setExcluded();
                 }
             }
-            unset($filterFieldsConfig[$entityAlias]);
+        }
+
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->hasTargetEntity()) {
+                $propertyPath = $field->getPropertyPath() ?: $fieldName;
+                if ($metadata->hasAssociation($propertyPath)) {
+                    $this->filterFields(
+                        $field->getTargetEntity(),
+                        $metadata->getAssociationTargetClass($propertyPath),
+                        $fieldFilters,
+                        $requestType
+                    );
+                }
+            }
         }
     }
 
     /**
-     * @param string $entityClass
-     * @param array  $fieldsDefinition
-     * @param array  $filterFieldsConfig
+     * @param ClassMetadata $metadata
+     * @param array         $fieldFilters
+     * @param RequestType   $requestType
+     *
+     * @return string[]|null
      */
-    protected function filterAssociations($entityClass, &$fieldsDefinition, &$filterFieldsConfig)
+    protected function getAllowedFields(ClassMetadata $metadata, array $fieldFilters, RequestType $requestType)
     {
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-
-        $associationsMapping = $metadata->getAssociationMappings();
-        foreach ($associationsMapping as $fieldName => $mapping) {
-            $identifierFieldNames     = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass(
-                $mapping['targetEntity']
-            );
-
-            if (!isset($filterFieldsConfig[$fieldName])
-                || (
-                    !isset($fieldsDefinition[$fieldName][ConfigUtil::DEFINITION][ConfigUtil::FIELDS])
-                    || !is_array($fieldsDefinition[$fieldName][ConfigUtil::DEFINITION][ConfigUtil::FIELDS])
-                )
-            ) {
-                continue;
+        $allowedFields = null;
+        if ($metadata->inheritanceType === ClassMetadata::INHERITANCE_TYPE_NONE) {
+            $entityType = $this->convertToEntityType($metadata->name, $requestType);
+            if (null !== $entityType && !empty($fieldFilters[$entityType])) {
+                $allowedFields = $fieldFilters[$entityType];
             }
-
-            $associationAllowedFields = $filterFieldsConfig[$fieldName];
-            foreach ($fieldsDefinition[$fieldName][ConfigUtil::DEFINITION][ConfigUtil::FIELDS] as $name => &$def) {
-                if (in_array($name, $identifierFieldNames, true)) {
-                    continue;
-                }
-
-                if (!in_array($name, $associationAllowedFields, true) && !ConfigUtil::isMetadataProperty($name)) {
-                    if (is_array($def)) {
-                        $def = array_merge($def, [ConfigUtil::EXCLUDE => true]);
+        } else {
+            $entityClasses = array_unique(array_merge([$metadata->name], $metadata->subClasses));
+            foreach ($entityClasses as $entityClass) {
+                $entityType = $this->convertToEntityType($entityClass, $requestType);
+                if (null !== $entityType && !empty($fieldFilters[$entityType])) {
+                    if (null === $allowedFields) {
+                        $allowedFields = $fieldFilters[$entityType];
                     } else {
-                        $def = [ConfigUtil::EXCLUDE => true];
+                        $allowedFields = array_unique(array_merge($allowedFields, $fieldFilters[$entityType]));
                     }
                 }
             }
         }
+
+        return $allowedFields;
+    }
+
+    /**
+     * @param string      $entityClass
+     * @param RequestType $requestType
+     *
+     * @return string|null
+     */
+    protected function convertToEntityType($entityClass, RequestType $requestType)
+    {
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            $requestType,
+            false
+        );
     }
 }

@@ -2,13 +2,16 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
-use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Symfony\Component\Form\FormEvents;
+
+use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class DefaultValuesListenerTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ContextAccessor
      */
     protected $contextAccessor;
 
@@ -24,7 +27,7 @@ class DefaultValuesListenerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
 

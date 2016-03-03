@@ -2,47 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+use Oro\Component\Action\Action\CreateDateTime as BaseCreateDateTime;
 
-class CreateDateTime extends AbstractDateAction
+/**
+ * @deprecated since 1.10. Use {@see Oro\Component\Action\Action\CreateDateTime} instead
+ */
+class CreateDateTime extends BaseCreateDateTime
 {
-    /**
-     * @return \DateTime
-     */
-    protected function createDateTime()
-    {
-        return new \DateTime(
-            $this->getOption($this->options, 'time'),
-            $this->getOption($this->options, 'timezone')
-        );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initialize(array $options)
-    {
-        if (empty($options['time'])) {
-            $options['time'] = null;
-        } elseif (!is_string($options['time'])) {
-            throw new InvalidParameterException(
-                sprintf('Option "time" must be a string, %s given.', $this->getClassOrType($options['time']))
-            );
-        }
-
-        if (empty($options['timezone'])) {
-            $options['timezone'] = new \DateTimeZone('UTC');
-        } elseif (is_string($options['timezone'])) {
-            $options['timezone'] = new \DateTimeZone($options['timezone']);
-        } elseif (!$options['timezone'] instanceof \DateTimeZone) {
-            throw new InvalidParameterException(
-                sprintf(
-                    'Option "timezone" must be a string or instance of DateTimeZone, %s given.',
-                    $this->getClassOrType($options['timezone'])
-                )
-            );
-        }
-
-        return parent::initialize($options);
-    }
 }

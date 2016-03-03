@@ -9,12 +9,13 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\InstallerBundle\Command\Provider\InputOptionProvider;
 use Oro\Bundle\InstallerBundle\CommandExecutor;
 use Oro\Bundle\InstallerBundle\ScriptExecutor;
 use Oro\Bundle\InstallerBundle\ScriptManager;
+use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+use Oro\Bundle\UserBundle\Migrations\Data\ORM\LoadAdminUserData;
 
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -431,6 +432,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     '--force'             => true,
                     '--process-isolation' => true,
                     '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
+                ]
+            )
+            ->runCommand(
+                LoadPermissionConfigurationCommand::NAME,
+                [
+                    '--process-isolation' => true
                 ]
             )
             ->runCommand(

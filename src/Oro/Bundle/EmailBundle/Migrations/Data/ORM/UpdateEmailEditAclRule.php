@@ -80,14 +80,22 @@ class UpdateEmailEditAclRule extends AbstractFixture implements
     protected function updateUserRole(AclManager $manager)
     {
         $oid = $manager->getOid('entity:Oro\Bundle\EmailBundle\Entity\Email');
+        $extension = $manager->getExtensionSelector()->select($oid);
+        $maskBuilders = $extension->getAllMaskBuilders();
+
         $roles = $this->getRoles();
         foreach ($roles as $role) {
             $sid = $manager->getSid($role);
-            $maskBuilder = $manager->getMaskBuilder($oid)
-                ->add('VIEW_SYSTEM')
-                ->add('CREATE_SYSTEM')
-                ->add('EDIT_SYSTEM');
-            $manager->setPermission($sid, $oid, $maskBuilder->get());
+
+            foreach ($maskBuilders as $maskBuilder) {
+                foreach (['VIEW_SYSTEM', 'CREATE_SYSTEM', 'EDIT_SYSTEM'] as $permission) {
+                    if ($maskBuilder->hasMask('MASK_' . $permission)) {
+                        $maskBuilder->add($permission);
+                    }
+                }
+
+                $manager->setPermission($sid, $oid, $maskBuilder->get());
+            }
         }
     }
 

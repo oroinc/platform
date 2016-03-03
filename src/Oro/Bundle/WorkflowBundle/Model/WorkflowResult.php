@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-class WorkflowResult extends AbstractStorage
+use Oro\Component\Action\Model\AbstractStorage as ComponentAbstractStorage;
+
+class WorkflowResult extends ComponentAbstractStorage
 {
 }

@@ -21,22 +21,16 @@ abstract class NormalizeDescription implements ProcessorInterface
     }
 
     /**
-     * @param array  $config
-     * @param string $attributeName
+     * @param Label $value
+     *
+     * @return string|null
      */
-    protected function normalizeAttribute(array &$config, $attributeName)
+    protected function trans(Label $value)
     {
-        if (empty($config[$attributeName])) {
-            return;
-        }
-        $attribute = $config[$attributeName];
-        if ($attribute instanceof Label) {
-            $translated = $attribute->trans($this->translator);
-            if (!empty($translated)) {
-                $config[$attributeName] = $translated;
-            } else {
-                unset($config[$attributeName]);
-            }
-        }
+        $translated = $value->trans($this->translator);
+
+        return !empty($translated)
+            ? $translated
+            : null;
     }
 }

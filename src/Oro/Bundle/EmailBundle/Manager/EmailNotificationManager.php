@@ -82,11 +82,14 @@ class EmailNotificationManager
             $bodyContent = '';
             try {
                 $this->emailCacheManager->ensureEmailBodyCached($email);
-                $bodyContent = $this->htmlTagHelper->shorten(
-                    $this->htmlTagHelper->stripTags(
-                        $this->htmlTagHelper->purify($email->getEmailBody()->getBodyContent())
-                    )
-                );
+                $emailBody = $email->getEmailBody();
+                if ($emailBody) {
+                    $bodyContent = $this->htmlTagHelper->shorten(
+                        $this->htmlTagHelper->stripTags(
+                            $this->htmlTagHelper->purify($emailBody->getBodyContent())
+                        )
+                    );
+                }
             } catch (LoadEmailBodyException $e) {
                 // no content
             }

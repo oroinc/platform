@@ -2,12 +2,17 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ContextTest extends \PHPUnit_Framework_TestCase
@@ -44,24 +49,20 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testRequestType()
     {
-        $this->assertEquals([], $this->context->getRequestType());
+        $this->assertEquals(new RequestType([]), $this->context->getRequestType());
 
-        $this->context->setRequestType('test');
-        $this->assertEquals(['test'], $this->context->getRequestType());
-        $this->assertEquals(['test'], $this->context->get(Context::REQUEST_TYPE));
+        $this->context->getRequestType()->add('test');
+        $this->assertEquals(new RequestType(['test']), $this->context->getRequestType());
+        $this->assertEquals(new RequestType(['test']), $this->context->get(Context::REQUEST_TYPE));
 
-        $this->context->setRequestType('another');
-        $this->assertEquals(['test', 'another'], $this->context->getRequestType());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::REQUEST_TYPE));
+        $this->context->getRequestType()->add('another');
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(Context::REQUEST_TYPE));
 
         // test that already existing type is not added twice
-        $this->context->setRequestType('another');
-        $this->assertEquals(['test', 'another'], $this->context->getRequestType());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::REQUEST_TYPE));
-
-        $this->context->setRequestType(['test1', 'test2']);
-        $this->assertEquals(['test', 'another', 'test1', 'test2'], $this->context->getRequestType());
-        $this->assertEquals(['test', 'another', 'test1', 'test2'], $this->context->get(Context::REQUEST_TYPE));
+        $this->context->getRequestType()->add('another');
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(Context::REQUEST_TYPE));
     }
 
     /**
@@ -116,11 +117,11 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($headers->get($key1));
         $this->assertNull($headers[$key1]);
 
-        $this->assertEquals(1, count($headers));
+        $this->assertCount(1, $headers);
         $this->assertEquals([$key1 => null], $headers->toArray());
 
         $headers->clear();
-        $this->assertEquals(0, count($headers));
+        $this->assertCount(0, $headers);
     }
 
     /**
@@ -179,11 +180,11 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($headers->get($key1));
         $this->assertNull($headers[$key1]);
 
-        $this->assertEquals(1, count($headers));
+        $this->assertCount(1, $headers);
         $this->assertEquals([$key1 => null], $headers->toArray());
 
         $headers->clear();
-        $this->assertEquals(0, count($headers));
+        $this->assertCount(0, $headers);
     }
 
     public function testResponseStatusCode()
@@ -215,11 +216,12 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             new TestConfigExtra('extra1')
         ];
 
-        $config         = ConfigUtil::getInitialConfig();
+        $config = new EntityDefinitionConfig();
+        $config->setExcludeAll();
         $section1Config = ['test'];
 
         $this->context->setVersion($version);
-        $this->context->setRequestType($requestType);
+        $this->context->getRequestType()->add($requestType);
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
@@ -228,14 +230,16 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                [$requestType],
+                new RequestType([$requestType]),
                 $configExtras
             )
             ->willReturn(
-                [
-                    ConfigUtil::DEFINITION => $config,
-                    'section1' => $section1Config
-                ]
+                $this->getConfig(
+                    [
+                        ConfigUtil::DEFINITION => $config,
+                        'section1'             => $section1Config
+                    ]
+                )
             );
 
         // test that a config is not loaded yet
@@ -272,11 +276,12 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             new TestConfigSection('section2')
         ];
 
-        $config         = ConfigUtil::getInitialConfig();
+        $config = new EntityDefinitionConfig();
+        $config->setExcludeAll();
         $section1Config = ['test'];
 
         $this->context->setVersion($version);
-        $this->context->setRequestType($requestType);
+        $this->context->getRequestType()->add($requestType);
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
@@ -285,14 +290,16 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                [$requestType],
+                new RequestType([$requestType]),
                 $configExtras
             )
             ->willReturn(
-                [
-                    ConfigUtil::DEFINITION => $config,
-                    'section1' => $section1Config
-                ]
+                $this->getConfig(
+                    [
+                        ConfigUtil::DEFINITION => $config,
+                        'section1'             => $section1Config
+                    ]
+                )
             );
 
         // test that a config is not loaded yet
@@ -330,7 +337,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testConfigWhenItIsSetExplicitly()
     {
-        $config = ConfigUtil::getInitialConfig();
+        $config = new EntityDefinitionConfig();
+        $config->setExcludeAll();
 
         $this->context->setConfigExtras([new TestConfigSection('section1')]);
         $this->context->setClassName('Test\Class');
@@ -417,17 +425,19 @@ class ContextTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoadKnownSectionConfigByGetConfigOf($configSection)
     {
-        $mainConfig    = ConfigUtil::getInitialConfig();
-        $sectionConfig = ConfigUtil::getInitialConfig();
+        $mainConfig    = new EntityDefinitionConfig();
+        $sectionConfig = [];
 
-        $mainConfig[ConfigUtil::FIELDS]['field1']    = null;
-        $mainConfig[ConfigUtil::FIELDS]['field2']    = null;
+        $mainConfig->addField('field1');
+        $mainConfig->addField('field2');
         $sectionConfig[ConfigUtil::FIELDS]['field1'] = null;
 
-        $config = [
-            ConfigUtil::DEFINITION => $mainConfig,
-            $configSection => $sectionConfig
-        ];
+        $config = $this->getConfig(
+            [
+                ConfigUtil::DEFINITION => $mainConfig,
+                $configSection         => $sectionConfig
+            ]
+        );
 
         $this->context->setClassName('Test\Class');
         // set "known" sections
@@ -463,10 +473,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider configSectionProvider
      */
-    public function testConfigWhenIsSetExplicitlyForKnownSection($configSection)
+    public function testConfigWhenIsSetExplicitlyForKnownSection($configSection, $sectionConfig)
     {
-        $sectionConfig = ConfigUtil::getInitialConfig();
-
         $this->context->setClassName('Test\Class');
         // set "known" sections
         $this->context->setConfigExtras([new FiltersConfigExtra(), new SortersConfigExtra()]);
@@ -494,8 +502,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function configSectionProvider()
     {
         return [
-            [FiltersConfigExtra::NAME],
-            [SortersConfigExtra::NAME]
+            [FiltersConfigExtra::NAME, new FiltersConfig()],
+            [SortersConfigExtra::NAME, new SortersConfig()]
         ];
     }
 
@@ -590,12 +598,12 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             new TestConfigSection('section2')
         ];
 
-        $config         = ConfigUtil::getInitialConfig();
+        $config         = new EntityDefinitionConfig();
         $metadata       = new EntityMetadata();
         $metadataExtras = [new TestMetadataExtra('extra1')];
 
         $this->context->setVersion($version);
-        $this->context->setRequestType($requestType);
+        $this->context->getRequestType()->add($requestType);
         $this->context->setConfigExtras($configExtras);
         $this->context->setMetadataExtras($metadataExtras);
         $this->context->setClassName($entityClass);
@@ -605,16 +613,16 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                [$requestType],
+                new RequestType([$requestType]),
                 $configExtras
             )
-            ->willReturn([ConfigUtil::DEFINITION => $config]);
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
         $this->metadataProvider->expects($this->once())
             ->method('getMetadata')
             ->with(
                 $entityClass,
                 $version,
-                [$requestType],
+                new RequestType([$requestType]),
                 $metadataExtras,
                 $config
             )
@@ -759,5 +767,20 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->context->resetErrors();
         $this->assertFalse($this->context->hasErrors());
         $this->assertSame([], $this->context->getErrors());
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return Config
+     */
+    protected function getConfig(array $data = [])
+    {
+        $result = new Config();
+        foreach ($data as $sectionName => $config) {
+            $result->set($sectionName, $config);
+        }
+
+        return $result;
     }
 }

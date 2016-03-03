@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\GetMetadata;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
@@ -11,11 +12,11 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Expands metadata of root entity adding fields which are aliases for child associations.
- * For example if there is a configuration of field like:
+ * For example, if there is the field configuration like:
  * addressName:
  *      property_path: address.name
- * we need to add the 'addressName' field and its metadata should be based on metadata
- * of 'name' field of 'address' association.
+ * the "addressName" field should be added to the metadata.
+ * The metadata of this field should be based on metadata of the "name" field of the "address" association.
  */
 class NormalizeLinkedProperties implements ProcessorInterface
 {
@@ -48,29 +49,31 @@ class NormalizeLinkedProperties implements ProcessorInterface
         }
 
         $config = $context->getConfig();
-        if (empty($config)) {
+        if (null === $config) {
             // a configuration does not exist
             return;
         }
 
-        /** @var EntityMetadata $entityMetadata */
+        $entityClass = $context->getClassName();
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            // only manageable entities are supported
+            return;
+        }
+
         $entityMetadata = $context->getResult();
         $this->normalizeMetadata($entityMetadata, $config);
     }
 
     /**
-     * @param EntityMetadata $entityMetadata
-     * @param array          $config
+     * @param EntityMetadata         $entityMetadata
+     * @param EntityDefinitionConfig $definition
      */
-    protected function normalizeMetadata(EntityMetadata $entityMetadata, array $config)
+    protected function normalizeMetadata(EntityMetadata $entityMetadata, EntityDefinitionConfig $definition)
     {
-        $fields = ConfigUtil::getArrayValue($config, ConfigUtil::FIELDS);
-        foreach ($fields as $fieldName => $fieldConfig) {
-            if (!$entityMetadata->hasProperty($fieldName)
-                && null !== $fieldConfig
-                && isset($fieldConfig[ConfigUtil::PROPERTY_PATH])
-            ) {
-                $path = ConfigUtil::explodePropertyPath($fieldConfig[ConfigUtil::PROPERTY_PATH]);
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if (!$entityMetadata->hasProperty($fieldName) && $field->hasPropertyPath()) {
+                $path = ConfigUtil::explodePropertyPath($field->getPropertyPath());
                 if (count($path) > 1) {
                     $this->addLinkedProperty($entityMetadata, $fieldName, $path);
                 }

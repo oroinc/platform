@@ -6,6 +6,8 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
+use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+
 class PlatformUpdateCommand extends AbstractCommand
 {
     /**
@@ -52,6 +54,7 @@ class PlatformUpdateCommand extends AbstractCommand
                         '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                     )
                 )
+                ->runCommand(LoadPermissionConfigurationCommand::NAME, array('--process-isolation' => true))
                 ->runCommand('oro:workflow:definitions:load', array('--process-isolation' => true))
                 ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
                 ->runCommand('oro:migration:data:load', array('--process-isolation' => true))

@@ -1,0 +1,4 @@
+oro:
+    action:
+        confirm_title: Action Confirmation
+        confirm_content: Are you sure you want to perform this action?
