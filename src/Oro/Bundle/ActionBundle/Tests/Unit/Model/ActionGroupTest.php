@@ -122,16 +122,15 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
      * @dataProvider isAllowedProvider
      * @param ActionData $data
      * @param ConfigurableCondition $condition
-     * @param \PHPUnit_Framework_MockObject_Matcher_Invocation $expectedConditionFactory
      * @param bool $allowed
      */
-    public function testIsAllowed(ActionData $data, $condition, $expectedConditionFactory, $allowed)
+    public function testIsAllowed(ActionData $data, $condition, $allowed)
     {
         if ($condition) {
             $this->actionGroup->getDefinition()->setConditions(['condition1']);
         }
 
-        $this->conditionFactory->expects($expectedConditionFactory)
+        $this->conditionFactory->expects($condition ? $this->once() : $this->never())
             ->method('create')
             ->willReturn($condition);
 
@@ -149,19 +148,16 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             'no conditions' => [
                 'data' => $data,
                 'condition' => null,
-                'expectedConditionFactory' =>  $this->never(),
                 'allowed' => true,
             ],
             '!isConditionAllowed' => [
                 'data' => $data,
                 'condition' => $this->createCondition($this->once(), $data, false),
-                'expectedConditionFactory' => $this->once(),
                 'allowed' => false,
             ],
             'allowed' => [
                 'data' => $data,
                 'condition' => $this->createCondition($this->once(), $data, true),
-                'expectedConditionFactory' => $this->once(),
                 'allowed' => true,
             ],
         ];
