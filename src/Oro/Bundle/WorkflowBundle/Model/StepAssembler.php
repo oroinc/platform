@@ -8,9 +8,9 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Model\AbstractAssembler;
+use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 
-class StepAssembler extends AbstractAssembler
+class StepAssembler extends BaseAbstractAssembler
 {
     /**
      * @var Attribute[]

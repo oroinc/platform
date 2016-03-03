@@ -8,9 +8,9 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Action\AbstractAction as ComponentAbstractAction;
 
-class StartWorkflow extends AbstractAction
+class StartWorkflow extends ComponentAbstractAction
 {
     /**
      * @var array
