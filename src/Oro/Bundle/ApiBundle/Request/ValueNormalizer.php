@@ -24,15 +24,12 @@ class ValueNormalizer
      *
      * @var array
      */
-    protected $cachedDataTypes = [
-        DataType::ENTITY_TYPE         => true,
-        DataType::ENTITY_CLASS        => true,
-        DataType::ENTITY_ALIAS        => true,
-        DataType::ENTITY_PLURAL_ALIAS => true,
+    protected $cachedData = [
+        DataType::ENTITY_TYPE         => [],
+        DataType::ENTITY_CLASS        => [],
+        DataType::ENTITY_ALIAS        => [],
+        DataType::ENTITY_PLURAL_ALIAS => [],
     ];
-
-    /** @var array */
-    private $cachedData = [];
 
     /**
      * @param NormalizeValueProcessor $processor
@@ -49,7 +46,7 @@ class ValueNormalizer
      */
     public function enableCacheForDataType($dataType)
     {
-        $this->cachedDataTypes[$dataType] = true;
+        $this->cachedData[$dataType] = [];
     }
 
     /**
@@ -64,13 +61,13 @@ class ValueNormalizer
      */
     public function normalizeValue($value, $dataType, RequestType $requestType, $isArrayAllowed = false)
     {
-        if (!array_key_exists($dataType, $this->cachedDataTypes)) {
+        if (!isset($this->cachedData[$dataType])) {
             $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
 
             return $context->getResult();
         }
 
-        if (!isset($this->cachedData[$dataType][$value])) {
+        if (!array_key_exists($value, $this->cachedData[$dataType])) {
             $context = $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed);
             $this->cachedData[$dataType][$value] = $context->getResult();
         }
