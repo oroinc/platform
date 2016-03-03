@@ -6,9 +6,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
 {
@@ -91,7 +92,7 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\ActionException
+     * @expectedException \Oro\Component\Action\Exception\ActionException
      * @expectedExceptionMessage Cannot transit workflow, instance of "stdClass" doesn't have workflow item.
      */
     public function testExecuteFailsWhenThereIsNoWorkflowItem()
@@ -209,14 +210,14 @@ class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
         return [
             'no entity' => [
                 'options' => [],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Option "entity" is required.',
             ],
             'invalid route parameters' => [
                 'options' => [
                     'entity' => new PropertyPath('test'),
                 ],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Option "transition" is required.',
             ],
         ];

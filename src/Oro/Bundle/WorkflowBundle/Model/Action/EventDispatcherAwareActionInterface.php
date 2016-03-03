@@ -2,14 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Oro\Component\Action\Action\EventDispatcherAwareActionInterface as BaseEventDispatcherAwareActionInterface;
 
-interface EventDispatcherAwareActionInterface
+/**
+ * @deprecated since 1.10. Use {@see Oro\Component\Action\Action\EventDispatcherAwareActionInterface} instead
+ */
+interface EventDispatcherAwareActionInterface extends BaseEventDispatcherAwareActionInterface
 {
-    /**
-     * Add event dispatcher to the action
-     *
-     * @param EventDispatcherInterface $eventDispatcher
-     */
-    public function setDispatcher(EventDispatcherInterface $eventDispatcher);
 }
