@@ -18,13 +18,10 @@ class NormalizeValueContext extends ApiContext
     /** a delimiter that should be used to split a string to separate elements */
     const ARRAY_DELIMITER = 'arrayDelimiter';
 
-    /** a default delimiter value that should be used to split a string to separate elements */
-    const ARRAY_DELIMITER_VALUE = ',';
-
     public function __construct()
     {
         parent::__construct();
-        $this->set(self::ARRAY_DELIMITER, self::ARRAY_DELIMITER_VALUE);
+        $this->set(self::ARRAY_DELIMITER, ',');
     }
 
     /**
