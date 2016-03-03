@@ -5,6 +5,7 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Oro\Bundle\ActionBundle\Model\AttributeManager as BaseAttributeManager;
 use Oro\Bundle\WorkflowBundle\Acl\AclManager;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
@@ -37,7 +38,7 @@ class Workflow
     protected $stepManager;
 
     /**
-     * @var AttributeManager
+     * @var BaseAttributeManager
      */
     protected $attributeManager;
 
@@ -65,20 +66,20 @@ class Workflow
      * @param EntityConnector $entityConnector
      * @param AclManager $aclManager
      * @param StepManager|null $stepManager
-     * @param AttributeManager|null $attributeManager
+     * @param BaseAttributeManager|null $attributeManager
      * @param TransitionManager|null $transitionManager
      */
     public function __construct(
         EntityConnector $entityConnector,
         AclManager $aclManager,
         StepManager $stepManager = null,
-        AttributeManager $attributeManager = null,
+        BaseAttributeManager $attributeManager = null,
         TransitionManager $transitionManager = null
     ) {
         $this->entityConnector = $entityConnector;
         $this->aclManager = $aclManager;
         $this->stepManager = $stepManager ? $stepManager : new StepManager();
-        $this->attributeManager  = $attributeManager ? $attributeManager : new AttributeManager();
+        $this->attributeManager  = $attributeManager ? $attributeManager : new BaseAttributeManager();
         $this->transitionManager = $transitionManager ? $transitionManager : new TransitionManager();
     }
 
@@ -135,7 +136,7 @@ class Workflow
     }
 
     /**
-     * @return AttributeManager
+     * @return BaseAttributeManager
      */
     public function getAttributeManager()
     {

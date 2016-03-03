@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ContextTest extends \PHPUnit_Framework_TestCase
@@ -48,24 +49,20 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testRequestType()
     {
-        $this->assertEquals([], $this->context->getRequestType());
+        $this->assertEquals(new RequestType([]), $this->context->getRequestType());
 
-        $this->context->setRequestType('test');
-        $this->assertEquals(['test'], $this->context->getRequestType());
-        $this->assertEquals(['test'], $this->context->get(Context::REQUEST_TYPE));
+        $this->context->getRequestType()->add('test');
+        $this->assertEquals(new RequestType(['test']), $this->context->getRequestType());
+        $this->assertEquals(new RequestType(['test']), $this->context->get(Context::REQUEST_TYPE));
 
-        $this->context->setRequestType('another');
-        $this->assertEquals(['test', 'another'], $this->context->getRequestType());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::REQUEST_TYPE));
+        $this->context->getRequestType()->add('another');
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(Context::REQUEST_TYPE));
 
         // test that already existing type is not added twice
-        $this->context->setRequestType('another');
-        $this->assertEquals(['test', 'another'], $this->context->getRequestType());
-        $this->assertEquals(['test', 'another'], $this->context->get(Context::REQUEST_TYPE));
-
-        $this->context->setRequestType(['test1', 'test2']);
-        $this->assertEquals(['test', 'another', 'test1', 'test2'], $this->context->getRequestType());
-        $this->assertEquals(['test', 'another', 'test1', 'test2'], $this->context->get(Context::REQUEST_TYPE));
+        $this->context->getRequestType()->add('another');
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->getRequestType());
+        $this->assertEquals(new RequestType(['test', 'another']), $this->context->get(Context::REQUEST_TYPE));
     }
 
     /**
@@ -224,7 +221,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $section1Config = ['test'];
 
         $this->context->setVersion($version);
-        $this->context->setRequestType($requestType);
+        $this->context->getRequestType()->add($requestType);
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
@@ -233,7 +230,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                [$requestType],
+                new RequestType([$requestType]),
                 $configExtras
             )
             ->willReturn(
@@ -284,7 +281,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $section1Config = ['test'];
 
         $this->context->setVersion($version);
-        $this->context->setRequestType($requestType);
+        $this->context->getRequestType()->add($requestType);
         $this->context->setConfigExtras($configExtras);
         $this->context->setClassName($entityClass);
 
@@ -293,7 +290,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                [$requestType],
+                new RequestType([$requestType]),
                 $configExtras
             )
             ->willReturn(
@@ -606,7 +603,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $metadataExtras = [new TestMetadataExtra('extra1')];
 
         $this->context->setVersion($version);
-        $this->context->setRequestType($requestType);
+        $this->context->getRequestType()->add($requestType);
         $this->context->setConfigExtras($configExtras);
         $this->context->setMetadataExtras($metadataExtras);
         $this->context->setClassName($entityClass);
@@ -616,7 +613,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                [$requestType],
+                new RequestType([$requestType]),
                 $configExtras
             )
             ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
@@ -625,7 +622,7 @@ class ContextTest extends \PHPUnit_Framework_TestCase
             ->with(
                 $entityClass,
                 $version,
-                [$requestType],
+                new RequestType([$requestType]),
                 $metadataExtras,
                 $config
             )

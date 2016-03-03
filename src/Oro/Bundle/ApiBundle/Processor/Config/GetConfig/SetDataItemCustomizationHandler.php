@@ -46,6 +46,11 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
+            return;
+        }
+
         $this->setCustomizationHandler($definition, $context);
     }
 
@@ -96,23 +101,26 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
             $propertyPath = $field->getPropertyPath() ?: $fieldName;
             $path         = ConfigUtil::explodePropertyPath($propertyPath);
             if (count($path) === 1) {
-                $this->setFieldCustomizationHandler(
-                    $context,
-                    $field,
-                    $metadata,
-                    $propertyPath,
-                    $rootEntityClass,
-                    $this->buildFieldPath($fieldName, $fieldPath)
-                );
+                if ($metadata->hasAssociation($propertyPath)) {
+                    $linkedMetadata = $this->doctrineHelper->getEntityMetadataForClass(
+                        $metadata->getAssociationTargetClass($propertyPath)
+                    );
+                    $this->setFieldCustomizationHandler(
+                        $context,
+                        $field,
+                        $linkedMetadata,
+                        $rootEntityClass,
+                        $this->buildFieldPath($fieldName, $fieldPath)
+                    );
+                }
             } else {
-                $linkedField    = array_pop($path);
+                array_pop($path);
                 $linkedMetadata = $this->doctrineHelper->findEntityMetadataByPath($metadata->name, $path);
                 if (null !== $linkedMetadata) {
                     $this->setFieldCustomizationHandler(
                         $context,
                         $field,
                         $linkedMetadata,
-                        $linkedField,
                         $rootEntityClass,
                         $this->buildFieldPath($fieldName, $fieldPath)
                     );
@@ -125,7 +133,6 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
      * @param ConfigContext               $context
      * @param EntityDefinitionFieldConfig $field
      * @param ClassMetadata               $metadata
-     * @param string                      $fieldName
      * @param string                      $rootEntityClass
      * @param string                      $fieldPath
      */
@@ -133,23 +140,20 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
         ConfigContext $context,
         EntityDefinitionFieldConfig $field,
         ClassMetadata $metadata,
-        $fieldName,
         $rootEntityClass,
         $fieldPath
     ) {
-        if ($metadata->hasAssociation($fieldName)) {
-            $targetEntity = $field->getOrCreateTargetEntity();
-            $targetEntity->setPostSerializeHandler(
-                $this->getCustomizationHandler(
-                    $context,
-                    $rootEntityClass,
-                    $fieldPath,
-                    $metadata->getAssociationTargetClass($fieldName),
-                    $targetEntity->getPostSerializeHandler()
-                )
-            );
-            $this->processFields($context, $targetEntity, $rootEntityClass, $metadata, $fieldPath);
-        }
+        $targetEntity = $field->getOrCreateTargetEntity();
+        $targetEntity->setPostSerializeHandler(
+            $this->getCustomizationHandler(
+                $context,
+                $rootEntityClass,
+                $fieldPath,
+                $metadata->name,
+                $targetEntity->getPostSerializeHandler()
+            )
+        );
+        $this->processFields($context, $targetEntity, $rootEntityClass, $metadata, $fieldPath);
     }
 
     /**
@@ -175,7 +179,7 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
         /** @var CustomizeDataItemContext $customizationContext */
         $customizationContext = $this->customizationProcessor->createContext();
         $customizationContext->setVersion($context->getVersion());
-        $customizationContext->setRequestType($context->getRequestType());
+        $customizationContext->getRequestType()->set($context->getRequestType()->toArray());
 
         return $customizationContext;
     }

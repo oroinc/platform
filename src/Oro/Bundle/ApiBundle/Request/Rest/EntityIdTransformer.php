@@ -19,6 +19,9 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var RequestType */
+    protected $requestType;
+
     /**
      * @param DoctrineHelper  $doctrineHelper
      * @param ValueNormalizer $valueNormalizer
@@ -27,6 +30,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     {
         $this->doctrineHelper  = $doctrineHelper;
         $this->valueNormalizer = $valueNormalizer;
+        $this->requestType     = new RequestType([RequestType::REST]);
     }
 
     /**
@@ -64,7 +68,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
     protected function reverseTransformSingleId($value, $dataType)
     {
         return $dataType !== DataType::STRING
-            ? $this->valueNormalizer->normalizeValue($value, $dataType, [RequestType::REST])
+            ? $this->valueNormalizer->normalizeValue($value, $dataType, $this->requestType)
             : $value;
     }
 
@@ -109,7 +113,7 @@ class EntityIdTransformer implements EntityIdTransformerInterface
 
             $dataType         = $metadata->getTypeOfField($key);
             $normalized[$key] = $dataType !== DataType::STRING
-                ? $this->valueNormalizer->normalizeValue($val, $dataType, [RequestType::REST])
+                ? $this->valueNormalizer->normalizeValue($val, $dataType, $this->requestType)
                 : $val;
 
             unset($fieldMap[$key]);

@@ -8,7 +8,7 @@ use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigSection;
 
 class ConfigContextTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,23 +36,48 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setMaxRelatedEntities(123);
         $this->assertEquals(123, $this->context->getMaxRelatedEntities());
         $this->assertEquals(123, $this->context->get(ConfigContext::MAX_RELATED_ENTITIES));
+
+        $this->context->setMaxRelatedEntities();
+        $this->assertNull($this->context->getMaxRelatedEntities());
+        $this->assertFalse($this->context->has(ConfigContext::MAX_RELATED_ENTITIES));
     }
 
     public function testExtras()
     {
         $this->assertSame([], $this->context->getExtras());
         $this->assertSame([], $this->context->get(ConfigContext::EXTRA));
+        $this->assertFalse($this->context->hasExtra('test'));
         $this->assertFalse($this->context->has('test'));
 
-        $extras = [new TestConfigExtra('test')];
+        $extras = [new TestConfigExtra('test', ['test_attr' => true])];
         $this->context->setExtras($extras);
         $this->assertEquals($extras, $this->context->getExtras());
         $this->assertEquals(['test'], $this->context->get(ConfigContext::EXTRA));
-        $this->assertTrue($this->context->has('test'));
+        $this->assertTrue($this->context->hasExtra('test'));
+        $this->assertTrue($this->context->has('test_attr'));
 
         $this->context->setExtras([]);
         $this->assertSame([], $this->context->getExtras());
+        $this->assertFalse($this->context->hasExtra('test'));
         $this->assertSame([], $this->context->get(ConfigContext::EXTRA));
+    }
+
+    public function testGetInheritableExtras()
+    {
+        $this->assertSame([], $this->context->getInheritableExtras());
+
+        $extras = [
+            new TestConfigExtra('test'),
+            new TestConfigSection('test_section')
+        ];
+        $this->context->setExtras($extras);
+        $this->assertEquals(
+            [new TestConfigSection('test_section')],
+            $this->context->getInheritableExtras()
+        );
+
+        $this->context->setExtras([]);
+        $this->assertSame([], $this->context->getInheritableExtras());
     }
 
     public function testFilters()
