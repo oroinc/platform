@@ -144,8 +144,8 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         $this->conditionFactory->expects($expectedConditionFactory)
             ->method('create')
             ->willReturn($condition);
-        $errors = new ArrayCollection();
-        $this->assertEquals($allowed, $this->actionGroup->isAllowed($data, $errors));
+
+        $this->assertEquals($allowed, $this->actionGroup->isAllowed($data));
     }
 
     /**
