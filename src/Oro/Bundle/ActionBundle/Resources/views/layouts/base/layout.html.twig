@@ -42,7 +42,7 @@
             <div class="btn-group icons-holder">
                 <a {{ _self.get_action_attributes(dialogRoute, executionRoute, action, entityClass, entityId) }}>
                     {% if action.icon is not empty %}
-                        <i class="{{ action.icon }} {{ action.buttonOptions.iCss|default('') }} hide-text">vvv{{ action.label }}</i>
+                        <i class="{{ action.icon }} {{ action.buttonOptions.iCss|default('') }} hide-text">{{ action.label }}</i>
                     {% endif %}
                     {{ action.label|trim }}
                 </a>

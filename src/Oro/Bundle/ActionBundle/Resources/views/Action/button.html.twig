@@ -31,12 +31,6 @@
                 <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text">{{ linkLabel }}</i>
                 {{ linkLabel|trim }}
             </a>
-            {#{{ dump(params) }}#}
-                <div{% if params.buttonOptions.data is defined %}
-                    {% for dataName,dataValue in params.buttonOptions.data %}
-                        data-{{ dataName }}="{{ dataValue|e('html_attr')|raw }}"
-                    {% endfor %}
-                {% endif %}></div>
         {% endblock %}
     {% if onlyLink is not defined %}</div>{% endif %}
 {% endblock %}
