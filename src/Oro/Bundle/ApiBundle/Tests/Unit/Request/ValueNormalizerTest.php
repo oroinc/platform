@@ -44,10 +44,6 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $processorMap = [
             [
-                $this->addProcessor($processorBag, 'set_array_delimiter'),
-                new Processor\SetArrayDelimiter()
-            ],
-            [
                 $this->addProcessor($processorBag, 'string', DataType::STRING),
                 new Processor\NormalizeString()
             ],
