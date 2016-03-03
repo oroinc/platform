@@ -56,7 +56,7 @@ class ActionLineButtonsType extends AbstractType
                 'dialogRoute' => $this->applicationsHelper->getDialogRoute(),
                 'executionRoute' => $this->applicationsHelper->getExecutionRoute(),
                 'attr' => [
-                    'data-page-component-module' => 'oroaction/js/app/components/buttons-component',
+                    'data-page-component-module' => 'oroaction/js/app/components/buttons-component'
                 ]
             ]
         );

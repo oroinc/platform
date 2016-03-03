@@ -101,8 +101,8 @@ class ActionExtension extends AbstractExtension
 
         $actions = $this->actionManager->getActions($datagridContext, false);
 
-        foreach ($actions as $action) {
-            $actionName = strtolower($action->getName());
+        foreach ($actions as $actionName => $action) {
+            $actionName = strtolower($actionName);
             if (!array_key_exists($actionName, $actionsConfig)) {
                 $result[$actionName] = $action;
             }
