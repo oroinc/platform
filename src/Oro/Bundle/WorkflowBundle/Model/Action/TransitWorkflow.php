@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Bundle\WorkflowBundle\Exception\ActionException;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+
+use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Exception\ActionException;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Model\ContextAccessor;
 
 /**
  * Performs workflow transition for given entity.

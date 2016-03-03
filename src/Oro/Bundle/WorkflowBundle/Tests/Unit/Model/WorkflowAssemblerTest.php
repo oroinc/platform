@@ -201,7 +201,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function getAttributeMock($name)
     {
-        $attributeMock = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Attribute')
+        $attributeMock = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
             ->disableOriginalConstructor()
             ->getMock();
         $attributeMock->expects($this->any())
@@ -409,7 +409,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
+     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @expectedExceptionMessage Workflow "test_name" does not contains neither start step nor start transitions
      */
     public function testAssembleStartTransitionException()
@@ -516,7 +516,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
+     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @expectedExceptionMessage Option "steps" is required
      */
     public function testAssembleNoStepsConfigurationException()
@@ -530,7 +530,7 @@ class WorkflowAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
+     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @expectedExceptionMessage Option "transitions" is required
      */
     public function testAssembleNoTransitionsConfigurationException()
