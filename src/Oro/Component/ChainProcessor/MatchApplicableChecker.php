@@ -19,9 +19,15 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
     {
         $result = self::APPLICABLE;
         foreach ($processorAttributes as $key => $value) {
-            if ($key === 'group' || (!is_scalar($value) && !is_array($value))) {
+            if ($key === 'group') {
                 continue;
             }
+            if ($value instanceof ToArrayInterface) {
+                $value = $value->toArray();
+            } elseif (!is_scalar($value) && !is_array($value)) {
+                continue;
+            }
+
             if (!$context->has($key)) {
                 $result = self::ABSTAIN;
             } elseif (!$this->isMatch($value, $context->get($key))) {

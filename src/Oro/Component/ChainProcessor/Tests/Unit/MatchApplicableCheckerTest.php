@@ -92,12 +92,24 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
                     'attributes' => ['class' => 'TestCls', 'feature' => ['feature1', 'feature3']]
                 ],
                 [
+                    'processor'  => 'processor17_toArray',
+                    'attributes' => ['class' => 'TestCls', 'feature' => new TestArrayObject(['feature1', 'feature3'])]
+                ],
+                [
                     'processor'  => 'processor18',
                     'attributes' => ['class' => 'TestCls', 'feature' => ['feature3', 'feature1']]
                 ],
                 [
+                    'processor'  => 'processor18_toArray',
+                    'attributes' => ['class' => 'TestCls', 'feature' => new TestArrayObject(['feature3', 'feature1'])]
+                ],
+                [
                     'processor'  => 'processor19',
                     'attributes' => ['class' => 'TestCls', 'feature' => ['feature1', 'feature2']]
+                ],
+                [
+                    'processor'  => 'processor19_toArray',
+                    'attributes' => ['class' => 'TestCls', 'feature' => new TestArrayObject(['feature1', 'feature2'])]
                 ],
                 [
                     'processor'  => 'processor20',
@@ -173,7 +185,9 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
                 'processor14',
                 'processor16',
                 'processor17',
+                'processor17_toArray',
                 'processor18',
+                'processor18_toArray',
                 'processor21',
                 'processor23',
                 'processor25',
