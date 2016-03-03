@@ -15,6 +15,9 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class FixFieldNaming implements ProcessorInterface
 {
+    const TYPE_FIELD_NAME = 'type';
+    const ID_FIELD_NAME   = 'id';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -39,14 +42,14 @@ class FixFieldNaming implements ProcessorInterface
             return;
         }
 
-        $entityClass        = $context->getClassName();
-        $reservedFieldNames = array_intersect(array_keys($definition->getFields()), ['id', 'type']);
-        foreach ($reservedFieldNames as $fieldName) {
-            if ('type' === $fieldName
-                || ('id' === $fieldName && !$this->isIdentifierField($entityClass, $fieldName))
-            ) {
-                $this->renameReservedField($definition, $entityClass, $fieldName);
-            }
+        $entityClass = $context->getClassName();
+        if ($definition->hasField(self::TYPE_FIELD_NAME)) {
+            $this->renameReservedField($definition, $entityClass, self::TYPE_FIELD_NAME);
+        }
+        if ($definition->hasField(self::ID_FIELD_NAME)
+            && !$this->isIdentifierField($entityClass, self::ID_FIELD_NAME)
+        ) {
+            $this->renameReservedField($definition, $entityClass, self::ID_FIELD_NAME);
         }
     }
 

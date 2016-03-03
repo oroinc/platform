@@ -10,12 +10,17 @@ class TestConfigExtra implements ConfigExtraInterface
     /** @var string */
     protected $name;
 
+    /** @var array */
+    protected $contextAttributes;
+
     /**
      * @param string $name
+     * @param array  $contextAttributes
      */
-    public function __construct($name)
+    public function __construct($name, array $contextAttributes = [])
     {
-        $this->name = $name;
+        $this->name              = $name;
+        $this->contextAttributes = $contextAttributes;
     }
 
     /**
@@ -31,6 +36,24 @@ class TestConfigExtra implements ConfigExtraInterface
      */
     public function configureContext(ConfigContext $context)
     {
-        $context->set($this->name, true);
+        foreach ($this->contextAttributes as $name => $value) {
+            $context->set($name, $value);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInheritable()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheKeyPart()
+    {
+        return null;
     }
 }

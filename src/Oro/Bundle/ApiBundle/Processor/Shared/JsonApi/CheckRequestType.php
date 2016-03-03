@@ -29,7 +29,7 @@ class CheckRequestType implements ProcessorInterface
         /** @var Context $context */
 
         if ($this->isJsonApiRequest($context->getRequestHeaders())) {
-            $context->setRequestType(RequestType::JSON_API);
+            $context->getRequestType()->add(RequestType::JSON_API);
         }
     }
 
