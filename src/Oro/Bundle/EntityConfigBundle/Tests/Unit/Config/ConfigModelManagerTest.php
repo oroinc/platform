@@ -63,7 +63,7 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->lockObject = new LockObject();
 
-        $this->configModelManager = new ConfigModelManager($emLink, $this->lockObject);
+        $this->configModelManager = new ConfigModelManager($emLink, $this->lockObject, true);
     }
 
     public function testGetEntityManager()
@@ -71,75 +71,13 @@ class ConfigModelManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($this->em, $this->configModelManager->getEntityManager());
     }
 
-    public function testCheckDatabaseException()
+    public function testCheckDatabase()
     {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
+        $emLink = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink')
             ->disableOriginalConstructor()
             ->getMock();
-        $connection->expects($this->once())
-            ->method('connect')
-            ->will($this->throwException(new \PDOException()));
-
-        $this->em->expects($this->once())
-            ->method('getConnection')
-            ->will($this->returnValue($connection));
-
-        $this->assertFalse($this->configModelManager->checkDatabase());
-    }
-
-    /**
-     * @dataProvider checkDatabaseProvider
-     */
-    public function testCheckDatabase(array $tables, $expectedResult)
-    {
-        $connection = $this->getMockBuilder('Doctrine\DBAL\Connection')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $connection->expects($this->once())
-            ->method('getConfiguration')
-            ->will($this->returnValue(new Configuration()));
-        $connection->expects($this->once())
-            ->method('getDatabasePlatform')
-            ->will($this->returnValue(new MySqlPlatform()));
-        $connection->expects($this->once())
-            ->method('getSchemaManager')
-            ->will($this->returnValue(new SchemaManagerMock($connection)));
-        $connection->expects($this->once())
-            ->method('fetchAll')
-            ->will($this->returnValue($tables));
-
-        $this->em->expects($this->once())
-            ->method('getConnection')
-            ->will($this->returnValue($connection));
-
-        $this->assertEquals($expectedResult, $this->configModelManager->checkDatabase());
-    }
-
-    public function checkDatabaseProvider()
-    {
-        return [
-            [
-                [
-                    'other_table',
-                    'oro_entity_config',
-                    'oro_entity_config_field',
-                    'oro_entity_config_index_value',
-                ],
-                true
-            ],
-            [
-                [
-                    'other_table',
-                    'oro_entity_config',
-                    'oro_entity_config_field',
-                ],
-                false
-            ],
-            [
-                [],
-                false
-            ],
-        ];
+        $configModelManager = new ConfigModelManager($emLink, $this->lockObject, '');
+        $this->assertFalse($configModelManager->checkDatabase());
     }
 
     /**
