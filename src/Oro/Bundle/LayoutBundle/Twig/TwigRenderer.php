@@ -8,7 +8,7 @@ use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 use Oro\Component\Layout\Renderer;
 
 /**
- * Heavily inspired by FormRenderer class
+ * Heavily inspired by TwigRenderer class
  *
  * @see \Symfony\Bridge\Twig\Form\TwigRenderer
  */
