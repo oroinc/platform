@@ -66,12 +66,6 @@ config:
         'jquery.multiselect.filter':
             deps:
                 - 'jquery.multiselect'
-        'oroui/js/app/views/input-widget/uniform-file':
-            deps:
-                - 'jquery.uniform'
-        'oroui/js/app/views/input-widget/uniform-select':
-            deps:
-                - 'jquery.uniform'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'

@@ -4,6 +4,7 @@ define(function(require) {
     var UniformFileInputWidget;
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
     var __ = require('orotranslation/js/translator');
+    require('jquery.uniform');
 
     UniformFileInputWidget = AbstractInputWidget.extend({
         widgetFunctionName: 'uniform',
@@ -35,7 +36,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.$el.uniform.restore();
+            this.$el.uniform.restore(this.$el);
             UniformFileInputWidget.__super__.dispose.apply(this, arguments);
         },
 

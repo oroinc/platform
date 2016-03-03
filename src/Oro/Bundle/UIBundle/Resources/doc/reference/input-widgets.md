@@ -36,7 +36,6 @@ var UniformSelectInputWidget = AbstractInputWidget.extend({
 
 var InputWidgetManager = require('oroui/js/input-widget-manager');
 InputWidgetManager.addWidget('uniform-select', {
-    tagName: 'SELECT',
     selector: 'select:not(.no-uniform)',
     Widget: UniformSelectInputWidget
 });

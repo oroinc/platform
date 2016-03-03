@@ -5,6 +5,8 @@ define(function(require) {
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
     var $ = require('jquery');
     var _ = require('underscore');
+    var tools = require('oroui/js/tools');
+    var console = window.console;
 
     /**
      * InputWidgetManager used to register input widgets and create widget for applicable inputs.
@@ -15,17 +17,14 @@ define(function(require) {
      *     //add widget to InputWidgetManager
      *     InputWidgetManager.addWidget('uniform-select', {
      *         priority: 10,
-     *         tagName: 'SELECT',
      *         selector: 'select:not(.no-uniform)',
      *         Widget: UniformSelectInputWidget
      *     });
      *
      *     'uniform-select' - unique widget key
-     *     `tagName` - required. Widget will be used only for inputs with the same tag name.
+     *     `selector` - required. Widget will be used only for inputs applicable to this selector
      *     `Widget` - required. InputWidget constructor
-     *     `selector` - additional filter for input elements
-     *     `priority` - for each input will be used first applicable widget.
-     *     You can control the order of the widgets, if in the InputWidgetManager registered several widgets with theme same `tagName`.
+     *     `priority` - you can control the order of the widgets. For each input will be used first applicable widget.
      *
      *     //or you can remove widget from InputWidgetManager
      *     InputWidgetManager.removeWidget('uniform-select')
@@ -39,7 +38,7 @@ define(function(require) {
 
         widgets: {},
 
-        widgetsByTag: {},
+        widgetsByPriority: {},
 
         /**
          * @param {String} key
@@ -49,7 +48,6 @@ define(function(require) {
             _.defaults(widget, {
                 key: key,
                 priority: 10,
-                tagName: '',
                 selector: '',
                 Widget: null
             });
@@ -65,7 +63,7 @@ define(function(require) {
         },
 
         /**
-         * Execute addWidgets and removeWidgets queue, then rebuild widgetsByTag.
+         * Execute addWidgets and removeWidgets queue, then rebuild widgetsByPriority.
          */
         collectWidgets: function() {
             var self = this;
@@ -88,19 +86,21 @@ define(function(require) {
             }
 
             if (rebuild) {
-                self.widgetsByTag = {};
+                self.widgetsByPriority = [];
                 _.each(_.sortBy(self.widgets, 'priority'), function(widget) {
-                    if (!widget.tagName ||
-                        !_.isFunction(widget.Widget) ||
-                        !(widget.Widget.prototype instanceof AbstractInputWidget)) {
+                    if (!self.isValidWidget(widget)) {
+                        self.error('Input widget "%s" is invalid', widget.key);
                         return;
                     }
-                    if (!self.widgetsByTag[widget.tagName]) {
-                        self.widgetsByTag[widget.tagName] = [];
-                    }
-                    self.widgetsByTag[widget.tagName].push(widget);
+                    self.widgetsByPriority.push(widget);
                 });
             }
+        },
+
+        isValidWidget: function(widget) {
+            return widget.selector &&
+                _.isFunction(widget.Widget) &&
+                widget.Widget.prototype instanceof AbstractInputWidget;
         },
 
         /**
@@ -118,8 +118,7 @@ define(function(require) {
                     return ;
                 }
 
-                var widgets = self.widgetsByTag[$input.prop('tagName')] || [];
-                _.each(widgets, function(widget) {
+                _.each(self.widgetsByPriority, function(widget) {
                     if (!self.hasWidget($input) && self.isApplicable($input, widget)) {
                         self.createWidget($input, widget.Widget, {});
                     }
@@ -143,9 +142,9 @@ define(function(require) {
 
         /**
          * @param {jQuery} $input
-         * @param {AbstractInputWidget} Widget
+         * @param {AbstractInputWidget|Function} Widget
          * @param {Object} options
-         * @returns {AbstractInputWidget}
+         * @returns {AbstractInputWidget|Object}
          */
         createWidget: function($input, Widget, options) {
             if (!options) {
@@ -160,7 +159,7 @@ define(function(require) {
          * @returns {boolean}
          */
         hasWidget: function($input) {
-            return this.getWidget($input) ? true : false;
+            return Boolean(this.getWidget($input));
         },
 
         /**
@@ -168,8 +167,13 @@ define(function(require) {
          * @returns {AbstractInputWidget|null}
          */
         getWidget: function($input) {
-            var widget = $input.data('inputWidget');
-            return widget ? widget : null;
+            return $input.data('inputWidget') || null;
+        },
+
+        error: function() {
+            if (tools.debug) {
+                console.error.apply(console, arguments);
+            }
         }
     };
 
@@ -191,23 +195,30 @@ define(function(require) {
          * @returns {mixed}
          */
         inputWidget: function(command) {
+            $('select:first,input:last').width();
             if (command === 'create') {
                 return InputWidgetManager.create(this);
             }
 
             var response = null;
             var args = Array.prototype.slice.call(arguments, 1);
-            this.each(function() {
+            this.each(function(i) {
+                var result = null;
                 var $input = $(this);
                 var widget = InputWidgetManager.getWidget($input);
 
                 if (!command) {
-                    response = widget ? widget : false;
+                    result = widget;
                 } else if (widget) {
-                    if (!widget[command]) {
-                        throw new Error('Input widget doesn\'t support command "' + command + '"');
+                    if (!_.isFunction(widget[command])) {
+                        InputWidgetManager.error('Input widget doesn\'t support command "%s"', command);
+                    } else {
+                        result = widget[command].apply(widget, args);
                     }
-                    response = widget[command].apply(widget, args);
+                }
+
+                if (i === 0) {
+                    response = result;
                 }
             });
 

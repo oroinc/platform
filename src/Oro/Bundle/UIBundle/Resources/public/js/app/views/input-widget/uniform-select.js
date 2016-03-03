@@ -3,6 +3,7 @@ define(function(require) {
 
     var UniformSelectInputWidget;
     var AbstractInputWidget = require('oroui/js/app/views/input-widget/abstract');
+    require('jquery.uniform');
 
     UniformSelectInputWidget = AbstractInputWidget.extend({
         widgetFunctionName: 'uniform',
@@ -29,7 +30,7 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
-            this.$el.uniform.restore();
+            this.$el.uniform.restore(this.$el);
             UniformSelectInputWidget.__super__.dispose.apply(this, arguments);
         },
 

@@ -78,7 +78,7 @@ define(function(require) {
                 return;
             }
 
-            this.$el.data('inputWidget', null);
+            this.$el.removeData('inputWidget');
 
             if (this.destroyOptions) {
                 this.widgetFunction(this.destroyOptions);
