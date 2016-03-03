@@ -11,8 +11,8 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Persistence\Mapping\ClassMetadata;
 
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ActionBundle\Exception\AttributeException;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AttributeGuesser
 {

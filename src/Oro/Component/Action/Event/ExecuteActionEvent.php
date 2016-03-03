@@ -15,7 +15,7 @@ class ExecuteActionEvent extends Event
     protected $action;
 
     /**
-     * @param                 $context
+     * @param mixed           $context
      * @param ActionInterface $action
      */
     public function __construct($context, ActionInterface $action)

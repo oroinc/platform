@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\WorkflowBundle\Exception\WorkflowException;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 interface AttributeNormalizer

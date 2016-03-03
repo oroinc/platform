@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+use Symfony\Component\Routing\RouterInterface;
+
 use Oro\Component\Action\Action\Redirect;
 use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\ConfigExpression\Tests\Unit\Fixtures\ItemStub;
@@ -16,7 +19,7 @@ class RedirectTest extends \PHPUnit_Framework_TestCase
     protected $action;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|RouterInterface
      */
     protected $router;
 
@@ -30,6 +33,8 @@ class RedirectTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnCallback(array($this, 'generateTestUrl')));
 
         $this->action = new Redirect(new ContextAccessor(), $this->router, self::REDIRECT_PATH);
+
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -38,8 +43,7 @@ class RedirectTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->router);
-        unset($this->action);
+        unset($this->router, $this->action);
     }
 
     /**

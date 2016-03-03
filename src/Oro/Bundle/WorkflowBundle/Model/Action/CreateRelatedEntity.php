@@ -5,11 +5,12 @@ namespace Oro\Bundle\WorkflowBundle\Model\Action;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
-use Oro\Component\Action\Action\AbstractAction;
-use Oro\Component\Action\Action\CreateObject;
+
+use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\Action\Action\AbstractAction as ComponentAbstractAction;
+use Oro\Component\Action\Action\CreateObject as ComponentCreateObject;
 use Oro\Component\Action\Exception\ActionException;
 use Oro\Component\Action\Exception\InvalidParameterException;
 
@@ -18,7 +19,7 @@ use Oro\Component\Action\Exception\InvalidParameterException;
  *
  * Create workflow entity and set it to corresponding property of context
  */
-class CreateRelatedEntity extends AbstractAction
+class CreateRelatedEntity extends ComponentAbstractAction
 {
     /**
      * @var ManagerRegistry
@@ -79,7 +80,7 @@ class CreateRelatedEntity extends AbstractAction
      */
     protected function getData()
     {
-        return $this->getOption($this->options, CreateObject::OPTION_KEY_DATA, array());
+        return $this->getOption($this->options, ComponentCreateObject::OPTION_KEY_DATA, array());
     }
 
     /**
@@ -100,7 +101,9 @@ class CreateRelatedEntity extends AbstractAction
      */
     public function initialize(array $options)
     {
-        if (!empty($options[CreateObject::OPTION_KEY_DATA]) && !is_array($options[CreateObject::OPTION_KEY_DATA])) {
+        if (!empty($options[ComponentCreateObject::OPTION_KEY_DATA]) &&
+            !is_array($options[ComponentCreateObject::OPTION_KEY_DATA])
+        ) {
             throw new InvalidParameterException('Object data must be an array.');
         }
         $this->options = $options;

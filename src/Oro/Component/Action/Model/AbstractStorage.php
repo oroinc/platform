@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Action\Model;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Countable
 {
     /**

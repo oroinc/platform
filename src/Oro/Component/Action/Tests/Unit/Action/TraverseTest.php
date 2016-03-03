@@ -2,16 +2,18 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\Action\Action\Configurable;
 use Oro\Component\Action\Action\Traverse;
+use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\Action\Tests\Unit\Action\Stub\StubStorage;
 
 class TraverseTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject|
+     * @var \PHPUnit_Framework_MockObject_MockObject|Configurable
      */
     protected $configurableAction;
 
@@ -27,6 +29,8 @@ class TraverseTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->action = new Traverse(new ContextAccessor(), $this->configurableAction);
+
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();

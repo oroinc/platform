@@ -7,14 +7,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 use Oro\Bundle\WorkflowBundle\Form\Type\WorkflowTransitionType;
+
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\Action\Exception\AssemblerException;
+use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
-use Oro\Component\Action\Model\AbstractAssembler;
 
-class TransitionAssembler extends AbstractAssembler
+class TransitionAssembler extends BaseAbstractAssembler
 {
     /**
      * @var FormOptionsAssembler

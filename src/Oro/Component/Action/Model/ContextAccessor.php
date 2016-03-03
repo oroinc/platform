@@ -1,6 +1,6 @@
 <?php
 
-namespace  Oro\Component\Action\Model;
+namespace Oro\Component\Action\Model;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;

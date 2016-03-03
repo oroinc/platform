@@ -1,4 +1,5 @@
 <?php
+
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;

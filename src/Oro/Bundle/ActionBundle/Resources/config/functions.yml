@@ -12,6 +12,7 @@ parameters:
     oro_action.function.create_object.class: Oro\Component\Action\Action\CreateObject
     oro_action.function.create_date.class: Oro\Bundle\ActionBundle\Action\CreateDate
     oro_action.function.create_entity.class: Oro\Component\Action\Action\CreateEntity
+    oro_action.function.flush_entity.class: Oro\Component\Action\Action\FlushEntity
     oro_action.function.request_entity.class: Oro\Component\Action\Action\RequestEntity
     oro_action.function.redirect.class: Oro\Component\Action\Action\Redirect
     oro_action.function.format_string.class: Oro\Component\Action\Action\FormatString
@@ -109,6 +110,14 @@ services:
             - @doctrine
         tags:
             - { name: oro_action.function, alias: create_entity }
+
+    oro_action.function.flush_entity:
+        class: %oro_action.function.flush_entity.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.function, alias: flush_entity }
 
     oro_action.function.request_entity:
         class: %oro_action.function.request_entity.class%

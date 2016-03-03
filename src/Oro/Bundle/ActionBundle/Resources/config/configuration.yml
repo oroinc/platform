@@ -3,7 +3,7 @@ parameters:
     oro_action.configuration.config.action_definition_list.class: Oro\Bundle\ActionBundle\Configuration\ActionDefinitionListConfiguration
     oro_action.configuration.validator.action_definition.class: Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfigurationValidator
     oro_action.configuration.provider.class: Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider
-    oro_action.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Configuration\ConfigurationPass\ReplacePropertyPath
+    oro_action.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath
 
 services:
     oro_action.configuration.config.action_definition:

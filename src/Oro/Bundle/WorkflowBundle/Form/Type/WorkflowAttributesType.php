@@ -8,13 +8,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\OptionsResolver\Options;
 
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\DefaultValuesListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
 use Oro\Bundle\WorkflowBundle\Form\EventListener\RequiredAttributesListener;
-use Oro\Bundle\ActionBundle\Model\Attribute;
-use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry;
+
 use Oro\Component\Action\Model\ContextAccessor;
 
 class WorkflowAttributesType extends AbstractType

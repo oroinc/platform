@@ -1,5 +1,5 @@
 parameters:
-    oro_workflow.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Configuration\ConfigurationPass\ReplacePropertyPath
+    oro_workflow.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath
 
     oro_workflow.action_assembler.class: Oro\Component\Action\Action\ActionAssembler
     oro_workflow.attribute_assembler.class: Oro\Bundle\WorkflowBundle\Model\AttributeAssembler
@@ -13,6 +13,7 @@ services:
         class: %oro_workflow.configuration_pass.replace_property_path.class%
         arguments:
             - "data"
+        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.configuration_pass.replace_property_path" instead
 
     oro_workflow.action_assembler:
         class: %oro_workflow.action_assembler.class%
@@ -21,6 +22,7 @@ services:
             - @oro_workflow.expression.factory
         calls:
             - [addConfigurationPass, [@oro_workflow.configuration_pass.replace_property_path]]
+        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.function_assembler" instead
 
     oro_workflow.expression.assembler:
         class: Oro\Component\ConfigExpression\ExpressionAssembler

@@ -3,11 +3,13 @@
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
 use Doctrine\ORM\EntityManager;
+
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\ActivityListBundle\Provider\ActivityListChainProvider;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
-use Oro\Component\Action\Exception\InvalidParameterException;
+
 use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\ContextAccessor;
 
 /**

@@ -7,6 +7,7 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+
 use Oro\Component\Action\Exception\InvalidParameterException;
 
 class ProcessConfigurationBuilder extends AbstractConfigurationBuilder

@@ -82,7 +82,7 @@ abstract class AbstractPage
                 window.onerror = function (errorMsg, url, lineNumber, column, errorObj) {
                     var html =
                         '<div style="background: rgba(255,255,200,0.7); color: rgb(0,0,255); ' +
-                            'position: absolute; top: 15px; left: 15px; right: 15px; ' +
+                            'pointer-events: none; position: absolute; top: 15px; left: 15px; right: 15px; ' +
                             'z-index: 999999; padding: 10px; border: 1px solid red;  border-radius: 5px;' +
                             'box-shadow: 0 0 40px rgba(0,0,0,0.5); white-space: pre">' +
                             '<h5>Js error occured</h5>' + errorMsg + '\\n' +

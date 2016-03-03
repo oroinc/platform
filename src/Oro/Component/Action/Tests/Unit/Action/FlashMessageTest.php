@@ -2,7 +2,9 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Component\Action\Action\FlashMessage;
 use Oro\Component\Action\Model\ContextAccessor;
@@ -16,7 +18,7 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface
      */
     protected $translator;
 
@@ -31,6 +33,8 @@ class FlashMessageTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->getMock();
         $this->action = new FlashMessage($this->contextAccessor, $this->translator);
+
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();

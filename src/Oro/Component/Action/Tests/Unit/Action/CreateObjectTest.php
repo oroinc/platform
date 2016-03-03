@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\Action\Action\CreateObject;
@@ -24,6 +25,8 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
     {
         $this->contextAccessor = new ContextAccessor();
         $this->action = new CreateObject($this->contextAccessor);
+
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();
@@ -32,8 +35,7 @@ class CreateObjectTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->contextAccessor);
-        unset($this->action);
+        unset($this->contextAccessor, $this->action);
     }
 
     /**

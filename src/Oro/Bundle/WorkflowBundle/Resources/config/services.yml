@@ -49,9 +49,11 @@ services:
             - [addFormTypeMapping, ["bool", "checkbox"]]
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
+        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.attribute_guesser" instead
 
     oro_workflow.context_accessor:
         class: %oro_workflow.context_accessor.class%
+        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.context_accessor" instead
 
     oro_workflow.datagrid.action.workflow_activate:
         class: %oro_workflow.datagrid.action.workflow_activate.class%

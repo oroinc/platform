@@ -4,13 +4,14 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\Attribute as BaseAttribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Component\Action\Exception\AssemblerException;
-use Oro\Component\Action\Model\AbstractAssembler;
 
-class AttributeAssembler extends AbstractAssembler
+use Oro\Component\Action\Exception\AssemblerException;
+use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
+
+class AttributeAssembler extends BaseAbstractAssembler
 {
     /**
      * @var AttributeGuesser
@@ -57,7 +58,7 @@ class AttributeAssembler extends AbstractAssembler
      * @param WorkflowDefinition $definition
      * @param string $name
      * @param array $options
-     * @return Attribute
+     * @return BaseAttribute
      */
     protected function assembleAttribute(WorkflowDefinition $definition, $name, array $options)
     {
@@ -68,7 +69,7 @@ class AttributeAssembler extends AbstractAssembler
         $this->assertOptions($options, array('label', 'type'));
         $this->assertAttributeEntityAcl($options);
 
-        $attribute = new Attribute();
+        $attribute = new BaseAttribute();
         $attribute->setName($name);
         $attribute->setLabel($options['label']);
         $attribute->setType($options['type']);
@@ -132,10 +133,10 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
+     * @param BaseAttribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
-    protected function validateAttribute(Attribute $attribute)
+    protected function validateAttribute(BaseAttribute $attribute)
     {
         $this->assertAttributeHasValidType($attribute);
 
@@ -147,10 +148,10 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
+     * @param BaseAttribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
-    protected function assertAttributeHasValidType(Attribute $attribute)
+    protected function assertAttributeHasValidType(BaseAttribute $attribute)
     {
         $attributeType = $attribute->getType();
         $allowedTypes = array('bool', 'boolean', 'int', 'integer', 'float', 'string', 'array', 'object', 'entity');
@@ -167,11 +168,11 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
+     * @param BaseAttribute $attribute
      * @param string|array $optionNames
      * @throws AssemblerException If attribute is invalid
      */
-    protected function assertAttributeHasOptions(Attribute $attribute, $optionNames)
+    protected function assertAttributeHasOptions(BaseAttribute $attribute, $optionNames)
     {
         $optionNames = (array)$optionNames;
 
@@ -185,11 +186,11 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
+     * @param BaseAttribute $attribute
      * @param string|array $optionNames
      * @throws AssemblerException If attribute is invalid
      */
-    protected function assertAttributeHasNoOptions(Attribute $attribute, $optionNames)
+    protected function assertAttributeHasNoOptions(BaseAttribute $attribute, $optionNames)
     {
         $optionNames = (array)$optionNames;
 
@@ -203,10 +204,10 @@ class AttributeAssembler extends AbstractAssembler
     }
 
     /**
-     * @param Attribute $attribute
+     * @param BaseAttribute $attribute
      * @throws AssemblerException If attribute is invalid
      */
-    protected function assertAttributeHasClassOption(Attribute $attribute)
+    protected function assertAttributeHasClassOption(BaseAttribute $attribute)
     {
         $this->assertAttributeHasOptions($attribute, 'class');
         if (!class_exists($attribute->getOption('class'))) {

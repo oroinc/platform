@@ -4,12 +4,12 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Component\Layout\BlockInterface;
-use Oro\Component\Layout\BlockView;
-
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
 
 class ActionLineButtonsTypeTest extends \PHPUnit_Framework_TestCase
 {

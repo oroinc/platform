@@ -2,6 +2,9 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\Action\Model\ContextAccessor;
@@ -16,7 +19,7 @@ class RemoveEntityTest extends \PHPUnit_Framework_TestCase
     protected $contextAccessor;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry
      */
     protected $registry;
 
@@ -33,6 +36,8 @@ class RemoveEntityTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->action = new RemoveEntity($this->contextAccessor, $this->registry);
+
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();

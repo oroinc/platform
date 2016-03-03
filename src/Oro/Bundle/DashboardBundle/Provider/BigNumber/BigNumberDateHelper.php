@@ -62,10 +62,12 @@ class BigNumberDateHelper
      */
     public function getLastWeekPeriod($weeksDiff = 0)
     {
-        $end = new \DateTime('last Saturday', new \DateTimeZone($this->localeSettings->getTimeZone()));
+        // As for now week starts from Monday and ends by Sunday
+        // @todo: Should be refactored in BAP-9846
+        $end = new \DateTime('last Sunday', new \DateTimeZone($this->localeSettings->getTimeZone()));
 
         $start = clone $end;
-        $start->modify('-7 days');
+        $start->modify('-6 days');
         $end->setTime(23, 59, 59);
 
         if ($weeksDiff) {

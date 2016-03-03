@@ -4,6 +4,7 @@ namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\Action\Action\FormatString;
@@ -38,6 +39,8 @@ class FormatStringTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->action = new FormatString(new ContextAccessor());
+
+        /** @var EventDispatcher $dispatcher */
         $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
             ->disableOriginalConstructor()
             ->getMock();

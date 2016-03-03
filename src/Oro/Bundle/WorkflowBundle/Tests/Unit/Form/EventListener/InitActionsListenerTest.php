@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Form\EventListener;
 
-use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
 use Symfony\Component\Form\FormEvents;
+
+use Oro\Bundle\WorkflowBundle\Form\EventListener\InitActionsListener;
 
 class InitActionsListenerTest extends \PHPUnit_Framework_TestCase
 {

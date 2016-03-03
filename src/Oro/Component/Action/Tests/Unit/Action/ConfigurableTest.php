@@ -2,6 +2,7 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\Action\Action\Configurable;
 
 class ConfigurableTest extends \PHPUnit_Framework_TestCase
@@ -12,7 +13,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
     protected $configurableAction;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|ActionAssembler
      */
     protected $assembler;
 
@@ -37,8 +38,7 @@ class ConfigurableTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->configurableAction);
-        unset($this->assembler);
+        unset($this->configurableAction, $this->assembler);
     }
 
     public function testInitialize()

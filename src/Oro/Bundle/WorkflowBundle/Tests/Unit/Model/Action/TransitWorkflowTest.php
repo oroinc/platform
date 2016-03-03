@@ -6,9 +6,10 @@ use Symfony\Component\EventDispatcher\EventDispatcher;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow;
-use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class TransitWorkflowTest extends \PHPUnit_Framework_TestCase
 {
