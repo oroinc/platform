@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Layout\DataProvider;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
-use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 
 use Oro\Component\Layout\ContextInterface;
@@ -99,18 +99,18 @@ class ActionsDataProvider implements DataProviderInterface
     }
 
     /**
-     * @param Action[] $actions
+     * @param Operation[] $operations
      * @return array
      */
-    protected function getPreparedData(array $actions = [])
+    protected function getPreparedData(array $operations = [])
     {
         $data = [];
-        foreach ($actions as $action) {
-            if (!$action->getDefinition()->isEnabled()) {
+        foreach ($operations as $operation) {
+            if (!$operation->getDefinition()->isEnabled()) {
                 continue;
             }
 
-            $definition = $action->getDefinition();
+            $definition = $operation->getDefinition();
 
             $frontendOptions = $definition->getFrontendOptions();
             $buttonOptions = $definition->getButtonOptions();
@@ -125,7 +125,7 @@ class ActionsDataProvider implements DataProviderInterface
                 'name' => $definition->getName(),
                 'label' => $this->translator->trans($definition->getLabel()),
                 'title' => $this->translator->trans($title),
-                'hasForm' => $action->hasForm(),
+                'hasForm' => $operation->hasForm(),
                 'showDialog' => !empty($frontendOptions['show_dialog']),
                 'icon' =>  $icon,
                 'buttonOptions' => $buttonOptions,

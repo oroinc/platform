@@ -71,11 +71,9 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'datagrids' => [],
                     'order' => 0,
                     'enabled' => true,
-                    'prefunctions' => [],
+                    'preactions' => [],
                     'preconditions' => [],
-                    'conditions' => [],
                     'form_init' => [],
-                    'functions' => [],
                     'attributes' => [],
                     'frontend_options' => [
                         'options' => [],
@@ -139,7 +137,7 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'attribute_1' => 'value 1',
                             ]
                         ],
-                        'prefunctions' => [
+                        'preactions' => [
                             '@create_date' => [],
                         ],
                         'preconditions' => [
@@ -147,9 +145,6 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                         ],
                         'form_init' => [
                             '@assign_value' => ['$field1', 'value2'],
-                        ],
-                        'functions' => [
-                            '@call_method' => [],
                         ],
                         'attributes' => [
                             'test_attribute' => [
@@ -168,18 +163,14 @@ class ActionDefinitionConfigurationTest extends \PHPUnit_Framework_TestCase
                     'datagrids' => ['datagrid_1', 'datagrid_2'],
                     'order' => 15,
                     'enabled' => false,
-                    'prefunctions' => [
+                    'preactions' => [
                         '@create_date' => [],
                     ],
                     'preconditions' => [
                         '@equal' => ['$field1', 'value1'],
                     ],
-                    'conditions' => [],
                     'form_init' => [
                         '@assign_value' => ['$field1', 'value2'],
-                    ],
-                    'functions' => [
-                        '@call_method' => [],
                     ],
                     'attributes' => [
                         'test_attribute' => [

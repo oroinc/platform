@@ -8,7 +8,7 @@ use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
 use Symfony\Component\Config\Definition\Processor;
 
-use Oro\Bundle\ActionBundle\Model\ActionDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 class ActionDefinitionConfiguration implements ConfigurationInterface
 {
@@ -81,6 +81,10 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
                 ->booleanNode('enabled')
                     ->defaultTrue()
                 ->end()
+                ->arrayNode(OperationDefinition::PRECONDITIONS)
+                    ->prototype('variable')
+                    ->end()
+                ->end()
                 ->append($this->getAttributesNode())
                 ->append($this->getButtonOptionsNode())
                 ->append($this->getFrontendOptionsNode())
@@ -88,8 +92,7 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
                 ->append($this->getFormOptionsNode())
             ->end();
 
-        $this->appendFunctionsNodes($nodeDefinition->children());
-        $this->appendConditionsNodes($nodeDefinition->children());
+        $this->appendActionsNodes($nodeDefinition->children());
 
         return $nodeDefinition;
     }
@@ -97,23 +100,9 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
     /**
      * @param NodeBuilder $builder
      */
-    protected function appendFunctionsNodes(NodeBuilder $builder)
+    protected function appendActionsNodes(NodeBuilder $builder)
     {
-        foreach (ActionDefinition::getAllowedFunctions() as $nodeName) {
-            $builder
-                ->arrayNode($nodeName)
-                    ->prototype('variable')
-                    ->end()
-                ->end();
-        }
-    }
-
-    /**
-     * @param NodeBuilder $builder
-     */
-    protected function appendConditionsNodes(NodeBuilder $builder)
-    {
-        foreach (ActionDefinition::getAllowedConditions() as $nodeName) {
+        foreach (OperationDefinition::getAllowedActions() as $nodeName) {
             $builder
                 ->arrayNode($nodeName)
                     ->prototype('variable')

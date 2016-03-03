@@ -40,12 +40,12 @@ class ActionFormManager
      */
     public function getActionForm($actionName, ActionData $data)
     {
-        $action = $this->actionManager->getAction($actionName, $data);
+        $operation = $this->actionManager->getAction($actionName, $data);
 
         return $this->formFactory->create(
-            $action->getDefinition()->getFormType(),
+            $operation->getDefinition()->getFormType(),
             $data,
-            array_merge($action->getFormOptions($data), ['action' => $action])
+            array_merge($operation->getFormOptions($data), ['action' => $operation])
         );
     }
 }

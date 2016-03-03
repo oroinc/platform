@@ -4,9 +4,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Extension;
 
 use Oro\Bundle\ActionBundle\Datagrid\Extension\ActionExtension;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
-use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
@@ -75,7 +75,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param DatagridConfiguration $config
-     * @param Action[] $actions
+     * @param Operation[] $operations
      * @param bool $expected
      * @param array $expectedConfiguration
      *
@@ -83,13 +83,13 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsApplicable(
         DatagridConfiguration $config,
-        array $actions,
+        array $operations,
         $expected,
         array $expectedConfiguration = []
     ) {
         $this->manager->expects($this->once())
             ->method('getActions')
-            ->willReturn($actions);
+            ->willReturn($operations);
 
         $this->assertEquals($expected, $this->extension->isApplicable($config));
 
@@ -106,12 +106,12 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param ResultRecord $record
-     * @param $actions
+     * @param array $actions
      * @param array $expectedActions
      *
      * @dataProvider getActionsPermissionsProvider
      */
-    public function testGetActionsPermissions(ResultRecord $record, $actions, array $expectedActions)
+    public function testGetActionsPermissions(ResultRecord $record, array $actions, array $expectedActions)
     {
         $this->manager->expects($this->any())
             ->method('getActions')
@@ -127,16 +127,16 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function isApplicableProvider()
     {
-        $action1 = $this->createAction(
-            'test_action',
+        $operation1 = $this->createOperation(
+            'test_operation',
             true,
             [
                 'getDatagridOptions' => ['mass_action_provider' => self::PROVIDER_ALIAS]
             ]
         );
 
-        $action2 = $this->createAction(
-            'test_action',
+        $operation2 = $this->createOperation(
+            'test_operation',
             true,
             [
                 'getDatagridOptions' => ['mass_action' => ['label' => 'test_mass_action_label']]
@@ -146,18 +146,18 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             'applicable with provider' => [
                 'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
-                'actions' => [$action1],
+                'actions' => [$operation1],
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'mass_actions' => ['test_actiontest_config' => ['label' => 'test_label']]
+                    'mass_actions' => ['test_operationtest_config' => ['label' => 'test_label']]
                 ]
             ],
             'applicable with single mass action' => [
                 'config' => DatagridConfiguration::create(['name' => ' datagrid1']),
-                'actions' => [$action2],
+                'actions' => [$operation2],
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'mass_actions' => ['test_action' => ['label' => 'test_mass_action_label']]
+                    'mass_actions' => ['test_operation' => ['label' => 'test_mass_action_label']]
                 ]
             ],
             'not applicable' => [
@@ -173,9 +173,9 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
      */
     public function getActionsPermissionsProvider()
     {
-        $actionAllowed1 = $this->createAction('action1', true);
-        $actionAllowed2 = $this->createAction('action2', true);
-        $actionNotAllowed = $this->createAction('action3', false);
+        $operationAllowed1 = $this->createOperation('operation1', true);
+        $operationAllowed2 = $this->createOperation('operation2', true);
+        $operationNotAllowed = $this->createOperation('operation3', false);
 
         return [
             'no actions' => [
@@ -185,13 +185,13 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             '2 allowed actions' => [
                 'record' => new ResultRecord(['id' => 2]),
-                'actions' => [$actionAllowed1, $actionAllowed2],
-                'expectedActions' => ['action1' => true, 'action2' => true],
+                'actions' => [$operationAllowed1, $operationAllowed2],
+                'expectedActions' => ['operation1' => true, 'operation2' => true],
             ],
             '1 allowed action' => [
                 'record' => new ResultRecord(['id' => 3]),
-                'actions' => [$actionAllowed1, $actionNotAllowed],
-                'expectedActions' => ['action1' => true, 'action3' => false],
+                'actions' => [$operationAllowed1, $operationNotAllowed],
+                'expectedActions' => ['operation1' => true, 'operation3' => false],
             ],
         ];
     }
@@ -201,12 +201,12 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
      * @param bool $isAvailable
      * @param array $definitionParams
      *
-     * @return Action|\PHPUnit_Framework_MockObject_MockObject
+     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createAction($name = 'test_action', $isAvailable = true, array $definitionParams = [])
+    protected function createOperation($name = 'test_operation', $isAvailable = true, array $definitionParams = [])
     {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionDefinition $definition */
-        $definition = $this->getMock('Oro\Bundle\ActionBundle\Model\ActionDefinition');
+        /** @var \PHPUnit_Framework_MockObject_MockObject|OperationDefinition $definition */
+        $definition = $this->getMock('Oro\Bundle\ActionBundle\Model\OperationDefinition');
 
         foreach ($definitionParams as $method => $params) {
             $definition->expects($this->any())
@@ -214,21 +214,21 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($params);
         }
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Action $action */
-        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
+        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->getMock();
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('getDefinition')
             ->willReturn($definition);
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('getName')
             ->willReturn($name);
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('isAvailable')
             ->withAnyParameters()
             ->willReturn($isAvailable);
 
-        return $action;
+        return $operation;
     }
 }

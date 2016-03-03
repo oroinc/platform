@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
-use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\Operation;
 
 class RestrictHelper
 {
@@ -13,29 +13,29 @@ class RestrictHelper
      * if $groups is array - restrict only actions which in this array with groups
      * if $groups is string - restrict only actions which equals this string with group
      *
-     * @param Action[] $actions
+     * @param Operation[] $operations
      * @param array|bool|string|null $groups
-     * @return Action[]
+     * @return Operation[]
      */
-    public function restrictActionsByGroup($actions, $groups = null)
+    public function restrictActionsByGroup($operations, $groups = null)
     {
         if (null === $groups) {
-            return $actions;
+            return $operations;
         }
 
         $groups = $groups === false ? false : (array)$groups;
-        $restrictedActions = [];
-        foreach ($actions as $key => $action) {
-            $buttonOptions = $action->getDefinition()->getButtonOptions();
+        $restrictedOperations = [];
+        foreach ($operations as $key => $operation) {
+            $buttonOptions = $operation->getDefinition()->getButtonOptions();
             if (array_key_exists('group', $buttonOptions)) {
                 if ($groups !== false && in_array($buttonOptions['group'], $groups, true)) {
-                    $restrictedActions[$key] = $action;
+                    $restrictedOperations[$key] = $operation;
                 }
             } elseif ($groups === false) {
-                $restrictedActions[$key] = $action;
+                $restrictedOperations[$key] = $operation;
             }
         }
 
-        return $restrictedActions;
+        return $restrictedOperations;
     }
 }

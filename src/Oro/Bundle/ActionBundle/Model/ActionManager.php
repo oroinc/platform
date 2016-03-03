@@ -39,8 +39,8 @@ class ActionManager
     /** @var array */
     private $datagrids = [];
 
-    /** @var array|Action[] */
-    private $actions = [];
+    /** @var array|Operation[] */
+    private $operations = [];
 
     /** @var bool */
     private $initialized = false;
@@ -67,32 +67,32 @@ class ActionManager
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param array|null $context
      * @param Collection|null $errors
      * @return ActionData
      */
-    public function executeByContext($actionName, array $context = null, Collection $errors = null)
+    public function executeByContext($operationName, array $context = null, Collection $errors = null)
     {
         $actionData = $this->contextHelper->getActionData($context);
 
-        $this->execute($actionName, $actionData, $errors);
+        $this->execute($operationName, $actionData, $errors);
 
         return $actionData;
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param ActionData $actionData
      * @param Collection|null $errors
      * @return ActionData
      * @throws \Exception
      */
-    public function execute($actionName, ActionData $actionData, Collection $errors = null)
+    public function execute($operationName, ActionData $actionData, Collection $errors = null)
     {
-        $action = $this->getAction($actionName, $actionData);
+        $operation = $this->getAction($operationName, $actionData);
 
-        $action->execute($actionData, $errors);
+        $operation->execute($actionData, $errors);
 
         $entity = $actionData->getEntity();
         if ($entity) {
@@ -123,58 +123,58 @@ class ActionManager
     /**
      * @param array|null $context
      * @param bool $onlyAvailable
-     * @return Action[]
+     * @return Operation[]
      */
     public function getActions(array $context = null, $onlyAvailable = true)
     {
         $this->loadActions();
 
-        $actions = $this->findActions($this->contextHelper->getContext($context));
+        $operations = $this->findActions($this->contextHelper->getContext($context));
         $actionData = $this->contextHelper->getActionData($context);
         if ($onlyAvailable) {
-            $actions = array_filter($actions, function (Action $action) use ($actionData) {
-                return $action->isAvailable($actionData);
+            $operations = array_filter($operations, function (Operation $operation) use ($actionData) {
+                return $operation->isAvailable($actionData);
             });
         }
 
-        uasort($actions, function (Action $action1, Action $action2) {
-            return $action1->getDefinition()->getOrder() - $action2->getDefinition()->getOrder();
+        uasort($operations, function (Operation $operation1, Operation $operation2) {
+            return $operation1->getDefinition()->getOrder() - $operation2->getDefinition()->getOrder();
         });
 
-        return $actions;
+        return $operations;
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param ActionData $actionData
      * @param bool $checkAvailable
-     * @return Action
+     * @return Operation
      * @throws ActionNotFoundException
      */
-    public function getAction($actionName, ActionData $actionData, $checkAvailable = true)
+    public function getAction($operationName, ActionData $actionData, $checkAvailable = true)
     {
         $this->loadActions();
 
-        $action = array_key_exists($actionName, $this->actions) ? $this->actions[$actionName] : null;
-        if (!$action instanceof Action || ($checkAvailable && !$action->isAvailable($actionData))) {
-            throw new ActionNotFoundException($actionName);
+        $operation = array_key_exists($operationName, $this->operations) ? $this->operations[$operationName] : null;
+        if (!$operation instanceof Operation || ($checkAvailable && !$operation->isAvailable($actionData))) {
+            throw new ActionNotFoundException($operationName);
         }
 
-        return $action;
+        return $operation;
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param array|null $context
      * @return string
      */
-    public function getFrontendTemplate($actionName, array $context = null)
+    public function getFrontendTemplate($operationName, array $context = null)
     {
         $template = self::DEFAULT_FORM_TEMPLATE;
-        $action = $this->getAction($actionName, $this->contextHelper->getActionData($context), false);
+        $operation = $this->getAction($operationName, $this->contextHelper->getActionData($context), false);
 
-        if ($action) {
-            $frontendOptions = $action->getDefinition()->getFrontendOptions();
+        if ($operation) {
+            $frontendOptions = $operation->getDefinition()->getFrontendOptions();
 
             if (array_key_exists('template', $frontendOptions)) {
                 $template = $frontendOptions['template'];
@@ -188,33 +188,36 @@ class ActionManager
 
     /**
      * @param array $context
-     * @return Action[]
+     * @return Operation[]
      */
     protected function findActions(array $context)
     {
-        /** @var $actions Action[] */
-        $actions = [];
+        /** @var $operations Operation[] */
+        $operations = [];
 
         if ($context[ContextHelper::ROUTE_PARAM] &&
             array_key_exists($context[ContextHelper::ROUTE_PARAM], $this->routes)
         ) {
-            $actions = array_merge($actions, $this->routes[$context[ContextHelper::ROUTE_PARAM]]);
+            $operations = array_merge($operations, $this->routes[$context[ContextHelper::ROUTE_PARAM]]);
         }
 
         if ($context[ContextHelper::DATAGRID_PARAM] &&
             array_key_exists($context[ContextHelper::DATAGRID_PARAM], $this->datagrids)
         ) {
-            $actions = $actions = array_merge($actions, $this->datagrids[$context[ContextHelper::DATAGRID_PARAM]]);
+            $operations = $operations = array_merge(
+                $operations,
+                $this->datagrids[$context[ContextHelper::DATAGRID_PARAM]]
+            );
         }
 
         if ($context[ContextHelper::ENTITY_CLASS_PARAM] &&
             $context[ContextHelper::ENTITY_ID_PARAM] &&
             array_key_exists($context[ContextHelper::ENTITY_CLASS_PARAM], $this->entities)
         ) {
-            $actions = array_merge($actions, $this->entities[$context[ContextHelper::ENTITY_CLASS_PARAM]]);
+            $operations = array_merge($operations, $this->entities[$context[ContextHelper::ENTITY_CLASS_PARAM]]);
         }
 
-        return $actions;
+        return $operations;
     }
 
     protected function loadActions()
@@ -224,56 +227,56 @@ class ActionManager
         }
 
         $configuration = $this->configurationProvider->getActionConfiguration();
-        $actions = $this->assembler->assemble($configuration);
+        $operations = $this->assembler->assemble($configuration);
 
-        foreach ($actions as $action) {
-            if (!$action->isEnabled()) {
+        foreach ($operations as $operation) {
+            if (!$operation->isEnabled()) {
                 continue;
             }
 
-            if (!$this->applicationsHelper->isApplicationsValid($action)) {
+            if (!$this->applicationsHelper->isApplicationsValid($operation)) {
                 continue;
             }
 
-            $this->mapActionRoutes($action);
-            $this->mapActionEntities($action);
-            $this->mapActionDatagrids($action);
-            $this->actions[$action->getName()] = $action;
+            $this->mapActionRoutes($operation);
+            $this->mapActionEntities($operation);
+            $this->mapActionDatagrids($operation);
+            $this->operations[$operation->getName()] = $operation;
         }
 
         $this->initialized = true;
     }
 
     /**
-     * @param Action $action
+     * @param Operation $operation
      */
-    protected function mapActionRoutes(Action $action)
+    protected function mapActionRoutes(Operation $operation)
     {
-        foreach ($action->getDefinition()->getRoutes() as $routeName) {
-            $this->routes[$routeName][$action->getName()] = $action;
+        foreach ($operation->getDefinition()->getRoutes() as $routeName) {
+            $this->routes[$routeName][$operation->getName()] = $operation;
         }
     }
 
     /**
-     * @param Action $action
+     * @param Operation $operation
      */
-    protected function mapActionEntities(Action $action)
+    protected function mapActionEntities(Operation $operation)
     {
-        foreach ($action->getDefinition()->getEntities() as $entityName) {
+        foreach ($operation->getDefinition()->getEntities() as $entityName) {
             if (false === ($className = $this->getEntityClassName($entityName))) {
                 continue;
             }
-            $this->entities[$className][$action->getName()] = $action;
+            $this->entities[$className][$operation->getName()] = $operation;
         }
     }
 
     /**
-     * @param Action $action
+     * @param Operation $operation
      */
-    protected function mapActionDatagrids(Action $action)
+    protected function mapActionDatagrids(Operation $operation)
     {
-        foreach ($action->getDefinition()->getDatagrids() as $datagridName) {
-            $this->datagrids[$datagridName][$action->getName()] = $action;
+        foreach ($operation->getDefinition()->getDatagrids() as $datagridName) {
+            $this->datagrids[$datagridName][$operation->getName()] = $operation;
         }
     }
 
