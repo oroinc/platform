@@ -28,7 +28,7 @@ class SetDefaultPaging extends BaseSetDefaultPaging
             return;
         }
 
-        if (!$context->getRequestType()->has(RequestType::REST)) {
+        if (!$context->getRequestType()->contains(RequestType::REST)) {
             parent::process($context);
         } else {
             // reuse REST API paging filters

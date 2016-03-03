@@ -13,6 +13,11 @@ abstract class ApiContext extends BaseContext
     /** API version */
     const VERSION = 'version';
 
+    public function __construct()
+    {
+        $this->set(self::REQUEST_TYPE, new RequestType([]));
+    }
+
     /**
      * Gets the current request type.
      * A request can belong to several types, e.g. "rest" and "json_api".
@@ -21,31 +26,18 @@ abstract class ApiContext extends BaseContext
      */
     public function getRequestType()
     {
-        $requestTypes = $this->get(self::REQUEST_TYPE);
-
-        return null !== $requestTypes
-            ? $requestTypes
-            : new RequestType([]);
+        return $this->get(self::REQUEST_TYPE);
     }
 
     /**
-     * Sets the type of the current request, for example "rest", "soap", etc.
+     * Sets the current request type.
      * A request can belong to several types, e.g. "rest" and "json_api".
-     * This method adds the given type(s) to a list of already set types.
      *
-     * @param RequestType|string|string[] $requestType
+     * @param RequestType $requestType
      */
-    public function setRequestType($requestType)
+    public function setRequestType(RequestType $requestType)
     {
-        if ($requestType instanceof RequestType) {
-            $this->set(self::REQUEST_TYPE, $requestType);
-        } else {
-            $type = $this->getRequestType();
-            foreach ((array)$requestType as $item) {
-                $type->add($item);
-            }
-            $this->set(self::REQUEST_TYPE, $type);
-        }
+        $this->set(self::REQUEST_TYPE, $requestType);
     }
 
     /**

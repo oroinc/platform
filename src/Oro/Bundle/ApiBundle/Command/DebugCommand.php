@@ -13,6 +13,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class DebugCommand extends ContainerAwareCommand
@@ -99,9 +100,7 @@ class DebugCommand extends ContainerAwareCommand
 
         $context = new Context();
         $context->setAction($action);
-        if (!empty($requestType)) {
-            $context->set('requestType', $requestType);
-        }
+        $context->set(ApiContext::REQUEST_TYPE, $requestType);
         $processors = $processorBag->getProcessors($context);
 
         $applicableChecker = new ChainApplicableChecker();

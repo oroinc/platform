@@ -26,6 +26,7 @@ class MetadataContext extends ApiContext
 
     public function __construct()
     {
+        parent::__construct();
         $this->set(self::EXTRA, []);
     }
 

@@ -151,9 +151,9 @@ class RestDocHandler implements HandlerInterface
         $context = $processor->createContext();
         $context->removeConfigExtra(SortersConfigExtra::NAME);
         $context->addConfigExtra(new DescriptionsConfigExtra());
-        $context->setRequestType(RequestType::REST);
+        $context->getRequestType()->add(RequestType::REST);
         if ('rest_json_api' === $this->docViewDetector->getView()) {
-            $context->setRequestType(RequestType::JSON_API);
+            $context->getRequestType()->add(RequestType::JSON_API);
         }
         $context->setLastGroup('initialize');
         if ($entityClass) {

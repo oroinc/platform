@@ -30,7 +30,7 @@ class SetDefaultSorting extends BaseSetDefaultSorting
             return;
         }
 
-        if (!$context->getRequestType()->has(RequestType::REST)) {
+        if (!$context->getRequestType()->contains(RequestType::REST)) {
             parent::process($context);
         } else {
             // reuse REST API sorting filter

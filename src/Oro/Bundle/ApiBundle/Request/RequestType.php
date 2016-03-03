@@ -36,6 +36,16 @@ class RequestType implements ToArrayInterface
 
     /**
      * @param string $type
+     *
+     * @return bool
+     */
+    public function contains($type)
+    {
+        return in_array($type, $this->types, true);
+    }
+
+    /**
+     * @param string $type
      */
     public function add($type)
     {
@@ -59,21 +69,17 @@ class RequestType implements ToArrayInterface
     }
 
     /**
-     * @param string $type
-     *
-     * @return bool
-     */
-    public function has($type)
-    {
-        return in_array($type, $this->types, true);
-    }
-
-    /**
      * @return bool
      */
     public function isEmpty()
     {
         return empty($this->types);
+    }
+
+    public function clear()
+    {
+        $this->types = [];
+        $this->str   = null;
     }
 
     /**

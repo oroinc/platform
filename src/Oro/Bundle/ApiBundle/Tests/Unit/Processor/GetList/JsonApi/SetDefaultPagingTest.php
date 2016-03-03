@@ -5,7 +5,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultPaging;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
@@ -36,8 +35,8 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
 
     public function testProcessForJSONAPIRequest()
     {
-        $this->context->remove(GetListContext::REQUEST_TYPE);
-        $this->context->setRequestType([RequestType::JSON_API]);
+        $this->context->getRequestType()->clear();
+        $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
@@ -61,8 +60,9 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
         $filters->add('page', $pageNumberFilter);
         $this->context->set('filters', $filters);
 
-        $this->context->remove(GetListContext::REQUEST_TYPE);
-        $this->context->setRequestType([RequestType::REST, RequestType::JSON_API]);
+        $this->context->getRequestType()->clear();
+        $this->context->getRequestType()->add(RequestType::REST);
+        $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->processor->process($this->context);
 
         $this->assertEquals(2, $filters->count());

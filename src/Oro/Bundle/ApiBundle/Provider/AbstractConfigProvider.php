@@ -26,9 +26,7 @@ abstract class AbstractConfigProvider
     ) {
         $context->setClassName($className);
         $context->setVersion($version);
-        if (!$requestType->isEmpty()) {
-            $context->setRequestType($requestType);
-        }
+        $context->setRequestType($requestType);
         if (!empty($extras)) {
             $context->setExtras($extras);
         }

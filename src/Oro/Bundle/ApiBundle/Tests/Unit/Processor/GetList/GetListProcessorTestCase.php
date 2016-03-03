@@ -33,7 +33,7 @@ class GetListProcessorTestCase extends \PHPUnit_Framework_TestCase
 
         $this->context = new GetListContext($this->configProvider, $this->metadataProvider);
         $this->context->setVersion(self::TEST_VERSION);
-        $this->context->setRequestType(self::TEST_REQUEST_TYPE);
+        $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $this->context->setConfigExtras(
             [
                 new VirtualFieldsConfigExtra(),
