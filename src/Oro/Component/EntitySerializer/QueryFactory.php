@@ -99,19 +99,17 @@ class QueryFactory
         if (null !== $limit && count($entityIds) > 1) {
             $selectStmt = null;
             $subQueries = [];
-            foreach ($entityIds as $id) {
-                $subQuery = $this->getRelatedItemsIdsQuery($associationMapping, [$id], $config);
-                $subQuery->setMaxResults($limit);
-                // We should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
-                $subQueries[] = '(' . QueryUtils::getExecutableSql($subQuery) . ')';
-                if (null === $selectStmt) {
-                    $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
-                    $selectStmt = sprintf(
-                        'entity.%s AS entityId, entity.%s AS relatedEntityId',
-                        QueryUtils::getColumnNameByAlias($mapping, 'entityId'),
-                        QueryUtils::getColumnNameByAlias($mapping, 'relatedEntityId')
-                    );
-                }
+            $subQuery = $this->getRelatedItemsIdsQuery($associationMapping, $entityIds, $config);
+            $subQuery->setMaxResults($limit);
+            // We should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
+            $subQueries[] = '(' . QueryUtils::getExecutableSql($subQuery) . ')';
+            if (null === $selectStmt) {
+                $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
+                $selectStmt = sprintf(
+                    'entity.%s AS entityId, entity.%s AS relatedEntityId',
+                    QueryUtils::getColumnNameByAlias($mapping, 'entityId'),
+                    QueryUtils::getColumnNameByAlias($mapping, 'relatedEntityId')
+                );
             }
             $rsm = new ResultSetMapping();
             $rsm
