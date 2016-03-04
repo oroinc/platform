@@ -23,6 +23,8 @@ define([
             organizations: []
         },
 
+        treeHandlers: {},
+
         initialize: function(options) {
             OrganizationStructureTreeView.__super__.initialize.apply(this, arguments);
             _.each(this.requiredOptions, function(optionName) {
@@ -68,17 +70,18 @@ define([
                 .find('button[type=submit]')
                 .on('click' + this.eventNamespace(), _.bind(this._preSubmit, this));
 
-            var treeHandlers = {};
             _.each(options.tree, function(node) {
                 var collapse = '#organization_' + node.id;
-                treeHandlers[collapse] = _.partial(me._handleTreeShow, collapse, node);
+                this.treeHandlers[collapse] = _.partial(me._handleTreeShow, collapse, node);
+                this._createTreeHandlers(node, '#businessUnit_');
             }, this);
 
             if (this.accordionEnabled) {
                 var me = this;
-                this.$el.on('show', '.collapse', function() {
+                this.$el.on('show', '.collapse', function(e) {
+                    e.stopPropagation();
                     var collapse = '#' + $(this).attr('id');
-                    treeHandlers[collapse].call(me);
+                    me.treeHandlers[collapse].call(me);
                 });
             } else {
                 _.each(treeHandlers, function(treeHandler) {
@@ -107,12 +110,24 @@ define([
             OrganizationStructureTreeView.__super__.dispose.apply(this, arguments);
         },
 
+        _createTreeHandlers: function(node, collapsePrefix) {
+            if (!node.children) {
+                return;
+            }
+
+            _.each(node.children, function(businessUnit) {
+                var collapse = collapsePrefix + businessUnit.id;
+                this.treeHandlers[collapse] = _.partial(this._handleTreeShow, collapse, businessUnit);
+                this._createTreeHandlers(businessUnit, collapsePrefix);
+            }, this);
+        },
+
         _handleTreeShow: function(collapse, node) {
             var html = this.template({
-                level: 1,
                 children: node.children,
                 selected: this.inputData.businessUnits,
                 organization: node.id,
+                accordionEnabled: this.accordionEnabled,
                 render: this.template
             });
 
@@ -140,7 +155,7 @@ define([
          */
         _preSubmit: function() {
             if (this.accordionEnabled) {
-                this.$('.accordion-toggle:not(.collapse)').click();
+                this.$('.accordion-toggle:not(.collapsed)').click();
                 this.$('.accordion-inner').empty();
             }
         },
