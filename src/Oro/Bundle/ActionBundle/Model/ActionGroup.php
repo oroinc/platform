@@ -26,6 +26,7 @@ class ActionGroup
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
+     * @param ActionGroupDefinition $definition
      */
     public function __construct(
         ActionFactory $actionFactory,
