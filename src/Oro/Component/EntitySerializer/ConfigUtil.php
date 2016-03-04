@@ -30,7 +30,7 @@ class ConfigUtil
      */
     const CLASS_NAME = '__class__';
 
-    const FIELDS = 'fields';
+    const FIELDS = EntityConfig::FIELDS;
 
     const EXCLUSION_POLICY      = EntityConfig::EXCLUSION_POLICY;
     const EXCLUSION_POLICY_ALL  = EntityConfig::EXCLUSION_POLICY_ALL;

@@ -3,8 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity as Object;
@@ -314,7 +317,11 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
      */
     protected function createConfigObject(array $config)
     {
-        $loaderFactory = new ConfigLoaderFactory();
+        $configExtensionRegistry = new ConfigExtensionRegistry();
+        $configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $configExtensionRegistry->addExtension(new SortersConfigExtension());
+
+        $loaderFactory = new ConfigLoaderFactory($configExtensionRegistry);
 
         return $loaderFactory->getLoader(ConfigUtil::DEFINITION)->load($config);
     }
