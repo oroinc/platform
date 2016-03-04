@@ -253,9 +253,11 @@ oro_entity_config:
                 virtual_fields: # array of strings
                     options:
                         auditable: false
-                # responds for searching entities in the reports filter.
-                search_fields:
-                    options: []
-                # responds for the rendering searching items labels.
-                representation_field:
-                    options: []
+                # specify the list of fields used for searching in the reports filter
+                search_fields: # array of strings
+                    options:
+                        auditable: false
+                # specify representation field used for rendering titles for search items in the reports filter
+                representation_field: # string
+                    options:
+                        auditable: false
