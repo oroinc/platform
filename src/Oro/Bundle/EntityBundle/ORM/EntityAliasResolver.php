@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
@@ -13,7 +11,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
 
 class EntityAliasResolver implements WarmableInterface
 {
-    /** @var ManagerRegistry */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /** @var ManagerBagInterface */
