@@ -4,8 +4,9 @@ namespace Oro\Bundle\ActionBundle\Datagrid\Extension;
 
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
-use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -36,6 +37,9 @@ class ActionExtension extends AbstractExtension
     /** @var array|Operation[] */
     protected $operations = [];
 
+    /** @var array  */
+    protected $actionGroups;
+
     /**
      * @param ActionManager $actionManager
      * @param ContextHelper $contextHelper
@@ -50,8 +54,16 @@ class ActionExtension extends AbstractExtension
     ) {
         $this->actionManager = $actionManager;
         $this->contextHelper = $contextHelper;
-        $this->applicationsHelper = $applicationHelper;
+        $this->applicationHelper = $applicationHelper;
         $this->providerRegistry = $providerRegistry;
+    }
+
+    /**
+     * @param array $actionGroups
+     */
+    public function setActionGroups(array $actionGroups)
+    {
+        $this->actionGroups = $actionGroups;
     }
 
     /**
@@ -60,7 +72,10 @@ class ActionExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         $this->datagridContext = $this->getDatagridContext($config);
-        $this->operations = $this->actionManager->getActions($this->datagridContext, false);
+        $this->operations = $this->getActions(
+            $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []),
+            $this->datagridContext
+        );
 
         if (0 === count($this->operations)) {
             return false;
@@ -68,37 +83,92 @@ class ActionExtension extends AbstractExtension
 
         $this->processActionsConfig($config);
         $this->processMassActionsConfig($config);
+
         $this->actionConfiguration = $config->offsetGetOr(DatagridActionExtension::ACTION_CONFIGURATION_KEY, []);
-        $config->offsetSet(DatagridActionExtension::ACTION_CONFIGURATION_KEY, [$this, 'getActionsPermissions']);
+        $config->offsetSet(DatagridActionExtension::ACTION_CONFIGURATION_KEY, [$this, 'getRowConfiguration']);
 
         return true;
     }
 
     /**
+     * @param array $actionsConfig
+     * @param array $datagridContext
+     * @return Action[]
+     */
+    protected function getActions(array $actionsConfig, array $datagridContext)
+    {
+        $result = [];
+
+        $actions = $this->actionManager->getActions($datagridContext, false);
+
+        foreach ($actions as $actionName => $action) {
+            $actionName = strtolower($actionName);
+            if (!array_key_exists($actionName, $actionsConfig)) {
+                $result[$actionName] = $action;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * @param ResultRecordInterface $record
+     * @param array $config
      *
      * @return array
      */
-    public function getActionsPermissions(ResultRecordInterface $record)
+    public function getRowConfiguration(ResultRecordInterface $record, array $config)
     {
-        $actionsOld = [];
-        // process own permissions of the datagrid
-        if ($this->actionConfiguration && is_callable($this->actionConfiguration)) {
-            $actionsOld = call_user_func($this->actionConfiguration, $record);
-            $actionsOld = is_array($actionsOld) ? $actionsOld : [];
-        }
-
         $actionData = $this->contextHelper->getActionData([
             'entityId' => $record->getValue('id'),
             'entityClass' => $this->datagridContext['entityClass'],
+            'datagrid' => $this->datagridContext['datagrid'],
         ]);
 
         $actionsNew = [];
-        foreach ($this->operations as $operation) {
-            $actionsNew[$operation->getName()] = $operation->isAvailable($actionData);
+        foreach ($this->operations as $operationName => $operation) {
+            $actionsNew[$operationName] = $this->getRowActionsConfig($operation, $actionData);
         }
 
-        return array_merge($actionsOld, $actionsNew);
+        return array_merge($actionsNew, $this->getParentRowConfiguration($record, $config));
+    }
+
+    /**
+     * @param ResultRecordInterface $record
+     * @param array $config
+     * @return array
+     */
+    protected function getParentRowConfiguration(ResultRecordInterface $record, array $config)
+    {
+        if (empty($this->actionConfiguration)) {
+            return [];
+        }
+
+        $rowActions = [];
+
+        if (is_callable($this->actionConfiguration)) {
+            $rowActions = call_user_func($this->actionConfiguration, $record, $config);
+        } elseif (is_array($this->actionConfiguration)) {
+            $rowActions = $this->actionConfiguration;
+        }
+
+        return is_array($rowActions) ? $rowActions : [];
+    }
+
+    /**
+     * @param Action $action
+     * @param ActionData $actionData
+     * @return bool|array
+     */
+    protected function getRowActionsConfig(Action $action, ActionData $actionData)
+    {
+        if (!$action->isAvailable($actionData)) {
+            return false;
+        }
+
+        return [
+            'translates' => $actionData->getScalarValues(),
+        ];
     }
 
     /**
@@ -106,36 +176,47 @@ class ActionExtension extends AbstractExtension
      */
     protected function processActionsConfig(DatagridConfiguration $config)
     {
-        $actionsConfig = $config->offsetGetOr('actions', []);
+        $actionsConfig = $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []);
 
-        foreach ($this->operations as $operation) {
-            $buttonOptions = $operation->getDefinition()->getButtonOptions();
-            $frontendOptions = $operation->getDefinition()->getFrontendOptions();
-
-            $actionsConfig[$operation->getName()] = [
-                'type' => 'action-widget',
-                'label' => $operation->getDefinition()->getLabel(),
-                'rowAction' => false,
-                'link' => '#',
-                'icon' => !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit',
-                'options' => [
-                    'actionName' => $operation->getName(),
-                    'entityClass' => $this->datagridContext['entityClass'],
-                    'datagrid' => $this->datagridContext['datagrid'],
-                    'confirmation' =>  !empty($frontendOptions['confirmation']) ? $frontendOptions['confirmation'] : '',
-                    'hasDialog' => $operation->hasForm(),
-                    'showDialog' => !empty($frontendOptions['show_dialog']),
-                    'executionRoute' => $this->applicationsHelper->getExecutionRoute(),
-                    'dialogRoute' => $this->applicationsHelper->getDialogRoute(),
-                    'dialogOptions' => [
-                        'title' => $operation->getDefinition()->getLabel(),
-                        'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
-                    ]
-                ]
-            ];
+        foreach ($this->operations as $operationName => $operation) {
+            $actionsConfig[$operationName] = $this->getRowsActionsConfig($operation);
         }
 
-        $config->offsetSet('actions', $actionsConfig);
+        $config->offsetSet(DatagridActionExtension::ACTION_KEY, $actionsConfig);
+    }
+
+    /**
+     * @param Operation $operation
+     * @return array
+     */
+    protected function getRowsActionsConfig(Operation $operation)
+    {
+        $buttonOptions = $operation->getDefinition()->getButtonOptions();
+        $frontendOptions = $action->getDefinition()->getFrontendOptions();
+        $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
+        $confirmation = !empty($frontendOptions['confirmation']) ? $frontendOptions['confirmation'] : '';
+
+        return [
+            'type' => 'action-widget',
+            'label' => $operation->getDefinition()->getLabel(),
+            'rowAction' => false,
+            'link' => '#',
+            'icon' => $icon,
+            'options' => [
+                'actionName' => $operation->getName(),
+                'entityClass' => $this->datagridContext['entityClass'],
+                'datagrid' => $this->datagridContext['datagrid'],
+                'confirmation' => $confirmation,
+                'hasDialog' => $operation->hasForm(),
+                'showDialog' => !empty($frontendOptions['show_dialog']),
+                'executionRoute' => $this->applicationHelper->getExecutionRoute(),
+                'dialogRoute' => $this->applicationHelper->getDialogRoute(),
+                'dialogOptions' => [
+                    'title' => $operation->getDefinition()->getLabel(),
+                    'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
+                ]
+            ]
+        ];
     }
 
     /**
@@ -178,8 +259,9 @@ class ActionExtension extends AbstractExtension
         $entityClass = $config->offsetGetByPath('[extended_entity_name]');
 
         return [
-            'entityClass' => $entityClass ? : $config->offsetGetByPath('[entity_name]'),
+            'entityClass' => $entityClass ?: $config->offsetGetByPath('[entity_name]'),
             'datagrid' => $config->offsetGetByPath('[name]'),
+            'group' => $this->actionGroups,
         ];
     }
 }

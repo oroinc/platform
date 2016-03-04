@@ -57,13 +57,29 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
                     ->isRequired()
                     ->cannotBeEmpty()
                 ->end()
+                ->scalarNode('substitute_action')
+                ->end()
                 ->arrayNode('applications')
                     ->prototype('scalar')
                     ->end()
                 ->end()
+                ->arrayNode('groups')
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->booleanNode('for_all_entities')
+                    ->defaultFalse()
+                ->end()
                 ->arrayNode('entities')
                     ->prototype('scalar')
                     ->end()
+                ->end()
+                ->arrayNode('exclude_entities')
+                    ->prototype('scalar')
+                    ->end()
+                ->end()
+                ->booleanNode('for_all_datagrids')
+                    ->defaultFalse()
                 ->end()
                 ->arrayNode('datagrids')
                     ->prototype('scalar')
@@ -194,7 +210,14 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
         $node
             ->addDefaultsIfNotSet()
             ->children()
-                ->scalarNode('confirmation')->end()
+                ->variableNode('confirmation')
+                    ->beforeNormalization()
+                        ->ifString()
+                        ->then(function ($value) {
+                            return !empty($value) ? ['message' => $value] : [];
+                        })
+                    ->end()
+                ->end()
                 ->arrayNode('options')
                     ->prototype('variable')
                     ->end()
@@ -240,7 +263,7 @@ class ActionDefinitionConfiguration implements ConfigurationInterface
 
         return $node;
     }
-    
+
     /**
      * @return NodeDefinition
      */

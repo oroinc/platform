@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 
 class GetListContextTest extends \PHPUnit_Framework_TestCase
@@ -27,14 +25,6 @@ class GetListContextTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->context = new GetListContext($this->configProvider, $this->metadataProvider);
-    }
-
-    public function testDefaultAccessorConfigExtras()
-    {
-        $this->assertEquals(
-            [new FiltersConfigExtra(), new SortersConfigExtra()],
-            $this->context->getConfigExtras()
-        );
     }
 
     public function testTotalCountCallback()

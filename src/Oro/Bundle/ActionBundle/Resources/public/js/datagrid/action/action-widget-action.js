@@ -3,6 +3,7 @@
 define(function(require) {
     'use strict';
 
+    var _ = require('underscore');
     var ModelAction = require('oro/datagrid/action/model-action');
     var ActionManager = require('oroaction/js/action-manager');
     var routing = require('routing');
@@ -15,6 +16,7 @@ define(function(require) {
         options: {
             datagrid: null,
             confirmation: null,
+            confirmComponent: null,
             showDialog: null,
             hasDialog: null,
             executionRoute: null,
@@ -43,17 +45,22 @@ define(function(require) {
 
             var routeParams = this._getRouteParams();
 
-            var options = {
+            var config = this.model.get('action_configuration') || {};
+
+            var options = _.extend({
                 showDialog: this.options.showDialog,
                 hasDialog: this.options.hasDialog,
                 dialogUrl: routing.generate(this.options.dialogRoute, routeParams),
                 dialogOptions: this.options.dialogOptions,
                 url: routing.generate(this.options.executionRoute, routeParams),
-                confirmation: Boolean(this.options.confirmation),
+                confirmation: !_.isEmpty(this.options.confirmation),
+                confirmComponent: this.options.confirmComponent,
                 messages: {
-                    confirm_content: this.options.confirmation
-                }
-            };
+                    confirm_title: this.options.confirmation.title,
+                    confirm_content: this.options.confirmation.message
+                },
+                translates: this.options.translates || {}
+            }, config[this.options.actionName.toLowerCase()] || {});
 
             this.actionManager = new ActionManager(options);
         },

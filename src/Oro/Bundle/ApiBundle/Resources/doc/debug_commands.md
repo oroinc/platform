@@ -90,3 +90,10 @@ If you want to see entity metadata that is used for a particular request type yo
 ```bash
 php app/console oro:api:metadata:dump users --request-type=rest --request-type=json_api
 ```
+
+### oro:api:config:dump-reference
+This command shows the structure of `Resources/config/oro/api.yml`.
+
+```bash
+php app/console oro:api:config:dump-reference
+```
