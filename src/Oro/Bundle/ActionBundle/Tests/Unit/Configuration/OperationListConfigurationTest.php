@@ -11,9 +11,6 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
      */
     protected $configuration;
 
-    /**
-     * {@inheritdoc}
-     */
     public function setUp()
     {
         $this->configuration = new OperationListConfiguration();
@@ -280,6 +277,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     protected function invalidConfigurationProvider()
     {
