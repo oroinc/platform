@@ -40,16 +40,16 @@ define([
             this.template = _.template($('#organization-children-template').html());
 
             var me = this;
-            this.$el.on('change', 'input.bu:checkbox:checked', function () {
-                var org_id = parseInt($(this).data('organization'));
-                var $organization = $('input.org-id-' + org_id + ':checkbox:not(:checked)');
+            this.$el.on('change', 'input.bu:checkbox:checked', function() {
+                var organization = parseInt($(this).data('organization'));
+                var $organization = $('input.org-id-' + organization + ':checkbox:not(:checked)');
                 $organization.prop('checked', true);
 
                 if ($organization.length) {
-                    me.inputData.organizations.push(org_id);
+                    me.inputData.organizations.push(organization);
                 }
             });
-            this.$el.on('change', 'input.org:checkbox:not(:checked)', function () {
+            this.$el.on('change', 'input.org:checkbox:not(:checked)', function() {
                 var organization = parseInt($(this).val());
                 var $businessUnits = $('input.bu:checkbox:checked[data-organization="' + organization + '"]');
                 $businessUnits.prop('checked', false);

@@ -17,7 +17,7 @@ define([
         ],
 
         initialize: function(options) {
-             _.each(this.requiredOptions, function(optionName) {
+            _.each(this.requiredOptions, function(optionName) {
                 if (!_.has(options, optionName)) {
                     throw new Error('Required option "' + optionName + '" not found.');
                 }
