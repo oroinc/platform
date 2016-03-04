@@ -101,7 +101,7 @@ class SendEmailTemplate extends AbstractSendEmail
      */
     protected function executeAction($context)
     {
-        $emailModel = new Email();
+        $emailModel = $this->getEmailModel();
 
         $from = $this->getEmailAddress($context, $this->options['from']);
         $this->validateAddress($from);
@@ -158,5 +158,13 @@ class SendEmailTemplate extends AbstractSendEmail
                 throw new ValidatorException($errorList->get(0)->getMessage());
             }
         }
+    }
+
+    /**
+     * @return Email
+     */
+    protected function getEmailModel()
+    {
+        return new Email();
     }
 }
