@@ -440,7 +440,7 @@ class ConfigManagerPerformanceTest extends \PHPUnit_Framework_TestCase
         return new ConfigManager(
             $this->eventDispatcher,
             $this->metadataFactory,
-            new ConfigModelManager($emLink, new LockObject(), true),
+            new ConfigModelManager($emLink, new LockObject()),
             new AuditManager($securityTokenStorage, $doctrine),
             new ConfigCache(new ArrayCache(), new ArrayCache())
         );
