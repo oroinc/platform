@@ -633,7 +633,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 'sourceEntity'             => $entityClass,
                 'targetEntity'             => $targetEntityClass,
                 'fieldName'                => $defaultRelationFieldName,
-                'type'                     => ClassMetadataInfo::MANY_TO_ONE,
+                'type'                     => ClassMetadataInfo::ONE_TO_ONE,
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => null,
@@ -643,7 +643,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                         'name'                 => $defaultRelationFieldName . '_id',
                         'referencedColumnName' => 'id',
                         'nullable'             => true,
-                        'unique'               => false,
+                        'unique'               => true,
                         'onDelete'             => 'SET NULL',
                         'columnDefinition'     => null
                     ]
@@ -1062,7 +1062,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 'sourceEntity'             => $entityClass,
                 'targetEntity'             => $targetEntityClass,
                 'fieldName'                => $defaultRelationFieldName,
-                'type'                     => ClassMetadataInfo::MANY_TO_ONE,
+                'type'                     => ClassMetadataInfo::ONE_TO_ONE,
                 'isOwningSide'             => true,
                 'mappedBy'                 => null,
                 'inversedBy'               => null,
@@ -1072,7 +1072,7 @@ class RelationMetadataBuilderTest extends \PHPUnit_Framework_TestCase
                         'name'                 => $defaultRelationFieldName . '_id',
                         'referencedColumnName' => 'id',
                         'nullable'             => true,
-                        'unique'               => false,
+                        'unique'               => true,
                         'onDelete'             => 'SET NULL',
                         'columnDefinition'     => null
                     ]
