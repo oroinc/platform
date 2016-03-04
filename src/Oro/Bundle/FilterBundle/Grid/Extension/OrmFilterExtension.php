@@ -4,8 +4,11 @@ namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
@@ -116,9 +119,9 @@ class OrmFilterExtension extends AbstractExtension
             if (!$lazy) {
                 $filter->resolveOptions();
             }
-            $value        = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
-            $initialValue = isset($initialValues[$filter->getName()]) ? $initialValues[$filter->getName()] : false;
-
+            $filter->resolveOptions();
+            $value        = ArrayUtil::getValue($values, $filter->getName(), false);
+            $initialValue = ArrayUtil::getValue($initialValues, $filter->getName(), false);
             $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
             $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
 

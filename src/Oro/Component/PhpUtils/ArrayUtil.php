@@ -372,4 +372,16 @@ class ArrayUtil
 
         return $result;
     }
+
+    /**
+     * @param array      $array
+     * @param mixed      $key
+     * @param mixed|null $default
+     *
+     * @return mixed
+     */
+    public static function getValue(array $array, $key, $default = null)
+    {
+        return isset($array[$key]) ? $array[$key] : $default;
+    }
 }
