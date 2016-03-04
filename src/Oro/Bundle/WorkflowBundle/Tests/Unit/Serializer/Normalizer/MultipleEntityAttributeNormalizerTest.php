@@ -55,7 +55,7 @@ class MultipleEntityAttributeNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->attribute = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Attribute')
+        $this->attribute = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Attribute')
             ->setMethods(array('getType', 'getOption', 'getName'))
             ->disableOriginalConstructor()
             ->getMock();

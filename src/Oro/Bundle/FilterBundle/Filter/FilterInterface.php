@@ -39,6 +39,11 @@ interface FilterInterface
     public function getMetadata();
 
     /**
+     * Resolves lazy options
+     */
+    public function resolveOptions();
+
+    /**
      * Applies a filter restrictions to a data source
      *
      * @param FilterDatasourceAdapterInterface $ds

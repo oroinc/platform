@@ -45,7 +45,8 @@ class FilterTypeTest extends AbstractTypeTestCase
                     'operator_choices' => array(),
                     'operator_type' => 'choice',
                     'operator_options' => array(),
-                    'show_filter' => false
+                    'show_filter' => false,
+                    'lazy' => false
                 ),
                 'requiredOptions' => array(
                     'field_type',

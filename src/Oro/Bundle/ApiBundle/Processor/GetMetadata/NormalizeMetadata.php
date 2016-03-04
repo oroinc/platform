@@ -9,9 +9,14 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
- * Does the following normalizations of metadata:
- * * removes excluded fields
- * * renames fields based on 'property_path' attribute
+ * Removes excluded fields and associations.
+ * Renames fields and associations if their names are not correspond the configuration of entity
+ * and there is the "property_path" attribute for the field.
+ * For example, if the metadata has the "address_name" field, and there is the following configuration:
+ * 'fields' => [
+ *      'address' => ['property_path' => 'address_name']
+ * ]
+ * the metadata field will be renamed to "address".
  */
 class NormalizeMetadata implements ProcessorInterface
 {
@@ -33,7 +38,6 @@ class NormalizeMetadata implements ProcessorInterface
             return;
         }
 
-        /** @var EntityMetadata $entityMetadata */
         $entityMetadata = $context->getResult();
         $this->normalizeMetadata($entityMetadata, $config);
     }
@@ -52,9 +56,9 @@ class NormalizeMetadata implements ProcessorInterface
             if ($field->isExcluded()) {
                 $entityMetadata->removeProperty($fieldName);
             } elseif ($field->hasPropertyPath()) {
-                $path = ConfigUtil::explodePropertyPath($field->getPropertyPath());
-                if (count($path) === 1) {
-                    $entityMetadata->renameProperty(reset($path), $fieldName);
+                $propertyPath = $field->getPropertyPath();
+                if ($fieldName !== $propertyPath && count(ConfigUtil::explodePropertyPath($propertyPath)) === 1) {
+                    $entityMetadata->renameProperty($propertyPath, $fieldName);
                 }
             }
         }

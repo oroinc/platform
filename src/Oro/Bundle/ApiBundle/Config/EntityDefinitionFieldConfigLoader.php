@@ -70,8 +70,6 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
                 $this->callSetter($field, $this->methodMap[$key], $value);
             } elseif (ConfigUtil::FIELDS === $key) {
                 $this->loadTargetFields($field, $value);
-            } elseif (ConfigUtil::DEFINITION === $key) {
-                $this->loadField($field, $value);
             } elseif (ConfigUtil::FILTERS === $key) {
                 $this->loadTargetFilters($field, $value);
             } elseif (ConfigUtil::SORTERS === $key) {

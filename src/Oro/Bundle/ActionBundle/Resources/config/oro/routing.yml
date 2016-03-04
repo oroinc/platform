@@ -1,0 +1,13 @@
+oro_action_widget:
+    resource:     "@OroActionBundle/Controller/WidgetController.php"
+    type:         annotation
+    prefix:       /actionwidget
+
+oro_action_bundle_api:
+    resource:     '@OroActionBundle/Resources/config/oro/routing_api.yml'
+    prefix:       api/rest/{version}/
+    requirements:
+        version:  latest|v1
+        _format:  json
+    defaults:
+        version:  latest

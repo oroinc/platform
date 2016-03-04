@@ -2,54 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Oro\Component\Action\Action\AbstractDateAction as BaseAbstractDateAction;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-
-abstract class AbstractDateAction extends AbstractAction
+/**
+ * @deprecated since 1.10. Use {@see Oro\Component\Action\Action\AbstractDateAction} instead
+ */
+abstract class AbstractDateAction extends BaseAbstractDateAction
 {
-    /**
-     * @var array
-     */
-    protected $options;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function executeAction($context)
-    {
-        $this->contextAccessor->setValue($context, $this->options['attribute'], $this->createDateTime());
-    }
-
-    /**
-     * @return \DateTime
-     */
-    abstract protected function createDateTime();
-
-    /**
-     * {@inheritdoc}
-     */
-    public function initialize(array $options)
-    {
-        if (empty($options['attribute'])) {
-            throw new InvalidParameterException('Option "attribute" name parameter is required');
-        }
-
-        if (!$options['attribute'] instanceof PropertyPathInterface) {
-            throw new InvalidParameterException('Option "attribute" must be valid property definition.');
-        }
-
-        $this->options = $options;
-
-        return $this;
-    }
-
-    /**
-     * @param mixed $value
-     * @return string
-     */
-    protected function getClassOrType($value)
-    {
-        return is_object($value) ? get_class($value) : gettype($value);
-    }
 }

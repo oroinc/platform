@@ -582,6 +582,83 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider shiftRangeProvider
+     */
+    public function testShiftRange(array $sortedUniqueInts, $expectedResult, $expectedShiftedUniqueInts)
+    {
+        $this->assertEquals($expectedResult, ArrayUtil::shiftRange($sortedUniqueInts));
+        $this->assertEquals($expectedShiftedUniqueInts, $sortedUniqueInts);
+    }
+
+    public function shiftRangeProvider()
+    {
+        return [
+            'empty' => [
+                [],
+                false,
+                [],
+            ],
+            '1 item' => [
+                [5],
+                [5, 5],
+                [],
+            ],
+            '2 items' => [
+                [5, 6],
+                [5, 6],
+                [],
+            ],
+            'first' => [
+                [1, 3, 5],
+                [1, 1],
+                [3, 5],
+            ],
+            'first to last' => [
+                [1, 2, 3, 4, 5],
+                [1, 5],
+                [],
+            ],
+            'first to gap' => [
+                [1, 2, 3, 5, 6],
+                [1, 3],
+                [5, 6],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider intRangesProvider
+     */
+    public function testIntRanges($ints, array $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ArrayUtil::intRanges($ints));
+    }
+
+    public function intRangesProvider()
+    {
+        return [
+            [
+                [],
+                [],
+            ],
+            [
+                [1],
+                [
+                    [1, 1],
+                ]
+            ],
+            [
+                [5, 5, 3, 1, 6, 4, 100],
+                [
+                    [1, 1],
+                    [3, 6],
+                    [100, 100],
+                ]
+            ]
+        ];
+    }
+
+    /**
      * @param array $array
      * @param mixed $columnKey
      * @param mixed $indexKey
