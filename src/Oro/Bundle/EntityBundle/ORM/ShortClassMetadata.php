@@ -52,7 +52,7 @@ class ShortClassMetadata implements \Serializable
     // @codingStandardsIgnoreStart
     public static function __set_state($data)
     {
-        return new self($data['name'], $data['isMappedSuperclass']);
+        return new ShortClassMetadata($data['name'], $data['isMappedSuperclass']);
     }
     // @codingStandardsIgnoreEnd
 }

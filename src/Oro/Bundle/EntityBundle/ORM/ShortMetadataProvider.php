@@ -25,18 +25,20 @@ class ShortMetadataProvider
      */
     public function getAllShortMetadata(ObjectManager $manager, $throwException = true)
     {
-        $metadataFactory = $manager->getMetadataFactory();
-        $cacheDriver = $metadataFactory instanceof AbstractClassMetadataFactory
-            ? $metadataFactory->getCacheDriver()
-            : null;
-        if ($cacheDriver) {
-            $this->metadataCache = $cacheDriver->fetch(static::ALL_SHORT_METADATA_CACHE_KEY);
-            if (false === $this->metadataCache) {
+        if (null === $this->metadataCache) {
+            $metadataFactory = $manager->getMetadataFactory();
+            $cacheDriver = $metadataFactory instanceof AbstractClassMetadataFactory
+                ? $metadataFactory->getCacheDriver()
+                : null;
+            if ($cacheDriver) {
+                $this->metadataCache = $cacheDriver->fetch(static::ALL_SHORT_METADATA_CACHE_KEY);
+                if (false === $this->metadataCache) {
+                    $this->metadataCache = $this->loadAllShortMetadata($manager, $throwException);
+                    $cacheDriver->save(static::ALL_SHORT_METADATA_CACHE_KEY, $this->metadataCache);
+                }
+            } else {
                 $this->metadataCache = $this->loadAllShortMetadata($manager, $throwException);
-                $cacheDriver->save(static::ALL_SHORT_METADATA_CACHE_KEY, $this->metadataCache);
             }
-        } else {
-            $this->metadataCache = $this->loadAllShortMetadata($manager, $throwException);
         }
 
         return $this->metadataCache;
