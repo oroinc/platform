@@ -78,7 +78,7 @@ require([
 
                           if (count === 0) {
                               noResults = __('oro.search.quick_search.noresults');
-                              searchDropdown.html('<li><span>' + noResults + '</span></li>');
+                              searchDropdown.html('<ul><li><span>' + noResults + '</span></li></ul>');
                           } else if (countAll > count) {
                               searchDropdown.append($('.search-more').html());
                           }

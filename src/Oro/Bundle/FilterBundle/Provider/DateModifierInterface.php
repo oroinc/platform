@@ -21,6 +21,19 @@ interface DateModifierInterface
     const VAR_THIS_YEAR    = 14;
     const VAR_FDQ          = 15; // first day of quarter
     const VAR_FMQ          = 16; // first month of quarter
+    const VAR_JANUARY      = 17;
+    const VAR_FEBRUARY     = 18;
+    const VAR_MARCH        = 19;
+    const VAR_APRIL        = 20;
+    const VAR_MAY          = 21;
+    const VAR_JUNE         = 22;
+    const VAR_JULY         = 23;
+    const VAR_AUGUST       = 24;
+    const VAR_SEPTEMBER    = 25;
+    const VAR_OCTOBER      = 26;
+    const VAR_NOVEMBER     = 27;
+    const VAR_DECEMBER     = 28;
+    const VAR_THIS_DAY_W_Y = 29;
 
     const PART_SOURCE  = 'source';
     const PART_VALUE   = 'value';
