@@ -12,7 +12,8 @@ define([
             'dataInputSelector',
             'tree',
             'selectedBusinessUnits',
-            'selectedOrganizations'
+            'selectedOrganizations',
+            'accordionEnabled'
         ],
 
         initialize: function(options) {
@@ -27,7 +28,8 @@ define([
                 dataInputSelector: options.dataInputSelector,
                 tree: options.tree,
                 selectedBusinessUnits: options.selectedBusinessUnits,
-                selectedOrganizations: options.selectedOrganizations
+                selectedOrganizations: options.selectedOrganizations,
+                accordionEnabled: options.accordionEnabled
             });
         }
     });

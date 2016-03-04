@@ -7,12 +7,15 @@ define([
 
     var OrganizationStructureTreeView = BaseView.extend({
         dataInputSelector: null,
+        template: null,
+        accordionEnabled: true,
 
         requiredOptions: [
             'dataInputSelector',
             'tree',
             'selectedBusinessUnits',
-            'selectedOrganizations'
+            'selectedOrganizations',
+            'accordionEnabled'
         ],
 
         inputData: {
@@ -31,6 +34,8 @@ define([
             this.dataInputSelector = options.dataInputSelector;
             this.inputData.businessUnits = options.selectedBusinessUnits;
             this.inputData.organizations = options.selectedOrganizations;
+            this.accordionEnabled = options.accordionEnabled;
+            this.template = _.template($('#organization-children-template').html());
 
             var me = this;
             this.$el.on('change', 'input.bu:checkbox:checked', function () {
@@ -44,7 +49,7 @@ define([
             });
             this.$el.on('change', 'input.org:checkbox:not(:checked)', function () {
                 var organization = parseInt($(this).val());
-                var $businessUnits = $('input.bu:checkbox:checked[data-organization="' + organization + '"]')
+                var $businessUnits = $('input.bu:checkbox:checked[data-organization="' + organization + '"]');
                 $businessUnits.prop('checked', false);
 
                 var excludedBusinessUnits = _.chain($businessUnits)
@@ -63,17 +68,24 @@ define([
                 .find('button[type=submit]')
                 .on('click' + this.eventNamespace(), _.bind(this._preSubmit, this));
 
-            var template = _.template($('#organization-children-template').html());
-            _.each(options.tree, function(organization) {
-                var html = template({
-                    level: 1,
-                    children: organization.children,
-                    selected: options.selectedBusinessUnits,
-                    organization: organization.id,
-                    render: template
-                });
-                this.$('#organization_' + organization.id + ' .accordion-inner').html(html);
+            var treeHandlers = {};
+            _.each(options.tree, function(node) {
+                var collapse = '#organization_' + node.id;
+                treeHandlers[collapse] = _.partial(me._handleTreeShow, collapse, node);
             }, this);
+
+            if (this.accordionEnabled) {
+                var me = this;
+                this.$el.on('show', '.collapse', function() {
+                    var collapse = '#' + $(this).attr('id');
+                    treeHandlers[collapse].call(me);
+                });
+            } else {
+                _.each(treeHandlers, function(treeHandler) {
+                    treeHandler.call(this);
+                }, this);
+            }
+
             this.$el.on(
                 'change',
                 'input[data-name="organization"]',
@@ -93,6 +105,18 @@ define([
             this.$el.closest('form').off(this.eventNamespace());
             this.$el.closest('form').find('button[type=submit]').off(this.eventNamespace());
             OrganizationStructureTreeView.__super__.dispose.apply(this, arguments);
+        },
+
+        _handleTreeShow: function(collapse, node) {
+            var html = this.template({
+                level: 1,
+                children: node.children,
+                selected: this.inputData.businessUnits,
+                organization: node.id,
+                render: this.template
+            });
+
+            this.$(collapse + ' .accordion-inner').html(html);
         },
 
         _createCheckboxHandler: function(dataName) {
@@ -115,7 +139,10 @@ define([
          * (tested with 10 000)
          */
         _preSubmit: function() {
-            this.$('.accordion-toggle:not(.collapse)').click();
+            if (this.accordionEnabled) {
+                this.$('.accordion-toggle:not(.collapse)').click();
+                this.$('.accordion-inner').empty();
+            }
         },
 
         _onSubmit: function() {
