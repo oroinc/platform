@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Provider;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
-use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig\RelationConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\RelationConfigProcessor;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class RelationConfigProvider
+class RelationConfigProvider extends AbstractConfigProvider
 {
     /** @var RelationConfigProcessor */
     protected $processor;
@@ -29,61 +29,31 @@ class RelationConfigProvider
      *
      * @param string                 $className   The FQCN of an entity
      * @param string                 $version     The version of a config
-     * @param string[]               $requestType The request type, for example "rest", "soap", etc.
-     * @param ConfigExtraInterface[] $extras      Additional configuration data.
+     * @param RequestType            $requestType The request type, for example "rest", "soap", etc.
+     * @param ConfigExtraInterface[] $extras      Requests for additional configuration data
      *
      * @return Config
      */
-    public function getRelationConfig($className, $version, array $requestType = [], array $extras = [])
+    public function getRelationConfig($className, $version, RequestType $requestType, array $extras = [])
     {
         if (empty($className)) {
             throw new \InvalidArgumentException('$className must not be empty.');
         }
 
-        $cacheKey = implode('', $requestType) . $version . $className;
+        $cacheKey = $this->buildCacheKey($className, $version, $requestType, $extras);
         if (array_key_exists($cacheKey, $this->cache)) {
             return $this->cache[$cacheKey];
         }
 
         /** @var RelationConfigContext $context */
         $context = $this->processor->createContext();
-        $context->setClassName($className);
-        $context->setVersion($version);
-        if (!empty($requestType)) {
-            $context->setRequestType($requestType);
-        }
-        if (!empty($extras)) {
-            $context->setExtras($extras);
-        }
+        $this->initContext($context, $className, $version, $requestType, $extras);
 
         $this->processor->process($context);
 
         $config = $this->buildResult($context);
 
         $this->cache[$cacheKey] = $config;
-
-        return $config;
-    }
-
-
-    /**
-     * @param RelationConfigContext $context
-     *
-     * @return Config
-     */
-    protected function buildResult(RelationConfigContext $context)
-    {
-        $config = new Config();
-        if ($context->hasResult()) {
-            $config->setDefinition($context->getResult());
-        }
-        $extras = $context->getExtras();
-        foreach ($extras as $extra) {
-            $sectionName = $extra->getName();
-            if ($extra instanceof ConfigExtraSectionInterface && $context->has($sectionName)) {
-                $config->set($sectionName, $context->get($sectionName));
-            }
-        }
 
         return $config;
     }

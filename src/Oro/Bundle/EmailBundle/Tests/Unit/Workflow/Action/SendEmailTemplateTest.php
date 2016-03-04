@@ -68,7 +68,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
@@ -133,7 +133,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
         return [
             'no from' => [
                 'options' => ['to' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass()],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'From parameter is required'
             ],
             'no from email' => [
@@ -141,12 +141,12 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'to' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'from' => ['name' => 'Test']
                 ],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
             ],
             'no to' => [
                 'options' => ['from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass()],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'To parameter is required'
             ],
             'no to email' => [
@@ -154,7 +154,7 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'to' => ['name' => 'Test']
                 ],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
             ],
             'no to email in one of addresses' => [
@@ -162,17 +162,17 @@ class SendEmailTemplateTest extends \PHPUnit_Framework_TestCase
                     'from' => 'test@test.com', 'template' => 'test', 'entity' => new \stdClass(),
                     'to' => ['test@test.com', ['name' => 'Test']]
                 ],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
             ],
             'no template' => [
                 'options' => ['from' => 'test@test.com', 'to' => 'test@test.com', 'entity' => new \stdClass()],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Template parameter is required'
             ],
             'no entity' => [
                 'options' => ['from' => 'test@test.com', 'to' => 'test@test.com', 'template' => 'test'],
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Entity parameter is required'
             ],
         ];

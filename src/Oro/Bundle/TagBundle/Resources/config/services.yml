@@ -17,6 +17,8 @@ parameters:
 
     oro_tag.event_listener.merge_listener.class: Oro\Bundle\TagBundle\EventListener\MergeListener
 
+    oro_tag.workflow.action.copy_tagging.class: Oro\Bundle\TagBundle\Workflow\Action\CopyTagging
+
 services:
     oro_tag.tag.manager:
         class: %oro_tag.tag.manager.class%
@@ -209,3 +211,13 @@ services:
             - @oro_security.acl_helper
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: tags-report }
+
+    oro_tag.workflow.action.copy_tagging.class:
+        class: %oro_tag.workflow.action.copy_tagging.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper
+        tags:
+            - { name: oro_workflow.action, alias: copy_tagging }
+            - { name: oro_action.function, alias: copy_tagging }

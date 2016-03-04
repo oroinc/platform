@@ -6,6 +6,8 @@ use Doctrine\ORM\EntityManager;
 
 use Sylius\Bundle\FlowBundle\Process\Context\ProcessContextInterface;
 
+use Oro\Bundle\SecurityBundle\Command\LoadPermissionConfigurationCommand;
+
 class SchemaStep extends AbstractStep
 {
     public function displayAction(ProcessContextInterface $context)
@@ -31,6 +33,8 @@ class SchemaStep extends AbstractStep
                     'oro:migration:data:load',
                     array('--no-interaction' => true)
                 );
+            case 'permissions':
+                return $this->handleAjaxAction(LoadPermissionConfigurationCommand::NAME);
             case 'workflows':
                 return $this->handleAjaxAction('oro:workflow:definitions:load');
             case 'processes':
