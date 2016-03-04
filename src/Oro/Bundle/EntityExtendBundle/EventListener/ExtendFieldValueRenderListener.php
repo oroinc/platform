@@ -74,13 +74,13 @@ class ExtendFieldValueRenderListener
         SecurityFacade $securityFacade,
         EntityClassNameHelper $entityClassNameHelper
     ) {
-        $this->configManager = $configManager;
-        $this->router = $router;
-        $this->registry = $registry;
-        $this->securityFacade = $securityFacade;
+        $this->configManager         = $configManager;
+        $this->router                = $router;
+        $this->registry              = $registry;
+        $this->securityFacade        = $securityFacade;
         $this->entityClassNameHelper = $entityClassNameHelper;
 
-        $this->extendProvider = $configManager->getProvider('extend');
+        $this->extendProvider   = $configManager->getProvider('extend');
         $this->propertyAccessor = PropertyAccess::createPropertyAccessor();
     }
 
@@ -118,8 +118,8 @@ class ExtendFieldValueRenderListener
      */
     protected function getValueForCollection(Collection $collection, ConfigIdInterface $fieldConfig)
     {
-        $extendConfig   = $this->extendProvider->getConfigById($fieldConfig);
-        $titleFieldName = $extendConfig->get('target_title');
+        $extendConfig    = $this->extendProvider->getConfigById($fieldConfig);
+        $titleFieldName  = $extendConfig->get('target_title');
         $targetClassName = $extendConfig->get('target_entity');
 
         if (!class_exists($targetClassName)) {
@@ -130,16 +130,20 @@ class ExtendFieldValueRenderListener
 
         $values     = [];
         $priorities = [];
+        $config     = $this->extendProvider->getConfig($targetClassName);
+        $idColumns  = $config->get('pk_columns', false, ['id']);
+        $identifier = reset($idColumns);
         /** @var object $item */
         foreach ($collection as $item) {
-            $routeOptions['route_params']['id'] = $item->getId();
+            $id                                 = $this->propertyAccessor->getValue($item, $identifier);
+            $routeOptions['route_params']['id'] = $id;
 
             $title = [];
             foreach ($titleFieldName as $fieldName) {
                 $title[] = $this->propertyAccessor->getValue($item, $fieldName);
             }
 
-            $value = [ 'id' => $item->getId(), 'title' => implode(' ', $title)];
+            $value = ['id' => $id, 'title' => implode(' ', $title)];
             if (!empty($routeOptions['route']) && $this->securityFacade->isGranted('VIEW', $item)) {
                 $value['link'] = $this->router->generate($routeOptions['route'], $routeOptions['route_params']);
             }
@@ -161,7 +165,7 @@ class ExtendFieldValueRenderListener
     /**
      * Return view link options or simple text
      *
-     * @param object          $targetEntity
+     * @param object            $targetEntity
      * @param ConfigIdInterface $fieldConfigId
      *
      * @throws \Doctrine\ORM\Mapping\MappingException
@@ -225,7 +229,7 @@ class ExtendFieldValueRenderListener
         /** @var EntityMetadata $metadata */
         $metadata = $this->configManager->getEntityMetadata($entityClassName);
         if ($metadata && $metadata->routeView) {
-            $routeOptions['route'] = $metadata->routeView;
+            $routeOptions['route']        = $metadata->routeView;
             $routeOptions['route_params'] = ['id' => $id];
         }
 
@@ -233,8 +237,8 @@ class ExtendFieldValueRenderListener
     }
 
     /**
-     * @param string   $entityClassName
-     * @param mixed    $id
+     * @param string $entityClassName
+     * @param mixed  $id
      *
      * @return array
      */

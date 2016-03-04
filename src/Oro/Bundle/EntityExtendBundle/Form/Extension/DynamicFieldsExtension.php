@@ -10,6 +10,7 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Component\PhpUtils\ArrayUtil;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -34,10 +35,11 @@ class DynamicFieldsExtension extends AbstractTypeExtension
     /** @var TranslatorInterface */
     protected $translator;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var PropertyAccessor */
+    protected $propertyAccessor;
 
     /**
      * @param ConfigManager       $configManager
@@ -51,10 +53,11 @@ class DynamicFieldsExtension extends AbstractTypeExtension
         TranslatorInterface $translator,
         DoctrineHelper $doctrineHelper
     ) {
-        $this->configManager  = $configManager;
-        $this->router         = $router;
-        $this->translator     = $translator;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->configManager    = $configManager;
+        $this->router           = $router;
+        $this->translator       = $translator;
+        $this->doctrineHelper   = $doctrineHelper;
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -151,7 +154,7 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     protected function addInitialElements(FormView $view, FormInterface $form, ConfigInterface $extendConfig)
     {
-        $data      = $form->getData();
+        $data = $form->getData();
         if (!is_object($data)) {
             return;
         }
@@ -263,12 +266,17 @@ class DynamicFieldsExtension extends AbstractTypeExtension
      */
     protected function getInitialElements($entities, $defaultEntity, ConfigInterface $extendConfig)
     {
-        $result = [];
+        $result          = [];
+        $className       = $extendConfig->get('target_entity');
+        $identifier      = $this->getIdColumnName($className);
+        $defaultEntityId = $defaultEntity !== null
+            ? $this->propertyAccessor->getValue($defaultEntity, $identifier)
+            : null;
         foreach ($entities as $entity) {
             $extraData = [];
             foreach ($extendConfig->get('target_grid') as $fieldName) {
                 $label = $this->configManager->getProvider('entity')
-                    ->getConfig($extendConfig->get('target_entity'), $fieldName)
+                    ->getConfig($className, $fieldName)
                     ->get('label');
 
                 $extraData[] = [
@@ -287,24 +295,43 @@ class DynamicFieldsExtension extends AbstractTypeExtension
              * of the entity, we need to make sure an ID is present. An ID
              * isn't present when a PHP-based Validation Constraint is fired.
              */
-            if (null !== $entity->getId()) {
+            $id = $this->propertyAccessor->getValue($entity, $identifier);
+
+            if (null !== $id) {
                 $result[] = [
-                    'id'        => $entity->getId(),
+                    'id'        => $id,
                     'label'     => implode(' ', $title),
                     'link'      => $this->router->generate(
                         'oro_entity_detailed',
                         [
-                            'id'         => $entity->getId(),
+                            'id'         => $id,
                             'entityName' => str_replace('\\', '_', $extendConfig->getId()->getClassName()),
                             'fieldName'  => $extendConfig->getId()->getFieldName()
                         ]
                     ),
                     'extraData' => $extraData,
-                    'isDefault' => ($defaultEntity != null && $defaultEntity->getId() == $entity->getId())
+                    'isDefault' => ($defaultEntity != null && $defaultEntityId === $id)
                 ];
             }
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $className
+     *
+     * @return string
+     */
+    protected function getIdColumnName($className)
+    {
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        if ($extendConfigProvider->hasConfig($className)) {
+            $idColumns = $extendConfigProvider->getConfig($className)->get('pk_columns', false, ['id']);
+
+            return reset($idColumns);
+        }
+
+        return 'id';
     }
 }

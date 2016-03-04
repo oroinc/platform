@@ -3,10 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
-use Oro\Bundle\WorkflowBundle\Model\Condition\AbstractCondition;
-use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable as ConfigurableCondition;
+
+use Oro\Component\Action\Action\ActionAssembler;
+use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Condition\AbstractCondition;
+use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class Process

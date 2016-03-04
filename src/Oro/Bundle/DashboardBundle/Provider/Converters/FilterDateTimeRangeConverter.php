@@ -2,77 +2,35 @@
 
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
-use \Datetime;
-
-use Symfony\Component\Translation\TranslatorInterface;
-
-use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
-use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
-use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
-use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-
 use Oro\Bundle\DashboardBundle\Helper\DateHelper;
+use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
+use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Component\Config\Resolver\SystemAwareResolver;
 
 class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
 {
-    const MIN_DATE = '1900-01-01';
+    /** @var FilterDateRangeConverter */
+    protected $converter;
 
-    /** @var DateTimeFormatter */
-    protected $formatter;
-
-    /** @var Compiler */
-    protected $dateCompiler;
-
-    /** @var TranslatorInterface */
-    protected $translator;
+    /** @var SystemAwareResolver */
+    protected $resolver;
 
     /** @var DateHelper */
     protected $dateHelper;
 
     /**
-     * @param DateTimeFormatter   $formatter
-     * @param Compiler            $dateCompiler
-     * @param TranslatorInterface $translator
-     * @param DateHelper          $dateHelper
+     * @param FilterDateRangeConverter $converter
+     * @param SystemAwareResolver      $resolver
+     * @param DateHelper               $dateHelper
      */
     public function __construct(
-        DateTimeFormatter $formatter,
-        Compiler $dateCompiler,
-        TranslatorInterface $translator,
+        FilterDateRangeConverter $converter,
+        SystemAwareResolver $resolver,
         DateHelper $dateHelper
     ) {
-        $this->formatter    = $formatter;
-        $this->dateCompiler = $dateCompiler;
-        $this->translator   = $translator;
-        $this->dateHelper   = $dateHelper;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
-    {
-        if (is_null($value)
-            || ($value['value']['start'] === null && $value['value']['end'] === null)
-        ) {
-            list($start, $end) = $this->dateHelper->getDateTimeInterval('P1M');
-
-            $type  = AbstractDateFilterType::TYPE_BETWEEN;
-        } else {
-            list($startValue, $endValue, $type) = $this->getPeriodValues($value);
-
-            $start = $startValue instanceof DateTime ? $startValue : $this->dateCompiler->compile($startValue);
-            $start->setTime(0, 0, 0);
-
-            $end = $endValue instanceof DateTime ? $endValue : $this->dateCompiler->compile($endValue);
-            $end->setTime(23, 59, 59);
-        }
-
-        return [
-            'start' => $start,
-            'end'   => $end,
-            'type'  => $type
-        ];
+        $this->converter  = $converter;
+        $this->resolver   = $resolver;
+        $this->dateHelper = $dateHelper;
     }
 
     /**
@@ -80,52 +38,72 @@ class FilterDateTimeRangeConverter extends ConfigValueConverterAbstract
      */
     public function getViewValue($value)
     {
-        switch ($value['type']) {
-            case AbstractDateFilterType::TYPE_MORE_THAN:
-                return sprintf(
-                    '%s %s',
-                    $this->translator->trans('oro.filter.form.label_date_type_more_than'),
-                    $this->formatter->formatDate($value['start'])
-                );
-            case AbstractDateFilterType::TYPE_LESS_THAN:
-                return sprintf(
-                    '%s %s',
-                    $this->translator->trans('oro.filter.form.label_date_type_less_than'),
-                    $this->formatter->formatDate($value['end'])
-                );
-        }
+        $convertedValue = $this->converter->getConvertedValue([], $value);
 
-        return sprintf(
-            '%s - %s',
-            $this->formatter->formatDate($value['start']),
-            $this->formatter->formatDate($value['end'])
-        );
+        return $this->converter->getViewValue($convertedValue);
     }
 
     /**
-     * @param array $value
+     * {@inheritdoc}
+     */
+    public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
+    {
+        if (null === $value &&
+            isset($config['converter_attributes']['default_selected']) &&
+            is_array($config['converter_attributes']['default_selected'])
+        ) {
+            $default = $this->getDefaultValues($config['converter_attributes']['default_selected']);
+
+            return $default;
+        }
+        $value['part'] = DateModifierInterface::PART_VALUE;
+
+        if (!isset($value['value']['start']) && !isset($value['value']['end'])) {
+            /** @var \DateTime $start */
+            /** @var \DateTime $end */
+            list($start, $end) = $this->dateHelper->getDateTimeInterval();
+
+            $value['value']['start'] = $start->format('Y-m-d H:i:s');
+            $value['value']['end']   = $end->format('Y-m-d H:i:s');
+        }
+
+        return parent::getConvertedValue($widgetConfig, $value);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getFormValue(array $converterAttributes, $value)
+    {
+        if (null === $value &&
+            isset($converterAttributes['converter_attributes']['default_selected']) &&
+            is_array($converterAttributes['converter_attributes']['default_selected'])
+        ) {
+            $default = $this->getDefaultValues($converterAttributes['converter_attributes']['default_selected']);
+
+            return $default;
+        }
+
+        return parent::getFormValue($converterAttributes, $value);
+    }
+
+    /**
+     * @param array $config
+     *
      * @return array
      */
-    protected function getPeriodValues($value)
+    protected function getDefaultValues(array $config)
     {
-        $startValue = $value['value']['start'];
-        $endValue   = $value['value']['end'];
-        $type       = $value['type'];
+        $default = $this->resolver->resolve($config);
+        if (isset($default['value']['start'])) {
+            $default['value']['start'] = str_replace(' ', '', $default['value']['start']);
+        }
+        if (isset($default['value']['end'])) {
+            $default['value']['end'] = str_replace(' ', '', $default['value']['end']);
 
-        if ($type === AbstractDateFilterType::TYPE_LESS_THAN
-            || ($type === AbstractDateFilterType::TYPE_BETWEEN && $startValue === null)
-        ) {
-            $startValue = new DateTime(self::MIN_DATE, new \DateTimeZone('UTC'));
-            $type       = AbstractDateFilterType::TYPE_LESS_THAN;
+            return $default;
         }
 
-        if ($type === AbstractDateFilterType::TYPE_MORE_THAN
-            || ($type === AbstractDateFilterType::TYPE_BETWEEN && $endValue === null)
-        ) {
-            $endValue = new DateTime('now', new \DateTimeZone('UTC'));
-            $type     = AbstractDateFilterType::TYPE_MORE_THAN;
-        }
-
-        return [$startValue, $endValue, $type];
+        return $default;
     }
 }
