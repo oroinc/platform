@@ -134,7 +134,7 @@ define([
             var html = this.template({
                 children: node.children,
                 selected: this.inputData.businessUnits,
-                organization: node.id,
+                organization: node.organization || node.id,
                 accordionEnabled: this.accordionEnabled,
                 render: this.template
             });
