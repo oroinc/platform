@@ -91,7 +91,7 @@ define(function(require) {
             'datepicker:dialogReposition .hasDatepicker': 'onDropdownReposition'
         },
 
-        format: datetimeFormatter.getBackendDateFormat(),
+        format: datetimeFormatter.backendFormats.date,
 
         render: function() {
             DateEditorView.__super__.render.call(this);

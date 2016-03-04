@@ -109,7 +109,7 @@ define(function(require) {
             'hideTimepicker .ui-timepicker-input': 'onTimepickerHide'
         },
 
-        format: datetimeFormatter.getBackendDateTimeFormat(),
+        format: datetimeFormatter.backendFormats.datetime,
 
         render: function() {
             var _this = this;

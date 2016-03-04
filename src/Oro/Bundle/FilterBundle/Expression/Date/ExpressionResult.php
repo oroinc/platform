@@ -17,10 +17,9 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
  */
 class ExpressionResult
 {
-    const TYPE_INT      = 1;
-    const TYPE_DATE     = 2;
-    const TYPE_TIME     = 3;
-    const TYPE_DAYMONTH = 4;
+    const TYPE_INT  = 1;
+    const TYPE_DATE = 2;
+    const TYPE_TIME = 3;
 
     /** @var int */
     private $variableType = null;
@@ -45,7 +44,6 @@ class ExpressionResult
 
                 switch ($value->getValue()) {
                     case DateModifierInterface::VAR_TODAY:
-                    case DateModifierInterface::VAR_THIS_DAY_W_Y:
                         $dateValue->startOfDay();
                         break;
                     case DateModifierInterface::VAR_SOW:
@@ -68,20 +66,6 @@ class ExpressionResult
                     case DateModifierInterface::VAR_THIS_YEAR:
                         $dateValue->firstOfYear();
                         break;
-                    case DateModifierInterface::VAR_JANUARY:
-                    case DateModifierInterface::VAR_FEBRUARY:
-                    case DateModifierInterface::VAR_MARCH:
-                    case DateModifierInterface::VAR_APRIL:
-                    case DateModifierInterface::VAR_MAY:
-                    case DateModifierInterface::VAR_JUNE:
-                    case DateModifierInterface::VAR_JULY:
-                    case DateModifierInterface::VAR_AUGUST:
-                    case DateModifierInterface::VAR_SEPTEMBER:
-                    case DateModifierInterface::VAR_OCTOBER:
-                    case DateModifierInterface::VAR_NOVEMBER:
-                    case DateModifierInterface::VAR_DECEMBER:
-                        $dateValue->modify('first day of '.$value);
-                        break;
                 }
 
                 $this->value = $dateValue;
@@ -101,10 +85,6 @@ class ExpressionResult
             } elseif ($value->is(Token::TYPE_INTEGER)) {
                 $this->sourceType = self::TYPE_INT;
                 $this->value      = $value->getValue();
-            } elseif ($value->is(Token::TYPE_DAYMONTH)) { //03-20, [month]-[day]
-                $this->sourceType = self::TYPE_DAYMONTH;
-                //don't worry about date(Y), later we get only day and month
-                $this->value      = Carbon::parse(date('Y').'-'.$value->getValue(), new \DateTimeZone($timezone));
             }
         }
     }
@@ -164,7 +144,6 @@ class ExpressionResult
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
-                case DateModifierInterface::VAR_THIS_DAY_W_Y:
                 case DateModifierInterface::VAR_SOW:
                 case DateModifierInterface::VAR_SOM:
                 case DateModifierInterface::VAR_SOQ:
@@ -215,7 +194,6 @@ class ExpressionResult
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
-                case DateModifierInterface::VAR_THIS_DAY_W_Y:
                 case DateModifierInterface::VAR_SOW:
                 case DateModifierInterface::VAR_SOM:
                 case DateModifierInterface::VAR_SOQ:
