@@ -52,7 +52,7 @@ class ConfigModelManager
     ];
 
     /**
-     * @param ServiceLink $emLink  A link to the EntityManager
+     * @param ServiceLink $emLink A link to the EntityManager
      * @param LockObject  $lockObject
      */
     public function __construct(ServiceLink $emLink, LockObject $lockObject)
@@ -267,7 +267,7 @@ class ConfigModelManager
             );
         }
 
-        $result = false;
+        $result     = false;
         $fieldModel = $this->findFieldModel($className, $fieldName);
         if ($fieldModel && $fieldModel->getFieldName() !== $newFieldName) {
             $fieldModel->setFieldName($newFieldName);
@@ -275,7 +275,7 @@ class ConfigModelManager
             unset($this->fields[$className][$fieldName]);
 
             $this->fields[$className][$newFieldName] = $fieldModel;
-            $result = true;
+            $result                                  = true;
         }
 
         return $result;
@@ -315,14 +315,14 @@ class ConfigModelManager
             );
         }
 
-        $result = false;
+        $result     = false;
         $fieldModel = $this->findFieldModel($className, $fieldName);
         if ($fieldModel && $fieldModel->getType() !== $fieldType) {
             $fieldModel->setType($fieldType);
             $this->getEntityManager()->persist($fieldModel);
 
             $this->fields[$className][$fieldName] = $fieldModel;
-            $result = true;
+            $result                               = true;
         }
 
         return $result;
@@ -362,14 +362,14 @@ class ConfigModelManager
             );
         }
 
-        $result = false;
+        $result     = false;
         $fieldModel = $this->findFieldModel($className, $fieldName);
         if ($fieldModel && $fieldModel->getMode() !== $mode) {
             $fieldModel->setMode($mode);
             $this->getEntityManager()->persist($fieldModel);
 
             $this->fields[$className][$fieldName] = $fieldModel;
-            $result = true;
+            $result                               = true;
         }
 
         return $result;
@@ -404,14 +404,14 @@ class ConfigModelManager
             );
         }
 
-        $result = false;
+        $result      = false;
         $entityModel = $this->findEntityModel($className);
         if ($entityModel && $entityModel->getMode() !== $mode) {
             $entityModel->setMode($mode);
             $this->getEntityManager()->persist($entityModel);
 
             $this->entities[$className] = $entityModel;
-            $result = true;
+            $result                     = true;
         }
 
         return $result;
@@ -527,9 +527,9 @@ class ConfigModelManager
      */
     public function clearCache()
     {
-        $this->entities = null;
+        $this->entities          = null;
         $this->entitiesAreLoaded = false;
-        $this->fields = [];
+        $this->fields            = [];
 
         $em = $this->getEntityManager();
         $em->clear('Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel');
