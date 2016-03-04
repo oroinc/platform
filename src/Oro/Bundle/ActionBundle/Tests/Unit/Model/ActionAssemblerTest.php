@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
-use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionAssembler;
-use Oro\Bundle\ActionBundle\Model\ActionDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 
@@ -80,16 +80,14 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function assembleProvider()
     {
-        $definition1 = new ActionDefinition();
+        $definition1 = new OperationDefinition();
         $definition1
             ->setName('minimum_name')
             ->setLabel('My Label')
             ->setEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'])
-            ->setConditions('conditions', [])
-            ->setConditions('preconditions', [])
-            ->setFunctions('prefunctions', [])
-            ->setFunctions('form_init', [])
-            ->setFunctions('functions', [])
+            ->setPreconditions([])
+            ->setActions('preactions', [])
+            ->setActions('form_init', [])
             ->setFormType(ActionType::NAME);
 
         $definition2 = clone $definition1;
@@ -101,11 +99,9 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setEnabled(false)
             ->setApplications(['application1'])
             ->setAttributes(['config_attr'])
-            ->setConditions('preconditions', ['config_pre_cond'])
-            ->setConditions('conditions', ['config_cond'])
-            ->setFunctions('prefunctions', ['config_pre_func'])
-            ->setFunctions('form_init', ['config_form_init_func'])
-            ->setFunctions('functions', ['config_post_func'])
+            ->setPreconditions(['config_pre_cond'])
+            ->setActions('preactions', ['config_pre_func'])
+            ->setActions('form_init', ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
@@ -119,16 +115,14 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setAttributes(['config_attr'])
             ->setForAllEntities(true)
             ->setExcludeEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'])
-            ->setConditions('preconditions', [
+            ->setPreconditions([
                 '@and' => [
                     ['@acl_granted' => 'test_acl'],
                     ['config_pre_cond']
                 ]
              ])
-            ->setConditions('conditions', ['config_cond'])
-            ->setFunctions('prefunctions', ['config_pre_func'])
-            ->setFunctions('form_init', ['config_form_init_func'])
-            ->setFunctions('functions', ['config_post_func'])
+            ->setActions('preactions', ['config_pre_func'])
+            ->setActions('form_init', ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
@@ -150,7 +144,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ]
                 ,
                 'expected' => [
-                    'minimum_name' => new Action(
+                    'minimum_name' => new Operation(
                         $this->getFunctionFactory(),
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
@@ -170,18 +164,16 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                         'enabled' => false,
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
-                        'conditions' => ['config_cond'],
-                        'prefunctions' => ['config_pre_func'],
+                        'preactions' => ['config_pre_func'],
                         'preconditions' => ['config_pre_cond'],
                         'form_init' => ['config_form_init_func'],
-                        'functions' => ['config_post_func'],
                         'form_options' => ['config_form_options'],
                         'frontend_options' => ['config_frontend_options'],
                         'order' => 77,
                     ]
                 ],
                 'expected' => [
-                    'maximum_name' => new Action(
+                    'maximum_name' => new Operation(
                         $this->getFunctionFactory(),
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
@@ -203,11 +195,9 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                         'exclude_entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'],
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
-                        'conditions' => ['config_cond'],
-                        'prefunctions' => ['config_pre_func'],
+                        'preactions' => ['config_pre_func'],
                         'preconditions' => ['config_pre_cond'],
                         'form_init' => ['config_form_init_func'],
-                        'functions' => ['config_post_func'],
                         'form_options' => ['config_form_options'],
                         'frontend_options' => ['config_frontend_options'],
                         'order' => 77,
@@ -215,7 +205,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'expected' => [
-                    'maximum_name_and_acl' => new Action(
+                    'maximum_name_and_acl' => new Operation(
                         $this->getFunctionFactory(),
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),

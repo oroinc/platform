@@ -38,31 +38,31 @@ class ActionManager
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param array|null $context
      * @param Collection|null $errors
      * @return ActionData
      */
-    public function executeByContext($actionName, array $context = null, Collection $errors = null)
+    public function executeByContext($operationName, array $context = null, Collection $errors = null)
     {
         $actionData = $this->contextHelper->getActionData($context);
 
-        $this->execute($actionName, $actionData, $errors);
+        $this->execute($operationName, $actionData, $errors);
 
         return $actionData;
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param ActionData $actionData
      * @param Collection|null $errors
      * @return ActionData
      * @throws \Exception
      */
-    public function execute($actionName, ActionData $actionData, Collection $errors = null)
+    public function execute($operationName, ActionData $actionData, Collection $errors = null)
     {
-        $action = $this->getAction($actionName, $actionData);
-        $action->execute($actionData, $errors);
+        $operation = $this->getAction($operationName, $actionData);
+        $operation->execute($actionData, $errors);
 
         $entity = $actionData->getEntity();
         if ($entity) {
@@ -93,14 +93,14 @@ class ActionManager
     /**
      * @param array|null $context
      * @param bool $onlyAvailable
-     * @return Action[]
+     * @return Operation[]
      */
     public function getActions(array $context = null, $onlyAvailable = true)
     {
         $context = $this->contextHelper->getContext($context);
         $actionData = $this->contextHelper->getActionData($context);
 
-        $actions = $this->actionRegistry->find(
+        $operations = $this->actionRegistry->find(
             $context[ContextHelper::ENTITY_ID_PARAM] ? $context[ContextHelper::ENTITY_CLASS_PARAM] : null,
             $context[ContextHelper::ROUTE_PARAM],
             $context[ContextHelper::DATAGRID_PARAM],
@@ -108,47 +108,47 @@ class ActionManager
         );
 
         if ($onlyAvailable) {
-            $actions = array_filter($actions, function (Action $action) use ($actionData) {
-                return $action->isAvailable($actionData);
+            $operations = array_filter($operations, function (Operation $operation) use ($actionData) {
+                return $operation->isAvailable($actionData);
             });
         }
 
-        uasort($actions, function (Action $action1, Action $action2) {
-            return $action1->getDefinition()->getOrder() - $action2->getDefinition()->getOrder();
+        uasort($operations, function (Operation $operation1, Operation $operation2) {
+            return $operation1->getDefinition()->getOrder() - $operation2->getDefinition()->getOrder();
         });
 
-        return $actions;
+        return $operations;
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param ActionData $actionData
      * @param bool $checkAvailable
-     * @return Action
+     * @return Operation
      * @throws ActionNotFoundException
      */
-    public function getAction($actionName, ActionData $actionData, $checkAvailable = true)
+    public function getAction($operationName, ActionData $actionData, $checkAvailable = true)
     {
-        $action = $this->actionRegistry->findByName($actionName);
-        if (!$action instanceof Action || ($checkAvailable && !$action->isAvailable($actionData))) {
-            throw new ActionNotFoundException($actionName);
+        $operation = $this->actionRegistry->findByName($operationName);
+        if (!$operation instanceof Operation || ($checkAvailable && !$operation->isAvailable($actionData))) {
+            throw new ActionNotFoundException($operationName);
         }
 
-        return $action;
+        return $operation;
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param array|null $context
      * @return string
      */
-    public function getFrontendTemplate($actionName, array $context = null)
+    public function getFrontendTemplate($operationName, array $context = null)
     {
         $template = self::DEFAULT_FORM_TEMPLATE;
-        $action = $this->getAction($actionName, $this->contextHelper->getActionData($context), false);
+        $operation = $this->getAction($operationName, $this->contextHelper->getActionData($context), false);
 
-        if ($action) {
-            $frontendOptions = $action->getDefinition()->getFrontendOptions();
+        if ($operation) {
+            $frontendOptions = $operation->getDefinition()->getFrontendOptions();
 
             if (array_key_exists('template', $frontendOptions)) {
                 $template = $frontendOptions['template'];
