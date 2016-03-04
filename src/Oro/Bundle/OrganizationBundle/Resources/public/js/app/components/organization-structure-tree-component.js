@@ -8,14 +8,26 @@ define([
     return BaseComponent.extend({
         organizationStructureTreeView: null,
 
+        requiredOptions: [
+            'dataInputSelector',
+            'tree',
+            'selectedBusinessUnits',
+            'selectedOrganizations'
+        ],
+
         initialize: function(options) {
-            if (!_.has(options, 'dataInputSelector')) {
-                throw new Error('Required option "dataInputSelector" not found.');
-            }
+             _.each(this.requiredOptions, function(optionName) {
+                if (!_.has(options, optionName)) {
+                    throw new Error('Required option "' + optionName + '" not found.');
+                }
+            });
 
             this.organizationStructureTreeView = new OrganizationStructureTreeView({
                 el: options._sourceElement,
-                dataInputSelector: options.dataInputSelector
+                dataInputSelector: options.dataInputSelector,
+                tree: options.tree,
+                selectedBusinessUnits: options.selectedBusinessUnits,
+                selectedOrganizations: options.selectedOrganizations
             });
         }
     });
