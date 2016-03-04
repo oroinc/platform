@@ -252,4 +252,12 @@ oro_entity_config:
                 # if not specified the virtual fields are created for all fields, except identifier ones
                 virtual_fields: # array of strings
                     options:
-                        auditable:          false
+                        auditable: false
+                # specify the list of fields used for searching in the reports filter
+                search_fields: # array of strings
+                    options:
+                        auditable: false
+                # specify representation field used for rendering titles for search items in the reports filter
+                representation_field: # string
+                    options:
+                        auditable: false
