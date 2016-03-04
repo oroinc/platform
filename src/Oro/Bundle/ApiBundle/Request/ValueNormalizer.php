@@ -41,6 +41,7 @@ class ValueNormalizer
 
     /**
      * Enables local cache for given data type values.
+     * Values of this type should be scalar or objects that can be represented as string (by method __toString).
      *
      * @param string $dataType
      */
@@ -65,13 +66,14 @@ class ValueNormalizer
             return $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
         }
 
-        if (array_key_exists($value, $this->cachedData[$dataType])) {
-            return $this->cachedData[$dataType][$value];
+        $cacheKey = (string)$value  . '|' . (string)$requestType . '|' . ($isArrayAllowed ? '+' : '-');
+        if (array_key_exists($cacheKey, $this->cachedData[$dataType])) {
+            return $this->cachedData[$dataType][$cacheKey];
         }
 
         $result = $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
 
-        $this->cachedData[$dataType][$value] = $result;
+        $this->cachedData[$dataType][$cacheKey] = $result;
 
         return $result;
     }
