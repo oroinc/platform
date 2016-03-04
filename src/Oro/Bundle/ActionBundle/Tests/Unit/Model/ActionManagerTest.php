@@ -9,7 +9,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\ActionBundle\Model\ActionRegistry;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -22,8 +22,8 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
  */
 class ActionManagerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionRegistry */
-    protected $actionRegistry;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
+    protected $operationRegistry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
@@ -39,7 +39,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->actionRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionRegistry')
+        $this->operationRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -51,7 +51,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new ActionManager($this->actionRegistry, $this->doctrineHelper, $this->contextHelper);
+        $this->manager = new ActionManager($this->operationRegistry, $this->doctrineHelper, $this->contextHelper);
     }
 
     /**
@@ -64,7 +64,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->markTestIncomplete();
 
-        $this->actionRegistry->expects($this->once())->method('find')->willReturn($actions);
+        $this->operationRegistry->expects($this->once())->method('find')->willReturn($actions);
 
         $this->assertContextHelperCalled();
         $this->assertEquals($expected, $this->manager->hasActions());
@@ -106,7 +106,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertContextHelperCalled($context);
 
-        $this->actionRegistry->expects($this->once())
+        $this->operationRegistry->expects($this->once())
             ->method('find')
             ->with($class, $route, $datagrid, $group)
             ->willReturn($actions);
@@ -244,7 +244,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             );
         }
 
-        $this->actionRegistry->expects($this->once())
+        $this->operationRegistry->expects($this->once())
             ->method('findByName')
             ->with($operationName)
             ->willReturn($operation);
@@ -300,7 +300,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 return true;
             });
 
-        $this->actionRegistry->expects($this->once())
+        $this->operationRegistry->expects($this->once())
             ->method('findByName')
             ->with('test_action')
             ->willReturn($action);
@@ -394,7 +394,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 return true;
             });
 
-        $this->actionRegistry->expects($this->once())
+        $this->operationRegistry->expects($this->once())
             ->method('findByName')
             ->with('test_action')
             ->willReturn($action);
@@ -453,7 +453,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             1
         );
 
-        $this->actionRegistry->expects($this->once())
+        $this->operationRegistry->expects($this->once())
             ->method('findByName')
             ->with($operationName)
             ->willReturn($this->getActions($operationName));

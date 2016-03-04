@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\ActionAssembler;
+use Oro\Bundle\ActionBundle\Model\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
@@ -14,12 +14,12 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
+class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var ActionAssembler */
+    /** @var OperationAssembler */
     protected $assembler;
 
     protected function setUp()
@@ -33,7 +33,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 return $class;
             });
 
-        $this->assembler = new ActionAssembler(
+        $this->assembler = new OperationAssembler(
             $this->getFunctionFactory(),
             $this->getConditionFactory(),
             $this->getAttributeAssembler(),

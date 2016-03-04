@@ -13,8 +13,8 @@ class ActionManager
     const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Action:form.html.twig';
     const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Action:page.html.twig';
 
-    /** @var ActionRegistry */
-    protected $actionRegistry;
+    /** @var OperationRegistry */
+    protected $operationRegistry;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -23,16 +23,16 @@ class ActionManager
     protected $contextHelper;
 
     /**
-     * @param ActionRegistry $actionRegistry
+     * @param OperationRegistry $operationRegistry
      * @param DoctrineHelper $doctrineHelper
      * @param ContextHelper $contextHelper
      */
     public function __construct(
-        ActionRegistry $actionRegistry,
+        OperationRegistry $operationRegistry,
         DoctrineHelper $doctrineHelper,
         ContextHelper $contextHelper
     ) {
-        $this->actionRegistry = $actionRegistry;
+        $this->operationRegistry = $operationRegistry;
         $this->doctrineHelper = $doctrineHelper;
         $this->contextHelper = $contextHelper;
     }
@@ -100,7 +100,7 @@ class ActionManager
         $context = $this->contextHelper->getContext($context);
         $actionData = $this->contextHelper->getActionData($context);
 
-        $operations = $this->actionRegistry->find(
+        $operations = $this->operationRegistry->find(
             $context[ContextHelper::ENTITY_ID_PARAM] ? $context[ContextHelper::ENTITY_CLASS_PARAM] : null,
             $context[ContextHelper::ROUTE_PARAM],
             $context[ContextHelper::DATAGRID_PARAM],
@@ -129,7 +129,7 @@ class ActionManager
      */
     public function getAction($operationName, ActionData $actionData, $checkAvailable = true)
     {
-        $operation = $this->actionRegistry->findByName($operationName);
+        $operation = $this->operationRegistry->findByName($operationName);
         if (!$operation instanceof Operation || ($checkAvailable && !$operation->isAvailable($actionData))) {
             throw new ActionNotFoundException($operationName);
         }

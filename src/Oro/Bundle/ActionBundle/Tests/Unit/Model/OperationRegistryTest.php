@@ -5,21 +5,21 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\ActionAssembler;
-use Oro\Bundle\ActionBundle\Model\ActionRegistry;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\OperationAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-class ActionRegistryTest extends \PHPUnit_Framework_TestCase
+class OperationRegistryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ActionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationProvider;
 
-    /** @var ActionAssembler */
+    /** @var OperationAssembler */
     protected $assembler;
 
     /** @var ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
@@ -40,7 +40,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
     protected $formOptionsAssembler;
 
-    /** @var ActionRegistry */
+    /** @var OperationRegistry */
     protected $registry;
 
     private $contextHelper;
@@ -96,7 +96,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 return $class;
             });
 
-        $this->assembler = new ActionAssembler(
+        $this->assembler = new OperationAssembler(
             $this->functionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
@@ -104,7 +104,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
             $this->doctrineHelper
         );
 
-        $this->registry = new ActionRegistry(
+        $this->registry = new OperationRegistry(
             $this->configurationProvider,
             $this->assembler,
             $this->applicationsHelper

@@ -7,13 +7,13 @@ use Doctrine\ORM\ORMException;
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-class ActionAssembler extends AbstractAssembler
+class OperationAssembler extends AbstractAssembler
 {
-    /** @var FunctionFactory */
-    private $functionFactory;
+    /** @var ActionFactory */
+    private $actionFactory;
 
     /** @var ConditionFactory */
     private $conditionFactory;
@@ -31,20 +31,20 @@ class ActionAssembler extends AbstractAssembler
     private $entityNames = [];
 
     /**
-     * @param FunctionFactory $functionFactory
+     * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
-        FunctionFactory $functionFactory,
+        ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
         FormOptionsAssembler $formOptionsAssembler,
         DoctrineHelper $doctrineHelper
     ) {
-        $this->functionFactory = $functionFactory;
+        $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->attributeAssembler = $attributeAssembler;
         $this->formOptionsAssembler = $formOptionsAssembler;
@@ -61,7 +61,7 @@ class ActionAssembler extends AbstractAssembler
 
         foreach ($configuration as $actionName => $options) {
             $actions[$actionName] = new Operation(
-                $this->functionFactory,
+                $this->actionFactory,
                 $this->conditionFactory,
                 $this->attributeAssembler,
                 $this->formOptionsAssembler,

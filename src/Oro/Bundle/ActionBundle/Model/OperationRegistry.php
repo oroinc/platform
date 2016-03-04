@@ -5,14 +5,14 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 
-class ActionRegistry
+class OperationRegistry
 {
     const DEFAULT_GROUP = '';
 
     /** @var ActionConfigurationProvider */
     protected $configurationProvider;
 
-    /** @var ActionAssembler */
+    /** @var OperationAssembler */
     protected $assembler;
 
     /** @var ApplicationsHelper */
@@ -23,12 +23,12 @@ class ActionRegistry
 
     /**
      * @param ActionConfigurationProvider $configurationProvider
-     * @param ActionAssembler $assembler
+     * @param OperationAssembler $assembler
      * @param ApplicationsHelper $applicationsHelper
      */
     public function __construct(
         ActionConfigurationProvider $configurationProvider,
-        ActionAssembler $assembler,
+        OperationAssembler $assembler,
         ApplicationsHelper $applicationsHelper
     ) {
         $this->configurationProvider = $configurationProvider;
@@ -132,11 +132,7 @@ class ActionRegistry
         $inEntities = in_array($className, $definition->getEntities(), true);
         $inExcludedEntities = in_array($className, $definition->getExcludeEntities(), true);
 
-        if (($forAllEntities && !$inExcludedEntities) || (!$forAllEntities && $inEntities)) {
-            return true;
-        }
-
-        return false;
+        return ($forAllEntities && !$inExcludedEntities) || (!$forAllEntities && $inEntities);
     }
 
     /**
