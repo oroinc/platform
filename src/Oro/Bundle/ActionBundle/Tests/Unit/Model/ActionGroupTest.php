@@ -10,6 +10,7 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
@@ -48,14 +49,14 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->actionFactory, $this->conditionFactory);
+        unset($this->actionGroup, $this->actionFactory, $this->conditionFactory, $this->data);
     }
 
     /**
      * @param ActionData $data
      * @param ActionInterface $action
      * @param ConfigurableCondition $condition
-     * @param string $actionName
+     * @param string $actionGroupName
      * @param string $exceptionMessage
      *
      * @dataProvider executeProvider
@@ -64,19 +65,21 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         ActionData $data,
         ActionInterface $action,
         ConfigurableCondition $condition,
-        $actionName,
+        $actionGroupName,
         $exceptionMessage = ''
     ) {
-        $this->actionGroup->getDefinition()->setName($actionName);
+        $this->actionGroup->getDefinition()->setName($actionGroupName);
         $this->actionGroup->getDefinition()->setActions(['action1']);
         $this->actionGroup->getDefinition()->setConditions(['condition1']);
 
         $this->actionFactory->expects($this->any())
             ->method('create')
+            ->with(ConfigurableAction::ALIAS)
             ->willReturn($action);
 
         $this->conditionFactory->expects($this->any())
             ->method('create')
+            ->with(ConfigurableCondition::ALIAS)
             ->willReturn($condition);
 
         $errors = new ArrayCollection();
@@ -98,21 +101,21 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
      */
     public function executeProvider()
     {
-        $data = new ActionData();
+        $data = new ActionData(['data' => 'value']);
 
         return [
             '!isConditionAllowed' => [
                 'data' => $data,
-                'action' => $this->createAction($this->never(), $data),
+                'action' => $this->createActionGroup($this->never(), $data),
                 'condition' => $this->createCondition($this->once(), $data, false),
-                'actionName' => 'TestName2',
+                'actionGroupName' => 'TestName2',
                 'exception' => 'ActionGroup "TestName2" is not allowed.'
             ],
             'isAllowed' => [
                 'data' => $data,
-                'action' => $this->createAction($this->once(), $data),
+                'action' => $this->createActionGroup($this->once(), $data),
                 'condition' => $this->createCondition($this->once(), $data, true),
-                'actionName' => 'TestName3',
+                'actionGroupName' => 'TestName3',
             ],
         ];
     }
@@ -120,6 +123,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     /**
      *
      * @dataProvider isAllowedProvider
+     *
      * @param ActionData $data
      * @param ConfigurableCondition $condition
      * @param bool $allowed
@@ -142,7 +146,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
      */
     public function isAllowedProvider()
     {
-        $data = new ActionData();
+        $data = new ActionData(['data' => 'value']);
 
         return [
             'no conditions' => [
@@ -168,18 +172,11 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
      * @param ActionData $data
      * @return ActionInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createAction(
-        \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
-        ActionData $data
-    ) {
+    protected function createActionGroup(\PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects, ActionData $data)
+    {
         /* @var $action ActionInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $action->expects($expects)
-            ->method('execute')
-            ->with($data);
+        $action = $this->getMock('Oro\Component\Action\Action\ActionInterface');
+        $action->expects($expects)->method('execute')->with($data);
 
         return $action;
     }
@@ -199,11 +196,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $condition->expects($expects)
-            ->method('evaluate')
-            ->with($data)
-            ->willReturn($returnValue);
+        $condition->expects($expects)->method('evaluate')->with($data)->willReturn($returnValue);
 
         return $condition;
     }
