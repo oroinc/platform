@@ -65,7 +65,7 @@ class ValueNormalizer
             return $this->getNormalizedValue($dataType, $requestType, $value, $isArrayAllowed);
         }
 
-        $cacheKey = $this->buildCacheKey($dataType, $requestType, $value, $isArrayAllowed);
+        $cacheKey = (string)$value  . '|' . (string)$requestType . '|' . ($isArrayAllowed ? '+' : '-');
         if (array_key_exists($cacheKey, $this->cachedData[$dataType])) {
             return $this->cachedData[$dataType][$cacheKey];
         }
@@ -135,18 +135,5 @@ class ValueNormalizer
     protected function getNormalizedValue($dataType, RequestType $requestType, $value, $isArrayAllowed)
     {
         return $this->doNormalization($dataType, $requestType, $value, $isArrayAllowed)->getResult();
-    }
-
-    /**
-     * @param string      $dataType
-     * @param RequestType $requestType
-     * @param mixed       $value
-     * @param bool        $isArrayAllowed
-     *
-     * @return string
-     */
-    protected function buildCacheKey($dataType, RequestType $requestType, $value, $isArrayAllowed)
-    {
-        return (string)$value . '|' . $dataType . '|' . (string)$requestType . '|' . ($isArrayAllowed ? '+' : '-');
     }
 }
