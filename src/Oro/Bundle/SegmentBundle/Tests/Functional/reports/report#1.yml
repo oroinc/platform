@@ -15,7 +15,7 @@ request:
         oro_segment_form[owner]: 1
         oro_segment_form[type]: dynamic
 response:
-        - [admin,1,/user/view/1]
+        - [admin,1,/admin/user/view/1]
 export:
         - [admin]
 export_filter:
