@@ -119,9 +119,9 @@ class OrmFilterExtension extends AbstractExtension
             if (!$lazy) {
                 $filter->resolveOptions();
             }
-            $filter->resolveOptions();
             $value        = ArrayUtil::getValue($values, $filter->getName(), false);
             $initialValue = ArrayUtil::getValue($initialValues, $filter->getName(), false);
+
             $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
             $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
 
