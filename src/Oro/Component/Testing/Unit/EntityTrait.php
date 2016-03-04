@@ -31,17 +31,32 @@ trait EntityTrait
         }
 
         foreach ($properties as $property => $value) {
-            try {
-                $this->getPropertyAccessor()->setValue($entity, $property, $value);
-            } catch (NoSuchPropertyException $e) {
-                $method = $reflectionClass->getProperty($property);
-                $method->setAccessible(true);
-                $method->setValue($entity, $value);
-            } catch (\ReflectionException $e) {
-            }
+            $this->setValue($entity, $property, $value);
         }
 
         return $entity;
+    }
+
+    /**
+     * @param object $object
+     * @param string $property
+     * @param string $value
+     * @return bool true if success, otherwise false
+     */
+    protected function setValue($object, $property, $value)
+    {
+        try {
+            $this->getPropertyAccessor()->setValue($object, $property, $value);
+        } catch (NoSuchPropertyException $e) {
+            $reflectionClass = new \ReflectionClass($object);
+            $method = $reflectionClass->getProperty($property);
+            $method->setAccessible(true);
+            $method->setValue($object, $value);
+        } catch (\ReflectionException $e) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
