@@ -157,7 +157,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $action3 = $this->createAction(
+        $operation3 = $this->createOperation(
             'action3',
             true,
             [
@@ -169,7 +169,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
         return [
             'applicable with provider' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-                'actions' => ['test_action' => $action1],
+                'actions' => ['test_operation' => $operation1],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_operationtest_config' => ['label' => 'test_label']]
@@ -177,7 +177,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'applicable with single mass action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-                'actions' => ['test_action' => $action2],
+                'actions' => ['test_operation' => $operation2],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'mass_actions' => ['test_operation' => ['label' => 'test_mass_action_label']]
@@ -185,7 +185,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'applicable with single action' => [
                 'config' => DatagridConfiguration::create(['name' => 'datagrid1']),
-                'actions' => ['action3' => $action3],
+                'actions' => ['action3' => $operation3],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'actions' => ['action3' => $this->getRowActionConfig('action3', 'datagrid1', 'Action 3 label')],
@@ -193,12 +193,12 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'should not replace existing default action' => [
                 'config' => DatagridConfiguration::create(['actions' => ['action3' => ['label' => 'default action3']]]),
-                'actions' => ['action3' => $action3, 'test_action' => $action2],
+                'actions' => ['action3' => $operation3, 'test_operation' => $operation2],
                 'expected' => true,
                 'expectedConfiguration' => [
                     'actions' => [
                         'action3' => ['label' => 'default action3'],
-                        'test_action' => $this->getRowActionConfig('test_action'),
+                        'test_operation' => $this->getRowActionConfig('test_operation'),
                     ]
                 ]
             ],
@@ -239,7 +239,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             '2 allowed actions' => [
                 'config' => DatagridConfiguration::create([]),
                 'record' => new ResultRecord(['id' => 2]),
-                'actions' => ['action1' => $actionAllowed1, 'action2' => $actionAllowed2],
+                'actions' => ['action1' => $operationAllowed1, 'action2' => $operationAllowed2],
                 'expectedActions' => [
                     'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
                     'action2' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
@@ -249,7 +249,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             '1 allowed action' => [
                 'config' => DatagridConfiguration::create([]),
                 'record' => new ResultRecord(['id' => 3]),
-                'actions' => ['action1' => $actionAllowed1, 'action3' => $actionNotAllowed],
+                'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
                 'expectedActions' => [
                     'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
                     'action3' => false
@@ -265,7 +265,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
-                'actions' => ['action1' => $actionAllowed1, 'action3' => $actionNotAllowed],
+                'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
                 'expectedActions' => [
                     'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
                     'action3' => false,
@@ -285,7 +285,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                     },
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
-                'actions' => ['action1' => $actionAllowed1, 'action3' => $actionNotAllowed],
+                'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
                 'expectedActions' => [
                     'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
                     'action3' => false,

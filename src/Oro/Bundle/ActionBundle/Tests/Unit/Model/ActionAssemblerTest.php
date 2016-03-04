@@ -86,8 +86,8 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setLabel('My Label')
             ->setEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'])
             ->setPreconditions([])
-            ->setFunctions('preactions', [])
-            ->setFunctions('form_init', [])
+            ->setActions('preactions', [])
+            ->setActions('form_init', [])
             ->setFormType(ActionType::NAME);
 
         $definition2 = clone $definition1;

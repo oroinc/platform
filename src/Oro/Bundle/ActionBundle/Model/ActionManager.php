@@ -100,7 +100,7 @@ class ActionManager
         $context = $this->contextHelper->getContext($context);
         $actionData = $this->contextHelper->getActionData($context);
 
-        $actions = $this->actionRegistry->find(
+        $operations = $this->actionRegistry->find(
             $context[ContextHelper::ENTITY_ID_PARAM] ? $context[ContextHelper::ENTITY_CLASS_PARAM] : null,
             $context[ContextHelper::ROUTE_PARAM],
             $context[ContextHelper::DATAGRID_PARAM],

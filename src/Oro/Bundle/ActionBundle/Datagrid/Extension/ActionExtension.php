@@ -43,18 +43,18 @@ class ActionExtension extends AbstractExtension
     /**
      * @param ActionManager $actionManager
      * @param ContextHelper $contextHelper
-     * @param ApplicationsHelper $applicationHelper
+     * @param ApplicationsHelper $applicationsHelper
      * @param MassActionProviderRegistry $providerRegistry
      */
     public function __construct(
         ActionManager $actionManager,
         ContextHelper $contextHelper,
-        ApplicationsHelper $applicationHelper,
+        ApplicationsHelper $applicationsHelper,
         MassActionProviderRegistry $providerRegistry
     ) {
         $this->actionManager = $actionManager;
         $this->contextHelper = $contextHelper;
-        $this->applicationHelper = $applicationHelper;
+        $this->applicationsHelper = $applicationsHelper;
         $this->providerRegistry = $providerRegistry;
     }
 
@@ -93,7 +93,7 @@ class ActionExtension extends AbstractExtension
     /**
      * @param array $actionsConfig
      * @param array $datagridContext
-     * @return Action[]
+     * @return Operation[]
      */
     protected function getActions(array $actionsConfig, array $datagridContext)
     {
@@ -156,13 +156,13 @@ class ActionExtension extends AbstractExtension
     }
 
     /**
-     * @param Action $action
+     * @param Operation $operation
      * @param ActionData $actionData
      * @return bool|array
      */
-    protected function getRowActionsConfig(Action $action, ActionData $actionData)
+    protected function getRowActionsConfig(Operation $operation, ActionData $actionData)
     {
-        if (!$action->isAvailable($actionData)) {
+        if (!$operation->isAvailable($actionData)) {
             return false;
         }
 
@@ -192,7 +192,7 @@ class ActionExtension extends AbstractExtension
     protected function getRowsActionsConfig(Operation $operation)
     {
         $buttonOptions = $operation->getDefinition()->getButtonOptions();
-        $frontendOptions = $action->getDefinition()->getFrontendOptions();
+        $frontendOptions = $operation->getDefinition()->getFrontendOptions();
         $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
         $confirmation = !empty($frontendOptions['confirmation']) ? $frontendOptions['confirmation'] : '';
 
@@ -209,8 +209,8 @@ class ActionExtension extends AbstractExtension
                 'confirmation' => $confirmation,
                 'hasDialog' => $operation->hasForm(),
                 'showDialog' => !empty($frontendOptions['show_dialog']),
-                'executionRoute' => $this->applicationHelper->getExecutionRoute(),
-                'dialogRoute' => $this->applicationHelper->getDialogRoute(),
+                'executionRoute' => $this->applicationsHelper->getExecutionRoute(),
+                'dialogRoute' => $this->applicationsHelper->getDialogRoute(),
                 'dialogOptions' => [
                     'title' => $operation->getDefinition()->getLabel(),
                     'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
