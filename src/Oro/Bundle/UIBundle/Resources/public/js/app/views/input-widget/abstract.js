@@ -78,11 +78,12 @@ define(function(require) {
                 return;
             }
 
-            this.$el.removeData('inputWidget');
-
             if (this.destroyOptions) {
                 this.widgetFunction(this.destroyOptions);
             }
+
+            this.$el.removeData('inputWidget');
+            delete this.$container;
 
             return AbstractInputWidget.__super__.dispose.apply(this, arguments);
         },
