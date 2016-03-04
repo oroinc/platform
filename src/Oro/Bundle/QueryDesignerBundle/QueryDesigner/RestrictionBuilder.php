@@ -64,15 +64,7 @@ class RestrictionBuilder implements RestrictionBuilderInterface
                 }
                 if ($form->isValid()) {
                     $ds->beginRestrictionGroup($operator);
-                    $originalValues=[];
-                    if (isset($item['filterData']['value']['start'])) {
-                        $originalValues['value']['start_original'] = $item['filterData']['value']['start'];
-                    }
-                    if (isset($item['filterData']['value']['end'])) {
-                        $originalValues['value']['end_original'] = $item['filterData']['value']['end'];
-                    }
-                    $data = array_merge_recursive($form->getData(), $originalValues);
-                    $filter->apply($ds, $data);
+                    $filter->apply($ds, $form->getData());
                     $ds->endRestrictionGroup();
                 }
             }

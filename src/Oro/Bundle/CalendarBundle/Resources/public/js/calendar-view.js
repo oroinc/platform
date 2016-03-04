@@ -25,7 +25,7 @@ define(function(require) {
     require('jquery.fullcalendar');
 
     CalendarView = BaseView.extend({
-        MOMENT_BACKEND_FORMAT: dateTimeFormatter.getBackendDateTimeFormat(),
+        MOMENT_BACKEND_FORMAT: dateTimeFormatter.backendFormats.datetime,
         /** @property */
         eventsTemplate: _.template(
             '<div>' +

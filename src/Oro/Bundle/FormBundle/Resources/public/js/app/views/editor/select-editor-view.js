@@ -63,6 +63,7 @@ define(function(require) {
      */
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
+    var $ = require('jquery');
     var _ = require('underscore');
     require('jquery.select2');
 
@@ -82,9 +83,6 @@ define(function(require) {
             },
             'mouseup .select2-choices': function() {
                 delete this._isSelection;
-            },
-            'focus .select2-choice': function() {
-                this.$('.select2-focusser').focus();
             }
         },
 
@@ -155,12 +153,6 @@ define(function(require) {
                 if (!_this.disposed && !_this.isChanged()) {
                     SelectEditorView.__super__.onGenericEnterKeydown.call(_this, e);
                 }
-            });
-            this.$('.select2-search-choice-close').on('mousedown', function() {
-                _this._isSelection = true;
-                _this.$('.select2-choice').one('focus', function() {
-                    delete _this._isSelection;
-                });
             });
         },
 
@@ -248,10 +240,9 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onFocusout: function(e) {
-            var select2 = this.$('input[name=value]').data('select2');
             if (this._isSelection) {
                 this.$('.select2-focused').focus();
-            } else if (!select2 || !select2.opened()) {
+            } else if (!e.relatedTarget || !$('.select2-drop').has(e.relatedTarget).length) {
                 SelectEditorView.__super__.onFocusout.call(this, e);
             }
         },

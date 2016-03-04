@@ -148,30 +148,9 @@ abstract class AbstractDateTimeFormatConverter implements DateTimeFormatConverte
      */
     public function getDayFormat($locale = null)
     {
-        return $this->convertFormat(
-            $this->convertToDayFormat(
-                $this->formatter->getPattern(\IntlDateFormatter::MEDIUM, \IntlDateFormatter::NONE, $locale)
-            )
-        );
-    }
+        $pattern = $this->translator->trans('oro.locale.date_format.day', [], null, $locale);
 
-    /**
-     * Convert from 'd MMM y' to 'd MMM' format with different types of dates
-     *
-     * @param string $format
-     * @return string
-     */
-    public function convertToDayFormat($format)
-    {
-        $regexp = [
-            '/(\xe2\x80\x8f\x2fy)/',
-            '/((,|\/|\.|\-|\s*)\s*[y]+$)|(^[y]+\s*(,|\/|\.|\-|\s*))/i',
-            '/.[y]+ \'г\'\./i',
-            '/(\.[y]+\.)|([y]+\.$)/i',
-            '/སྤྱི་ལོ་[y]+ /i',
-            '/\s*\'gada\'\s*/i',
-        ];
-        return trim(preg_replace($regexp, '', $format));
+        return $this->convertFormat($pattern);
     }
 
     /**

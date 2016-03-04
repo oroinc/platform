@@ -78,8 +78,7 @@
         'organization': data and data.organization is defined and data.organization ? data.organization.id : null,
         'user': form.parent.userEmailOrigin.user.vars.value,
         'accessToken': form.parent.userEmailOrigin.accessToken.vars.value,
-        'accessTokenExpiresAt': form.parent.userEmailOrigin.accessTokenExpiresAt.vars.value,
-        'id': form.vars.value and form.vars.value.id is defined ? form.vars.value.id : null,
+        'accessTokenExpiresAt': form.parent.userEmailOrigin.accessTokenExpiresAt.vars.value
     }) %}
 
     <div class="container-imap-gmail-container"
