@@ -41,6 +41,7 @@ class ValueNormalizer
 
     /**
      * Enables local cache for given data type values.
+     * Values of this type should be scalar or objects that can be represented as string (by method __toString).
      *
      * @param string $dataType
      */
