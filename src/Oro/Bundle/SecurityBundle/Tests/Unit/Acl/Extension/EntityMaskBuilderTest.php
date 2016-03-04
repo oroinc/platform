@@ -2,17 +2,37 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Extension;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder;
 
 class EntityMaskBuilderTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var int */
+    protected $identity;
+
+    /** @var EntityMaskBuilder */
+    protected $builder;
+
+    protected function setUp()
+    {
+        $this->identity = $this->getIdentity(rand(0, 20));
+        $this->builder = new EntityMaskBuilder($this->identity, ['VIEW', 'CREATE', 'EDIT']);
+    }
+
+    protected function tearDown()
+    {
+        unset($this->builder, $this->identity);
+    }
+
     /**
      * @dataProvider maskConstantProvider
+     *
+     * @param int $mask
      */
     public function testMaskConstant($mask)
     {
         $count = 0;
-        $bitmask = decbin($mask);
+        $bitmask = decbin($this->builder->getMask($mask) & EntityMaskBuilder::REMOVE_SERVICE_BITS);
         for ($i = 0; $i < strlen($bitmask); $i++) {
             if ('1' === $bitmask[$i]) {
                 $count++;
@@ -24,20 +44,22 @@ class EntityMaskBuilderTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider addAndRemoveProvider
+     *
+     * @param string $maskName
+     * @param int $mask
      */
     public function testAddAndRemove($maskName, $mask)
     {
-        $builder = new EntityMaskBuilder();
-        $builder->add($maskName);
-        $this->assertEquals($mask, $builder->get());
+        $this->builder->add($maskName);
+        $this->assertEquals($mask | $this->identity, $this->builder->get());
 
-        $builder->remove($maskName);
-        $this->assertEquals(EntityMaskBuilder::IDENTITY, $mask = $builder->get());
+        $this->builder->remove($maskName);
+        $this->assertEquals($this->identity, $this->builder->get());
     }
 
     public function testGetPattern()
     {
-        $builder = new EntityMaskBuilder();
+        $builder = new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']);
         $this->assertEquals(EntityMaskBuilder::PATTERN_ALL_OFF, $builder->getPattern());
         $this->assertEquals(EntityMaskBuilder::PATTERN_ALL_OFF_BRIEF, $builder->getPattern(true));
 
@@ -48,7 +70,7 @@ class EntityMaskBuilderTest extends \PHPUnit_Framework_TestCase
                 0,
                 strlen(EntityMaskBuilder::PATTERN_ALL_OFF) - 1
             )
-            . 'V';
+            . EntityMaskBuilder::ON;
         $this->assertEquals($expected, $builder->getPattern());
         $expectedBrief =
             substr(
@@ -56,310 +78,202 @@ class EntityMaskBuilderTest extends \PHPUnit_Framework_TestCase
                 0,
                 strlen(EntityMaskBuilder::PATTERN_ALL_OFF_BRIEF) - 1
             )
-            . 'V';
+            . EntityMaskBuilder::ON;
         $this->assertEquals($expectedBrief, $builder->getPattern(true));
 
+        $offOn = EntityMaskBuilder::OFF . EntityMaskBuilder::ON;
+        $onOn = EntityMaskBuilder::ON . EntityMaskBuilder::ON;
+
         $builder->add('view_local');
-        $expected = str_replace('. basic:', 'V basic:', $expected);
+        $expected = str_replace($offOn, $onOn, $expected);
         $this->assertEquals($expected, $builder->getPattern());
 
         $builder->add('view_deep');
-        $expected = str_replace('. local:', 'V local:', $expected);
+        $expected = str_replace($offOn, $onOn, $expected);
         $this->assertEquals($expected, $builder->getPattern());
 
         $builder->add('view_global');
-        $expected = str_replace('. deep:', 'V deep:', $expected);
+        $expected = str_replace($offOn, $onOn, $expected);
         $this->assertEquals($expected, $builder->getPattern());
 
         $builder->add('view_system');
-        $expected = str_replace('. global:', 'V global:', $expected);
+        $expected = str_replace($offOn, $onOn, $expected);
         $this->assertEquals($expected, $builder->getPattern());
     }
 
     public function testGetPatternWithUndefinedMask()
     {
-        $delim = strpos(EntityMaskBuilder::PATTERN_ALL_OFF, ' ');
-        $expected =
-            substr(EntityMaskBuilder::PATTERN_ALL_OFF, 0, $delim + 1)
-            . '*'
-            . substr(
-                EntityMaskBuilder::PATTERN_ALL_OFF,
-                $delim + 2,
-                strlen(EntityMaskBuilder::PATTERN_ALL_OFF) - $delim - 2
-            );
+        $expected = EntityMaskBuilder::ON . substr(
+            EntityMaskBuilder::PATTERN_ALL_OFF,
+            1,
+            strlen(EntityMaskBuilder::PATTERN_ALL_OFF) - 1
+        );
+
         $this->assertEquals($expected, EntityMaskBuilder::getPatternFor((integer) 2147483648));
     }
 
     public function testReset()
     {
-        $builder = new EntityMaskBuilder();
-        $this->assertEquals(EntityMaskBuilder::IDENTITY, $builder->get());
+        $this->assertEquals($this->identity, $this->builder->get());
 
-        $builder->add('view_basic');
-        $this->assertTrue($builder->get() > 0);
+        $this->builder->add('view_basic');
+        $this->assertTrue($this->builder->get() > $this->identity);
 
-        $builder->reset();
-        $this->assertEquals(EntityMaskBuilder::IDENTITY, $builder->get());
+        $this->builder->reset();
+        $this->assertEquals($this->identity, $this->builder->get());
     }
 
     /**
      * @dataProvider groupProvider
+     *
+     * @param string $groupName
+     * @param int $expectedMask
      */
-    public function testGroup($groupMask, $expectedMask)
+    public function testGroup($groupName, $expectedMask)
     {
+        $groupMask = $this->builder->getMask($groupName);
+
         $this->assertEquals(
-            $expectedMask,
+            $expectedMask | $this->identity,
             $groupMask,
             'Actual: ' . EntityMaskBuilder::getPatternFor($groupMask)
         );
     }
 
+    /**
+     * @return array
+     */
     public static function addAndRemoveProvider()
     {
-        return array(
-            array('VIEW_BASIC', EntityMaskBuilder::MASK_VIEW_BASIC),
-            array('CREATE_BASIC', EntityMaskBuilder::MASK_CREATE_BASIC),
-            array('EDIT_BASIC', EntityMaskBuilder::MASK_EDIT_BASIC),
-            array('DELETE_BASIC', EntityMaskBuilder::MASK_DELETE_BASIC),
-            array('ASSIGN_BASIC', EntityMaskBuilder::MASK_ASSIGN_BASIC),
-            array('SHARE_BASIC', EntityMaskBuilder::MASK_SHARE_BASIC),
-            array('VIEW_LOCAL', EntityMaskBuilder::MASK_VIEW_LOCAL),
-            array('CREATE_LOCAL', EntityMaskBuilder::MASK_CREATE_LOCAL),
-            array('EDIT_LOCAL', EntityMaskBuilder::MASK_EDIT_LOCAL),
-            array('DELETE_LOCAL', EntityMaskBuilder::MASK_DELETE_LOCAL),
-            array('ASSIGN_LOCAL', EntityMaskBuilder::MASK_ASSIGN_LOCAL),
-            array('SHARE_LOCAL', EntityMaskBuilder::MASK_SHARE_LOCAL),
-            array('VIEW_DEEP', EntityMaskBuilder::MASK_VIEW_DEEP),
-            array('CREATE_DEEP', EntityMaskBuilder::MASK_CREATE_DEEP),
-            array('EDIT_DEEP', EntityMaskBuilder::MASK_EDIT_DEEP),
-            array('DELETE_DEEP', EntityMaskBuilder::MASK_DELETE_DEEP),
-            array('ASSIGN_DEEP', EntityMaskBuilder::MASK_ASSIGN_DEEP),
-            array('SHARE_DEEP', EntityMaskBuilder::MASK_SHARE_DEEP),
-            array('VIEW_GLOBAL', EntityMaskBuilder::MASK_VIEW_GLOBAL),
-            array('CREATE_GLOBAL', EntityMaskBuilder::MASK_CREATE_GLOBAL),
-            array('EDIT_GLOBAL', EntityMaskBuilder::MASK_EDIT_GLOBAL),
-            array('DELETE_GLOBAL', EntityMaskBuilder::MASK_DELETE_GLOBAL),
-            array('ASSIGN_GLOBAL', EntityMaskBuilder::MASK_ASSIGN_GLOBAL),
-            array('SHARE_GLOBAL', EntityMaskBuilder::MASK_SHARE_GLOBAL),
-            array('VIEW_SYSTEM', EntityMaskBuilder::MASK_VIEW_SYSTEM),
-            array('CREATE_SYSTEM', EntityMaskBuilder::MASK_CREATE_SYSTEM),
-            array('EDIT_SYSTEM', EntityMaskBuilder::MASK_EDIT_SYSTEM),
-            array('DELETE_SYSTEM', EntityMaskBuilder::MASK_DELETE_SYSTEM),
-            array('ASSIGN_SYSTEM', EntityMaskBuilder::MASK_ASSIGN_SYSTEM),
-            array('SHARE_SYSTEM', EntityMaskBuilder::MASK_SHARE_SYSTEM),
-            array('view_basic', EntityMaskBuilder::MASK_VIEW_BASIC),
-            array('create_basic', EntityMaskBuilder::MASK_CREATE_BASIC),
-            array('edit_basic', EntityMaskBuilder::MASK_EDIT_BASIC),
-            array('delete_basic', EntityMaskBuilder::MASK_DELETE_BASIC),
-            array('assign_basic', EntityMaskBuilder::MASK_ASSIGN_BASIC),
-            array('share_basic', EntityMaskBuilder::MASK_SHARE_BASIC),
-            array('view_local', EntityMaskBuilder::MASK_VIEW_LOCAL),
-            array('create_local', EntityMaskBuilder::MASK_CREATE_LOCAL),
-            array('edit_local', EntityMaskBuilder::MASK_EDIT_LOCAL),
-            array('delete_local', EntityMaskBuilder::MASK_DELETE_LOCAL),
-            array('assign_local', EntityMaskBuilder::MASK_ASSIGN_LOCAL),
-            array('share_local', EntityMaskBuilder::MASK_SHARE_LOCAL),
-            array('view_deep', EntityMaskBuilder::MASK_VIEW_DEEP),
-            array('create_deep', EntityMaskBuilder::MASK_CREATE_DEEP),
-            array('edit_deep', EntityMaskBuilder::MASK_EDIT_DEEP),
-            array('delete_deep', EntityMaskBuilder::MASK_DELETE_DEEP),
-            array('assign_deep', EntityMaskBuilder::MASK_ASSIGN_DEEP),
-            array('share_deep', EntityMaskBuilder::MASK_SHARE_DEEP),
-            array('view_global', EntityMaskBuilder::MASK_VIEW_GLOBAL),
-            array('create_global', EntityMaskBuilder::MASK_CREATE_GLOBAL),
-            array('edit_global', EntityMaskBuilder::MASK_EDIT_GLOBAL),
-            array('delete_global', EntityMaskBuilder::MASK_DELETE_GLOBAL),
-            array('assign_global', EntityMaskBuilder::MASK_ASSIGN_GLOBAL),
-            array('share_global', EntityMaskBuilder::MASK_SHARE_GLOBAL),
-            array('view_system', EntityMaskBuilder::MASK_VIEW_SYSTEM),
-            array('create_system', EntityMaskBuilder::MASK_CREATE_SYSTEM),
-            array('edit_system', EntityMaskBuilder::MASK_EDIT_SYSTEM),
-            array('delete_system', EntityMaskBuilder::MASK_DELETE_SYSTEM),
-            array('assign_system', EntityMaskBuilder::MASK_ASSIGN_SYSTEM),
-            array('share_system', EntityMaskBuilder::MASK_SHARE_SYSTEM),
-            array(EntityMaskBuilder::MASK_VIEW_BASIC, EntityMaskBuilder::MASK_VIEW_BASIC),
-            array(EntityMaskBuilder::MASK_CREATE_BASIC, EntityMaskBuilder::MASK_CREATE_BASIC),
-            array(EntityMaskBuilder::MASK_EDIT_BASIC, EntityMaskBuilder::MASK_EDIT_BASIC),
-            array(EntityMaskBuilder::MASK_DELETE_BASIC, EntityMaskBuilder::MASK_DELETE_BASIC),
-            array(EntityMaskBuilder::MASK_ASSIGN_BASIC, EntityMaskBuilder::MASK_ASSIGN_BASIC),
-            array(EntityMaskBuilder::MASK_SHARE_BASIC, EntityMaskBuilder::MASK_SHARE_BASIC),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL, EntityMaskBuilder::MASK_VIEW_LOCAL),
-            array(EntityMaskBuilder::MASK_CREATE_LOCAL, EntityMaskBuilder::MASK_CREATE_LOCAL),
-            array(EntityMaskBuilder::MASK_EDIT_LOCAL, EntityMaskBuilder::MASK_EDIT_LOCAL),
-            array(EntityMaskBuilder::MASK_DELETE_LOCAL, EntityMaskBuilder::MASK_DELETE_LOCAL),
-            array(EntityMaskBuilder::MASK_ASSIGN_LOCAL, EntityMaskBuilder::MASK_ASSIGN_LOCAL),
-            array(EntityMaskBuilder::MASK_SHARE_LOCAL, EntityMaskBuilder::MASK_SHARE_LOCAL),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP, EntityMaskBuilder::MASK_VIEW_DEEP),
-            array(EntityMaskBuilder::MASK_CREATE_DEEP, EntityMaskBuilder::MASK_CREATE_DEEP),
-            array(EntityMaskBuilder::MASK_EDIT_DEEP, EntityMaskBuilder::MASK_EDIT_DEEP),
-            array(EntityMaskBuilder::MASK_DELETE_DEEP, EntityMaskBuilder::MASK_DELETE_DEEP),
-            array(EntityMaskBuilder::MASK_ASSIGN_DEEP, EntityMaskBuilder::MASK_ASSIGN_DEEP),
-            array(EntityMaskBuilder::MASK_SHARE_DEEP, EntityMaskBuilder::MASK_SHARE_DEEP),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL, EntityMaskBuilder::MASK_VIEW_GLOBAL),
-            array(EntityMaskBuilder::MASK_CREATE_GLOBAL, EntityMaskBuilder::MASK_CREATE_GLOBAL),
-            array(EntityMaskBuilder::MASK_EDIT_GLOBAL, EntityMaskBuilder::MASK_EDIT_GLOBAL),
-            array(EntityMaskBuilder::MASK_DELETE_GLOBAL, EntityMaskBuilder::MASK_DELETE_GLOBAL),
-            array(EntityMaskBuilder::MASK_ASSIGN_GLOBAL, EntityMaskBuilder::MASK_ASSIGN_GLOBAL),
-            array(EntityMaskBuilder::MASK_SHARE_GLOBAL, EntityMaskBuilder::MASK_SHARE_GLOBAL),
-            array(EntityMaskBuilder::MASK_VIEW_SYSTEM, EntityMaskBuilder::MASK_VIEW_SYSTEM),
-            array(EntityMaskBuilder::MASK_CREATE_SYSTEM, EntityMaskBuilder::MASK_CREATE_SYSTEM),
-            array(EntityMaskBuilder::MASK_EDIT_SYSTEM, EntityMaskBuilder::MASK_EDIT_SYSTEM),
-            array(EntityMaskBuilder::MASK_DELETE_SYSTEM, EntityMaskBuilder::MASK_DELETE_SYSTEM),
-            array(EntityMaskBuilder::MASK_ASSIGN_SYSTEM, EntityMaskBuilder::MASK_ASSIGN_SYSTEM),
-            array(EntityMaskBuilder::MASK_SHARE_SYSTEM, EntityMaskBuilder::MASK_SHARE_SYSTEM),
-        );
-    }
-
-    public static function maskConstantProvider()
-    {
-        return array(
-            array(EntityMaskBuilder::MASK_VIEW_BASIC),
-            array(EntityMaskBuilder::MASK_CREATE_BASIC),
-            array(EntityMaskBuilder::MASK_EDIT_BASIC),
-            array(EntityMaskBuilder::MASK_DELETE_BASIC),
-            array(EntityMaskBuilder::MASK_ASSIGN_BASIC),
-            array(EntityMaskBuilder::MASK_SHARE_BASIC),
-            array(EntityMaskBuilder::MASK_VIEW_LOCAL),
-            array(EntityMaskBuilder::MASK_CREATE_LOCAL),
-            array(EntityMaskBuilder::MASK_EDIT_LOCAL),
-            array(EntityMaskBuilder::MASK_DELETE_LOCAL),
-            array(EntityMaskBuilder::MASK_ASSIGN_LOCAL),
-            array(EntityMaskBuilder::MASK_SHARE_LOCAL),
-            array(EntityMaskBuilder::MASK_VIEW_DEEP),
-            array(EntityMaskBuilder::MASK_CREATE_DEEP),
-            array(EntityMaskBuilder::MASK_EDIT_DEEP),
-            array(EntityMaskBuilder::MASK_DELETE_DEEP),
-            array(EntityMaskBuilder::MASK_ASSIGN_DEEP),
-            array(EntityMaskBuilder::MASK_SHARE_DEEP),
-            array(EntityMaskBuilder::MASK_VIEW_GLOBAL),
-            array(EntityMaskBuilder::MASK_CREATE_GLOBAL),
-            array(EntityMaskBuilder::MASK_EDIT_GLOBAL),
-            array(EntityMaskBuilder::MASK_DELETE_GLOBAL),
-            array(EntityMaskBuilder::MASK_ASSIGN_GLOBAL),
-            array(EntityMaskBuilder::MASK_SHARE_GLOBAL),
-            array(EntityMaskBuilder::MASK_VIEW_SYSTEM),
-            array(EntityMaskBuilder::MASK_CREATE_SYSTEM),
-            array(EntityMaskBuilder::MASK_EDIT_SYSTEM),
-            array(EntityMaskBuilder::MASK_DELETE_SYSTEM),
-            array(EntityMaskBuilder::MASK_ASSIGN_SYSTEM),
-            array(EntityMaskBuilder::MASK_SHARE_SYSTEM),
-        );
+        return [
+            ['VIEW_BASIC', 1],
+            ['VIEW_LOCAL', 2],
+            ['VIEW_DEEP', 4],
+            ['VIEW_GLOBAL', 8],
+            ['VIEW_SYSTEM', 16],
+            ['CREATE_BASIC', 32],
+            ['CREATE_LOCAL', 64],
+            ['CREATE_DEEP', 128],
+            ['CREATE_GLOBAL', 256],
+            ['CREATE_SYSTEM', 512],
+            ['EDIT_BASIC', 1024],
+            ['EDIT_LOCAL', 2048],
+            ['EDIT_DEEP', 4096],
+            ['EDIT_GLOBAL', 8192],
+            ['EDIT_SYSTEM', 16384],
+            ['view_basic', 1],
+            ['view_local', 2],
+            ['view_deep', 4],
+            ['view_global', 8],
+            ['view_system', 16],
+            ['create_basic', 32],
+            ['create_local', 64],
+            ['create_deep', 128],
+            ['create_global', 256],
+            ['create_system', 512],
+            ['edit_basic', 1024],
+            ['edit_local', 2048],
+            ['edit_deep', 4096],
+            ['edit_global', 8192],
+            ['edit_system', 16384],
+            [1, 1],
+            [2, 2],
+            [4, 4],
+            [8, 8],
+            [16, 16],
+            [32, 32],
+            [64, 64],
+            [128, 128],
+            [256, 256],
+            [512, 512],
+            [1024, 1024],
+            [2048, 2048],
+            [4096, 4096],
+            [8192, 8192],
+            [16384, 16384],
+            [PHP_INT_MAX, 32767],
+        ];
     }
 
     /**
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     * @return array
+     */
+    public static function maskConstantProvider()
+    {
+        return [
+            ['MASK_VIEW_BASIC'],
+            ['MASK_CREATE_BASIC'],
+            ['MASK_EDIT_BASIC'],
+            ['MASK_VIEW_LOCAL'],
+            ['MASK_CREATE_LOCAL'],
+            ['MASK_EDIT_LOCAL'],
+            ['MASK_VIEW_DEEP'],
+            ['MASK_CREATE_DEEP'],
+            ['MASK_EDIT_DEEP'],
+            ['MASK_VIEW_GLOBAL'],
+            ['MASK_CREATE_GLOBAL'],
+            ['MASK_EDIT_GLOBAL'],
+            ['MASK_VIEW_SYSTEM'],
+            ['MASK_CREATE_SYSTEM'],
+            ['MASK_EDIT_SYSTEM']
+        ];
+    }
+
+    /**
+     * @return array
      */
     public static function groupProvider()
     {
-        return array(
-            'GROUP_BASIC' => array(
-                EntityMaskBuilder::GROUP_BASIC,
-                EntityMaskBuilder::MASK_VIEW_BASIC
-                | EntityMaskBuilder::MASK_CREATE_BASIC
-                | EntityMaskBuilder::MASK_EDIT_BASIC
-                | EntityMaskBuilder::MASK_DELETE_BASIC
-                | EntityMaskBuilder::MASK_ASSIGN_BASIC
-                | EntityMaskBuilder::MASK_SHARE_BASIC
-            ),
-            'GROUP_LOCAL' => array(
-                EntityMaskBuilder::GROUP_LOCAL,
-                EntityMaskBuilder::MASK_VIEW_LOCAL
-                | EntityMaskBuilder::MASK_CREATE_LOCAL
-                | EntityMaskBuilder::MASK_EDIT_LOCAL
-                | EntityMaskBuilder::MASK_DELETE_LOCAL
-                | EntityMaskBuilder::MASK_ASSIGN_LOCAL
-                | EntityMaskBuilder::MASK_SHARE_LOCAL
-            ),
-            'GROUP_DEEP' => array(
-                EntityMaskBuilder::GROUP_DEEP,
-                EntityMaskBuilder::MASK_VIEW_DEEP
-                | EntityMaskBuilder::MASK_CREATE_DEEP
-                | EntityMaskBuilder::MASK_EDIT_DEEP
-                | EntityMaskBuilder::MASK_DELETE_DEEP
-                | EntityMaskBuilder::MASK_ASSIGN_DEEP
-                | EntityMaskBuilder::MASK_SHARE_DEEP
-            ),
-            'GROUP_GLOBAL' => array(
-                EntityMaskBuilder::GROUP_GLOBAL,
-                EntityMaskBuilder::MASK_VIEW_GLOBAL
-                | EntityMaskBuilder::MASK_CREATE_GLOBAL
-                | EntityMaskBuilder::MASK_EDIT_GLOBAL
-                | EntityMaskBuilder::MASK_DELETE_GLOBAL
-                | EntityMaskBuilder::MASK_ASSIGN_GLOBAL
-                | EntityMaskBuilder::MASK_SHARE_GLOBAL
-            ),
-            'GROUP_SYSTEM' => array(
-                EntityMaskBuilder::GROUP_SYSTEM,
-                EntityMaskBuilder::MASK_VIEW_SYSTEM
-                | EntityMaskBuilder::MASK_CREATE_SYSTEM
-                | EntityMaskBuilder::MASK_EDIT_SYSTEM
-                | EntityMaskBuilder::MASK_DELETE_SYSTEM
-                | EntityMaskBuilder::MASK_ASSIGN_SYSTEM
-                | EntityMaskBuilder::MASK_SHARE_SYSTEM
-            ),
-            'GROUP_CRUD_SYSTEM' => array(
-                EntityMaskBuilder::GROUP_CRUD_SYSTEM,
-                EntityMaskBuilder::MASK_VIEW_SYSTEM
-                | EntityMaskBuilder::MASK_CREATE_SYSTEM
-                | EntityMaskBuilder::MASK_EDIT_SYSTEM
-                | EntityMaskBuilder::MASK_DELETE_SYSTEM
-            ),
-            'GROUP_VIEW' => array(
-                EntityMaskBuilder::GROUP_VIEW,
-                EntityMaskBuilder::MASK_VIEW_BASIC
-                | EntityMaskBuilder::MASK_VIEW_LOCAL
-                | EntityMaskBuilder::MASK_VIEW_DEEP
-                | EntityMaskBuilder::MASK_VIEW_GLOBAL
-                | EntityMaskBuilder::MASK_VIEW_SYSTEM
-            ),
-            'GROUP_EDIT' => array(
-                EntityMaskBuilder::GROUP_EDIT,
-                EntityMaskBuilder::MASK_EDIT_BASIC
-                | EntityMaskBuilder::MASK_EDIT_LOCAL
-                | EntityMaskBuilder::MASK_EDIT_DEEP
-                | EntityMaskBuilder::MASK_EDIT_GLOBAL
-                | EntityMaskBuilder::MASK_EDIT_SYSTEM
-            ),
-            'GROUP_CREATE' => array(
-                EntityMaskBuilder::GROUP_CREATE,
-                EntityMaskBuilder::MASK_CREATE_BASIC
-                | EntityMaskBuilder::MASK_CREATE_LOCAL
-                | EntityMaskBuilder::MASK_CREATE_DEEP
-                | EntityMaskBuilder::MASK_CREATE_GLOBAL
-                | EntityMaskBuilder::MASK_CREATE_SYSTEM
-            ),
-            'GROUP_DELETE' => array(
-                EntityMaskBuilder::GROUP_DELETE,
-                EntityMaskBuilder::MASK_DELETE_BASIC
-                | EntityMaskBuilder::MASK_DELETE_LOCAL
-                | EntityMaskBuilder::MASK_DELETE_DEEP
-                | EntityMaskBuilder::MASK_DELETE_GLOBAL
-                | EntityMaskBuilder::MASK_DELETE_SYSTEM
-            ),
-            'GROUP_ASSIGN' => array(
-                EntityMaskBuilder::GROUP_ASSIGN,
-                EntityMaskBuilder::MASK_ASSIGN_BASIC
-                | EntityMaskBuilder::MASK_ASSIGN_LOCAL
-                | EntityMaskBuilder::MASK_ASSIGN_DEEP
-                | EntityMaskBuilder::MASK_ASSIGN_GLOBAL
-                | EntityMaskBuilder::MASK_ASSIGN_SYSTEM
-            ),
-            'GROUP_SHARE' => array(
-                EntityMaskBuilder::GROUP_SHARE,
-                EntityMaskBuilder::MASK_SHARE_BASIC
-                | EntityMaskBuilder::MASK_SHARE_LOCAL
-                | EntityMaskBuilder::MASK_SHARE_DEEP
-                | EntityMaskBuilder::MASK_SHARE_GLOBAL
-                | EntityMaskBuilder::MASK_SHARE_SYSTEM
-            ),
-            'GROUP_ALL' => array(
-                EntityMaskBuilder::GROUP_ALL,
-                EntityMaskBuilder::GROUP_BASIC
-                | EntityMaskBuilder::GROUP_LOCAL
-                | EntityMaskBuilder::GROUP_DEEP
-                | EntityMaskBuilder::GROUP_GLOBAL
-                | EntityMaskBuilder::GROUP_SYSTEM
-            ),
-        );
+        return [
+            'GROUP_BASIC' => [
+                'groupName' => 'GROUP_BASIC',
+                'expectedMask' => 1 << 0 | 1 << 5 | 1 << 10
+            ],
+            'GROUP_LOCAL' => [
+                'groupName' => 'GROUP_LOCAL',
+                'expectedMask' => 1 << 1 | 1 << 6 | 1 << 11
+            ],
+            'GROUP_DEEP' => [
+                'groupName' => 'GROUP_DEEP',
+                'expectedMask' => 1 << 2 | 1 << 7 | 1 << 12
+            ],
+            'GROUP_GLOBAL' => [
+                'groupName' => 'GROUP_GLOBAL',
+                'expectedMask' => 1 << 3 | 1 << 8 | 1 << 13
+            ],
+            'GROUP_SYSTEM' => [
+                'groupName' => 'GROUP_SYSTEM',
+                'expectedMask' => 1 << 4 | 1 << 9 | 1 << 14
+            ],
+            'GROUP_VIEW' => [
+                'groupName' => 'GROUP_VIEW',
+                'expectedMask' => (1 << 5) - 1
+            ],
+            'GROUP_CREATE' => [
+                'groupName' => 'GROUP_CREATE',
+                'expectedMask' => (1 << 10) - (1 << 5)
+            ],
+            'GROUP_EDIT' => [
+                'groupName' => 'GROUP_EDIT',
+                'expectedMask' => (1 << 15) - (1 << 10)
+            ],
+            'GROUP_NONE' => [
+                'groupName' => 'GROUP_NONE',
+                'expectedMask' => 0
+            ],
+            'GROUP_ALL' => [
+                'groupName' => 'GROUP_ALL',
+                'expectedMask' => (1 << 15) - 1
+            ]
+        ];
+    }
+
+    /**
+     * @param int $index
+     * @return int
+     */
+    protected static function getIdentity($index)
+    {
+        return $index << (count(AccessLevel::$allAccessLevelNames) * EntityMaskBuilder::MAX_PERMISSIONS_IN_MASK);
     }
 }

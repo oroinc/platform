@@ -35,6 +35,12 @@ class SetMaxRelatedEntities implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
+        $definition = $context->getResult();
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
+            return;
+        }
+
         $maxRelatedEntities = $context->getMaxRelatedEntities();
         if (null === $maxRelatedEntities || $maxRelatedEntities < 0) {
             // there is no limit to the number of related entities
@@ -47,29 +53,26 @@ class SetMaxRelatedEntities implements ProcessorInterface
             return;
         }
 
-        $this->setLimits($context->getResult(), $entityClass, $maxRelatedEntities);
+        $this->setLimits(
+            $definition,
+            $this->doctrineHelper->getEntityMetadataForClass($entityClass),
+            $maxRelatedEntities
+        );
     }
 
     /**
      * @param EntityDefinitionConfig $definition
-     * @param string                 $entityClass
+     * @param ClassMetadata          $metadata
      * @param int                    $limit
      */
-    protected function setLimits(EntityDefinitionConfig $definition, $entityClass, $limit)
+    protected function setLimits(EntityDefinitionConfig $definition, ClassMetadata $metadata, $limit)
     {
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $fields   = $definition->getFields();
+        $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $propertyPath = $field->getPropertyPath() ?: $fieldName;
             $path         = ConfigUtil::explodePropertyPath($propertyPath);
             if (count($path) === 1) {
                 $this->setFieldLimit($field, $metadata, $propertyPath, $limit);
-            } else {
-                $linkedField    = array_pop($path);
-                $linkedMetadata = $this->doctrineHelper->findEntityMetadataByPath($entityClass, $path);
-                if (null !== $linkedMetadata) {
-                    $this->setFieldLimit($field, $linkedMetadata, $linkedField, $limit);
-                }
             }
         }
     }
@@ -94,7 +97,10 @@ class SetMaxRelatedEntities implements ProcessorInterface
                 }
             }
             if ($field->hasTargetEntity()) {
-                $this->setLimits($field->getTargetEntity(), $metadata->name, $limit);
+                $linkedMetadata = $this->doctrineHelper->getEntityMetadataForClass(
+                    $metadata->getAssociationTargetClass($fieldName)
+                );
+                $this->setLimits($field->getTargetEntity(), $linkedMetadata, $limit);
             }
         }
     }

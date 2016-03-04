@@ -2,13 +2,14 @@
 
 namespace Oro\Bundle\WorkflowBundle\Form\EventListener;
 
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class DefaultValuesListener implements EventSubscriberInterface
 {

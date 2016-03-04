@@ -18,19 +18,6 @@ class ConfigBag
     }
 
     /**
-     * Gets metadata for the given version of a class
-     *
-     * @param string $className The FQCN of an entity
-     * @param string $version   The version of metadata
-     *
-     * @return array|null
-     */
-    public function getMetadata($className, $version)
-    {
-        return $this->findConfig('metadata', $className, $version);
-    }
-
-    /**
      * Gets a configuration for all entities for the given version
      *
      * @param string $version The version of a config

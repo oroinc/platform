@@ -12,6 +12,9 @@ class SortersConfig implements EntityConfigInterface
     use Traits\ConfigTrait;
     use Traits\ExclusionPolicyTrait;
 
+    /** a list of sorters */
+    const FIELDS = EntityConfig::FIELDS;
+
     /** a type of the exclusion strategy that should be used for the sorters */
     const EXCLUSION_POLICY = EntityConfig::EXCLUSION_POLICY;
 
@@ -39,8 +42,8 @@ class SortersConfig implements EntityConfigInterface
 
         if (!empty($this->fields)) {
             foreach ($this->fields as $fieldName => $field) {
-                $fieldConfig                  = $field->toArray();
-                $result['fields'][$fieldName] = !empty($fieldConfig) ? $fieldConfig : null;
+                $fieldConfig                      = $field->toArray();
+                $result[self::FIELDS][$fieldName] = !empty($fieldConfig) ? $fieldConfig : null;
             }
         }
 

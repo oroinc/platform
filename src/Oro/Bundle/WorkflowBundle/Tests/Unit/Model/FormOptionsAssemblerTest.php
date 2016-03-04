@@ -4,9 +4,10 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\WorkflowBundle\Model\Action\Configurable;
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\FormOptionsAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
+
+use Oro\Component\Action\Action\Configurable;
 
 class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -27,7 +28,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->actionFactory = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory')
+        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -64,7 +65,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
                 'attribute_one' => new PropertyPath('data.foo'),
                 'attribute_two' => new PropertyPath('data.bar'),
             ),
-            'init_actions' => $this->getMock('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+            'init_actions' => $this->getMock('Oro\Component\Action\Action\ActionInterface')
         );
 
         $attributes = array(
@@ -123,7 +124,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
                 'attributes' => array(),
                 'owner' => FormOptionsAssembler::STEP_OWNER,
                 'ownerName' => 'test',
-                'expectedException' => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => 'Option "form_options.attribute_fields" at step "test" must be an array.'
             ),
             'string_attribute_default_values' => array(
@@ -133,7 +134,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
                 'attributes' => array(),
                 'owner' => FormOptionsAssembler::STEP_OWNER,
                 'ownerName' => 'test',
-                'expectedException' => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' =>
                     'Option "form_options.attribute_default_values" of step "test" must be an array.'
             ),
@@ -176,7 +177,7 @@ class FormOptionsAssemblerTest extends \PHPUnit_Framework_TestCase
                 ),
                 'owner' => FormOptionsAssembler::STEP_OWNER,
                 'ownerName' => 'test',
-                'expectedException' => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' =>
                     'Form options of step "test" doesn\'t have attribute "attribute_two" which is referenced in ' .
                     '"attribute_default_values" option.'
