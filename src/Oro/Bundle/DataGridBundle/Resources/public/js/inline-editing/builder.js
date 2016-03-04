@@ -124,14 +124,13 @@ define(function(require) {
                             columnMeta.inline_editing.enable$changeReason =
                                 'Automatically disabled due to absent editor realization';
                             if (behaviour === 'enable_selected') {
-                                // if user selected this column as editable and there is no editor - throw an Error
-                                // but don't lock UI
-                                setTimeout(function() {
-                                    throw new Error(
+                                // if user selected this column as editable and there is no editor - show an error
+                                if (console && console.error) {
+                                    console.error(
                                         'Could not enable editing on grid column due to absent editor realization' +
                                         ' for type `' + columnMeta.type + '`'
                                     );
-                                }, 0);
+                                }
                             }
                             return;
                         }

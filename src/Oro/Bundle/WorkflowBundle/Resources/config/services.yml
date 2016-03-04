@@ -1,5 +1,5 @@
 parameters:
-    oro_workflow.attribute_guesser.class: Oro\Bundle\WorkflowBundle\Model\AttributeGuesser
+    oro_workflow.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_workflow.context_accessor.class: Oro\Bundle\WorkflowBundle\Model\ContextAccessor
     oro_workflow.datagrid.action.workflow_activate.class: Oro\Bundle\WorkflowBundle\Datagrid\Action\WorkflowActivateAction
     oro_workflow.entity_connector.class: Oro\Bundle\WorkflowBundle\Model\EntityConnector
@@ -49,9 +49,11 @@ services:
             - [addFormTypeMapping, ["bool", "checkbox"]]
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
+        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.attribute_guesser" instead
 
     oro_workflow.context_accessor:
         class: %oro_workflow.context_accessor.class%
+        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.context_accessor" instead
 
     oro_workflow.datagrid.action.workflow_activate:
         class: %oro_workflow.datagrid.action.workflow_activate.class%

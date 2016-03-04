@@ -1,6 +1,7 @@
 oro_api:
     exclusions:
         - { entity: Test\Entity1 }
+        - { entity: Test\Entity2 }
 
     entities:
         Test\Entity1: ~
@@ -8,27 +9,38 @@ oro_api:
         Test\Entity3:
             exclude: true
         Test\Entity4:
-            definition:
+            fields:
+                field1: ~
+                field2:
+                    exclude: true
+                field3:
+                    order_by:
+                        name: ASC
+                field4:
+                    fields:
+                        field41:
+                            order_by:
+                                name: DESC
+                field5:
+                    fields:
+                        field51:
+                            fields:
+                                field511:
+                                    disable_partial_load: true
+            filters:
+                fields:
+                    field1: ~
+                    field2:
+                        data_type: string
+                    field3:
+                        exclude: true
+            sorters:
                 fields:
                     field1: ~
                     field2:
                         exclude: true
-                    field3: ~
-                filters:
-                    fields:
-                        field1: ~
-                        field2:
-                            data_type: string
-                        field3:
-                            exclude: true
-                sorters:
-                    fields:
-                        field1: ~
-                        field2:
-                            exclude: true
         Test\Entity5:
-            definition:
-                fields:
-                    field1: ~
+            fields:
+                field1: ~
         Test\Entity6: ~
         Test\Entity10: ~
