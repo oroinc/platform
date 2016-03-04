@@ -17,6 +17,9 @@ class OroClassMetadataFactory extends ClassMetadataFactory
     /** @var bool[] */
     protected $isTransientCache = [];
 
+    /** @var array */
+    protected $allMetadataCache;
+
     /** @var OrmLogger */
     protected $logger;
 
@@ -41,26 +44,29 @@ class OroClassMetadataFactory extends ClassMetadataFactory
             $logger->startGetAllMetadata();
         }
 
-        $cacheDriver = $this->getCacheDriver();
-        if ($cacheDriver) {
-            $result = $cacheDriver->fetch(static::ALL_METADATA_KEY);
-            if ($result === false) {
-                $result = parent::getAllMetadata();
-                $cacheDriver->save(static::ALL_METADATA_KEY, $result);
-            } else {
-                foreach ($result as $cached) {
-                    $this->wakeupReflection($cached, $this->getReflectionService());
+        if (null === $this->allMetadataCache) {
+            $cacheDriver = $this->getCacheDriver();
+            if ($cacheDriver) {
+                $this->allMetadataCache = $cacheDriver->fetch(static::ALL_METADATA_KEY);
+                if (false === $this->allMetadataCache) {
+                    $this->allMetadataCache = parent::getAllMetadata();
+                    $cacheDriver->save(static::ALL_METADATA_KEY, $this->allMetadataCache);
+                } else {
+                    $reflectionService = $this->getReflectionService();
+                    foreach ($this->allMetadataCache as $metadata) {
+                        $this->wakeupReflection($metadata, $reflectionService);
+                    }
                 }
+            } else {
+                $this->allMetadataCache = parent::getAllMetadata();
             }
-        } else {
-            $result = parent::getAllMetadata();
         }
 
         if ($logger) {
             $logger->stopGetAllMetadata();
         }
 
-        return $result;
+        return $this->allMetadataCache;
 
     }
 
