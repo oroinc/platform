@@ -682,8 +682,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emails = $this->manager->getEmails($searchQuery);
         } else {
             $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
+
             $this->logger->info(sprintf('Previous max email UID "%s"', $lastUid));
-            $emails = $this->manager->getEmailsUidBased(sprintf('%s:*', ++$lastUid));
+
+            $emails = $this->manager->getEmailsUidBased($lastUid);
         }
 
         return $emails;
