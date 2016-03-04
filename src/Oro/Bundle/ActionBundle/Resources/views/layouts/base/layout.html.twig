@@ -6,33 +6,30 @@
         'entityId': entityId
     } %}
     {% set fromUrl = app.request.requestUri %}
-    {% set actionUrl = action.hasForm ? path(dialogRoute|default('oro_action_widget_form'), {actionName: action.name, fromUrl: fromUrl}|merge(context)) : null %}
+    {% set actionUrl = action.hasDialog ? path(dialogRoute|default('oro_action_widget_form'), {actionName: action.name, fromUrl: fromUrl}|merge(context)) : null %}
     {% if cssClasses is null %}
         {% set cssClasses = action.buttonOptions.class|default('icons-holder-text') ~ " "  ~ params.buttonOptions.aCss|default('') %}
     {% endif %}
     {% if executionRoute is not empty %}
         {% set actionPath = path(executionRoute|default('oro_api_action_execute_actions'), {actionName: action.name}|merge(context)) %}
     {% endif %}
+    {% set dialogOptions = {
+        'title': action.title,
+        'dialogOptions': action.frontendOptions.options|default({}),
+    } %}
     href="{{ actionPath|default('javascript:void(0);') }}"
     class="action-button {{ cssClasses }}"
     title="{{ action.title }}"
-    data-from-url="{{ fromUrl }}"
-    {% if action.showDialog %}
-        {% set dialogOptions = {
-            'title': action.title,
-            'dialogOptions': action.frontendOptions.options|default({}),
-        } %}
-        data-dialog-url="{{ actionUrl }}"
-        data-dialog-options="{{ dialogOptions|json_encode }}"
-    {% else %}
-        data-page-url="{{ actionUrl }}"
-    {% endif %}
-    data-confirmation="{{ action.frontendOptions.confirmation|default('') }}"
+    data-dialog-show="{{ action.frontendOptions.show_dialog|default(false) }}"
+    data-dialog-url="{{ actionUrl }}"
+    data-dialog-options="{{ dialogOptions|json_encode }}"
+    data-translates="{{ action.translates|default({})|json_encode }}"
+    data-confirmation="{{ action.frontendOptions.confirmation|default({})|json_encode() }}"
     {% if action.buttonOptions.page_component_module is defined %}data-page-component-module={{ action.buttonOptions.page_component_module }}{% endif %}
     {% if action.buttonOptions.page_component_options is defined %}data-page-component-options={{ action.buttonOptions.page_component_options|json_encode }}{% endif %}
     {% if action.buttonOptions.data is defined %}
         {% for dataName,dataValue in action.buttonOptions.data %}
-            data-{{ dataName }}="{{ dataValue|e('html_attr')|raw }}" {{ dataName }}
+            data-{{ dataName }}="{{ dataValue|e('html_attr')|raw }}"
         {% endfor %}
     {% endif %}
     {% endspaceless %}

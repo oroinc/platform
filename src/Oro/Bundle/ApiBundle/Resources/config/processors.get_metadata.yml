@@ -10,13 +10,6 @@ services:
     # get_metadata
     #
 
-    oro_api.get_metadata.load_from_config_bag:
-        class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadFromConfigBag
-        arguments:
-            - @oro_api.config_bag
-        tags:
-            - { name: oro.api.processor, action: get_metadata, priority: -10 }
-
     oro_api.get_metadata.load_entity_metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadEntityMetadata
         arguments:

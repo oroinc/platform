@@ -68,15 +68,19 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'replace' => [],
                         'label' => 'Test Label 1',
                         'applications' => [],
+                        'for_all_entities' => false,
                         'entities' => [],
+                        'exclude_entities' => [],
                         'routes' => [],
+                        'groups' => [],
+                        'for_all_datagrids' => false,
                         'datagrids' => [],
                         'order' => 0,
                         'enabled' => true,
                         'preactions' => [],
                         'preconditions' => [],
-                        'form_init' => [],
                         'action_groups' => [],
+                        'form_init' => [],
                         'attributes' => [],
                         'frontend_options' => [
                             'options' => [],
@@ -97,9 +101,14 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                     'oper1' => [
                         'replace' => 'test_replace',
                         'label' => 'Test Label 2',
+                        'substitute_action' => 'test_action',
                         'applications' => ['app1', 'app2', 'app3'],
+                        'for_all_entities' => true,
                         'entities' => ['Entity1', 'Entity2'],
+                        'exclude_entities' => ['Entity3'],
                         'routes' => ['route_1', 'route_2'],
+                        'groups' => ['group_1', 'group_2'],
+                        'for_all_datagrids' => true,
                         'datagrids' => ['datagrid_1', 'datagrid_2'],
                         'order' => 15,
                         'enabled' => false,
@@ -171,9 +180,14 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                     'oper1' => [
                         'replace' => ['test_replace'],
                         'label' => 'Test Label 2',
+                        'substitute_action' => 'test_action',
                         'applications' => ['app1', 'app2', 'app3'],
+                        'for_all_entities' => true,
                         'entities' => ['Entity1', 'Entity2'],
+                        'exclude_entities' => ['Entity3'],
                         'routes' => ['route_1', 'route_2'],
+                        'groups' => ['group_1', 'group_2'],
+                        'for_all_datagrids' => true,
                         'datagrids' => ['datagrid_1', 'datagrid_2'],
                         'order' => 15,
                         'enabled' => false,
@@ -198,7 +212,9 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                             'template' => 'template',
                             'title' => 'dialog title',
                             'options' => ['width' => 400],
-                            'confirmation' => 'Confirmation message',
+                            'confirmation' => [
+                                'message' => 'Confirmation message',
+                            ],
                             'show_dialog' => false
                         ],
                         'button_options' => [
@@ -242,8 +258,8 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                             ]
                         ]
                     ]
-                ]
-            ]
+                ],
+            ],
         ];
     }
 
@@ -280,7 +296,17 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'The child node "label" at path "operations.oper1" must be configured'
             ],
-            'empty operation[label]' => [
+            'incorrect operation[substitute_action]' => [
+                'input' => [
+                    'oper1' => [
+                        'label' => 'Test Label',
+                        'substitute_action' => ['array', 'value']
+                    ]
+                ],
+                'message' => 'Invalid type for path "operations.oper1.substitute_action". ' .
+                    'Expected scalar, but got array'
+            ],
+            'incorrect action[application]' => [
                 'input' => [
                     'oper1' => []
                 ],
@@ -316,7 +342,19 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'Invalid type for path "operations.oper1.routes". Expected array, but got string'
             ],
-            'incorrect operation[order]' => [
+            'incorrect operation[groups]' => [
+                'input' => [
+                    'oper1' => [
+                        'label' => 'Test Label',
+                        'applications' => [],
+                        'entities' => [],
+                        'routes' => [],
+                        'groups' => 'not array route'
+                    ]
+                ],
+                'message' => 'Invalid type for path "operations.oper1.groups". Expected array, but got string'
+            ],
+            'incorrect action[order]' => [
                 'input' => [
                     'oper1' => [
                         'label' => 'Test Label',

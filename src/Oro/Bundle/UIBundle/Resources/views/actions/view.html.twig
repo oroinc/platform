@@ -21,7 +21,7 @@
                     <div class="pull-right title-buttons-container">
                         {% block navButtonContainer %}
                             {% placeholder view_navButtons_before with {entity: entity} %}
-                            {% block navButtons %}{% endblock navButtons %}
+                            {% block navButtons %}{% placeholder view_navButtons with {entity: entity} %}{% endblock navButtons %}
                             {% placeholder view_navButtons_after with {entity: entity} %}
                         {% endblock navButtonContainer%}
                     </div>

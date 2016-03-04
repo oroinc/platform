@@ -21,14 +21,29 @@ class OperationDefinition
     /** @var boolean */
     private $enabled = true;
 
+    /** @var string */
+    private $substituteAction = null;
+
+    /** @var bool */
+    private $forAllEntities = false;
+
     /** @var array */
     private $entities = [];
+
+    /** @var array */
+    private $excludeEntities = [];
+
+    /** @var bool */
+    private $forAllDatagrids = false;
 
     /** @var array */
     private $datagrids = [];
 
     /** @var array */
     private $routes = [];
+
+    /** * @var array */
+    private $groups = [];
 
     /** @var array */
     private $applications = [];
@@ -148,6 +163,25 @@ class OperationDefinition
     }
 
     /**
+     * @return bool
+     */
+    public function isForAllEntities()
+    {
+        return $this->forAllEntities;
+    }
+
+    /**
+     * @param bool $forAllEntities
+     * @return $this
+     */
+    public function setForAllEntities($forAllEntities)
+    {
+        $this->forAllEntities = $forAllEntities;
+
+        return $this;
+    }
+
+    /**
      * @return array
      */
     public function getEntities()
@@ -162,6 +196,44 @@ class OperationDefinition
     public function setEntities(array $entities)
     {
         $this->entities = $entities;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExcludeEntities()
+    {
+        return $this->excludeEntities;
+    }
+
+    /**
+     * @param array $excludeEntities
+     * @return $this
+     */
+    public function setExcludeEntities(array $excludeEntities)
+    {
+        $this->excludeEntities = $excludeEntities;
+
+        return $this;
+    }
+
+    /**
+     * @return bool
+     */
+    public function isForAllDatagrids()
+    {
+        return $this->forAllDatagrids;
+    }
+
+    /**
+     * @param bool $forAllDatagrids
+     * @return $this
+     */
+    public function setForAllDatagrids($forAllDatagrids)
+    {
+        $this->forAllDatagrids = $forAllDatagrids;
 
         return $this;
     }
@@ -397,6 +469,43 @@ class OperationDefinition
     {
         $this->actionGroups = $data;
 
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getSubstituteAction()
+    {
+        return $this->substituteAction;
+    }
+
+    /**
+     * @param string $substituteAction
+     * @return $this
+     */
+    public function setSubstituteAction($substituteAction)
+    {
+        $this->substituteAction = $substituteAction;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getGroups()
+    {
+        return $this->groups;
+    }
+
+    /**
+     * @param array $groups
+     * @return $this
+     */
+    public function setGroups(array $groups)
+    {
+        $this->groups = $groups;
         return $this;
     }
 }
