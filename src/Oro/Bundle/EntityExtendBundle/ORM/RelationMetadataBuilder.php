@@ -252,7 +252,7 @@ class RelationMetadataBuilder implements MetadataBuilderInterface
         $targetEntity
     ) {
         $targetIdColumn = $this->getSinglePrimaryKeyColumn($targetEntity);
-        $builder        = $metadataBuilder->createManyToOne(
+        $builder        = $metadataBuilder->createOneToOne(
             ExtendConfigDumper::DEFAULT_PREFIX . $fieldId->getFieldName(),
             $targetEntity
         );
