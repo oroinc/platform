@@ -84,7 +84,7 @@ define([
                     me.treeHandlers[collapse].call(me);
                 });
             } else {
-                _.each(treeHandlers, function(treeHandler) {
+                _.each(this.treeHandlers, function(treeHandler) {
                     treeHandler.call(this);
                 }, this);
             }
