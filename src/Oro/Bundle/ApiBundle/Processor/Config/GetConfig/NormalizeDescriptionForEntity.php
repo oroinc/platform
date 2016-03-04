@@ -3,10 +3,13 @@
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\NormalizeDescription;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Localizes "label", "plural_label" and "description" attributes for the entity.
+ */
 class NormalizeDescriptionForEntity extends NormalizeDescription
 {
     /**
@@ -17,15 +20,24 @@ class NormalizeDescriptionForEntity extends NormalizeDescription
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
-        if (empty($definition)) {
-            // an entity configuration does not exist
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
             return;
         }
 
-        $this->normalizeAttribute($definition, ConfigUtil::LABEL);
-        $this->normalizeAttribute($definition, ConfigUtil::PLURAL_LABEL);
-        $this->normalizeAttribute($definition, ConfigUtil::DESCRIPTION);
+        $label = $definition->getLabel();
+        if ($label instanceof Label) {
+            $definition->setLabel($this->trans($label));
+        }
 
-        $context->setResult($definition);
+        $pluralLabel = $definition->getPluralLabel();
+        if ($pluralLabel instanceof Label) {
+            $definition->setPluralLabel($this->trans($pluralLabel));
+        }
+
+        $description = $definition->getDescription();
+        if ($description instanceof Label) {
+            $definition->setDescription($this->trans($description));
+        }
     }
 }

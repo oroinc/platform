@@ -60,14 +60,19 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      *
      * @param string $entityClassName
      * @param string $associationName
+     * @param string $suffix
+     *
      * @return string
      */
-    public function generateOneToManyRelationColumnName($entityClassName, $associationName)
-    {
+    public function generateOneToManyRelationColumnName(
+        $entityClassName,
+        $associationName,
+        $suffix = self::RELATION_COLUMN_SUFFIX
+    ) {
         return sprintf(
             '%s%s',
             ExtendHelper::buildToManyRelationTargetFieldName($entityClassName, $associationName),
-            self::RELATION_COLUMN_SUFFIX
+            $suffix
         );
     }
 
@@ -107,30 +112,30 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      * Builds a column name for a relation
      *
      * @param string $associationName
+     * @param string $suffix
+     *
      * @return string
      */
-    public function generateRelationColumnName($associationName)
+    public function generateRelationColumnName($associationName, $suffix = self::RELATION_COLUMN_SUFFIX)
     {
-        return sprintf(
-            '%s%s',
-            $associationName,
-            self::RELATION_COLUMN_SUFFIX
-        );
+        return sprintf('%s%s', $associationName, $suffix);
     }
 
     /**
      * Builds a column name for a default relation
      *
      * @param string $associationName
+     * @param string $suffix
+     *
      * @return string
      */
-    public function generateRelationDefaultColumnName($associationName)
+    public function generateRelationDefaultColumnName($associationName, $suffix = self::RELATION_COLUMN_SUFFIX)
     {
         return sprintf(
             '%s%s%s',
             self::RELATION_DEFAULT_COLUMN_PREFIX,
             $associationName,
-            self::RELATION_COLUMN_SUFFIX
+            $suffix
         );
     }
 
@@ -208,14 +213,17 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      * Builds the name of a column in a join table for a many-to-many relation
      *
      * @param string $entityClassName
+     * @param string $suffix
+     *
      * @return string
+     *
      */
-    public function generateManyToManyJoinTableColumnName($entityClassName)
+    public function generateManyToManyJoinTableColumnName($entityClassName, $suffix = self::RELATION_COLUMN_SUFFIX)
     {
         return sprintf(
             '%s%s',
             strtolower(ExtendHelper::getShortClassName($entityClassName)),
-            self::RELATION_COLUMN_SUFFIX
+            $suffix
         );
     }
 

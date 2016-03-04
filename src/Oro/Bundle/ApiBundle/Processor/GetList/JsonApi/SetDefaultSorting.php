@@ -25,7 +25,12 @@ class SetDefaultSorting extends BaseSetDefaultSorting
     {
         /** @var GetListContext $context */
 
-        if (!in_array(RequestType::REST, $context->getRequestType(), true)) {
+        if ($context->hasQuery()) {
+            // a query is already built
+            return;
+        }
+
+        if (!$context->getRequestType()->contains(RequestType::REST)) {
             parent::process($context);
         } else {
             // reuse REST API sorting filter

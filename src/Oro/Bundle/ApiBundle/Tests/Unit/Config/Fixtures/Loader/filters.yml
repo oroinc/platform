@@ -1,0 +1,103 @@
+empty:
+    config: []
+    expected: []
+
+null_fields:
+    config:
+        fields: ~
+    expected: []
+
+empty_fields:
+    config:
+        fields: []
+    expected: []
+
+default_exclusion_policy:
+    config:
+        exclusion_policy: none
+    expected: []
+
+full:
+    config:
+        exclusion_policy: all
+        fields:
+            field1:
+                exclude: true
+                property_path: path1
+                data_type: string
+                allow_array: true
+                default_value: val1
+                description: description1
+                extra1: true
+            field2:
+                exclude: true
+            field3:
+                exclude: false
+            field4:
+                property_path: path1
+            field5:
+                property_path: ~
+            field6:
+                property_path: ""
+            field7:
+                data_type: integer
+            field8:
+                data_type: ~
+            field9:
+                data_type: ""
+            field10:
+                allow_array: true
+            field11:
+                allow_array: false
+            field12:
+                default_value: val1
+            field13:
+                default_value: ~
+            field14:
+                default_value: ""
+            field15:
+                description: description1
+            field16:
+                description: ~
+            field17:
+                description: ""
+            field18:
+                extra1: ~
+        extra1: true
+        extra2: ~
+    expected:
+        exclusion_policy: all
+        fields:
+            field1:
+                exclude: true
+                property_path: path1
+                data_type: string
+                allow_array: true
+                default_value: val1
+                description: description1
+                extra1: true
+            field2:
+                exclude: true
+            field3: ~
+            field4:
+                property_path: path1
+            field5: ~
+            field6: ~
+            field7:
+                data_type: integer
+            field8: ~
+            field9: ~
+            field10:
+                allow_array: true
+            field11: ~
+            field12:
+                default_value: val1
+            field13: ~
+            field14:
+                default_value: ""
+            field15:
+                description: description1
+            field16: ~
+            field17: ~
+            field18: ~
+        extra1: true

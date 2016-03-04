@@ -344,9 +344,15 @@ define(function(require) {
                 }, {
                     wait: true,
                     success: function() {
-                        if (model.get('is_default')) {
-                            self._getCurrentDefaultViewModel().set({is_default: false});
-                        } else {
+                        var currentDefaultViewModel = self._getCurrentDefaultViewModel();
+                        var isCurrentDefault = currentDefaultViewModel === model;
+                        var isCurrentWasDefault = currentDefaultViewModel === undefined;
+                        if (model.get('is_default') && !isCurrentDefault) {
+                            // if current view hadn't default property and it is going to be
+                            currentDefaultViewModel.set({is_default: false});
+                        } else if (isCurrentWasDefault) {
+                            // if current view had 'default' property and this property was removed, there are no
+                            // views with 'default' property and it shall be set to system view.
                             self._getDefaultSystemViewModel().set({is_default: true});
                         }
                         self._showFlashMessage('success', __('oro.datagrid.gridView.updated'));
@@ -376,7 +382,7 @@ define(function(require) {
         getViewChoices: function() {
             var choices = this.viewsCollection.map(function(model) {
                 return {
-                    label: model.get('label'),
+                    label: model.getLabel(),
                     value: model.get('name')
                 };
             });

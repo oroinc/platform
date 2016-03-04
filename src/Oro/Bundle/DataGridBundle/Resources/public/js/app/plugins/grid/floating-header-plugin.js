@@ -214,7 +214,7 @@ define(function(require) {
                     if (this.currentFloatTheadMode !== mode) {
                         this.$el.removeClass('floatThead-relative');
                         this.$el.addClass('floatThead-fixed');
-                        this.$grid.find('thead:first .dropdown.open').removeClass('open');
+                        this.$grid.find('thead:first .dropdown.open .dropdown-toggle').trigger('tohide.bs.dropdown');
                         this._ensureTHeadSizing();
                     }
                     this.domCache.thead.css({

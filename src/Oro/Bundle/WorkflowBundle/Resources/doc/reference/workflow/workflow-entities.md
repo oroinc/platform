@@ -143,7 +143,7 @@ list of errors;
 Attribute
 ---------
 **Class:**
-Oro\Bundle\WorkflowBundle\Model\Attribute
+Oro\Bundle\ActionBundle\Model\Attribute
 
 **Description:**
 Encapsulates attribute parameters, has label, type and options. Also has possibility manage ACL permission
@@ -157,7 +157,7 @@ for the entity actions.
 Action
 ------
 **Interface:**
-Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface
+Oro\Component\Action\Action\ActionInterface
 
 **Description:**
 Basic interface for Transition Actions.
@@ -170,7 +170,7 @@ Basic interface for Transition Actions.
 Action Factory
 --------------
 **Class:**
-Oro\Bundle\WorkflowBundle\Model\Action\ActionFactory
+Oro\Component\Action\Action\ActionFactory
 
 **Description:**
 Creates instances of Transition Actions based on type (alias) and options.
@@ -232,7 +232,7 @@ Assemble Attribute instances based on WorkflowDefinition and source configuratio
 Action Assembler
 ----------------
 **Class:**
-Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler
+Oro\Component\Action\Action\ActionAssembler
 
 **Description:**
 Walks through Action configuration and creates instance of appropriate Actions using Action Factory and ConfigExpression Factory.
@@ -454,7 +454,7 @@ and list of additional functions applicable to transitions.
 Attribute Manager
 ----------------
 **Class:**
-Oro\Bundle\WorkflowBundle\Model\AttributeManager
+Oro\Bundle\ActionBundle\Model\AttributeManager
 
 **Description:**
 AttributeManager is a container for attributes, is provides getters, setters
@@ -468,7 +468,7 @@ and list of additional functions applicable to attributes.
 Context Accessor
 ----------------
 **Class:**
-Oro\Bundle\WorkflowBundle\Model\ContextAccessor
+Oro\Component\Action\Model\ContextAccessor
 
 **Description:**
 Context is used in action and conditions and thereby it's usually an instance of Workflow Item.

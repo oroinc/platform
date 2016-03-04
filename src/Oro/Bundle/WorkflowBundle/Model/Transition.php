@@ -8,7 +8,8 @@ use Oro\Component\ConfigExpression\ExpressionInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
+
+use Oro\Component\Action\Action\ActionInterface;
 
 class Transition
 {

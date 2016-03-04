@@ -137,7 +137,7 @@ services:
     oro_imap.workflow.action.dependency_job:
         class: %oro_imap.workflow.action.dependency_job.class%
         arguments:
-            - @oro_workflow.context_accessor
+            - @oro_action.context_accessor
             - @doctrine
         tags:
             - { name: oro_workflow.action, alias: job_add_dependency }
@@ -154,6 +154,7 @@ services:
         class: %oro_imap.imap_email_google_oauth2_manager.class%
         arguments:
             - @hwi_oauth.http_client
+            - @hwi_oauth.resource_ownermap.main
             - @oro_config.global
             - @doctrine
 
@@ -166,6 +167,7 @@ services:
             - @oro_security.encoder.mcrypt
             - @doctrine
             - @oro_imap.connector.factory
+            - @oro_imap.imap_email_google_oauth2_manager
             - %oro_imap.user_form_name%
             - %oro_imap.email_mailbox_form_name%
             - %oro_imap.email_mailbox_form_type%

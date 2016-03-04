@@ -13,6 +13,8 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class DebugCommand extends ContainerAwareCommand
 {
@@ -23,17 +25,17 @@ class DebugCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:api:debug')
-            ->setDescription('Shows details about registered API actions and processors.')
+            ->setDescription('Shows details about registered Data API actions and processors.')
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'Shows a list of processors for a specified action in the order they are executed'
+                'Shows a list of processors for a specified action'
             )
             ->addOption(
                 'request-type',
                 null,
                 InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'API request type'
+                'The request type'
             );
     }
 
@@ -46,7 +48,7 @@ class DebugCommand extends ContainerAwareCommand
         if (empty($action)) {
             $this->dumpActions($output);
         } else {
-            $this->dumpProcessors($output, $action, $input->getOption('request-type'));
+            $this->dumpProcessors($output, $action, new RequestType($input->getOption('request-type')));
         }
     }
 
@@ -84,11 +86,11 @@ class DebugCommand extends ContainerAwareCommand
     /**
      * @param OutputInterface $output
      * @param string          $action
-     * @param string[]        $requestType
+     * @param RequestType     $requestType
      */
-    protected function dumpProcessors(OutputInterface $output, $action, array $requestType)
+    protected function dumpProcessors(OutputInterface $output, $action, RequestType $requestType)
     {
-        $output->writeln('The processors are displayed in order they are executed.');
+        $output->writeln('The processors are displayed in the order they are executed.');
 
         /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
@@ -98,9 +100,7 @@ class DebugCommand extends ContainerAwareCommand
 
         $context = new Context();
         $context->setAction($action);
-        if (!empty($requestType)) {
-            $context->set('requestType', $requestType);
-        }
+        $context->set(ApiContext::REQUEST_TYPE, $requestType);
         $processors = $processorBag->getProcessors($context);
 
         $applicableChecker = new ChainApplicableChecker();

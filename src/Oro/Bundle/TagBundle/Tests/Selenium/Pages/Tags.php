@@ -36,8 +36,11 @@ class Tags extends AbstractPageFilteredGrid
         if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
             $menu = $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
             $this->test->moveto($menu);
+            $this->test->byXpath("//ul[contains(@class,'dropdown-menu__action-cell')]" .
+                "[contains(@class,'dropdown-menu__floating')]//a[@title= 'Edit']")->click();
+        } else {
+            $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Edit']")->click();
         }
-        $this->test->byXpath("//td[contains(@class,'action-cell')]//a[@title= 'Edit']")->click();
         $this->waitPageToLoad();
         $this->waitForAjax();
 
@@ -50,7 +53,13 @@ class Tags extends AbstractPageFilteredGrid
         if ($this->isElementPresent("//td[contains(@class,'action-cell')]//a[contains(., '...')]")) {
             $this->test->byXpath("//td[contains(@class,'action-cell')]//a[contains(., '...')]")->click();
             $this->waitForAjax();
+            $result = $this->assertElementNotPresent("//ul[contains(@class,'dropdown-menu__action-cell')]" .
+                "[contains(@class,'dropdown-menu__floating')]//a[@title= '{$contextName}']");
+        } else {
+            $result = $this->assertElementNotPresent(
+                "//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']"
+            );
         }
-        $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$contextName}']");
+        return $result;
     }
 }
