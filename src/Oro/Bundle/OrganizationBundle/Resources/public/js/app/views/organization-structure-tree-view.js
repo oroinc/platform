@@ -71,6 +71,10 @@ define([
                 .on('click' + this.eventNamespace(), _.bind(this._preSubmit, this));
 
             _.each(options.tree, function(node) {
+                if (!node.children.length) {
+                    return;
+                }
+
                 var collapse = '#organization_' + node.id;
                 this.treeHandlers[collapse] = _.partial(me._handleTreeShow, collapse, node);
                 this._createTreeHandlers(node, '#businessUnit_');
@@ -116,6 +120,10 @@ define([
             }
 
             _.each(node.children, function(businessUnit) {
+                if (!businessUnit.children || !businessUnit.children.length) {
+                    return;
+                }
+
                 var collapse = collapsePrefix + businessUnit.id;
                 this.treeHandlers[collapse] = _.partial(this._handleTreeShow, collapse, businessUnit);
                 this._createTreeHandlers(businessUnit, collapsePrefix);
