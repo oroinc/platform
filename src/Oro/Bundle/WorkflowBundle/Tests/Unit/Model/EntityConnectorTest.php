@@ -119,9 +119,51 @@ class EntityConnectorTest extends \PHPUnit_Framework_TestCase
         $this->entityConnector->getWorkflowStep(new \DateTime());
     }
 
-    public function testIsWorkflowItemAware()
+    /**
+     * @dataProvider workflowAwareDataProvider
+     * @param object $entity
+     * @param bool $expected
+     */
+    public function testIsWorkflowItemAware($entity, $expected)
     {
-        $this->assertTrue($this->entityConnector->isWorkflowAware(new EntityWithWorkflow()));
-        $this->assertFalse($this->entityConnector->isWorkflowAware(new \DateTime()));
+        $this->assertEquals($expected, $this->entityConnector->isWorkflowAware($entity));
+    }
+
+    public function testInterfaceInteraction()
+    {
+        $entity = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareInterface');
+        $workflowStep = new WorkflowStep();
+        $workflowItem = new WorkflowItem();
+
+        $entity->expects($this->once())
+            ->method('setWorkflowStep')
+            ->with($workflowStep);
+        $entity->expects($this->once())
+            ->method('setWorkflowItem')
+            ->with($workflowItem);
+        $entity->expects($this->once())
+            ->method('getWorkflowStep')
+            ->will($this->returnValue($workflowStep));
+        $entity->expects($this->once())
+            ->method('getWorkflowItem')
+            ->will($this->returnValue($workflowItem));
+
+        $this->entityConnector->setWorkflowStep($entity, $workflowStep);
+        $this->entityConnector->setWorkflowItem($entity, $workflowItem);
+
+        $this->assertSame($workflowItem, $this->entityConnector->getWorkflowItem($entity));
+        $this->assertSame($workflowStep, $this->entityConnector->getWorkflowStep($entity));
+    }
+
+    /**
+     * @return array
+     */
+    public function workflowAwareDataProvider()
+    {
+        return [
+            [new EntityWithWorkflow(), true],
+            [new \DateTime(), false],
+            [$this->getMock('Oro\Bundle\WorkflowBundle\Entity\WorkflowAwareInterface'), true]
+        ];
     }
 }
