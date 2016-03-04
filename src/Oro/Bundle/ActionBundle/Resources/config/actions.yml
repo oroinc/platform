@@ -1,8 +1,6 @@
 actions:
     CRUD_ACTION:
         label: CRUD_ACTION
-        groups:
-            - navButtons
         button_options:
             template: OroActionBundle:Action:crud-button.html.twig
 
