@@ -18,8 +18,8 @@ class ActionRegistry
     /** @var ApplicationsHelper */
     protected $applicationsHelper;
 
-    /** @var array|Action[] */
-    protected $actions;
+    /** @var array|Operation[] */
+    protected $operations;
 
     /**
      * @param ActionConfigurationProvider $configurationProvider
@@ -41,84 +41,87 @@ class ActionRegistry
      * @param string|null $route
      * @param string|null $datagrid
      * @param string|array|null $group
-     * @return Action[]
+     * @return Operation[]
      */
     public function find($entityClass, $route, $datagrid, $group = null)
     {
         $this->loadActions();
 
-        $allActions = $this->filterByGroup($group);
-        $actions = [];
+        $allOperations = $this->filterByGroup($group);
+        $operations = [];
 
-        foreach ($allActions as $action) {
-            $definition = $action->getDefinition();
+        foreach ($allOperations as $operation) {
+            $definition = $operation->getDefinition();
 
             if ($this->isEntityClassMatched($entityClass, $definition) ||
                 ($route && in_array($route, $definition->getRoutes(), true)) ||
                 $this->isDatagridMatched($datagrid, $definition)
             ) {
-                $actions[$action->getName()] = $action;
+                $operations[$operation->getName()] = $operation;
             }
         }
 
-        return $actions;
+        return $operations;
     }
 
     /**
      * @param string $name
-     * @return null|Action
+     * @return null|Operation
      */
     public function findByName($name)
     {
         $this->loadActions();
 
-        return array_key_exists($name, $this->actions) ? $this->actions[$name] : null;
+        return array_key_exists($name, $this->operations) ? $this->operations[$name] : null;
     }
 
     protected function loadActions()
     {
-        if ($this->actions !== null) {
+        if ($this->operations !== null) {
             return;
         }
 
-        $this->actions = [];
+        $this->operations = [];
 
         $configuration = $this->configurationProvider->getActionConfiguration();
-        $actions = $this->assembler->assemble($configuration);
+        $operations = $this->assembler->assemble($configuration);
 
-        foreach ($actions as $action) {
-            if (!$action->isEnabled()) {
+        foreach ($operations as $operation) {
+            if (!$operation->isEnabled()) {
                 continue;
             }
 
-            if (!$this->applicationsHelper->isApplicationsValid($action)) {
+            if (!$this->applicationsHelper->isApplicationsValid($operation)) {
                 continue;
             }
 
-            $this->actions[$action->getName()] = $action;
+            $this->operations[$operation->getName()] = $operation;
         }
     }
 
     /**
      * @param string|array|null $group
-     * @return array|Action[]
+     * @return array|Operation[]
      */
     protected function filterByGroup($group = null)
     {
         $this->normalizeGroup($group);
 
-        return array_filter($this->actions, function (Action $action) use ($group) {
-            $matchedGroups = array_intersect($group, $action->getDefinition()->getGroups() ?: [static::DEFAULT_GROUP]);
+        return array_filter($this->operations, function (Operation $operation) use ($group) {
+            $matchedGroups = array_intersect(
+                $group,
+                $operation->getDefinition()->getGroups() ?: [static::DEFAULT_GROUP]
+            );
             return !empty($matchedGroups);
         });
     }
 
     /**
      * @param string $className
-     * @param ActionDefinition $definition
+     * @param OperationDefinition $definition
      * @return bool
      */
-    protected function isEntityClassMatched($className, ActionDefinition $definition)
+    protected function isEntityClassMatched($className, OperationDefinition $definition)
     {
         if (!$className) {
             return false;
@@ -138,10 +141,10 @@ class ActionRegistry
 
     /**
      * @param string $datagrid
-     * @param ActionDefinition $definition
+     * @param OperationDefinition $definition
      * @return bool
      */
-    protected function isDatagridMatched($datagrid, ActionDefinition $definition)
+    protected function isDatagridMatched($datagrid, OperationDefinition $definition)
     {
         if (!$datagrid) {
             return false;

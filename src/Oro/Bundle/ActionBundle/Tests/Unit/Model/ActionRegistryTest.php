@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
-use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionAssembler;
 use Oro\Bundle\ActionBundle\Model\ActionRegistry;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
@@ -78,12 +78,12 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
         $this->applicationsHelper->expects($this->any())
             ->method('isApplicationsValid')
             ->willReturnCallback(
-                function (Action $action) {
-                    if (count($action->getDefinition()->getApplications()) === 0) {
+                function (Operation $operation) {
+                    if (count($operation->getDefinition()->getApplications()) === 0) {
                         return true;
                     }
 
-                    return in_array('backend', $action->getDefinition()->getApplications(), true);
+                    return in_array('backend', $operation->getDefinition()->getApplications(), true);
                 }
             );
 
@@ -250,9 +250,9 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $action = $this->registry->findByName($actionName);
+        $operation = $this->registry->findByName($actionName);
 
-        $this->assertEquals($expected, $action ? $action->getName() : $action);
+        $this->assertEquals($expected, $operation ? $operation->getName() : $operation);
     }
 
     /**

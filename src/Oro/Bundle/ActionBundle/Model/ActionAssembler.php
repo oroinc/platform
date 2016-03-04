@@ -53,14 +53,14 @@ class ActionAssembler extends AbstractAssembler
 
     /**
      * @param array $configuration
-     * @return Action[]
+     * @return Operation[]
      */
     public function assemble(array $configuration)
     {
         $actions = [];
 
         foreach ($configuration as $actionName => $options) {
-            $actions[$actionName] = new Action(
+            $actions[$actionName] = new Operation(
                 $this->functionFactory,
                 $this->conditionFactory,
                 $this->attributeAssembler,
@@ -75,14 +75,14 @@ class ActionAssembler extends AbstractAssembler
     /**
      * @param string $actionName
      * @param array $options
-     * @return ActionDefinition
+     * @return OperationDefinition
      */
     protected function assembleDefinition($actionName, array $options)
     {
         $this->assertOptions($options, ['label'], $actionName);
-        $actionDefinition = new ActionDefinition();
+        $operationDefinition = new OperationDefinition();
 
-        $actionDefinition
+        $operationDefinition
             ->setName($actionName)
             ->setLabel($this->getOption($options, 'label'))
             ->setSubstituteAction($this->getOption($options, 'substitute_action', null))
@@ -101,39 +101,36 @@ class ActionAssembler extends AbstractAssembler
             ->setFrontendOptions($this->getOption($options, 'frontend_options', []))
             ->setDatagridOptions($this->getOption($options, 'datagrid_options', []))
             ->setAttributes($this->getOption($options, 'attributes', []))
-            ->setFormOptions($this->getOption($options, 'form_options', []));
+            ->setFormOptions($this->getOption($options, 'form_options', []))
+            ->setPreconditions($this->getOption($options, 'preconditions', []));
 
-        foreach (ActionDefinition::getAllowedConditions() as $name) {
-            $actionDefinition->setConditions($name, $this->getOption($options, $name, []));
+        foreach (OperationDefinition::getAllowedActions() as $name) {
+            $operationDefinition->setActions($name, $this->getOption($options, $name, []));
         }
 
-        foreach (ActionDefinition::getAllowedFunctions() as $name) {
-            $actionDefinition->setFunctions($name, $this->getOption($options, $name, []));
-        }
+        $this->addAclPrecondition($operationDefinition, $this->getOption($options, 'acl_resource'));
 
-        $this->addAclPrecondition($actionDefinition, $this->getOption($options, 'acl_resource'));
-
-        return $actionDefinition;
+        return $operationDefinition;
     }
 
     /**
-     * @param ActionDefinition $actionDefinition
+     * @param OperationDefinition $operationDefinition
      * @param mixed $aclResource
      */
-    protected function addAclPrecondition(ActionDefinition $actionDefinition, $aclResource)
+    protected function addAclPrecondition(OperationDefinition $operationDefinition, $aclResource)
     {
         if (!$aclResource) {
             return;
         }
 
-        $definition = $actionDefinition->getConditions(ActionDefinition::PRECONDITIONS);
+        $definition = $operationDefinition->getPreconditions();
 
         $newDefinition = ['@and' => [['@acl_granted' => $aclResource]]];
         if ($definition) {
             $newDefinition['@and'][] = $definition;
         }
 
-        $actionDefinition->setConditions(ActionDefinition::PRECONDITIONS, $newDefinition);
+        $operationDefinition->setPreconditions($newDefinition);
     }
 
     /**

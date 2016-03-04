@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
-use Oro\Bundle\ActionBundle\Model\Action;
-use Oro\Bundle\ActionBundle\Model\ActionDefinition;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 class RestrictHelperTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,22 +26,22 @@ class RestrictHelperTest extends \PHPUnit_Framework_TestCase
     public function testRestrictActionsByGroup($actionsValues, $definedGroups, $expectedActions)
     {
         foreach ($actionsValues as $actionName => $buttonOptions) {
-            /** @var Action|\PHPUnit_Framework_MockObject_MockObject|Action $action */
-            $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
+            /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
+            $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
                 ->disableOriginalConstructor()
                 ->getMock();
-            $actionDefinition = new ActionDefinition();
-            $actionDefinition->setButtonOptions($buttonOptions);
-            $action->expects($this->any())->method('getDefinition')->willReturn($actionDefinition);
-            $actions[$actionName] = $action;
+            $operationDefinition = new OperationDefinition();
+            $operationDefinition->setButtonOptions($buttonOptions);
+            $operation->expects($this->any())->method('getDefinition')->willReturn($operationDefinition);
+            $operations[$actionName] = $operation;
         }
-        /** @var Action[] $actions */
-        $restrictedActions = $this->helper->restrictActionsByGroup($actions, $definedGroups);
+        /** @var Operation[] $actions */
+        $restrictedActions = $this->helper->restrictActionsByGroup($operations, $definedGroups);
         foreach ($expectedActions as $expectedActionName) {
-            $this->assertArrayHasKey($expectedActionName, $actions);
+            $this->assertArrayHasKey($expectedActionName, $operations);
             $this->assertArrayHasKey($expectedActionName, $restrictedActions);
             $this->assertEquals(
-                spl_object_hash($actions[$expectedActionName]),
+                spl_object_hash($operations[$expectedActionName]),
                 spl_object_hash($restrictedActions[$expectedActionName])
             );
         }

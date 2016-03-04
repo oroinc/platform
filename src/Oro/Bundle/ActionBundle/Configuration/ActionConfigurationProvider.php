@@ -13,7 +13,7 @@ class ActionConfigurationProvider
 {
     const ROOT_NODE_NAME = 'actions';
 
-    /** @var ActionDefinitionListConfiguration */
+    /** @var OperationListConfiguration */
     protected $definitionConfiguration;
 
     /** @var ActionDefinitionConfigurationValidator */
@@ -32,14 +32,14 @@ class ActionConfigurationProvider
     protected $processedConfigs = [];
 
     /**
-     * @param ActionDefinitionListConfiguration $definitionConfiguration
+     * @param OperationListConfiguration $definitionConfiguration
      * @param ActionDefinitionConfigurationValidator $definitionConfigurationValidator
      * @param CacheProvider $cache
      * @param array $rawConfiguration
      * @param array $kernelBundles
      */
     public function __construct(
-        ActionDefinitionListConfiguration $definitionConfiguration,
+        OperationListConfiguration $definitionConfiguration,
         ActionDefinitionConfigurationValidator $definitionConfigurationValidator,
         CacheProvider $cache,
         array $rawConfiguration,
