@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
-use Oro\Bundle\ActionBundle\Configuration\ActionDefinitionListConfiguration;
+use Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration;
 use Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfigurationValidator;
 
 class ActionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
@@ -14,7 +14,7 @@ class ActionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     const BUNDLE2 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle2';
     const BUNDLE3 = 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle3';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionDefinitionListConfiguration */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationListConfiguration */
     protected $definitionConfiguration;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ActionDefinitionConfigurationValidator */
@@ -26,7 +26,7 @@ class ActionConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->definitionConfiguration = $this
-            ->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\ActionDefinitionListConfiguration')
+            ->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration')
             ->disableOriginalConstructor()
             ->getMock();
 
