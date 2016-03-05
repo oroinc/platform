@@ -18,30 +18,24 @@ class ActionGroupAssembler extends AbstractAssembler
     /** @var ArgumentAssembler */
     private $argumentAssembler;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param ArgumentAssembler $argumentAssembler
-     * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
-        ArgumentAssembler $argumentAssembler,
-        DoctrineHelper $doctrineHelper
+        ArgumentAssembler $argumentAssembler
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->argumentAssembler = $argumentAssembler;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
      * @param array $configuration
-     * @return Operation[]
+     * @return ActionGroup[]
      */
     public function assemble(array $configuration)
     {

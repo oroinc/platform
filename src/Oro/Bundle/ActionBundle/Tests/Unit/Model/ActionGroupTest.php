@@ -8,6 +8,7 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 
+use Oro\Bundle\ActionBundle\Model\ArgumentAssembler;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
@@ -41,6 +42,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         $this->actionGroup = new ActionGroup(
             $this->actionFactory,
             $this->conditionFactory,
+            new ArgumentAssembler(),
             new ActionGroupDefinition()
         );
 

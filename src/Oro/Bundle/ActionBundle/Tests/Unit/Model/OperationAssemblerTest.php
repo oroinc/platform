@@ -8,10 +8,9 @@ use Oro\Bundle\ActionBundle\Model\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
@@ -34,7 +33,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             });
 
         $this->assembler = new OperationAssembler(
-            $this->getFunctionFactory(),
+            $this->getActionFactory(),
             $this->getConditionFactory(),
             $this->getAttributeAssembler(),
             $this->getFormOptionsAssembler(),
@@ -57,7 +56,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $definitions = $this->assembler->assemble($configuration);
 
-        static::assertEquals($expected, $definitions);
+        $this->assertEquals($expected, $definitions);
     }
 
     /**
@@ -145,7 +144,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 ,
                 'expected' => [
                     'minimum_name' => new Operation(
-                        $this->getFunctionFactory(),
+                        $this->getActionFactory(),
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
@@ -174,7 +173,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'maximum_name' => new Operation(
-                        $this->getFunctionFactory(),
+                        $this->getActionFactory(),
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
@@ -206,7 +205,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'maximum_name_and_acl' => new Operation(
-                        $this->getFunctionFactory(),
+                        $this->getActionFactory(),
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
@@ -218,9 +217,9 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FunctionFactory
+     * @return \PHPUnit_Framework_MockObject_MockObject|ActionFactory
      */
-    protected function getFunctionFactory()
+    protected function getActionFactory()
     {
         return $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()

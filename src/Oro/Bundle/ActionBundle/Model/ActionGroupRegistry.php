@@ -48,7 +48,7 @@ class ActionGroupRegistry
         $actionGroups = $this->assembler->assemble($configuration);
 
         foreach ($actionGroups as $actionGroup) {
-            $this->actionGroups[$actionGroup->getName()] = $actionGroup;
+            $this->actionGroups[$actionGroup->getDefinition()->getName()] = $actionGroup;
         }
     }
 }

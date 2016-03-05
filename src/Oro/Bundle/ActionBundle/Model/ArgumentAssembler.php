@@ -32,8 +32,7 @@ class ArgumentAssembler extends AbstractAssembler
     {
         $argument = new Argument();
         $argument->setName($name);
-        $argument->setType($options['type']);
-        $argument->setMessage($this->getOption($options, 'type'));
+        $argument->setType($this->getOption($options, 'type'));
         $argument->setMessage($this->getOption($options, 'message', ''));
         $argument->setDefault($this->getOption($options, 'default'));
         $argument->setRequired($this->getOption($options, 'required', false));
