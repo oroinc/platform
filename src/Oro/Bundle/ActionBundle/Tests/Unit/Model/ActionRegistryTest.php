@@ -134,6 +134,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function findDataProvider()
     {
@@ -229,6 +230,27 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'group' => null,
                 'expected' => ['action10', 'action13', 'action14']
             ],
+            'entity3 substitution of action15 by action16' => [
+                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                'route' => null,
+                'datagrid' =>  null,
+                'group' => null,
+                'expected' => ['action13', 'action14']
+            ],
+            'action17 matched by group but no substitution and no appearance' => [
+                'entityClass' => null,
+                'route' => null,
+                'datagrid' =>  null,
+                'group' => 'group4',
+                'expected' => []
+            ],
+            'substitute conditional only for specific entity and common group' => [
+                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                'route' => null,
+                'datagrid' =>  null,
+                'group' => 'limited',
+                'expected' => ['action18']
+            ]
         ];
     }
 
@@ -273,6 +295,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     protected function getConfiguration()
@@ -362,6 +385,30 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'for_all_entities' => true,
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                 'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+            ],
+            'action15' => [
+                'label' => 'Label15',
+                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
+            ],
+            'action16' => [
+                'label' => 'Label17Substituted15',
+                'substitute_action' => 'action15'
+            ],
+            'action17' => [
+                'label' => 'Label17',
+                'substitute_action' => 'unreachableAction',
+                'groups' => ['group5']
+            ],
+            'action18' => [
+                'label' => 'Label18',
+                'for_all_entities' => true,
+                'groups' => ['limited']
+            ],
+            'action19' => [
+                'label' => 'Label18 Specific Entity Replacement',
+                'substitute_action' => 'action18',
+                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
+                'groups' => ['limited']
             ],
             'action15' => [
                 'label' => 'Label15',

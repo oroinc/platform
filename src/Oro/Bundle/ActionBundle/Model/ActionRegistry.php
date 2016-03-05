@@ -3,7 +3,9 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Helper\SubstitutionVenue;
 
 class ActionRegistry
 {
@@ -21,6 +23,9 @@ class ActionRegistry
     /** @var array|Action[] */
     protected $actions;
 
+    /* @var SubstitutionVenue */
+    protected $substitution;
+
     /**
      * @param ActionConfigurationProvider $configurationProvider
      * @param ActionAssembler $assembler
@@ -34,6 +39,7 @@ class ActionRegistry
         $this->configurationProvider = $configurationProvider;
         $this->assembler = $assembler;
         $this->applicationsHelper = $applicationsHelper;
+        $this->substitution = new SubstitutionVenue();
     }
 
     /**
@@ -61,6 +67,8 @@ class ActionRegistry
             }
         }
 
+        $this->substitution->apply($actions);
+
         return $actions;
     }
 
@@ -83,6 +91,8 @@ class ActionRegistry
 
         $this->actions = [];
 
+        $replacements = [];
+
         $configuration = $this->configurationProvider->getActionConfiguration();
         $actions = $this->assembler->assemble($configuration);
 
@@ -95,8 +105,17 @@ class ActionRegistry
                 continue;
             }
 
-            $this->actions[$action->getName()] = $action;
+            $actionName = $action->getName();
+
+            $this->actions[$actionName] = $action;
+
+            $substitutionTarget = $action->getDefinition()->getSubstituteAction();
+            if ($substitutionTarget) {
+                $replacements[$substitutionTarget] = $actionName;
+            }
         }
+
+        $this->substitution->setMap($replacements);
     }
 
     /**
@@ -129,11 +148,7 @@ class ActionRegistry
         $inEntities = in_array($className, $definition->getEntities(), true);
         $inExcludedEntities = in_array($className, $definition->getExcludeEntities(), true);
 
-        if (($forAllEntities && !$inExcludedEntities) || (!$forAllEntities && $inEntities)) {
-            return true;
-        }
-
-        return false;
+        return ($forAllEntities && !$inExcludedEntities) || (!$forAllEntities && $inEntities);
     }
 
     /**
