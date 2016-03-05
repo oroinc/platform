@@ -11,8 +11,8 @@ use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
-use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
-use Oro\Component\Action\Action\ActionInterface as FunctionInterface;
+use Oro\Component\Action\Action\ActionFactory;
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
@@ -24,8 +24,8 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationDefinition */
     protected $definition;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory */
-    protected $functionFactory;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
+    protected $actionFactory;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
     protected $conditionFactory;
@@ -48,7 +48,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->functionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
+        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -65,7 +65,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->operation = new Operation(
-            $this->functionFactory,
+            $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
@@ -104,18 +104,18 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             ['form_init', ['form_init']],
         ];
 
-        $functions = [
-            'form_init' => $this->createFunction($this->once(), $this->data),
+        $actions = [
+            'form_init' => $this->createAction($this->once(), $this->data),
         ];
 
         $this->definition->expects($this->any())
             ->method('getActions')
             ->willReturnMap($config);
 
-        $this->functionFactory->expects($this->any())
+        $this->actionFactory->expects($this->any())
             ->method('create')
-            ->willReturnCallback(function ($type, $config) use ($functions) {
-                return $functions[$config[0]];
+            ->willReturnCallback(function ($type, $config) use ($actions) {
+                return $actions[$config[0]];
             });
 
         $this->operation->init($this->data);
@@ -124,7 +124,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     /**
      * @param ActionData $data
      * @param array $config
-     * @param array $functions
+     * @param array $actions
      * @param array $conditions
      * @param string $actionName
      * @param string $exceptionMessage
@@ -134,7 +134,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     public function testExecute(
         ActionData $data,
         array $config,
-        array $functions,
+        array $actions,
         array $conditions,
         $actionName,
         $exceptionMessage = ''
@@ -153,10 +153,10 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             ->method('getConditions')
             ->will($this->returnValueMap($config));
 
-        $this->functionFactory->expects($this->any())
+        $this->actionFactory->expects($this->any())
             ->method('create')
-            ->willReturnCallback(function ($type, $config) use ($functions) {
-                return $functions[$config[0]];
+            ->willReturnCallback(function ($type, $config) use ($actions) {
+                return $actions[$config[0]];
             });
 
         $this->conditionFactory->expects($this->any())
@@ -454,8 +454,8 @@ class OperationTest extends \PHPUnit_Framework_TestCase
                 'data' => $data,
                 'config' => $config,
                 'functions' => [
-                    'prefunctions' => $this->createFunction($this->once(), $data),
-                    'functions' => $this->createFunction($this->never(), $data),
+                    'prefunctions' => $this->createAction($this->once(), $data),
+                    'functions' => $this->createAction($this->never(), $data),
                 ],
                 'conditions' => [
                     'preconditions' => $this->createCondition($this->once(), $data, false),
@@ -468,8 +468,8 @@ class OperationTest extends \PHPUnit_Framework_TestCase
                 'data' => $data,
                 'config' => $config,
                 'functions' => [
-                    'prefunctions' => $this->createFunction($this->once(), $data),
-                    'functions' => $this->createFunction($this->never(), $data),
+                    'prefunctions' => $this->createAction($this->once(), $data),
+                    'functions' => $this->createAction($this->never(), $data),
                 ],
                 'conditions' => [
                     'preconditions' => $this->createCondition($this->once(), $data, true),
@@ -482,8 +482,8 @@ class OperationTest extends \PHPUnit_Framework_TestCase
                 'data' => $data,
                 'config' => $config,
                 'functions' => [
-                    'prefunctions' => $this->createFunction($this->once(), $data),
-                    'functions' => $this->createFunction($this->once(), $data),
+                    'prefunctions' => $this->createAction($this->once(), $data),
+                    'functions' => $this->createAction($this->once(), $data),
                 ],
                 'conditions' => [
                     'preconditions' => $this->createCondition($this->once(), $data, true),
@@ -618,22 +618,22 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     /**
      * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
      * @param ActionData $data
-     * @return FunctionInterface|\PHPUnit_Framework_MockObject_MockObject
+     * @return ActionInterface|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createFunction(
+    protected function createAction(
         \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects,
         ActionData $data
     ) {
-        /* @var $function FunctionInterface|\PHPUnit_Framework_MockObject_MockObject */
-        $function = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
+        /* @var $action ActionInterface|\PHPUnit_Framework_MockObject_MockObject */
+        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $function->expects($expects)
+        $action->expects($expects)
             ->method('execute')
             ->with($data);
 
-        return $function;
+        return $action;
     }
 
     /**

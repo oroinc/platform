@@ -138,7 +138,7 @@ class Operation
         throw new ForbiddenActionException('This function does not implemented yet');
 
         return $this->isPreConditionAllowed($data, $errors) &&
-            $this->evaluateConditions($data, ActionDefinition::CONDITIONS, $errors);
+            $this->evaluateConditions($data, OperationDefinition::CONDITIONS, $errors);
     }
 
     /**

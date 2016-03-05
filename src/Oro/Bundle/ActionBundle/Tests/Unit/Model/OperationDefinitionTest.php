@@ -63,7 +63,7 @@ class OperationDefinitionTest extends \PHPUnit_Framework_TestCase
                 ['formType', 'test_form_type'],
                 ['attributes', ['config1', 'config2'], []],
                 ['preconditions', ['cond1', 'cond2'], []],
-                ['actionGroups', ['cond1', 'cond2'], []]
+                ['actionGroups', ['action_group1', 'action_group2'], []]
             ]
         );
     }
