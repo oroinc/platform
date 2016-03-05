@@ -335,11 +335,13 @@ class OrmDatasourceExtensionTest extends OrmTestCase
                 $localeSetting = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Model\LocaleSettings')
                     ->disableOriginalConstructor()->getMock();
                 $localeSetting->expects($this->any())->method('getTimeZone')->will($this->returnValue('UTC'));
+                $compiler = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
+                    ->disableOriginalConstructor()->getMock();
 
                 $filter = new DateTimeRangeFilter(
                     $this->formFactory,
                     new FilterUtility(),
-                    new DateFilterUtility($localeSetting)
+                    new DateFilterUtility($localeSetting, $compiler)
                 );
                 break;
             default:

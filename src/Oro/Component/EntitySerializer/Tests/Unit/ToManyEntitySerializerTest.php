@@ -152,26 +152,15 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             1,
-            'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
-            . ' FROM ('
-            . '(SELECT u0_.id AS id_0, g1_.id AS id_1'
-            . ' FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . '))'
-            . ' WHERE u0_.id = 123 LIMIT 10)'
-            . ' UNION ALL'
-            . ' (SELECT u0_.id AS id_0, g1_.id AS id_1'
-            . ' FROM group_table g1_'
-            . ' INNER JOIN user_table u0_ ON (EXISTS ('
-            . 'SELECT 1 FROM rel_user_to_group_table r2_'
-            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
-            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
-            . '))'
-            . ' WHERE u0_.id = 456 LIMIT 10)'
-            . ') entity',
+            'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId '
+            . 'FROM ('
+            . '(SELECT u0_.id AS id_0, g1_.id AS id_1 '
+            . 'FROM group_table g1_ '
+            . 'INNER JOIN user_table u0_ ON '
+            . '(EXISTS (SELECT 1 FROM rel_user_to_group_table r2_ '
+            . 'INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id '
+            . 'WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id))) '
+            . 'WHERE u0_.id IN (123, 456) LIMIT 10)) entity',
             [
                 [
                     'entityId'        => 123,
