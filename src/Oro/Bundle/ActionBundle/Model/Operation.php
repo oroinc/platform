@@ -237,7 +237,7 @@ class Operation
     {
         $this->preconditions = false;
 
-        $config = $this->definition->getPreConditions();
+        $config = $this->definition->getPreconditions();
         if ($config) {
             $this->preconditions = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $config);
         }
