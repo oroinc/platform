@@ -3,8 +3,10 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit;
 
 use Doctrine\Common\Annotations\AnnotationReader;
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
+use Doctrine\ORM\ORMException;
 use Oro\Component\TestUtils\ORM\Mocks\EntityManagerMock;
 use Oro\Component\TestUtils\ORM\OrmTestCase;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -14,8 +16,14 @@ class OrmRelatedTestCase extends OrmTestCase
     /** @var EntityManagerMock */
     protected $em;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
+    protected $doctrine;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var string[] */
+    protected $notManageableClassNames = [];
 
     protected function setUp()
     {
@@ -33,22 +41,40 @@ class OrmRelatedTestCase extends OrmTestCase
             ]
         );
 
-        $doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
+        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $doctrine->expects($this->any())
+        $this->doctrine->expects($this->any())
             ->method('getManagerForClass')
-            ->willReturn($this->em);
-        $doctrine->expects($this->any())
+            ->willReturnCallback(
+                function ($class) {
+                    return !in_array($class, $this->notManageableClassNames, true)
+                        ? $this->em
+                        : null;
+                }
+            );
+        $this->doctrine->expects($this->any())
             ->method('getAliasNamespace')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        ['Test', 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity']
-                    ]
-                )
+            ->willReturnCallback(
+                function ($alias) {
+                    if ('Test' !== $alias) {
+                        throw ORMException::unknownEntityNamespace($alias);
+                    }
+
+                    return 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity';
+                }
             );
 
-        $this->doctrineHelper = new DoctrineHelper($doctrine);
+        $this->doctrineHelper = new DoctrineHelper($this->doctrine);
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getQueryBuilderMock()
+    {
+        return $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

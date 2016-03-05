@@ -8,14 +8,15 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\ExpandRelatedEntitiesConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FilterFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Loads full configuration of the target entity for associations were requested to expand.
- * For example, in JSON.API the "include" parameter can be used to request related resources.
+ * For example, in JSON.API the "include" parameter can be used to request related entities.
  */
 class ExpandRelatedEntities implements ProcessorInterface
 {
@@ -60,61 +61,54 @@ class ExpandRelatedEntities implements ProcessorInterface
             $context->get(ExpandRelatedEntitiesConfigExtra::NAME),
             $context->getVersion(),
             $context->getRequestType(),
-            $this->getAssociationExtras($context->getExtras())
-        );
-    }
-
-    /**
-     * @param array $extras
-     *
-     * @return array
-     */
-    protected function getAssociationExtras($extras)
-    {
-        return array_values(
-            array_filter(
-                $extras,
-                function ($extra) {
-                    return
-                        !$extra instanceof ExpandRelatedEntitiesConfigExtra
-                        && !$extra instanceof FilterFieldsConfigExtra;
-                }
-            )
+            $context->getInheritableExtras()
         );
     }
 
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
-     * @param string[]               $associationNames
+     * @param string[]               $expandedEntities
      * @param string                 $version
-     * @param string[]               $requestType
-     * @param ConfigExtraInterface[] $associationExtras
+     * @param RequestType            $requestType
+     * @param ConfigExtraInterface[] $extras
      */
     protected function completeAssociations(
         EntityDefinitionConfig $definition,
         $entityClass,
-        $associationNames,
+        $expandedEntities,
         $version,
-        array $requestType,
-        array $associationExtras
+        RequestType $requestType,
+        array $extras
     ) {
         $metadata     = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        $associations = $metadata->getAssociationMappings();
-        foreach ($associations as $fieldName => $mapping) {
-            if (!in_array($fieldName, $associationNames, true)) {
+        $associations = $this->splitExpandedEntities($expandedEntities);
+        foreach ($associations as $fieldName => $childExpandedEntities) {
+            $propertyPath = null;
+            if ($definition->hasField($fieldName)) {
+                $propertyPath = $definition->getField($fieldName)->getPropertyPath();
+            }
+            if (!$propertyPath) {
+                $propertyPath = $fieldName;
+            }
+            if (!$metadata->hasAssociation($propertyPath)) {
                 continue;
             }
 
+            $targetExtras = $extras;
+            if (!empty($childExpandedEntities)) {
+                $targetExtras[] = new ExpandRelatedEntitiesConfigExtra($childExpandedEntities);
+            }
+
             $config = $this->configProvider->getConfig(
-                $mapping['targetEntity'],
+                $metadata->getAssociationTargetClass($propertyPath),
                 $version,
                 $requestType,
-                $associationExtras
+                $targetExtras
             );
             if ($config->hasDefinition()) {
                 $targetEntity = $config->getDefinition();
-                foreach ($associationExtras as $extra) {
+                foreach ($extras as $extra) {
                     $sectionName = $extra->getName();
                     if ($extra instanceof ConfigExtraSectionInterface && $config->has($sectionName)) {
                         $targetEntity->set($sectionName, $config->get($sectionName));
@@ -123,5 +117,26 @@ class ExpandRelatedEntities implements ProcessorInterface
                 $definition->getOrAddField($fieldName)->setTargetEntity($targetEntity);
             }
         }
+    }
+
+    /**
+     * @param string[] $expandedEntities
+     *
+     * @return array
+     */
+    protected function splitExpandedEntities($expandedEntities)
+    {
+        $result = [];
+        foreach ($expandedEntities as $expandedEntity) {
+            $path = ConfigUtil::explodePropertyPath($expandedEntity);
+            if (count($path) === 1) {
+                $result[$expandedEntity] = [];
+            } else {
+                $fieldName            = array_shift($path);
+                $result[$fieldName][] = implode(ConfigUtil::PATH_DELIMITER, $path);
+            }
+        }
+
+        return $result;
     }
 }

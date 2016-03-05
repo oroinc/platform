@@ -27,7 +27,7 @@ class ResourcesLoaderTest extends \PHPUnit_Framework_TestCase
     public function testGetResources()
     {
         $version     = '1.2.3';
-        $requestType = [RequestType::REST, RequestType::JSON_API];
+        $requestType = new RequestType([RequestType::REST, RequestType::JSON_API]);
 
         $this->processor->expects($this->once())
             ->method('process')

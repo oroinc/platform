@@ -14,8 +14,10 @@ use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
@@ -56,6 +58,12 @@ class DumpConfigCommand extends ContainerAwareCommand
                 'entities'
             )
             ->addOption(
+                'without-virtual-fields',
+                null,
+                InputOption::VALUE_NONE,
+                'Whether virtual fields should not be added'
+            )
+            ->addOption(
                 'with-descriptions',
                 null,
                 InputOption::VALUE_NONE,
@@ -72,12 +80,15 @@ class DumpConfigCommand extends ContainerAwareCommand
         $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
 
         $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'), true);
-        $requestType = $input->getOption('request-type');
+        $requestType = new RequestType($input->getOption('request-type'));
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
 
         $extras = [new FiltersConfigExtra(), new SortersConfigExtra()];
+        if (!$input->getOption('without-virtual-fields')) {
+            $extras[] = new VirtualFieldsConfigExtra();
+        }
         if ($input->getOption('with-descriptions')) {
             $extras[] = new DescriptionsConfigExtra();
         }
@@ -111,14 +122,14 @@ class DumpConfigCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string   $entityClass
-     * @param string   $version
-     * @param string[] $requestType
-     * @param array    $extras
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
+     * @param array       $extras
      *
      * @return array
      */
-    protected function getConfig($entityClass, $version, array $requestType, array $extras)
+    protected function getConfig($entityClass, $version, RequestType $requestType, array $extras)
     {
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.config_provider');
@@ -135,14 +146,14 @@ class DumpConfigCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string   $entityClass
-     * @param string   $version
-     * @param string[] $requestType
-     * @param array    $extras
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
+     * @param array       $extras
      *
      * @return array
      */
-    protected function getRelationConfig($entityClass, $version, array $requestType, array $extras)
+    protected function getRelationConfig($entityClass, $version, RequestType $requestType, array $extras)
     {
         /** @var RelationConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.relation_config_provider');

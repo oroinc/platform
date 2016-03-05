@@ -39,7 +39,12 @@ class SetDescriptionForEntity implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        $definition  = $context->getResult();
+        $definition = $context->getResult();
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
+            return;
+        }
+
         $entityClass = $context->getClassName();
         if (!$definition->hasLabel()) {
             $entityName = $this->entityClassNameProvider->getEntityClassName($entityClass);

@@ -1,10 +1,11 @@
 actions:
     CRUD_ACTION:
         label: CRUD_ACTION
-        groups:
-            - navButtons
         button_options:
             template: OroActionBundle:Action:crud-button.html.twig
+        preconditions:
+            @and:
+                - @not_blank: $.data
 
     UPDATE:
         extends: CRUD_ACTION
@@ -16,11 +17,15 @@ actions:
             - view_navButtons
             - datagridRowAction
         prefunctions:
-            - @call_service_method:
-                service: oro_entity_config.helper.entity_config
-                method: getRoutes
-                method_parameters: [$.data, ['update']]
-                attribute: $.routes
+            - @tree:
+                conditions:
+                    @not_blank: $.data
+                actions:
+                    - @call_service_method:
+                        service: oro_entity_config.helper.entity_config
+                        method: getRoutes
+                        method_parameters: [$.data, ['update']]
+                        attribute: $.routes
         preconditions:
             @and:
                 - @not_blank: $.routes[update]
@@ -45,19 +50,23 @@ actions:
             - update_navButtons
             - datagridRowAction
         prefunctions:
-            - @call_service_method:
-                service: oro_entity_config.helper.entity_config
-                method: getRoutes
-                method_parameters: [$.data, ['name', 'delete']]
-                attribute: $.routes
-            - @call_service_method:
-                service: oro_entity_config.helper.entity_config
-                method: getConfigValue
-                method_parameters: [$.data, 'label']
-                attribute: $.entityLabel
-            - @trans:
-                id: $.entityLabel
-                attribute: $.entityLabel
+            - @tree:
+                conditions:
+                    @not_blank: $.data
+                actions:
+                    - @call_service_method:
+                        service: oro_entity_config.helper.entity_config
+                        method: getRoutes
+                        method_parameters: [$.data, ['name', 'delete']]
+                        attribute: $.routes
+                    - @call_service_method:
+                        service: oro_entity_config.helper.entity_config
+                        method: getConfigValue
+                        method_parameters: [$.data, 'label']
+                        attribute: $.entityLabel
+                    - @trans:
+                        id: $.entityLabel
+                        attribute: $.entityLabel
         preconditions:
             @and:
                 - @not_blank: $.routes[name]
