@@ -83,9 +83,6 @@ class ActionRegistry
         return array_key_exists($name, $this->actions) ? $this->actions[$name] : null;
     }
 
-    /**
-     * @throws CircularReferenceException
-     */
     protected function loadActions()
     {
         if ($this->actions !== null) {

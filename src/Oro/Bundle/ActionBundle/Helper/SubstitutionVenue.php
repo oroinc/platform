@@ -53,7 +53,6 @@ class SubstitutionVenue
      */
     public function apply(array &$things)
     {
-
         $bounded = $this->replace($things);
 
         if ($this->clearUnboundedSubstitutions) {
