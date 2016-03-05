@@ -1,6 +1,6 @@
 parameters:
     oro_action.context_accessor.class: Oro\Component\Action\Model\ContextAccessor
-    oro_action.action_factory.class: Oro\Component\Action\Action\ActionFactory
+    oro_action.function_factory.class: Oro\Component\Action\Action\ActionFactory
     oro_action.function_assembler.class: Oro\Component\Action\Action\ActionAssembler
 
     oro_action.function.tree.class: Oro\Component\Action\Action\TreeExecutor
@@ -32,8 +32,8 @@ services:
     oro_action.context_accessor:
         class: %oro_action.context_accessor.class%
 
-    oro_action.action_factory:
-        class: %oro_action.action_factory.class%
+    oro_action.function_factory:
+        class: %oro_action.function_factory.class%
         arguments:
             - @service_container
             - []
@@ -41,7 +41,7 @@ services:
     oro_action.function_assembler:
         class: %oro_action.function_assembler.class%
         arguments:
-            - @oro_action.action_factory
+            - @oro_action.function_factory
             - @oro_action.expression.factory
         calls:
             - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]

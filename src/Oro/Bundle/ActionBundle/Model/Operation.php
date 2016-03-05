@@ -51,7 +51,7 @@ class Operation
     /** @var array */
     private $formOptions;
 
-    /** @var Argument[] */
+    /** @var OperationActionGroup[] */
     private $operationActionGroups;
 
     /**
