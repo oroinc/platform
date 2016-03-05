@@ -1,13 +1,14 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
+use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
-use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -37,6 +38,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             $this->getConditionFactory(),
             $this->getAttributeAssembler(),
             $this->getFormOptionsAssembler(),
+            $this->getOperationActionGroupAssembler(),
             $this->doctrineHelper
         );
     }
@@ -148,6 +150,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
+                        $this->getOperationActionGroupAssembler(),
                         $definition1
                     )
                 ],
@@ -177,6 +180,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
+                        $this->getOperationActionGroupAssembler(),
                         $definition2
                     )
                 ],
@@ -209,6 +213,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
+                        $this->getOperationActionGroupAssembler(),
                         $definition3
                     )
                 ],
@@ -241,7 +246,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getAttributeAssembler()
     {
-        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
+        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -251,8 +256,16 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getFormOptionsAssembler()
     {
-        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
+        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|OperationActionGroupAssembler
+     */
+    protected function getOperationActionGroupAssembler()
+    {
+        return new OperationActionGroupAssembler();
     }
 }

@@ -1,11 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
-
-use Doctrine\Common\Collections\ArrayCollection;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Model\Argument;
-use Oro\Bundle\ActionBundle\Model\ArgumentAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
 
 class ArgumentAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -32,7 +30,7 @@ class ArgumentAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $definitions = $this->assembler->assemble($configuration);
 
-        $this->assertEquals(new ArrayCollection($expected), $definitions);
+        $this->assertEquals($expected, $definitions);
     }
 
     /**
@@ -73,9 +71,7 @@ class ArgumentAssemblerTest extends \PHPUnit_Framework_TestCase
                         'message' => 'Please provide argument',
                     ]
                 ],
-                'expected' => [
-                    'maximum_name' => $argument2,
-                ],
+                'expected' => ['maximum_name' => $argument2],
             ],
         ];
     }

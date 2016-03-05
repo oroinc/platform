@@ -4,8 +4,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
-use Oro\Bundle\ActionBundle\Model\ArgumentAssembler;
-use Oro\Bundle\ActionBundle\Model\ActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;

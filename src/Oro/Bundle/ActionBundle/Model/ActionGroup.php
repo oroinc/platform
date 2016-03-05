@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
+use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;

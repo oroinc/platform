@@ -1,12 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Model;
+namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\ActionBundle\Exception\AssemblerException;
 use Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException;
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 
 class AttributeAssembler extends AbstractAssembler
 {

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 
 class ActionGroupRegistry
 {

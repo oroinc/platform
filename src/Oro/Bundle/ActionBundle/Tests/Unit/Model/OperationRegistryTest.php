@@ -4,14 +4,15 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
-use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
-use Oro\Bundle\ActionBundle\Model\OperationAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class OperationRegistryTest extends \PHPUnit_Framework_TestCase
@@ -28,8 +29,8 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory */
-    protected $functionFactory;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
+    protected $actionFactory;
 
     /** @var ConditionFactory|\PHPUnit_Framework_MockObject_MockObject */
     protected $conditionFactory;
@@ -56,7 +57,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->functionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
+        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -64,13 +65,13 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
+        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formOptionsAssembler = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler'
+        )->disableOriginalConstructor()->getMock();
 
         $this->applicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
             ->disableOriginalConstructor()
@@ -97,10 +98,11 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             });
 
         $this->assembler = new OperationAssembler(
-            $this->functionFactory,
+            $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
+            new OperationActionGroupAssembler(),
             $this->doctrineHelper
         );
 

@@ -1,11 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
-use Oro\Bundle\ActionBundle\Model\ActionGroupAssembler;
-use Oro\Bundle\ActionBundle\Model\ArgumentAssembler;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
+use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;

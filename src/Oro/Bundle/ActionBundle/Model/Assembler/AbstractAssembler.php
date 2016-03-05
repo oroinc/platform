@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Model;
+namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Exception\MissedRequiredOptionException;
 

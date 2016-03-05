@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Model;
+namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\ActionBundle\Model\ActionGroup;
+use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
@@ -39,10 +40,10 @@ class ActionGroupAssembler extends AbstractAssembler
      */
     public function assemble(array $configuration)
     {
-        $actions = [];
+        $actionGroups = [];
 
         foreach ($configuration as $actionGroupName => $options) {
-            $actions[$actionGroupName] = new ActionGroup(
+            $actionGroups[$actionGroupName] = new ActionGroup(
                 $this->actionFactory,
                 $this->conditionFactory,
                 $this->argumentAssembler,
@@ -50,7 +51,7 @@ class ActionGroupAssembler extends AbstractAssembler
             );
         }
 
-        return $actions;
+        return $actionGroups;
     }
 
     /**

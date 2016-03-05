@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 
 class OperationRegistry
 {
