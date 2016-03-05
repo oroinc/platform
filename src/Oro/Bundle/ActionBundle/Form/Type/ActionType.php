@@ -9,7 +9,7 @@ use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
@@ -78,7 +78,7 @@ class ActionType extends AbstractType
 
         $resolver->setAllowedTypes(
             [
-                'action' => 'Oro\Bundle\ActionBundle\Model\Action',
+                'action' => 'Oro\Bundle\ActionBundle\Model\Operation',
                 'attribute_fields' => 'array',
                 'attribute_default_values' => 'array'
             ]
@@ -104,9 +104,9 @@ class ActionType extends AbstractType
         /** @var ActionData $data */
         $data = $builder->getData();
 
-        /** @var Action $action */
-        $action = $options['action'];
-        $action->init($data);
+        /** @var Operation $operation */
+        $operation = $options['action'];
+        $operation->init($data);
     }
 
     /**
@@ -143,20 +143,20 @@ class ActionType extends AbstractType
      */
     protected function addAttributes(FormBuilderInterface $builder, array $options)
     {
-        /** @var Action $action */
-        $action = $options['action'];
+        /** @var Operation $operation */
+        $operation = $options['action'];
 
         /** @var ActionData $actionData */
         $actionData = $builder->getData();
 
         foreach ($options['attribute_fields'] as $attributeName => $attributeOptions) {
-            $attribute = $action->getAttributeManager($actionData)->getAttribute($attributeName);
+            $attribute = $operation->getAttributeManager($actionData)->getAttribute($attributeName);
             if (!$attribute) {
                 throw new InvalidConfigurationException(
                     sprintf(
                         'Invalid reference to unknown attribute "%s" of action "%s".',
                         $attributeName,
-                        $action->getName()
+                        $operation->getName()
                     )
                 );
             }
@@ -185,14 +185,14 @@ class ActionType extends AbstractType
     protected function prepareAttributeOptions(Attribute $attribute, array $attributeOptions, array $options)
     {
         if (empty($attributeOptions['form_type'])) {
-            /** @var Action $action */
-            $action = $options['action'];
+            /** @var Operation $operation */
+            $operation = $options['action'];
 
             throw new InvalidConfigurationException(
                 sprintf(
                     'Parameter "form_type" must be defined for attribute "%s" in action "%s".',
                     $attribute->getName(),
-                    $action->getName()
+                    $operation->getName()
                 )
             );
         }

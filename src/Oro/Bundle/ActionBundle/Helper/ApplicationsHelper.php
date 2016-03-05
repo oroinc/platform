@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
-use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class ApplicationsHelper
@@ -25,12 +25,12 @@ class ApplicationsHelper
     }
 
     /**
-     * @param Action $action
+     * @param Operation $operation
      * @return bool
      */
-    public function isApplicationsValid(Action $action)
+    public function isApplicationsValid(Operation $operation)
     {
-        $applications = $action->getDefinition()->getApplications();
+        $applications = $operation->getDefinition()->getApplications();
         if (empty($applications)) {
             return true;
         }

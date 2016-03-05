@@ -4,9 +4,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionDefinition;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
@@ -138,7 +138,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
      * @param array $frontendOptions
      * @param array $buttonOptions
      * @param bool $hasForm
-     * @return \PHPUnit_Framework_MockObject_MockObject|Action
+     * @return \PHPUnit_Framework_MockObject_MockObject|Operation
      */
     protected function getAction(
         $actionName,
@@ -148,24 +148,24 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
         array $buttonOptions = [],
         $hasForm = false
     ) {
-        $definition = new ActionDefinition();
+        $definition = new OperationDefinition();
         $definition->setEnabled($enabled);
         $definition->setName($actionName);
         $definition->setLabel($label);
         $definition->setFrontendOptions($frontendOptions);
         $definition->setButtonOptions($buttonOptions);
 
-        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
+        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->getMock();
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('getDefinition')
             ->will($this->returnValue($definition));
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('hasForm')
             ->will($this->returnValue($hasForm));
 
-        return $action;
+        return $operation;
     }
 
     /**

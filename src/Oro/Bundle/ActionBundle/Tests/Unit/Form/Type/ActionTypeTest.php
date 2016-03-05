@@ -6,7 +6,7 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
-use Oro\Bundle\ActionBundle\Model\Action;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Model\Attribute;
@@ -246,7 +246,7 @@ class ActionTypeTest extends FormIntegrationTestCase
                     ],
                 ],
                 'exception' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
-                'message' => 'Invalid reference to unknown attribute "field" of action "test_action".',
+                'message' => 'Invalid reference to unknown attribute "field" of action "test_operation".',
                 'context' => $this->createActionData()
             ],
             [
@@ -257,7 +257,7 @@ class ActionTypeTest extends FormIntegrationTestCase
                     ],
                 ],
                 'exception' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
-                'message' => 'Parameter "form_type" must be defined for attribute "field" in action "test_action".',
+                'message' => 'Parameter "form_type" must be defined for attribute "field" in action "test_operation".',
                 'context' => $this->createActionData()
             ]
         ];
@@ -282,7 +282,7 @@ class ActionTypeTest extends FormIntegrationTestCase
 
     /**
      * @param bool $noAttributes
-     * @return Action|\PHPUnit_Framework_MockObject_MockObject
+     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function createAction($noAttributes = false)
     {
@@ -308,18 +308,18 @@ class ActionTypeTest extends FormIntegrationTestCase
                 }
             );
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Action $action */
-        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
+        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->getMock();
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('getAttributeManager')
             ->with($this->isInstanceOf('Oro\Bundle\ActionBundle\Model\ActionData'))
             ->willReturn($attributeManager);
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('getName')
-            ->willReturn('test_action');
+            ->willReturn('test_operation');
 
-        return $action;
+        return $operation;
     }
 }
