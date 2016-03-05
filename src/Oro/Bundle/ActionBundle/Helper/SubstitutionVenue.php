@@ -144,7 +144,6 @@ class SubstitutionVenue
         }
 
         return $this->lookUpReplacements($map, $map[$key], $maxDepth, ++$depth);
-
     }
 
     /**

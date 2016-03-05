@@ -384,11 +384,11 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'label' => 'Label14',
                 'for_all_entities' => true,
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
-                'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1']
+                'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
             ],
             'action15' => [
                 'label' => 'Label15',
-                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3']
+                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
             ],
             'action16' => [
                 'label' => 'Label17Substituted15',
