@@ -61,7 +61,7 @@ class StartTransitionHandler
         $responseCode = null;
 
         try {
-            $dataArray = array();
+            $dataArray = [];
             if ($data) {
                 $this->serializer->setWorkflowName($workflow->getName());
                 /* @var $data WorkflowData */

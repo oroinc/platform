@@ -37,6 +37,7 @@ class TransitionHelper
      */
     public function createCompleteResponse(WorkflowItem $workflowItem, $responseCode = null)
     {
+        $transitResponseContent = null;
         if (!$responseCode) {
             $view = View::create([
                 'workflowItem' => $workflowItem,
