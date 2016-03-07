@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
@@ -17,7 +17,7 @@ use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class OperationRegistryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ActionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationProvider;
 
     /** @var OperationAssembler */
@@ -52,10 +52,8 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configurationProvider = $this
-            ->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configurationProvider =
+            $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
         $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
@@ -125,7 +123,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
     public function testFind($entityClass, $route, $datagrid, $group, array $expected)
     {
         $this->configurationProvider->expects($this->once())
-            ->method('getActionConfiguration')
+            ->method('getConfiguration')
             ->willReturn($this->getConfiguration());
 
         $this->assertEquals($expected, array_keys($this->registry->find($entityClass, $route, $datagrid, $group)));
@@ -243,7 +241,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
     public function testFindByName($actionName, $expected)
     {
         $this->configurationProvider->expects($this->once())
-            ->method('getActionConfiguration')
+            ->method('getConfiguration')
             ->willReturn(
                 [
                     'action1' => [

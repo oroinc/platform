@@ -48,7 +48,7 @@ services:
     oro_action.operation_registry:
         class: %oro_action.operation_registry.class%
         arguments:
-            - @oro_action.configuration.provider
+            - @oro_action.configuration.provider.operations
             - @oro_action.assembler.operation
             - @oro_action.helper.applications
 

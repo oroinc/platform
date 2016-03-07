@@ -11,7 +11,7 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ActionDefinitionConfigurationValidator
+class ActionDefinitionConfigurationValidator implements ConfigurationValidatorInterface
 {
     /**
      * @var RouterInterface
@@ -67,7 +67,6 @@ class ActionDefinitionConfigurationValidator
     /**
      * @param array $configuration
      * @param Collection $errors
-     * @return array
      */
     public function validate(array $configuration, Collection $errors = null)
     {

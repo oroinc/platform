@@ -8,7 +8,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 
 class ValidateActionConfigurationCommand extends ContainerAwareCommand
 {
@@ -29,7 +29,7 @@ class ValidateActionConfigurationCommand extends ContainerAwareCommand
         $output->writeln('Load actions ...');
 
         $errors = new ArrayCollection();
-        $configuration = $this->getConfigurationProvider()->getActionConfiguration(true, $errors);
+        $configuration = $this->getConfigurationProvider()->getConfiguration(true, $errors);
 
         if ($configuration) {
             $output->writeln(sprintf('Found %d action(s) with %d error(s)', count($configuration), count($errors)));
@@ -43,7 +43,7 @@ class ValidateActionConfigurationCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return ActionConfigurationProvider
+     * @return ConfigurationProviderInterface
      */
     protected function getConfigurationProvider()
     {

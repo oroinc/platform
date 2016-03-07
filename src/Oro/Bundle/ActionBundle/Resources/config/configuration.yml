@@ -1,18 +1,16 @@
 parameters:
-    oro_action.configuration.config.action_definition.class: Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfiguration
-    oro_action.configuration.config.action_definition_list.class: Oro\Bundle\ActionBundle\Configuration\ActionDefinitionListConfiguration
+    oro_action.configuration.config.operation_list.class: Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration
+    oro_action.configuration.config.action_group_list.class: Oro\Bundle\ActionBundle\Configuration\ActionGroupListConfiguration
     oro_action.configuration.validator.action_definition.class: Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfigurationValidator
-    oro_action.configuration.provider.class: Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider
+    oro_action.configuration.provider.class: Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider
     oro_action.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath
 
 services:
-    oro_action.configuration.config.action_definition:
-        class: %oro_action.configuration.config.action_definition.class%
+    oro_action.configuration.config.operation_list:
+        class: %oro_action.configuration.config.operation_list.class%
 
-    oro_action.configuration.config.action_definition_list:
-        class: %oro_action.configuration.config.action_definition_list.class%
-        arguments:
-            - @oro_action.configuration.config.action_definition
+    oro_action.configuration.config.action_group_list:
+        class: %oro_action.configuration.config.action_group_list.class%
 
     oro_action.configuration.validator.action_definition:
         class: %oro_action.configuration.validator.action_definition.class%
@@ -23,14 +21,25 @@ services:
             - @logger
             - %kernel.debug%
 
-    oro_action.configuration.provider:
+    oro_action.configuration.provider.operations:
         class: %oro_action.configuration.provider.class%
         arguments:
-            - @oro_action.configuration.config.action_definition_list
+            - @oro_action.configuration.config.operation_list
             - @oro_action.configuration.validator.action_definition
-            - @oro_action.cache.provider
+            - @oro_action.cache.provider.operations
             - []
             - %kernel.bundles%
+            - 'operations'
+
+    oro_action.configuration.provider.action_groups:
+        class: %oro_action.configuration.provider.class%
+        arguments:
+            - @oro_action.configuration.config.action_group_list
+            - @oro_action.configuration.validator.action_definition
+            - @oro_action.cache.provider.action_groups
+            - []
+            - %kernel.bundles%
+            - 'action_groups'
 
     oro_action.configuration_pass.replace_property_path:
         class: %oro_action.configuration_pass.replace_property_path.class%
