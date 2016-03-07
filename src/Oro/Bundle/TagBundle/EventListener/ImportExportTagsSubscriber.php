@@ -155,8 +155,13 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         }
 
         $taggables = $this->preparedTaggedObjects;
+        if (!$taggables) {
+            return;
+        }
+
         $this->preparedTaggedObjects = [];
-        array_map([$this->getTagImportManager(), 'saveTags'], $taggables);
+        array_walk($taggables, [$this->getTagImportManager(), 'persistTags']);
+        $args->getEntityManager()->flush();
     }
 
     /**
