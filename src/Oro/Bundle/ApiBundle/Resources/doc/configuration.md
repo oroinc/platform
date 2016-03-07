@@ -25,15 +25,7 @@ Configuration structure
 To get the configuration structure, execute the following command:
 
 ```bash
-php ./app/console oro:api:config:dump-reference --max-nesting-level=0
-```
-
-The default nesting level is 3. It's configured in parameter in [services.yml](../config/services.yml). So it will allow to easily change it via overriding the parameter. 
-
-```yaml
-parameters:
-    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
-    oro_api.config.max_nesting_level: 3
+php ./app/console oro:api:config:dump-reference
 ```
 
 The result of the command execution will be output similar to this:
@@ -142,6 +134,16 @@ oro_api:
 Tips and tricks
 ---------------
 
+--
+`oro:api:config:dump-reference` command shows the configuration. And the default nesting level is 3. It's configured in parameter in [services.yml](../config/services.yml). So it will allow to easily change it via overriding the parameter. 
+
+```yaml
+parameters:
+    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
+    oro_api.config.max_nesting_level: 3
+```
+
+--
 `oro_api.entities.exclude` flag excludes entity only from API, but in case an entity or its' field(s) should be excluded globally use `Resources/config/oro/entity.yml`, e.g.
 
 ```yaml
@@ -157,17 +159,19 @@ Config Extensions
 
 -- ConfigExtensionRegistry(../../Config/ConfigExtensionRegistry.php)
 
- Registers the configuration extension.
- Returns all registered configuration extensions.
- Collects the configuration definition settings from all registered extensions.
- 
-How to add new config extension?
---------------------------------
+- Registers the configuration extension.
+- Returns all registered configuration extensions.
+- Collects the configuration definition settings from all registered extensions.
 
-Any config extension should:
 
-- implement [ConfigExtensionInterface](../../Config/ConfigExtensionInterface.php). As an example see [TestConfigExtension](../../Tests/Unit/Config/Stub/TestConfigExtension.php)
-- be registered in services.yml and marked with tag `oro_api.config_extension`, e.g.
+How to add new configuration extension?
+---------------------------------------
+
+At first any configuration extension should:
+
+- be registered in services.yml and marked with tag `oro_api.config_extension`
+- implement [ConfigExtensionInterface](../../Config/ConfigExtensionInterface.php) or extend [AbstractConfigExtension](../../Config/AbstractConfigExtension)
+
 
 ```yaml
   acme_bundle.config_extension.my_config_extension:
@@ -177,20 +181,235 @@ Any config extension should:
         - { name: oro_api.config_extension }
 ```
 
+```php
+namespace Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension;
+
+class MyConfigExtension implements ConfigExtensionInterface
+{
+    public function getEntityConfigurationSections()
+    {
+        return [];
+    }
+
+    public function getConfigureCallbacks()
+    {
+        return [];
+    }
+
+    public function getPreProcessCallbacks()
+    {
+        return [];
+    }
+
+    public function getPostProcessCallbacks()
+    {
+        return [];
+    }
+
+    public function getEntityConfigurationLoaders()
+    {
+        return [];
+    }
+}
+```
+
+The next step is the configuration class that will implement [ConfigurationSectionInterface](../../Config/Definition/ConfigurationSectionInterface.php), e.g.
+
+```
+namespace Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension;
+
+class TestConfiguration implements ConfigurationSectionInterface
+{
+    public function configure(
+        NodeBuilder $node,
+        array $configureCallbacks,
+        array $preProcessCallbacks,
+        array $postProcessCallbacks
+    ) {
+}
+```
+
+after that the method `getEntityConfigurationSections` in `MyConfigExtension` needs changes a bit and will looks like this:
+
+```
+    public function getEntityConfigurationSections()
+    {
+        return ['test_section' => new TestConfiguration()];
+    }
+```
+
+so the new section `test_section` will appear in the `oro:api:config:dump-reference` command execution output
+
+```yaml
+# The structure of "Resources/config/oro/api.yml"
+oro_api:
+    ...
+    entities:
+        name:
+            ...
+            test_section:         []
+            ...
+```
+
+How to add new property into existing config section?
+-----------------------------------------------------
+
+So, in the previous step we have added a new section called `test_section`. Let's add a new property.
+To deal with it all that we have to do is just modify the `configure` method in `TestConfiguration` class, e.g.
+
+```
+    public function configure(
+        NodeBuilder $node,
+        array $configureCallbacks,
+        array $preProcessCallbacks,
+        array $postProcessCallbacks
+    ) {
+        $node->scalarNode('test_property')->cannotBeEmpty()->end();
+    }
+```
+
+And the `oro:api:config:dump-reference` command execution output
+
+```yaml
+# The structure of "Resources/config/oro/api.yml"
+oro_api:
+    ...
+    entities:
+        name:
+            ...
+            test_section:
+                test_property: ~
+            ...
+```
+
+How to allow 3rd party bundles to extend existing section?
+----------------------------------------------------------
+
+Let's extend the previous examples to allow extending the section from another bundles.
+
+```php
+
+namespace Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension;
+
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+
+use Oro\Bundle\ApiBundle\Config\Definition\AbstractConfigurationSection;
+use Oro\Bundle\ApiBundle\Config\Definition\ConfigurationSectionInterface;
+
+class TestConfiguration extends AbstractConfigurationSection implements ConfigurationSectionInterface
+{
+    /**
+     * {@inheritdoc}
+     */
+    public function configure(
+        NodeBuilder $node,
+        array $configureCallbacks,
+        array $preProcessCallbacks,
+        array $postProcessCallbacks
+    ) {
+        $sectionName = 'test_section';
+
+        /** @var ArrayNodeDefinition $parentNode */
+        $parentNode = $node->end();
+        $parentNode
+            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
+            ->beforeNormalization()
+            ->always(
+                function ($value) use ($preProcessCallbacks, $sectionName) {
+                    return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
+                }
+            );
+
+        $node->scalarNode('test_property')->cannotBeEmpty()->end();
+
+        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
+
+        $parentNode
+            ->validate()
+            ->always(
+                function ($value) use ($postProcessCallbacks, $sectionName) {
+                    return $this->callProcessConfigCallbacks($value, $postProcessCallbacks, $sectionName);
+                }
+            );
+    }
+}
+```
+
+So after that it will be possible to add new property from any other extension, e.g.
+
+```php
+
+namespace Acme\Bundle\AnotherAcmeBundle\ConfigExtension\MyNewConfigExtension;
+
+use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+
+class AnotherTestConfigExtension implements ConfigExtensionInterface
+{
+    public function getConfigureCallbacks()
+    {
+        return [
+            'test_section' => function (NodeBuilder $node) {
+                $node->scalarNode('test_property_new');
+            },
+        ];
+    }
+
+```
+
+And the `oro:api:config:dump-reference` command execution output
+
+```yaml
+
+# The structure of "Resources/config/oro/api.yml"
+oro_api:
+    ...
+    entities:
+        name:
+            ...
+            test_section:
+                test_property_new: ~
+                test_property: ~
+            ...
+```
+
+Pre/PostProcessCallbacks in [ConfigExtensionInterface](../../Config/ConfigExtensionInterface.php)
+------------------------------------------------------
+
+When the configs are processed they are first normalized, then merged and finally the tree is used to validate the result. So, the `getPreProcessCallbacks` methods will run before normalization and `getPostProcessCallbacks` will be used to validate. As an example see [TargetEntityDefinitionConfiguration](../../Config/Definition/TargetEntityDefinitionConfiguration.php), e.g.
+
+```
+    ...
+    protected function postProcessConfig(array $config)
+    {
+        if (empty($config[EntityDefinitionConfig::ORDER_BY])) {
+            unset($config[EntityDefinitionConfig::ORDER_BY]);
+        }
+        if (empty($config[EntityDefinitionConfig::HINTS])) {
+            unset($config[EntityDefinitionConfig::HINTS]);
+        }
+        if (empty($config[EntityDefinitionConfig::POST_SERIALIZE])) {
+            unset($config[EntityDefinitionConfig::POST_SERIALIZE]);
+        }
+        if (empty($config[EntityDefinitionConfig::FIELDS])) {
+            unset($config[EntityDefinitionConfig::FIELDS]);
+        }
+
+        return $config;
+    }
+    ...
+```
+
+Here's, the main idea is to cleanup empty sections in configuration.
+
+
 Config Sections
 ===============
-
-const RELATIONS_SECTION  = 'relations';
-const EXCLUSIONS_SECTION = 'exclusions';
-const ENTITIES_SECTION   = 'entities';
-
-
-describe the following config sections:
 
 |Config Section | Description |
 | ---                   | :--- |
 |exclusions             | The section describes entity(ies) and\or field(s) exclusions | 
-| ---                   |  |
+| ---                   | --- |
 |entities               | The section describes entities configurations |
 |entities.entity        | The section describes whole single entity configuration with all fields, sorters, filters, etc. |
 |entities.entity.fields | The section describes the configuration of fields per certain entity|
@@ -198,28 +417,17 @@ describe the following config sections:
 |relations              | The section describes relations configurations |
 |relations.entity       | The section describes whole single relation configuration with all fields, sorters, filters, etc. |
 |relations.entity.fields| The section describes the configuration of fields per certain relation |
-| ---                   |  |
+| ---                   | --- |
 |filters                | The section presents in both: entities and relations. Describes the configuration of filters |
-|filters.fields         |  |
-| ---                   |  |
+|filters.fields         | The section describes the filter configuration per fields |
+| ---                   | --- |
 |sorters                | The section presents in both: entities and relations. Describes the configuration of sorters |
-|sorters.fields         |  |
-| ---                   |  |
+|sorters.fields         | The section describes the sorters configuration per fields |
+| ---                   | --- |
 
 
-
-How to add new property into existing config section?
------------------------------------------------------
-
-TODO
-
-How to deal with sections (add new, get existing one)?
-------------------------------------------------------
-
-TODO
-
-
-- should be documented: 
+TODO: should be documented:
+===========================
 
 -- ConfigExtraSectionInterface
   This interface can be used to tell the Context that an additional data should be available as additional type of configuration. 
@@ -233,10 +441,3 @@ TODO
 
 -- ConfigLoaderFactory
 
-
-
-TO DO
-======
-
-- example how to introduce "options" config section and add process "exclude_from" specific requests option
-- also  how to do the same for a specific entity using a processor
