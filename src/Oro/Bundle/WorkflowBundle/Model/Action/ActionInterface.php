@@ -2,33 +2,11 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model\Action;
 
-use Oro\Component\ConfigExpression\ExpressionInterface;
+use Oro\Component\Action\Action\ActionInterface as BaseActionInterface;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-
-interface ActionInterface
+/**
+ * @deprecated since 1.10. Use {@see Oro\Component\Action\Action\ActionInterface} instead
+ */
+interface ActionInterface extends BaseActionInterface
 {
-    /**
-     * Execute action.
-     *
-     * @param mixed $context
-     */
-    public function execute($context);
-
-    /**
-     * Initialize action based on passed options.
-     *
-     * @param array $options
-     * @return ActionInterface
-     * @throws InvalidParameterException
-     */
-    public function initialize(array $options);
-
-    /**
-     * Set optional condition for action
-     *
-     * @param ExpressionInterface $condition
-     * @return mixed
-     */
-    public function setCondition(ExpressionInterface $condition);
 }

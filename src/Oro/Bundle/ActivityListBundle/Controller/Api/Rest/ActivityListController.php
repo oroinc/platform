@@ -49,19 +49,12 @@ class ActivityListController extends RestController
         $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
         $filter      = $this->getRequest()->get('filter');
 
-        $results = [
-            'count' => $this->getManager()->getListCount(
-                $entityClass,
-                $entityId,
-                $filter
-            ),
-            'data'  => $this->getManager()->getList(
-                $entityClass,
-                $entityId,
-                $filter,
-                $this->getRequest()->get('page', 1)
-            )
-        ];
+        $results = $this->getmanager()->getListData(
+            $entityClass,
+            $entityId,
+            $filter,
+            $this->getRequest()->get('page', 1)
+        );
 
         return new JsonResponse($results);
     }

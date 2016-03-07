@@ -5,6 +5,8 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
+use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
+use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 
 class DateFilterUtility
 {
@@ -14,12 +16,17 @@ class DateFilterUtility
     /** @var string */
     private $offset;
 
+    /** @var Compiler */
+    protected $expressionCompiler;
+
     /**
      * @param LocaleSettings $localeSettings
+     * @param Compiler $compiler
      */
-    public function __construct(LocaleSettings $localeSettings)
+    public function __construct(LocaleSettings $localeSettings, Compiler $compiler)
     {
         $this->localeSettings = $localeSettings;
+        $this->expressionCompiler = $compiler;
     }
 
     /**
@@ -42,16 +49,20 @@ class DateFilterUtility
         // values will not be used, so just unset them
         if ($data['type'] == DateRangeFilterType::TYPE_MORE_THAN) {
             $data['value']['end'] = null;
+            $data['value']['end_original'] = null;
         } elseif ($data['type'] == DateRangeFilterType::TYPE_LESS_THAN) {
             $data['value']['start'] = null;
+            $data['value']['start_original'] = null;
         }
 
         $data = [
-            'date_start' => $data['value']['start'],
-            'date_end'   => $data['value']['end'],
-            'type'       => $data['type'],
-            'part'       => isset($data['part']) ? $data['part'] : DateModifierInterface::PART_VALUE,
-            'field'      => $field
+            'date_start'          => $data['value']['start'],
+            'date_end'            => $data['value']['end'],
+            'date_start_original' => $data['value']['start_original'],
+            'date_end_original'   => $data['value']['end_original'],
+            'type'                => $data['type'],
+            'part'                => isset($data['part']) ? $data['part'] : DateModifierInterface::PART_VALUE,
+            'field'               => $field
         ];
         $data = $this->applyDatePart($data);
 
@@ -85,9 +96,10 @@ class DateFilterUtility
      *
      * @return array
      */
-    protected function applyDatePart($data)
+    protected function applyDatePart(array $data)
     {
-        $field = $data['field'];
+        $field = $this->modifyFieldToDayWithMonth($data['field'], $data);
+
         switch ($data['part']) {
             case DateModifierInterface::PART_MONTH:
                 $field = $this->getEnforcedTimezoneFunction('MONTH', $field);
@@ -119,6 +131,57 @@ class DateFilterUtility
     }
 
     /**
+     * variable 'this day without year' search all today records without year
+     * text 'January 16' search all January 16 records without year
+     *
+     * @param string $sqlField
+     * @param array $data
+     * @return string
+     */
+    protected function modifyFieldToDayWithMonth($sqlField, array &$data)
+    {
+        $isModifyAllowed = false;
+        $fields = ['date_start', 'date_end'];
+        foreach ($fields as $field) {
+            $originalKey = $field.'_original';
+            if ($this->allowToModifyFieldToDayWithMonth($data, $originalKey, $field)) {
+                    $data[$field] = $data[$field]
+                        ->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()))
+                        ->format('md');
+                    $isModifyAllowed = true;
+            }
+        }
+
+        if ($isModifyAllowed) {
+            $sqlField = $this->applyTimezoneConvert($sqlField);
+            $sqlField = sprintf('MONTH(%1$s) * 100 + DAY(%1$s)', $sqlField);
+        }
+
+        return $sqlField;
+    }
+
+    /**
+     * Allow to modify sql field if present 'this day without year' variable or date without year
+     *
+     * @param array $data
+     * @param string $originalKey
+     * @param string $field
+     * @return bool
+     */
+    protected function allowToModifyFieldToDayWithMonth($data, $originalKey, $field)
+    {
+        if (!$data[$originalKey]) {
+            return false;
+        }
+        $expression = $this->expressionCompiler->compile($data[$originalKey], true);
+        return
+            $expression instanceof ExpressionResult &&
+            $data[$field] instanceof \DateTime &&
+            ($expression->getVariableType() == DateModifierInterface::VAR_THIS_DAY_W_Y ||
+             $expression->getSourceType() == ExpressionResult::TYPE_DAYMONTH);
+    }
+
+    /**
      * Check whenever user timezone not UTC then wrap field name with convert timezone func
      *
      * @param string $functionName
@@ -128,12 +191,24 @@ class DateFilterUtility
      */
     private function getEnforcedTimezoneFunction($functionName, $fieldName)
     {
+        $result = sprintf('%s(%s)', $functionName, $this->applyTimezoneConvert($fieldName));
+
+        return $result;
+    }
+
+    /**
+     * Correcting time zone in case if it not equals UTC
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    protected function applyTimezoneConvert($fieldName)
+    {
         if ('UTC' !== $this->localeSettings->getTimeZone()) {
             $fieldName = sprintf("CONVERT_TZ(%s, '+00:00', '%s')", $fieldName, $this->getTimeZoneOffset());
         }
-        $result = sprintf('%s(%s)', $functionName, $fieldName);
 
-        return $result;
+        return $fieldName;
     }
 
     /**

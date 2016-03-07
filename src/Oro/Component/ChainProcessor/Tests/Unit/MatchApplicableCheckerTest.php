@@ -20,6 +20,7 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
         $context->set('class', 'TestCls');
         $context->set('type', 'test');
         $context->set('feature', ['feature1', 'feature3']);
+        $context->set('featureObj', new TestArrayObject(['feature1', 'feature3']));
 
         $processors = [
             'action1' => [
@@ -99,6 +100,70 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
                     'processor'  => 'processor19',
                     'attributes' => ['class' => 'TestCls', 'feature' => ['feature1', 'feature2']]
                 ],
+                [
+                    'processor'  => 'processor20',
+                    'attributes' => ['type' => '!test']
+                ],
+                [
+                    'processor'  => 'processor21',
+                    'attributes' => ['type' => '!test1']
+                ],
+                [
+                    'processor'  => 'processor22',
+                    'attributes' => ['feature' => '!feature1']
+                ],
+                [
+                    'processor'  => 'processor23',
+                    'attributes' => ['feature' => '!feature2']
+                ],
+                [
+                    'processor'  => 'processor24',
+                    'attributes' => ['feature' => ['!feature1', '!feature2']]
+                ],
+                [
+                    'processor'  => 'processor25',
+                    'attributes' => ['feature' => ['feature1', '!feature2']]
+                ],
+                [
+                    'processor'  => 'processor26',
+                    'attributes' => ['feature' => ['!feature1', 'feature2']]
+                ],
+                [
+                    'processor'  => 'processor27',
+                    'attributes' => ['feature' => ['!feature1', '!feature3']]
+                ],
+                [
+                    'processor'  => 'processor28',
+                    'attributes' => ['feature' => ['!feature2', '!feature4']]
+                ],
+                [
+                    'processor'  => 'processor29',
+                    'attributes' => ['type' => ['!test', '!test1']]
+                ],
+                [
+                    'processor'  => 'processor30',
+                    'attributes' => ['type' => ['test', '!test1']]
+                ],
+                [
+                    'processor'  => 'processor31',
+                    'attributes' => ['type' => ['!test', 'test1']]
+                ],
+                [
+                    'processor'  => 'processor32',
+                    'attributes' => ['type' => ['test', 'test1']]
+                ],
+                [
+                    'processor'  => 'processor33',
+                    'attributes' => ['class' => 'TestCls', 'featureObj' => ['feature1', 'feature3']]
+                ],
+                [
+                    'processor'  => 'processor34',
+                    'attributes' => ['class' => 'TestCls', 'featureObj' => ['feature3', 'feature1']]
+                ],
+                [
+                    'processor'  => 'processor35',
+                    'attributes' => ['class' => 'TestCls', 'featureObj' => ['feature1', 'feature2']]
+                ],
             ]
         ];
 
@@ -122,6 +187,13 @@ class MatchApplicableCheckerTest extends \PHPUnit_Framework_TestCase
                 'processor16',
                 'processor17',
                 'processor18',
+                'processor21',
+                'processor23',
+                'processor25',
+                'processor28',
+                'processor30',
+                'processor33',
+                'processor34',
             ],
             $iterator
         );

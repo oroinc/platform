@@ -125,7 +125,7 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
             $this->setupRouterStub($data['viewPageRoute'], $data['entities'], $data['isCustomEntity'], $classParam);
         }
 
-        $this->setupExtendRelationConfigStub($entityClass, $data['isCustomEntity']);
+        $this->setupExtendRelationConfigStub($entityClass, $data['isCustomEntity'], true);
 
         $event = new ValueRenderEvent($entity, $value, $fieldConfig);
         $this->target->beforeValueRender($event);
@@ -373,10 +373,19 @@ class ExtendFieldValueRenderListenerTest extends \PHPUnit_Framework_TestCase
     /**
      * @param string $expectedClass
      * @param bool   $isCustomEntity
+     * @param bool   $expectGet
      */
-    protected function setupExtendRelationConfigStub($expectedClass, $isCustomEntity = true)
+    protected function setupExtendRelationConfigStub($expectedClass, $isCustomEntity = true, $expectGet = false)
     {
         $relationExtendConfig = $this->getMock('Oro\Bundle\EntityConfigBundle\Config\ConfigInterface');
+        if ($expectGet) {
+            $relationExtendConfig
+                ->expects($this->once())
+                ->method('get')
+                ->with('pk_columns', false, ['id'])
+                ->willReturn(['id']);
+        }
+
         $relationExtendConfig->expects($this->any())
             ->method('is')
             ->willReturnMap([

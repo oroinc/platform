@@ -12,6 +12,7 @@ class CollectResourcesContext extends ApiContext
 {
     public function __construct()
     {
+        parent::__construct();
         $this->setResult(new ApiResourceCollection());
     }
 }

@@ -6,8 +6,8 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Yaml\Parser;
 
-use Oro\Bundle\ApiBundle\Request\JsonApi\EntityClassTransformer;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -17,8 +17,8 @@ abstract class ApiTestCase extends WebTestCase
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EntityClassTransformer */
-    protected $entityClassTransformer;
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
 
     /**
      * Local cache for expectations
@@ -35,12 +35,12 @@ abstract class ApiTestCase extends WebTestCase
         /** @var ContainerInterface $container */
         $container = $this->getContainer();
 
-        $this->entityClassTransformer = $container->get('oro_api.json_api.entity_class_transformer');
-        $this->doctrineHelper         = $container->get('oro_api.doctrine_helper');
+        $this->valueNormalizer = $container->get('oro_api.value_normalizer');
+        $this->doctrineHelper  = $container->get('oro_api.doctrine_helper');
     }
 
     /**
-     * @return string[]
+     * @return RequestType
      */
     abstract protected function getRequestType();
 
@@ -61,32 +61,6 @@ abstract class ApiTestCase extends WebTestCase
         }
 
         return $entities;
-    }
-
-    /**
-     * @param string $entityClass
-     * @param array  $content
-     *
-     * @return array
-     */
-    protected function getGetRequestConfig($entityClass, $content)
-    {
-        $recordExist   = count($content) === 1;
-        $recordContent = $recordExist ? $content [0] : [];
-        $idFields      = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-        $idFieldCount  = count($idFields);
-        if ($idFieldCount === 1) {
-            // single identifier
-            return [$recordExist ? $recordContent[reset($idFields)] : 1, $recordExist];
-        } elseif ($idFieldCount > 1) {
-            // combined identifier
-            $requirements = [];
-            foreach ($idFields as $field) {
-                $requirements[$field] = $recordExist ? $content[$field] : 1;
-            }
-
-            return [implode(RestRequest::ARRAY_DELIMITER, $requirements), $recordExist];
-        }
     }
 
     /**

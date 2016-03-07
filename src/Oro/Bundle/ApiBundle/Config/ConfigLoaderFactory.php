@@ -6,8 +6,19 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ConfigLoaderFactory
 {
+    /** @var ConfigExtensionRegistry */
+    protected $extensionRegistry;
+
     /** @var ConfigLoaderInterface[] */
-    private $loaders = [];
+    private $loaders;
+
+    /**
+     * @param ConfigExtensionRegistry $extensionRegistry
+     */
+    public function __construct(ConfigExtensionRegistry $extensionRegistry)
+    {
+        $this->extensionRegistry = $extensionRegistry;
+    }
 
     /**
      * Indicates whether a loader for a given configuration type exists.
@@ -47,10 +58,10 @@ class ConfigLoaderFactory
      * This method can be used to register a loader for new configuration type
      * or to override a default loader.
      *
-     * @param string                $configType
-     * @param ConfigLoaderInterface $loader
+     * @param string                     $configType
+     * @param ConfigLoaderInterface|null $loader
      */
-    public function setLoader($configType, ConfigLoaderInterface $loader)
+    protected function setLoader($configType, ConfigLoaderInterface $loader = null)
     {
         if ($loader instanceof ConfigLoaderFactoryAwareInterface) {
             $loader->setConfigLoaderFactory($this);
@@ -65,15 +76,24 @@ class ConfigLoaderFactory
      */
     protected function findLoader($configType)
     {
+        if (null === $this->loaders) {
+            $this->loaders = [];
+
+            $extensions = $this->extensionRegistry->getExtensions();
+            foreach ($extensions as $extension) {
+                $loaders = $extension->getEntityConfigurationLoaders();
+                foreach ($loaders as $type => $loader) {
+                    $this->setLoader($type, $loader);
+                }
+            }
+        }
+
         if (array_key_exists($configType, $this->loaders)) {
             return $this->loaders[$configType];
         }
 
         $loader = $this->createDefaultLoader($configType);
-        if ($loader instanceof ConfigLoaderFactoryAwareInterface) {
-            $loader->setConfigLoaderFactory($this);
-        }
-        $this->loaders[$configType] = $loader;
+        $this->setLoader($configType, $loader);
 
         return $loader;
     }
@@ -90,10 +110,6 @@ class ConfigLoaderFactory
                 return new EntityDefinitionConfigLoader();
             case ConfigUtil::FIELDS:
                 return new EntityDefinitionFieldConfigLoader();
-            case ConfigUtil::FILTERS:
-                return new FiltersConfigLoader();
-            case ConfigUtil::SORTERS:
-                return new SortersConfigLoader();
             default:
                 return null;
         }
