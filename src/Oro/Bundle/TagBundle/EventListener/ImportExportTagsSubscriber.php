@@ -4,6 +4,7 @@ namespace Oro\Bundle\TagBundle\EventListener;
 
 use Countable;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Event\PostFlushEventArgs;
 
@@ -219,14 +220,10 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
 
                 $this->getTagImportManager()->setTags(
                     $entity,
-                    [
-                        'autocomplete' => [],
-                        'all' => [
-                            new Tag('custom tag'),
-                            new Tag('second tag'),
-                        ],
-                        'owner' => [],
-                    ]
+                    new ArrayCollection([
+                        new Tag('custom tag'),
+                        new Tag('second tag'),
+                    ])
                 );
             }
         }
