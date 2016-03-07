@@ -126,7 +126,7 @@ class TagImportManager
     /**
      * @param object $entity
      */
-    public function saveTags($entity)
+    public function persistTags($entity)
     {
         $key = spl_object_hash($entity);
         if (isset($this->pendingTags[$key])) {
@@ -135,7 +135,7 @@ class TagImportManager
             unset($this->pendingTags[$key]);
         }
 
-        $this->tagStorage->saveTagging($entity);
+        $this->tagStorage->saveTagging($entity, false);
     }
 
     /**
