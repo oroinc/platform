@@ -238,6 +238,33 @@ services:
         arguments:
             - @oro_security.acl.sid_manager
 
+    oro_user.api.delete.security_check_data_by_handler:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\SecurityCheckByCustomProcessHandler
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_user.handler.delete
+            - %oro_user.entity.class%
+        tags:
+            - { name: oro.api.processor, action: delete, group: security_check_data, priority: 0 }
+
+    oro_user.api.delete.security_check_data_by_handler:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\SecurityCheckByCustomProcessHandler
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_user.role.handler.delete
+            - %oro_user.role.entity.class%
+        tags:
+            - { name: oro.api.processor, action: delete, group: security_check_data, priority: 0 }
+
+    oro_user.api.delete.delete_data_by_handler:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomProcessHandler
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_user.role.handler.delete
+            - %oro_user.role.entity.class%
+        tags:
+            - { name: oro.api.processor, action: delete, group: delete_data, priority: 0 }
+
     oro_user.activity_widget_provider:
         class: %oro_user.activity_widget_provider.class%
         arguments:

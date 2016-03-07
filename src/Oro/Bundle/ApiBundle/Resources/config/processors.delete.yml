@@ -76,3 +76,53 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_input, priority: -100 }
+
+
+    #
+    # load_data
+    #
+
+    oro_api.delete.load_data:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\LoadData
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
+
+    #
+    # security_check_data
+    #
+
+    oro_api.delete.security_check_data_by_handler:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\SecurityCheckByProcessHandler
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_soap.handler.delete
+        tags:
+            - { name: oro.api.processor, action: delete, group: security_check_data, priority: -10 }
+
+    oro_api.delete.security_check_data:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\SecurityCheck
+        arguments:
+            - @oro_security.security_facade
+        tags:
+            - { name: oro.api.processor, action: delete, group: security_check_data, priority: -20 }
+
+    #
+    # delete_data
+    #
+
+    oro_api.delete.delete_data_by_handler:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByProcessHandler
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_soap.handler.delete
+        tags:
+            - { name: oro.api.processor, action: delete, group: delete_data, priority: -10 }
+
+    oro_api.delete.delete_data:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteData
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: delete, group: delete_data, priority: -20 }

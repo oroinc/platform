@@ -58,11 +58,11 @@ oro_api:
                     priority: -20
                 normalize_input:
                     priority: -30
-                build_query:
-                    priority: -40
                 load_data:
+                    priority: -40
+                security_check_data:
                     priority: -50
-                normalize_data:
+                delete_data:
                     priority: -60
                 finalize:
                     priority: -70
