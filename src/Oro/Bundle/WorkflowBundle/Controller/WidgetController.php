@@ -126,10 +126,6 @@ class WidgetController extends Controller
                 $data = $serializer->serialize(new WorkflowData($formAttributes), 'json');
                 $saved = true;
 
-                $entityId = $this->getRequest()->get('entityId', 0);
-                $entityClass = $workflow->getDefinition()->getRelatedEntity();
-                $entity = $this->getEntityReference($entityClass, $entityId);
-
                 $response = $this->get('oro_workflow.handler.start_transition_handler')
                     ->handle($workflow, $transition, $data, $entity);
                 if ($response) {
