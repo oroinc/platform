@@ -169,7 +169,12 @@ class DataGridExtension extends \Twig_Extension
     protected function generateUrl(DatagridInterface $grid, $route, $params)
     {
         $gridFullName = $this->nameStrategy->buildGridFullName($grid->getName(), $grid->getScope());
-        return $this->router->generate($route ?: self::ROUTE, ['gridName' => $gridFullName, $gridFullName => $params]);
+        $gridUniqueName = $this->nameStrategy->getGridUniqueName($gridFullName);
+
+        return $this->router->generate(
+            $route ?: self::ROUTE,
+            ['gridName' => $gridFullName, $gridUniqueName => $params]
+        );
     }
 
     /**

@@ -109,6 +109,7 @@ services:
         class: %oro_filter.date_filter_utility.class%
         arguments:
             - @oro_locale.settings
+            - @oro_filter.expression.date.compiler
 
     oro_filter.date_range_filter:
         class: %oro_filter.date_range_filter.class%

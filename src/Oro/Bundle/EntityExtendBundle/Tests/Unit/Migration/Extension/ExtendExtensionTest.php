@@ -1064,33 +1064,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage The target column name must be "id". Relation column: "table1::rel_id". Target column
-     * name: "name".
-     */
-    public function testInvalidRelationColumnName()
-    {
-        $schema    = $this->getExtendSchema();
-        $extension = $this->getExtendExtension();
-
-        $selfTable = $schema->createTable('table1');
-        $selfTable->addColumn('id', 'integer');
-        $selfTable->setPrimaryKey(['id']);
-
-        $targetTable = $schema->createTable('table2');
-        $targetTable->addColumn('name', 'integer');
-        $targetTable->setPrimaryKey(['name']);
-
-        $extension->addManyToOneRelation(
-            $schema,
-            $selfTable,
-            'rel',
-            $targetTable,
-            'name'
-        );
-    }
-
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
      * @expectedExceptionMessage The type of relation column "table1::rel_id" must be an integer or string. "float"
      * type is not supported.
      */

@@ -85,11 +85,18 @@ interface DatagridInterface
 
     /**
      * Retrieve metadata from all extensions
-     * Metadata needed to create view layer
+     * Metadata needed to create view layer (can be lazy - so additional request is required)
      *
      * @return MetadataObject
      */
     public function getMetadata();
+
+    /**
+     * Returns the same as getMetadata with resolved lazy stuff
+     *
+     * @return MetadataObject
+     */
+    public function getResolvedMetadata();
 
     /**
      * Returns parameters

@@ -57,6 +57,12 @@ parameters:
     oro_entity.helper.dictionary.class:                      Oro\Bundle\EntityBundle\Helper\DictionaryHelper
 
 services:
+    oro_entity.entity_manager_bag:
+        public: false
+        class: Oro\Bundle\EntityBundle\ORM\ManagerBag
+        arguments:
+            - @doctrine
+
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
         arguments:
@@ -104,6 +110,7 @@ services:
         class: %oro_entity.event_listener.entity_relation_grid_listener.class%
         arguments:
             - @oro_entity_config.config_manager
+            - @oro_entity.doctrine_helper
         calls:
             - [setRequest, [@?request=]]
         tags:
@@ -210,7 +217,7 @@ services:
         arguments:
             - @oro_entity.doctrine_helper
             - @oro_entity_config.provider.extend
-            - @oro_entity_config.entity_manager_bag
+            - @oro_entity.entity_manager_bag
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%
@@ -269,7 +276,8 @@ services:
     oro_entity.entity_alias_resolver:
         class: %oro_entity.entity_alias_resolver.class%
         arguments:
-            - @doctrine
+            - @oro_entity.doctrine_helper
+            - @oro_entity.entity_manager_bag
             - %kernel.debug%
         lazy: true
 

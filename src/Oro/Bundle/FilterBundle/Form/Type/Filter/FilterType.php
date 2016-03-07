@@ -95,6 +95,7 @@ class FilterType extends AbstractType
                 'operator_type'    => 'choice',
                 'operator_options' => array(),
                 'show_filter'      => false,
+                'lazy'             => false,
             )
         )->setRequired(
             array(

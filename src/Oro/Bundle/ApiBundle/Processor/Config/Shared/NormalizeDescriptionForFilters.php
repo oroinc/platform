@@ -19,7 +19,12 @@ class NormalizeDescriptionForFilters extends NormalizeDescription
         /** @var ConfigContext $context */
 
         $filters = $context->getFilters();
-        $fields  = $filters->getFields();
+        if (!$filters->hasFields()) {
+            // nothing to process
+            return;
+        }
+
+        $fields = $filters->getFields();
         foreach ($fields as $fieldName => $field) {
             $description = $field->getDescription();
             if ($description instanceof Label) {

@@ -5,11 +5,13 @@ namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\EntityIdAccessor;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\ObjectAccessor;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\ObjectAccessorInterface;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class JsonApiDocumentBuilder
 {
@@ -24,8 +26,8 @@ class JsonApiDocumentBuilder
     const ID            = 'id';
     const TYPE          = 'type';
 
-    /** @var EntityClassTransformerInterface */
-    protected $entityClassTransformer;
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
 
     /** @var EntityIdTransformerInterface */
     protected $entityIdTransformer;
@@ -39,22 +41,26 @@ class JsonApiDocumentBuilder
     /** @var array */
     protected $result = [];
 
+    /** @var RequestType */
+    protected $requestType;
+
     /**
-     * @param EntityClassTransformerInterface $entityClassTransformer
-     * @param EntityIdTransformerInterface    $entityIdTransformer
+     * @param ValueNormalizer              $valueNormalizer
+     * @param EntityIdTransformerInterface $entityIdTransformer
      */
     public function __construct(
-        EntityClassTransformerInterface $entityClassTransformer,
+        ValueNormalizer $valueNormalizer,
         EntityIdTransformerInterface $entityIdTransformer
     ) {
-        $this->entityClassTransformer = $entityClassTransformer;
-        $this->entityIdTransformer    = $entityIdTransformer;
+        $this->valueNormalizer     = $valueNormalizer;
+        $this->entityIdTransformer = $entityIdTransformer;
 
         $this->objectAccessor   = new ObjectAccessor();
         $this->entityIdAccessor = new EntityIdAccessor(
             $this->objectAccessor,
             $this->entityIdTransformer
         );
+        $this->requestType      = new RequestType([RequestType::JSON_API]);
     }
 
     /**
@@ -336,15 +342,31 @@ class JsonApiDocumentBuilder
     protected function getEntityType($entityClass, $fallbackEntityClass = null)
     {
         if (null === $fallbackEntityClass) {
-            $entityType = $this->entityClassTransformer->transform($entityClass);
+            $entityType = $this->convertToEntityType($entityClass);
         } else {
-            $entityType = $this->entityClassTransformer->transform($entityClass, false);
+            $entityType = $this->convertToEntityType($entityClass, false);
             if (!$entityType) {
-                $entityType = $this->entityClassTransformer->transform($fallbackEntityClass);
+                $entityType = $this->convertToEntityType($fallbackEntityClass);
             }
         }
 
         return $entityType;
+    }
+
+    /**
+     * @param string $entityClass
+     * @param bool   $throwException
+     *
+     * @return string|null
+     */
+    protected function convertToEntityType($entityClass, $throwException = true)
+    {
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            $this->requestType,
+            $throwException
+        );
     }
 
     /**
