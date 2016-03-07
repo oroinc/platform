@@ -4,35 +4,36 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 class SetFieldsFilter implements ProcessorInterface
 {
     const FILTER_KEY          = 'fields';
     const FILTER_KEY_TEMPLATE = 'fields[%s]';
-    const FILTER_KEY_DESCRIPTION
-        = 'Return only specific fields in the response on a per-type basis by including a fields[TYPE] parameter.';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EntityClassTransformerInterface */
-    protected $entityClassTransformer;
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
 
     /**
      * @param DoctrineHelper                  $doctrineHelper
-     * @param EntityClassTransformerInterface $entityClassTransformer
+     * @param ValueNormalizer $valueNormalizer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
-        EntityClassTransformerInterface $entityClassTransformer
+        ValueNormalizer $valueNormalizer
     ) {
         $this->doctrineHelper         = $doctrineHelper;
-        $this->entityClassTransformer = $entityClassTransformer;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -54,29 +55,52 @@ class SetFieldsFilter implements ProcessorInterface
             return;
         }
 
-        $fieldFilter = new FieldsFilter(
-            DataType::STRING,
-            self::FILTER_KEY_DESCRIPTION
-        );
-        $fieldFilter->setArrayAllowed(true);
-
-        $filters->add(
-            sprintf(self::FILTER_KEY_TEMPLATE, $this->entityClassTransformer->transform($entityClass)),
-            $fieldFilter
-        );
+        $this->addFilter($filters, $entityClass, $context->getRequestType());
 
         $associations = $context->getMetadata()->getAssociations();
-        if (!$associations) {
-            // no associations - no sense to add associations fields filters
-            return;
+        foreach ($associations as $association) {
+            $targetClasses = $association->getAcceptableTargetClassNames();
+            foreach ($targetClasses as $targetClass) {
+                $this->addFilter($filters, $targetClass, $context->getRequestType());
+            }
         }
+    }
 
-        $associationKeys = array_keys($associations);
-        foreach ($associationKeys as $association) {
+    /**
+     * @param FilterCollection $filters
+     * @param string           $entityClass
+     * @param RequestType      $requestType
+     */
+    protected function addFilter(FilterCollection $filters, $entityClass, RequestType $requestType)
+    {
+        $entityType = $this->convertToEntityType($entityClass, $requestType);
+        if ($entityType) {
+            $filter = new FieldsFilter(
+                DataType::STRING,
+                sprintf('A list of fields for the \'%s\' entity to be returned.', $entityType)
+            );
+            $filter->setArrayAllowed(true);
+
             $filters->add(
-                sprintf(self::FILTER_KEY_TEMPLATE, $association),
-                $fieldFilter
+                sprintf(self::FILTER_KEY_TEMPLATE, $entityType),
+                $filter
             );
         }
+    }
+
+    /**
+     * @param string      $entityClass
+     * @param RequestType $requestType
+     *
+     * @return string|null
+     */
+    protected function convertToEntityType($entityClass, RequestType $requestType)
+    {
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            $requestType,
+            false
+        );
     }
 }

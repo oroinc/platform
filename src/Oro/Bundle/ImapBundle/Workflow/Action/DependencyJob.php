@@ -6,10 +6,10 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
 
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Action\ActionInterface;
+use Oro\Component\Action\Model\ContextAccessor;
 
 class DependencyJob extends AbstractAction
 {

@@ -2,7 +2,9 @@
 
 namespace Oro\Bundle\WorkflowBundle\Model;
 
-class ProcessData extends AbstractStorage implements EntityAwareInterface
+use Oro\Component\Action\Model\AbstractStorage as ComponentAbstractStorage;
+
+class ProcessData extends ComponentAbstractStorage implements EntityAwareInterface
 {
     /**
      * {@inheritdoc}

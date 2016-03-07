@@ -216,10 +216,12 @@ class ArrayUtil
     }
 
     /**
-     * Return first element on which callback returns truthy value, null otherwise
+     * Return first element on which callback returns true value, null otherwise
      *
      * @param callable $callback
      * @param array    $array
+     *
+     * @return mixed|null
      */
     public static function find(callable $callback, array $array)
     {
@@ -281,6 +283,51 @@ class ArrayUtil
         }
 
         return $first;
+    }
+
+    /**
+     * Return array of ranges (inclusive)
+     * [[min1, max1], [min2, max2], ...]
+     *
+     * @param int[] $ints List of integers
+     *
+     * @return array
+     */
+    public static function intRanges(array $ints)
+    {
+        $ints = array_unique($ints);
+        sort($ints);
+
+        $result = [];
+        while (false !== ($subResult = static::shiftRange($ints))) {
+            $result[] = $subResult;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $sortedUniqueInts
+     *
+     * @return array|false Array 2 elements [min, max] or false when the array is empty
+     */
+    public static function shiftRange(array &$sortedUniqueInts)
+    {
+        if (!$sortedUniqueInts) {
+            return false;
+        }
+
+        $min = $max = reset($sortedUniqueInts);
+
+        $c = 1;
+        while (next($sortedUniqueInts) !== false && current($sortedUniqueInts) - $c === $min) {
+            $max = current($sortedUniqueInts);
+            array_shift($sortedUniqueInts);
+            $c++;
+        }
+        array_shift($sortedUniqueInts);
+
+        return [$min, $max];
     }
 
     /**

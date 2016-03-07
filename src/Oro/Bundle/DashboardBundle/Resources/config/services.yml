@@ -18,7 +18,6 @@ parameters:
     oro_dashboard.event_listener.widget_configuration_load.class: Oro\Bundle\DashboardBundle\EventListener\WidgetConfigurationLoadListener
     oro_dashboard.event_listener.widget_items_load_data.class: Oro\Bundle\DashboardBundle\EventListener\WidgetItemsLoadDataListener
 
-    oro_dashboard.widget_config_value.date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
     oro_dashboard.widget_config_value.previous_date_range.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\PreviousFilterDateRangeConverter
     oro_dashboard.widget_config_value.widget_title.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetTitleConverter
     oro_dashboard.widget_config_value.widget_items_choice.converter.class: Oro\Bundle\DashboardBundle\Provider\Converters\WidgetItemsChoiceTypeConverter
@@ -146,6 +145,11 @@ services:
         tags:
             - { name: form.type, alias: "oro_type_widget_date_range" }
 
+    oro_dashboard.form.type.widget_datetime_range:
+        class: Oro\Bundle\DashboardBundle\Form\Type\WidgetDateTimeRangeType
+        tags:
+            - { name: form.type, alias: "oro_type_widget_datetime_range" }
+
     oro_dashboard.form.type.widget_date_range_value:
         class: %oro_dashboard.form.type.date_range_value.class%
         tags:
@@ -188,7 +192,7 @@ services:
         class: %oro_dashboard.widget_config_value.provider.class%
 
     oro_dashboard.widget_config_value.date_range.converter:
-        class: %oro_dashboard.widget_config_value.date_range.converter.class%
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter
         arguments:
             - @oro_locale.formatter.date_time
             - @oro_filter.expression.date.compiler
@@ -196,6 +200,15 @@ services:
             - @oro_dashboard.datetime.helper
         tags:
             - { name: oro_dashboard.value.converter, alias: "oro_type_widget_date_range" }
+
+    oro_dashboard.widget_config_value.datetime_range.converter:
+        class: Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter
+        arguments:
+            - @oro_dashboard.widget_config_value.date_range.converter
+            - @oro_dashboard.config_resolver
+            - @oro_dashboard.datetime.helper
+        tags:
+            - { name: oro_dashboard.value.converter, alias: "oro_type_widget_datetime_range" }
 
     oro_dashboard.widget_config_value.previous_date_range.converter:
           class: %oro_dashboard.widget_config_value.previous_date_range.converter.class%
