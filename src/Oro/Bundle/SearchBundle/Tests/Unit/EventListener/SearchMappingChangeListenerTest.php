@@ -110,8 +110,6 @@ class SearchMappingChangeListenerTest extends \PHPUnit_Framework_TestCase
     public function configurationObjectsProvider()
     {
         $classNames = [
-            'Oro\Bundle\ConfigBundle\Entity\Config',
-            'Oro\Bundle\ConfigBundle\Entity\ConfigValue',
             'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel',
             'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel',
         ];
