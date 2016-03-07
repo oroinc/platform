@@ -30,7 +30,7 @@ define(function(require) {
          */
         updateTimeFieldState: function() {
             var value = this.$el.val();
-            if (this.dateVariableHelper.isDateVariable(value)) {
+            if (this.dateVariableHelper.isDateVariable(value) || this.dayValueHelper.isDayValue(value)) {
                 this.$frontTimeField.val('').attr('disabled', 'disabled');
             } else {
                 this.$frontTimeField.removeAttr('disabled');
@@ -48,10 +48,11 @@ define(function(require) {
             var date = this.$frontDateField.val();
             var time = this.$frontTimeField.val();
             var isVariable = this.dateVariableHelper.isDateVariable(date);
+            var isDay = this.dayValueHelper.isDayValue(date);
             var isValidDate = moment(date, this.getDateFormat(), true).isValid();
             var isValidTime = moment(time, this.getTimeFormat(), true).isValid();
 
-            if (!target && !isVariable && (!isValidDate || !isValidTime)) {
+            if (!this._preventFrontendUpdate && !target && !isVariable && !isDay && (!isValidDate || !isValidTime)) {
                 this.$frontDateField.val('');
                 this.$frontTimeField.val('');
             }
@@ -66,6 +67,8 @@ define(function(require) {
             var value = this.$frontDateField.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
+            } else if (this.dayValueHelper.isDayValue(value)) {
+                value = this.dayValueHelper.formatRawValue(value);
             } else {
                 value = dateTimePickerViewMixin.getBackendFormattedValue.call(this);
             }
@@ -81,6 +84,8 @@ define(function(require) {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
+            } else if (this.dayValueHelper.isDayValue(value)) {
+                value = this.dayValueHelper.formatDisplayValue(value);
             } else {
                 value = dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
             }

@@ -18,8 +18,10 @@ class MappingDriverChain extends BaseMappingDriverChain
             return $this->isTransientCache[$className];
         }
 
-        $this->isTransientCache[$className] = parent::isTransient($className);
+        $result = parent::isTransient($className);
 
-        return $this->isTransientCache[$className];
+        $this->isTransientCache[$className] = $result;
+
+        return $result;
     }
 }

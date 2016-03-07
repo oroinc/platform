@@ -36,8 +36,8 @@ class Translator extends BaseTranslator
      */
     protected $dynamicResources = [];
 
-    /** @var bool|null */
-    protected $dbCheck;
+    /** @var bool */
+    protected $installed;
 
     /**
      * Collector of translations
@@ -273,14 +273,10 @@ class Translator extends BaseTranslator
      */
     protected function checkDatabase()
     {
-        if (null === $this->dbCheck) {
-            $doctrine      = $this->container->get('doctrine');
-            $this->dbCheck = SafeDatabaseChecker::tablesExist(
-                $doctrine->getManagerForClass(Translation::ENTITY_NAME)->getConnection(),
-                SafeDatabaseChecker::getTableName($doctrine, Translation::ENTITY_NAME)
-            );
+        if (null === $this->installed) {
+            $this->installed = (bool)$this->container->getParameter('installed');
         }
 
-        return $this->dbCheck;
+        return $this->installed;
     }
 }
