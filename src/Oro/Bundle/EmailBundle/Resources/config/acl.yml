@@ -10,12 +10,6 @@ oro_email_email_create:
     permission: CREATE
     group_name: ""
 
-oro_email_email_edit:
-    type: entity
-    class: OroEmailBundle:Email
-    permission: EDIT
-    group_name: ""
-
 oro_email_email_user_edit:
     type: entity
     class: OroEmailBundle:EmailUser

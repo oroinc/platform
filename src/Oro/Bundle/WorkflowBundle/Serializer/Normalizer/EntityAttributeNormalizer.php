@@ -5,10 +5,10 @@ namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
-use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
+use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class EntityAttributeNormalizer implements AttributeNormalizer
 {

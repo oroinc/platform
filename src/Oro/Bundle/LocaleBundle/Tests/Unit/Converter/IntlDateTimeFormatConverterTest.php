@@ -70,7 +70,7 @@ class IntlDateTimeFormatConverterTest extends AbstractFormatConverterTestCase
     {
         return [
             'en default' => ["MMM d", self::LOCALE_EN],
-            'ru default' => ["d.MMM", self::LOCALE_RU],
+            'ru default' => ["dd.MM", self::LOCALE_RU],
         ];
     }
 }

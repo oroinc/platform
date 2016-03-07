@@ -42,7 +42,8 @@ define([
             '<div class="more-bar-holder">' +
                 '<div class="dropdown">' +
                     '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
-                    '<ul class="dropdown-menu pull-right launchers-dropdown-menu"></ul>' +
+                    '<ul class="dropdown-menu dropdown-menu__action-cell pull-right launchers-dropdown-menu" ' +
+                        'data-options="{&quot;html&quot;: true}"></ul>' +
                 '</div>' +
             '</div>'
         ),
@@ -105,7 +106,7 @@ define([
             ActionCell.__super__.initialize.apply(this, arguments);
             this.actions = this.createActions();
             _.each(this.actions, function(action) {
-                this.listenTo(action, 'run', this.onActionRun);
+                this.listenTo(action, 'preExecute', this.onActionRun);
             }, this);
 
             this.launchers = this.createLaunchers();
@@ -132,7 +133,7 @@ define([
          * @param {oro.datagrid.action.AbstractAction} action
          */
         onActionRun: function(action) {
-            this.$('.dropdown.open').removeClass('open');
+            this.$('.dropdown.open .dropdown-toggle').trigger('tohide.bs.dropdown');
         },
 
         /**

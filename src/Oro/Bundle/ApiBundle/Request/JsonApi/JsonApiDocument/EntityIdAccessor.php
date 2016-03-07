@@ -14,14 +14,14 @@ class EntityIdAccessor
     protected $entityIdTransformer;
 
     /**
-     * @param ObjectAccessorInterface $objectAccessor
+     * @param ObjectAccessorInterface      $objectAccessor
      * @param EntityIdTransformerInterface $entityIdTransformer
      */
     public function __construct(
         ObjectAccessorInterface $objectAccessor,
         EntityIdTransformerInterface $entityIdTransformer
     ) {
-        $this->objectAccessor = $objectAccessor;
+        $this->objectAccessor      = $objectAccessor;
         $this->entityIdTransformer = $entityIdTransformer;
     }
 

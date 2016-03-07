@@ -4,8 +4,11 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Model\Label;
 
+/**
+ * Localizes "label" and "description" attributes for fields.
+ */
 class NormalizeDescriptionForFields extends NormalizeDescription
 {
     /**
@@ -16,24 +19,22 @@ class NormalizeDescriptionForFields extends NormalizeDescription
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
-        if (empty($definition)
-            || empty($definition[ConfigUtil::FIELDS])
-            || !is_array($definition[ConfigUtil::FIELDS])
-        ) {
-            // a configuration of fields does not exist or a normalization is not needed
+        if (!$definition->hasFields()) {
+            // nothing to process
             return;
         }
 
-        $fields = array_keys($definition[ConfigUtil::FIELDS]);
-        foreach ($fields as $fieldName) {
-            $fieldConfig = $definition[ConfigUtil::FIELDS][$fieldName];
-            if (null !== $fieldConfig && is_array($fieldConfig)) {
-                $this->normalizeAttribute($fieldConfig, ConfigUtil::LABEL);
-                $this->normalizeAttribute($fieldConfig, ConfigUtil::DESCRIPTION);
-                $definition[ConfigUtil::FIELDS][$fieldName] = $fieldConfig;
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            $label = $field->getLabel();
+            if ($label instanceof Label) {
+                $field->setLabel($this->trans($label));
+            }
+
+            $description = $field->getDescription();
+            if ($description instanceof Label) {
+                $field->setDescription($this->trans($description));
             }
         }
-
-        $context->setResult($definition);
     }
 }

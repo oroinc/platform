@@ -163,6 +163,30 @@ abstract class AbstractDateFilter extends AbstractFilter
     }
 
     /**
+     * Apply expression using one condition (equal or not equal)
+     *
+     * @param FilterDatasourceAdapterInterface $ds
+     * @param string                           $dateValue
+     * @param string                           $dateParameterName
+     * @param string                           $fieldName
+     * @param bool                             $isEqual
+     */
+    protected function applyFilterEqual(
+        $ds,
+        $dateValue,
+        $dateParameterName,
+        $fieldName,
+        $isEqual
+    ) {
+        if (null !== $dateValue) {
+            $expr = $isEqual
+                ? $ds->expr()->eq($fieldName, $dateParameterName, true)
+                : $ds->expr()->neq($fieldName, $dateParameterName, true);
+            $this->applyFilterToClause($ds, $expr);
+        }
+    }
+
+    /**
      * Applies filter depending on it's type
      *
      * @param int                              $type
@@ -210,6 +234,24 @@ abstract class AbstractDateFilter extends AbstractFilter
                     $startDateParameterName,
                     $endDateParameterName,
                     $fieldName
+                );
+                break;
+            case DateRangeFilterType::TYPE_EQUAL:
+                $this->applyFilterEqual(
+                    $ds,
+                    $dateStartValue,
+                    $startDateParameterName,
+                    $fieldName,
+                    true
+                );
+                break;
+            case DateRangeFilterType::TYPE_NOT_EQUAL:
+                $this->applyFilterEqual(
+                    $ds,
+                    $dateEndValue,
+                    $endDateParameterName,
+                    $fieldName,
+                    false
                 );
                 break;
             default:

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class GetRestJsonApiTest extends ApiTestCase
@@ -27,7 +28,7 @@ class GetRestJsonApiTest extends ApiTestCase
      */
     protected function getRequestType()
     {
-        return [RequestType::REST, RequestType::JSON_API];
+        return new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -37,7 +38,11 @@ class GetRestJsonApiTest extends ApiTestCase
      */
     public function testGetListRestRequests($entityClass)
     {
-        $entityAlias = $this->entityClassTransformer->transform($entityClass);
+        $entityAlias = $this->valueNormalizer->normalizeValue(
+            $entityClass,
+            DataType::ENTITY_TYPE,
+            $this->getRequestType()
+        );
 
         /**
          * @TODO: Fix AbandonedCartBundle/Acl/Voter/AbandonedCartVoter (CRM-4733)
@@ -61,36 +66,31 @@ class GetRestJsonApiTest extends ApiTestCase
         $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
 
         // test get request
-        $content = $this->jsonToArray($response->getContent());
-        list($id, $recordExist) = $this->getGetRequestConfig($entityClass, $content);
-
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id]),
-            [],
-            [],
-            array_replace(
-                $this->generateWsseAuthHeader(),
-                ['CONTENT_TYPE' => 'application/vnd.api+json']
-            )
-        );
-        $this->assertApiResponseStatusCodeEquals(
-            $this->client->getResponse(),
-            $recordExist ? 200 : 404,
-            $entityAlias,
-            'get'
-        );
+        $id = $this->getGetEntityId($this->jsonToArray($response->getContent()));
+        if (null !== $id) {
+            $this->client->request(
+                'GET',
+                $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id]),
+                [],
+                [],
+                array_replace(
+                    $this->generateWsseAuthHeader(),
+                    ['CONTENT_TYPE' => 'application/vnd.api+json']
+                )
+            );
+            $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 200, $entityAlias, 'get');
+        }
     }
 
     /**
-     * {@inheritdoc}
+     * @param array $content
+     *
+     * @return mixed
      */
-    protected function getGetRequestConfig($entityClass, $content)
+    protected function getGetEntityId($content)
     {
-        if (array_key_exists('data', $content) && count($content['data']) === 1) {
-            return [$content['data'][0]['id'], true];
-        }
-
-        return [1, false];
+        return array_key_exists('data', $content) && count($content['data']) === 1
+            ? $content['data'][0]['id']
+            : null;
     }
 }

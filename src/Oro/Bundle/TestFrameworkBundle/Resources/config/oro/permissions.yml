@@ -1,0 +1,12 @@
+oro_permissions:
+    DELETE:
+        exclude_entities:
+            - Oro\Bundle\TestFrameworkBundle\Entity\TestActivity
+
+    ASSIGN:
+        exclude_entities:
+            - Oro\Bundle\TestFrameworkBundle\Entity\TestActivity
+
+    SHARE:
+        exclude_entities:
+            - Oro\Bundle\TestFrameworkBundle\Entity\TestActivity
