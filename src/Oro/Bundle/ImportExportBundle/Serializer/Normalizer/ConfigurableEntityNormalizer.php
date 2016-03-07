@@ -236,8 +236,8 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     protected function dispatchDenormalizeEvent($data, $result)
     {
-        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::DENORMALIZE_ENTITY)) {
-            $this->dispatcher->dispatch(Events::DENORMALIZE_ENTITY, new DenormalizeEntityEvent($result, $data));
+        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_DENORMALIZE_ENTITY)) {
+            $this->dispatcher->dispatch(Events::AFTER_DENORMALIZE_ENTITY, new DenormalizeEntityEvent($result, $data));
         }
     }
 
@@ -250,9 +250,9 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     protected function dispatchNormalize($object, $result, array $context)
     {
-        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::NORMALIZE_ENTITY)) {
+        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_NORMALIZE_ENTITY)) {
             $event = new NormalizeEntityEvent($object, $result, $this->getMode($context) === static::FULL_MODE);
-            $this->dispatcher->dispatch(Events::NORMALIZE_ENTITY, $event);
+            $this->dispatcher->dispatch(Events::AFTER_NORMALIZE_ENTITY, $event);
 
             return $event->getResult();
         }

@@ -48,11 +48,11 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::READ_ENTITY => 'readEntity',
-            Events::NORMALIZE_ENTITY => 'normalizeEntity',
-            Events::DENORMALIZE_ENTITY => 'denormalizeEntity',
-            Events::LOAD_ENTITY_RULES_AND_BACKEND_HEADERS => 'loadEntityRulesAndBackendHeaders',
-            Events::LOAD_TEMPLATE_FIXTURES => 'addTagsIntoFixtures',
+            Events::AFTER_READ_ENTITY => 'readEntity',
+            Events::AFTER_NORMALIZE_ENTITY => 'normalizeEntity',
+            Events::AFTER_DENORMALIZE_ENTITY => 'denormalizeEntity',
+            Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS => 'loadEntityRulesAndBackendHeaders',
+            Events::AFTER_LOAD_TEMPLATE_FIXTURES => 'addTagsIntoFixtures',
             StrategyEvent::PROCESS_BEFORE => ['beforeImport', 255],
             StrategyEvent::PROCESS_AFTER => ['afterImport', -255],
         ];

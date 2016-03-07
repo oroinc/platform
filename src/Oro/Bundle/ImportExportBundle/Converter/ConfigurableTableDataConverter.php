@@ -461,8 +461,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             $this->getConversionType(),
             $fullData
         );
-        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::LOAD_ENTITY_RULES_AND_BACKEND_HEADERS)) {
-            $this->dispatcher->dispatch(Events::LOAD_ENTITY_RULES_AND_BACKEND_HEADERS, $event);
+        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS)) {
+            $this->dispatcher->dispatch(Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS, $event);
         }
 
         return $event;
