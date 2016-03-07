@@ -1,0 +1,78 @@
+services:
+    oro_api.delete.processor:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteProcessor
+        public: false
+        arguments:
+            - @oro_api.processor_bag
+            - delete
+            - @oro_api.config_provider
+            - @oro_api.metadata_provider
+        tags:
+            - { name: oro.api.action_processor }
+
+    #
+    # initialize
+    #
+
+    oro_api.delete.check_request_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CheckRequestType
+        tags:
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 250 }
+
+    oro_api.delete.validate_request_type_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+        tags:
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 210 }
+
+    oro_api.delete.validate_class_name_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
+        tags:
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 210 }
+
+    oro_api.delete.normalize_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
+        tags:
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
+
+#    oro_api.delete.initialize_criteria:
+#        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
+#        arguments:
+#            - @oro_entity.orm.entity_class_resolver
+#        tags:
+#            - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
+
+#    oro_api.delete.normalize_include_header:
+#        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+#        tags:
+#            - { name: oro.api.processor, action: delete, group: initialize, priority: 50 }
+
+
+    oro_api.delete.normalize_entity_class:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 20 }
+
+
+    #
+    # security_check
+    #
+
+    oro_api.delete.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - @security.authorization_checker
+            - @oro_api.doctrine_helper
+            - DELETE
+        tags:
+            - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
+
+    #
+    # normalize_input
+    #
+
+    oro_api.delete.validate_entity_id_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists
+        tags:
+            - { name: oro.api.processor, action: delete, group: normalize_input, priority: -100 }

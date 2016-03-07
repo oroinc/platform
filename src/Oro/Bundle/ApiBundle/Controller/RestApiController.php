@@ -64,6 +64,28 @@ class RestApiController extends FOSRestController
     }
 
     /**
+     * Delete an entity
+     *
+     * @param Request $request
+     *
+     * @ApiDoc(
+     *      description="Delete entity", resource=true, views={"rest_plain", "rest_json_api"} )
+     * @return Response
+     */
+    public function deleteAction(Request $request)
+    {
+        $processor = $this->getProcessor($request);
+        /** @var GetContext $context */
+        $context = $this->getContext($processor, $request);
+        $context->setId($request->attributes->get('id'));
+        $context->setFilterValues(new RestFilterValueAccessor($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
      * @param Request $request
      *
      * @return ActionProcessor

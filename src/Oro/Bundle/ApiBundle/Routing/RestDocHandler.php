@@ -42,6 +42,13 @@ class RestDocHandler implements HandlerInterface
             'description_key'      => EntityDefinitionConfig::PLURAL_LABEL,
             'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
         ],
+        'delete' => [
+            'description'          => 'Delete {name}',
+            'fallback_description' => 'Delete an record of {class} class',
+            'get_name_method'      => 'getEntityClassName',
+            'description_key'      => EntityDefinitionConfig::LABEL,
+            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
+        ],
     ];
 
     /** @var RestDocViewDetector */
