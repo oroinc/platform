@@ -3,8 +3,10 @@
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Layout\Block\Extension;
 
 use Oro\Component\Layout\Block\Type\BaseType;
-use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\DataAccessorInterface;
+use Oro\Component\Layout\LayoutContext;
 use Oro\Component\Layout\OptionValueBag;
 use Oro\Bundle\LayoutBundle\Layout\Block\Extension\OptionValueBagExtension;
 
@@ -28,12 +30,14 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @param array $actual
      * @param array $expected
-     * @dataProvider normalizeOptionsDataProvider
+     * @param bool $isApplied
+     * @dataProvider optionsDataProvider
      */
-    public function testNormalizeOptions(array $actual, array $expected)
+    public function testNormalizeOptions(array $actual, array $expected, $isApplied = true)
     {
-        /** @var ContextInterface $context */
-        $context = $this->getMock('Oro\Component\Layout\ContextInterface');
+        $context = new LayoutContext();
+        $context['expressions_evaluate_deferred'] = !$isApplied;
+
         /** @var DataAccessorInterface $dataAccessor */
         $dataAccessor = $this->getMock('Oro\Component\Layout\DataAccessorInterface');
 
@@ -42,11 +46,40 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $actual
+     * @param array $expected
+     * @param bool $isApplied
+     * @dataProvider optionsDataProvider
+     */
+    public function testFinishView(array $actual, array $expected, $isApplied = true)
+    {
+        $context = new LayoutContext();
+        $context['expressions_evaluate_deferred'] = $isApplied;
+
+        $view = new BlockView();
+        $view->vars = $actual;
+
+        /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
+        $block = $this->getMock('Oro\Component\Layout\BlockInterface');
+        $block->expects($this->once())
+            ->method('getContext')
+            ->willReturn($context);
+
+        $this->extension->finishView($view, $block, []);
+        $this->assertEquals($expected, $view->vars);
+    }
+
+    /**
      * @return array
      */
-    public function normalizeOptionsDataProvider()
+    public function optionsDataProvider()
     {
         return [
+            'not applied' => [
+                'actual' => [],
+                'expected' => [],
+                'isApplied' => false,
+            ],
             'empty bag' => [
                 'actual' => [
                     'option' => $this->createOptionValueBag([])

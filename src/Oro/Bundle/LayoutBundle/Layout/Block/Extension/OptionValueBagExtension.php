@@ -6,6 +6,8 @@ use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ArrayOptionValueBuilder;
 use Oro\Component\Layout\Block\Type\BaseType;
+use Oro\Component\Layout\BlockInterface;
+use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\OptionValueBag;
@@ -22,7 +24,19 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      */
     public function normalizeOptions(array &$options, ContextInterface $context, DataAccessorInterface $data)
     {
-        $this->resolveValueBags($options);
+        if (false === $context->getOr('expressions_evaluate_deferred')) {
+            $this->resolveValueBags($options);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    {
+        if (true === $block->getContext()->getOr('expressions_evaluate_deferred')) {
+            $this->resolveValueBags($view->vars);
+        }
     }
 
     /**
