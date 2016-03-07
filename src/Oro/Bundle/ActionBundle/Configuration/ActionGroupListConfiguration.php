@@ -29,6 +29,7 @@ class ActionGroupListConfiguration implements ConfigurationInterface
         $root->useAttributeAsKey('name')
             ->prototype('array')
             ->children()
+                ->variableNode('acl_resource')->end()
                 ->arrayNode('arguments')
                     ->useAttributeAsKey('name')
                     ->prototype('array')
