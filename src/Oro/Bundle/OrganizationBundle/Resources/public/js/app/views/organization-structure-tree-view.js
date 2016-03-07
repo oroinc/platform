@@ -81,7 +81,6 @@ define([
             }, this);
 
             if (this.accordionEnabled) {
-                var me = this;
                 this.$el.on('show', '.collapse', function(e) {
                     e.stopPropagation();
                     var collapse = '#' + $(this).attr('id');
