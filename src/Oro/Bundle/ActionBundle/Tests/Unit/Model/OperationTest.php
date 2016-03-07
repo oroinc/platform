@@ -20,7 +20,6 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class OperationTest extends \PHPUnit_Framework_TestCase
 {

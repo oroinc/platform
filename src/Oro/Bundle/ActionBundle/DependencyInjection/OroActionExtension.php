@@ -15,6 +15,7 @@ class OroActionExtension extends Extension
     public function load(array $configs, ContainerBuilder $container)
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__.'/../Resources/config'));
+        $loader->load('assemblers.yml');
         $loader->load('cache.yml');
         $loader->load('conditions.yml');
         $loader->load('configuration.yml');

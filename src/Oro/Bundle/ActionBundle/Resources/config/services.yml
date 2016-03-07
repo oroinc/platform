@@ -6,13 +6,7 @@ parameters:
     oro_action.operation_registry.class: Oro\Bundle\ActionBundle\Model\OperationRegistry
     oro_action.action_group_registry.class: Oro\Bundle\ActionBundle\Model\ActionGroupRegistry
     oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager
-    oro_action.assembler.operation.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler
-    oro_action.assembler.action_group.class: Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler
-    oro_action.assembler.argument.class: Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler
-    oro_action.assembler.operation_action_group.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler
-    oro_action.assembler.attribute.class: Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler
     oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
-    oro_action.assembler.form_options.class: Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler
     oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\ActionFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_action.datagrid.action_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\ActionExtension
@@ -55,7 +49,7 @@ services:
     oro_action.action_group_registry:
         class: %oro_action.action_group_registry.class%
         arguments:
-            - @oro_action.configuration.provider
+            - @oro_action.configuration.provider.action_groups
             - @oro_action.assembler.action_group
 
     oro_action.manager:
@@ -64,34 +58,6 @@ services:
             - @oro_action.operation_registry
             - @oro_entity.doctrine_helper
             - @oro_action.helper.context
-
-    oro_action.assembler.operation:
-        class: %oro_action.assembler.operation.class%
-        arguments:
-            - @oro_action.function_factory
-            - @oro_action.expression.factory
-            - @oro_action.assembler.attribute
-            - @oro_action.assembler.form_options
-            - @oro_action.assembler.operation_action_group
-            - @oro_entity.doctrine_helper
-
-    oro_action.assembler.action_group:
-        class: %oro_action.assembler.action_group.class%
-        arguments:
-            - @oro_action.function_factory
-            - @oro_action.expression.factory
-            - @oro_action.assembler.argument
-
-    oro_action.assembler.argument:
-        class: %oro_action.assembler.argument.class%
-
-    oro_action.assembler.operation_action_group:
-        class: %oro_action.assembler.operation_action_group.class%
-
-    oro_action.assembler.attribute:
-        class: %oro_action.assembler.attribute.class%
-        arguments:
-            - @oro_action.attribute_guesser
 
     oro_action.attribute_guesser:
         class: %oro_action.attribute_guesser.class%
@@ -128,11 +94,6 @@ services:
             - [addFormTypeMapping, ["bool", "checkbox"]]
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
-
-    oro_action.assembler.form_options:
-        class: %oro_action.assembler.form_options.class%
-        calls:
-            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
 
     oro_action.form_manager:
         class: %oro_action.form_manager.class%

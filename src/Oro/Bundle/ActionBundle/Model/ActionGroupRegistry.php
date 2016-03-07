@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 
 class ActionGroupRegistry
 {
-    /** @var ActionConfigurationProvider */
+    /** @var ConfigurationProviderInterface */
     protected $configurationProvider;
 
     /** @var ActionGroupAssembler */
@@ -17,10 +17,10 @@ class ActionGroupRegistry
     protected $actionGroups;
 
     /**
-     * @param ActionConfigurationProvider $configurationProvider
+     * @param ConfigurationProviderInterface $configurationProvider
      * @param ActionGroupAssembler $assembler
      */
-    public function __construct(ActionConfigurationProvider $configurationProvider, ActionGroupAssembler $assembler)
+    public function __construct(ConfigurationProviderInterface $configurationProvider, ActionGroupAssembler $assembler)
     {
         $this->configurationProvider = $configurationProvider;
         $this->assembler = $assembler;
@@ -45,7 +45,7 @@ class ActionGroupRegistry
 
         $this->actionGroups = [];
 
-        $configuration = $this->configurationProvider->getActionConfiguration();
+        $configuration = $this->configurationProvider->getConfiguration();
         $actionGroups = $this->assembler->assemble($configuration);
 
         foreach ($actionGroups as $actionGroup) {

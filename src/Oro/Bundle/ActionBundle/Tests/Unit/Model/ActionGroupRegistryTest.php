@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
@@ -12,7 +12,7 @@ use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ActionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationProvider;
 
     /** @var ActionGroupAssembler */
@@ -29,10 +29,8 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->configurationProvider = $this
-            ->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->configurationProvider =
+            $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
         $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
@@ -62,9 +60,8 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
      */
     public function testFindByName($actionGroupName, $expected)
     {
-        $this->markTestIncomplete();
         $this->configurationProvider->expects($this->once())
-            ->method('getActionGroupConfiguration')
+            ->method('getConfiguration')
             ->willReturn(
                 [
                     'action_group1' => [
