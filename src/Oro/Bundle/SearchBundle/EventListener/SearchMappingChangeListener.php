@@ -14,8 +14,6 @@ class SearchMappingChangeListener
 
     /** @var array */
     protected $configClassNames = [
-        'Oro\Bundle\ConfigBundle\Entity\Config',
-        'Oro\Bundle\ConfigBundle\Entity\ConfigValue',
         'Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel',
         'Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel',
     ];
