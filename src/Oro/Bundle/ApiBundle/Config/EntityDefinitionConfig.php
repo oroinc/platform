@@ -43,11 +43,11 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
             }
         }
 
-        if (isset($result['fields'])) {
-            $fieldNames = array_keys($result['fields']);
+        if (isset($result[self::FIELDS])) {
+            $fieldNames = array_keys($result[self::FIELDS]);
             foreach ($fieldNames as $fieldName) {
-                if (empty($result['fields'][$fieldName])) {
-                    $result['fields'][$fieldName] = null;
+                if (empty($result[self::FIELDS][$fieldName])) {
+                    $result[self::FIELDS][$fieldName] = null;
                 }
             }
         }

@@ -14,6 +14,8 @@ final class DataType
     const STRING              = 'string';
     const BOOLEAN             = 'boolean';
     const DATETIME            = 'datetime';
+    const ENTITY_TYPE         = 'entityType';
+    const ENTITY_CLASS        = 'entityClass';
     const ENTITY_ALIAS        = 'entityAlias';
     const ENTITY_PLURAL_ALIAS = 'entityPluralAlias';
     const ORDER_BY            = 'orderBy';
