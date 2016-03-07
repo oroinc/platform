@@ -12,6 +12,9 @@ parameters:
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
+    oro_workflow.handler.transition_helper.class: Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper
+    oro_workflow.handler.transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\TransitionHandler
+    oro_workflow.handler.start_transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\StartTransitionHandler
 
 services:
     oro_workflow.attribute_guesser:
@@ -112,3 +115,22 @@ services:
         public: false
         tags:
             - { name: oro_entity.exclusion_provider.api }
+
+    oro_workflow.handler.transition_helper:
+        class: %oro_workflow.handler.transition_helper.class%
+        arguments:
+            - @fos_rest.view_handler
+            - @twig
+
+    oro_workflow.handler.transition_handler:
+        class: %oro_workflow.handler.transition_handler.class%
+        arguments:
+            - @oro_workflow.manager
+            - @oro_workflow.handler.transition_helper
+
+    oro_workflow.handler.start_transition_handler:
+        class: %oro_workflow.handler.start_transition_handler.class%
+        arguments:
+            - @oro_workflow.manager
+            - @oro_workflow.serializer.data.serializer
+            - @oro_workflow.handler.transition_helper
