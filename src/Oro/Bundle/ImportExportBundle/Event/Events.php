@@ -5,11 +5,11 @@ namespace Oro\Bundle\ImportExportBundle\Event;
 final class Events
 {
     /**
-     * This event occurs after the entity is read by entity reader.
+     * This event occurs after the entity page is loaded in interator.
      *
-     * Can be used to modify entity data processed during export
+     * Can be used to modify rows.
      */
-    const AFTER_READ_ENTITY = 'oro.import_export.after_read_entity';
+    const AFTER_ENTITY_PAGE_LOADED = 'oro.import_export.after_entity_page_loaded';
 
     /**
      * This event occurs after entity is normalized.

@@ -4,6 +4,7 @@ namespace Oro\Bundle\TagBundle\Manager;
 
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\TagBundle\Entity\Tag;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
@@ -53,13 +54,13 @@ class TagImportManager
     }
 
     /**
-     * @param array|Collection|null $tags
+     * @param Collection|null $tags
      *
      * @return array
      */
     public function normalizeTags($tags)
     {
-        if (!$tags || (is_array($tags) && empty($tags['all']))) {
+        if (!$tags) {
             return ['name' => ''];
         }
 
@@ -171,10 +172,42 @@ class TagImportManager
     }
 
     /**
-     * @param object $taggable
+     * @param object[] $entities
      */
-    public function loadTags($taggable)
+    public function loadTags(array $entities)
     {
-        $this->tagStorage->loadTagging($taggable);
+        if (!$entities) {
+            return;
+        }
+
+        $class = ClassUtils::getClass($entities[0]);
+        if (!$this->isTaggable($class)) {
+            return;
+        }
+
+        $entitiesById = array_combine(
+            array_map([$this->taggableHelper, 'getEntityId'], $entities),
+            $entities
+        );
+
+        $tagsByEntityId = array_reduce(
+            $this->tagStorage->getTagsByEntityIds(
+                $class,
+                array_keys($entitiesById)
+            ),
+            function (array $tags, array $tag) {
+                $tags[$tag['entityId']][] = new Tag($tag['name']);
+
+                return $tags;
+            },
+            array_fill_keys(array_keys($entitiesById), [])
+        );
+
+        array_walk(
+            $tagsByEntityId,
+            function (array $tags, $entityId) use ($entitiesById) {
+                $this->tagStorage->setTags($entitiesById[$entityId], new ArrayCollection($tags));
+            }
+        );
     }
 }

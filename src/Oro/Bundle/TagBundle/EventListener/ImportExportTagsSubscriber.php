@@ -11,7 +11,7 @@ use Doctrine\ORM\Event\PostFlushEventArgs;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
-use Oro\Bundle\ImportExportBundle\Event\ReadEntityEvent;
+use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
 use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
@@ -49,7 +49,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            Events::AFTER_READ_ENTITY => 'readEntity',
+            Events::AFTER_ENTITY_PAGE_LOADED => 'updateEntityResults',
             Events::AFTER_NORMALIZE_ENTITY => 'normalizeEntity',
             Events::AFTER_DENORMALIZE_ENTITY => 'denormalizeEntity',
             Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS => 'loadEntityRulesAndBackendHeaders',
@@ -94,14 +94,11 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ReadEntityEvent $event
+     * @param AfterEntityPageLoadedEvent $event
      */
-    public function readEntity(ReadEntityEvent $event)
+    public function updateEntityResults(AfterEntityPageLoadedEvent $event)
     {
-        $entity = $event->getObject();
-        if ($this->getTagImportManager()->isTaggable($entity)) {
-            $this->getTagImportManager()->loadTags($entity);
-        }
+        $this->getTagImportManager()->loadTags($event->getRows());
     }
 
     /**

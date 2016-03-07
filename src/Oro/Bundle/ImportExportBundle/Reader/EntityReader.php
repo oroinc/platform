@@ -11,8 +11,8 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\ImportExportBundle\Context\ContextRegistry;
+use Oro\Bundle\ImportExportBundle\Event\AfterEntityPageLoadedEvent;
 use Oro\Bundle\ImportExportBundle\Event\Events;
-use Oro\Bundle\ImportExportBundle\Event\ReadEntityEvent;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidConfigurationException;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -46,22 +46,6 @@ class EntityReader extends IteratorBasedReader
     }
 
     /**
-     * {@inheritdoc}
-     */
-    public function read()
-    {
-        $object = parent::read();
-        if ($object && $this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_READ_ENTITY)) {
-            $event = new ReadEntityEvent($object);
-            $this->dispatcher->dispatch(Events::AFTER_READ_ENTITY, $event);
-
-            return $event->getObject();
-        }
-
-        return $object;
-    }
-
-    /**
      * @param ContextInterface $context
      * @throws InvalidConfigurationException
      */
@@ -85,7 +69,7 @@ class EntityReader extends IteratorBasedReader
      */
     public function setSourceQueryBuilder(QueryBuilder $queryBuilder)
     {
-        $this->setSourceIterator(new BufferedQueryResultIterator($queryBuilder));
+        $this->setSourceIterator($this->createSourceIterator($queryBuilder));
     }
 
     /**
@@ -93,7 +77,7 @@ class EntityReader extends IteratorBasedReader
      */
     public function setSourceQuery(Query $query)
     {
-        $this->setSourceIterator(new BufferedQueryResultIterator($query));
+        $this->setSourceIterator($this->createSourceIterator($query));
     }
 
     /**
@@ -153,5 +137,25 @@ class EntityReader extends IteratorBasedReader
                     ->setParameter('organization', $organization);
             }
         }
+    }
+
+    /**
+     * @param Query|QueryBuilder $source
+     *
+     * @return \Iterator
+     */
+    protected function createSourceIterator($source)
+    {
+        return (new BufferedQueryResultIterator($source))
+            ->setPageLoadedCallback(function (array $rows) {
+                if (!$this->dispatcher->hasListeners(Events::AFTER_ENTITY_PAGE_LOADED)) {
+                    return $rows;
+                }
+
+                $event = new AfterEntityPageLoadedEvent($rows);
+                $this->dispatcher->dispatch(Events::AFTER_ENTITY_PAGE_LOADED, $event);
+
+                return $event->getRows();
+            });
     }
 }
