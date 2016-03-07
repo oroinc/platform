@@ -14,7 +14,7 @@ use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 /**
@@ -425,13 +425,13 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @expectedException \Oro\Bundle\ActionBundle\Exception\ActionNotFoundException
-     * @expectedExceptionMessage Action with name "test_action" not found
+     * @expectedExceptionMessage Action with name "test_operation" not found
      */
     public function testExecuteByContextException()
     {
         $this->assertContextHelperCalled([], 0, 1);
 
-        $this->manager->executeByContext('test_action');
+        $this->manager->executeByContext('test_operation');
     }
 
     /**
@@ -659,7 +659,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->setGroups($group)
             ->setFrontendOptions($frontendOptions);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory */
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
         $functionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();

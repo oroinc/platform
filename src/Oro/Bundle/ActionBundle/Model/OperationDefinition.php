@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class OperationDefinition
 {
@@ -462,12 +463,12 @@ class OperationDefinition
     }
 
     /**
-     * @param array $data
+     * @param array $actionGroups
      * @return $this
      */
-    public function setActionGroups(array $data)
+    public function setActionGroups(array $actionGroups)
     {
-        $this->actionGroups = $data;
+        $this->actionGroups = $actionGroups;
 
         return $this;
     }
