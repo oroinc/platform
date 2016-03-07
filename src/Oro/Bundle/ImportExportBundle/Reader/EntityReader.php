@@ -51,9 +51,9 @@ class EntityReader extends IteratorBasedReader
     public function read()
     {
         $object = parent::read();
-        if ($object && $this->dispatcher && $this->dispatcher->hasListeners(Events::READ_ENTITY)) {
+        if ($object && $this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_READ_ENTITY)) {
             $event = new ReadEntityEvent($object);
-            $this->dispatcher->dispatch(Events::READ_ENTITY, $event);
+            $this->dispatcher->dispatch(Events::AFTER_READ_ENTITY, $event);
 
             return $event->getObject();
         }
