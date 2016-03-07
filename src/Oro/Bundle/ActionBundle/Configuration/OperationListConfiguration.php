@@ -6,11 +6,10 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Builder\NodeDefinition;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
-class OperationListConfiguration implements ConfigurationInterface
+class OperationListConfiguration implements ConfigurationDefinitionInterface
 {
     /**
      * @param array $configs

@@ -1,6 +1,20 @@
 skiped_config:
-    test_action3:
-        label: Test Action 3
-actions:
-    test_action4:
-        label: Test Action 4
+    test_operation3:
+        label: Test Operation 3
+
+operations:
+    test_operation4:
+        label: Test Operation 4
+
+action_groups:
+    group2:
+        arguments:
+            $.date:
+                type: DateTime
+                message: No data specified!
+
+        conditions:
+            @gt: [$updatedAt, $.date]
+
+        actions:
+            - @assign_value: [$expired, true]

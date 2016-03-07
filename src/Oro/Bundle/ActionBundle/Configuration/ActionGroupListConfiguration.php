@@ -4,9 +4,8 @@ namespace Oro\Bundle\ActionBundle\Configuration;
 
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
-use Symfony\Component\Config\Definition\ConfigurationInterface;
 
-class ActionGroupListConfiguration implements ConfigurationInterface
+class ActionGroupListConfiguration implements ConfigurationDefinitionInterface
 {
     /**
      * @param array $configs

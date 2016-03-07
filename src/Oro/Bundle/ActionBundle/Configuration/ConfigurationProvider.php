@@ -9,15 +9,13 @@ use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
 use Oro\Component\Config\Merger\ConfigurationMerger;
 
-class ActionConfigurationProvider
+class ConfigurationProvider implements ConfigurationProviderInterface
 {
-    const ROOT_NODE_NAME = 'actions';
+    /** @var ConfigurationDefinitionInterface */
+    protected $configurationDefinition;
 
-    /** @var OperationListConfiguration */
-    protected $definitionConfiguration;
-
-    /** @var ActionDefinitionConfigurationValidator */
-    protected $definitionConfigurationValidator;
+    /** @var ConfigurationValidatorInterface */
+    protected $validator;
 
     /** @var CacheProvider */
     protected $cache;
@@ -31,36 +29,42 @@ class ActionConfigurationProvider
     /** @var array */
     protected $processedConfigs = [];
 
+    /** @var string */
+    protected $rootNode;
+
     /**
-     * @param OperationListConfiguration $definitionConfiguration
-     * @param ActionDefinitionConfigurationValidator $definitionConfigurationValidator
+     * @param ConfigurationDefinitionInterface $configurationDefinition
+     * @param ConfigurationValidatorInterface $validator
      * @param CacheProvider $cache
      * @param array $rawConfiguration
      * @param array $kernelBundles
+     * @param string $rootNode
      */
     public function __construct(
-        OperationListConfiguration $definitionConfiguration,
-        ActionDefinitionConfigurationValidator $definitionConfigurationValidator,
+        ConfigurationDefinitionInterface $configurationDefinition,
+        ConfigurationValidatorInterface $validator,
         CacheProvider $cache,
         array $rawConfiguration,
-        array $kernelBundles
+        array $kernelBundles,
+        $rootNode
     ) {
-        $this->definitionConfiguration = $definitionConfiguration;
-        $this->definitionConfigurationValidator = $definitionConfigurationValidator;
+        $this->configurationDefinition = $configurationDefinition;
+        $this->validator = $validator;
         $this->cache = $cache;
         $this->rawConfiguration = $rawConfiguration;
         $this->kernelBundles = array_values($kernelBundles);
+        $this->rootNode = $rootNode;
     }
 
     public function warmUpCache()
     {
         $this->clearCache();
-        $this->cache->save(self::ROOT_NODE_NAME, $this->resolveConfiguration());
+        $this->cache->save($this->rootNode, $this->resolveConfiguration());
     }
 
     public function clearCache()
     {
-        $this->cache->delete(self::ROOT_NODE_NAME);
+        $this->cache->delete($this->rootNode);
     }
 
     /**
@@ -69,16 +73,16 @@ class ActionConfigurationProvider
      * @return array
      * @throws InvalidConfigurationException
      */
-    public function getActionConfiguration($ignoreCache = false, Collection $errors = null)
+    public function getConfiguration($ignoreCache = false, Collection $errors = null)
     {
-        if (!$ignoreCache && $this->cache->contains(self::ROOT_NODE_NAME)) {
-            $configuration = $this->cache->fetch(self::ROOT_NODE_NAME);
+        if (!$ignoreCache && $this->cache->contains($this->rootNode)) {
+            $configuration = $this->cache->fetch($this->rootNode);
         } else {
             $configuration = $this->resolveConfiguration($errors);
 
             if (!$ignoreCache) {
                 $this->clearCache();
-                $this->cache->save(self::ROOT_NODE_NAME, $configuration);
+                $this->cache->save($this->rootNode, $configuration);
             }
         }
 
@@ -98,12 +102,13 @@ class ActionConfigurationProvider
 
         try {
             if (!empty($configs)) {
-                $data = $this->definitionConfiguration->processConfiguration($configs);
+                $data = $this->configurationDefinition->processConfiguration($configs);
 
-                $this->definitionConfigurationValidator->validate($data, $errors);
+                //TODO: should be done in BB-2272
+                //$this->validator->validate($data, $errors);
             }
         } catch (InvalidConfigurationException $e) {
-            throw new InvalidConfigurationException(sprintf('Can\'t parse action configuration. %s', $e->getMessage()));
+            throw new InvalidConfigurationException(sprintf('Can\'t parse configuration. %s', $e->getMessage()));
         }
 
         return $data;

@@ -4,19 +4,21 @@ namespace Oro\Bundle\ActionBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheClearer\CacheClearerInterface;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 
 class CacheClearer implements CacheClearerInterface
 {
-    /** @var ActionConfigurationProvider */
-    private $provider;
+    /**
+     * @var array|ConfigurationProviderInterface[]
+     */
+    private $providers = [];
 
     /**
-     * @param ActionConfigurationProvider $provider
+     * @param ConfigurationProviderInterface $provider
      */
-    public function __construct(ActionConfigurationProvider $provider)
+    public function addProvider(ConfigurationProviderInterface $provider)
     {
-        $this->provider = $provider;
+        $this->providers[] = $provider;
     }
 
     /**
@@ -24,6 +26,11 @@ class CacheClearer implements CacheClearerInterface
      */
     public function clear($cacheDir)
     {
-        $this->provider->clearCache();
+        array_walk(
+            $this->providers,
+            function (ConfigurationProviderInterface $provider) {
+                $provider->clearCache();
+            }
+        );
     }
 }
