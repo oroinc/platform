@@ -462,6 +462,9 @@ class DoctrineHelper
     }
 
     /**
+     * Works the way like refresh on EntityManager.
+     * In addition it makes sure all relations with cascade persist are also refreshed.
+     *
      * @param object $entity
      */
     public function refreshIncludingUnitializedRelations($entity)
