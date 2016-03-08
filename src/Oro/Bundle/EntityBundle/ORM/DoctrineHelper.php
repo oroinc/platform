@@ -483,7 +483,9 @@ class DoctrineHelper
                 continue;
             }
 
-            array_map([$em, 'refresh'], $relatedEntities->toArray());
+            foreach ($relatedEntities as $relatedEntity) {
+                $em->refresh($relatedEntity);
+            }
         }
     }
 

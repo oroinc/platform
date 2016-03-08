@@ -170,11 +170,11 @@ class ImportStrategyHelper
     }
 
     /**
-     * @param Collection $importedValue
+     * @param Collection $importedValueCollection
      * @param object $entity
      * @param string $propertyName
      */
-    protected function forceCallingAdders(Collection $importedValue, $entity, $propertyName)
+    protected function forceCallingAdders(Collection $importedValueCollection, $entity, $propertyName)
     {
         $singular = ArrayUtil::find(
             function ($singular) use ($entity) {
@@ -184,7 +184,8 @@ class ImportStrategyHelper
         );
 
         if ($singular) {
-            array_map([$entity, sprintf('add%s', $singular)], $importedValue->toArray());
+            $importedValues = $importedValueCollection->toArray();
+            array_walk($importedValues, [$entity, sprintf('add%s', $singular)]);
         }
     }
 
