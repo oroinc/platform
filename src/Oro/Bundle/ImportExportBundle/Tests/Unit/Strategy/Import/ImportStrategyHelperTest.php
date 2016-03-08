@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Import;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Oro\Bundle\ImportExportBundle\Strategy\Import\ImportStrategyHelper;
 
 class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
@@ -108,16 +106,8 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $importedEntity->fieldOne = 'one';
         $importedEntity->fieldTwo = 'two';
-        $importedEntity->fieldThree = new ArrayCollection(['item1', 'item2']);
         $importedEntity->excludedField = 'excluded';
         $excludedProperties = ['excludedField'];
-
-        $basicEntity->expects($this->exactly(2))
-            ->method('addfieldThroo')
-            ->withConsecutive(
-                ['item1'],
-                ['item2']
-            );
 
         $metadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
@@ -134,14 +124,12 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValueMap([
                 [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
                 [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
-                [$importedEntity, 'fieldThree', $importedEntity->fieldThree],
             ]));
         $this->fieldHelper->expects($this->exactly(3))
             ->method('setObjectValue')
             ->withConsecutive(
                 [$basicEntity, 'fieldOne', $importedEntity->fieldOne],
-                [$basicEntity, 'fieldTwo', $importedEntity->fieldTwo],
-                [$basicEntity, 'fieldThree', $importedEntity->fieldThree]
+                [$basicEntity, 'fieldTwo', $importedEntity->fieldTwo]
             );
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
