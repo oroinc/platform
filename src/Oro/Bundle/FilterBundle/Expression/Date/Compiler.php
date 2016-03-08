@@ -18,11 +18,11 @@ class Compiler
 
     /**
      * @param string $string
-     *
+     * @param bool $returnRawToken
      * @return ExpressionResult
      */
-    public function compile($string)
+    public function compile($string, $returnRawToken = false)
     {
-        return $this->parser->parse($this->lexer->tokenize($string));
+        return $this->parser->parse($this->lexer->tokenize($string), $returnRawToken);
     }
 }
