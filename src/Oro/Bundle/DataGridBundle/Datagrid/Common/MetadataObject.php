@@ -10,6 +10,7 @@ class MetadataObject extends Object
     const GRID_NAME_KEY        = 'gridName';
     const OPTIONS_KEY          = 'options';
     const REQUIRED_MODULES_KEY = 'requireJSModules';
+    const LAZY_KEY             = 'lazy';
 
     /**
      * Default metadata array
@@ -20,7 +21,8 @@ class MetadataObject extends Object
     {
         return [
             self::REQUIRED_MODULES_KEY => [],
-            self::OPTIONS_KEY          => []
+            self::OPTIONS_KEY          => [],
+            self::LAZY_KEY             => true,
         ];
     }
 
@@ -29,7 +31,7 @@ class MetadataObject extends Object
      */
     public static function createNamed($name, array $params)
     {
-        $params                                         = self::getDefaultMetadata();
+        $params                                         = array_merge(self::getDefaultMetadata(), $params);
         $params[self::OPTIONS_KEY][self::GRID_NAME_KEY] = $name;
 
         return self::create($params);

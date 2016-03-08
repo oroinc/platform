@@ -130,13 +130,14 @@ services:
         class: %oro_imap.imap_clear_manager.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_entity.event_listener.entity_modify_created_updated_properties_listener
         calls:
             - [setLogger, [@logger]]
 
     oro_imap.workflow.action.dependency_job:
         class: %oro_imap.workflow.action.dependency_job.class%
         arguments:
-            - @oro_workflow.context_accessor
+            - @oro_action.context_accessor
             - @doctrine
         tags:
             - { name: oro_workflow.action, alias: job_add_dependency }

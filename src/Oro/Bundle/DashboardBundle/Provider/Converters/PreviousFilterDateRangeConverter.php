@@ -4,7 +4,7 @@ namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
 
-class PreviousFilterDateRangeConverter extends FilterDateTimeRangeConverter
+class PreviousFilterDateRangeConverter extends FilterDateRangeConverter
 {
     /**
      * {@inheritdoc}

@@ -10,6 +10,8 @@ use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\PhpUtils\QueryUtil;
+
 class QueryUtils
 {
     /**
@@ -288,5 +290,37 @@ class QueryUtils
         }
 
         return $criteria;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $field
+     * @param int $values
+     */
+    public static function applyOptimizedIn(QueryBuilder $qb, $field, array $values)
+    {
+        $exprs = [];
+        $optimizedValues = QueryUtil::optimizeIntValues($values);
+
+        if ($optimizedValues[QueryUtil::IN]) {
+            $inParam = QueryUtil::generateParameterName('buid');
+
+            $qb->setParameter($inParam, $optimizedValues[QueryUtil::IN]);
+            $exprs[] = $qb->expr()->in($field, ':'.$inParam);
+        }
+
+        foreach ($optimizedValues[QueryUtil::IN_BETWEEN] as $range) {
+            list($min, $max) = $range;
+            $minParam = QueryUtil::generateParameterName('buid');
+            $maxParam = QueryUtil::generateParameterName('buid');
+
+            $qb->setParameter($minParam, $min);
+            $qb->setParameter($maxParam, $max);
+            $exprs[] = $qb->expr()->between($field, ':'.$minParam, ':'.$maxParam);
+        }
+
+        if ($exprs) {
+            $qb->andWhere(call_user_func_array([$qb->expr(), 'orX'], $exprs));
+        }
     }
 }

@@ -3,6 +3,8 @@ define(function(require) {
 
     var EmailAttachmentListRowView;
     var $ = require('jquery');
+    var datetime = require('orolocale/js/formatter/datetime');
+    var numeral = require('numeral');
     var EmailAttachmentModel = require('oroemail/js/app/models/email-attachment-model');
     var BaseView = require('oroui/js/app/views/base/view');
 
@@ -29,6 +31,20 @@ define(function(require) {
             }
 
             return EmailAttachmentListRowView.__super__.getTemplateFunction.call(this);
+        },
+
+        getTemplateData: function() {
+            var data = EmailAttachmentListRowView.__super__.getTemplateData.apply(this, arguments);
+            if ('fileName' in data && data.fileName.length > 15) {
+                data.fileName = data.fileName.substr(0, 7) + '..' + data.fileName.substr(data.fileName.length - 7);
+            }
+            if ('fileSize' in data) {
+                data.fileSize = numeral(data.fileSize).format('b');
+            }
+            if ('modified' in data) {
+                data.modified = datetime.formatDateTime(data.modified);
+            }
+            return data;
         },
 
         checkboxClick: function(event) {

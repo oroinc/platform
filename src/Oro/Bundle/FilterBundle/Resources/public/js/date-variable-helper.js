@@ -71,10 +71,18 @@ define(function(require) {
          */
         isDateVariable: function(value) {
             var result;
+            var self = this;
+            //replace -5 +60 modifiers to '', we need clear variable
+            value = value.replace(/([\-+]+(\d+)?)/, '');
+
             result = _.some(this.index, function(displayValue, index) {
-                var rawValue = '{{' + index + '}}';
-                return rawValue === value.substr(0, rawValue.length) ||
-                    displayValue === value.substr(0, displayValue.length);
+                var regexpVariable = new RegExp('^' + value + '$', 'i');
+                var isShortMonth =
+                        !/\s+/.test(displayValue) &&
+                        regexpVariable.test(displayValue.substr(0, 3)) &&
+                        self.dateVariables.month[index];
+
+                return value === '{{' + index + '}}' || regexpVariable.test(displayValue) || isShortMonth;
             });
             return result;
         },
@@ -101,9 +109,20 @@ define(function(require) {
          * @returns {string}
          */
         formatRawValue: function(value) {
+            var displayValue = null;
             for (var i in this.index) {
                 if (this.index.hasOwnProperty(i)) {
-                    value = value.replace(new RegExp(this.index[i], 'g'), '{{' + i + '}}');
+                    var regexpVariable = new RegExp('^' + value + '$', 'i');
+                    var isShortMonth =
+                        !/\s+/.test(this.index[i]) &&
+                        regexpVariable.test(this.index[i].substr(0, 3)) &&
+                        this.dateVariables.month[i];
+                    if (isShortMonth) {
+                        displayValue = this.index[i].substr(0, 3);
+                    } else {
+                        displayValue = this.index[i];
+                    }
+                    value = value.replace(new RegExp(displayValue, 'gi'), '{{' + i + '}}');
                 }
             }
             return value;

@@ -1,0 +1,5 @@
+actions:
+    test_action1:
+        label: Test Action 1
+    test_action2:
+        label: Test Action 2

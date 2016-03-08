@@ -7,6 +7,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndex;
 
+/**
+ * Loads data by SearchBundle query.
+ */
 class LoadDataBySearchQuery implements ProcessorInterface
 {
     /** @var SearchIndex */

@@ -1,7 +1,7 @@
 parameters:
     oro_workflow.prototype.workflow.class: Oro\Bundle\WorkflowBundle\Model\Workflow
     oro_workflow.prototype.step_manager.class: Oro\Bundle\WorkflowBundle\Model\StepManager
-    oro_workflow.prototype.attribute_manager.class: Oro\Bundle\WorkflowBundle\Model\AttributeManager
+    oro_workflow.prototype.attribute_manager.class: Oro\Bundle\ActionBundle\Model\AttributeManager
     oro_workflow.prototype.transition_manager.class: Oro\Bundle\WorkflowBundle\Model\TransitionManager
 
 services:

@@ -266,7 +266,7 @@ services:
     oro_integration.action.abstract_fields_changes:
         abstract: true
         arguments:
-            - @oro_workflow.context_accessor
+            - @oro_action.context_accessor
         calls:
             - [setFieldsChangesManager, [@oro_integration.manager.fields_changes]]
 
@@ -285,7 +285,7 @@ services:
     oro_integration.workflow.action.populate_integration_owner:
         class: %oro_integration.workflow.action.populate_integration_owner.class%
         arguments:
-            - @oro_workflow.context_accessor
+            - @oro_action.context_accessor
             - @oro_integration.helper.default_owner_helper
         tags:
             - { name: oro_workflow.action, alias: populate_integration_owner }

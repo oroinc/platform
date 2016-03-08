@@ -22,7 +22,9 @@ class ImapClearManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new ImapClearManager($this->em);
+        $listener = $this->getMock('Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface');
+
+        $this->manager = new ImapClearManager($this->em, $listener);
         $this->manager->setLogger($this->logger);
     }
 

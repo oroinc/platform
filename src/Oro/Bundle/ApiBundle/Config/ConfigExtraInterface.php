@@ -22,4 +22,18 @@ interface ConfigExtraInterface
      * @param ConfigContext $context
      */
     public function configureContext(ConfigContext $context);
+
+    /**
+     * Indicates whether this config extra is applicable to nested configs.
+     *
+     * @return bool
+     */
+    public function isInheritable();
+
+    /**
+     * Returns a string that should be used as a part of a cache key used by config providers.
+     *
+     * @return string|null
+     */
+    public function getCacheKeyPart();
 }

@@ -16,7 +16,7 @@ services:
             - [addExtension, [@oro_workflow.expression.extension]]
 
     oro_workflow.condition.configurable:
-        class: Oro\Bundle\WorkflowBundle\Model\Condition\Configurable
+        class: Oro\Component\Action\Condition\Configurable
         arguments:
             - @oro_workflow.expression.assembler
         tags:
