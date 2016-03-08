@@ -98,12 +98,8 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testImportEntity()
     {
-        $basicEntity = $this->getMockBuilder('stdClass')
-            ->setMethods(['addfieldThroo'])
-            ->getMock();
-        $importedEntity = $this->getMockBuilder('stdClass')
-            ->setMethods(['addfieldThroo'])
-            ->getMock();
+        $basicEntity = new \stdClass();
+        $importedEntity = new \stdClass();
         $importedEntity->fieldOne = 'one';
         $importedEntity->fieldTwo = 'two';
         $importedEntity->excludedField = 'excluded';
