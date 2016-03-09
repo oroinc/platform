@@ -388,7 +388,8 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
             ],
             'action15' => [
                 'label' => 'Label15',
-                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
+                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                'groups' => ['', 'group1']
             ],
             'action16' => [
                 'label' => 'Label17Substituted15',
@@ -409,11 +410,6 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 'substitute_action' => 'action18',
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
                 'groups' => ['limited']
-            ],
-            'action15' => [
-                'label' => 'Label15',
-                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
-                'groups' => ['', 'group1']
             ],
         ];
     }

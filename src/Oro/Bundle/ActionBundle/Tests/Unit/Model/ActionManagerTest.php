@@ -114,6 +114,8 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getActionsProvider()
     {

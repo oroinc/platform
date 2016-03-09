@@ -42,6 +42,14 @@ define(function(require) {
             confirm_cancel: 'Cancel'
         },
 
+        /**
+         * @type {Object}
+         */
+        confirmModal: null,
+
+        /**
+         * @type {String}
+         */
         confirmComponent: 'oroui/js/delete-confirmation',
 
         /**

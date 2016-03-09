@@ -5,7 +5,6 @@ define(function(require) {
 
     var BaseComponent = require('oroui/js/app/components/base/component');
     var ActionManager = require('oroaction/js/action-manager');
-    var _ = require('underscore');
     var $ = require('jquery');
 
     var ButtonsComponent = BaseComponent.extend({

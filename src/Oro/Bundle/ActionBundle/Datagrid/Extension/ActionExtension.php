@@ -120,10 +120,7 @@ class ActionExtension extends AbstractExtension
     {
         $actionsNew = [];
         foreach ($this->actions as $actionName => $action) {
-            $actionsNew[$actionName] = $this->getRowActionsConfig(
-                $action,
-                $record->getValue('id')
-            );
+            $actionsNew[$actionName] = $this->getRowActionsConfig($action, $record->getValue('id'));
         }
 
         $result = array_filter($this->getParentRowConfiguration($record, $config), function ($item) {
@@ -252,9 +249,9 @@ class ActionExtension extends AbstractExtension
         $entityClass = $config->offsetGetByPath('[extended_entity_name]');
 
         return [
-            'entityClass' => $entityClass ?: $config->offsetGetByPath('[entity_name]'),
-            'datagrid' => $config->offsetGetByPath('[name]'),
-            'group' => $this->groups,
+            ContextHelper::ENTITY_CLASS_PARAM => $entityClass ?: $config->offsetGetByPath('[entity_name]'),
+            ContextHelper::DATAGRID_PARAM => $config->offsetGetByPath('[name]'),
+            ContextHelper::GROUP_PARAM => $this->groups,
         ];
     }
 }

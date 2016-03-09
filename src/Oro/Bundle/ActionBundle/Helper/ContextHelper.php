@@ -148,7 +148,8 @@ class ContextHelper
                 self::ENTITY_ID_PARAM => null,
                 self::ENTITY_CLASS_PARAM => null,
                 self::DATAGRID_PARAM => null,
-                self::GROUP_PARAM => null
+                self::GROUP_PARAM => null,
+                self::FROM_URL_PARAM => null,
             ],
             $context
         );
