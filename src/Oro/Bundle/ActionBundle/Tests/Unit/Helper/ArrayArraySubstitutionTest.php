@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 
-class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
+class ArraySubstitutionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array $map
@@ -14,11 +14,11 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
      */
     public function testApply(array $map, array $things, array $expected)
     {
-        $substotutor = new ArraySubstitution();
+        $substitution = new ArraySubstitution();
 
-        $substotutor->setMap($map);
+        $substitution->setMap($map);
 
-        $substotutor->apply($things);
+        $substitution->apply($things);
 
         $this->assertEquals($expected, $things);
     }
