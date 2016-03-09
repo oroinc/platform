@@ -11,6 +11,7 @@ class Lexer
 {
     const REGEXP_TIME     = '#(\d\d:\d\d(:\d\d)?)#';
     const REGEXP_DATETIME = '#((\d{4}\-\d{2}\-\d{2})[tT\s]*(\d\d:\d\d(:\d\d)?)?)#';
+    const REGEXP_DAYMONTH = '#^\d{2}\-\d{2}$#';
     const REGEXP_VARIABLE = '#{{(\d+)}}#';
     const REGEXP_OPERATOR = '#\+|\-#';
     const REGEXP_INTEGER  = '#[0-9]+#';
@@ -52,6 +53,9 @@ class Lexer
                 if (!empty($match[3])) {
                     $tokens[] = new Token(Token::TYPE_TIME, $match[3]);
                 }
+                $cursor += strlen($match[0]);
+            } elseif (preg_match(self::REGEXP_DAYMONTH . 'A', $string, $match, null, $cursor)) {
+                $tokens[] = new Token(Token::TYPE_DAYMONTH, $match[0]);
                 $cursor += strlen($match[0]);
             } elseif (preg_match(self::REGEXP_TIME . 'A', $string, $match, null, $cursor)) {
                 $tokens[] = new Token(Token::TYPE_TIME, $match[0]);

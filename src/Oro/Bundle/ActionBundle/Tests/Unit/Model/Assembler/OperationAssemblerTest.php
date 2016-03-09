@@ -94,7 +94,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
         $definition2 = clone $definition1;
         $definition2
             ->setName('maximum_name')
-            ->setSubstituteAction('test_action_to_substitute')
+            ->setSubstituteOperation('test_operation_to_substitute')
             ->setRoutes(['my_route'])
             ->setGroups(['my_group'])
             ->setEnabled(false)
@@ -159,7 +159,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     'maximum_name' => [
                         'label' => 'My Label',
-                        'substitute_action' => 'test_action_to_substitute',
+                        'substitute_operation' => 'test_operation_to_substitute',
                         'entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                         'routes' => ['my_route'],
                         'groups' => ['my_group'],
@@ -189,7 +189,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     'maximum_name_and_acl' => [
                         'label' => 'My Label',
-                        'substitute_action' => 'test_action_to_substitute',
+                        'substitute_operation' => 'test_operation_to_substitute',
                         'entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                         'routes' => ['my_route'],
                         'groups' => ['my_group'],

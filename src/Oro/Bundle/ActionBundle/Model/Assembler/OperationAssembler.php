@@ -94,7 +94,7 @@ class OperationAssembler extends AbstractAssembler
         $operationDefinition
             ->setName($operationName)
             ->setLabel($this->getOption($options, 'label'))
-            ->setSubstituteAction($this->getOption($options, 'substitute_action', null))
+            ->setSubstituteOperation($this->getOption($options, 'substitute_operation', null))
             ->setForAllEntities($this->getOption($options, 'for_all_entities', false))
             ->setEntities($this->filterEntities($this->getOption($options, 'entities', [])))
             ->setExcludeEntities($this->filterEntities($this->getOption($options, 'exclude_entities', [])))

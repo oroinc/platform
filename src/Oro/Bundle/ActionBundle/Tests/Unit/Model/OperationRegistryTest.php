@@ -134,6 +134,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function findDataProvider()
     {
@@ -157,78 +158,107 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['action6', 'action10', 'action12', 'action13', 'action15']
+                'expected' => ['operation6', 'operation10', 'operation12', 'operation13', 'operation15']
             ],
             'route1' => [
                 'entityClass' => null,
                 'route' => 'route1',
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['action4', 'action10']
+                'expected' => ['operation4', 'operation10']
             ],
             'datagrid1' => [
                 'entityClass' => null,
                 'route' => null,
                 'datagrid' => 'datagrid1',
                 'group' => null,
-                'expected' => ['action8']
+                'expected' => ['operation8']
             ],
             'entity1 group1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
                 'route' => null,
                 'datagrid' => null,
                 'group' => 'group1',
-                'expected' => ['action7', 'action11', 'action15']
+                'expected' => ['operation7', 'operation11', 'operation15']
             ],
             'route1 group1' => [
                 'entityClass' => null,
                 'route' => 'route1',
                 'datagrid' => null,
                 'group' => 'group1',
-                'expected' => ['action5', 'action11']
+                'expected' => ['operation5', 'operation11']
             ],
             'datagrid1 group1' => [
                 'entityClass' => null,
                 'route' => null,
                 'datagrid' => 'datagrid1',
                 'group' => 'group1',
-                'expected' => ['action9']
+                'expected' => ['operation9']
             ],
             'route1 & entity1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
                 'route' => 'route1',
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['action4', 'action6', 'action10', 'action12', 'action13', 'action15']
+                'expected' => ['operation4', 'operation6', 'operation10', 'operation12', 'operation13', 'operation15']
             ],
             'route1 & datagrid1' => [
                 'entityClass' => null,
                 'route' => 'route1',
                 'datagrid' => 'datagrid1',
                 'group' => null,
-                'expected' => ['action4', 'action8', 'action10']
+                'expected' => ['operation4', 'operation8', 'operation10']
             ],
             'route1 & entity1 & datagrid1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
                 'route' => 'route1',
                 'datagrid' => 'datagrid1',
                 'group' => null,
-                'expected' => ['action4', 'action6', 'action8', 'action10', 'action12', 'action13', 'action15']
+                'expected' => [
+                    'operation4',
+                    'operation6',
+                    'operation8',
+                    'operation10',
+                    'operation12',
+                    'operation13',
+                    'operation15'
+                ]
             ],
             'route1 group1 & entity1 group1 & datagrid1 group1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
                 'route' => 'route1',
                 'datagrid' => 'datagrid1',
                 'group' => 'group1',
-                'expected' => ['action5', 'action7', 'action9', 'action11', 'action15']
+                'expected' => ['operation5', 'operation7', 'operation9', 'operation11', 'operation15']
             ],
             'entity2' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2',
                 'route' => null,
                 'datagrid' => null,
                 'group' => null,
-                'expected' => ['action10', 'action13', 'action14']
+                'expected' => ['operation10', 'operation13', 'operation14']
             ],
+            'entity3 substitution of action15 by action16' => [
+                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                'route' => null,
+                'datagrid' =>  null,
+                'group' => null,
+                'expected' => ['operation13', 'operation14']
+            ],
+            'action17 matched by group but no substitution and no appearance' => [
+                'entityClass' => null,
+                'route' => null,
+                'datagrid' =>  null,
+                'group' => 'group4',
+                'expected' => []
+            ],
+            'substitute conditional only for specific entity and common group' => [
+                'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
+                'route' => null,
+                'datagrid' =>  null,
+                'group' => 'limited',
+                'expected' => ['operation18']
+            ]
         ];
     }
 
@@ -244,7 +274,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
             ->method('getConfiguration')
             ->willReturn(
                 [
-                    'action1' => [
+                    'operation1' => [
                         'label' => 'Label1'
                     ]
                 ]
@@ -262,26 +292,27 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'invalid action name' => [
-                'actionName' => 'test',
+                'operationName' => 'test',
                 'expected' => null
             ],
             'valid action name' => [
-                'actionName' => 'action1',
-                'expected' => 'action1'
+                'operationName' => 'operation1',
+                'expected' => 'operation1'
             ],
         ];
     }
 
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      * @return array
      */
     protected function getConfiguration()
     {
         return [
-            'action1' => [
+            'operation1' => [
                 'label' => 'Label1'
             ],
-            'action2' => [
+            'operation2' => [
                 'label' => 'Label2',
                 'enabled' => false,
                 'entities' => [
@@ -292,7 +323,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'routes' => ['route1', 'route2', 'route3'],
                 'datagrids' => ['datagrid1', 'datagrid2', 'datagrid3']
             ],
-            'action3' => [
+            'operation3' => [
                 'label' => 'Label3',
                 'applications' => ['frontend'],
                 'groups' => ['group1'],
@@ -304,34 +335,34 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'routes' => ['route1', 'route2', 'route3'],
                 'datagrids' => ['datagrid1', 'datagrid2', 'datagrid3']
             ],
-            'action4' => [
+            'operation4' => [
                 'label' => 'Label4',
                 'routes' => ['route1']
             ],
-            'action5' => [
+            'operation5' => [
                 'label' => 'Label5',
                 'groups' => ['group1'],
                 'routes' => ['route1']
             ],
-            'action6' => [
+            'operation6' => [
                 'label' => 'Label6',
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1']
             ],
-            'action7' => [
+            'operation7' => [
                 'label' => 'Label7',
                 'groups' => ['group1'],
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1']
             ],
-            'action8' => [
+            'operation8' => [
                 'label' => 'Label8',
                 'datagrids' => ['datagrid1'],
             ],
-            'action9' => [
+            'operation9' => [
                 'label' => 'Label9',
                 'groups' => ['group1'],
                 'datagrids' => ['datagrid1'],
             ],
-            'action10' => [
+            'operation10' => [
                 'label' => 'Label10',
                 'entities' => [
                     'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
@@ -339,7 +370,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 ],
                 'routes' => ['route1', 'route2']
             ],
-            'action11' => [
+            'operation11' => [
                 'label' => 'Label11',
                 'groups' => ['group1'],
                 'entities' => [
@@ -348,25 +379,45 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 ],
                 'routes' => ['route1', 'route2']
             ],
-            'action12' => [
+            'operation12' => [
                 'label' => 'Label12',
                 'applications' => ['backend'],
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
             ],
-            'action13' => [
+            'operation13' => [
                 'label' => 'Label13',
                 'for_all_entities' => true
             ],
-            'action14' => [
+            'operation14' => [
                 'label' => 'Label14',
                 'for_all_entities' => true,
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                 'exclude_entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
             ],
-            'action15' => [
+            'operation15' => [
                 'label' => 'Label15',
                 'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                 'groups' => ['', 'group1']
+            ],
+            'operation16' => [
+                'label' => 'Label17Substituted15',
+                'substitute_operation' => 'operation15'
+            ],
+            'operation17' => [
+                'label' => 'Label17',
+                'substitute_operation' => 'unreachableAction',
+                'groups' => ['group5']
+            ],
+            'operation18' => [
+                'label' => 'Label18',
+                'for_all_entities' => true,
+                'groups' => ['limited']
+            ],
+            'operation19' => [
+                'label' => 'Label18 Specific Entity Replacement',
+                'substitute_operation' => 'operation18',
+                'entities' => ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3'],
+                'groups' => ['limited']
             ],
         ];
     }

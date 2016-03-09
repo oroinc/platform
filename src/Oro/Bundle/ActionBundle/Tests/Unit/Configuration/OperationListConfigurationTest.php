@@ -98,7 +98,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                     'oper1' => [
                         'replace' => 'test_replace',
                         'label' => 'Test Label 2',
-                        'substitute_action' => 'test_action',
+                        'substitute_operation' => 'test_action',
                         'applications' => ['app1', 'app2', 'app3'],
                         'for_all_entities' => true,
                         'entities' => ['Entity1', 'Entity2'],
@@ -177,7 +177,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                     'oper1' => [
                         'replace' => ['test_replace'],
                         'label' => 'Test Label 2',
-                        'substitute_action' => 'test_action',
+                        'substitute_operation' => 'test_action',
                         'applications' => ['app1', 'app2', 'app3'],
                         'for_all_entities' => true,
                         'entities' => ['Entity1', 'Entity2'],
@@ -294,14 +294,14 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'The child node "label" at path "operations.oper1" must be configured'
             ],
-            'incorrect operation[substitute_action]' => [
+            'incorrect operation[substitute_operation]' => [
                 'input' => [
                     'oper1' => [
                         'label' => 'Test Label',
-                        'substitute_action' => ['array', 'value']
+                        'substitute_operation' => ['array', 'value']
                     ]
                 ],
-                'message' => 'Invalid type for path "operations.oper1.substitute_action". ' .
+                'message' => 'Invalid type for path "operations.oper1.substitute_operation". ' .
                     'Expected scalar, but got array'
             ],
             'incorrect action[application]' => [

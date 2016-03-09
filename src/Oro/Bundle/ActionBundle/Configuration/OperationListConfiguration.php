@@ -49,7 +49,7 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
                 ->isRequired()
                 ->cannotBeEmpty()
             ->end()
-            ->scalarNode('substitute_action')->end()
+            ->scalarNode('substitute_operation')->end()
             ->arrayNode('applications')
                 ->prototype('scalar')->end()
             ->end()

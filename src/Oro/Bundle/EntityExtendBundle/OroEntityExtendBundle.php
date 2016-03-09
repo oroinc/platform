@@ -20,7 +20,7 @@ use Oro\Bundle\InstallerBundle\CommandExecutor;
 
 class OroEntityExtendBundle extends Bundle
 {
-    const CACHE_GENERATION_TIMEOUT = 300;
+    const CACHE_GENERATION_TIMEOUT = 1300;
     const CACHE_CHECKOUT_INTERVAL = 1;
     const CACHE_CHECKOUT_ATTEMPTS = 120;
 

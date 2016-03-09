@@ -23,7 +23,7 @@ class OperationDefinition
     private $enabled = true;
 
     /** @var string */
-    private $substituteAction = null;
+    private $substituteOperation;
 
     /** @var bool */
     private $forAllEntities = false;
@@ -476,18 +476,18 @@ class OperationDefinition
     /**
      * @return string
      */
-    public function getSubstituteAction()
+    public function getSubstituteOperation()
     {
-        return $this->substituteAction;
+        return $this->substituteOperation;
     }
 
     /**
-     * @param string $substituteAction
+     * @param string $substituteOperation
      * @return $this
      */
-    public function setSubstituteAction($substituteAction)
+    public function setSubstituteOperation($substituteOperation)
     {
-        $this->substituteAction = $substituteAction;
+        $this->substituteOperation = $substituteOperation;
 
         return $this;
     }

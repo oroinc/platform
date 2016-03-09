@@ -46,7 +46,7 @@ class OperationDefinitionTest extends \PHPUnit_Framework_TestCase
             [
                 ['name', 'test'],
                 ['label', 'test'],
-                ['substituteAction', 'test_action_name_to_substitute'],
+                ['substituteOperation', 'test_operation_name_to_substitute'],
                 ['enabled', false, true],
                 ['forAllEntities', false, true],
                 ['entities', ['entity1', 'entity2'], []],

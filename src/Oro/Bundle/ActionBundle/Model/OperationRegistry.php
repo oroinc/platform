@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 
 class OperationRegistry
@@ -22,6 +23,9 @@ class OperationRegistry
     /** @var array|Operation[] */
     protected $operations;
 
+    /* @var ArraySubstitution */
+    protected $substitution;
+
     /**
      * @param ConfigurationProviderInterface $configurationProvider
      * @param OperationAssembler $assembler
@@ -35,6 +39,7 @@ class OperationRegistry
         $this->configurationProvider = $configurationProvider;
         $this->assembler = $assembler;
         $this->applicationsHelper = $applicationsHelper;
+        $this->substitution = new ArraySubstitution();
     }
 
     /**
@@ -46,7 +51,7 @@ class OperationRegistry
      */
     public function find($entityClass, $route, $datagrid, $group = null)
     {
-        $this->loadActions();
+        $this->loadOperations();
 
         $allOperations = $this->filterByGroup($group);
         $operations = [];
@@ -62,6 +67,8 @@ class OperationRegistry
             }
         }
 
+        $this->substitution->apply($operations);
+
         return $operations;
     }
 
@@ -71,18 +78,20 @@ class OperationRegistry
      */
     public function findByName($name)
     {
-        $this->loadActions();
+        $this->loadOperations();
 
         return array_key_exists($name, $this->operations) ? $this->operations[$name] : null;
     }
 
-    protected function loadActions()
+    protected function loadOperations()
     {
         if ($this->operations !== null) {
             return;
         }
 
         $this->operations = [];
+
+        $replacements = [];
 
         $configuration = $this->configurationProvider->getConfiguration();
         $operations = $this->assembler->assemble($configuration);
@@ -96,8 +105,17 @@ class OperationRegistry
                 continue;
             }
 
-            $this->operations[$operation->getName()] = $operation;
+            $operationName = $operation->getName();
+
+            $this->operations[$operationName] = $operation;
+
+            $substitutionTarget = $operation->getDefinition()->getSubstituteOperation();
+            if ($substitutionTarget) {
+                $replacements[$substitutionTarget] = $operationName;
+            }
         }
+
+        $this->substitution->setMap($replacements);
     }
 
     /**
@@ -113,6 +131,7 @@ class OperationRegistry
                 $group,
                 $operation->getDefinition()->getGroups() ?: [static::DEFAULT_GROUP]
             );
+
             return !empty($matchedGroups);
         });
     }

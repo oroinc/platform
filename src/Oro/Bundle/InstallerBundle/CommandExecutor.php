@@ -14,7 +14,7 @@ use Oro\Bundle\CacheBundle\Manager\OroDataCacheManager;
 
 class CommandExecutor
 {
-    const DEFAULT_TIMEOUT = 300;
+    const DEFAULT_TIMEOUT = 1300;
 
     /**
      * @var string|null
