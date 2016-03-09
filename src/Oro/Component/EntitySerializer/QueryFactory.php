@@ -13,6 +13,10 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 class QueryFactory
 {
+    /**
+     * this value is used to optimize (avoid redundant call parseQuery) UNION ALL queries
+     * for the getRelatedItemsIds() method
+     */
     const FAKE_ID = '__fake_id__';
 
     /** @var DoctrineHelper */
@@ -99,14 +103,9 @@ class QueryFactory
     {
         $limit = $config->getMaxResults();
         if ($limit > 0 && count($entityIds) > 1) {
-            $subQuery = $this->getRelatedItemsIdsQuery($associationMapping, [self::FAKE_ID], $config);
-            $subQuery->setMaxResults($limit);
-            $qb = $this->getRelatedItemsUnionAllQuery(
-                $this->doctrineHelper->getEntityManager($associationMapping['targetEntity']),
-                $subQuery,
-                $entityIds
-            );
-            $rows = $qb->getQuery()->getScalarResult();
+            $rows = $this->getRelatedItemsUnionAllQuery($associationMapping, $entityIds, $config, $limit)
+                ->getQuery()
+                ->getScalarResult();
         } else {
             $query = $this->getRelatedItemsIdsQuery($associationMapping, $entityIds, $config);
             if ($limit >= 0) {
@@ -119,20 +118,27 @@ class QueryFactory
     }
 
     /**
-     * @param EntityManager    $em          The entity manager
-     * @param Query            $subQueryTemplate
-     * @param array            $entityIds
+     * @param array        $associationMapping
+     * @param array        $entityIds
+     * @param EntityConfig $config
+     * @param int          $relatedRecordsLimit
      *
      * @return SqlQueryBuilder
+     * @throws Query\QueryException
      */
     protected function getRelatedItemsUnionAllQuery(
-        EntityManager $em,
-        Query $subQueryTemplate,
-        array $entityIds
+        $associationMapping,
+        array $entityIds,
+        EntityConfig $config,
+        $relatedRecordsLimit
     ) {
+        $subQueryTemplate = $this->getRelatedItemsIdsQuery($associationMapping, [self::FAKE_ID], $config);
+        $subQueryTemplate->setMaxResults($relatedRecordsLimit);
         // we should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
         $subQuerySqlTemplate = '(' . QueryUtils::getExecutableSql($subQueryTemplate) . ')';
 
+        // we should build subquery for each parent entity id because the limit of related records
+        // should by applied for each parent entity individually
         $subQueries = [];
         foreach ($entityIds as $id) {
             $fakeId = self::FAKE_ID;
@@ -149,6 +155,7 @@ class QueryFactory
             QueryUtils::getColumnNameByAlias($subQueryMapping, 'relatedEntityId')
         );
 
+        $em = $this->doctrineHelper->getEntityManager($associationMapping['targetEntity']);
         $rsm = QueryUtils::createResultSetMapping($em->getConnection()->getDatabasePlatform());
         $rsm
             ->addScalarResult('entityId', 'entityId')
