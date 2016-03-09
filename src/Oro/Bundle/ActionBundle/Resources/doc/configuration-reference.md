@@ -38,7 +38,7 @@ Configuration of Action declares all aspects related to specific action:
 * frontend configuration
 * action dialog parameters
 
-Structure of configuration is declared in class Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfiguration.
+Structure of configuration is declared in class Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration.
 
 Configuration File
 ==================
