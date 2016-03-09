@@ -122,7 +122,7 @@ class QueryFactory
     /**
      * @param array        $associationMapping
      * @param array        $entityIds
-     * @param EntityConfig $config
+     * @param array        $config
      * @param int          $relatedRecordsLimit
      *
      * @return SqlQueryBuilder
@@ -131,7 +131,7 @@ class QueryFactory
     protected function getRelatedItemsUnionAllQuery(
         $associationMapping,
         array $entityIds,
-        EntityConfig $config,
+        $config,
         $relatedRecordsLimit
     ) {
         $subQueryTemplate = $this->getRelatedItemsIdsQuery($associationMapping, [self::FAKE_ID], $config);
