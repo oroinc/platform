@@ -11,9 +11,10 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
 class DumpCommand extends ContainerAwareCommand
@@ -47,7 +48,7 @@ class DumpCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $requestType = $input->getOption('request-type');
+        $requestType = new RequestType($input->getOption('request-type'));
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
@@ -67,7 +68,7 @@ class DumpCommand extends ContainerAwareCommand
             $table->addRow(
                 [
                     $resource->getEntityClass(),
-                    $this->convertResourceAttributesToString($this->getResourceAttributes($resource))
+                    $this->convertResourceAttributesToString($this->getResourceAttributes($resource, $requestType))
                 ]
             );
             $i++;
@@ -78,18 +79,23 @@ class DumpCommand extends ContainerAwareCommand
 
     /**
      * @param ApiResource $resource
+     * @param RequestType $requestType
      *
      * @return array
      */
-    protected function getResourceAttributes(ApiResource $resource)
+    protected function getResourceAttributes(ApiResource $resource, RequestType $requestType)
     {
         $result = [];
 
         $entityClass = $resource->getEntityClass();
 
-        /** @var EntityAliasResolver $entityAliasResolver */
-        $entityAliasResolver = $this->getContainer()->get('oro_entity.entity_alias_resolver');
-        $result['Alias']     = $entityAliasResolver->getPluralAlias($entityClass);
+        /** @var ValueNormalizer $valueNormalizer */
+        $valueNormalizer      = $this->getContainer()->get('oro_api.value_normalizer');
+        $result['Entity Type'] = $valueNormalizer->normalizeValue(
+            $entityClass,
+            DataType::ENTITY_TYPE,
+            $requestType
+        );
 
         /** @var EntityClassNameProviderInterface $entityClassNameProvider */
         $entityClassNameProvider = $this->getContainer()->get('oro_entity.entity_class_name_provider');

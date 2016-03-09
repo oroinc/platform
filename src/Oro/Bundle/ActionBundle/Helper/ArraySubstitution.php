@@ -41,7 +41,6 @@ class ArraySubstitution
      */
     public function apply(array &$things)
     {
-
         $bounded = $this->replace($things);
 
         if ($this->clearUnboundedSubstitutions) {
@@ -124,7 +123,6 @@ class ArraySubstitution
         }
 
         return $this->lookUpReplacements($map, $map[$key], $maxDepth, ++$depth);
-
     }
 
     /**

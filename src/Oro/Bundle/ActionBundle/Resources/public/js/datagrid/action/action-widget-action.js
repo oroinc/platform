@@ -60,7 +60,7 @@ define(function(require) {
                     confirm_content: this.options.confirmation.message
                 },
                 translates: this.options.translates || {}
-            }, config[this.options.actionName] || {});
+            }, config[this.options.actionName.toLowerCase()] || {});
 
             this.actionManager = new ActionManager(options);
         },

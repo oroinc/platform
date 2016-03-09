@@ -43,10 +43,10 @@ class ActionRegistry
     }
 
     /**
-     * @param string|null $entityClass match by entity
-     * @param string|null $route match by route
-     * @param string|null $datagrid match by grid
-     * @param string|array|null $group filter by group
+     * @param string|null $entityClass
+     * @param string|null $route
+     * @param string|null $datagrid
+     * @param string|array|null $group
      * @return Action[]
      */
     public function find($entityClass, $route, $datagrid, $group = null)
@@ -60,9 +60,8 @@ class ActionRegistry
             $definition = $action->getDefinition();
 
             if ($this->isEntityClassMatched($entityClass, $definition) ||
-                $action->hasUnboundSubstitution() ||
-                $this->isDatagridMatched($datagrid, $definition) ||
-                ($route && in_array($route, $definition->getRoutes(), true))
+                ($route && in_array($route, $definition->getRoutes(), true)) ||
+                $this->isDatagridMatched($datagrid, $definition)
             ) {
                 $actions[$action->getName()] = $action;
             }
@@ -84,9 +83,6 @@ class ActionRegistry
         return array_key_exists($name, $this->actions) ? $this->actions[$name] : null;
     }
 
-    /**
-     * @throws CircularReferenceException
-     */
     protected function loadActions()
     {
         if ($this->actions !== null) {
@@ -119,17 +115,7 @@ class ActionRegistry
             }
         }
 
-        $substitutionMap = [];
-        foreach ($replacements as $target => $replacementName) {
-            if (array_key_exists($target, $this->actions)) {
-                $substitutionMap[$target] = $replacementName;
-            } else {
-                unset($this->actions[$replacementName]); //if nothing to replace no need to keep the action
-            }
-        }
-
-        $this->substitution->setMap($substitutionMap);
-
+        $this->substitution->setMap($replacements);
     }
 
     /**

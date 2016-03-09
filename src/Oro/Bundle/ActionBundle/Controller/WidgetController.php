@@ -61,7 +61,6 @@ class WidgetController extends Controller
             /** @var Form $form */
             $form = $this->get('oro_action.form_manager')->getActionForm($actionName, $data);
 
-            $params['form'] = $form->createView();
             $data['form'] = $form;
 
             $form->handleRequest($request);
@@ -80,6 +79,10 @@ class WidgetController extends Controller
             if (!$errors->count()) {
                 $errors->add(['message' => $e->getMessage()]);
             }
+        }
+
+        if (isset($form)) {
+            $params['form'] = $form->createView();
         }
 
         $params['context'] = $data->getValues();

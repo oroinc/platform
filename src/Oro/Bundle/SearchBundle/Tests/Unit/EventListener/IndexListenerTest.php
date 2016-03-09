@@ -26,7 +26,13 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
      * @var array
      */
     protected $entitiesMapping = [
-        'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product' => [],
+        'Oro\Bundle\SearchBundle\Tests\Unit\Fixture\Entity\Product' => [
+            'fields' => [
+                [
+                    'name' => 'field',
+                ],
+            ],
+        ],
     ];
 
     protected function setUp()
@@ -61,7 +67,6 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
             ]));
         $unitOfWork->expects($this->once())->method('getScheduledEntityUpdates')
             ->will($this->returnValue([
-                'inserted' => $insertedEntity,
                 'updated' => $updatedEntity,
                 'not_supported' => $notSupportedEntity,
             ]));
@@ -69,6 +74,12 @@ class IndexListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue([
                 'deleted' => $deletedEntity,
                 'not_supported' => $notSupportedEntity,
+            ]));
+        $unitOfWork->expects($this->once())
+            ->method('getEntityChangeSet')
+            ->with($updatedEntity)
+            ->will($this->returnValue([
+                'field' => ['val1', 'val2'],
             ]));
 
         $this->doctrineHelper->expects($this->once())->method('getEntityClass')->with($deletedEntity)

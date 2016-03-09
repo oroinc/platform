@@ -7,6 +7,9 @@ namespace Oro\Component\EntitySerializer;
  */
 class EntityConfig
 {
+    /** a list of fields */
+    const FIELDS = 'fields';
+
     /** a type of the exclusion strategy that should be used for the entity */
     const EXCLUSION_POLICY = 'exclusion_policy';
 
@@ -48,7 +51,7 @@ class EntityConfig
 
         if (!empty($this->fields)) {
             foreach ($this->fields as $fieldName => $fieldConfig) {
-                $result['fields'][$fieldName] = $fieldConfig->toArray();
+                $result[self::FIELDS][$fieldName] = $fieldConfig->toArray();
             }
         }
 

@@ -14,9 +14,6 @@ use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- */
 class Action
 {
     /** @var FunctionFactory */
@@ -246,22 +243,5 @@ class Action
         $formOptionsConfig = $this->definition->getFormOptions();
 
         return !empty($formOptionsConfig['attribute_fields']);
-    }
-
-    /**
-     * @return bool
-     */
-    public function hasUnboundSubstitution()
-    {
-        return (
-            $this->definition->getSubstituteAction() &&
-            false === (
-                $this->definition->getGroups() ||
-                $this->definition->getDatagrids() ||
-                $this->definition->getEntities() ||
-                $this->definition->getExcludeEntities() ||
-                $this->definition->isForAllEntities()
-            )
-        );
     }
 }

@@ -130,7 +130,7 @@ class ActionExtension extends AbstractExtension
             $actionsNew[$actionName] = $this->getRowActionsConfig($action, $actionData);
         }
 
-        return array_merge($this->getParentRowConfiguration($record, $config), $actionsNew);
+        return array_merge($actionsNew, $this->getParentRowConfiguration($record, $config));
     }
 
     /**
@@ -179,7 +179,7 @@ class ActionExtension extends AbstractExtension
         $actionsConfig = $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []);
 
         foreach ($this->actions as $actionName => $action) {
-            $actionsConfig[$actionName] = $this->getRowsActionsConfig($action, $actionName);
+            $actionsConfig[$actionName] = $this->getRowsActionsConfig($action);
         }
 
         $config->offsetSet(DatagridActionExtension::ACTION_KEY, $actionsConfig);
@@ -187,10 +187,9 @@ class ActionExtension extends AbstractExtension
 
     /**
      * @param Action $action
-     * @param string $actionName
      * @return array
      */
-    protected function getRowsActionsConfig(Action $action, $actionName)
+    protected function getRowsActionsConfig(Action $action)
     {
         $buttonOptions = $action->getDefinition()->getButtonOptions();
         $frontendOptions = $action->getDefinition()->getFrontendOptions();
@@ -204,7 +203,7 @@ class ActionExtension extends AbstractExtension
             'link' => '#',
             'icon' => $icon,
             'options' => [
-                'actionName' => $actionName,
+                'actionName' => $action->getName(),
                 'entityClass' => $this->datagridContext['entityClass'],
                 'datagrid' => $this->datagridContext['datagrid'],
                 'confirmation' => $confirmation,
