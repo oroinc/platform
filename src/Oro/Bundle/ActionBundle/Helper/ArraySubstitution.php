@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 
-class SubstitutionVenue
+class ArraySubstitution
 {
     const SUBSTITUTION_PATH_MAX_DEPTH = 10;
 
@@ -21,7 +21,7 @@ class SubstitutionVenue
     private $maxDepth;
 
     /**
-     * SubstitutionVenue constructor.
+     * ArraySubstitution constructor.
      * @param bool $clearUnboundedSubstitutions result of substitution will be cleared form unused replacers
      * @param int $substitutionMapMaxDepth
      * @param bool $ignoreCircularReferences if set to true and circular ref met in map will throw an exception
@@ -34,18 +34,6 @@ class SubstitutionVenue
         $this->clearUnboundedSubstitutions = $clearUnboundedSubstitutions;
         $this->maxDepth = $substitutionMapMaxDepth;
         $this->ignoreCircularReferences = $ignoreCircularReferences;
-    }
-
-    /**
-     * Create result array with substituted values if found. Does not apply changes to argument.
-     * @param array $things associative array of named elements that can be matched in map and replaced if condition met
-     * @return array
-     */
-    public function substitute(array $things)
-    {
-        $this->apply($things);
-
-        return $things;
     }
 
     /**
@@ -75,7 +63,8 @@ class SubstitutionVenue
         $bounded = [];
 
         foreach ($scopeMap as $target => $replacement) {
-            if ($this->isReplacement($target)) {
+
+            if (in_array($target, $this->map, true)) { //ignore replacement targets
                 continue;
             }
 
@@ -115,19 +104,10 @@ class SubstitutionVenue
     }
 
     /**
-     * @param string $name
-     * @return bool
-     */
-    protected function isReplacement($name)
-    {
-        return in_array($name, $this->map, true);
-    }
-
-    /**
      * @param array $map
      * @param $key
      * @param int $maxDepth
-     * @param int $depth
+     * @internal int $depth
      * @return string the key of last found point
      * @throws CircularReferenceException
      */
@@ -165,45 +145,10 @@ class SubstitutionVenue
     public function setMap(array $map)
     {
         if (!$this->ignoreCircularReferences) {
-            self::assertNoCircularReferences($map);
+            Substitution\CircularReferenceSearch::assert($map);
         }
         $this->map = $map;
 
         return $this;
-    }
-
-    /**
-     * @param $pairs
-     * @throws CircularReferenceException
-     */
-    public static function assertNoCircularReferences($pairs)
-    {
-        $walker = function (array &$list, $target, $point) use (&$walker) {
-            if (null === $point) {
-                return false;
-            }
-
-            if (array_key_exists($point, $list)) {
-                if ($list[$point] === $target || $list[$point] === $point) {
-                    return true;
-                } else {
-                    return $walker($list, $target, $list[$point]);
-                }
-            }
-
-            return false;
-        };
-
-        foreach ($pairs as $target => $replacement) {
-            if ($walker($pairs, $target, $replacement)) {
-                throw new CircularReferenceException(
-                    sprintf(
-                        'Circular reference detected. On replacement %s that points tp %s target.',
-                        $target,
-                        $replacement
-                    )
-                );
-            }
-        }
     }
 }

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
-use Oro\Bundle\ActionBundle\Helper\SubstitutionVenue;
+use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 
 class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
 {
@@ -14,7 +14,7 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
      */
     public function testApply(array $map, array $things, array $expected)
     {
-        $substotutor = new SubstitutionVenue();
+        $substotutor = new ArraySubstitution();
 
         $substotutor->setMap($map);
 
@@ -122,7 +122,7 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
 
     public function testMaxDepthException()
     {
-        $substitutor = new SubstitutionVenue(true, 2);
+        $substitutor = new ArraySubstitution(true, 2);
 
         $substitutor->setMap([
             'a' => 'c',
@@ -132,12 +132,14 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Oro\Bundle\ActionBundle\Exception\CircularReferenceException');
 
-        $substitutor->substitute([
+        $things = [
             'a' => ['a body'],
             'c' => ['c body'],
             'b' => ['b body'],
             'e' => ['e body']
-        ]);
+        ];
+
+        $substitutor->apply($things);
     }
 
     /**
@@ -148,10 +150,14 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotClearUnbound($map, $things, $expected)
     {
-        $substitutionVenue = new SubstitutionVenue(false);
+        $substitutionVenue = new ArraySubstitution(false);
         $substitutionVenue->setMap($map);
 
-        $this->assertEquals($expected, $substitutionVenue->substitute($things));
+        $applyTo = $things;
+
+        $substitutionVenue->apply($applyTo);
+
+        $this->assertEquals($expected, $applyTo);
     }
 
     public function clearUnboundProvider()
