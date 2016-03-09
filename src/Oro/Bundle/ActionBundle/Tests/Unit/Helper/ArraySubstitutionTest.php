@@ -150,16 +150,19 @@ class ArraySubstitutionTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotClearUnbound($map, $things, $expected)
     {
-        $substitutionVenue = new ArraySubstitution(false);
-        $substitutionVenue->setMap($map);
+        $arraySubstitution = new ArraySubstitution(false);
+        $arraySubstitution->setMap($map);
 
         $applyTo = $things;
 
-        $substitutionVenue->apply($applyTo);
+        $arraySubstitution->apply($applyTo);
 
         $this->assertEquals($expected, $applyTo);
     }
 
+    /**
+     * @return array
+     */
     public function clearUnboundProvider()
     {
         return [
