@@ -268,10 +268,21 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             0,
-            'SELECT r0_.code AS code_0 FROM role_table r0_ WHERE r0_.code IN (?, ?)',
+            'SELECT r0_.code AS code_0, c1_.name AS name_1, r0_.category_name AS category_name_2'
+            . ' FROM role_table r0_'
+            . ' LEFT JOIN category_table c1_ ON r0_.category_name = c1_.name'
+            . ' WHERE r0_.code IN (?, ?)',
             [
-                ['code_0' => 'id1'],
-                ['code_0' => 'id2']
+                [
+                    'code_0'          => 'id1',
+                    'name_1'          => 'category_1',
+                    'category_name_2' => 'category_1',
+                ],
+                [
+                    'code_0'          => 'id2',
+                    'name_1'          => null,
+                    'category_name_2' => null,
+                ]
             ],
             [1 => 'id1', 2 => 'id2'],
             [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR]
@@ -312,24 +323,15 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             ]
         );
 
-        $this->setQueryExpectationAt(
-            $conn,
-            2,
-            'SELECT g0_.id AS id_0 FROM group_table g0_ WHERE g0_.id IN (?, ?)',
-            [
-                ['id_0' => 10],
-                ['id_0' => 20],
-            ],
-            [1 => 10, 2 => 20],
-            [1 => \PDO::PARAM_INT, 2 => \PDO::PARAM_INT]
-        );
-
         $result = $this->serializer->serialize(
             $qb,
             [
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'code'   => null,
+                    'category' => [
+                        'fields' => 'name'
+                    ],
                     'groups' => [
                         'max_results' => 10,
                         'fields'      => 'id'
@@ -341,12 +343,14 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->assertArrayEquals(
             [
                 [
-                    'code'   => 'id1',
-                    'groups' => [10, 20]
+                    'code'     => 'id1',
+                    'category' => 'category_1',
+                    'groups'   => [10, 20]
                 ],
                 [
-                    'code'   => 'id2',
-                    'groups' => null,
+                    'code'     => 'id2',
+                    'category' => null,
+                    'groups'   => null,
                 ]
             ],
             $result

@@ -26,6 +26,12 @@ class Role
     protected $label;
 
     /**
+     * @ORM\ManyToOne(targetEntity="Category")
+     * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
+     **/
+    protected $category;
+
+    /**
      * @ORM\ManyToMany(targetEntity="Group")
      * @ORM\JoinTable(name="rel_role_to_group_table",
      *      joinColumns={@ORM\JoinColumn(name="role_code", referencedColumnName="code", onDelete="CASCADE")},
@@ -79,6 +85,26 @@ class Role
     public function setLabel($label)
     {
         $this->label = $label;
+
+        return $this;
+    }
+
+    /**
+     * @return Category
+     */
+    public function getCategory()
+    {
+        return $this->category;
+    }
+
+    /**
+     * @param Category $category
+     *
+     * @return self
+     */
+    public function setCategory($category)
+    {
+        $this->category = $category;
 
         return $this;
     }

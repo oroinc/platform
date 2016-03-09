@@ -126,19 +126,22 @@ class QueryUtils
     }
 
     /**
-     * @param Query $query
+     * @param Query                   $query
+     * @param Query\ParserResult|null $parsedQuery
      *
      * @return string
      *
      * @throws QueryException
      */
-    public static function getExecutableSql(Query $query)
+    public static function getExecutableSql(Query $query, Query\ParserResult $parsedQuery = null)
     {
-        $parserResult = static::parseQuery($query);
+        if (null === $parsedQuery) {
+            $parsedQuery = static::parseQuery($query);
+        }
 
-        $sql = $parserResult->getSqlExecutor()->getSqlStatements();
+        $sql = $parsedQuery->getSqlExecutor()->getSqlStatements();
 
-        list($params, $types) = self::processParameterMappings($query, $parserResult->getParameterMappings());
+        list($params, $types) = self::processParameterMappings($query, $parsedQuery->getParameterMappings());
         list($sql, $params, $types) = SQLParserUtils::expandListParameters($sql, $params, $types);
 
         $paramPos = SQLParserUtils::getPlaceholderPositions($sql);
