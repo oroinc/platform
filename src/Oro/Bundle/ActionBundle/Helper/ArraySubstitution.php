@@ -104,9 +104,9 @@ class ArraySubstitution
 
     /**
      * @param array $map
-     * @param $key
+     * @param string $key
      * @param int $maxDepth
-     * @internal int $depth
+     * @param int $depth step counter for function self usage purpose
      * @return string the key of last found point
      * @throws CircularReferenceException
      */
