@@ -7,7 +7,7 @@
         '_wid': app.request.get('_wid')
     } %}
     {% set attr = attr|merge({
-        class: attr.class|default('') ~ "widget-content",
+        class: attr.class|default('') ~ "widget-content " ~ (class_prefix ? class_prefix),
         'data-page-component-options': pageComponentOptions|merge(attr['data-page-component-options']|default([]))|json_encode
     }) %}
     <div{{ block('block_attributes') }}>
