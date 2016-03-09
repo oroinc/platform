@@ -27,6 +27,8 @@ class AdditionalMetadataProvider
 
     /**
      * @param string $className
+     *
+     * @return array
      */
     public function getInversedUnidirectionalAssociationMappings($className)
     {
@@ -52,8 +54,10 @@ class AdditionalMetadataProvider
     }
 
     /**
-     * @param ClassMetadata $classMetadata
+     * @param ClassMetadata   $classMetadata
      * @param ClassMetadata[] $allMetadata
+     *
+     * @return array
      */
     protected function createInversedUnidirectionalAssociationMappings(ClassMetadata $classMetadata, array $allMetadata)
     {
