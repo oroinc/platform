@@ -52,6 +52,7 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
             'max valid configuration' => [
                 'config' => [
                     'test' => [
+                        'acl_resource' => ['EDIT', new \stdClass()],
                         'arguments' => [
                             'arg1' => [
                                 'type' => 'string',
@@ -71,6 +72,7 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'test' => [
+                        'acl_resource' => ['EDIT', new \stdClass()],
                         'arguments' => [
                             'arg1' => [
                                 'type' => 'string',

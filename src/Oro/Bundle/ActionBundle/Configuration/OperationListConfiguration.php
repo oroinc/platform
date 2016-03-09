@@ -103,7 +103,8 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
     protected function appendActionsNodes($builder)
     {
         foreach (OperationDefinition::getAllowedActions() as $nodeName) {
-            $builder->arrayNode($nodeName)
+            $builder
+                ->arrayNode($nodeName)
                     ->prototype('variable')->end()
                 ->end();
         }
@@ -116,7 +117,8 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
     {
         $builder = new TreeBuilder();
         $node = $builder->root('attributes');
-        $node->useAttributeAsKey('name')
+        $node
+            ->useAttributeAsKey('name')
             ->prototype('array')
                 ->children()
                     ->scalarNode('name')
@@ -156,7 +158,8 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
     {
         $builder = new TreeBuilder();
         $node = $builder->root('button_options');
-        $node->addDefaultsIfNotSet()
+        $node
+            ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('icon')->end()
                 ->scalarNode('class')->end()
@@ -181,7 +184,8 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
     {
         $builder = new TreeBuilder();
         $node = $builder->root('frontend_options');
-        $node->addDefaultsIfNotSet()
+        $node
+            ->addDefaultsIfNotSet()
             ->children()
                 ->variableNode('confirmation')
                     ->beforeNormalization()
@@ -211,7 +215,8 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
     {
         $builder = new TreeBuilder();
         $node = $builder->root('datagrid_options');
-        $node->addDefaultsIfNotSet()
+        $node
+            ->addDefaultsIfNotSet()
             ->children()
                 ->scalarNode('mass_action_provider')->end()
                 ->arrayNode('mass_action')
@@ -240,23 +245,24 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
     {
         $builder = new TreeBuilder();
         $node = $builder->root('form_options');
-        $node->children()
-            ->arrayNode('attribute_fields')
-                ->useAttributeAsKey('name')
-                ->prototype('array')
-                    ->children()
-                        ->scalarNode('form_type')->end()
-                        ->arrayNode('options')
-                            ->prototype('variable')->end()
+        $node
+            ->children()
+                ->arrayNode('attribute_fields')
+                    ->useAttributeAsKey('name')
+                    ->prototype('array')
+                        ->children()
+                            ->scalarNode('form_type')->end()
+                            ->arrayNode('options')
+                                ->prototype('variable')->end()
+                            ->end()
                         ->end()
                     ->end()
                 ->end()
-            ->end()
-            ->arrayNode('attribute_default_values')
-                ->useAttributeAsKey('name')
-                ->prototype('variable')->end()
-            ->end()
-        ->end();
+                ->arrayNode('attribute_default_values')
+                    ->useAttributeAsKey('name')
+                    ->prototype('variable')->end()
+                ->end()
+            ->end();
 
         return $node;
     }
@@ -268,7 +274,8 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
     {
         $builder = new TreeBuilder();
         $node = $builder->root('action_groups');
-        $node->prototype('array')
+        $node
+            ->prototype('array')
                 ->children()
                     ->scalarNode('name')
                         ->isRequired()
