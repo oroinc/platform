@@ -21,7 +21,6 @@ class ArraySubstitution
     private $maxDepth;
 
     /**
-     * ArraySubstitution constructor.
      * @param bool $clearUnboundedSubstitutions result of substitution will be cleared form unused replacers
      * @param int $substitutionMapMaxDepth
      * @param bool $ignoreCircularReferences if set to true and circular ref met in map will throw an exception
