@@ -124,7 +124,7 @@ class ActionExtension extends AbstractExtension
         }
 
         $result = array_filter($this->getParentRowConfiguration($record, $config), function ($item) {
-            return $item === false;
+            return $item === false || is_array($item);
         });
 
         return array_merge($result, $actionsNew);

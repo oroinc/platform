@@ -73,9 +73,10 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => null,
                     'entityClass' => null,
                     'datagrid' => null,
-                    'group' => null
+                    'group' => null,
+                    'fromUrl' => null,
                 ],
-                'calls' => 6,
+                'calls' => 7,
             ],
             [
                 'request' => new Request(),
@@ -84,9 +85,10 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => null,
                     'entityClass' => null,
                     'datagrid' => null,
-                    'group' => null
+                    'group' => null,
+                    'fromUrl' => null,
                 ],
-                'calls' => 6,
+                'calls' => 7,
             ],
             [
                 'request' => new Request(
@@ -95,7 +97,8 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'entityId' => '42',
                         'entityClass' => 'stdClass',
                         'datagrid' => 'test_datagrid',
-                        'group' => 'test_group'
+                        'group' => 'test_group',
+                        'fromUrl' => 'test-url',
                     ]
                 ),
                 'expected' => [
@@ -103,9 +106,10 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => '42',
                     'entityClass' => 'stdClass',
                     'datagrid' => 'test_datagrid',
-                    'group' => 'test_group'
+                    'group' => 'test_group',
+                    'fromUrl' => 'test-url'
                 ],
-                'calls' => 5,
+                'calls' => 6,
             ]
         ];
     }
@@ -260,12 +264,12 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
         return [
             'without request' => [
                 'request' => null,
-                'requestStackCalls' => 6,
+                'requestStackCalls' => 7,
                 'expected' => new ActionData(['data' => null])
             ],
             'empty request' => [
                 'request' => new Request(),
-                'requestStackCalls' => 6,
+                'requestStackCalls' => 7,
                 'expected' => new ActionData(['data' => null])
             ],
             'route1 without entity id' => [
@@ -275,7 +279,7 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                         'entityClass' => 'stdClass'
                     ]
                 ),
-                'requestStackCalls' => 5,
+                'requestStackCalls' => 6,
                 'expected' => new ActionData(['data' => new \stdClass()])
             ],
             'entity' => [

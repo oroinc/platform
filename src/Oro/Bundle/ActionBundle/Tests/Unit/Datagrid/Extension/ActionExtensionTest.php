@@ -8,8 +8,8 @@ use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
@@ -41,11 +41,6 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('getActionData')
             ->willReturn(new ActionData(['data' => ['param'], 'key1' => 'value1', 'key2' => 2]));
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper $applicationHelper */
-        $applicationHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $provider = $this->getMock('Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderInterface');
         $provider->expects($this->any())
             ->method('getActions')
@@ -61,11 +56,19 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(self::PROVIDER_ALIAS)
             ->willReturn($provider);
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|OptionsHelper $optionsHelper */
+        $optionsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\OptionsHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $optionsHelper->expects($this->any())
+            ->method('getFrontendOptions')
+            ->willReturn(['option1' => 'value1', 'option2' => 'value2']);
+
         $this->extension = new ActionExtension(
             $this->manager,
             $contextHelper,
-            $applicationHelper,
-            $this->massActionProviderRegistry
+            $this->massActionProviderRegistry,
+            $optionsHelper
         );
     }
 
@@ -129,7 +132,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->willReturn($actions);
 
         if ($groups) {
-            $this->extension->setActionGroups($groups);
+            $this->extension->setGroups($groups);
         }
         $this->extension->isApplicable($datagridConfig);
 
@@ -241,8 +244,8 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 2]),
                 'actions' => ['action1' => $actionAllowed1, 'action2' => $actionAllowed2],
                 'expectedActions' => [
-                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
-                    'action2' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action1' => ['option1' => 'value1', 'option2' => 'value2'],
+                    'action2' => ['option1' => 'value1', 'option2' => 'value2'],
                 ],
                 'context' => ['entityClass' => null, 'datagrid' => null, 'group' => null],
             ],
@@ -251,7 +254,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 3]),
                 'actions' => ['action1' => $actionAllowed1, 'action3' => $actionNotAllowed],
                 'expectedActions' => [
-                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false
                 ],
                 'context' => ['entityClass' => null, 'datagrid' => null, 'group' => null],
@@ -267,7 +270,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => ['action1' => $actionAllowed1, 'action3' => $actionNotAllowed],
                 'expectedActions' => [
-                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false,
                     'view' => ['key1' => 'value1'],
                     'update' => false,
@@ -287,10 +290,9 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => ['action1' => $actionAllowed1, 'action3' => $actionNotAllowed],
                 'expectedActions' => [
-                    'action1' => ['translates' => ['key1' => 'value1', 'key2' => 2]],
+                    'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false,
                     'view' => ['key2' => 'value2'],
-                    'update' => true,
                 ],
                 'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
@@ -313,17 +315,6 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             'icon' => 'edit',
             'options' => [
                 'actionName' => $action,
-                'entityClass' => null,
-                'datagrid' => $datagrid,
-                'confirmation' => '',
-                'hasDialog' => null,
-                'showDialog' => false,
-                'executionRoute' => null,
-                'dialogRoute' => null,
-                'dialogOptions' => [
-                    'title' => $label,
-                    'dialogOptions' => []
-                ]
             ]
         ];
     }
