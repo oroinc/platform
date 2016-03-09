@@ -198,8 +198,7 @@ class MetadataBuilder
 
     /**
      * @param EntityMetadata $entityMetadata
-     * @param ClassMetadata $classMetadata
-     * @param string $className
+     * @param ClassMetadata  $classMetadata
      */
     protected function addDoctrineInverseAssociations(
         EntityMetadata $entityMetadata,
