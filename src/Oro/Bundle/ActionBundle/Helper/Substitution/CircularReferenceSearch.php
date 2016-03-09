@@ -14,11 +14,7 @@ class CircularReferenceSearch
      */
     protected static function hasPointToTarget(array &$list, $target, $point)
     {
-        if (null === $point) {
-            return false;
-        }
-
-        if (array_key_exists($point, $list)) {
+        if (null !== $point && array_key_exists($point, $list)) {
             if ($list[$point] === $target || $list[$point] === $point) {
                 return true;
             } else {
@@ -31,10 +27,10 @@ class CircularReferenceSearch
 
     /**
      * Looks for circular reference in values -> keys in pairs, throws an exception if found.
-     * @param $pairs
+     * @param array $pairs
      * @throws CircularReferenceException
      */
-    public static function assert($pairs)
+    public static function assert(array $pairs)
     {
         foreach ($pairs as $target => $replacement) {
             if (self::hasPointToTarget($pairs, $target, $replacement)) {

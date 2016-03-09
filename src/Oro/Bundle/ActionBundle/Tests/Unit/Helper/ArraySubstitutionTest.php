@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 
-class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
+class ArraySubstitutionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array $map
@@ -150,16 +150,19 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
      */
     public function testNotClearUnbound($map, $things, $expected)
     {
-        $substitutionVenue = new ArraySubstitution(false);
-        $substitutionVenue->setMap($map);
+        $arraySubstitution = new ArraySubstitution(false);
+        $arraySubstitution->setMap($map);
 
         $applyTo = $things;
 
-        $substitutionVenue->apply($applyTo);
+        $arraySubstitution->apply($applyTo);
 
         $this->assertEquals($expected, $applyTo);
     }
 
+    /**
+     * @return array
+     */
     public function clearUnboundProvider()
     {
         return [

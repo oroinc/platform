@@ -61,7 +61,6 @@ class ArraySubstitution
         $bounded = [];
 
         foreach ($scopeMap as $target => $replacement) {
-
             if (in_array($target, $this->map, true)) { //ignore replacement targets
                 continue;
             }
