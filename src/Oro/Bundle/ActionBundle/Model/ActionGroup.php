@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
+use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -20,21 +21,30 @@ class ActionGroup
     /** @var ConditionFactory */
     private $conditionFactory;
 
+    /** @var ArgumentAssembler */
+    private $argumentAssembler;
+
     /** @var ActionGroupDefinition */
     private $definition;
+
+    /** @var Argument[] */
+    private $arguments;
 
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
+     * @param ArgumentAssembler $argumentAssembler
      * @param ActionGroupDefinition $definition
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
+        ArgumentAssembler $argumentAssembler,
         ActionGroupDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
+        $this->argumentAssembler = $argumentAssembler;
         $this->definition = $definition;
     }
 
@@ -92,5 +102,21 @@ class ActionGroup
                 $actions->execute($data);
             }
         }
+    }
+
+    /**
+     * @return array
+     */
+    public function getArguments()
+    {
+        if ($this->arguments === null) {
+            $this->arguments = [];
+            $argumentsConfig = $this->definition->getArguments();
+            if ($argumentsConfig) {
+                $this->arguments = $this->argumentAssembler->assemble($argumentsConfig);
+            }
+        }
+
+        return $this->arguments;
     }
 }

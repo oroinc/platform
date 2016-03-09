@@ -7,6 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
+use Oro\Bundle\ActionBundle\Model\Argument;
+use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -41,6 +43,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         $this->actionGroup = new ActionGroup(
             $this->actionFactory,
             $this->conditionFactory,
+            new ArgumentAssembler(),
             new ActionGroupDefinition()
         );
 
@@ -163,6 +166,41 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
                 'data' => $data,
                 'condition' => $this->createCondition($this->once(), $data, true),
                 'allowed' => true,
+            ],
+        ];
+    }
+
+    /**
+     *
+     * @dataProvider getArgumentsProvider
+     * @param array $config
+     * @param Argument[] $expected
+     */
+    public function testGetArguments(array $config, array $expected)
+    {
+        if ($config) {
+            $this->actionGroup->getDefinition()->setArguments($config);
+        }
+
+        $this->assertEquals($expected, $this->actionGroup->getArguments());
+    }
+
+    /**
+     * @return array
+     */
+    public function getArgumentsProvider()
+    {
+        $argument1 = new Argument();
+        $argument1->setName('argument1');
+
+        return [
+            'no arguments' => [
+                'config' => [],
+                'expected' => [],
+            ],
+            '1 argument' => [
+                'config' => ['argument1' => []],
+                'expected' => ['argument1' => $argument1],
             ],
         ];
     }

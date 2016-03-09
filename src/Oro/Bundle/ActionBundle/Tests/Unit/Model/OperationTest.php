@@ -5,10 +5,12 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
-use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
-use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -56,19 +58,20 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
+        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formOptionsAssembler = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler'
+        )->disableOriginalConstructor()->getMock();
 
         $this->operation = new Operation(
             $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
+            new OperationActionGroupAssembler(),
             $this->definition
         );
 
@@ -611,6 +614,43 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             'filled' => [
                 'input' => ['attribute_fields' => ['attribute' => []]],
                 'expected' => ['attribute_fields' => ['attribute' => []]],
+            ],
+        ];
+    }
+
+    /**
+     *
+     * @dataProvider getOperationActionGroupsProvider
+     * @param array $config
+     * @param OperationActionGroup[] $expected
+     */
+    public function testGetOperationActionGroups(array $config, array $expected)
+    {
+        if ($config) {
+            $this->definition->expects($this->once())
+                ->method('getActionGroups')
+                ->willReturn($config);
+        }
+
+        $this->assertEquals($expected, $this->operation->getOperationActionGroups());
+    }
+
+    /**
+     * @return array
+     */
+    public function getOperationActionGroupsProvider()
+    {
+        $item = new OperationActionGroup();
+        $item->setName('name1');
+
+        return [
+            'no items' => [
+                'config' => [],
+                'expected' => [],
+            ],
+            '1 item' => [
+                'config' => [['name' => 'name1']],
+                'expected' => [$item],
             ],
         ];
     }

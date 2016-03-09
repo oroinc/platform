@@ -1,19 +1,21 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Model;
+namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Doctrine\ORM\ORMException;
 
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-class ActionAssembler extends AbstractAssembler
+class OperationAssembler extends AbstractAssembler
 {
-    /** @var FunctionFactory */
-    private $functionFactory;
+    /** @var ActionFactory */
+    private $actionFactory;
 
     /** @var ConditionFactory */
     private $conditionFactory;
@@ -24,6 +26,9 @@ class ActionAssembler extends AbstractAssembler
     /** @var FormOptionsAssembler */
     private $formOptionsAssembler;
 
+    /** @var OperationActionGroupAssembler */
+    private $operationActionGroupAssembler;
+
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
@@ -31,23 +36,26 @@ class ActionAssembler extends AbstractAssembler
     private $entityNames = [];
 
     /**
-     * @param FunctionFactory $functionFactory
+     * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
+     * @param OperationActionGroupAssembler $operationActionGroupAssembler,
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
-        FunctionFactory $functionFactory,
+        ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
         FormOptionsAssembler $formOptionsAssembler,
+        OperationActionGroupAssembler $operationActionGroupAssembler,
         DoctrineHelper $doctrineHelper
     ) {
-        $this->functionFactory = $functionFactory;
+        $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->attributeAssembler = $attributeAssembler;
         $this->formOptionsAssembler = $formOptionsAssembler;
+        $this->operationActionGroupAssembler = $operationActionGroupAssembler;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -57,33 +65,34 @@ class ActionAssembler extends AbstractAssembler
      */
     public function assemble(array $configuration)
     {
-        $actions = [];
+        $operations = [];
 
-        foreach ($configuration as $actionName => $options) {
-            $actions[$actionName] = new Operation(
-                $this->functionFactory,
+        foreach ($configuration as $operationName => $options) {
+            $operations[$operationName] = new Operation(
+                $this->actionFactory,
                 $this->conditionFactory,
                 $this->attributeAssembler,
                 $this->formOptionsAssembler,
-                $this->assembleDefinition($actionName, $options)
+                new OperationActionGroupAssembler(),
+                $this->assembleDefinition($operationName, $options)
             );
         }
 
-        return $actions;
+        return $operations;
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param array $options
      * @return OperationDefinition
      */
-    protected function assembleDefinition($actionName, array $options)
+    protected function assembleDefinition($operationName, array $options)
     {
-        $this->assertOptions($options, ['label'], $actionName);
+        $this->assertOptions($options, ['label'], $operationName);
         $operationDefinition = new OperationDefinition();
 
         $operationDefinition
-            ->setName($actionName)
+            ->setName($operationName)
             ->setLabel($this->getOption($options, 'label'))
             ->setSubstituteAction($this->getOption($options, 'substitute_action', null))
             ->setForAllEntities($this->getOption($options, 'for_all_entities', false))
@@ -140,7 +149,7 @@ class ActionAssembler extends AbstractAssembler
     protected function filterEntities(array $entities)
     {
         return array_filter(array_map([$this, 'getEntityClassName'], $entities), 'is_string');
-}
+    }
 
     /**
      * @param string $entityName

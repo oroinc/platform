@@ -1,25 +1,25 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
+use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\ActionAssembler;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
-use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
-
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
+class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var ActionAssembler */
+    /** @var OperationAssembler */
     protected $assembler;
 
     protected function setUp()
@@ -33,11 +33,12 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 return $class;
             });
 
-        $this->assembler = new ActionAssembler(
-            $this->getFunctionFactory(),
+        $this->assembler = new OperationAssembler(
+            $this->getActionFactory(),
             $this->getConditionFactory(),
             $this->getAttributeAssembler(),
             $this->getFormOptionsAssembler(),
+            $this->getOperationActionGroupAssembler(),
             $this->doctrineHelper
         );
     }
@@ -57,7 +58,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $definitions = $this->assembler->assemble($configuration);
 
-        static::assertEquals($expected, $definitions);
+        $this->assertEquals($expected, $definitions);
     }
 
     /**
@@ -145,10 +146,11 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ,
                 'expected' => [
                     'minimum_name' => new Operation(
-                        $this->getFunctionFactory(),
+                        $this->getActionFactory(),
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
+                        $this->getOperationActionGroupAssembler(),
                         $definition1
                     )
                 ],
@@ -174,10 +176,11 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'maximum_name' => new Operation(
-                        $this->getFunctionFactory(),
+                        $this->getActionFactory(),
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
+                        $this->getOperationActionGroupAssembler(),
                         $definition2
                     )
                 ],
@@ -206,10 +209,11 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'maximum_name_and_acl' => new Operation(
-                        $this->getFunctionFactory(),
+                        $this->getActionFactory(),
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
+                        $this->getOperationActionGroupAssembler(),
                         $definition3
                     )
                 ],
@@ -218,9 +222,9 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|FunctionFactory
+     * @return \PHPUnit_Framework_MockObject_MockObject|ActionFactory
      */
-    protected function getFunctionFactory()
+    protected function getActionFactory()
     {
         return $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
@@ -242,7 +246,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getAttributeAssembler()
     {
-        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
+        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
             ->disableOriginalConstructor()
             ->getMock();
     }
@@ -252,8 +256,16 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getFormOptionsAssembler()
     {
-        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
+        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|OperationActionGroupAssembler
+     */
+    protected function getOperationActionGroupAssembler()
+    {
+        return new OperationActionGroupAssembler();
     }
 }

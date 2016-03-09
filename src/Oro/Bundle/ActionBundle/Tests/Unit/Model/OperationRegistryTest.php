@@ -4,22 +4,23 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\ActionAssembler;
-use Oro\Bundle\ActionBundle\Model\ActionRegistry;
-use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
-use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\OperationRegistry;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
+use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-class ActionRegistryTest extends \PHPUnit_Framework_TestCase
+class OperationRegistryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationProvider;
 
-    /** @var ActionAssembler */
+    /** @var OperationAssembler */
     protected $assembler;
 
     /** @var ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
@@ -28,8 +29,8 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|FunctionFactory */
-    protected $functionFactory;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
+    protected $actionFactory;
 
     /** @var ConditionFactory|\PHPUnit_Framework_MockObject_MockObject */
     protected $conditionFactory;
@@ -40,7 +41,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
     protected $formOptionsAssembler;
 
-    /** @var ActionRegistry */
+    /** @var OperationRegistry */
     protected $registry;
 
     private $contextHelper;
@@ -54,7 +55,7 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
         $this->configurationProvider =
             $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
-        $this->functionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
+        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -62,13 +63,13 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeAssembler')
+        $this->attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\FormOptionsAssembler')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->formOptionsAssembler = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler'
+        )->disableOriginalConstructor()->getMock();
 
         $this->applicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
             ->disableOriginalConstructor()
@@ -94,15 +95,16 @@ class ActionRegistryTest extends \PHPUnit_Framework_TestCase
                 return $class;
             });
 
-        $this->assembler = new ActionAssembler(
-            $this->functionFactory,
+        $this->assembler = new OperationAssembler(
+            $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
+            new OperationActionGroupAssembler(),
             $this->doctrineHelper
         );
 
-        $this->registry = new ActionRegistry(
+        $this->registry = new OperationRegistry(
             $this->configurationProvider,
             $this->assembler,
             $this->applicationsHelper

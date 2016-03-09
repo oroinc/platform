@@ -5,6 +5,9 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
+use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -27,6 +30,9 @@ class Operation
     /** @var FormOptionsAssembler */
     private $formOptionsAssembler;
 
+    /** @var OperationActionGroupAssembler */
+    private $operationActionGroupAssembler;
+
     /** @var OperationDefinition */
     private $definition;
 
@@ -42,11 +48,15 @@ class Operation
     /** @var array */
     private $formOptions;
 
+    /** @var OperationActionGroup[] */
+    private $operationActionGroups;
+
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
+     * @param OperationActionGroupAssembler $operationActionGroupAssembler
      * @param OperationDefinition $definition
      */
     public function __construct(
@@ -54,12 +64,14 @@ class Operation
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
         FormOptionsAssembler $formOptionsAssembler,
+        OperationActionGroupAssembler $operationActionGroupAssembler,
         OperationDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->attributeAssembler = $attributeAssembler;
         $this->formOptionsAssembler = $formOptionsAssembler;
+        $this->operationActionGroupAssembler = $operationActionGroupAssembler;
         $this->definition = $definition;
     }
 
@@ -222,7 +234,7 @@ class Operation
     {
         $this->preconditions = false;
 
-        $config = $this->definition->getPreConditions();
+        $config = $this->definition->getPreconditions();
         if ($config) {
             $this->preconditions = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $config);
         }
@@ -242,5 +254,21 @@ class Operation
         $formOptionsConfig = $this->definition->getFormOptions();
 
         return !empty($formOptionsConfig['attribute_fields']);
+    }
+
+    /**
+     * @return array
+     */
+    public function getOperationActionGroups()
+    {
+        if ($this->operationActionGroups === null) {
+            $this->operationActionGroups = [];
+            $config = $this->definition->getActionGroups();
+            if ($config) {
+                $this->operationActionGroups = $this->operationActionGroupAssembler->assemble($config);
+            }
+        }
+
+        return $this->operationActionGroups;
     }
 }
