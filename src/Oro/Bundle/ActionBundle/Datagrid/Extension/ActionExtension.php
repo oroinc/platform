@@ -3,11 +3,10 @@
 namespace Oro\Bundle\ActionBundle\Datagrid\Extension;
 
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Model\Action;
-use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
@@ -22,11 +21,11 @@ class ActionExtension extends AbstractExtension
     /** @var ContextHelper */
     protected $contextHelper;
 
-    /** @var ApplicationsHelper */
-    protected $applicationHelper;
-
     /** @var MassActionProviderRegistry */
     protected $providerRegistry;
+
+    /** @var OptionsHelper */
+    protected $optionsHelper;
 
     /** @var array */
     protected $actionConfiguration = [];
@@ -37,33 +36,33 @@ class ActionExtension extends AbstractExtension
     /** @var array|Action[] */
     protected $actions = [];
 
-    /** @var array  */
-    protected $actionGroups;
+    /** @var array */
+    protected $groups;
 
     /**
      * @param ActionManager $actionManager
      * @param ContextHelper $contextHelper
-     * @param ApplicationsHelper $applicationHelper
      * @param MassActionProviderRegistry $providerRegistry
+     * @param OptionsHelper $optionsHelper
      */
     public function __construct(
         ActionManager $actionManager,
         ContextHelper $contextHelper,
-        ApplicationsHelper $applicationHelper,
-        MassActionProviderRegistry $providerRegistry
+        MassActionProviderRegistry $providerRegistry,
+        OptionsHelper $optionsHelper
     ) {
         $this->actionManager = $actionManager;
         $this->contextHelper = $contextHelper;
-        $this->applicationHelper = $applicationHelper;
         $this->providerRegistry = $providerRegistry;
+        $this->optionsHelper = $optionsHelper;
     }
 
     /**
-     * @param array $actionGroups
+     * @param array $groups
      */
-    public function setActionGroups(array $actionGroups)
+    public function setGroups(array $groups)
     {
-        $this->actionGroups = $actionGroups;
+        $this->groups = $groups;
     }
 
     /**
@@ -119,18 +118,19 @@ class ActionExtension extends AbstractExtension
      */
     public function getRowConfiguration(ResultRecordInterface $record, array $config)
     {
-        $actionData = $this->contextHelper->getActionData([
-            'entityId' => $record->getValue('id'),
-            'entityClass' => $this->datagridContext['entityClass'],
-            'datagrid' => $this->datagridContext['datagrid'],
-        ]);
-
         $actionsNew = [];
         foreach ($this->actions as $actionName => $action) {
-            $actionsNew[$actionName] = $this->getRowActionsConfig($action, $actionData);
+            $actionsNew[$actionName] = $this->getRowActionsConfig(
+                $action,
+                $record->getValue('id')
+            );
         }
 
-        return array_merge($actionsNew, $this->getParentRowConfiguration($record, $config));
+        $result = array_filter($this->getParentRowConfiguration($record, $config), function ($item) {
+            return $item === false;
+        });
+
+        return array_merge($result, $actionsNew);
     }
 
     /**
@@ -157,18 +157,24 @@ class ActionExtension extends AbstractExtension
 
     /**
      * @param Action $action
-     * @param ActionData $actionData
-     * @return bool|array
+     * @param mixed $entityId
+     * @return boolean
      */
-    protected function getRowActionsConfig(Action $action, ActionData $actionData)
+    protected function getRowActionsConfig(Action $action, $entityId)
     {
+        $context = [
+            'entityId' => $entityId,
+            'entityClass' => $this->datagridContext['entityClass'],
+            'datagrid' => $this->datagridContext['datagrid'],
+        ];
+
+        $actionData = $this->contextHelper->getActionData($context);
+
         if (!$action->isAvailable($actionData)) {
             return false;
         }
 
-        return [
-            'translates' => $actionData->getScalarValues(),
-        ];
+        return $this->optionsHelper->getFrontendOptions($action, $context);
     }
 
     /**
@@ -179,7 +185,7 @@ class ActionExtension extends AbstractExtension
         $actionsConfig = $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []);
 
         foreach ($this->actions as $actionName => $action) {
-            $actionsConfig[$actionName] = $this->getRowsActionsConfig($action);
+            $actionsConfig[$actionName] = $this->getRowsActionsConfig($action, $actionName);
         }
 
         $config->offsetSet(DatagridActionExtension::ACTION_KEY, $actionsConfig);
@@ -189,12 +195,10 @@ class ActionExtension extends AbstractExtension
      * @param Action $action
      * @return array
      */
-    protected function getRowsActionsConfig(Action $action)
+    protected function getRowsActionsConfig(Action $action, $actionName)
     {
         $buttonOptions = $action->getDefinition()->getButtonOptions();
-        $frontendOptions = $action->getDefinition()->getFrontendOptions();
         $icon = !empty($buttonOptions['icon']) ? str_ireplace('icon-', '', $buttonOptions['icon']) : 'edit';
-        $confirmation = !empty($frontendOptions['confirmation']) ? $frontendOptions['confirmation'] : '';
 
         return [
             'type' => 'action-widget',
@@ -203,18 +207,7 @@ class ActionExtension extends AbstractExtension
             'link' => '#',
             'icon' => $icon,
             'options' => [
-                'actionName' => $action->getName(),
-                'entityClass' => $this->datagridContext['entityClass'],
-                'datagrid' => $this->datagridContext['datagrid'],
-                'confirmation' => $confirmation,
-                'hasDialog' => $action->hasForm(),
-                'showDialog' => !empty($frontendOptions['show_dialog']),
-                'executionRoute' => $this->applicationHelper->getExecutionRoute(),
-                'dialogRoute' => $this->applicationHelper->getDialogRoute(),
-                'dialogOptions' => [
-                    'title' => $action->getDefinition()->getLabel(),
-                    'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
-                ]
+                'actionName' => $actionName,
             ]
         ];
     }
@@ -261,7 +254,7 @@ class ActionExtension extends AbstractExtension
         return [
             'entityClass' => $entityClass ?: $config->offsetGetByPath('[entity_name]'),
             'datagrid' => $config->offsetGetByPath('[name]'),
-            'group' => $this->actionGroups,
+            'group' => $this->groups,
         ];
     }
 }

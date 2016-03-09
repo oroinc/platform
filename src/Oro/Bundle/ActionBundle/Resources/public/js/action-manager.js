@@ -25,13 +25,11 @@ define(function(require) {
             widgetAlias: 'action_buttons_widget',
             redirectUrl: '',
             dialogUrl: '',
-            url: '',
-            confirmation: false,
-            confirmComponent: 'oroui/js/delete-confirmation',
+            executionUrl: '',
+            confirmation: {},
             showDialog: false,
+            hasDialog: false,
             dialogOptions: {},
-            messages: {},
-            translates: {}
         },
 
         /**
@@ -44,10 +42,7 @@ define(function(require) {
             confirm_cancel: 'Cancel'
         },
 
-        /**
-         * @type {Object}
-         */
-        confirmModal: null,
+        confirmComponent: 'oroui/js/delete-confirmation',
 
         /**
          * @type {Function}
@@ -60,14 +55,14 @@ define(function(require) {
         initialize: function(options) {
             this.options = _.defaults(_.pick(options, _.identity) || {}, this.options);
 
-            this.confirmModalConstructor = require(this.options.confirmComponent);
+            this.confirmModalConstructor = require(this.options.confirmation.component || this.confirmComponent);
         },
 
         /**
          * @param {jQuery.Event} e
          */
         execute: function(e) {
-            if (this.options.confirmation) {
+            if (!_.isEmpty(this.options.confirmation)) {
                 this.showConfirmDialog(_.bind(this.doExecute, this, e));
             } else {
                 this.doExecute(e);
@@ -97,7 +92,7 @@ define(function(require) {
             } else {
                 mediator.execute('showLoading');
 
-                $.getJSON(this.options.url)
+                $.getJSON(this.options.executionUrl)
                     .done(_.bind(function(response) {
                         this.doResponse(response, e);
                     }, this))
@@ -169,14 +164,20 @@ define(function(require) {
          * @return {oroui.Modal}
          */
         showConfirmDialog: function(callback) {
-            var messages = _.defaults(this.options.messages, this.messages);
+            var placeholders = this.options.confirmation.message_parameters || {};
 
-            this.confirmModal = (new this.confirmModalConstructor({
-                title: __(messages.confirm_title, $.extend({}, this.options.translates)),
-                content: __(messages.confirm_content, $.extend({}, this.options.translates)),
-                okText: __(messages.confirm_ok, $.extend({}, this.options.translates)),
-                cancelText: __(messages.confirm_cancel, $.extend({}, this.options.translates))
-            }));
+            var messages = {
+                title : (this.options.confirmation.title || this.messages.confirm_title),
+                content : (this.options.confirmation.message || this.messages.confirm_content),
+                okText : (this.options.confirmation.okText || this.messages.confirm_ok),
+                cancelText : (this.options.confirmation.cancelText || this.messages.confirm_cancel)
+            };
+
+            _.each(messages, function(item, key, list) {
+                list[key] = __(item, $.extend({}, placeholders));
+            });
+
+            this.confirmModal = (new this.confirmModalConstructor(messages));
             Backbone.listenTo(this.confirmModal, 'ok', callback);
 
             this.confirmModal.open();

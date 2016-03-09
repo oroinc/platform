@@ -17,6 +17,7 @@ class ContextHelper
     const ENTITY_CLASS_PARAM = 'entityClass';
     const DATAGRID_PARAM = 'datagrid';
     const GROUP_PARAM = 'group';
+    const FROM_URL_PARAM = 'fromUrl';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -58,7 +59,8 @@ class ContextHelper
                 self::ENTITY_ID_PARAM => $this->getRequestParameter(self::ENTITY_ID_PARAM),
                 self::ENTITY_CLASS_PARAM => $this->getRequestParameter(self::ENTITY_CLASS_PARAM),
                 self::DATAGRID_PARAM => $this->getRequestParameter(self::DATAGRID_PARAM),
-                self::GROUP_PARAM => $this->getRequestParameter(self::GROUP_PARAM)
+                self::GROUP_PARAM => $this->getRequestParameter(self::GROUP_PARAM),
+                self::FROM_URL_PARAM => $this->getRequestParameter(self::FROM_URL_PARAM),
             ];
         }
 
@@ -78,7 +80,7 @@ class ContextHelper
         }
         $params = [
             self::ROUTE_PARAM => $request->get('_route'),
-            'fromUrl' => $request->getRequestUri()
+            self::FROM_URL_PARAM => $request->getRequestUri()
         ];
 
         $entity = array_key_exists('entity', $context) && is_object($context['entity']) ? $context['entity'] : null;
