@@ -26,7 +26,8 @@ class ActionGroupListConfiguration implements ConfigurationInterface
     {
         $builder = new TreeBuilder();
         $root = $builder->root('action_groups');
-        $root->useAttributeAsKey('name')
+        $root
+            ->useAttributeAsKey('name')
             ->prototype('array')
             ->children()
                 ->variableNode('acl_resource')->end()
