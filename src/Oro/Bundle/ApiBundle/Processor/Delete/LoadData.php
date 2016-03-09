@@ -6,6 +6,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Loads object that should be deleted.
+ */
 class LoadData implements ProcessorInterface
 {
     /** @var DoctrineHelper */

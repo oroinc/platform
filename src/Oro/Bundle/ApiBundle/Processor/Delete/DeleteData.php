@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 
+/**
+ * Deletes object by entity manager.
+ */
 class DeleteData implements ProcessorInterface
 {
     /** @var DoctrineHelper */

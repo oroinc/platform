@@ -8,8 +8,6 @@ class DeleteContext extends SingleItemContext
 {
     const OBJECT = 'object';
 
-    const SECURITY_CHECKED = 'security_checked';
-
     /**
      * Sets object needs to be deleted.
      *
@@ -46,23 +44,5 @@ class DeleteContext extends SingleItemContext
     public function removeObject()
     {
         $this->remove(self::OBJECT);
-    }
-
-    /**
-     * Returns true if security checks was processed.
-     *
-     * @return bool
-     */
-    public function isSecurityChecked()
-    {
-        return $this->get(self::SECURITY_CHECKED);
-    }
-
-    /**
-     * Sets indicator that security checks was processed.
-     */
-    public function setSecurityChecked()
-    {
-        $this->set(self::SECURITY_CHECKED, true);
     }
 }

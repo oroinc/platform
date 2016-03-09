@@ -7,6 +7,9 @@ use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 
+/**
+ * Deletes object by DeleteProcessHandler.
+ */
 class DeleteDataByProcessHandler implements ProcessorInterface
 {
     /** @var DeleteHandler */

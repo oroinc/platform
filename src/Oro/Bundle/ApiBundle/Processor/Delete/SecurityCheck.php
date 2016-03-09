@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Delete;
 
+use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
+
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
-use Symfony\Component\HttpKernel\Exception\AccessDeniedHttpException;
 
+/**
+ * Checks permission to delete object.
+ */
 class SecurityCheck implements ProcessorInterface
 {
     /** @var SecurityFacade */
@@ -39,15 +43,8 @@ class SecurityCheck implements ProcessorInterface
             return;
         }
 
-        if ($context->isSecurityChecked()) {
-            //security already checked
-            return;
+        if (!$this->securityFacade->isGranted('DELETE', $object)) {
+            throw new AccessDeniedHttpException('You have no access to delete given record');
         }
-
-        if (!$this->securityFacade->isGranted($object, 'DELETE')) {
-            throw new AccessDeniedHttpException();
-        }
-
-        $context->setSecurityChecked();
     }
 }

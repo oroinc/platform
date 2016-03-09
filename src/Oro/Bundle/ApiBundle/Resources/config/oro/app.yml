@@ -60,11 +60,7 @@ oro_api:
                     priority: -30
                 load_data:
                     priority: -40
-                security_check_data:
-                    priority: -50
                 delete_data:
                     priority: -60
-                finalize:
-                    priority: -70
                 normalize_result:
-                    priority: -80
+                    priority: -70

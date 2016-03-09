@@ -34,13 +34,6 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
 
-#    oro_api.delete.initialize_criteria:
-#        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
-#        arguments:
-#            - @oro_entity.orm.entity_class_resolver
-#        tags:
-#            - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
-
 #    oro_api.delete.normalize_include_header:
 #        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
 #        tags:
@@ -89,24 +82,17 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
 
-    #
-    # security_check_data
-    #
-
-    oro_api.delete.security_check_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\SecurityCheckByProcessHandler
-        arguments:
-            - @oro_api.doctrine_helper
-            - @oro_soap.handler.delete
+    oro_api.delete.validate_result:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateObject
         tags:
-            - { name: oro.api.processor, action: delete, group: security_check_data, priority: -10 }
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -250 }
 
     oro_api.delete.security_check_data:
         class: Oro\Bundle\ApiBundle\Processor\Delete\SecurityCheck
         arguments:
             - @oro_security.security_facade
         tags:
-            - { name: oro.api.processor, action: delete, group: security_check_data, priority: -20 }
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -20 }
 
     #
     # delete_data
@@ -126,3 +112,38 @@ services:
             - @oro_api.doctrine_helper
         tags:
             - { name: oro.api.processor, action: delete, group: delete_data, priority: -20 }
+
+    #
+    # normalize_result
+    #
+
+    oro_api.delete.rest.set_http_response_status_code:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
+        arguments:
+           - 204
+        tags:
+            - { name: oro.api.processor, action: delete, group: normalize_result, requestType: rest, priority: -10 }
+
+    oro_api.delete.normalize_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors
+        arguments:
+            - @translator
+        tags:
+            - { name: oro.api.processor, action: delete, group: normalize_result, priority: -10 }
+
+    oro_api.delete.json_api.build_json_api_document:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\JsonApi\BuildJsonApiDocument
+        arguments:
+            - @oro_api.json_api.document_builder_factory
+        tags:
+            - { name: oro.api.processor, action: delete, group: normalize_result, requestType: json_api, priority: -20 }
+
+    oro_api.delete.process_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
+        tags:
+            - { name: oro.api.processor, action: delete, group: normalize_result, priority: -100 }
+
+    oro_api.delete.json_api.set_response_content_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType
+        tags:
+            - { name: oro.api.processor, action: delete, group: normalize_result, requestType: json_api, priority: -250 }

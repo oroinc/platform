@@ -44,19 +44,7 @@ class DeleteHandler
         }
 
         $em = $manager->getObjectManager();
-        $this->checkPermissions($entity, $em);
         $this->processDelete($entity, $em);
-    }
-
-    /**
-     * Checks if given object can be deleted by current user.
-     *
-     * @param object        $entity
-     * @param ObjectManager $em
-     */
-    public function isDeleteGranted($entity, ObjectManager $em)
-    {
-        $this->checkPermissions($entity, $em);
     }
 
     /**
@@ -67,6 +55,7 @@ class DeleteHandler
      */
     public function processDelete($entity, ObjectManager $em)
     {
+        $this->checkPermissions($entity, $em);
         $this->deleteEntity($entity, $em);
         $em->flush();
     }

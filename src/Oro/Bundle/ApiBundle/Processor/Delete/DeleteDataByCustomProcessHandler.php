@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Component\ChainProcessor\ContextInterface;
 
+/**
+ * Deletes object by custom DeleteProcessHandler.
+ */
 class DeleteDataByCustomProcessHandler extends DeleteDataByProcessHandler
 {
     /** @var string */
@@ -28,6 +31,11 @@ class DeleteDataByCustomProcessHandler extends DeleteDataByProcessHandler
     public function process(ContextInterface $context)
     {
         /** @var DeleteContext $context */
+
+        if (!$context->hasObject()) {
+            // entity already deleted
+            return;
+        }
 
         $object = $context->getObject();
         if (!is_a($object, $this->className)) {
