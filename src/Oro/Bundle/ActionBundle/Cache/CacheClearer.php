@@ -26,11 +26,8 @@ class CacheClearer implements CacheClearerInterface
      */
     public function clear($cacheDir)
     {
-        array_walk(
-            $this->providers,
-            function (ConfigurationProviderInterface $provider) {
-                $provider->clearCache();
-            }
-        );
+        foreach ($this->providers as $provider) {
+            $provider->clearCache();
+        }
     }
 }

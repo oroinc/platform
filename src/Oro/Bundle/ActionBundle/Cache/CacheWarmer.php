@@ -26,12 +26,9 @@ class CacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        array_walk(
-            $this->providers,
-            function (ConfigurationProviderInterface $provider) {
-                $provider->warmUpCache();
-            }
-        );
+        foreach ($this->providers as $provider) {
+            $provider->warmUpCache();
+        }
     }
 
     /**

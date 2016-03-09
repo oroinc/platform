@@ -1,4 +1,4 @@
-skiped_config:
+skipped_config:
     test_operation3:
         label: Test Operation 3
 

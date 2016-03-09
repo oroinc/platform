@@ -18,6 +18,8 @@ class ConfigurationPass implements CompilerPassInterface
     const ACTION_GROUPS_PROVIDER = 'oro_action.configuration.provider.action_groups';
     const ACTION_GROUPS_NODE_NAME = 'action_groups';
 
+    const CONFIG_FILE_PATH = 'Resources/config/oro/actions.yml';
+
     /** @var CumulativeConfigLoader */
     protected $loader;
 
@@ -75,7 +77,7 @@ class ConfigurationPass implements CompilerPassInterface
         if (!$this->loader) {
             $this->loader = new CumulativeConfigLoader(
                 'oro_action',
-                new YamlCumulativeFileLoader('Resources/config/actions.yml')
+                new YamlCumulativeFileLoader(self::CONFIG_FILE_PATH)
             );
         }
 
