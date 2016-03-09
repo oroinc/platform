@@ -5,6 +5,14 @@ namespace Oro\Bundle\WorkflowBundle\Controller;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
+use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
+
+use Symfony\Component\Form\Form;
+use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
+use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+
 use Oro\Bundle\EntityBundle\Exception\NotManageableEntityException;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -14,14 +22,6 @@ use Oro\Bundle\WorkflowBundle\Model\Workflow;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\ParamConverter;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
-use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
-
-use Symfony\Component\Form\Form;
-use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
-use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
 /**
  * @Route("/workflowwidget")
@@ -125,6 +125,12 @@ class WidgetController extends Controller
                 $serializer->setWorkflowName($workflow->getName());
                 $data = $serializer->serialize(new WorkflowData($formAttributes), 'json');
                 $saved = true;
+
+                $response = $this->get('oro_workflow.handler.start_transition_handler')
+                    ->handle($workflow, $transition, $data, $entity);
+                if ($response) {
+                    return $response;
+                }
             }
         }
 
@@ -169,6 +175,11 @@ class WidgetController extends Controller
                 $this->getEntityManager()->flush();
 
                 $saved = true;
+
+                $response = $this->get('oro_workflow.handler.transition_handler')->handle($transition, $workflowItem);
+                if ($response) {
+                    return $response;
+                }
             }
         }
 
