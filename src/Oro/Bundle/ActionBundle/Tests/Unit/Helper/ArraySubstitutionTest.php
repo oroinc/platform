@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
-use Oro\Bundle\ActionBundle\Helper\SubstitutionVenue;
+use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 
-class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
+class ArraySubstitutionTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @param array $map
@@ -14,11 +14,11 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
      */
     public function testApply(array $map, array $things, array $expected)
     {
-        $substotutor = new SubstitutionVenue();
+        $substitution = new ArraySubstitution();
 
-        $substotutor->setMap($map);
+        $substitution->setMap($map);
 
-        $substotutor->apply($things);
+        $substitution->apply($things);
 
         $this->assertEquals($expected, $things);
     }
@@ -122,7 +122,7 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
 
     public function testMaxDepthException()
     {
-        $substitutor = new SubstitutionVenue(true, 2);
+        $substitutor = new ArraySubstitution(true, 2);
 
         $substitutor->setMap([
             'a' => 'c',
@@ -132,28 +132,37 @@ class SubstitutionVenueTest extends \PHPUnit_Framework_TestCase
 
         $this->setExpectedException('Oro\Bundle\ActionBundle\Exception\CircularReferenceException');
 
-        $substitutor->substitute([
+        $things = [
             'a' => ['a body'],
             'c' => ['c body'],
             'b' => ['b body'],
             'e' => ['e body']
-        ]);
+        ];
+
+        $substitutor->apply($things);
     }
 
     /**
      * @dataProvider clearUnboundProvider
-     * @param $map
-     * @param $things
-     * @param $expected
+     * @param array $map
+     * @param array $things
+     * @param array $expected
      */
-    public function testNotClearUnbound($map, $things, $expected)
+    public function testNotClearUnbound(array $map, array $things, array $expected)
     {
-        $substitutionVenue = new SubstitutionVenue(false);
-        $substitutionVenue->setMap($map);
+        $arraySubstitution = new ArraySubstitution(false);
+        $arraySubstitution->setMap($map);
 
-        $this->assertEquals($expected, $substitutionVenue->substitute($things));
+        $applyTo = $things;
+
+        $arraySubstitution->apply($applyTo);
+
+        $this->assertEquals($expected, $applyTo);
     }
 
+    /**
+     * @return array
+     */
     public function clearUnboundProvider()
     {
         return [

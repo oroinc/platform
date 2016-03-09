@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Exception\CircularReferenceException;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
-use Oro\Bundle\ActionBundle\Helper\SubstitutionVenue;
+use Oro\Bundle\ActionBundle\Helper\ArraySubstitution;
 
 class ActionRegistry
 {
@@ -23,7 +23,7 @@ class ActionRegistry
     /** @var array|Action[] */
     protected $actions;
 
-    /* @var SubstitutionVenue */
+    /* @var ArraySubstitution */
     protected $substitution;
 
     /**
@@ -39,7 +39,7 @@ class ActionRegistry
         $this->configurationProvider = $configurationProvider;
         $this->assembler = $assembler;
         $this->applicationsHelper = $applicationsHelper;
-        $this->substitution = new SubstitutionVenue();
+        $this->substitution = new ArraySubstitution();
     }
 
     /**
