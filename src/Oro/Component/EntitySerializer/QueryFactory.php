@@ -2,10 +2,10 @@
 
 namespace Oro\Component\EntitySerializer;
 
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\ResultSetMapping;
 
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
@@ -13,6 +13,8 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 class QueryFactory
 {
+    const FAKE_ID = '__fake_id__';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -99,33 +101,13 @@ class QueryFactory
             ? $config[ConfigUtil::MAX_RESULTS]
             : -1;
         if ($limit > 0 && count($entityIds) > 1) {
-            $selectStmt = null;
-            $subQueries = [];
-            foreach ($entityIds as $id) {
-                $subQuery = $this->getRelatedItemsIdsQuery($associationMapping, [$id], $config);
-                $subQuery->setMaxResults($limit);
-                // We should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
-                $subQueries[] = '(' . QueryUtils::getExecutableSql($subQuery) . ')';
-                if (null === $selectStmt) {
-                    $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
-                    $selectStmt = sprintf(
-                        'entity.%s AS entityId, entity.%s AS relatedEntityId',
-                        QueryUtils::getColumnNameByAlias($mapping, 'entityId'),
-                        QueryUtils::getColumnNameByAlias($mapping, 'relatedEntityId')
-                    );
-                }
-            }
-            $rsm = new ResultSetMapping();
-            $rsm
-                ->addScalarResult('entityId', 'entityId')
-                ->addScalarResult('relatedEntityId', 'relatedEntityId');
-            $qb = new SqlQueryBuilder(
+            $subQuery = $this->getRelatedItemsIdsQuery($associationMapping, [self::FAKE_ID], $config);
+            $subQuery->setMaxResults($limit);
+            $qb = $this->getRelatedItemsUnionAllQuery(
                 $this->doctrineHelper->getEntityManager($associationMapping['targetEntity']),
-                $rsm
+                $subQuery,
+                $entityIds
             );
-            $qb
-                ->select($selectStmt)
-                ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
             $rows = $qb->getQuery()->getScalarResult();
         } else {
             $query = $this->getRelatedItemsIdsQuery($associationMapping, $entityIds, $config);
@@ -136,6 +118,50 @@ class QueryFactory
         }
 
         return $rows;
+    }
+
+    /**
+     * @param EntityManager    $em          The entity manager
+     * @param Query            $subQueryTemplate
+     * @param array            $entityIds
+     *
+     * @return SqlQueryBuilder
+     */
+    protected function getRelatedItemsUnionAllQuery(
+        EntityManager $em,
+        Query $subQueryTemplate,
+        array $entityIds
+    ) {
+        // we should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
+        $subQuerySqlTemplate = '(' . QueryUtils::getExecutableSql($subQueryTemplate) . ')';
+
+        $subQueries = [];
+        foreach ($entityIds as $id) {
+            $fakeId = self::FAKE_ID;
+            if (!is_string($id)) {
+                $fakeId = '\'' . $fakeId . '\'';
+            }
+            $subQueries[] = str_replace($fakeId, $id, $subQuerySqlTemplate);
+        }
+
+        $subQueryMapping = QueryUtils::parseQuery($subQueryTemplate)->getResultSetMapping();
+        $selectStmt = sprintf(
+            'entity.%s AS entityId, entity.%s AS relatedEntityId',
+            QueryUtils::getColumnNameByAlias($subQueryMapping, 'entityId'),
+            QueryUtils::getColumnNameByAlias($subQueryMapping, 'relatedEntityId')
+        );
+
+        $rsm = QueryUtils::createResultSetMapping($em->getConnection()->getDatabasePlatform());
+        $rsm
+            ->addScalarResult('entityId', 'entityId')
+            ->addScalarResult('relatedEntityId', 'relatedEntityId');
+
+        $qb = new SqlQueryBuilder($em, $rsm);
+        $qb
+            ->select($selectStmt)
+            ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
+
+        return $qb;
     }
 
     /**

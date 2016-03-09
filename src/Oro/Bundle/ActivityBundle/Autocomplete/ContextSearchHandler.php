@@ -10,7 +10,6 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
@@ -355,7 +354,7 @@ class ContextSearchHandler implements ConverterInterface
             }
         }
 
-        $rsm = new ResultSetMapping();
+        $rsm = QueryUtils::createResultSetMapping($objectManager->getConnection()->getDatabasePlatform());
         $rsm
             ->addScalarResult('id', 'id', Type::INTEGER)
             ->addScalarResult('entity', 'entity')
