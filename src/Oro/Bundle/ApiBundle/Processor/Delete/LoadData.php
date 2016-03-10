@@ -29,8 +29,8 @@ class LoadData implements ProcessorInterface
     {
         /** @var DeleteContext $context */
 
-        if ($context->hasResult()) {
-            // result is already built
+        if ($context->hasObject()) {
+            // object already loaded
             return;
         }
 
@@ -81,6 +81,7 @@ class LoadData implements ProcessorInterface
                 $counter++;
             }
         }
+        $repo = $this->doctrineHelper->getEntityRepositoryForClass($entityClass);
 
         $context->setObject($this->doctrineHelper->getEntityRepositoryForClass($entityClass)->find($ids));
     }
