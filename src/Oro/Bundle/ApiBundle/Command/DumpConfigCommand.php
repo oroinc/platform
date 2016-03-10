@@ -10,9 +10,8 @@ use Symfony\Component\Yaml\Yaml;
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Component\ChainProcessor\ProcessorBag;
+
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -26,8 +25,10 @@ class DumpConfigCommand extends ContainerAwareCommand
      * @var array
      */
     protected $knownExtras = [
-        'filters' => 'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
-        'sorters' => 'Oro\Bundle\ApiBundle\Config\SortersConfigExtra'
+        'filters'        => 'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
+        'sorters'        => 'Oro\Bundle\ApiBundle\Config\SortersConfigExtra',
+        'virtual_fields' => 'Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra',
+        'descriptions'   => 'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra'
     ];
 
     /**
@@ -64,24 +65,15 @@ class DumpConfigCommand extends ContainerAwareCommand
                 'entities'
             )
             ->addOption(
-                'without-virtual-fields',
-                null,
-                InputOption::VALUE_NONE,
-                'Whether virtual fields should not be added'
-            )
-            ->addOption(
-                'with-descriptions',
-                null,
-                InputOption::VALUE_NONE,
-                'Whether human-readable descriptions should be added'
-            )
-            ->addOption(
                 'extra',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Whether any extra should be added. ' .
-                'Can be "filters", "sorters" or FQCN of a ConfigExtraSectionInterface',
-                ['filters', 'sorters']
+                'Whether any extra configuration data should be added. ' .
+                sprintf(
+                    'Can be: %s or FQCN of a ConfigExtraSectionInterface or ConfigExtraInterface',
+                    implode(', ', array_keys($this->knownExtras))
+                ),
+                []
             );
     }
 
@@ -106,17 +98,13 @@ class DumpConfigCommand extends ContainerAwareCommand
             if (array_key_exists($extraName, $this->knownExtras)) {
                 $extras[] = new $this->knownExtras[$extraName];
             } elseif (class_exists($extraName)
-                && is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface', true)
+                && (
+                    is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface', true)
+                    || is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface', true)
+                )
             ) {
                 $extras[] = new $extraName;
             }
-        }
-
-        if (!$input->getOption('without-virtual-fields')) {
-            $extras[] = new VirtualFieldsConfigExtra();
-        }
-        if ($input->getOption('with-descriptions')) {
-            $extras[] = new DescriptionsConfigExtra();
         }
 
         /** @var ProcessorBag $processorBag */
