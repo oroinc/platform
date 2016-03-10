@@ -46,7 +46,8 @@ class ChoiceTreeFilter extends AbstractFilter
     {
         $metadata = parent::getMetadata();
         $metadata[FilterUtility::TYPE_KEY] = 'choice-tree';
-        $metadata['data'] = $this->params['options']['data'];
+        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
+        $metadata['data'] = isset($options['data']) ? $options['data'] : [];
         return $metadata;
     }
 

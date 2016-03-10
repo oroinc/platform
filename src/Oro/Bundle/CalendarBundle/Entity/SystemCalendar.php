@@ -30,7 +30,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *          },
  *          "security"={
  *              "type"="ACL",
- *              "permissions"="VIEW;CREATE;EDIT;DELETE",
  *              "group_name"=""
  *          },
  *          "note"={

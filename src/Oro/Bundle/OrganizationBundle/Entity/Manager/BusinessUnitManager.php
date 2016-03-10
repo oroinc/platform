@@ -146,6 +146,28 @@ class BusinessUnitManager
     }
 
     /**
+     * @param User $user
+     * @param Organization $organization
+     *
+     * @return BusinessUnit|null
+     */
+    public function getCurrentBusinessUnit(User $user, Organization $organization)
+    {
+        $qb = $this->getBusinessUnitRepo()->createQueryBuilder('bu');
+        $result = $qb
+            ->join('bu.users', 'u')
+            ->andWhere($qb->expr()->eq('u', ':user'))
+            ->andWhere($qb->expr()->eq('u.organization', ':organization'))
+            ->setParameter('user', $user)
+            ->setParameter('organization', $organization)
+            ->setMaxResults(1)
+            ->getQuery()
+            ->getResult();
+
+        return reset($result) ?: null;
+    }
+
+    /**
      * @return BusinessUnitRepository
      */
     public function getBusinessUnitRepo()
@@ -181,6 +203,22 @@ class BusinessUnitManager
         }
 
         return $choices;
+    }
+
+    /**
+     * @param array $tree
+     *
+     * @return int
+     */
+    public function getTreeNodesCount($tree)
+    {
+        return array_reduce(
+            $tree,
+            function ($count, $node) {
+                return $count + (isset($node['children']) ? $this->getTreeNodesCount($node['children']) : 0);
+            },
+            count($tree)
+        );
     }
 
     /**

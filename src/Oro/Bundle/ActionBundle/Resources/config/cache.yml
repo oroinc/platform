@@ -1,0 +1,26 @@
+parameters:
+    oro_action.cache.clearer.class: Oro\Bundle\ActionBundle\Cache\CacheClearer
+    oro_action.cache.warmer.class: Oro\Bundle\ActionBundle\Cache\CacheWarmer
+
+services:
+    oro_action.cache.provider:
+        parent: oro.cache.abstract
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_actions' ] ]
+
+    oro_action.cache.clearer:
+        class: %oro_action.cache.clearer.class%
+        public: false
+        arguments:
+            - @oro_action.configuration.provider
+        tags:
+            - { name: kernel.cache_clearer }
+
+    oro_action.cache.warmer:
+        class: %oro_action.cache.warmer.class%
+        public: false
+        arguments:
+            - @oro_action.configuration.provider
+        tags:
+            - { name: kernel.cache_warmer }

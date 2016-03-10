@@ -276,7 +276,7 @@ services:
     oro_calendar.workflow.action.create_calendar_event:
         class: Oro\Bundle\CalendarBundle\Workflow\Action\CreateCalendarEventAction
         arguments:
-            - @oro_workflow.context_accessor
+            - @oro_action.context_accessor
             - @doctrine
         tags:
             - { name: oro_workflow.action, alias: create_calendar_event }

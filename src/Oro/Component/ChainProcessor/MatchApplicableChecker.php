@@ -36,19 +36,91 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
     /**
      * Checks if a value of a processor attribute matches a corresponding value from the context
      *
-     * @param mixed $value
-     * @param mixed $contextValue
+     * @param mixed $value        Array or Scalar
+     * @param mixed $contextValue Array or Scalar
      *
      * @return bool
      */
     protected function isMatch($value, $contextValue)
     {
-        if (is_array($contextValue)) {
-            return is_array($value)
-                ? count(array_intersect($value, $contextValue)) === count($value)
-                : in_array($value, $contextValue, true);
+        if ($contextValue instanceof ToArrayInterface) {
+            return $this->isMatchAnyInArray($value, $contextValue->toArray());
         }
 
-        return $contextValue === $value;
+        return is_array($contextValue)
+            ? $this->isMatchAnyInArray($value, $contextValue)
+            : $this->isMatchAnyWithScalar($value, $contextValue);
+    }
+
+    /**
+     * @param mixed $value        Array or Scalar
+     * @param mixed $contextValue Array
+     *
+     * @return bool
+     */
+    protected function isMatchAnyInArray($value, $contextValue)
+    {
+        if (!is_array($value)) {
+            return $this->isMatchScalarInArray($value, $contextValue);
+        }
+
+        $result = true;
+        foreach ($value as $val) {
+            if (!$this->isMatchScalarInArray($val, $contextValue)) {
+                $result = false;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param mixed $value        Scalar
+     * @param mixed $contextValue Array
+     *
+     * @return bool
+     */
+    protected function isMatchScalarInArray($value, $contextValue)
+    {
+        return is_string($value) && 0 === strpos($value, '!')
+            ? !in_array(substr($value, 1), $contextValue, true)
+            : in_array($value, $contextValue, true);
+    }
+
+    /**
+     * @param mixed $value        Array or Scalar
+     * @param mixed $contextValue Scalar
+     *
+     * @return bool
+     */
+    protected function isMatchAnyWithScalar($value, $contextValue)
+    {
+        if (!is_array($value)) {
+            return $this->isMatchScalars($value, $contextValue);
+        }
+
+        $result = true;
+        foreach ($value as $val) {
+            if (!$this->isMatchScalars($val, $contextValue)) {
+                $result = false;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param mixed $value        Scalar
+     * @param mixed $contextValue Scalar
+     *
+     * @return bool
+     */
+    protected function isMatchScalars($value, $contextValue)
+    {
+        return is_string($value) && 0 === strpos($value, '!')
+            ? $contextValue !== substr($value, 1)
+            : $contextValue === $value;
     }
 }

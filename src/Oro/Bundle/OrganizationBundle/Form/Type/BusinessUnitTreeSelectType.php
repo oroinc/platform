@@ -45,7 +45,7 @@ class BusinessUnitTreeSelectType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['business_unit_ids'] = $options['business_unit_ids'];
+        $view->vars['business_unit_ids'] = array_combine($options['business_unit_ids'], $options['business_unit_ids']);
         $view->vars['forbidden_business_unit_ids'] = $options['forbidden_business_unit_ids'];
     }
 }

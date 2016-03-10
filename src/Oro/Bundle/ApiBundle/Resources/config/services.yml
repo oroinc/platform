@@ -1,4 +1,6 @@
 parameters:
+    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
+    oro_api.config.max_nesting_level: 3
     # a list of supported formats of REST API requests delimited by |
     oro_api.rest.formats: json
     # default format of REST API requests
@@ -83,6 +85,23 @@ services:
         arguments:
             - @oro_api.collect_resources.processor
 
+    oro_api.config_extension_registry:
+        class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
+        arguments:
+            - %oro_api.config.max_nesting_level%
+
+    oro_api.config_extension.filters:
+        class: Oro\Bundle\ApiBundle\Config\FiltersConfigExtension
+        public: false
+        tags:
+            - { name: oro_api.config_extension }
+
+    oro_api.config_extension.sorters:
+        class: Oro\Bundle\ApiBundle\Config\SortersConfigExtension
+        public: false
+        tags:
+            - { name: oro_api.config_extension }
+
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false
@@ -92,6 +111,8 @@ services:
     oro_api.config_loader_factory:
         class: Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory
         public: false
+        arguments:
+            - @oro_api.config_extension_registry
 
     oro_api.config_provider:
         class: Oro\Bundle\ApiBundle\Provider\ConfigProvider
@@ -177,17 +198,11 @@ services:
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
 
-    oro_api.json_api.entity_class_transformer:
-        class: Oro\Bundle\ApiBundle\Request\JsonApi\EntityClassTransformer
-        public: false
-        arguments:
-            - @oro_entity.entity_alias_resolver
-
     oro_api.json_api.document_builder_factory:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilderFactory
         public: false
         arguments:
-            - @oro_api.json_api.entity_class_transformer
+            - @oro_api.value_normalizer
             - @oro_api.rest.entity_id_transformer
 
     oro_api.rest.routing_options_resolver:
@@ -196,7 +211,6 @@ services:
         arguments:
             - %installed%
             - @oro_api.resources_loader
-            - @oro_entity.entity_alias_resolver
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
             - %oro_api.rest.formats%

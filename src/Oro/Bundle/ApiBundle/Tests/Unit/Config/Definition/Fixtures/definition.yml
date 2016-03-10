@@ -1,0 +1,477 @@
+empty:
+    config: []
+    expected: []
+
+null_fields:
+    config:
+        fields: ~
+    expected: []
+
+empty_fields:
+    config:
+        fields: []
+    expected: []
+
+default_exclusion_policy:
+    config:
+        exclusion_policy: none
+    expected:
+        exclusion_policy: none
+
+exclusion_policy:
+    config:
+        exclusion_policy: all
+    expected:
+        exclusion_policy: all
+
+null_exclusion_policy:
+    config:
+        exclusion_policy: null
+    expected: []
+    error: 'The value null is not allowed for path "entity.exclusion_policy". Permissible values: "all", "none"'
+
+invalid_exclusion_policy:
+    config:
+        exclusion_policy: invalid
+    expected: []
+    error: 'The value "invalid" is not allowed for path "entity.exclusion_policy". Permissible values: "all", "none"'
+
+default_disable_partial_load:
+    config:
+        disable_partial_load: false
+    expected:
+        disable_partial_load: false
+
+disable_partial_load:
+    config:
+        disable_partial_load: true
+    expected:
+        disable_partial_load: true
+
+invalid_disable_partial_load:
+    config:
+        disable_partial_load: 123
+    expected: []
+    error: 'Invalid type for path "entity.disable_partial_load". Expected boolean, but got integer.'
+
+empty_order_by:
+    config:
+        order_by: []
+    expected: []
+
+order_by:
+    config:
+        order_by:
+            field1: ASC
+            field2: DESC
+    expected:
+        order_by:
+            field1: ASC
+            field2: DESC
+
+invalid_direction_in_order_by:
+    config:
+        order_by:
+            field1: other
+    expected: []
+    error: 'The value "other" is not allowed for path "entity.order_by.field1". Permissible values: "ASC", "DESC"'
+
+default_max_results:
+    config:
+        max_results: ~
+    expected: []
+    error: 'Invalid type for path "entity.max_results". Expected int, but got NULL.'
+
+zero_max_results:
+    config:
+        max_results: 0
+    expected:
+        max_results: 0
+
+unlimited_max_results:
+    config:
+        max_results: -1
+    expected:
+        max_results: -1
+
+invalid_max_results:
+    config:
+        max_results: -2
+    expected: []
+    error: 'The value -2 is too small for path "entity.max_results". Should be greater than or equal to -1'
+
+empty_hints:
+    config:
+        hints: []
+    expected: []
+
+hints:
+    config:
+        hints:
+            - HINT_1
+            - {name: HINT_2}
+            - {name: HINT_3, value: class}
+    expected:
+        hints:
+            - {name: HINT_1}
+            - {name: HINT_2}
+            - {name: HINT_3, value: class}
+
+invalid_hints:
+    config:
+        hints:
+            - {name: HINT_1, value: class, extra: val}
+    expected: []
+    error: 'Unrecognized option "extra" under "entity.hints.0"'
+
+empty_post_serialize:
+    config:
+        post_serialize: ~
+    expected: []
+
+post_serialize:
+    config:
+        post_serialize: [class, method]
+    expected:
+        post_serialize: [class, method]
+
+null_label:
+    config:
+        label: ~
+    expected: []
+    error: 'The path "entity.label" cannot contain an empty value, but got null.'
+
+empty_label:
+    config:
+        label: ""
+    expected: []
+    error: 'The path "entity.label" cannot contain an empty value, but got "".'
+
+null_plural_label:
+    config:
+        plural_label: ~
+    expected: []
+    error: 'The path "entity.plural_label" cannot contain an empty value, but got null.'
+
+empty_plural_label:
+    config:
+        plural_label: ""
+    expected: []
+    error: 'The path "entity.plural_label" cannot contain an empty value, but got "".'
+
+null_description:
+    config:
+        description: ~
+    expected: []
+    error: 'The path "entity.description" cannot contain an empty value, but got null.'
+
+empty_description:
+    config:
+        description: ""
+    expected: []
+    error: 'The path "entity.description" cannot contain an empty value, but got "".'
+
+all_attributes:
+    config:
+        exclusion_policy: all
+        disable_partial_load: true
+        order_by:
+            id: DESC
+        max_results: 50
+        hints:
+            - HINT_1
+            - {name: HINT_2, value: hint_val2}
+        post_serialize: [class, method]
+        label: label1
+        plural_label: plural_label1
+        description: description1
+    expected:
+        exclusion_policy: all
+        disable_partial_load: true
+        order_by:
+            id: DESC
+        max_results: 50
+        hints:
+            - {name: HINT_1}
+            - {name: HINT_2, value: hint_val2}
+        post_serialize: [class, method]
+        label: label1
+        plural_label: plural_label1
+        description: description1
+
+empty_field:
+    config:
+        fields:
+            field1: ~
+            field2: []
+    expected:
+        fields:
+            field1: []
+            field2: []
+
+field_exclude:
+    config:
+        fields:
+            field1:
+                exclude: true
+            field2:
+                exclude: false
+    expected:
+        fields:
+            field1:
+                exclude: true
+            field2:
+                exclude: false
+
+invalid_field_exclude:
+    config:
+        fields:
+            field1:
+                exclude: 123
+    expected: []
+    error: 'Invalid type for path "entity.fields.field1.exclude". Expected boolean, but got integer.'
+
+field_property_path:
+    config:
+        fields:
+            field1:
+                property_path: path1
+    expected:
+        fields:
+            field1:
+                property_path: path1
+
+null_field_property_path:
+    config:
+        fields:
+            field1:
+                property_path: null
+    expected: []
+    error: 'The path "entity.fields.field1.property_path" cannot contain an empty value, but got null.'
+
+empty_field_property_path:
+    config:
+        fields:
+            field1:
+                property_path: ""
+    expected: []
+    error: 'The path "entity.fields.field1.property_path" cannot contain an empty value, but got "".'
+
+field_collapse:
+    config:
+        fields:
+            field1:
+                collapse: true
+            field2:
+                collapse: false
+    expected:
+        fields:
+            field1:
+                collapse: true
+            field2:
+                collapse: false
+
+invalid_field_collapse:
+    config:
+        fields:
+            field1:
+                collapse: 123
+    expected: []
+    error: 'Invalid type for path "entity.fields.field1.collapse". Expected boolean, but got integer.'
+
+field_data_transformer:
+    config:
+        fields:
+            field1:
+                data_transformer: ~
+            field2:
+                data_transformer: ""
+            field3:
+                data_transformer: []
+            field4:
+                data_transformer: [service1, [class, method]]
+    expected:
+        fields:
+            field1: []
+            field2: []
+            field3: []
+            field4:
+                data_transformer: [service1, [class, method]]
+
+field_label:
+    config:
+        fields:
+            field1:
+                label: path1
+    expected:
+        fields:
+            field1:
+                label: path1
+
+null_field_label:
+    config:
+        fields:
+            field1:
+                label: null
+    expected: []
+    error: 'The path "entity.fields.field1.label" cannot contain an empty value, but got null.'
+
+empty_field_label:
+    config:
+        fields:
+            field1:
+                label: ""
+    expected: []
+    error: 'The path "entity.fields.field1.label" cannot contain an empty value, but got "".'
+
+field_description:
+    config:
+        fields:
+            field1:
+                description: path1
+    expected:
+        fields:
+            field1:
+                description: path1
+
+null_field_description:
+    config:
+        fields:
+            field1:
+                description: null
+    expected: []
+    error: 'The path "entity.fields.field1.description" cannot contain an empty value, but got null.'
+
+empty_field_description:
+    config:
+        fields:
+            field1:
+                description: ""
+    expected: []
+    error: 'The path "entity.fields.field1.description" cannot contain an empty value, but got "".'
+
+filters_and_sorters:
+    config:
+        filters:
+            exclusion_policy: none
+            fields:
+                field1:
+                    allow_array: false
+                    property_path: path1
+        sorters:
+            exclusion_policy: none
+            fields:
+                field1:
+                    exclude: false
+                    property_path: path1
+    expected:
+        filters:
+            exclusion_policy: none
+            fields:
+                field1:
+                    allow_array: false
+                    property_path: path1
+        sorters:
+            exclusion_policy: none
+            fields:
+                field1:
+                    exclude: false
+                    property_path: path1
+
+field_with_filters_and_sorters:
+    config:
+        fields:
+            field1:
+                filters:
+                    exclusion_policy: none
+                    fields:
+                        field11:
+                            allow_array: false
+                            property_path: path1
+                sorters:
+                    exclusion_policy: none
+                    fields:
+                        field11:
+                            exclude: false
+                            property_path: path1
+    expected:
+        fields:
+            field1:
+                filters:
+                    exclusion_policy: none
+                    fields:
+                        field11:
+                            allow_array: false
+                            property_path: path1
+                sorters:
+                    exclusion_policy: none
+                    fields:
+                        field11:
+                            exclude: false
+                            property_path: path1
+
+field_with_target_entity:
+    config:
+        fields:
+            field1:
+                collapse: true
+                exclusion_policy: all
+                disable_partial_load: true
+                order_by:
+                    id: DESC
+                max_results: 50
+                hints:
+                    - HINT_1
+                    - {name: HINT_2, value: hint_val2}
+    expected:
+        fields:
+            field1:
+                collapse: true
+                exclusion_policy: all
+                disable_partial_load: true
+                order_by:
+                    id: DESC
+                max_results: 50
+                hints:
+                    - {name: HINT_1}
+                    - {name: HINT_2, value: hint_val2}
+
+extra_config:
+    config:
+        entity_extra: entity_extra_val
+        fields:
+            field1:
+                field_extra: field1_extra_val
+                filters:
+                    filters_extra: field1_filters_extra_val
+                    fields:
+                        field11:
+                            filter_field_extra: field11_filter_extra_val
+                sorters:
+                    sorters_extra: sorters_extra_val
+                    fields:
+                        field11:
+                            sorter_field_extra: field11_sorter_extra_val
+                test_section:
+                    key1: val1
+        test_section:
+            key1: val1
+    expected:
+        entity_extra: entity_extra_val (added by extension)
+        fields:
+            field1:
+                field_extra: field1_extra_val (added by extension)
+                filters:
+                    filters_extra: field1_filters_extra_val (added by extension)
+                    fields:
+                        field11:
+                            filter_field_extra: field11_filter_extra_val (added by extension)
+                sorters:
+                    sorters_extra: sorters_extra_val (added by extension)
+                    fields:
+                        field11:
+                            sorter_field_extra: field11_sorter_extra_val (added by extension)
+                test_section:
+                    key1: val1
+        test_section:
+            key1: val1

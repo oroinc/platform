@@ -10,11 +10,6 @@ services:
     # common processors
     #
 
-    oro_api.normalize_value.set_array_delimiter:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\SetArrayDelimiter
-        tags:
-            - { name: oro.api.processor, action: normalize_value, priority: 200 }
-
     oro_api.normalize_value.string:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeString
         tags:
@@ -29,6 +24,20 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeUnsignedInteger
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: unsignedInteger, priority: -10 }
+
+    oro_api.normalize_value.entity_class:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityClass
+        arguments:
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: entityClass, priority: -10 }
+
+    oro_api.normalize_value.entity_type:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityType
+        arguments:
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: entityType, priority: -10 }
 
     oro_api.normalize_value.entity_alias:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityAlias
