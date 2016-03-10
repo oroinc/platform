@@ -68,10 +68,12 @@ class DumpConfigCommand extends ContainerAwareCommand
                 'extra',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Whether any extra configuration data should be added. ' .
+                'Whether any extra configuration data should be displayed. ' .
                 sprintf(
-                    'Can be: %s or FQCN of a ConfigExtraSectionInterface or ConfigExtraInterface',
-                    implode(', ', array_keys($this->knownExtras))
+                    'Can be %s or FQCN of a class implements "%s" or "%s"',
+                    '"' . implode('", "', array_keys($this->knownExtras)) . '"',
+                    'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface',
+                    'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'
                 ),
                 []
             );
@@ -195,7 +197,11 @@ class DumpConfigCommand extends ContainerAwareCommand
         $data = $config->toArray();
 
         // add known sections in predefined order
-        foreach ([ConfigUtil::DEFINITION, ConfigUtil::FILTERS, ConfigUtil::SORTERS] as $sectionName) {
+        if (!empty($data[ConfigUtil::DEFINITION])) {
+            $result = $data[ConfigUtil::DEFINITION];
+            unset($data[ConfigUtil::DEFINITION]);
+        }
+        foreach ([ConfigUtil::FILTERS, ConfigUtil::SORTERS] as $sectionName) {
             if (array_key_exists($sectionName, $data)) {
                 $result[$sectionName] = $data[$sectionName];
             }
