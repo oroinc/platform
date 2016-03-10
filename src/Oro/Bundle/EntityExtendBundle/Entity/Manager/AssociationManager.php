@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
-use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -237,7 +236,7 @@ class AssociationManager
             }
         }
 
-        $rsm = new ResultSetMapping();
+        $rsm = QueryUtils::createResultSetMapping($em->getConnection()->getDatabasePlatform());
         $rsm
             ->addScalarResult('id', 'id', Type::INTEGER)
             ->addScalarResult('entity', 'entity')
@@ -358,7 +357,7 @@ class AssociationManager
             }
         }
 
-        $rsm = new ResultSetMapping();
+        $rsm = QueryUtils::createResultSetMapping($em->getConnection()->getDatabasePlatform());
         $rsm
             ->addScalarResult('id', 'id', Type::INTEGER)
             ->addScalarResult('entity', 'entity')
