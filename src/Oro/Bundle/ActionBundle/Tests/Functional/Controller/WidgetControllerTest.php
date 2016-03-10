@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
@@ -30,6 +31,7 @@ class WidgetControllerTest extends WebTestCase
         $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider');
         $this->loadFixtures([
             'Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData',
+            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems',
         ]);
         $this->entityId = $this->getReference(LoadTestEntityData::TEST_ENTITY_1)->getId();
     }
@@ -127,6 +129,42 @@ class WidgetControllerTest extends WebTestCase
 
         $this->assertContains($expectedMessage, $crawler->html());
         $this->assertEntityFields($expectedData);
+    }
+
+    /**
+     * @param string $groupName
+     * @param array $actions
+     *
+     * @dataProvider buttonsActionAndGroupsProvider
+     */
+    public function testButtonsActionAndGroups($groupName, array $actions)
+    {
+        $item = $this->getReference(LoadItems::ITEM1);
+
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_action_widget_buttons',
+                [
+                    '_widgetContainer' => 'dialog',
+                    'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\Item',
+                    'entityId' => $item->getId(),
+                    'group' => $groupName
+                ]
+            )
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        if ($actions) {
+            foreach ($actions as $action) {
+                $this->assertNotEmpty($crawler->selectLink($action));
+            }
+        } else {
+            $this->assertEmpty($crawler);
+        }
     }
 
     /**
@@ -490,6 +528,33 @@ class WidgetControllerTest extends WebTestCase
                     ['@assign_value' => ['$description', '$.descr_attr']]
                 ]
             ]
+        ];
+    }
+
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function buttonsActionAndGroupsProvider()
+    {
+        return [
+            'default group' => [
+                'group' => '',
+                'actions' => [],
+            ],
+            'view_navButtons' => [
+                'group' => 'view_navButtons',
+                'actions' => ['Edit', 'Delete'],
+            ],
+            'update_navButtons' => [
+                'group' => 'update_navButtons',
+                'actions' => ['Delete'],
+            ],
+            'datagridRowAction' => [
+                'group' => 'datagridRowAction',
+                'actions' => ['Edit', 'Delete'],
+            ],
         ];
     }
 }
