@@ -186,11 +186,11 @@ To deal with extensions it's easy to use [ConfigExtensionRegistry](../../Config/
 - Returns all registered configuration extensions.
 - Collects the configuration definition settings from all registered extensions.
 
- - [How to add new configuration extension?](#how-to-add-new-configuration-extension?)
- - [How to add new property into existing config section?](#how-to-add-new-property-into-existing-config-section?)
- - [How to allow to extend section?](#how-to-allow-to-extend-section?)
- - [Pre/PostProcessCallbacks in ConfigExtensionInterface](#Pre/PostProcessCallbacks-in-ConfigExtensionInterface)
- - [Config loaders and ConfigExtraSectionInterface](#config-loaders-and-configExtraSectionInterface)
+ - [How to add new configuration extension?](#how-to-add-new-configuration-extension)
+ - [How to add new property into existing config section?](#how-to-add-new-property-into-existing-config-section)
+ - [How to allow to extend section?](#how-to-allow-to-extend-section)
+ - [Pre/PostProcessCallbacks in ConfigExtensionInterface](#prepostprocesscallbacks-in-configextensioninterface)
+ - [Config loaders and ConfigExtraSectionInterface](#config-loaders-and-configextrasectioninterface)
 
 
 How to add new configuration extension?
@@ -609,7 +609,7 @@ class TestConfigurationExtra implements ConfigExtraInterface, ConfigExtraSection
 }
 ```
 
-And to check that all works fine just execute the `` command. The output will looks like this:
+And to check that all works fine just execute the `oro:api:config:dump acmeentity --with-extras="Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension\TestConfigurationExtra"` command. The output will looks like this:
 
 
 ```yaml
