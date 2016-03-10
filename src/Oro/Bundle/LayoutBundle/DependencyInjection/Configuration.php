@@ -14,7 +14,7 @@ class Configuration implements ConfigurationInterface
     /**
      * @var string[]
      */
-    private static $mandatoryImageTypes = ['main', 'additional', 'thumbnail'];
+    private static $mandatoryImageTypes = ['main', 'additional', 'listing'];
 
     /**
      * {@inheritdoc}
@@ -206,7 +206,7 @@ class Configuration implements ConfigurationInterface
                 ->arrayNode('types')
                 ->useAttributeAsKey('image-type-identifier')
                 ->validate()
-                    ->ifTrue(function($config) {
+                    ->ifTrue(function ($config) {
                         return count(array_diff(array_keys($config), self::$mandatoryImageTypes));
                     })
                     ->thenInvalid(sprintf(
