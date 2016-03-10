@@ -2,7 +2,7 @@
 
 namespace Oro\Component\TestUtils\Mocks;
 
-use Oro\Component\DependencyInjection\ServiceLink as BaseServiceLink;
+use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink as BaseServiceLink;
 
 class ServiceLink extends BaseServiceLink
 {
