@@ -58,7 +58,7 @@ class TagImportManager
      *
      * @return array
      */
-    public function normalizeTags($tags)
+    public function normalizeTags(Collection $tags = null)
     {
         if (!$tags) {
             return ['name' => ''];
@@ -71,7 +71,7 @@ class TagImportManager
                     function (Tag $tag) {
                         return $tag->getName();
                     },
-                    is_array($tags) ? $tags['all'] : $tags->toArray()
+                    $tags->toArray()
                 )
             )
         ];
@@ -180,16 +180,29 @@ class TagImportManager
             return;
         }
 
-        $class = ClassUtils::getClass($entities[0]);
+        $class = ClassUtils::getClass(reset($entities));
         if (!$this->isTaggable($class)) {
             return;
         }
 
+        /*
+         * map of entities by their ids
+         * [int => object, ...]
+         * where int is id of the entity and object is the entity itself
+         */
         $entitiesById = array_combine(
             array_map([$this->taggableHelper, 'getEntityId'], $entities),
             $entities
         );
 
+        /*
+         * map of array of tags by related entity ids
+         * [int => Tag[], ...]
+         * where int is id of the related entity and Tag[] is list of the entity tags
+         *
+         * Tags here are loaded in 1 query for all given entities.
+         * In case entity have no tags, the array of tags is empty
+         */
         $tagsByEntityId = array_reduce(
             $this->tagStorage->getTagsByEntityIds(
                 $class,
@@ -203,6 +216,9 @@ class TagImportManager
             array_fill_keys(array_keys($entitiesById), [])
         );
 
+        /*
+         * Loads tags into corresponding entities
+         */
         array_walk(
             $tagsByEntityId,
             function (array $tags, $entityId) use ($entitiesById) {

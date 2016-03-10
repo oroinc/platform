@@ -1,3 +1,8 @@
+##
+# Services in this file are used for testing
+#
+# @see TagBundle/Tests/Functional/Controller/ImportExportControllerTest.php
+##
 services:
     oro_user.importexport.strategy.user.add_or_replace:
         parent: oro_importexport.strategy.configurable_add_or_replace

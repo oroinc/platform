@@ -4,8 +4,8 @@ namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
 use Doctrine\ORM\Query;
+
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 use Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity;

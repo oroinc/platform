@@ -5,7 +5,7 @@ namespace Oro\Bundle\ImportExportBundle\Event;
 final class Events
 {
     /**
-     * This event occurs after the entity page is loaded in interator.
+     * This event occurs after the entity page is loaded in iterator.
      *
      * Can be used to modify rows.
      */
@@ -28,7 +28,7 @@ final class Events
     /**
      * This event occurs after rules and backend headers are loaded.
      *
-     * Can be used to modify add new headers and modify rules.
+     * Can be used to modify, add new headers and modify rules.
      */
     const AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS = 'oro.import_export.after_load_entity_rules_and_backend_headers';
 

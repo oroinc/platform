@@ -50,24 +50,9 @@ class TagImportManagerTest extends \PHPUnit_Framework_TestCase
                 null,
                 ['name' => ''],
             ],
-            'empty array' => [
-                ['all' => []],
-                ['name' => ''],
-            ],
             'empty collection' => [
                 new ArrayCollection(),
                 ['name' => ''],
-            ],
-            'array' => [
-                [
-                    'all' => [
-                        new Tag('1'),
-                        new Tag('2'),
-                    ],
-                ],
-                [
-                    'name' => '1, 2',
-                ],
             ],
             'collection' => [
                 new ArrayCollection([
