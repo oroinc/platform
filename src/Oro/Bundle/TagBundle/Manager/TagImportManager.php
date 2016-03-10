@@ -20,7 +20,7 @@ class TagImportManager
     /** @var TaggableHelper */
     protected $taggableHelper;
 
-    /** @var array */
+    /** @var ArrayCollection[] */
     protected $pendingTags = [];
 
     /**
@@ -130,8 +130,7 @@ class TagImportManager
     {
         $key = spl_object_hash($entity);
         if (isset($this->pendingTags[$key])) {
-            $tags = $this->pendingTags[$key] ? new ArrayCollection($this->pendingTags[$key]) : $this->pendingTags[$key];
-            $this->tagStorage->setTags($entity, $tags);
+            $this->tagStorage->setTags($entity, $this->pendingTags[$key]);
             unset($this->pendingTags[$key]);
         }
 
@@ -158,7 +157,7 @@ class TagImportManager
      */
     public function setTags($entity, $tags)
     {
-        $this->pendingTags[spl_object_hash($entity)] = $tags;
+        $this->pendingTags[spl_object_hash($entity)] = is_array($tags) ? new ArrayCollection($tags) : $tags;
     }
 
     /**
