@@ -131,6 +131,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         }
 
         $uow = $args->getEntityManager()->getUnitOfWork();
+        // adds managed objects with updated tags into "preparedTaggedObjects" for further processing
         $this->preparedTaggedObjects = array_merge(
             $this->preparedTaggedObjects,
             array_filter(
@@ -140,6 +141,10 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
                 }
             )
         );
+        /*
+         * Removes managed objects with updated tags from "pendingTaggedObjects"
+         * as they progressed further in previous command
+         */
         $this->pendingTaggedObjects = array_diff_key($this->pendingTaggedObjects, $this->preparedTaggedObjects);
     }
 
@@ -160,6 +165,7 @@ class ImportExportTagsSubscriber implements EventSubscriberInterface
         }
 
         $this->preparedTaggedObjects = [];
+        // persist tags of all $taggables objects
         array_walk($taggables, [$this->getTagImportManager(), 'persistTags']);
         $args->getEntityManager()->flush();
     }

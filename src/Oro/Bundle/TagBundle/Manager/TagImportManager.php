@@ -34,6 +34,9 @@ class TagImportManager
     }
 
     /**
+     * Converts tags from strings ("tag1, tag2") into arrays (["tag1", "tag2"])
+     * and returns them in form of Tag[] objects
+     *
      * @param array $data
      *
      * @return array|null
@@ -54,6 +57,9 @@ class TagImportManager
     }
 
     /**
+     * Converts $tags collection into string representation
+     * ["name" => "tag1, tag2"]
+     *
      * @param Collection|null $tags
      *
      * @return array
