@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Delete;
 
-
 class DeleteContextTest extends DeleteContextTestCase
 {
     public function testContext()

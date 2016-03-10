@@ -81,7 +81,6 @@ class LoadData implements ProcessorInterface
                 $counter++;
             }
         }
-        $repo = $this->doctrineHelper->getEntityRepositoryForClass($entityClass);
 
         $context->setObject($this->doctrineHelper->getEntityRepositoryForClass($entityClass)->find($ids));
     }
