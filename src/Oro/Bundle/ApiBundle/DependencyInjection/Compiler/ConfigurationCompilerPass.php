@@ -12,19 +12,15 @@ use Oro\Bundle\ApiBundle\DependencyInjection\Configuration;
 
 class ConfigurationCompilerPass implements CompilerPassInterface
 {
-    const PROCESSOR_BAG_SERVICE_ID             = 'oro_api.processor_bag';
-
-    const ACTION_PROCESSOR_BAG_SERVICE_ID      = 'oro_api.action_processor_bag';
-    const ACTION_PROCESSOR_TAG                 = 'oro.api.action_processor';
-
-    const FILTER_FACTORY_SERVICE_ID            = 'oro_api.filter_factory';
-    const FILTER_FACTORY_TAG                   = 'oro.api.filter_factory';
-
-    const EXCLUSION_PROVIDER_SERVICE_ID        = 'oro_api.entity_exclusion_provider';
-    const EXCLUSION_PROVIDER_TAG               = 'oro_entity.exclusion_provider.api';
-
-    const VIRTUAL_FIELD_PROVIDER_SERVICE_ID    = 'oro_api.virtual_field_provider';
-    const VIRTUAL_FIELD_PROVIDER_TAG           = 'oro_entity.virtual_field_provider.api';
+    const PROCESSOR_BAG_SERVICE_ID          = 'oro_api.processor_bag';
+    const ACTION_PROCESSOR_BAG_SERVICE_ID   = 'oro_api.action_processor_bag';
+    const ACTION_PROCESSOR_TAG              = 'oro.api.action_processor';
+    const FILTER_FACTORY_SERVICE_ID         = 'oro_api.filter_factory';
+    const FILTER_FACTORY_TAG                = 'oro.api.filter_factory';
+    const EXCLUSION_PROVIDER_SERVICE_ID     = 'oro_api.entity_exclusion_provider';
+    const EXCLUSION_PROVIDER_TAG            = 'oro_entity.exclusion_provider.api';
+    const VIRTUAL_FIELD_PROVIDER_SERVICE_ID = 'oro_api.virtual_field_provider';
+    const VIRTUAL_FIELD_PROVIDER_TAG        = 'oro_entity.virtual_field_provider.api';
 
     /**
      * {@inheritdoc}
@@ -106,10 +102,10 @@ class ConfigurationCompilerPass implements CompilerPassInterface
         $chainServiceDef = $this->findDefinition($container, $chainServiceId);
         if (null !== $chainServiceDef) {
             // find services
-            $services       = [];
+            $services = [];
             $taggedServices = $container->findTaggedServiceIds($tagName);
             foreach ($taggedServices as $id => $attributes) {
-                $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+                $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
                 $services[$priority][] = new Reference($id);
             }
             if (empty($services)) {

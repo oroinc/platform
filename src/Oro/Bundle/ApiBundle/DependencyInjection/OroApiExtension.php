@@ -31,6 +31,10 @@ class OroApiExtension extends Extension
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
 
+        /**
+         * To load configuration we need fully configured config tree builder, that's why all configuration extensions
+         *   should be registered before.
+         */
         $this->registerTaggedServices(
             $container,
             self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,

@@ -99,14 +99,35 @@ class DumpConfigCommand extends ContainerAwareCommand
         foreach ($extraOptions as $extraName) {
             if (array_key_exists($extraName, $this->knownExtras)) {
                 $extras[] = new $this->knownExtras[$extraName];
-            } elseif (class_exists($extraName)
-                && (
-                    is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface', true)
-                    || is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface', true)
-                )
-            ) {
-                $extras[] = new $extraName;
+                continue;
             }
+
+            if (false === strpos($extraName, '\\')) {
+                throw new \InvalidArgumentException(
+                    sprintf('Unknown value "%s" for option `--extra`.', $extraName)
+                );
+            }
+
+            if (!class_exists($extraName)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Class "%s" passed as value for option `--extra` not found.', $extraName)
+                );
+            }
+
+            if (!is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface', true)
+                && !is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface', true)
+            ) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Class "%s" passed as value for option `--extra` do not implements ' .
+                        '`Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface` or '.
+                        '`Oro\Bundle\ApiBundle\Config\ConfigExtraInterface`.',
+                        $extraName
+                    )
+                );
+            }
+
+            $extras[] = new $extraName;
         }
 
         /** @var ProcessorBag $processorBag */
