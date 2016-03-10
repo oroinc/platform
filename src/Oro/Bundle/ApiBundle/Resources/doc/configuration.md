@@ -5,12 +5,25 @@ Table of Contents
 -----------------
  - [Overview](#overview)
  - [Configuration structure](#configuration-structure)
- - [Config Sections](#config-sections)
+    - ["Exclusions" configuration section & "exclude" flag](#)
+    - ["Entities" configuration section](#)
+    - ["Relations" configuration section](#)
  - [Config Extensions](#config-extensions)
  - [Conclusion](#conclusion)
 
 Overview
 ========
+
+The configuration declares all aspects related to specific entity. The certain configuration for entity should be placed in `api.yml` to be automatically loaded. Typically configuration starts from the root element `oro_api` and followed by configuration section and its properties. Each file can have single entity configuration or a collection of configurations for many entities.
+
+To get the overall configuration structure, execute the following command:
+
+```bash
+php ./app/console oro:api:config:dump-reference
+```
+
+Configuration structure
+=======================
 
 All entities, except custom entities, dictionaries and enumerations are not accessible through Data API. To allow usage of an entity in Data API you can use `Resources/config/oro/api.yml` file. For example, to make `Acme\Bundle\ProductBundle\Product` entity available through Data API you can write the following configuration:
 
@@ -20,25 +33,138 @@ oro_api:
         Acme\Bundle\ProductBundle\Product: ~
 ```
 
-Configuration structure
-=======================
+The first level sections of configuration are:
 
-To get the configuration structure, execute the following command:
+* **exclusions** - describes exclusion rules per whole entity or certain entity field. This can be useful for example to exclude security specific data from being accessible via Data API.  
+* **entities**   - describes the entities configuration
+* **relations**  - describes the relations configuration
 
-```bash
-php ./app/console oro:api:config:dump-reference
+Below is an overview table of sections and its typical childes. 
+
+|Config Section | Description |
+|||
+|exclusions | The section describes entity(ies) and\or field(s) exclusions | 
+|||
+|entities               | The section describes entities configurations |
+|entities.entity        | The section describes whole single entity configuration with all fields, sorters, filters, etc. |
+|entities.entity.fields | The section describes the configuration of fields per certain entity|
+|                       | The relations configuration are similar to entity configuration |
+|relations              | The section describes relations configurations |
+|relations.entity       | The section describes whole single relation configuration with all fields, sorters, filters, etc. |
+|relations.entity.fields| The section describes the configuration of fields per certain relation |
+|||
+|entities/relations.entity.filters | The section can be present under both: entities and relations. Describes the configuration of filters |
+|entities/relations.entity.filters.fields | The section describes the filter configuration per fields |
+|||
+|entities/relations.entity.sorters | The section can be present under both: entities and relations. Describes the configuration of sorters |
+|entities/relations.entity.sorters.fields | The section describes the sorters configuration per fields |
+|||
+
+
+```yaml
+oro_api:
+    exclusions:
+        ...
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            fields:
+                ...
+            sorters:
+                fields:
+                    ...
+            filters:
+                fields:
+                    ...
+            exclude:    ~
+        ...
+    relations:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            fields:
+                ...
+            sorters:
+                fields:
+                    ...
+            filters:
+                fields:
+                    ...
+        ...
 ```
 
-The result of the command execution will be output similar to this:
+"Exclusions" configuration section & "exclude" flag
+---------------------------------------------------
+
+The `exclusions` configuration section describes whether whole entity or some of its fields should be excluded from result. The definition is a key-value collection where `entity` keys' value is a FQCN of entity to be excluded and `field` keys' value is a field name of an entity to be excluded. If `field` is omitted it will lead to exclusion of whole entity.  
+
+As an example:
+
+```yaml
+oro_api:
+    exclusions:
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity0 }                 # whole entity exclusion
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity1, field: fieldName0 }  # field0 will be excluded
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity1, field: fieldName1 }  # field1 will be excluded
+```
+
+The same behaviour can be reached by usage of `exclude` flag under `entities` configuration section, e.g.
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity0:
+            exclude: true
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            fields:
+                fieldName0:
+                    exclude: true
+                fieldName1:
+                    exclude: true
+```
+
+The mentioned flag can be also used to indicate whether sorter or filter should be excluded, e.g.
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity1:
+            sorter:
+                fields:
+                    fieldName0:
+                        exclude: true
+            filters:
+                fields:
+                    fieldName1:
+                        exclude: true
+```
+
+Please note  `oro_api.exclusions` rules will excludes entity only from Data API, but in case an entity or its' field(s) should be excluded globally use `Resources/config/oro/entity.yml`, e.g.
+
+```yaml
+oro_entity:
+    exclusions:
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity, field: fieldName }        # single field exclusion
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity, field: anotherFieldName } # single field exclusion
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AnotherAcmeEntity }                   # whole entity exclusion
+```
+
+"Entities" configuration section
+--------------------------------
+
+
+
+"Relations" configuration section
+---------------------------------
+
+The `relations` configuration describes how the entity data should be shown then retrieved as a relation to some other entity. It's absolutely identical to `entities` configuration section, the only difference is `exclude` flag - it's not available under relation configuration.
+
+
+
 
 ```yaml
 # The structure of "Resources/config/oro/api.yml"
 oro_api:
-    exclusions:                                                # SECTION name
-        entity:               ~ # Required                     # Fully-Qualified Class Name (FQCN)
-        field:                ~                                # field name
-
-    entities:                                                  # SECTION name
+    exclusions:                                                # exclusions configuration section
+        ...
+    entities:                                                  # entities configuration section
         # Prototype                                            # --------------------------------
         name:                                                  # Fully-Qualified Class Name (FQCN)
             inherit:              ~                            # 
@@ -49,14 +175,13 @@ oro_api:
                 name:             ~                            # a field name and the value one of "ASC"; "DESC"
             max_results:          ~                            # the maximum number of items in the result
             hints:                                             # Doctrine query hints
-                name:             ~                            # - please refer to [Doctine documentation](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints) for more details
-                value:            ~                            #
+                ...
             post_serialize:       ~                            # a handler to be used to modify serialized data
             label:                ~                            # a human-readable representation of the entity
             plural_label:         ~                            # a human-readable representation in plural of the entity
             description:          ~                            # a human-readable description of the entity
 
-            fields:                                            # SECTION name
+            fields:                                            # fields configuration section
                 # Prototype                                    # --------------------------------
                 name:                                          # a field name
                     exclude:              ~                    # indicates whether the exclusion flag is set explicitly 
@@ -66,7 +191,7 @@ oro_api:
                     label:                ~                    # human-readable representation of the field
                     description:          ~                    # human-readable description of the field
 
-            filters:                                           # SECTION name
+            filters:                                           # filters configuration section
                 exclusion_policy:         ~                    # One of "all"; "none"
                 fields:                                        # Represents a filter configuration per field
                     # Prototype                                # --------------------------------
@@ -89,47 +214,23 @@ oro_api:
             exclude:                      ~                    # flag indicates whether entity should be excluded
 
     relations:                                                 # The relation configuration is similar to entity
-        # Prototype                                            # configuration except it does not have `exclude` property.
-        name:                                                  #
+        name:                                                  # configuration except it does not have `exclude` property.
             inherit:              ~
-            exclusion_policy:     ~ # One of "all"; "none"
+            exclusion_policy:     ~
             disable_partial_load: ~
             order_by:
-                # Prototype
-                name:             ~
+                ...
             max_results:          ~
             hints:
-                name:             ~
-                value:            ~
+                ...
             post_serialize:       ~
             collapse:             ~
             fields:
-                # Prototype
-                name:
-                    exclude:              ~
-                    property_path:        ~
-                    collapse:             ~
-                    data_transformer:     ~
-                    label:                ~
-                    description:          ~
+                ...
             filters:
-                exclusion_policy:         ~ # One of "all"; "none"
-                fields:
-                    # Prototype
-                    name:
-                        exclude:          ~
-                        property_path:    ~
-                        data_type:        ~
-                        allow_array:      ~
-                        default_value:    ~
-                        description:      ~
+                ...
             sorters:
-                exclusion_policy:         ~ # One of "all"; "none"
-                fields:
-                    # Prototype
-                    name:
-                        exclude:          ~
-                        property_path:    ~
+                ...
 ```
 
 Tips and tricks
@@ -144,38 +245,6 @@ parameters:
     oro_api.config.max_nesting_level: 3
 ```
 
---
-`oro_api.entities.exclude` flag excludes entity only from API, but in case an entity or its' field(s) should be excluded globally use `Resources/config/oro/entity.yml`, e.g.
-
-```yaml
-oro_entity:
-    exclusions:
-        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity, field: fieldName }        # single field exclusion
-        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity, field: anotherFieldName } # single field exclusion
-        - { entity: Acme\Bundle\AcmeBundle\Entity\AnotherAcmeEntity }                   # whole entity exclusion
-```
-
-Config Sections
-===============
-
-|Config Section         | Description |
-| ---                   | :--- |
-|exclusions             | The section describes entity(ies) and\or field(s) exclusions | 
-| ---                   | --- |
-|entities               | The section describes entities configurations |
-|entities.entity        | The section describes whole single entity configuration with all fields, sorters, filters, etc. |
-|entities.entity.fields | The section describes the configuration of fields per certain entity|
-| ---                   | The relations configuration are similar to entity configuration|
-|relations              | The section describes relations configurations |
-|relations.entity       | The section describes whole single relation configuration with all fields, sorters, filters, etc. |
-|relations.entity.fields| The section describes the configuration of fields per certain relation |
-| ---                   | --- |
-|filters                | The section presents in both: entities and relations. Describes the configuration of filters |
-|filters.fields         | The section describes the filter configuration per fields |
-| ---                   | --- |
-|sorters                | The section presents in both: entities and relations. Describes the configuration of sorters |
-|sorters.fields         | The section describes the sorters configuration per fields |
-| ---                   | --- |
 
 
 Config Extensions
@@ -549,7 +618,6 @@ or if it needs to use own setters:
 ```php
 class TestConfigurationLoader extends AbstractConfigLoader implements ConfigLoaderInterface
 {
-    /** @var array */
     protected $methodMap = [
         TestConfig::PROP1 => 'setTestProperty',
         TestConfig::PROP2 => 'setTestPropertyNew'
