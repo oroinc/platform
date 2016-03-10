@@ -139,6 +139,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     'executionUrl' => 'execution-url',
                     'dialogUrl' => 'dialog-url',
+                    'url' => 'execution-url',
                 ],
             ],
             'optional parameters' => [
@@ -173,6 +174,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     'executionUrl' => 'execution-url2',
                     'dialogUrl' => 'dialog-url2',
+                    'url' => 'execution-url2',
                     'confirmation' => [
                         'option1' => 'value1',
                         'key1' => 'value1',
@@ -210,6 +212,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     'executionUrl' => 'execution-url3',
                     'dialogUrl' => 'dialog-url3',
+                    'url' => 'dialog-url3',
                 ],
             ],
         ];

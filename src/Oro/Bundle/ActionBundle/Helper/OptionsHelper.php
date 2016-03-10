@@ -70,6 +70,16 @@ class OptionsHelper
 
         $actionName = $action->getName();
 
+        $executionUrl = $this->router->generate(
+            $this->applicationsHelper->getExecutionRoute(),
+            array_merge($actionContext, ['actionName' => $actionName])
+        );
+
+        $dialogUrl = $this->router->generate(
+            $this->applicationsHelper->getDialogRoute(),
+            array_merge($actionContext, ['actionName' => $actionName])
+        );
+
         $options = [
             'hasDialog' => $action->hasForm(),
             'showDialog' => !empty($frontendOptions['show_dialog']),
@@ -77,14 +87,9 @@ class OptionsHelper
                 'title' => $action->getDefinition()->getLabel(),
                 'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
             ],
-            'executionUrl' => $this->router->generate(
-                $this->applicationsHelper->getExecutionRoute(),
-                array_merge($actionContext, ['actionName' => $actionName])
-            ),
-            'dialogUrl' => $this->router->generate(
-                $this->applicationsHelper->getDialogRoute(),
-                array_merge($actionContext, ['actionName' => $actionName])
-            ),
+            'executionUrl' => $executionUrl,
+            'dialogUrl' => $dialogUrl,
+            'url' => $action->hasForm() ? $dialogUrl : $executionUrl,
         ];
 
         if (!empty($frontendOptions['confirmation'])) {
