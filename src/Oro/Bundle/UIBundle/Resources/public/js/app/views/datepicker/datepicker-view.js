@@ -32,7 +32,7 @@ define(function(require) {
         /**
          * Format of date/datetime that original input accepts
          */
-        backendFormat: datetimeFormatter.backendFormats.date,
+        backendFormat: datetimeFormatter.getBackendDateFormat(),
 
         /**
          * Flag to prevent frontend field update once origin field is changed
@@ -110,6 +110,7 @@ define(function(require) {
             this.$frontDateField = $('<input />');
             options.dateInputAttrs.type = this.nativeMode ? 'date' : 'text';
             this.$frontDateField.attr(options.dateInputAttrs);
+            this.$frontDateField.attr('data-fake-front-field', '');
             this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
             this.$el.after(this.$frontDateField);
             this.$el.attr('data-format', 'backend');

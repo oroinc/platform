@@ -28,7 +28,7 @@ define([
             this.$simpleEl = $(options.simpleEl);
 
             this.target.closest('.controls').append(this.$simpleEl);
-            this.uniform = $('#uniform-' + this.target[0].id);
+            this.targetWidget = this.target.inputWidget('getContainer');
             this.$simpleEl.attr('type', 'text');
 
             this.showSelect = options.showSelect;
@@ -115,7 +115,9 @@ define([
             if (this.collection.models.length > 0) {
                 this.target.show();
                 this.displaySelect2(true);
-                this.uniform.show();
+                if (this.targetWidget) {
+                    this.targetWidget.show();
+                }
 
                 this.target.find('option[value!=""]').remove();
                 this.target.append(this.template({regions: this.collection.models}));
@@ -127,7 +129,9 @@ define([
                 this.target.hide();
                 this.target.val('');
                 this.displaySelect2(false);
-                this.uniform.hide();
+                if (this.targetWidget) {
+                    this.targetWidget.hide();
+                }
                 this.$simpleEl.show();
             }
             this.$el.trigger('value:changed');

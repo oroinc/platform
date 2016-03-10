@@ -3,10 +3,11 @@
 namespace Oro\Bundle\EntityBundle\Tools;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\Mapping\ClassMetadata;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\DBALException;
 use Doctrine\ORM\EntityManagerInterface;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\ORMException;
 
 /**
@@ -70,15 +71,15 @@ class SafeDatabaseChecker
     /**
      * Returns metadata of all entities registered in a given entity manager.
      *
-     * @param EntityManagerInterface $em
+     * @param ObjectManager $manager
      *
      * @return ClassMetadata[]
      */
-    public static function getAllMetadata(EntityManagerInterface $em)
+    public static function getAllMetadata(ObjectManager $manager)
     {
         $allMetadata = [];
         try {
-            $allMetadata = $em->getMetadataFactory()->getAllMetadata();
+            $allMetadata = $manager->getMetadataFactory()->getAllMetadata();
         } catch (\PDOException $e) {
         } catch (DBALException $e) {
         } catch (ORMException $e) {

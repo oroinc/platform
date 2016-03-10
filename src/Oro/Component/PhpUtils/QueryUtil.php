@@ -30,6 +30,12 @@ class QueryUtil
             }
         }
 
+        // when there is lots of ranges, it takes way longer than IN
+        if (count($result[static::IN_BETWEEN]) > 1000) {
+            $result[static::IN] = $intValues;
+            $result[static::IN_BETWEEN] = [];
+        }
+
         return $result;
     }
 

@@ -2,44 +2,37 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\EntityBundle\ORM\ShortClassMetadata;
 
 class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrine;
+    protected $doctrineHelper;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $managerBag;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $em;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $metadataFactory;
 
     /** @var EntityAliasResolver */
     protected $entityAliasResolver;
 
     protected function setUp()
     {
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-        $this->em       = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->doctrine->expects($this->any())
-            ->method('getManager')
-            ->willReturn($this->em);
-        $this->metadataFactory = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->em->expects($this->any())
-            ->method('getMetadataFactory')
-            ->willReturn($this->metadataFactory);
+        $this->em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $this->managerBag = $this->getMock('Oro\Bundle\EntityBundle\ORM\ManagerBagInterface');
+        $this->managerBag->expects($this->any())
+            ->method('getManagers')
+            ->willReturn([$this->em]);
 
-        $this->entityAliasResolver = new EntityAliasResolver($this->doctrine, true);
+        $this->entityAliasResolver = new EntityAliasResolver($this->doctrineHelper, $this->managerBag, true);
     }
 
     public function testHasAliasForUnknownEntity()
@@ -138,8 +131,9 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetClassByAliasForUnknownAlias()
     {
-        $this->metadataFactory->expects($this->once())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn([]);
 
         $this->entityAliasResolver->getClassByAlias('unknown');
@@ -151,8 +145,9 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetClassByAliasCacheForUnknownAlias()
     {
-        $this->metadataFactory->expects($this->once())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn([]);
 
         try {
@@ -171,8 +166,9 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetClassByPluralAliasForUnknownAlias()
     {
-        $this->metadataFactory->expects($this->once())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn([]);
 
         $this->entityAliasResolver->getClassByPluralAlias('unknown');
@@ -184,8 +180,9 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetClassByPluralAliasCacheForUnknownAlias()
     {
-        $this->metadataFactory->expects($this->once())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn([]);
 
         try {
@@ -200,8 +197,9 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAllForEmptyEntityManager()
     {
-        $this->metadataFactory->expects($this->once())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn([]);
 
         $this->assertSame(
@@ -217,8 +215,9 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testWarmUp()
     {
-        $this->metadataFactory->expects($this->once())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn([]);
 
         $this->entityAliasResolver->warmUp('cache/dir');
@@ -328,9 +327,10 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClassByAliasCache()
     {
-        $this->metadataFactory->expects($this->once())
-            ->method('getAllMetadata')
-            ->willReturn([new ClassMetadata('Test\Entity1')]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
+            ->willReturn([new ShortClassMetadata('Test\Entity1')]);
 
         $entityAliasProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $entityAliasProvider->expects($this->once())
@@ -363,9 +363,10 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClassByPluralAliasCache()
     {
-        $this->metadataFactory->expects($this->once())
-            ->method('getAllMetadata')
-            ->willReturn([new ClassMetadata('Test\Entity1')]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
+            ->willReturn([new ShortClassMetadata('Test\Entity1')]);
 
         $entityAliasProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $entityAliasProvider->expects($this->once())
@@ -409,12 +410,13 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateDuplicateAliases()
     {
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
@@ -444,14 +446,15 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateDuplicateAliasesNoDebug()
     {
-        $this->entityAliasResolver = new EntityAliasResolver($this->doctrine, false);
+        $this->entityAliasResolver = new EntityAliasResolver($this->doctrineHelper, $this->managerBag, false);
 
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
@@ -477,12 +480,13 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateDuplicatePluralAliases()
     {
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
@@ -512,14 +516,15 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateDuplicatePluralAliasesNoDebug()
     {
-        $this->entityAliasResolver = new EntityAliasResolver($this->doctrine, false);
+        $this->entityAliasResolver = new EntityAliasResolver($this->doctrineHelper, $this->managerBag, false);
 
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
@@ -545,12 +550,13 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateDuplicateAliasAndPluralAlias()
     {
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
@@ -580,14 +586,15 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateDuplicateAliasAndPluralAliasNoDebug()
     {
-        $this->entityAliasResolver = new EntityAliasResolver($this->doctrine, false);
+        $this->entityAliasResolver = new EntityAliasResolver($this->doctrineHelper, $this->managerBag, false);
 
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
@@ -613,12 +620,13 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateDuplicatePluralAliasAndAlias()
     {
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
@@ -648,14 +656,15 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateDuplicatePluralAliasAndAliasNoDebug()
     {
-        $this->entityAliasResolver = new EntityAliasResolver($this->doctrine, false);
+        $this->entityAliasResolver = new EntityAliasResolver($this->doctrineHelper, $this->managerBag, false);
 
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
@@ -681,12 +690,13 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateDuplicateAliasesWithCustomHelpMessage()
     {
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
@@ -715,9 +725,10 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testThatEarlierProviderWins()
     {
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
-            ->willReturn([new ClassMetadata('Test\Entity1')]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
+            ->willReturn([new ShortClassMetadata('Test\Entity1')]);
 
         $entityAliasProvider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $entityAliasProvider1->expects($this->once())
@@ -741,9 +752,10 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testEntityAliasCanBeDisabled()
     {
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
-            ->willReturn([new ClassMetadata('Test\Entity1')]);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
+            ->willReturn([new ShortClassMetadata('Test\Entity1')]);
 
         $entityAliasProvider1 = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $entityAliasProvider1->expects($this->once())
@@ -765,9 +777,10 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testHasAliasForDisabledAlias()
     {
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
-            ->willReturn([new ClassMetadata('Test\Entity1')]);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
+            ->willReturn([new ShortClassMetadata('Test\Entity1')]);
 
         $entityAliasProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $entityAliasProvider->expects($this->once())
@@ -784,9 +797,10 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
 
     public function testHasAliasCacheForDisabledAlias()
     {
-        $this->metadataFactory->expects($this->any())
-            ->method('getAllMetadata')
-            ->willReturn([new ClassMetadata('Test\Entity1')]);
+        $this->doctrineHelper->expects($this->any())
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
+            ->willReturn([new ShortClassMetadata('Test\Entity1')]);
 
         $entityAliasProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface');
         $entityAliasProvider->expects($this->once())
@@ -811,12 +825,13 @@ class EntityAliasResolverTest extends \PHPUnit_Framework_TestCase
      */
     protected function initialiseAliases($expectedCallsOfGetAllMetadata)
     {
-        $this->metadataFactory->expects($this->exactly($expectedCallsOfGetAllMetadata))
-            ->method('getAllMetadata')
+        $this->doctrineHelper->expects($this->exactly($expectedCallsOfGetAllMetadata))
+            ->method('getAllShortMetadata')
+            ->with($this->identicalTo($this->em), false)
             ->willReturn(
                 [
-                    new ClassMetadata('Test\Entity1'),
-                    new ClassMetadata('Test\Entity2')
+                    new ShortClassMetadata('Test\Entity1'),
+                    new ShortClassMetadata('Test\Entity2')
                 ]
             );
 
