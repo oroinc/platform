@@ -70,6 +70,24 @@ The `section` option can be used to see a configuration of an entity when it is 
 php app/console oro:api:config:dump addresses --section=relations
 ```
 
+By default the configuration of `filters` and `sorters` section are added into output, but they can be omitted with the `with-extras` option:
+
+```bash
+php app/console oro:api:config:dump users --with-extras={}
+```
+
+or to show only `sorters`
+
+```bash
+php app/console oro:api:config:dump users --with-extras="sorters"
+```
+
+or if a new extra section was added just pass the FQCN of a ConfigExtra
+
+```bash
+php app/console oro:api:config:dump users --with-extras={"sorters","Acme\Bundle\AcmeBundle\Config\AcmeConfigExtra"}
+```
+
 ### oro:api:metadata:dump
 This command shows metadata for a particular entity.
 

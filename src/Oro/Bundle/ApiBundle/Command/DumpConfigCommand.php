@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Config\TestConfigurationExtra;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -12,8 +13,6 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Oro\Component\ChainProcessor\ProcessorBag;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
@@ -24,6 +23,18 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpConfigCommand extends ContainerAwareCommand
 {
+    /**
+     * Defined sections
+     *  key   -> section name
+     *  value -> FQCN
+     *
+     * @var array
+     */
+    protected $knownExtras = [
+        'filters' => 'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
+        'sorters' => 'Oro\Bundle\ApiBundle\Config\SortersConfigExtra'
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -68,6 +79,14 @@ class DumpConfigCommand extends ContainerAwareCommand
                 null,
                 InputOption::VALUE_NONE,
                 'Whether human-readable descriptions should be added'
+            )
+            ->addOption(
+                'with-extras',
+                null,
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Whether any extra should be added. ' .
+                'Can be "filters", "sorters" or FQCN of a ConfigExtraSectionInterface',
+                ['filters', 'sorters']
             );
     }
 
@@ -85,7 +104,20 @@ class DumpConfigCommand extends ContainerAwareCommand
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
 
-        $extras = [new FiltersConfigExtra(), new SortersConfigExtra()];
+        $extras = [];
+
+        if ($withExtras = $input->getOption('with-extras')) {
+            foreach ($withExtras as $extraName) {
+                if (array_key_exists($extraName, $this->knownExtras)) {
+                    $extras[] = new $this->knownExtras[$extraName];
+                } elseif (class_exists($extraName)
+                    && is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface', true)
+                ) {
+                    $extras[] = new $extraName;
+                }
+            }
+        }
+
         if (!$input->getOption('without-virtual-fields')) {
             $extras[] = new VirtualFieldsConfigExtra();
         }

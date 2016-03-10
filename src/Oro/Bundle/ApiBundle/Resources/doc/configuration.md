@@ -5,8 +5,9 @@ Table of Contents
 -----------------
  - [Overview](#overview)
  - [Configuration structure](#configuration-structure)
- - [Config Extensions](#config-extensions)
  - [Config Sections](#config-sections)
+ - [Config Extensions](#config-extensions)
+ - [Conclusion](#conclusion)
 
 Overview
 ========
@@ -154,14 +155,42 @@ oro_entity:
         - { entity: Acme\Bundle\AcmeBundle\Entity\AnotherAcmeEntity }                   # whole entity exclusion
 ```
 
+Config Sections
+===============
+
+|Config Section         | Description |
+| ---                   | :--- |
+|exclusions             | The section describes entity(ies) and\or field(s) exclusions | 
+| ---                   | --- |
+|entities               | The section describes entities configurations |
+|entities.entity        | The section describes whole single entity configuration with all fields, sorters, filters, etc. |
+|entities.entity.fields | The section describes the configuration of fields per certain entity|
+| ---                   | The relations configuration are similar to entity configuration|
+|relations              | The section describes relations configurations |
+|relations.entity       | The section describes whole single relation configuration with all fields, sorters, filters, etc. |
+|relations.entity.fields| The section describes the configuration of fields per certain relation |
+| ---                   | --- |
+|filters                | The section presents in both: entities and relations. Describes the configuration of filters |
+|filters.fields         | The section describes the filter configuration per fields |
+| ---                   | --- |
+|sorters                | The section presents in both: entities and relations. Describes the configuration of sorters |
+|sorters.fields         | The section describes the sorters configuration per fields |
+| ---                   | --- |
+
+
 Config Extensions
 =================
 
--- ConfigExtensionRegistry(../../Config/ConfigExtensionRegistry.php)
-
+To deal with extensions it's easy to use [ConfigExtensionRegistry](../../Config/ConfigExtensionRegistry.php). It allows to:
 - Registers the configuration extension.
 - Returns all registered configuration extensions.
 - Collects the configuration definition settings from all registered extensions.
+
+ - [How to add new configuration extension?](#how-to-add-new-configuration-extension?)
+ - [How to add new property into existing config section?](#how-to-add-new-property-into-existing-config-section?)
+ - [How to allow to extend section?](#how-to-allow-to-extend-section?)
+ - [Pre/PostProcessCallbacks in ConfigExtensionInterface](#Pre/PostProcessCallbacks-in-ConfigExtensionInterface)
+ - [Config loaders and ConfigExtraSectionInterface](#config-loaders-and-configExtraSectionInterface)
 
 
 How to add new configuration extension?
@@ -282,8 +311,8 @@ oro_api:
             ...
 ```
 
-How to allow 3rd party bundles to extend existing section?
-----------------------------------------------------------
+How to allow to extend section?
+-------------------------------
 
 Let's extend the previous examples to allow extending the section from another bundles.
 
@@ -373,8 +402,8 @@ oro_api:
             ...
 ```
 
-Pre/PostProcessCallbacks in [ConfigExtensionInterface](../../Config/ConfigExtensionInterface.php)
-------------------------------------------------------
+Pre/PostProcessCallbacks in ConfigExtensionInterface
+----------------------------------------------------
 
 When the configs are processed they are first normalized, then merged and finally the tree is used to validate the result. So, the `getPreProcessCallbacks` methods will run before normalization and `getPostProcessCallbacks` will be used to validate. As an example see [TargetEntityDefinitionConfiguration](../../Config/Definition/TargetEntityDefinitionConfiguration.php), e.g.
 
@@ -403,41 +432,210 @@ When the configs are processed they are first normalized, then merged and finall
 Here's, the main idea is to cleanup empty sections in configuration.
 
 
-Config Sections
-===============
+Config loaders and ConfigExtraSectionInterface
+----------------------------------------------
 
-|Config Section | Description |
-| ---                   | :--- |
-|exclusions             | The section describes entity(ies) and\or field(s) exclusions | 
-| ---                   | --- |
-|entities               | The section describes entities configurations |
-|entities.entity        | The section describes whole single entity configuration with all fields, sorters, filters, etc. |
-|entities.entity.fields | The section describes the configuration of fields per certain entity|
-| ---                   | The relations configuration are similar to entity configuration|
-|relations              | The section describes relations configurations |
-|relations.entity       | The section describes whole single relation configuration with all fields, sorters, filters, etc. |
-|relations.entity.fields| The section describes the configuration of fields per certain relation |
-| ---                   | --- |
-|filters                | The section presents in both: entities and relations. Describes the configuration of filters |
-|filters.fields         | The section describes the filter configuration per fields |
-| ---                   | --- |
-|sorters                | The section presents in both: entities and relations. Describes the configuration of sorters |
-|sorters.fields         | The section describes the sorters configuration per fields |
-| ---                   | --- |
+Configuration loaders are represented with [ConfigLoaderInterface](../../Config/ConfigLoaderInterface.php) and [ConfigLoaderFactory](../../Config/ConfigLoaderFactory.php).
 
+ConfigLoaderInterface - Loads a configuration from an array
+ConfigLoaderFactory are used to:
+  - Determinate whether a loader for a given configuration type exists.
+  - Find the loader that can be used to load a given configuration type.
+  - Register or override the loader for a given configuration type.
 
-TODO: should be documented:
-===========================
-
--- ConfigExtraSectionInterface
-  This interface can be used to tell the Context that an additional data should be available as additional type of configuration. 
+ConfigExtraSectionInterface
+  The interface used to tell the Context that an additional data should be available as additional type of configuration. 
   So, "hasConfigOf", "getConfigOf" and "setConfigOf" methods of the Context can be used to access those data. 
 
--- ConfigExtraInterface
-  an interface for different kind requests for additional configuration data
 
--- ConfigLoaderInterface
- Loads a configuration from an array
+So, the responsibility of Config loaders is to pass configuration options from array(yaml) into objects. For example, we want to set values for our newly created properties for some entity, lets say `AcmeEntity`:
 
--- ConfigLoaderFactory
+Defining properties in `api.yml`: 
 
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
+            test_section:
+                test_property:     "test value"
+                test_property_new: "another test value"
+            ...
+```
+
+the Config:
+
+```php
+namespace Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension;
+
+use Oro\Bundle\ApiBundle\Config\Traits;
+
+class TestConfig
+{
+    use Traits\ConfigTrait;
+
+    const PROP1 = 'test_property';
+    const PROP2 = 'test_property_new';
+
+    /** @var array */
+    protected $items = [];
+
+    public function toArray()
+    {
+        return $this->items;
+    }
+
+    public function isEmpty()
+    {
+        return empty($this->items);
+    }
+```
+
+If it needs to have own setters/getters, just add them
+
+
+```php
+    public function getTestProperty()
+    {
+        return array_key_exists(self::PROP1, $this->items)
+            ? $this->items[self::PROP1]
+            : null;
+    }
+    public function getTestPropertyNew()
+    {
+        return array_key_exists(self::PROP2, $this->items)
+            ? $this->items[self::PROP2]
+            : null;
+    }
+    public function setTestProperty($value)
+    {
+        if ($value) {
+            $this->items[self::PROP1] = $value;
+        } else {
+            unset($this->items[self::PROP1]);
+        }
+    }
+    public function setTestPropertyNew($value)
+    {
+        if ($value) {
+            $this->items[self::PROP2] = $value;
+        } else {
+            unset($this->items[self::PROP2]);
+        }
+    }
+```
+
+the Config loader:
+
+
+```php
+namespace Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension;
+
+class TestConfigurationLoader extends AbstractConfigLoader implements ConfigLoaderInterface
+{
+    public function load(array $config)
+    {
+        $testConfig = new TestConfig();
+        foreach ($config as $key => $value) {
+            $this->setValue($testConfig, $key, $value);
+        }
+        return $testConfig;
+    }
+}
+```
+
+or if it needs to use own setters:
+
+```php
+class TestConfigurationLoader extends AbstractConfigLoader implements ConfigLoaderInterface
+{
+    /** @var array */
+    protected $methodMap = [
+        TestConfig::PROP1 => 'setTestProperty',
+        TestConfig::PROP2 => 'setTestPropertyNew'
+    ];
+
+    public function load(array $config)
+    {
+        $testConfig = new TestConfig();
+
+        foreach ($config as $key => $value) {
+            if (isset($this->methodMap[$key])) {
+                $this->callSetter($testConfig, $this->methodMap[$key], $value);
+            } else {
+                $this->setValue($testConfig, $key, $value);
+            }
+        }
+        return $testConfig;
+    }
+}
+```
+
+the next step is implementation of ConfigExtraSectionInterface
+
+
+```php
+namespace Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension;
+
+use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+
+class TestConfigurationExtra implements ConfigExtraInterface, ConfigExtraSectionInterface
+{
+    const NAME = 'test_section';
+
+    public function getName()
+    {
+        return self::NAME;
+    }
+
+    public function configureContext(ConfigContext $context)
+    {
+    }
+
+    public function isInheritable()
+    {
+        return true;
+    }
+
+    public function getConfigType()
+    {
+        return self::NAME;
+    }
+
+    public function getCacheKeyPart()
+    {
+        return self::NAME;
+    }
+}
+```
+
+And to check that all works fine just execute the `` command. The output will looks like this:
+
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            exclusion_policy: all
+            fields:
+                id: ~
+            order_by:
+                primary: DESC
+            filters:
+                exclusion_policy: all
+                fields:
+                    id:
+                        data_type: integer
+            sorters:
+                exclusion_policy: all
+                fields:
+                    id: ~
+            test_section:
+                test_property:     "test value"
+                test_property_new: "another test value"
+```
+
+Conclusion
+==========
+
+At this point we have newly created section with own properties and possibility to pass new configuration via yaml files. Please refer to [processors](processors.md) documentation section for more detail about how to use configuration in Data API logic.
