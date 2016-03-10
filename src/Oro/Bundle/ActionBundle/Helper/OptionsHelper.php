@@ -113,16 +113,24 @@ class OptionsHelper
      */
     protected function resolveOptions(ActionData $data, array $options)
     {
-        $resolvedOptions = $this->optionsAssembler->assemble($options);
+        return $this->resolveValues($data, $this->optionsAssembler->assemble($options));
+    }
 
-        foreach ($resolvedOptions as $key => $value) {
+    /**
+     * @param ActionData $data
+     * @param array $options
+     * @return array
+     */
+    protected function resolveValues(ActionData $data, array $options)
+    {
+        foreach ($options as $key => $value) {
             if (is_array($value)) {
-                $resolvedOptions[$key] = $this->resolveOptions($data, $value);
+                $options[$key] = $this->resolveValues($data, $value);
             } else {
-                $resolvedOptions[$key] = $this->contextAccessor->getValue($data, $value);
+                $options[$key] = $this->contextAccessor->getValue($data, $value);
             }
         }
 
-        return $resolvedOptions;
+        return $options;
     }
 }
