@@ -1,6 +1,6 @@
 css:
   'orosidebar':
       - 'bundles/orosidebar/css/less/sidebar.less'
-      - 'bundles/orosidebar/css/widget-add.css'
+      - 'bundles/orosidebar/css/less/widget-add.less'
       - 'bundles/orosidebar/css/modal.css'
       - 'bundles/orosidebar/sidebar_widgets/sticky_note/css/styles.css'
