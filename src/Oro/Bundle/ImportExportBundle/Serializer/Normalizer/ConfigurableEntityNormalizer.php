@@ -162,7 +162,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $result[$fieldName] = $fieldValue;
         }
 
-        return $this->dispatchNormalize($object, $result, $context, Events::AFTER_DENORMALIZE_ENTITY);
+        return $this->dispatchNormalize($object, $result, $context, Events::AFTER_NORMALIZE_ENTITY);
     }
 
     /**
