@@ -6,7 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
@@ -21,7 +21,7 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ActionManagerTest extends \PHPUnit_Framework_TestCase
+class OperationManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
     protected $operationRegistry;
@@ -32,7 +32,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper */
     protected $contextHelper;
 
-    /** @var ActionManager */
+    /** @var OperationManager */
     protected $manager;
 
     /**
@@ -52,7 +52,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new ActionManager($this->operationRegistry, $this->doctrineHelper, $this->contextHelper);
+        $this->manager = new OperationManager($this->operationRegistry, $this->doctrineHelper, $this->contextHelper);
     }
 
     /**
@@ -470,11 +470,11 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
         return [
             [
                 'actionName' => 'action2',
-                'expected' => ActionManager::DEFAULT_FORM_TEMPLATE
+                'expected' => OperationManager::DEFAULT_FORM_TEMPLATE
             ],
             [
                 'actionName' => 'action1',
-                'expected' => ActionManager::DEFAULT_PAGE_TEMPLATE
+                'expected' => OperationManager::DEFAULT_PAGE_TEMPLATE
             ],
             [
                 'actionName' => 'action4',
@@ -535,7 +535,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getActionData')
             ->willReturn(new ActionData());
 
-        $this->assertEquals($expectedOperations, array_keys($this->manager->getActions($inputContext)));
+        $this->assertEquals($expectedOperations, array_keys($this->manager->getOperations($inputContext)));
     }
 
     /**
@@ -569,7 +569,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
      * @param string $name
      * @return array
      */
-    protected function getActions($name = null)
+    protected function getOperations($name = null)
     {
         $actions = [
             'action1' => $this->getAction('action1', 50, ['show_dialog' => false]),

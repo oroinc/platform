@@ -7,7 +7,7 @@ use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -24,12 +24,12 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var ActionExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionManager */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
     protected $manager;
 
     protected function setUp()
     {
-        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
             ->disableOriginalConstructor()
             ->getMock();
 

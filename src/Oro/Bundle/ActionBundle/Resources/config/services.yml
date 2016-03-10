@@ -5,11 +5,11 @@ parameters:
     oro_action.helper.restrict.class: Oro\Bundle\ActionBundle\Helper\RestrictHelper
     oro_action.operation_registry.class: Oro\Bundle\ActionBundle\Model\OperationRegistry
     oro_action.action_group_registry.class: Oro\Bundle\ActionBundle\Model\ActionGroupRegistry
-    oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager
+    oro_action.operation_manager.class: Oro\Bundle\ActionBundle\Model\OperationManager
     oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\ActionFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_action.datagrid.action_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\ActionExtension
+    oro_action.datagrid.operation_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
     oro_action.layout.block_type.action_line_buttons.class: Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType
@@ -52,10 +52,11 @@ services:
             - @oro_action.configuration.provider.action_groups
             - @oro_action.assembler.action_group
 
-    oro_action.manager:
-        class: %oro_action.manager.class%
+    oro_action.operation_manager:
+        class: %oro_action.operation_manager.class%
         arguments:
             - @oro_action.operation_registry
+            - @oro_action.action_group_registry
             - @oro_entity.doctrine_helper
             - @oro_action.helper.context
 
@@ -99,7 +100,7 @@ services:
         class: %oro_action.form_manager.class%
         arguments:
             - @form.factory
-            - @oro_action.manager
+            - @oro_action.operation_manager
             - @oro_action.helper.context
 
     oro_action.api_manager:
@@ -109,10 +110,10 @@ services:
             - ''
             - @doctrine.orm.entity_manager
 
-    oro_action.datagrid.extension.action:
-        class: %oro_action.datagrid.action_extension.class%
+    oro_action.datagrid.extension.operation:
+        class: %oro_action.datagrid.operation_extension.class%
         arguments:
-            - @oro_action.manager
+            - @oro_action.operation_manager
             - @oro_action.helper.context
             - @oro_action.helper.applications
             - @oro_action.datagrid.mass_action_provider.registry
@@ -149,7 +150,7 @@ services:
     oro_action.layout.data_provider.actions_data_rpovider:
         class: %oro_action.layout.data_provider.actions_data_rpovider.class%
         arguments:
-            - @oro_action.manager
+            - @oro_action.operation_manager
             - @oro_action.helper.restrict
             - @translator
             - @oro_action.helper.context

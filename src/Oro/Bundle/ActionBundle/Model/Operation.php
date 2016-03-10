@@ -131,26 +131,7 @@ class Operation
      */
     public function isAvailable(ActionData $data, Collection $errors = null)
     {
-        if ($this->hasForm()) {
-            return $this->isPreconditionAllowed($data, $errors);
-        } else {
-            return $this->isAllowed($data, $errors);
-        }
-    }
-
-    /**
-     * Check is action allowed to execute
-     *
-     * @param ActionData $data
-     * @param Collection|null $errors
-     * @return bool
-     */
-    public function isAllowed(ActionData $data, Collection $errors = null)
-    {
-        throw new ForbiddenActionException('This function does not implemented yet');
-
-        return $this->isPreConditionAllowed($data, $errors) &&
-            $this->evaluateConditions($data, OperationDefinition::CONDITIONS, $errors);
+        return $this->isPreconditionAllowed($data, $errors);
     }
 
     /**
@@ -257,7 +238,7 @@ class Operation
     }
 
     /**
-     * @return array
+     * @return OperationActionGroup[]
      */
     public function getOperationActionGroups()
     {

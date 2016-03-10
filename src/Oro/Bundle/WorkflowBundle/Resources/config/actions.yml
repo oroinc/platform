@@ -227,7 +227,7 @@ services:
         class: %oro_workflow.action.run_action.class%
         arguments:
             - @oro_action.context_accessor
-            - @oro_action.manager
+            - @oro_action.operation_manager
             - @oro_action.helper.context
         tags:
             - { name: oro_workflow.action, alias: run_action }

@@ -9,7 +9,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\ActionFormManager;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,8 +19,8 @@ class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|FormFactoryInterface */
     protected $formFactory;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionManager */
-    protected $actionManager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
+    protected $operationManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper */
     protected $contextHelper;
@@ -36,7 +36,7 @@ class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
 
-        $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+        $this->operationManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -44,12 +44,12 @@ class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new ActionFormManager($this->formFactory, $this->actionManager, $this->contextHelper);
+        $this->manager = new ActionFormManager($this->formFactory, $this->operationManager, $this->contextHelper);
     }
 
     protected function tearDown()
     {
-        unset($this->manager, $this->formFactory, $this->actionManager, $this->contextHelper, $this->action);
+        unset($this->manager, $this->formFactory, $this->operationManager, $this->contextHelper, $this->action);
     }
 
     public function testGetActionForm()
@@ -69,7 +69,7 @@ class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getFormOptions')
             ->willReturn(['some_option' => 'option_value']);
 
-        $this->actionManager->expects($this->once())
+        $this->operationManager->expects($this->once())
             ->method('getAction')
             ->willReturnCallback(function ($actionName) {
                 $this->operation->expects($this->any())
@@ -95,6 +95,6 @@ class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
             )
             ->willReturn($form);
 
-        $this->assertSame($form, $this->manager->getActionForm($data, new ActionData(['data' => ['param']])));
+        $this->assertSame($form, $this->manager->getOperationForm($data, new ActionData(['data' => ['param']])));
     }
 }

@@ -8,17 +8,17 @@ use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\ActionBundle\Form\Type\ActionType;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 
 class ActionTypeTest extends FormIntegrationTestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionManager */
-    protected $actionManager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
+    protected $operationManager;
 
     /** @var RequiredAttributesListener */
     protected $requiredAttributesListener;
@@ -30,14 +30,14 @@ class ActionTypeTest extends FormIntegrationTestCase
     {
         parent::setUp();
 
-        $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+        $this->operationManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->requiredAttributesListener = new RequiredAttributesListener();
 
         $this->formType = new ActionType(
-            $this->actionManager,
+            $this->operationManager,
             $this->requiredAttributesListener,
             new ContextAccessor()
         );
@@ -45,7 +45,7 @@ class ActionTypeTest extends FormIntegrationTestCase
 
     protected function tearDown()
     {
-        unset($this->formType, $this->actionManager, $this->requiredAttributesListener);
+        unset($this->formType, $this->operationManager, $this->requiredAttributesListener);
     }
 
     /**

@@ -9,7 +9,7 @@ use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider;
 
 use Oro\Component\Layout\ContextInterface;
@@ -17,9 +17,9 @@ use Oro\Component\Layout\ContextInterface;
 class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ActionManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var OperationManager|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $actionManager;
+    protected $operationManager;
 
     /**
      * @var RestrictHelper|\PHPUnit_Framework_MockObject_MockObject
@@ -46,7 +46,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+        $this->operationManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -61,7 +61,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->dataProvider = new ActionsDataProvider(
-            $this->actionManager,
+            $this->operationManager,
             $this->restrictHelper,
             $this->translator,
             $this->contextHelper
@@ -188,7 +188,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
 
         $actionData = new ActionData(['key1' => 'val1']);
 
-        $this->actionManager->expects($this->once())
+        $this->operationManager->expects($this->once())
             ->method('getActions')
             ->will($this->returnValue($actions));
         $this->restrictHelper->expects($this->once())
