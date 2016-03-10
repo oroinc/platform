@@ -6,10 +6,10 @@ use Doctrine\Common\Util\ClassUtils;
 
 class FieldAccessor
 {
-    const KEY_FIELDS_ALL                         = '!fields';
-    const KEY_FIELDS_TO_SELECT                   = '!select';
-    const KEY_FIELDS_TO_SELECT_WITH_ASSOCIATIONS = '!assoc_select';
-    const KEY_FIELDS_TO_SERIALIZE                = '!serialize';
+    const KEY_FIELDS_ALL                         = 'fields';
+    const KEY_FIELDS_TO_SELECT                   = 'select';
+    const KEY_FIELDS_TO_SELECT_WITH_ASSOCIATIONS = 'select_assoc';
+    const KEY_FIELDS_TO_SERIALIZE                = 'serialize';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
