@@ -43,9 +43,7 @@ define([
                         .attr('disabled', value)
                         .trigger(value ? 'disable' : 'enable');
 
-                    if (!_.isUndefined($.uniform) && _.contains($.uniform.elements, el)) {
-                        $(el).uniform('update');
-                    }
+                    $(el).inputWidget('refresh');
                 });
 
                 prepareTinymce($(this).parents('.controls').find('textarea'));

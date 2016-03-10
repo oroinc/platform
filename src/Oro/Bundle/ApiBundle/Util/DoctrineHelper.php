@@ -21,19 +21,18 @@ class DoctrineHelper extends BaseHelper
     {
         $joins = $criteria->getJoins();
         if (!empty($joins)) {
-            $rootAlias = QueryUtils::getSingleRootAlias($qb);
+            $basePlaceholders = [];
+            foreach ($joins as $path => $join) {
+                $basePlaceholders[sprintf(Criteria::PLACEHOLDER_TEMPLATE, $path)] = $join->getAlias();
+            }
+            $basePlaceholders[Criteria::ROOT_ALIAS_PLACEHOLDER] = QueryUtils::getSingleRootAlias($qb);
             foreach ($joins as $join) {
-                $alias     = $join->getAlias();
-                $joinExpr  = str_replace(Criteria::ROOT_ALIAS_PLACEHOLDER, $rootAlias, $join->getJoin());
-                $condition = $join->getCondition();
+                $alias        = $join->getAlias();
+                $placeholders = array_merge($basePlaceholders, [Criteria::ENTITY_ALIAS_PLACEHOLDER => $alias]);
+                $joinExpr     = strtr($join->getJoin(), $placeholders);
+                $condition    = $join->getCondition();
                 if ($condition) {
-                    $condition = strtr(
-                        $condition,
-                        [
-                            Criteria::ROOT_ALIAS_PLACEHOLDER   => $rootAlias,
-                            Criteria::ENTITY_ALIAS_PLACEHOLDER => $alias
-                        ]
-                    );
+                    $condition = strtr($condition, $placeholders);
                 }
 
                 $method = strtolower($join->getJoinType()) . 'Join';

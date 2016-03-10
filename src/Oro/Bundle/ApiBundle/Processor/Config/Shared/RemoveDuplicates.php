@@ -26,6 +26,15 @@ abstract class RemoveDuplicates implements ProcessorInterface
      */
     protected function removeDuplicatedFields(EntityConfigInterface $section, $entityClass)
     {
+        if (!$section->hasFields()) {
+            // nothing to remove
+            return;
+        }
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            // only manageable entities are supported
+            return;
+        }
+
         $fieldKeys = array_keys($section->getFields());
         foreach ($fieldKeys as $fieldKey) {
             $field = $section->getField($fieldKey);

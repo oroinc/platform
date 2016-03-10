@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -59,7 +60,7 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
             $entityClass,
             $context->getVersion(),
             $context->getRequestType(),
-            $context->getExtras()
+            $context->getInheritableExtras()
         );
     }
 
@@ -67,14 +68,14 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      * @param string                 $version
-     * @param string[]               $requestType
+     * @param RequestType            $requestType
      * @param ConfigExtraInterface[] $extras
      */
     protected function completeAssociations(
         EntityDefinitionConfig $definition,
         $entityClass,
         $version,
-        array $requestType,
+        RequestType $requestType,
         array $extras
     ) {
         $metadata     = $this->doctrineHelper->getEntityMetadataForClass($entityClass);

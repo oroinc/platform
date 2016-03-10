@@ -19,7 +19,12 @@ class NormalizeDescriptionForFields extends NormalizeDescription
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
-        $fields     = $definition->getFields();
+        if (!$definition->hasFields()) {
+            // nothing to process
+            return;
+        }
+
+        $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {
             $label = $field->getLabel();
             if ($label instanceof Label) {

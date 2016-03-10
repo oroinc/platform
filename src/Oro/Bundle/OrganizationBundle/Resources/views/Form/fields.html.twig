@@ -20,45 +20,37 @@
         {% set attr = attr|merge({'class': attr.class is defined ? attr.class ~ ' horizontal' : 'horizontal'}) %}
         {% set attr = attr|merge({'class': attr.class ~ ' validate-group'}) %}
         <div {{ block('widget_container_attributes') }}>
-            <input type="hidden" name="{{ form.vars.full_name }}[organizations][]" value="{{ form.default_organization.vars.value }}" />
-            <input type="hidden" name="{{ form.vars.full_name }}[default_organization]" value="{{ form.default_organization.vars.value }}" />
-            {{ _self.renderOrganizationChildren(
-                form,
-                form.vars.organization_tree_ids[0].organization,
-                form.vars.organization_tree_ids,
-                form.vars.selected_business_units,
-                0
-            ) }}
+            {% set options = {
+                dataInputSelector: 'input[name="' ~ form.vars.full_name ~ '"]',
+                tree: [{id: default_organization, children: form.vars.organization_tree_ids}],
+                selectedBusinessUnits: form.vars.selected_business_units,
+                selectedOrganizations: form.vars.selected_organizations,
+                accordionEnabled: accordion_enabled
+            } %}
+            {% include 'OroOrganizationBundle:Js:organizationStructure.js.twig' %}
+            <div class="accordion organization-structure{% if not accordion_enabled %} disabled{% endif %}"
+                 data-page-component-module="oroorganization/js/app/components/organization-structure-tree-component"
+                 data-page-component-options="{{ options|json_encode }}">
+                <div class="accordion-group">
+                    <div class="accordion-heding{% if not accordion_enabled %} hide{% endif %}">
+                        <a class="accordion-toggle collapsed" data-toggle="collapse" href="#organization_{{ default_organization }}"></a>
+                        <input type="checkbox"
+                               data-name="organization"
+                               value="{{ form.vars.selected_organizations }}"
+                               checked="checked"
+                               class="hide org org-id-{{ form.vars.selected_organizations }}"/>
+                    </div>
+                    <div id="organization_{{ default_organization }}" class="accordion-body collapse{% if not accordion_enabled %} in{% endif %}">
+                        <div class="accordion-inner"></div>
+                    </div>
+                </div>
+                <input type="hidden" name="{{ form.vars.full_name }}"
+                       value="{{ {organizations: form.vars.selected_organizations,
+                                  businessUnits: form.vars.selected_business_units}|json_encode }}">
+            </div>
         </div>
     {% endspaceless %}
 {% endblock %}
-
-{% macro renderOrganizationChildren(form, org_id, children = {}, selected = {}, level = 1) %}
-    {% for child in children %}
-        <div class="oro-clearfix">
-            <span style="float:left;">
-            {% if level != 0 %}
-                {% for i in 1..level %}
-                    {% for si in 0..5 %}{{ '&nbsp;' }}{% endfor %}
-                {% endfor %}
-            {% endif %}
-            </span>
-            <input type="checkbox"
-                id="{{ form.vars.id }}_businessUnits_{{ child.id }}"
-                name="{{ form.vars.full_name }}[businessUnits][]"
-                value="{{ child.id }}"
-                {% if child.id in selected %} checked="checked" {% endif %}
-                class="bu"
-                data-organization="{{ org_id }}"
-            />
-            <label for="{{ form.vars.id }}_businessUnits_{{ child.id }}">{{ child.name }}</label>
-        </div>
-        {% if child.children is defined %}
-            {% set sublevel = level + 1 %}
-            {{ _self.renderOrganizationChildren(form, org_id, child.children, selected, sublevel) }}
-        {% endif %}
-    {% endfor %}
-{% endmacro %}
 
 {% block oro_type_choice_ownership_type_widget %}
     {% spaceless %}
@@ -123,7 +115,7 @@
                         {% set disable = 'disabled="disabled"' %}
                     {% endif %}
                 {% else %}
-                    {% if not (choice.value in business_unit_ids) or (entityId and entityId == choice.value) %}
+                    {% if not (business_unit_ids[choice.value] is defined) or (entityId and entityId == choice.value) %}
                         {% set disable = 'disabled="disabled"' %}
                     {% endif %}
                 {% endif %}
