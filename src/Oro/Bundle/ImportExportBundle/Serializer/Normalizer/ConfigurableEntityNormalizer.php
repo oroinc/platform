@@ -116,7 +116,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         $entityName = ClassUtils::getClass($object);
         $fields = $this->fieldHelper->getFields($entityName, true);
 
-        $result = [];
+        $result = $this->dispatchNormalize($object, [], $context, Events::BEFORE_NORMALIZE_ENTITY);
         foreach ($fields as $field) {
             $fieldName = $field['name'];
 
@@ -162,7 +162,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $result[$fieldName] = $fieldValue;
         }
 
-        return $this->dispatchNormalize($object, $result, $context);
+        return $this->dispatchNormalize($object, $result, $context, Events::AFTER_DENORMALIZE_ENTITY);
     }
 
     /**
@@ -245,14 +245,15 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      * @param $object
      * @param $result
      * @param array $context
+     * @param string $eventName
      *
      * @return array
      */
-    protected function dispatchNormalize($object, $result, array $context)
+    protected function dispatchNormalize($object, $result, array $context, $eventName)
     {
-        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_NORMALIZE_ENTITY)) {
+        if ($this->dispatcher && $this->dispatcher->hasListeners($eventName)) {
             $event = new NormalizeEntityEvent($object, $result, $this->getMode($context) === static::FULL_MODE);
-            $this->dispatcher->dispatch(Events::AFTER_NORMALIZE_ENTITY, $event);
+            $this->dispatcher->dispatch($eventName, $event);
 
             return $event->getResult();
         }
