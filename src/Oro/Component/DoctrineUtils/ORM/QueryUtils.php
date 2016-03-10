@@ -3,7 +3,9 @@
 namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\SQLParserUtils;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\QueryException;
@@ -66,6 +68,16 @@ class QueryUtils
         }
 
         return [$sqlParams, $types];
+    }
+
+    /**
+     * @param AbstractPlatform $platform
+     *
+     * @return ResultSetMapping
+     */
+    public static function createResultSetMapping(AbstractPlatform $platform)
+    {
+        return new PlatformResultSetMapping($platform);
     }
 
     /**
