@@ -23,10 +23,6 @@ use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 class DumpConfigCommand extends ContainerAwareCommand
 {
     /**
-     * Defined sections
-     *  key   -> section name
-     *  value -> FQCN
-     *
      * @var array
      */
     protected $knownExtras = [
@@ -80,7 +76,7 @@ class DumpConfigCommand extends ContainerAwareCommand
                 'Whether human-readable descriptions should be added'
             )
             ->addOption(
-                'with-extras',
+                'extra',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
                 'Whether any extra should be added. ' .
@@ -105,15 +101,14 @@ class DumpConfigCommand extends ContainerAwareCommand
 
         $extras = [];
 
-        if ($withExtras = $input->getOption('with-extras')) {
-            foreach ($withExtras as $extraName) {
-                if (array_key_exists($extraName, $this->knownExtras)) {
-                    $extras[] = new $this->knownExtras[$extraName];
-                } elseif (class_exists($extraName)
-                    && is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface', true)
-                ) {
-                    $extras[] = new $extraName;
-                }
+        $extraOptions = $input->getOption('extra');
+        foreach ($extraOptions as $extraName) {
+            if (array_key_exists($extraName, $this->knownExtras)) {
+                $extras[] = new $this->knownExtras[$extraName];
+            } elseif (class_exists($extraName)
+                && is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface', true)
+            ) {
+                $extras[] = new $extraName;
             }
         }
 

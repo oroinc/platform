@@ -609,7 +609,7 @@ class TestConfigurationExtra implements ConfigExtraInterface, ConfigExtraSection
 }
 ```
 
-And to check that all works fine just execute the `oro:api:config:dump acmeentity --with-extras="Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension\TestConfigurationExtra"` command. The output will looks like this:
+And to check that all works fine just execute the `oro:api:config:dump acmeentity --extra="Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension\TestConfigurationExtra"` command. The output will looks like this:
 
 
 ```yaml
