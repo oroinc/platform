@@ -46,6 +46,7 @@ oro:
             reply_all: Reply All
             reply: Reply
             forward: Forward
+            description: "This widget allows you to see most recent additions to your inbox and outbox"
         notification:
             menu_item.hint: Recent Emails
             mark_read.label: Mark all as Read
