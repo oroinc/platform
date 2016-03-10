@@ -12,6 +12,13 @@ final class Events
     const AFTER_ENTITY_PAGE_LOADED = 'oro.import_export.after_entity_page_loaded';
 
     /**
+     * This event occurs before entity is normalized.
+     *
+     * Can be used to change entity data or prefill normalized data before normalization.
+     */
+    const BEFORE_NORMALIZE_ENTITY = 'oro.import_export.before_normalize_entity';
+
+    /**
      * This event occurs after entity is normalized.
      *
      * Can be used to change normalized data.
