@@ -175,10 +175,10 @@ define(function(require) {
             var placeholders = this.options.confirmation.message_parameters || {};
 
             var messages = {
-                title : (this.options.confirmation.title || this.messages.confirm_title),
-                content : (this.options.confirmation.message || this.messages.confirm_content),
-                okText : (this.options.confirmation.okText || this.messages.confirm_ok),
-                cancelText : (this.options.confirmation.cancelText || this.messages.confirm_cancel)
+                title: (this.options.confirmation.title || this.messages.confirm_title),
+                content: (this.options.confirmation.message || this.messages.confirm_content),
+                okText: (this.options.confirmation.okText || this.messages.confirm_ok),
+                cancelText: (this.options.confirmation.cancelText || this.messages.confirm_cancel)
             };
 
             _.each(messages, function(item, key, list) {
