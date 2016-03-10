@@ -619,17 +619,7 @@ oro_api:
             exclusion_policy: all
             fields:
                 id: ~
-            order_by:
-                primary: DESC
-            filters:
-                exclusion_policy: all
-                fields:
-                    id:
-                        data_type: integer
-            sorters:
-                exclusion_policy: all
-                fields:
-                    id: ~
+                ...
             test_section:
                 test_property:     "test value"
                 test_property_new: "another test value"
