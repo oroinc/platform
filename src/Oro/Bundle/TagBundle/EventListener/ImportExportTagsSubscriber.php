@@ -17,9 +17,9 @@ use Oro\Bundle\ImportExportBundle\Event\Events;
 use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 use Oro\Bundle\ImportExportBundle\Event\LoadTemplateFixturesEvent;
 use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
+use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 use Oro\Bundle\TagBundle\Manager\TagImportManager;
 use Oro\Bundle\TagBundle\Entity\Tag;
-use Oro\Bundle\ImportExportBundle\Event\StrategyEvent;
 
 class ImportExportTagsSubscriber implements EventSubscriberInterface
 {
