@@ -46,11 +46,6 @@ class DeleteDataByProcessHandler implements ProcessorInterface
             return;
         }
 
-        if (!$context->isSecurityChecked()) {
-            // security is not checked
-            return;
-        }
-
         $this->deleteHandler->processDelete($object, $this->doctrineHelper->getEntityManager($object));
         $context->removeObject();
     }

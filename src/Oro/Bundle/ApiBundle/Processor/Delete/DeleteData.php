@@ -41,11 +41,6 @@ class DeleteData implements ProcessorInterface
             return;
         }
 
-        if (!$context->isSecurityChecked()) {
-            // security is not checked
-            return;
-        }
-
         $em = $this->doctrineHelper->getEntityManager($object);
         $em->remove($object);
         $em->flush();
