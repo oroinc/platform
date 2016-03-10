@@ -34,12 +34,6 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
 
-#    oro_api.delete.normalize_include_header:
-#        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
-#        tags:
-#            - { name: oro.api.processor, action: delete, group: initialize, priority: 50 }
-
-
     oro_api.delete.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
@@ -85,14 +79,14 @@ services:
     oro_api.delete.validate_result:
         class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateObject
         tags:
-            - { name: oro.api.processor, action: delete, group: load_data, priority: -250 }
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -20 }
 
     oro_api.delete.security_check_data:
         class: Oro\Bundle\ApiBundle\Processor\Delete\SecurityCheck
         arguments:
             - @oro_security.security_facade
         tags:
-            - { name: oro.api.processor, action: delete, group: load_data, priority: -20 }
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -250 }
 
     #
     # delete_data
