@@ -137,6 +137,8 @@ parameters:
     oro_email.workflow.action.strip_html_tags.class:    Oro\Bundle\EmailBundle\Model\Action\StripHtmlTags
     oro_email.workflow.action.add_activity_target.class: Oro\Bundle\EmailBundle\Model\Action\AddActivityTarget
 
+    oro_email.model.email_activity_updates.class: Oro\Bundle\EmailBundle\Model\EmailActivityUpdates
+
 services:
     oro_email.entity.cache.warmer:
         class: %oro_email.entity.cache.warmer.class%
@@ -180,11 +182,24 @@ services:
         public: false
         class: %oro_email.email_flag_manager_loader_selector.class%
 
+    oro_email.email_address.entity_manager:
+        public: false
+        class: Doctrine\ORM\EntityManager
+        factory: [@doctrine, getManagerForClass]
+        arguments:
+            - 'OroEmailBundle:EmailAddress'
+
+    oro_email.link.email_address.entity_manager:
+        tags:
+            - { name: oro_service_link,  service: oro_email.email_address.entity_manager }
+
     oro_email.email.address.manager:
         class: %oro_email.email.address.manager.class%
         arguments:
             - %oro_email.entity.cache_namespace%
             - %oro_email.entity.proxy_name_template%
+        calls:
+            - [setEntityManagerLink, [@oro_email.link.email_address.entity_manager]]
 
     oro_email.email.owner.provider.storage:
         public: false
@@ -258,13 +273,21 @@ services:
             - @oro_email.email.owner.provider
             - @event_dispatcher
 
+    oro_email.link.email.activity.manager:
+        tags:
+            - { name: oro_service_link,  service: oro_email.email.activity.manager }
+
+    oro_email.link.email.thread.manager:
+        tags:
+            - { name: oro_service_link,  service: oro_email.email.thread.manager }
+
     oro_email.listener.entity_listener:
         class: %oro_email.listener.entity_listener.class%
         arguments:
             - @oro_email.email.owner.manager
-            - @oro_email.email.activity.manager
-            - @oro_email.email.thread.manager
-            - @oro_email.provider.emailowners.provider
+            - @oro_email.link.email.activity.manager
+            - @oro_email.link.email.thread.manager
+            - @oro_email.model.email_activity_updates
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -589,6 +612,7 @@ services:
             - @oro_email.email.thread.provider
             - @security.token_storage
             - @oro_security.owner.entity_owner_accessor.link
+            - @=service('doctrine').getManagerForClass('OroEmailBundle:Email')
 
     oro_email.email.thread.provider:
         class: %oro_email.email.thread.provider.class%
@@ -597,6 +621,7 @@ services:
         class: %oro_email.email.thread.manager.class%
         arguments:
             - @oro_email.email.thread.provider
+            - @=service('doctrine').getManagerForClass('OroEmailBundle:EmailThread')
 
     oro_email.email.manager:
         class: %oro_email.email.manager.class%
@@ -964,3 +989,9 @@ services:
             - @event_dispatcher
         calls:
             - [setLogger, [@logger]]
+
+    oro_email.model.email_activity_updates:
+         class: %oro_email.model.email_activity_updates.class%
+         arguments:
+             - @oro_email.provider.emailowners.provider
+             - @oro_entity.doctrine_helper
