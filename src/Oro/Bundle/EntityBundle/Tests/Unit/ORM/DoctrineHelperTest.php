@@ -157,6 +157,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function testIsNewEntityDataProvider()
     {
         $entityWithTwoId = new ItemStub();
@@ -251,6 +254,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getSingleEntityIdentifierDataProvider
+     * @param integer $expected
+     * @param array $identifiers
+     * @param bool $throwException
      */
     public function testGetSingleEntityIdentifier($expected, array $identifiers, $throwException = true)
     {
@@ -428,6 +434,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getSingleEntityIdentifierFieldNameDataProvider
+     * @param string $expected
+     * @param array $identifiers
+     * @param bool $throwException
      */
     public function testGetSingleEntityIdentifierFieldName($expected, array $identifiers, $throwException = true)
     {
@@ -502,6 +511,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getSingleEntityIdentifierFieldTypeDataProvider
+     * @param string $expected
+     * @param array $identifiers
+     * @param bool $throwException
      */
     public function testGetSingleEntityIdentifierFieldType($expected, array $identifiers, $throwException = true)
     {
@@ -535,6 +547,9 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function getSingleEntityIdentifierFieldTypeDataProvider()
     {
         return [
@@ -669,6 +684,8 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getEntityMetadataDataProvider
+     * @param string|object $entityOrClass
+     * @param string $class
      */
     public function testGetEntityMetadata($entityOrClass, $class)
     {
@@ -779,6 +796,7 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getEntityManagerDataProvider
+     * @param string|object $entityOrClass
      */
     public function testGetEntityManager($entityOrClass)
     {
@@ -1051,9 +1069,14 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testManagersCache()
     {
-        $this->registry->expects($this->once())->method('getManagerForClass')->willReturn($this->em);
+        $this->registry
+            ->expects($this->exactly(2))
+            ->method('getManagerForClass')
+            ->willReturn($this->onConsecutiveCalls($this->em, null));
 
         $this->doctrineHelper->getEntityManager('\stdClass');
         $this->doctrineHelper->getEntityManager('\stdClass');
+        $this->doctrineHelper->getEntityManager(new TestEntity(), false);
+        $this->doctrineHelper->getEntityManager(new TestEntity(), false);
     }
 }

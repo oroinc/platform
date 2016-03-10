@@ -173,16 +173,20 @@ abstract class AbstractFieldsExtension extends AbstractExtension
     protected function prepareColumnOptions(FieldConfigId $field, array &$columnOptions)
     {
         $fieldName = $field->getFieldName();
-        // if field is visible as mandatory it is required in grid settings and rendered
-        // and not required and hidden by default otherwise.
-        $isMandatory = $this->getFieldConfig('datagrid', $field)
-                ->get('is_visible') === DatagridScope::IS_VISIBLE_MANDATORY;
+
+        // if field is "visible as mandatory" it is required in grid settings and rendered
+        // if field is just "visible" it's rendered by default and manageable in grid settings
+        // otherwise - not required and hidden by default.
+        $gridVisibilityValue = $this->getFieldConfig('datagrid', $field)->get('is_visible');
+
+        $isRequired   = $gridVisibilityValue === DatagridScope::IS_VISIBLE_MANDATORY;
+        $isRenderable = $isRequired ? : $gridVisibilityValue === DatagridScope::IS_VISIBLE_TRUE;
 
         $columnOptions = [
             DatagridGuesser::FORMATTER => [
                 'label'      => $this->getFieldConfig('entity', $field)->get('label') ? : $fieldName,
-                'renderable' => $isMandatory,
-                'required'   => $isMandatory
+                'renderable' => $isRenderable,
+                'required'   => $isRequired
             ],
             DatagridGuesser::SORTER    => [
                 'data_name' => $fieldName

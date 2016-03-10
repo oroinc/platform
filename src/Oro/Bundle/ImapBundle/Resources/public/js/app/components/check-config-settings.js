@@ -8,6 +8,14 @@ define(['jquery', 'underscore'], function($, _) {
      * @param {string} options.elementNamePrototype
      */
     return function(options) {
+        function setVisibility(controlCheckbox, configValues) {
+            var isEnabled = $(controlCheckbox).is(':checked');
+            configValues.each(function() {
+                $(this).closest('.control-group').toggle(isEnabled);
+                $(this).enable(isEnabled);
+            });
+        }
+
         var $el = $(options._sourceElement);
         var $parentContainer = $el.parent().parent();
         var useImap = $parentContainer.find('.imap-config:checkbox');
@@ -15,38 +23,14 @@ define(['jquery', 'underscore'], function($, _) {
         var imapFields = $parentContainer.find('input.imap-config,select.imap-config').not(':checkbox');
         var smtpFields = $parentContainer.find('input.smtp-config,select.smtp-config').not(':checkbox');
 
-        if (useImap.prop('checked') === false) {
-            imapFields.each(function() {
-                $(this).parents('.control-group').hide();
-                $(this).enable(false);
-            });
-        }
-        if (useSmtp.prop('checked') === false) {
-            smtpFields.each(function() {
-                $(this).parents('.control-group').hide();
-                $(this).enable(false);
-            });
-        }
+        setVisibility(useImap, imapFields);
+        setVisibility(useSmtp, smtpFields);
 
         $(useImap).on('change', function() {
-            configShowHide(useImap, imapFields);
+            setVisibility(this, imapFields);
         });
         $(useSmtp).on('change', function() {
-            configShowHide(useSmtp, smtpFields);
+            setVisibility(this, smtpFields);
         });
-
-        var configShowHide = function(controlCheckbox, configValues) {
-            if (controlCheckbox.is(':checked')) {
-                configValues.each(function() {
-                    $(this).parents('.control-group').show();
-                    $(this).enable();
-                });
-            } else {
-                configValues.each(function() {
-                    $(this).parents('.control-group').hide();
-                    $(this).enable(false);
-                });
-            }
-        };
     };
 });

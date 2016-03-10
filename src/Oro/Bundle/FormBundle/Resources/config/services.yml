@@ -4,6 +4,7 @@ parameters:
     oro_form.twig.js_validation_extension.class: Oro\Bundle\FormBundle\Twig\JsValidationExtension
     oro_form.model.update_handler.class:         Oro\Bundle\FormBundle\Model\UpdateHandler
     oro_form.provider.html_tag_provider.class:   Oro\Bundle\FormBundle\Provider\HtmlTagProvider
+    oro_form.event.event_dispatcher.class:       Oro\Bundle\FormBundle\Event\EventDispatcher
 
 services:
     oro_form.validator.constraint_factory:
@@ -27,7 +28,7 @@ services:
             - @session
             - @oro_ui.router
             - @oro_entity.doctrine_helper
-            - @event_dispatcher
+            - @oro_form.event.event_dispatcher
 
     oro_form.provider.html_tag_provider:
         class: %oro_form.provider.html_tag_provider.class%
@@ -36,3 +37,8 @@ services:
         class: Oro\Bundle\FormBundle\EventListener\CountQueryOptimizationListener
         tags:
             - { name: kernel.event_listener, event: oro.entity.count_query.optimize, method: onOptimize }
+
+    oro_form.event.event_dispatcher:
+        class: %oro_form.event.event_dispatcher.class%
+        arguments:
+            - @event_dispatcher

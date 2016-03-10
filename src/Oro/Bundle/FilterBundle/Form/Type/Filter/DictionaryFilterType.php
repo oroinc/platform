@@ -3,11 +3,11 @@
 namespace Oro\Bundle\FilterBundle\Form\Type\Filter;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\AbstractType;
 
 class DictionaryFilterType extends AbstractType
 {
@@ -99,7 +99,7 @@ class DictionaryFilterType extends AbstractType
                 'populate_default' => false,
                 'default_value' => null,
                 'null_value' => null,
-                'class' => null,
+                'class' => '',
                 'operator_choices' => [
                     self::TYPE_IN => $this->translator->trans('oro.filter.form.label_type_in'),
                     self::TYPE_NOT_IN => $this->translator->trans('oro.filter.form.label_type_not_in'),

@@ -82,15 +82,13 @@ define(function(require) {
         onChangeCheckBox: function(e) {
             this.resetGoogleErrorMessage();
             this.resetToken();
-            this.render();
+            this.hideMessages();
 
             if ($(e.target).is(':checked')) {
                 this.canShowMessage = true;
                 this.trigger('requestToken');
-                this.$googleWarningMessage.hide();
             } else {
                 this.canShowMessage = false;
-                this.trigger('change:canShowMessage');
                 this.$googleWarningMessage.show();
             }
         },
@@ -119,6 +117,7 @@ define(function(require) {
             this.$errorMessage.hide();
             this.$successMessage.hide();
             this.$googleErrorMessage.hide();
+            this.$googleWarningMessage.hide();
         },
 
         /**

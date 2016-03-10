@@ -876,8 +876,6 @@
                     {% elseif (ownerType == 'BUSINESS_UNIT') %}
                         {% set ownerPath = path('oro_business_unit_view', {'id': owner.id}) %}
                         {% set ownerName = owner.name %}
-                    {% elseif (ownerType == 'ORGANIZATION') %}
-                        {% set ownerName = owner.name %}
                     {% endif %}
                     {% if ownerName is defined %}
                         {% if renderLabel %}
@@ -962,3 +960,21 @@
         {% endfor -%}
     </ul>
 {% endmacro %}
+
+{%- macro entityViewLink(entity, label, route, permission) -%}
+    {% if entity %}
+        {% if route and resource_granted(permission|default('VIEW'), entity) %}
+            {{ _self.renderUrl(path(route, {'id': entity.id}), label) }}
+        {% else %}
+            {{ label|escape }}
+        {% endif %}
+    {% endif %}
+{%- endmacro -%}
+
+{%- macro entityViewLinks(entities, labelProperty, route, permission) -%}
+    {% set links = [] %}
+    {% for entity in entities %}
+        {% set links = links|merge([_self.entityViewLink(entity, attribute(entity, labelProperty), route, permission)]) %}
+    {% endfor %}
+    {{ _self.renderList(links) }}
+{%- endmacro -%}

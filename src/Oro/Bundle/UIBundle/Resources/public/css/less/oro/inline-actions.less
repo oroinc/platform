@@ -1,7 +1,6 @@
 .inline-actions-element {
   position: relative;
   top: -4px;
-  left: -2px;
   line-height: 19px;
   display: inline-block;
   margin-bottom: -3px;
@@ -17,7 +16,7 @@
   }
   &.inline-actions-element_no-actions:hover {
     background: transparent;
-    outline: none;
+    .inline-actions-element-outline(transparent);
   }
   .inline-actions-element_wrapper {
     word-break: break-all;
@@ -29,9 +28,10 @@
 .inline-actions-element_actions {
   display: inline-block;
   vertical-align: top;
+  margin:0 2px;
   .btn {
     font: 0/0 a;
-    width: 23px;
+    width: 19px;
     height: 23px;
     padding: 0;
     &, &:focus, &:active, &:hover {
@@ -44,6 +44,7 @@
     [class^="icon-"], [class*=" icon-"] {
       width: 14px;
       height: 20px;
+      margin:0 1px;
       &:before {
         font: @baseFontSize/26px 'FontAwesome';
         color: @inlineActionColor;

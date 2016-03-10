@@ -173,9 +173,6 @@
   }
   .accordion-body {
     padding: 0;
-    .control-group{
-      max-width: none;
-    }
     > .message {
       .user-fieldset {
         margin-top: 5px;
@@ -195,6 +192,9 @@
     .pagination{
       white-space: nowrap;
       padding-top: 1px;
+      width: 375px;
+      margin: 0 auto;
+      text-align: center;
       > ul > li a{
         width:24px;
         i {
@@ -206,45 +206,6 @@
       padding-bottom: 5px;
     }
   }
-}
-@media screen and (max-width: 650px){
-  .mobile-version .activity-list-widget {
-    .grid-toolbar .btn-group {
-      margin: 0 10px 10px 0;
-    }
-    .pagination {
-      width: 100%;
-      overflow: hidden;
-      text-overflow: ellipsis;
-    }
-    .accordion > .items {
-      .message-item {
-        clear: left;
-        margin: 7px 0 7px 4px;
-        width: calc(~"100% - 186px");
-      }
-      .details {
-        min-width: 0;
-        max-width: calc(~"100% - 72px");
-        margin-right: 0;
-      }
-      .actions {
-        margin-left: 0;
-        margin-right: -10px;
-      }
-    }
-    .accordion-body {
-      .widget-content > .responsive-block {
-        min-width: 100%;
-      }
-      .message .comment {
-        padding: 0 ;
-      }
-    }
-  }
-}
-.mobile-version .activity-list-widget .accordion-body .message .comment {
-  padding-right: 0;
 }
 
 li[data-criteria="condition-activity"] {

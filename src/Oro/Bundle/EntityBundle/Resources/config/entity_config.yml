@@ -140,7 +140,8 @@ oro_entity_config:
                         options:
                             choices:
                                 0: 'No'
-                                1: 'Yes'
+                                1: oro.entity.entity_config.datagrid.field.items.is_visible.shown
+                                3: oro.entity.entity_config.datagrid.field.items.is_visible.hidden
                                 2: oro.entity.entity_config.datagrid.field.items.is_visible.mandatory
                             empty_value:    false
                             block:          other
@@ -251,4 +252,12 @@ oro_entity_config:
                 # if not specified the virtual fields are created for all fields, except identifier ones
                 virtual_fields: # array of strings
                     options:
-                        auditable:          false
+                        auditable: false
+                # specify the list of fields used for searching in the reports filter
+                search_fields: # array of strings
+                    options:
+                        auditable: false
+                # specify representation field used for rendering titles for search items in the reports filter
+                representation_field: # string
+                    options:
+                        auditable: false

@@ -29,6 +29,7 @@ define(function(require) {
             $(this.listSelector).html('');
 
             this.$el.hide();
+            this.collection.map(this.collectionAdd, this);
         },
 
         collectionAdd: function(model) {

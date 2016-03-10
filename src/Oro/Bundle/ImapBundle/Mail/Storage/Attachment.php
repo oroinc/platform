@@ -79,6 +79,16 @@ class Attachment
     }
 
     /**
+     * Gets the attached file size
+     *
+     * @return int size
+     */
+    public function getFileSize()
+    {
+        return $this->part->getSize();
+    }
+
+    /**
      * Gets the attachment content
      *
      * @return Content

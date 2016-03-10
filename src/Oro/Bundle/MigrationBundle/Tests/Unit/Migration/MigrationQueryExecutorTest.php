@@ -35,7 +35,7 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
         $query = 'DELETE FROM some_table';
 
         $this->logger->expects($this->once())
-            ->method('notice')
+            ->method('info')
             ->with($query);
         $this->connection->expects($this->once())
             ->method('executeQuery')
@@ -49,7 +49,7 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
         $query = 'DELETE FROM some_table';
 
         $this->logger->expects($this->once())
-            ->method('notice')
+            ->method('info')
             ->with($query);
         $this->connection->expects($this->never())
             ->method('executeQuery');
@@ -97,7 +97,7 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queryDescription));
 
         $this->logger->expects($this->once())
-            ->method('notice')
+            ->method('info')
             ->with($queryDescription);
 
         $query->expects($this->never())
@@ -117,10 +117,10 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queryDescription));
 
         $this->logger->expects($this->at(0))
-            ->method('notice')
+            ->method('info')
             ->with($queryDescription[0]);
         $this->logger->expects($this->at(1))
-            ->method('notice')
+            ->method('info')
             ->with($queryDescription[1]);
 
         $query->expects($this->never())
@@ -140,7 +140,7 @@ class MigrationQueryExecutorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queryDescription));
 
         $this->logger->expects($this->never())
-            ->method('notice');
+            ->method('info');
 
         $query->expects($this->never())
             ->method('execute');

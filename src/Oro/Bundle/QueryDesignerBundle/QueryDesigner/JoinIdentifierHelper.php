@@ -55,6 +55,7 @@ class JoinIdentifierHelper
      * @param string|null $joinType
      * @param string|null $conditionType
      * @param string|null $condition
+     *
      * @return string
      */
     public function buildJoinIdentifier(
@@ -83,6 +84,7 @@ class JoinIdentifierHelper
      * Returns the join identifier for the given column
      *
      * @param string $columnName
+     *
      * @return string
      */
     public function buildColumnJoinIdentifier($columnName)
@@ -93,7 +95,13 @@ class JoinIdentifierHelper
     /**
      * Gets all join identifiers the given column name consists
      *
+     * As example, for 'rootEntityField+Class\Name::joinedEntityRelation+Relation\Class::fieldToSelect' column
+     * the result will be:
+     * - 'Root\Class::rootEntityField'
+     * - 'Root\Class::rootEntityField+Class\Name::joinedEntityRelation'
+     *
      * @param string $columnName
+     *
      * @return string[]
      */
     public function explodeColumnName($columnName)
@@ -112,6 +120,7 @@ class JoinIdentifierHelper
      * Gets all join identifiers the given join identifier consists
      *
      * @param string $joinId
+     *
      * @return string[]
      */
     public function explodeJoinIdentifier($joinId)
@@ -131,7 +140,9 @@ class JoinIdentifierHelper
      * Extracts a parent join identifier
      *
      * @param string $joinId
+     *
      * @return string
+     *
      * @throws \LogicException if incorrect join identifier specified
      */
     public function getParentJoinIdentifier($joinId)
@@ -153,6 +164,7 @@ class JoinIdentifierHelper
      *
      * @param string $joinId          The join identifier
      * @param string $joinByFieldName The name of a field should be used to join new table
+     *
      * @return string The join identifier
      */
     public function buildSiblingJoinIdentifier($joinId, $joinByFieldName)
@@ -179,6 +191,7 @@ class JoinIdentifierHelper
      * Extracts an entity class name for the given column or from the given join identifier
      *
      * @param string $columnNameOrJoinId
+     *
      * @return string|null
      */
     public function getEntityClassName($columnNameOrJoinId)
@@ -212,6 +225,7 @@ class JoinIdentifierHelper
      * Extracts a field name for the given column or from the given join identifier
      *
      * @param string $columnNameOrJoinId
+     *
      * @return string
      */
     public function getFieldName($columnNameOrJoinId)
@@ -238,6 +252,7 @@ class JoinIdentifierHelper
      * Checks if the given join identifier represents unidirectional relationship
      *
      * @param string $joinId
+     *
      * @return bool
      */
     public function isUnidirectionalJoin($joinId)
@@ -279,7 +294,7 @@ class JoinIdentifierHelper
         $startDelimiter = $this->getStartPosition($joinId, '+');
         $endDelimiter   = strpos($joinId, '|', $startDelimiter);
 
-        $lastJoinPart  = false === $endDelimiter
+        $lastJoinPart = false === $endDelimiter
             ? substr($joinId, $startDelimiter)
             : substr($joinId, $startDelimiter, $endDelimiter - $startDelimiter);
 
@@ -292,6 +307,7 @@ class JoinIdentifierHelper
      * Extracts the join part from the given join identifier
      *
      * @param $joinId
+     *
      * @return string
      */
     public function getJoin($joinId)
@@ -308,6 +324,7 @@ class JoinIdentifierHelper
      * Extracts the join type from the given join identifier
      *
      * @param $joinId
+     *
      * @return null|string NULL for autodetect, or a string represents the join type, for example 'inner' or 'left'
      */
     public function getJoinType($joinId)
@@ -334,6 +351,7 @@ class JoinIdentifierHelper
      * Extracts the join condition type from the given join identifier
      *
      * @param $joinId
+     *
      * @return null|string NULL if not specified
      *                     or a string represents the join condition type, for example 'WITH' or 'ON'
      */
@@ -366,6 +384,7 @@ class JoinIdentifierHelper
      * Extracts the join condition from the given join identifier
      *
      * @param $joinId
+     *
      * @return null|string NULL if not specified, or a string represents the join condition
      */
     public function getJoinCondition($joinId)
@@ -399,11 +418,13 @@ class JoinIdentifierHelper
     /**
      * @param string $str
      * @param string $needle
+     *
      * @return int
      */
     protected function getStartPosition($str, $needle)
     {
         $startDelimiter = strrpos($str, $needle);
+
         return false === $startDelimiter
             ? 0
             : $startDelimiter + strlen($needle);

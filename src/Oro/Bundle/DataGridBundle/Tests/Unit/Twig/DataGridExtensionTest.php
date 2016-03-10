@@ -180,6 +180,11 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($gridName, $gridScope)
             ->will($this->returnValue($gridFullName));
 
+        $this->nameStrategy->expects($this->once())
+            ->method('getGridUniqueName')
+            ->with($gridFullName)
+            ->will($this->returnValue($gridFullName));
+
         $this->router->expects($this->once())
             ->method('generate')
             ->with(

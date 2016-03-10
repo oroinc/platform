@@ -8,7 +8,8 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessJob;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Event\ProcessEvents;
 use Oro\Bundle\WorkflowBundle\Event\ProcessHandleEvent;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
+
+use Oro\Component\Action\Exception\InvalidParameterException;
 
 class ProcessHandler
 {
@@ -58,10 +59,6 @@ class ProcessHandler
             ProcessEvents::HANDLE_BEFORE,
             new ProcessHandleEvent($processTrigger, $processData)
         );
-
-        if (!$processData['data']) {
-            throw new InvalidParameterException('Invalid process data. Entity can not be empty.');
-        }
 
         $process = $this->getProcess($processTrigger);
         $process->execute($processData);

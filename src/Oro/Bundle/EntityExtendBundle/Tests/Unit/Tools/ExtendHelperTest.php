@@ -28,6 +28,24 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider buildToManyRelationTargetFieldNameProvider
+     */
+    public function testBuildToManyRelationTargetFieldName($entityClassName, $fieldName, $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            ExtendHelper::buildToManyRelationTargetFieldName($entityClassName, $fieldName)
+        );
+    }
+
+    public static function buildToManyRelationTargetFieldNameProvider()
+    {
+        return [
+            ['Oro\Bundle\TestBundle\Entity\Test', 'testField', 'test_testField'],
+        ];
+    }
+
+    /**
      * @dataProvider buildAssociationNameProvider
      */
     public function testBuildAssociationName($targetEntityClassName, $associationKind, $expected)
@@ -61,6 +79,14 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(
             'manyToOne|Test\Entity|Test\TargetEntity|testField',
             ExtendHelper::buildRelationKey('Test\Entity', 'testField', 'manyToOne', 'Test\TargetEntity')
+        );
+    }
+
+    public function testGetRelationType()
+    {
+        $this->assertEquals(
+            'manyToOne',
+            ExtendHelper::getRelationType('manyToOne|Test\Entity|Test\TargetEntity|testField')
         );
     }
 

@@ -2,7 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
-use Symfony\Component\Yaml\Parser;
+use Oro\Bundle\ApiBundle\Request\DataType;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
 {
@@ -10,13 +11,6 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
      * FQCN of the entity being used for testing.
      */
     const ENTITY_CLASS = 'Oro\Bundle\UserBundle\Entity\User';
-
-    /**
-     * Local cache for expectations
-     *
-     * @var array
-     */
-    protected $expectations = [];
 
     /**
      * {@inheritdoc}
@@ -35,6 +29,14 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
     }
 
     /**
+     * {@inheritdoc}
+     */
+    protected function getRequestType()
+    {
+        return new RequestType([RequestType::REST, RequestType::JSON_API]);
+    }
+
+    /**
      * @param array $params
      * @param array $expects
      *
@@ -42,7 +44,11 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
      */
     public function testGetEntityWithIncludeParameter($params, $expects)
     {
-        $entityAlias = $this->entityClassTransformer->transform(self::ENTITY_CLASS);
+        $entityAlias = $this->valueNormalizer->normalizeValue(
+            self::ENTITY_CLASS,
+            DataType::ENTITY_TYPE,
+            $this->getRequestType()
+        );
 
         // test get list request
         $this->client->request(
@@ -99,7 +105,7 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
                     'include' => 'owner,organization',
                     'fields'  => [
                         'users' => 'phone,title,username,email,firstName,middleName,lastName,enabled,owner',
-                        'owner' => 'name,phone,website,email,fax,organization,owner,users'
+                        'businessunits' => 'name,phone,website,email,fax,organization,owner,users'
                     ],
                 ],
                 'expects' => $this->loadExpectation('output_2.yml')
@@ -108,10 +114,10 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
                 'params'  => [
                     'include' => 'organization',
                     'fields'  => [
-                        'users' => 'username,firstName,lastName,email,organization',
-                        'owner' => 'name,phone,website,email,fax',
-                        'organization' => 'enabled',
-                        'roles' => 'name'
+                        'users' => 'username,firstName,lastName,email,organization,owner,roles',
+                        'businessunits' => 'name,phone,website,email,fax',
+                        'organizations' => 'enabled',
+                        'userroles' => 'name'
                     ],
                 ],
                 'expects' => $this->loadExpectation('output_3.yml')
@@ -123,26 +129,18 @@ class GetRestJsonApiWithIncludeFieldsTest extends ApiTestCase
                     ],
                 ],
                 'expects' => $this->loadExpectation('output_4.yml')
-            ]
+            ],
+            'Include of third level entity' => [
+                'params'  => [
+                    'include' => 'owner,owner.organization',
+                    'fields'  => [
+                        'users' => 'username,email,owner',
+                        'businessunits' => 'name,organization',
+                        'organizations' => 'enabled'
+                    ],
+                ],
+                'expects' => $this->loadExpectation('output_5.yml')
+            ],
         ];
-    }
-
-    /**
-     * @param $filename
-     *
-     * @return array
-     */
-    protected function loadExpectation($filename)
-    {
-        if (!isset($this->expectations[$filename])) {
-            $expectedContent = file_get_contents(
-                __DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $filename
-            );
-            $ymlParser       = new Parser();
-
-            $this->expectations[$filename] = $ymlParser->parse($expectedContent);
-        }
-
-        return $this->expectations[$filename];
     }
 }

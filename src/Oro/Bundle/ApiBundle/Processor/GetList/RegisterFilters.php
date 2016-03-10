@@ -4,11 +4,14 @@ namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
+/**
+ * Registers filters according to the "filters" configuration section.
+ */
 class RegisterFilters implements ProcessorInterface
 {
     /** @var FilterFactoryInterface */
@@ -30,60 +33,51 @@ class RegisterFilters implements ProcessorInterface
         /** @var GetListContext $context */
 
         $configOfFilters = $context->getConfigOfFilters();
-        if (empty($configOfFilters)) {
+        if (null === $configOfFilters || $configOfFilters->isEmpty()) {
             // a filters' configuration does not contains any data
             return;
         }
 
-        if (!ConfigUtil::isExcludeAll($configOfFilters)) {
+        if (!$configOfFilters->isExcludeAll()) {
             // it seems that filters' configuration was not normalized
             throw new \RuntimeException(
                 sprintf(
                     'Expected "all" exclusion policy for filters. Got: %s.',
-                    ConfigUtil::getExclusionPolicy($configOfFilters)
+                    $configOfFilters->getExclusionPolicy()
                 )
             );
         }
 
-        $fields  = ConfigUtil::getArrayValue($configOfFilters, ConfigUtil::FIELDS);
         $filters = $context->getFilters();
-        foreach ($fields as $field => $fieldConfig) {
-            if ($filters->has($field)) {
+        $fields  = $configOfFilters->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($filters->has($fieldName)) {
                 continue;
             }
-            $filter = $this->createFilter(
-                !empty($fieldConfig[ConfigUtil::PROPERTY_PATH]) ? $fieldConfig[ConfigUtil::PROPERTY_PATH] : $field,
-                $fieldConfig
-            );
+            $filter = $this->createFilter($fieldName, $field);
             if (null !== $filter) {
-                $filters->add($field, $filter);
+                $filters->add($fieldName, $filter);
             }
         }
     }
 
     /**
-     * @param string $field
-     * @param array  $fieldConfig
+     * @param string            $fieldName
+     * @param FilterFieldConfig $field
      *
      * @return StandaloneFilter|null
      */
-    protected function createFilter($field, array $fieldConfig)
+    protected function createFilter($fieldName, FilterFieldConfig $field)
     {
-        $filter = $this->filterFactory->createFilter($fieldConfig[ConfigUtil::DATA_TYPE]);
+        $filter = $this->filterFactory->createFilter($field->getDataType());
         if (null !== $filter) {
             if ($filter instanceof ComparisonFilter) {
-                $filter->setField($field);
+                $filter->setField($field->getPropertyPath() ?: $fieldName);
             }
             if ($filter instanceof StandaloneFilter) {
-                if (isset($fieldConfig[ConfigUtil::ALLOW_ARRAY])) {
-                    $filter->setArrayAllowed($fieldConfig[ConfigUtil::ALLOW_ARRAY]);
-                }
-                if (isset($fieldConfig[ConfigUtil::DESCRIPTION])) {
-                    $filter->setDescription($fieldConfig[ConfigUtil::DESCRIPTION]);
-                }
-                if (isset($fieldConfig[ConfigUtil::DEFAULT_VALUE])) {
-                    $filter->setDefaultValue($fieldConfig[ConfigUtil::DEFAULT_VALUE]);
-                }
+                $filter->setArrayAllowed($field->isArrayAllowed());
+                $filter->setDescription($field->getDescription());
+                $filter->setDefaultValue($field->getDefaultValue());
             }
         }
 

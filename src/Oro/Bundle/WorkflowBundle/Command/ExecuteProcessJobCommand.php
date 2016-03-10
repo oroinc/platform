@@ -103,10 +103,9 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
                 $start = microtime(true);
                 $output->writeln(
                     sprintf(
-                        '<info>[%s] Executing process job #%d "%s" (%s)</info>',
+                        '<info>[%s] Executing process job #%d %s</info>',
                         (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
                         $processJobId,
-                        $processDefinition->getLabel(),
                         $processDefinition->getName()
                     )
                 );
@@ -121,10 +120,9 @@ class ExecuteProcessJobCommand extends ContainerAwareCommand
 
                 $output->writeln(
                     sprintf(
-                        '<info>[%s] Process job #%d %s successfully finished in %f s</info>',
+                        '<info>[%s] Process job #%d successfully finished in %f s</info>',
                         (new \DateTime('now', new \DateTimeZone('UTC')))->format('Y-m-d H:i:s'),
                         $processJobId,
-                        $processDefinition->getName(),
                         microtime(true) - $start
                     )
                 );

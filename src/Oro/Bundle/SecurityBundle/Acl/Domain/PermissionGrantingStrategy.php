@@ -268,8 +268,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         $aceMask   = $ace->getMask();
 
         if ($acl->getObjectIdentity()->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            $isFieldExtension = FieldAclExtension::EXTENSION_KEY == $extension->getExtensionKey();
-            $isEntityIdentity = EntityAclExtension::EXTENSION_KEY == $acl->getObjectIdentity()->getIdentifier();
+            $isFieldExtension = FieldAclExtension::NAME == $extension->getExtensionKey();
+            $isEntityIdentity = EntityAclExtension::NAME == $acl->getObjectIdentity()->getIdentifier();
             $isFieldFallback = $isFieldExtension && $isEntityIdentity;
 
             if ($acl->getObjectIdentity()->getIdentifier() !== $extension->getExtensionKey() && !$isFieldFallback) {

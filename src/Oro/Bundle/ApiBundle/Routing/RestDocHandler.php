@@ -7,6 +7,7 @@ use Symfony\Component\Routing\Route;
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Nelmio\ApiDocBundle\Extractor\HandlerInterface;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
@@ -17,7 +18,6 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
@@ -32,15 +32,15 @@ class RestDocHandler implements HandlerInterface
             'description'          => 'Get {name}',
             'fallback_description' => 'Get {class}',
             'get_name_method'      => 'getEntityClassName',
-            'description_key'      => ConfigUtil::LABEL,
-            'documentation_key'    => ConfigUtil::DESCRIPTION
+            'description_key'      => EntityDefinitionConfig::LABEL,
+            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
         ],
         'get_list' => [
             'description'          => 'Get {name}',
             'fallback_description' => 'Get a list of {class}',
             'get_name_method'      => 'getEntityClassPluralName',
-            'description_key'      => ConfigUtil::PLURAL_LABEL,
-            'documentation_key'    => ConfigUtil::DESCRIPTION
+            'description_key'      => EntityDefinitionConfig::PLURAL_LABEL,
+            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
         ],
     ];
 
@@ -61,6 +61,9 @@ class RestDocHandler implements HandlerInterface
 
     /** @var ValueNormalizer */
     protected $valueNormalizer;
+
+    /** @var RequestType */
+    protected $requestType;
 
     /**
      * @param RestDocViewDetector              $docViewDetector
@@ -84,6 +87,7 @@ class RestDocHandler implements HandlerInterface
         $this->entityAliasResolver     = $entityAliasResolver;
         $this->doctrineHelper          = $doctrineHelper;
         $this->valueNormalizer         = $valueNormalizer;
+        $this->requestType             = new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -102,7 +106,7 @@ class RestDocHandler implements HandlerInterface
         $entityClass = $this->getEntityClass($route);
         if ($entityClass) {
             $config = $this->getConfig($action, $entityClass);
-            $this->setDescription($annotation, $action, (array)$config->getConfig(), $entityClass);
+            $this->setDescription($annotation, $action, $config->getConfig()->toArray(), $entityClass);
             if ($this->hasAttribute($route, RestRouteOptionsResolver::ID_PLACEHOLDER)) {
                 $this->addIdRequirement(
                     $annotation,
@@ -147,9 +151,9 @@ class RestDocHandler implements HandlerInterface
         $context = $processor->createContext();
         $context->removeConfigExtra(SortersConfigExtra::NAME);
         $context->addConfigExtra(new DescriptionsConfigExtra());
-        $context->setRequestType(RequestType::REST);
+        $context->getRequestType()->add(RequestType::REST);
         if ('rest_json_api' === $this->docViewDetector->getView()) {
-            $context->setRequestType(RequestType::JSON_API);
+            $context->getRequestType()->add(RequestType::JSON_API);
         }
         $context->setLastGroup('initialize');
         if ($entityClass) {
@@ -260,7 +264,7 @@ class RestDocHandler implements HandlerInterface
                     'description' => $filter->getDescription(),
                     'requirement' => $this->valueNormalizer->getRequirement(
                         $filter->getDataType(),
-                        [RequestType::REST, RequestType::JSON_API],
+                        $this->requestType,
                         $filter->isArrayAllowed()
                     )
                 ];

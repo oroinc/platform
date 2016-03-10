@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -42,6 +42,9 @@ class ControllersRoleTest extends WebTestCase
         $this->assertContains("Role saved", $crawler->html());
     }
 
+    /**
+     * @depends testCreate
+     */
     public function testUpdate()
     {
         $response = $this->client->requestGrid(
@@ -206,6 +209,9 @@ class ControllersRoleTest extends WebTestCase
         $this->assertEquals(AccessLevel::NONE_LEVEL, $fieldInput->getAttribute('value'));
     }
 
+    /**
+     * @depends testUpdate
+     */
     public function testGridData()
     {
         $response = $this->client->requestGrid(

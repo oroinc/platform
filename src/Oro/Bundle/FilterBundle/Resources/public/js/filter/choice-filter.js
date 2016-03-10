@@ -163,7 +163,7 @@ define([
             var leftWidth = this.$('.choice-filter .dropdown-toggle').outerWidth();
             var rightWidth = this.$('.filter-update').outerWidth();
             valueFrame.css('margin-left', leftWidth);
-            valueFrame.css('margin-right', rightWidth);
+            valueFrame.css('padding-right', rightWidth);
             // update class of criteria dropdown
             type = this.$(this.criteriaValueSelectors.type).val();
             isEmptyType = this.isEmptyType(type);

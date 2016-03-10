@@ -62,7 +62,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
      */
     public function createDirectories($dirs)
     {
-        $this->logger->notice('Creating directories');
+        $this->logger->info('Creating directories');
 
         foreach ($dirs as $index => $dir) {
             $current = $index + 1;
@@ -95,7 +95,7 @@ class CrowdinAdapter extends AbstractAPIAdapter
      */
     public function uploadFiles($files, $mode)
     {
-        $this->logger->notice('Uploading files');
+        $this->logger->info('Uploading files');
 
         $failed  = [];
         $current = 0;

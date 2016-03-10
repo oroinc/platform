@@ -69,7 +69,13 @@ define(function(require) {
             _.defaults(this.options.activityListOptions, defaults.activityListOptions);
             _.defaults(this.options.commentOptions, defaults.commentOptions);
 
-            activityListData = JSON.parse(this.options.activityListData);
+            try {
+                activityListData = JSON.parse(this.options.activityListData);
+            } catch (e) {
+                mediator.execute('showMessage', 'error', __('oro.activitylist.load_error'));
+                activityListData = {data: [], count: 0};
+            }
+
             this.options.activityListData = activityListData.data;
             this.options.activityListCount = activityListData.count;
 

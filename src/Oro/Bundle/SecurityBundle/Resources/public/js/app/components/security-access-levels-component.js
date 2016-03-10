@@ -65,7 +65,7 @@ define(function(require) {
                         selectDiv.append(selector);
                         selectDiv.show();
                         linkDiv.remove();
-                        selector.uniform('update');
+                        selector.inputWidget('refresh');
                         selector.on('change', function(e) {
                             mediator.trigger('securityAccessLevelsComponent:link:click', {
                                 accessLevel: $(e.target).val(),

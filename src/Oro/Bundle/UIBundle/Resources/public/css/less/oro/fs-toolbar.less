@@ -20,7 +20,19 @@
     }
     & > .hide-button{
       background: none;
-
+      color: #ccc;
+      &:before{
+        content: "\f147";
+        font: 18px 'FontAwesome';
+        text-align: center;
+        display: inline-block;
+        width: 100%;
+        padding-top: 12px;
+      }
+      &:hover {
+        background: white;
+        color: #333E48;
+      }
     }
   }
   .sf-toolbar-block .sf-toolbar-icon > a,

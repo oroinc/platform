@@ -90,13 +90,6 @@ define([
         buttonActiveClass: 'open-filter',
 
         /**
-         * Null link value
-         *
-         * @property {String}
-         */
-        nullLink: '#',
-
-        /**
          * Element enclosing a criteria dropdown
          *
          * @property {Array.<string|jQuery|HTMLElement>}

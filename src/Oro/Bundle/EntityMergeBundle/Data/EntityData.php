@@ -67,9 +67,6 @@ class EntityData
             $this->addEntity($entity);
         }
 
-        $masterEntity = reset($entities);
-        $this->setMasterEntity($masterEntity);
-
         return $this;
     }
 
@@ -155,10 +152,6 @@ class EntityData
     {
         $field = new FieldData($this, $metadata);
         $this->fields[$field->getFieldName()] = $field;
-
-        if ($this->getMasterEntity()) {
-            $field->setSourceEntity($this->getMasterEntity());
-        }
 
         return $field;
     }

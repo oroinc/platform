@@ -106,15 +106,7 @@ define([
          */
         beforePageChange: function(e) {
             var action = $(e.target).data('action');
-            var href = $(e.target).attr('href');
-            if (
-                action !== 'cancel' &&
-                    !this._isStateTraceRequired() &&
-                    this._isStateChanged() &&
-                    !mediator.execute('compareUrl', href) && // link to same page
-                    // jshint -W107
-                    href.substr(0, 11) !== 'javascript:' // javascript code link
-            ) {
+            if (action !== 'cancel' && !this._isStateTraceRequired() && this._isStateChanged()) {
                 e.prevented = !window.confirm(__('oro.ui.leave_page_with_unsaved_data_confirm'));
             }
         },

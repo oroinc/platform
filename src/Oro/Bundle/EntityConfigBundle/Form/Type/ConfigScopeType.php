@@ -60,12 +60,9 @@ class ConfigScopeType extends AbstractType
                 $options = isset($config['form']['options']) ? $config['form']['options'] : array();
 
                 $options['config_id']     = $this->config->getId();
-                $options['config_is_new'] = $this->configModel->getId() == false;
+                $options['config_is_new'] = !$this->configModel->getId();
 
-                /**
-                 * Disable field on editAction
-                 */
-                if (isset($config['options']['create_only']) && $this->configModel->getId()) {
+                if ($this->isDisabledItem($config)) {
                     $options['disabled'] = true;
                     $this->appendClassAttr($options, 'disabled-' . $config['form']['type']);
                 }
@@ -108,7 +105,7 @@ class ConfigScopeType extends AbstractType
                             }
 
                             //check if requirement property is set in this form
-                            if ($className == $this->config->getId()->getClassName()) {
+                            if ($className === $this->config->getId()->getClassName()) {
                                 if ($fieldName) {
                                     if ($this->config->getId() instanceof FieldConfigId
                                         && $this->config->getId()->getFieldName() == $fieldName
@@ -161,6 +158,37 @@ class ConfigScopeType extends AbstractType
         return 'oro_entity_config_scope_type';
     }
 
+    /**
+     * @param array $config
+     *
+     * @return bool
+     */
+    protected function isDisabledItem(array $config)
+    {
+        $createOnly = isset($config['options']['create_only']) && $config['options']['create_only'];
+
+        // disable config attribute if its value cannot be changed
+        if ($createOnly && $this->configModel->getId()) {
+            return true;
+        }
+
+        // disable field config attribute if its value cannot be changed for some field types
+        // an attribute marked as create only should not be disabled on create field page
+        if ($this->config->getId() instanceof FieldConfigId
+            && !empty($config['options']['immutable_type'])
+            && in_array($this->config->getId()->getFieldType(), $config['options']['immutable_type'], true)
+            && (!$createOnly || $this->configModel->getId())
+        ) {
+            return true;
+        }
+
+        return false;
+    }
+
+    /**
+     * @param array  $options
+     * @param string $cssClass
+     */
     protected function appendClassAttr(array &$options, $cssClass)
     {
         if (isset($options['attr']['class'])) {
@@ -170,6 +198,11 @@ class ConfigScopeType extends AbstractType
         }
     }
 
+    /**
+     * @param array  $options
+     * @param string $name
+     * @param mixed  $value
+     */
     protected function setAttr(array &$options, $name, $value)
     {
         if (!isset($options['attr'])) {

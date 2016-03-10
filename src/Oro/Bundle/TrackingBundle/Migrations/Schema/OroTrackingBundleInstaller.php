@@ -20,7 +20,7 @@ class OroTrackingBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_7';
+        return 'v1_8';
     }
 
     /**
@@ -191,6 +191,7 @@ class OroTrackingBundleInstaller implements Installation
         $table->addIndex(['website_id'], 'idx_d204b98018f45c82', []);
         $table->addIndex(['visitor_uid'], 'visit_visitorUid_idx', []);
         $table->addIndex(['user_identifier'], 'visit_userIdentifier_idx', []);
+        $table->addIndex(['website_id', 'first_action_time'], 'website_first_action_time_idx', []);
     }
 
     /**

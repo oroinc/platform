@@ -30,9 +30,13 @@
 @headerTextColor:                 #cad2da;
 @inlineActionColor:               #94b4c9;
 @inlineActionBackground:          #edf5fb;
-@rowHighlightBackground:          #fffeea;
-@rowSelectedBackground:           @inlineActionBackground;
-@cellSelectedBorder:              @inlineActionColor;
+@cellSelectedBackground:          @inlineActionBackground;
+@rowSelectedBackground:           #FDF8E4;
+@rowHighlightBackground:          lighten(@rowSelectedBackground, 2%);
+@cellSuccessBackground:           #f1f8dc;
+@cellSuccessColor:                #96b76d;
+@cellErrorBackground:             #fcd4d3;
+@cellLoadingBackground:           #f5f5f5;
 @sideBarClosedWidth:              33px;
 @sideBarOpenedWidth:              200px;
 
@@ -80,6 +84,8 @@
 @tagItemBackground:               #aaa;
 @tagMyItemBackground:             #ccc;
 
+@errorMessageBalloonBackground:   lighten(@errorText, 20%);
+
 // Links
 @linkColor:                       #006acc;
 @linkColorHover:                  darken(@linkColor, 10%);
@@ -96,3 +102,6 @@
 
 // Z-indexs
 @oroZindexDropdown:                     900;
+
+@dotMenuDropdownMinHeight:        168px;
+@dotMenuDropdownMaxHeight:        330px;

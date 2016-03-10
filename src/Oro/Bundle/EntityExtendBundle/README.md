@@ -125,6 +125,8 @@ class OroCRMSalesBundle implements Migration, ExtendExtensionAwareInterface
 }
 ```
 
+More examples you can find in [relations chapter](./Resources/doc/relations.md).
+
 Add option set field
 --------------------
 The option set is a special type of a field which allows to choose one or more options from a predefined set of options. Oro Platform provides two different data types for these purposes:

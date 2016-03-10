@@ -91,8 +91,8 @@ class CleanupCommand extends ContainerAwareCommand implements CronCommandInterfa
             $message = 'Removed %d rows';
         }
 
-        $logger->notice(sprintf($message, $result));
-        $logger->notice('Completed');
+        $logger->info(sprintf($message, $result));
+        $logger->info('Completed');
 
         return self::EXITCODE_SUCCESS;
     }

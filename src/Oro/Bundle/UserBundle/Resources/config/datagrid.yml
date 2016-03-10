@@ -34,6 +34,10 @@ datagrid:
             enabled:
                 label:         oro.user.enabled.label
                 frontend_type: select
+                inline_editing:
+                    editor:
+                        view_options:
+                            key_type: 'boolean'
                 choices:
                    - Inactive
                    - Active

@@ -28,8 +28,6 @@ parameters:
     oro_entity_extend.entity_config_type.extension.enum.class:  Oro\Bundle\EntityExtendBundle\Form\Extension\EnumFieldConfigExtension
     oro_entity_extend.type.enum_choice.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumChoiceType
     oro_entity_extend.type.enum_select.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumSelectType
-    oro_entity_extend.type.enum_filter.class:                   Oro\Bundle\EntityExtendBundle\Form\Type\EnumFilterType
-    oro_entity_extend.type.dictionary_filter.class:             Oro\Bundle\EntityExtendBundle\Form\Type\DictionaryFilterType
 
     oro_entity_extend.form.guesser.extend_field.class:          Oro\Bundle\EntityExtendBundle\Form\Guesser\ExtendFieldTypeGuesser
 
@@ -218,22 +216,6 @@ services:
             - @doctrine
         tags:
             - { name: form.type, alias: oro_enum_select }
-
-    oro_entity_extend.type.enum_filter:
-        class: %oro_entity_extend.type.enum_filter.class%
-        arguments:
-            - @translator
-            - @oro_entity_extend.enum_value_provider
-        tags:
-            - { name: form.type, alias: oro_enum_filter }
-
-    oro_entity_extend.type.dictionary_filter:
-        class: %oro_entity_extend.type.dictionary_filter.class%
-        arguments:
-            - @translator
-            - @oro_entity_extend.enum_value_provider
-        tags:
-            - { name: form.type, alias: oro_dictionary_filter }
 
     oro_entity_extend.form.guesser.extend_field:
         class: %oro_entity_extend.form.guesser.extend_field.class%

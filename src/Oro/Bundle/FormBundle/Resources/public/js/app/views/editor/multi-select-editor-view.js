@@ -84,12 +84,11 @@ define(function(require) {
             return options;
         },
 
-        getFormattedValue: function() {
-            return this.getModelValue().join(',');
+        formatRawValue: function(value) {
+            return this.parseRawValue(value).join(',');
         },
 
-        getModelValue: function() {
-            var value = this.model.get(this.fieldName);
+        parseRawValue: function(value) {
             if (_.isString(value)) {
                 value = JSON.parse(value);
             }

@@ -81,6 +81,10 @@ define([
                 label: this.inline ? null : this.label
             }));
 
+            if (this.filter.selectWidget) {
+                this.filter.selectWidget.multiselect('getButton').hide();
+            }
+
             if (this.inline) {
                 this.filter.$el.find(this.selectors.itemHint).append(this.$el);
             } else {

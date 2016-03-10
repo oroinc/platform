@@ -9,7 +9,7 @@ parameters:
     oro_migration.migration.extension.rename.class:      Oro\Bundle\MigrationBundle\Migration\Extension\RenameExtension
     oro_migration.tools.schema_dumper.class:             Oro\Bundle\MigrationBundle\Tools\SchemaDumper
     oro_migration.twig.schema_dumper.class:              Oro\Bundle\MigrationBundle\Twig\SchemaDumperExtension
-    oro_migration.migration.extension.data_strore.class: Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension
+    oro_migration.migration.extension.data_storage.class: Oro\Bundle\MigrationBundle\Migration\Extension\DataStorageExtension
 services:
     oro_migration.db_id_name_generator:
         class: %oro_migration.db_id_name_generator.class%
@@ -54,8 +54,8 @@ services:
         tags:
             - { name: oro_migration.extension, extension_name: rename }
 
-    oro_migration.migration.extension.data_strore:
-        class: %oro_migration.migration.extension.data_strore.class%
+    oro_migration.migration.extension.data_storage:
+        class: %oro_migration.migration.extension.data_storage.class%
         tags:
             - { name: oro_migration.extension, extension_name: data_store }
 

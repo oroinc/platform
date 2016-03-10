@@ -48,3 +48,15 @@ services:
         class: %oro_report.listener.segment_subscriber.class%
         tags:
             - { name: kernel.event_subscriber }
+
+    oro_report.grid.extension.store_sql:
+        class: Oro\Bundle\ReportBundle\Grid\StoreSqlExtension
+        arguments:
+            - @oro_security.security_facade
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_report.event_listener.store_sql:
+        class: Oro\Bundle\ReportBundle\EventListener\StoreSqlListener
+        tags:
+            - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.after, method: onResultAfter }

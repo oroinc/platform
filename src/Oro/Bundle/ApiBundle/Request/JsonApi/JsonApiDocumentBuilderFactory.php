@@ -2,27 +2,27 @@
 
 namespace Oro\Bundle\ApiBundle\Request\JsonApi;
 
-use Oro\Bundle\ApiBundle\Request\EntityClassTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 class JsonApiDocumentBuilderFactory
 {
-    /** @var EntityClassTransformerInterface */
-    protected $entityClassTransformer;
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
 
     /** @var EntityIdTransformerInterface */
     protected $entityIdTransformer;
 
     /**
-     * @param EntityClassTransformerInterface $entityClassTransformer
-     * @param EntityIdTransformerInterface    $entityIdTransformer
+     * @param ValueNormalizer              $valueNormalizer
+     * @param EntityIdTransformerInterface $entityIdTransformer
      */
     public function __construct(
-        EntityClassTransformerInterface $entityClassTransformer,
+        ValueNormalizer $valueNormalizer,
         EntityIdTransformerInterface $entityIdTransformer
     ) {
-        $this->entityClassTransformer = $entityClassTransformer;
-        $this->entityIdTransformer    = $entityIdTransformer;
+        $this->valueNormalizer     = $valueNormalizer;
+        $this->entityIdTransformer = $entityIdTransformer;
     }
 
     /**
@@ -31,7 +31,7 @@ class JsonApiDocumentBuilderFactory
     public function createDocumentBuilder()
     {
         return new JsonApiDocumentBuilder(
-            $this->entityClassTransformer,
+            $this->valueNormalizer,
             $this->entityIdTransformer
         );
     }

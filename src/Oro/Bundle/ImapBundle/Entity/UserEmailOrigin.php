@@ -112,11 +112,6 @@ class UserEmailOrigin extends EmailOrigin
     protected $clientId;
 
     /**
-     * @var string
-     */
-    protected $googleAuthCode;
-
-    /**
      * Gets the host name of IMAP server
      *
      * @return string
@@ -425,21 +420,5 @@ class UserEmailOrigin extends EmailOrigin
     public function getClientId()
     {
         return $this->clientId;
-    }
-
-    /**
-     * @param string $value
-     */
-    public function setGoogleAuthCode($value)
-    {
-        $this->googleAuthCode = $value;
-    }
-
-    /**
-     * @return string
-     */
-    public function getGoogleAuthCode()
-    {
-        return $this->googleAuthCode;
     }
 }

@@ -6,9 +6,9 @@ use Doctrine\ORM\Mapping\ClassMetadataInfo;
 
 use Oro\Bundle\EntityMergeBundle\Event\EntityMetadataEvent;
 use Oro\Bundle\EntityMergeBundle\MergeEvents;
-use Oro\Bundle\EntityMergeBundle\Metadata\MetadataFactory;
 use Oro\Bundle\EntityMergeBundle\Metadata\MetadataBuilder;
 use Oro\Bundle\EntityMergeBundle\Model\MergeModes;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class MetadataBuilderTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,6 +39,16 @@ class MetadataBuilderTest extends \PHPUnit_Framework_TestCase
      */
     protected $eventDispatcher;
 
+    /**
+     * @var ConfigProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $entityExtendConfigProvider;
+
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $additionalMetadataProvider;
+
     protected function setUp()
     {
         $this->eventDispatcher = $this->getMock('Symfony\\Component\\EventDispatcher\\EventDispatcherInterface');
@@ -55,10 +65,16 @@ class MetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->entityExtendConfigProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->metadataBuilder = new MetadataBuilder(
             $this->metadataFactory,
             $this->doctrineHelper,
-            $this->eventDispatcher
+            $this->eventDispatcher,
+            $this->entityExtendConfigProvider
         );
     }
 
@@ -71,6 +87,16 @@ class MetadataBuilderTest extends \PHPUnit_Framework_TestCase
             ->method('getMetadataFor')
             ->with(self::CLASS_NAME)
             ->will($this->returnValue($this->classMetadata));
+
+        $this->entityExtendConfigProvider->expects($this->any())
+                ->method('getConfigs')
+                ->with(static::CLASS_NAME)
+                ->will($this->returnValue([]));
+
+        $this->classMetadata->name = static::CLASS_NAME;
+        $this->classMetadata->expects($this->any())
+            ->method('getIdentifierFieldNames')
+            ->will($this->returnValue(['id']));
 
         // Test creation of entity metadata
         $entityMetadataCallIndex = 0;
@@ -85,24 +111,24 @@ class MetadataBuilderTest extends \PHPUnit_Framework_TestCase
         // Test adding doctrine fields
         $doctrineFieldNames = ['id', 'foo_field', 'bar_field'];
         $doctrineFieldNamesWithoutId = ['foo_field', 'bar_field'];
-        $classMetadataCallIndex = 0;
 
         $idFieldNames = ['id'];
-        $this->classMetadata->expects($this->at($classMetadataCallIndex++))
+        $this->classMetadata->expects($this->any())
             ->method('getIdentifierFieldNames')
             ->will($this->returnValue($idFieldNames));
 
-        $this->classMetadata->expects($this->at($classMetadataCallIndex++))
+        $this->classMetadata->expects($this->any())
             ->method('getFieldNames')
             ->will($this->returnValue($doctrineFieldNames));
 
+        $this->classMetadata->expects($this->any())
+            ->method('getFieldMapping')
+            ->will($this->returnCallback(function ($fieldName) {
+                return ['fieldName' => $fieldName];
+            }));
+
         foreach ($doctrineFieldNamesWithoutId as $fieldName) {
             $fieldMapping = ['fieldName' => $fieldName];
-
-            $this->classMetadata->expects($this->at($classMetadataCallIndex++))
-                ->method('getFieldMapping')
-                ->with($fieldName)
-                ->will($this->returnValue($fieldMapping));
 
             $fieldMetadata = $this->createFieldMetadata();
 
@@ -122,9 +148,15 @@ class MetadataBuilderTest extends \PHPUnit_Framework_TestCase
             'bar_association' => ['bar' => 'baz']
         ];
 
-        $this->classMetadata->expects($this->at($classMetadataCallIndex++))
-            ->method('getAssociationMappings')
-            ->will($this->returnValue($associationMappings));
+        $this->classMetadata->expects($this->any())
+            ->method('getAssociationNames')
+            ->will($this->returnValue(array_keys($associationMappings)));
+
+        $this->classMetadata->expects($this->any())
+            ->method('getAssociationMapping')
+            ->will($this->returnCallback(function ($association) use ($associationMappings) {
+                return $associationMappings[$association];
+            }));
 
         foreach ($associationMappings as $fieldName => $associationMapping) {
             $fieldMetadata = $this->createFieldMetadata();
@@ -139,88 +171,46 @@ class MetadataBuilderTest extends \PHPUnit_Framework_TestCase
                 ->with($fieldMetadata);
         }
 
-        // Test adding doctrine inverse associations
-        $allMetadata = [
-            self::CLASS_NAME => $this->classMetadata,
-            'Namespace\\FooEntity' => $fooClassMetadata = $this->createClassMetadata(),
-            'Namespace\\BarEntity' => $barClassMetadata = $this->createClassMetadata(),
-            'Namespace\\FooBarEntity' => $fooBarClassMetadata = $this->createClassMetadata(),
-        ];
-
-        $expectedClassesData = [
-            'Namespace\\FooEntity' => [
-                'associationMappings' => [
-                    'foo_association' => ['foo' => 'bar', 'type' => ClassMetadataInfo::ONE_TO_MANY],
-                ],
-                'expectedFields' => [
-                    'foo_association' => [
-                        'field_name' => 'Namespace_FooEntity_foo_association',
-                        'merge_modes' => [MergeModes::UNITE],
-                        'source_field_name' => 'foo_association',
-                        'source_class_name' => 'Namespace\\FooEntity',
-                    ],
-                ]
+        $inversedUnidirectionalAssociationMappings = [
+            [
+                'fieldName' => 'foo_association',
+                'type' => ClassMetadataInfo::ONE_TO_MANY,
+                'sourceEntity' => 'Namespace\\FooEntity',
+                'targetEntity' => 'Namespace\\EntityName',
+                'mappedBySourceEntity' => false,
+                '_generatedFieldName' => 'Namespace_FooEntity_foo_association',
             ],
-            'Namespace\\BarEntity' => [
-                'associationMappings' => [
-                    'bar_association' => ['bar' => 'baz', 'type' => ClassMetadataInfo::ONE_TO_MANY],
-                    'skipped_many_to_many' => ['type' => ClassMetadataInfo::MANY_TO_MANY],
-                    'skipped_mapped_by' => ['mappedBy' => self::CLASS_NAME],
-                ],
-                'expectedFields' => [
-                    'bar_association' => [
-                        'field_name' => 'Namespace_BarEntity_bar_association',
-                        'merge_modes' => [MergeModes::UNITE],
-                        'source_field_name' => 'bar_association',
-                        'source_class_name' => 'Namespace\\BarEntity',
-                    ],
-                ]
+            [
+                'fieldName' => 'bar_association',
+                'type' => ClassMetadataInfo::ONE_TO_MANY,
+                'sourceEntity' => 'Namespace\\BarEntity',
+                'targetEntity' => 'Namespace\\EntityName',
+                'mappedBySourceEntity' => false,
+                '_generatedFieldName' => 'Namespace_BarEntity_bar_association',
             ],
-            'Namespace\\FooBarEntity' => [
-                'associationMappings' => [
-                    'bar_association' => ['bar' => 'baz', 'type' => ClassMetadataInfo::ONE_TO_ONE],
-                ],
-                'expectedFields' => [
-                    'bar_association' => [
-                        'field_name' => 'Namespace_FooBarEntity_bar_association',
-                        'merge_modes' => [MergeModes::REPLACE],
-                        'source_field_name' => 'bar_association',
-                        'source_class_name' => 'Namespace\\FooBarEntity',
-                    ],
-                ]
-            ]
+            [
+                'fieldName' => 'bar_association',
+                'type' => ClassMetadataInfo::ONE_TO_ONE,
+                'sourceEntity' => 'Namespace\\FooBarEntity',
+                'targetEntity' => 'Namespace\\EntityName',
+                'mappedBySourceEntity' => false,
+                '_generatedFieldName' => 'Namespace_FooBarEntity_bar_association',
+            ],
         ];
-
         $this->doctrineHelper->expects($this->once())
-            ->method('getAllMetadata')
-            ->will($this->returnValue(array_values($allMetadata)));
+            ->method('getInversedUnidirectionalAssociationMappings')
+            ->willReturn($inversedUnidirectionalAssociationMappings);
 
-        foreach ($expectedClassesData as $className => $expectedData) {
-            $metadata = $allMetadata[$className];
-            $metadata->expects($this->once())
-                ->method('getName')
-                ->will($this->returnValue($className));
+        foreach ($inversedUnidirectionalAssociationMappings as $associationMapping) {
+            $fieldMetadata = $this->createFieldMetadata();
 
-            $metadata->expects($this->once())
-                ->method('getAssociationsByTargetClass')
-                ->with(self::CLASS_NAME)
-                ->will($this->returnValue($expectedData['associationMappings']));
+            $this->metadataFactory->expects($this->at($metadataFactoryCallIndex++))
+                ->method('createFieldMetadata')
+                ->will($this->returnValue($fieldMetadata));
 
-            foreach ($expectedData['expectedFields'] as $fieldName => $expectedOptions) {
-                $expectedAssociationMapping = $expectedData['associationMappings'][$fieldName];
-                $expectedAssociationMapping['mappedBySourceEntity'] = false;
-
-                $fieldMetadata = $this->createFieldMetadata();
-
-                $this->metadataFactory->expects($this->at($metadataFactoryCallIndex++))
-                    ->method('createFieldMetadata')
-                    ->with($expectedOptions, $expectedAssociationMapping)
-                    ->will($this->returnValue($fieldMetadata));
-
-                $entityMetadata->expects($this->at($entityMetadataCallIndex++))
-                    ->method('addFieldMetadata')
-                    ->with($fieldMetadata);
-            }
+            $entityMetadata->expects($this->at($entityMetadataCallIndex++))
+                ->method('addFieldMetadata')
+                ->with($fieldMetadata);
         }
 
         // Test event dispatcher

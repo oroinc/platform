@@ -74,10 +74,10 @@ oro_system_configuration:
             type: text # can be any custom type
             options:
                label: 'Date format'
+               tooltip: 'Some additional information'
                resettable: false  # should "use default checkbox" be shown(optional, default: true)
                # here we can override any default option of the given form type
                # also here can be added field tooltips
-            tooltip: 'Some additional information'
             acl_resource: 'acl_resource_name'
             priority: 20
 ```

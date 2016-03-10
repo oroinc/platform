@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityBundle\ORM;
 
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
@@ -14,11 +15,25 @@ use Oro\Bundle\EntityBundle\Exception;
 
 class DoctrineHelper
 {
-    /** @var ManagerRegistry */
+    /**
+     * @var ManagerRegistry
+     */
     protected $registry;
 
-    /** @var EntityManager[] */
+    /**
+     * @var ShortMetadataProvider
+     */
+    private $shortMetadataProvider;
+
+    /**
+     * @var EntityManager[]
+     */
     private $managers = [];
+
+    /**
+     * @var array
+     */
+    private $managersMap = [];
 
     /**
      * @param ManagerRegistry $registry
@@ -284,6 +299,25 @@ class DoctrineHelper
     }
 
     /**
+     * Gets short form of metadata for all entities registered in a given entity manager.
+     * Use this method if you need only FQCN of entities and "mapped superclass" flag.
+     * Using of this method instead of getAllMetadata() gives significant performance gain.
+     *
+     * @param ObjectManager $manager        The entity manager
+     * @param bool          $throwException Whether to throw exception in case if metadata cannot be retrieved
+     *
+     * @return ShortClassMetadata[]
+     */
+    public function getAllShortMetadata(ObjectManager $manager, $throwException = true)
+    {
+        if (null === $this->shortMetadataProvider) {
+            $this->shortMetadataProvider = $this->createShortMetadataProvider();
+        }
+
+        return $this->shortMetadataProvider->getAllShortMetadata($manager, $throwException);
+    }
+
+    /**
      * Gets the EntityManager associated with the given entity or class.
      *
      * @param object|string $entityOrClass  An entity object, entity class name or entity proxy class name
@@ -443,10 +477,26 @@ class DoctrineHelper
      */
     private function getManagerForClass($entityClass)
     {
-        if (!array_key_exists($entityClass, $this->managers)) {
-            $this->managers[$entityClass] = $this->registry->getManagerForClass($entityClass);
+        if (!array_key_exists($entityClass, $this->managersMap)) {
+            $manager = $this->registry->getManagerForClass($entityClass);
+            if (null !== $manager) {
+                $hash = spl_object_hash($manager);
+                $this->managers[$hash] = $manager;
+                $this->managersMap[$entityClass] = $hash;
+            } else {
+                $this->managersMap[$entityClass] = null;
+            }
+            return $manager;
         }
 
-        return $this->managers[$entityClass];
+        return $this->managersMap[$entityClass] ? $this->managers[$this->managersMap[$entityClass]] : null;
+    }
+
+    /**
+     * @return ShortMetadataProvider
+     */
+    protected function createShortMetadataProvider()
+    {
+        return new ShortMetadataProvider();
     }
 }

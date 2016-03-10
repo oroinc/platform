@@ -326,6 +326,9 @@ body .select2-dropdown-open {
       padding-left: 125px
     }
   }
+  .select2-no-results, .select2-searching, .select2-selection-limit {
+    background-color: initial !important;
+  }
   li {
     list-style: none;
     display: list-item;
@@ -451,7 +454,7 @@ disabled look for disabled choices in the results dropdown
 }
 
 .select2-container-multi .select2-choices .select2-search-field input {
-  padding: 5px 5px 1px;
+  padding: 3px 5px 1px;
   margin: 1px 0;
   font-family:@baseFontFamily;
   font-size: 100%;

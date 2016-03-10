@@ -9,6 +9,17 @@ function PackageManager(Urls, util) {
     var reflectUICallback = function() {
     };
 
+    var pm = {
+        install: function(params, _reflectUICallback) {
+            reflectUICallback = _reflectUICallback || reflectUICallback;
+            sendRequest(Urls.install, params, installCompleteCallback);
+        },
+        update: function(params, _reflectUICallback) {
+            reflectUICallback = _reflectUICallback || reflectUICallback;
+            sendRequest(Urls.update, params, updateCompleteCallback);
+        }
+    };
+
     function sendRequest(url, params, completeCallback) {
         $.ajax({
             url: url,
@@ -93,17 +104,6 @@ function PackageManager(Urls, util) {
                 reflectUICallback();
         }
     }
-
-    var pm = {
-        install: function(params, _reflectUICallback) {
-            reflectUICallback = _reflectUICallback || reflectUICallback;
-            sendRequest(Urls.install, params, installCompleteCallback);
-        },
-        update: function(params, _reflectUICallback) {
-            reflectUICallback = _reflectUICallback || reflectUICallback;
-            sendRequest(Urls.update, params, updateCompleteCallback);
-        }
-    };
 
     return pm;
 }

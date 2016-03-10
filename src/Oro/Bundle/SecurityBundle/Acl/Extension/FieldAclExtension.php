@@ -12,7 +12,7 @@ use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 
 class FieldAclExtension extends EntityAclExtension
 {
-    const EXTENSION_KEY = 'field';
+    const NAME = 'field';
 
     /**
      * {@inheritdoc}

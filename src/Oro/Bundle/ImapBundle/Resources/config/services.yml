@@ -1,4 +1,7 @@
 parameters:
+    oro_imap.user_form_name:                         oro_user_user_form
+    oro_imap.email_mailbox_form_name:                oro_email_mailbox
+    oro_imap.email_mailbox_form_type:                oro_email_mailbox
     oro_imap.connector.factory.class:                Oro\Bundle\ImapBundle\Connector\ImapConnectorFactory
     oro_imap.connector.class:                        Oro\Bundle\ImapBundle\Connector\ImapConnector
     oro_imap.services.factory.class:                 Oro\Bundle\ImapBundle\Connector\ImapServicesFactory
@@ -47,6 +50,7 @@ services:
             - @oro_imap.connector.factory
             - @oro_security.encoder.mcrypt
             - @oro_imap.imap_email_google_oauth2_manager
+            - @oro_config.global
         tags:
             - { name: oro_email.email_body_loader }
 
@@ -126,13 +130,14 @@ services:
         class: %oro_imap.imap_clear_manager.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_entity.event_listener.entity_modify_created_updated_properties_listener
         calls:
             - [setLogger, [@logger]]
 
     oro_imap.workflow.action.dependency_job:
         class: %oro_imap.workflow.action.dependency_job.class%
         arguments:
-            - @oro_workflow.context_accessor
+            - @oro_action.context_accessor
             - @doctrine
         tags:
             - { name: oro_workflow.action, alias: job_add_dependency }
@@ -149,6 +154,7 @@ services:
         class: %oro_imap.imap_email_google_oauth2_manager.class%
         arguments:
             - @hwi_oauth.http_client
+            - @hwi_oauth.resource_ownermap.main
             - @oro_config.global
             - @doctrine
 
@@ -161,3 +167,7 @@ services:
             - @oro_security.encoder.mcrypt
             - @doctrine
             - @oro_imap.connector.factory
+            - @oro_imap.imap_email_google_oauth2_manager
+            - %oro_imap.user_form_name%
+            - %oro_imap.email_mailbox_form_name%
+            - %oro_imap.email_mailbox_form_type%

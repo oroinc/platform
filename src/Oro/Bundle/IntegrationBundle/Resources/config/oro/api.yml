@@ -1,0 +1,5 @@
+oro_api:
+    entities:
+        Oro\Bundle\IntegrationBundle\Entity\Channel: ~
+        Oro\Bundle\IntegrationBundle\Entity\FieldsChanges: ~
+        Oro\Bundle\IntegrationBundle\Entity\Status: ~

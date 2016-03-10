@@ -99,6 +99,7 @@ define(function(require) {
             } else {
                 state.core.selected = [];
             }
+            this.$tree.jstree().select_node(this.nodeId);
             return state;
         },
 

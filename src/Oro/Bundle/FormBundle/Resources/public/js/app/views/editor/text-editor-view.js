@@ -53,7 +53,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
@@ -76,7 +75,14 @@ define(function(require) {
         events: {
             'change input[name=value]': 'onChange',
             'keyup input[name=value]': 'onChange',
-            'click [data-action]': 'rethrowAction'
+            'mousedown': 'onMousedown',
+            'click [data-action]': 'rethrowAction',
+            'keydown input[name=value]': 'onGenericKeydown',
+            'keydown': 'rethrowEvent',
+            'keypress': 'rethrowEvent',
+            'keyup': 'rethrowEvent',
+            'focusin': 'onFocusin',
+            'focusout': 'onFocusout'
         },
 
         TAB_KEY_CODE: 9,
@@ -91,7 +97,11 @@ define(function(require) {
         ARROW_RIGHT_KEY_CODE: 39,
         ARROW_BOTTOM_KEY_CODE: 40,
 
-        UNSET_FIELD_VALUE: {'#unset': true},
+        /**
+         * Internal focus tracking variable
+         * @protected
+         */
+        _isFocused: false,
 
         constructor: function(options) {
             // className adjustment cannot be done in initialize()
@@ -103,11 +113,10 @@ define(function(require) {
 
         initialize: function(options) {
             this.options = options;
-            this.fieldName = options.fieldName;
-            this.metadata = options.metadata || {};
-            this.placeholder = options.placeholder;
-            this.placeholderRaw = options.placeholder_raw;
-            this.validationRules = options.validationRules || {};
+            _.extend(this, _.pick(options, ['fieldName', 'placeholder', 'placeholder_raw', 'validationRules']));
+            _.defaults(this, {
+                validationRules: {}
+            });
             TextEditorView.__super__.initialize.apply(this, arguments);
         },
 
@@ -136,7 +145,7 @@ define(function(require) {
             data.inputType = this.inputType;
             data.data = this.model.toJSON();
             data.fieldName = this.fieldName;
-            data.value = this.getFormattedValue();
+            data.value = this.formatRawValue(this.getRawModelValue());
             data.placeholder = this.getPlaceholder();
             return data;
         },
@@ -158,7 +167,37 @@ define(function(require) {
                     value: this.getValidationRules()
                 }
             });
+            if (this.options.value) {
+                this.setFormState(this.options.value);
+            }
             this.onChange();
+        },
+
+        /**
+         * Shows backend validation errors
+         *
+         * @param {Object} backendErrors map of field name to its error
+         */
+        showBackendErrors: function(backendErrors) {
+            this.validator.showErrors(backendErrors);
+        },
+
+        /**
+         * Reads state of form (map of element name to its value)
+         *
+         * @return {Object}
+         */
+        getFormState: function() {
+            return this.$el.formFieldValues();
+        },
+
+        /**
+         * Set values to form elements
+         *
+         * @param {Object} value map of element name to its value
+         */
+        setFormState: function(value) {
+            this.$el.formFieldValues(value);
         },
 
         /**
@@ -172,6 +211,50 @@ define(function(require) {
         },
 
         /**
+         * Handles focusin event
+         *
+         * @param {jQuery.Event} e
+         */
+        onFocusin: function(e) {
+            if (!this._isFocused) {
+                this._isFocused = true;
+                this.trigger('focus');
+            }
+        },
+
+        /**
+         * Handles focusout event
+         *
+         * @param {jQuery.Event} e
+         */
+        onFocusout: function(e) {
+            if (!this._isSelected) {
+                this.blur();
+            } else {
+                delete this._isSelected;
+            }
+        },
+
+        /**
+         * Handles mousedown event
+         *
+         * @param {jQuery.Event} e
+         */
+        onMousedown: function(e) {
+            this._isSelected = true;
+        },
+
+        /**
+         * Turn view into blur
+         */
+        blur: function() {
+            if (this._isFocused) {
+                this._isFocused = false;
+                this.trigger('blur');
+            }
+        },
+
+        /**
          * Prepares validation rules for usage
          *
          * @returns {Object}
@@ -181,12 +264,32 @@ define(function(require) {
         },
 
         /**
-         * Formats and returns the model value before it is rendered
+         * Reads proper model's field value
          *
-         * @returns {string}
+         * @return {*}
          */
-        getFormattedValue: function() {
-            return this.getModelValue();
+        getRawModelValue: function() {
+            return this.model.get(this.fieldName);
+        },
+
+        /**
+         * Converts model value to the format that can be passed to a template as field value
+         *
+         * @param {*} value
+         * @return {string}
+         */
+        formatRawValue: function(value) {
+            return this.parseRawValue(value);
+        },
+
+        /**
+         * Parses value that is stored in model
+         *
+         * @param {*} value
+         * @return {*}
+         */
+        parseRawValue: function(value) {
+            return value ? value : '';
         },
 
         /**
@@ -195,8 +298,7 @@ define(function(require) {
          * @returns {string}
          */
         getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
-            return raw ? raw : '';
+            return this.parseRawValue(this.getRawModelValue());
         },
 
         /**
@@ -234,6 +336,13 @@ define(function(require) {
         },
 
         /**
+         * Generic handler for DOM events. Used on form to allow processing that events outside view.
+         */
+        rethrowEvent: function(e) {
+            this.trigger(e.type, e, this);
+        },
+
+        /**
          * Returns true if the user has changed the value
          *
          * @returns {boolean}
@@ -260,6 +369,18 @@ define(function(require) {
             } else {
                 this.$('[type=submit]').removeAttr('disabled');
             }
+            this.trigger('change');
+        },
+
+        /**
+         * Refers keydown action to proper action handler
+         *
+         * @param e
+         */
+        onGenericKeydown: function(e) {
+            this.onGenericEnterKeydown(e);
+            this.onGenericTabKeydown(e);
+            this.onGenericArrowKeydown(e);
         },
 
         /**

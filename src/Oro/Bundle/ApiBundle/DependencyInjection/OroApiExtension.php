@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
-use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 
 class OroApiExtension extends Extension
 {
@@ -21,6 +22,7 @@ class OroApiExtension extends Extension
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
         $loader->load('processors.normalize_value.yml');
+        $loader->load('processors.collect_resources.yml');
         $loader->load('processors.get_config.yml');
         $loader->load('processors.get_metadata.yml');
         $loader->load('processors.get_list.yml');
@@ -39,39 +41,23 @@ class OroApiExtension extends Extension
             new YamlCumulativeFileLoader('Resources/config/oro/api.yml')
         );
         $resources    = $configLoader->load($container);
-        $apiConfig    = [];
-        foreach ($resources as $resource) {
-            $apiConfig = $this->mergeApiConfiguration($resource, $apiConfig);
-        }
 
-        $exclusions = [];
-        if (array_key_exists('exclusions', $apiConfig)) {
-            $exclusions = $apiConfig['exclusions'];
-            unset($apiConfig['exclusions']);
+        $config = [];
+        foreach ($resources as $resource) {
+            $config[] = $resource->data['oro_api'];
         }
+        $config = $this->processConfiguration(
+            new ApiConfiguration($container->get('oro_api.config_extension_registry')),
+            $config
+        );
+
+        $exclusions = $config['exclusions'];
+        unset($config['exclusions']);
 
         $configBagDef = $container->getDefinition('oro_api.config_bag');
-        $configBagDef->replaceArgument(0, $apiConfig);
+        $configBagDef->replaceArgument(0, $config);
 
         $exclusionProviderDef = $container->getDefinition('oro_api.entity_exclusion_provider.config');
         $exclusionProviderDef->replaceArgument(1, $exclusions);
-    }
-
-    /**
-     * @param CumulativeResourceInfo $resource
-     * @param array                  $data
-     *
-     * @return array
-     */
-    protected function mergeApiConfiguration(CumulativeResourceInfo $resource, array $data)
-    {
-        if (!empty($resource->data['oro_api'])) {
-            $data = array_merge(
-                $data,
-                $resource->data['oro_api']
-            );
-        }
-
-        return $data;
     }
 }

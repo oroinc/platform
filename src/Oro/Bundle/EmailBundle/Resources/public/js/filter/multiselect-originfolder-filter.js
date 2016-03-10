@@ -80,7 +80,6 @@ define([
                     showLabel: this.showLabel,
                     options: options,
                     placeholder: this.placeholder,
-                    nullLink: this.nullLink,
                     canDisable: this.canDisable,
                     selected: _.extend({}, this.emptyValue, this.value),
                     isEmpty: this.isEmpty()

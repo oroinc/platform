@@ -31,54 +31,42 @@ class FieldAccessor
     }
 
     /**
-     * @param array $config
-     *
-     * @return string
-     */
-    public function getConfigFields($config)
-    {
-        if (empty($config[ConfigUtil::FIELDS])) {
-            return [];
-        } else {
-            return array_keys($config[ConfigUtil::FIELDS]);
-        }
-    }
-
-    /**
-     * @param string $entityClass
-     * @param array  $config
+     * @param string       $entityClass
+     * @param EntityConfig $config
      *
      * @return string[]
      */
-    public function getFields($entityClass, $config)
+    public function getFields($entityClass, EntityConfig $config)
     {
         $result = [];
-        if (ConfigUtil::isExcludeAll($config)) {
-            if (!empty($config[ConfigUtil::FIELDS])) {
-                foreach ($config[ConfigUtil::FIELDS] as $field => $fieldConfig) {
-                    if (null === $fieldConfig || !ConfigUtil::isExclude($fieldConfig)) {
-                        $result[] = $field;
-                    }
+        if ($config->isExcludeAll()) {
+            $fieldConfigs = $config->getFields();
+            foreach ($fieldConfigs as $field => $fieldConfig) {
+                if (!$fieldConfig->isExcluded()) {
+                    $result[] = $field;
                 }
             }
         } else {
             $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
             $fields         = array_merge($entityMetadata->getFieldNames(), $entityMetadata->getAssociationNames());
             foreach ($fields as $field) {
-                if (ConfigUtil::hasFieldConfig($config, $field)) {
-                    $fieldConfig = $config[ConfigUtil::FIELDS][$field];
-                    if (null === $fieldConfig || !ConfigUtil::isExclude($fieldConfig)) {
+                if ($config->hasField($field)) {
+                    $fieldConfig = $config->getField($field);
+                    if (!$fieldConfig->isExcluded()) {
                         $result[] = $field;
                     }
                 } elseif ($this->isApplicableField($entityClass, $field)) {
-                    $result[] = $field;
-                }
-            }
-            if (!empty($config[ConfigUtil::FIELDS])) {
-                foreach ($config[ConfigUtil::FIELDS] as $field => $fieldConfig) {
-                    if ($this->isMetadataProperty($field)) {
+                    // @todo: ignore not configured relations to avoid infinite loop
+                    // it is a temporary fix until the identifier field will not be used by default for them
+                    if (!$entityMetadata->isAssociation($field)) {
                         $result[] = $field;
                     }
+                }
+            }
+            $fieldConfigs = $config->getFields();
+            foreach ($fieldConfigs as $field => $fieldConfig) {
+                if (ConfigUtil::isMetadataProperty($fieldConfig->getPropertyPath() ?: $field)) {
+                    $result[] = $field;
                 }
             }
         }
@@ -87,13 +75,13 @@ class FieldAccessor
     }
 
     /**
-     * @param string $entityClass
-     * @param array  $config
-     * @param bool   $withAssociations
+     * @param string       $entityClass
+     * @param EntityConfig $config
+     * @param bool         $withAssociations
      *
      * @return string[]
      */
-    public function getFieldsToSelect($entityClass, $config, $withAssociations = false)
+    public function getFieldsToSelect($entityClass, EntityConfig $config, $withAssociations = false)
     {
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
         $fields         = array_filter(
@@ -120,12 +108,12 @@ class FieldAccessor
     }
 
     /**
-     * @param string $entityClass
-     * @param array  $config
+     * @param string       $entityClass
+     * @param EntityConfig $config
      *
      * @return string[]
      */
-    public function getFieldsToSerialize($entityClass, $config)
+    public function getFieldsToSerialize($entityClass, EntityConfig $config)
     {
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
 
@@ -135,18 +123,6 @@ class FieldAccessor
                 return !$entityMetadata->isCollectionValuedAssociation($field);
             }
         );
-    }
-
-    /**
-     * Checks whether a property path represents some metadata property
-     *
-     * @param string $propertyPath
-     *
-     * @return bool
-     */
-    public function isMetadataProperty($propertyPath)
-    {
-        return ConfigUtil::isMetadataProperty($propertyPath);
     }
 
     /**

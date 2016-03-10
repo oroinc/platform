@@ -14,7 +14,7 @@ define(function(require) {
     ImapGmailComponent = BaseComponent.extend({
         ViewType: ImapGmailView,
 
-        scopes: ['https://mail.google.com/'],
+        scopes: ['https://mail.google.com/', 'https://www.googleapis.com/auth/userinfo.email'],
 
         /**
          * @constructor
@@ -22,11 +22,17 @@ define(function(require) {
          */
         initialize: function(options) {
             this.route = _.result(options, 'route') || '';
+            this.routeAccessToken = _.result(options, 'routeAccessToken') || '';
             this.routeGetFolders = _.result(options, 'routeGetFolders') || '';
             this.formParentName = _.result(options, 'formParentName') || '';
+            this.originId = _.result(options, 'id') || null;
 
             var viewConfig = this.prepareViewOptions(options);
             this.view = new this.ViewType(viewConfig);
+
+            this.view.setAccessToken(_.result(options, 'accessToken') || '');
+            this.view.setExpiredAt(_.result(options, 'accessTokenExpiresAt') || '');
+            this.view.setEmail(_.result(options, 'user') || '');
 
             this.listenTo(this.view, 'getFolders', this.onGetFolders);
 
@@ -53,9 +59,8 @@ define(function(require) {
          * Handler event checkConnection
          */
         onCheckConnection: function() {
-            mediator.execute('showLoading');
             this.view.resetErrorMessage();
-            this.requestAccessToken();
+            this.requestGoogleAuthCode();
         },
 
         /**
@@ -63,84 +68,116 @@ define(function(require) {
          */
         requestGoogleAuthCode: function(emailAddress) {
             var data = this.view.getData();
+            var args = {};
 
             if (data.clientId.length === 0) {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.emptyClientId'));
                 this.view.render();
             } else {
-                gapi.auth.authorize({
-                    'client_id': data.clientId,
-                    'scope': this.scopes.join(' '),
-                    'immediate': false,
-                    'login_hint': emailAddress,
-                    'access_type': 'offline',
-                    'response_type': 'code',
-                    'approval_prompt': 'force'
-                }, _.bind(this.handleResponseGoogleAuthCode, this));
+                this._wrapFirstWindowOpen(args);
+                args.deferred = gapi.auth.authorize({
+                        'client_id': data.clientId,
+                        'scope': this.scopes.join(' '),
+                        'immediate': false,
+                        'login_hint': emailAddress,
+                        'access_type': 'offline',
+                        'response_type': 'code',
+                        'approval_prompt': 'force'
+                    }, _.bind(this.handleResponseGoogleAuthCode, this)
+                ).then(
+                    null,
+                    function() {
+                        mediator.execute(
+                            'showFlashMessage',
+                            'error',
+                            __('oro.imap.connection.google.oauth.error.closed_auth')
+                        );
+                    }
+                );
             }
         },
 
         /**
-         * Handler response from google API  for request to get google auth code
+         * Handler response from google API for request to get google auth code
          */
         handleResponseGoogleAuthCode: function(response) {
             if (response.error === 'access_denied') {
                 this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.access_deny'));
                 this.view.render();
-                mediator.execute('hideLoading');
             } else {
-                this.view.setGoogleAuthCode(response.code);
-                this.view.render();
-                this.requestFormGetFolder();
+                mediator.execute('showLoading');
+                this.requestAccessToken(response.code);
             }
         },
 
         /**
          * Request to google API to get token
          */
-        requestAccessToken: function() {
-            var data = this.view.getData();
-            gapi.auth.authorize({
-                'client_id': data.clientId,
-                'scope': this.scopes.join(' '),
-                'immediate': false,
-                'authuser': -1
-            }, _.bind(this.checkAuthorization, this));
-        },
-
-        /**
-         * Handler response from google API  for request to get token
-         */
-        checkAuthorization: function(result) {
-            this.view.setToken(result.access_token);
-            this.view.setExpiredAt(result.expires_in);
-
-            gapi.client.load('gmail', 'v1', _.bind(this.requestProfile, this));
-        },
-
-        /**
-         * Request to google API to get user profile
-         */
-        requestProfile: function() {
-            var request = gapi.client.gmail.users.getProfile({
-                'userId': 'me'
+        requestAccessToken: function(code) {
+            $.ajax({
+                url: this.getUrlGetAccessToken(),
+                method: 'POST',
+                data: {code: code},
+                success: _.bind(this.prepareAuthorization, this),
+                error:  _.bind(this.requestError, this)
             });
+        },
 
-            request.execute(_.bind(this.responseProfile, this));
+        _wrapFirstWindowOpen: function(args) {
+            args = args || {};
+
+            (function(wrapped) {
+                window.open = function() {
+                    window.open = wrapped;
+
+                    var win = wrapped.apply(this, arguments);
+                    if (win) {
+                        var i = setInterval(function() {
+                            if (win.closed) {
+                                clearInterval(i);
+                                setTimeout(function() {
+                                    if (typeof args.deferred !== 'undefined') {
+                                        args.deferred.cancel();
+                                    }
+                                }, 1500);
+                            }
+                        }, 100);
+                    } else {
+                        mediator.execute(
+                            'showFlashMessage',
+                            'error',
+                            __('oro.imap.connection.google.oauth.error.blocked_popup')
+                        );
+                    }
+
+                    return win;
+                };
+            })(window.open);
         },
 
         /**
-         * Handler response from google API  for request to get user profile
+         * Handler response for request to get token
          */
-        responseProfile: function(response) {
-            if (response.code === 403) {
+        prepareAuthorization: function(response) {
+            if (response.code !== undefined) {
                 this.view.setErrorMessage(response.message);
                 this.view.render();
+                mediator.execute('hideLoading');
             } else if (response) {
-                this.view.setEmail(response.emailAddress);
-                mediator.trigger('change:systemMailBox:email', {email: response.emailAddress});
-                this.requestGoogleAuthCode(response.emailAddress);
+                this.view.setEmail(response.email_address);
+                this.view.setAccessToken(response.access_token);
+                this.view.setRefreshToken(response.refresh_token);
+                this.view.setExpiredAt(response.expires_in);
+                this.view.render();
+                mediator.trigger('change:systemMailBox:email', {email: response.email_address});
+
+                this.requestFormGetFolder();
             }
+        },
+
+        requestError: function(response) {
+            this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.request'));
+            this.view.render();
         },
 
         /**
@@ -149,12 +186,14 @@ define(function(require) {
         requestFormGetFolder: function() {
             var data = this.view.getData();
             data.formParentName = this.formParentName;
+            mediator.execute('showLoading');
 
             $.ajax({
                 url: this.getUrl(),
                 method: 'POST',
                 data: data,
-                success: _.bind(this.renderFormGetFolder, this)
+                success: _.bind(this.renderFormGetFolder, this),
+                error:  _.bind(this.requestError, this)
             });
         },
 
@@ -163,9 +202,19 @@ define(function(require) {
          * @param response
          */
         renderFormGetFolder: function(response) {
-            this.view.setHtml(response.html);
-            this.view.render();
-            this.view.autoRetrieveFolders();
+            if (response.error !== undefined) {
+                this.view.setErrorMessage(response.error);
+                this.view.render();
+                mediator.execute('hideLoading');
+            } else if (response.html === undefined) {
+                this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.request'));
+                this.view.render();
+                mediator.execute('hideLoading');
+            } else {
+                this.view.setHtml(response.html);
+                this.view.render();
+                this.view.autoRetrieveFolders();
+            }
         },
 
         /**
@@ -181,7 +230,8 @@ define(function(require) {
                 url: this.getUrlGetFolders(),
                 method: 'POST',
                 data: data,
-                success: _.bind(this.handlerGetFolders, this)
+                success: _.bind(this.handlerGetFolders, this),
+                error: _.bind(this.requestError, this)
             });
         },
 
@@ -190,7 +240,13 @@ define(function(require) {
          * @param response
          */
         handlerGetFolders: function(response) {
-            this.view.setHtml(response.html);
+            if (response.error !== undefined) {
+                this.view.setErrorMessage(response.error);
+            } else if (response.html === undefined) {
+                this.view.setErrorMessage(__('oro.imap.connection.google.oauth.error.request'));
+            } else {
+                this.view.setHtml(response.html);
+            }
             this.view.render();
             mediator.execute('hideLoading');
         },
@@ -203,7 +259,8 @@ define(function(require) {
         prepareDataForForm: function(values) {
             var data = {
                 oro_imap_configuration_gmail: {},
-                formParentName: this.formParentName
+                formParentName: this.formParentName,
+                id: this.originId
             };
 
             for (var i in values) {
@@ -229,6 +286,14 @@ define(function(require) {
          */
         getUrlGetFolders: function() {
             return routing.generate(this.routeGetFolders, this._getUrlParams());
+        },
+
+        /**
+         * Generate url for request to get access token
+         * @returns {string|*}
+         */
+        getUrlGetAccessToken: function() {
+            return routing.generate(this.routeAccessToken, this._getUrlParams());
         },
 
         /**

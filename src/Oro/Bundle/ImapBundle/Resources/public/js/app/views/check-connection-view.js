@@ -36,6 +36,7 @@ define(function(require) {
             } else {
                 $container.empty();
             }
+            this.initLayout();
         },
 
         ensureContainer: function() {

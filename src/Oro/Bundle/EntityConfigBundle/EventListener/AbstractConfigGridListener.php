@@ -244,87 +244,92 @@ abstract class AbstractConfigGridListener implements EventSubscriberInterface
     {
         // configure properties from config providers
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
-        $filters    = [];
+        $columns    = $config->offsetGetByPath(self::PATH_COLUMNS, []);
         $actions    = [];
 
         $providers = $this->configManager->getProviders();
         foreach ($providers as $provider) {
             $gridActions = $provider->getPropertyConfig()->getGridActions($itemType);
-
-            $this->prepareProperties($gridActions, $properties, $actions, $filters);
-
-            // TODO: check if this neccessary for field config grid
-            if (static::GRID_NAME == 'entityconfig-grid' && $provider->getPropertyConfig()->getUpdateActionFilter()) {
-                $filters['update'] = $provider->getPropertyConfig()->getUpdateActionFilter();
+            if (!empty($gridActions)) {
+                $this->prepareProperties($gridActions, $columns, $properties, $actions);
             }
         }
 
-        if (count($filters)) {
+        if (count($actions)) {
             $config->offsetSet(
                 ActionExtension::ACTION_CONFIGURATION_KEY,
-                $this->getActionConfigurationClosure($filters, $actions)
+                $this->getActionConfigurationClosure($actions)
             );
         }
         $config->offsetSet(Configuration::PROPERTIES_KEY, $properties);
     }
 
     /**
-     * @param $gridActions
-     * @param $properties
-     * @param $actions
-     * @param $filters
+     * @param array $gridActions
+     * @param array $columns
+     * @param array $properties
+     * @param array $actions
      */
-    protected function prepareProperties($gridActions, &$properties, &$actions, &$filters)
+    protected function prepareProperties($gridActions, $columns, &$properties, &$actions)
     {
         foreach ($gridActions as $config) {
-            $properties[strtolower($config['name']) . '_link'] = [
+            $key = strtolower($config['name']);
+
+            $properties[$key . '_link'] = [
                 'type'   => 'url',
                 'route'  => $config['route'],
                 'params' => isset($config['args']) ? $config['args'] : []
             ];
 
+            $filters = [];
             if (isset($config['filter'])) {
-                $filters[strtolower($config['name'])] = $config['filter'];
+                foreach ($config['filter'] as $column => $filter) {
+                    $dataName = isset($columns[$column]['data_name'])
+                        ? $columns[$column]['data_name']
+                        : $column;
+                    $filters[$dataName] = $filter;
+                }
             }
-
-            $actions[strtolower($config['name'])] = true;
+            $actions[$key] = $filters;
         }
     }
 
     /**
      * Returns closure that will configure actions for each row in grid
      *
-     * @param array $filters
      * @param array $actions
      *
      * @return callable
      */
-    public function getActionConfigurationClosure($filters, $actions)
+    public function getActionConfigurationClosure($actions)
     {
-        return function (ResultRecord $record) use ($filters, $actions) {
-            foreach ($filters as $action => $filter) {
-                foreach ($filter as $key => $value) {
-                    if (is_array($value)) {
-                        $error = true;
-                        foreach ($value as $v) {
-                            if ($record->getValue($key) == $v) {
-                                $error = false;
+        return function (ResultRecord $record) use ($actions) {
+            $result = [];
+            foreach ($actions as $action => $filters) {
+                $isApplicable = true;
+                foreach ($filters as $dataName => $filter) {
+                    $value = $record->getValue($dataName);
+                    if (is_array($filter)) {
+                        $atLeastOneMatched = false;
+                        foreach ($filter as $f) {
+                            if ($value == $f) {
+                                $atLeastOneMatched = true;
+                                break;
                             }
                         }
-                        if ($error) {
-                            $actions[$action] = false;
+                        if (!$atLeastOneMatched) {
+                            $isApplicable = false;
                             break;
                         }
-                    } else {
-                        if ($record->getValue($key) != $value) {
-                            $actions[$action] = false;
-                            break;
-                        }
+                    } elseif ($value != $filter) {
+                        $isApplicable = false;
+                        break;
                     }
                 }
+                $result[$action] = $isApplicable;
             }
 
-            return $actions;
+            return $result;
         };
     }
 

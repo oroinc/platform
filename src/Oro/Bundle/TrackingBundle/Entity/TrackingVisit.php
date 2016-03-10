@@ -11,7 +11,8 @@ use Oro\Bundle\TrackingBundle\Model\ExtendTrackingVisit;
  * @ORM\Entity()
  * @ORM\Table(name="oro_tracking_visit", indexes={
  *     @ORM\Index(name="visit_visitorUid_idx", columns={"visitor_uid"}),
- *     @ORM\Index(name="visit_userIdentifier_idx", columns={"user_identifier"})
+ *     @ORM\Index(name="visit_userIdentifier_idx", columns={"user_identifier"}),
+ *     @ORM\Index(name="website_first_action_time_idx", columns={"website_id", "first_action_time"})
  * })
  * @ORM\HasLifecycleCallbacks()
  * @Config(

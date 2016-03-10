@@ -18,8 +18,7 @@ class ValidateRequestTypeExists implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $requestType = $context->getRequestType();
-        if (empty($requestType)) {
+        if ($context->getRequestType()->isEmpty()) {
             throw new \RuntimeException('The type of a request must be set in the context.');
         }
     }

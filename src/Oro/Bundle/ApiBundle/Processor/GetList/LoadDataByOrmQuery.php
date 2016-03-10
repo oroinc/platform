@@ -8,6 +8,9 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Loads data using ORM QueryBuilder object.
+ */
 class LoadDataByOrmQuery implements ProcessorInterface
 {
     /**

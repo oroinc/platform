@@ -99,36 +99,20 @@ class GridViewsExtension extends AbstractExtension
     {
         $currentViewId = $this->getCurrentViewId($config->getName());
         $this->setDefaultParams($config->getName());
-
         $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
         $data->offsetAddToArray('state', ['gridView' => $currentViewId]);
 
-        $allLabel = null;
-        if (isset($config['options'], $config['options']['gridViews'], $config['options']['gridViews']['allLabel'])) {
-            $allLabel = $this->translator->trans($config['options']['gridViews']['allLabel']);
-        }
-
-        /** @var AbstractViewsList $list */
-        $list           = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
         $systemGridView = new View(self::DEFAULT_VIEW_ID);
         $systemGridView->setDefault($this->getDefaultViewId($config->getName()) === null);
+        if ($config->offsetGetByPath('[options][gridViews][allLabel]')) {
+            $systemGridView->setLabel($this->translator->trans($config['options']['gridViews']['allLabel']));
+        }
 
-        $gridViews = [
-            'choices' => [
-                [
-                    'label' => $allLabel,
-                    'value' => self::DEFAULT_VIEW_ID,
-                ],
-            ],
-            'views'   => [
-                $systemGridView->getMetadata()
-            ],
-        ];
+        $gridViews = [$systemGridView->getMetadata()];
+        /** @var AbstractViewsList $list */
+        $list           = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
         if ($list !== false) {
-            $configuredGridViews            = $list->getMetadata();
-            $configuredGridViews['views']   = array_merge($gridViews['views'], $configuredGridViews['views']);
-            $configuredGridViews['choices'] = array_merge($gridViews['choices'], $configuredGridViews['choices']);
-            $gridViews                      = $configuredGridViews;
+            $gridViews = array_merge($gridViews, $list->getMetadata());
         }
 
         if ($this->eventDispatcher->hasListeners(GridViewsLoadEvent::EVENT_NAME)) {
@@ -137,9 +121,14 @@ class GridViewsExtension extends AbstractExtension
             $gridViews = $event->getGridViews();
         }
 
-        $gridViews['gridName']    = $config->getName();
-        $gridViews['permissions'] = $this->getPermissions();
-        $data->offsetAddToArray('gridViews', $gridViews);
+        $data->offsetAddToArray(
+            'gridViews',
+            [
+                'views' => $gridViews,
+                'gridName' => $config->getName(),
+                'permissions' => $this->getPermissions()
+            ]
+        );
     }
 
     /**

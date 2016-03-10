@@ -43,7 +43,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
@@ -57,9 +56,8 @@ define(function(require) {
     PercentEditorView = NumberEditorView.extend(/** @exports PercentEditorView.prototype */{
         className: 'number-editor',
 
-        getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
-            return parseFloat(raw) * 100;
+        parseRawValue: function(value) {
+            return parseFloat(value) * 100;
         },
 
         getModelUpdateData: function() {
@@ -68,15 +66,13 @@ define(function(require) {
             return data;
         },
 
-        getFormattedValue: function() {
-
-            var raw = this.getModelValue();
+        formatRawValue: function(value) {
+            var raw = this.parseRawValue(value);
             if (isNaN(raw)) {
                 return '';
             }
             return String(raw);
         }
-
     });
 
     return PercentEditorView;
