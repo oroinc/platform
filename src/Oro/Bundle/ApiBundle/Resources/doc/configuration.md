@@ -42,7 +42,7 @@ The first level sections of configuration are:
 Below is an overview table of sections and its typical childes. 
 
 |Config Section | Description |
-|||
+| --- | :--- |
 |exclusions | The section describes entity(ies) and\or field(s) exclusions | 
 |||
 |entities               | The section describes entities configurations |
