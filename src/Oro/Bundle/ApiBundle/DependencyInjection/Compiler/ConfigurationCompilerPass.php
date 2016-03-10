@@ -14,9 +14,6 @@ class ConfigurationCompilerPass implements CompilerPassInterface
 {
     const PROCESSOR_BAG_SERVICE_ID             = 'oro_api.processor_bag';
 
-//    const CONFIG_EXTENSION_REGISTRY_SERVICE_ID = 'oro_api.config_extension_registry';
-//    const CONFIG_EXTENSION_TAG                 = 'oro_api.config_extension';
-
     const ACTION_PROCESSOR_BAG_SERVICE_ID      = 'oro_api.action_processor_bag';
     const ACTION_PROCESSOR_TAG                 = 'oro.api.action_processor';
 
