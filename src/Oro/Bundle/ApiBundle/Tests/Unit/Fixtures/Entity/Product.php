@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity
+ * @ORM\Entity(repositoryClass="Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Repository\TestRepository")
  * @ORM\Table(name="product_table")
  */
 class Product
