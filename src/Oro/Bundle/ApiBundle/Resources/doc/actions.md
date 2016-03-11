@@ -4,14 +4,15 @@ Actions
 Table of Contents
 -----------------
  - [Overview](#overview)
- - [**collect_resources** Action](#collect_resources-action)
- - [**get** Action](#get-action)
- - [**get_list** Action](#get_list-action)
- - [**customize_loaded_data** Action](#customize_loaded_data-action)
- - [**get_config** Action](#get_config-action)
- - [**get_relation_config** Action](#get_relation_config-action)
- - [**get_metadata** Action](#get_metadata-action)
- - [**normalize_value** Action](#normalize_value-action)
+ - Existing actions
+    - [**collect_resources** Action](#collect_resources-action)
+    - [**get** Action](#get-action)
+    - [**get_list** Action](#get_list-action)
+    - [**customize_loaded_data** Action](#customize_loaded_data-action)
+    - [**get_config** Action](#get_config-action)
+    - [**get_relation_config** Action](#get_relation_config-action)
+    - [**get_metadata** Action](#get_metadata-action)
+    - [**normalize_value** Action](#normalize_value-action)
  - [**Context** class](#context_class)
  - [Creating new action](#creating-new-action)
 
