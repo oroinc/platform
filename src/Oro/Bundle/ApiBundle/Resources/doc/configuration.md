@@ -5,11 +5,15 @@ Table of Contents
 -----------------
  - [Overview](#overview)
  - [Configuration structure](#configuration-structure)
-    - ["Exclusions" configuration section & "exclude" flag](#)
-    - ["Entities" configuration section](#)
-    - ["Relations" configuration section](#)
+    - ["Exclusions" configuration section & "exclude" flag](#exclusions-configuration-section-exclude-flag)
+    - ["Entities" configuration section](#entities-configuration-section)
+    - ["Relations" configuration section](#relations-configuration-section)
  - [Config Extensions](#config-extensions)
- - [Conclusion](#conclusion)
+    - [How to add new configuration extension?](#how-to-add-new-configuration-extension)
+    - [How to add new property into existing config section?](#how-to-add-new-property-into-existing-config-section)
+    - [How to allow to extend section?](#how-to-allow-to-extend-section)
+    - [Pre/PostProcessCallbacks in ConfigExtensionInterface](#prepostprocesscallbacks-in-configextensioninterface)
+    - [Config loaders and ConfigExtraSectionInterface](#config-loaders-and-configextrasectioninterface)
 
 Overview
 ========
@@ -20,6 +24,20 @@ To get the overall configuration structure, execute the following command:
 
 ```bash
 php ./app/console oro:api:config:dump-reference
+```
+
+The default nesting level is 3, so please use the option `--max-nesting-level` to simplify the output, e.g.
+  
+```bash
+php ./app/console oro:api:config:dump-reference --max-nesting-level=0
+```
+
+It's configured in parameter in [services.yml](../config/services.yml). So, if needed, it will allow to easily be changed by overriding the parameter `oro_api.config.max_nesting_level`. 
+
+```yaml
+parameters:
+    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
+    oro_api.config.max_nesting_level: 3
 ```
 
 Configuration structure
@@ -39,27 +57,7 @@ The first level sections of configuration are:
 * **entities**   - describes the entities configuration
 * **relations**  - describes the relations configuration
 
-Below is an overview table of sections and its typical childes. 
-
-|Config Section | Description |
-| --- | :--- |
-|exclusions | The section describes entity(ies) and\or field(s) exclusions | 
-|||
-|entities               | The section describes entities configurations |
-|entities.entity        | The section describes whole single entity configuration with all fields, sorters, filters, etc. |
-|entities.entity.fields | The section describes the configuration of fields per certain entity|
-|                       | The relations configuration are similar to entity configuration |
-|relations              | The section describes relations configurations |
-|relations.entity       | The section describes whole single relation configuration with all fields, sorters, filters, etc. |
-|relations.entity.fields| The section describes the configuration of fields per certain relation |
-|||
-|entities/relations.entity.filters | The section can be present under both: entities and relations. Describes the configuration of filters |
-|entities/relations.entity.filters.fields | The section describes the filter configuration per fields |
-|||
-|entities/relations.entity.sorters | The section can be present under both: entities and relations. Describes the configuration of sorters |
-|entities/relations.entity.sorters.fields | The section describes the sorters configuration per fields |
-|||
-
+And a simplified configuration example:
 
 ```yaml
 oro_api:
@@ -67,6 +65,7 @@ oro_api:
         ...
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
             fields:
                 ...
             sorters:
@@ -75,10 +74,11 @@ oro_api:
             filters:
                 fields:
                     ...
-            exclude:    ~
+            exclude: ~
         ...
     relations:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
             fields:
                 ...
             sorters:
@@ -120,7 +120,9 @@ oro_api:
                     exclude: true
 ```
 
-The mentioned flag can be also used to indicate whether sorter or filter should be excluded, e.g.
+The mentioned flag can be also used to indicate whether sorter or filter for certain field should be excluded. Please note that exclusion on `fields` level (as mentioned above) has higher priority then `sorters` or `filters`, so it's not possible to exclude field without affecting its' sorters and filters. 
+
+, e.g.
 
 ```yaml
 oro_api:
@@ -149,15 +151,95 @@ oro_entity:
 "Entities" configuration section
 --------------------------------
 
+The `entities` configuration section describe single or multiple entities configurations and contains options:
 
+* **label** - String. A human-readable representation of the entity (used in auto generated api doc only)
+* **plural_label** - String. A human-readable representation in plural of the entity (used in auto generated api doc only)
+* **description** - String. A human-readable description of the entity (used in auto generated api doc only)
+* **inherit** - Boolean. By default `true`. The flag indicates that the configuration for certain entity should be merged with parent entity configuration. So it allows to have huge configuration for some AbstractEntity and specifying and more simplified configurations for all its' inheritors. Or if an inherited entity should have completely different configuration and merging with parent configuration is not needed the flag should be set to `false`. 
+* **exclusion_policy** - By default `none`. Can be "all" or "none". Indicates the type of the exclusion strategy that should be used for the entity. If is set to "all" - means that the configuration of all fields and associations was completed. 
+* **disable_partial_load** - Boolean. By default `false`. The flag indicates whether usage of Doctrine partial object is disabled. It can be helpful for entities with SINGLE_TABLE inheritance mapping.
+* **max_results** - Integer. By default unlimited. The maximum number of items in the result. Set -1 (it means unlimited), zero or positive value to set own limit. In JSON API the default is `10` - setting up by [SetDefaultPaging](../../Processor/GetList/JsonApi/SetDefaultPaging.php) processor.
+* **order_by** - Array[[fieldName: ASC|DESC], ...]. The property can be used to configure default ordering.
+* **hints** - Array[HINT_NAME0, [name: HINT_NAME1], [name: HINT_NAME2, value: FQCN], ...]. By default empty. Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). The `name` is required  and `value` can be omitted.
+* **post_serialize** -
+
+And an example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            label:                "Acme Entity"
+            plural_label:         "Acme Entities"
+            description:          "Acme Entities description"
+            inherit:              false 
+            exclusion_policy:     all 
+            disable_partial_load: false 
+            max_results:          25
+            order_by:
+                fieldName0:       DESC
+                fieldName1:       ASC
+            hints:
+                - HINT_TRANSLATABLE
+                - { name: HINT_FILTER_BY_CURRENT_USER }
+                - { name: HINT_CUSTOM_OUTPUT_WALKER, value: "Acme\Bundle\AcmeBundle\AST_Walker_Class"}
+            post_serialize:       ~ # a handler to be used to modify serialized data [class, method]
+            excluded:             false
+            fields:
+                ...
+            filters:
+                ...
+            sorters:
+                ...
+```
+
+* **fields** -
+* **filters** -
+* **sorters** -
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
+            fields:
+                id: null
+                name: null
+                description: null
+                createdAt: null
+                enabled: null
+                users:
+                    collapse: true    Indicates whether the entity should be collapsed.
+                                      It means that target entity should be returned as a value, instead of an array with values of entity fields.
+                                      Usually this property is set by "get_relation_config" processors to get identifier of the related entity.  
+                    exclusion_policy: all
+                    post_serialize: \Closure
+                    fields:
+                        id: null
+            filters:
+                exclusion_policy: all
+                fields:
+                    enabled:
+                        data_type: boolean
+                    id:
+                        data_type: integer
+                    name:
+                        data_type: string
+            sorters:
+                exclusion_policy: all
+                fields:
+                    enabled: null
+                    id: null
+                    name: null
+```
 
 "Relations" configuration section
 ---------------------------------
 
 The `relations` configuration describes how the entity data should be shown then retrieved as a relation to some other entity. It's absolutely identical to `entities` configuration section, the only difference is `exclude` flag - it's not available under relation configuration.
 
-
-
+====
 
 ```yaml
 # The structure of "Resources/config/oro/api.yml"
@@ -165,21 +247,7 @@ oro_api:
     exclusions:                                                # exclusions configuration section
         ...
     entities:                                                  # entities configuration section
-        # Prototype                                            # --------------------------------
         name:                                                  # Fully-Qualified Class Name (FQCN)
-            inherit:              ~                            # 
-            exclusion_policy:     ~                            # One of "all"; "none". A type of the exclusion strategy that should be used for the entity
-            disable_partial_load: ~                            # a flag indicates whether usage of Doctrine partial object is disabled
-            order_by:                                          # the ordering of the result
-                # Prototype                                    # --------------------------------
-                name:             ~                            # a field name and the value one of "ASC"; "DESC"
-            max_results:          ~                            # the maximum number of items in the result
-            hints:                                             # Doctrine query hints
-                ...
-            post_serialize:       ~                            # a handler to be used to modify serialized data
-            label:                ~                            # a human-readable representation of the entity
-            plural_label:         ~                            # a human-readable representation in plural of the entity
-            description:          ~                            # a human-readable description of the entity
 
             fields:                                            # fields configuration section
                 # Prototype                                    # --------------------------------
@@ -214,38 +282,8 @@ oro_api:
             exclude:                      ~                    # flag indicates whether entity should be excluded
 
     relations:                                                 # The relation configuration is similar to entity
-        name:                                                  # configuration except it does not have `exclude` property.
-            inherit:              ~
-            exclusion_policy:     ~
-            disable_partial_load: ~
-            order_by:
-                ...
-            max_results:          ~
-            hints:
-                ...
-            post_serialize:       ~
-            collapse:             ~
-            fields:
-                ...
-            filters:
-                ...
-            sorters:
-                ...
+                                                               # configuration except it does not have `exclude` property.
 ```
-
-Tips and tricks
----------------
-
---
-`oro:api:config:dump-reference` command shows the configuration. And the default nesting level is 3. It's configured in parameter in [services.yml](../config/services.yml). So it will allow to easily change it via overriding the parameter. 
-
-```yaml
-parameters:
-    # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
-    oro_api.config.max_nesting_level: 3
-```
-
-
 
 Config Extensions
 =================
@@ -255,12 +293,26 @@ To deal with extensions it's easy to use [ConfigExtensionRegistry](../../Config/
 - Returns all registered configuration extensions.
 - Collects the configuration definition settings from all registered extensions.
 
- - [How to add new configuration extension?](#how-to-add-new-configuration-extension)
- - [How to add new property into existing config section?](#how-to-add-new-property-into-existing-config-section)
- - [How to allow to extend section?](#how-to-allow-to-extend-section)
- - [Pre/PostProcessCallbacks in ConfigExtensionInterface](#prepostprocesscallbacks-in-configextensioninterface)
- - [Config loaders and ConfigExtraSectionInterface](#config-loaders-and-configextrasectioninterface)
+Below is an overview table of sections and its typical childes. 
 
+|Config Section | Description |
+| --- | :--- |
+|exclusions | The section describes entity(ies) and\or field(s) exclusions | 
+|||
+|entities               | The section describes entities configurations |
+|entities.entity        | The section describes whole single entity configuration with all fields, sorters, filters, etc. |
+|entities.entity.fields | The section describes the configuration of fields per certain entity|
+|                       | The relations configuration are similar to entity configuration |
+|relations              | The section describes relations configurations |
+|relations.entity       | The section describes whole single relation configuration with all fields, sorters, filters, etc. |
+|relations.entity.fields| The section describes the configuration of fields per certain relation |
+|||
+|entities/relations.entity.filters | The section can be present under both: entities and relations. Describes the configuration of filters |
+|entities/relations.entity.filters.fields | The section describes the filter configuration per fields |
+|||
+|entities/relations.entity.sorters | The section can be present under both: entities and relations. Describes the configuration of sorters |
+|entities/relations.entity.sorters.fields | The section describes the sorters configuration per fields |
+|||
 
 How to add new configuration extension?
 ---------------------------------------
@@ -679,7 +731,6 @@ class TestConfigurationExtra implements ConfigExtraInterface, ConfigExtraSection
 
 And to check that all works fine just execute the `oro:api:config:dump acmeentity --extra="Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension\TestConfigurationExtra"` command. The output will looks like this:
 
-
 ```yaml
 oro_api:
     entities:
@@ -693,7 +744,4 @@ oro_api:
                 test_property_new: "another test value"
 ```
 
-Conclusion
-==========
-
-At this point we have newly created section with own properties and possibility to pass new configuration via yaml files. Please refer to [processors](processors.md) documentation section for more detail about how to use configuration in Data API logic.
+At this point we have newly created section with own properties and possibility to pass new configuration via yaml files. Please refer to [actions](actions.md) documentation section for more detail about how to use configuration in Data API logic.
