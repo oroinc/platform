@@ -50,8 +50,11 @@ collect_resources Action
 This action is intended to get a list of all resources available through Data API.
 
 The context class: [CollectResourcesContext](../../Processor/CollectResources/CollectResourcesContext.php).
+
 The main processor class: [CollectResourcesProcessor](../../Processor/CollectResourcesProcessor.php).
+
 Existing worker processors: [processors.collect_resources.yml](../../Resources/config/processors.collect_resources.yml) or run `php app/console oro:api:debug collect_resources`.
+
 Also [ResourcesLoader](../../Provider/ResourcesLoader.php) was created to make usage of this action as easy as possible.
 
 Example of usage:
@@ -68,7 +71,9 @@ get Action
 This action is intended to get an entity by its identifier.
 
 The context class: [GetContext](../../Processor/Get/GetContext.php). Also see  [Context class](#context_class) for more details.
+
 The main processor class: [GetProcessor](../../Processor/GetProcessor.php).
+
 Existing worker processors: [processors.get.yml](../../Resources/config/processors.get.yml) or run `php app/console oro:api:debug get`.
 
 This action has the following processor groups:
@@ -90,7 +95,9 @@ get_list Action
 This action is intended to get a list of entities.
 
 The context class: [GetListContext](../../Processor/GetList/GetListContext.php). Also see  [Context class](#context_class) for more details.
+
 The main processor class: [GetListProcessor](../../Processor/GetListProcessor.php).
+
 Existing worker processors: [processors.get_list.yml](../../Resources/config/processors.get_list.yml) or run `php app/console oro:api:debug get_list`.
 
 This action has the following processor groups:
@@ -112,7 +119,9 @@ customize_loaded_data Action
 This action is intended to make modifications of data loaded by [get](#get-action) or [get_list](#get_list-action) actions.
 
 The context class: [CustomizeLoadedDataContext](../../Processor/CollectResources/CustomizeLoadedDataContext.php).
+
 The main processor class: [CustomizeLoadedDataProcessor](../../Processor/CustomizeLoadedDataProcessor.php).
+
 There are no worker processors in ApiBundle. To see existing worker processors from other bundles run `php app/console oro:api:debug customize_loaded_data`.
 
 An example of own processor to modify loaded data:
@@ -161,8 +170,11 @@ get_config Action
 This action is intended to get a configuration of an entity.
 
 The context class: [ConfigContext](../../Processor/Config/ConfigContext.php).
+
 The main processor class: [ConfigProcessor](../../Processor/Config/ConfigProcessor.php).
+
 Existing worker processors: [processors.get_config.yml](../../Resources/config/processors.get_config.yml) or run `php app/console oro:api:debug get_config`.
+
 Also [ConfigProvider](../../Provider/ConfigProvider.php) was created to make usage of this action as easy as possible.
 
 Example of usage:
@@ -179,8 +191,11 @@ get_relation_config Action
 This action is intended to get a configuration of an entity if it is used in a relationship.
 
 The context class: [RelationConfigContext](../../Processor/Config/GetRelationConfig/RelationConfigContext.php).
+
 The main processor class: [RelationConfigProcessor](../../Processor/Config/RelationConfigProcessor.php).
+
 Existing worker processors: [processors.get_config.yml](../../Resources/config/processors.get_config.yml) or run `php app/console oro:api:debug get_relation_config`.
+
 Also [RelationConfigProvider](../../Provider/RelationConfigProvider.php) was created to make usage of this action as easy as possible.
 
 Example of usage:
@@ -197,8 +212,11 @@ get_metadata Action
 This action is intended to get a metadata of an entity.
 
 The context class: [MetadataContext](../../Processor/GetMetadata/MetadataContext.php).
+
 The main processor class: [MetadataProcessor](../../Processor/MetadataProcessor.php).
+
 Existing worker processors: [processors.get_metadata.yml](../../Resources/config/processors.get_metadata.yml) or run `php app/console oro:api:debug get_metadata`.
+
 Also [MetadataProvider](../../Provider/MetadataProvider.php) was created to make usage of this action as easy as possible.
 
 Example of usage:
@@ -215,8 +233,11 @@ normalize_value Action
 This action is intended to convert a value to a requested data type.
 
 The context class: [NormalizeValueContext](../../Processor/NormalizeValue/NormalizeValueContext.php).
+
 The main processor class: [NormalizeValueProcessor](../../Processor/NormalizeValueProcessor.php).
+
 Existing worker processors: [processors.normalize_value.yml](../../Resources/config/processors.normalize_value.yml) or run `php app/console oro:api:debug normalize_value`.
+
 Also [ValueNormalizer](../../Request/ValueNormalizer.php) was created to make usage of this action as easy as possible.
 
 Example of usage:
