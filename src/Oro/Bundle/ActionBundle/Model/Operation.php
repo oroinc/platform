@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
@@ -108,21 +107,6 @@ class Operation
     }
 
     /**
-     * @param ActionData $data
-     * @param Collection $errors
-     * @throws ForbiddenActionException
-     */
-    public function execute(ActionData $data, Collection $errors = null)
-    {
-        if (!$this->isAllowed($data, $errors)) {
-            throw new ForbiddenActionException(sprintf('Action "%s" is not allowed.', $this->getName()));
-        }
-
-        throw new ForbiddenActionException('This function does not implemented yet');
-        //$this->executeFunctions($data, OperationDefinition::FUNCTIONS);
-    }
-
-    /**
      * Check that action is available to show
      *
      * @param ActionData $data
@@ -130,35 +114,6 @@ class Operation
      * @return bool
      */
     public function isAvailable(ActionData $data, Collection $errors = null)
-    {
-        if ($this->hasForm()) {
-            return $this->isPreconditionAllowed($data, $errors);
-        } else {
-            return $this->isAllowed($data, $errors);
-        }
-    }
-
-    /**
-     * Check is action allowed to execute
-     *
-     * @param ActionData $data
-     * @param Collection|null $errors
-     * @return bool
-     */
-    public function isAllowed(ActionData $data, Collection $errors = null)
-    {
-        throw new ForbiddenActionException('This function does not implemented yet');
-
-        return $this->isPreConditionAllowed($data, $errors) &&
-            $this->evaluateConditions($data, OperationDefinition::CONDITIONS, $errors);
-    }
-
-    /**
-     * @param ActionData $data
-     * @param Collection $errors
-     * @return bool
-     */
-    protected function isPreconditionAllowed(ActionData $data, Collection $errors = null)
     {
         $this->executeActions($data, OperationDefinition::PREACTIONS);
 

@@ -4,14 +4,14 @@ namespace Oro\Bundle\ActionBundle\Twig;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ActionExtension extends \Twig_Extension
+class OperationExtension extends \Twig_Extension
 {
     const NAME = 'oro_action';
 
-    /** @var ActionManager */
+    /** @var OperationManager */
     protected $manager;
 
     /** @var ApplicationsHelper */
@@ -24,13 +24,13 @@ class ActionExtension extends \Twig_Extension
     protected $contextHelper;
 
     /**
-     * @param ActionManager $manager
+     * @param OperationManager $manager
      * @param ApplicationsHelper $appsHelper
      * @param DoctrineHelper $doctrineHelper
      * @param ContextHelper $contextHelper
      */
     public function __construct(
-        ActionManager $manager,
+        OperationManager $manager,
         ApplicationsHelper $appsHelper,
         DoctrineHelper $doctrineHelper,
         ContextHelper $contextHelper
@@ -61,7 +61,7 @@ class ActionExtension extends \Twig_Extension
                 ['needs_context' => true]
             ),
             new \Twig_SimpleFunction('oro_action_widget_route', [$this, 'getWidgetRoute']),
-            new \Twig_SimpleFunction('has_actions', [$this, 'hasActions']),
+            new \Twig_SimpleFunction('has_operations', [$this, 'hasOperations']),
         );
     }
 
@@ -77,8 +77,8 @@ class ActionExtension extends \Twig_Extension
      * @param array $params
      * @return bool
      */
-    public function hasActions(array $params)
+    public function hasOperations(array $params)
     {
-        return $this->manager->hasActions($params);
+        return $this->manager->hasOperations($params);
     }
 }

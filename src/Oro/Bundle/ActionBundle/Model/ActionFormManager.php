@@ -12,24 +12,24 @@ class ActionFormManager
     /** @var FormFactoryInterface */
     protected $formFactory;
 
-    /** @var ActionManager */
-    protected $actionManager;
+    /** @var OperationManager */
+    protected $operationManager;
 
     /** @var ContextHelper */
     protected $contextHelper;
 
     /**
      * @param FormFactoryInterface $formFactory
-     * @param ActionManager $actionManager
+     * @param OperationManager $operationManager
      * @param ContextHelper $contextHelper
      */
     public function __construct(
         FormFactoryInterface $formFactory,
-        ActionManager $actionManager,
+        OperationManager $operationManager,
         ContextHelper $contextHelper
     ) {
         $this->formFactory = $formFactory;
-        $this->actionManager = $actionManager;
+        $this->operationManager = $operationManager;
         $this->contextHelper = $contextHelper;
     }
 
@@ -38,9 +38,9 @@ class ActionFormManager
      * @param ActionData $data
      * @return Form
      */
-    public function getActionForm($actionName, ActionData $data)
+    public function getOperationForm($actionName, ActionData $data)
     {
-        $operation = $this->actionManager->getAction($actionName, $data);
+        $operation = $this->operationManager->getOperation($actionName, $data);
 
         return $this->formFactory->create(
             $operation->getDefinition()->getFormType(),

@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller\Api\Rest;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
@@ -11,7 +11,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 /**
  * @dbIsolation
  */
-class ActionControllerTest extends WebTestCase
+class OperationControllerTest extends WebTestCase
 {
     const MESSAGE_DEFAULT = 'test message';
 
@@ -44,7 +44,7 @@ class ActionControllerTest extends WebTestCase
      */
     protected function tearDown()
     {
-        $this->cacheProvider->delete(ActionConfigurationProvider::ROOT_NODE_NAME);
+        $this->cacheProvider->delete(ConfigurationProvider::OPROOT_NODE_NAME);
 
         parent::tearDown();
     }
@@ -69,7 +69,7 @@ class ActionControllerTest extends WebTestCase
         $statusCode,
         $message
     ) {
-        $this->cacheProvider->save(ActionConfigurationProvider::ROOT_NODE_NAME, $config);
+        $this->cacheProvider->save(ConfigurationProvider::ROOT_NODE_NAME, $config);
 
         $this->assertEquals(self::MESSAGE_DEFAULT, $this->entity->getMessage());
 

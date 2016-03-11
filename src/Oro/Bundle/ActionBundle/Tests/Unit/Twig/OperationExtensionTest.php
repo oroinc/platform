@@ -4,17 +4,17 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\ActionBundle\Twig\ActionExtension;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
+use Oro\Bundle\ActionBundle\Twig\OperationExtension;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ActionExtensionTest extends \PHPUnit_Framework_TestCase
+class OperationExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const ROUTE = 'test_route';
     const REQUEST_URI = '/test/request/uri';
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionManager */
-    protected $actionManager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
+    protected $operationManager;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper */
     protected $appsHelper;
@@ -22,7 +22,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var ActionExtension */
+    /** @var OperationExtension */
     protected $extension;
 
     /** @var  ContextHelper */
@@ -30,7 +30,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+        $this->operationManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -46,8 +46,8 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->extension = new ActionExtension(
-            $this->actionManager,
+        $this->extension = new OperationExtension(
+            $this->operationManager,
             $this->appsHelper,
             $this->doctrineHelper,
             $this->contextHelper
@@ -56,12 +56,12 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->extension, $this->actionManager, $this->appsHelper, $this->doctrineHelper, $this->requestStack);
+        unset($this->extension, $this->operationManager, $this->appsHelper, $this->doctrineHelper, $this->requestStack);
     }
 
     public function testGetName()
     {
-        $this->assertEquals(ActionExtension::NAME, $this->extension->getName());
+        $this->assertEquals(OperationExtension::NAME, $this->extension->getName());
     }
 
     public function testGetFunctions()
@@ -72,7 +72,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedFunctions = [
             'oro_action_widget_parameters' => true,
             'oro_action_widget_route' => false,
-            'has_actions' => false,
+            'has_operations' => false,
         ];
 
         /** @var \Twig_SimpleFunction $function */
@@ -94,26 +94,26 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider hasActionsDataProvider
+     * @dataProvider hasOperationsDataProvider
      *
      * @param bool $result
      */
-    public function testHasActions($result)
+    public function testHasOperations($result)
     {
         $params = ['test_param' => 'test_param_value'];
 
-        $this->actionManager->expects($this->once())
-            ->method('hasActions')
+        $this->operationManager->expects($this->once())
+            ->method('hasOperations')
             ->with($params)
             ->willReturn($result);
 
-        $this->assertEquals($result, $this->extension->hasActions($params));
+        $this->assertEquals($result, $this->extension->hasOperations($params));
     }
 
     /**
      * @return array
      */
-    public function hasActionsDataProvider()
+    public function hasOperationsDataProvider()
     {
         return [
             [true],

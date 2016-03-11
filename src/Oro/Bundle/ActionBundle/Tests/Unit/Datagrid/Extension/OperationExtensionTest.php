@@ -2,34 +2,34 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Datagrid\Extension;
 
-use Oro\Bundle\ActionBundle\Datagrid\Extension\ActionExtension;
+use Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
+use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 
-class ActionExtensionTest extends \PHPUnit_Framework_TestCase
+class OperationExtensionTest extends \PHPUnit_Framework_TestCase
 {
     const PROVIDER_ALIAS = 'test_mass_action_provider';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|MassActionProviderRegistry */
     protected $massActionProviderRegistry;
 
-    /** @var ActionExtension */
+    /** @var OperationExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionManager */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
     protected $manager;
 
     protected function setUp()
     {
-        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -61,7 +61,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(self::PROVIDER_ALIAS)
             ->willReturn($provider);
 
-        $this->extension = new ActionExtension(
+        $this->extension = new OperationExtension(
             $this->manager,
             $contextHelper,
             $applicationHelper,
@@ -89,7 +89,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
         array $expectedConfiguration = []
     ) {
         $this->manager->expects($this->once())
-            ->method('getActions')
+            ->method('getOperations')
             ->willReturn($operations);
 
         $this->assertEquals($expected, $this->extension->isApplicable($config));
@@ -124,7 +124,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
         array $groups = null
     ) {
         $this->manager->expects($this->any())
-            ->method('getActions')
+            ->method('getOperations')
             ->with($context, false)
             ->willReturn($actions);
 
@@ -259,7 +259,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             '1 allowed action and array parent config' => [
                 'config' => DatagridConfiguration::create([
                     'name' => 'datagrid_name',
-                    DatagridActionExtension::ACTION_CONFIGURATION_KEY => [
+                    ActionExtension::ACTION_CONFIGURATION_KEY => [
                         'view' => ['key1' => 'value1'],
                         'update' => false,
                     ],
@@ -277,7 +277,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             '1 allowed action and callable parent config' => [
                 'config' => DatagridConfiguration::create([
                     'name' => 'datagrid_name',
-                    DatagridActionExtension::ACTION_CONFIGURATION_KEY => function () {
+                    ActionExtension::ACTION_CONFIGURATION_KEY => function () {
                         return [
                             'view' => ['key2' => 'value2'],
                             'update' => true,

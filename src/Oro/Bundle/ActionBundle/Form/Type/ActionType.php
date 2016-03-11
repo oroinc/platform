@@ -11,7 +11,7 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 
@@ -21,8 +21,8 @@ class ActionType extends AbstractType
 {
     const NAME = 'oro_action';
 
-    /** @var ActionManager */
-    protected $actionManager;
+    /** @var OperationManager */
+    protected $operationManager;
 
     /** @var RequiredAttributesListener */
     protected $requiredAttributesListener;
@@ -32,16 +32,16 @@ class ActionType extends AbstractType
 
     /**
      * ActionType constructor.
-     * @param ActionManager $actionManager
+     * @param OperationManager $operationManager
      * @param RequiredAttributesListener $requiredAttributesListener
      * @param ContextAccessor $contextAccessor
      */
     public function __construct(
-        ActionManager $actionManager,
+        OperationManager $operationManager,
         RequiredAttributesListener $requiredAttributesListener,
         ContextAccessor $contextAccessor
     ) {
-        $this->actionManager = $actionManager;
+        $this->operationManager = $operationManager;
         $this->requiredAttributesListener = $requiredAttributesListener;
         $this->contextAccessor = $contextAccessor;
     }

@@ -6,9 +6,8 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ActionNotFoundException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ActionManager
+class OperationManager
 {
     const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Action:form.html.twig';
     const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Action:page.html.twig';
@@ -16,24 +15,21 @@ class ActionManager
     /** @var OperationRegistry */
     protected $operationRegistry;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var ContextHelper */
     protected $contextHelper;
 
     /**
      * @param OperationRegistry $operationRegistry
-     * @param DoctrineHelper $doctrineHelper
+     * @param ActionGroupRegistry $actionGroupRegistry,
      * @param ContextHelper $contextHelper
      */
     public function __construct(
         OperationRegistry $operationRegistry,
-        DoctrineHelper $doctrineHelper,
+        ActionGroupRegistry $actionGroupRegistry,
         ContextHelper $contextHelper
     ) {
         $this->operationRegistry = $operationRegistry;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->actionGroupRegistry = $actionGroupRegistry;
         $this->contextHelper = $contextHelper;
     }
 
@@ -61,21 +57,11 @@ class ActionManager
      */
     public function execute($operationName, ActionData $actionData, Collection $errors = null)
     {
-        $operation = $this->getAction($operationName, $actionData);
-        $operation->execute($actionData, $errors);
-
-        $entity = $actionData->getEntity();
-        if ($entity) {
-            $manager = $this->doctrineHelper->getEntityManager($entity);
-            $manager->beginTransaction();
-
-            try {
-                $manager->flush();
-                $manager->commit();
-            } catch (\Exception $e) {
-                $manager->rollback();
-                throw $e;
-            }
+        $operation = $this->getOperation($operationName, $actionData);
+        $operationActionGroups = $operation->getOperationActionGroups();
+        foreach ($operationActionGroups as $operationActionGroup) {
+            $actionGroup = $this->actionGroupRegistry->findByName($operationActionGroup->getName());
+            $actionGroup->execute($actionData, $errors);
         }
 
         return $actionData;
@@ -85,9 +71,9 @@ class ActionManager
      * @param array|null $context
      * @return bool
      */
-    public function hasActions(array $context = null)
+    public function hasOperations(array $context = null)
     {
-        return count($this->getActions($context)) > 0;
+        return count($this->getOperations($context)) > 0;
     }
 
     /**
@@ -95,7 +81,7 @@ class ActionManager
      * @param bool $onlyAvailable
      * @return Operation[]
      */
-    public function getActions(array $context = null, $onlyAvailable = true)
+    public function getOperations(array $context = null, $onlyAvailable = true)
     {
         $context = $this->contextHelper->getContext($context);
         $actionData = $this->contextHelper->getActionData($context);
@@ -127,7 +113,7 @@ class ActionManager
      * @return Operation
      * @throws ActionNotFoundException
      */
-    public function getAction($operationName, ActionData $actionData, $checkAvailable = true)
+    public function getOperation($operationName, ActionData $actionData, $checkAvailable = true)
     {
         $operation = $this->operationRegistry->findByName($operationName);
         if (!$operation instanceof Operation || ($checkAvailable && !$operation->isAvailable($actionData))) {
@@ -145,7 +131,7 @@ class ActionManager
     public function getFrontendTemplate($operationName, array $context = null)
     {
         $template = self::DEFAULT_FORM_TEMPLATE;
-        $operation = $this->getAction($operationName, $this->contextHelper->getActionData($context), false);
+        $operation = $this->getOperation($operationName, $this->contextHelper->getActionData($context), false);
 
         if ($operation) {
             $frontendOptions = $operation->getDefinition()->getFrontendOptions();
