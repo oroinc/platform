@@ -211,7 +211,7 @@ services:
         parent: oro_soap.handler.delete.abstract
 
     oro_organization.api.business_unit.delete.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomProcessHandler
+        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomDeleteHandler
         arguments:
             - @oro_api.doctrine_helper
             - @oro_organization.business_unit.handler.delete
@@ -224,7 +224,7 @@ services:
         parent: oro_soap.handler.delete.abstract
 
     oro_organization.api.organization.delete.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomProcessHandler
+        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomDeleteHandler
         arguments:
             - @oro_api.doctrine_helper
             - @oro_organization.organization.handler.delete

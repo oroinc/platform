@@ -3,23 +3,28 @@
 namespace Oro\Bundle\ApiBundle\Processor\Delete;
 
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 
 /**
- * Deletes object by entity manager.
+ * Deletes object by DeleteProcessHandler.
  */
-class DeleteData implements ProcessorInterface
+class DeleteDataByDeleteHandler implements ProcessorInterface
 {
+    /** @var DeleteHandler */
+    protected $deleteHandler;
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /**
-     * @param DoctrineHelper $doctrineHelper
+     * @param DeleteHandler $deleteHandler
      */
-    public function __construct(DoctrineHelper $doctrineHelper)
+    public function __construct(DoctrineHelper $doctrineHelper, DeleteHandler $deleteHandler)
     {
         $this->doctrineHelper = $doctrineHelper;
+        $this->deleteHandler = $deleteHandler;
     }
 
     /**
@@ -41,9 +46,7 @@ class DeleteData implements ProcessorInterface
             return;
         }
 
-        $em = $this->doctrineHelper->getEntityManager($object);
-        $em->remove($object);
-        $em->flush();
+        $this->deleteHandler->processDelete($object, $this->doctrineHelper->getEntityManager($object));
         $context->removeResult();
     }
 }

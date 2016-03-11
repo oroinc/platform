@@ -12,6 +12,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Component\ChainProcessor\ActionProcessor;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBag;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -74,10 +75,9 @@ class RestApiController extends FOSRestController
     public function deleteAction(Request $request)
     {
         $processor = $this->getProcessor($request);
-        /** @var GetContext $context */
+        /** @var DeleteContext $context */
         $context = $this->getContext($processor, $request);
         $context->setId($request->attributes->get('id'));
-        $context->setFilterValues(new RestFilterValueAccessor($request));
 
         $processor->process($context);
 

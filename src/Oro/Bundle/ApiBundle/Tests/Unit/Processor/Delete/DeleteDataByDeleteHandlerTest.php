@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Delete;
 
-use Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByProcessHandler;
+use Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByDeleteHandler;
 
-class DeleteDataByProcessHandlerTest extends DeleteContextTestCase
+class DeleteDataByDeleteHandlerTest extends DeleteContextTestCase
 {
-    /** @var DeleteDataByProcessHandler */
+    /** @var DeleteDataByDeleteHandler */
     protected $processor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -65,6 +65,6 @@ class DeleteDataByProcessHandlerTest extends DeleteContextTestCase
 
     protected function buildProcessor()
     {
-        $this->processor = new DeleteDataByProcessHandler($this->doctrineHelper, $this->deleteHandler);
+        $this->processor = new DeleteDataByDeleteHandler($this->doctrineHelper, $this->deleteHandler);
     }
 }
