@@ -107,7 +107,7 @@ This action has the following processor groups:
 
 | Group Name | Responsibility of Processors | Description |
 | --- | --- | --- |
-| **initialize | Initializing of the context | The processors from this group are executed when Data API documentation is generated. |
+| initialize | Initializing of the context | The processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | build_query | Building a query that will be used to load data | |
