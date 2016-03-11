@@ -119,7 +119,10 @@ class EntityConfigHelperTest extends \PHPUnit_Framework_TestCase
                     'class' => 'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1',
                     'routes' => ['name', 'view', 'unknown'],
                     'group' => null,
-                    'metadata' => $this->getEntityMetadata('Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1', []),
+                    'metadata' => $this->getEntityMetadata(
+                        'Oro\Bundle\EntityConfigBundle\Tests\Unit\Stub\TestEntity1',
+                        []
+                    ),
                 ],
                 'expected' => [
                     'name' => 'oro_testentity1_index',

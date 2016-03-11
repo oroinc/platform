@@ -143,7 +143,7 @@ class ActionAssembler extends AbstractAssembler
     protected function filterEntities(array $entities)
     {
         return array_filter(array_map([$this, 'getEntityClassName'], $entities), 'is_string');
-}
+    }
 
     /**
      * @param string $entityName
