@@ -194,9 +194,39 @@ oro_api:
                 ...
 ```
 
-* **fields** -
-* **filters** -
-* **sorters** -
+* **fields** - the `fields` configuration section describes entity fields' configuration. Each item under `fields` starts from a field name and has properties:
+
+* **label** - String. A human-readable representation of the field
+* **description** - String. A human-readable description of the field
+* **property_path** - String. Property path to reach the fields' value. Can be used for example if field and association names are not correspond. So, for example:
+    
+```yaml
+fields:
+    address:
+        property_path: address.addressName
+]
+```
+
+in this case the field `address` will contain the value from field `address_name`.
+
+* **data_transformer** - The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name.
+
+```yaml
+fields
+    fieldName0:
+        data_transformer: my.data.transformer.service.id
+    fieldName1:
+        data_transformer:
+            - my.data.transformer.service.id
+            - { class: 'Acme\Bundle\AcmeBundle\DataTransformer\MyDataTransformer', method: 'transform' }       
+    fieldName2:
+        data_transformer: [my.data.transformer.service.id, { class: 'Acme\Bundle\AcmeBundle\DataTransformer\MyDataTransformer', method: 'transform' } ]
+```
+
+* **collapse** - Boolean. Associations ONLY. Indicates whether the entity should be collapsed. It means that target entity should be returned as a value, instead of an array with values of entity fields. Usually this property is set by "get_relation_config" processors to get identifier of the related entity.
+* **exclude** - Boolean. Indicates whether the field should be excluded. This property is described above in [Exclusions" configuration section & "exclude" flag](#exclusions-configuration-section-exclude-flag).
+
+The example:
 
 ```yaml
 oro_api:
@@ -204,34 +234,80 @@ oro_api:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             ...
             fields:
-                id: null
-                name: null
-                description: null
-                createdAt: null
+                name:
+                    label:            "Acme name"
+                    description:      "Acme name description"
+                    property_path:    "firstName"
                 enabled: null
                 users:
-                    collapse: true    Indicates whether the entity should be collapsed.
-                                      It means that target entity should be returned as a value, instead of an array with values of entity fields.
-                                      Usually this property is set by "get_relation_config" processors to get identifier of the related entity.  
+                    collapse:         true
                     exclusion_policy: all
-                    post_serialize: \Closure
                     fields:
                         id: null
+```
+
+* **filters** - the `filters` configuration section describes the filtering possibilities. It contains two main properties: `exclusion_policy` and `fields`.
+    * **exclusion_policy** - The `exclusion_policy` option works the same way as for `entities` section. Please refer to ["Entities" configuration section](#entities-configuration-section).
+    * **fields** - just a container with fields' filters configuration, the `key` is a field name and `properties` are: 
+        * **description** - String. A human-readable description of the fields' filter
+        * **exclude** - Boolean. Indicates whether the field filter should be excluded. This property is described above in [Exclusions" configuration section & "exclude" flag](#exclusions-configuration-section-exclude-flag).
+        * **property_path** - Property path to reach the fields' value. The same way as above in `fields` configuration section.
+        * **data_type** - String. The data type of the filter value: boolean, integer, string, etc.
+        * **allow_array** - Boolean. By default `false`. A flag indicates whether the filter value can be an array.
+        * **default_value** - The default value for the filter.
+
+The example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
+            fields:
+                ...
             filters:
                 exclusion_policy: all
                 fields:
-                    enabled:
-                        data_type: boolean
                     id:
                         data_type: integer
+                        exclude: true
                     name:
                         data_type: string
+                        property_path: firstName
+                        description: "My filter description"
+                    enabled:
+                        data_type: boolean
+                        allow_array: false
+                        default_value: true
+```
+    
+* **sorters** - the `sorters` configuration section describes the sorting possibilities. It contains two main properties: `exclusion_policy` and `fields`.
+    * **exclusion_policy** - The `exclusion_policy` option works the same way as for `entities` section. Please refer to ["Entities" configuration section](#entities-configuration-section).
+    * **fields** - just a container with fields' sorters configuration, the `key` is a field name and `properties` are:
+        * **exclude** - Boolean. Indicates whether the field sorter should be excluded. This property is described above in [Exclusions" configuration section & "exclude" flag](#exclusions-configuration-section-exclude-flag).
+        * **property_path** - Property path to reach the fields' value. The same way as above in `fields` configuration section.
+
+In other words the `sorters` section will just enable/disable sorting possibility per certain field. It do not has any responsibility for default sorting. 
+
+The example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
+            fields:
+                ...
+            filters:
+                ...
             sorters:
-                exclusion_policy: all
+                exclusion_policy: none
                 fields:
-                    enabled: null
-                    id: null
-                    name: null
+                    id: ~
+                    name:
+                        property_path: firstName
+                    enabled:
+                        exclude: true
 ```
 
 "Relations" configuration section
@@ -239,51 +315,6 @@ oro_api:
 
 The `relations` configuration describes how the entity data should be shown then retrieved as a relation to some other entity. It's absolutely identical to `entities` configuration section, the only difference is `exclude` flag - it's not available under relation configuration.
 
-====
-
-```yaml
-# The structure of "Resources/config/oro/api.yml"
-oro_api:
-    exclusions:                                                # exclusions configuration section
-        ...
-    entities:                                                  # entities configuration section
-        name:                                                  # Fully-Qualified Class Name (FQCN)
-
-            fields:                                            # fields configuration section
-                # Prototype                                    # --------------------------------
-                name:                                          # a field name
-                    exclude:              ~                    # indicates whether the exclusion flag is set explicitly 
-                    property_path:        ~                    # property path to reach the field value
-                    collapse:             ~                    # associations ONLY. Indicates whether the collapse target entity flag is set explicitly  
-                    data_transformer:     ~                    # the data transformer(s) to be applies to the field value
-                    label:                ~                    # human-readable representation of the field
-                    description:          ~                    # human-readable description of the field
-
-            filters:                                           # filters configuration section
-                exclusion_policy:         ~                    # One of "all"; "none"
-                fields:                                        # Represents a filter configuration per field
-                    # Prototype                                # --------------------------------
-                    name:                                      # a field name
-                        exclude:          ~                    # flag indicates whether the field should be excluded
-                        property_path:    ~                    # property path to reach the field value
-                        data_type:        ~                    # data type of the filter value
-                        allow_array:      ~                    # flag indicates whether the filter value can be an array or not
-                        default_value:    ~                    # default value for the filter
-                        description:      ~                    # human-readable description of the filter
-
-            sorters:                                           # SECTION name
-                exclusion_policy:         ~                    # One of "all"; "none"
-                fields:                                        # Represents a sorter configuration per field
-                    # Prototype                                # --------------------------------
-                    name:                                      # a field name
-                        exclude:          ~                    # flag indicates whether the field should be excluded
-                        property_path:    ~                    # property path to reach the field value
-
-            exclude:                      ~                    # flag indicates whether entity should be excluded
-
-    relations:                                                 # The relation configuration is similar to entity
-                                                               # configuration except it does not have `exclude` property.
-```
 
 Config Extensions
 =================
@@ -744,4 +775,4 @@ oro_api:
                 test_property_new: "another test value"
 ```
 
-At this point we have newly created section with own properties and possibility to pass new configuration via yaml files. Please refer to [actions](actions.md) documentation section for more detail about how to use configuration in Data API logic.
+At this point we have newly created section with own properties and possibility to pass new configuration via yaml files. Please refer to [actions](./actions.md#context_class) documentation section for more detail about how to use configuration in Data API logic.
