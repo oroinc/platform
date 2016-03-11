@@ -36,7 +36,7 @@ class DeleteDataByProcessHandlerTest extends DeleteContextTestCase
 
     public function testProcessOnNonObject()
     {
-        $this->context->setObject('');
+        $this->context->setResult('');
         $this->deleteHandler->expects($this->never())
             ->method('processDelete');
         $this->processor->process($this->context);
@@ -45,7 +45,7 @@ class DeleteDataByProcessHandlerTest extends DeleteContextTestCase
     public function testProcess()
     {
         $object = new \stdClass();
-        $this->context->setObject($object);
+        $this->context->setResult($object);
 
         $em = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
@@ -60,7 +60,7 @@ class DeleteDataByProcessHandlerTest extends DeleteContextTestCase
             ->with($object, $em);
 
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasObject());
+        $this->assertFalse($this->context->hasResult());
     }
 
     protected function buildProcessor()

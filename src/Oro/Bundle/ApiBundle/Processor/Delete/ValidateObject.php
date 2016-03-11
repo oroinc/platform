@@ -17,9 +17,9 @@ class ValidateObject implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        if (!$context->hasObject()) {
+        if (!$context->hasResult()) {
             throw new NotFoundHttpException('Unsupported request.');
-        } elseif (null === $context->getObject()) {
+        } elseif (null === $context->getResult()) {
             throw new NotFoundHttpException('An entity with the requested identifier does not exist.');
         }
     }

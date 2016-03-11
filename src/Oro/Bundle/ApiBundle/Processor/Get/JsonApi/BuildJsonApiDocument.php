@@ -57,6 +57,7 @@ class BuildJsonApiDocument implements ProcessorInterface
             $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
             $documentBuilder->setErrorObject($error);
             $context->setResult($documentBuilder->getDocument());
+            $context->resetErrors();
         }
     }
 }

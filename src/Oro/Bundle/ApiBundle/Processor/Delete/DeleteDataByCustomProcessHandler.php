@@ -32,12 +32,12 @@ class DeleteDataByCustomProcessHandler extends DeleteDataByProcessHandler
     {
         /** @var DeleteContext $context */
 
-        if (!$context->hasObject()) {
+        if (!$context->hasResult()) {
             // entity already deleted
             return;
         }
 
-        $object = $context->getObject();
+        $object = $context->getResult();
         if (!is_a($object, $this->className)) {
             // given object does not supports
             return;

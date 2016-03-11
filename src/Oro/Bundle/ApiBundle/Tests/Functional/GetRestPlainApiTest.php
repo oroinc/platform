@@ -6,6 +6,9 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 
+/**
+ * @dbIsolation
+ */
 class GetRestPlainApiTest extends ApiTestCase
 {
     /**
@@ -54,14 +57,29 @@ class GetRestPlainApiTest extends ApiTestCase
         $response = $this->client->getResponse();
         $this->assertApiResponseStatusCodeEquals($response, 200, $entityAlias, 'get list');
 
-        // test get request
         $id = $this->getGetEntityId($entityClass, $this->jsonToArray($response->getContent()));
         if (null !== $id) {
+            // test get request
             $this->client->request(
                 'GET',
                 $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
             );
             $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 200, $entityAlias, 'get');
+
+            // test delete request
+            $this->client->request(
+                'DELETE',
+                $this->getUrl('oro_rest_api_delete', ['entity' => $entityAlias, 'id' => $id])
+            );
+            $response = $this->client->getResponse();
+            if ($response->getStatusCode() == 204) {
+                // check if entity was really deleted
+                $this->client->request(
+                    'GET',
+                    $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
+                );
+                $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 404, $entityAlias, 'get');
+            }
         }
     }
 
