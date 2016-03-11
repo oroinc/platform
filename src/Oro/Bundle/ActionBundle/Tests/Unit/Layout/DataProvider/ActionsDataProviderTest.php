@@ -4,11 +4,11 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
+use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider;
 use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
-use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider;
 
 use Oro\Component\Layout\ContextInterface;
 

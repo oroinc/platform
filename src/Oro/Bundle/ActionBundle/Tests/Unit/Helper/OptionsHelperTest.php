@@ -46,14 +46,13 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
         $this->optionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->contextAccessor = new ContextAccessor();
         $this->router = $this->getMock('Symfony\Component\Routing\RouterInterface');
 
         $this->helper = new OptionsHelper(
             $this->contextHelper,
             $this->applicationsHelper,
             $this->optionsAssembler,
-            $this->contextAccessor,
+            new ContextAccessor(),
             $this->router
         );
     }

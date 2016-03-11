@@ -191,7 +191,7 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
                 'actions' => ['action3' => $action3],
                 'expected' => true,
                 'expectedConfiguration' => [
-                    'actions' => ['action3' => $this->getRowActionConfig('action3', 'datagrid1', 'Action 3 label')],
+                    'actions' => ['action3' => $this->getRowActionConfig('action3', 'Action 3 label')],
                 ]
             ],
             'should not replace existing default action' => [
@@ -301,11 +301,10 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param string $action
-     * @param string $datagrid
      * @param string $label
      * @return array
      */
-    protected function getRowActionConfig($action, $datagrid = null, $label = null)
+    protected function getRowActionConfig($action, $label = null)
     {
         return [
             'type' => 'action-widget',

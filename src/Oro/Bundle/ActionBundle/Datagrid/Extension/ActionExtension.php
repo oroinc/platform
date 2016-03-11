@@ -190,6 +190,7 @@ class ActionExtension extends AbstractExtension
 
     /**
      * @param Action $action
+     * @param string $actionName
      * @return array
      */
     protected function getRowsActionsConfig(Action $action, $actionName)
