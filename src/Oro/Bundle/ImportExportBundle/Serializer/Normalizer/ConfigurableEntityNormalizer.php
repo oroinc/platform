@@ -51,7 +51,11 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $result = $this->createObject($class);
+        $result = $this->dispatchDenormalizeEvent(
+            $data,
+            $this->createObject($class),
+            Events::BEFORE_DENORMALIZE_ENTITY
+        );
         $fields = $this->fieldHelper->getFields($class, true);
 
         foreach ($fields as $field) {
@@ -77,9 +81,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             }
         }
 
-        $this->dispatchDenormalizeEvent($data, $result);
-
-        return $result;
+        return $this->dispatchDenormalizeEvent($data, $result, Events::AFTER_DENORMALIZE_ENTITY);
     }
 
     /**
@@ -231,14 +233,19 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     /**
-     * @param $data
-     * @param $result
+     * @param array $data
+     * @param object $result
+     * @param string $eventName
+     *
+     * @return object
      */
-    protected function dispatchDenormalizeEvent($data, $result)
+    protected function dispatchDenormalizeEvent($data, $result, $eventName)
     {
-        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_DENORMALIZE_ENTITY)) {
-            $this->dispatcher->dispatch(Events::AFTER_DENORMALIZE_ENTITY, new DenormalizeEntityEvent($result, $data));
+        if ($this->dispatcher && $this->dispatcher->hasListeners($eventName)) {
+            $this->dispatcher->dispatch($eventName, new DenormalizeEntityEvent($result, $data));
         }
+
+        return $result;
     }
 
     /**
