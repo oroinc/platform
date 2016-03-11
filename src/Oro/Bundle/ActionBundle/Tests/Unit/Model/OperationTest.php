@@ -18,9 +18,6 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- */
 class OperationTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationDefinition */
@@ -125,64 +122,6 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ActionData $data
-     * @param array $config
-     * @param array $actions
-     * @param array $conditions
-     * @param string $actionName
-     * @param string $exceptionMessage
-     *
-     * @dataProvider executeProvider
-     */
-    public function testExecute(
-        ActionData $data,
-        array $config,
-        array $actions,
-        array $conditions,
-        $actionName,
-        $exceptionMessage = ''
-    ) {
-        $this->markTestIncomplete();
-
-        $this->definition->expects($this->any())
-            ->method('getName')
-            ->willReturn($actionName);
-
-        $this->definition->expects($this->any())
-            ->method('getFunctions')
-            ->will($this->returnValueMap($config));
-
-        $this->definition->expects($this->any())
-            ->method('getConditions')
-            ->will($this->returnValueMap($config));
-
-        $this->actionFactory->expects($this->any())
-            ->method('create')
-            ->willReturnCallback(function ($type, $config) use ($actions) {
-                return $actions[$config[0]];
-            });
-
-        $this->conditionFactory->expects($this->any())
-            ->method('create')
-            ->willReturnCallback(function ($type, $config) use ($conditions) {
-                return $conditions[$config[0]];
-            });
-
-        $errors = new ArrayCollection();
-
-        if ($exceptionMessage) {
-            $this->setExpectedException(
-                'Oro\Bundle\ActionBundle\Exception\ForbiddenActionException',
-                $exceptionMessage
-            );
-        }
-
-        $this->operation->execute($data, $errors);
-
-        $this->assertEmpty($errors->toArray());
-    }
-
-    /**
      * @param array $inputData
      * @param array $expectedData
      *
@@ -190,20 +129,14 @@ class OperationTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsAvailable(array $inputData, array $expectedData)
     {
-        $this->markTestIncomplete();
-
         $this->definition->expects($this->any())
-            ->method('getConditions')
-            ->will($this->returnValueMap($inputData['config']['conditions']));
-
-        $this->definition->expects($this->any())
-            ->method('getFormOptions')
-            ->willReturn($inputData['config']['form_options']);
+            ->method('getPreconditions')
+            ->willReturn($inputData['config']['preconditions']);
 
         $this->conditionFactory->expects($expectedData['conditionFactory'])
             ->method('create')
             ->willReturnCallback(function ($type, $config) use ($inputData) {
-                return $inputData['conditions'][$config[0]];
+                return $inputData['preconditions'];
             });
 
         $this->assertEquals($expectedData['available'], $this->operation->isAvailable($inputData['data']));
@@ -211,19 +144,17 @@ class OperationTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
-     *
-     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function isAvailableProvider()
     {
         $data = new ActionData();
 
         return [
-            'no conditions' => [
+            'no preconditions' => [
                 'input' => [
                     'data' => $data,
                     'config' => [
-                        'conditions' => [],
+                        'preconditions' => [],
                         'form_options' => [],
                     ],
                 ],
@@ -233,159 +164,35 @@ class OperationTest extends \PHPUnit_Framework_TestCase
                     'errors' => [],
                 ],
             ],
-            '!isPreConditionAllowed' => [
+            '!isPreconditionAllowed' => [
                 'input' => [
                     'data' => $data,
                     'config' => [
-                        'conditions' => [
-                            ['preconditions', ['preconditions']],
-                            ['conditions', ['conditions']],
-                        ],
+                        'preconditions' => ['preconditions'],
                         'form_options' => [],
                     ],
-                    'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, false),
-                        'conditions' => $this->createCondition($this->never(), $data, true),
-                    ],
+                    'preconditions' => $this->createCondition($this->once(), $data, false),
                 ],
                 'expected' => [
                     'conditionFactory' => $this->exactly(1),
                     'available' => false,
                 ],
             ],
-            '!isConditionAllowed' => [
+            'isPreconditionAllowed' => [
                 'input' => [
                     'data' => $data,
                     'config' => [
-                        'conditions' => [
-                            ['preconditions', ['preconditions']],
-                            ['conditions', ['conditions']],
-                        ],
+                        'preconditions' => ['preconditions'],
                         'form_options' => [],
                     ],
-                    'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, true),
-                        'conditions' => $this->createCondition($this->once(), $data, false),
-                    ],
-                ],
-                'expected' => [
-                    'conditionFactory' => $this->exactly(2),
-                    'available' => false,
-                    'errors' => ['error3', 'error4'],
-                ],
-            ],
-            'allowed' => [
-                'input' => [
-                    'data' => $data,
-                    'config' => [
-                        'conditions' => [
-                            ['preconditions', ['preconditions']],
-                            ['conditions', ['conditions']],
-                        ],
-                        'form_options' => [],
-                    ],
-                    'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, true),
-                        'conditions' => $this->createCondition($this->once(), $data, true),
-                    ],
-                ],
-                'expected' => [
-                    'conditionFactory' => $this->exactly(2),
-                    'available' => true,
-                    'errors' => [],
-                ],
-            ],
-            'hasForm and no conditions' => [
-                'input' => [
-                    'data' => $data,
-                    'config' => [
-                        'conditions' => [],
-                        'form_options' => [
-                            'attribute_fields' => [
-                                'attribute1' => [],
-                            ],
-                        ],
-                    ],
-                ],
-                'expected' => [
-                    'conditionFactory' => $this->never(),
-                    'available' => true,
-                    'errors' => [],
-                ],
-            ],
-            'hasForm and !isPreConditionAllowed' => [
-                'input' => [
-                    'data' => $data,
-                    'config' => [
-                        'conditions' => [
-                            ['preconditions', ['preconditions']],
-                            ['conditions', ['conditions']],
-                        ],
-                        'form_options' => [
-                            'attribute_fields' => [
-                                'attribute2' => [],
-                            ],
-                        ],
-                    ],
-                    'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, false),
-                        'conditions' => $this->createCondition($this->never(), $data, true),
-                    ],
-                ],
-                'expected' => [
-                    'conditionFactory' => $this->exactly(1),
-                    'available' => false,
-                ],
-            ],
-            'hasForm and allowed' => [
-                'input' => [
-                    'data' => $data,
-                    'config' => [
-                        'conditions' => [
-                            ['preconditions', ['preconditions']],
-                            ['conditions', ['conditions']],
-                        ],
-                        'form_options' => [
-                            'attribute_fields' => [
-                                'attribute3' => [],
-                            ],
-                        ],
-                    ],
-                    'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, true),
-                        'conditions' => $this->createCondition($this->never(), $data, true),
-                    ],
+                    'preconditions' => $this->createCondition($this->once(), $data, true),
                 ],
                 'expected' => [
                     'conditionFactory' => $this->exactly(1),
                     'available' => true,
-                    'errors' => [],
                 ],
             ],
         ];
-    }
-
-    /**
-     * @param array $inputData
-     * @param array $expectedData
-     *
-     * @dataProvider isAllowedProvider
-     */
-    public function testIsAllowed(array $inputData, array $expectedData)
-    {
-        $this->markTestIncomplete();
-
-        $this->definition->expects($this->any())
-            ->method('getConditions')
-            ->will($this->returnValueMap($inputData['config']['conditions']));
-
-        $this->conditionFactory->expects($expectedData['conditionFactory'])
-            ->method('create')
-            ->willReturnCallback(function ($type, $config) use ($inputData) {
-                return $inputData['conditions'][$config[0]];
-            });
-
-        $this->assertEquals($expectedData['allowed'], $this->operation->isAllowed($inputData['data']));
     }
 
     /**
@@ -436,148 +243,6 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             ->method('getFormOptions')
             ->willReturn($input);
         $this->assertEquals($expected, $this->operation->hasForm());
-    }
-
-    /**
-     * @return array
-     */
-    public function executeProvider()
-    {
-        $data = new ActionData();
-
-        $config = [
-            ['prefunctions', ['prefunctions']],
-            ['functions', ['functions']],
-            ['preconditions', ['preconditions']],
-            ['conditions', ['conditions']],
-        ];
-
-        return [
-            '!isPreConditionAllowed' => [
-                'data' => $data,
-                'config' => $config,
-                'functions' => [
-                    'prefunctions' => $this->createAction($this->once(), $data),
-                    'functions' => $this->createAction($this->never(), $data),
-                ],
-                'conditions' => [
-                    'preconditions' => $this->createCondition($this->once(), $data, false),
-                    'conditions' => $this->createCondition($this->never(), $data, true),
-                ],
-                'actionName' => 'TestName1',
-                'exception' => 'Action "TestName1" is not allowed.'
-            ],
-            '!isConditionAllowed' => [
-                'data' => $data,
-                'config' => $config,
-                'functions' => [
-                    'prefunctions' => $this->createAction($this->once(), $data),
-                    'functions' => $this->createAction($this->never(), $data),
-                ],
-                'conditions' => [
-                    'preconditions' => $this->createCondition($this->once(), $data, true),
-                    'conditions' => $this->createCondition($this->once(), $data, false),
-                ],
-                'actionName' => 'TestName2',
-                'exception' => 'Action "TestName2" is not allowed.'
-            ],
-            'isAllowed' => [
-                'data' => $data,
-                'config' => $config,
-                'functions' => [
-                    'prefunctions' => $this->createAction($this->once(), $data),
-                    'functions' => $this->createAction($this->once(), $data),
-                ],
-                'conditions' => [
-                    'preconditions' => $this->createCondition($this->once(), $data, true),
-                    'conditions' => $this->createCondition($this->once(), $data, true),
-                ],
-                'actionName' => 'TestName3',
-            ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    public function isAllowedProvider()
-    {
-        $data = new ActionData();
-
-        return [
-            'no conditions' => [
-                'input' => [
-                    'data' => $data,
-                    'config' => [
-                        'conditions' => [],
-                    ],
-                ],
-                'expected' => [
-                    'conditionFactory' => $this->never(),
-                    'allowed' => true,
-                    'errors' => [],
-                ],
-            ],
-            '!isPreConditionAllowed' => [
-                'input' => [
-                    'data' => $data,
-                    'config' => [
-                        'conditions' => [
-                            ['preconditions', ['preconditions']],
-                            ['conditions', ['conditions']],
-                        ],
-                    ],
-                    'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, false),
-                        'conditions' => $this->createCondition($this->never(), $data, true),
-                    ],
-                ],
-                'expected' => [
-                    'conditionFactory' => $this->exactly(1),
-                    'allowed' => false,
-                ],
-            ],
-            '!isConditionAllowed' => [
-                'input' => [
-                    'data' => $data,
-                    'config' => [
-                        'conditions' => [
-                            ['preconditions', ['preconditions']],
-                            ['conditions', ['conditions']],
-                        ],
-                    ],
-                    'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, true),
-                        'conditions' => $this->createCondition($this->once(), $data, false),
-                    ],
-                ],
-                'expected' => [
-                    'conditionFactory' => $this->exactly(2),
-                    'allowed' => false,
-                    'errors' => ['error3', 'error4'],
-                ],
-            ],
-            'allowed' => [
-                'input' => [
-                    'data' => $data,
-                    'config' => [
-                        'conditions' => [
-                            ['preconditions', ['preconditions']],
-                            ['conditions', ['conditions']],
-                        ],
-                    ],
-                    'conditions' => [
-                        'preconditions' => $this->createCondition($this->once(), $data, true),
-                        'conditions' => $this->createCondition($this->once(), $data, true),
-                    ],
-                ],
-                'expected' => [
-                    'conditionFactory' => $this->exactly(2),
-                    'allowed' => true,
-                    'errors' => [],
-                ],
-            ],
-        ];
     }
 
     /**

@@ -108,21 +108,6 @@ class Operation
     }
 
     /**
-     * @param ActionData $data
-     * @param Collection $errors
-     * @throws ForbiddenActionException
-     */
-    public function execute(ActionData $data, Collection $errors = null)
-    {
-        if (!$this->isAllowed($data, $errors)) {
-            throw new ForbiddenActionException(sprintf('Action "%s" is not allowed.', $this->getName()));
-        }
-
-        throw new ForbiddenActionException('This function does not implemented yet');
-        //$this->executeFunctions($data, OperationDefinition::FUNCTIONS);
-    }
-
-    /**
      * Check that action is available to show
      *
      * @param ActionData $data
@@ -130,16 +115,6 @@ class Operation
      * @return bool
      */
     public function isAvailable(ActionData $data, Collection $errors = null)
-    {
-        return $this->isPreconditionAllowed($data, $errors);
-    }
-
-    /**
-     * @param ActionData $data
-     * @param Collection $errors
-     * @return bool
-     */
-    protected function isPreconditionAllowed(ActionData $data, Collection $errors = null)
     {
         $this->executeActions($data, OperationDefinition::PREACTIONS);
 

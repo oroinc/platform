@@ -70,11 +70,11 @@ class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(['some_option' => 'option_value']);
 
         $this->operationManager->expects($this->once())
-            ->method('getAction')
-            ->willReturnCallback(function ($actionName) {
+            ->method('getOperation')
+            ->willReturnCallback(function ($operationName) {
                 $this->operation->expects($this->any())
                     ->method('getName')
-                    ->willReturn($actionName);
+                    ->willReturn($operationName);
 
                 return $this->operation;
             });

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Action;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 
 use Oro\Component\Action\Action\AbstractAction;
@@ -17,25 +17,25 @@ class RunAction extends AbstractAction
     /** @var array */
     protected $options;
 
-    /** @var ActionManager */
-    protected $actionManager;
+    /** @var OperationManager */
+    protected $operationManager;
 
     /** @var ContextHelper */
     protected $contextHelper;
 
     /**
      * @param ContextAccessor $contextAccessor
-     * @param ActionManager $actionManager
+     * @param OperationManager $operationManager
      * @param ContextHelper $contextHelper
      */
     public function __construct(
         ContextAccessor $contextAccessor,
-        ActionManager $actionManager,
+        OperationManager $operationManager,
         ContextHelper $contextHelper
     ) {
         parent::__construct($contextAccessor);
 
-        $this->actionManager = $actionManager;
+        $this->operationManager = $operationManager;
         $this->contextHelper = $contextHelper;
     }
 
@@ -66,7 +66,7 @@ class RunAction extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $result = $this->actionManager->execute($this->options['action'], $this->getActionData($context));
+        $result = $this->operationManager->execute($this->options['action'], $this->getActionData($context));
 
         $attribute = $this->getAttribute();
         if ($attribute) {

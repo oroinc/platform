@@ -72,7 +72,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
         $expectedFunctions = [
             'oro_action_widget_parameters' => true,
             'oro_action_widget_route' => false,
-            'has_actions' => false,
+            'has_operations' => false,
         ];
 
         /** @var \Twig_SimpleFunction $function */
@@ -94,26 +94,26 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider hasActionsDataProvider
+     * @dataProvider hasOperationsDataProvider
      *
      * @param bool $result
      */
-    public function testHasActions($result)
+    public function testHasOperations($result)
     {
         $params = ['test_param' => 'test_param_value'];
 
         $this->operationManager->expects($this->once())
-            ->method('hasActions')
+            ->method('hasOperations')
             ->with($params)
             ->willReturn($result);
 
-        $this->assertEquals($result, $this->extension->hasActions($params));
+        $this->assertEquals($result, $this->extension->hasOperations($params));
     }
 
     /**
      * @return array
      */
-    public function hasActionsDataProvider()
+    public function hasOperationsDataProvider()
     {
         return [
             [true],

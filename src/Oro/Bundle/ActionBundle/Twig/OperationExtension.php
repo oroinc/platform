@@ -61,7 +61,7 @@ class OperationExtension extends \Twig_Extension
                 ['needs_context' => true]
             ),
             new \Twig_SimpleFunction('oro_action_widget_route', [$this, 'getWidgetRoute']),
-            new \Twig_SimpleFunction('has_actions', [$this, 'hasActions']),
+            new \Twig_SimpleFunction('has_operations', [$this, 'hasOperations']),
         );
     }
 
@@ -77,7 +77,7 @@ class OperationExtension extends \Twig_Extension
      * @param array $params
      * @return bool
      */
-    public function hasActions(array $params)
+    public function hasOperations(array $params)
     {
         return $this->manager->hasOperations($params);
     }

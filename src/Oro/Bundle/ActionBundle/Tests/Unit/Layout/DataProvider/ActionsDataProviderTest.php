@@ -132,7 +132,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param string $label
      * @param bool $enabled
      * @param array $frontendOptions
@@ -140,8 +140,8 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
      * @param bool $hasForm
      * @return \PHPUnit_Framework_MockObject_MockObject|Operation
      */
-    protected function getAction(
-        $actionName,
+    protected function getOperation(
+        $operationName,
         $label,
         $enabled = true,
         array $frontendOptions = [],
@@ -150,7 +150,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
     ) {
         $definition = new OperationDefinition();
         $definition->setEnabled($enabled);
-        $definition->setName($actionName);
+        $definition->setName($operationName);
         $definition->setLabel($label);
         $definition->setFrontendOptions($frontendOptions);
         $definition->setButtonOptions($buttonOptions);
@@ -174,8 +174,8 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function assertGetByGroups($groups)
     {
-        $actionOne = $this->getAction('action1', 'action1_label');
-        $actionTwo = $this->getAction(
+        $actionOne = $this->getOperation('action1', 'action1_label');
+        $actionTwo = $this->getOperation(
             'action2',
             'action2_label',
             true,
@@ -183,13 +183,13 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
             ['icon' => 'icon'],
             true
         );
-        $actionThree = $this->getAction('action3', 'action3_label', false);
+        $actionThree = $this->getOperation('action3', 'action3_label', false);
         $actions = [$actionOne, $actionTwo, $actionThree];
 
         $actionData = new ActionData(['key1' => 'val1']);
 
         $this->operationManager->expects($this->once())
-            ->method('getActions')
+            ->method('getOperations')
             ->will($this->returnValue($actions));
         $this->restrictHelper->expects($this->once())
             ->method('restrictActionsByGroup')
