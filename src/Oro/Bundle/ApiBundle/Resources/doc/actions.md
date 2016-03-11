@@ -4,14 +4,14 @@ Actions
 Table of Contents
 -----------------
  - [Overview](#overview)
- - [**collect_resources** Action](#collect-resources-action)
+ - [**collect_resources** Action](#collect_resources-action)
  - [**get** Action](#get-action)
- - [**get_list** Action](#get-list-action)
- - [**customize_loaded_data** Action](#customize-loaded-data-action)
- - [**get_config** Action](#get-config-action)
- - [**get_relation_config** Action](#get-relation-config-action)
- - [**get_metadata** Action](#get-metadata-action)
- - [**normalize_value** Action](#normalize-value-action)
+ - [**get_list** Action](#get_list-action)
+ - [**customize_loaded_data** Action](#customize_loaded_data-action)
+ - [**get_config** Action](#get_config-action)
+ - [**get_relation_config** Action](#get_relation_config-action)
+ - [**get_metadata** Action](#get_metadata-action)
+ - [**normalize_value** Action](#normalize_value-action)
  - [**Context** class](#context_class)
  - [Creating new action](#creating-new-action)
 
@@ -31,14 +31,14 @@ The following table shows all actions provided out of the box:
 
 | Action Name           | Description |
 | ---                   | --- |
-| [collect_resources](#collect-resources-action) | Returns a list of all resources available through Data API |
+| [collect_resources](#collect_resources-action) | Returns a list of all resources available through Data API |
 | [get](#get-action) | Returns an entity by its identifier |
-| [get_list](#get-list-action) | Returns a list of entities |
-| [customize_loaded_data](#customize-loaded-data-action) | Makes modifications of data loaded by [get](#get-action) or [get_list](#get-list-action) actions |
-| [get_config](#get-config-action) | Returns a configuration of an entity |
-| [get_relation_config](#get-relation-config-action) | Returns a configuration of an entity if it is used in a relationship |
-| [get_metadata](#get-metadata-action) | Returns a metadata of an entity |
-| [normalize_value](#normalize-value-action) | Converts a value to a requested data type |
+| [get_list](#get_list-action) | Returns a list of entities |
+| [customize_loaded_data](#customize_loaded_data-action) | Makes modifications of data loaded by [get](#get-action) or [get_list](#get_list-action) actions |
+| [get_config](#get_config-action) | Returns a configuration of an entity |
+| [get_relation_config](#get_relation_config-action) | Returns a configuration of an entity if it is used in a relationship |
+| [get_metadata](#get_metadata-action) | Returns a metadata of an entity |
+| [normalize_value](#normalize_value-action) | Converts a value to a requested data type |
 
 Please see [processors](./processors.md) section for more details about how to create a processor.
 
@@ -109,7 +109,7 @@ Example of usage you can find in the `cgetAction` method of [RestApiController](
 customize_loaded_data Action
 ----------------------------
 
-This action is intended to make modifications of data loaded by [get](#get-action) or [get_list](#get-list-action) actions.
+This action is intended to make modifications of data loaded by [get](#get-action) or [get_list](#get_list-action) actions.
 
 The context class: [CustomizeLoadedDataContext](../../Processor/CollectResources/CustomizeLoadedDataContext.php).
 The main processor class: [CustomizeLoadedDataProcessor](../../Processor/CustomizeLoadedDataProcessor.php).
@@ -230,7 +230,7 @@ $normalizedValue = $valueNormalizer->normalizeValue($value, $dataType, $requestT
 Context class
 -------------
 
-The [Context](../../Processor/Context.php) class is very important because it contains a lot of features and it is used as a superclass for the context classes of such actions as [get](#get-action) and [get_list](#get-list-action).
+The [Context](../../Processor/Context.php) class is very important because it contains a lot of features and it is used as a superclass for the context classes of such actions as [get](#get-action) and [get_list](#get_list-action).
 
 General methods:
 
