@@ -102,4 +102,13 @@ class BusinessUnitController extends SoapController
     {
         return $this->container->get('oro_organization.form.handler.business_unit.api');
     }
+
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->container->get('oro_organization.business_unit.handler.delete');
+    }
 }

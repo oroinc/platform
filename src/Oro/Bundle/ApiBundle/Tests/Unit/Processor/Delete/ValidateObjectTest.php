@@ -30,7 +30,7 @@ class ValidateObjectTest extends DeleteContextTestCase
      */
     public function testProcessWithNullObject()
     {
-        $this->context->setObject(null);
+        $this->context->setResult(null);
         $this->processor->process($this->context);
     }
 }

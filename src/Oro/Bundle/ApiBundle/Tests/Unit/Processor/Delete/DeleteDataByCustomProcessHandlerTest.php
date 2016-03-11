@@ -20,7 +20,7 @@ class DeleteDataByCustomProcessHandlerTest extends DeleteDataByProcessHandlerTes
 
     public function testProcessOnNonSupportedObject()
     {
-        $this->context->setObject(new \stdClass());
+        $this->context->setResult(new \stdClass());
         $this->deleteHandler->expects($this->never())
             ->method('processDelete');
         $this->processor->process($this->context);
@@ -29,7 +29,7 @@ class DeleteDataByCustomProcessHandlerTest extends DeleteDataByProcessHandlerTes
     public function testProcess()
     {
         $object = new Product();
-        $this->context->setObject($object);
+        $this->context->setResult($object);
 
         $em = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
@@ -44,6 +44,6 @@ class DeleteDataByCustomProcessHandlerTest extends DeleteDataByProcessHandlerTes
             ->with($object, $em);
 
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasObject());
+        $this->assertFalse($this->context->hasResult());
     }
 }

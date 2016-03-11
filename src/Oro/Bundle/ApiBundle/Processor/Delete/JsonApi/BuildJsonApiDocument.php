@@ -33,6 +33,11 @@ class BuildJsonApiDocument implements ProcessorInterface
         $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
 
         try {
+            // at this step, context must not contain result.
+            if ($context->hasResult() && !$context->hasErrors()) {
+                throw new \Exception('Record was not deleted.');
+            }
+
             if ($context->hasErrors()) {
                 $documentBuilder->setErrorCollection($context->getErrors());
                 // remove errors from the Context to avoid processing them by other processors
@@ -47,6 +52,7 @@ class BuildJsonApiDocument implements ProcessorInterface
             $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
             $documentBuilder->setErrorObject($error);
             $context->setResult($documentBuilder->getDocument());
+            $context->resetErrors();
         }
     }
 }

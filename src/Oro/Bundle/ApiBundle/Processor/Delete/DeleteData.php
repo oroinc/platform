@@ -29,21 +29,21 @@ class DeleteData implements ProcessorInterface
     {
         /** @var DeleteContext $context */
 
-        if (!$context->hasObject()) {
+        if (!$context->hasResult()) {
             // entity already deleted
             return;
         }
 
-        $object = $context->getObject();
+        $object = $context->getResult();
 
         if (!is_object($object)) {
-            // entity already deleted
+            // entity already deleted or not supported
             return;
         }
 
         $em = $this->doctrineHelper->getEntityManager($object);
         $em->remove($object);
         $em->flush();
-        $context->removeObject();
+        $context->removeResult();
     }
 }

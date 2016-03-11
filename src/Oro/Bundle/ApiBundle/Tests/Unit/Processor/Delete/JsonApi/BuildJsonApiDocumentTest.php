@@ -70,7 +70,24 @@ class BuildJsonApiDocumentTest extends GetProcessorTestCase
             ->willReturn($this->documentBuilder);
 
         $this->context->addError(new Error());
-        $this->context->setResult(null);
+        $this->processor->process($this->context);
+
+        $this->assertEquals(500, $this->context->getResponseStatusCode());
+    }
+
+    public function testProcessWithResult()
+    {
+        $this->documentBuilder->expects($this->never())
+            ->method('setErrorCollection');
+        $this->documentBuilder->expects($this->once())
+            ->method('getDocument');
+        $this->documentBuilder->expects($this->once())
+            ->method('setErrorObject');
+        $this->documentBuilderFactory->expects($this->exactly(2))
+            ->method('createDocumentBuilder')
+            ->willReturn($this->documentBuilder);
+
+        $this->context->setResult('some data');
         $this->processor->process($this->context);
 
         $this->assertEquals(500, $this->context->getResponseStatusCode());

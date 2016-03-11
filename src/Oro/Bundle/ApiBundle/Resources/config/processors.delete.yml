@@ -34,6 +34,13 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
 
+    oro_api.delete.initialize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
+        arguments:
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
+
     oro_api.delete.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
@@ -64,29 +71,45 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_input, priority: -100 }
 
+    oro_api.delete.rest.normalize_entity_id:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
+        arguments:
+            - @oro_api.rest.entity_id_transformer
+        tags:
+            - { name: oro.api.processor, action: delete, group: normalize_input, requestType: rest, priority: -110 }
+
+    #
+    # build_query
+    #
+
+    oro_api.delete.protect_query_by_acl:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
+        arguments:
+            - @oro_security.acl_helper
+            - DELETE
+        tags:
+            - { name: oro.api.processor, action: delete, group: build_query, priority: -90 }
+
+    oro_api.delete.build_query:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: delete, group: build_query, priority: -100 }
 
     #
     # load_data
     #
 
-    oro_api.delete.load_data:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\LoadData
-        arguments:
-            - @oro_api.doctrine_helper
-        tags:
-            - { name: oro.api.processor, action: delete, group: load_data, priority: -10 }
-
-    oro_api.delete.validate_result:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateObject
+    oro_api.delete.load_data_by_orm_query:
+        class: Oro\Bundle\ApiBundle\Processor\Get\LoadDataByOrmQuery
         tags:
             - { name: oro.api.processor, action: delete, group: load_data, priority: -20 }
 
-    oro_api.delete.security_check_data:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\SecurityCheck
-        arguments:
-            - @oro_security.security_facade
+    oro_api.delete.validate_object:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateObject
         tags:
-            - { name: oro.api.processor, action: delete, group: load_data, priority: -250 }
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -20 }
 
     #
     # delete_data

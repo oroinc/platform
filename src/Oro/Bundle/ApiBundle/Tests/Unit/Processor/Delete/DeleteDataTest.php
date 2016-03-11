@@ -30,7 +30,7 @@ class DeleteDataTest extends DeleteContextTestCase
 
     public function testProcessOnNonObject()
     {
-        $this->context->setObject('');
+        $this->context->setResult('');
         $this->doctrineHelper->expects($this->never())
             ->method('getEntityManager');
         $this->processor->process($this->context);
@@ -39,7 +39,7 @@ class DeleteDataTest extends DeleteContextTestCase
     public function testProcess()
     {
         $object = new \stdClass();
-        $this->context->setObject($object);
+        $this->context->setResult($object);
 
         $em = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
         $this->doctrineHelper->expects($this->once())
@@ -50,6 +50,6 @@ class DeleteDataTest extends DeleteContextTestCase
         $em->expects($this->once())->method('flush');
 
         $this->processor->process($this->context);
-        $this->assertFalse($this->context->hasObject());
+        $this->assertFalse($this->context->hasResult());
     }
 }

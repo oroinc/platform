@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Delete;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Loads object that should be deleted.
+ * Builds ORM QueryBuilder object that will be used to get an entity by its identifier.
  */
-class LoadData implements ProcessorInterface
+class BuildQuery implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -27,10 +27,10 @@ class LoadData implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var DeleteContext $context */
+        /** @var GetContext $context */
 
-        if ($context->hasObject()) {
-            // object already loaded
+        if ($context->hasQuery()) {
+            // a query is already built
             return;
         }
 
@@ -40,7 +40,9 @@ class LoadData implements ProcessorInterface
             return;
         }
 
-        $ids = null;
+        $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
+        $this->doctrineHelper->applyCriteria($query, $context->getCriteria());
+
         $entityId = $context->getId();
         $idFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
         if (count($idFields) === 1) {
@@ -53,10 +55,11 @@ class LoadData implements ProcessorInterface
                     )
                 );
             }
-            $ids = $entityId;
+            $query
+                ->andWhere(sprintf('e.%s = :id', reset($idFields)))
+                ->setParameter('id', $entityId);
         } else {
             // combined identifier
-            $ids = [];
             if (!is_array($entityId)) {
                 throw new \UnexpectedValueException(
                     sprintf(
@@ -77,11 +80,12 @@ class LoadData implements ProcessorInterface
                         )
                     );
                 }
-                $ids[$field] = $entityId[$field];
+                $query
+                    ->andWhere(sprintf('e.%s = :id%d', $field, $counter))
+                    ->setParameter(sprintf('id%d', $counter), $entityId[$field]);
                 $counter++;
             }
         }
-
-        $context->setObject($this->doctrineHelper->getEntityRepositoryForClass($entityClass)->find($ids));
+        $context->setQuery($query);
     }
 }

@@ -141,7 +141,7 @@ services:
             - { name: oro.api.processor, action: get, group: build_query, priority: -90 }
 
     oro_api.get.build_query:
-        class: Oro\Bundle\ApiBundle\Processor\Get\BuildQuery
+        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
             - @oro_api.doctrine_helper
         tags:

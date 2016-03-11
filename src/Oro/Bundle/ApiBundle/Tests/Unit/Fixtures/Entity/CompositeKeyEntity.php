@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * @ORM\Entity(repositoryClass="Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Repository\TestRepository")
+ * @ORM\Entity
  * @ORM\Table(name="composite_key_entity")
  */
 class CompositeKeyEntity
