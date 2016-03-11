@@ -30,7 +30,9 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\UserRepository")
- * @ORM\Table(name="oro_user")
+ * @ORM\Table(name="oro_user", indexes = {
+ *      @ORM\Index("user_first_name_last_name_idx", columns = {"first_name", "last_name"})
+ * })
  * @ORM\HasLifecycleCallbacks()
  * @Oro\Loggable
  * @Config(
