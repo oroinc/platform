@@ -10,6 +10,7 @@ Table of Contents
  - [Configuration Replacing](#configuration-replacing)
  - [Defining an Action](#defining-an-action)
    - [Example](#example)
+ - [Matching and Filter Mechanism](#matching-and-filter-mechanism)
  - [Substitution of Action](#substitution-of-action)
  - [Button Options Configuration](#button-options-configuration)
    - [Example](#example-1)
@@ -84,8 +85,8 @@ Merging uses simple rules:
 After first step application knows about all actions and have only one configuration for each action.
 
 **Extending**
-On this step application collects configurations for all actions which contain `extends`. Then main action 
-configuration, which specified in `extends`, copied and merged with configuration of original action. Merging use same 
+On this step application collects configurations for all actions which contain `extends`. Then main action
+configuration, which specified in `extends`, copied and merged with configuration of original action. Merging use same
 way, which use `overriding` step (rules).
 
 Configuration Replacing
@@ -210,13 +211,13 @@ Filters are presents in single property `groups` for now
 
 Matching
 --------
-Matching properties are: 
-- `for_all_entities` and `for_all_datagrids` as wildcards boolean indicators. 
-- And elements comparisons: `entities`, `routes`, `datagrids` 
+Matching properties are:
+- `for_all_entities` and `for_all_datagrids` as wildcards boolean indicators.
+- And elements comparisons: `entities`, `routes`, `datagrids`
 - also here is present `exclude_entities` - as exclusion matcher useful with wildcard `for_all_entities` defined to
 `true`.
 
-How it works? **Filters** discards all non matched actions and applied first before matchers. 
+How it works? **Filters** discards all non matched actions and applied first before matchers.
 Then, **matchers**, in turn, collect all actions, among filtered, where any of comparison met though `OR` statement.
 E.g.
  if `datagrid` `OR` `route` will be met in context and present in action config then that action will be added to result
@@ -285,7 +286,6 @@ actions:
                 component_name: '[name$="[component]"]'
                 component_additional: '[name$="[additional]"]'
 ```
-
 
 Frontend Options Configuration
 ==============================

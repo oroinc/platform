@@ -1,37 +1,18 @@
-{% macro get_action_attributes(dialogRoute, executionRoute, action, entityClass, entityId, cssClasses) %}
+{% macro get_action_attributes(action, entityClass, entityId, cssClasses) %}
     {% spaceless %}
     {% set context = {
         'route': app.request.get('route', app.request.get('_route')),
         'entityClass': entityClass,
         'entityId': entityId
     } %}
-    {% set fromUrl = app.request.requestUri %}
-    {% set actionUrl = action.hasDialog ? path(dialogRoute|default('oro_action_widget_form'), {actionName: action.name, fromUrl: fromUrl}|merge(context)) : null %}
+    {% set options = oro_action_frontend_options(action.action, context) %}
     {% if cssClasses is null %}
-        {% set cssClasses = action.buttonOptions.class|default('icons-holder-text') ~ " "  ~ params.buttonOptions.aCss|default('') %}
+        {% set cssClasses = action.definition.buttonOptions.class|default('icons-holder-text') ~ " "  ~ action.definition.buttonOptions.aCss|default('') %}
     {% endif %}
-    {% if executionRoute is not empty %}
-        {% set actionPath = path(executionRoute|default('oro_api_action_execute_actions'), {actionName: action.name}|merge(context)) %}
-    {% endif %}
-    {% set dialogOptions = {
-        'title': action.title,
-        'dialogOptions': action.frontendOptions.options|default({}),
-    } %}
-    href="{{ actionPath|default('javascript:void(0);') }}"
+    href="{{ options.url|default('javascript:void(0);') }}"
     class="action-button {{ cssClasses }}"
     title="{{ action.title }}"
-    data-dialog-show="{{ action.frontendOptions.show_dialog|default(false) }}"
-    data-dialog-url="{{ actionUrl }}"
-    data-dialog-options="{{ dialogOptions|json_encode }}"
-    data-translates="{{ action.translates|default({})|json_encode }}"
-    data-confirmation="{{ action.frontendOptions.confirmation|default({})|json_encode() }}"
-    {% if action.buttonOptions.page_component_module is defined %}data-page-component-module={{ action.buttonOptions.page_component_module }}{% endif %}
-    {% if action.buttonOptions.page_component_options is defined %}data-page-component-options={{ action.buttonOptions.page_component_options|json_encode }}{% endif %}
-    {% if action.buttonOptions.data is defined %}
-        {% for dataName,dataValue in action.buttonOptions.data %}
-            data-{{ dataName }}="{{ dataValue|e('html_attr')|raw }}"
-        {% endfor %}
-    {% endif %}
+    data-options="{{ options|json_encode }}"
     {% endspaceless %}
 {% endmacro %}
 
@@ -40,7 +21,7 @@
     <div{{ block('block_attributes') }}>
         {% for action in actions %}
             <div class="btn-group icons-holder">
-                <a {{ _self.get_action_attributes(dialogRoute, executionRoute, action, entityClass, entityId) }}>
+                <a {{ _self.get_action_attributes(action, entityClass, entityId) }}>
                     {% if action.icon is not empty %}
                         <i class="{{ action.icon }} {{ action.buttonOptions.iCss|default('') }} hide-text">{{ action.label }}</i>
                     {% endif %}
@@ -58,7 +39,7 @@
         {% set attr = attr|merge({ class: attr.class|default('') ~ " btn-group"}) %}
         {% set primaryButtonCss = 'btn btn-primary ' ~ action.buttonOptions.class|default('') ~ " "  ~ params.buttonOptions.aCss|default('') %}
         <div{{ block('block_attributes') }}>
-            <a {{ _self.get_action_attributes(dialogRoute, executionRoute, action, entityClass, entityId, primaryButtonCss) }}>
+            <a {{ _self.get_action_attributes(action, entityClass, entityId, primaryButtonCss) }}>
                 {% if action.icon is not empty %}
                     <i class="{{ action.icon }} {{ action.buttonOptions.iCss|default('') }} hide-text">{{ action.label }}</i>
                 {% endif %}
@@ -71,7 +52,7 @@
             <ul class="dropdown-menu">
                 {% for action in actions|slice(1) %}
                     <li>
-                        <a {{ _self.get_action_attributes(dialogRoute, executionRoute, action, entityClass, entityId) }}>
+                        <a {{ _self.get_action_attributes(action, entityClass, entityId) }}>
                             {% if action.icon is not empty %}
                                 <i class="{{ action.icon }} {{ action.buttonOptions.iCss|default('') }} hide-text">{{ action.label }}</i>
                             {% endif %}

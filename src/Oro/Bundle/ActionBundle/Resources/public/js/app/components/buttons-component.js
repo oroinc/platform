@@ -11,6 +11,11 @@ define(function(require) {
     var ButtonsComponent = BaseComponent.extend({
 
         /**
+         * @property {Object}
+         */
+        options: {},
+
+        /**
          * @property {jQuery.Element}
          */
         $container: null,
@@ -21,7 +26,7 @@ define(function(require) {
         initialize: function(options) {
             ButtonsComponent.__super__.initialize.apply(this, arguments);
 
-            this.options = _.defaults(options || {}, this.options);
+            this.options = options || {};
 
             this.$container = $(this.options._sourceElement);
             this.$container
@@ -32,9 +37,9 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onClick: function(e) {
-            e.preventDefault();
-
             this._getActionManager($(e.currentTarget)).execute(e);
+
+            return false;
         },
 
         /**
@@ -44,21 +49,7 @@ define(function(require) {
          */
         _getActionManager: function($element) {
             if (!$element.data('action-manager')) {
-                var options = {
-                    showDialog: Boolean($element.data('dialog-show')),
-                    hasDialog: Boolean($element.data('dialog-url')),
-                    dialogUrl: $element.data('dialog-url'),
-                    dialogOptions: $element.data('dialog-options'),
-                    redirectUrl: $element.data('page-url'),
-                    url: $element.attr('href'),
-                    confirmation: !_.isEmpty($element.data('confirmation')),
-                    confirmComponent: $element.data('confirm_сomponent'),
-                    messages: {
-                        confirm_title: $element.data('confirmation').title,
-                        confirm_content: $element.data('confirmation').message
-                    },
-                    translates: $element.data('translates') || {}
-                };
+                var options = $element.data('options') || {};
 
                 $element.data('action-manager', new ActionManager(options));
             }

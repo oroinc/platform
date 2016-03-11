@@ -89,5 +89,7 @@ actions:
             confirmation:
                 title: oro.action.delete_entity
                 message: oro.action.delete_confirm
+                message_parameters:
+                    entityLabel: $.entityLabel
         button_options:
             icon: icon-trash
