@@ -162,7 +162,7 @@ The `entities` configuration section describe single or multiple entities config
 * **max_results** - Integer. By default unlimited. The maximum number of items in the result. Set -1 (it means unlimited), zero or positive value to set own limit. In JSON API the default is `10` - setting up by [SetDefaultPaging](../../Processor/GetList/JsonApi/SetDefaultPaging.php) processor.
 * **order_by** - Array[[fieldName: ASC|DESC], ...]. The property can be used to configure default ordering.
 * **hints** - Array[HINT_NAME0, [name: HINT_NAME1], [name: HINT_NAME2, value: FQCN], ...]. By default empty. Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). The `name` is required  and `value` can be omitted.
-* **post_serialize** -
+* **post_serialize** - A handler to be used to modify serialized data [class: FQCN, method: methodName]
 
 And an example:
 
@@ -184,7 +184,7 @@ oro_api:
                 - HINT_TRANSLATABLE
                 - { name: HINT_FILTER_BY_CURRENT_USER }
                 - { name: HINT_CUSTOM_OUTPUT_WALKER, value: "Acme\Bundle\AcmeBundle\AST_Walker_Class"}
-            post_serialize:       ~ # a handler to be used to modify serialized data [class, method]
+            post_serialize:       [class: "Acme\Bundle\AcmeBundle\Serializer\MySerializerHandler", method: "serialize"]
             excluded:             false
             fields:
                 ...
