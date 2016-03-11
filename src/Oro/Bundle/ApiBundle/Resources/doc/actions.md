@@ -290,16 +290,16 @@ Entity configuration related methods:
 - **removeConfigExtra(extraName)** - Removes a request for some additional configuration data.
 - **hasConfig()** - Checks whether a configuration of an entity exists.
 - **getConfig()** - Gets a [configuration of an entity](../../Config/EntityDefinitionConfig.php).
-- **setConfig(config)** - Sets a custom configuration of an entity. If this method is called the default configuration of an entity will be ignored at all.
+- **setConfig(config)** - Sets a custom configuration of an entity. This method can be used to completely override the default configuration of an entity.
 - **hasConfigOfFilters()** - Checks whether an entity has a configuration of filters.
 - **getConfigOfFilters()** - Gets a [configuration of filters](../../Config/FiltersConfig.php) for an entity.
-- **setConfigOfFilters(config)** - Sets a custom configuration of filters. If this method is called the default configuration of filters will be ignored at all.
+- **setConfigOfFilters(config)** - Sets a custom configuration of filters. This method can be used to completely override the default configuration of filters.
 - **hasConfigOfSorters()** - Checks whether an entity has a configuration of sorters.
 - **getConfigOfSorters()** - Gets a [configuration of sorters](../../Config/SortersConfig.php) for an entity.
-- **setConfigOfSorters(config)** - Sets a custom configuration of sorters. If this method is called the default configuration of sorters will be ignored at all.
+- **setConfigOfSorters(config)** - Sets a custom configuration of sorters. This method can be used to completely override the default configuration of sorters.
 - **hasConfigOf(configSection)** - Checks whether a configuration of the given section exists.
 - **getConfigOf(configSection)** - Gets a configuration from the given section.
-- **setConfigOf(configSection, config)** - Sets a configuration for the given section. If this method is called the default configuration for the given section will be ignored at all.
+- **setConfigOf(configSection, config)** - Sets a configuration for the given section. This method can be used to completely override the default configuration for the given section.
 
 Entity metadata related methods:
 
@@ -310,7 +310,7 @@ Entity metadata related methods:
 - **removeMetadataExtra(extraName)** - Removes a request for some additional metadata info.
 - **hasMetadata()** - Checks whether metadata of an entity exists.
 - **getMetadata()** - Gets [metadata](../../Metadata/EntityMetadata.php) of an entity.
-- **setMetadata(metadata)** - Sets metadata of an entity. If this method is called the default metadata of an entity will be ignored at all.
+- **setMetadata(metadata)** - Sets metadata of an entity. This method can be used to completely override the default metadata of an entity.
 
 
 Creating new action
