@@ -57,7 +57,6 @@ services:
         arguments:
             - @oro_action.operation_registry
             - @oro_action.action_group_registry
-            - @oro_entity.doctrine_helper
             - @oro_action.helper.context
 
     oro_action.attribute_guesser:

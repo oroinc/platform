@@ -23,6 +23,7 @@ services:
             - @oro_action.function_factory
             - @oro_action.expression.factory
             - @oro_action.assembler.argument
+            - @oro_entity.doctrine_helper
 
     oro_action.assembler.argument:
         class: %oro_action.assembler.argument.class%
