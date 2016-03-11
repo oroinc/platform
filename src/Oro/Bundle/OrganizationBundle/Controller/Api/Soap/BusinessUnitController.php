@@ -103,7 +103,6 @@ class BusinessUnitController extends SoapController
         return $this->container->get('oro_organization.form.handler.business_unit.api');
     }
 
-
     /**
      * {@inheritdoc}
      */

@@ -48,7 +48,6 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 20 }
 
-
     #
     # security_check
     #
