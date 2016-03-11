@@ -23,6 +23,9 @@ parameters:
 
     oro_search.provider.search_mapping.class: Oro\Bundle\SearchBundle\Provider\SearchMappingProvider
 
+    oro_search.cache.search_mapping_cache.class: Oro\Bundle\SearchBundle\Cache\SearchMappingCache
+    oro_search.event_listener.search_mapping_change_listener.class: Oro\Bundle\SearchBundle\EventListener\SearchMappingChangeListener
+
     # services used only for ORM search engine
     oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
     oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
@@ -175,6 +178,7 @@ services:
         class: %oro_search.provider.search_mapping.class%
         arguments:
             - @event_dispatcher
+            - @doctrine.orm.default_metadata_cache
         calls:
             - [setMappingConfig, [%oro_search.entities_config%]]
 
@@ -191,3 +195,17 @@ services:
             - 'search'
         calls:
             - [setRegistry, [@doctrine]]
+
+    oro_search.cache.search_mapping_cache:
+        class: %oro_search.cache.search_mapping_cache.class%
+        arguments:
+            - @oro_search.provider.search_mapping
+        tags:
+            - { name: kernel.cache_warmer }
+
+    oro_search.event_listener.search_mapping_change_listener:
+        class: %oro_search.event_listener.search_mapping_change_listener.class%
+        arguments:
+            - @oro_search.provider.search_mapping
+        tags:
+            - { name: doctrine.event_listener, event: onFlush }
