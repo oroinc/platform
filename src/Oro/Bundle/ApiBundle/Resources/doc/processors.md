@@ -146,4 +146,4 @@ Examples of processor conditions
         - { name: oro.api.processor, action: get_list, group: initialize, class: "Oro\Bundle\UserBundle\Entity\User" }
 ```
 
-More examples you can find in [configuration of existing processors](../config). See *processors.\*.yml* files.
+More examples you can find in [configuration of existing processors](../config). See `processors.*.yml` files.
