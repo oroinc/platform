@@ -44,11 +44,11 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
         );
 
         return $this->dispatchFormatConversionEvent(
-                Events::AFTER_EXPORT_FORMAT_CONVERSION,
-                $exportedRecord,
-                $filledPlainDataWithFrontendHints
-            )
-            ->getResult();
+            Events::AFTER_EXPORT_FORMAT_CONVERSION,
+            $exportedRecord,
+            $filledPlainDataWithFrontendHints
+        )
+        ->getResult();
     }
 
     /**
@@ -71,11 +71,11 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
         $filteredComplexDataWithBackendHeader = $this->filterEmptyArrays($complexDataWithBackendHeader);
 
         return $this->dispatchFormatConversionEvent(
-                Events::AFTER_IMPORT_FORMAT_CONVERSION,
-                $importedRecord,
-                $filteredComplexDataWithBackendHeader
-            )
-            ->getResult();
+            Events::AFTER_IMPORT_FORMAT_CONVERSION,
+            $importedRecord,
+            $filteredComplexDataWithBackendHeader
+        )
+        ->getResult();
     }
 
     /**
