@@ -13,7 +13,7 @@ Table of Contents
     - [**get_relation_config** Action](#get_relation_config-action)
     - [**get_metadata** Action](#get_metadata-action)
     - [**normalize_value** Action](#normalize_value-action)
- - [**Context** class](#context_class)
+ - [**Context** class](#context-class)
  - [Creating new action](#creating-new-action)
 
 Overview
@@ -71,7 +71,7 @@ get Action
 
 This action is intended to get an entity by its identifier.
 
-The context class: [GetContext](../../Processor/Get/GetContext.php). Also see  [Context class](#context_class) for more details.
+The context class: [GetContext](../../Processor/Get/GetContext.php). Also see  [Context class](#context-class) for more details.
 
 The main processor class: [GetProcessor](../../Processor/GetProcessor.php).
 
@@ -95,7 +95,7 @@ get_list Action
 
 This action is intended to get a list of entities.
 
-The context class: [GetListContext](../../Processor/GetList/GetListContext.php). Also see  [Context class](#context_class) for more details.
+The context class: [GetListContext](../../Processor/GetList/GetListContext.php). Also see  [Context class](#context-class) for more details.
 
 The main processor class: [GetListProcessor](../../Processor/GetListProcessor.php).
 
