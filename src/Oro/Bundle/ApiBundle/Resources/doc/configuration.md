@@ -775,4 +775,4 @@ oro_api:
                 test_property_new: "another test value"
 ```
 
-At this point we have newly created section with own properties and possibility to pass new configuration via yaml files. Please refer to [actions](./actions.md#context_class) documentation section for more detail about how to use configuration in Data API logic.
+At this point we have newly created section with own properties and possibility to pass new configuration via yaml files. Please refer to [actions](./actions.md#context-class) documentation section for more detail about how to use configuration in Data API logic.
