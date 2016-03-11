@@ -257,7 +257,7 @@ class Operation
     }
 
     /**
-     * @return array
+     * @return OperationActionGroup[]
      */
     public function getOperationActionGroups()
     {

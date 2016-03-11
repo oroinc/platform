@@ -11,37 +11,31 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ActionDefinitionConfigurationValidator implements ConfigurationValidatorInterface
+class OperationConfigurationValidator implements ConfigurationValidatorInterface
 {
-    /**
-     * @var RouterInterface
-     */
+    /** @var RouterInterface */
     protected $router;
 
-    /**
-     * @var \Twig_ExistsLoaderInterface
-     */
+    /** @var \Twig_ExistsLoaderInterface */
     protected $twigLoader;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $debug;
 
-    /**
-     * @var Collection
-     */
+    /** @var Collection */
     protected $errors;
+
+    /** @var ConfigurationProviderInterface[] */
+    protected $configurationProviders = [];
+
+    /** @var array */
+    protected $configurations = [];
 
     /**
      * @param RouterInterface $router
@@ -65,6 +59,15 @@ class ActionDefinitionConfigurationValidator implements ConfigurationValidatorIn
     }
 
     /**
+     * @param ConfigurationProviderInterface $provider
+     * @param string $name
+     */
+    public function addConfigurationProvider(ConfigurationProviderInterface $provider, $name)
+    {
+        $this->configurationProviders[$name] = $provider;
+    }
+
+    /**
      * @param array $configuration
      * @param Collection $errors
      */
@@ -78,6 +81,7 @@ class ActionDefinitionConfigurationValidator implements ConfigurationValidatorIn
             $this->validateFormOptions($action, $name);
             $this->validateRoutes($action['routes'], $this->getPath($name, 'routes'));
             $this->validateEntities($action['entities'], $this->getPath($name, 'entities'));
+            $this->validateActionGroups($action['action_groups'], $this->getPath($name, 'action_groups'));
         }
     }
 
@@ -207,6 +211,40 @@ class ActionDefinitionConfigurationValidator implements ConfigurationValidatorIn
         }
 
         return false;
+    }
+
+    /**
+     * @param array $items
+     * @param string $path
+     */
+    protected function validateActionGroups(array $items, $path)
+    {
+        if (null === ($configuration = $this->getConfiguration('action_groups'))) {
+            return;
+        }
+
+        foreach ($items as $key => $item) {
+            if (!array_key_exists($item['name'], $configuration)) {
+                $this->handleError($this->getPath($path, $key), 'Action Group "%s" not found.', $item['name'], false);
+            }
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return array|null
+     */
+    protected function getConfiguration($name)
+    {
+        if (!array_key_exists($name, $this->configurations)) {
+            $this->configurations[$name] = null;
+
+            if (array_key_exists($name, $this->configurationProviders)) {
+                $this->configurations[$name] = $this->configurationProviders[$name]->getConfiguration();
+            }
+        }
+
+        return $this->configurations[$name];
     }
 
     /**

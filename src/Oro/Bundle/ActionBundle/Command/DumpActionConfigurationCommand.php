@@ -9,7 +9,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 
 class DumpActionConfigurationCommand extends ContainerAwareCommand
 {
@@ -31,7 +31,7 @@ class DumpActionConfigurationCommand extends ContainerAwareCommand
         $output->writeln('Load actions ...');
 
         $errors = new ArrayCollection();
-        $configuration = $this->getConfigurationProvider()->getActionConfiguration(true, $errors);
+        $configuration = $this->getConfigurationProvider()->getConfiguration(true, $errors);
 
         if ($configuration) {
             $action = $input->getArgument('action');
@@ -50,10 +50,10 @@ class DumpActionConfigurationCommand extends ContainerAwareCommand
     }
 
     /**
-     * @return ActionConfigurationProvider
+     * @return ConfigurationProvider
      */
     protected function getConfigurationProvider()
     {
-        return $this->getContainer()->get('oro_action.configuration.provider');
+        return $this->getContainer()->get('oro_action.configuration.provider.operations');
     }
 }
