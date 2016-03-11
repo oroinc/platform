@@ -79,14 +79,16 @@ Existing worker processors: [processors.get.yml](../../Resources/config/processo
 
 This action has the following processor groups:
 
-- **initialize** - for processors responsible for initializing of the context. Also the processors from this group are executed when Data API documentation is generated.
-- **security_check** - for processors responsible for checking whether an access to the requested resource is granted.
-- **normalize_input** - for processors responsible for preparing input data to be ready to use by processors from the next groups.
-- **build_query** - for processors responsible for building a query that will be used to load data.
-- **load_data** - for processors responsible for loading data.
-- **normalize_data** - for processors responsible for converting loaded data to an array. In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadDataByEntitySerializer](../../Processor/Get/LoadDataByEntitySerializer.php).
-- **finalize** - for processors responsible for final validation of loaded data.
-- **normalize_result** - for processors responsible for building the action result. The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
+| Group Name | Responsibility of Processors | Description |
+| --- | --- | --- |
+| initialize | Initializing of the context | The processors from this group are executed when Data API documentation is generated. |
+| security_check | Checking whether an access to the requested resource is granted | |
+| normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| build_query | Building a query that will be used to load data | |
+| load_data | Loading data | |
+| normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadDataByEntitySerializer](../../Processor/Get/LoadDataByEntitySerializer.php). |
+| finalize | Final validation of loaded data | |
+| normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `getAction` method of [RestApiController](../../Controller/RestApiController.php).
 
@@ -103,14 +105,16 @@ Existing worker processors: [processors.get_list.yml](../../Resources/config/pro
 
 This action has the following processor groups:
 
-- **initialize** - for processors responsible for initializing of the context. Also the processors from this group are executed when Data API documentation is generated.
-- **security_check** - for processors responsible for checking whether an access to the requested resource is granted.
-- **normalize_input** - for processors responsible for preparing input data to be ready to use by processors from the next groups.
-- **build_query** - for processors responsible for building a query that will be used to load data.
-- **load_data** - for processors responsible for loading data.
-- **normalize_data** - for processors responsible for converting loaded data to an array. In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadDataByEntitySerializer](../../Processor/Get/LoadDataByEntitySerializer.php).
-- **finalize** - for processors responsible for final validation of loaded data.
-- **normalize_result** - for processors responsible for building the action result. The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
+| Group Name | Responsibility of Processors | Description |
+| --- | --- | --- |
+| **initialize | Initializing of the context | The processors from this group are executed when Data API documentation is generated. |
+| security_check | Checking whether an access to the requested resource is granted | |
+| normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| build_query | Building a query that will be used to load data | |
+| load_data | Loading data | |
+| normalize_data | Converting loaded data into array | In most cases the processors from this group are skipped because most of entities are loaded by the [EntitySerializer](../../../../Component/EntitySerializer/README.md) and it returns already normalized data. For details see [LoadDataByEntitySerializer](../../Processor/Get/LoadDataByEntitySerializer.php). |
+| finalize | Final validation of loaded data | |
+| normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `cgetAction` method of [RestApiController](../../Controller/RestApiController.php).
 
@@ -252,7 +256,7 @@ $normalizedValue = $valueNormalizer->normalizeValue($value, $dataType, $requestT
 Context class
 -------------
 
-The [Context](../../Processor/Context.php) class is very important because it contains a lot of features and it is used as a superclass for the context classes of such actions as [get](#get-action) and [get_list](#get_list-action).
+The [Context](../../Processor/Context.php) class is very important because it is used as a superclass for the context classes of such actions as [get](#get-action) and [get_list](#get_list-action).
 
 General methods:
 
@@ -314,8 +318,8 @@ Creating new action
 
 To create a new action you need to create two classes:
 
-- **context** - This class represents an context in which an action is executed. Actually an instance of this class is used to store input and output data and share data between processors. This class must extend [ApiContext](../../Processor/ApiContext.php). Also, depending of your needs, you can use another classes derived from the [ApiContext](../../Processor/ApiContext.php), for example [Context](../../Processor/Context.php) or [SingleItemContext](../../Processor/SingleItemContext.php).
-- **main processor** - This class is the main entry point for an action and responsible for creating an instance of the context class and executing all worker processors. This class must extend [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php) and implement the `createContextObject` method. Also, depending of your needs, you can use another classes derived from the [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php), for example [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
+- **context** - This class represents an context in scope of which an action is executed. Actually an instance of this class is used to store input and output data and share data between processors. This class must extend [ApiContext](../../Processor/ApiContext.php). Also, depending on your needs, you can use another classes derived from the [ApiContext](../../Processor/ApiContext.php), for example [Context](../../Processor/Context.php) or [SingleItemContext](../../Processor/SingleItemContext.php).
+- **main processor** - This class is the main entry point for an action and responsible for creating an instance of the context class and executing all worker processors. This class must extend [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php) and implement the `createContextObject` method. Also, depending on your needs, you can use another classes derived from the [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php), for example [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
 
 ```php
 <?php
