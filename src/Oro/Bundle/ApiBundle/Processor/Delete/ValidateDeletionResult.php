@@ -16,7 +16,7 @@ class ValidateDeletionResult implements ProcessorInterface
     public function process(ContextInterface $context)
     {
         if ($context->hasResult()) {
-            throw new \Exception('The record was not deleted.');
+            throw new \RuntimeException('The record was not deleted.');
         }
     }
 }
