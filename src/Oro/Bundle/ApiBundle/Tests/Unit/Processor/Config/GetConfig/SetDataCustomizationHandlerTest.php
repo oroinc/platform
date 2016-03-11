@@ -3,11 +3,11 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\GetConfig;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataItemCustomizationHandler;
-use Oro\Bundle\ApiBundle\Processor\CustomizeDataItemContext;
+use Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataCustomizationHandler;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
-class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
+class SetDataCustomizationHandlerTest extends ConfigProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $customizationProcessor;
@@ -15,7 +15,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /** @var SetDataItemCustomizationHandler */
+    /** @var SetDataCustomizationHandler */
     protected $processor;
 
     /** @var int */
@@ -28,7 +28,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
         $this->customizationProcessorCallIndex = 0;
 
         $this->customizationProcessor = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Processor\CustomizeDataItemProcessor')
+            ->getMockBuilder('Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->doctrineHelper         = $this
@@ -36,7 +36,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new SetDataItemCustomizationHandler(
+        $this->processor = new SetDataCustomizationHandler(
             $this->customizationProcessor,
             $this->doctrineHelper
         );
@@ -502,7 +502,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
         $this->customizationProcessor->expects($this->at($this->customizationProcessorCallIndex++))
             ->method('process')
             ->willReturnCallback(
-                function (CustomizeDataItemContext $context) use ($sourceDataItem, $processedDataItem) {
+                function (CustomizeLoadedDataContext $context) use ($sourceDataItem, $processedDataItem) {
                     $this->assertEquals($this->context->getVersion(), $context->getVersion());
                     $this->assertEquals($this->context->getRequestType(), $context->getRequestType());
                     $this->assertEquals($this->context->getClassName(), $context->getClassName());
@@ -538,7 +538,7 @@ class SetDataItemCustomizationHandlerTest extends ConfigProcessorTestCase
         $this->customizationProcessor->expects($this->at($this->customizationProcessorCallIndex++))
             ->method('process')
             ->willReturnCallback(
-                function (CustomizeDataItemContext $context) use (
+                function (CustomizeLoadedDataContext $context) use (
                     $sourceDataItem,
                     $processedDataItem,
                     $childEntityClass,

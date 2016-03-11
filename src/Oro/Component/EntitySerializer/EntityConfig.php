@@ -71,6 +71,53 @@ class EntityConfig
     }
 
     /**
+     * Checks whether the configuration attribute exists.
+     *
+     * @param string $key
+     *
+     * @return bool
+     */
+    public function has($key)
+    {
+        return array_key_exists($key, $this->items);
+    }
+
+    /**
+     * Gets the configuration value.
+     *
+     * @param string $key
+     *
+     * @return mixed
+     */
+    public function get($key)
+    {
+        return array_key_exists($key, $this->items)
+            ? $this->items[$key]
+            : null;
+    }
+
+    /**
+     * Sets the configuration value.
+     *
+     * @param string $key
+     * @param mixed  $value
+     */
+    public function set($key, $value)
+    {
+        $this->items[$key] = $value;
+    }
+
+    /**
+     * Removes the configuration value.
+     *
+     * @param string $key
+     */
+    public function remove($key)
+    {
+        unset($this->items[$key]);
+    }
+
+    /**
      * Gets the configuration for all fields.
      *
      * @return FieldConfig[] [field name => config, ...]

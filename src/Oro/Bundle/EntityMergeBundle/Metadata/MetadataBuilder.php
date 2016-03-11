@@ -63,7 +63,7 @@ class MetadataBuilder
 
         $this->addDoctrineFields($result, $classMetadata);
         $this->addDoctrineAssociations($result, $classMetadata);
-        $this->addDoctrineInverseAssociations($result, $classMetadata, $className);
+        $this->addDoctrineInverseAssociations($result, $classMetadata);
         $this->addUnmappedDynamicFields($result, $classMetadata);
 
         $this->eventDispatcher->dispatch(
@@ -198,54 +198,36 @@ class MetadataBuilder
 
     /**
      * @param EntityMetadata $entityMetadata
-     * @param ClassMetadata $classMetadata
-     * @param string $className
+     * @param ClassMetadata  $classMetadata
      */
     protected function addDoctrineInverseAssociations(
         EntityMetadata $entityMetadata,
-        ClassMetadata $classMetadata,
-        $className
+        ClassMetadata $classMetadata
     ) {
-        $allMetadata = $this->doctrineHelper->getAllMetadata();
+        $associationMappings = $this->doctrineHelper
+            ->getInversedUnidirectionalAssociationMappings($classMetadata->name);
 
-        foreach ($allMetadata as $metadata) {
-            if ($metadata == $classMetadata) {
-                // Skip own class metadata
-                continue;
+        foreach ($associationMappings as $fieldName => $associationMapping) {
+            $mergeModes = [MergeModes::UNITE];
+            if ($associationMapping['type'] === ClassMetadataInfo::ONE_TO_ONE) {
+                // for fields with ONE_TO_ONE relation Unite strategy is impossible, so Replace is used
+                $mergeModes = [MergeModes::REPLACE];
             }
 
-            $currentClassName = $metadata->getName();
-            $associationMappings = $metadata->getAssociationsByTargetClass($className);
+            $fieldName = $associationMapping['fieldName'];
+            $currentClassName = $associationMapping['sourceEntity'];
 
-            foreach ($associationMappings as $fieldName => $associationMapping) {
-                if ((isset($associationMapping['type']) &&
-                    $associationMapping['type'] === ClassMetadataInfo::MANY_TO_MANY) ||
-                    isset($associationMapping['mappedBy'])
-                ) {
-                    // Skip "mapped by" and many-to-many as it's included on other side.
-                    continue;
-                }
+            $fieldMetadata = $this->metadataFactory->createFieldMetadata(
+                array(
+                    'field_name' => $this->createInverseAssociationFieldName($currentClassName, $fieldName),
+                    'merge_modes' => $mergeModes,
+                    'source_field_name' => $fieldName,
+                    'source_class_name' => $currentClassName,
+                ),
+                $associationMapping
+            );
 
-                $associationMapping['mappedBySourceEntity'] = false;
-
-                $mergeModes = [MergeModes::UNITE];
-                if ($associationMapping['type'] === ClassMetadataInfo::ONE_TO_ONE) {
-                    // for fields with ONE_TO_ONE relation Unite strategy is impossible, so Replace is used
-                    $mergeModes = [MergeModes::REPLACE];
-                }
-
-                $fieldMetadata = $this->metadataFactory->createFieldMetadata(
-                    array(
-                        'field_name' => $this->createInverseAssociationFieldName($currentClassName, $fieldName),
-                        'merge_modes' => $mergeModes,
-                        'source_field_name' => $fieldName,
-                        'source_class_name' => $currentClassName,
-                    ),
-                    $associationMapping
-                );
-
-                $entityMetadata->addFieldMetadata($fieldMetadata);
-            }
+            $entityMetadata->addFieldMetadata($fieldMetadata);
         }
     }
 
