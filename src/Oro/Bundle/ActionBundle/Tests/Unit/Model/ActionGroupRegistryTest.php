@@ -6,9 +6,10 @@ use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
-use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
+use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,12 +19,6 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var ActionGroupAssembler */
     protected $assembler;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
-    protected $actionFactory;
-
-    /** @var ConditionFactory|\PHPUnit_Framework_MockObject_MockObject */
-    protected $conditionFactory;
-
     /** @var ActionGroupRegistry */
     protected $registry;
 
@@ -32,18 +27,26 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         $this->configurationProvider =
             $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
-        $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory $doctrineHelper */
+        $actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory $doctrineHelper */
+        $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper $doctrineHelper */
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->assembler = new ActionGroupAssembler(
-            $this->actionFactory,
-            $this->conditionFactory,
-            new ArgumentAssembler()
+            $actionFactory,
+            $conditionFactory,
+            new ArgumentAssembler(),
+            $doctrineHelper
         );
 
         $this->registry = new ActionGroupRegistry(

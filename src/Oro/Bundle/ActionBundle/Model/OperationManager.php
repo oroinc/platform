@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ActionNotFoundException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class OperationManager
 {
@@ -16,27 +15,21 @@ class OperationManager
     /** @var OperationRegistry */
     protected $operationRegistry;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var ContextHelper */
     protected $contextHelper;
 
     /**
      * @param OperationRegistry $operationRegistry
      * @param ActionGroupRegistry $actionGroupRegistry,
-     * @param DoctrineHelper $doctrineHelper
      * @param ContextHelper $contextHelper
      */
     public function __construct(
         OperationRegistry $operationRegistry,
         ActionGroupRegistry $actionGroupRegistry,
-        DoctrineHelper $doctrineHelper,
         ContextHelper $contextHelper
     ) {
         $this->operationRegistry = $operationRegistry;
         $this->actionGroupRegistry = $actionGroupRegistry;
-        $this->doctrineHelper = $doctrineHelper;
         $this->contextHelper = $contextHelper;
     }
 
@@ -69,20 +62,6 @@ class OperationManager
         foreach ($operationActionGroups as $operationActionGroup) {
             $actionGroup = $this->actionGroupRegistry->findByName($operationActionGroup->getName());
             $actionGroup->execute($actionData, $errors);
-        }
-
-        $entity = $actionData->getEntity();
-        if ($entity) {
-            $manager = $this->doctrineHelper->getEntityManager($entity);
-            $manager->beginTransaction();
-
-            try {
-                $manager->flush();
-                $manager->commit();
-            } catch (\Exception $e) {
-                $manager->rollback();
-                throw $e;
-            }
         }
 
         return $actionData;

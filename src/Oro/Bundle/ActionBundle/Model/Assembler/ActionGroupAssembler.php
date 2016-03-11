@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
@@ -19,19 +20,25 @@ class ActionGroupAssembler extends AbstractAssembler
     /** @var ArgumentAssembler */
     private $argumentAssembler;
 
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param ArgumentAssembler $argumentAssembler
+     * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
-        ArgumentAssembler $argumentAssembler
+        ArgumentAssembler $argumentAssembler,
+        DoctrineHelper $doctrineHelper
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->argumentAssembler = $argumentAssembler;
+        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -47,6 +54,7 @@ class ActionGroupAssembler extends AbstractAssembler
                 $this->actionFactory,
                 $this->conditionFactory,
                 $this->argumentAssembler,
+                $this->doctrineHelper,
                 $this->assembleDefinition($actionGroupName, $options)
             );
         }

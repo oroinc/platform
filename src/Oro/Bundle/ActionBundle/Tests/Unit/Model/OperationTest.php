@@ -135,9 +135,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase
 
         $this->conditionFactory->expects($expectedData['conditionFactory'])
             ->method('create')
-            ->willReturnCallback(function ($type, $config) use ($inputData) {
-                return $inputData['preconditions'];
-            });
+            ->willReturn($inputData['preconditions']);
 
         $this->assertEquals($expectedData['available'], $this->operation->isAvailable($inputData['data']));
     }
@@ -157,6 +155,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase
                         'preconditions' => [],
                         'form_options' => [],
                     ],
+                    'preconditions' => [],
                 ],
                 'expected' => [
                     'conditionFactory' => $this->never(),

@@ -6,6 +6,7 @@ use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
@@ -20,13 +21,14 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assembler = new ActionGroupAssembler(
             $this->getActionFactory(),
             $this->getConditionFactory(),
-            $this->getArgumentAssembler()
+            $this->getArgumentAssembler(),
+            $this->getDoctrineHelper()
         );
     }
 
     protected function tearDown()
     {
-        unset($this->assembler, $this->functionFactory, $this->conditionFactory);
+        unset($this->assembler);
     }
 
     /**
@@ -50,6 +52,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
         $argumentAssembler = $this->getArgumentAssembler();
         $actionFactory = $this->getActionFactory();
         $conditionFactory = $this->getConditionFactory();
+        $doctrineHelper = $this->getDoctrineHelper();
 
         $definition1 = new ActionGroupDefinition();
         $definition1
@@ -95,6 +98,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         $actionFactory,
                         $conditionFactory,
                         $argumentAssembler,
+                        $doctrineHelper,
                         $definition1
                     )
                 ],
@@ -112,6 +116,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         $actionFactory,
                         $conditionFactory,
                         $argumentAssembler,
+                        $doctrineHelper,
                         $definition2
                     )
                 ],
@@ -130,6 +135,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         $actionFactory,
                         $conditionFactory,
                         $argumentAssembler,
+                        $doctrineHelper,
                         $definition3
                     )
                 ],
@@ -153,6 +159,16 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
     protected function getConditionFactory()
     {
         return $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper
+     */
+    protected function getDoctrineHelper()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
     }

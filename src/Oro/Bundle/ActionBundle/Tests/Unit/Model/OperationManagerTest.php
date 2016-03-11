@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
@@ -14,7 +15,6 @@ use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory;
@@ -27,8 +27,8 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
     protected $operationRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionGroupRegistry */
+    protected $actionGroupRegistry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper */
     protected $contextHelper;
@@ -49,10 +49,6 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()
             ->getMock();
@@ -60,7 +56,6 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
         $this->manager = new OperationManager(
             $this->operationRegistry,
             $this->actionGroupRegistry,
-            $this->doctrineHelper,
             $this->contextHelper
         );
     }
@@ -300,10 +295,6 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteByContext(array $context, ActionData $actionData)
     {
-        if ($actionData->getEntity()) {
-            $this->assertEntityManagerCalled('stdClass');
-        }
-
         $errors = new ArrayCollection();
 
         $actionGroup = $this->createActionGroupMock();
@@ -392,18 +383,9 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider executeDataProvider
      *
      * @param ActionData $actionData
-     * @param bool $exception
      */
-    public function testExecute(ActionData $actionData, $exception = false)
+    public function testExecute(ActionData $actionData)
     {
-        if ($actionData->getEntity()) {
-            $this->assertEntityManagerCalled(get_class($actionData->getEntity()), $exception);
-
-            if ($exception) {
-                $this->setExpectedException('\Exception', 'Flush exception');
-            }
-        }
-
         $errors = new ArrayCollection();
 
         $operation = $this->createOperationMock();
@@ -446,8 +428,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
                 'actionData' => new ActionData(['data' => new \stdClass])
             ],
             'exception' => [
-                'actionData' => new ActionData(['data' => new \stdClass]),
-                'exception' => true
+                'actionData' => new ActionData(['data' => new \stdClass])
             ],
         ];
     }
@@ -509,31 +490,6 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
                 'expected' => 'test.html.twig'
             ]
         ];
-    }
-
-    /**
-     * @param string $className
-     * @param bool $throwException
-     */
-    protected function assertEntityManagerCalled($className, $throwException = false)
-    {
-        $entityManager = $this->getMock('Doctrine\ORM\EntityManagerInterface');
-        $entityManager->expects($this->once())->method('beginTransaction');
-
-        if ($throwException) {
-            $entityManager->expects($this->once())
-                ->method('flush')
-                ->willThrowException(new \Exception('Flush exception'));
-            $entityManager->expects($this->once())->method('rollback');
-        } else {
-            $entityManager->expects($this->once())->method('flush');
-            $entityManager->expects($this->once())->method('commit');
-        }
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityManager')
-            ->with($this->isInstanceOf($className))
-            ->willReturn($entityManager);
     }
 
     /**
