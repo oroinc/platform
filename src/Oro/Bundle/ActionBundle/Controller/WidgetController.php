@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Session\Session;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 class WidgetController extends Controller
 {
@@ -29,7 +29,7 @@ class WidgetController extends Controller
     public function buttonsAction(Request $request)
     {
         return [
-            'actions' => $this->getActionManager()->getActions(),
+            'actions' => $this->getOperationManager()->getOperations(),
             'context' => $this->getContextHelper()->getContext(),
             'actionData' => $this->getContextHelper()->getActionData(),
             'dialogRoute' => $this->getApplicationsHelper()->getDialogRoute(),
@@ -53,20 +53,20 @@ class WidgetController extends Controller
         $params = [
             '_wid' => $request->get('_wid'),
             'fromUrl' => $request->get('fromUrl'),
-            'action' => $this->getActionManager()->getAction($actionName, $data),
+            'action' => $this->getOperationManager()->getOperation($actionName, $data),
             'actionData' => $data,
         ];
 
         try {
             /** @var Form $form */
-            $form = $this->get('oro_action.form_manager')->getActionForm($actionName, $data);
+            $form = $this->get('oro_action.form_manager')->getOperationForm($actionName, $data);
 
             $data['form'] = $form;
 
             $form->handleRequest($request);
 
             if ($form->isValid()) {
-                $data = $this->getActionManager()->execute($actionName, $data, $errors);
+                $data = $this->getOperationManager()->execute($actionName, $data, $errors);
 
                 $params['response'] = $this->getResponse($data);
 
@@ -88,7 +88,7 @@ class WidgetController extends Controller
         $params['context'] = $data->getValues();
         $params['errors'] = $errors;
 
-        return $this->render($this->getActionManager()->getFrontendTemplate($actionName), $params);
+        return $this->render($this->getOperationManager()->getFrontendTemplate($actionName), $params);
     }
 
     /**
@@ -101,11 +101,11 @@ class WidgetController extends Controller
     }
 
     /**
-     * @return ActionManager
+     * @return OperationManager
      */
-    protected function getActionManager()
+    protected function getOperationManager()
     {
-        return $this->get('oro_action.manager');
+        return $this->get('oro_action.operation_manager');
     }
 
     /**

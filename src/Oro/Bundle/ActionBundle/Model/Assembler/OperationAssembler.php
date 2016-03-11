@@ -111,7 +111,8 @@ class OperationAssembler extends AbstractAssembler
             ->setDatagridOptions($this->getOption($options, 'datagrid_options', []))
             ->setAttributes($this->getOption($options, 'attributes', []))
             ->setFormOptions($this->getOption($options, 'form_options', []))
-            ->setPreconditions($this->getOption($options, 'preconditions', []));
+            ->setPreconditions($this->getOption($options, 'preconditions', []))
+            ->setActionGroups($this->getOption($options, 'action_groups', []));
 
         foreach (OperationDefinition::getAllowedActions() as $name) {
             $operationDefinition->setActions($name, $this->getOption($options, $name, []));

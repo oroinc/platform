@@ -6,6 +6,7 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
 use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -27,6 +28,9 @@ class ActionGroup
     /** @var ActionGroupDefinition */
     private $definition;
 
+    /** @var DoctrineHelper */
+    private $doctrineHelper;
+
     /** @var Argument[] */
     private $arguments;
 
@@ -34,17 +38,20 @@ class ActionGroup
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param ArgumentAssembler $argumentAssembler
+     * @param DoctrineHelper $doctrineHelper
      * @param ActionGroupDefinition $definition
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
         ArgumentAssembler $argumentAssembler,
+        DoctrineHelper $doctrineHelper,
         ActionGroupDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->argumentAssembler = $argumentAssembler;
+        $this->doctrineHelper = $doctrineHelper;
         $this->definition = $definition;
     }
 
@@ -52,6 +59,7 @@ class ActionGroup
      * @param ActionData $data
      * @param Collection $errors
      * @throws ForbiddenActionException
+     * @throws \Exception
      */
     public function execute(ActionData $data, Collection $errors = null)
     {
@@ -62,6 +70,19 @@ class ActionGroup
         }
 
         $this->executeActions($data);
+        $entity = $data->getEntity();
+        if ($entity) {
+            $manager = $this->doctrineHelper->getEntityManager($entity);
+            $manager->beginTransaction();
+
+            try {
+                $manager->flush();
+                $manager->commit();
+            } catch (\Exception $e) {
+                $manager->rollback();
+                throw $e;
+            }
+        }
     }
 
     /**

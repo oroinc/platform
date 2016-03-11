@@ -7,7 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataProviderInterface;
@@ -15,9 +15,9 @@ use Oro\Component\Layout\DataProviderInterface;
 class ActionsDataProvider implements DataProviderInterface
 {
     /**
-     * @var ActionManager
+     * @var OperationManager
      */
-    protected $actionManager;
+    protected $operationManager;
 
     /**
      * @var RestrictHelper
@@ -35,17 +35,17 @@ class ActionsDataProvider implements DataProviderInterface
     protected $contextHelper;
 
     /**
-     * @param ActionManager $actionManager
+     * @param OperationManager $operationManager
      * @param RestrictHelper $restrictHelper
      * @param TranslatorInterface $translator
      */
     public function __construct(
-        ActionManager $actionManager,
+        OperationManager $operationManager,
         RestrictHelper $restrictHelper,
         TranslatorInterface $translator,
         ContextHelper $contextHelper
     ) {
-        $this->actionManager = $actionManager;
+        $this->operationManager = $operationManager;
         $this->restrictHelper = $restrictHelper;
         $this->translator = $translator;
         $this->contextHelper = $contextHelper;
@@ -101,7 +101,7 @@ class ActionsDataProvider implements DataProviderInterface
      */
     public function getByGroup($groups = null)
     {
-        $actions = $this->restrictHelper->restrictActionsByGroup($this->actionManager->getActions(), $groups);
+        $actions = $this->restrictHelper->restrictActionsByGroup($this->operationManager->getOperations(), $groups);
 
         return $this->getPreparedData($actions);
     }

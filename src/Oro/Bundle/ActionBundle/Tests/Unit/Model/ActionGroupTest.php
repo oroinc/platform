@@ -9,6 +9,7 @@ use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Argument;
 use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -27,6 +28,9 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     /** @var ActionGroup */
     protected $actionGroup;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var ActionData */
     protected $data;
 
@@ -40,10 +44,15 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->actionGroup = new ActionGroup(
             $this->actionFactory,
             $this->conditionFactory,
             new ArgumentAssembler(),
+            $this->doctrineHelper,
             new ActionGroupDefinition()
         );
 
@@ -61,6 +70,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
      * @param ConfigurableCondition $condition
      * @param string $actionGroupName
      * @param string $exceptionMessage
+     * @param bool $flushException
      *
      * @dataProvider executeProvider
      */
@@ -69,7 +79,8 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         ActionInterface $action,
         ConfigurableCondition $condition,
         $actionGroupName,
-        $exceptionMessage = ''
+        $exceptionMessage = '',
+        $flushException = false
     ) {
         $this->actionGroup->getDefinition()->setName($actionGroupName);
         $this->actionGroup->getDefinition()->setActions(['action1']);
@@ -94,6 +105,14 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             );
         }
 
+        if ($data->getEntity() && $this->actionGroup->isAllowed($data)) {
+            $this->assertEntityManagerCalled(get_class($data->getEntity()), $flushException);
+
+            if ($flushException) {
+                $this->setExpectedException('\Exception', 'Flush exception');
+            }
+        }
+
         $this->actionGroup->execute($data, $errors);
 
         $this->assertEmpty($errors->toArray());
@@ -104,21 +123,29 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
      */
     public function executeProvider()
     {
-        $data = new ActionData(['data' => 'value']);
+        $data = new ActionData(['data' => new \stdClass()]);
 
         return [
             '!isConditionAllowed' => [
                 'data' => $data,
                 'action' => $this->createActionGroup($this->never(), $data),
-                'condition' => $this->createCondition($this->once(), $data, false),
+                'condition' => $this->createCondition($this->exactly(2), $data, false),
                 'actionGroupName' => 'TestName2',
                 'exception' => 'ActionGroup "TestName2" is not allowed.'
             ],
             'isAllowed' => [
                 'data' => $data,
                 'action' => $this->createActionGroup($this->once(), $data),
-                'condition' => $this->createCondition($this->once(), $data, true),
+                'condition' => $this->createCondition($this->exactly(2), $data, true),
                 'actionGroupName' => 'TestName3',
+            ],
+            'allowed with flush exception' => [
+                'data' => $data,
+                'action' => $this->createActionGroup($this->once(), $data),
+                'condition' => $this->createCondition($this->exactly(2), $data, true),
+                'actionGroupName' => 'TestName3',
+                'exception' => '',
+                'flushException' => true,
             ],
         ];
     }
@@ -237,5 +264,30 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         $condition->expects($expects)->method('evaluate')->with($data)->willReturn($returnValue);
 
         return $condition;
+    }
+
+    /**
+     * @param string $className
+     * @param bool $throwException
+     */
+    protected function assertEntityManagerCalled($className, $throwException = false)
+    {
+        $entityManager = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $entityManager->expects($this->once())->method('beginTransaction');
+
+        if ($throwException) {
+            $entityManager->expects($this->once())
+                ->method('flush')
+                ->willThrowException(new \Exception('Flush exception'));
+            $entityManager->expects($this->once())->method('rollback');
+        } else {
+            $entityManager->expects($this->once())->method('flush');
+            $entityManager->expects($this->once())->method('commit');
+        }
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('getEntityManager')
+            ->with($this->isInstanceOf($className))
+            ->willReturn($entityManager);
     }
 }

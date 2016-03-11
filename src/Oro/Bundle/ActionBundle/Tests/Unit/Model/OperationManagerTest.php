@@ -6,14 +6,15 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory;
@@ -21,18 +22,18 @@ use Oro\Component\ConfigExpression\ExpressionFactory;
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
-class ActionManagerTest extends \PHPUnit_Framework_TestCase
+class OperationManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationRegistry */
     protected $operationRegistry;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionGroupRegistry */
+    protected $actionGroupRegistry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper */
     protected $contextHelper;
 
-    /** @var ActionManager */
+    /** @var OperationManager */
     protected $manager;
 
     /**
@@ -44,7 +45,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->actionGroupRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -52,40 +53,42 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new ActionManager($this->operationRegistry, $this->doctrineHelper, $this->contextHelper);
+        $this->manager = new OperationManager(
+            $this->operationRegistry,
+            $this->actionGroupRegistry,
+            $this->contextHelper
+        );
     }
 
     /**
-     * @dataProvider hasActionsDataProvider
+     * @dataProvider hasOperationsDataProvider
      *
-     * @param array $actions
+     * @param array $operations
      * @param bool $expected
      */
-    public function testHasActions(array $actions, $expected)
+    public function testHasOperations(array $operations, $expected)
     {
-        $this->markTestIncomplete();
-
-        $this->operationRegistry->expects($this->once())->method('find')->willReturn($actions);
+        $this->operationRegistry->expects($this->once())->method('find')->willReturn($operations);
 
         $this->assertContextHelperCalled();
-        $this->assertEquals($expected, $this->manager->hasActions());
+        $this->assertEquals($expected, $this->manager->hasOperations());
     }
 
     /**
      * @return array
      */
-    public function hasActionsDataProvider()
+    public function hasOperationsDataProvider()
     {
         return [
-            'no actions' => [
-                'actions' => [],
+            'no operations' => [
+                'operations' => [],
                 'expected' => false
             ],
             'route1 & entity1' => [
-                'actions' => [
-                    $this->getActions('action2'),
-                    $this->getActions('action1'),
-                    $this->getActions('action3')
+                'operations' => [
+                    $this->getOperations('operation2'),
+                    $this->getOperations('operation1'),
+                    $this->getOperations('operation3')
                 ],
                 'expected' => true
             ]
@@ -93,32 +96,39 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider getActionsProvider
+     * @dataProvider getOperationsProvider
      *
      * @param string $class
      * @param string $route
      * @param string $datagrid
      * @param string $group
      * @param array $context
-     * @param array $actions
+     * @param array $operations
      * @param array $expected
      */
-    public function testGetActions($class, $route, $datagrid, $group, array $context, array $actions, array $expected)
-    {
+    public function testgetOperations(
+        $class,
+        $route,
+        $datagrid,
+        $group,
+        array $context,
+        array $operations,
+        array $expected
+    ) {
         $this->assertContextHelperCalled($context);
 
         $this->operationRegistry->expects($this->once())
             ->method('find')
             ->with($class, $route, $datagrid, $group)
-            ->willReturn($actions);
+            ->willReturn($operations);
 
-        $this->assertGetActions($expected, $context);
+        $this->assertGetOperations($expected, $context);
     }
 
     /**
      * @return array
      */
-    public function getActionsProvider()
+    public function getOperationsProvider()
     {
         return [
             'empty context' => [
@@ -127,8 +137,8 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 'datagrid' => null,
                 'group' => null,
                 'context' => [],
-                'actions' => [],
-                'expectedActions' => []
+                'operations' => [],
+                'expectedOperations' => []
             ],
             'incorrect context parameter' => [
                 'entityClass' => null,
@@ -136,8 +146,8 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 'datagrid' => null,
                 'group' => null,
                 'context' => ['entityId' => 1],
-                'actions' => [],
-                'expectedActions' => []
+                'operations' => [],
+                'expectedOperations' => []
             ],
             'route1' => [
                 'entityClass' => null,
@@ -145,13 +155,13 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 'datagrid' => null,
                 'group' => null,
                 'context' => ['route' => 'route1'],
-                'actions' => [
-                    'action2' => $this->getActions('action2'),
-                    'action4' => $this->getActions('action4'),
+                'operations' => [
+                    'operation2' => $this->getOperations('operation2'),
+                    'operation4' => $this->getOperations('operation4'),
                 ],
-                'expectedActions' => [
-                    'action4',
-                    'action2',
+                'expectedOperations' => [
+                    'operation4',
+                    'operation2',
                 ]
             ],
             'entity1 without id' => [
@@ -160,8 +170,8 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 'datagrid' => null,
                 'group' => null,
                 'context' => ['entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
-                'actions' => [],
-                'expectedActions' => []
+                'operations' => [],
+                'expectedOperations' => []
             ],
             'entity1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
@@ -172,15 +182,15 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                     'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
                     'entityId' => 1,
                 ],
-                'actions' => [
-                    'action3' => $this->getActions('action3'),
-                    'action4' => $this->getActions('action4'),
-                    'action6' => $this->getActions('action6'),
+                'operations' => [
+                    'operation3' => $this->getOperations('operation3'),
+                    'operation4' => $this->getOperations('operation4'),
+                    'operation6' => $this->getOperations('operation6'),
                 ],
-                'expectedActions' => [
-                    'action4',
-                    'action3',
-                    'action6'
+                'expectedOperations' => [
+                    'operation4',
+                    'operation3',
+                    'operation6'
                 ]
             ],
             'route1 & entity1' => [
@@ -193,17 +203,17 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                     'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
                     'entityId' => 1,
                 ],
-                'actions' => [
-                    'action2' => $this->getActions('action2'),
-                    'action3' => $this->getActions('action3'),
-                    'action4' => $this->getActions('action4'),
-                    'action6' => $this->getActions('action6'),
+                'operations' => [
+                    'operation2' => $this->getOperations('operation2'),
+                    'operation3' => $this->getOperations('operation3'),
+                    'operation4' => $this->getOperations('operation4'),
+                    'operation6' => $this->getOperations('operation6'),
                 ],
-                'expectedActions' => [
-                        'action4',
-                        'action3',
-                        'action2',
-                        'action6'
+                'expectedOperations' => [
+                        'operation4',
+                        'operation3',
+                        'operation2',
+                        'operation6'
                 ]
             ],
             'full context' => [
@@ -218,13 +228,13 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                     'datagrid' => 'grid1',
                     'group' => 'group1'
                 ],
-                'actions' => [
-                    'action2' => $this->getActions('action2'),
-                    'action3' => $this->getActions('action3'),
-                    'action4' => $this->getActions('action4'),
-                    'action6' => $this->getActions('action6')
+                'operations' => [
+                    'operation2' => $this->getOperations('operation2'),
+                    'operation3' => $this->getOperations('operation3'),
+                    'operation4' => $this->getOperations('operation4'),
+                    'operation6' => $this->getOperations('operation6')
                 ],
-                'expectedActions' => ['action4', 'action3', 'action2', 'action6']
+                'expectedOperations' => ['operation4', 'operation3', 'operation2', 'operation6']
             ]
         ];
     }
@@ -236,7 +246,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
      * @param Operation|null $operation
      * @param bool $isAvailable
      */
-    public function testGetAction($operationName, $operation, $isAvailable)
+    public function testGetOperation($operationName, $operation, $isAvailable)
     {
         if (!$operation || !$isAvailable) {
             $this->setExpectedException(
@@ -250,7 +260,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->with($operationName)
             ->willReturn($operation);
 
-        $this->assertSame($operation, $this->manager->getAction($operationName, new ActionData()));
+        $this->assertSame($operation, $this->manager->getOperation($operationName, new ActionData()));
     }
 
     /**
@@ -259,19 +269,19 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     public function getActionDataProvider()
     {
         return [
-            'no action' => [
-                'actionName' => 'test',
-                'action' => null,
+            'no operation' => [
+                'operationName' => 'test',
+                'operation' => null,
                 'isAvailable' => true
             ],
-            'action not available' => [
-                'actionName' => 'test',
-                'action' => $this->createActionMock(false),
+            'operation not available' => [
+                'operationName' => 'test',
+                'operation' => $this->createOperationMock(false),
                 'isAvailable' => false
             ],
-            'valid action' => [
-                'actionName' => 'test_action',
-                'action' => $this->createActionMock(true),
+            'valid operation' => [
+                'operationName' => 'test_operation',
+                'operation' => $this->createOperationMock(true),
                 'isAvailable' => true
             ]
         ];
@@ -285,14 +295,11 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecuteByContext(array $context, ActionData $actionData)
     {
-        if ($actionData->getEntity()) {
-            $this->assertEntityManagerCalled('stdClass');
-        }
-
         $errors = new ArrayCollection();
 
-        $action = $this->createActionMock();
-        $action->expects($this->once())
+        $actionGroup = $this->createActionGroupMock();
+        $operation = $this->createOperationMock();
+        $actionGroup->expects($this->once())
             ->method('execute')
             ->willReturn(function ($param1, $param2) use ($actionData, $errors) {
                 $this->assertSame($actionData, $param1);
@@ -303,15 +310,20 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->operationRegistry->expects($this->once())
             ->method('findByName')
-            ->with('test_action')
-            ->willReturn($action);
+            ->with('test_operation')
+            ->willReturn($operation);
+
+        $this->actionGroupRegistry->expects($this->once())
+            ->method('findByName')
+            ->with('test_actionGroup')
+            ->willReturn($actionGroup);
 
         $this->contextHelper->expects($this->once())
             ->method('getActionData')
             ->with($context)
             ->willReturn($actionData);
 
-        $this->manager->executeByContext('test_action', $context, $errors);
+        $this->manager->executeByContext('test_operation', $context, $errors);
 
         $this->assertEmpty($errors->toArray());
     }
@@ -356,7 +368,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 ],
                 'actionData' => new ActionData(),
             ],
-            'route1 and entity with action data and entity' => [
+            'route1 and entity with operation data and entity' => [
                 'context' => [
                     'route' => 'route1',
                     'entityClass' => 'stdClass',
@@ -371,22 +383,13 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
      * @dataProvider executeDataProvider
      *
      * @param ActionData $actionData
-     * @param bool $exception
      */
-    public function testExecute(ActionData $actionData, $exception = false)
+    public function testExecute(ActionData $actionData)
     {
-        if ($actionData->getEntity()) {
-            $this->assertEntityManagerCalled(get_class($actionData->getEntity()), $exception);
-
-            if ($exception) {
-                $this->setExpectedException('\Exception', 'Flush exception');
-            }
-        }
-
         $errors = new ArrayCollection();
 
-        $action = $this->createActionMock();
-        $action->expects($this->once())
+        $operation = $this->createOperationMock();
+        $operation->expects($this->any())
             ->method('execute')
             ->willReturn(function ($param1, $param2) use ($actionData, $errors) {
                 $this->assertSame($actionData, $param1);
@@ -397,10 +400,17 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->operationRegistry->expects($this->once())
             ->method('findByName')
-            ->with('test_action')
-            ->willReturn($action);
+            ->with('test_operation')
+            ->willReturn($operation);
 
-        $this->manager->execute('test_action', $actionData, $errors);
+        $actionGroup = $this->createActionGroupMock();
+
+        $this->actionGroupRegistry->expects($this->once())
+            ->method('findByName')
+            ->with('test_actionGroup')
+            ->willReturn($actionGroup);
+
+        $this->manager->execute('test_operation', $actionData, $errors);
 
         $this->assertEmpty($errors->toArray());
     }
@@ -418,8 +428,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 'actionData' => new ActionData(['data' => new \stdClass])
             ],
             'exception' => [
-                'actionData' => new ActionData(['data' => new \stdClass]),
-                'exception' => true
+                'actionData' => new ActionData(['data' => new \stdClass])
             ],
         ];
     }
@@ -457,7 +466,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
         $this->operationRegistry->expects($this->once())
             ->method('findByName')
             ->with($operationName)
-            ->willReturn($this->getActions($operationName));
+            ->willReturn($this->getOperations($operationName));
 
         $this->assertEquals($expected, $this->manager->getFrontendTemplate($operationName));
     }
@@ -469,53 +478,26 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'actionName' => 'action2',
-                'expected' => ActionManager::DEFAULT_FORM_TEMPLATE
+                'operationName' => 'operation2',
+                'expected' => OperationManager::DEFAULT_FORM_TEMPLATE
             ],
             [
-                'actionName' => 'action1',
-                'expected' => ActionManager::DEFAULT_PAGE_TEMPLATE
+                'operationName' => 'operation1',
+                'expected' => OperationManager::DEFAULT_PAGE_TEMPLATE
             ],
             [
-                'actionName' => 'action4',
+                'operationName' => 'operation4',
                 'expected' => 'test.html.twig'
             ]
         ];
     }
 
     /**
-     * @param string $className
-     * @param bool $throwException
-     */
-    protected function assertEntityManagerCalled($className, $throwException = false)
-    {
-        $entityManager = $this->getMock('Doctrine\ORM\EntityManagerInterface');
-        $entityManager->expects($this->once())->method('beginTransaction');
-
-        if ($throwException) {
-            $entityManager->expects($this->once())
-                ->method('flush')
-                ->willThrowException(new \Exception('Flush exception'));
-            $entityManager->expects($this->once())->method('rollback');
-        } else {
-            $entityManager->expects($this->once())->method('flush');
-            $entityManager->expects($this->once())->method('commit');
-        }
-
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityManager')
-            ->with($this->isInstanceOf($className))
-            ->willReturn($entityManager);
-    }
-
-    /**
      * @param array $expectedOperations
      * @param array $inputContext
      */
-    protected function assertGetActions(array $expectedOperations, array $inputContext)
+    protected function assertGetOperations(array $expectedOperations, array $inputContext)
     {
-        $this->markTestIncomplete();
-
         $this->contextHelper->expects($this->any())
             ->method('getContext')
             ->willReturnCallback(function ($context) {
@@ -535,7 +517,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getActionData')
             ->willReturn(new ActionData());
 
-        $this->assertEquals($expectedOperations, array_keys($this->manager->getActions($inputContext)));
+        $this->assertEquals($expectedOperations, array_keys($this->manager->getOperations($inputContext)));
     }
 
     /**
@@ -569,19 +551,19 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
      * @param string $name
      * @return array
      */
-    protected function getActions($name = null)
+    protected function getOperations($name = null)
     {
-        $actions = [
-            'action1' => $this->getAction('action1', 50, ['show_dialog' => false]),
-            'action2' => $this->getAction('action2', 40, ['show_dialog' => true], [], ['route1']),
-            'action3' => $this->getAction(
-                'action3',
+        $operations = [
+            'operation1' => $this->getOperation('operation1', 50, ['show_dialog' => false]),
+            'operation2' => $this->getOperation('operation2', 40, ['show_dialog' => true], [], ['route1']),
+            'operation3' => $this->getOperation(
+                'operation3',
                 30,
                 ['show_dialog' => true],
                 ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1']
             ),
-            'action4' => $this->getAction(
-                'action4',
+            'operation4' => $this->getOperation(
+                'operation4',
                 20,
                 ['template' => 'test.html.twig', 'show_dialog' => true],
                 [
@@ -590,8 +572,8 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['route1', 'route2']
             ),
-            'action5' => $this->getAction(
-                'action5',
+            'operation5' => $this->getOperation(
+                'operation5',
                 10,
                 ['show_dialog' => true],
                 [
@@ -604,15 +586,15 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
                 [],
                 false
             ),
-            'action6' => $this->getAction(
-                'action6',
+            'operation6' => $this->getOperation(
+                'operation6',
                 50,
                 ['show_dialog' => true],
                 ['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                 ['route2', 'route3']
             ),
-            'action7' => $this->getAction(
-                'action7',
+            'operation7' => $this->getOperation(
+                'operation7',
                 50,
                 ['show_dialog' => true],
                 [
@@ -624,7 +606,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
             )
         ];
 
-        return $name ? $actions[$name] : $actions;
+        return $name ? $operations[$name] : $operations;
     }
 
     /**
@@ -638,7 +620,7 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
      * @param bool $enabled
      * @return Operation
      */
-    protected function getAction(
+    protected function getOperation(
         $name,
         $order = 10,
         array $frontendOptions = [],
@@ -694,13 +676,31 @@ class ActionManagerTest extends \PHPUnit_Framework_TestCase
      * @param bool $isAvailable
      * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createActionMock($isAvailable = true)
+    protected function createOperationMock($isAvailable = true)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
         $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->getMock();
+        $operationActionGroup = new OperationActionGroup();
+        $operationActionGroup->setName('test_actionGroup');
         $operation->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
+        $operation->expects($this->once())->method('getOperationActionGroups')->willReturn([$operationActionGroup]);
+
+        return $operation;
+    }
+
+    /**
+     * @param bool $isAllowed
+     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createActionGroupMock($isAllowed = true)
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
+        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $operation->expects($this->any())->method('isAllowed')->willReturn($isAllowed);
 
         return $operation;
     }
