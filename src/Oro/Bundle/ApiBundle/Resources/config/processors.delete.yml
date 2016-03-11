@@ -90,7 +90,7 @@ services:
             - { name: oro.api.processor, action: delete, group: build_query, priority: -90 }
 
     oro_api.delete.build_query:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
+        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
             - @oro_api.doctrine_helper
         tags:
@@ -105,29 +105,27 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: load_data, priority: -20 }
 
-    oro_api.delete.validate_object:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateObject
+    oro_api.delete.validate_loaded_result:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateLoadedResult
         tags:
-            - { name: oro.api.processor, action: delete, group: load_data, priority: -20 }
+            - { name: oro.api.processor, action: delete, group: load_data, priority: -200 }
 
     #
     # delete_data
     #
 
     oro_api.delete.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByProcessHandler
+        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByDeleteHandler
         arguments:
             - @oro_api.doctrine_helper
             - @oro_soap.handler.delete
         tags:
             - { name: oro.api.processor, action: delete, group: delete_data, priority: -10 }
 
-    oro_api.delete.delete_data:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteData
-        arguments:
-            - @oro_api.doctrine_helper
+    oro_api.delete.validate_deletion_result:
+        class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateDeletionResult
         tags:
-            - { name: oro.api.processor, action: delete, group: delete_data, priority: -20 }
+            - { name: oro.api.processor, action: delete, group: delete_data, priority: -200 }
 
     #
     # normalize_result
@@ -148,7 +146,7 @@ services:
             - { name: oro.api.processor, action: delete, group: normalize_result, priority: -10 }
 
     oro_api.delete.json_api.build_json_api_document:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\JsonApi\BuildJsonApiDocument
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\BuildSingleItemJsonApiDocument
         arguments:
             - @oro_api.json_api.document_builder_factory
         tags:

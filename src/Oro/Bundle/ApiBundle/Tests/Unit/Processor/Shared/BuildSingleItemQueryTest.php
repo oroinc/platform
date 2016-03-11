@@ -6,12 +6,12 @@ use Doctrine\ORM\Query\Parameter;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
-use Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery;
+use Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorOrmRelatedTestCase;
 
-class BuildQueryTest extends GetProcessorOrmRelatedTestCase
+class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 {
-    /** @var BuildQuery */
+    /** @var BuildSingleItemQuery */
     protected $processor;
 
     protected function setUp()
@@ -23,7 +23,7 @@ class BuildQueryTest extends GetProcessorOrmRelatedTestCase
             ->getMock();
         $this->context->setCriteria(new Criteria($resolver));
 
-        $this->processor = new BuildQuery($this->doctrineHelper);
+        $this->processor = new BuildSingleItemQuery($this->doctrineHelper);
     }
 
     public function testProcessOnExistingQuery()

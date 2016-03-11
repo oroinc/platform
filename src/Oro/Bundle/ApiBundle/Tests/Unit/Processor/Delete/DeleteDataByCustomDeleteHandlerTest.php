@@ -2,16 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Delete;
 
-use Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomProcessHandler;
+use Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomDeleteHandler;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
 
-class DeleteDataByCustomProcessHandlerTest extends DeleteDataByProcessHandlerTest
+class DeleteDataByCustomDeleteHandlerTest extends DeleteDataByDeleteHandlerTest
 {
     protected $supportedClassName = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
 
     protected function buildProcessor()
     {
-        $this->processor = new DeleteDataByCustomProcessHandler(
+        $this->processor = new DeleteDataByCustomDeleteHandler(
             $this->doctrineHelper,
             $this->deleteHandler,
             $this->supportedClassName

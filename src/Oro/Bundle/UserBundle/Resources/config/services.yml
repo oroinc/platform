@@ -239,7 +239,7 @@ services:
             - @oro_security.acl.sid_manager
 
     oro_user.api.user.delete.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomProcessHandler
+        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomDeleteHandler
         arguments:
             - @oro_api.doctrine_helper
             - @oro_user.handler.delete
@@ -248,7 +248,7 @@ services:
             - { name: oro.api.processor, action: delete, group: delete_data, priority: 0 }
 
     oro_user.api.role.delete.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomProcessHandler
+        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomDeleteHandler
         arguments:
             - @oro_api.doctrine_helper
             - @oro_user.role.handler.delete

@@ -9,7 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 /**
  * Deletes object by custom DeleteProcessHandler.
  */
-class DeleteDataByCustomProcessHandler extends DeleteDataByProcessHandler
+class DeleteDataByCustomDeleteHandler extends DeleteDataByDeleteHandler
 {
     /** @var string */
     protected $className;

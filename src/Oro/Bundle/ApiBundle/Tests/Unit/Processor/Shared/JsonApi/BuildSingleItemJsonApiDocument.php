@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Delete\JsonApi;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\JsonApi;
 
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\Delete\JsonApi\BuildJsonApiDocument;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\BuildSingleItemJsonApiDocument;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get\GetProcessorTestCase;
 
-class BuildJsonApiDocumentTest extends GetProcessorTestCase
+class BuildSingleItemJsonApiDocumentTest extends GetProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $documentBuilder;
@@ -14,7 +15,7 @@ class BuildJsonApiDocumentTest extends GetProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $documentBuilderFactory;
 
-    /** @var BuildJsonApiDocument */
+    /** @var BuildSingleItemJsonApiDocument */
     protected $processor;
 
     protected function setUp()
@@ -30,7 +31,41 @@ class BuildJsonApiDocumentTest extends GetProcessorTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new BuildJsonApiDocument($this->documentBuilderFactory);
+        $this->processor = new BuildSingleItemJsonApiDocument($this->documentBuilderFactory);
+    }
+
+    public function testProcessContextWithoutErrorsOnEmptyResult()
+    {
+        $this->documentBuilder->expects($this->once())
+            ->method('setDataObject')
+            ->with(null);
+        $this->documentBuilder->expects($this->once())
+            ->method('getDocument');
+        $this->documentBuilderFactory->expects($this->once())
+            ->method('createDocumentBuilder')
+            ->willReturn($this->documentBuilder);
+
+        $this->context->setResult(null);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessContextWithoutErrorsOnNonEmptyResult()
+    {
+        $result   = [new \stdClass()];
+        $metadata = new EntityMetadata();
+
+        $this->documentBuilder->expects($this->once())
+            ->method('setDataObject')
+            ->with($result, $metadata);
+        $this->documentBuilder->expects($this->once())
+            ->method('getDocument');
+        $this->documentBuilderFactory->expects($this->once())
+            ->method('createDocumentBuilder')
+            ->willReturn($this->documentBuilder);
+
+        $this->context->setResult($result);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
     }
 
     public function testProcessWithErrors()
@@ -59,7 +94,7 @@ class BuildJsonApiDocumentTest extends GetProcessorTestCase
         $exception = new \LogicException();
 
         $this->documentBuilder->expects($this->once())
-            ->method('setErrorCollection')
+            ->method('setDataObject')
             ->willThrowException($exception);
         $this->documentBuilder->expects($this->once())
             ->method('getDocument');
@@ -69,25 +104,7 @@ class BuildJsonApiDocumentTest extends GetProcessorTestCase
             ->method('createDocumentBuilder')
             ->willReturn($this->documentBuilder);
 
-        $this->context->addError(new Error());
-        $this->processor->process($this->context);
-
-        $this->assertEquals(500, $this->context->getResponseStatusCode());
-    }
-
-    public function testProcessWithResult()
-    {
-        $this->documentBuilder->expects($this->never())
-            ->method('setErrorCollection');
-        $this->documentBuilder->expects($this->once())
-            ->method('getDocument');
-        $this->documentBuilder->expects($this->once())
-            ->method('setErrorObject');
-        $this->documentBuilderFactory->expects($this->exactly(2))
-            ->method('createDocumentBuilder')
-            ->willReturn($this->documentBuilder);
-
-        $this->context->setResult('some data');
+        $this->context->setResult(null);
         $this->processor->process($this->context);
 
         $this->assertEquals(500, $this->context->getResponseStatusCode());

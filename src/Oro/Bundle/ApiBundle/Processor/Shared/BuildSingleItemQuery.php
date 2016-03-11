@@ -2,14 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Builds ORM QueryBuilder object that will be used to get an entity by its identifier.
  */
-class BuildQuery implements ProcessorInterface
+class BuildSingleItemQuery implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -27,7 +28,7 @@ class BuildQuery implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetContext $context */
+        /** @var SingleItemContext $context */
 
         if ($context->hasQuery()) {
             // a query is already built

@@ -10,7 +10,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Validates loaded object.
  */
-class ValidateObject implements ProcessorInterface
+class ValidateLoadedResult implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
