@@ -26,6 +26,13 @@ final class Events
     const AFTER_NORMALIZE_ENTITY = 'oro.import_export.after_normalize_entity';
 
     /**
+     * This event occurs before entity is denormalized.
+     *
+     * Can be used to prefill denormalized data.
+     */
+    const BEFORE_DENORMALIZE_ENTITY = 'oro.import_export.before_denormalize_entity';
+
+    /**
      * This event occurs after entity is denormalized.
      *
      * Can be used to change denormalized data.
@@ -45,4 +52,32 @@ final class Events
      * Can be used to modify fixtures.
      */
     const AFTER_LOAD_TEMPLATE_FIXTURES = 'oro.import_export.after_load_template_fixtures';
+
+    /**
+     * This event occurs before data is converted into export format.
+     *
+     * Can be used to modify record before conversion begins.
+     */
+    const BEFORE_EXPORT_FORMAT_CONVERSION = 'oro.import_export.before_export_format_conversion';
+
+    /**
+     * This event occurs after data is converted into export format.
+     *
+     * Can be used to modify result after conversion ends.
+     */
+    const AFTER_EXPORT_FORMAT_CONVERSION = 'oro.import_export.after_export_format_conversion';
+
+    /**
+     * This event occurs before data is converted into import format.
+     *
+     * Can be used to modify record before conversion begins.
+     */
+    const BEFORE_IMPORT_FORMAT_CONVERSION = 'oro.import_export.before_import_format_conversion';
+
+    /**
+     * This event occurs after data is converted into export format.
+     *
+     * Can be used to modify result after conversion ends.
+     */
+    const AFTER_IMPORT_FORMAT_CONVERSION = 'oro.import_export.after_import_format_conversion';
 }
