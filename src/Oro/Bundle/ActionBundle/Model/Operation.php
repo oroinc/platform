@@ -259,7 +259,7 @@ class Operation
     /**
      * @return array
      */
-    public function getOperationActionGroups()
+    protected function getOperationActionGroups()
     {
         if ($this->operationActionGroups === null) {
             $this->operationActionGroups = [];
@@ -270,5 +270,14 @@ class Operation
         }
 
         return $this->operationActionGroups;
+    }
+
+    /**
+     * @param ActionData $data
+     * @return OperationActionGroupsMappingIterator
+     */
+    public function getActionGroupsIterator(ActionData $data)
+    {
+        return new OperationActionGroupsMappingIterator($this->getOperationActionGroups(), $data);
     }
 }

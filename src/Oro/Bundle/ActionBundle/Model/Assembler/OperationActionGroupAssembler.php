@@ -3,9 +3,21 @@
 namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
 class OperationActionGroupAssembler extends AbstractAssembler
 {
+    /** @var ConfigurationPassInterface */
+    private $replacePropertyPath;
+
+    /**
+     * @param ConfigurationPassInterface $replacePropertyPath
+     */
+    public function __construct(ConfigurationPassInterface $replacePropertyPath)
+    {
+        $this->replacePropertyPath = $replacePropertyPath;
+    }
+
     /**
      * @param array $configuration
      * @return OperationActionGroup[]
@@ -31,7 +43,15 @@ class OperationActionGroupAssembler extends AbstractAssembler
         $operationActionGroup = new OperationActionGroup();
         $operationActionGroup
             ->setName($options['name'])
-            ->setArgumentsMapping($this->getOption($options, 'arguments_mapping', []));
+            ->setArgumentsMapping(
+                $this->replacePropertyPath->passConfiguration(
+                    $this->getOption(
+                        $options,
+                        'arguments_mapping',
+                        []
+                    )
+                )
+            );
 
         return $operationActionGroup;
     }

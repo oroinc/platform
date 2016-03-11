@@ -10,7 +10,7 @@ use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
+use Oro\Bundle\ActionBundle\Model\OperationActionGroupsMappingIterator;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -37,6 +37,9 @@ class OperationTest extends \PHPUnit_Framework_TestCase
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
     protected $formOptionsAssembler;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationActionGroupAssembler */
+    protected $actionGroupAssembler;
 
     /** @var Operation */
     protected $operation;
@@ -66,12 +69,16 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler'
         )->disableOriginalConstructor()->getMock();
 
+        $this->actionGroupAssembler = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler'
+        )->disableOriginalConstructor()->getMock();
+
         $this->operation = new Operation(
             $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
-            new OperationActionGroupAssembler(),
+            $this->actionGroupAssembler,
             $this->definition
         );
 
@@ -619,43 +626,6 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     *
-     * @dataProvider getOperationActionGroupsProvider
-     * @param array $config
-     * @param OperationActionGroup[] $expected
-     */
-    public function testGetOperationActionGroups(array $config, array $expected)
-    {
-        if ($config) {
-            $this->definition->expects($this->once())
-                ->method('getActionGroups')
-                ->willReturn($config);
-        }
-
-        $this->assertEquals($expected, $this->operation->getOperationActionGroups());
-    }
-
-    /**
-     * @return array
-     */
-    public function getOperationActionGroupsProvider()
-    {
-        $item = new OperationActionGroup();
-        $item->setName('name1');
-
-        return [
-            'no items' => [
-                'config' => [],
-                'expected' => [],
-            ],
-            '1 item' => [
-                'config' => [['name' => 'name1']],
-                'expected' => [$item],
-            ],
-        ];
-    }
-
-    /**
      * @param \PHPUnit_Framework_MockObject_Matcher_InvokedCount $expects
      * @param ActionData $data
      * @return ActionInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -722,5 +692,57 @@ class OperationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\AttributeManager', $attributeManager);
         $this->assertEquals(new ArrayCollection(['test_attr' => $attribute]), $attributeManager->getAttributes());
+    }
+
+    /**
+     * @param array $actionGroupsConfig
+     * @param ActionData $actionData
+     * @dataProvider providerGetActionGroupIterator
+     */
+    public function testGetActionGroupsIteratorReturnsIt(array $actionGroupsConfig, ActionData $actionData)
+    {
+        $this->definition->expects($this->once())->method('getActionGroups')->willReturn($actionGroupsConfig);
+
+        if ($actionGroupsConfig) {
+            $this->actionGroupAssembler->expects($this->once())->method('assemble')->with($actionGroupsConfig)
+                ->willReturn($actionGroupsConfig);
+        }
+
+        $iterator = $this->operation->getActionGroupsIterator($actionData);
+
+        $this->assertInstanceOf(
+            'Oro\Bundle\ActionBundle\Model\OperationActionGroupsMappingIterator',
+            $iterator
+        );
+
+        $this->assertEquals(
+            new OperationActionGroupsMappingIterator(
+                $actionGroupsConfig,
+                $actionData
+            ),
+            $iterator
+        );
+    }
+
+    public function providerGetActionGroupIterator()
+    {
+        return [
+            'no mapping' => [
+                'definition config' => [],
+                'actionData' => new ActionData()
+            ],
+            'with values' => [
+                'definition config' => ['arg1' => 'value1'],
+                'actionData' => new ActionData()
+            ],
+            'without values - with context' => [
+                'definition config' => [],
+                'actionData' => new ActionData(['dataKey' => 'datavalue'])
+            ],
+            'both' => [
+                'definition config' => [],
+                'actionData' => new ActionData(['dataKey' => 'datavalue'])
+            ]
+        ];
     }
 }

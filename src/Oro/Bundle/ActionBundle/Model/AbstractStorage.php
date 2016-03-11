@@ -89,7 +89,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function isEmpty()
     {
-        return empty($this->data);
+        return 0 === count($this->data);
     }
 
     /**
