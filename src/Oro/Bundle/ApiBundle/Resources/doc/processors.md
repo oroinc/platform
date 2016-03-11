@@ -57,7 +57,7 @@ Please note that:
 
 - The name of a processor usually starts with a verb and the `Processor` suffix is not used.
 - A processor must be a public service because it is loaded on demand.
-- The `priority` attribute is used to control the order in which processors are executed. The highest the priority, the earlier a processor is executed. Default value is 0. The possible range is from -255 to 255. But for some types of processors the range can be different. More details you can find in the [documentation of the ChainProcessor](../../../../ChainProcessor/README.md#types-of-processors) component. If several processors have the same priority the order they are executed is unpredictable.
+- The `priority` attribute is used to control the order in which processors are executed. The highest the priority, the earlier a processor is executed. Default value is 0. The possible range is from -255 to 255. But for some types of processors the range can be different. More details you can find in the [documentation of the ChainProcessor](../../../../Component/ChainProcessor/README.md#types-of-processors) component. If several processors have the same priority the order they are executed is unpredictable.
 
 The list of all existing processors you can find in the [Processor](../../Processor) folder.
 
