@@ -81,7 +81,7 @@ class OperationConfigurationValidator implements ConfigurationValidatorInterface
             $this->validateFormOptions($action, $name);
             $this->validateRoutes($action['routes'], $this->getPath($name, 'routes'));
             $this->validateEntities($action['entities'], $this->getPath($name, 'entities'));
-            $this->validateActionGroups($action['action_groups'], $this->getPath($name, 'action_groups'));
+            $this->validateActionGroups($action, 'action_groups', $name);
         }
     }
 
@@ -215,15 +215,18 @@ class OperationConfigurationValidator implements ConfigurationValidatorInterface
 
     /**
      * @param array $items
+     * @param string $name
      * @param string $path
      */
-    protected function validateActionGroups(array $items, $path)
+    protected function validateActionGroups(array $items, $name, $path)
     {
-        if (null === ($configuration = $this->getConfiguration('action_groups'))) {
+        $path = $this->getPath($path, $name);
+
+        if (!array_key_exists($name, $items) || null === ($configuration = $this->getConfiguration($name))) {
             return;
         }
 
-        foreach ($items as $key => $item) {
+        foreach ($items[$name] as $key => $item) {
             if (!array_key_exists($item['name'], $configuration)) {
                 $this->handleError($this->getPath($path, $key), 'Action Group "%s" not found.', $item['name'], false);
             }

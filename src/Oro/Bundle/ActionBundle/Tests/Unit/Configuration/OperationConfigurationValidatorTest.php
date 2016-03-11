@@ -9,10 +9,10 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfigurationValidator;
+use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ActionDefinitionConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
+class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
 {
     /**
      * @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject
@@ -35,7 +35,7 @@ class ActionDefinitionConfigurationValidatorTest extends \PHPUnit_Framework_Test
     protected $logger;
 
     /**
-     * @var ActionDefinitionConfigurationValidator
+     * @var OperationConfigurationValidator
      */
     protected $validator;
 
@@ -59,7 +59,7 @@ class ActionDefinitionConfigurationValidatorTest extends \PHPUnit_Framework_Test
      */
     protected function createValidator($debug = false)
     {
-        $this->validator = new ActionDefinitionConfigurationValidator(
+        $this->validator = new OperationConfigurationValidator(
             $this->router,
             $this->twigLoader,
             $this->doctrineHelper,
