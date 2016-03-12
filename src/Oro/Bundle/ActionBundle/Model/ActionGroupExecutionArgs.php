@@ -7,19 +7,18 @@ class ActionGroupExecutionArgs
     /** @var string */
     private $name;
 
-    /** @var array */
+    /** @var ActionData */
     private $arguments = [];
 
     /**
      * @param $actionGroupName
-     * @param array $arguments
+     * @param ActionData $arguments
      */
-    public function __construct($actionGroupName, array $arguments = [])
+    public function __construct($actionGroupName, ActionData $arguments = null)
     {
         $this->name = $actionGroupName;
-        $this->arguments = $arguments;
+        $this->arguments = $arguments ?: new ActionData();
     }
-
 
     /**
      * @return string
@@ -42,7 +41,7 @@ class ActionGroupExecutionArgs
     }
 
     /**
-     * @return array
+     * @return ActionData
      */
     public function getArguments()
     {

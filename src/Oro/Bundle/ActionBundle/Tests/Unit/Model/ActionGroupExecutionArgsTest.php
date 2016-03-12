@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 
 class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
 {
+    use OperationsTestHelperTrait;
+
     public function testNameConstruction()
     {
         $expected = 'nameOfActionGroup';
@@ -39,33 +42,39 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
     public function provideArguments()
     {
         return [
-            'no args' => [
-                'expected' => []
+            'no args'   => [
+                'expected' =>new ActionData([])
             ],
-            'few' => [
-                'expected' => [
-                    'arg1' => 'val1',
-                    'arg2' => 'val2'
-                ],
+            'few'       => [
+                'expected' => $this->modifiedData(
+                    [
+                        'arg1' => 'val1',
+                        'arg2' => 'val2'
+                    ]
+                ),
                 ['arg1', 'val1'],
                 ['arg2', 'val2'],
             ],
-            'many' => [
-                'expected' => [
-                    'arg1' => 'val1',
-                    'arg2' => 'val1',
-                    'arg3' => 'val1',
-                    'arg4' => 'val1',
-                ],
+            'many'      => [
+                'expected' => $this->modifiedData(
+                    [
+                        'arg1' => 'val1',
+                        'arg2' => 'val1',
+                        'arg3' => 'val1',
+                        'arg4' => 'val1',
+                    ]
+                ),
                 ['arg1', 'val1'],
                 ['arg2', 'val1'],
                 ['arg3', 'val1'],
                 ['arg4', 'val1'],
             ],
             'overrides' => [
-                'expected' => [
-                    'arg1' => 'val2'
-                ],
+                'expected' => $this->modifiedData(
+                    [
+                        'arg1' => 'val2'
+                    ]
+                ),
                 [
                     'arg1',
                     'val1'

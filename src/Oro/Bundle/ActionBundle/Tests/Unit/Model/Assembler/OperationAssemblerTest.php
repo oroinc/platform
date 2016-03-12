@@ -121,7 +121,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                     ['@acl_granted' => 'test_acl'],
                     ['config_pre_cond']
                 ]
-             ])
+            ])
             ->setActions('preactions', ['config_pre_func'])
             ->setActions('form_init', ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
@@ -130,14 +130,14 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFormType(ActionType::NAME);
 
         return [
-            'no data' => [
+            'no data'                       => [
                 [],
                 'expected' => [],
             ],
-            'minimum data' => [
+            'minimum data'                  => [
                 [
                     'minimum_name' => [
-                        'label' => 'My Label',
+                        'label'    => 'My Label',
                         'entities' => [
                             '\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'
                         ],
@@ -155,23 +155,23 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                     )
                 ],
             ],
-            'maximum data' => [
+            'maximum data'                  => [
                 [
                     'maximum_name' => [
-                        'label' => 'My Label',
+                        'label'                => 'My Label',
                         'substitute_operation' => 'test_operation_to_substitute',
-                        'entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
-                        'routes' => ['my_route'],
-                        'groups' => ['my_group'],
-                        'enabled' => false,
-                        'applications' => ['application1'],
-                        'attributes' => ['config_attr'],
-                        'preactions' => ['config_pre_func'],
-                        'preconditions' => ['config_pre_cond'],
-                        'form_init' => ['config_form_init_func'],
-                        'form_options' => ['config_form_options'],
-                        'frontend_options' => ['config_frontend_options'],
-                        'order' => 77,
+                        'entities'             => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                        'routes'               => ['my_route'],
+                        'groups'               => ['my_group'],
+                        'enabled'              => false,
+                        'applications'         => ['application1'],
+                        'attributes'           => ['config_attr'],
+                        'preactions'           => ['config_pre_func'],
+                        'preconditions'        => ['config_pre_cond'],
+                        'form_init'            => ['config_form_init_func'],
+                        'form_options'         => ['config_form_options'],
+                        'frontend_options'     => ['config_frontend_options'],
+                        'order'                => 77,
                     ]
                 ],
                 'expected' => [
@@ -188,23 +188,23 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             'maximum data and acl_resource' => [
                 [
                     'maximum_name_and_acl' => [
-                        'label' => 'My Label',
+                        'label'                => 'My Label',
                         'substitute_operation' => 'test_operation_to_substitute',
-                        'entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
-                        'routes' => ['my_route'],
-                        'groups' => ['my_group'],
-                        'enabled' => false,
-                        'for_all_entities' => true,
-                        'exclude_entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'],
-                        'applications' => ['application1'],
-                        'attributes' => ['config_attr'],
-                        'preactions' => ['config_pre_func'],
-                        'preconditions' => ['config_pre_cond'],
-                        'form_init' => ['config_form_init_func'],
-                        'form_options' => ['config_form_options'],
-                        'frontend_options' => ['config_frontend_options'],
-                        'order' => 77,
-                        'acl_resource' => 'test_acl',
+                        'entities'             => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
+                        'routes'               => ['my_route'],
+                        'groups'               => ['my_group'],
+                        'enabled'              => false,
+                        'for_all_entities'     => true,
+                        'exclude_entities'     => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'],
+                        'applications'         => ['application1'],
+                        'attributes'           => ['config_attr'],
+                        'preactions'           => ['config_pre_func'],
+                        'preconditions'        => ['config_pre_cond'],
+                        'form_init'            => ['config_form_init_func'],
+                        'form_options'         => ['config_form_options'],
+                        'frontend_options'     => ['config_frontend_options'],
+                        'order'                => 77,
+                        'acl_resource'         => 'test_acl',
                     ]
                 ],
                 'expected' => [
@@ -266,6 +266,9 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getOperationActionGroupAssembler()
     {
-        return new OperationActionGroupAssembler();
+        return new OperationActionGroupAssembler(
+            $this->getMockBuilder('Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface')
+                ->getMock()
+        );
     }
 }

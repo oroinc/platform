@@ -46,6 +46,9 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
 
     private $contextHelper;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationActionGroupAssembler*/
+    private $mockOperationActionGroupAssembler;
+
     protected function setUp()
     {
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
@@ -95,12 +98,16 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 return $class;
             });
 
+        $this->mockOperationActionGroupAssembler = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler'
+        )->disableOriginalConstructor()->getMock();
+
         $this->assembler = new OperationAssembler(
             $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
-            new OperationActionGroupAssembler(),
+            $this->mockOperationActionGroupAssembler,
             $this->doctrineHelper
         );
 

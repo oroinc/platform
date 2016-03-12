@@ -73,7 +73,7 @@ class OperationAssembler extends AbstractAssembler
                 $this->conditionFactory,
                 $this->attributeAssembler,
                 $this->formOptionsAssembler,
-                new OperationActionGroupAssembler(),
+                $this->operationActionGroupAssembler,
                 $this->assembleDefinition($operationName, $options)
             );
         }

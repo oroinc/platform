@@ -9,7 +9,6 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
-use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
@@ -127,6 +126,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getOperationsProvider()
     {
@@ -210,10 +210,10 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
                     'operation6' => $this->getOperations('operation6'),
                 ],
                 'expectedOperations' => [
-                        'operation4',
-                        'operation3',
-                        'operation2',
-                        'operation6'
+                    'operation4',
+                    'operation3',
+                    'operation2',
+                    'operation6'
                 ]
             ],
             'full context' => [
@@ -276,12 +276,12 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ],
             'operation not available' => [
                 'operationName' => 'test',
-                'operation' => $this->createOperationMock(false),
+                'operation' => $this->createOperationMock(new ActionData(), false),
                 'isAvailable' => false
             ],
             'valid operation' => [
                 'operationName' => 'test_operation',
-                'operation' => $this->createOperationMock(true),
+                'operation' => $this->createOperationMock(new ActionData(), true),
                 'isAvailable' => true
             ]
         ];
@@ -298,15 +298,17 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
         $errors = new ArrayCollection();
 
         $actionGroup = $this->createActionGroupMock();
-        $operation = $this->createOperationMock();
+        $operation = $this->createOperationMock($actionData);
         $actionGroup->expects($this->once())
             ->method('execute')
-            ->willReturn(function ($param1, $param2) use ($actionData, $errors) {
-                $this->assertSame($actionData, $param1);
-                $this->assertSame($errors, $param2);
+            ->willReturn(
+                function ($param1, $param2) use ($actionData, $errors) {
+                    $this->assertSame($actionData, $param1);
+                    $this->assertSame($errors, $param2);
 
-                return true;
-            });
+                    return true;
+                }
+            );
 
         $this->operationRegistry->expects($this->once())
             ->method('findByName')
@@ -388,15 +390,17 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     {
         $errors = new ArrayCollection();
 
-        $operation = $this->createOperationMock();
+        $operation = $this->createOperationMock($actionData);
         $operation->expects($this->any())
             ->method('execute')
-            ->willReturn(function ($param1, $param2) use ($actionData, $errors) {
-                $this->assertSame($actionData, $param1);
-                $this->assertSame($errors, $param2);
+            ->willReturn(
+                function ($param1, $param2) use ($actionData, $errors) {
+                    $this->assertSame($actionData, $param1);
+                    $this->assertSame($errors, $param2);
 
-                return true;
-            });
+                    return true;
+                }
+            );
 
         $this->operationRegistry->expects($this->once())
             ->method('findByName')
@@ -500,18 +504,20 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->contextHelper->expects($this->any())
             ->method('getContext')
-            ->willReturnCallback(function ($context) {
-                return array_merge(
-                    [
-                        'route' => null,
-                        'entityId' => null,
-                        'entityClass' => null,
-                        'datagrid' => null,
-                        'group' => null
-                    ],
-                    $context
-                );
-            });
+            ->willReturnCallback(
+                function ($context) {
+                    return array_merge(
+                        [
+                            'route' => null,
+                            'entityId' => null,
+                            'entityClass' => null,
+                            'datagrid' => null,
+                            'group' => null
+                        ],
+                        $context
+                    );
+                }
+            );
 
         $this->contextHelper->expects($this->any())
             ->method('getActionData')
@@ -662,21 +668,26 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $mockOperationActionGroupAssembler = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler'
+        )->disableOriginalConstructor()->getMock();
+
         return new Operation(
             $functionFactory,
             $conditionFactory,
             $attributeAssembler,
             $formOptionsAssembler,
-            new OperationActionGroupAssembler(),
+            $mockOperationActionGroupAssembler,
             $definition
         );
     }
 
     /**
+     * @param ActionData $actionData
      * @param bool $isAvailable
      * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createOperationMock($isAvailable = true)
+    protected function createOperationMock(ActionData $actionData, $isAvailable = true)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
         $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
@@ -684,8 +695,20 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $operationActionGroup = new OperationActionGroup();
         $operationActionGroup->setName('test_actionGroup');
+
+        $mockActionGroupArgs = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs'
+        )->disableOriginalConstructor()->getMock();
+
+        $mockActionGroupArgs->expects($this->once())->method('getName')->willReturn('test_actionGroup');
+        $mockActionGroupArgs->expects($this->once())->method('getArguments')->willReturn($actionData);
+
         $operation->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
-        $operation->expects($this->once())->method('getOperationActionGroups')->willReturn([$operationActionGroup]);
+        $operation->expects($this->once())->method('getActionGroupsIterator')->willReturn(
+            [
+                $mockActionGroupArgs
+            ]
+        );
 
         return $operation;
     }

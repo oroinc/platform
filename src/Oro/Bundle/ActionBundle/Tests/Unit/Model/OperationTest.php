@@ -18,6 +18,9 @@ use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class OperationTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationDefinition */
