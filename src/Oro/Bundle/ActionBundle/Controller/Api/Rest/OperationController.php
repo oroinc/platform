@@ -12,7 +12,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Exception\ActionNotFoundException;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
@@ -21,7 +21,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
  * @Rest\RouteResource("actions")
  * @Rest\NamePrefix("oro_api_action_")
  */
-class ActionController extends FOSRestController
+class OperationController extends FOSRestController
 {
     /**
      * @ApiDoc(description="Execute action", resource=true)
@@ -34,7 +34,7 @@ class ActionController extends FOSRestController
     public function executeAction($actionName)
     {
         try {
-            $data = $this->getActionManager()->executeByContext($actionName);
+            $data = $this->getOperationManager()->executeByContext($actionName);
         } catch (ActionNotFoundException $e) {
             return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND);
         } catch (ForbiddenActionException $e) {
@@ -49,11 +49,11 @@ class ActionController extends FOSRestController
     }
 
     /**
-     * @return ActionManager
+     * @return OperationManager
      */
-    protected function getActionManager()
+    protected function getOperationManager()
     {
-        return $this->get('oro_action.manager');
+        return $this->get('oro_action.operation_manager');
     }
 
     /**

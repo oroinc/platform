@@ -1,11 +1,11 @@
 parameters:
-    oro_action.twig.extension.action.class: Oro\Bundle\ActionBundle\Twig\ActionExtension
+    oro_action.twig.extension.operation.class: Oro\Bundle\ActionBundle\Twig\OperationExtension
 
 services:
-    oro_action.twig.extension.action:
-        class: %oro_action.twig.extension.action.class%
+    oro_action.twig.extension.operation:
+        class: %oro_action.twig.extension.operation.class%
         arguments:
-            - @oro_action.manager
+            - @oro_action.operation_manager
             - @oro_action.helper.applications
             - @oro_entity.doctrine_helper
             - @oro_action.helper.context

@@ -219,7 +219,7 @@ services:
         class: %oro_action.function.run_action.class%
         arguments:
             - @oro_action.context_accessor
-            - @oro_action.manager
+            - @oro_action.operation_manager
             - @oro_action.helper.context
         tags:
             - { name: oro_action.function, alias: run_action }

@@ -6,7 +6,7 @@ use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Model\Operation;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
@@ -14,10 +14,10 @@ use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension as DatagridActionExtension;
 
-class ActionExtension extends AbstractExtension
+class OperationExtension extends AbstractExtension
 {
-    /** @var ActionManager */
-    protected $actionManager;
+    /** @var OperationManager */
+    protected $operationManager;
 
     /** @var ContextHelper */
     protected $contextHelper;
@@ -41,18 +41,18 @@ class ActionExtension extends AbstractExtension
     protected $actionGroups;
 
     /**
-     * @param ActionManager $actionManager
+     * @param OperationManager $operationManager
      * @param ContextHelper $contextHelper
      * @param ApplicationsHelper $applicationsHelper
      * @param MassActionProviderRegistry $providerRegistry
      */
     public function __construct(
-        ActionManager $actionManager,
+        OperationManager $operationManager,
         ContextHelper $contextHelper,
         ApplicationsHelper $applicationsHelper,
         MassActionProviderRegistry $providerRegistry
     ) {
-        $this->actionManager = $actionManager;
+        $this->operationManager = $operationManager;
         $this->contextHelper = $contextHelper;
         $this->applicationsHelper = $applicationsHelper;
         $this->providerRegistry = $providerRegistry;
@@ -72,7 +72,7 @@ class ActionExtension extends AbstractExtension
     public function isApplicable(DatagridConfiguration $config)
     {
         $this->datagridContext = $this->getDatagridContext($config);
-        $this->operations = $this->getActions(
+        $this->operations = $this->getOperations(
             $config->offsetGetOr(DatagridActionExtension::ACTION_KEY, []),
             $this->datagridContext
         );
@@ -95,11 +95,11 @@ class ActionExtension extends AbstractExtension
      * @param array $datagridContext
      * @return Operation[]
      */
-    protected function getActions(array $actionsConfig, array $datagridContext)
+    protected function getOperations(array $actionsConfig, array $datagridContext)
     {
         $result = [];
 
-        $actions = $this->actionManager->getActions($datagridContext, false);
+        $actions = $this->operationManager->getOperations($datagridContext, false);
 
         foreach ($actions as $actionName => $action) {
             $actionName = strtolower($actionName);

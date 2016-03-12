@@ -7,7 +7,7 @@ use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Oro\Bundle\ActionBundle\Action\RunAction;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Component\Action\Model\ContextAccessor;
 
@@ -21,7 +21,7 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
     /** @var RunAction */
     protected $function;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionManager */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
     protected $manager;
 
     protected function setUp()
@@ -36,7 +36,7 @@ class RunActionTest extends \PHPUnit_Framework_TestCase
             ->method('getActionData')
             ->willReturn(new ActionData(['data' => ['param']]));
 
-        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
             ->disableOriginalConstructor()
             ->getMock();
 
