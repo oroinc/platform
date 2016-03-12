@@ -391,6 +391,9 @@ class OperationTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function providerGetActionGroupIterator()
     {
         return [

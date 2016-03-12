@@ -2,18 +2,18 @@
 
 namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
+use Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath;
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
-use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
 class OperationActionGroupAssembler extends AbstractAssembler
 {
-    /** @var ConfigurationPassInterface */
+    /** @var ReplacePropertyPath */
     private $replacePropertyPath;
 
     /**
-     * @param ConfigurationPassInterface $replacePropertyPath
+     * @param ReplacePropertyPath $replacePropertyPath
      */
-    public function __construct(ConfigurationPassInterface $replacePropertyPath)
+    public function __construct(ReplacePropertyPath $replacePropertyPath)
     {
         $this->replacePropertyPath = $replacePropertyPath;
     }

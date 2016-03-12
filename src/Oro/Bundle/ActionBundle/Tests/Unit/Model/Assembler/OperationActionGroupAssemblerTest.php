@@ -18,7 +18,7 @@ class OperationActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->mockConfigurationPass = $this->getMockBuilder(
-            'Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface'
+            '\Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath'
         )->getMock();
 
         $this->assembler = new OperationActionGroupAssembler($this->mockConfigurationPass);
