@@ -1,7 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Model;
+namespace Oro\Bundle\ActionBundle\Model\Operation;
 
+use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
+use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Component\Action\Model\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
@@ -9,7 +12,7 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
  * Iterator provide mapping for \Oro\Bundle\ActionBundle\Model\OperationActionGroup with ActionData values to
  * \Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs instances
  */
-class OperationActionGroupsMappingIterator extends \ArrayIterator
+class ActionGroupsMappingIterator extends \ArrayIterator
 {
     /** @var ActionData */
     private $data;

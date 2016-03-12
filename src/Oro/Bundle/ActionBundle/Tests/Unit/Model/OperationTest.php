@@ -10,7 +10,7 @@ use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OperationActionGroupsMappingIterator;
+use Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -378,12 +378,12 @@ class OperationTest extends \PHPUnit_Framework_TestCase
         $iterator = $this->operation->getActionGroupsIterator($actionData);
 
         $this->assertInstanceOf(
-            'Oro\Bundle\ActionBundle\Model\OperationActionGroupsMappingIterator',
+            'Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator',
             $iterator
         );
 
         $this->assertEquals(
-            new OperationActionGroupsMappingIterator(
+            new Operation\ActionGroupsMappingIterator(
                 $actionGroupsConfig,
                 $actionData
             ),

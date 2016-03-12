@@ -1,14 +1,15 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Operation;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
-use Oro\Bundle\ActionBundle\Model\OperationActionGroupsMappingIterator;
+use Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator;
+use Oro\Bundle\ActionBundle\Tests\Unit\Model\OperationsTestHelperTrait;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-class OperationActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
+class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
 {
     use OperationsTestHelperTrait;
 
@@ -20,7 +21,7 @@ class OperationActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCa
 
         $data1 = new ActionData([1]);
 
-        $instance = new OperationActionGroupsMappingIterator($groups, $data1);
+        $instance = new ActionGroupsMappingIterator($groups, $data1);
 
         $this->assertEquals($groups, $instance->getArrayCopy());
 
@@ -44,7 +45,7 @@ class OperationActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCa
         $mockGroup1->expects($this->once())->method('getName')->willReturn('actionGroupName');
         $mockGroup1->expects($this->once())->method('getArgumentsMapping')->willReturn([]);
 
-        $instance = new OperationActionGroupsMappingIterator([$mockGroup1], new ActionData());
+        $instance = new ActionGroupsMappingIterator([$mockGroup1], new ActionData());
 
         $array = iterator_to_array($instance);
 
@@ -76,7 +77,7 @@ class OperationActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCa
                 ->with($data, $acGetValue['pp'])->willReturn($acGetValue['return']);
         }
 
-        $instance = new OperationActionGroupsMappingIterator($opActionGroups, $data, $contextAccessor);
+        $instance = new ActionGroupsMappingIterator($opActionGroups, $data, $contextAccessor);
 
         $result = iterator_to_array($instance);
 

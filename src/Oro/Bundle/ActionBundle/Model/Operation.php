@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -229,10 +230,10 @@ class Operation
 
     /**
      * @param ActionData $data
-     * @return OperationActionGroupsMappingIterator
+     * @return ActionGroupsMappingIterator
      */
     public function getActionGroupsIterator(ActionData $data)
     {
-        return new OperationActionGroupsMappingIterator($this->getOperationActionGroups(), $data);
+        return new ActionGroupsMappingIterator($this->getOperationActionGroups(), $data);
     }
 }
