@@ -14,6 +14,7 @@ services:
     # initialize
     #
 
+
     oro_api.delete.check_request_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CheckRequestType
         tags:
@@ -47,6 +48,11 @@ services:
             - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 20 }
+
+    oro_api.delete.initialize_actions_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetActionsConfig
+        tags:
+            - { name: oro.api.processor, action: delete, group: initialize, priority: 10 }
 
     #
     # security_check

@@ -33,6 +33,7 @@ class DeleteDataByDeleteHandler implements ProcessorInterface
     public function process(ContextInterface $context)
     {
         /** @var DeleteContext $context */
+        $actions = $context->getConfigOf('actions');
 
         if (!$context->hasResult()) {
             // entity already deleted
