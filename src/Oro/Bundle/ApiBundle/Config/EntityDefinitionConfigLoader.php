@@ -62,6 +62,8 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
                 $this->loadFilters($definition, $value);
             } elseif (ConfigUtil::SORTERS === $key) {
                 $this->loadSorters($definition, $value);
+            } elseif ('actions' === $key) {
+                $this->loadActions($definition, $value);
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadSection($definition, $this->factory->getLoader($key), $key, $value);
             } else {
@@ -112,6 +114,21 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
             $sorters = $this->factory->getLoader(ConfigUtil::SORTERS)->load($config);
             if (!$sorters->isEmpty()) {
                 $this->setValue($definition, ConfigUtil::SORTERS, $sorters);
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param array|null             $config
+     */
+    protected function loadActions(EntityDefinitionConfig $definition, array $config = null)
+    {
+        if (!empty($config)) {
+            /** @var SortersConfig $sorters */
+            $actions = $this->factory->getLoader('actions')->load($config);
+            if (!$actions->isEmpty()) {
+                $this->setValue($definition, 'actions', $actions);
             }
         }
     }

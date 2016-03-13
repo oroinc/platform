@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfigExtra;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
@@ -85,7 +86,7 @@ class DumpConfigCommand extends ContainerAwareCommand
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
 
-        $extras = [new FiltersConfigExtra(), new SortersConfigExtra()];
+        $extras = [new FiltersConfigExtra(), new SortersConfigExtra(), new ActionsConfigExtra()];
         if (!$input->getOption('without-virtual-fields')) {
             $extras[] = new VirtualFieldsConfigExtra();
         }

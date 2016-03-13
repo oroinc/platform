@@ -17,6 +17,12 @@ class EntityDefinitionConfiguration extends TargetEntityDefinitionConfiguration
         $node
             ->scalarNode(EntityDefinitionConfig::LABEL)->cannotBeEmpty()->end()
             ->scalarNode(EntityDefinitionConfig::PLURAL_LABEL)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionConfig::DESCRIPTION)->cannotBeEmpty()->end();
+            ->scalarNode(EntityDefinitionConfig::DESCRIPTION)->cannotBeEmpty()->end()
+            ->arrayNode('actions')
+                ->prototype('array')
+                ->children()
+                    ->scalarNode('delete_handler')
+                    ->end()
+                ->end();
     }
 }
