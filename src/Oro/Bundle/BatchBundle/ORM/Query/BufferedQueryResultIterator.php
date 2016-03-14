@@ -166,6 +166,8 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
      * Sets callback to be called after page iteration was finished
      *
      * @param callable $callback
+     *
+     * @return $this
      */
     public function setPageCallback(callable $callback = null)
     {

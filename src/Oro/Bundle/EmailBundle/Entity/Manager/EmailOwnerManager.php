@@ -94,6 +94,8 @@ class EmailOwnerManager
 
     /**
      * @param array $entities
+     *
+     * @return array
      */
     protected function getEmailOwnerChanges(array $entities)
     {

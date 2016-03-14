@@ -58,6 +58,9 @@ class EmailActivityManager
         $this->em                      = $em;
     }
 
+    /**
+     * @param Email[] $createdEmails
+     */
     public function updateActivities(array $createdEmails)
     {
         foreach ($createdEmails as $email) {
