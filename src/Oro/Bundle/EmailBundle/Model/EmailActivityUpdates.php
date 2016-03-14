@@ -75,7 +75,9 @@ class EmailActivityUpdates
     }
 
     /**
-     * @param object[] $entitiesOwnedByEmails
+     * @param EmailOwnerInterface[] $entitiesOwnedByEmails
+     *
+     * @return array
      */
     protected function createJobsArgs(array $entitiesOwnedByEmails)
     {
