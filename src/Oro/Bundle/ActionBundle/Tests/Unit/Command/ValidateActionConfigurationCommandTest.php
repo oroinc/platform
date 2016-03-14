@@ -45,7 +45,7 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
-            ->with('oro_action.configuration.provider', 1)
+            ->with('oro_action.configuration.provider.operations', 1)
             ->willReturn($this->provider);
 
         $this->input = $this->getMock('Symfony\Component\Console\Input\InputInterface');

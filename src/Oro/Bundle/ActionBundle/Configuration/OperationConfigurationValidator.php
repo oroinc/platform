@@ -11,37 +11,31 @@ use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ActionDefinitionConfigurationValidator implements ConfigurationValidatorInterface
+class OperationConfigurationValidator implements ConfigurationValidatorInterface
 {
-    /**
-     * @var RouterInterface
-     */
+    /** @var RouterInterface */
     protected $router;
 
-    /**
-     * @var \Twig_ExistsLoaderInterface
-     */
+    /** @var \Twig_ExistsLoaderInterface */
     protected $twigLoader;
 
-    /**
-     * @var DoctrineHelper
-     */
+    /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /**
-     * @var LoggerInterface
-     */
+    /** @var LoggerInterface */
     protected $logger;
 
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $debug;
 
-    /**
-     * @var Collection
-     */
+    /** @var Collection */
     protected $errors;
+
+    /** @var ConfigurationProviderInterface[] */
+    protected $configurationProviders = [];
+
+    /** @var array */
+    protected $configurations = [];
 
     /**
      * @param RouterInterface $router
@@ -65,6 +59,15 @@ class ActionDefinitionConfigurationValidator implements ConfigurationValidatorIn
     }
 
     /**
+     * @param ConfigurationProviderInterface $provider
+     * @param string $name
+     */
+    public function addConfigurationProvider(ConfigurationProviderInterface $provider, $name)
+    {
+        $this->configurationProviders[$name] = $provider;
+    }
+
+    /**
      * @param array $configuration
      * @param Collection $errors
      */
@@ -78,6 +81,7 @@ class ActionDefinitionConfigurationValidator implements ConfigurationValidatorIn
             $this->validateFormOptions($action, $name);
             $this->validateRoutes($action['routes'], $this->getPath($name, 'routes'));
             $this->validateEntities($action['entities'], $this->getPath($name, 'entities'));
+            $this->validateActionGroups($action, 'action_groups', $name);
         }
     }
 
@@ -210,6 +214,43 @@ class ActionDefinitionConfigurationValidator implements ConfigurationValidatorIn
     }
 
     /**
+     * @param array $config
+     * @param string $name
+     * @param string $path
+     */
+    protected function validateActionGroups(array $config, $name, $path)
+    {
+        $path = $this->getPath($path, $name);
+
+        if (!array_key_exists($name, $config) || null === ($configuration = $this->getConfiguration($name))) {
+            return;
+        }
+
+        foreach ($config[$name] as $key => $item) {
+            if (!array_key_exists($item['name'], $configuration)) {
+                $this->handleError($this->getPath($path, $key), 'Action Group "%s" not found.', $item['name'], false);
+            }
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return array|null
+     */
+    protected function getConfiguration($name)
+    {
+        if (!array_key_exists($name, $this->configurations)) {
+            $this->configurations[$name] = null;
+
+            if (array_key_exists($name, $this->configurationProviders)) {
+                $this->configurations[$name] = $this->configurationProviders[$name]->getConfiguration();
+            }
+        }
+
+        return $this->configurations[$name];
+    }
+
+    /**
      * @param string $path
      * @param string $subpath
      * @return string
@@ -224,6 +265,7 @@ class ActionDefinitionConfigurationValidator implements ConfigurationValidatorIn
      * @param string $message
      * @param mixed $value
      * @param bool $silent
+     * @throws InvalidConfigurationException
      */
     protected function handleError($path, $message, $value, $silent = true)
     {
