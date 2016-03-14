@@ -45,7 +45,9 @@ class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configurationProvider = $this->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface')
+        $this->configurationProvider = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface'
+        )
             ->disableOriginalConstructor()
             ->getMock();
 

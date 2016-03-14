@@ -214,19 +214,19 @@ class OperationConfigurationValidator implements ConfigurationValidatorInterface
     }
 
     /**
-     * @param array $items
+     * @param array $config
      * @param string $name
      * @param string $path
      */
-    protected function validateActionGroups(array $items, $name, $path)
+    protected function validateActionGroups(array $config, $name, $path)
     {
         $path = $this->getPath($path, $name);
 
-        if (!array_key_exists($name, $items) || null === ($configuration = $this->getConfiguration($name))) {
+        if (!array_key_exists($name, $config) || null === ($configuration = $this->getConfiguration($name))) {
             return;
         }
 
-        foreach ($items[$name] as $key => $item) {
+        foreach ($config[$name] as $key => $item) {
             if (!array_key_exists($item['name'], $configuration)) {
                 $this->handleError($this->getPath($path, $key), 'Action Group "%s" not found.', $item['name'], false);
             }
@@ -265,6 +265,7 @@ class OperationConfigurationValidator implements ConfigurationValidatorInterface
      * @param string $message
      * @param mixed $value
      * @param bool $silent
+     * @throws InvalidConfigurationException
      */
     protected function handleError($path, $message, $value, $silent = true)
     {
