@@ -20,7 +20,7 @@ class ExecuteActionEvents
      *
      * @var string
      */
-    const HANDLE_AFTER = 'oro_action.action.handle_before';
+    const HANDLE_AFTER = 'oro_action.action.handle_after';
 
     /**
      * @deprecated since 1.10. Use {@see Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE} instead
