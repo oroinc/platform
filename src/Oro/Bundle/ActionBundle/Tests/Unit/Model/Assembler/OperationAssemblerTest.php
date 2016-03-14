@@ -270,9 +270,12 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getOperationActionGroupAssembler()
     {
-        return new OperationActionGroupAssembler(
+        $assembler = new OperationActionGroupAssembler();
+        $assembler->addConfigurationPass(
             $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
                 ->getMock()
         );
+
+        return $assembler;
     }
 }

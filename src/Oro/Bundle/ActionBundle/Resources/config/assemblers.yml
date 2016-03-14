@@ -30,7 +30,8 @@ services:
 
     oro_action.assembler.operation_action_group:
         class: %oro_action.assembler.operation_action_group.class%
-        arguments: [@oro_action.configuration_pass.replace_property_path]
+        calls:
+            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
 
     oro_action.assembler.attribute:
         class: %oro_action.assembler.attribute.class%

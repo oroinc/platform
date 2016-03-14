@@ -2,11 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Model\Operation;
 
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
+use Oro\Component\Action\Model\ContextAccessor;
+
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
-use Oro\Component\Action\Model\ContextAccessor;
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 /**
  * Iterator provide mapping for \Oro\Bundle\ActionBundle\Model\OperationActionGroup with ActionData values to
@@ -53,11 +55,14 @@ class ActionGroupsMappingIterator extends \ArrayIterator
             if ($value instanceof PropertyPathInterface) {
                 $value = $this->accessor->getValue($this->data, $value);
             } elseif (is_array($value)) {
-                array_walk_recursive($value, function (&$element) {
-                    if ($element instanceof PropertyPathInterface) {
-                        $element = $this->accessor->getValue($this->data, $element);
+                array_walk_recursive(
+                    $value,
+                    function (&$element) {
+                        if ($element instanceof PropertyPathInterface) {
+                            $element = $this->accessor->getValue($this->data, $element);
+                        }
                     }
-                });
+                );
             }
 
             $executionArgs->addArgument($argumentName, $value);
@@ -81,6 +86,7 @@ class ActionGroupsMappingIterator extends \ArrayIterator
     public function setData(ActionData $data)
     {
         $this->data = $data;
+
         return $this;
     }
 }

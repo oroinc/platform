@@ -11,13 +11,13 @@ class ActionGroupExecutionArgs
     private $arguments = [];
 
     /**
-     * @param $actionGroupName
-     * @param ActionData $arguments
+     * @param string $actionGroupName
+     * @param array $arguments
      */
-    public function __construct($actionGroupName, ActionData $arguments = null)
+    public function __construct($actionGroupName, array $arguments = [])
     {
         $this->name = $actionGroupName;
-        $this->arguments = $arguments ?: new ActionData();
+        $this->arguments = $arguments;
     }
 
     /**
@@ -41,10 +41,11 @@ class ActionGroupExecutionArgs
     }
 
     /**
+     * Creates new instance of action data with default root element as arguments object \stdClass
      * @return ActionData
      */
-    public function getArguments()
+    public function getActionData()
     {
-        return $this->arguments;
+        return new ActionData(['data' => (object)$this->arguments]);
     }
 }

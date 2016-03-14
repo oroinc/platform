@@ -6,13 +6,10 @@ use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator;
-use Oro\Bundle\ActionBundle\Tests\Unit\Model\OperationsTestHelperTrait;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
 {
-    use OperationsTestHelperTrait;
-
     public function testConstructionDataAccess()
     {
         $groups = [
@@ -50,7 +47,7 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
         $array = iterator_to_array($instance);
 
         $expected = [
-            new ActionGroupExecutionArgs('actionGroupName', new  ActionData([]))
+            new ActionGroupExecutionArgs('actionGroupName', [])
         ];
 
         $this->assertEquals($expected, $array);
@@ -67,6 +64,7 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
         array $accessorAts,
         array $expected
     ) {
+        /** @var \Oro\Component\Action\Model\ContextAccessor| \PHPUnit_Framework_MockObject_MockObject */
         $contextAccessor = $this->getMockBuilder('\Oro\Component\Action\Model\ContextAccessor')->getMock();
 
         $data = new ActionData();
@@ -117,7 +115,7 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
                 [
                     new ActionGroupExecutionArgs(
                         'OAGValuesOnly',
-                        $this->modifiedData(['arg1' => 'val1', 'compound arg2' => ['val2', 'val3']])
+                        ['arg1' => 'val1', 'compound arg2' => ['val2', 'val3']]
                     )
                 ]
             ],
@@ -129,7 +127,7 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
                 [
                     new ActionGroupExecutionArgs(
                         'OAGSimplePath',
-                        $this->modifiedData(['arg1' => 'val1'])
+                        ['arg1' => 'val1']
                     )
                 ]
             ],
@@ -141,14 +139,12 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
                 [
                     new ActionGroupExecutionArgs(
                         'OAGDeepPaths',
-                        $this->modifiedData(
-                            [
-                                'arg1' => [
-                                    'property' => 'valFromPP1',
-                                    'value' => 'val1'
-                                ]
+                        [
+                            'arg1' => [
+                                'property' => 'valFromPP1',
+                                'value' => 'val1'
                             ]
-                        )
+                        ]
                     )
                 ]
             ]

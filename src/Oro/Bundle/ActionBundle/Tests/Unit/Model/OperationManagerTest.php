@@ -702,7 +702,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
         )->disableOriginalConstructor()->getMock();
 
         $mockActionGroupArgs->expects($this->once())->method('getName')->willReturn('test_actionGroup');
-        $mockActionGroupArgs->expects($this->once())->method('getArguments')->willReturn($actionData);
+        $mockActionGroupArgs->expects($this->once())->method('getActionData')->willReturn($actionData);
 
         $operation->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
         $operation->expects($this->once())->method('getActionGroupsIterator')->willReturn(

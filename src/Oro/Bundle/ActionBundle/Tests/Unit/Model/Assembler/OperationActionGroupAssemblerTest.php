@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
+
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
-use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 class OperationActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +23,8 @@ class OperationActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             '\Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath'
         )->getMock();
 
-        $this->assembler = new OperationActionGroupAssembler($this->mockConfigurationPass);
+        $this->assembler = new OperationActionGroupAssembler();
+        $this->assembler->addConfigurationPass($this->mockConfigurationPass);
     }
 
     protected function tearDown()

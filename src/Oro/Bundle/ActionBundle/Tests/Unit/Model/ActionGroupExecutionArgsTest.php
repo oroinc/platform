@@ -7,8 +7,6 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 
 class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
 {
-    use OperationsTestHelperTrait;
-
     public function testNameConstruction()
     {
         $expected = 'nameOfActionGroup';
@@ -18,22 +16,28 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $instance->getName());
     }
 
+    public function testGetArgumentsCreateNewInstanceOfActionData()
+    {
+        $instance = new ActionGroupExecutionArgs('name');
+
+        $this->assertNotSame($instance->getActionData(), $instance->getActionData());
+    }
+
     /**
      * @param $expected
+     * @param array $arguments
      * @dataProvider provideArguments
      */
-    public function testArguments($expected)
+    public function testAddArguments($expected, array $arguments)
     {
         $instance = new ActionGroupExecutionArgs('someName');
 
-        $args = func_get_args();
-        array_shift($args);
-        foreach ($args as $v) {
+        foreach ($arguments as $v) {
             list($name, $value) = $v;
             $instance->addArgument($name, $value);
         }
 
-        $this->assertEquals($expected, $instance->getArguments());
+        $this->assertEquals($expected, $instance->getActionData());
     }
 
     /**
@@ -42,46 +46,59 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
     public function provideArguments()
     {
         return [
-            'no args'   => [
-                'expected' =>new ActionData([])
+            'no args' => [
+                'expected' => new ActionData(['data' => (object)[]]),
+                'arguments' => []
             ],
-            'few'       => [
-                'expected' => $this->modifiedData(
+            'few' => [
+                'expected' => new ActionData(
                     [
-                        'arg1' => 'val1',
-                        'arg2' => 'val2'
+                        'data' => (object)[
+                            'arg1' => 'val1',
+                            'arg2' => 'val2'
+                        ]
                     ]
                 ),
-                ['arg1', 'val1'],
-                ['arg2', 'val2'],
+                'arguments' => [
+                    ['arg1', 'val1'],
+                    ['arg2', 'val2']
+                ]
             ],
-            'many'      => [
-                'expected' => $this->modifiedData(
+            'many' => [
+                'expected' => new ActionData(
                     [
-                        'arg1' => 'val1',
-                        'arg2' => 'val1',
-                        'arg3' => 'val1',
-                        'arg4' => 'val1',
+                        'data' => (object)[
+                            'arg1' => 'val1',
+                            'arg2' => 'val1',
+                            'arg3' => 'val1',
+                            'arg4' => 'val1',
+                        ]
                     ]
                 ),
-                ['arg1', 'val1'],
-                ['arg2', 'val1'],
-                ['arg3', 'val1'],
-                ['arg4', 'val1'],
+                'arguments' => [
+                    ['arg1', 'val1'],
+                    ['arg2', 'val1'],
+                    ['arg3', 'val1'],
+                    ['arg4', 'val1']
+                ],
             ],
             'overrides' => [
-                'expected' => $this->modifiedData(
+                'expected' => new ActionData(
                     [
-                        'arg1' => 'val2'
+                        'data' => (object)[
+                            'arg1' => 'val2'
+                        ]
                     ]
                 ),
-                [
-                    'arg1',
-                    'val1'
-                ],
-                [
-                    'arg1',
-                    'val2'
+                'arguments' => [
+                    [
+                        'arg1',
+                        'val1'
+                    ],
+                    [
+                        'arg1',
+                        'val2'
+                    ]
                 ]
             ]
         ];
