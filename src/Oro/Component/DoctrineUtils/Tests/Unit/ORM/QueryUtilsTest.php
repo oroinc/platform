@@ -9,6 +9,18 @@ use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 
 class QueryUtilsTest extends \PHPUnit_Framework_TestCase
 {
+    public function testCreateResultSetMapping()
+    {
+        $platform = $this->getMockBuilder('Doctrine\DBAL\Platforms\AbstractPlatform')
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $this->assertInstanceOf(
+            'Oro\Component\DoctrineUtils\ORM\PlatformResultSetMapping',
+            QueryUtils::createResultSetMapping($platform)
+        );
+    }
+
     /**
      * @dataProvider concatExprProvider
      *

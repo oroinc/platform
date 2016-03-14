@@ -7,7 +7,7 @@ services:
         arguments:
             - @oro_action.operation_manager
             - @oro_action.helper.applications
-            - @oro_entity.doctrine_helper
             - @oro_action.helper.context
+            - @oro_action.helper.options
         tags:
             - { name: twig.extension }

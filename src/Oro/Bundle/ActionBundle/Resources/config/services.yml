@@ -3,10 +3,15 @@ parameters:
     oro_action.helper.context.class: Oro\Bundle\ActionBundle\Helper\ContextHelper
     oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
     oro_action.helper.restrict.class: Oro\Bundle\ActionBundle\Helper\RestrictHelper
+    oro_action.helper.options.class: Oro\Bundle\ActionBundle\Helper\OptionsHelper
     oro_action.operation_registry.class: Oro\Bundle\ActionBundle\Model\OperationRegistry
     oro_action.action_group_registry.class: Oro\Bundle\ActionBundle\Model\ActionGroupRegistry
     oro_action.operation_manager.class: Oro\Bundle\ActionBundle\Model\OperationManager
+    oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
+    oro_action.attribute_assembler.class: Oro\Bundle\ActionBundle\Model\AttributeAssembler
     oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
+    oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
+    oro_action.form_options_assembler.class: Oro\Bundle\ActionBundle\Model\FormOptionsAssembler
     oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\ActionFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_action.datagrid.operation_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension
@@ -38,6 +43,15 @@ services:
 
     oro_action.helper.restrict:
         class: %oro_action.helper.restrict.class%
+
+    oro_action.helper.options:
+        class: %oro_action.helper.options.class%
+        arguments:
+            - @oro_action.helper.context
+            - @oro_action.helper.applications
+            - @oro_action.options_assembler
+            - @oro_action.context_accessor
+            - @router
 
     oro_action.operation_registry:
         class: %oro_action.operation_registry.class%
@@ -95,6 +109,16 @@ services:
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
 
+    oro_action.options_assembler:
+        class: %oro_action.options_assembler.class%
+        calls:
+            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+
+    oro_action.form_options_assembler:
+        class: %oro_action.form_options_assembler.class%
+        calls:
+            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+
     oro_action.form_manager:
         class: %oro_action.form_manager.class%
         arguments:
@@ -114,10 +138,10 @@ services:
         arguments:
             - @oro_action.operation_manager
             - @oro_action.helper.context
-            - @oro_action.helper.applications
             - @oro_action.datagrid.mass_action_provider.registry
+            - @oro_action.helper.options
         calls:
-            - [setActionGroups, [['', 'datagridRowAction']]]
+            - [setGroups, [['', 'datagridRowAction']]]
         tags:
             - { name: oro_datagrid.extension }
         lazy: true
@@ -152,6 +176,5 @@ services:
             - @oro_action.operation_manager
             - @oro_action.helper.restrict
             - @translator
-            - @oro_action.helper.context
         tags:
             - { name: layout.data_provider, alias: actions }

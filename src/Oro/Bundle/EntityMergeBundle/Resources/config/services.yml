@@ -49,6 +49,7 @@ services:
         class: %oro_entity_merge.doctrine_helper.class%
         arguments:
             - @doctrine.orm.entity_manager
+            - @oro_entity.orm.mapping.additional_metadata_provider
 
     oro_entity_merge.data.entity_data_factory:
         class: %oro_entity_merge.data.entity_data_factory.class%

@@ -1,7 +1,8 @@
 parameters:
     oro_action.configuration.config.operation_list.class: Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration
     oro_action.configuration.config.action_group_list.class: Oro\Bundle\ActionBundle\Configuration\ActionGroupListConfiguration
-    oro_action.configuration.validator.action_definition.class: Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfigurationValidator
+    oro_action.configuration.validator.action_group.class: Oro\Bundle\ActionBundle\Configuration\ActionGroupConfigurationValidator
+    oro_action.configuration.validator.operation.class: Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator
     oro_action.configuration.provider.class: Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider
     oro_action.configuration_pass.replace_property_path.class: Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath
 
@@ -12,20 +13,25 @@ services:
     oro_action.configuration.config.action_group_list:
         class: %oro_action.configuration.config.action_group_list.class%
 
-    oro_action.configuration.validator.action_definition:
-        class: %oro_action.configuration.validator.action_definition.class%
+    oro_action.configuration.validator.action_group:
+        class: %oro_action.configuration.validator.action_group.class%
+
+    oro_action.configuration.validator.operation:
+        class: %oro_action.configuration.validator.operation.class%
         arguments:
             - @router
             - @twig.loader
             - @oro_entity.doctrine_helper
             - @logger
             - %kernel.debug%
+        calls:
+            - [addConfigurationProvider, [@oro_action.configuration.provider.action_groups, 'action_groups']]
 
     oro_action.configuration.provider.operations:
         class: %oro_action.configuration.provider.class%
         arguments:
             - @oro_action.configuration.config.operation_list
-            - @oro_action.configuration.validator.action_definition
+            - @oro_action.configuration.validator.operation
             - @oro_action.cache.provider.operations
             - []
             - %kernel.bundles%
@@ -35,7 +41,7 @@ services:
         class: %oro_action.configuration.provider.class%
         arguments:
             - @oro_action.configuration.config.action_group_list
-            - @oro_action.configuration.validator.action_definition
+            - @oro_action.configuration.validator.action_group
             - @oro_action.cache.provider.action_groups
             - []
             - %kernel.bundles%
