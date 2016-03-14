@@ -4,9 +4,11 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\GetRelationConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Loads default configuration based on entity metadata.
+ */
 class LoadFromMetadata implements ProcessorInterface
 {
     /** @var DoctrineHelper */
@@ -27,9 +29,9 @@ class LoadFromMetadata implements ProcessorInterface
     {
         /** @var RelationConfigContext $context */
 
-        $config = $context->getResult();
-        if (null !== $config && ConfigUtil::isRelationInitialized($config)) {
-            // a config already exists
+        $definition = $context->getResult();
+        if ($definition->hasFields()) {
+            // already initialized
             return;
         }
 
@@ -39,19 +41,11 @@ class LoadFromMetadata implements ProcessorInterface
             return;
         }
 
-        if (null === $config) {
-            $config = [];
+        $definition->setExcludeAll();
+        $definition->setCollapsed();
+        $targetIdFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($context->getClassName());
+        foreach ($targetIdFields as $fieldName) {
+            $definition->addField($fieldName);
         }
-
-        $targetIdFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-
-        if (!isset($config[ConfigUtil::EXCLUSION_POLICY])) {
-            $config[ConfigUtil::EXCLUSION_POLICY] = ConfigUtil::EXCLUSION_POLICY_ALL;
-        }
-        $config[ConfigUtil::FIELDS] = count($targetIdFields) === 1
-            ? reset($targetIdFields)
-            : array_fill_keys($targetIdFields, null);
-
-        $context->setResult($config);
     }
 }

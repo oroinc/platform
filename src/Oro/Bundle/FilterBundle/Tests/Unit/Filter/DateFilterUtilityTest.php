@@ -17,6 +17,18 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->setMethods(array('getTimezone', 'getFirstQuarterMonth', 'getFirstQuarterDay'))
             ->getMock();
+        $compiler = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Compiler')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $expressionResult = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $expressionResult->expects($this->any())
+            ->method('getVariableType')
+            ->will($this->returnValue(DateModifierInterface::VAR_THIS_DAY_W_Y));
+        $compiler->expects($this->any())
+            ->method('compile')
+            ->will($this->returnValue($expressionResult));
         $localeSettings->expects($this->any())
             ->method('getTimezone')
             ->will($this->returnValue('Asia/Tbilisi'));
@@ -27,7 +39,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ->method('getFirstQuarterDay')
             ->will($this->returnValue(15));
 
-        $this->utility = new DateFilterUtility($localeSettings);
+        $this->utility = new DateFilterUtility($localeSettings, $compiler);
     }
 
     protected function tearDown()
@@ -70,11 +82,13 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                 false
             ],
             'valid date given'                                 => [
-                ['value' => ['start' => '2001-01-01']],
+                ['value' => ['start' => '2001-01-01', 'start_original' => '', 'end_original' => '']],
                 'field',
                 [
                     'date_start' => '2001-01-01',
                     'date_end'   => null,
+                    'date_start_original' => '',
+                    'date_end_original' => '',
                     'type'       => DateRangeFilterType::TYPE_BETWEEN,
                     'part'       => DateModifierInterface::PART_VALUE,
                     'field'      => 'field',
@@ -82,7 +96,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ],
             'valid data given, more then given part day'       => [
                 [
-                    'value' => ['start' => 1, 'end' => 20],
+                    'value' => ['start' => 1, 'end' => 20, 'start_original' => 1, 'end_original' => 3],
                     'type'  => DateRangeFilterType::TYPE_MORE_THAN,
                     'part'  => DateModifierInterface::PART_DAY,
                 ],
@@ -90,6 +104,8 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                 [
                     'date_start' => 1,
                     'date_end'   => null,
+                    'date_start_original' => 1,
+                    'date_end_original' => null,
                     'type'       => DateRangeFilterType::TYPE_MORE_THAN,
                     'part'       => DateModifierInterface::PART_DAY,
                     'field'      => "DAY(CONVERT_TZ(field, '+00:00', '+04:00'))",
@@ -97,7 +113,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ],
             'valid data given, less then given part month'     => [
                 [
-                    'value' => ['start' => 1, 'end' => 3],
+                    'value' => ['start' => 1, 'end' => 3, 'start_original' => 5, 'end_original' => 6],
                     'type'  => DateRangeFilterType::TYPE_LESS_THAN,
                     'part'  => DateModifierInterface::PART_MONTH,
                 ],
@@ -105,6 +121,8 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                 [
                     'date_start' => null,
                     'date_end'   => 3,
+                    'date_start_original' => null,
+                    'date_end_original' => 6,
                     'type'       => DateRangeFilterType::TYPE_LESS_THAN,
                     'part'       => DateModifierInterface::PART_MONTH,
                     'field'      => "MONTH(CONVERT_TZ(field, '+00:00', '+04:00'))",
@@ -112,7 +130,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ],
             'valid data given, between given part year'        => [
                 [
-                    'value' => ['start' => 2001, 'end' => 2005],
+                    'value' => ['start' => 2001, 'end' => 2005, 'start_original' => 2005, 'end_original' => 2012],
                     'type'  => DateRangeFilterType::TYPE_BETWEEN,
                     'part'  => DateModifierInterface::PART_YEAR,
                 ],
@@ -120,6 +138,8 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                 [
                     'date_start' => 2001,
                     'date_end'   => 2005,
+                    'date_start_original' => 2005,
+                    'date_end_original' => 2012,
                     'type'       => DateRangeFilterType::TYPE_BETWEEN,
                     'part'       => DateModifierInterface::PART_YEAR,
                     'field'      => "YEAR(CONVERT_TZ(field, '+00:00', '+04:00'))",
@@ -127,7 +147,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ],
             'valid data given, between given part week'        => [
                 [
-                    'value' => ['start' => 2, 'end' => 5],
+                    'value' => ['start' => 2, 'end' => 5, 'start_original' => 3, 'end_original' => 7],
                     'type'  => DateRangeFilterType::TYPE_BETWEEN,
                     'part'  => DateModifierInterface::PART_WEEK,
                 ],
@@ -135,6 +155,8 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                 [
                     'date_start' => 2,
                     'date_end'   => 5,
+                    'date_start_original' => 3,
+                    'date_end_original' => 7,
                     'type'       => DateRangeFilterType::TYPE_BETWEEN,
                     'part'       => DateModifierInterface::PART_WEEK,
                     'field'      => "WEEK(CONVERT_TZ(field, '+00:00', '+04:00'))",
@@ -142,7 +164,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ],
             'valid data given, between given part day of week' => [
                 [
-                    'value' => ['start' => 2, 'end' => 5],
+                    'value' => ['start' => 2, 'end' => 5, 'start_original' => 5, 'end_original' => 8],
                     'type'  => DateRangeFilterType::TYPE_BETWEEN,
                     'part'  => DateModifierInterface::PART_DOW,
                 ],
@@ -150,6 +172,8 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                 [
                     'date_start' => 2,
                     'date_end'   => 5,
+                    'date_start_original' => 5,
+                    'date_end_original' => 8,
                     'type'       => DateRangeFilterType::TYPE_BETWEEN,
                     'part'       => DateModifierInterface::PART_DOW,
                     'field'      => "DAYOFWEEK(CONVERT_TZ(field, '+00:00', '+04:00'))",
@@ -157,7 +181,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ],
             'valid data given, between given part day of year' => [
                 [
-                    'value' => ['start' => 320, 'end' => 365],
+                    'value' => ['start' => 320, 'end' => 365, 'start_original' => 340, 'end_original' => 350],
                     'type'  => DateRangeFilterType::TYPE_BETWEEN,
                     'part'  => DateModifierInterface::PART_DOY,
                 ],
@@ -165,6 +189,8 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                 [
                     'date_start' => 320,
                     'date_end'   => 365,
+                    'date_start_original' => 340,
+                    'date_end_original' => 350,
                     'type'       => DateRangeFilterType::TYPE_BETWEEN,
                     'part'       => DateModifierInterface::PART_DOY,
                     'field'      => "DAYOFYEAR(CONVERT_TZ(field, '+00:00', '+04:00'))",
@@ -172,7 +198,7 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
             ],
             'valid data given, between given part quarter'     => [
                 [
-                    'value' => ['start' => 1, 'end' => 2],
+                    'value' => ['start' => 1, 'end' => 2, 'start_original' => 2, 'end_original' => 3],
                     'type'  => DateRangeFilterType::TYPE_BETWEEN,
                     'part'  => DateModifierInterface::PART_QUARTER,
                 ],
@@ -180,12 +206,55 @@ class DateFilterUtilityTest extends \PHPUnit_Framework_TestCase
                 [
                     'date_start' => 1,
                     'date_end'   => 2,
+                    'date_start_original' => 2,
+                    'date_end_original' => 3,
                     'type'       => DateRangeFilterType::TYPE_BETWEEN,
                     'part'       => DateModifierInterface::PART_QUARTER,
                     'field'      =>
                         "QUARTER(DATE_SUB(DATE_SUB(CONVERT_TZ(field, '+00:00', '+04:00'), 1, 'month'), 14, 'day'))",
                 ]
-            ]
+            ],
+            'valid data given, equal then given part month'     => [
+                [
+                    'value' => ['start' => 1, 'end' => 3, 'start_original' => 5, 'end_original' => 6],
+                    'type'  => DateRangeFilterType::TYPE_EQUAL,
+                    'part'  => DateModifierInterface::PART_MONTH,
+                ],
+                'field',
+                [
+                    'date_start' => 1,
+                    'date_end'   => 3,
+                    'date_start_original' => 5,
+                    'date_end_original' => 6,
+                    'type'       => DateRangeFilterType::TYPE_EQUAL,
+                    'part'       => DateModifierInterface::PART_MONTH,
+                    'field'      => "MONTH(CONVERT_TZ(field, '+00:00', '+04:00'))",
+                ]
+            ],
+            'valid data given, equal then given part month with current day without year var'     => [
+                [
+                    'value' => [
+                        'start' => new \DateTime('2010-01-02'),
+                        'end' => 3,
+                        'start_original' => '{{'.DateModifierInterface::VAR_THIS_DAY_W_Y.'}}',
+                        'end_original' => 6
+                    ],
+                    'type'  => DateRangeFilterType::TYPE_EQUAL,
+                    'part'  => DateModifierInterface::PART_VALUE,
+                ],
+                'field',
+                [
+                    'date_start' => '0102',
+                    'date_end'   => 3,
+                    'date_start_original' => '{{'.DateModifierInterface::VAR_THIS_DAY_W_Y.'}}',
+                    'date_end_original' => 6,
+                    'type'       => DateRangeFilterType::TYPE_EQUAL,
+                    'part'       => DateModifierInterface::PART_VALUE,
+                    'field'      =>
+                        "MONTH(CONVERT_TZ(field, '+00:00', '+04:00')) * 100 + ".
+                        "DAY(CONVERT_TZ(field, '+00:00', '+04:00'))",
+                ]
+            ],
         ];
     }
 }

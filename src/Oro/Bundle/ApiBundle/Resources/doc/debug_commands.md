@@ -1,8 +1,23 @@
 Debug commands
 --------------
 
+### oro:api:dump
+This command shows all resources available through Data API.
+
+Run this command without parameters to see all available resources:
+
+```bash
+php app/console oro:api:dump
+```
+
+or specify the `request-type` option if you need to know resources for a particular request type:
+
+```bash
+php app/console oro:api:dump --request-type=rest --request-type=json_api
+```
+
 ### oro:api:debug
-This command shows details about registered API actions and processors.
+This command shows details about registered Data API actions and processors.
 
 If you want to know all actions run this command without parameters:
 
@@ -22,23 +37,8 @@ The `request-type` option can be used to see the processors which will be execut
 php app/console oro:api:debug get_list --request-type=rest --request-type=json_api
 ```
 
-### oro:api:resources:dump
-This command shows all API resources.
-
-Run this command without parameters to see all available API resources:
-
-```bash
-php app/console oro:api:resources:dump
-```
-
-or specify the `request-type` option if you need to know API resources for a particular request type:
-
-```bash
-php app/console oro:api:resources:dump --request-type=rest --request-type=json_api
-```
-
 ### oro:api:config:dump
-This command shows API configuration for a particular entity.
+This command shows configuration for a particular entity.
 
 Run this command and specify entity class or entity alias as an argument:
 
@@ -52,7 +52,7 @@ or
 php app/console oro:api:config:dump users
 ```
 
-To see API configuration for a particular request type you can use the `request-type` option:
+To see the configuration for a particular request type you can use the `request-type` option:
 
 ```bash
 php app/console oro:api:config:dump users --request-type=rest --request-type=json_api
@@ -89,4 +89,11 @@ If you want to see entity metadata that is used for a particular request type yo
 
 ```bash
 php app/console oro:api:metadata:dump users --request-type=rest --request-type=json_api
+```
+
+### oro:api:config:dump-reference
+This command shows the structure of `Resources/config/oro/api.yml`.
+
+```bash
+php app/console oro:api:config:dump-reference
 ```

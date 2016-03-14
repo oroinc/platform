@@ -132,6 +132,110 @@ class BusinessUnitManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedResult, $result);
     }
 
+    /**
+     * @dataProvider getTreeNodesProvider
+     */
+    public function testGetTreeNodesCount(array $tree, $expectedCount)
+    {
+        $this->assertEquals($expectedCount, $this->businessUnitManager->getTreeNodesCount($tree));
+    }
+
+    public function getTreeNodesProvider()
+    {
+        return [
+            [
+                [],
+                0,
+            ],
+            [
+                [
+                    [
+                        'id' => 1,
+                        'name' => 'org',
+                        'children' => [
+                            [
+                                'id' => '3',
+                                'name' => 'First BU',
+                                'parent' => null,
+                                'organization' => 1,
+                                'children' => [
+                                    [
+                                        'id' => '5',
+                                        'name' => 'Sub First BU',
+                                        'parent' => null,
+                                        'organization' => 1,
+                                        'children' => [
+                                            [
+                                                'id' => '4',
+                                                'name' => 'Sub Sub First BU',
+                                                'parent' => null,
+                                                'organization' => 1,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                        ],
+                    ],
+                ],
+                4,
+            ],
+            [
+                [
+                    [
+                        'id' => 1,
+                        'name' => 'org',
+                        'children' => [
+                            [
+                                'id' => '3',
+                                'name' => 'First BU',
+                                'parent' => null,
+                                'organization' => 1,
+                                'children' => [
+                                    [
+                                        'id' => '5',
+                                        'name' => 'Sub First BU',
+                                        'parent' => null,
+                                        'organization' => 1,
+                                        'children' => [
+                                            [
+                                                'id' => '4',
+                                                'name' => 'Sub Sub First BU',
+                                                'parent' => null,
+                                                'organization' => 1,
+                                            ],
+                                        ],
+                                    ],
+                                ],
+                            ],
+                            [
+                                'id' => '10',
+                                'name' => 'Second BU',
+                                'parent' => null,
+                                'organization' => 1,
+                                'children' => [
+                                    [
+                                        'id' => 11,
+                                        'name' => 'Sub Second BU',
+                                        'parent' => null,
+                                        'organization' => 1,
+                                    ],
+                                ],
+                            ],
+                            [
+                                'id' => '15',
+                                'name' => 'BU wo children',
+                                'parent' => null,
+                                'organization' => 1,
+                            ],
+                        ],
+                    ],
+                ],
+                7,
+            ],
+        ];
+    }
+
     public function testGetBusinessUnitsTree()
     {
         $this->buRepo->expects($this->once())

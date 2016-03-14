@@ -108,6 +108,14 @@
     {%- endif -%}
 {% endblock %}
 
+{% block form_widget %}
+    {% if split_to_fields %}
+        {{ block_widget(block) }}
+    {% else %}
+        {{ form_widget(form) }}
+    {% endif %}
+{% endblock %}
+
 {% block form_end_widget %}
     {{ form_end(form) }}
 {% endblock %}

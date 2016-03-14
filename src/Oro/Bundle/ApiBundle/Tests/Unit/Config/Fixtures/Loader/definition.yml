@@ -1,0 +1,306 @@
+empty:
+    config: []
+    expected: []
+
+null_fields:
+    config:
+        fields: ~
+    expected: []
+
+empty_fields:
+    config:
+        fields: []
+    expected: []
+
+default_exclusion_policy:
+    config:
+        exclusion_policy: none
+    expected: []
+
+default_disable_partial_load:
+    config:
+        disable_partial_load: false
+    expected: []
+
+empty_order_by:
+    config:
+        order_by: []
+    expected: []
+
+default_max_results:
+    config:
+        max_results: ~
+    expected: []
+
+zero_max_results:
+    config:
+        max_results: 0
+    expected:
+        max_results: 0
+
+unlimited_max_results:
+    config:
+        max_results: -1
+    expected:
+        max_results: -1
+
+empty_hints:
+    config:
+        hints: []
+    expected: []
+
+empty_post_serialize:
+    config:
+        post_serialize: ~
+    expected: []
+
+null_label:
+    config:
+        label: ~
+    expected: []
+
+empty_label:
+    config:
+        label: ""
+    expected: []
+
+null_plural_label:
+    config:
+        plural_label: ~
+    expected: []
+
+empty_plural_label:
+    config:
+        plural_label: ""
+    expected: []
+
+null_description:
+    config:
+        description: ~
+    expected: []
+
+empty_description:
+    config:
+        description: ""
+    expected: []
+
+default_collapse:
+    config:
+        collapse: false
+    expected: []
+
+all_attributes:
+    config:
+        exclusion_policy: all
+        disable_partial_load: true
+        order_by:
+            id: DESC
+        max_results: 50
+        hints:
+            - hint1
+            - {name: hint2, value: hint_val2}
+        post_serialize: [class, method]
+        label: label1
+        plural_label: plural_label1
+        description: description1
+        collapse: true
+        extra1: true
+    expected:
+        exclusion_policy: all
+        disable_partial_load: true
+        order_by:
+            id: DESC
+        max_results: 50
+        hints:
+            - hint1
+            - {name: hint2, value: hint_val2}
+        post_serialize: [class, method]
+        label: label1
+        plural_label: plural_label1
+        description: description1
+        collapse: true
+        extra1: true
+
+field_exclude:
+    config:
+        fields:
+            field1:
+                exclude: true
+            field2:
+                exclude: false
+    expected:
+        fields:
+            field1:
+                exclude: true
+            field2: ~
+
+field_collapse:
+    config:
+        fields:
+            field1:
+                collapse: true
+            field2:
+                collapse: false
+    expected:
+        fields:
+            field1:
+                collapse: true
+            field2: ~
+
+field_property_path:
+    config:
+        fields:
+            field1:
+                property_path: ~
+            field2:
+                property_path: ""
+            field3:
+                property_path: path1
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                property_path: path1
+
+field_data_transformer:
+    config:
+        fields:
+            field1:
+                data_transformer: ~
+            field2:
+                data_transformer: ""
+            field3:
+                data_transformer: service1
+            field4:
+                data_transformer: [service1, [class, method]]
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                data_transformer: [service1]
+            field4:
+                data_transformer: [service1, [class, method]]
+
+field_label:
+    config:
+        fields:
+            field1:
+                label: ~
+            field2:
+                label: ""
+            field3:
+                label: label1
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                label: label1
+
+field_description:
+    config:
+        fields:
+            field1:
+                description: ~
+            field2:
+                description: ""
+            field3:
+                description: description1
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                description: description1
+
+field_with_extra_attributes:
+    config:
+        fields:
+            field1:
+                extra1: true
+    expected:
+        fields:
+            field1:
+                extra1: true
+
+filters_and_sorters:
+    config:
+        filters:
+            exclusion_policy: none
+            fields:
+                field1:
+                    allow_array: false
+                    property_path: path1
+        sorters:
+            exclusion_policy: none
+            fields:
+                field1:
+                    exclude: false
+                    property_path: path1
+    expected:
+        filters:
+            fields:
+                field1:
+                    property_path: path1
+        sorters:
+            fields:
+                field1:
+                    property_path: path1
+
+field_with_filters_and_sorters:
+    config:
+        fields:
+            field1:
+                filters:
+                    exclusion_policy: none
+                    fields:
+                        field11:
+                            allow_array: false
+                            property_path: path1
+                sorters:
+                    exclusion_policy: none
+                    fields:
+                        field11:
+                            exclude: false
+                            property_path: path1
+    expected:
+        fields:
+            field1:
+                filters:
+                    fields:
+                        field11:
+                            property_path: path1
+                sorters:
+                    fields:
+                        field11:
+                            property_path: path1
+
+empty_extra_sections:
+    config:
+        test_section: []
+        another_section: []
+    expected:
+        another_section: []
+
+extra_sections_with_default_value_of_attribute:
+    config:
+        test_section:
+            label: ""
+    expected: []
+
+extra_sections:
+    config:
+        test_section:
+            exclusion_policy: none
+            extra: true
+        another_section:
+            exclusion_policy: none
+            extra: true
+    expected:
+        test_section:
+            extra: true
+        another_section:
+            exclusion_policy: none
+            extra: true

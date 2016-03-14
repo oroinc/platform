@@ -1,0 +1,137 @@
+<?php
+
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get;
+
+use Doctrine\ORM\Query\Parameter;
+use Doctrine\ORM\QueryBuilder;
+
+use Oro\Bundle\ApiBundle\Collection\Criteria;
+use Oro\Bundle\ApiBundle\Processor\Get\BuildQuery;
+
+class BuildQueryTest extends GetProcessorOrmRelatedTestCase
+{
+    /** @var BuildQuery */
+    protected $processor;
+
+    protected function setUp()
+    {
+        parent::setUp();
+
+        $resolver = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\EntityClassResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->context->setCriteria(new Criteria($resolver));
+
+        $this->processor = new BuildQuery($this->doctrineHelper);
+    }
+
+    public function testProcessOnExistingQuery()
+    {
+        $qb = $this->getQueryBuilderMock();
+
+        $this->context->setQuery($qb);
+        $this->processor->process($this->context);
+
+        $this->assertSame($qb, $this->context->getQuery());
+    }
+
+    public function testProcessForNotManageableEntity()
+    {
+        $className = 'Test\Class';
+
+        $this->notManageableClassNames = [$className];
+
+        $this->context->setClassName($className);
+        $this->processor->process($this->context);
+
+        $this->assertNull($this->context->getQuery());
+    }
+
+    public function testProcessOnSingleIdEntity()
+    {
+        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User';
+        $id        = 12;
+
+        $this->context->setClassName($className);
+        $this->context->setId($id);
+        $this->processor->process($this->context);
+
+        $this->assertTrue($this->context->hasQuery());
+        /** @var QueryBuilder $query */
+        $query = $this->context->getQuery();
+        $this->assertEquals(
+            sprintf('SELECT e FROM %s e WHERE e.id = :id', $className),
+            $query->getDQL()
+        );
+        /** @var Parameter $parameter */
+        $parameter = $query->getParameters()->first();
+        $this->assertEquals('id', $parameter->getName());
+        $this->assertEquals($id, $parameter->getValue());
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage The entity identifier cannot be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" has single primary key.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessOnSingleIdEntityWithGivenArrayId()
+    {
+        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
+        $this->context->setId([2, 4]);
+        $this->processor->process($this->context);
+    }
+
+    public function testProcessOnCompositeIdEntity()
+    {
+        $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity';
+        $id        = ['id' => 23, 'title' => 'test'];
+
+        $this->context->setClassName($className);
+        $this->context->setId($id);
+        $this->processor->process($this->context);
+
+        $this->assertTrue($this->context->hasQuery());
+        /** @var QueryBuilder $query */
+        $query = $this->context->getQuery();
+        $this->assertEquals(
+            sprintf('SELECT e FROM %s e WHERE e.id = :id1 AND e.title = :id2', $className),
+            $query->getDQL()
+        );
+
+        /** @var Parameter $parameter */
+        $parameters  = $query->getParameters();
+        $idParameter = $parameters[0];
+        $this->assertEquals('id1', $idParameter->getName());
+        $this->assertEquals($id['id'], $idParameter->getValue());
+        $titleParameter = $parameters[1];
+        $this->assertEquals('id2', $titleParameter->getName());
+        $this->assertEquals($id['title'], $titleParameter->getValue());
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage The entity identifier must be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite primary key.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessOnCompositeIdEntityWithGivenScalarId()
+    {
+        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity');
+        $this->context->setId(54);
+        $this->processor->process($this->context);
+    }
+
+    // @codingStandardsIgnoreStart
+    /**
+     * @expectedException \UnexpectedValueException
+     * @expectedExceptionMessage The entity identifier array must have the key "title" because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite primary key.
+     */
+    // @codingStandardsIgnoreEnd
+    public function testProcessOnCompositeIdEntityWithGivenWrongId()
+    {
+        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity');
+        $this->context->setId(['id' => 45]);
+        $this->processor->process($this->context);
+    }
+}

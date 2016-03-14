@@ -68,7 +68,10 @@ define([
      */
     function getErrorTarget(element) {
         var $target = $(validationBelongs(element));
-        if ($target.parent().is('.selector, .uploader, .input-append, .input-prepend')) {
+        var $widgetContainer = $target.inputWidget('getContainer');
+        if ($widgetContainer) {
+            $target = $widgetContainer;
+        } else if ($target.parent().is('.input-append, .input-prepend')) {
             $target = $target.parent();
         }
         return $target;
@@ -295,6 +298,7 @@ define([
         'oroform/js/validator/notnull',
         'oroform/js/validator/number',
         'oroform/js/validator/range',
+        'oroform/js/validator/open-range',
         'oroform/js/validator/regex',
         'oroform/js/validator/repeated',
         'oroform/js/validator/time',

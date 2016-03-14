@@ -3,7 +3,9 @@
 namespace Oro\Bundle\OrganizationBundle\Provider\Filter;
 
 use Doctrine\Bundle\DoctrineBundle\Registry;
+use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
@@ -51,34 +53,24 @@ class ChoiceTreeBusinessUnitProvider
     {
         $businessUnitRepo = $this->getBusinessUnitRepo();
 
-        $response = [];
-
         $qb = $businessUnitRepo->getQueryBuilder();
         $qb
-            ->andWhere(
-                $qb->expr()->in('businessUnit.id', ':ids')
-            )
+            ->select('businessUnit.id')
+            ->addSelect('o.id AS owner_id')
+            ->leftJoin('businessUnit.owner', 'o')
             ->orderBy('businessUnit.id', 'ASC');
+        $this->addBusinessUnitName($qb);
+        QueryUtils::applyOptimizedIn($qb, 'businessUnit.id', $this->getBusinessUnitIds());
 
-        $qb->setParameter('ids', $this->getBusinessUnitIds());
+        return $this->aclHelper->apply($qb)->getArrayResult();
+    }
 
-        $businessUnits = $this->aclHelper->apply($qb)->getResult();
-        /** @var BusinessUnit $businessUnit */
-        foreach ($businessUnits as $businessUnit) {
-            if ($businessUnit->getOwner()) {
-                $name = $businessUnit->getName();
-            } else {
-                $name = $this->getBusinessUnitName($businessUnit);
-            }
-
-            $response[] = [
-                'id'       => $businessUnit->getId(),
-                'name'     => $name,
-                'owner_id' => $businessUnit->getOwner() ? $businessUnit->getOwner()->getId() : null
-            ];
-        }
-
-        return $response;
+    /**
+     * @return bool
+     */
+    public function shouldBeLazy()
+    {
+        return count($this->getBusinessUnitIds()) >= 500;
     }
 
     /**
@@ -97,6 +89,14 @@ class ChoiceTreeBusinessUnitProvider
     protected function getBusinessUnitName(BusinessUnit $businessUnit)
     {
         return $businessUnit->getName();
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     */
+    protected function addBusinessUnitName(QueryBuilder $qb)
+    {
+        $qb->addSelect('businessUnit.name');
     }
 
     /**

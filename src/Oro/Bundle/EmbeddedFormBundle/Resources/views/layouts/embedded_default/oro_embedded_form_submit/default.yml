@@ -6,6 +6,7 @@ layout:
             blockType: form
             options:
                 form_name: embedded_form
+                split_to_fields: true
 
     conditions:
         @eq:

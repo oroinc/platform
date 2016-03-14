@@ -103,6 +103,11 @@
 </script>
 
 <script type="text/template" id="select-field-template">
+    <% if (obj.popoverContent) { %>
+    <div class="select-field-date-popover">
+        <i class="icon-info-sign" data-content="<%= popoverContent %>" data-placement="bottom" data-toggle="popover"></i>
+    </div>
+    <% } %>
     <div class="horizontal clearfix">
         <span class="filter-select-oro-wrapper">
             <select name="<%= name %>" class="filter-select-oro">

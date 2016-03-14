@@ -1,0 +1,12 @@
+oro_permissions:
+    DELETE:
+        exclude_entities:
+            - Oro\Bundle\EmailBundle\Entity\EmailUser
+
+    ASSIGN:
+        exclude_entities:
+            - Oro\Bundle\EmailBundle\Entity\EmailUser
+
+    SHARE:
+        exclude_entities:
+            - Oro\Bundle\EmailBundle\Entity\EmailUser

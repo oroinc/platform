@@ -14,10 +14,10 @@ class EmailTemplatesViewList extends AbstractViewsList
     {
         return [
             new View(
-                'oro.email.datagrid.emailtemplate.view.all_templates'
+                $this->translator->trans('oro.email.datagrid.emailtemplate.view.all_templates')
             ),
             new View(
-                'oro.email.datagrid.emailtemplate.view.system_templates',
+                $this->translator->trans('oro.email.datagrid.emailtemplate.view.system_templates'),
                 [
                     'isSystem' => [
                         'value' => 1

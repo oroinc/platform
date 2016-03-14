@@ -39,7 +39,8 @@ define(function(require) {
         updateTimeFieldState: function() {
             var value = this.$el.val();
             if ((!this.$variables || this.$variables.dateVariables('getPart') !== 'value') ||
-                this.dateVariableHelper.isDateVariable(value)
+                this.dateVariableHelper.isDateVariable(value) ||
+                this.dayValueHelper.isDayValue(value)
             ) {
                 this.$frontTimeField.val('').attr('disabled', 'disabled');
             } else {
@@ -86,6 +87,10 @@ define(function(require) {
                 return this.dateVariableHelper.formatRawValue(value);
             }
 
+            if (this.dayValueHelper.isDayValue(value)) {
+                return this.dayValueHelper.formatRawValue(value);
+            }
+
             if (this.$variables.dateVariables('getPart') === 'value') {
                 return dateTimePickerViewMixin.getBackendFormattedValue.call(this);
             }
@@ -102,6 +107,10 @@ define(function(require) {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
                 return this.dateVariableHelper.formatDisplayValue(value);
+            }
+
+            if (this.dayValueHelper.isDayValue(value)) {
+                return this.dayValueHelper.formatDisplayValue(value);
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {

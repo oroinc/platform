@@ -53,7 +53,7 @@ class SetIncludeFilter implements ProcessorInterface
 
         $includeFilter = new IncludeFilter(
             DataType::STRING,
-            'Inclusion of related resources. Comma-separated paths, e.g. "articles,comments,author"'
+            'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.'
         );
         $includeFilter->setArrayAllowed(true);
 
