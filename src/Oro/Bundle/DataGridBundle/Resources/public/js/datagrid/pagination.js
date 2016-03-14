@@ -169,6 +169,8 @@ define([
                 handles.unshift({
                     label: _.has(ffConfig.prev, 'label') ? ffConfig.prev.label : undefined,
                     wrapClass: _.has(ffConfig.prev, 'wrapClass') ? ffConfig.prev.wrapClass : undefined,
+                    direction: 'prev',
+                    arrow: 'left',
                     className: collection.hasPrevious() ? undefined : 'disabled'
                 });
             }
@@ -177,6 +179,8 @@ define([
                 handles.push({
                     label: _.has(ffConfig.next, 'label') ? ffConfig.next.label : undefined,
                     wrapClass: _.has(ffConfig.next, 'wrapClass') ? ffConfig.next.wrapClass : undefined,
+                    direction: 'next',
+                    arrow: 'right',
                     className: collection.hasNext() ? void 0 : 'disabled'
                 });
             }

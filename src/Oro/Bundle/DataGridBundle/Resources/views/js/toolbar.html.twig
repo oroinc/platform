@@ -7,9 +7,9 @@
         </div>
         <div class="pull-right grid-toolbar-tools">
             <div class="actions-panel pull-right form-horizontal"></div>
-            <div class="page-size pull-right form-horizontal"></div>
+            <div class="page-size pull-right form-horizontal" data-grid-pagesize></div>
         </div>
-        <div class="pagination pagination-centered"></div>
+        <div class="pagination pagination-centered" data-grid-pagination></div>
     </div>
 {% else %}
     <div class="grid-toolbar">
@@ -19,7 +19,7 @@
         </div>
         <div class="pagination-container">
             <div class="pagination pull-left"></div>
-            <div class="page-size pull-left"></div>
+            <div class="page-size pull-left" data-grid-pagesize></div>
         </div>
     </div>
 {% endif %}

@@ -34,6 +34,12 @@ define([
         /** @property */
         extraActionsPanel: ActionsPanel,
 
+        /** @property */
+        selector: {
+            pagination: '[data-grid-pagination]',
+            pagesize: '[data-grid-pagesize]',
+        },
+
         /**
          * Initializer.
          *
@@ -122,10 +128,10 @@ define([
             this.$el.append(this.template());
 
             $pagination = this.subviews.pagination.render().$el;
-            $pagination.attr('class', this.$('.pagination').attr('class'));
+            $pagination.attr('class', this.$(this.selector.pagination).attr('class'));
 
-            this.$('.pagination').replaceWith($pagination);
-            this.$('.page-size').append(this.subviews.pageSize.render().$el);
+            this.$(this.selector.pagination).replaceWith($pagination);
+            this.$(this.selector.pagesize).append(this.subviews.pageSize.render().$el);
             this.$('.actions-panel').append(this.subviews.actionsPanel.render().$el);
             if (this.subviews.extraActionsPanel.haveActions()) {
                 this.$('.extra-actions-panel').append(this.subviews.extraActionsPanel.render().$el);
