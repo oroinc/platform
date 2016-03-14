@@ -20,4 +20,13 @@ interface ConfigurationSectionInterface
         array $preProcessCallbacks,
         array $postProcessCallbacks
     );
+
+    /**
+     * Checks if section can be added to the given section
+     *
+     * @param string $section
+     *
+     * @return bool
+     */
+    public function isApplicable($section);
 }

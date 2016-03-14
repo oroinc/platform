@@ -210,24 +210,6 @@ services:
         class: Oro\Bundle\OrganizationBundle\Handler\BusinessUnitDeleteHandler
         parent: oro_soap.handler.delete.abstract
 
-    oro_organization.api.business_unit.delete.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomDeleteHandler
-        arguments:
-            - @oro_api.doctrine_helper
-            - @oro_organization.business_unit.handler.delete
-            - %oro_organization.business_unit.entity.class%
-        tags:
-            - { name: oro.api.processor, action: delete, group: delete_data, priority: 0 }
-
     oro_organization.organization.handler.delete:
         class: Oro\Bundle\OrganizationBundle\Handler\OrganizationDeleteHandler
         parent: oro_soap.handler.delete.abstract
-
-    oro_organization.api.organization.delete.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomDeleteHandler
-        arguments:
-            - @oro_api.doctrine_helper
-            - @oro_organization.organization.handler.delete
-            - %oro_organization.organization.entity.class%
-        tags:
-            - { name: oro.api.processor, action: delete, group: delete_data, priority: 0 }

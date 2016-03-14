@@ -30,4 +30,20 @@ class ActionsConfig
     {
         return empty($this->items);
     }
+
+    /**
+     * Gets action configs
+     *
+     * @param string $action
+     *
+     * @return array
+     */
+    public function getAction($action)
+    {
+        return $this->has($action) ? $this->get($action) : [];
+    }
+
+    public function isActionEnabled($action)
+    {
+    }
 }

@@ -30,12 +30,12 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $config = $this->getConfig($container);
-        $this->registerTaggedServices(
-            $container,
-            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
-            self::CONFIG_EXTENSION_TAG,
-            'addExtension'
-        );
+//        $this->registerTaggedServices(
+//            $container,
+//            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
+//            self::CONFIG_EXTENSION_TAG,
+//            'addExtension'
+//        );
         $this->registerProcessingGroups($container, $config);
         $this->registerActionProcessors($container);
         $this->registerTaggedServices(
@@ -64,7 +64,6 @@ class ConfigurationCompilerPass implements CompilerPassInterface
      */
     protected function registerProcessingGroups(ContainerBuilder $container, array $config)
     {
-        $actionConfigExtensionDefinition = $this->findDefinition($container, 'oro_api.config_extension.actions');
         $processorBagServiceDef = $this->findDefinition($container, self::PROCESSOR_BAG_SERVICE_ID);
         if (null !== $processorBagServiceDef) {
             foreach ($config['actions'] as $action => $actionConfig) {
@@ -75,15 +74,6 @@ class ConfigurationCompilerPass implements CompilerPassInterface
                             [$group, $action, $groupConfig['priority']]
                         );
                     }
-                }
-                if (isset($actionConfig['extra_config'])) {
-                    $actionConfigExtensionDefinition->addMethodCall(
-                        'addActionConfig',
-                        [
-                            $action,
-                            $actionConfig['extra_config']
-                        ]
-                    );
                 }
             }
         }

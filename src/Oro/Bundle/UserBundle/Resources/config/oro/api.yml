@@ -2,5 +2,12 @@ oro_api:
     entities:
         Oro\Bundle\UserBundle\Entity\Email: ~
         Oro\Bundle\UserBundle\Entity\Group: ~
-        Oro\Bundle\UserBundle\Entity\Role: ~
-        Oro\Bundle\UserBundle\Entity\User: ~
+        Oro\Bundle\UserBundle\Entity\Role:
+            actions:
+                delete:
+                    delete_handler: oro_user.role.handler.delete
+
+        Oro\Bundle\UserBundle\Entity\User:
+            actions:
+                delete:
+                    delete_handler: oro_user.handler.delete
