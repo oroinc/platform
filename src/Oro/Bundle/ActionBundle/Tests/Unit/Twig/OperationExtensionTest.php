@@ -83,10 +83,10 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                 'Oro\Bundle\ActionBundle\Helper\ApplicationsHelper',
                 'getWidgetRoute',
             ],
-            'has_actions' => [
+            'has_operations' => [
                 false,
                 'Oro\Bundle\ActionBundle\Model\OperationManager',
-                'hasActions',
+                'hasOperations',
             ],
             'oro_action_frontend_options' => [
                 false,

@@ -61,7 +61,7 @@ class OperationExtension extends \Twig_Extension
                 ['needs_context' => true]
             ),
             new \Twig_SimpleFunction('oro_action_widget_route', [$this->appsHelper, 'getWidgetRoute']),
-            new \Twig_SimpleFunction('has_actions', [$this->manager, 'hasActions']),
+            new \Twig_SimpleFunction('has_operations', [$this->manager, 'hasOperations']),
             new \Twig_SimpleFunction('oro_action_frontend_options', [$this->optionsHelper, 'getFrontendOptions']),
         );
     }
