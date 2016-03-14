@@ -51,7 +51,7 @@ class ChoiceTreeUserProvider
         $qb = $this->createListQb()
             ->select('COUNT(1)');
 
-        return $this->aclHelper->apply($qb)->getSingleScalarResult() >= 100;
+        return $this->aclHelper->apply($qb)->getSingleScalarResult() >= 500;
     }
 
     /**

@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActionBundle\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
@@ -30,11 +29,6 @@ class ActionsDataProvider implements DataProviderInterface
     protected $translator;
 
     /**
-     * @var ContextHelper
-     */
-    protected $contextHelper;
-
-    /**
      * @param OperationManager $operationManager
      * @param RestrictHelper $restrictHelper
      * @param TranslatorInterface $translator
@@ -42,13 +36,11 @@ class ActionsDataProvider implements DataProviderInterface
     public function __construct(
         OperationManager $operationManager,
         RestrictHelper $restrictHelper,
-        TranslatorInterface $translator,
-        ContextHelper $contextHelper
+        TranslatorInterface $translator
     ) {
         $this->operationManager = $operationManager;
         $this->restrictHelper = $restrictHelper;
         $this->translator = $translator;
-        $this->contextHelper = $contextHelper;
     }
 
     /**
@@ -112,8 +104,6 @@ class ActionsDataProvider implements DataProviderInterface
      */
     protected function getPreparedData(array $operations = [])
     {
-        $actionData = $this->contextHelper->getActionData();
-
         $data = [];
         foreach ($operations as $operation) {
             if (!$operation->getDefinition()->isEnabled()) {
@@ -135,12 +125,10 @@ class ActionsDataProvider implements DataProviderInterface
                 'name' => $definition->getName(),
                 'label' => $this->translator->trans($definition->getLabel()),
                 'title' => $this->translator->trans($title),
-                'hasDialog' => $operation->hasForm(),
-                'showDialog' => !empty($frontendOptions['show_dialog']),
+//                'hasDialog' => $operation->hasForm(),
+//                'showDialog' => !empty($frontendOptions['show_dialog']),
                 'icon' =>  $icon,
-                'buttonOptions' => $buttonOptions,
-                'frontendOptions' => $frontendOptions,
-                'translates' => $actionData->getScalarValues(),
+                'action' => $operation,
             ];
         }
 

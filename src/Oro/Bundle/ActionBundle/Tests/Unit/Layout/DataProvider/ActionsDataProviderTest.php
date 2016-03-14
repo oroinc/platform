@@ -4,11 +4,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Helper\ContextHelper;
-use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider;
 
@@ -32,11 +29,6 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
     protected $translator;
 
     /**
-     * @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected $contextHelper;
-
-    /**
      * @var ActionsDataProvider
      */
     protected $dataProvider;
@@ -56,15 +48,10 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
-        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->dataProvider = new ActionsDataProvider(
             $this->operationManager,
             $this->restrictHelper,
-            $this->translator,
-            $this->contextHelper
+            $this->translator
         );
     }
 
@@ -186,8 +173,6 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
         $actionThree = $this->getOperation('action3', 'action3_label', false);
         $actions = [$actionOne, $actionTwo, $actionThree];
 
-        $actionData = new ActionData(['key1' => 'val1']);
-
         $this->operationManager->expects($this->once())
             ->method('getOperations')
             ->will($this->returnValue($actions));
@@ -198,32 +183,21 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
         $this->translator->expects($this->atLeastOnce())
             ->method('trans')
             ->will($this->returnArgument(0));
-        $this->contextHelper->expects($this->once())
-            ->method('getActionData')
-            ->willReturn($actionData);
 
         $expected = [
             [
                 'name' => 'action1',
                 'label' => 'action1_label',
                 'title' => 'action1_label',
-                'hasDialog' => false,
-                'showDialog' => false,
                 'icon' => '',
-                'buttonOptions' => [],
-                'frontendOptions' => [],
-                'translates' => ['key1' => 'val1'],
+                'action' => $actionOne,
             ],
             [
                 'name' => 'action2',
                 'label' => 'action2_label',
                 'title' => 'title',
-                'hasDialog' => true,
-                'showDialog' => true,
                 'icon' => 'icon',
-                'buttonOptions' => ['icon' => 'icon'],
-                'frontendOptions' => ['title' => 'title', 'show_dialog' => true],
-                'translates' => ['key1' => 'val1'],
+                'action' => $actionTwo
             ]
         ];
 

@@ -57,10 +57,10 @@ class GridViewsLoadListener
 
         $gridViewRepository = $this->getGridViewRepository();
         $gridViews          = $gridViewRepository->findGridViews($this->aclHelper, $currentUser, $gridName);
-        $defaultGridView    = $gridViewRepository->findDefaultGridView($this->aclHelper, $currentUser, $gridName);
         if (!$gridViews) {
             return;
         }
+        $defaultGridView    = $gridViewRepository->findDefaultGridView($this->aclHelper, $currentUser, $gridName);
         $views = $event->getGridViews();
         foreach ($gridViews as $gridView) {
             $view = $gridView->createView();

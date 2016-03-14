@@ -9,11 +9,14 @@ use Doctrine\ORM\QueryBuilder;
 
 class DoctrineHelper
 {
+    const KEY_METADATA = 'metadata';
+    const KEY_ID_FIELD = 'id';
+
     /** @var ManagerRegistry */
     protected $doctrine;
 
-    /** @var EntityMetadata[] */
-    protected $metadata = [];
+    /** @var array */
+    protected $cache = [];
 
     /**
      * @param ManagerRegistry $doctrine
@@ -57,13 +60,16 @@ class DoctrineHelper
      */
     public function getEntityMetadata($entityClass)
     {
-        if (!isset($this->metadata[$entityClass])) {
-            $this->metadata[$entityClass] = new EntityMetadata(
-                $this->getEntityManager($entityClass)->getClassMetadata($entityClass)
-            );
+        if (isset($this->cache[$entityClass][self::KEY_METADATA])) {
+            return $this->cache[$entityClass][self::KEY_METADATA];
         }
 
-        return $this->metadata[$entityClass];
+        $metadata = new EntityMetadata(
+            $this->getEntityManager($entityClass)->getClassMetadata($entityClass)
+        );
+        $this->cache[$entityClass][self::KEY_METADATA] = $metadata;
+
+        return $metadata;
     }
 
     /**
@@ -151,6 +157,13 @@ class DoctrineHelper
      */
     public function getEntityIdFieldName($entityClass)
     {
-        return $this->getEntityMetadata($entityClass)->getSingleIdentifierFieldName();
+        if (isset($this->cache[$entityClass][self::KEY_ID_FIELD])) {
+            return $this->cache[$entityClass][self::KEY_ID_FIELD];
+        }
+
+        $idFieldName = $this->getEntityMetadata($entityClass)->getSingleIdentifierFieldName();
+        $this->cache[$entityClass][self::KEY_ID_FIELD] = $idFieldName;
+
+        return $idFieldName;
     }
 }
