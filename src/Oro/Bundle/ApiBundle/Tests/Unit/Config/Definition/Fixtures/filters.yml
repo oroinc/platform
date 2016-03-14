@@ -1,0 +1,149 @@
+empty:
+    config: []
+    expected: []
+
+empty_root:
+    config:
+        filters: []
+    expected: []
+
+null_fields:
+    config:
+        filters:
+            fields: ~
+    expected: []
+
+empty_fields:
+    config:
+        filters:
+            fields: []
+    expected: []
+
+default_exclusion_policy:
+    config:
+        filters:
+            exclusion_policy: none
+    expected:
+        filters:
+            exclusion_policy: none
+
+exclusion_policy:
+    config:
+        filters:
+            exclusion_policy: all
+    expected:
+        filters:
+            exclusion_policy: all
+
+null_exclusion_policy:
+    config:
+        filters:
+            exclusion_policy: null
+    expected: []
+    error: 'The value null is not allowed for path "entity.filters.exclusion_policy". Permissible values: "all", "none"'
+
+invalid_exclusion_policy:
+    config:
+        filters:
+            exclusion_policy: invalid
+    expected: []
+    error: 'The value "invalid" is not allowed for path "entity.filters.exclusion_policy". Permissible values: "all", "none"'
+
+full:
+    config:
+        filters:
+            exclusion_policy: all
+            fields:
+                field1: ~
+                field2: []
+                field3:
+                    exclude: true
+                    property_path: path1
+                    data_type: string
+                    allow_array: true
+                    default_value: val1
+                    description: description1
+                field4:
+                    exclude: false
+                field5:
+                    allow_array: false
+    expected:
+        filters:
+            exclusion_policy: all
+            fields:
+                field1: []
+                field2: []
+                field3:
+                    exclude: true
+                    property_path: path1
+                    data_type: string
+                    allow_array: true
+                    default_value: val1
+                    description: description1
+                field4:
+                    exclude: false
+                field5:
+                    allow_array: false
+
+invalid_field_exclude:
+    config:
+        filters:
+            fields:
+                field1:
+                    exclude: 123
+    expected: []
+    error: 'Invalid type for path "entity.filters.fields.field1.exclude". Expected boolean, but got integer.'
+
+null_field_property_path:
+    config:
+        filters:
+            fields:
+                field1:
+                    property_path: null
+    expected: []
+    error: 'The path "entity.filters.fields.field1.property_path" cannot contain an empty value, but got null.'
+
+null_field_data_type:
+    config:
+        filters:
+            fields:
+                field1:
+                    data_type: null
+    expected: []
+    error: 'The path "entity.filters.fields.field1.data_type" cannot contain an empty value, but got null.'
+
+invalid_field_allow_array:
+    config:
+        filters:
+            fields:
+                field1:
+                    allow_array: 123
+    expected: []
+    error: 'Invalid type for path "entity.filters.fields.field1.allow_array". Expected boolean, but got integer.'
+
+null_field_default_value:
+    config:
+        filters:
+            fields:
+                field1:
+                    default_value: null
+    expected: []
+    error: 'The path "entity.filters.fields.field1.default_value" cannot contain an empty value, but got null.'
+
+null_field_description:
+    config:
+        filters:
+            fields:
+                field1:
+                    description: null
+    expected: []
+    error: 'The path "entity.filters.fields.field1.description" cannot contain an empty value, but got null.'
+
+empty_field_description:
+    config:
+        filters:
+            fields:
+                field1:
+                    description: ""
+    expected: []
+    error: 'The path "entity.filters.fields.field1.description" cannot contain an empty value, but got "".'

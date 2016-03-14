@@ -70,7 +70,12 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
 
         $this->expression = $this->getMock('\Doctrine\ORM\Query\Expr', array(), array(), '', false);
 
-        $this->doctrineHelper = new DoctrineHelper($this->entityManager);
+        $additionalMetadataProvider = $this
+            ->getMockBuilder('Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->doctrineHelper = new DoctrineHelper($this->entityManager, $additionalMetadataProvider);
     }
 
     public function testGetEntityRepository()

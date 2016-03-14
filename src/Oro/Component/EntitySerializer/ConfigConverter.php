@@ -13,7 +13,7 @@ class ConfigConverter
      */
     public function convertConfig(array $config)
     {
-        $result = new EntityConfig();
+        $result = new InternalEntityConfig();
         $this->buildEntityConfig($result, $config);
 
         return $result;
@@ -53,7 +53,7 @@ class ConfigConverter
         $this->setCollapsed($result, $config);
         $this->setDataTransformers($result, $config);
 
-        $targetEntity = new EntityConfig();
+        $targetEntity = new InternalEntityConfig();
         $this->buildEntityConfig($targetEntity, $config);
         if (!$targetEntity->isEmpty()) {
             $result->setTargetEntity($targetEntity);

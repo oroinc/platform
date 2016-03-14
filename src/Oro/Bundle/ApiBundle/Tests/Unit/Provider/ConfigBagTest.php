@@ -18,35 +18,25 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
             $config[$section] = [
                 /* @todo: API version is not supported for now
                 'Test\Class1' => [
-                    '0' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]],
+                    '0' => ['fields' => ['class1_v0' => []]],
                 ],
                 'Test\Class2' => [
-                    '0'   => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v0' => []]]],
-                    '1.0' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v1.0' => []]]],
-                    '1.5' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v1.5' => []]]],
-                    '2.0' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]],
+                    '0'   => ['fields' => ['class2_v0' => []]],
+                    '1.0' => ['fields' => ['class2_v1.0' => []]],
+                    '1.5' => ['fields' => ['class2_v1.5' => []]],
+                    '2.0' => ['fields' => ['class2_v2.0' => []]],
                 ],
                 */
                 'Test\Class1' => [
-                    ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]],
+                    'fields' => ['class1_v0' => []],
                 ],
                 'Test\Class2' => [
-                    ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]],
+                    'fields' => ['class2_v2.0' => []],
                 ],
             ];
         }
 
         $this->configBag = new ConfigBag($config);
-    }
-
-    /**
-     * @dataProvider noConfigProvider
-     */
-    public function testNoMetadata($className, $version)
-    {
-        $this->assertNull(
-            $this->configBag->getMetadata($className, $version)
-        );
     }
 
     /**
@@ -67,15 +57,15 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
             [
                 '1.0',
                 [
-                    'Test\Class1' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]],
-                    'Test\Class2' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]],
+                    'Test\Class1' => ['fields' => ['class1_v0' => []]],
+                    'Test\Class2' => ['fields' => ['class2_v2.0' => []]],
                 ]
             ],
             [
                 Version::LATEST,
                 [
-                    'Test\Class1' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]],
-                    'Test\Class2' => [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]],
+                    'Test\Class1' => ['fields' => ['class1_v0' => []]],
+                    'Test\Class2' => ['fields' => ['class2_v2.0' => []]],
                 ]
             ],
         ];
@@ -111,17 +101,6 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider getConfigProvider
      */
-    public function testGetMetadata($className, $version, $expectedConfig)
-    {
-        $this->assertEquals(
-            $expectedConfig,
-            $this->configBag->getMetadata($className, $version)
-        );
-    }
-
-    /**
-     * @dataProvider getConfigProvider
-     */
     public function testGetConfig($className, $version, $expectedConfig)
     {
         $this->assertEquals(
@@ -145,21 +124,21 @@ class ConfigBagTest extends \PHPUnit_Framework_TestCase
     {
         return [
             /* @todo: API version is not supported for now
-            ['Test\Class1', '0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]]],
-            ['Test\Class1', '1.0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]]],
-            ['Test\Class1', Version::LATEST, [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]]],
-            ['Test\Class2', '0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v0' => []]]]],
-            ['Test\Class2', '0.5', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v0' => []]]]],
-            ['Test\Class2', '1.0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v1.0' => []]]]],
-            ['Test\Class2', '1.4', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v1.0' => []]]]],
-            ['Test\Class2', '1.5', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v1.5' => []]]]],
-            ['Test\Class2', '1.6', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v1.5' => []]]]],
-            ['Test\Class2', '2.0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]]],
-            ['Test\Class2', '2.1', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]]],
-            ['Test\Class2', Version::LATEST, [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]]],
+            ['Test\Class1', '0', ['fields' => ['class1_v0' => []]]],
+            ['Test\Class1', '1.0', ['fields' => ['class1_v0' => []]]],
+            ['Test\Class1', Version::LATEST, ['fields' => ['class1_v0' => []]]],
+            ['Test\Class2', '0', ['fields' => ['class2_v0' => []]]],
+            ['Test\Class2', '0.5', ['fields' => ['class2_v0' => []]]],
+            ['Test\Class2', '1.0', ['fields' => ['class2_v1.0' => []]]],
+            ['Test\Class2', '1.4', ['fields' => ['class2_v1.0' => []]]],
+            ['Test\Class2', '1.5', ['fields' => ['class2_v1.5' => []]]],
+            ['Test\Class2', '1.6', ['fields' => ['class2_v1.5' => []]]],
+            ['Test\Class2', '2.0', ['fields' => ['class2_v2.0' => []]]],
+            ['Test\Class2', '2.1', ['fields' => ['class2_v2.0' => []]]],
+            ['Test\Class2', Version::LATEST, ['fields' => ['class2_v2.0' => []]]],
             */
-            ['Test\Class1', '1.0', [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class1_v0' => []]]]],
-            ['Test\Class2', Version::LATEST, [ConfigUtil::DEFINITION => [ConfigUtil::FIELDS => ['class2_v2.0' => []]]]],
+            ['Test\Class1', '1.0', ['fields' => ['class1_v0' => []]]],
+            ['Test\Class2', Version::LATEST, ['fields' => ['class2_v2.0' => []]]],
         ];
     }
 }

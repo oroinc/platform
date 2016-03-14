@@ -6,6 +6,11 @@ use Doctrine\Common\Util\ClassUtils;
 
 class FieldAccessor
 {
+    const KEY_FIELDS_ALL                         = 'fields';
+    const KEY_FIELDS_TO_SELECT                   = 'select';
+    const KEY_FIELDS_TO_SELECT_WITH_ASSOCIATIONS = 'select_assoc';
+    const KEY_FIELDS_TO_SERIALIZE                = 'serialize';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -25,8 +30,8 @@ class FieldAccessor
         DataAccessorInterface $dataAccessor,
         EntityFieldFilterInterface $entityFieldFilter = null
     ) {
-        $this->doctrineHelper    = $doctrineHelper;
-        $this->dataAccessor      = $dataAccessor;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->dataAccessor = $dataAccessor;
         $this->entityFieldFilter = $entityFieldFilter;
     }
 
@@ -38,6 +43,12 @@ class FieldAccessor
      */
     public function getFields($entityClass, EntityConfig $config)
     {
+        // try to use cached result
+        $result = $config->get(self::KEY_FIELDS_ALL);
+        if (null !== $result) {
+            return $result;
+        }
+
         $result = [];
         if ($config->isExcludeAll()) {
             $fieldConfigs = $config->getFields();
@@ -48,7 +59,7 @@ class FieldAccessor
             }
         } else {
             $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
-            $fields         = array_merge($entityMetadata->getFieldNames(), $entityMetadata->getAssociationNames());
+            $fields = array_merge($entityMetadata->getFieldNames(), $entityMetadata->getAssociationNames());
             foreach ($fields as $field) {
                 if ($config->hasField($field)) {
                     $fieldConfig = $config->getField($field);
@@ -70,6 +81,8 @@ class FieldAccessor
                 }
             }
         }
+        // add result to cache
+        $config->set(self::KEY_FIELDS_ALL, $result);
 
         return $result;
     }
@@ -83,28 +96,39 @@ class FieldAccessor
      */
     public function getFieldsToSelect($entityClass, EntityConfig $config, $withAssociations = false)
     {
-        $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
-        $fields         = array_filter(
-            $this->getFields($entityClass, $config),
-            function ($field) use ($entityMetadata, $withAssociations) {
-                // skip virtual properties
-                if (!$entityMetadata->isField($field) && !$entityMetadata->isAssociation($field)) {
-                    return false;
-                }
-
-                return $withAssociations
-                    ? !$entityMetadata->isCollectionValuedAssociation($field)
-                    : !$entityMetadata->isAssociation($field);
-            }
-        );
-        // make sure identifier fields are added
-        foreach ($entityMetadata->getIdentifierFieldNames() as $field) {
-            if (!in_array($field, $fields, true)) {
-                $fields[] = $field;
-            }
+        // try to use cached result
+        $cacheKey = $withAssociations
+            ? self::KEY_FIELDS_TO_SELECT_WITH_ASSOCIATIONS
+            : self::KEY_FIELDS_TO_SELECT;
+        $result = $config->get($cacheKey);
+        if (null !== $result) {
+            return $result;
         }
 
-        return $fields;
+        $result = [];
+        $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        $fields = $this->getFields($entityClass, $config);
+        foreach ($fields as $field) {
+            if ($entityMetadata->isField($field)) {
+                $result[] = $field;
+            } elseif ($withAssociations
+                && $entityMetadata->isAssociation($field)
+                && !$entityMetadata->isCollectionValuedAssociation($field)
+            ) {
+                $result[] = $field;
+            }
+        }
+        // make sure identifier fields are added
+        $idFields = $entityMetadata->getIdentifierFieldNames();
+        foreach ($idFields as $field) {
+            if (!in_array($field, $result, true)) {
+                $result[] = $field;
+            }
+        }
+        // add result to cache
+        $config->set($cacheKey, $result);
+
+        return $result;
     }
 
     /**
@@ -115,14 +139,24 @@ class FieldAccessor
      */
     public function getFieldsToSerialize($entityClass, EntityConfig $config)
     {
-        $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        // try to use cached result
+        $result = $config->get(self::KEY_FIELDS_TO_SERIALIZE);
+        if (null !== $result) {
+            return $result;
+        }
 
-        return array_filter(
-            $this->getFields($entityClass, $config),
-            function ($field) use ($entityMetadata) {
-                return !$entityMetadata->isCollectionValuedAssociation($field);
+        $result = [];
+        $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        $fields = $this->getFields($entityClass, $config);
+        foreach ($fields as $field) {
+            if (!$entityMetadata->isCollectionValuedAssociation($field)) {
+                $result[] = $field;
             }
-        );
+        }
+        // add result to cache
+        $config->set(self::KEY_FIELDS_TO_SERIALIZE, $result);
+
+        return $result;
     }
 
     /**

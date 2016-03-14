@@ -5,9 +5,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
+use Oro\Bundle\EntityConfigBundle\Config\Config;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -432,7 +432,7 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param array  $actualOptions
+     * @param array $actualOptions
      * @param string|null $label
      * @param string $type
      * @param array $options
