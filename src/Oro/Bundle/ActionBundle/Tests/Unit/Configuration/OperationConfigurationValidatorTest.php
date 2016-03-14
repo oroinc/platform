@@ -9,34 +9,28 @@ use Psr\Log\LoggerInterface;
 use Symfony\Component\Routing\RouteCollection;
 use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfigurationValidator;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
-class ActionDefinitionConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
+class OperationConfigurationValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $router;
 
-    /**
-     * @var \Twig_Loader_Filesystem|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \Twig_Loader_Filesystem|\PHPUnit_Framework_MockObject_MockObject */
     protected $twigLoader;
 
-    /**
-     * @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var DoctrineHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
-    /**
-     * @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $configurationProvider;
+
+    /** @var LoggerInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $logger;
 
-    /**
-     * @var ActionDefinitionConfigurationValidator
-     */
+    /** @var OperationConfigurationValidator */
     protected $validator;
 
     public function setUp()
@@ -51,6 +45,16 @@ class ActionDefinitionConfigurationValidatorTest extends \PHPUnit_Framework_Test
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->configurationProvider = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface'
+        )
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->configurationProvider->expects($this->any())
+            ->method('getConfiguration')
+            ->willReturn(['group1' => 'config1', 'group2' => 'config2']);
+
         $this->createValidator();
     }
 
@@ -59,13 +63,15 @@ class ActionDefinitionConfigurationValidatorTest extends \PHPUnit_Framework_Test
      */
     protected function createValidator($debug = false)
     {
-        $this->validator = new ActionDefinitionConfigurationValidator(
+        $this->validator = new OperationConfigurationValidator(
             $this->router,
             $this->twigLoader,
             $this->doctrineHelper,
             $this->logger,
             $debug
         );
+
+        $this->validator->addConfigurationProvider($this->configurationProvider, 'action_groups');
     }
 
     /**
@@ -206,6 +212,20 @@ class ActionDefinitionConfigurationValidatorTest extends \PHPUnit_Framework_Test
                 'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
                 'exceptionMessage' => 'action2.form_options.attribute_default_values: Unknown attribute "attribute3".',
             ],
+            'unknown action_group' => [
+                'config' => [
+                    'action3' => [
+                        'routes' => [],
+                        'entities' => [],
+                        'frontend_options' => [],
+                        'action_groups' => [
+                            ['name' => 'unknown_action_group'],
+                        ],
+                    ],
+                ],
+                'exceptionName' => 'Symfony\Component\Config\Definition\Exception\InvalidConfigurationException',
+                'exceptionMessage' => 'action3.action_groups.0: Action Group "unknown_action_group" not found.',
+            ],
         ];
     }
 
@@ -330,6 +350,9 @@ class ActionDefinitionConfigurationValidatorTest extends \PHPUnit_Framework_Test
                             ],
                             'frontend_options' => [
                                 'template' => 'Template1'
+                            ],
+                            'action_groups' => [
+                                ['name' => 'group1']
                             ],
                         ]),
                     ],

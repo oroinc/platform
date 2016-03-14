@@ -104,8 +104,7 @@ class ConfigurationProvider implements ConfigurationProviderInterface
             if (!empty($configs)) {
                 $data = $this->configurationDefinition->processConfiguration($configs);
 
-                //TODO: should be done in BB-2272
-                //$this->validator->validate($data, $errors);
+                $this->validator->validate($data, $errors);
             }
         } catch (InvalidConfigurationException $e) {
             throw new InvalidConfigurationException(sprintf('Can\'t parse configuration. %s', $e->getMessage()));

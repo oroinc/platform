@@ -47,6 +47,6 @@ class ValidateActionConfigurationCommand extends ContainerAwareCommand
      */
     protected function getConfigurationProvider()
     {
-        return $this->getContainer()->get('oro_action.configuration.provider');
+        return $this->getContainer()->get('oro_action.configuration.provider.operations');
     }
 }

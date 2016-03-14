@@ -6,7 +6,7 @@ use Doctrine\Common\Cache\CacheProvider;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration;
-use Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfigurationValidator;
+use Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator;
 
 class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,7 +19,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationListConfiguration */
     protected $definitionConfiguration;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|ActionDefinitionConfigurationValidator */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationConfigurationValidator */
     protected $definitionConfigurationValidator;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
@@ -33,7 +33,7 @@ class ConfigurationProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->definitionConfigurationValidator = $this
-            ->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\ActionDefinitionConfigurationValidator')
+            ->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\OperationConfigurationValidator')
             ->disableOriginalConstructor()
             ->getMock();
 
