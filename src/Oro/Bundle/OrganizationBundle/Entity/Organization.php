@@ -3,7 +3,6 @@
 namespace Oro\Bundle\OrganizationBundle\Entity;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\ORM\Event\PreUpdateEventArgs;
 use Doctrine\ORM\Mapping as ORM;
 
 use Symfony\Bridge\Doctrine\Validator\Constraints\UniqueEntity;
@@ -338,17 +337,10 @@ class Organization extends ExtendOrganization implements
      * Pre update event handler
      *
      * @ORM\PreUpdate
-     *
-     * @param PreUpdateEventArgs $event
      */
-    public function preUpdate(PreUpdateEventArgs $event)
+    public function preUpdate()
     {
-        // prevent invoke update query if changesets updatedAt, createdAt field
-        $excludedFields = ['createdAt', 'updatedAt'];
-
-        if (array_diff_key($event->getEntityChangeSet(), array_flip($excludedFields))) {
-            $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
-        }
+        $this->updatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
     }
 
     /**

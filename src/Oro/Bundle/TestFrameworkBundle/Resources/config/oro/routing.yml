@@ -1,0 +1,4 @@
+oro_item:
+    resource:     "@OroTestFrameworkBundle/Controller/ItemController.php"
+    type:         annotation
+    prefix:       /test
