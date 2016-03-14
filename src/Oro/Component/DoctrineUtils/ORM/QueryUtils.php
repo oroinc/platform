@@ -3,12 +3,16 @@
 namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\SQLParserUtils;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\QueryException;
 use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
+
+use Oro\Component\PhpUtils\QueryUtil;
 
 class QueryUtils
 {
@@ -67,6 +71,16 @@ class QueryUtils
     }
 
     /**
+     * @param AbstractPlatform $platform
+     *
+     * @return ResultSetMapping
+     */
+    public static function createResultSetMapping(AbstractPlatform $platform)
+    {
+        return new PlatformResultSetMapping($platform);
+    }
+
+    /**
      * @param ResultSetMapping $mapping
      * @param string           $alias
      *
@@ -112,19 +126,22 @@ class QueryUtils
     }
 
     /**
-     * @param Query $query
+     * @param Query                   $query
+     * @param Query\ParserResult|null $parsedQuery
      *
      * @return string
      *
      * @throws QueryException
      */
-    public static function getExecutableSql(Query $query)
+    public static function getExecutableSql(Query $query, Query\ParserResult $parsedQuery = null)
     {
-        $parserResult = static::parseQuery($query);
+        if (null === $parsedQuery) {
+            $parsedQuery = static::parseQuery($query);
+        }
 
-        $sql = $parserResult->getSqlExecutor()->getSqlStatements();
+        $sql = $parsedQuery->getSqlExecutor()->getSqlStatements();
 
-        list($params, $types) = self::processParameterMappings($query, $parserResult->getParameterMappings());
+        list($params, $types) = self::processParameterMappings($query, $parsedQuery->getParameterMappings());
         list($sql, $params, $types) = SQLParserUtils::expandListParameters($sql, $params, $types);
 
         $paramPos = SQLParserUtils::getPlaceholderPositions($sql);
@@ -288,5 +305,37 @@ class QueryUtils
         }
 
         return $criteria;
+    }
+
+    /**
+     * @param QueryBuilder $qb
+     * @param string $field
+     * @param int $values
+     */
+    public static function applyOptimizedIn(QueryBuilder $qb, $field, array $values)
+    {
+        $exprs = [];
+        $optimizedValues = QueryUtil::optimizeIntValues($values);
+
+        if ($optimizedValues[QueryUtil::IN]) {
+            $inParam = QueryUtil::generateParameterName('buid');
+
+            $qb->setParameter($inParam, $optimizedValues[QueryUtil::IN]);
+            $exprs[] = $qb->expr()->in($field, ':'.$inParam);
+        }
+
+        foreach ($optimizedValues[QueryUtil::IN_BETWEEN] as $range) {
+            list($min, $max) = $range;
+            $minParam = QueryUtil::generateParameterName('buid');
+            $maxParam = QueryUtil::generateParameterName('buid');
+
+            $qb->setParameter($minParam, $min);
+            $qb->setParameter($maxParam, $max);
+            $exprs[] = $qb->expr()->between($field, ':'.$minParam, ':'.$maxParam);
+        }
+
+        if ($exprs) {
+            $qb->andWhere(call_user_func_array([$qb->expr(), 'orX'], $exprs));
+        }
     }
 }

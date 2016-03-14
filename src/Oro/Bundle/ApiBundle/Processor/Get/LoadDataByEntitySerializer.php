@@ -8,6 +8,10 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
 
+/**
+ * Loads data through the EntitySerializer component.
+ * As returned data is already normalized, the "normalize_data" group will be skipped.
+ */
 class LoadDataByEntitySerializer implements ProcessorInterface
 {
     /** @var EntitySerializer */

@@ -86,6 +86,7 @@ class Context extends ApiContext
      */
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
+        parent::__construct();
         $this->configProvider   = $configProvider;
         $this->metadataProvider = $metadataProvider;
     }

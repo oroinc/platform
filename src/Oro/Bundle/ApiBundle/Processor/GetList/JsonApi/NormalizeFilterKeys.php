@@ -11,6 +11,10 @@ use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Encloses filters keys by the "filter[%s]" pattern.
+ * Replaces the filter key for the identifier field with "filter[id]".
+ */
 class NormalizeFilterKeys implements ProcessorInterface
 {
     const FILTER_KEY_TEMPLATE = 'filter[%s]';
@@ -37,6 +41,17 @@ class NormalizeFilterKeys implements ProcessorInterface
     public function process(ContextInterface $context)
     {
         /** @var GetListContext $context */
+
+        if ($context->hasQuery()) {
+            // a query is already built
+            return;
+        }
+
+        $entityClass = $context->getClassName();
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            // only manageable entities are supported
+            return;
+        }
 
         $filterCollection = $context->getFilters();
         $idFieldName      = $this->getIdFieldName($context->getClassName());

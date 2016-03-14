@@ -18,12 +18,6 @@ class RemoveDuplicatedSorters extends RemoveDuplicates
     {
         /** @var ConfigContext $context */
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
-        }
-
         $this->removeDuplicatedFields($context->getSorters(), $context->getClassName());
     }
 }

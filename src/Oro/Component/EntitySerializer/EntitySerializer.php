@@ -140,9 +140,6 @@ class EntitySerializer
     /** @var DataNormalizer */
     protected $dataNormalizer;
 
-    /** @var EntityConfig */
-    private $nullEntityConfig;
-
     /**
      * @param DoctrineHelper           $doctrineHelper
      * @param DataAccessorInterface    $dataAccessor
@@ -489,18 +486,35 @@ class EntitySerializer
      */
     protected function loadRelatedItems($entityIds, $mapping, EntityConfig $config)
     {
-        $entityClass = $mapping['targetEntity'];
-        $bindings    = $this->getRelatedItemsBindings($entityIds, $mapping, $config);
-        $qb          = $this->queryFactory->getRelatedItemsQueryBuilder(
-            $entityClass,
-            $this->getRelatedItemsIds($bindings)
-        );
-        $this->updateQuery($qb, $config);
-        $data = $this->queryFactory->getQuery($qb, $config)->getResult();
-
         $result = [];
-        if (!empty($data)) {
-            $items = $this->serializeItems((array)$data, $entityClass, $config, true);
+
+        $entityClass = $mapping['targetEntity'];
+        $bindings = $this->getRelatedItemsBindings($entityIds, $mapping, $config);
+
+        $items = [];
+        $resultFieldName = $this->getIdFieldNameIfIdOnlyRequested($config, $entityClass);
+        if (null !== $resultFieldName) {
+            $postSerializeHandler = $config->getPostSerializeHandler();
+            $relatedItemIds = $this->getRelatedItemsIds($bindings);
+            foreach ($relatedItemIds as $relatedItemId) {
+                $relatedItem = [$resultFieldName => $relatedItemId];
+                if (null !== $postSerializeHandler) {
+                    $relatedItem = $this->postSerialize($relatedItem, $postSerializeHandler);
+                }
+                $items[$relatedItemId] = $relatedItem;
+            }
+        } else {
+            $qb = $this->queryFactory->getRelatedItemsQueryBuilder(
+                $entityClass,
+                $this->getRelatedItemsIds($bindings)
+            );
+            $this->updateQuery($qb, $config);
+            $data = $this->queryFactory->getQuery($qb, $config)->getResult();
+            if (!empty($data)) {
+                $items = $this->serializeItems((array)$data, $entityClass, $config, true);
+            }
+        }
+        if (!empty($items)) {
             foreach ($bindings as $entityId => $relatedEntityIds) {
                 foreach ($relatedEntityIds as $relatedEntityId) {
                     if (isset($items[$relatedEntityId])) {
@@ -514,11 +528,43 @@ class EntitySerializer
     }
 
     /**
+     * @param EntityConfig $config
+     * @param string       $entityClass
+     *
+     * @return string|null The name of result field if only identity field should be returned;
+     *                     otherwise, NULL
+     */
+    protected function getIdFieldNameIfIdOnlyRequested(EntityConfig $config, $entityClass)
+    {
+        if (!$config->isExcludeAll()) {
+            return null;
+        }
+        $fields = $config->getFields();
+        if (count($fields) !== 1) {
+            return null;
+        }
+        reset($fields);
+        /** @var FieldConfig $field */
+        list($fieldName, $field) = each($fields);
+        $targetConfig = $field->getTargetEntity();
+        if (null !== $targetConfig && !$targetConfig->isEmpty()) {
+            return null;
+        }
+
+        $propertyPath = $field->getPropertyPath() ?: $fieldName;
+        if ($this->doctrineHelper->getEntityIdFieldName($entityClass) !== $propertyPath) {
+            return null;
+        }
+
+        return $fieldName;
+    }
+
+    /**
      * @param array        $entityIds
      * @param array        $mapping
      * @param EntityConfig $config
      *
-     * @return array [entityId => relatedEntityId, ...]
+     * @return array [entityId => [relatedEntityId, ...], ...]
      */
     protected function getRelatedItemsBindings($entityIds, $mapping, EntityConfig $config)
     {
@@ -640,15 +686,15 @@ class EntitySerializer
      */
     public function getTargetEntity(EntityConfig $config, $field)
     {
-        $fieldConfig  = $config->getField($field);
-        $targetConfig = null !== $fieldConfig
-            ? $fieldConfig->getTargetEntity()
-            : null;
+        $fieldConfig = $config->getField($field);
+        if (null === $fieldConfig) {
+            return new InternalEntityConfig();
+        }
+
+        $targetConfig = $fieldConfig->getTargetEntity();
         if (null === $targetConfig) {
-            if (null === $this->nullEntityConfig) {
-                $this->nullEntityConfig = new EntityConfig();
-            }
-            $targetConfig = $this->nullEntityConfig;
+            $targetConfig = new InternalEntityConfig();
+            $fieldConfig->setTargetEntity($targetConfig);
         }
 
         return $targetConfig;

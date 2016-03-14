@@ -19,6 +19,8 @@ abstract class AbstractDateFilterType extends AbstractType
     const TYPE_NOT_BETWEEN = 2;
     const TYPE_MORE_THAN   = 3;
     const TYPE_LESS_THAN   = 4;
+    const TYPE_EQUAL       = 5;
+    const TYPE_NOT_EQUAL   = 6;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -59,7 +61,9 @@ abstract class AbstractDateFilterType extends AbstractType
             'between'    => self::TYPE_BETWEEN,
             'notBetween' => self::TYPE_NOT_BETWEEN,
             'moreThan'   => self::TYPE_MORE_THAN,
-            'lessThan'   => self::TYPE_LESS_THAN
+            'lessThan'   => self::TYPE_LESS_THAN,
+            'equal'      => self::TYPE_EQUAL,
+            'notEqual'   => self::TYPE_NOT_EQUAL
         ];
     }
 
@@ -73,6 +77,8 @@ abstract class AbstractDateFilterType extends AbstractType
             self::TYPE_NOT_BETWEEN => $this->translator->trans('oro.filter.form.label_date_type_not_between'),
             self::TYPE_MORE_THAN   => $this->translator->trans('oro.filter.form.label_date_type_more_than'),
             self::TYPE_LESS_THAN   => $this->translator->trans('oro.filter.form.label_date_type_less_than'),
+            self::TYPE_EQUAL       => $this->translator->trans('oro.filter.form.label_date_type_equals'),
+            self::TYPE_NOT_EQUAL   => $this->translator->trans('oro.filter.form.label_date_type_not_equals')
         ];
     }
 
