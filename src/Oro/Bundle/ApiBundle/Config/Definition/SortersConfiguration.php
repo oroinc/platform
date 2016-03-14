@@ -66,7 +66,7 @@ class SortersConfiguration extends AbstractConfigurationSection implements Confi
         array $preProcessCallbacks,
         array $postProcessCallbacks
     ) {
-        $sectionName = ConfigUtil::SORTERS . '.' . SortersConfig::FIELDS;
+        $sectionName = ConfigUtil::SORTERS . '.field';
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();

@@ -66,7 +66,7 @@ class FiltersConfiguration extends AbstractConfigurationSection implements Confi
         array $preProcessCallbacks,
         array $postProcessCallbacks
     ) {
-        $sectionName = ConfigUtil::FILTERS . '.' . FiltersConfig::FIELDS;
+        $sectionName = ConfigUtil::FILTERS . '.field';
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
