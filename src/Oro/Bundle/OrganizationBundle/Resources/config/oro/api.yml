@@ -1,4 +1,10 @@
 oro_api:
     entities:
-        Oro\Bundle\OrganizationBundle\Entity\BusinessUnit: ~
-        Oro\Bundle\OrganizationBundle\Entity\Organization: ~
+        Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+            actions:
+                delete:
+                    delete_handler: oro_organization.business_unit.handler.delete
+        Oro\Bundle\OrganizationBundle\Entity\Organization:
+            actions:
+                delete:
+                    delete_handler: oro_organization.organization.handler.delete

@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 
 class ActionsConfiguration extends AbstractConfigurationSection implements ConfigurationSectionInterface
 {
@@ -19,6 +18,7 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
         $sectionName = 'actions';
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
+
         $parentNode
             //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
             ->beforeNormalization()
@@ -27,19 +27,30 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
                     return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
                 }
             );
-        //$node->arrayNode()
-        ////
-
-//        $node->arrayNode('get_list')->end();
-        $node->arrayNode('delete')->end();
-        ////////////
         $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
+
+        $parentNode->useAttributeAsKey('name')->prototype('array')->children()
+                ->booleanNode('enabled')->cannotBeEmpty()->defaultTrue()->end()
+                ->scalarNode('delete_handler')->cannotBeEmpty()->end()
+                ->scalarNode('acl_resource')->cannotBeEmpty()->end();
+
         $parentNode
             ->validate()
             ->always(
                 function ($value) use ($postProcessCallbacks, $sectionName) {
+                    if (empty($value[$sectionName])) {
+                        unset($value[$sectionName]);
+                    }
                     return $this->callProcessConfigCallbacks($value, $postProcessCallbacks, $sectionName);
                 }
             );
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isApplicable($section)
+    {
+        return $section === 'entities.entity';
     }
 }

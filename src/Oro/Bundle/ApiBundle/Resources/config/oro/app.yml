@@ -51,10 +51,6 @@ oro_api:
                 normalize_result:
                     priority: -80
         delete:
-            extra_config:
-                delete_handler:
-                    type: scalar
-                    default_value: oro_api.delete.delete_data_by_handler
             processing_groups:
                 initialize:
                     priority: -10

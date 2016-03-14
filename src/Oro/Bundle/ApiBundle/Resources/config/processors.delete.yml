@@ -14,7 +14,6 @@ services:
     # initialize
     #
 
-
     oro_api.delete.check_request_type:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CheckRequestType
         tags:
@@ -124,7 +123,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByDeleteHandler
         arguments:
             - @oro_api.doctrine_helper
-            - @oro_soap.handler.delete
+            - @service_container
         tags:
             - { name: oro.api.processor, action: delete, group: delete_data, priority: -10 }
 

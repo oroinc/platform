@@ -250,24 +250,6 @@ services:
             - [setSecurityFacade, [@oro_security.security_facade]]
             - [setEmailSendProcessor, [@oro_calendar.send_processor.email]]
 
-    oro_calendar.api.calendar_event.delete.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomDeleteHandler
-        arguments:
-            - @oro_api.doctrine_helper
-            - @oro_calendar.calendar_event.handler.delete
-            - %oro_calendar.calendar_event.entity.class%
-        tags:
-            - { name: oro.api.processor, action: delete, group: delete_data, priority: 0 }
-
-    oro_calendar.api.delete.system_calendar.delete_data_by_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByCustomDeleteHandler
-        arguments:
-            - @oro_api.doctrine_helper
-            - @oro_calendar.system_calendar.handler.delete
-            - %oro_calendar.system_calendar.entity.class%
-        tags:
-            - { name: oro.api.processor, action: delete, group: delete_data, priority: 0 }
-
     oro_calendar.system_calendar_event.datagrid_helper:
         class: %oro_calendar.system_calendar_event.datagrid_helper.class%
         arguments:
