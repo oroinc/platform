@@ -16,6 +16,9 @@ use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Operation
 {
     /** @var ActionFactory */

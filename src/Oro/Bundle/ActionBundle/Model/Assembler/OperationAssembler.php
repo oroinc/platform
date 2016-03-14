@@ -12,6 +12,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OperationAssembler extends AbstractAssembler
 {
     /** @var ActionFactory */
