@@ -36,6 +36,7 @@ define(function(require) {
         partsDateValidation: {
             value: function(date) {
                 return this.dateVariableHelper.isDateVariable(date) ||
+                    this.dayValueHelper.isDayValue(date) ||
                     moment(date, this.getDateFormat(), true).isValid();
             },
             dayofweek: function(date) {
@@ -196,7 +197,7 @@ define(function(require) {
          */
         checkConsistency: function(target) {
             var date = this.$frontDateField.val();
-            if (!target && !this._isDateValid(date)) {
+            if (!this._preventFrontendUpdate && !target && !this._isDateValid(date)) {
                 this.$frontDateField.val('');
             }
         },
@@ -264,12 +265,10 @@ define(function(require) {
                 return this.dateVariableHelper.formatRawValue(value);
             }
 
-            if (this.dayValueHelper.isDayValue(value)) {
-                return this.dayValueHelper.formatRawValue(value);
-            }
-
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return VariableDatePickerView.__super__.getBackendFormattedValue.call(this);
+                return this.dayValueHelper.isDayValue(value)
+                    ? this.dayValueHelper.formatRawValue(value)
+                    : VariableDatePickerView.__super__.getBackendFormattedValue.call(this);
             }
 
             return this.getBackendPartFormattedValue();
@@ -299,12 +298,10 @@ define(function(require) {
                 return this.dateVariableHelper.formatDisplayValue(value);
             }
 
-            if (this.dayValueHelper.isDayValue(value)) {
-                return this.dayValueHelper.formatDisplayValue(value);
-            }
-
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return VariableDatePickerView.__super__.getFrontendFormattedDate.call(this);
+                return this.dayValueHelper.isDayValue(value)
+                    ? this.dayValueHelper.formatDisplayValue(value)
+                    : VariableDatePickerView.__super__.getFrontendFormattedDate.call(this);
             }
 
             return this.getFrontendPartFormattedDate();

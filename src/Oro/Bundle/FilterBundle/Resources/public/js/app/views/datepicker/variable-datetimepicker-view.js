@@ -16,6 +16,7 @@ define(function(require) {
         partsDateTimeValidation: {
             value: function(date, time) {
                 return this.dateVariableHelper.isDateVariable(date) ||
+                    this.dayValueHelper.isDayValue(date) ||
                     (moment(date, this.getDateFormat(), true).isValid() &&
                      moment(time, this.getTimeFormat(), true).isValid());
             }
@@ -60,7 +61,7 @@ define(function(require) {
             var date = this.$frontDateField.val();
             var time = this.$frontTimeField.val();
 
-            if (!target && !this._isDateTimeValid(date, time)) {
+            if (!this._preventFrontendUpdate && !target && !this._isDateTimeValid(date, time)) {
                 this.$frontDateField.val('');
                 this.$frontTimeField.val('');
             }
@@ -87,12 +88,10 @@ define(function(require) {
                 return this.dateVariableHelper.formatRawValue(value);
             }
 
-            if (this.dayValueHelper.isDayValue(value)) {
-                return this.dayValueHelper.formatRawValue(value);
-            }
-
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return dateTimePickerViewMixin.getBackendFormattedValue.call(this);
+                return this.dayValueHelper.isDayValue(value)
+                    ? this.dayValueHelper.formatRawValue(value)
+                    : dateTimePickerViewMixin.getBackendFormattedValue.call(this);
             }
 
             return this.getBackendPartFormattedValue();
@@ -109,12 +108,10 @@ define(function(require) {
                 return this.dateVariableHelper.formatDisplayValue(value);
             }
 
-            if (this.dayValueHelper.isDayValue(value)) {
-                return this.dayValueHelper.formatDisplayValue(value);
-            }
-
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
+                return this.dayValueHelper.isDayValue(value)
+                    ? this.dayValueHelper.formatDisplayValue(value)
+                    : dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
             }
 
             return this.getFrontendPartFormattedDate();
