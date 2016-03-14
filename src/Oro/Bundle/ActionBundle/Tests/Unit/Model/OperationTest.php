@@ -10,7 +10,6 @@ use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 use Oro\Component\Action\Action\ActionFactory;
