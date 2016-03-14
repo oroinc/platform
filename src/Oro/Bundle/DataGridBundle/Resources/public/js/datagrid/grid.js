@@ -55,10 +55,10 @@ define(function(require) {
         /** @property {Object} */
         selectors: {
             grid:        '.grid',
-            toolbar:     '.toolbar',
+            toolbar:     '[data-grid-toolbar]',
             toolbars: {
-                top: '.toolbar.toolbar-top',
-                bottom: '.toolbar.toolbar-bottom'
+                top: '[data-grid-toolbar=top]',
+                bottom: '[data-grid-toolbar=bottom]'
             },
             noDataBlock: '.no-data',
             filterBox:   '.filter-box',
@@ -692,7 +692,7 @@ define(function(require) {
                 return this.toolbars[placement];
             }
 
-            this.toolbars[placement] = this._createToolbar(this.toolbarOptions);
+            this.toolbars[placement] = this._createToolbar({el: this.$(this.selectors.toolbars[placement])});
 
             return this.toolbars[placement];
         },
