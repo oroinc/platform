@@ -61,7 +61,7 @@ The following table describes existing sections for which new options can be add
 
 An example:
 
-```
+```php
 <?php
 namespace Acme\Bundle\AcmeBundle\Api;
 
