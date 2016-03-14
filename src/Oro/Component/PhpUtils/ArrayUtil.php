@@ -213,6 +213,25 @@ class ArrayUtil
     }
 
     /**
+     * Return first element on which callback returns true value, null otherwise
+     *
+     * @param callable $callback
+     * @param array    $array
+     *
+     * @return mixed|null
+     */
+    public static function find(callable $callback, array $array)
+    {
+        foreach ($array as $item) {
+            if (call_user_func($callback, $item)) {
+                return $item;
+            }
+        }
+
+        return null;
+    }
+
+    /**
      * Return copy of the array starting with item for which callback returns falsity value
      *
      * @param callable $callback

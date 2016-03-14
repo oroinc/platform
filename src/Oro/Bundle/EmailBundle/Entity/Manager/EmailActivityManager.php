@@ -3,8 +3,6 @@
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Event\OnFlushEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
 
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage;
 
@@ -15,44 +13,26 @@ use Oro\Bundle\EmailBundle\Entity\Provider\EmailThreadProvider;
 use Oro\Bundle\EmailBundle\Provider\EmailActivityListProvider;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
-use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 
-/**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
- */
 class EmailActivityManager
 {
-    /**
-     * @var ActivityManager
-     */
+    /** @var ActivityManager */
     protected $activityManager;
 
-    /**
-     * @var EmailActivityListProvider
-     */
+    /** @var EmailActivityListProvider */
     protected $activityListProvider;
 
-    /**
-     * @var EmailThreadProvider
-     */
+    /** @var EmailThreadProvider */
     protected $emailThreadProvider;
 
-    /**
-     * Emails for updates after flush
-     *
-     * @var Email[]
-     */
-    protected $queueUpdate;
-
-    /**
-     * @var TokenStorage
-     */
+    /** @var TokenStorage */
     protected $tokenStorage;
 
-    /**
-     * @var ServiceLink
-     */
+    /** @var ServiceLink */
     protected $entityOwnerAccessorLink;
+
+    /** @var EntityManager */
+    protected $em;
 
     /**
      * @param ActivityManager           $activityManager
@@ -60,60 +40,39 @@ class EmailActivityManager
      * @param EmailThreadProvider       $emailThreadProvider
      * @param TokenStorage              $tokenStorage
      * @param ServiceLink               $entityOwnerAccessorLink
+     * @param EntityManager             $em
      */
     public function __construct(
         ActivityManager $activityManager,
         EmailActivityListProvider $activityListProvider,
         EmailThreadProvider $emailThreadProvider,
         TokenStorage $tokenStorage,
-        ServiceLink $entityOwnerAccessorLink
+        ServiceLink $entityOwnerAccessorLink,
+        EntityManager $em
     ) {
         $this->activityManager           = $activityManager;
         $this->emailActivityListProvider = $activityListProvider;
         $this->emailThreadProvider       = $emailThreadProvider;
-        $this->resetQueue();
         $this->tokenStorage            = $tokenStorage;
         $this->entityOwnerAccessorLink = $entityOwnerAccessorLink;
+        $this->em                      = $em;
     }
 
     /**
-     * Handles onFlush event
-     *
-     * @param OnFlushEventArgs $event
+     * @param Email[] $createdEmails
      */
-    public function handleOnFlush(OnFlushEventArgs $event)
+    public function updateActivities(array $createdEmails)
     {
-        $em  = $event->getEntityManager();
-        $uow = $em->getUnitOfWork();
-        foreach ($uow->getScheduledEntityInsertions() as $entity) {
-            if ($entity instanceof Email) {
-                $this->addEmailToQueue($entity);
+        foreach ($createdEmails as $email) {
+            $this->copyContexts($email);
+            // prepare the list of association targets
+            $targets = [];
+            if (count($this->emailActivityListProvider->getTargetEntities($email)) === 0) {
+                $this->addRecipientOwners($targets, $email);
             }
-        }
-    }
-
-    /**
-     * Handles postFlush event
-     *
-     * @param PostFlushEventArgs $event
-     */
-    public function handlePostFlush(PostFlushEventArgs $event)
-    {
-        $em = $event->getEntityManager();
-        if ($this->getQueue()) {
-            foreach ($this->getQueue() as $email) {
-                $this->copyContexts($em, $email);
-                // prepare the list of association targets
-                $targets = [];
-                if (count($this->emailActivityListProvider->getTargetEntities($email)) === 0) {
-                    $this->addRecipientOwners($targets, $email);
-                }
-                $this->addSenderOwner($targets, $email);
-                // add associations
-                $this->addContextsToThread($em, $email, $targets);
-            }
-            $this->resetQueue();
-            $em->flush();
+            $this->addSenderOwner($targets, $email);
+            // add associations
+            $this->addContextsToThread($email, $targets);
         }
     }
 
@@ -201,44 +160,42 @@ class EmailActivityManager
     }
 
     /**
-     * @param EntityManager $em
-     * @param Email         $email
+     * @param Email $email
      */
-    protected function copyContexts(EntityManager $em, Email $email)
+    protected function copyContexts(Email $email)
     {
         $thread = $email->getThread();
         if ($thread) {
-            $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
+            $relatedEmails = $this->em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
             $contexts      = $this->emailActivityListProvider->getTargetEntities($email);
             // from email to thread emails
             if (count($contexts) > 0) {
                 foreach ($relatedEmails as $relatedEmail) {
                     if ($email->getId() !== $relatedEmail->getId()) {
-                        $this->changeContexts($em, $relatedEmail, $contexts);
+                        $this->changeContexts($relatedEmail, $contexts);
                     }
                 }
             } else {
                 // from thread to email
-                $relatedEmails = $this->emailThreadProvider->getEmailReferences($em, $email);
+                $relatedEmails = $this->emailThreadProvider->getEmailReferences($this->em, $email);
                 if (count($relatedEmails) > 0) {
                     $parentEmail = $relatedEmails[0];
                     $contexts    = $this->emailActivityListProvider->getTargetEntities($parentEmail);
-                    $this->changeContexts($em, $email, $contexts);
+                    $this->changeContexts($email, $contexts);
                 }
             }
         }
     }
 
     /**
-     * @param EntityManager $em
      * @param Email         $email
      * @param [] $contexts
      */
-    protected function addContextsToThread(EntityManager $em, Email $email, $contexts)
+    protected function addContextsToThread(Email $email, $contexts)
     {
         $thread = $email->getThread();
         if ($thread) {
-            $relatedEmails = $em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
+            $relatedEmails = $this->em->getRepository(Email::ENTITY_CLASS)->findByThread($thread);
         } else {
             $relatedEmails = [$email];
         }
@@ -252,11 +209,10 @@ class EmailActivityManager
     }
 
     /**
-     * @param EntityManager $em
      * @param Email         $email
      * @param [] $contexts
      */
-    protected function changeContexts(EntityManager $em, Email $email, $contexts)
+    protected function changeContexts(Email $email, $contexts)
     {
         $oldContexts    = $this->emailActivityListProvider->getTargetEntities($email);
         //please, do not use array_diff because it compares objects as strings and it is not correct
@@ -268,35 +224,7 @@ class EmailActivityManager
         foreach ($contexts as $context) {
             $this->addAssociation($email, $context);
         }
-        $em->persist($email);
-    }
-
-    /**
-     * Reset thread update queue
-     */
-    public function resetQueue()
-    {
-        $this->queueUpdate = [];
-    }
-
-    /**
-     * Get tread update queue
-     *
-     * @return Email[]
-     */
-    public function getQueue()
-    {
-        return $this->queueUpdate;
-    }
-
-    /**
-     * Add email to thread update queue
-     *
-     * @param Email $email
-     */
-    public function addEmailToQueue(Email $email)
-    {
-        $this->queueUpdate[] = $email;
+        $this->em->persist($email);
     }
 
     /**

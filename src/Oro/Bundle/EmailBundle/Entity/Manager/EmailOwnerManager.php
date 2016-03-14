@@ -13,7 +13,7 @@ use Oro\Bundle\EmailBundle\Entity\EmailInterface;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProviderStorage;
 
 /**
- * This class responsible for binging EmailAddress to owner entities
+ * This class responsible for binding EmailAddress to owner entities
  */
 class EmailOwnerManager
 {
@@ -49,104 +49,150 @@ class EmailOwnerManager
     }
 
     /**
-     * Handle onFlush event
+     * @param array $emailAddressData Data retrieved by "createEmailAddressData"
      *
-     * @param OnFlushEventArgs $event
+     * @return EmailAddress[] Updated email addresses
      */
-    public function handleOnFlush(OnFlushEventArgs $event)
+    public function handleChangedAddresses(array $emailAddressData)
     {
-        $em  = $event->getEntityManager();
-        $uow = $em->getUnitOfWork();
+        $emailOwnerChanges = $this->getEmailOwnerChanges($emailAddressData['updates']);
+        $emailOwnerDeletions = $this->handleDeletions($emailOwnerChanges, $emailAddressData['deletions']);
 
-        $bindings = [
-            // array of array('email' => email address, 'owner' => EmailOwnerInterface or false)
-            'changes'   => [],
-            // array of EmailOwnerInterface
-            'deletions' => []
-        ];
-
-        $this->handleInsertionsOrUpdates($bindings, $uow->getScheduledEntityInsertions(), $uow);
-        $this->handleInsertionsOrUpdates($bindings, $uow->getScheduledEntityUpdates(), $uow);
-        $this->handleDeletions($bindings, $uow->getScheduledEntityDeletions());
-
-        $this->persistBindings($bindings, $em);
+        return $this->updateEmailAddresses($emailOwnerChanges, $emailOwnerDeletions);
     }
 
     /**
-     * @param array      $bindings
-     * @param array      $entities
+     * Creates data
+     *
      * @param UnitOfWork $uow
+     * @return array
      */
-    protected function handleInsertionsOrUpdates(array &$bindings, array $entities, UnitOfWork $uow)
+    public function createEmailAddressData(UnitOfWork $uow)
     {
-        foreach ($entities as $entity) {
-            if ($entity instanceof EmailOwnerInterface) {
-                $emailFields = $entity->getEmailFields();
-                if (!empty($emailFields)) {
-                    foreach ($emailFields as $emailField) {
-                        $this->processInsertionOrUpdateEntity(
-                            $bindings,
-                            $emailField,
-                            $entity,
-                            $entity,
-                            $uow
-                        );
-                    }
-                }
-            } elseif ($entity instanceof EmailInterface) {
-                $this->processInsertionOrUpdateEntity(
-                    $bindings,
-                    $entity->getEmailField(),
-                    $entity,
-                    $entity->getEmailOwner(),
-                    $uow
+        return [
+            'updates' => array_map(
+                function ($entity) use ($uow) {
+                    return [
+                        'entity' => $entity,
+                        'changeSet' => $uow->getEntityChangeSet($entity),
+                    ];
+                },
+                array_filter(
+                    array_merge(
+                        $uow->getScheduledEntityInsertions(),
+                        $uow->getScheduledEntityUpdates()
+                    ),
+                    $this->getEntityFilter()
+                )
+            ),
+            'deletions' => array_filter(
+                $uow->getScheduledEntityDeletions(),
+                $this->getEntityFilter()
+            )
+        ];
+    }
+
+    /**
+     * @param array $entities
+     *
+     * @return array
+     */
+    protected function getEmailOwnerChanges(array $entities)
+    {
+        $emailOwnerChanges = [];
+        foreach ($entities as $data) {
+            $entity = $data['entity'];
+            $changeSet = $data['changeSet'];
+            $ownerData = $this->createEmailOwnerData($entity);
+
+            foreach ($ownerData['emailFields'] as $emailField) {
+                $this->processEntityChanges(
+                    $emailOwnerChanges,
+                    $emailField,
+                    $ownerData['owner'],
+                    $changeSet
                 );
             }
         }
+
+        return $emailOwnerChanges;
     }
 
     /**
-     * @param array               $bindings
-     * @param                     $emailField
-     * @param mixed               $entity
-     * @param EmailOwnerInterface $owner
-     * @param UnitOfWork          $uow
+     * @param object $entity
+     *
+     * @return array
+     * @throws \InvalidArgumentException
      */
-    protected function processInsertionOrUpdateEntity(
-        array &$bindings,
+    protected function createEmailOwnerData($entity)
+    {
+        if ($entity instanceof EmailOwnerInterface) {
+            return [
+                'emailFields' => $entity->getEmailFields() ?: [],
+                'owner' => $entity,
+            ];
+        }
+
+        if ($entity instanceof EmailInterface) {
+            return [
+                'emailFields' => [$entity->getEmailField()],
+                'owner' => $entity->getEmailOwner(),
+            ];
+        }
+
+        throw new \InvalidArgumentException(
+            'Entity is expected to be type one of types: "%s" but "%s" given.',
+            'Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface, Oro\Bundle\EmailBundle\Entity\EmailInterface',
+            ClassUtils::getClass($entity)
+        );
+    }
+
+    /**
+     * @param array               $emailOwnerData
+     * @param                     $emailField
+     * @param EmailOwnerInterface $owner
+     * @param array               $changeSet
+     */
+    protected function processEntityChanges(
+        array &$emailOwnerData,
         $emailField,
-        $entity,
         EmailOwnerInterface $owner,
-        UnitOfWork $uow
+        array $changeSet
     ) {
-        $changeSet = $uow->getEntityChangeSet($entity);
-        foreach ($changeSet as $field => $values) {
-            if ($field === $emailField) {
-                list($oldValue, $newValue) = $values;
-                if ($newValue !== $oldValue) {
-                    if (!empty($newValue)) {
-                        $bindings['changes'][strtolower($newValue)] = [
-                            'email' => $newValue,
-                            'owner' => $owner
-                        ];
-                    }
-                    if (!empty($oldValue) && !isset($bindings['changes'][strtolower($oldValue)])) {
-                        $bindings['changes'][strtolower($oldValue)] = [
-                            'email' => $oldValue,
-                            'owner' => false
-                        ];
-                    }
-                }
-            }
+
+        if (!array_key_exists($emailField, $changeSet)) {
+            return;
+        }
+
+        $values = $changeSet[$emailField];
+        list($oldValue, $newValue) = $values;
+        if ($newValue === $oldValue) {
+            return;
+        }
+
+        if (!empty($newValue)) {
+            $emailOwnerData[strtolower($newValue)] = [
+                'email' => $newValue,
+                'owner' => $owner
+            ];
+        }
+        if (!empty($oldValue) && !isset($emailOwnerData[strtolower($oldValue)])) {
+            $emailOwnerData[strtolower($oldValue)] = [
+                'email' => $oldValue,
+                'owner' => false
+            ];
         }
     }
 
     /**
-     * @param array $bindings
+     * @param array $emailOwnerChanges
      * @param array $entities
+     *
+     * @return EmailOwnerInterface[]
      */
-    protected function handleDeletions(array &$bindings, array $entities)
+    protected function handleDeletions(array &$emailOwnerChanges, array $entities)
     {
+        $emailOwnerDeletions = [];
         foreach ($entities as $entity) {
             if ($entity instanceof EmailOwnerInterface) {
                 $key                         = sprintf(
@@ -154,67 +200,69 @@ class EmailOwnerManager
                     ClassUtils::getClass($entity),
                     $entity->getId()
                 );
-                $bindings['deletions'][$key] = $entity;
+                $emailOwnerDeletions[$key] = $entity;
             } elseif ($entity instanceof EmailInterface) {
                 $email = $entity->getEmail();
-                if (!empty($email) && !isset($bindings['changes'][strtolower($email)])) {
-                    $bindings['changes'][strtolower($email)] = [
+                if (!empty($email) && !isset($emailOwnerChanges[strtolower($email)])) {
+                    $emailOwnerChanges[strtolower($email)] = [
                         'email' => $email,
                         'owner' => false
                     ];
                 }
             }
         }
+
+        return $emailOwnerDeletions;
     }
 
     /**
-     * @param array         $bindings
-     * @param EntityManager $em
+     * @param array $emailOwnerChanges
+     *
+     * @return EmailAddress[]
      */
-    protected function persistBindings(array &$bindings, EntityManager $em)
+    protected function updateEmailAddresses(array $emailOwnerChanges, array $emailOwnerDeletions)
     {
-        $repository = $this->emailAddressManager->getEmailAddressRepository($em);
-
-        foreach ($bindings['changes'] as $item) {
+        $updatedEmailAddresses = [];
+        foreach ($emailOwnerChanges as $item) {
             $email = $item['email'];
-            $owner = false === $item['owner'] ? null : $item['owner'];
-            $emailAddress = $repository->findOneBy(['email' => $email]);
+            $newOwner = false === $item['owner'] ? null : $item['owner'];
+            $emailAddress = $this->emailAddressManager->getEmailAddressRepository()->findOneBy(['email' => $email]);
             if ($emailAddress === null) {
                 $emailAddress = $this->emailAddressManager->newEmailAddress()
                     ->setEmail($email)
-                    ->setOwner($owner);
-                $em->persist($emailAddress);
-                $this->computeEntityChangeSet($em, $emailAddress);
-            } elseif ($emailAddress->getOwner() !== $owner) {
-                $emailAddress->setOwner($owner);
-                $this->computeEntityChangeSet($em, $emailAddress);
+                    ->setOwner($newOwner);
+                $this->emailAddressManager->getEntityManager()->persist($emailAddress);
+                $updatedEmailAddresses[] = $emailAddress;
+            } elseif ($emailAddress->getOwner() !== $newOwner) {
+                $emailAddress->setOwner($newOwner);
+                $updatedEmailAddresses[] = $emailAddress;
             }
         }
 
-        foreach ($bindings['deletions'] as $owner) {
+        foreach ($emailOwnerDeletions as $owner) {
             foreach ($this->emailOwnerClasses as $fieldName => $ownerClass) {
                 if (is_a($owner, $ownerClass)) {
                     $condition = array($fieldName => $owner);
-                    /** @var EmailAddress[] $emailAddresses */
-                    $emailAddresses = $repository->findBy($condition);
+                    /* @var $emailAddresses EmailAddress[] */
+                    $emailAddresses = $this->emailAddressManager->getEmailAddressRepository()->findBy($condition);
                     foreach ($emailAddresses as $emailAddress) {
                         $emailAddress->setOwner(null);
-                        $this->computeEntityChangeSet($em, $emailAddress);
+                        $updatedEmailAddresses[] = $emailAddress;
                     }
                 }
             }
         }
+
+        return $updatedEmailAddresses;
     }
 
     /**
-     * @param EntityManager $entityManager
-     * @param mixed         $entity
+     * @return \Closure
      */
-    protected function computeEntityChangeSet(EntityManager $entityManager, $entity)
+    protected function getEntityFilter()
     {
-        $entityClass   = ClassUtils::getClass($entity);
-        $classMetadata = $entityManager->getClassMetadata($entityClass);
-        $unitOfWork    = $entityManager->getUnitOfWork();
-        $unitOfWork->computeChangeSet($classMetadata, $entity);
+        return function ($entity) {
+            return $entity instanceof EmailOwnerInterface || $entity instanceof EmailInterface;
+        };
     }
 }
