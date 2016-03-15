@@ -10,6 +10,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
+ * @dbKeepConnection
  */
 class CleanupCommandTest extends WebTestCase
 {

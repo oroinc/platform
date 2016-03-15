@@ -29,6 +29,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
     const DB_REINDEX_ANNOTATION   = 'dbReindex';
+    const DB_KEEP_CONNECTION      = 'dbKeepConnection';
 
     /** Default WSSE credentials */
     const USER_NAME     = 'admin';
@@ -48,6 +49,11 @@ abstract class WebTestCase extends BaseWebTestCase
      * @var bool[]
      */
     private static $dbReindex;
+
+    /**
+     * @var bool[]
+     */
+    private static $dbKeepConnection;
 
     /**
      * @var Client
@@ -86,6 +92,18 @@ abstract class WebTestCase extends BaseWebTestCase
             if (!$prop->isStatic() && 0 !== strpos($prop->getDeclaringClass()->getName(), 'PHPUnit_')) {
                 $prop->setAccessible(true);
                 $prop->setValue($this, null);
+            }
+        }
+
+        /**
+         * We should close all opened DB connection to avoid exceeding the `max_connections` limitation.
+         * Due all test cases runs in single process.
+         * If needed this can be omitted by annotating the test class with `@dbKeepConnection`.
+         */
+        if (!self::getDbKeepConnectionSetting()) {
+            $connections = self::getContainer()->get('doctrine')->getConnections();
+            foreach ($connections as $connection) {
+                $connection->close();
             }
         }
     }
@@ -209,6 +227,21 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::$dbReindex[$calledClass];
+    }
+
+    /**
+     * Get value of dbKeepConnection option from annotation of called class
+     *
+     * @return bool
+     */
+    private static function getDbKeepConnectionSetting()
+    {
+        $calledClass = get_called_class();
+        if (!isset(self::$dbKeepConnection[$calledClass])) {
+            self::$dbKeepConnection[$calledClass] = self::isClassHasAnnotation($calledClass, self::DB_KEEP_CONNECTION);
+        }
+
+        return self::$dbKeepConnection[$calledClass];
     }
 
     /**

@@ -8,6 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
+ * @dbKeepConnection
  */
 class ActivityListControllerTest extends WebTestCase
 {
