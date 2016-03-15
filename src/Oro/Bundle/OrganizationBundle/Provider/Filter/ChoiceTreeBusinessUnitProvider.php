@@ -70,7 +70,7 @@ class ChoiceTreeBusinessUnitProvider
      */
     public function shouldBeLazy()
     {
-        return count($this->getBusinessUnitIds()) >= 100;
+        return count($this->getBusinessUnitIds()) >= 500;
     }
 
     /**

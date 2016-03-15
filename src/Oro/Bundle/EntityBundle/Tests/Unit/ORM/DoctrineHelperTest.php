@@ -2,12 +2,16 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\ORM;
 
+use Doctrine\ORM\PersistentCollection;
+use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Fixtures\TestEntity;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub;
 use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\__CG__\ItemStubProxy;
+use Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ReflectionProperty;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -1067,16 +1071,90 @@ class DoctrineHelperTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testManagersCache()
+    public function testRefreshIncludingUnitializedRelations()
     {
-        $this->registry
-            ->expects($this->exactly(2))
-            ->method('getManagerForClass')
-            ->willReturn($this->onConsecutiveCalls($this->em, null));
+        $itemsToRefresh = [
+            new ItemStub(['id' => 0]),
+            new ItemStub(['id' => 1]),
+        ];
 
-        $this->doctrineHelper->getEntityManager('\stdClass');
-        $this->doctrineHelper->getEntityManager('\stdClass');
-        $this->doctrineHelper->getEntityManager(new TestEntity(), false);
-        $this->doctrineHelper->getEntityManager(new TestEntity(), false);
+        $entity = new ItemStub();
+        $entity->cascadeRefreshPersistentInitializedCollection = new PersistentCollection(
+            $this->em,
+            'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+            new ArrayCollection([
+                $itemsToRefresh[0],
+            ])
+        );
+        $entity->cascadeRefreshPersistentUninitializedCollection = new PersistentCollection(
+            $this->em,
+            'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+            new ArrayCollection([
+                $itemsToRefresh[1],
+            ])
+        );
+        $entity->cascadeRefreshPersistentUninitializedCollection->setInitialized(false);
+        $entity->persistentUninitializedCollection = new PersistentCollection(
+            $this->em,
+            'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+            new ArrayCollection([
+                $itemsToRefresh[1],
+            ])
+        );
+        $entity->persistentUninitializedCollection->setInitialized(false);
+
+        $entityMetadata = new ClassMetadata('Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub');
+        $entityMetadata->reflFields = [
+            'cascadeRefreshPersistentInitializedCollection' => new ReflectionProperty(
+                'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'cascadeRefreshPersistentInitializedCollection',
+                [spl_object_hash($entity) => $entity->cascadeRefreshPersistentInitializedCollection]
+            ),
+            'cascadeRefreshPersistentUninitializedCollection' => new ReflectionProperty(
+                'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'cascadeRefreshPersistentInitializedCollection',
+                [spl_object_hash($entity) => $entity->cascadeRefreshPersistentUninitializedCollection]
+            ),
+            'persistentUninitializedCollection' => new ReflectionProperty(
+                'Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub',
+                'persistentUninitializedCollection',
+                [spl_object_hash($entity) => $entity->persistentUninitializedCollection]
+            ),
+        ];
+        $entityMetadata->associationMappings = [
+            [
+                'fieldName' => 'cascadeRefreshPersistentInitializedCollection',
+                'isCascadeRefresh' => true,
+            ],
+            [
+                'fieldName' => 'cascadeRefreshPersistentUninitializedCollection',
+                'isCascadeRefresh' => true,
+            ],
+            [
+                'fieldName' => 'persistentUninitializedCollection',
+                'isCascadeRefresh' => false,
+            ],
+        ];
+
+        $this->registry->expects($this->any())
+            ->method('getManagerForClass')
+            ->will($this->returnValueMap([
+                ['Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub', $this->em],
+            ]));
+
+        $this->em->expects($this->any())
+            ->method('getClassMetadata')
+            ->will($this->returnValueMap([
+                ['Oro\Bundle\EntityBundle\Tests\Unit\ORM\Stub\ItemStub', $entityMetadata],
+            ]));
+
+        $this->em->expects($this->exactly(2))
+            ->method('refresh')
+            ->withConsecutive(
+                [$entity],
+                [$itemsToRefresh[1]]
+            );
+
+        $this->doctrineHelper->refreshIncludingUnitializedRelations($entity);
     }
 }

@@ -7,6 +7,8 @@ use Doctrine\ORM\PersistentCollection;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -72,14 +74,10 @@ class OrganizationsSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'default_organization',
-            'hidden',
-            [
-                'mapped' => false,
-                'data'   => $this->securityFacade->getOrganizationId(),
-            ]
-        );
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $event->setData(json_decode($event->getData(), true));
+        });
+
         $builder->add(
             'organizations',
             'entity',
@@ -87,7 +85,6 @@ class OrganizationsSelectType extends AbstractType
                 'class'    => 'OroOrganizationBundle:Organization',
                 'property' => 'name',
                 'multiple' => true,
-                'expanded' => true,
                 'choices'  => $this->getOrganizationOptions(),
             ]
         );
@@ -96,7 +93,6 @@ class OrganizationsSelectType extends AbstractType
             'oro_business_unit_tree',
             [
                 'multiple' => true,
-                'expanded' => true,
                 'required' => false,
             ]
         );
@@ -123,8 +119,10 @@ class OrganizationsSelectType extends AbstractType
             )->getValues();
         }
 
+        $view->vars['default_organization'] = $this->securityFacade->getOrganizationId();
         $view->vars['selected_organizations']  = [$this->securityFacade->getOrganizationId()];
         $view->vars['selected_business_units'] = $businessUnitData;
+        $view->vars['accordion_enabled'] = $this->buManager->getTreeNodesCount($buTree) > 1000;
     }
 
     /**
