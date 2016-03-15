@@ -13,7 +13,7 @@ define(function(require) {
 
     var IconView = require('./widget-container/icon-view');
     var WidgetContainerView = require('./widget-container/view');
-    var WidgetAddView = require('./widget-container/widget-add-view');
+    var WidgetPickerModal = require('./widget-container/widget-picker-modal');
     var WidgetSetupModalView = require('./widget-container/widget-setup-view');
 
     var sidebarTemplate = require('text!./templates/template.html');
@@ -72,7 +72,15 @@ define(function(require) {
         },
 
         getAvailableWidgets: function() {
-            return this.options.availableWidgets;
+            var Widgets = this.getWidgets();
+            return _.map(this.options.availableWidgets, function(widgetObject, widgetName){
+                return _.extend(widgetObject, {
+                    widgetName: widgetName,
+                    added: Widgets.filter(function(widget){
+                        return widget.get('widgetName') === widgetName;
+                    }).length
+                });
+            });
         },
 
         getWidgets: function() {
@@ -213,7 +221,7 @@ define(function(require) {
             e.stopPropagation();
             e.preventDefault();
 
-            var widgetAddView = new WidgetAddView({
+            var widgetAddView = new WidgetPickerModal({
                 sidebar: this
             });
 

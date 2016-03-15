@@ -10,6 +10,7 @@ define(function(require) {
     var DashboardItemWidget = require('orodashboard/js/widget/dashboard-item');
     var dashboardUtil = require('orodashboard/js/dashboard-util');
     var ConfigurationWidget = require('orodashboard/js/widget/configuration-widget');
+    var WidgetPickerModal = require('orodashboard/js/widget-picker-modal');
     require('jquery-ui');
 
     /**
@@ -90,6 +91,38 @@ define(function(require) {
             $('.dashboard-container-wrapper .title-buttons-container .remove-button').on('removesuccess', function() {
                 dashboardUtil.onDashboardRemove($(this).attr('data-id'));
             });
+
+            $('.dashboard-widgets-add').on('click', _.bind(this._onClickAddWidget, this));
+        },
+
+        /**
+         * @return {Array}
+         */
+        getAvailableWidgets: function() {
+            var Widgets = this.widgets;
+            return _.map(this.options.availableWidgets, function(widgetObject){
+                return _.extend(widgetObject, {
+                    added: _.filter(Widgets, function(widget){
+                        return widget.options.widgetName === widgetObject.widgetName;
+                    }).length
+                });
+            });
+        },
+
+        /**
+         *
+         * @param {Event} e
+         */
+        _onClickAddWidget: function (e) {
+            e.preventDefault();
+            var columnIndex = $(event.target).closest(this.options.columnsSelector).index();
+            var targetColumn = (columnIndex === -1) ? 0 : columnIndex;
+            var dialog = new WidgetPickerModal({
+                dashboard: this,
+                dashboardId: this.options.dashboardId,
+                targetColumn: targetColumn
+            });
+            dialog.open();
         },
 
         /**
@@ -115,7 +148,8 @@ define(function(require) {
                 'loadingMaskEnabled': false,
                 'container': '#' + containerId,
                 'allowEdit': this.options.allowEdit,
-                'showConfig': this.options.allowEdit && !_.isEmpty(data.config.configuration)
+                'showConfig': this.options.allowEdit && !_.isEmpty(data.config.configuration),
+                'widgetName': data.name
             };
             var widget = new DashboardItemWidget(widgetParams);
             widget.render();

@@ -17,6 +17,7 @@ services:
         arguments:
             - @oro_sidebar.widget_definition.registry
             - @translator
+            - @assets.packages
         tags:
             - { name: twig.extension }
 

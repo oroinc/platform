@@ -184,6 +184,7 @@ config:
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
         'oroui/js/app/components/basic-tree-component': 'bundles/oroui/js/app/components/basic-tree-component.js'
         'oroui/js/app/components/basic-tree-manage-component': 'bundles/oroui/js/app/components/basic-tree-manage-component.js'
+        'oroui/js/app/components/widget-picker-component': 'bundles/oroui/js/app/components/widget-picker-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
         'oro/block-widget': 'bundles/oroui/js/widget/block-widget.js'
@@ -204,6 +205,15 @@ config:
         'oroui/js/app/views/input-widget/uniform-select': 'bundles/oroui/js/app/views/input-widget/uniform-select.js'
 
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
+
+        'oroui/js/app/views/widget-picker/widget-picker-collection-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-collection-view.js'
+        'oroui/js/app/views/widget-picker/widget-picker-filter-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-filter-view.js'
+        'oroui/js/app/views/widget-picker/widget-picker-item-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-item-view.js'
+        'oroui/js/app/models/widget-picker/widget-picker-filter-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-filter-model.js'
+        'oroui/js/app/models/widget-picker/widget-picker-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-model.js'
+        'oroui/templates/widget-picker/widget-picker-filter-view.html': 'bundles/oroui/templates/widget-picker/widget-picker-filter-view.html'
+        'oroui/templates/widget-picker/widget-picker-item-view.html': 'bundles/oroui/templates/widget-picker/widget-picker-item-view.html'
+        'oroui/templates/widget-picker/widget-picker-modal-template.html': 'bundles/oroui/templates/widget-picker/widget-picker-modal-template.html'
 
         'autolinker': 'bundles/oroui/lib/autolinker.min.js'
     appmodules:

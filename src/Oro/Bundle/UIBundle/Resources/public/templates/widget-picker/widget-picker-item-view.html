@@ -1,0 +1,34 @@
+<table>
+    <tbody>
+    <tr class="widget-picker-title">
+        <td class="widget-picker-small-column">
+            <% if (description) { %>
+            <a class="widget-picker-collapse"></a>
+            <% } %>
+        </td>
+        <td class="widget-picker-small-column">
+            <img src="<%= dialogIcon %>" alt="<%= title %>" title="<%= title %>"/>
+        </td>
+        <td class="widget-picker-large-column">
+            <strong><%= title %></strong>
+            <% if (isNew) { %>
+            <span class="new">New</span>
+            <% } %>
+            <span class="added<% if (!added) { %> hidden <% } %>" >Added <span>(<%= added %>)</span></span>
+        </td>
+        <td class="widget-picker-add-btn-wrapper">
+            <a class="btn widget-picker-add-btn btn-primary">
+                Add
+            </a>
+        </td>
+    </tr>
+    <% if (description) { %>
+    <tr class="widget-picker-description">
+        <td colspan="2"></td>
+        <td class="widget-picker-large-column">
+            <%= description %>
+        </td>
+    </tr>
+    <% } %>
+    </tbody>
+</table>

@@ -6,7 +6,7 @@ config:
         'orodashboard/js/widget/dashboard-item': 'bundles/orodashboard/js/widget/dashboard-item.js'
         'orodashboard/js/widget/configuration-widget': 'bundles/orodashboard/js/widget/configuration-widget.js'
         'orodashboard/js/dashboard-container': 'bundles/orodashboard/js/dashboard-container.js'
-        'orodashboard/js/widget-picker': 'bundles/orodashboard/js/widget-picker.js'
+        'orodashboard/js/widget-picker-modal': 'bundles/orodashboard/js/widget-picker-modal.js'
         'orodashboard/js/dashboard-util': 'bundles/orodashboard/js/dashboard-util.js'
         'orodashboard/js/widget/date-range': 'bundles/orodashboard/js/widget/date-range.js'
         'orodashboard/js/widget/datetime-range': 'bundles/orodashboard/js/widget/datetime-range.js'
