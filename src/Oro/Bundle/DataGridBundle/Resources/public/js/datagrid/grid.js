@@ -172,8 +172,7 @@ define(function(require) {
 
             // Init properties values based on options and defaults
             _.extend(this, this.defaults, opts);
-            this.toolbarOptions = {};
-            _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
+            this._initToolbars(opts);
             this.exportOptions = {};
             _.extend(this.exportOptions, opts.exportOptions);
 
@@ -188,7 +187,6 @@ define(function(require) {
 
             this._initColumns(opts);
 
-            this.toolbars = {};
             this.template = _.template($(opts.template || this.template).html());
 
             // use columns collection as event bus since there is no alternatives
@@ -204,6 +202,16 @@ define(function(require) {
             this._listenToCollectionEvents();
             this._listenToContentEvents();
             this._listenToCommands();
+        },
+
+        /**
+         * @param {Object} opts
+         * @private
+         */
+        _initToolbars: function(opts) {
+            this.toolbars = {};
+            this.toolbarOptions = {};
+            _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
         },
 
         /**
