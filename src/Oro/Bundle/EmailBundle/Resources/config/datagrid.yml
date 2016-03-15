@@ -276,6 +276,7 @@ datagrid:
         options:
             toolbarOptions:
                 addColumnManager: false
+            entity_pagination: true
 
     dashboard-recent-emails-grid:
         source:
