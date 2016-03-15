@@ -29,15 +29,17 @@ oro:
             label_type_range_less_equals: equals or less than
             label_date_type_between:      between
             label_date_type_not_between:  not between
-            label_date_type_more_than:    more than
-            label_date_type_less_than:    less than
+            label_date_type_more_than:    later than
+            label_date_type_less_than:    earlier than
+            label_date_type_equals:       equals
+            label_date_type_not_equals:   not equals
             label_not_selected:           Not Selected
             label_selected:               Selected
             label_date_part.source:       source
             label_date_part.value:        value
             label_date_part.dayofweek:    day of week
             label_date_part.week:         week
-            label_date_part.day:          day
+            label_date_part.day:          day of month
             label_date_part.month:        month
             label_date_part.quarter:      quarter
             label_date_part.dayofyear:    day of year
@@ -49,9 +51,22 @@ oro:
             label_date_var.soq:           start of the quarter
             label_date_var.soy:           start of the year
             label_date_var.this_day:      current day
+            label_date_var.this_day_w_y:  this day without year
             label_date_var.this_week:     current week
-            label_date_var.this_month:    current month
+            label_date_var.this_month:    current month without year
             label_date_var.this_quarter:  current quarter
             label_date_var.this_year:     current year
             label_date_var.this_fdq:      first day of quarter
             label_date_var.this_fmq:      first month of quarter
+            label_date_var.january:       january
+            label_date_var.february:      february
+            label_date_var.march:         march
+            label_date_var.april:         april
+            label_date_var.may:           may
+            label_date_var.june:          june
+            label_date_var.july:          july
+            label_date_var.august:        august
+            label_date_var.september:     september
+            label_date_var.october:       october
+            label_date_var.november:      november
+            label_date_var.december:      december

@@ -8,9 +8,16 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\Validator\Exception\UnexpectedTypeException;
 
+use Carbon\Carbon;
+
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\AbstractDateFilterType;
+use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class DateFilterSubscriber implements EventSubscriberInterface
 {
     /** @var Compiler */
@@ -41,6 +48,7 @@ class DateFilterSubscriber implements EventSubscriberInterface
      * Parses date expressions
      * If date part given, then replace value fields by choice fields with specific to that value choices
      *
+     * @param FormEvent $event
      * @SuppressWarnings(PHPMD.CyclomaticComplexity) many cases in switch - have no sense to refactor this.
      */
     public function preSubmit(FormEvent $event)
@@ -58,7 +66,8 @@ class DateFilterSubscriber implements EventSubscriberInterface
         }
 
         $children = array_keys($form->get('value')->all());
-
+        $this->modifyDateForEqualType($data);
+        $this->modifyPartByVariable($data);
         // compile expressions
         $this->mapValues(
             $children,
@@ -163,6 +172,106 @@ class DateFilterSubscriber implements EventSubscriberInterface
 
         foreach ($children as $child) {
             $form->add($child, 'choice', ['choices' => $choices]);
+        }
+    }
+
+    /**
+     * Modify filter when selected (source or value) and (equals or not equals) and today, start_of_* modifiers
+     * For example: equals today convert to between from 2015-11-25 00:00:00 to 2015-11-25 23:59:59
+     * It's normal user's expectations
+     *
+     * @param array $data
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     */
+    private function modifyDateForEqualType(&$data)
+    {
+        if (!isset($data['part'], $data['type'])) {
+            return;
+        }
+
+        $validType =
+            $data['type'] == AbstractDateFilterType::TYPE_EQUAL ||
+            $data['type'] == AbstractDateFilterType::TYPE_NOT_EQUAL;
+        $validPart =
+            $data['part'] === DateModifierInterface::PART_SOURCE ||
+            $data['part'] === DateModifierInterface::PART_VALUE;
+
+        if (isset($data['value']) && $validType && $validPart) {
+            if ($data['type'] == AbstractDateFilterType::TYPE_EQUAL) {
+                $date = $data['value']['start'];
+            } else {
+                $date = $data['value']['end'];
+            }
+            $result = $this->expressionCompiler->compile($date, true);
+
+            if ($result instanceof ExpressionResult) {
+                switch ($result->getVariableType()) {
+                    case DateModifierInterface::VAR_TODAY:
+                    case DateModifierInterface::VAR_SOW:
+                    case DateModifierInterface::VAR_SOM:
+                    case DateModifierInterface::VAR_SOQ:
+                    case DateModifierInterface::VAR_SOY:
+                        /** @var Carbon $date */
+                        $date = $this->expressionCompiler->compile($date);
+                        $clonedDate = clone $date;
+                        if ($data['type'] == AbstractDateFilterType::TYPE_EQUAL) {
+                            $data['value']['end'] = $clonedDate->endOfDay()->format('Y-m-d H:i');
+                            $data['type'] = AbstractDateFilterType::TYPE_BETWEEN;
+                        } else {
+                            $data['type'] = AbstractDateFilterType::TYPE_NOT_BETWEEN;
+                            $data['value']['start'] = $data['value']['end'];
+                            $data['value']['end'] = $clonedDate->endOfDay()->format('Y-m-d H:i');
+                        }
+                        break;
+                }
+            }
+        }
+    }
+
+    /**
+     * Doesn't matter which part user was selected. This variables should contain own certain part.
+     * To support this approach see that now grid doesn't contain 'part' select box and backend must
+     * change 'part' dynamically
+     *
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
+     * @param array $data
+     */
+    protected function modifyPartByVariable(&$data)
+    {
+        if (!isset($data['part'], $data['type'])) {
+            return;
+        }
+
+        foreach ($data['value'] as $field) {
+            if ($field) {
+                $result = $this->expressionCompiler->compile($field, true);
+                switch ($result->getVariableType()) {
+                    case DateModifierInterface::VAR_THIS_DAY_W_Y:
+                        $data['part']=DateModifierInterface::PART_VALUE;
+                        break;
+                    case DateModifierInterface::VAR_THIS_MONTH:
+                    case DateModifierInterface::VAR_JANUARY:
+                    case DateModifierInterface::VAR_FEBRUARY:
+                    case DateModifierInterface::VAR_MARCH:
+                    case DateModifierInterface::VAR_APRIL:
+                    case DateModifierInterface::VAR_MAY:
+                    case DateModifierInterface::VAR_JUNE:
+                    case DateModifierInterface::VAR_JULY:
+                    case DateModifierInterface::VAR_AUGUST:
+                    case DateModifierInterface::VAR_SEPTEMBER:
+                    case DateModifierInterface::VAR_OCTOBER:
+                    case DateModifierInterface::VAR_NOVEMBER:
+                    case DateModifierInterface::VAR_DECEMBER:
+                        $data['part']=DateModifierInterface::PART_MONTH;
+                        break;
+                }
+
+                switch ($result->getSourceType()) {
+                    case ExpressionResult::TYPE_DAYMONTH:
+                        $data['part']=DateModifierInterface::PART_VALUE;
+                        break;
+                }
+            }
         }
     }
 
