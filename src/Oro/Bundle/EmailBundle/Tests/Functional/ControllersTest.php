@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Functional;
 
+use Doctrine\Bundle\DoctrineBundle\Registry;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -10,9 +12,15 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class ControllersTest extends WebTestCase
 {
+    /**
+     * @var Registry
+     */
+    protected $registry;
+
     protected function setUp()
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->registry = $this->getContainer()->get('doctrine');
         $this->loadFixtures([
             'Oro\Bundle\EmailBundle\Tests\Functional\DataFixtures\LoadUserData'
         ]);
@@ -55,8 +63,7 @@ class ControllersTest extends WebTestCase
      */
     public function testAutoCompleteHandler($active, $handlerName, $query)
     {
-        $manager = $this->getContainer()->get('doctrine')->getManager();
-        $user = $manager->getRepository('OroUserBundle:User')->findOneBy(['username' => 'simple_user2']);
+        $user = $this->registry->getRepository('OroUserBundle:User')->findOneBy(['username' => 'simple_user2']);
         $user->setEnabled($active);
         $this->registry->getManager()->flush();
 
