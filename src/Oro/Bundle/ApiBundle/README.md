@@ -14,4 +14,6 @@ To achieve this, this bundle is implemented based on two ORO components: [ChainP
 Table of Contents
 -----------------
  - [Configuration](./Resources/doc/configuration.md)
+ - [Actions](./Resources/doc/actions.md)
+ - [Processors](./Resources/doc/processors.md)
  - [Debug commands](./Resources/doc/debug_commands.md)

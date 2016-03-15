@@ -9,6 +9,9 @@ use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 
+/**
+ * Registers filters according to the "filters" configuration section.
+ */
 class RegisterFilters implements ProcessorInterface
 {
     /** @var FilterFactoryInterface */

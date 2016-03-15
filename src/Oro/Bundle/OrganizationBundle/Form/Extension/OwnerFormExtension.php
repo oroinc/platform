@@ -130,6 +130,7 @@ class OwnerFormExtension extends AbstractTypeExtension
         }
 
         $formConfig = $builder->getFormConfig();
+
         if (!$formConfig->getCompound()) {
             return;
         }
@@ -453,26 +454,15 @@ class OwnerFormExtension extends AbstractTypeExtension
             return null;
         }
 
-        $businessUnits = $user->getBusinessUnits()->filter(
-            function (BusinessUnit $businessUnit) use ($organization) {
-                return $businessUnit->getOrganization()->getId() === $organization->getId();
-            }
-        );
         if (!$this->isAssignGranted) {
-            return $businessUnits->first();
+            return $user->getBusinessUnits()
+                ->filter(function (BusinessUnit $businessUnit) use ($organization) {
+                    return $businessUnit->getOrganization()->getId() === $organization->getId();
+                })
+                ->first();
         }
 
-        // if assign is granted then only allowed business units can be used
-        $allowedBusinessUnits = $this->businessUnitManager->getBusinessUnitIds();
-
-        /** @var BusinessUnit $businessUnit */
-        foreach ($businessUnits as $businessUnit) {
-            if (in_array($businessUnit->getId(), $allowedBusinessUnits)) {
-                return $businessUnit;
-            }
-        }
-
-        return null;
+        return $this->businessUnitManager->getCurrentBusinessUnit($user, $organization);
     }
 
     /**

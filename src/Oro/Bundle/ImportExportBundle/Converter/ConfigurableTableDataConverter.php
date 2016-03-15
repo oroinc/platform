@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -12,30 +16,26 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     const DEFAULT_MULTIPLE_RELATION_LEVEL = 3;
     const DEFAULT_ORDER = 10000;
 
-    /**
-     * @var string
-     */
+    const CONVERSION_TYPE_DATA = 'data';
+    const CONVERSION_TYPE_FIXTURES = 'fixtures';
+
+    /** @var string */
     protected $entityName;
 
-    /**
-     * @var FieldHelper
-     */
+    /**  @var FieldHelper */
     protected $fieldHelper;
 
-    /**
-     * @var RelationCalculator
-     */
+    /** @var RelationCalculator */
     protected $relationCalculator;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $relationDelimiter = ' ';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $collectionDelimiter = '(\d+)';
+
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
 
     /**
      * @param FieldHelper $fieldHelper
@@ -45,6 +45,14 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     {
         $this->fieldHelper = $fieldHelper;
         $this->relationCalculator = $relationCalculator;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
     }
 
     /**
@@ -167,7 +175,9 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
             }
         }
 
-        return [$this->sortData($rules), $this->sortData($backendHeaders)];
+        $event = $this->dispatchEntityRulesEvent($entityName, $backendHeaders, $rules, $fullData);
+
+        return [$this->sortData($event->getRules()), $this->sortData($event->getHeaders())];
     }
 
     /**
@@ -421,5 +431,40 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         }
 
         return [$relationRules, $relationBackendHeaders];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getConversionType()
+    {
+        return $this->relationCalculator instanceof RelationCalculator
+            ? static::CONVERSION_TYPE_DATA
+            : static::CONVERSION_TYPE_FIXTURES;
+    }
+
+    /**
+     * @param string $entityName
+     * @param array $backendHeaders
+     * @param array $rules
+     * @param bool $fullData
+     *
+     * @return LoadEntityRulesAndBackendHeadersEvent
+     */
+    protected function dispatchEntityRulesEvent($entityName, $backendHeaders, array $rules, $fullData)
+    {
+        $event = new LoadEntityRulesAndBackendHeadersEvent(
+            $entityName,
+            $backendHeaders,
+            $rules,
+            $this->convertDelimiter,
+            $this->getConversionType(),
+            $fullData
+        );
+        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS)) {
+            $this->dispatcher->dispatch(Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS, $event);
+        }
+
+        return $event;
     }
 }

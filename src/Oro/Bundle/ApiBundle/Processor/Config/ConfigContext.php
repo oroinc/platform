@@ -21,7 +21,7 @@ class ConfigContext extends ApiContext
     /** the maximum number of related entities that can be retrieved */
     const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
 
-    /** a list of additional configuration data that should be retrieved */
+    /** a list of requests for additional configuration data that should be retrieved */
     const EXTRA = 'extra';
 
     /** @var ConfigExtraInterface[] */
@@ -29,6 +29,7 @@ class ConfigContext extends ApiContext
 
     public function __construct()
     {
+        parent::__construct();
         $this->set(self::EXTRA, []);
     }
 
@@ -65,15 +66,19 @@ class ConfigContext extends ApiContext
     /**
      * Sets the maximum number of related entities that can be retrieved
      *
-     * @param int $limit
+     * @param int|null $limit
      */
-    public function setMaxRelatedEntities($limit)
+    public function setMaxRelatedEntities($limit = null)
     {
-        $this->set(self::MAX_RELATED_ENTITIES, $limit);
+        if (null === $limit) {
+            $this->remove(self::MAX_RELATED_ENTITIES);
+        } else {
+            $this->set(self::MAX_RELATED_ENTITIES, $limit);
+        }
     }
 
     /**
-     * Checks if the specified additional configuration data is requested.
+     * Checks whether some additional configuration data is requested.
      *
      * @param string $extraName
      *
@@ -85,7 +90,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets a list of requested additional configuration data.
+     * Gets a list of requests for additional configuration data.
      *
      * @return ConfigExtraInterface[]
      */
@@ -95,7 +100,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Sets additional configuration data that you need.
+     * Sets requests for additional configuration data.
      *
      * @param ConfigExtraInterface[] $extras
      *
@@ -116,6 +121,24 @@ class ConfigContext extends ApiContext
 
         $this->extras = $extras;
         $this->set(self::EXTRA, $names);
+    }
+
+    /**
+     * Gets a list of requests for additional configuration data that can be used
+     * to get configuration of related entities.
+     *
+     * @return ConfigExtraInterface[]
+     */
+    public function getInheritableExtras()
+    {
+        $result = [];
+        foreach ($this->extras as $extra) {
+            if ($extra->isInheritable()) {
+                $result[] = $extra;
+            }
+        }
+
+        return $result;
     }
 
     /**

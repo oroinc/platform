@@ -5,6 +5,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 use Oro\Component\Config\CumulativeResourceManager;
+use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\DependencyInjection\Fixtures;
 
@@ -33,6 +36,11 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
 
         $container = new ContainerBuilder();
 
+        $configExtensionRegistry = new ConfigExtensionRegistry(3);
+        $configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $configExtensionRegistry->addExtension(new SortersConfigExtension());
+        $container->set('oro_api.config_extension_registry', $configExtensionRegistry);
+
         $extension->load([], $container);
 
         $this->assertNotNull(
@@ -46,60 +54,74 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'entities' => [
+                'entities'  => [
                     'Test\Entity1'  => [],
                     'Test\Entity2'  => [],
                     'Test\Entity3'  => [],
                     'Test\Entity4'  => [
-                        'definition' => [
-                            'fields'  => [
-                                'field1' => null,
+                        'fields'  => [
+                            'field1' => [],
+                            'field2' => [
+                                'exclude' => true
+                            ],
+                            'field3' => [
+                                'exclude'  => true,
+                                'order_by' => ['name' => 'ASC']
+                            ],
+                            'field4' => [
+                                'fields' => [
+                                    'field41' => [
+                                        'order_by' => ['name' => 'DESC']
+                                    ]
+                                ]
+                            ],
+                            'field5' => [
+                                'fields' => [
+                                    'field51' => [
+                                        'fields' => [
+                                            'field511' => [
+                                                'disable_partial_load' => true
+                                            ]
+                                        ]
+                                    ]
+                                ]
+                            ]
+                        ],
+                        'filters' => [
+                            'fields' => [
+                                'field1' => [],
                                 'field2' => [
-                                    'exclude' => true
+                                    'data_type' => 'string',
+                                    'exclude'   => true
                                 ],
                                 'field3' => [
                                     'exclude' => true
                                 ]
-                            ],
-                            'filters' => [
-                                'fields' => [
-                                    'field1' => null,
-                                    'field2' => [
-                                        'data_type' => 'string',
-                                        'exclude'   => true
-                                    ],
-                                    'field3' => [
-                                        'exclude' => true
-                                    ]
+                            ]
+                        ],
+                        'sorters' => [
+                            'fields' => [
+                                'field1' => [],
+                                'field2' => [
+                                    'exclude' => true
                                 ]
-                            ],
-                            'sorters' => [
-                                'fields' => [
-                                    'field1' => null,
-                                    'field2' => [
-                                        'exclude' => true
-                                    ]
-                                ]
-                            ],
-                        ]
+                            ]
+                        ],
                     ],
                     'Test\Entity5'  => [
-                        'definition' => [
-                            'fields' => [
-                                'field1' => null
-                            ]
+                        'fields' => [
+                            'field1' => []
                         ]
                     ],
                     'Test\Entity6'  => [
-                        'definition' => [
-                            'fields' => [
-                                'field1' => null
-                            ]
+                        'fields' => [
+                            'field1' => []
                         ]
                     ],
                     'Test\Entity10' => [],
                     'Test\Entity11' => [],
-                ]
+                ],
+                'relations' => [],
             ],
             $container->getDefinition('oro_api.config_bag')->getArgument(0)
         );

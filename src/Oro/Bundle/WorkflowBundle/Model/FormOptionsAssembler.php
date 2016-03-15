@@ -8,12 +8,12 @@ use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\Configurable as ConfigurableAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
-use Oro\Component\Action\Model\AbstractAssembler;
+use Oro\Component\Action\Model\AbstractAssembler as BaseAbstractAssembler;
 
 /**
  * Assembles form options that can be passed to transition and step
  */
-class FormOptionsAssembler extends AbstractAssembler
+class FormOptionsAssembler extends BaseAbstractAssembler
 {
     const STEP_OWNER = 'step';
     const TRANSITION_OWNER = 'transition';

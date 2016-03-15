@@ -6,19 +6,23 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
 /**
  * An instance of this class can be added to the config extras of the Context
- * to request inclusion of additional related entities data
+ * to request to add related entities to a result.
  */
 class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
 {
     const NAME = 'expand_related_entities';
 
-    /** @var array */
+    /** @var string[] */
     protected $expandedEntities;
 
     /**
-     * @param array $expandedEntities
+     * @param string[] $expandedEntities The list of related entities.
+     *                                   Each item can be an association name or a path to a nested association.
+     *                                   Example: ["comments", "comments.author"]
+     *                                   Where "comments" is an association under a primary entity,
+     *                                   "author" is an association under the "comments" entity.
      */
-    public function __construct($expandedEntities = [])
+    public function __construct(array $expandedEntities)
     {
         $this->expandedEntities = $expandedEntities;
     }
@@ -37,5 +41,21 @@ class ExpandRelatedEntitiesConfigExtra implements ConfigExtraInterface
     public function configureContext(ConfigContext $context)
     {
         $context->set(self::NAME, $this->expandedEntities);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isInheritable()
+    {
+        return false;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheKeyPart()
+    {
+        return 'expand:' . implode(',', $this->expandedEntities);
     }
 }

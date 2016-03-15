@@ -4,8 +4,8 @@ namespace Oro\Bundle\ActionBundle\Twig;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActionExtension extends \Twig_Extension
 {
@@ -17,28 +17,28 @@ class ActionExtension extends \Twig_Extension
     /** @var ApplicationsHelper */
     protected $appsHelper;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var  ContextHelper */
+    /** @var ContextHelper */
     protected $contextHelper;
+
+    /** @var OptionsHelper */
+    protected $optionsHelper;
 
     /**
      * @param ActionManager $manager
      * @param ApplicationsHelper $appsHelper
-     * @param DoctrineHelper $doctrineHelper
      * @param ContextHelper $contextHelper
+     * @param OptionsHelper $optionsHelper
      */
     public function __construct(
         ActionManager $manager,
         ApplicationsHelper $appsHelper,
-        DoctrineHelper $doctrineHelper,
-        ContextHelper $contextHelper
+        ContextHelper $contextHelper,
+        OptionsHelper $optionsHelper
     ) {
         $this->manager = $manager;
         $this->appsHelper = $appsHelper;
-        $this->doctrineHelper = $doctrineHelper;
         $this->contextHelper = $contextHelper;
+        $this->optionsHelper = $optionsHelper;
     }
 
     /**
@@ -60,25 +60,9 @@ class ActionExtension extends \Twig_Extension
                 [$this->contextHelper, 'getActionParameters'],
                 ['needs_context' => true]
             ),
-            new \Twig_SimpleFunction('oro_action_widget_route', [$this, 'getWidgetRoute']),
-            new \Twig_SimpleFunction('has_actions', [$this, 'hasActions']),
+            new \Twig_SimpleFunction('oro_action_widget_route', [$this->appsHelper, 'getWidgetRoute']),
+            new \Twig_SimpleFunction('has_actions', [$this->manager, 'hasActions']),
+            new \Twig_SimpleFunction('oro_action_frontend_options', [$this->optionsHelper, 'getFrontendOptions']),
         );
-    }
-
-    /**
-     * @return string
-     */
-    public function getWidgetRoute()
-    {
-        return $this->appsHelper->getWidgetRoute();
-    }
-
-    /**
-     * @param array $params
-     * @return bool
-     */
-    public function hasActions(array $params)
-    {
-        return $this->manager->hasActions($params);
     }
 }
