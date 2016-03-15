@@ -7,7 +7,7 @@ use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
-use Oro\Component\ConfigExpression\Condition\AbstractCondition;
+use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\ConfigExpression\ContextAccessorAwareInterface;
 use Oro\Component\ConfigExpression\ContextAccessorAwareTrait;
 use Oro\Component\ConfigExpression\Exception\InvalidArgumentException;

@@ -3,9 +3,10 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Condition\Configurable as ConfigurableCondition;
 use Oro\Bundle\WorkflowBundle\Model\Process;
+
+use Oro\Component\Action\Action\ActionAssembler;
+use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ProcessTest extends \PHPUnit_Framework_TestCase
@@ -40,7 +41,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->actionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler')
+        $this->actionAssembler = $this->getMockBuilder('Oro\Component\Action\Action\ActionAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -52,7 +53,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
         $context = array('context');
         $configuration = array('config');
 
-        $action = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionInterface')
+        $action = $this->getMockBuilder('Oro\Component\Action\Action\ActionInterface')
             ->getMock();
         $action->expects($this->exactly(2))
             ->method('execute')
@@ -96,7 +97,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $context = [];
         $conditionConfiguration = ['test' => []];
-        $condition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\Configurable')
+        $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
             ->disableOriginalConstructor()
             ->getMock();
         $condition->expects($this->any())
@@ -121,7 +122,7 @@ class ProcessTest extends \PHPUnit_Framework_TestCase
     {
         $context = [];
         $conditionConfiguration = ['test' => []];
-        $condition = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Condition\Configurable')
+        $condition = $this->getMockBuilder('Oro\Component\Action\Condition\Configurable')
             ->disableOriginalConstructor()
             ->getMock();
         $condition->expects($this->any())

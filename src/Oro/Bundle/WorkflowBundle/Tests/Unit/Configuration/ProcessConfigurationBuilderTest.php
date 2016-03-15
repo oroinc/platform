@@ -264,7 +264,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                 'configuration' => array(
                     'event' => 'my_custom_event',
                 ),
-                'exception' => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'message'   => 'Event "my_custom_event" is not allowed'
             ),
             'incorrect time shift' => array(
@@ -272,7 +272,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'time_shift' => 'invalid_value',
                 ),
-                'exception' => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'message'   => 'Time shift parameter must be either integer or DateInterval'
             ),
             'field is not allowed' => array(
@@ -280,7 +280,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'field' => 'someField',
                 ),
-                'exception' => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'message'   => 'Field is only allowed for update event'
             ),
             'invalid cron expression' => [
@@ -295,7 +295,7 @@ class ProcessConfigurationBuilderTest extends \PHPUnit_Framework_TestCase
                     'event' => ProcessTrigger::EVENT_CREATE,
                     'cron' => '* * * * *'
                 ],
-                'exception' => 'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exception' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'message'   => 'Only one parameter "event" or "cron" must be configured.'
             ]
         );

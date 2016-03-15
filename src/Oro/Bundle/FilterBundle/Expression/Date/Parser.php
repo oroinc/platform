@@ -20,11 +20,10 @@ class Parser
 
     /**
      * @param array $tokens
-     *
-     * @throws \LogicException
+     * @param bool $returnRawToken
      * @return mixed
      */
-    public function parse($tokens)
+    public function parse($tokens, $returnRawToken = false)
     {
         $this->validate($tokens);
         $RPNTokens = $this->convertExprToRPN($tokens);
@@ -51,7 +50,11 @@ class Parser
             }
         }
 
-        return $result === null ? $result : $result->getValue();
+        if ($returnRawToken || $result === null) {
+            return $result;
+        }
+
+        return $result->getValue();
     }
 
     /**

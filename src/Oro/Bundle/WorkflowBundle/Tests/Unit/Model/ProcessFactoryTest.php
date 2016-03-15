@@ -3,8 +3,9 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Oro\Bundle\WorkflowBundle\Model\ProcessFactory;
-use Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+
+use Oro\Component\Action\Action\ActionAssembler;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 class ProcessFactoryTest extends \PHPUnit_Framework_TestCase
@@ -12,7 +13,7 @@ class ProcessFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreate()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|ActionAssembler $actionAssembler */
-        $actionAssembler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Action\ActionAssembler')
+        $actionAssembler = $this->getMockBuilder('Oro\Component\Action\Action\ActionAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 

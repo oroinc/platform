@@ -46,7 +46,7 @@ require(['jquery', 'routing'],
                         selectDiv.append(selector);
                         selectDiv.show();
                         linkDiv.remove();
-                        $('select').uniform('update');
+                        $('select').inputWidget('refresh');
                     },
                     error: function() {
                         link.show();

@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\EntityBundle\ORM;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-
 use Symfony\Component\HttpKernel\CacheWarmer\WarmableInterface;
 
 use Oro\Bundle\EntityBundle\Exception\EntityAliasNotFoundException;
 use Oro\Bundle\EntityBundle\Exception\RuntimeException;
 use Oro\Bundle\EntityBundle\Model\EntityAlias;
 use Oro\Bundle\EntityBundle\Provider\EntityAliasProviderInterface;
-use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 
 class EntityAliasResolver implements WarmableInterface
 {
-    /** @var ManagerRegistry */
-    protected $doctrine;
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /** @var ManagerBagInterface */
+    protected $managerBag;
 
     /** @var bool */
     protected $debug;
@@ -42,13 +42,15 @@ class EntityAliasResolver implements WarmableInterface
     private $allAliasesLoaded = false;
 
     /**
-     * @param ManagerRegistry $doctrine
-     * @param bool            $debug
+     * @param DoctrineHelper      $doctrineHelper
+     * @param ManagerBagInterface $managerBag
+     * @param bool                $debug
      */
-    public function __construct(ManagerRegistry $doctrine, $debug)
+    public function __construct(DoctrineHelper $doctrineHelper, ManagerBagInterface $managerBag, $debug)
     {
-        $this->doctrine = $doctrine;
-        $this->debug    = $debug;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->managerBag = $managerBag;
+        $this->debug = $debug;
     }
 
     /**
@@ -306,10 +308,13 @@ class EntityAliasResolver implements WarmableInterface
             return;
         }
 
-        $allMetadata = SafeDatabaseChecker::getAllMetadata($this->doctrine->getManager());
-        foreach ($allMetadata as $metadata) {
-            if (!$metadata->isMappedSuperclass && !isset($this->aliases[$metadata->name])) {
-                $this->findEntityAlias($metadata->name);
+        $managers = $this->managerBag->getManagers();
+        foreach ($managers as $om) {
+            $allMetadata = $this->doctrineHelper->getAllShortMetadata($om, false);
+            foreach ($allMetadata as $metadata) {
+                if (!$metadata->isMappedSuperclass && !isset($this->aliases[$metadata->name])) {
+                    $this->findEntityAlias($metadata->name);
+                }
             }
         }
         $this->allAliasesLoaded = true;

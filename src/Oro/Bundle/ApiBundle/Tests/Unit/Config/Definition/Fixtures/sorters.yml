@@ -1,0 +1,92 @@
+empty:
+    config: []
+    expected: []
+
+empty_root:
+    config:
+        sorters: []
+    expected: []
+
+null_fields:
+    config:
+        sorters:
+            fields: ~
+    expected: []
+
+empty_fields:
+    config:
+        sorters:
+            fields: []
+    expected: []
+
+default_exclusion_policy:
+    config:
+        sorters:
+            exclusion_policy: none
+    expected:
+        sorters:
+            exclusion_policy: none
+
+exclusion_policy:
+    config:
+        sorters:
+            exclusion_policy: all
+    expected:
+        sorters:
+            exclusion_policy: all
+
+null_exclusion_policy:
+    config:
+        sorters:
+            exclusion_policy: null
+    expected: []
+    error: 'The value null is not allowed for path "entity.sorters.exclusion_policy". Permissible values: "all", "none"'
+
+invalid_exclusion_policy:
+    config:
+        sorters:
+            exclusion_policy: invalid
+    expected: []
+    error: 'The value "invalid" is not allowed for path "entity.sorters.exclusion_policy". Permissible values: "all", "none"'
+
+full:
+    config:
+        sorters:
+            exclusion_policy: all
+            fields:
+                field1: ~
+                field2: []
+                field3:
+                    exclude: true
+                    property_path: path1
+                field4:
+                    exclude: false
+    expected:
+        sorters:
+            exclusion_policy: all
+            fields:
+                field1: []
+                field2: []
+                field3:
+                    exclude: true
+                    property_path: path1
+                field4:
+                    exclude: false
+
+invalid_field_exclude:
+    config:
+        sorters:
+            fields:
+                field1:
+                    exclude: 123
+    expected: []
+    error: 'Invalid type for path "entity.sorters.fields.field1.exclude". Expected boolean, but got integer.'
+
+null_field_property_path:
+    config:
+        sorters:
+            fields:
+                field1:
+                    property_path: null
+    expected: []
+    error: 'The path "entity.sorters.fields.field1.property_path" cannot contain an empty value, but got null.'
