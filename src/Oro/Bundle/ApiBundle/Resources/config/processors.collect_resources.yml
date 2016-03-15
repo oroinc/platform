@@ -37,3 +37,10 @@ services:
             - @oro_api.entity_exclusion_provider
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -100 }
+
+    oro_api.collect_resources.add_excluded_actions_config:
+        class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddActionsToResources
+        arguments:
+            - @oro_api.config_provider
+        tags:
+            - { name: oro.api.processor, action: collect_resources, priority: -100 }

@@ -1,6 +1,9 @@
 oro_api:
     entities:
-        Oro\Bundle\CalendarBundle\Entity\Calendar: ~
+        Oro\Bundle\CalendarBundle\Entity\Calendar:
+            actions:
+                delete:
+                    acl_resource: oro_calendar_view
         Oro\Bundle\CalendarBundle\Entity\CalendarEvent:
             actions:
                 delete:
@@ -10,3 +13,4 @@ oro_api:
             actions:
                 delete:
                     delete_handler: oro_calendar.system_calendar.handler.delete
+                    acl_resource: ~

@@ -137,7 +137,7 @@ class Config implements \IteratorAggregate
     }
 
     /**
-     * Checks whether the configuration of sorters exists.
+     * Checks whether the configuration of actions.
      *
      * @return bool
      */
@@ -147,9 +147,9 @@ class Config implements \IteratorAggregate
     }
 
     /**
-     * Gets the configuration of sorters.
+     * Gets the configuration of actions.
      *
-     * @return SortersConfig|null
+     * @return ActionsConfig|null
      */
     public function getActions()
     {
@@ -157,9 +157,9 @@ class Config implements \IteratorAggregate
     }
 
     /**
-     * Sets the configuration of sorters.
+     * Sets the configuration of actions.
      *
-     * @param SortersConfig|null $sorters
+     * @param ActionsConfig|null $actions
      */
     public function setActions(ActionsConfig $actions = null)
     {

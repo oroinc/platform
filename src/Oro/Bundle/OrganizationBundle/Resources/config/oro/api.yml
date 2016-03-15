@@ -6,5 +6,4 @@ oro_api:
                     delete_handler: oro_organization.business_unit.handler.delete
         Oro\Bundle\OrganizationBundle\Entity\Organization:
             actions:
-                delete:
-                    delete_handler: oro_organization.organization.handler.delete
+                delete: false

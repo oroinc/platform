@@ -8,6 +8,13 @@ class ApiResource
     protected $entityClass;
 
     /**
+     * List of excluded actions
+     *
+     * @var array
+     */
+    protected $excludedActions;
+
+    /**
      * @param $entityClass
      */
     public function __construct($entityClass)
@@ -31,5 +38,21 @@ class ApiResource
     public function __toString()
     {
         return $this->entityClass;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExcludedActions()
+    {
+        return $this->excludedActions;
+    }
+
+    /**
+     * @param array $excludedActions
+     */
+    public function setExcludedActions($excludedActions)
+    {
+        $this->excludedActions = $excludedActions;
     }
 }
