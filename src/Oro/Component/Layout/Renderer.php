@@ -23,20 +23,20 @@ class Renderer implements FormRendererInterface
     /**
      * @var array
      */
-    private $blockNameHierarchyMap = array();
+    private $blockNameHierarchyMap = [];
 
     /**
      * @var array
      */
-    private $hierarchyLevelMap = array();
+    private $hierarchyLevelMap = [];
 
     /**
      * @var array
      */
-    private $variableStack = array();
+    private $variableStack = [];
 
     /**
-     * @param FormRendererEngineInterface    $engine
+     * @param FormRendererEngineInterface $engine
      */
     public function __construct(FormRendererEngineInterface $engine)
     {
@@ -70,7 +70,7 @@ class Renderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function renderBlock(FormView $view, $blockName, array $variables = array())
+    public function renderBlock(FormView $view, $blockName, array $variables = [])
     {
         $resource = $this->engine->getResourceForBlockName($view, $blockName);
 
@@ -83,7 +83,7 @@ class Renderer implements FormRendererInterface
         // The variables are cached globally for a view (instead of for the
         // current suffix)
         if (!isset($this->variableStack[$viewCacheKey])) {
-            $this->variableStack[$viewCacheKey] = array();
+            $this->variableStack[$viewCacheKey] = [];
 
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
@@ -129,18 +129,18 @@ class Renderer implements FormRendererInterface
     /**
      * {@inheritdoc}
      */
-    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = array())
+    public function searchAndRenderBlock(FormView $view, $blockNameSuffix, array $variables = [])
     {
         $viewCacheKey = $view->vars[self::CACHE_KEY_VAR];
-        $viewAndSuffixCacheKey = $viewCacheKey.$blockNameSuffix;
+        $viewAndSuffixCacheKey = $viewCacheKey . $blockNameSuffix;
 
         if (!isset($this->blockNameHierarchyMap[$viewAndSuffixCacheKey])) {
             // INITIAL CALL
             // Calculate the hierarchy of template blocks and start on
             // the bottom level of the hierarchy (= "_<id>_<section>" block)
-            $blockNameHierarchy = array();
+            $blockNameHierarchy = [];
             foreach ($view->vars['block_prefixes'] as $blockNamePrefix) {
-                $blockNameHierarchy[] = $blockNamePrefix.'_'.$blockNameSuffix;
+                $blockNameHierarchy[] = $blockNamePrefix . '_' . $blockNameSuffix;
             }
             $hierarchyLevel = count($blockNameHierarchy) - 1;
 
@@ -158,7 +158,7 @@ class Renderer implements FormRendererInterface
         // The variables are cached globally for a view (instead of for the
         // current suffix)
         if (!isset($this->variableStack[$viewCacheKey])) {
-            $this->variableStack[$viewCacheKey] = array();
+            $this->variableStack[$viewCacheKey] = [];
 
             // The default variable scope contains all view variables, merged with
             // the variables passed explicitly to the helper
@@ -234,6 +234,6 @@ class Renderer implements FormRendererInterface
      */
     public function humanize($text)
     {
-        return ucfirst(trim(strtolower(preg_replace(array('/([A-Z])/', '/[_\s]+/'), array('_$1', ' '), $text))));
+        return ucfirst(trim(strtolower(preg_replace(['/([A-Z])/', '/[_\s]+/'], ['_$1', ' '], $text))));
     }
 }
