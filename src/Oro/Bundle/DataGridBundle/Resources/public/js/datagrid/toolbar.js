@@ -38,6 +38,8 @@ define([
         selector: {
             pagination: '[data-grid-pagination]',
             pagesize: '[data-grid-pagesize]',
+            actionsPanel: '[data-grid-actions-panel]',
+            extraActionsPanel: '[data-grid-extra-actions-panel]'
         },
 
         /**
@@ -132,11 +134,11 @@ define([
 
             this.$(this.selector.pagination).replaceWith($pagination);
             this.$(this.selector.pagesize).append(this.subviews.pageSize.render().$el);
-            this.$('.actions-panel').append(this.subviews.actionsPanel.render().$el);
+            this.$(this.selector.actionsPanel).append(this.subviews.actionsPanel.render().$el);
             if (this.subviews.extraActionsPanel.haveActions()) {
-                this.$('.extra-actions-panel').append(this.subviews.extraActionsPanel.render().$el);
+                this.$(this.selector.extraActionsPanel).append(this.subviews.extraActionsPanel.render().$el);
             } else {
-                this.$('.extra-actions-panel').hide();
+                this.$(this.selector.extraActionsPanel).hide();
             }
 
             return this;

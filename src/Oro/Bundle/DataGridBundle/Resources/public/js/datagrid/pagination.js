@@ -29,17 +29,21 @@ define([
 
         /** @property */
         events: {
-            'click a': 'onChangePage'
+            'click [data-grid-pagination-trigger]': 'onChangePage'
         },
 
         /** @property */
         fastForwardHandleConfig: {
             prev: {
                 label: 'Prev',
+                direction: 'prev',
+                arrow: 'left',
                 wrapClass: 'icon-chevron-left hide-text'
             },
             next: {
                 label: 'Next',
+                direction: 'next',
+                arrow: 'right',
                 wrapClass: 'icon-chevron-right hide-text'
             }
         },
@@ -106,22 +110,23 @@ define([
                 return;
             }
 
-            var label = $.trim($(e.target).text());
+            var direction = $.trim($(e.target).closest('[data-grid-pagination-trigger]')
+                .data('grid-pagination-direction'));
             var ffConfig = this.fastForwardHandleConfig;
 
             var collection = this.collection;
             var state = collection.state;
 
             if (ffConfig) {
-                var prevLabel = _.has(ffConfig.prev, 'label') ? ffConfig.prev.label : undefined;
-                var nextLabel = _.has(ffConfig.next, 'label') ? ffConfig.next.label : undefined;
-                switch (label) {
-                    case prevLabel:
+                var prevDirection = _.has(ffConfig.prev, 'direction') ? ffConfig.prev.direction : undefined;
+                var nextDirection = _.has(ffConfig.next, 'direction') ? ffConfig.next.direction : undefined;
+                switch (direction) {
+                    case prevDirection:
                         if (collection.hasPrevious()) {
                             collection.getPreviousPage();
                         }
                         return;
-                    case nextLabel:
+                    case nextDirection:
                         if (collection.hasNext()) {
                             collection.getNextPage();
                         }
@@ -169,8 +174,8 @@ define([
                 handles.unshift({
                     label: _.has(ffConfig.prev, 'label') ? ffConfig.prev.label : undefined,
                     wrapClass: _.has(ffConfig.prev, 'wrapClass') ? ffConfig.prev.wrapClass : undefined,
-                    direction: 'prev',
-                    arrow: 'left',
+                    direction: _.has(ffConfig.prev, 'direction') ? ffConfig.prev.direction : undefined,
+                    arrow: _.has(ffConfig.prev, 'arrow') ? ffConfig.prev.arrow : undefined,
                     className: collection.hasPrevious() ? undefined : 'disabled'
                 });
             }
@@ -179,8 +184,8 @@ define([
                 handles.push({
                     label: _.has(ffConfig.next, 'label') ? ffConfig.next.label : undefined,
                     wrapClass: _.has(ffConfig.next, 'wrapClass') ? ffConfig.next.wrapClass : undefined,
-                    direction: 'next',
-                    arrow: 'right',
+                    direction: _.has(ffConfig.next, 'direction') ? ffConfig.next.direction : undefined,
+                    arrow: _.has(ffConfig.next, 'arrow') ? ffConfig.next.arrow : undefined,
                     className: collection.hasNext() ? void 0 : 'disabled'
                 });
             }
