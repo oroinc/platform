@@ -13,7 +13,7 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
 
         $instance = new ActionGroupExecutionArgs($expected);
 
-        $this->assertEquals($expected, $instance->getName());
+        $this->assertEquals($expected, $instance->getActionGroupName());
     }
 
     public function testGetArgumentsCreateNewInstanceOfActionData()

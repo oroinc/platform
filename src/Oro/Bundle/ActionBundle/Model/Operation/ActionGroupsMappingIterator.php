@@ -2,13 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Model\Operation;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
-use Oro\Component\Action\Model\ContextAccessor;
-
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
+use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersMapper;
 
 /**
  * Iterator provide mapping for \Oro\Bundle\ActionBundle\Model\OperationActionGroup with ActionData values to
@@ -19,19 +16,21 @@ class ActionGroupsMappingIterator extends \ArrayIterator
     /** @var ActionData */
     private $data;
 
-    /** @var ContextAccessor */
-    private $accessor;
+    /**
+     * @var ParametersMapper
+     */
+    private $mapper;
 
     /**
      * @param array|OperationActionGroup[] $actionGroups
      * @param ActionData $data
-     * @param ContextAccessor|null $accessor
+     * @param ParametersMapper $mapper
      */
-    public function __construct(array $actionGroups, ActionData $data, ContextAccessor $accessor = null)
+    public function __construct(array $actionGroups, ActionData $data, ParametersMapper $mapper)
     {
         parent::__construct($actionGroups);
         $this->data = $data;
-        $this->accessor = $accessor ?: new ContextAccessor();
+        $this->mapper = $mapper;
     }
 
     /**
@@ -51,22 +50,7 @@ class ActionGroupsMappingIterator extends \ArrayIterator
     {
         $executionArgs = new ActionGroupExecutionArgs($operationActionGroup->getName());
 
-        foreach ($operationActionGroup->getArgumentsMapping() as $argumentName => $value) {
-            if ($value instanceof PropertyPathInterface) {
-                $value = $this->accessor->getValue($this->data, $value);
-            } elseif (is_array($value)) {
-                array_walk_recursive(
-                    $value,
-                    function (&$element) {
-                        if ($element instanceof PropertyPathInterface) {
-                            $element = $this->accessor->getValue($this->data, $element);
-                        }
-                    }
-                );
-            }
-
-            $executionArgs->addArgument($argumentName, $value);
-        }
+        $this->mapper->mapToArgs($executionArgs, $operationActionGroup->getArgumentsMapping(), $this->data);
 
         return $executionArgs;
     }

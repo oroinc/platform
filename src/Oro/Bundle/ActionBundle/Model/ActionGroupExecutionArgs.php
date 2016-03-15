@@ -23,7 +23,7 @@ class ActionGroupExecutionArgs
     /**
      * @return string
      */
-    public function getName()
+    public function getActionGroupName()
     {
         return $this->name;
     }

@@ -701,7 +701,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs'
         )->disableOriginalConstructor()->getMock();
 
-        $mockActionGroupArgs->expects($this->once())->method('getName')->willReturn('test_actionGroup');
+        $mockActionGroupArgs->expects($this->once())->method('getActionGroupName')->willReturn('test_actionGroup');
         $mockActionGroupArgs->expects($this->once())->method('getActionData')->willReturn($actionData);
 
         $operation->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
