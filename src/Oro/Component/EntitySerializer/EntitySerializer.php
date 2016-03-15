@@ -4,7 +4,6 @@ namespace Oro\Component\EntitySerializer;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
 use Oro\Component\EntitySerializer\Filter\EntityAwareFilterInterface;
 
 /**
@@ -197,7 +196,7 @@ class EntitySerializer
 
         $this->updateQuery($qb, $entityConfig);
         $data = $this->queryFactory->getQuery($qb, $entityConfig)->getResult();
-        $data = $this->serializeItems((array)$data, $this->doctrineHelper->getRootEntityClass($qb), $entityConfig);
+        $data = $this->serializeItems((array) $data, $this->doctrineHelper->getRootEntityClass($qb), $entityConfig);
 
         return $this->dataNormalizer->normalizeData($data, $entityConfig);
     }
@@ -261,8 +260,7 @@ class EntitySerializer
         if ($useIdAsKey) {
             foreach ($entities as $entity) {
                 if ($this->fieldFilter
-                    && EntityAwareFilterInterface::FILTER_ALL === $this->fieldFilter->checkEntity($entity))
-                {
+                    && EntityAwareFilterInterface::FILTER_ALL === $this->fieldFilter->checkEntity($entity)) {
                     continue;
                 }
 
@@ -272,8 +270,7 @@ class EntitySerializer
         } else {
             foreach ($entities as $entity) {
                 if ($this->fieldFilter
-                    && EntityAwareFilterInterface::FILTER_ALL === $this->fieldFilter->checkEntity($entity))
-                {
+                    && EntityAwareFilterInterface::FILTER_ALL === $this->fieldFilter->checkEntity($entity)) {
                     continue;
                 }
 
@@ -394,7 +391,7 @@ class EntitySerializer
             $join  = sprintf('%s.%s', $rootAlias, $field);
             $alias = $this->getExistingJoinAlias($qb, $rootAlias, $join);
             if (!$alias) {
-                $alias = 'a' . ++$aliasCounter;
+                $alias = 'a'.++$aliasCounter;
                 $qb->leftJoin($join, $alias);
             }
             $this->updateSelectQueryPart(
@@ -426,7 +423,7 @@ class EntitySerializer
             }
         }
 
-        return null;
+        return;
     }
 
     /**
@@ -540,7 +537,7 @@ class EntitySerializer
 
         $result = [];
         if (!empty($data)) {
-            $items = $this->serializeItems((array)$data, $entityClass, $config, true);
+            $items = $this->serializeItems((array) $data, $entityClass, $config, true);
             foreach ($bindings as $entityId => $relatedEntityIds) {
                 foreach ($relatedEntityIds as $relatedEntityId) {
                     if (isset($items[$relatedEntityId])) {
