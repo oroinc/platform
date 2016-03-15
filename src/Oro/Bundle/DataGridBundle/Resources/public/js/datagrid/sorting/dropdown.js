@@ -66,7 +66,7 @@ define([
             if (keys.length) {
                 var columnName = keys[0];
                 var direction = null;
-                var column = this.columns.find(function (column) {
+                var column = this.columns.find(function(column) {
                     return column.get('name') === columnName;
                 });
                 var intDirection = this.collection.state.sorters[columnName];
