@@ -319,74 +319,56 @@ class EntitySerializer
                 continue;
             }
 
-            $value = EntityAwareFilterInterface::FILTER_NOTHING === $isFieldAllowed ?
-                $this->serializeItemField($entity, $field, $entityClass, $entityMetadata, $config) :
-                null; // return field but without value
+            if (EntityAwareFilterInterface::FILTER_NOTHING !== $isFieldAllowed) {
+                // return field but without value
+                $result[$field] = null;
+                continue;
+            }
 
-            $result[$field] = $value;
+            $fieldConfig = $config->getField($field);
+
+            $value = null;
+            if ($this->dataAccessor->tryGetValue($entity, $field, $value)) {
+                if ($entityMetadata->isAssociation($field)) {
+                    if ($value !== null) {
+                        $targetConfig = $this->getTargetEntity($config, $field);
+                        if (null !== $targetConfig && !$targetConfig->isEmpty()) {
+                            $targetEntityClass = $entityMetadata->getAssociationTargetClass($field);
+                            $targetEntityId    = $this->dataAccessor->getValue(
+                                $value,
+                                $this->doctrineHelper->getEntityIdFieldName($targetEntityClass)
+                            );
+
+                            $value = $this->serializeItem($value, $targetEntityClass, $targetConfig);
+                            $items = [$value];
+                            $this->loadRelatedData($items, $targetEntityClass, [$targetEntityId], $targetConfig);
+                            $value = reset($items);
+
+                            $postSerializeHandler = $targetConfig->getPostSerializeHandler();
+                            if (null !== $postSerializeHandler) {
+                                $value = $this->postSerialize($value, $postSerializeHandler);
+                            }
+                        } else {
+                            $value = $this->transformValue($entityClass, $field, $value, $fieldConfig);
+                        }
+                    }
+                } else {
+                    $value = $this->transformValue($entityClass, $field, $value, $fieldConfig);
+                }
+                $result[$field] = $value;
+            } elseif (null !== $fieldConfig) {
+                $propertyPath = $fieldConfig->getPropertyPath() ?: $field;
+                if (ConfigUtil::isMetadataProperty($propertyPath)) {
+                    $result[$field] = $this->fieldAccessor->getMetadataProperty(
+                        $entity,
+                        $propertyPath,
+                        $entityMetadata
+                    );
+                }
+            }
         }
 
         return $result;
-    }
-
-    /**
-     * @param object         $entity
-     * @param string         $field
-     * @param string         $entityClass
-     * @param EntityMetadata $entityMetadata
-     * @param EntityConfig   $config
-     *
-     * @return array|mixed|null
-     */
-    protected function serializeItemField(
-        $entity,
-        $field,
-        $entityClass,
-        EntityMetadata $entityMetadata,
-        EntityConfig $config
-    ) {
-        $fieldConfig = $config->getField($field);
-
-        $value = null;
-        if ($this->dataAccessor->tryGetValue($entity, $field, $value)) {
-            if ($entityMetadata->isAssociation($field)) {
-                if ($value !== null) {
-                    $targetConfig = $this->getTargetEntity($config, $field);
-                    if (null !== $targetConfig && !$targetConfig->isEmpty()) {
-                        $targetEntityClass = $entityMetadata->getAssociationTargetClass($field);
-                        $targetEntityId    = $this->dataAccessor->getValue(
-                            $value,
-                            $this->doctrineHelper->getEntityIdFieldName($targetEntityClass)
-                        );
-
-                        $value = $this->serializeItem($value, $targetEntityClass, $targetConfig);
-                        $items = [$value];
-                        $this->loadRelatedData($items, $targetEntityClass, [$targetEntityId], $targetConfig);
-                        $value = reset($items);
-
-                        $postSerializeHandler = $targetConfig->getPostSerializeHandler();
-                        if (null !== $postSerializeHandler) {
-                            $value = $this->postSerialize($value, $postSerializeHandler);
-                        }
-                    } else {
-                        $value = $this->transformValue($entityClass, $field, $value, $fieldConfig);
-                    }
-                }
-            } else {
-                $value = $this->transformValue($entityClass, $field, $value, $fieldConfig);
-            }
-        } elseif (null !== $fieldConfig) {
-            $propertyPath = $fieldConfig->getPropertyPath() ?: $field;
-            if (ConfigUtil::isMetadataProperty($propertyPath)) {
-                $value = $this->fieldAccessor->getMetadataProperty(
-                    $entity,
-                    $propertyPath,
-                    $entityMetadata
-                );
-            }
-        }
-
-        return $value;
     }
 
     /**

@@ -439,8 +439,12 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $extension = new EntityAclExtension(
-            new ObjectIdAccessor(),
+            new ObjectIdAccessor($doctrineHelper),
             $entityClassResolver,
             $this->securityMetadataProvider,
             $this->metadataProvider,

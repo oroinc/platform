@@ -6,17 +6,49 @@ use Doctrine\ORM\Mapping\MappingException;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class FieldAclExtension extends EntityAclExtension
 {
     const NAME = 'field';
+
+    const IDENTITY = 0;
+
+    // These access levels give a user access to own records and objects that are shared with the user.
+    const MASK_VIEW_BASIC         = 1;          // 1 << 0     + IDENTITY
+    const MASK_CREATE_BASIC       = 2;          // 1 << 1     + IDENTITY
+    const MASK_EDIT_BASIC         = 4;          // 1 << 2     + IDENTITY
+
+    // These access levels give a user access to records in all business units are assigned to the user.
+    const MASK_VIEW_LOCAL         = 64;         // 1 << 6     + IDENTITY
+    const MASK_CREATE_LOCAL       = 128;        // 1 << 7     + IDENTITY
+    const MASK_EDIT_LOCAL         = 256;        // 1 << 8     + IDENTITY
+
+    // These access levels give a user access to records in all business units are assigned to the user
+    // and all business units subordinate to business units are assigned to the user.
+    const MASK_VIEW_DEEP          = 4096;       // 1 << 12    + IDENTITY
+    const MASK_CREATE_DEEP        = 8192;       // 1 << 13    + IDENTITY
+    const MASK_EDIT_DEEP          = 16384;      // 1 << 14    + IDENTITY
+
+    // These access levels give a user access to all records within the organization,
+    // regardless of the business unit hierarchical level to which the domain object belongs
+    // or the user is assigned to.
+    const MASK_VIEW_GLOBAL        = 262144;     // 1 << 18    + IDENTITY
+    const MASK_CREATE_GLOBAL      = 524288;     // 1 << 19    + IDENTITY
+    const MASK_EDIT_GLOBAL        = 1048576;    // 1 << 20    + IDENTITY
+
+    // These access levels give a user access to all records within the system.
+    const MASK_VIEW_SYSTEM        = 16777216;   // 1 << 24    + IDENTITY
+    const MASK_CREATE_SYSTEM      = 33554432;   // 1 << 25    + IDENTITY
+    const MASK_EDIT_SYSTEM        = 67108864;   // 1 << 26    + IDENTITY
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -33,6 +65,8 @@ class FieldAclExtension extends EntityAclExtension
         EntitySecurityMetadataProvider $entityMetadataProvider,
         MetadataProviderInterface $metadataProvider,
         AccessLevelOwnershipDecisionMakerInterface $decisionMaker,
+        PermissionManager $permissionManager,
+        AclGroupProviderInterface $groupProvider,
         DoctrineHelper $doctrineHelper
     ) {
         parent::__construct(
@@ -40,39 +74,41 @@ class FieldAclExtension extends EntityAclExtension
             $entityClassResolver,
             $entityMetadataProvider,
             $metadataProvider,
-            $decisionMaker
+            $decisionMaker,
+            $permissionManager,
+            $groupProvider
         );
 
         $this->doctrineHelper = $doctrineHelper;
 
         // override permission map for fields
         $this->permissionToMaskBuilderIdentity = [
-            'VIEW'   => EntityMaskBuilder::IDENTITY,
-            'CREATE' => EntityMaskBuilder::IDENTITY,
-            'EDIT'   => EntityMaskBuilder::IDENTITY,
+            'VIEW'   => self::IDENTITY,
+            'CREATE' => self::IDENTITY,
+            'EDIT'   => self::IDENTITY,
         ];
 
         $this->map = [
             'VIEW'   => [
-                EntityMaskBuilder::MASK_VIEW_BASIC,
-                EntityMaskBuilder::MASK_VIEW_LOCAL,
-                EntityMaskBuilder::MASK_VIEW_DEEP,
-                EntityMaskBuilder::MASK_VIEW_GLOBAL,
-                EntityMaskBuilder::MASK_VIEW_SYSTEM,
+                self::MASK_VIEW_BASIC,
+                self::MASK_VIEW_LOCAL,
+                self::MASK_VIEW_DEEP,
+                self::MASK_VIEW_GLOBAL,
+                self::MASK_VIEW_SYSTEM,
             ],
             'CREATE' => [
-                EntityMaskBuilder::MASK_CREATE_BASIC,
-                EntityMaskBuilder::MASK_CREATE_LOCAL,
-                EntityMaskBuilder::MASK_CREATE_DEEP,
-                EntityMaskBuilder::MASK_CREATE_GLOBAL,
-                EntityMaskBuilder::MASK_CREATE_SYSTEM,
+                self::MASK_CREATE_BASIC,
+                self::MASK_CREATE_LOCAL,
+                self::MASK_CREATE_DEEP,
+                self::MASK_CREATE_GLOBAL,
+                self::MASK_CREATE_SYSTEM,
             ],
             'EDIT'   => [
-                EntityMaskBuilder::MASK_EDIT_BASIC,
-                EntityMaskBuilder::MASK_EDIT_LOCAL,
-                EntityMaskBuilder::MASK_EDIT_DEEP,
-                EntityMaskBuilder::MASK_EDIT_GLOBAL,
-                EntityMaskBuilder::MASK_EDIT_SYSTEM,
+                self::MASK_EDIT_BASIC,
+                self::MASK_EDIT_LOCAL,
+                self::MASK_EDIT_DEEP,
+                self::MASK_EDIT_GLOBAL,
+                self::MASK_EDIT_SYSTEM,
             ],
         ];
     }
@@ -94,7 +130,7 @@ class FieldAclExtension extends EntityAclExtension
         // either id starts with 'field' (e.g. field+fieldName)
         // or id is null (checking for new entity)
 
-        return (0 === strpos($id, self::EXTENSION_KEY) || null === $id);
+        return (0 === strpos($id, self::NAME) || null === $id);
     }
 
     /**
@@ -148,7 +184,7 @@ class FieldAclExtension extends EntityAclExtension
         $className = $oid->getType();
 
         $isRoot = $className == ObjectIdentityFactory::ROOT_IDENTITY_TYPE;
-        if ($isRoot || $oid->getIdentifier() != self::EXTENSION_KEY) {
+        if ($isRoot || $oid->getIdentifier() != self::NAME) {
             return $result;
         }
 
@@ -178,6 +214,6 @@ class FieldAclExtension extends EntityAclExtension
      */
     public function getExtensionKey()
     {
-        return self::EXTENSION_KEY;
+        return self::NAME;
     }
 }

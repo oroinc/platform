@@ -657,11 +657,6 @@ services:
             - @oro_entity.doctrine_helper
             - @validator
 
-    oro_security.field_filter:
-        class: %oro_security.field_filter.class%
-        arguments:
-            - @oro_security.security_facade
-
     oro_security.form.extension.aclprotected_fields_type:
         class: %oro_security.form.extension.aclprotected_fields_type.class%
         arguments:
@@ -675,13 +670,9 @@ services:
 
     oro_security.acl.extension.field:
         public: false
+        parent: oro_security.acl.extension.entity
         class: %oro_security.acl.extension.field.class%
         arguments:
-            - @oro_security.acl.object_id_accessor
-            - @oro_entity.orm.entity_class_resolver
-            - @oro_security.entity_security_metadata_provider
-            - @oro_security.owner.metadata_provider.chain
-            - @oro_security.owner.ownership_decision_maker.chain
             - @oro_entity.doctrine_helper
         calls:
             - [setEntityOwnerAccessor, [@oro_security.owner.entity_owner_accessor]]
