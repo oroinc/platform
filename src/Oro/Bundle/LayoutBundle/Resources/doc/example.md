@@ -230,7 +230,7 @@ Here is how it can look like:
 {% block _attributes_container_widget %}
     <div class="attributes-container">
         {% for attribute in attributes %}
-            {% do block.addToVars('attribute', attribute) %}
+            {% do block|merge_context({'attribute': attribute}) %}
             {{ block('container_widget') }}
         {% endfor %}
     </div>

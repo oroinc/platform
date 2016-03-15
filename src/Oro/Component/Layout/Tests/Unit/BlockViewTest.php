@@ -11,24 +11,4 @@ class BlockViewTest extends LayoutTestCase
         $rootView = new BlockView();
         $this->assertArrayNotHasKey('value', $rootView->vars);
     }
-
-    public function testAddToVars()
-    {
-        $parent = new BlockView();
-        $firstChild = new BlockView();
-        $secondChild = new BlockView();
-
-        $parent->children['first'] = $firstChild;
-        $parent->children['second'] = $secondChild;
-
-        $name = 'name';
-        $value = 'value';
-        $parent->addToVars($name, $value);
-
-        /** @var BlockView $view */
-        foreach ([$parent, $firstChild, $secondChild] as $view) {
-            $this->assertArrayHasKey($name, $view->vars);
-            $this->assertEquals($value, $view->vars[$name]);
-        }
-    }
 }
