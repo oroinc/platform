@@ -76,7 +76,7 @@ define([
                     direction = 'ascending';
                 }
                 if (direction) {
-                    this._selectCurrentSortableColumn(column, direction)
+                    this._selectCurrentSortableColumn(column, direction);
                 }
             }
         },
