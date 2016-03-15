@@ -233,7 +233,7 @@ class Operation
 
     /**
      * @param ActionData $data
-     * @return ActionGroupsMappingIterator
+     * @return ActionGroupsMappingIterator|OperationActionGroup[]
      */
     public function getActionGroupsIterator(ActionData $data)
     {
