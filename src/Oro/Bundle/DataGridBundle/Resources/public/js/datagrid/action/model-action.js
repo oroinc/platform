@@ -76,7 +76,7 @@ define([
             if (this.backUrl) {
                 backUrl = _.isBoolean(this.backUrl) ? location.href : this.backUrl;
                 backUrl = encodeURIComponent(backUrl);
-                result = UrlHelper.addUrlParameter(result, this.backUrlParameter, backUrl);
+                result = this.addUrlParameter(result, this.backUrlParameter, backUrl);
             }
 
             return result;
