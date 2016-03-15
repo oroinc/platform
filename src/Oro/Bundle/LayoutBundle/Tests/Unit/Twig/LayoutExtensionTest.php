@@ -109,7 +109,7 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $name = 'name';
         $value = 'value';
 
-        $this->extension->mergeContext($parent, [$name => $value]);
+        $this->assertEquals($parent, $this->extension->mergeContext($parent, [$name => $value]));
 
         /** @var BlockView $view */
         foreach ([$parent, $firstChild, $secondChild] as $view) {
