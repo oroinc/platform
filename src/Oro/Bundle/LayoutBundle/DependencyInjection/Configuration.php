@@ -12,11 +12,6 @@ class Configuration implements ConfigurationInterface
     const DEFAULT_LAYOUT_TWIG_RESOURCE = 'OroLayoutBundle:Layout:div_layout.html.twig';
 
     /**
-     * @var string[]
-     */
-    private static $mandatoryImageTypes = ['main', 'additional', 'listing'];
-
-    /**
      * {@inheritdoc}
      */
     public function getConfigTreeBuilder()
