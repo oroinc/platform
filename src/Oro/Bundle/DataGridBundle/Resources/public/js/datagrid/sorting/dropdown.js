@@ -56,8 +56,29 @@ define([
 
             this.listenTo(this.columns, 'change:direction', this._selectCurrentSortableColumn);
             this.listenTo(this.columns, 'change:renderable', this._columnRenderableChanged);
+            this._initCurrentSortableColumn();
 
             SortingDropdown.__super__.initialize.call(this, options);
+        },
+
+        _initCurrentSortableColumn: function() {
+            var keys = Object.keys(this.collection.state.sorters);
+            if (keys.length) {
+                var columnName = keys[0];
+                var direction = null;
+                var column = this.columns.find(function (column) {
+                    return column.get('name') === columnName;
+                });
+                var intDirection = this.collection.state.sorters[columnName];
+                if (1 === parseInt(intDirection, 10)) {
+                    direction = 'descending';
+                } else if (-1 === parseInt(intDirection, 10)) {
+                    direction = 'ascending';
+                }
+                if (direction) {
+                    this._selectCurrentSortableColumn(column, direction)
+                }
+            }
         },
 
         /**
