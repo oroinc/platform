@@ -60,7 +60,7 @@ services:
     oro_api.delete.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - @security.authorization_checker
+            - @oro_security.security_facade
             - @oro_api.doctrine_helper
             - DELETE
         tags:
@@ -90,6 +90,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
         arguments:
             - @oro_security.acl_helper
+            - @oro_security.acl.annotation_provider
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete, group: build_query, priority: -90 }

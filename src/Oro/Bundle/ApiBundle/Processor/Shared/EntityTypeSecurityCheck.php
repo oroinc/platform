@@ -8,13 +8,15 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\ActionsConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EntityTypeSecurityCheck implements ProcessorInterface
 {
-    /** @var AuthorizationCheckerInterface */
-    protected $securityContext;
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -23,18 +25,18 @@ class EntityTypeSecurityCheck implements ProcessorInterface
     protected $permission;
 
     /**
-     * @param AuthorizationCheckerInterface $securityContext
-     * @param DoctrineHelper                $doctrineHelper
-     * @param string                        $permission
+     * @param SecurityFacade $securityFacade
+     * @param DoctrineHelper $doctrineHelper
+     * @param string         $permission
      */
     public function __construct(
-        AuthorizationCheckerInterface $securityContext,
+        SecurityFacade $securityFacade,
         DoctrineHelper $doctrineHelper,
         $permission
     ) {
-        $this->securityContext = $securityContext;
-        $this->doctrineHelper  = $doctrineHelper;
-        $this->permission      = $permission;
+        $this->securityFacade = $securityFacade;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->permission = $permission;
     }
 
     /**
@@ -50,7 +52,22 @@ class EntityTypeSecurityCheck implements ProcessorInterface
             return;
         }
 
-        if (!$this->securityContext->isGranted($this->permission, new ObjectIdentity('entity', $entityClass))) {
+        $action = $context->getAction();
+
+        /** @var ActionsConfig $actions */
+        $actions = $context->getConfigOf('actions');
+
+        // we should not check access for this action
+        if (!$actions->isAclProtectedAction($action)) {
+            return;
+        }
+
+        $isGranted = $actions->getAclResource($action)
+            ? $this->securityFacade->isGranted($actions->getAclResource($action))
+            : $this->securityFacade->isGranted($this->permission, new ObjectIdentity('entity', $entityClass));
+
+
+        if (!$isGranted) {
             throw new AccessDeniedException();
         }
     }
