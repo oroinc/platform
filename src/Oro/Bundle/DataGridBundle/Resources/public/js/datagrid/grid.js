@@ -232,7 +232,6 @@ define(function(require) {
                 delete this[viewName];
             }, this);
 
-
             this.callToolbar('dispose');
             delete this.toolbars;
 
