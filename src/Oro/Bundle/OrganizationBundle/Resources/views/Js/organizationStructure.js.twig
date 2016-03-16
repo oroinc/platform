@@ -1,0 +1,31 @@
+<script type="text/template" id="organization-children-template">
+    <% _.each(children, function(child) { %>
+        <% if (child.hasOwnProperty('children')) { %>
+            <div class="accordion-group">
+                <div class="accordion-heding">
+        <% } %>
+                    <div class="oro-clearfix">
+                        <% if (child.hasOwnProperty('children')) { %>
+                            <a class="accordion-toggle collapsed" data-toggle="collapse" href="#businessUnit_<%= child.id %>"></a>
+                        <% } %>
+                        <label>
+                            <input type="checkbox"
+                                   data-name="businessUnit"
+                                   value="<%= child.id %>"
+                                   <% if (selected.indexOf(child.id) !== -1) { %>
+                                       checked="checked"
+                                   <% } %>
+                                   class="bu"
+                                   data-organization="<%= organization %>"/>
+                            <%= child.name %>
+                        </label>
+                    </div>
+        <% if (child.hasOwnProperty('children')) { %>
+                </div>
+                <div id="businessUnit_<%= child.id %>" class="accordion-body collapse<%= !accordionEnabled ? ' in' : '' %>">
+                    <div class="accordion-inner"></div>
+                </div>
+            </div>
+        <% } %>
+    <% }) %>
+</script>

@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\PersistentCollection;
 
 use Oro\Bundle\EntityBundle\Exception;
 
@@ -24,16 +25,6 @@ class DoctrineHelper
      * @var ShortMetadataProvider
      */
     private $shortMetadataProvider;
-
-    /**
-     * @var EntityManager[]
-     */
-    private $managers = [];
-
-    /**
-     * @var array
-     */
-    private $managersMap = [];
 
     /**
      * @param ManagerRegistry $registry
@@ -347,7 +338,7 @@ class DoctrineHelper
      */
     public function getEntityManagerForClass($entityClass, $throwException = true)
     {
-        $manager = $this->getManagerForClass($entityClass);
+        $manager = $this->registry->getManagerForClass($entityClass);
         if (null === $manager && $throwException) {
             throw new Exception\NotManageableEntityException($entityClass);
         }
@@ -471,25 +462,34 @@ class DoctrineHelper
     }
 
     /**
-     * @param string $entityClass The real class name of an entity
+     * Works the way like refresh on EntityManager.
+     * In addition it makes sure all relations with cascade persist are also refreshed.
      *
-     * @return EntityManager|null
+     * @param object $entity
      */
-    private function getManagerForClass($entityClass)
+    public function refreshIncludingUnitializedRelations($entity)
     {
-        if (!array_key_exists($entityClass, $this->managersMap)) {
-            $manager = $this->registry->getManagerForClass($entityClass);
-            if (null !== $manager) {
-                $hash = spl_object_hash($manager);
-                $this->managers[$hash] = $manager;
-                $this->managersMap[$entityClass] = $hash;
-            } else {
-                $this->managersMap[$entityClass] = null;
-            }
-            return $manager;
-        }
+        $em = $this->getEntityManager($entity);
+        $em->refresh($entity);
 
-        return $this->managersMap[$entityClass] ? $this->managers[$this->managersMap[$entityClass]] : null;
+        $metadata = $this->getEntityMetadata($entity);
+        $associationMappings = array_filter(
+            $metadata->associationMappings,
+            function ($assoc) {
+                return $assoc['isCascadeRefresh'];
+            }
+        );
+
+        foreach ($associationMappings as $assoc) {
+            $relatedEntities = $metadata->reflFields[$assoc['fieldName']]->getValue($entity);
+            if (!$relatedEntities instanceof PersistentCollection || $relatedEntities->isInitialized()) {
+                continue;
+            }
+
+            foreach ($relatedEntities as $relatedEntity) {
+                $em->refresh($relatedEntity);
+            }
+        }
     }
 
     /**

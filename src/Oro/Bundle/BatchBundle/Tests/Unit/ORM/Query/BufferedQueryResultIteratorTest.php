@@ -4,11 +4,11 @@ namespace Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query;
 
 use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-
 use Doctrine\ORM\Query;
+
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
-
+use Oro\Bundle\BatchBundle\Tests\Unit\ORM\Query\Stub\Entity;
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 
 class BufferedQueryResultIteratorTest extends OrmTestCase
@@ -648,6 +648,85 @@ class BufferedQueryResultIteratorTest extends OrmTestCase
                 ],
                 $bufferSize = 5,
                 $pages = 1,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider pageLoadedCallbackProvider
+     */
+    public function testPageLoadedCallback(array $statements, array $expectedResult, callable $pageLoadedCallback)
+    {
+        $statementCounter = 0;
+        $this->getDriverConnectionMock($this->em)->expects($this->any())
+            ->method('query')
+            ->will(
+                $this->returnCallback(
+                    function ($sql) use (&$statements, &$statementCounter, &$actualSqls) {
+                        $actualSqls[$statementCounter] = $sql;
+                        $statement = $statements[$statementCounter];
+                        $statementCounter++;
+                        return $statement;
+                    }
+                )
+            );
+
+        $source = $this->em->createQueryBuilder()
+            ->select('o')
+            ->from('Stub:Entity', 'o');
+
+        $iterator = (new BufferedQueryResultIterator($source))
+            ->setBufferSize(1)
+            ->setPageLoadedCallback($pageLoadedCallback);
+
+        $this->assertEquals($expectedResult, iterator_to_array($iterator));
+    }
+
+    public function pageLoadedCallbackProvider()
+    {
+        $records = [
+            ['a_0' => '1'],
+            ['a_0' => '2'],
+            ['a_0' => '3'],
+        ];
+
+        return [
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0]]),
+                    $this->createFetchStatementMock([$records[1]]),
+                    $this->createFetchStatementMock([$records[2]]),
+                ],
+                $expectedResult = [
+                    new Entity(1),
+                    new Entity(2),
+                    new Entity(3),
+                ],
+                function (array $rows) {
+                    return $rows;
+                },
+            ],
+            [
+                $statements = [
+                    $this->createFetchStatementMock([['sclr_0' => count($records)]]),
+                    $this->createFetchStatementMock([$records[0]]),
+                    $this->createFetchStatementMock([$records[1]]),
+                    $this->createFetchStatementMock([$records[2]]),
+                ],
+                $expectedResult = [
+                    ['entity' => new Entity(1), '_id' => 1],
+                    ['entity' => new Entity(2), '_id' => 2],
+                    ['entity' => new Entity(3), '_id' => 3],
+                ],
+                function (array $rows) {
+                    return array_map(
+                        function (Entity $entity) {
+                            return ['entity' => $entity, '_id' => $entity->a];
+                        },
+                        $rows
+                    );
+                },
             ],
         ];
     }

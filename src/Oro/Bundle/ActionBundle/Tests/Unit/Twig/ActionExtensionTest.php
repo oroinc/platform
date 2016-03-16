@@ -4,9 +4,9 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
+use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
 use Oro\Bundle\ActionBundle\Twig\ActionExtension;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class ActionExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,15 +19,18 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ApplicationsHelper */
     protected $appsHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var ActionExtension */
     protected $extension;
 
-    /** @var  ContextHelper */
+    /** @var ContextHelper */
     protected $contextHelper;
 
+    /** @var OptionsHelper */
+    protected $optionsHelper;
+
+    /**
+     * {@inheritdoc}
+     */
     protected function setUp()
     {
         $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
@@ -38,25 +41,25 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
+        $this->optionsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\OptionsHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->extension = new ActionExtension(
             $this->actionManager,
             $this->appsHelper,
-            $this->doctrineHelper,
-            $this->contextHelper
+            $this->contextHelper,
+            $this->optionsHelper
         );
     }
 
     protected function tearDown()
     {
-        unset($this->extension, $this->actionManager, $this->appsHelper, $this->doctrineHelper, $this->requestStack);
+        unset($this->extension, $this->actionManager, $this->appsHelper, $this->contextHelper, $this->optionsHelper);
     }
 
     public function testGetName()
@@ -67,57 +70,43 @@ class ActionExtensionTest extends \PHPUnit_Framework_TestCase
     public function testGetFunctions()
     {
         $functions = $this->extension->getFunctions();
-        $this->assertCount(3, $functions);
+        $this->assertCount(4, $functions);
 
         $expectedFunctions = [
-            'oro_action_widget_parameters' => true,
-            'oro_action_widget_route' => false,
-            'has_actions' => false,
+            'oro_action_widget_parameters' => [
+                true,
+                'Oro\Bundle\ActionBundle\Helper\ContextHelper',
+                'getActionParameters',
+            ],
+            'oro_action_widget_route' => [
+                false,
+                'Oro\Bundle\ActionBundle\Helper\ApplicationsHelper',
+                'getWidgetRoute',
+            ],
+            'has_actions' => [
+                false,
+                'Oro\Bundle\ActionBundle\Model\ActionManager',
+                'hasActions',
+            ],
+            'oro_action_frontend_options' => [
+                false,
+                'Oro\Bundle\ActionBundle\Helper\OptionsHelper',
+                'getFrontendOptions',
+            ],
         ];
 
         /** @var \Twig_SimpleFunction $function */
         foreach ($functions as $function) {
             $this->assertInstanceOf('\Twig_SimpleFunction', $function);
             $this->assertArrayHasKey($function->getName(), $expectedFunctions);
-            $this->assertEquals($expectedFunctions[$function->getName()], $function->needsContext());
+
+            $expectedFunction = $expectedFunctions[$function->getName()];
+            $this->assertEquals($expectedFunction[0], $function->needsContext());
+
+            $callable = $function->getCallable();
+
+            $this->assertInstanceOf($expectedFunction[1], $callable[0]);
+            $this->assertEquals($expectedFunction[2], $callable[1]);
         }
-    }
-
-    public function testGetWidgetRoute()
-    {
-        $this->appsHelper->expects($this->once())
-            ->method('getWidgetRoute')
-            ->withAnyParameters()
-            ->willReturn('test_route');
-
-        $this->assertSame('test_route', $this->extension->getWidgetRoute());
-    }
-
-    /**
-     * @dataProvider hasActionsDataProvider
-     *
-     * @param bool $result
-     */
-    public function testHasActions($result)
-    {
-        $params = ['test_param' => 'test_param_value'];
-
-        $this->actionManager->expects($this->once())
-            ->method('hasActions')
-            ->with($params)
-            ->willReturn($result);
-
-        $this->assertEquals($result, $this->extension->hasActions($params));
-    }
-
-    /**
-     * @return array
-     */
-    public function hasActionsDataProvider()
-    {
-        return [
-            [true],
-            [false],
-        ];
     }
 }
