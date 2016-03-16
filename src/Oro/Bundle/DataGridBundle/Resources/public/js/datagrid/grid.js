@@ -47,7 +47,10 @@ define(function(require) {
         className: 'oro-datagrid',
 
         /** @property */
-        template: '#template-datagrid-grid',
+        templateSelector: '#template-datagrid-grid',
+
+        /** @property */
+        template: '',
 
         /** @property */
         noDataTemplate: _.template('<span><%= hint %><span>'),
@@ -187,7 +190,7 @@ define(function(require) {
 
             this._initColumns(opts);
 
-            this.template = _.template($(opts.template || this.template).html());
+            this.template = _.template($(opts.template || this.templateSelector).html());
 
             // use columns collection as event bus since there is no alternatives
             this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
