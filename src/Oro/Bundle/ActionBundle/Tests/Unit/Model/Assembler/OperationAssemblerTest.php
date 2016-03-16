@@ -268,7 +268,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $assembler = new OperationActionGroupAssembler();
         $assembler->addConfigurationPass(
-            $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
+            $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
                 ->getMock()
         );
 

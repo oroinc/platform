@@ -302,14 +302,12 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
         $operation = $this->createOperationMock($actionData);
         $actionGroup->expects($this->once())
             ->method('execute')
-            ->willReturn(
-                function ($param1, $param2) use ($actionData, $errors) {
-                    $this->assertSame($actionData, $param1);
-                    $this->assertSame($errors, $param2);
+            ->willReturn(function ($param1, $param2) use ($actionData, $errors) {
+                $this->assertSame($actionData, $param1);
+                $this->assertSame($errors, $param2);
 
-                    return true;
-                }
-            );
+                return true;
+            });
 
         $this->operationRegistry->expects($this->once())
             ->method('findByName')
