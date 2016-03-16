@@ -65,7 +65,7 @@ class ActionGroup
     {
         if (!$this->isAllowed($data, $errors)) {
             throw new ForbiddenActionException(
-                sprintf('ActionGroup "%s" is not allowed.', $this->definition->getName())
+                sprintf('ActionGroup "%s" is not allowed', $this->definition->getName())
             );
         }
         $this->executeActions($data);

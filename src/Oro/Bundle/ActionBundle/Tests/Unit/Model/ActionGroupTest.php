@@ -119,7 +119,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
                 'action' => $this->createActionGroup($this->never(), $data),
                 'condition' => $this->createCondition($this->exactly(2), $data, false),
                 'actionGroupName' => 'TestName2',
-                'exception' => 'ActionGroup "TestName2" is not allowed.'
+                'exception' => 'ActionGroup "TestName2" is not allowed'
             ],
             'isAllowed' => [
                 'data' => $data,
