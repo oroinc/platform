@@ -50,7 +50,7 @@ class ActionsConfig
      *
      * @return bool
      */
-    public function isActionEnabled($action)
+    public function isEnabled($action)
     {
         return !($this->getAction($action)
             && isset($this->get($action)['exclude'])
@@ -60,7 +60,7 @@ class ActionsConfig
     /**
      * @return array
      */
-    public function getExcludedActions()
+    public function getExcluded()
     {
         $result = [];
         foreach ($this->items as $action => $data) {
@@ -79,7 +79,7 @@ class ActionsConfig
      *
      * @return bool
      */
-    public function isAclProtectedAction($action)
+    public function isAclProtected($action)
     {
         return !($this->has($action)
             && isset($this->get($action)['acl_resource'])

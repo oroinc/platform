@@ -96,7 +96,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
-     * @return array [[entity class, entity plural alias, [excluded actions]], ...]
+     * @return array [[entity class, entity plural alias, [excluded action, ...]], ...]
      */
     protected function getSupportedEntities()
     {
@@ -127,7 +127,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param array                   $entities [[entity class, entity plural alias, [excluded actions]], ...]
+     * @param array                   $entities [[entity class, entity plural alias, [excluded action, ...]], ...]
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
