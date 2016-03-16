@@ -109,12 +109,9 @@ abstract class WebTestCase extends BaseWebTestCase
 
     public static function tearDownAfterClass()
     {
-        foreach (self::$connections as $connection) {
-            $connection->close();
-        }
-        self::$connections = [];
-
         if (self::$clientInstance) {
+            self::cleanUpConnections();
+
             if (self::getDbIsolationSetting()) {
                 self::$clientInstance->rollbackTransaction();
             }
@@ -123,6 +120,15 @@ abstract class WebTestCase extends BaseWebTestCase
             self::$soapClientInstance = null;
             self::$loadedFixtures = [];
         }
+    }
+
+    public static function cleanUpConnections()
+    {
+        $connections = self::$connections;
+        foreach ($connections as $connection) {
+            $connection->close();
+        }
+        self::$connections = [];
     }
 
     /**
