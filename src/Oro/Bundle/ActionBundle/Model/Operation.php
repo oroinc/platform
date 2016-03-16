@@ -7,6 +7,7 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -15,6 +16,9 @@ use Oro\Component\Action\Condition\AbstractCondition;
 use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class Operation
 {
     /** @var ActionFactory */
@@ -214,7 +218,7 @@ class Operation
     /**
      * @return OperationActionGroup[]
      */
-    public function getOperationActionGroups()
+    protected function getOperationActionGroups()
     {
         if ($this->operationActionGroups === null) {
             $this->operationActionGroups = [];
@@ -225,5 +229,14 @@ class Operation
         }
 
         return $this->operationActionGroups;
+    }
+
+    /**
+     * @param ActionData $data
+     * @return ActionGroupsMappingIterator
+     */
+    public function getActionGroupsIterator(ActionData $data)
+    {
+        return new ActionGroupsMappingIterator($this->getOperationActionGroups(), $data);
     }
 }

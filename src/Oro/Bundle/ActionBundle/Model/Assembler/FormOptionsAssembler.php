@@ -8,19 +8,15 @@ use Symfony\Component\Form\Exception\InvalidConfigurationException;
 
 use Oro\Bundle\ActionBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\ActionBundle\Model\Attribute;
-use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
-class FormOptionsAssembler
+class FormOptionsAssembler implements ConfigurationPassesAwareInterface
 {
+    use ConfigurationPassesAwareTrait;
+
     /**
      * @var Attribute[]
      */
     protected $attributes;
-
-    /**
-     * @var ConfigurationPassInterface[]
-     */
-    protected $configurationPasses = array();
 
     /**
      * @param array $options
@@ -74,27 +70,6 @@ class FormOptionsAssembler
                 $this->attributes[$attribute->getName()] = $attribute;
             }
         }
-    }
-
-    /**
-     * @param ConfigurationPassInterface $configurationPass
-     */
-    public function addConfigurationPass(ConfigurationPassInterface $configurationPass)
-    {
-        $this->configurationPasses[] = $configurationPass;
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    protected function passConfiguration(array $data)
-    {
-        foreach ($this->configurationPasses as $configurationPass) {
-            $data = $configurationPass->passConfiguration($data);
-        }
-
-        return $data;
     }
 
     /**

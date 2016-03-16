@@ -127,7 +127,6 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
-     *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function getOperationsProvider()
@@ -212,10 +211,10 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
                     'operation6' => $this->getOperations('operation6'),
                 ],
                 'expectedOperations' => [
-                        'operation4',
-                        'operation3',
-                        'operation2',
-                        'operation6'
+                    'operation4',
+                    'operation3',
+                    'operation2',
+                    'operation6'
                 ]
             ],
             'full context' => [
@@ -278,12 +277,12 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ],
             'operation not available' => [
                 'operationName' => 'test',
-                'operation' => $this->createOperationMock(false),
+                'operation' => $this->createOperationMock(new ActionData(), false),
                 'isAvailable' => false
             ],
             'valid operation' => [
                 'operationName' => 'test_operation',
-                'operation' => $this->createOperationMock(true),
+                'operation' => $this->createOperationMock(new ActionData(), true),
                 'isAvailable' => true
             ]
         ];
@@ -300,7 +299,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
         $errors = new ArrayCollection();
 
         $actionGroup = $this->createActionGroupMock();
-        $operation = $this->createOperationMock();
+        $operation = $this->createOperationMock($actionData);
         $actionGroup->expects($this->once())
             ->method('execute')
             ->willReturn(function ($param1, $param2) use ($actionData, $errors) {
@@ -390,7 +389,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     {
         $errors = new ArrayCollection();
 
-        $operation = $this->createOperationMock();
+        $operation = $this->createOperationMock($actionData);
         $operation->expects($this->any())
             ->method('execute')
             ->willReturn(function ($param1, $param2) use ($actionData, $errors) {
@@ -644,41 +643,47 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->setGroups($group)
             ->setFrontendOptions($frontendOptions);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
+        /* @var $functionFactory \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
         $functionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
+        /* @var $conditionFactory \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
         $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeAssembler */
+        /* @var $attributeAssembler \PHPUnit_Framework_MockObject_MockObject|AttributeAssembler */
         $attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
+        /* @var $formOptionsAssembler \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
         $formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
+
+        /* @var $operationActionGroupAssembler \PHPUnit_Framework_MockObject_MockObject|OperationActionGroupAssembler */
+        $operationActionGroupAssembler = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler'
+        )->disableOriginalConstructor()->getMock();
 
         return new Operation(
             $functionFactory,
             $conditionFactory,
             $attributeAssembler,
             $formOptionsAssembler,
-            new OperationActionGroupAssembler(),
+            $operationActionGroupAssembler,
             $definition
         );
     }
 
     /**
+     * @param ActionData $actionData
      * @param bool $isAvailable
      * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createOperationMock($isAvailable = true)
+    protected function createOperationMock(ActionData $actionData, $isAvailable = true)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
         $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
@@ -686,8 +691,20 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $operationActionGroup = new OperationActionGroup();
         $operationActionGroup->setName('test_actionGroup');
+
+        $mockActionGroupArgs = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs'
+        )->disableOriginalConstructor()->getMock();
+
+        $mockActionGroupArgs->expects($this->once())->method('getName')->willReturn('test_actionGroup');
+        $mockActionGroupArgs->expects($this->once())->method('getActionData')->willReturn($actionData);
+
         $operation->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
-        $operation->expects($this->once())->method('getOperationActionGroups')->willReturn([$operationActionGroup]);
+        $operation->expects($this->once())->method('getActionGroupsIterator')->willReturn(
+            [
+                $mockActionGroupArgs
+            ]
+        );
 
         return $operation;
     }

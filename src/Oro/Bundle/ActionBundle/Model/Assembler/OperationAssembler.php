@@ -12,6 +12,9 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
+/**
+ * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
+ */
 class OperationAssembler extends AbstractAssembler
 {
     /** @var ActionFactory */
@@ -40,7 +43,7 @@ class OperationAssembler extends AbstractAssembler
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
-     * @param OperationActionGroupAssembler $operationActionGroupAssembler,
+     * @param OperationActionGroupAssembler $operationActionGroupAssembler
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
@@ -73,7 +76,7 @@ class OperationAssembler extends AbstractAssembler
                 $this->conditionFactory,
                 $this->attributeAssembler,
                 $this->formOptionsAssembler,
-                new OperationActionGroupAssembler(),
+                $this->operationActionGroupAssembler,
                 $this->assembleDefinition($operationName, $options)
             );
         }

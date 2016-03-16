@@ -121,7 +121,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                     ['@acl_granted' => 'test_acl'],
                     ['config_pre_cond']
                 ]
-             ])
+            ])
             ->setActions('preactions', ['config_pre_func'])
             ->setActions('form_init', ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
@@ -266,6 +266,12 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     protected function getOperationActionGroupAssembler()
     {
-        return new OperationActionGroupAssembler();
+        $assembler = new OperationActionGroupAssembler();
+        $assembler->addConfigurationPass(
+            $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
+                ->getMock()
+        );
+
+        return $assembler;
     }
 }

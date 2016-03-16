@@ -6,6 +6,8 @@ use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 
 class OperationActionGroupAssembler extends AbstractAssembler
 {
+    use ConfigurationPassesAwareTrait;
+
     /**
      * @param array $configuration
      * @return OperationActionGroup[]
@@ -31,7 +33,7 @@ class OperationActionGroupAssembler extends AbstractAssembler
         $operationActionGroup = new OperationActionGroup();
         $operationActionGroup
             ->setName($options['name'])
-            ->setArgumentsMapping($this->getOption($options, 'arguments_mapping', []));
+            ->setArgumentsMapping($this->passConfiguration($this->getOption($options, 'arguments_mapping', [])));
 
         return $operationActionGroup;
     }
