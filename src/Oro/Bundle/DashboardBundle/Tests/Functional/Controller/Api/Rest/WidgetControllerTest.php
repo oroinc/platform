@@ -12,7 +12,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
- * @dbKeepConnection
  */
 class WidgetControllerTest extends WebTestCase
 {

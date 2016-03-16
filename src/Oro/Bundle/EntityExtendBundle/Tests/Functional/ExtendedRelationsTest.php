@@ -9,7 +9,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
- * @dbKeepConnection
  */
 class ExtendedRelationsTest extends WebTestCase
 {

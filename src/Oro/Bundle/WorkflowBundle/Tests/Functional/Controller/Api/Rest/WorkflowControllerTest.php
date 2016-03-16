@@ -12,7 +12,6 @@ use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
 /**
  * @dbIsolation
- * @dbKeepConnection
  */
 class WorkflowControllerTest extends WebTestCase
 {

@@ -12,7 +12,6 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @dbIsolation
- * @dbKeepConnection
  */
 class WidgetControllerTest extends WebTestCase
 {

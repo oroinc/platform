@@ -10,7 +10,6 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
- * @dbKeepConnection
  */
 class GridViewControllerTest extends WebTestCase
 {

@@ -15,7 +15,6 @@ use Symfony\Component\Console\Tester\CommandTester;
 
 /**
  * @dbIsolation
- * @dbKeepConnection
  */
 class UserCreateUpdateTest extends WebTestCase
 {
