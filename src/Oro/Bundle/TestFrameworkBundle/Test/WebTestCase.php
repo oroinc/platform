@@ -103,18 +103,20 @@ abstract class WebTestCase extends BaseWebTestCase
          */
         $connections = self::getContainer()->get('doctrine')->getConnections();
         foreach ($connections as $connection) {
-            self::$connections[] = $connection;
+            if ($connection->isConnected()) {
+                self::$connections[] = $connection;
+            }
         }
     }
 
     public static function tearDownAfterClass()
     {
         if (self::$clientInstance) {
-            self::cleanUpConnections();
-
             if (self::getDbIsolationSetting()) {
                 self::$clientInstance->rollbackTransaction();
             }
+
+            self::cleanUpConnections();
 
             self::$clientInstance = null;
             self::$soapClientInstance = null;
@@ -122,6 +124,9 @@ abstract class WebTestCase extends BaseWebTestCase
         }
     }
 
+    /**
+     * Closes opened DB connections to avoid exceeding the `max_connections` limitation.
+     */
     public static function cleanUpConnections()
     {
         $connections = self::$connections;
@@ -365,7 +370,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $loader = $this->getFixtureLoader($classNames);
         $fixtures = array_values($loader->getFixtures());
 
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->getContainer()->get('doctrine')->getManager();
         $executor = new ORMExecutor($em, new ORMPurger($em));
         $executor->execute($fixtures, true);
         self::$referenceRepository = $executor->getReferenceRepository();
