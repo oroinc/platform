@@ -93,8 +93,7 @@ define([
          *
          * @protected
          */
-        _updateView: function()
-        {
+        _updateView: function() {
             this.collection.state.currentPage = 1;
             this.collection.fetch({reset: true});
         },
