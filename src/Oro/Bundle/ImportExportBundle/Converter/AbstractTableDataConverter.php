@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\FormatConversionEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 abstract class AbstractTableDataConverter extends DefaultDataConverter
@@ -9,19 +13,16 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
     const BACKEND_TO_FRONTEND = 'backend_to_frontend';
     const FRONTEND_TO_BACKEND = 'frontend_to_backend';
 
-    /**
-     * @var array
-     */
+    /** @var EventDispatcherInterface|null */
+    protected $dispatcher;
+
+    /** @var array */
     protected $backendHeader;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $backendToFrontendHeader;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $headerConversionRules;
 
     /**
@@ -29,6 +30,9 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      */
     public function convertToExportFormat(array $exportedRecord, $skipNullValues = true)
     {
+        $exportedRecord = $this->dispatchFormatConversionEvent(Events::BEFORE_EXPORT_FORMAT_CONVERSION, $exportedRecord)
+            ->getRecord();
+
         $plainDataWithBackendHeader = parent::convertToExportFormat($exportedRecord, $skipNullValues);
         $filledPlainDataWithBackendHeader = $this->fillEmptyColumns(
             $this->receiveBackendHeader(),
@@ -39,7 +43,12 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
             $filledPlainDataWithBackendHeader
         );
 
-        return $filledPlainDataWithFrontendHints;
+        return $this->dispatchFormatConversionEvent(
+            Events::AFTER_EXPORT_FORMAT_CONVERSION,
+            $exportedRecord,
+            $filledPlainDataWithFrontendHints
+        )
+        ->getResult();
     }
 
     /**
@@ -47,6 +56,9 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
      */
     public function convertToImportFormat(array $importedRecord, $skipNullValues = true)
     {
+        $importedRecord = $this->dispatchFormatConversionEvent(Events::BEFORE_IMPORT_FORMAT_CONVERSION, $importedRecord)
+            ->getRecord();
+
         $plainDataWithFrontendHeader = $this->removeEmptyColumns($importedRecord, $skipNullValues);
 
         $frontendHeader = array_keys($plainDataWithFrontendHeader);
@@ -58,7 +70,37 @@ abstract class AbstractTableDataConverter extends DefaultDataConverter
         $complexDataWithBackendHeader = parent::convertToImportFormat($plainDataWithBackendHeader, $skipNullValues);
         $filteredComplexDataWithBackendHeader = $this->filterEmptyArrays($complexDataWithBackendHeader);
 
-        return $filteredComplexDataWithBackendHeader;
+        return $this->dispatchFormatConversionEvent(
+            Events::AFTER_IMPORT_FORMAT_CONVERSION,
+            $importedRecord,
+            $filteredComplexDataWithBackendHeader
+        )
+        ->getResult();
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * @param string $eventName
+     * @param array $record
+     * @param array $result
+     *
+     * @return FormatConversionEvent
+     */
+    protected function dispatchFormatConversionEvent($eventName, array $record, array $result = [])
+    {
+        $event = new FormatConversionEvent($record, $result);
+        if ($this->dispatcher && $this->dispatcher->hasListeners($eventName)) {
+            $this->dispatcher->dispatch($eventName, $event);
+        }
+
+        return $event;
     }
 
     /**
