@@ -166,6 +166,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
 
+    oro_entity_extend.validator.unique_extend_entity_method_name_validator:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
+        arguments:
+            - @oro_entity_extend.extend.field_name_validation_helper
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
+
     oro_entity_extend.validator.default_relation_field:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationFieldValidator
         arguments:
