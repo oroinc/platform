@@ -75,7 +75,7 @@ define([
 
         /**
          * @param {Object} column
-         * @param {string} direction
+         * @param {string} renderable
          * @private
          */
         _columnRenderableChanged: function(column, renderable) {
