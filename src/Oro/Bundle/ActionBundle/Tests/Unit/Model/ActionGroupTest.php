@@ -28,9 +28,6 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     /** @var ActionGroup */
     protected $actionGroup;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var ActionData */
     protected $data;
 
@@ -44,7 +41,8 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper $doctrineHelper */
+        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -52,7 +50,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             $this->actionFactory,
             $this->conditionFactory,
             new ArgumentAssembler(),
-            $this->doctrineHelper,
+            $doctrineHelper,
             new ActionGroupDefinition()
         );
 
