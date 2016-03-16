@@ -21,25 +21,24 @@ class RunActionGroup extends AbstractAction
     /** @var ActionGroupRegistry */
     protected $actionGroupRegistry;
 
+    /** @var ActionGroup\ParametersMapper */
     protected $parametersMapper;
 
     /** @var array|\Traversable */
     protected $parametersMap;
 
     /** @var ActionGroupExecutionArgs */
-    protected $executionArguments;
+    protected $executionArgs;
 
     /** @var mixed */
     protected $attribute;
 
     /**
-     * @param ContextAccessor $contextAccessor
      * @param ActionGroupRegistry $actionGroupRegistry
+     * @param ContextAccessor $contextAccessor
      */
-    public function __construct(
-        ContextAccessor $contextAccessor,
-        ActionGroupRegistry $actionGroupRegistry
-    ) {
+    public function __construct(ActionGroupRegistry $actionGroupRegistry, ContextAccessor $contextAccessor)
+    {
         parent::__construct($contextAccessor);
 
         $this->parametersMapper = new ActionGroup\ParametersMapper($contextAccessor);
@@ -54,7 +53,7 @@ class RunActionGroup extends AbstractAction
     {
         //clear up
         $this->parametersMap = [];
-        $this->executionArguments = null;
+        $this->executionArgs = null;
 
         if (empty($options[self::OPTION_ACTION_GROUP])) {
             throw new InvalidParameterException(
@@ -62,7 +61,7 @@ class RunActionGroup extends AbstractAction
             );
         }
 
-        $this->executionArguments = new ActionGroupExecutionArgs($options[self::OPTION_ACTION_GROUP]);
+        $this->executionArgs = new ActionGroupExecutionArgs($options[self::OPTION_ACTION_GROUP]);
 
         if (array_key_exists(self::OPTION_PARAMETERS_MAP, $options)) {
             $parametersMap = $options[self::OPTION_PARAMETERS_MAP];
@@ -88,15 +87,15 @@ class RunActionGroup extends AbstractAction
      */
     protected function executeAction($context)
     {
-        if (null === $this->executionArguments) {
+        if (null === $this->executionArgs) {
             throw new \BadMethodCallException('Uninitialized action execution.');
         }
 
-        $this->parametersMapper->mapToArgs($this->executionArguments, $this->parametersMap, $context);
+        $this->parametersMapper->mapToArgs($this->executionArgs, $this->parametersMap, $context);
 
         $errors = new ArrayCollection();
 
-        $result = $this->executionArguments->execute($this->actionGroupRegistry, $errors);
+        $result = $this->executionArgs->execute($this->actionGroupRegistry, $errors);
 
         if ($this->attribute) {
             $this->contextAccessor->setValue($context, $this->attribute, $result);

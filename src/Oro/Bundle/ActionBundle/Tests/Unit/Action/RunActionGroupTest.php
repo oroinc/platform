@@ -33,7 +33,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->function = new RunActionGroup(new ContextAccessor(), $this->actionGroupRegistry);
+        $this->function = new RunActionGroup($this->actionGroupRegistry, new ContextAccessor());
         $this->function->setDispatcher($this->eventDispatcher);
     }
 
@@ -69,7 +69,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 
         $this->assertAttributeInstanceOf(
             '\Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs',
-            'executionArguments',
+            'executionArgs',
             $this->function
         );
         $this->assertAttributeEquals($parametersMap, 'parametersMap', $this->function);
