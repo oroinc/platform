@@ -56,73 +56,73 @@ class TypeTest extends \PHPUnit_Framework_TestCase
     public function evaluateDataProvider()
     {
         return [
-            'integer'     => [
+            'integer' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'integer'],
                 'context'        => ['prop1' => 1],
                 'expectedResult' => true
             ],
-            'string'     => [
+            'string' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'string'],
                 'context'        => ['prop1' => 'string'],
                 'expectedResult' => true
             ],
-            'boolean'     => [
+            'boolean' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'boolean'],
                 'context'        => ['prop1' => false],
                 'expectedResult' => true
             ],
-            'array'     => [
+            'array' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'array'],
                 'context'        => ['prop1' => [2]],
                 'expectedResult' => true
             ],
-            'double'     => [
+            'double' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'double'],
                 'context'        => ['prop1' => 3.4],
                 'expectedResult' => true
             ],
-            'object'     => [
+            'object' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'object'],
                 'context'        => ['prop1' => new \stdClass()],
                 'expectedResult' => true
             ],
-            'instanceof \stdClass'     => [
+            '\stdClass' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => '\stdClass'],
                 'context'        => ['prop1' => new \stdClass()],
                 'expectedResult' => true
             ],
 
-            'no integer'     => [
+            'no integer'  => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'integer'],
                 'context'        => ['prop1' => 'string'],
                 'expectedResult' => false
             ],
-            'no string'     => [
+            'no string' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'string'],
                 'context'        => ['prop1' => 5],
                 'expectedResult' => false
             ],
-            'no boolean'     => [
+            'no boolean' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'boolean'],
                 'context'        => ['prop1' => 6],
                 'expectedResult' => false
             ],
-            'no array'     => [
+            'no array' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'array'],
                 'context'        => ['prop1' => 7],
                 'expectedResult' => false
             ],
-            'no double'     => [
+            'no double' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'double'],
                 'context'        => ['prop1' => 8],
                 'expectedResult' => false
             ],
-            'no object'     => [
+            'no object' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => 'object'],
                 'context'        => ['prop1' => 9],
                 'expectedResult' => false
             ],
-            'no instanceof \stdClass'     => [
+            'no \stdClass' => [
                 'options'        => ['left' => new PropertyPath('prop1'), 'right' => '\stdClass'],
                 'context'        => ['prop1' => 10],
                 'expectedResult' => false
