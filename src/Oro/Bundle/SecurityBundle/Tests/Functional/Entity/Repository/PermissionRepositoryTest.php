@@ -8,6 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
+ * @dbKeepConnection
  */
 class PermissionRepositoryTest extends WebTestCase
 {

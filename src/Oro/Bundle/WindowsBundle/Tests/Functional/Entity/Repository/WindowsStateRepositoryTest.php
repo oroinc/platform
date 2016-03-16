@@ -9,6 +9,7 @@ use Oro\Bundle\WindowsBundle\Entity\WindowsState;
 
 /**
  * @dbIsolation
+ * @dbKeepConnection
  */
 class WindowsStateRepositoryTest extends WebTestCase
 {

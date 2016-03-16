@@ -9,6 +9,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
+ * @dbKeepConnection
  */
 class ChannelRepositoryTest extends WebTestCase
 {

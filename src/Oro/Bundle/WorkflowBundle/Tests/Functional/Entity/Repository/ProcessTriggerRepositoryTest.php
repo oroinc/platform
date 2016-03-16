@@ -12,6 +12,7 @@ use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadProcessEntities;
 
 /**
  * @dbIsolation
+ * @dbKeepConnection
  */
 class ProcessTriggerRepositoryTest extends WebTestCase
 {
