@@ -350,8 +350,9 @@ services:
             - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
 
     oro_entity_extend.importexport.normalizer.enum:
-        parent: oro_importexport.serializer.configurable_entity_normalizer
         class: %oro_entity_extend.importexport.normalizer.enum.class%
+        arguments:
+            - @oro_importexport.field.field_helper
         tags:
             - { name: oro_importexport.normalizer, priority: 20 }
 

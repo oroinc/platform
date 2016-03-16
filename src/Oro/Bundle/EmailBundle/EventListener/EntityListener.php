@@ -89,7 +89,7 @@ class EntityListener
             )
         );
 
-        $this->emailActivityUpdates->processCreatedEntities($uow->getScheduledEntityInsertions());
+        $this->emailActivityUpdates->processUpdatedEmailAddresses($updatedEmailAddresses);
     }
 
     /**

@@ -3,7 +3,9 @@
 namespace Oro\Component\DoctrineUtils\ORM;
 
 use Doctrine\Common\Collections\Criteria;
+use Doctrine\DBAL\Platforms\AbstractPlatform;
 use Doctrine\DBAL\SQLParserUtils;
+use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\Query\Expr;
 use Doctrine\ORM\Query\QueryException;
@@ -69,6 +71,16 @@ class QueryUtils
     }
 
     /**
+     * @param AbstractPlatform $platform
+     *
+     * @return ResultSetMapping
+     */
+    public static function createResultSetMapping(AbstractPlatform $platform)
+    {
+        return new PlatformResultSetMapping($platform);
+    }
+
+    /**
      * @param ResultSetMapping $mapping
      * @param string           $alias
      *
@@ -114,19 +126,22 @@ class QueryUtils
     }
 
     /**
-     * @param Query $query
+     * @param Query                   $query
+     * @param Query\ParserResult|null $parsedQuery
      *
      * @return string
      *
      * @throws QueryException
      */
-    public static function getExecutableSql(Query $query)
+    public static function getExecutableSql(Query $query, Query\ParserResult $parsedQuery = null)
     {
-        $parserResult = static::parseQuery($query);
+        if (null === $parsedQuery) {
+            $parsedQuery = static::parseQuery($query);
+        }
 
-        $sql = $parserResult->getSqlExecutor()->getSqlStatements();
+        $sql = $parsedQuery->getSqlExecutor()->getSqlStatements();
 
-        list($params, $types) = self::processParameterMappings($query, $parserResult->getParameterMappings());
+        list($params, $types) = self::processParameterMappings($query, $parsedQuery->getParameterMappings());
         list($sql, $params, $types) = SQLParserUtils::expandListParameters($sql, $params, $types);
 
         $paramPos = SQLParserUtils::getPlaceholderPositions($sql);
