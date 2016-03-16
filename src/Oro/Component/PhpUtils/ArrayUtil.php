@@ -372,4 +372,25 @@ class ArrayUtil
 
         return $result;
     }
+
+    /**
+     * @param array $array
+     * @param array $path
+     */
+    public static function unsetPath(array $array, array $path)
+    {
+        $key = array_shift($path);
+
+        if (!$path) {
+            unset($array[$key]);
+
+            return $array;
+        }
+
+        if (array_key_exists($key, $array) && is_array($array[$key])) {
+            $array[$key] = static::unsetPath($array[$key], $path);
+        }
+
+        return $array;
+    }
 }
