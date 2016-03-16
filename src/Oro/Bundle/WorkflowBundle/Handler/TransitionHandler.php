@@ -10,6 +10,7 @@ use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
 use Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper;
 use Oro\Bundle\WorkflowBundle\Model\Transition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Psr\Log\LoggerInterface;
 use Symfony\Component\HttpFoundation\Response;
 
 class TransitionHandler
@@ -20,14 +21,22 @@ class TransitionHandler
     /** @var TransitionHelper */
     protected $transitionHelper;
 
+    /** @var LoggerInterface */
+    protected $logger;
+
     /**
      * @param WorkflowManager $workflowManager
      * @param TransitionHelper $transitionHelper
+     * @param LoggerInterface $logger
      */
-    public function __construct(WorkflowManager $workflowManager, TransitionHelper $transitionHelper)
-    {
+    public function __construct(
+        WorkflowManager $workflowManager,
+        TransitionHelper $transitionHelper,
+        LoggerInterface $logger
+    ) {
         $this->workflowManager = $workflowManager;
         $this->transitionHelper = $transitionHelper;
+        $this->logger = $logger;
     }
 
     /**
@@ -54,6 +63,10 @@ class TransitionHandler
             $responseCode = 403;
         } catch (Exception $e) {
             $responseCode = 500;
+        }
+
+        if (isset($e)) {
+            $this->logger->error($e->getMessage(), $e->getTrace());
         }
 
         return $this->transitionHelper->createCompleteResponse($workflowItem, $responseCode);
