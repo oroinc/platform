@@ -169,8 +169,6 @@ services:
 
     oro_entity_extend.validator.unique_extend_entity_method_name_validator:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
-        arguments:
-            - @oro_entity_extend.extend.field_name_validation_helper
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
 
