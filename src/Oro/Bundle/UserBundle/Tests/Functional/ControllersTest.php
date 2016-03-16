@@ -23,9 +23,7 @@ class ControllersTest extends WebTestCase
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
         $this->registry = $this->getContainer()->get('doctrine');
-        $this->loadFixtures([
-            'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData'
-        ]);
+        $this->loadFixtures(['Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData']);
     }
 
     public function testIndex()

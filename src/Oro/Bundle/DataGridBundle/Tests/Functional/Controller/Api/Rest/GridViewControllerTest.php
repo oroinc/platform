@@ -133,6 +133,6 @@ class GridViewControllerTest extends WebTestCase
      */
     private function getEntityManager()
     {
-        return $this->getContainer()->get('doctrine')->getManager();
+        return $this->getContainer()->get('doctrine.orm.entity_manager');
     }
 }
