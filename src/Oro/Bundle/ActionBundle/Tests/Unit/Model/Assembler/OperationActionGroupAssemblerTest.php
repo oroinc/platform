@@ -4,10 +4,10 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
-
-use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
+
+use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
 
 class OperationActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
 {

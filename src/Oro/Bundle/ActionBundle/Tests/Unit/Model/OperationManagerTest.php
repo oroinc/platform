@@ -394,14 +394,12 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
         $operation = $this->createOperationMock($actionData);
         $operation->expects($this->any())
             ->method('execute')
-            ->willReturn(
-                function ($param1, $param2) use ($actionData, $errors) {
-                    $this->assertSame($actionData, $param1);
-                    $this->assertSame($errors, $param2);
+            ->willReturn(function ($param1, $param2) use ($actionData, $errors) {
+                $this->assertSame($actionData, $param1);
+                $this->assertSame($errors, $param2);
 
-                    return true;
-                }
-            );
+                return true;
+            });
 
         $this->operationRegistry->expects($this->once())
             ->method('findByName')
@@ -505,20 +503,18 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     {
         $this->contextHelper->expects($this->any())
             ->method('getContext')
-            ->willReturnCallback(
-                function ($context) {
-                    return array_merge(
-                        [
-                            'route' => null,
-                            'entityId' => null,
-                            'entityClass' => null,
-                            'datagrid' => null,
-                            'group' => null
-                        ],
-                        $context
-                    );
-                }
-            );
+            ->willReturnCallback(function ($context) {
+                return array_merge(
+                    [
+                        'route' => null,
+                        'entityId' => null,
+                        'entityClass' => null,
+                        'datagrid' => null,
+                        'group' => null
+                    ],
+                    $context
+                );
+            });
 
         $this->contextHelper->expects($this->any())
             ->method('getActionData')
@@ -649,27 +645,28 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->setGroups($group)
             ->setFrontendOptions($frontendOptions);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
+        /* @var $functionFactory \PHPUnit_Framework_MockObject_MockObject|ActionFactory */
         $functionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
+        /* @var $conditionFactory \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory */
         $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeAssembler */
+        /* @var $attributeAssembler \PHPUnit_Framework_MockObject_MockObject|AttributeAssembler */
         $attributeAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
+        /* @var $formOptionsAssembler \PHPUnit_Framework_MockObject_MockObject|FormOptionsAssembler */
         $formOptionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $mockOperationActionGroupAssembler = $this->getMockBuilder(
+        /* @var $operationActionGroupAssembler \PHPUnit_Framework_MockObject_MockObject|OperationActionGroupAssembler */
+        $operationActionGroupAssembler = $this->getMockBuilder(
             'Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler'
         )->disableOriginalConstructor()->getMock();
 
@@ -678,7 +675,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             $conditionFactory,
             $attributeAssembler,
             $formOptionsAssembler,
-            $mockOperationActionGroupAssembler,
+            $operationActionGroupAssembler,
             $definition
         );
     }
