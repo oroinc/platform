@@ -38,8 +38,8 @@ operations:
             -
                 name: UPDATE
                 arguments_mapping:
-                    data: $.data
-                    routes: $.routes
+                    route: $.routes[update]
+                    id: $id
 
     DELETE:
         extends: CRUD_ACTION
@@ -64,7 +64,7 @@ operations:
                     - @call_service_method:
                         service: oro_entity_config.helper.entity_config
                         method: getConfigValue
-                        method_parameters: [$data, 'label']
+                        method_parameters: [$.data, 'label']
                         attribute: $.entityLabel
                     - @trans:
                         id: $.entityLabel
@@ -87,46 +87,37 @@ operations:
             -
                 name: DELETE
                 arguments_mapping:
-                    data: $.data
-                    routes: $.routes
-                    entityLabel: $.entityLabel
+                    entity: $.data
+                    entity_label: $.entityLabel
+                    route: $.routes[name]
 
 action_groups:
     UPDATE:
         arguments:
-            data:
-                type: object
-            routes:
-                type: array
-        conditions:
-            @not_blank: $routes[update]
-        acl_resource: [EDIT, $data]
+            id: ~
+            route:
+                type: string
         actions:
             - @redirect:
-                route: $routes[update]
-                route_parameters: {id: $data.id}
-
+                route: $route
+                route_parameters: {id: $id}
     DELETE:
         arguments:
-            data:
-                type: object
-            routes:
-                type: array
-            entityLabel:
+            entity: ~
+            route:
                 type: string
-        acl_resource: [DELETE, $.data]
-        conditions:
-            @and:
-                - @not_blank: $.routes[name]
-                - @not_blank: $.routes[delete]
+            entity_label:
+                type: string
         actions:
             - @call_service_method:
                 service: oro_action.handler.delete
                 method: handleDelete
-                method_parameters: [$data]
+                method_parameters: [$entity]
+
             - @flash_message:
                 message: oro.action.delete_message
                 type: 'info'
                 message_parameters:
-                    entityLabel: $entityLabel
-            - @redirect: {route: $routes[name]}
+                    entityLabel: $entity_label
+            - @redirect:
+                route: $route
