@@ -12,11 +12,11 @@ use Oro\Bundle\ActionBundle\Model\Attribute;
 class FormOptionsAssembler implements ConfigurationPassesAwareInterface
 {
     use ConfigurationPassesAwareTrait;
+
     /**
      * @var Attribute[]
      */
     protected $attributes;
-
 
     /**
      * @param array $options
@@ -71,8 +71,6 @@ class FormOptionsAssembler implements ConfigurationPassesAwareInterface
             }
         }
     }
-
-
 
     /**
      * @param string $attributeName

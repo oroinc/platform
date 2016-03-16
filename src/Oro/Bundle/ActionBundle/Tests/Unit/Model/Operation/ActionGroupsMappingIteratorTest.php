@@ -2,11 +2,14 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Operation;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator;
-use Symfony\Component\PropertyAccess\PropertyPath;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
 {
@@ -35,7 +38,7 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
 
     public function testIterationNoValues()
     {
-        $mockGroup1 = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\OperationActionGroup')
+        $mockGroup1 = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationActionGroup')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -64,8 +67,8 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
         array $accessorAts,
         array $expected
     ) {
-        /** @var \Oro\Component\Action\Model\ContextAccessor| \PHPUnit_Framework_MockObject_MockObject */
-        $contextAccessor = $this->getMockBuilder('\Oro\Component\Action\Model\ContextAccessor')->getMock();
+        /* @var $contextAccessor ContextAccessor|\PHPUnit_Framework_MockObject_MockObject */
+        $contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')->getMock();
 
         $data = new ActionData();
 
@@ -87,21 +90,21 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
      */
     public function provideIterationValues()
     {
-        $mockOpActionGroupValuesOnly = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\OperationActionGroup')
+        $mockOpActionGroupValuesOnly = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationActionGroup')
             ->getMock();
         $mockOpActionGroupValuesOnly->expects($this->once())->method('getName')->willReturn('OAGValuesOnly');
         $mockOpActionGroupValuesOnly->expects($this->once())->method('getArgumentsMapping')->willReturn(
             ['arg1' => 'val1', 'compound arg2' => ['val2', 'val3']]
         );
 
-        $mockOpActionGroupSimplePath = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\OperationActionGroup')
+        $mockOpActionGroupSimplePath = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationActionGroup')
             ->getMock();
         $mockOpActionGroupSimplePath->expects($this->once())->method('getName')->willReturn('OAGSimplePath');
         $mockOpActionGroupSimplePath->expects($this->once())->method('getArgumentsMapping')->willReturn(
             ['arg1' => $p1 = new PropertyPath('val1path')]
         );
 
-        $mockOpActionGroupDeepPaths = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\OperationActionGroup')
+        $mockOpActionGroupDeepPaths = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationActionGroup')
             ->getMock();
         $mockOpActionGroupDeepPaths->expects($this->once())->method('getName')->willReturn('OAGDeepPaths');
         $mockOpActionGroupDeepPaths->expects($this->once())->method('getArgumentsMapping')->willReturn(

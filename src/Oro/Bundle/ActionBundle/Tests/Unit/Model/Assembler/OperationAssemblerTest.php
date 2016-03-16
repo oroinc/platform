@@ -29,11 +29,9 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityClass')
-            ->willReturnCallback(
-                function ($class) {
-                    return $class;
-                }
-            );
+            ->willReturnCallback(function ($class) {
+                return $class;
+            });
 
         $this->assembler = new OperationAssembler(
             $this->getActionFactory(),
@@ -118,14 +116,12 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setAttributes(['config_attr'])
             ->setForAllEntities(true)
             ->setExcludeEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'])
-            ->setPreconditions(
-                [
-                    '@and' => [
-                        ['@acl_granted' => 'test_acl'],
-                        ['config_pre_cond']
-                    ]
+            ->setPreconditions([
+                '@and' => [
+                    ['@acl_granted' => 'test_acl'],
+                    ['config_pre_cond']
                 ]
-            )
+            ])
             ->setActions('preactions', ['config_pre_func'])
             ->setActions('form_init', ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
@@ -272,7 +268,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $assembler = new OperationActionGroupAssembler();
         $assembler->addConfigurationPass(
-            $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
+            $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
                 ->getMock()
         );
 
