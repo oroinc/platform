@@ -242,7 +242,8 @@ services:
             - { name: oro_workflow.action, alias: find_entities }
 
 
-    oro_workflow.action.assign_url.class:
+    oro_workflow.action.assign_url:
+        class: %oro_workflow.action.assign_url.class%
         arguments:
             - @oro_action.context_accessor
             - @router
