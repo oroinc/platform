@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
-use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -21,7 +21,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->assembler = new ActionGroupAssembler(
             $this->getActionFactory(),
             $this->getConditionFactory(),
-            $this->getArgumentAssembler(),
+            $this->getParameterAssembler(),
             $this->getDoctrineHelper()
         );
     }
@@ -51,7 +51,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function assembleProvider()
     {
-        $argumentAssembler = $this->getArgumentAssembler();
+        $parameterAssembler = $this->getParameterAssembler();
         $actionFactory = $this->getActionFactory();
         $conditionFactory = $this->getConditionFactory();
         $doctrineHelper = $this->getDoctrineHelper();
@@ -65,7 +65,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
         $definition2 = clone $definition1;
         $definition2
             ->setName('maximum_name')
-            ->setArguments([
+            ->setParameters([
                 'arg1' => [],
                 'arg2' => [
                     'required' => true,
@@ -149,7 +149,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                     'minimum_name' => new ActionGroup(
                         $actionFactory,
                         $conditionFactory,
-                        $argumentAssembler,
+                        $parameterAssembler,
                         $doctrineHelper,
                         $definition1
                     )
@@ -158,7 +158,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             'maximum data' => [
                 [
                     'maximum_name' => [
-                        'arguments' => [
+                        'parameters' => [
                             'arg1' => [],
                             'arg2' => [
                                 'required' => true,
@@ -179,7 +179,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                     'maximum_name' => new ActionGroup(
                         $actionFactory,
                         $conditionFactory,
-                        $argumentAssembler,
+                        $parameterAssembler,
                         $doctrineHelper,
                         $definition2
                     )
@@ -188,7 +188,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             'maximum data and acl_resource' => [
                 [
                     'maximum_name_and_acl' => [
-                        'arguments' => [
+                        'parameters' => [
                             'arg1' => [],
                             'arg2' => [
                                 'required' => true,
@@ -208,7 +208,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                     'maximum_name_and_acl' => new ActionGroup(
                         $actionFactory,
                         $conditionFactory,
-                        $argumentAssembler,
+                        $parameterAssembler,
                         $doctrineHelper,
                         $definition3
                     )
@@ -248,10 +248,10 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return ArgumentAssembler
+     * @return ParameterAssembler
      */
-    protected function getArgumentAssembler()
+    protected function getParameterAssembler()
     {
-        return new ArgumentAssembler();
+        return new ParameterAssembler();
     }
 }

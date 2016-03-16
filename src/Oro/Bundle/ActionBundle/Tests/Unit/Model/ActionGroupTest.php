@@ -7,8 +7,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
-use Oro\Bundle\ActionBundle\Model\Argument;
-use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
+use Oro\Bundle\ActionBundle\Model\Parameter;
+use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -49,7 +49,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
         $this->actionGroup = new ActionGroup(
             $this->actionFactory,
             $this->conditionFactory,
-            new ArgumentAssembler(),
+            new ParameterAssembler(),
             $doctrineHelper,
             new ActionGroupDefinition()
         );
@@ -179,35 +179,35 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
 
     /**
      *
-     * @dataProvider getArgumentsProvider
+     * @dataProvider getParametersProvider
      * @param array $config
-     * @param Argument[] $expected
+     * @param Parameter[] $expected
      */
-    public function testGetArguments(array $config, array $expected)
+    public function testGetParameters(array $config, array $expected)
     {
         if ($config) {
-            $this->actionGroup->getDefinition()->setArguments($config);
+            $this->actionGroup->getDefinition()->setParameters($config);
         }
 
-        $this->assertEquals($expected, $this->actionGroup->getArguments());
+        $this->assertEquals($expected, $this->actionGroup->getParameters());
     }
 
     /**
      * @return array
      */
-    public function getArgumentsProvider()
+    public function getParametersProvider()
     {
-        $argument1 = new Argument();
-        $argument1->setName('argument1');
+        $parameter1 = new Parameter();
+        $parameter1->setName('parameter1');
 
         return [
-            'no arguments' => [
+            'no parameters' => [
                 'config' => [],
                 'expected' => [],
             ],
-            '1 argument' => [
-                'config' => ['argument1' => []],
-                'expected' => ['argument1' => $argument1],
+            '1 parameter' => [
+                'config' => ['parameter1' => []],
+                'expected' => ['parameter1' => $parameter1],
             ],
         ];
     }

@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
-use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -22,8 +22,8 @@ class ActionGroup
     /** @var ConditionFactory */
     private $conditionFactory;
 
-    /** @var ArgumentAssembler */
-    private $argumentAssembler;
+    /** @var ParameterAssembler */
+    private $parameterAssembler;
 
     /** @var ActionGroupDefinition */
     private $definition;
@@ -31,26 +31,26 @@ class ActionGroup
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
-    /** @var Argument[] */
-    private $arguments;
+    /** @var Parameter[] */
+    private $parameters;
 
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
-     * @param ArgumentAssembler $argumentAssembler
+     * @param ParameterAssembler $parameterAssembler
      * @param DoctrineHelper $doctrineHelper
      * @param ActionGroupDefinition $definition
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
-        ArgumentAssembler $argumentAssembler,
+        ParameterAssembler $parameterAssembler,
         DoctrineHelper $doctrineHelper,
         ActionGroupDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
-        $this->argumentAssembler = $argumentAssembler;
+        $this->parameterAssembler = $parameterAssembler;
         $this->doctrineHelper = $doctrineHelper;
         $this->definition = $definition;
     }
@@ -116,16 +116,16 @@ class ActionGroup
     /**
      * @return array
      */
-    public function getArguments()
+    public function getParameters()
     {
-        if ($this->arguments === null) {
-            $this->arguments = [];
-            $argumentsConfig = $this->definition->getArguments();
-            if ($argumentsConfig) {
-                $this->arguments = $this->argumentAssembler->assemble($argumentsConfig);
+        if ($this->parameters === null) {
+            $this->parameters = [];
+            $parametersConfig = $this->definition->getParameters();
+            if ($parametersConfig) {
+                $this->parameters = $this->parameterAssembler->assemble($parametersConfig);
             }
         }
 
-        return $this->arguments;
+        return $this->parameters;
     }
 }

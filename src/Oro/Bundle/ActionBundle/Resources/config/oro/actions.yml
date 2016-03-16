@@ -37,7 +37,7 @@ operations:
         action_groups:
             -
                 name: UPDATE
-                arguments_mapping:
+                parameters_mapping:
                     route: $.routes[update]
                     id: $id
 
@@ -86,14 +86,14 @@ operations:
         action_groups:
             -
                 name: DELETE
-                arguments_mapping:
+                parameters_mapping:
                     entity: $.data
                     entity_label: $.entityLabel
                     route: $.routes[name]
 
 action_groups:
     UPDATE:
-        arguments:
+        parameters:
             id: ~
             route:
                 type: string
@@ -102,7 +102,7 @@ action_groups:
                 route: $route
                 route_parameters: {id: $id}
     DELETE:
-        arguments:
+        parameters:
             entity: ~
             route:
                 type: string

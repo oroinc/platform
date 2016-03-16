@@ -51,7 +51,7 @@ class ActionGroupsMappingIterator extends \ArrayIterator
     {
         $executionArgs = new ActionGroupExecutionArgs($operationActionGroup->getName());
 
-        foreach ($operationActionGroup->getArgumentsMapping() as $argumentName => $value) {
+        foreach ($operationActionGroup->getParametersMapping() as $parameterName => $value) {
             if ($value instanceof PropertyPathInterface) {
                 $value = $this->accessor->getValue($this->data, $value);
             } elseif (is_array($value)) {
@@ -65,7 +65,7 @@ class ActionGroupsMappingIterator extends \ArrayIterator
                 );
             }
 
-            $executionArgs->addArgument($argumentName, $value);
+            $executionArgs->addParameter($parameterName, $value);
         }
 
         return $executionArgs;

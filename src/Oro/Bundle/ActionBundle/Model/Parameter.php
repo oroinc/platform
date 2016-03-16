@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-class Argument
+class Parameter
 {
     /* @var string */
     private $name;

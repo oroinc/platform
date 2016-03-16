@@ -63,12 +63,12 @@ class OperationActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
         $actionGroup2 = new OperationActionGroup();
         $actionGroup2
             ->setName('maximum_name')
-            ->setArgumentsMapping(['argument1']);
+            ->setParametersMapping(['parameter1']);
 
         $actionGroup3 = new OperationActionGroup();
         $actionGroup3
             ->setName('with property path mapping')
-            ->setArgumentsMapping([new PropertyPath('propertyPath')]);
+            ->setParametersMapping([new PropertyPath('propertyPath')]);
 
         return [
             'no data' => [
@@ -89,24 +89,24 @@ class OperationActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     [
                         'name' => 'maximum_name',
-                        'arguments_mapping' => ['argument1'],
+                        'parameters_mapping' => ['parameter1'],
                     ],
                 ],
-                'passes' => [['argument1']],
+                'passes' => [['parameter1']],
                 'expected' => [$actionGroup2],
             ],
             'repeat items' => [
                 [
                     [
                         'name' => 'maximum_name',
-                        'arguments_mapping' => ['argument1'],
+                        'parameters_mapping' => ['parameter1'],
                     ],
                     [
                         'name' => 'maximum_name',
-                        'arguments_mapping' => ['argument1'],
+                        'parameters_mapping' => ['parameter1'],
                     ],
                 ],
-                'passes' => [['argument1'], ['argument1']],
+                'passes' => [['parameter1'], ['parameter1']],
                 'expected' => [
                     $actionGroup2,
                     $actionGroup2,
@@ -116,7 +116,7 @@ class OperationActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     [
                         'name' => 'with property path mapping',
-                        'arguments_mapping' => ['$.propertyPath']
+                        'parameters_mapping' => ['$.propertyPath']
                     ]
                 ],
                 'passes' => [[new PropertyPath('propertyPath')]],

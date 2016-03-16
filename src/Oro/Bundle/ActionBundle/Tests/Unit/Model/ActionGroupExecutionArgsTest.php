@@ -16,7 +16,7 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $instance->getName());
     }
 
-    public function testGetArgumentsCreateNewInstanceOfActionData()
+    public function testGetParametersCreateNewInstanceOfActionData()
     {
         $instance = new ActionGroupExecutionArgs('name');
 
@@ -25,16 +25,16 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param $expected
-     * @param array $arguments
-     * @dataProvider provideArguments
+     * @param array $parameters
+     * @dataProvider provideParameters
      */
-    public function testAddArguments($expected, array $arguments)
+    public function testAddParameters($expected, array $parameters)
     {
         $instance = new ActionGroupExecutionArgs('someName');
 
-        foreach ($arguments as $v) {
+        foreach ($parameters as $v) {
             list($name, $value) = $v;
-            $instance->addArgument($name, $value);
+            $instance->addParameter($name, $value);
         }
 
         $this->assertEquals($expected, $instance->getActionData());
@@ -43,12 +43,12 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function provideArguments()
+    public function provideParameters()
     {
         return [
             'no args' => [
                 'expected' => new ActionData(['data' => (object)[]]),
-                'arguments' => []
+                'parameters' => []
             ],
             'few' => [
                 'expected' => new ActionData(
@@ -59,7 +59,7 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ),
-                'arguments' => [
+                'parameters' => [
                     ['arg1', 'val1'],
                     ['arg2', 'val2']
                 ]
@@ -75,7 +75,7 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ),
-                'arguments' => [
+                'parameters' => [
                     ['arg1', 'val1'],
                     ['arg2', 'val1'],
                     ['arg3', 'val1'],
@@ -90,7 +90,7 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
                         ]
                     ]
                 ),
-                'arguments' => [
+                'parameters' => [
                     [
                         'arg1',
                         'val1'

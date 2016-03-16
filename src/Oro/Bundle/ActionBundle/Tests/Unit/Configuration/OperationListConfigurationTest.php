@@ -165,7 +165,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'action_groups' => [
                             [
                                 'name' => 'demo_expire_quote',
-                                'arguments_mapping' => [
+                                'parameters_mapping' => [
                                     'data' => '$.data',
                                     'date' => '$.currentDate'
                                 ]
@@ -248,7 +248,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'action_groups' => [
                             [
                                 'name' => 'demo_expire_quote',
-                                'arguments_mapping' => [
+                                'parameters_mapping' => [
                                     'data' => '$.data',
                                     'date' => '$.currentDate'
                                 ]
@@ -756,53 +756,53 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                 'message' => 'Invalid type for path "operations.oper1.action_groups.0.name". ' .
                     'Expected scalar, but got array'
             ],
-            'incorrect operation[action_groups][arguments_mapping]' => [
+            'incorrect operation[action_groups][parameters_mapping]' => [
                 'input' => [
                     'oper1' => [
                         'label' => 'Test Label',
                         'action_groups' => [
                             [
                                 'name' => 'test_name',
-                                'arguments_mapping' => ''
+                                'parameters_mapping' => ''
                             ]
                         ],
                     ],
                 ],
-                'message' => 'Invalid type for path "operations.oper1.action_groups.0.arguments_mapping". ' .
+                'message' => 'Invalid type for path "operations.oper1.action_groups.0.parameters_mapping". ' .
                     'Expected array, but got string'
             ],
-            'incorrect operation[action_groups][arguments_mapping][test]' => [
+            'incorrect operation[action_groups][parameters_mapping][test]' => [
                 'input' => [
                     'oper1' => [
                         'label' => 'Test Label',
                         'action_groups' => [
                             [
                                 'name' => 'test_name',
-                                'arguments_mapping' => [
+                                'parameters_mapping' => [
                                     'test' => []
                                 ]
                             ]
                         ],
                     ],
                 ],
-                'message' => 'Invalid type for path "operations.oper1.action_groups.0.arguments_mapping.test". ' .
+                'message' => 'Invalid type for path "operations.oper1.action_groups.0.parameters_mapping.test". ' .
                     'Expected scalar, but got array'
             ],
-            'empty operation[action_groups][arguments_mapping][test]' => [
+            'empty operation[action_groups][parameters_mapping][test]' => [
                 'input' => [
                     'oper1' => [
                         'label' => 'Test Label',
                         'action_groups' => [
                             [
                                 'name' => 'test_name',
-                                'arguments_mapping' => [
+                                'parameters_mapping' => [
                                     'test' => null
                                 ]
                             ]
                         ],
                     ],
                 ],
-                'message' => 'The path "operations.oper1.action_groups.0.arguments_mapping.test" cannot contain ' .
+                'message' => 'The path "operations.oper1.action_groups.0.parameters_mapping.test" cannot contain ' .
                     'an empty value, but got null'
             ]
         ];

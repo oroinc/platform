@@ -43,7 +43,7 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $mockGroup1->expects($this->once())->method('getName')->willReturn('actionGroupName');
-        $mockGroup1->expects($this->once())->method('getArgumentsMapping')->willReturn([]);
+        $mockGroup1->expects($this->once())->method('getParametersMapping')->willReturn([]);
 
         $instance = new ActionGroupsMappingIterator([$mockGroup1], new ActionData());
 
@@ -93,21 +93,21 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
         $mockOpActionGroupValuesOnly = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationActionGroup')
             ->getMock();
         $mockOpActionGroupValuesOnly->expects($this->once())->method('getName')->willReturn('OAGValuesOnly');
-        $mockOpActionGroupValuesOnly->expects($this->once())->method('getArgumentsMapping')->willReturn(
+        $mockOpActionGroupValuesOnly->expects($this->once())->method('getParametersMapping')->willReturn(
             ['arg1' => 'val1', 'compound arg2' => ['val2', 'val3']]
         );
 
         $mockOpActionGroupSimplePath = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationActionGroup')
             ->getMock();
         $mockOpActionGroupSimplePath->expects($this->once())->method('getName')->willReturn('OAGSimplePath');
-        $mockOpActionGroupSimplePath->expects($this->once())->method('getArgumentsMapping')->willReturn(
+        $mockOpActionGroupSimplePath->expects($this->once())->method('getParametersMapping')->willReturn(
             ['arg1' => $p1 = new PropertyPath('val1path')]
         );
 
         $mockOpActionGroupDeepPaths = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationActionGroup')
             ->getMock();
         $mockOpActionGroupDeepPaths->expects($this->once())->method('getName')->willReturn('OAGDeepPaths');
-        $mockOpActionGroupDeepPaths->expects($this->once())->method('getArgumentsMapping')->willReturn(
+        $mockOpActionGroupDeepPaths->expects($this->once())->method('getParametersMapping')->willReturn(
             ['arg1' => ['property' => $p2 = new PropertyPath('val1path'), 'value' => 'val1']]
         );
 

@@ -281,7 +281,7 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
                         ->isRequired()
                         ->cannotBeEmpty()
                     ->end()
-                    ->arrayNode('arguments_mapping')
+                    ->arrayNode('parameters_mapping')
                         ->prototype('scalar')
                             ->cannotBeEmpty()
                         ->end()

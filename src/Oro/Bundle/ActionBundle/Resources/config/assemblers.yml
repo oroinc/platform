@@ -1,7 +1,7 @@
 parameters:
     oro_action.assembler.operation.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler
     oro_action.assembler.action_group.class: Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler
-    oro_action.assembler.argument.class: Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler
+    oro_action.assembler.parameter.class: Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler
     oro_action.assembler.operation_action_group.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler
     oro_action.assembler.attribute.class: Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler
     oro_action.assembler.form_options.class: Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler
@@ -22,11 +22,11 @@ services:
         arguments:
             - @oro_action.function_factory
             - @oro_action.expression.factory
-            - @oro_action.assembler.argument
+            - @oro_action.assembler.parameter
             - @oro_entity.doctrine_helper
 
-    oro_action.assembler.argument:
-        class: %oro_action.assembler.argument.class%
+    oro_action.assembler.parameter:
+        class: %oro_action.assembler.parameter.class%
 
     oro_action.assembler.operation_action_group:
         class: %oro_action.assembler.operation_action_group.class%
