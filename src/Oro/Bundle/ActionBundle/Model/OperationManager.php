@@ -43,9 +43,7 @@ class OperationManager
     {
         $actionData = $this->contextHelper->getActionData($context);
 
-        $this->execute($operationName, $actionData, $errors);
-
-        return $actionData;
+        return $this->execute($operationName, $actionData, $errors);
     }
 
     /**
@@ -53,15 +51,13 @@ class OperationManager
      * @param ActionData $actionData
      * @param Collection|null $errors
      * @return ActionData
-     * @throws \Exception
      */
     public function execute($operationName, ActionData $actionData, Collection $errors = null)
     {
         $operation = $this->getOperation($operationName, $actionData);
         foreach ($operation->getActionGroupsIterator($actionData) as $executionArgs) {
             $actionGroup = $this->actionGroupRegistry->findByName($executionArgs->getName());
-
-            $actionGroup->execute($executionArgs->getActionData(), $errors);
+            $actionData = $actionGroup->execute($executionArgs->getActionData(), $errors);
         }
 
         return $actionData;

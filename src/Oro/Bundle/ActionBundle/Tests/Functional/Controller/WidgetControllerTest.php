@@ -502,7 +502,7 @@ class WidgetControllerTest extends WebTestCase
                     ],
                     'attribute_default_values' => ['message_attr' => '$message']
                 ],
-                'prefunctions' => [],
+                'preactions' => [],
                 'preconditions' => [],
                 'form_init' => [
                     ['@assign_value' => [
@@ -523,7 +523,7 @@ class WidgetControllerTest extends WebTestCase
                         ]
                     ]
                 ],
-                'functions' => [
+                'actions' => [
                     ['@assign_value' => ['$message', '$.message_attr']],
                     ['@assign_value' => ['$description', '$.descr_attr']]
                 ]

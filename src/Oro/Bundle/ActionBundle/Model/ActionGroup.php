@@ -58,8 +58,8 @@ class ActionGroup
     /**
      * @param ActionData $data
      * @param Collection $errors
+     * @return ActionData
      * @throws ForbiddenActionException
-     * @throws \Exception
      */
     public function execute(ActionData $data, Collection $errors = null)
     {
@@ -68,21 +68,9 @@ class ActionGroup
                 sprintf('ActionGroup "%s" is not allowed.', $this->definition->getName())
             );
         }
-
         $this->executeActions($data);
-        $entity = $data->getEntity();
-        if ($entity) {
-            $manager = $this->doctrineHelper->getEntityManager($entity);
-            $manager->beginTransaction();
 
-            try {
-                $manager->flush();
-                $manager->commit();
-            } catch (\Exception $e) {
-                $manager->rollback();
-                throw $e;
-            }
-        }
+        return $data;
     }
 
     /**
