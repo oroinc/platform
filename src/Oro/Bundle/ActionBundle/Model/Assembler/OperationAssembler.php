@@ -43,7 +43,7 @@ class OperationAssembler extends AbstractAssembler
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
-     * @param OperationActionGroupAssembler $operationActionGroupAssembler,
+     * @param OperationActionGroupAssembler $operationActionGroupAssembler
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
