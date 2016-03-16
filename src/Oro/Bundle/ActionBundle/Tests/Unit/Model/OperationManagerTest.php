@@ -4,12 +4,12 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
-use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
@@ -36,6 +36,9 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     /** @var OperationManager */
     protected $manager;
 
+    /** @var Collection|\PHPUnit_Framework_MockObject_MockObject */
+    private $errorsCollection;
+
     /**
      * {@inheritdoc}
      */
@@ -52,6 +55,8 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()
             ->getMock();
+
+        $this->errorsCollection = new ArrayCollection();
 
         $this->manager = new OperationManager(
             $this->operationRegistry,
@@ -298,28 +303,13 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     {
         $errors = new ArrayCollection();
 
-        $actionGroup = $this->createActionGroupMock();
         $operation = $this->createOperationMock($actionData);
-        $actionGroup->expects($this->once())
-            ->method('execute')
-            ->willReturn(
-                function ($param1, $param2) use ($actionData, $errors) {
-                    $this->assertSame($actionData, $param1);
-                    $this->assertSame($errors, $param2);
-
-                    return true;
-                }
-            );
 
         $this->operationRegistry->expects($this->once())
             ->method('findByName')
             ->with('test_operation')
             ->willReturn($operation);
 
-        $this->actionGroupRegistry->expects($this->once())
-            ->method('findByName')
-            ->with('test_actionGroup')
-            ->willReturn($actionGroup);
 
         $this->contextHelper->expects($this->once())
             ->method('getActionData')
@@ -389,15 +379,13 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
      */
     public function testExecute(ActionData $actionData)
     {
-        $errors = new ArrayCollection();
-
         $operation = $this->createOperationMock($actionData);
         $operation->expects($this->any())
             ->method('execute')
             ->willReturn(
-                function ($param1, $param2) use ($actionData, $errors) {
+                function ($param1, $param2) use ($actionData) {
                     $this->assertSame($actionData, $param1);
-                    $this->assertSame($errors, $param2);
+                    $this->assertSame($this->errorsCollection, $param2);
 
                     return true;
                 }
@@ -408,16 +396,9 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->with('test_operation')
             ->willReturn($operation);
 
-        $actionGroup = $this->createActionGroupMock();
+        $this->manager->execute('test_operation', $actionData, $this->errorsCollection);
 
-        $this->actionGroupRegistry->expects($this->once())
-            ->method('findByName')
-            ->with('test_actionGroup')
-            ->willReturn($actionGroup);
-
-        $this->manager->execute('test_operation', $actionData, $errors);
-
-        $this->assertEmpty($errors->toArray());
+        $this->assertEmpty($this->errorsCollection->toArray());
     }
 
     /**
@@ -701,8 +682,11 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             'Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs'
         )->disableOriginalConstructor()->getMock();
 
-        $mockActionGroupArgs->expects($this->once())->method('getActionGroupName')->willReturn('test_actionGroup');
-        $mockActionGroupArgs->expects($this->once())->method('getActionData')->willReturn($actionData);
+        $mockActionGroupArgs->expects($this->once())->method('execute')
+            ->with(
+                $this->actionGroupRegistry,
+                $this->errorsCollection
+            );
 
         $operation->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
         $operation->expects($this->once())->method('getActionGroupsIterator')->willReturn(

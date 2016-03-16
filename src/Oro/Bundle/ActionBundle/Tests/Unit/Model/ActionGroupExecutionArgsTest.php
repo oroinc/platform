@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 
@@ -38,6 +39,32 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
         }
 
         $this->assertEquals($expected, $instance->getActionData());
+    }
+
+    public function testExecute()
+    {
+        $instance = new ActionGroupExecutionArgs('test_action_group', ['arg1' => 'val1']);
+
+        $mockRegistry = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ActionGroupRegistry')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockActionGroup = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ActionGroup')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $mockRegistry->expects($this->once())
+            ->method('get')
+            ->with('test_action_group')
+            ->willReturn($mockActionGroup);
+
+        $errorsCollection = new ArrayCollection();
+
+        $mockActionGroup->expects($this->once())->method('execute')
+            ->with(new ActionData(['data' => (object)['arg1' => 'val1']]), $errorsCollection)
+            ->willReturn('ok');
+
+        $this->assertEquals('ok', $instance->execute($mockRegistry, $errorsCollection));
     }
 
     /**

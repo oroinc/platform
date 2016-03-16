@@ -4,13 +4,13 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
-use Oro\Component\Layout\ArrayCollection;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\ActionBundle\Action\RunActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 
 use Oro\Component\Action\Model\ContextAccessor;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 {
@@ -45,7 +45,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     public function testOptionNamesRequirements()
     {
         $this->assertEquals(RunActionGroup::OPTION_ACTION_GROUP, 'action_group');
-        $this->assertEquals(RunActionGroup::OPTION_PARAMETERS, 'parameters_mapping');
+        $this->assertEquals(RunActionGroup::OPTION_PARAMETERS_MAP, 'parameters_mapping');
         $this->assertEquals(RunActionGroup::OPTION_ATTRIBUTE, 'attribute');
     }
 
@@ -58,26 +58,21 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 
         $options = [
             RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
-            RunActionGroup::OPTION_PARAMETERS => $parametersMap,
+            RunActionGroup::OPTION_PARAMETERS_MAP => $parametersMap,
             RunActionGroup::OPTION_ATTRIBUTE => 'writeResultTo'
         ];
-
-        $mockGroup = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ActionGroup')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->actionGroupRegistry->expects($this->once())
-            ->method('findByName')
-            ->with(self::ACTION_NAME)
-            ->willReturn($mockGroup);
 
         $this->assertInstanceOf(
             'Oro\Component\Action\Action\ActionInterface',
             $this->function->initialize($options)
         );
 
-        $this->assertAttributeEquals($mockGroup, 'actionGroup', $this->function);
-        $this->assertAttributeEquals($parametersMap, 'parameters', $this->function);
+        $this->assertAttributeInstanceOf(
+            '\Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs',
+            'executionArguments',
+            $this->function
+        );
+        $this->assertAttributeEquals($parametersMap, 'parametersMap', $this->function);
         $this->assertAttributeEquals('writeResultTo', 'attribute', $this->function);
     }
 
@@ -87,17 +82,10 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
      * @param array $inputData
      * @param string $exception
      * @param string $exceptionMessage
-     * @param mixed $actionGroup
      * @throws \Oro\Component\Action\Exception\InvalidParameterException
      */
-    public function testInitializeException(array $inputData, $exception, $exceptionMessage, $actionGroup = false)
+    public function testInitializeException(array $inputData, $exception, $exceptionMessage)
     {
-        if ($actionGroup !== false) {
-            $this->actionGroupRegistry->expects($this->once())
-                ->method('findByName')
-                ->with(self::ACTION_NAME)
-                ->willReturn($actionGroup);
-        }
 
         $this->setExpectedException($exception, $exceptionMessage);
 
@@ -119,22 +107,15 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                 'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => sprintf('`%s` parameter is required', RunActionGroup::OPTION_ACTION_GROUP)
             ],
-            'action group not found' => [
-                'inputData' => [
-                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME
-                ],
-                'expectedException' => '\RuntimeException',
-                'expectedExceptionMessage' => sprintf('ActionGroup with name `%s` not found', self::ACTION_NAME)
-            ],
             'bad parameters map type' => [
                 'inputData' => [
                     RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
-                    RunActionGroup::OPTION_PARAMETERS => 'string is not supported'
+                    RunActionGroup::OPTION_PARAMETERS_MAP => 'string is not supported'
                 ],
                 'expectedException' => 'Oro\Component\Action\Exception\InvalidParameterException',
                 'expectedExceptionMessage' => sprintf(
                     'Option `%s` must be array or implement \Traversable interface',
-                    RunActionGroup::OPTION_PARAMETERS
+                    RunActionGroup::OPTION_PARAMETERS_MAP
                 ),
                 $mockGroup
             ]
@@ -143,7 +124,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 
     public function testExecuteActionWithoutInitialization()
     {
-        $this->setExpectedException('\BadMethodCallException', 'Uninitialized execution.');
+        $this->setExpectedException('\BadMethodCallException', 'Uninitialized action execution.');
         $this->function->execute([]);
     }
 
@@ -152,46 +133,37 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
      *
      * @param array $context
      * @param array $options
-     * @param ActionGroup|\PHPUnit_Framework_MockObject_MockObject $actionGroup
      * @param ActionData $arguments
-     * @param array $result
+     * @param $returnVal
+     * @param $expected
      * @throws \Oro\Component\Action\Exception\InvalidParameterException
      */
     public function testExecuteAction(
         array $context,
         array $options,
-        ActionGroup $actionGroup,
         ActionData $arguments,
         $returnVal,
         $expected
     ) {
         $data = new ActionData($context);
 
-        //during initialize
-        $this->actionGroupRegistry->expects($this->once())->method('findByName')
-            ->with($options[RunActionGroup::OPTION_ACTION_GROUP])
-            ->willReturn($actionGroup);
-
-        //during execute
-        $mockActionGroupDefinition = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ActionGroupDefinition')
+        $mockActionGroup = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ActionGroup')
+            ->disableOriginalConstructor()
             ->getMock();
 
-        $mockActionGroupDefinition->expects($this->once())
-            ->method('getName')
-            ->willReturn($options[RunActionGroup::OPTION_ACTION_GROUP]);
+        //during initialize
+        $this->actionGroupRegistry->expects($this->once())->method('get')
+            ->with($options[RunActionGroup::OPTION_ACTION_GROUP])
+            ->willReturn($mockActionGroup);
 
-        $actionGroup->expects($this->once())
-            ->method('getDefinition')
-            ->willReturn($mockActionGroupDefinition);
-
-        $actionGroup->expects($this->once())
+        //during execute
+        $mockActionGroup->expects($this->once())
             ->method('execute')
-            ->with($arguments, new ArrayCollection())
+            ->with($arguments)
             ->willReturn($returnVal);
 
         $this->function->initialize($options);
         $this->function->execute($data);
-
 
         $this->assertEquals($expected, $data);
     }
@@ -203,20 +175,18 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     {
         $actionData1 = new ActionData(['data' => (object)['paramValue' => 'value']]);
 
-        $mockActionGroup = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ActionGroup')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $actionDataWithAttributeApplied = new ActionData(['param' => 'value']);
+        $actionDataWithAttributeApplied['new_param_data'] = 'return value';
 
         return [
             'without attribute' => [
                 'contextParams' => ['param' => 'value'],
                 'options' => [
                     RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
-                    RunActionGroup::OPTION_PARAMETERS => [
-                        'paramValue' => '$.param'
+                    RunActionGroup::OPTION_PARAMETERS_MAP => [
+                        'paramValue' => new PropertyPath('param')
                     ]
                 ],
-                'actionGroup' => $mockActionGroup,
                 'arguments' => $actionData1,
                 'return' => 'not matters',
                 'expected' => new ActionData(['param' => 'value'])
@@ -225,26 +195,15 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                 'contextParams' => ['param' => 'value'],
                 'options' => [
                     RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
-                    RunActionGroup::OPTION_PARAMETERS => [
-                        'paramValue' => '$.param'
+                    RunActionGroup::OPTION_PARAMETERS_MAP => [
+                        'paramValue' => new PropertyPath('param')
                     ],
-                    RunActionGroup::OPTION_ATTRIBUTE => 'new_param_data'
+                    RunActionGroup::OPTION_ATTRIBUTE => new PropertyPath('new_param_data')
                 ],
-                'actionGroup' => $mockActionGroup,
                 'arguments' => $actionData1,
                 'return' => 'return value',
-                'expected' => new ActionData(['param' => 'value', 'new_param_data' => 'return value'])
+                'expected' => $actionDataWithAttributeApplied
             ]
         ];
-    }
-
-    /**
-     * @param array $data
-     */
-    protected function assertManagerCalled(array $data)
-    {
-        $this->actionGroupRegistry->expects($this->once())
-            ->method('find')
-            ->willReturn(new ActionData($data));
     }
 }

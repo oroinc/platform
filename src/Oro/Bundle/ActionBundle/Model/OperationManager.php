@@ -59,10 +59,7 @@ class OperationManager
     {
         $operation = $this->getOperation($operationName, $actionData);
         foreach ($operation->getActionGroupsIterator($actionData) as $executionArgs) {
-
-            $actionGroup = $this->actionGroupRegistry->findByName($executionArgs->getName());
-
-            $actionGroup->execute($executionArgs->getActionData(), $errors);
+            $executionArgs->execute($this->actionGroupRegistry, $errors);
         }
 
         return $actionData;

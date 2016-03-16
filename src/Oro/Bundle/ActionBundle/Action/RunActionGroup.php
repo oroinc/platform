@@ -14,22 +14,22 @@ use Oro\Bundle\ActionBundle\Model\ActionGroup;
 
 class RunActionGroup extends AbstractAction
 {
-    const OPTION_ACTION_GROUP = 'action_group';
-    const OPTION_PARAMETERS   = 'parameters_mapping';
-    const OPTION_ATTRIBUTE    = 'attribute';
+    const OPTION_ACTION_GROUP   = 'action_group';
+    const OPTION_PARAMETERS_MAP = 'parameters_mapping';
+    const OPTION_ATTRIBUTE      = 'attribute';
 
     /** @var ActionGroupRegistry */
     protected $actionGroupRegistry;
 
     protected $parametersMapper;
 
-    /** @var ActionGroup */
-    protected $actionGroup;
-
     /** @var array|\Traversable */
-    protected $parameters;
+    protected $parametersMap;
 
-    /** @var string|null */
+    /** @var ActionGroupExecutionArgs */
+    protected $executionArguments;
+
+    /** @var mixed */
     protected $attribute;
 
     /**
@@ -53,8 +53,8 @@ class RunActionGroup extends AbstractAction
     public function initialize(array $options)
     {
         //clear up
-        $this->parameters = [];
-        $this->attribute = $this->actionGroup = null;
+        $this->parametersMap = [];
+        $this->executionArguments = null;
 
         if (empty($options[self::OPTION_ACTION_GROUP])) {
             throw new InvalidParameterException(
@@ -62,26 +62,20 @@ class RunActionGroup extends AbstractAction
             );
         }
 
-        $this->actionGroup = $this->actionGroupRegistry->findByName($options[self::OPTION_ACTION_GROUP]);
+        $this->executionArguments = new ActionGroupExecutionArgs($options[self::OPTION_ACTION_GROUP]);
 
-        if (!$this->actionGroup instanceof ActionGroup) {
-            throw new \RuntimeException(
-                sprintf('ActionGroup with name `%s` not found', $options[self::OPTION_ACTION_GROUP])
-            );
-        }
-
-        if (array_key_exists(self::OPTION_PARAMETERS, $options)) {
-            $parameters = $options[self::OPTION_PARAMETERS];
-            if (!is_array($parameters) || $parameters instanceof \Traversable) {
+        if (array_key_exists(self::OPTION_PARAMETERS_MAP, $options)) {
+            $parametersMap = $options[self::OPTION_PARAMETERS_MAP];
+            if (!is_array($parametersMap) || $parametersMap instanceof \Traversable) {
                 throw new InvalidParameterException(
                     sprintf(
                         'Option `%s` must be array or implement \Traversable interface',
-                        self::OPTION_PARAMETERS
+                        self::OPTION_PARAMETERS_MAP
                     )
                 );
             }
 
-            $this->parameters = $parameters;
+            $this->parametersMap = $parametersMap;
         }
 
         $this->attribute = array_key_exists(self::OPTION_ATTRIBUTE, $options) ? $options[self::OPTION_ATTRIBUTE] : null;
@@ -94,17 +88,15 @@ class RunActionGroup extends AbstractAction
      */
     protected function executeAction($context)
     {
-        if (null === $this->actionGroup) {
+        if (null === $this->executionArguments) {
             throw new \BadMethodCallException('Uninitialized action execution.');
         }
 
-        $arguments = new ActionGroupExecutionArgs($this->actionGroup->getDefinition()->getName());
-
-        $this->parametersMapper->mapToArgs($arguments, $this->parameters, $context);
+        $this->parametersMapper->mapToArgs($this->executionArguments, $this->parametersMap, $context);
 
         $errors = new ArrayCollection();
 
-        $result = $this->actionGroup->execute($arguments->getActionData(), $errors);
+        $result = $this->executionArguments->execute($this->actionGroupRegistry, $errors);
 
         if ($this->attribute) {
             $this->contextAccessor->setValue($context, $this->attribute, $result);

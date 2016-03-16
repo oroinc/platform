@@ -19,22 +19,6 @@ class ParametersMapper
         $this->accessor = $accessor ?: new ContextAccessor();
     }
 
-    /**
-     * @param array|\Traversable $parametersMap
-     * @param mixed $context
-     * @return array
-     */
-    public function map($parametersMap, $context)
-    {
-        $this->assertTraversable($parametersMap);
-
-        $result = [];
-        foreach ($parametersMap as $argName => $argValue) {
-            $result[$argName] = $this->readValue($context, $argValue);
-        }
-
-        return $result;
-    }
 
     /**
      * Applies mapped values from context to ActionGroupExecutionArgs arguments
@@ -47,7 +31,7 @@ class ParametersMapper
         $this->assertTraversable($parametersMap);
 
         foreach ($parametersMap as $argName => $argValue) {
-            $args->addArgument($argName, $this->readValue($argValue, $context));
+            $args->addArgument($argName, $this->readValue($context, $argValue));
         }
     }
 

@@ -24,13 +24,12 @@ class ActionGroupsMappingIterator extends \ArrayIterator
     /**
      * @param array|OperationActionGroup[] $actionGroups
      * @param ActionData $data
-     * @param ParametersMapper $mapper
      */
-    public function __construct(array $actionGroups, ActionData $data, ParametersMapper $mapper)
+    public function __construct(array $actionGroups, ActionData $data)
     {
         parent::__construct($actionGroups);
         $this->data = $data;
-        $this->mapper = $mapper;
+        $this->mapper = new ParametersMapper();
     }
 
     /**

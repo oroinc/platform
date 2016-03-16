@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+use Doctrine\Common\Collections\Collection;
+
 class ActionGroupExecutionArgs
 {
     /** @var string */
@@ -47,5 +49,16 @@ class ActionGroupExecutionArgs
     public function getActionData()
     {
         return new ActionData(['data' => (object)$this->arguments]);
+    }
+
+    /**
+     * @param ActionGroupRegistry $registry
+     * @param Collection|null $errors
+     * @return mixed
+     * @throws \Oro\Bundle\ActionBundle\Exception\ForbiddenActionException
+     */
+    public function execute(ActionGroupRegistry $registry, Collection $errors = null)
+    {
+        return $registry->get($this->getActionGroupName())->execute($this->getActionData(), $errors);
     }
 }
