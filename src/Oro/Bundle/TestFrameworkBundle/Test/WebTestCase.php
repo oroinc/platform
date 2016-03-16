@@ -109,15 +109,15 @@ abstract class WebTestCase extends BaseWebTestCase
 
     public static function tearDownAfterClass()
     {
+        foreach (self::$connections as $connection) {
+            $connection->close();
+        }
+        self::$connections = [];
+
         if (self::$clientInstance) {
             if (self::getDbIsolationSetting()) {
                 self::$clientInstance->rollbackTransaction();
             }
-
-            foreach (self::$connections as $connection) {
-                $connection->close();
-            }
-            self::$connections = [];
 
             self::$clientInstance = null;
             self::$soapClientInstance = null;
