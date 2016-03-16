@@ -41,7 +41,7 @@ class AddActionsToResources implements ProcessorInterface
                 $requestType,
                 [$actionsExtra]
             );
-            $resource->setExcludedActions($config->getActions()->getExcludedActions());
+            $resource->setExcludedActions($config->getActions()->getExcluded());
         }
 
         $context->setResult($resources);

@@ -58,7 +58,7 @@ class EntityTypeSecurityCheck implements ProcessorInterface
         $actions = $context->getConfigOf('actions');
 
         // we should not check access for this action
-        if (!$actions->isAclProtectedAction($action)) {
+        if (!$actions->isAclProtected($action)) {
             return;
         }
 

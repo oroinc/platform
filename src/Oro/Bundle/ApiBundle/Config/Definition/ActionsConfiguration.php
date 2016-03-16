@@ -45,15 +45,12 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
             ->validate()
             ->always(
                 function ($value) use ($postProcessCallbacks, $sectionName) {
-                    if (empty($value[$sectionName])) {
-                        unset($value[$sectionName]);
-                    }
                     // validate delete_handler values
                     foreach ($value as $actionName => $actionConfig) {
                         if ($actionName !== 'delete' && array_key_exists('delete_handler', $actionConfig)) {
                             throw new InvalidConfigurationException(
                                 sprintf(
-                                    'Action "%s" does not supports delete_handler parameter',
+                                    'The "%s" action does not supports delete_handler parameter.',
                                     $actionName
                                 )
                             );
