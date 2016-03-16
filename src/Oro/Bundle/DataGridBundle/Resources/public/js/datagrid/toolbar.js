@@ -34,6 +34,14 @@ define([
         /** @property */
         extraActionsPanel: ActionsPanel,
 
+        /** @property */
+        selector: {
+            pagination: '[data-grid-pagination]',
+            pagesize: '[data-grid-pagesize]',
+            actionsPanel: '[data-grid-actions-panel]',
+            extraActionsPanel: '[data-grid-extra-actions-panel]'
+        },
+
         /**
          * Initializer.
          *
@@ -122,15 +130,15 @@ define([
             this.$el.append(this.template());
 
             $pagination = this.subviews.pagination.render().$el;
-            $pagination.attr('class', this.$('.pagination').attr('class'));
+            $pagination.attr('class', this.$(this.selector.pagination).attr('class'));
 
-            this.$('.pagination').replaceWith($pagination);
-            this.$('.page-size').append(this.subviews.pageSize.render().$el);
-            this.$('.actions-panel').append(this.subviews.actionsPanel.render().$el);
+            this.$(this.selector.pagination).replaceWith($pagination);
+            this.$(this.selector.pagesize).append(this.subviews.pageSize.render().$el);
+            this.$(this.selector.actionsPanel).append(this.subviews.actionsPanel.render().$el);
             if (this.subviews.extraActionsPanel.haveActions()) {
-                this.$('.extra-actions-panel').append(this.subviews.extraActionsPanel.render().$el);
+                this.$(this.selector.extraActionsPanel).append(this.subviews.extraActionsPanel.render().$el);
             } else {
-                this.$('.extra-actions-panel').hide();
+                this.$(this.selector.extraActionsPanel).hide();
             }
 
             return this;
