@@ -66,7 +66,7 @@ class TransitionHandler
         }
 
         if (isset($e)) {
-            $this->logger->error($e->getMessage());
+            $this->logger->error($e->getMessage(), $e->getTrace());
         }
 
         return $this->transitionHelper->createCompleteResponse($workflowItem, $responseCode);
