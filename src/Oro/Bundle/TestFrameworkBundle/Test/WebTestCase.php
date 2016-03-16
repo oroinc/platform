@@ -30,7 +30,6 @@ abstract class WebTestCase extends BaseWebTestCase
     /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
     const DB_REINDEX_ANNOTATION   = 'dbReindex';
-    const DB_KEEP_CONNECTION      = 'dbKeepConnection';
 
     /** Default WSSE credentials */
     const USER_NAME     = 'admin';

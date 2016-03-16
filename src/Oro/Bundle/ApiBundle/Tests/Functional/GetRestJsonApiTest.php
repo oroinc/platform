@@ -81,7 +81,7 @@ class GetRestJsonApiTest extends ApiTestCase
             $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 200, $entityAlias, 'get');
         }
 
-        parent::cleanUpConnections();
+        self::cleanUpConnections();
     }
 
     /**
