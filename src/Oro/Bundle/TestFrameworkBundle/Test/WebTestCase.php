@@ -100,6 +100,7 @@ abstract class WebTestCase extends BaseWebTestCase
          *  to avoid exceeding the `max_connections` limitation.
          * Due all test cases runs in single process.
          */
+        /** @var Connection[] $connections */
         $connections = self::getContainer()->get('doctrine')->getConnections();
         foreach ($connections as $connection) {
             if ($connection->isConnected()) {
