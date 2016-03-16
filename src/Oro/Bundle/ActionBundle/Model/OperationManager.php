@@ -15,12 +15,15 @@ class OperationManager
     /** @var OperationRegistry */
     protected $operationRegistry;
 
+    /** @var ActionGroupRegistry */
+    protected $actionGroupRegistry;
+
     /** @var ContextHelper */
     protected $contextHelper;
 
     /**
      * @param OperationRegistry $operationRegistry
-     * @param ActionGroupRegistry $actionGroupRegistry,
+     * @param ActionGroupRegistry $actionGroupRegistry
      * @param ContextHelper $contextHelper
      */
     public function __construct(
@@ -59,6 +62,7 @@ class OperationManager
     {
         $operation = $this->getOperation($operationName, $actionData);
         foreach ($operation->getActionGroupsIterator($actionData) as $executionArgs) {
+            /* @var $executionArgs ActionGroupExecutionArgs */
             $actionGroup = $this->actionGroupRegistry->findByName($executionArgs->getName());
 
             $actionGroup->execute($executionArgs->getActionData(), $errors);

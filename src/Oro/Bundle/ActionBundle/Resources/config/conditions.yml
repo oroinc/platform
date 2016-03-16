@@ -133,3 +133,8 @@ services:
         class: Oro\Bundle\ActionBundle\Condition\CollectionElementValueExists
         tags:
             - { name: oro_action.condition, alias: collection_element_value_exists }
+
+    oro_action.expression.type:
+        class: Oro\Component\ConfigExpression\Condition\Type
+        tags:
+            - { name: oro_action.condition, alias: type }

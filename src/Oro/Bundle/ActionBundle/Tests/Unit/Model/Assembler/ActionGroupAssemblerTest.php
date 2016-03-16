@@ -64,7 +64,11 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
         $definition2
             ->setName('maximum_name')
             ->setArguments(['config_arguments'])
-            ->setConditions(['config_conditions'])
+            ->setConditions([
+                '@and' => [
+                    ['config_conditions'],
+                ],
+            ])
             ->setActions(['config_actions']);
 
         $definition3 = clone $definition2;
