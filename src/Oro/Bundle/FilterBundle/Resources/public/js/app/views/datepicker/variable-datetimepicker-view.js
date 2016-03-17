@@ -89,9 +89,9 @@ define(function(require) {
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return this.dayValueHelper.isDayValue(value)
-                    ? this.dayValueHelper.formatRawValue(value)
-                    : dateTimePickerViewMixin.getBackendFormattedValue.call(this);
+                return this.dayValueHelper.isDayValue(value) ?
+                    this.dayValueHelper.formatRawValue(value) :
+                    dateTimePickerViewMixin.getBackendFormattedValue.call(this);
             }
 
             return this.getBackendPartFormattedValue();
@@ -109,9 +109,9 @@ define(function(require) {
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return this.dayValueHelper.isDayValue(value)
-                    ? this.dayValueHelper.formatDisplayValue(value)
-                    : dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
+                return this.dayValueHelper.isDayValue(value) ?
+                    this.dayValueHelper.formatDisplayValue(value) :
+                    dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
             }
 
             return this.getFrontendPartFormattedDate();

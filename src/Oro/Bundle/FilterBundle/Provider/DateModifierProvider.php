@@ -58,20 +58,7 @@ class DateModifierProvider implements DateModifierInterface
                 self::VAR_THIS_DAY,
             ],
             self::PART_MONTH   => [
-                self::VAR_THIS_MONTH,
                 self::VAR_FMQ,
-                self::VAR_JANUARY,
-                self::VAR_FEBRUARY,
-                self::VAR_MARCH,
-                self::VAR_APRIL,
-                self::VAR_MAY,
-                self::VAR_JUNE,
-                self::VAR_JULY,
-                self::VAR_AUGUST,
-                self::VAR_SEPTEMBER,
-                self::VAR_OCTOBER,
-                self::VAR_NOVEMBER,
-                self::VAR_DECEMBER
             ],
             self::PART_QUARTER => [
                 self::VAR_THIS_QUARTER
