@@ -8,6 +8,9 @@ use FOS\RestBundle\Util\Codes;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Session;
 
@@ -33,14 +36,16 @@ class OperationController extends FOSRestController
      */
     public function executeAction($actionName)
     {
+        $errors = new ArrayCollection();
+
         try {
-            $data = $this->getOperationManager()->executeByContext($actionName);
+            $data = $this->getOperationManager()->executeByContext($actionName, null, $errors);
         } catch (ActionNotFoundException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND);
+            return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND, $errors);
         } catch (ForbiddenActionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_FORBIDDEN);
+            return $this->handleError($e->getMessage(), Codes::HTTP_FORBIDDEN, $errors);
         } catch (\Exception $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR);
+            return $this->handleError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR, $errors);
         }
 
         return $this->handleView(
@@ -59,22 +64,34 @@ class OperationController extends FOSRestController
     /**
      * @param string $message
      * @param int $code
+     * @param Collection $errorMessages
      * @return Response
      */
-    protected function handleError($message, $code)
+    protected function handleError($message, $code, Collection $errorMessages)
     {
+        $messages = [];
+
+        if (count($errorMessages)) {
+            $translator = $this->get('translator');
+
+            foreach ($errorMessages as $errorMessage) {
+                $messages[] = $translator->trans($errorMessage['message'], $errorMessage['parameters']);
+            }
+        }
+
         return $this->handleView(
-            $this->view($this->formatErrorResponse($message), $code)
+            $this->view($this->formatErrorResponse($message, $messages), $code)
         );
     }
 
     /**
      * @param string $message
+     * @param array $messages
      * @return array
      */
-    protected function formatErrorResponse($message)
+    protected function formatErrorResponse($message, array $messages = [])
     {
-        return ['message' => $message];
+        return ['message' => $message, 'messages' => $messages];
     }
 
     /**

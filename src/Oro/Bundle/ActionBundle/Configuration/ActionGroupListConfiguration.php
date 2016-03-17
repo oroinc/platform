@@ -38,7 +38,7 @@ class ActionGroupListConfiguration implements ConfigurationDefinitionInterface
                             ->scalarNode('message')->end()
                             ->scalarNode('default')->end()
                             ->booleanNode('required')
-                                ->defaultFalse()
+                                ->defaultTrue()
                             ->end()
                         ->end()
                     ->end()

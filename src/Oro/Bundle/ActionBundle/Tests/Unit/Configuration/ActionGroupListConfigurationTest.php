@@ -58,7 +58,7 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'string',
                                 'message' => 'Exception message',
                                 'default' => 'test string',
-                                'required' => true
+                                'required' => false
                             ],
                             'arg2' => []
                         ],
@@ -78,10 +78,10 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'string',
                                 'message' => 'Exception message',
                                 'default' => 'test string',
-                                'required' => true
+                                'required' => false
                             ],
                             'arg2' => [
-                                'required' => false
+                                'required' => true
                             ]
                         ],
                         'conditions' => [
