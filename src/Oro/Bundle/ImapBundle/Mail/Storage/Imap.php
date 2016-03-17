@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ImapBundle\Mail\Storage;
 
 use Zend\Mail\Storage\Exception as BaseException;
-use Zend\Mail\Storage\Exception\InvalidArgumentException;
 
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
