@@ -4,6 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassChecking;
+use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 /**
@@ -12,6 +14,21 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
 {
     const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_method_name';
+
+    /** @var ExtendClassChecking */
+    protected $extendClassChecking;
+
+    /**
+     * @param FieldNameValidationHelper $validationHelper
+     * @param ExtendClassChecking       $extendClassChecking
+     *
+     */
+    public function __construct(FieldNameValidationHelper $validationHelper, ExtendClassChecking $extendClassChecking)
+    {
+        parent::__construct($validationHelper);
+
+        $this->extendClassChecking = $extendClassChecking;
+    }
 
     /**
      * {@inheritdoc}
@@ -29,32 +46,17 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
 
         $className = $value->getEntity()->getClassName();
         $fieldName = $value->getFieldName();
-        $camelized = $this->camelize($fieldName);
-        $reaching = [
-            'get' . $camelized,
-            'set' . $camelized,
-            'is' . $camelized,
-            'has' . $camelized
-        ];
 
-        $class_methods = get_class_methods($className);
-
-        foreach ($reaching as $methodName) {
-            if (in_array($methodName, $class_methods)) {
-                $this->addViolation($constraint->sameMethodMessage, $fieldName, $methodName);
-            }
+        if ($this->extendClassChecking->hasGetter($className, $fieldName)) {
+            $this->addViolation($constraint->message, 'getters', $className);
         }
-    }
 
-    /**
-     * Camelizes a given string.
-     *
-     * @param string $string Some string
-     *
-     * @return string The camelized version of the string
-     */
-    protected function camelize($string)
-    {
-        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
+        if ($this->extendClassChecking->hasSetter($className, $fieldName)) {
+            $this->addViolation($constraint->message, 'setters', $className);
+        }
+
+        if ($this->extendClassChecking->hasRemover($className, $fieldName)) {
+            $this->addViolation($constraint->message, 'remover', $className);
+        }
     }
 }
