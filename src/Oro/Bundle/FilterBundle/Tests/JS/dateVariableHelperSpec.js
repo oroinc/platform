@@ -4,12 +4,12 @@ define([
     'use strict';
 
     var dateVariableHelper = new DateVariableHelper({
-        "value": {
-            "10": "current day",
+        'value': {
+            '10': 'current day'
         },
-        "dayofweek": {
-            "10": "current day",
-            "15": "first day of quarter"
+        'dayofweek': {
+            '10': 'current day',
+            '15': 'first day of quarter'
         }
     });
 
@@ -32,13 +32,13 @@ define([
     ];
 
     describe('orofilter/js/date-variable-helper', function() {
-       it('should', function() {
-           data.forEach(function(item) {
+        it('should', function() {
+            data.forEach(function(item) {
                 expect(dateVariableHelper.isDateVariable(item.value)).toBe(item.isDateVariable);
                 if (item.isDateVariable) {
                     expect(dateVariableHelper.formatRawValue(item.value)).toEqual(item.rawValue);
                 }
-           });
-       });
+            });
+        });
     });
 });
