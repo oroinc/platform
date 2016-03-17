@@ -10,6 +10,9 @@ class ProcessorBag implements ProcessorBagInterface
     /** @var ProcessorFactoryInterface */
     protected $processorFactory;
 
+    /** @var bool */
+    protected $debug;
+
     /**
      * @var array|null
      * after the bag is initialized this property is set to NULL,
@@ -37,10 +40,12 @@ class ProcessorBag implements ProcessorBagInterface
 
     /**
      * @param ProcessorFactoryInterface $processorFactory
+     * @param bool                      $debug
      */
-    public function __construct(ProcessorFactoryInterface $processorFactory)
+    public function __construct(ProcessorFactoryInterface $processorFactory, $debug = false)
     {
         $this->processorFactory = $processorFactory;
+        $this->debug = $debug;
     }
 
     /**
@@ -103,8 +108,18 @@ class ProcessorBag implements ProcessorBagInterface
     {
         $this->ensureInitialized();
 
+        $processors = $this->processors;
+        // remove "priority" attribute in debug mode
+        if ($this->debug) {
+            foreach ($processors as &$item) {
+                foreach ($item as &$processor) {
+                    unset($processor['attributes']['priority']);
+                }
+            }
+        }
+
         return new ProcessorIterator(
-            $this->processors,
+            $processors,
             $context,
             $this->processorApplicableChecker,
             $this->processorFactory

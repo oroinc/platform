@@ -42,7 +42,7 @@ class RelationConfigProvider extends AbstractConfigProvider
 
         $cacheKey = $this->buildCacheKey($className, $version, $requestType, $extras);
         if (array_key_exists($cacheKey, $this->cache)) {
-            return $this->cache[$cacheKey];
+            return clone $this->cache[$cacheKey];
         }
 
         /** @var RelationConfigContext $context */
@@ -55,6 +55,6 @@ class RelationConfigProvider extends AbstractConfigProvider
 
         $this->cache[$cacheKey] = $config;
 
-        return $config;
+        return clone $config;
     }
 }
