@@ -2,15 +2,33 @@
 
 namespace Oro\Bundle\ImportExportBundle\TemplateFixture;
 
+use ArrayIterator;
+use Iterator;
+
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\LoadTemplateFixturesEvent;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 
 class TemplateEntityRegistry
 {
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
+
     /** @var bool */
     private $isDirty = true;
 
     /** @var array */
     private $entities = [];
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
 
     /**
      * @param string $entityClass
@@ -78,7 +96,7 @@ class TemplateEntityRegistry
      * @param string          $entityClass
      * @param string|null     $entityKey
      *
-     * @return \Iterator
+     * @return Iterator
      */
     public function getData(TemplateManager $templateManager, $entityClass, $entityKey = null)
     {
@@ -93,7 +111,7 @@ class TemplateEntityRegistry
             }
         }
 
-        return new \ArrayIterator($entities);
+        return new ArrayIterator($entities);
     }
 
     /**
@@ -114,6 +132,12 @@ class TemplateEntityRegistry
                         $val['isDirty'] = false;
                     }
                 }
+            }
+
+            if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_LOAD_TEMPLATE_FIXTURES)) {
+                $event = new LoadTemplateFixturesEvent($this->entities);
+                $this->dispatcher->dispatch(Events::AFTER_LOAD_TEMPLATE_FIXTURES, $event);
+                $this->entities = $event->getEntities();
             }
         }
     }

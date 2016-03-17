@@ -51,6 +51,9 @@ class ConfigNormalizer
                                     $fieldConfig
                                 );
                             }
+                        } elseif ($this->isCollapsedWithoutPropertyPath($fieldConfig)) {
+                            $targetFields = array_keys($fieldConfig[ConfigUtil::FIELDS]);
+                            $fieldConfig[ConfigUtil::PROPERTY_PATH] = reset($targetFields);
                         }
 
                         $config[ConfigUtil::FIELDS][$field] = $this->normalizeConfig($fieldConfig);
@@ -174,5 +177,21 @@ class ConfigNormalizer
         $config[ConfigUtil::EXCLUSION_POLICY] = ConfigUtil::EXCLUSION_POLICY_ALL;
         $config[ConfigUtil::PROPERTY_PATH]    = $field;
         $config[ConfigUtil::FIELDS]           = [$field => null];
+    }
+
+    /**
+     * @param array $fieldConfig
+     *
+     * @return bool
+     */
+    protected function isCollapsedWithoutPropertyPath(array $fieldConfig)
+    {
+        return
+            isset($fieldConfig[ConfigUtil::COLLAPSE])
+            && $fieldConfig[ConfigUtil::COLLAPSE]
+            && ConfigUtil::isExcludeAll($fieldConfig)
+            && isset($fieldConfig[ConfigUtil::FIELDS])
+            && is_array($fieldConfig[ConfigUtil::FIELDS])
+            && count($fieldConfig[ConfigUtil::FIELDS]) === 1;
     }
 }
