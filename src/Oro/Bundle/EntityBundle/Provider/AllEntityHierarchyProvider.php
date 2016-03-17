@@ -55,6 +55,8 @@ class AllEntityHierarchyProvider extends AbstractEntityHierarchyProvider
                 if (false === $hierarchy) {
                     $hierarchy = $this->loadHierarchy($om);
                     $cacheDriver->save(static::HIERARCHY_METADATA_CACHE_KEY, $hierarchy);
+                } elseif (!empty($hierarchy)) {
+                    $this->hierarchy = array_merge($this->hierarchy, $hierarchy);
                 }
             } else {
                 $this->loadHierarchy($om);

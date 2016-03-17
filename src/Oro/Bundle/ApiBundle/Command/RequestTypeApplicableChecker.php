@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Oro\Component\ChainProcessor\ApplicableCheckerInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\MatchApplicableChecker;
 
-class RequestTypeApplicableChecker implements ApplicableCheckerInterface
+class RequestTypeApplicableChecker extends MatchApplicableChecker
 {
     /**
      * {@inheritdoc}
@@ -14,31 +14,13 @@ class RequestTypeApplicableChecker implements ApplicableCheckerInterface
     {
         $result   = self::ABSTAIN;
         $attrName = 'requestType';
-        if (!empty($processorAttributes[$attrName]) && $context->has($attrName)) {
-            if (!$this->isMatch($processorAttributes[$attrName], $context->get($attrName))) {
-                $result = self::NOT_APPLICABLE;
-            }
+        if (!empty($processorAttributes[$attrName])
+            && $context->has($attrName)
+            && !$this->isMatch($processorAttributes[$attrName], $context->get($attrName))
+        ) {
+            $result = self::NOT_APPLICABLE;
         }
 
         return $result;
-    }
-
-    /**
-     * Checks if a value of a processor attribute matches a corresponding value from the context
-     *
-     * @param mixed $value
-     * @param mixed $contextValue
-     *
-     * @return bool
-     */
-    protected function isMatch($value, $contextValue)
-    {
-        if (is_array($contextValue)) {
-            return is_array($value)
-                ? count(array_intersect($value, $contextValue)) === count($value)
-                : in_array($value, $contextValue, true);
-        }
-
-        return $contextValue === $value;
     }
 }

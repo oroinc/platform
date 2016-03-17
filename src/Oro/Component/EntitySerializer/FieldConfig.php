@@ -59,6 +59,22 @@ class FieldConfig
     }
 
     /**
+     * Make a deep copy of object.
+     */
+    public function __clone()
+    {
+        $this->items = array_map(
+            function ($value) {
+                return is_object($value) ? clone $value : $value;
+            },
+            $this->items
+        );
+        if (null !== $this->targetEntity) {
+            $this->targetEntity = clone $this->targetEntity;
+        }
+    }
+
+    /**
      * Gets the configuration of the target entity if the field represents an association with another entity.
      *
      * @return EntityConfig|null
