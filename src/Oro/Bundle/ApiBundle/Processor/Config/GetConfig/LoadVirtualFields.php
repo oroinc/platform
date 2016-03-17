@@ -7,9 +7,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Provider\VirtualFieldProviderInterface;
 
+/**
+ * Loads configuration of virtual fields.
+ */
 class LoadVirtualFields implements ProcessorInterface
 {
     /** @var VirtualFieldProviderInterface */
@@ -30,31 +32,21 @@ class LoadVirtualFields implements ProcessorInterface
     {
         /** @var ConfigContext $context */
 
-        /** @var array $definition */
-        $definition = $context->getResult();
-        if (empty($definition) || !array_key_exists(ConfigUtil::FIELDS, $definition)) {
-            // virtual fields is added only if a definition of fields exists
-            return;
-        }
-
-        $entityClass   = $context->getClassName();
-        $virtualFields = $this->virtualFieldProvider->getVirtualFields($entityClass);
-        if (!empty($virtualFields)) {
-            foreach ($virtualFields as $field) {
-                $query        = $this->virtualFieldProvider->getVirtualFieldQuery($entityClass, $field);
+        $entityClass       = $context->getClassName();
+        $virtualFieldNames = $this->virtualFieldProvider->getVirtualFields($entityClass);
+        if (!empty($virtualFieldNames)) {
+            $definition = $context->getResult();
+            foreach ($virtualFieldNames as $virtualFieldName) {
+                $query        = $this->virtualFieldProvider->getVirtualFieldQuery($entityClass, $virtualFieldName);
                 $propertyPath = $this->getPropertyPath($query);
                 if (!empty($propertyPath)) {
-                    $definition[ConfigUtil::FIELDS][$field][ConfigUtil::PROPERTY_PATH] = $propertyPath;
-                    if (!empty($query['select']['label'])
-                        && $context->hasExtra(DescriptionsConfigExtra::NAME)
-                    ) {
-                        $definition[ConfigUtil::FIELDS][$field][ConfigUtil::LABEL] = new Label(
-                            $query['select']['label']
-                        );
+                    $field = $definition->getOrAddField($virtualFieldName);
+                    $field->setPropertyPath($propertyPath);
+                    if (!empty($query['select']['label']) && $context->hasExtra(DescriptionsConfigExtra::NAME)) {
+                        $field->setLabel(new Label($query['select']['label']));
                     }
                 }
             }
-            $context->setResult($definition);
         }
     }
 

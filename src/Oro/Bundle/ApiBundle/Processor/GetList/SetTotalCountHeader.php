@@ -13,6 +13,10 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
+/**
+ * Calculates and sets the total number of records to "X-Include-Total-Count" response header,
+ * in case if it was requested by "X-Include: totalCount" request header.
+ */
 class SetTotalCountHeader implements ProcessorInterface
 {
     const HEADER_NAME = 'X-Include-Total-Count';

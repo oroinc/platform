@@ -9,14 +9,16 @@ use Symfony\Component\Routing\Exception\ExceptionInterface as RoutingException;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * Excludes relations that are pointed to not accessible resources.
- * For example if entity1 has a reference to to entity2, but entity2 does not have API resource,
+ * For example if entity1 has a reference to to entity2, but entity2 does not have Data API resource,
  * the relation will be excluded.
  */
 class ExcludeNotAccessibleRelations implements ProcessorInterface
@@ -27,22 +29,22 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     /** @var RouterInterface */
     protected $router;
 
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
 
     /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param RouterInterface     $router
-     * @param EntityAliasResolver $entityAliasResolver
+     * @param DoctrineHelper  $doctrineHelper
+     * @param RouterInterface $router
+     * @param ValueNormalizer $valueNormalizer
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
         RouterInterface $router,
-        EntityAliasResolver $entityAliasResolver
+        ValueNormalizer $valueNormalizer
     ) {
-        $this->doctrineHelper      = $doctrineHelper;
-        $this->router              = $router;
-        $this->entityAliasResolver = $entityAliasResolver;
+        $this->doctrineHelper  = $doctrineHelper;
+        $this->router          = $router;
+        $this->valueNormalizer = $valueNormalizer;
     }
 
     /**
@@ -53,11 +55,8 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
-        if (!isset($definition[ConfigUtil::FIELDS])
-            || !is_array($definition[ConfigUtil::FIELDS])
-            || !ConfigUtil::isExcludeAll($definition)
-        ) {
-            // expected normalized configs
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
             return;
         }
 
@@ -67,67 +66,51 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
             return;
         }
 
-        if ($this->updateRelations($definition, $entityClass)) {
-            $context->setResult($definition);
-        }
+        $this->updateRelations($definition, $entityClass, $context->getRequestType());
     }
 
     /**
-     * @param array  $definition
-     * @param string $entityClass
-     *
-     * @return bool
+     * @param EntityDefinitionConfig $definition
+     * @param string                 $entityClass
+     * @param RequestType            $requestType
      */
-    protected function updateRelations(array &$definition, $entityClass)
+    protected function updateRelations(EntityDefinitionConfig $definition, $entityClass, RequestType $requestType)
     {
-        $hasChanges = false;
-
         $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
-        foreach ($definition[ConfigUtil::FIELDS] as $fieldName => &$fieldConfig) {
-            if (!is_array($fieldConfig) || empty($fieldConfig[ConfigUtil::DEFINITION][ConfigUtil::FIELDS])) {
+        $fields   = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            if ($field->isExcluded()) {
                 continue;
             }
 
-            $fieldDefinition = $fieldConfig[ConfigUtil::DEFINITION];
-            if (ConfigUtil::isExclude($fieldDefinition)) {
-                continue;
-            }
-
-            $propertyPath = ConfigUtil::getPropertyPath($fieldDefinition, $fieldName);
+            $propertyPath = $field->getPropertyPath() ?: $fieldName;
             if (!$metadata->hasAssociation($propertyPath)) {
                 continue;
             }
 
             $mapping        = $metadata->getAssociationMapping($propertyPath);
             $targetMetadata = $this->doctrineHelper->getEntityMetadataForClass($mapping['targetEntity']);
-            if ($this->isResourceForRelatedEntityAccessible($targetMetadata)) {
-                continue;
+            if (!$this->isResourceForRelatedEntityAccessible($targetMetadata, $requestType)) {
+                $field->setExcluded();
             }
-
-            $fieldDefinition[ConfigUtil::EXCLUDE] = true;
-
-            $fieldConfig[ConfigUtil::DEFINITION] = $fieldDefinition;
-
-            $hasChanges = true;
         }
-
-        return $hasChanges;
     }
 
     /**
      * @param ClassMetadata $targetMetadata
+     * @param RequestType   $requestType
      *
      * @return bool
      */
-    protected function isResourceForRelatedEntityAccessible(ClassMetadata $targetMetadata)
+    protected function isResourceForRelatedEntityAccessible(ClassMetadata $targetMetadata, RequestType $requestType)
     {
-        if ($this->isResourceAccessible($targetMetadata->name)) {
+        if ($this->isResourceAccessible($targetMetadata->name, $requestType)) {
             return true;
         }
         if ($targetMetadata->inheritanceType !== ClassMetadata::INHERITANCE_TYPE_NONE) {
-            // check that at least one inhetited entity has API resource
+            // check that at least one inherited entity has Data API resource
             foreach ($targetMetadata->subClasses as $inheritedEntityClass) {
-                if ($this->isResourceAccessible($inheritedEntityClass)) {
+                if ($this->isResourceAccessible($inheritedEntityClass, $requestType)) {
                     return true;
                 }
             }
@@ -137,15 +120,16 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     }
 
     /**
-     * @param string $entityClass
+     * @param string      $entityClass
+     * @param RequestType $requestType
      *
      * @return bool
      */
-    protected function isResourceAccessible($entityClass)
+    protected function isResourceAccessible($entityClass, RequestType $requestType)
     {
         $result = false;
 
-        $uri = $this->getEntityResourceUri($entityClass);
+        $uri = $this->getEntityResourceUri($entityClass, $requestType);
         if ($uri) {
             $matchingContext = $this->router->getContext();
 
@@ -167,18 +151,20 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
     }
 
     /**
-     * @param string $entityClass
+     * @param string      $entityClass
+     * @param RequestType $requestType
      *
      * @return string|null
      */
-    protected function getEntityResourceUri($entityClass)
+    protected function getEntityResourceUri($entityClass, RequestType $requestType)
     {
-        $uri = null;
-        if ($this->entityAliasResolver->hasAlias($entityClass)) {
+        $uri        = null;
+        $entityType = $this->convertToEntityType($entityClass, $requestType);
+        if ($entityType) {
             try {
                 $uri = $this->router->generate(
                     'oro_rest_api_cget',
-                    ['entity' => $this->entityAliasResolver->getPluralAlias($entityClass)]
+                    ['entity' => $entityType]
                 );
             } catch (RoutingException $e) {
                 // ignore any exceptions
@@ -193,6 +179,22 @@ class ExcludeNotAccessibleRelations implements ProcessorInterface
         }
 
         return $uri;
+    }
+
+    /**
+     * @param string      $entityClass
+     * @param RequestType $requestType
+     *
+     * @return string|null
+     */
+    protected function convertToEntityType($entityClass, RequestType $requestType)
+    {
+        return ValueNormalizerUtil::convertToEntityType(
+            $this->valueNormalizer,
+            $entityClass,
+            $requestType,
+            false
+        );
     }
 
     /**

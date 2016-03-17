@@ -2,12 +2,20 @@
 
 namespace Oro\Bundle\SearchBundle\Provider;
 
+use Doctrine\Common\Cache\Cache;
+use Doctrine\Common\Cache\ArrayCache;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
 use Oro\Bundle\SearchBundle\Event\SearchMappingCollectEvent;
 
 class SearchMappingProvider
 {
+    const CACHE_KEY = 'oro_search.mapping_config';
+
+    /** @var array */
+    protected $cacheDriver;
+
     /** @var array */
     protected $mappingConfig;
 
@@ -19,10 +27,12 @@ class SearchMappingProvider
 
     /**
      * @param EventDispatcherInterface $dispatcher
+     * @param Cache|null               $cacheDriver
      */
-    public function __construct(EventDispatcherInterface $dispatcher)
+    public function __construct(EventDispatcherInterface $dispatcher, Cache $cacheDriver = null)
     {
         $this->dispatcher = $dispatcher;
+        $this->cacheDriver = $cacheDriver ?: new ArrayCache();
     }
 
     /**
@@ -42,15 +52,29 @@ class SearchMappingProvider
     {
         if (!$this->isCollected) {
             $this->isCollected = true;
-            /**
-             *  dispatch oro_search.search_mapping_collect event
-             */
-            $event = new SearchMappingCollectEvent($this->mappingConfig);
-            $this->dispatcher->dispatch(SearchMappingCollectEvent::EVENT_NAME, $event);
-            $this->mappingConfig = $event->getMappingConfig();
+
+            if ($this->cacheDriver->contains(static::CACHE_KEY)) {
+                $this->mappingConfig = $this->cacheDriver->fetch(static::CACHE_KEY);
+            } else {
+                /**
+                 *  dispatch oro_search.search_mapping_collect event
+                 */
+                $event = new SearchMappingCollectEvent($this->mappingConfig);
+                $this->dispatcher->dispatch(SearchMappingCollectEvent::EVENT_NAME, $event);
+                $this->mappingConfig = $event->getMappingConfig();
+                $this->cacheDriver->save(static::CACHE_KEY, $this->mappingConfig);
+            }
         }
 
         return $this->mappingConfig;
+    }
+
+    /**
+     * Clears mapping cache
+     */
+    public function clearMappingCache()
+    {
+        $this->cacheDriver->delete(static::CACHE_KEY);
     }
 
     /**

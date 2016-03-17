@@ -8,6 +8,8 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AccessLevelOwnershipDecisionMakerInt
 use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector;
 use Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension;
 use Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension;
+use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
+use Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnerAccessor;
 use Oro\Bundle\SecurityBundle\Owner\EntityOwnershipDecisionMaker;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
@@ -66,13 +68,17 @@ class TestHelper
      * @param OwnerTree $ownerTree
      * @param ObjectIdAccessor $idAccessor
      * @param AccessLevelOwnershipDecisionMakerInterface $decisionMaker
+     * @param PermissionManager $permissionManager
+     * @param AclGroupProviderInterface $groupProvider
      * @return EntityAclExtension
      */
     public function createEntityAclExtension(
         OwnershipMetadataProvider $metadataProvider = null,
         OwnerTree $ownerTree = null,
         ObjectIdAccessor $idAccessor = null,
-        AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null
+        AccessLevelOwnershipDecisionMakerInterface $decisionMaker = null,
+        PermissionManager $permissionManager = null,
+        AclGroupProviderInterface $groupProvider = null
     ) {
         if ($idAccessor === null) {
             $idAccessor = new ObjectIdAccessor();
@@ -157,7 +163,48 @@ class TestHelper
             new EntityClassResolver($doctrine),
             $entityMetadataProvider,
             $metadataProvider,
-            $decisionMaker
+            $decisionMaker,
+            $permissionManager ?: $this->getPermissionManagerMock($this->testCase),
+            $groupProvider ?: $this->getGroupProviderMock($this->testCase)
         );
+    }
+
+    /**
+     * @param \PHPUnit_Framework_TestCase $testCase
+     *
+     * @return PermissionManager|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getPermissionManagerMock(\PHPUnit_Framework_TestCase $testCase)
+    {
+        $permissionManager = $testCase->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $permissionManager->expects($testCase->any())
+            ->method('getPermissionsMap')
+            ->willReturn([
+                'VIEW'   => 1,
+                'CREATE' => 2,
+                'EDIT'   => 3,
+                'DELETE' => 4,
+                'ASSIGN' => 5,
+                'SHARE'  => 6
+            ]);
+
+        return $permissionManager;
+    }
+
+    /**
+     * @param \PHPUnit_Framework_TestCase $testCase
+     *
+     * @return AclGroupProviderInterface|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getGroupProviderMock(\PHPUnit_Framework_TestCase $testCase)
+    {
+        $mock = $testCase->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
+        $mock->expects($testCase->any())
+            ->method('getGroup')
+            ->willReturn(AclGroupProviderInterface::DEFAULT_SECURITY_GROUP);
+
+        return $mock;
     }
 }

@@ -326,8 +326,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $translator->setLocale($locale);
         $translator->setDatabaseMetadataCache($databaseCache);
 
-        $translationTable = 'translation_table';
-
         $container
             ->expects($this->any())
             ->method('hasParameter')
@@ -353,31 +351,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->method('getRepository')
             ->with(Translation::ENTITY_NAME)
             ->willReturn($repository);
-        $em
-            ->expects($this->once())
-            ->method('getConnection')
-            ->willReturn($connection);
-        $em
-            ->expects($this->once())
-            ->method('getClassMetadata')
-            ->with(Translation::ENTITY_NAME)
-            ->willReturn($classMetadata);
-        $connection
-            ->expects($this->once())
-            ->method('connect');
-        $connection
-            ->expects($this->once())
-            ->method('getSchemaManager')
-            ->willReturn($schemaManager);
-        $schemaManager
-            ->expects($this->once())
-            ->method('tablesExist')
-            ->with($translationTable)
-            ->willReturn(true);
-        $classMetadata
-            ->expects($this->once())
-            ->method('getTableName')
-            ->willReturn($translationTable);
         $repository
             ->expects($this->once())
             ->method('findAvailableDomainsForLocales')
