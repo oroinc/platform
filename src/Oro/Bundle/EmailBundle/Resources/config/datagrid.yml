@@ -277,6 +277,7 @@ datagrid:
             toolbarOptions:
                 addColumnManager: false
             entity_pagination: true
+            alias: Oro\Bundle\EmailBundle\Entity\Email
 
     dashboard-recent-emails-grid:
         source:
