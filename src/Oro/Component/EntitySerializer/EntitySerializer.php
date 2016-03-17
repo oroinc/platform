@@ -2,6 +2,7 @@
 
 namespace Oro\Component\EntitySerializer;
 
+use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
@@ -571,8 +572,11 @@ class EntitySerializer
         $rows = $this->queryFactory->getRelatedItemsIds($mapping, $entityIds, $config);
 
         $result = [];
-        foreach ($rows as $row) {
-            $result[$row['entityId']][] = $row['relatedEntityId'];
+        if (!empty($rows)) {
+            $relatedEntityIdType = $this->getEntityIdType($mapping['targetEntity']);
+            foreach ($rows as $row) {
+                $result[$row['entityId']][] = $this->getTypedEntityId($row['relatedEntityId'], $relatedEntityIdType);
+            }
         }
 
         return $result;
@@ -676,6 +680,33 @@ class EntitySerializer
         }
 
         return array_values($ids);
+    }
+
+    /**
+     * @param string $entityClass
+     *
+     * @return string|null
+     */
+    protected function getEntityIdType($entityClass)
+    {
+        $metadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+
+        return $metadata->getFieldType($metadata->getSingleIdentifierFieldName());
+    }
+
+    /**
+     * @param mixed  $value
+     * @param string $type
+     *
+     * @return mixed
+     */
+    protected function getTypedEntityId($value, $type)
+    {
+        if (Type::INTEGER === $type || Type::SMALLINT === $type) {
+            $value = (int)$value;
+        }
+
+        return $value;
     }
 
     /**
