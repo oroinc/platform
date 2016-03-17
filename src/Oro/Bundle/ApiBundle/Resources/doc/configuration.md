@@ -99,7 +99,7 @@ Example:
 ```yaml
 oro_api:
     exclusions:
-	    # whole entity exclusion
+        # whole entity exclusion
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity1 }
         # exclude field1 of Acme\Bundle\AcmeBundle\Entity\Entity2 entity
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
@@ -141,7 +141,7 @@ Please note that `oro_api.exclusions` rules are applicable only for Data API. In
 ```yaml
 oro_entity:
     exclusions:
-	    # whole entity exclusion
+        # whole entity exclusion
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity1 }
         # exclude field1 of Acme\Bundle\AcmeBundle\Entity\Entity2 entity
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
@@ -210,14 +210,14 @@ oro_api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             fields:
-            	# the "firstName" field will be renamed to the "name" field
+                # the "firstName" field will be renamed to the "name" field
                 name:
                     property_path: firstName
 
-            	# the "addressName" field will contain the value of the "name" field of the "address" related entity
+                # the "addressName" field will contain the value of the "name" field of the "address" related entity
                 addressName:
                     property_path: address.name
-]
+
 ```
 
 * **data_transformer** - The data transformer(s) to be applies to the field value. Can be specified as service name, array of service names or as FQCN and method name.
@@ -268,7 +268,7 @@ oro_api:
                     description:      "Acme name description"
                     property_path:    "firstName"
                 field2:
-	                exclude: true
+                    exclude: true
 ```
 
 * **filters** - This section describes fields by which the result data can be filtered. It contains two properties: `exclusion_policy` and `fields`.
