@@ -2,6 +2,10 @@
 
 namespace Oro\Component\Action\Tests\Unit\Action;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Component\Action\Event\ExecuteActionEvent;
+use Oro\Component\Action\Event\ExecuteActionEvents;
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\Action\Tests\Unit\Action\Stub\ArrayCondition;
@@ -13,15 +17,18 @@ class AbstractActionTest extends \PHPUnit_Framework_TestCase
      */
     protected $action;
 
+    /** @var EventDispatcherInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $dispatcher;
+
     protected function setUp()
     {
         $this->action = $this->getMockBuilder('Oro\Component\Action\Action\AbstractAction')
             ->setConstructorArgs(array(new ContextAccessor()))
             ->getMockForAbstractClass();
-        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcher')
+        $this->dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->action->setDispatcher($dispatcher);
+        $this->action->setDispatcher($this->dispatcher);
     }
 
     protected function tearDown()
@@ -52,9 +59,17 @@ class AbstractActionTest extends \PHPUnit_Framework_TestCase
             $this->action->expects($this->once())
                 ->method('executeAction')
                 ->with($context);
+            $this->dispatcher->expects($this->at(0))
+                ->method('dispatch')
+                ->with(ExecuteActionEvents::HANDLE_BEFORE, new ExecuteActionEvent($context, $this->action));
+            $this->dispatcher->expects($this->at(2))
+                ->method('dispatch')
+                ->with(ExecuteActionEvents::HANDLE_AFTER, new ExecuteActionEvent($context, $this->action));
         } else {
             $this->action->expects($this->never())
                 ->method('executeAction');
+            $this->dispatcher->expects($this->never())
+                ->method('dispatch');
         }
 
         if ($conditionAllowed !== null) {
