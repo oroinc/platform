@@ -68,20 +68,6 @@ class ExpressionResult
                     case DateModifierInterface::VAR_THIS_YEAR:
                         $dateValue->firstOfYear();
                         break;
-                    case DateModifierInterface::VAR_JANUARY:
-                    case DateModifierInterface::VAR_FEBRUARY:
-                    case DateModifierInterface::VAR_MARCH:
-                    case DateModifierInterface::VAR_APRIL:
-                    case DateModifierInterface::VAR_MAY:
-                    case DateModifierInterface::VAR_JUNE:
-                    case DateModifierInterface::VAR_JULY:
-                    case DateModifierInterface::VAR_AUGUST:
-                    case DateModifierInterface::VAR_SEPTEMBER:
-                    case DateModifierInterface::VAR_OCTOBER:
-                    case DateModifierInterface::VAR_NOVEMBER:
-                    case DateModifierInterface::VAR_DECEMBER:
-                        $dateValue->modify('first day of '.$value);
-                        break;
                 }
 
                 $this->value = $dateValue;
