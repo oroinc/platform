@@ -5,6 +5,7 @@ namespace Oro\Bundle\LayoutBundle\Twig;
 use Symfony\Bridge\Twig\Form\TwigRendererInterface;
 
 use Oro\Component\Layout\Templating\TextHelper;
+use Oro\Component\Layout\BlockView;
 
 use Oro\Bundle\LayoutBundle\Twig\TokenParser\BlockThemeTokenParser;
 
@@ -82,8 +83,26 @@ class LayoutExtension extends \Twig_Extension
     {
         return [
             // Normalizes and translates (if needed) labels in the given value.
-            new \Twig_SimpleFilter('block_text', [$this->textHelper, 'processText'])
+            new \Twig_SimpleFilter('block_text', [$this->textHelper, 'processText']),
+            // Merge additional context to BlockView
+            new \Twig_SimpleFilter('merge_context', [$this, 'mergeContext']),
         ];
+    }
+
+    /**
+     * @param BlockView $view
+     * @param array $context
+     * @return BlockView
+     */
+    public function mergeContext(BlockView $view, array $context)
+    {
+        $view->vars = array_merge($view->vars, $context);
+
+        foreach ($view->children as $child) {
+            $this->mergeContext($child, $context);
+        }
+
+        return $view;
     }
 
     /**

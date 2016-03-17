@@ -8,7 +8,8 @@
         </button>
         <ul class="dropdown-menu pull-right">
             <% _.each(items, function (item) { %>
-            <li><a href="#" data-size="<% if (_.isUndefined(item.size)) { %><%= item %><% } else { %><%= item.size %><% } %>">
+            <li><a href="#" data-size="<% if (_.isUndefined(item.size)) { %><%= item %><% } else { %><%= item.size %><% } %>"
+                   data-grid-pagesize-trigger>
                 <% if (_.isUndefined(item.label)) { %><%= item %><% } else { %><%= item.label %><% } %></a></li>
             <% }); %>
         </ul>
