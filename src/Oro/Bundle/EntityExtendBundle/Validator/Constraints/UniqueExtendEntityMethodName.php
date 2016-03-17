@@ -7,7 +7,9 @@ use Symfony\Component\Validator\Constraint;
 class UniqueExtendEntityMethodName extends Constraint
 {
     /** @var string */
-    public $sameMethodMessage = 'A method \'{{ field }}\' for field name \'{{ value }}\' is already exist.';
+    public $message = <<<EOF
+This field name cannot be used because it conflicts with {{ value }} method fo this entity.Please use another name.
+EOF;
 
     /**
      * {@inheritdoc}
