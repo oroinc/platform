@@ -46,7 +46,11 @@ class TransitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->transitionHandler = new TransitionHandler($this->workflowManager, $this->transitionHelper, $this->logger);
+        $this->transitionHandler = new TransitionHandler(
+            $this->workflowManager,
+            $this->transitionHelper,
+            $this->logger
+        );
     }
 
     /**
