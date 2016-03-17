@@ -1,8 +1,10 @@
 title: "Sticky Note"
 icon: "bundles/orosidebar/sidebar_widgets/sticky_note/img/icon.ico"
+dialogIcon: "bundles/orosidebar/sidebar_widgets/sticky_note/img/icon-sticky.png"
 module: "orosidebar/widget/sticky-note"
 placement: "both"
 cssClass: 'sidebar-widget-sticky-note'
+description: oro.sidebar.sticky_note_widget.description
 settings:
     content: |
         Welcome to OroCRM!
