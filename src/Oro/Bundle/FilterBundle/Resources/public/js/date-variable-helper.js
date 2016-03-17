@@ -73,7 +73,7 @@ define(function(require) {
             var result;
             var self = this;
             //replace -5 +60 modifiers to '', we need clear variable
-            value = value.replace(/([\-+]+(\d+)?)/, '');
+            value = value.replace(/( *[\-+]+ *(\d+)?)/, '');
 
             result = _.some(this.index, function(displayValue, index) {
                 var regexpVariable = new RegExp('^' + value + '$', 'i');

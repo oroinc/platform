@@ -168,9 +168,10 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         updateOrigin: function(e) {
-            if (this.$el.val() !== this.getBackendFormattedValue()) {
+            var backendFormattedValue = this.getBackendFormattedValue();
+            if (this.$el.val() !== backendFormattedValue) {
                 this._preventFrontendUpdate = true;
-                this.$el.val(this.getBackendFormattedValue()).trigger('change');
+                this.$el.val(backendFormattedValue).trigger('change');
                 this._preventFrontendUpdate = false;
             }
         },
