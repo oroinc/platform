@@ -191,8 +191,8 @@ define([
                 this.setElement(html);
                 this._initializeSelectWidget();
             } else {
-                var options = $(html).find('select').html();
-                this.$('select').html(options);
+                var selectOptions = $(html).find('select').html();
+                this.$('select').html(selectOptions);
                 this.selectWidget.multiselect('refresh');
             }
 
