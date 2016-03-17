@@ -12,7 +12,10 @@
     href="{{ options.url|default('javascript:void(0);') }}"
     class="action-button {{ cssClasses }}"
     title="{{ action.title }}"
-    data-options="{{ options|json_encode }}"
+    {% for name,value in options.data %}
+        data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
+    {% endfor %}
+    data-options="{{ options.options|json_encode }}"
     {% endspaceless %}
 {% endmacro %}
 
