@@ -8,7 +8,6 @@ Table of Contents
  - ["exclusions" configuration section & "exclude" flag](#exclusions-configuration-section--exclude-flag)
  - ["entities" configuration section](#entities-configuration-section)
  - ["relations" configuration section](#relations-configuration-section)
- - [ConfigExtraSectionInterface](#configextrasectioninterface)
 
 Overview
 --------
@@ -329,65 +328,5 @@ oro_api:
 
 The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is absolutely identical to the [entities](#entities-configuration-section) section, the only difference is the `exclude` flag for an entity - it's not available under this configuration section.
 
-ConfigExtraSectionInterface
----------------------------
 
-ConfigExtraSectionInterface
-  The interface used to tell the Context that an additional data should be available as additional type of configuration.
-  So, "hasConfigOf", "getConfigOf" and "setConfigOf" methods of the Context can be used to access those data.
-
-
-the next step is implementation of ConfigExtraSectionInterface
-
-
-```php
-namespace Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension;
-
-use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-
-class TestConfigurationExtra implements ConfigExtraInterface, ConfigExtraSectionInterface
-{
-    const NAME = 'test_section';
-
-    public function getName()
-    {
-        return self::NAME;
-    }
-
-    public function configureContext(ConfigContext $context)
-    {
-    }
-
-    public function isInheritable()
-    {
-        return true;
-    }
-
-    public function getConfigType()
-    {
-        return self::NAME;
-    }
-
-    public function getCacheKeyPart()
-    {
-        return self::NAME;
-    }
-}
-```
-
-And to check that all works fine just execute the `oro:api:config:dump acmeentity --extra="Acme\Bundle\AcmeBundle\ConfigExtension\MyConfigExtension\TestConfigurationExtra"` command. The output will looks like this:
-
-```yaml
-oro_api:
-    entities:
-        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
-            exclusion_policy: all
-            fields:
-                id: ~
-                ...
-            test_section:
-                test_property:     "test value"
-                test_property_new: "another test value"
-```
-
-At this point we have newly created section with own properties and possibility to pass new configuration via yaml files. Please refer to [actions](./actions.md#context-class) documentation section for more detail about how to use configuration in Data API logic.
+Please refer to [actions](./actions.md#context-class) documentation section for more detail about **how to use configuration** in Data API logic.
