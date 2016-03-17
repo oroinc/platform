@@ -51,6 +51,12 @@ oro:
                 quarter: Type a quarter
                 dayofyear: Type a day of year
                 year: Type a year
+            part:
+                week.tooltip: Number of the week (1 - 53)
+                day.tooltip: Number of the day in month (1 - 31)
+                quarter.tooltip: Number of the quarter of year (1 - 4)
+                dayofyear.tooltip: Number of the day in year (1 - 366)
+                year.tooltip: Gregorian year, starting from 1 AD
         embedded:
             choice:
                 field_to_value: field value

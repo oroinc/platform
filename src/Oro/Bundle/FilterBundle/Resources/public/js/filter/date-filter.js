@@ -108,11 +108,22 @@ define(function(require) {
         },
 
         /**
+         * @property
+         */
+        dateParts: [],
+
+        /**
          * Date parts
          *
          * @property
          */
-        dateParts: [],
+        datePartTooltips: {
+            week: 'oro.filter.date.part.week.tooltip',
+            day: 'oro.filter.date.part.day.tooltip',
+            quarter: 'oro.filter.date.part.quarter.tooltip',
+            dayofyear: 'oro.filter.date.part.dayofyear.tooltip',
+            year:  'oro.filter.date.part.year.tooltip'
+        },
 
         hasPartsElement: false,
 
@@ -159,8 +170,14 @@ define(function(require) {
             // temp code to keep backward compatible
             if ($.isPlainObject(this.dateParts)) {
                 this.dateParts = _.map(this.dateParts, function(option, i) {
-                    return {value: i.toString(), label: option};
-                });
+                    var value = i.toString();
+
+                    return {
+                        value: value,
+                        label: option,
+                        tooltip: this._getPartTooltip(value)
+                    };
+                }, this);
             }
 
             if (_.isUndefined(this.emptyPart)) {
@@ -217,6 +234,11 @@ define(function(require) {
                 this.subview('start').setValue('');
                 this.subview('end').setPart(value);
                 this.subview('end').setValue('');
+
+                this.$(this.criteriaValueSelectors.date_part)
+                    .closest('.dropdown')
+                    .find('.dropdown-toggle')
+                    .attr('title', this._getPartTooltip(value));
             }
         },
 
@@ -241,7 +263,8 @@ define(function(require) {
                         name: this.name + '_part',
                         choices: this.dateParts,
                         selectedChoice: value.part,
-                        selectedChoiceLabel: selectedPartLabel
+                        selectedChoiceLabel: selectedPartLabel,
+                        selectedChoiceTooltip: this._getPartTooltip(value.part)
                     })
                 );
             }
@@ -486,6 +509,10 @@ define(function(require) {
             }
 
             return selectedChoiceLabel;
+        },
+
+        _getPartTooltip: function(part) {
+            return this.datePartTooltips[part] ? __(this.datePartTooltips[part]) : null;
         }
     });
 
