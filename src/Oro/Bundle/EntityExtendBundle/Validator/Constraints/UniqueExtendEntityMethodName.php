@@ -7,7 +7,7 @@ use Symfony\Component\Validator\Constraint;
 class UniqueExtendEntityMethodName extends Constraint
 {
     /** @var string  */
-    public $message = 'Method for this value is already used.';
+    public $message = 'Method for this value is already used. Please use another name.';
 
     /** @var string  */
     public $path = 'fieldName';

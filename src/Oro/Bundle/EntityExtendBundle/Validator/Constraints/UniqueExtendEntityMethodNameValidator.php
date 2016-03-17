@@ -4,8 +4,8 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
-use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassChecking;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
 /**
@@ -14,6 +14,18 @@ use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 class UniqueExtendEntityMethodNameValidator extends ConstraintValidator
 {
     const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_method_name';
+
+    /** @var ExtendClassChecking */
+    protected $extendClassChecking;
+
+    /**
+     * @param ExtendClassChecking $extendClassChecking
+     *
+     */
+    public function __construct(ExtendClassChecking $extendClassChecking)
+    {
+        $this->extendClassChecking = $extendClassChecking;
+    }
 
     /**
      * {@inheritdoc}
@@ -31,33 +43,13 @@ class UniqueExtendEntityMethodNameValidator extends ConstraintValidator
 
         $className = $value->getEntity()->getClassName();
         $fieldName = $value->getFieldName();
-        $camelized = $this->camelize($fieldName);
-        $reaching  = [
-            'get' . $camelized,
-            'set' . $camelized,
-            'is' . $camelized,
-            'has' . $camelized
-        ];
 
-        $class_methods = get_class_methods($className);
-
-        foreach ($reaching as $methodName) {
-            if (in_array($methodName, $class_methods)) {
-                $this->addViolation($constraint);
-            }
+        if ($this->extendClassChecking->hasGetter($className, $fieldName)
+            || $this->extendClassChecking->hasSetter($className, $fieldName)
+            || $this->extendClassChecking->hasRemover($className, $fieldName)
+        ) {
+            $this->addViolation($constraint);
         }
-    }
-
-    /**
-     * Camelizes a given string.
-     *
-     * @param string $string Some string
-     *
-     * @return string The camelized version of the string
-     */
-    protected function camelize($string)
-    {
-        return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
     }
 
     /**

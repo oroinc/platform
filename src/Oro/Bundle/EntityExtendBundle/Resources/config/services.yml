@@ -49,6 +49,9 @@ parameters:
     oro_entity_extend.enum_value_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\EnumValueProvider
     oro_entity_extend.dictionary_value_list_provider.enum.class: Oro\Bundle\EntityExtendBundle\Provider\EnumValueListProvider
 
+    # helpers
+    oro_entity_extend.helper.extend_class_checking.class: Oro\Bundle\EntityExtendBundle\Tools\ExtendClassChecking
+
 services:
     oro_entity_extend.entity.cache.warmer:
         public: false
@@ -169,6 +172,12 @@ services:
 
     oro_entity_extend.validator.unique_extend_entity_method_name_validator:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
+<<<<<<< HEAD
+=======
+        arguments:
+            - @oro_entity_extend.extend.field_name_validation_helper
+            - @oro_entity_extend.helper.extend_class_checking
+>>>>>>> 94621c8... CRM-5124 Unable to change email address on B2B Customer
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
 
@@ -430,3 +439,39 @@ services:
             - @doctrine
         tags:
             - { name: oro_entity.dictionary_value_list_provider, priority: -90 }
+<<<<<<< HEAD
+=======
+
+    oro_entity_extend.field_type_provider:
+        class: %oro_entity_extend.field_type_provider.class%
+        public: false
+        arguments:
+            - @oro_entity_config.config_manager
+            -
+                - string
+                - integer
+                - smallint
+                - bigint
+                - boolean
+                - decimal
+                - date
+                - datetime
+                - text
+                - float
+                - money
+                - percent
+                - file
+                - image
+                - enum
+                - multiEnum
+            -
+                #BAP-5875
+                #- oneToOne
+                - oneToMany
+                - manyToOne
+                - manyToMany
+
+    # Helpers
+    oro_entity_extend.helper.extend_class_checking:
+        class: %oro_entity_extend.helper.extend_class_checking.class%
+>>>>>>> 94621c8... CRM-5124 Unable to change email address on B2B Customer
