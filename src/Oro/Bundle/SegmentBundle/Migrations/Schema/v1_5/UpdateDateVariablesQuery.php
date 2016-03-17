@@ -123,10 +123,10 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
     private function updateFilterValue(array $filter)
     {
         if (!isset(
-                $filter['criterion']['filter'],
-                $filter['criterion']['data'],
-                $filter['criterion']['data']['part']
-            ) &&
+            $filter['criterion']['filter'],
+            $filter['criterion']['data'],
+            $filter['criterion']['data']['part']
+        ) &&
             !in_array($filter['criterion']['filter'], ['date', 'datetime']) &&
             !$filter['criterion']['data']['part'] === 'month'
         ) {
