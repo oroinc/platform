@@ -223,8 +223,6 @@ define(function(require) {
             }
 
             this._initColumns(opts);
-
-            this.toolbar = this._createToolbar(this.toolbarOptions);
         },
 
         /**
@@ -786,7 +784,8 @@ define(function(require) {
                 return this.toolbars[placement];
             }
 
-            this.toolbars[placement] = this._createToolbar({el: this.$(this.selectors.toolbars[placement])});
+            var toolbarOptions = _.extend(this.toolbarOptions, {el: this.$(this.selectors.toolbars[placement])});
+            this.toolbars[placement] = this._createToolbar(toolbarOptions);
 
             return this.toolbars[placement];
         },
