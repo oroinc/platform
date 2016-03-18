@@ -4,7 +4,7 @@ parameters:
     oro_action.assembler.form_options.class: Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler
     oro_action.assembler.operation.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler
     oro_action.assembler.operation_action_group.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler
-    oro_action.assembler.parameter.class: Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler
+    oro_action.assembler.argument.class: Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler
 
 services:
     oro_action.assembler.operation:
