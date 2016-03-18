@@ -12,17 +12,15 @@ use Oro\Bundle\ApiBundle\DependencyInjection\Configuration;
 
 class ConfigurationCompilerPass implements CompilerPassInterface
 {
-    const CONFIG_EXTENSION_REGISTRY_SERVICE_ID = 'oro_api.config_extension_registry';
-    const CONFIG_EXTENSION_TAG                 = 'oro_api.config_extension';
-    const ACTION_PROCESSOR_TAG                 = 'oro.api.action_processor';
-    const ACTION_PROCESSOR_BAG_SERVICE_ID      = 'oro_api.action_processor_bag';
-    const PROCESSOR_BAG_SERVICE_ID             = 'oro_api.processor_bag';
-    const FILTER_FACTORY_TAG                   = 'oro.api.filter_factory';
-    const FILTER_FACTORY_SERVICE_ID            = 'oro_api.filter_factory';
-    const EXCLUSION_PROVIDER_TAG               = 'oro_entity.exclusion_provider.api';
-    const EXCLUSION_PROVIDER_SERVICE_ID        = 'oro_api.entity_exclusion_provider';
-    const VIRTUAL_FIELD_PROVIDER_TAG           = 'oro_entity.virtual_field_provider.api';
-    const VIRTUAL_FIELD_PROVIDER_SERVICE_ID    = 'oro_api.virtual_field_provider';
+    const PROCESSOR_BAG_SERVICE_ID          = 'oro_api.processor_bag';
+    const ACTION_PROCESSOR_BAG_SERVICE_ID   = 'oro_api.action_processor_bag';
+    const ACTION_PROCESSOR_TAG              = 'oro.api.action_processor';
+    const FILTER_FACTORY_SERVICE_ID         = 'oro_api.filter_factory';
+    const FILTER_FACTORY_TAG                = 'oro.api.filter_factory';
+    const EXCLUSION_PROVIDER_SERVICE_ID     = 'oro_api.entity_exclusion_provider';
+    const EXCLUSION_PROVIDER_TAG            = 'oro_entity.exclusion_provider.api';
+    const VIRTUAL_FIELD_PROVIDER_SERVICE_ID = 'oro_api.virtual_field_provider';
+    const VIRTUAL_FIELD_PROVIDER_TAG        = 'oro_entity.virtual_field_provider.api';
 
     /**
      * {@inheritdoc}
@@ -30,14 +28,11 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $config = $this->getConfig($container);
-        $this->registerTaggedServices(
-            $container,
-            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
-            self::CONFIG_EXTENSION_TAG,
-            'addExtension'
-        );
+
         $this->registerProcessingGroups($container, $config);
+
         $this->registerActionProcessors($container);
+
         $this->registerTaggedServices(
             $container,
             self::FILTER_FACTORY_SERVICE_ID,
@@ -107,10 +102,10 @@ class ConfigurationCompilerPass implements CompilerPassInterface
         $chainServiceDef = $this->findDefinition($container, $chainServiceId);
         if (null !== $chainServiceDef) {
             // find services
-            $services       = [];
+            $services = [];
             $taggedServices = $container->findTaggedServiceIds($tagName);
             foreach ($taggedServices as $id => $attributes) {
-                $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+                $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
                 $services[$priority][] = new Reference($id);
             }
             if (empty($services)) {
@@ -151,8 +146,9 @@ class ConfigurationCompilerPass implements CompilerPassInterface
      */
     protected function findDefinition(ContainerBuilder $container, $serviceId)
     {
-        return $container->hasDefinition($serviceId)
-            ? $container->getDefinition($serviceId)
+        return $container->hasDefinition($serviceId) || $container->hasAlias($serviceId)
+            ? $container->findDefinition($serviceId)
             : null;
+
     }
 }

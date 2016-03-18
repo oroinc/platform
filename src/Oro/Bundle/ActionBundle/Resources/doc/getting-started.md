@@ -9,6 +9,7 @@ Table of Contents
  - [Configuration](#configuration)
  - [Action Diagram](#action-diagram)
  - [Configuration Validation](#configuration-validation)
+ - [Default Actions](#default-actions)
 
 What are Actions?
 -----------------
@@ -178,3 +179,56 @@ php app/console oro:action:configuration:validate
 ```
 
 **Note:** All configurations apply automatically after their changes on dev environment.
+
+
+Default Actions
+---------------
+
+**Oro Action Bundle** defines several system wide default actions for common purpose. Those are basic CRUD-called
+actions for entities:
+ 
+ - `UPDATE` - action to edit entity, using route from `routeUpdate` option of entity configuration.
+ - `DELETE` - action for entity deletion, using route from `routeDelete` option of entity configuration
+
+If Default Actions are using in not default application - e.g. `commerce` - routes will be retrieved from
+`routeCommerceUpdate` and `routeCommerceDelete` options.
+
+Configs for default actions placed in `Resources/config/action.yml` file under **Oro Action Bundle** directory.
+
+### Questions and Answers
+
+**How I can disable CRUD default action for my Bundle?**
+
+Suppose you need to disable default `DELETE` action for your new entity `MyEntity`.
+Here the case which describe the way. You can do this in `actions.yml` under your bundle config resources directory:
+
+```
+actions:
+    DELETE:
+        exclude_entities: ['MyEntity']
+```
+This will merge addition special condition to default action during config compilation. 
+So that default action `DELETE` will not be matched for your entity and will not be displayed as well.
+
+**How I can modify CRUD default action for my Bundle?**
+If you need to customize somehow a default (or any other) action. Suppose to change basically its `label`, you can do
+thing like that:
+ 
+```
+actions:
+    my_special_entity_custom_edit:
+        extends: UPDATE                         # this is for keeping all other properties same as in default
+        label: 'Modify me'                      # custom label
+        substitute_action: UPDATE               # replace UPDATE action with current one
+        entities: ['MyEntity']                  # replacement will occur only if this action will be matched by entity
+        for_all_entities: false                 # overriding extended property for `entities` field matching only
+```
+Here is custom modification through substitution mechanism. When action pointed in `substitute_action` field will be
+replaced by current one.
+Additionally there present limitation in field `entities` that will pick this custom action for substitution of default
+one only when context will be matched by that entity.
+For those who need to make full replacement of action instead of extended copy of it - `extends` field can be omitted
+and own, totally custom, body defined.
+
+See [substitution](./configuration-reference.md#substitution-of-action) section in
+[config documentation](./configuration-reference.md) for more details.

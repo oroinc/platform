@@ -1,6 +1,9 @@
 UPGRADE FROM 1.9 to 1.10
 ========================
 
+####EntityConfigBundle:
+- Entity config class metadata now allows any `route*` options, that can be used for CRUD routes configuration - as well as already existing `routeName`, `routeView` and `routeCreate` options.
+
 ####DashboardBundle:
 - Class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter` was renamed to `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter`. Service was not renamed.
 - Added new class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter`.
@@ -72,3 +75,5 @@ UPGRADE FROM 1.9 to 1.10
 - Service `oro_workflow.context_accessor` is deprecated. Use `oro_action.context_accessor` instead.
 - Service `oro_workflow.action_factory` is deprecated. Use `oro_action.function_factory` instead.
 - Service `oro_workflow.configuration_pass.replace_property_path` is deprecated. Use `oro_action.configuration_pass.replace_property_path` instead.
+- The constructor of the `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` class was changed. Third argument `LoggerInterface` (@logger service) was added.
+- Added error logging in `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` at handle method.

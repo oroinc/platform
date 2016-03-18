@@ -4,11 +4,11 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
+use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider;
 use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionDefinition;
-use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
-use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider;
 
 use Oro\Component\Layout\ContextInterface;
 
@@ -49,7 +49,11 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
-        $this->dataProvider = new ActionsDataProvider($this->actionManager, $this->restrictHelper, $this->translator);
+        $this->dataProvider = new ActionsDataProvider(
+            $this->actionManager,
+            $this->restrictHelper,
+            $this->translator
+        );
     }
 
     public function testGetData()
@@ -186,21 +190,15 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
                 'name' => 'action1',
                 'label' => 'action1_label',
                 'title' => 'action1_label',
-                'hasForm' => false,
-                'showDialog' => false,
                 'icon' => '',
-                'buttonOptions' => [],
-                'frontendOptions' => []
+                'action' => $actionOne,
             ],
             [
                 'name' => 'action2',
                 'label' => 'action2_label',
                 'title' => 'title',
-                'hasForm' => true,
-                'showDialog' => true,
                 'icon' => 'icon',
-                'buttonOptions' => ['icon' => 'icon'],
-                'frontendOptions' => ['title' => 'title', 'show_dialog' => true]
+                'action' => $actionTwo
             ]
         ];
 
