@@ -92,23 +92,17 @@ class OptionsHelper
             'url' => $action->hasForm() ? $dialogUrl : $executionUrl,
         ];
 
-        if (!empty($frontendOptions['confirmation'])) {
-            $options['confirmation'] = $frontendOptions['confirmation'];
-        }
+        $this->addOption($options, $frontendOptions, 'confirmation');
 
-        if (!empty($buttonOptions['page_component_module'])) {
-            $options['pageComponentModule'] = $buttonOptions['page_component_module'];
-        }
-
-        if (!empty($buttonOptions['page_component_options'])) {
-            $options['pageComponentOptions'] = $buttonOptions['page_component_options'];
-        }
+        $data = [];
+        $this->addOption($data, $buttonOptions, 'page_component_module');
+        $this->addOption($data, $buttonOptions, 'page_component_options');
 
         if (!empty($buttonOptions['data'])) {
-            $options = array_merge($options, $buttonOptions['data']);
+            $data = array_merge($data, $buttonOptions['data']);
         }
 
-        return $options;
+        return ['options' => $options, 'data' => $data];
     }
 
     /**
@@ -137,5 +131,19 @@ class OptionsHelper
         }
 
         return $options;
+    }
+
+    /**
+     * @param array $options
+     * @param array $source
+     * @param string $sourceKey
+     */
+    protected function addOption(array &$options, array $source, $sourceKey)
+    {
+        $optionsKey = str_replace('_', '-', $sourceKey);
+
+        if (!empty($source[$sourceKey])) {
+            $options[$optionsKey] = $source[$sourceKey];
+        }
     }
 }
