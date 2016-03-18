@@ -112,7 +112,10 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
             return false;
         }
 
-        return $validUpddates + $filters;
+        $updatedFilters = $validUpddates + $filters;
+        ksort($updatedFilters);
+
+        return $updatedFilters;
     }
 
     /**
