@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Add info about excluded actions to resources.
+ */
 class AddActionsToResources implements ProcessorInterface
 {
     /** @var ConfigProvider */

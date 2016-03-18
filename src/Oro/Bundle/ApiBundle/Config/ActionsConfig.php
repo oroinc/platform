@@ -8,6 +8,18 @@ class ActionsConfig
 {
     use Traits\ConfigTrait;
 
+    /** Indicates that action excluded or not */
+    const EXCLUDE = 'exclude';
+
+    /** ACL resource for action */
+    const ACL_RESOURCE = 'acl_resource';
+
+    /** Delete handler for delete action */
+    const DELETE_HANDLER = 'delete_handler';
+
+    /** Default delete handler service that will be used in case if delete_handler parameter is not set */
+    const DEFAULT_DELETE_HANDLER = 'oro_soap.handler.delete';
+
     /** @var array */
     protected $items = [];
 
@@ -53,8 +65,8 @@ class ActionsConfig
     public function isEnabled($action)
     {
         return !($this->getAction($action)
-            && isset($this->get($action)['exclude'])
-            && $this->get($action)['exclude'] === true);
+            && isset($this->get($action)[self::EXCLUDE])
+            && $this->get($action)[self::EXCLUDE] === true);
     }
 
     /**
@@ -64,7 +76,7 @@ class ActionsConfig
     {
         $result = [];
         foreach ($this->items as $action => $data) {
-            if (isset($data['exclude']) && $data['exclude'] === true) {
+            if (isset($data[self::EXCLUDE]) && $data[self::EXCLUDE] === true) {
                 $result[] = $action;
             }
         }
@@ -82,8 +94,8 @@ class ActionsConfig
     public function isAclProtected($action)
     {
         return !($this->has($action)
-            && isset($this->get($action)['acl_resource'])
-            && $this->get($action)['acl_resource'] === null);
+            && isset($this->get($action)[self::ACL_RESOURCE])
+            && $this->get($action)[self::ACL_RESOURCE] === null);
 
     }
 
@@ -101,10 +113,23 @@ class ActionsConfig
         }
 
         $action = $this->get($action);
-        if (!isset($action['acl_resource'])) {
+        if (!isset($action[self::ACL_RESOURCE])) {
             return;
         }
 
-        return $action['acl_resource'];
+        return $action[self::ACL_RESOURCE];
+    }
+
+    /**
+     * Returns delete handler service name for delete action.
+     *
+     * @return string
+     */
+    public function getDeleteHandler()
+    {
+        $deleteAction = $this->getAction('delete');
+        return array_key_exists(self::DELETE_HANDLER, $deleteAction)
+            ? $deleteAction[self::DELETE_HANDLER]
+            : self::DEFAULT_DELETE_HANDLER;
     }
 }
