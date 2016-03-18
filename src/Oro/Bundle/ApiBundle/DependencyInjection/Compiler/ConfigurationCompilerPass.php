@@ -146,8 +146,9 @@ class ConfigurationCompilerPass implements CompilerPassInterface
      */
     protected function findDefinition(ContainerBuilder $container, $serviceId)
     {
-        return $container->hasDefinition($serviceId)
-            ? $container->getDefinition($serviceId)
+        return $container->hasDefinition($serviceId) || $container->hasAlias($serviceId)
+            ? $container->findDefinition($serviceId)
             : null;
+
     }
 }
