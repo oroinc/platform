@@ -19,4 +19,9 @@ class TestConfiguration implements ConfigurationSectionInterface
     ) {
         $node->end()->useAttributeAsKey('name')->prototype('variable');
     }
+
+    public function isApplicable($section)
+    {
+        return true;
+    }
 }
