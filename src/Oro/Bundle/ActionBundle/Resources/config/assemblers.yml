@@ -1,10 +1,10 @@
 parameters:
-    oro_action.assembler.operation.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler
     oro_action.assembler.action_group.class: Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler
-    oro_action.assembler.argument.class: Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler
-    oro_action.assembler.operation_action_group.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler
     oro_action.assembler.attribute.class: Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler
     oro_action.assembler.form_options.class: Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler
+    oro_action.assembler.operation.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler
+    oro_action.assembler.operation_action_group.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler
+    oro_action.assembler.parameter.class: Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler
 
 services:
     oro_action.assembler.operation:

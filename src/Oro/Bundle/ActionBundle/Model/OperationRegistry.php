@@ -132,7 +132,7 @@ class OperationRegistry
                 $operation->getDefinition()->getGroups() ?: [static::DEFAULT_GROUP]
             );
 
-            return !empty($matchedGroups);
+            return 0 !== count($matchedGroups);
         });
     }
 

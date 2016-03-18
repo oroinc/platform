@@ -150,7 +150,6 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         $actionFactory,
                         $conditionFactory,
                         $argumentAssembler,
-                        $doctrineHelper,
                         $definition1
                     )
                 ],
@@ -180,7 +179,6 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         $actionFactory,
                         $conditionFactory,
                         $argumentAssembler,
-                        $doctrineHelper,
                         $definition2
                     )
                 ],
@@ -209,7 +207,6 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         $actionFactory,
                         $conditionFactory,
                         $argumentAssembler,
-                        $doctrineHelper,
                         $definition3
                     )
                 ],
