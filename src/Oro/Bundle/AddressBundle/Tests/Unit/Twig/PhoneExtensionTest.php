@@ -93,7 +93,7 @@ class PhoneExtensionTest extends \PHPUnit_Framework_TestCase
         if ($object) {
             $this->assertEquals($expectedPhones, $actualPhones);
         } else {
-            $this->assertNull($actualPhones);
+            $this->assertEquals([], $actualPhones);
         }
     }
 

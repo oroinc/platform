@@ -32,7 +32,7 @@ class PhoneExtension extends \Twig_Extension
 
     /**
      * @param object|null $object
-     * @return string
+     * @return string|null
      */
     public function getPhoneNumber($object)
     {
@@ -45,12 +45,12 @@ class PhoneExtension extends \Twig_Extension
 
     /**
      * @param object|null $object
-     * @return string
+     * @return array [['phone' => <string>, 'object' => <object>], ...]
      */
     public function getPhoneNumbers($object)
     {
         if (!$object) {
-            return null;
+            return [];
         }
 
         $result = [];
