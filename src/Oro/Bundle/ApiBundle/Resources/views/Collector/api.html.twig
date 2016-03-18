@@ -96,7 +96,7 @@
         <tbody id="actions">
         {% for i, action in collector.actions %}
             <tr id="actionNo-{{ i }}" class="{{ cycle(['odd', 'even'], i) }}">
-                <td>{{ '%0.2f'|format(action.time * 1000) }}&nbsp;ms</td>
+                <td>{{ '%0.2f'|format(action.time * 1000) }}&nbsp;ms{% if action.time * 1000 > 5 %} ({{ '%0.1f'|format((action.time * 100) / collector.totalTime) }}%){% endif %}</td>
                 <td>{{ action.count }} times</td>
                 <td>{{ action.name }}</td>
             </tr>
@@ -119,7 +119,7 @@
         <tbody id="processors">
         {% for i, processor in collector.processors %}
             <tr id="processorNo-{{ i }}" class="{{ cycle(['odd', 'even'], i) }}">
-                <td>{{ '%0.2f'|format(processor.time * 1000) }}&nbsp;ms</td>
+                <td>{{ '%0.2f'|format(processor.time * 1000) }}&nbsp;ms{% if processor.time * 1000 > 1 %} ({{ '%0.1f'|format((processor.time * 100) / collector.totalTime) }}%){% endif %}</td>
                 <td>{{ processor.count }} times</td>
                 <td>{{ processor.id }}</td>
             </tr>
@@ -133,9 +133,9 @@
 
 <pre>
 {% for action in collector.actionTree -%}
-<b>{{ action.name }}</b> <span  style="background-color: #ffd;{% if action.time * 1000 > 15 %}color: #d44{% endif %}">{{ '%0.2f'|format(action.time * 1000) }}&nbsp;ms</span>
+<b>{{ action.name }}</b> <span  style="background-color: #ffd;{% if action.time * 1000 > 15 %}color: #d44{% endif %}">{{ '%0.2f'|format(action.time * 1000) }}ms{% if action.time * 1000 > 5 %}/{{ '%0.1f'|format((action.time * 100) / collector.totalTime) }}%{% endif %}</span>
 {% if action.processors is defined %}{% for processor in action.processors %}
-    {{ processor.id }} <span  style="background-color: #ffd;{% if processor.time * 1000 > 5 %}color: #d44{% endif %}">{{ '%0.2f'|format(processor.time * 1000) }}&nbsp;ms</span>
+    {{ processor.id }} <span  style="background-color: #ffd;{% if processor.time * 1000 > 5 %}color: #d44{% endif %}">{{ '%0.2f'|format(processor.time * 1000) }}ms{% if processor.time * 1000 > 1 %}/{{ '%0.1f'|format((processor.time * 100) / collector.totalTime) }}%{% endif %}</span>
 {% endfor %}{% endif %}{% endfor %}
 </pre>
 {% endblock graph %}

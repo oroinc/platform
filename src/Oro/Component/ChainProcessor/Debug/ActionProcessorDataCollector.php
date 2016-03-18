@@ -11,6 +11,9 @@ class ActionProcessorDataCollector extends DataCollector
     /** @var TraceLogger */
     protected $logger;
 
+    /** @var number */
+    protected $totalTime;
+
     /**
      * @param TraceLogger $logger
      */
@@ -134,14 +137,16 @@ class ActionProcessorDataCollector extends DataCollector
      */
     public function getTotalTime()
     {
-        $time = 0;
-        foreach ($this->data['actions'] as $action) {
-            if (isset($action['time'])) {
-                $time += $action['time'];
+        if (null === $this->totalTime) {
+            $this->totalTime = 0;
+            foreach ($this->data['actions'] as $action) {
+                if (isset($action['time'])) {
+                    $this->totalTime += $action['time'];
+                }
             }
         }
 
-        return $time;
+        return $this->totalTime;
     }
 
     /**

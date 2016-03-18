@@ -93,14 +93,12 @@ class TraceLogger
     {
         $action = array_pop($this->actionStack);
         $action['time'] = microtime(true) - $action['time'] - $action['subtrahend'];
-        unset($action['subtrahend']);
-        foreach ($this->actionStack as &$item) {
-            $item['subtrahend'] += $action['time'];
-        }
-        unset($item);
         if (null !== $exception) {
             $action['exception'] = $exception->getMessage();
         }
+        unset($action['subtrahend']);
+        $this->addSubtrahend($this->actionStack, $action['time']);
+        $this->addSubtrahend($this->processorStack, $action['time']);
         array_unshift($this->actions, $action);
         if (empty($this->actionStack) && $this->stopwatch) {
             $this->stopwatch->stop($this->getStopwatchName());
@@ -114,7 +112,7 @@ class TraceLogger
      */
     public function startProcessor($processorId)
     {
-        $this->processorStack[] = ['id' => $processorId, 'time' => microtime(true)];
+        $this->processorStack[] = ['id' => $processorId, 'time' => microtime(true), 'subtrahend' => 0];
     }
 
     /**
@@ -125,10 +123,11 @@ class TraceLogger
     public function stopProcessor(\Exception $exception = null)
     {
         $processor = array_pop($this->processorStack);
-        $processor['time'] = microtime(true) - $processor['time'];
+        $processor['time'] = microtime(true) - $processor['time'] - $processor['subtrahend'];
         if (null !== $exception) {
             $processor['exception'] = $exception->getMessage();
         }
+        unset($processor['subtrahend']);
 
         if (!empty($this->actionStack)) {
             $action = array_pop($this->actionStack);
@@ -148,5 +147,16 @@ class TraceLogger
     protected function getStopwatchName()
     {
         return $this->sectionName . '.processors';
+    }
+
+    /**
+     * @param array  $items
+     * @param number $time
+     */
+    protected function addSubtrahend(array &$items, $time)
+    {
+        foreach ($items as &$item) {
+            $item['subtrahend'] += $time;
+        }
     }
 }
