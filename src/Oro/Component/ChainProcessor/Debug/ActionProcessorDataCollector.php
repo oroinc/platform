@@ -11,7 +11,7 @@ class ActionProcessorDataCollector extends DataCollector
     /** @var TraceLogger */
     protected $logger;
 
-    /** @var number */
+    /** @var float */
     protected $totalTime;
 
     /**
