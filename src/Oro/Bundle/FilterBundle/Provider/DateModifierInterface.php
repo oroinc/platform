@@ -14,14 +14,15 @@ interface DateModifierInterface
     const VAR_SOQ   = 5; // start of the quarter
     const VAR_SOY   = 6; // start of the year
 
-    const VAR_THIS_DAY     = 10;
-    const VAR_THIS_WEEK    = 11;
-    const VAR_THIS_MONTH   = 12;
-    const VAR_THIS_QUARTER = 13;
-    const VAR_THIS_YEAR    = 14;
-    const VAR_FDQ          = 15; // first day of quarter
-    const VAR_FMQ          = 16; // first month of quarter
-    const VAR_THIS_DAY_W_Y = 29;
+    const VAR_THIS_DAY       = 10;
+    const VAR_THIS_WEEK      = 11;
+    const VAR_THIS_MONTH     = 12;
+    const VAR_THIS_MONTH_W_Y = 17;
+    const VAR_THIS_QUARTER   = 13;
+    const VAR_THIS_YEAR      = 14;
+    const VAR_FDQ            = 15; // first day of quarter
+    const VAR_FMQ            = 16; // first month of quarter
+    const VAR_THIS_DAY_W_Y   = 29;
 
     const PART_SOURCE  = 'source';
     const PART_VALUE   = 'value';

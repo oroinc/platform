@@ -56,6 +56,7 @@ class ExpressionResult
                         break;
                     case DateModifierInterface::VAR_SOM:
                     case DateModifierInterface::VAR_THIS_MONTH:
+                    case DateModifierInterface::VAR_THIS_MONTH_W_Y:
                         $dateValue->firstOfMonth();
                         break;
                     case DateModifierInterface::VAR_FMQ:
@@ -163,6 +164,7 @@ class ExpressionResult
                     break;
                 case DateModifierInterface::VAR_FMQ:
                 case DateModifierInterface::VAR_THIS_MONTH:
+                case DateModifierInterface::VAR_THIS_MONTH_W_Y:
                     $dateValue->addMonths($value->getValue());
                     break;
                 case DateModifierInterface::VAR_THIS_QUARTER:
@@ -214,6 +216,7 @@ class ExpressionResult
                     break;
                 case DateModifierInterface::VAR_FMQ:
                 case DateModifierInterface::VAR_THIS_MONTH:
+                case DateModifierInterface::VAR_THIS_MONTH_W_Y:
                     $dateValue->subMonths($value->getValue());
                     break;
                 case DateModifierInterface::VAR_THIS_QUARTER:
@@ -243,6 +246,7 @@ class ExpressionResult
                     break;
                 case DateModifierInterface::VAR_FMQ:
                 case DateModifierInterface::VAR_THIS_MONTH:
+                case DateModifierInterface::VAR_THIS_MONTH_W_Y:
                     $this->value -= $value->getValue()->month;
                     break;
                 case DateModifierInterface::VAR_THIS_QUARTER:
