@@ -5,6 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Config;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\ConfigBundle\Event\LoadConfigEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 
@@ -306,6 +307,10 @@ class ConfigManager
                 }
             }
         }
+
+        $event = new LoadConfigEvent($this, $name, $value, $full);
+        $this->eventDispatcher->dispatch(LoadConfigEvent::NAME, $event);
+        $value = $event->getValue();
 
         return $value;
     }
