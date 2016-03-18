@@ -38,12 +38,6 @@ actions:
             title: oro.action.edit_entity
         button_options:
             icon: icon-edit
-        action_groups:
-            -
-                name: UPDATE
-                parameters_mapping:
-                    route: $.routes[update]
-                    entity: $data
 
     DELETE:
         extends: CRUD_ACTION
@@ -106,36 +100,3 @@ actions:
                     entity: $.data
                     entity_label: $.entityLabel
                     route: $.routes[name]
-
-action_groups:
-    UPDATE:
-        parameters:
-            entity: ~
-            route:
-                type: string
-        acl_resource: [EDIT, $entity]
-        actions:
-            - @redirect:
-                route: $route
-                route_parameters: {id: $entity.id}
-    DELETE:
-        parameters:
-            entity: ~
-            route:
-                type: string
-            entity_label:
-                type: string
-        acl_resource: [DELETE, $entity]
-        actions:
-            - @call_service_method:
-                service: oro_action.handler.delete
-                method: handleDelete
-                method_parameters: [$entity]
-
-            - @flash_message:
-                message: oro.action.delete_message
-                type: 'info'
-                message_parameters:
-                    entityLabel: $entity_label
-            - @redirect:
-                route: $route

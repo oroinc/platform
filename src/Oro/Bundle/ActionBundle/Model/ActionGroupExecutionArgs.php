@@ -55,7 +55,6 @@ class ActionGroupExecutionArgs
      * @param ActionGroupRegistry $registry
      * @param Collection|null $errors
      * @return mixed
-     * @throws \Oro\Bundle\ActionBundle\Exception\ForbiddenActionException
      */
     public function execute(ActionGroupRegistry $registry, Collection $errors = null)
     {

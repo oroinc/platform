@@ -2,15 +2,14 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
-use Oro\Bundle\ActionBundle\Model\ActionGroup;
-use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ActionBundle\Action\RunActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 
 use Oro\Component\Action\Model\ContextAccessor;
-use Symfony\Component\PropertyAccess\PropertyPath;
 
 class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 {
@@ -19,11 +18,11 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
 
-    /** @var RunActionGroup */
-    protected $function;
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|ActionGroupRegistry */
     protected $actionGroupRegistry;
+
+    /** @var RunActionGroup */
+    protected $function;
 
     protected function setUp()
     {
@@ -68,7 +67,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertAttributeInstanceOf(
-            '\Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs',
+            'Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs',
             'executionArgs',
             $this->function
         );
@@ -82,11 +81,9 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
      * @param array $inputData
      * @param string $exception
      * @param string $exceptionMessage
-     * @throws \Oro\Component\Action\Exception\InvalidParameterException
      */
     public function testInitializeException(array $inputData, $exception, $exceptionMessage)
     {
-
         $this->setExpectedException($exception, $exceptionMessage);
 
         $this->function->initialize($inputData);
@@ -97,7 +94,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
      */
     public function initializeExceptionDataProvider()
     {
-        $mockGroup = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ActionGroup')
+        $mockGroup = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -136,7 +133,6 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
      * @param ActionData $arguments
      * @param $returnVal
      * @param $expected
-     * @throws \Oro\Component\Action\Exception\InvalidParameterException
      */
     public function testExecuteAction(
         array $context,
@@ -147,7 +143,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     ) {
         $data = new ActionData($context);
 
-        $mockActionGroup = $this->getMockBuilder('\Oro\Bundle\ActionBundle\Model\ActionGroup')
+        $mockActionGroup = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup')
             ->disableOriginalConstructor()
             ->getMock();
 
