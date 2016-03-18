@@ -53,7 +53,7 @@ oro:
             label_date_var.this_day:      current day
             label_date_var.this_day_w_y:  this day without year
             label_date_var.this_week:     current week
-            label_date_var.this_month:    current month without year
+            label_date_var.this_month:    current month
             label_date_var.this_quarter:  current quarter
             label_date_var.this_year:     current year
             label_date_var.this_fdq:      first day of quarter

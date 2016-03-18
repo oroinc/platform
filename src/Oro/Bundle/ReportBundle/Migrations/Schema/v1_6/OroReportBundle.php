@@ -8,7 +8,7 @@ use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 use Oro\Bundle\SegmentBundle\Migrations\Schema\v1_5\UpdateDateVariablesQuery;
 
-class OroSegmentBundle implements Migration
+class OroReportBundle implements Migration
 {
     /**
      * {@inheritdoc}
