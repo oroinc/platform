@@ -6,7 +6,9 @@ use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
 
 class PhoneExtension extends \Twig_Extension
 {
-    /** @var PhoneProvider */
+    /**
+     * @var PhoneProvider
+     */
     protected $provider;
 
     /**
@@ -18,50 +20,49 @@ class PhoneExtension extends \Twig_Extension
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
         return [
-            'phone_number'  => new \Twig_Function_Method($this, 'getPhoneNumber'),
-            'phone_numbers' => new \Twig_Function_Method($this, 'getPhoneNumbers'),
+            new \Twig_SimpleFunction('phone_number', [$this, 'getPhoneNumber']),
+            new \Twig_SimpleFunction('phone_numbers', [$this, 'getPhoneNumbers']),
         ];
     }
 
     /**
-     * @param object $obj
-     *
+     * @param object|null $object
      * @return string
      */
-    public function getPhoneNumber($obj)
+    public function getPhoneNumber($object)
     {
-        if (!$obj) {
+        if (!$object) {
             return null;
         }
 
-        return $this->provider->getPhoneNumber($obj);
+        return $this->provider->getPhoneNumber($object);
     }
 
     /**
-     * @param object $obj
-     *
+     * @param object|null $object
      * @return string
      */
-    public function getPhoneNumbers($obj)
+    public function getPhoneNumbers($object)
     {
-        if (!$obj) {
+        if (!$object) {
             return null;
         }
 
-        return $this->provider->getPhoneNumbers($obj);
+        $result = [];
+        foreach ($this->provider->getPhoneNumbers($object) as $row) {
+            $result[] = ['phone' => $row[0], 'object' => $row[1]];
+        }
+
+        return $result;
     }
 
     /**
-     * Returns the name of the extension.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getName()
     {

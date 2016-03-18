@@ -7,10 +7,14 @@ use Oro\Bundle\AddressBundle\Provider\PhoneProvider;
 
 class PhoneExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|PhoneProvider */
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject|PhoneProvider
+     */
     protected $provider;
 
-    /** @var PhoneExtension */
+    /**
+     * @var PhoneExtension
+     */
     protected $extension;
 
     protected function setUp()
@@ -24,75 +28,84 @@ class PhoneExtensionTest extends \PHPUnit_Framework_TestCase
 
     public function testGetFunctions()
     {
-        $tests = [
-            'phone_number'  => '\Twig_Function_Method',
-            'phone_numbers' => '\Twig_Function_Method',
+        $expectedFunctions = [
+            [$this->extension, 'getPhoneNumber'],
+            [$this->extension, 'getPhoneNumbers'],
         ];
 
-        $functions = $this->extension->getFunctions();
+        $actualFunctions = $this->extension->getFunctions();
 
-        $this->assertCount(count($tests), $functions);
+        $this->assertSameSize($expectedFunctions, $actualFunctions);
 
-        foreach ($tests as $test => $func) {
-            $this->assertArrayHasKey($test, $functions);
-            $this->assertInstanceOf($func, $functions[$test]);
+        foreach ($expectedFunctions as $index => $expectedCallable) {
+            $this->assertArrayHasKey($index, $actualFunctions);
+            /** @var \Twig_SimpleFunction $actualFunction */
+            $actualFunction = $actualFunctions[$index];
+            $this->assertInstanceOf('\Twig_SimpleFunction', $actualFunction);
+            $this->assertEquals($expectedCallable, $actualFunction->getCallable());
         }
     }
 
     /**
-     * @param int   $expected
-     * @param mixed $expected
-     * @param mixed $obj
+     * @param object|null $object
      *
-     * @dataProvider getPhoneNumberProvider
+     * @dataProvider phoneSourceProvider
      */
-    public function testGetPhoneNumber($expectedCalls, $expected, $obj)
+    public function testGetPhoneNumber($object)
     {
-        $this->provider->expects($this->exactly($expectedCalls))
-            ->method('getPhoneNumber')
-            ->with($obj)
-            ->willReturn('phoneByProvider');
+        $expectedPhone = '123-456-789';
 
-        $this->assertEquals($expected, $this->extension->getPhoneNumber($obj));
+        $this->provider->expects($object ? $this->once() : $this->never())
+            ->method('getPhoneNumber')
+            ->with($object)
+            ->willReturn($object ? $expectedPhone : null);
+
+        $actualPhone = $this->extension->getPhoneNumber($object);
+        if ($object) {
+            $this->assertEquals($expectedPhone, $actualPhone);
+        } else {
+            $this->assertNull($actualPhone);
+        }
     }
 
     /**
-     * @param int   $expected
-     * @param mixed $expected
-     * @param mixed $obj
+     * @param object|null $object
      *
-     * @dataProvider getPhoneNumberProvider
+     * @dataProvider phoneSourceProvider
      */
-    public function testGetPhoneNumbers($expectedCalls, $expected, $obj)
+    public function testGetPhoneNumbers($object)
     {
-        $this->provider->expects($this->exactly($expectedCalls))
-            ->method('getPhoneNumbers')
-            ->with($obj)
-            ->willReturn('phoneByProvider');
+        $sourcePhones = [
+            ['123-456-789', new \stdClass],
+            ['987-654-321', new \stdClass],
+        ];
+        $expectedPhones = [
+            ['phone' => '123-456-789', 'object' => new \stdClass],
+            ['phone' => '987-654-321', 'object' => new \stdClass],
+        ];
 
-        $this->assertEquals($expected, $this->extension->getPhoneNumbers($obj));
+        $this->provider->expects($object ? $this->once() : $this->never())
+            ->method('getPhoneNumbers')
+            ->with($object)
+            ->willReturn($object ? $sourcePhones : null);
+
+        $actualPhones = $this->extension->getPhoneNumbers($object);
+        if ($object) {
+            $this->assertEquals($expectedPhones, $actualPhones);
+        } else {
+            $this->assertNull($actualPhones);
+        }
     }
 
     /**
      * @return array
      */
-    public function getPhoneNumberProvider()
+    public function phoneSourceProvider()
     {
-        $tests = [];
-
-        $tests['empty object'] = [
-            0,
-            null,
-            null,
+        return [
+            'no object' => [null],
+            'valid object' => [new \stdClass()]
         ];
-
-        $tests['phoneByProvider'] = [
-            1,
-            'phoneByProvider',
-            new \stdClass(),
-        ];
-
-        return $tests;
     }
 
     public function testGetName()
