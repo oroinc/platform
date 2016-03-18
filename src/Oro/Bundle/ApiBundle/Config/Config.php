@@ -47,6 +47,19 @@ class Config implements \IteratorAggregate
     }
 
     /**
+     * Make a deep copy of object.
+     */
+    public function __clone()
+    {
+        $this->items = array_map(
+            function ($value) {
+                return is_object($value) ? clone $value : $value;
+            },
+            $this->items
+        );
+    }
+
+    /**
      * Checks whether the configuration of an entity exists.
      *
      * @return bool
