@@ -9,7 +9,7 @@
     {% if cssClasses is null %}
         {% set cssClasses = action.definition.buttonOptions.class|default('icons-holder-text') ~ " "  ~ action.definition.buttonOptions.aCss|default('') %}
     {% endif %}
-    href="{{ options.url|default('javascript:void(0);') }}"
+    href="{{ options.options.url|default('javascript:void(0);') }}"
     class="action-button {{ cssClasses }}"
     title="{{ action.title }}"
     {% for name,value in options.data %}
