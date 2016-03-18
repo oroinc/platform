@@ -81,6 +81,8 @@ class GetRestPlainApiTest extends ApiTestCase
                 $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 404, $entityAlias, 'get');
             }
         }
+
+        self::cleanUpConnections();
     }
 
     /**

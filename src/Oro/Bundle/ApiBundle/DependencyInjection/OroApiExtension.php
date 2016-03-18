@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
@@ -43,7 +44,65 @@ class OroApiExtension extends Extension
             'addExtension'
         );
 
+        if ($container->getParameter('kernel.debug')) {
+            $loader->load('debug.yml');
+            $this->registerDebugService(
+                $container,
+                'oro_api.action_processor_bag',
+                'Oro\Bundle\ApiBundle\Debug\TraceableActionProcessorBag'
+            );
+            $this->registerDebugService(
+                $container,
+                'oro_api.processor_factory',
+                'Oro\Component\ChainProcessor\Debug\TraceableProcessorFactory'
+            );
+            $this->registerDebugService($container, 'oro_api.collect_resources.processor');
+            $this->registerDebugService($container, 'oro_api.customize_loaded_data.processor');
+            $this->registerDebugService($container, 'oro_api.get_config.processor');
+            $this->registerDebugService($container, 'oro_api.get_relation_config.processor');
+            $this->registerDebugService($container, 'oro_api.get_metadata.processor');
+            $this->registerDebugService($container, 'oro_api.normalize_value.processor');
+        }
+
+        /**
+         * To load configuration we need fully configured config tree builder, that's why all configuration extensions
+         *   should be registered before.
+         */
+        $this->registerTaggedServices(
+            $container,
+            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
+            self::CONFIG_EXTENSION_TAG,
+            'addExtension'
+        );
+
         $this->loadApiConfiguration($container);
+    }
+
+    /**
+     * Replaces a regular service with the debug one
+     *
+     * @param ContainerBuilder $container
+     * @param string           $serviceId
+     * @param string           $debugServiceClassName
+     */
+    protected function registerDebugService(
+        ContainerBuilder $container,
+        $serviceId,
+        $debugServiceClassName = 'Oro\Component\ChainProcessor\Debug\TraceableActionProcessor'
+    ) {
+        $definition = $container->findDefinition($serviceId);
+        $definition->setPublic(false);
+        $container->setDefinition($serviceId . '.debug.parent', $definition);
+        $debugDefinition = new Definition(
+            $debugServiceClassName,
+            [
+                new Reference($serviceId . '.debug.parent'),
+                new Reference('oro_api.profiler.logger')
+            ]
+        );
+        $debugDefinition->setPublic(false);
+        $container->setDefinition($serviceId . '.debug', $debugDefinition);
+        $container->setAlias($serviceId, $serviceId . '.debug');
     }
 
     /**

@@ -15,6 +15,7 @@ services:
         public: false
         arguments:
             - @oro_api.processor_factory
+            - %kernel.debug%
 
     oro_api.processor_factory:
         class: Oro\Component\ChainProcessor\ChainProcessorFactory
@@ -73,12 +74,12 @@ services:
         class: Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer
         public: false
 
-    oro_api.customize_data_item.processor:
-        class: Oro\Bundle\ApiBundle\Processor\CustomizeDataItemProcessor
+    oro_api.customize_loaded_data.processor:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor
         public: false
         arguments:
             - @oro_api.processor_bag
-            - customize_data_item
+            - customize_loaded_data
 
     oro_api.resources_loader:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesLoader

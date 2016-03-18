@@ -9,8 +9,8 @@ use FOS\RestBundle\Controller\FOSRestController;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
-use Oro\Component\ChainProcessor\ActionProcessor;
-use Oro\Bundle\ApiBundle\Processor\ActionProcessorBag;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
@@ -87,23 +87,23 @@ class RestApiController extends FOSRestController
     /**
      * @param Request $request
      *
-     * @return ActionProcessor
+     * @return ActionProcessorInterface
      */
     protected function getProcessor(Request $request)
     {
-        /** @var ActionProcessorBag $processorBag */
+        /** @var ActionProcessorBagInterface $processorBag */
         $processorBag = $this->get('oro_api.action_processor_bag');
 
         return $processorBag->getProcessor($request->attributes->get('_action'));
     }
 
     /**
-     * @param ActionProcessor $processor
-     * @param Request         $request
+     * @param ActionProcessorInterface $processor
+     * @param Request                  $request
      *
      * @return Context
      */
-    protected function getContext(ActionProcessor $processor, Request $request)
+    protected function getContext(ActionProcessorInterface $processor, Request $request)
     {
         /** @var Context $context */
         $context = $processor->createContext();

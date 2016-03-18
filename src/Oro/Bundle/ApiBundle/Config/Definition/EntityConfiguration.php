@@ -118,12 +118,8 @@ class EntityConfiguration extends AbstractConfigurationSection
         $parentSectionNode
             ->validate()
             ->always(
-                function ($value) use ($postProcessCallbacks) {
-                    return $this->callProcessConfigCallbacks(
-                        $this->postProcessConfig($value),
-                        $postProcessCallbacks,
-                        $this->sectionName
-                    );
+                function ($value) {
+                    return $this->postProcessConfig($value);
                 }
             );
     }
@@ -142,7 +138,7 @@ class EntityConfiguration extends AbstractConfigurationSection
     ) {
         $definitionConfigureCallbacks = $configureCallbacks;
         if ($this->maxNestingLevel > 0) {
-            $fieldSectionName        = $this->sectionName . '.entity.fields';
+            $fieldSectionName        = $this->sectionName . '.entity.field';
             $fieldConfigureCallbacks = isset($definitionConfigureCallbacks[$fieldSectionName])
                 ? $definitionConfigureCallbacks[$fieldSectionName]
                 : [];
