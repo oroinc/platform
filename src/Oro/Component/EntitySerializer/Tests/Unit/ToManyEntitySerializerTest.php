@@ -152,23 +152,34 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
         $this->setQueryExpectationAt(
             $conn,
             1,
-            'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId '
-            . 'FROM ('
-            . '(SELECT u0_.id AS id_0, g1_.id AS id_1 '
-            . 'FROM group_table g1_ '
-            . 'INNER JOIN user_table u0_ ON '
-            . '(EXISTS (SELECT 1 FROM rel_user_to_group_table r2_ '
-            . 'INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id '
-            . 'WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id))) '
-            . 'WHERE u0_.id IN (123, 456) LIMIT 10)) entity',
+            'SELECT entity.id_0 AS entityId, entity.id_1 AS relatedEntityId'
+            . ' FROM ('
+            . '(SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN user_table u0_ ON (EXISTS ('
+            . 'SELECT 1 FROM rel_user_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
+            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
+            . '))'
+            . ' WHERE u0_.id = 123 LIMIT 10)'
+            . ' UNION ALL'
+            . ' (SELECT u0_.id AS id_0, g1_.id AS id_1'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN user_table u0_ ON (EXISTS ('
+            . 'SELECT 1 FROM rel_user_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.user_group_id = g3_.id'
+            . ' WHERE r2_.user_id = u0_.id AND g3_.id IN (g1_.id)'
+            . '))'
+            . ' WHERE u0_.id = 456 LIMIT 10)'
+            . ') entity',
             [
                 [
-                    'entityId'        => 123,
-                    'relatedEntityId' => 10,
+                    'entityId'        => '123',
+                    'relatedEntityId' => '10',
                 ],
                 [
-                    'entityId'        => 123,
-                    'relatedEntityId' => 20,
+                    'entityId'        => '123',
+                    'relatedEntityId' => '20',
                 ],
             ]
         );
@@ -240,6 +251,106 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
                     'id'     => 456,
                     'name'   => 'user_name2',
                     'groups' => [],
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testSubQueryLimitAndStringEntityId()
+    {
+        $qb = $this->em->getRepository('Test:Role')->createQueryBuilder('e')
+            ->where('e.code IN (:ids)')
+            ->setParameter('ids', ['id1', 'id2']);
+
+        $conn = $this->getDriverConnectionMock($this->em);
+
+        $this->setQueryExpectationAt(
+            $conn,
+            0,
+            'SELECT r0_.code AS code_0, c1_.name AS name_1, r0_.category_name AS category_name_2'
+            . ' FROM role_table r0_'
+            . ' LEFT JOIN category_table c1_ ON r0_.category_name = c1_.name'
+            . ' WHERE r0_.code IN (?, ?)',
+            [
+                [
+                    'code_0'          => 'id1',
+                    'name_1'          => 'category_1',
+                    'category_name_2' => 'category_1',
+                ],
+                [
+                    'code_0'          => 'id2',
+                    'name_1'          => null,
+                    'category_name_2' => null,
+                ]
+            ],
+            [1 => 'id1', 2 => 'id2'],
+            [1 => \PDO::PARAM_STR, 2 => \PDO::PARAM_STR]
+        );
+
+        $this->setQueryExpectationAt(
+            $conn,
+            1,
+            'SELECT entity.code_0 AS entityId, entity.id_1 AS relatedEntityId'
+            . ' FROM ('
+            . '(SELECT r0_.code AS code_0, g1_.id AS id_1'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN role_table r0_ ON (EXISTS ('
+            . 'SELECT 1 FROM rel_role_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.role_group_id = g3_.id'
+            . ' WHERE r2_.role_code = r0_.code AND g3_.id IN (g1_.id)'
+            . '))'
+            . ' WHERE r0_.code = \'id1\' LIMIT 10)'
+            . ' UNION ALL'
+            . ' (SELECT r0_.code AS code_0, g1_.id AS id_1'
+            . ' FROM group_table g1_'
+            . ' INNER JOIN role_table r0_ ON (EXISTS ('
+            . 'SELECT 1 FROM rel_role_to_group_table r2_'
+            . ' INNER JOIN group_table g3_ ON r2_.role_group_id = g3_.id'
+            . ' WHERE r2_.role_code = r0_.code AND g3_.id IN (g1_.id)'
+            . '))'
+            . ' WHERE r0_.code = \'id2\' LIMIT 10)'
+            . ') entity',
+            [
+                [
+                    'entityId'        => 'id1',
+                    'relatedEntityId' => 10,
+                ],
+                [
+                    'entityId'        => 'id1',
+                    'relatedEntityId' => 20,
+                ],
+            ]
+        );
+
+        $result = $this->serializer->serialize(
+            $qb,
+            [
+                'exclusion_policy' => 'all',
+                'fields'           => [
+                    'code'   => null,
+                    'category' => [
+                        'fields' => 'name'
+                    ],
+                    'groups' => [
+                        'max_results' => 10,
+                        'fields'      => 'id'
+                    ],
+                ],
+            ]
+        );
+
+        $this->assertArrayEquals(
+            [
+                [
+                    'code'     => 'id1',
+                    'category' => 'category_1',
+                    'groups'   => [10, 20]
+                ],
+                [
+                    'code'     => 'id2',
+                    'category' => null,
+                    'groups'   => null,
                 ]
             ],
             $result

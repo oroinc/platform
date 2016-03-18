@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-class CustomizeDataItemContext extends ApiContext
+class CustomizeLoadedDataContext extends ApiContext
 {
     /** FQCN of a root entity */
     const ROOT_CLASS_NAME = 'rootClass';

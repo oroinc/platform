@@ -2,9 +2,7 @@
 
 namespace Oro\Bundle\EmailBundle\Entity\Manager;
 
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\UnitOfWork;
-use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EmailBundle\Entity\EmailAddress;
@@ -94,6 +92,8 @@ class EmailOwnerManager
 
     /**
      * @param array $entities
+     *
+     * @return array
      */
     protected function getEmailOwnerChanges(array $entities)
     {
