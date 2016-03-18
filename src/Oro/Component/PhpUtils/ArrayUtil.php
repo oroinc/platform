@@ -376,6 +376,8 @@ class ArrayUtil
     /**
      * @param array $array
      * @param array $path
+     *
+     * @return array
      */
     public static function unsetPath(array $array, array $path)
     {

@@ -107,7 +107,6 @@ abstract class AbstractFilter implements FilterInterface
         );
         $metadata = $this->mapParams($metadata);
         $metadata = array_merge($defaultMetadata, $metadata);
-        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
         $metadata['lazy'] = $this->isLazy();
 
         return $metadata;
