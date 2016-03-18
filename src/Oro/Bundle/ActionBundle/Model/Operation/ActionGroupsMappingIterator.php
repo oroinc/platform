@@ -4,8 +4,8 @@ namespace Oro\Bundle\ActionBundle\Model\Operation;
 
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
-use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersMapper;
+use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 
 /**
  * Iterator provide mapping for \Oro\Bundle\ActionBundle\Model\OperationActionGroup with ActionData values to

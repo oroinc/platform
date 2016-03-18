@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ActionBundle\Model\ActionGroup;
 
-use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
-use Oro\Component\Action\Model\ContextAccessor;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
+
+use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class ParametersMapper
 {
@@ -18,7 +20,6 @@ class ParametersMapper
     {
         $this->accessor = $accessor ?: new ContextAccessor();
     }
-
 
     /**
      * Applies mapped values from context to ActionGroupExecutionArgs arguments

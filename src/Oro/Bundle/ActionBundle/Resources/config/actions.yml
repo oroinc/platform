@@ -93,10 +93,3 @@ actions:
                     entityLabel: $.entityLabel
         button_options:
             icon: icon-trash
-        action_groups:
-            -
-                name: DELETE
-                parameters_mapping:
-                    entity: $.data
-                    entity_label: $.entityLabel
-                    route: $.routes[name]

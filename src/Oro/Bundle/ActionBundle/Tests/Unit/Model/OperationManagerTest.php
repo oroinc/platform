@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Doctrine\Common\Collections\ArrayCollection;
-
 use Doctrine\Common\Collections\Collection;
+
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
@@ -282,12 +282,12 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ],
             'operation not available' => [
                 'operationName' => 'test',
-                'operation' => $this->createOperationMock(new ActionData(), false),
+                'operation' => $this->createOperationMock(false),
                 'isAvailable' => false
             ],
             'valid operation' => [
                 'operationName' => 'test_operation',
-                'operation' => $this->createOperationMock(new ActionData(), true),
+                'operation' => $this->createOperationMock(true),
                 'isAvailable' => true
             ]
         ];
@@ -662,11 +662,10 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param ActionData $actionData
      * @param bool $isAvailable
      * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createOperationMock(ActionData $actionData, $isAvailable = true)
+    protected function createOperationMock($isAvailable = true)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
         $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')

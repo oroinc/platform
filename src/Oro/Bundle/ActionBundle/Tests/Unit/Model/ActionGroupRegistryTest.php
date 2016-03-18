@@ -102,7 +102,7 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $this->setExpectedException(
-            '\Oro\Bundle\ActionBundle\Exception\ActionNotFoundException',
+            'Oro\Bundle\ActionBundle\Exception\ActionNotFoundException',
             'Action with name "not exists" not found'
         );
 

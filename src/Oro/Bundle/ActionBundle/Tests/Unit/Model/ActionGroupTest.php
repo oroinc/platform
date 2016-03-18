@@ -27,8 +27,6 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     /** @var ActionGroup */
     protected $actionGroup;
 
-
-
     /** @var ActionData */
     protected $data;
 
@@ -63,6 +61,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
      * @param ConfigurableCondition $condition
      * @param string $actionGroupName
      * @param string $exceptionMessage
+     *
      * @dataProvider executeProvider
      */
     public function testExecute(
