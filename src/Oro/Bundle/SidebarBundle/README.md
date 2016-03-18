@@ -25,7 +25,9 @@ widgets: [
         id: 1,
         title: 'Hello world',
         icon: 'bundles/orosidebar/img/hello-world.ico',
+        dialogIcon: 'bundles/orosidebar/img/hello-world.png',
         module: 'orosidebar/widget/hello-world',
+        description: 'This widget prints "Hello, World !!!"'
         settings: {
             content: 'Hello, World!!!'
         }
@@ -40,9 +42,11 @@ Default data for your widget should be defined in `widget.yml` file in
 * **title** - title text of your widget;
 * **iconClass** - css icon class from `Font Awesome` icons. When this property is set, then **icon** setting will be ignored;
 * **icon** - path to the icon image of your widget in the assets folder;
+* **dialogIcon** - path to the icon that shown on widget add dialog
 * **cssClass** - css class for the container of your widget;
 * **module** - alias of the path to your widget in the asset folder, which should be declare in the `require.yml` file;
 * **placement** - possible sides placement for your widget. Available positions: `right`, `left`, `both`;
+* **description** - description that shown on widget add dialog. The description should be translatable, translation put to the file `jsmessages.[language_code].yml`  
 * **settings** - custom settings of your widget;
 
 Example:
@@ -50,9 +54,11 @@ Example:
 ```yml
 title:     "Task list"
 iconClass: "icon-tasks"
+dialogIcon: "bundles/orocrmtask/sidebar_widgets/assigned_tasks/img/icon-task.png"
 module:    "orocrm/sidebar/widget/assigned_tasks"
 placement: "both"
 cssClass:  "sidebar-widget-assigned-tasks"
+description: orocrm.task.assigned_tasks_widget.description
 settings:
     perPage: 5
 ```

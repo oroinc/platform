@@ -235,6 +235,13 @@ services:
         tags:
             - { name: oro_formatter, formatter: datetime }
 
+    oro_locale.format.currency:
+        class: Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter
+        arguments:
+            - @oro_locale.twig.number
+        tags:
+            - { name: oro_formatter, formatter: currency }
+
     oro_locale.entity_name_provider:
         class: %oro_locale.entity_name_provider.class%
         public: false

@@ -4,34 +4,34 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
-use Oro\Bundle\ApiBundle\Processor\CustomizeDataItemContext;
-use Oro\Bundle\ApiBundle\Processor\CustomizeDataItemProcessor;
+use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Registers a post loading handler for the entity and all related entities.
- * It allows to customize loaded data by registering own processors for the "customize_data_item" action.
+ * It allows to customize loaded data by registering own processors for the "customize_loaded_data" action.
  */
-class SetDataItemCustomizationHandler implements ProcessorInterface
+class SetDataCustomizationHandler implements ProcessorInterface
 {
-    /** @var CustomizeDataItemProcessor */
+    /** @var ActionProcessorInterface */
     protected $customizationProcessor;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /**
-     * @param CustomizeDataItemProcessor $customizationProcessor
-     * @param DoctrineHelper             $doctrineHelper
+     * @param ActionProcessorInterface $customizationProcessor
+     * @param DoctrineHelper           $doctrineHelper
      */
     public function __construct(
-        CustomizeDataItemProcessor $customizationProcessor,
+        ActionProcessorInterface $customizationProcessor,
         DoctrineHelper $doctrineHelper
     ) {
         $this->customizationProcessor = $customizationProcessor;
@@ -172,11 +172,11 @@ class SetDataItemCustomizationHandler implements ProcessorInterface
     /**
      * @param ConfigContext $context
      *
-     * @return CustomizeDataItemContext
+     * @return CustomizeLoadedDataContext
      */
     protected function createCustomizationContext(ConfigContext $context)
     {
-        /** @var CustomizeDataItemContext $customizationContext */
+        /** @var CustomizeLoadedDataContext $customizationContext */
         $customizationContext = $this->customizationProcessor->createContext();
         $customizationContext->setVersion($context->getVersion());
         $customizationContext->getRequestType()->set($context->getRequestType()->toArray());

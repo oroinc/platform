@@ -3,8 +3,9 @@ define([
     'underscore',
     'orotranslation/js/translator',
     './abstract-filter',
-    'orofilter/js/multiselect-decorator'
-], function($, _, __, AbstractFilter, MultiselectDecorator) {
+    'orofilter/js/multiselect-decorator',
+    'oroui/js/app/views/loading-mask-view'
+], function($, _, __, AbstractFilter, MultiselectDecorator, LoadingMaskView) {
     'use strict';
 
     var SelectFilter;
@@ -103,6 +104,11 @@ define([
         contextSearch: true,
 
         /**
+         * @property {Boolean}
+         */
+        loadedMetadata: true,
+
+        /**
          * Filter events
          *
          * @property
@@ -123,14 +129,7 @@ define([
             var opts = _.pick(options || {}, ['choices', 'dropdownContainer']);
             _.extend(this, opts);
 
-            // init filter content options if it was not initialized so far
-            if (_.isUndefined(this.choices)) {
-                this.choices = [];
-            }
-            // temp code to keep backward compatible
-            this.choices = _.map(this.choices, function(option, i) {
-                return _.isString(option) ? {value: i, label: option} : option;
-            });
+            this._setChoices(this.choices);
 
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
@@ -140,6 +139,19 @@ define([
             }
 
             SelectFilter.__super__.initialize.apply(this, arguments);
+
+            if (this.lazy) {
+                this.loadedMetadata = false;
+                this.loader(
+                    _.bind(function(metadata) {
+                        this._setChoices(metadata.choices);
+                        this.render();
+                        if (this.subview('loading')) {
+                            this.subview('loading').hide();
+                        }
+                    }, this)
+                );
+            }
         },
 
         /**
@@ -166,18 +178,30 @@ define([
                 options.unshift({value: '', label: this.placeholder});
             }
 
-            this.setElement((
-                this.template({
-                    label: this.labelPrefix + this.label,
-                    showLabel: this.showLabel,
-                    options: options,
-                    canDisable: this.canDisable,
-                    selected: _.extend({}, this.emptyValue, this.value),
-                    isEmpty: this.isEmpty()
-                })
-            ));
+            var html = this.template({
+                label: this.labelPrefix + this.label,
+                showLabel: this.showLabel,
+                options: options,
+                canDisable: this.canDisable,
+                selected: _.extend({}, this.emptyValue, this.value),
+                isEmpty: this.isEmpty()
+            });
 
-            this._initializeSelectWidget();
+            if (!this.selectWidget) {
+                this.setElement(html);
+                this._initializeSelectWidget();
+            } else {
+                var selectOptions = $(html).find('select').html();
+                this.$('select').html(selectOptions);
+                this.selectWidget.multiselect('refresh');
+            }
+
+            if (!this.loadedMetadata && !this.subview('loading')) {
+                this.subview('loading', new LoadingMaskView({
+                    container: this.$el
+                }));
+                this.subview('loading').show();
+            }
 
             return this;
         },
@@ -370,6 +394,15 @@ define([
             return {
                 value: this._getInputValue(this.inputSelector)
             };
+        },
+
+        _setChoices: function(choices) {
+            choices = choices || [];
+
+            // temp code to keep backward compatible
+            this.choices = _.map(choices, function(option, i) {
+                return _.isString(option) ? {value: i, label: option} : option;
+            });
         }
     });
 

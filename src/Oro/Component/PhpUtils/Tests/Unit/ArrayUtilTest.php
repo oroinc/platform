@@ -759,6 +759,76 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider unsetPathDataProvider
+     */
+    public function testUnsetPath(array $array, array $path, array $expectedValue)
+    {
+        $this->assertEquals($expectedValue, ArrayUtil::unsetPath($array, $path));
+    }
+
+    public function unsetPathDataProvider()
+    {
+        return [
+            'unset with empty path' => [
+                ['a' => 'aval'],
+                [],
+                ['a' => 'aval'],
+            ],
+            'unset with path having 1 element' => [
+                ['a' => 'aval'],
+                ['a'],
+                [],
+            ],
+            'unset with invalid path having 1 element' => [
+                ['a' => 'aval'],
+                ['b'],
+                ['a' => 'aval'],
+            ],
+            'unset with path having more elements' => [
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'c' => 'cval',
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+                ['b', 'c'],
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+            ],
+            'unset with invalid path having more elements' => [
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'c' => 'cval',
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+                ['a', 'b', 'c'],
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'c' => 'cval',
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider mergeDataProvider
      *
      * @param array $expected
