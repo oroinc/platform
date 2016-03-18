@@ -5,7 +5,8 @@ define([
 
     var dateVariableHelper = new DateVariableHelper({
         'value': {
-            '10': 'current day'
+            '10': 'current day',
+            '11': 'current day without year'
         },
         'dayofweek': {
             '10': 'current day',
@@ -28,15 +29,21 @@ define([
             value: 'not variable-1',
             isDateVariable: false,
             rawValue: ''
+        },
+        {
+            value: 'current day without year',
+            isDateVariable: true,
+            rawValue: '{{11}}'
         }
     ];
 
     describe('orofilter/js/date-variable-helper', function() {
-        it('should', function() {
+        it('should work as expected', function() {
             data.forEach(function(item) {
                 expect(dateVariableHelper.isDateVariable(item.value)).toBe(item.isDateVariable);
                 if (item.isDateVariable) {
                     expect(dateVariableHelper.formatRawValue(item.value)).toEqual(item.rawValue);
+                    expect(dateVariableHelper.formatDisplayValue(item.rawValue)).toEqual(item.value);
                 }
             });
         });
