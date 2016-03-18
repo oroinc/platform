@@ -46,6 +46,8 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function assembleProvider()
     {
@@ -63,8 +65,40 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
         $definition2 = clone $definition1;
         $definition2
             ->setName('maximum_name')
-            ->setArguments(['config_arguments'])
-            ->setConditions(['config_conditions'])
+            ->setArguments([
+                'arg1' => [],
+                'arg2' => [
+                    'required' => true,
+                ],
+                'arg3' => [
+                    'required' => true,
+                    'type' => 'string',
+                    'message' => 'Error Message',
+                ],
+            ])
+            ->setConditions([
+                '@and' => [
+                    [
+                        '@has_value' => [
+                            'parameters' => ['$arg2'],
+                            'message' => '$arg2 is required',
+                        ]
+                    ],
+                    [
+                        '@has_value' => [
+                            'parameters' => ['$arg3'],
+                            'message' => 'Error Message: $arg3 is required',
+                        ]
+                    ],
+                    [
+                        '@type' => [
+                            'parameters' => ['$arg3', 'string'],
+                            'message' => 'Error Message: $arg3 must be of type "{{ type }}", "{{ value }}" given',
+                        ]
+                    ],
+                    ['@condition' => 'config_conditions'],
+                ]
+            ])
             ->setActions(['config_actions']);
 
         $definition3 = clone $definition2;
@@ -73,7 +107,25 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setConditions([
                 '@and' => [
                     ['@acl_granted' => 'test_acl'],
-                    ['config_conditions']
+                    [
+                        '@has_value' => [
+                            'parameters' => ['$arg2'],
+                            'message' => '$arg2 is required',
+                        ]
+                    ],
+                    [
+                        '@has_value' => [
+                            'parameters' => ['$arg3'],
+                            'message' => 'Error Message: $arg3 is required',
+                        ]
+                    ],
+                    [
+                        '@type' => [
+                            'parameters' => ['$arg3', 'string'],
+                            'message' => 'Error Message: $arg3 must be of type "{{ type }}", "{{ value }}" given',
+                        ]
+                    ],
+                    ['@condition' => 'config_conditions']
                 ]
              ])
             ->setActions(['config_actions']);
@@ -105,8 +157,20 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             'maximum data' => [
                 [
                     'maximum_name' => [
-                        'arguments' => ['config_arguments'],
-                        'conditions' => ['config_conditions'],
+                        'arguments' => [
+                            'arg1' => [],
+                            'arg2' => [
+                                'required' => true,
+                            ],
+                            'arg3' => [
+                                'required' => true,
+                                'type' => 'string',
+                                'message' => 'Error Message',
+                            ],
+                        ],
+                        'conditions' => [
+                            '@condition' => 'config_conditions',
+                        ],
                         'actions' => ['config_actions'],
                     ]
                 ],
@@ -122,8 +186,18 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             'maximum data and acl_resource' => [
                 [
                     'maximum_name_and_acl' => [
-                        'arguments' => ['config_arguments'],
-                        'conditions' => ['config_conditions'],
+                        'arguments' => [
+                            'arg1' => [],
+                            'arg2' => [
+                                'required' => true,
+                            ],
+                            'arg3' => [
+                                'required' => true,
+                                'type' => 'string',
+                                'message' => 'Error Message',
+                            ],
+                        ],
+                        'conditions' => ['@condition' => 'config_conditions'],
                         'actions' => ['config_actions'],
                         'acl_resource' => 'test_acl',
                     ]

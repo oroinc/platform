@@ -76,26 +76,81 @@ class ActionGroupAssembler extends AbstractAssembler
             ->setActions($this->getOption($options, 'actions', []))
             ->setArguments($this->getOption($options, 'arguments', []));
 
-        $this->addAclCondition($definition, $this->getOption($options, 'acl_resource'));
+        $this->addConditions($definition, $options);
 
         return $definition;
     }
 
     /**
      * @param ActionGroupDefinition $definition
-     * @param string|array|null $aclResource
+     * @param array $options
      */
-    protected function addAclCondition(ActionGroupDefinition $definition, $aclResource)
+    protected function addConditions(ActionGroupDefinition $definition, array $options)
+    {
+        $conditions = array_merge(
+            $this->getAclConditions($this->getOption($options, 'acl_resource')),
+            $this->getArgumentsConditions($this->getOption($options, 'arguments', []))
+        );
+
+        if ($currentConditions = $definition->getConditions()) {
+            $conditions = array_merge($conditions, [$currentConditions]);
+        }
+
+        $definition->setConditions($conditions ? ['@and' => $conditions] : []);
+    }
+
+    /**
+     * @param array $arguments
+     * @return array
+     */
+    protected function getArgumentsConditions(array $arguments)
+    {
+        if (!$arguments) {
+            return [];
+        }
+
+        $conditions = [];
+
+        foreach ($arguments as $name => $argument) {
+            $action = '$' . $name;
+            $message = !empty($argument['message']) ? $argument['message'] . ': ' : '';
+
+            if (!empty($argument['required'])) {
+                $conditions[] = [
+                    '@has_value' => [
+                        'parameters' => [$action],
+                        'message' => sprintf('%s%s is required', $message, $action),
+                    ]
+                ];
+            }
+
+            if (!empty($argument['type'])) {
+                $conditions[] = [
+                    '@type' => [
+                        'parameters' => [$action, $argument['type']],
+                        'message' => sprintf(
+                            '%s%s must be of type "{{ type }}", "{{ value }}" given',
+                            $message,
+                            $action
+                        ),
+                    ]
+                ];
+            }
+        }
+
+        return $conditions;
+    }
+
+    /**
+     * @param string|array|null $aclResource
+     * @return array
+     */
+    protected function getAclConditions($aclResource)
     {
         if (!$aclResource) {
-            return;
+            return [];
         }
 
-        $newConditions = ['@and' => [['@acl_granted' => $aclResource]]];
-        if ($conditions = $definition->getConditions()) {
-            $newConditions['@and'][] = $conditions;
-        }
-
-        $definition->setConditions($newConditions);
+        return [['@acl_granted' => $aclResource]];
     }
 }

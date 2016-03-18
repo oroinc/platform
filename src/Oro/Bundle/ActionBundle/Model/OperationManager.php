@@ -15,12 +15,15 @@ class OperationManager
     /** @var OperationRegistry */
     protected $operationRegistry;
 
+    /** @var ActionGroupRegistry */
+    protected $actionGroupRegistry;
+
     /** @var ContextHelper */
     protected $contextHelper;
 
     /**
      * @param OperationRegistry $operationRegistry
-     * @param ActionGroupRegistry $actionGroupRegistry,
+     * @param ActionGroupRegistry $actionGroupRegistry
      * @param ContextHelper $contextHelper
      */
     public function __construct(

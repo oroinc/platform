@@ -114,8 +114,17 @@ define(function(require) {
                             message += ': ' + jqXHR.responseJSON.message;
                         }
 
+                        var messages = jqXHR.responseJSON.messages || {};
+
                         mediator.execute('hideLoading');
-                        messenger.notificationFlashMessage('error', message);
+
+                        if (_.isEmpty(messages)) {
+                            messenger.notificationFlashMessage('error', message);
+                        } else {
+                            _.each(messages, function(submessage) {
+                                messenger.notificationFlashMessage('error', message + ': ' + submessage);
+                            });
+                        }
                     });
             }
         },
