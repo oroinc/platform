@@ -51,12 +51,8 @@ class DeleteDataByDeleteHandler implements ProcessorInterface
 
         /** @var ActionsConfig $actions */
         $actions = $context->getConfigOf('actions');
-        $deleteAction = $actions->getAction('delete');
-        $deleteServiceName = array_key_exists('delete_handler', $deleteAction)
-            ? $deleteAction['delete_handler']
-            : 'oro_soap.handler.delete';
 
-        $deleteHandler = $this->container->get($deleteServiceName);
+        $deleteHandler = $this->container->get($actions->getDeleteHandler());
         $deleteHandler->processDelete($object, $this->doctrineHelper->getEntityManager($object));
         $context->removeResult();
     }

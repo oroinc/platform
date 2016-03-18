@@ -43,4 +43,16 @@ services:
         arguments:
             - @oro_api.config_provider
         tags:
-            - { name: oro.api.processor, action: collect_resources, priority: -100 }
+            - { name: oro.api.processor, action: collect_resources, priority: -110 }
+
+    oro_api.collect_resources.exclude_delete_for_dictionaries:
+        class: Oro\Bundle\ApiBundle\Processor\CollectResources\ExcludeDeleteForDictionaries
+        arguments:
+            - @oro_entity.dictionary_value_list_provider
+        tags:
+            - { name: oro.api.processor, action: collect_resources, priority: -120 }
+
+    oro_api.collect_resources.restore_delete_for_dictionaries:
+        class: Oro\Bundle\ApiBundle\Processor\CollectResources\RestoreDeleteForDictionaries
+        tags:
+            - { name: oro.api.processor, action: collect_resources, priority: -130 }

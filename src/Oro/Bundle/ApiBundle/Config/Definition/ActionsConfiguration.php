@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfig;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 
@@ -33,29 +34,20 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
         $parentNode->useAttributeAsKey('name')
                 ->prototype('array')
                 ->info('Actions configuration')
-                ->treatFalseLike(array('exclude' => true))
-                ->treatTrueLike(array('exclude' => false))
-                ->treatNullLike(array('exclude' => false))
+                ->treatFalseLike(array(ActionsConfig::EXCLUDE => true))
+                ->treatTrueLike(array(ActionsConfig::EXCLUDE => false))
+                ->treatNullLike(array(ActionsConfig::EXCLUDE => false))
                 ->children()
-                    ->booleanNode('exclude')->cannotBeEmpty()->defaultFalse()->end()
-                    ->scalarNode('delete_handler')->cannotBeEmpty()->end()
-                    ->scalarNode('acl_resource')->end();
+                    ->booleanNode(ActionsConfig::EXCLUDE)->cannotBeEmpty()->defaultFalse()->end()
+                    ->scalarNode(ActionsConfig::DELETE_HANDLER)->cannotBeEmpty()->end()
+                    ->scalarNode(ActionsConfig::ACL_RESOURCE)->end();
 
         $parentNode
             ->validate()
             ->always(
                 function ($value) use ($postProcessCallbacks, $sectionName) {
                     // validate delete_handler values
-                    foreach ($value as $actionName => $actionConfig) {
-                        if ($actionName !== 'delete' && array_key_exists('delete_handler', $actionConfig)) {
-                            throw new InvalidConfigurationException(
-                                sprintf(
-                                    'The "%s" action does not supports delete_handler parameter.',
-                                    $actionName
-                                )
-                            );
-                        }
-                    }
+                    $this->validateDeleteHandlerParameter($value);
                     return $this->callProcessConfigCallbacks($value, $postProcessCallbacks, $sectionName);
                 }
             );
@@ -67,5 +59,24 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
     public function isApplicable($section)
     {
         return $section === 'entities.entity';
+    }
+
+    /**
+     * Validates delete_handler parameter. It can exists only at 'delete' action.
+     *
+     * @param array $value
+     */
+    protected function validateDeleteHandlerParameter(array $value)
+    {
+        foreach ($value as $actionName => $actionConfig) {
+            if ($actionName !== 'delete' && array_key_exists(ActionsConfig::DELETE_HANDLER, $actionConfig)) {
+                throw new InvalidConfigurationException(
+                    sprintf(
+                        'The "%s" action does not supports delete_handler parameter.',
+                        $actionName
+                    )
+                );
+            }
+        }
     }
 }

@@ -22,9 +22,9 @@ interface ConfigurationSectionInterface
     );
 
     /**
-     * Checks if section can be added to the given section
+     * Checks if section can be added to the given configuration section
      *
-     * @param string $section
+     * @param string $section Configuration section, f.e. entities.entity, relations.entity etc
      *
      * @return bool
      */
