@@ -67,7 +67,7 @@ define(function(require) {
                     name: name
                 };
             })
-            .sortBy(function (item) {
+            .sortBy(function(item) {
                 return -item.name.length;
             })
             .value();
@@ -118,7 +118,7 @@ define(function(require) {
          */
         formatRawValue: function(value) {
             var displayValue = null;
-            _.each(this.objectIndex, function (item) {
+            _.each(this.objectIndex, function(item) {
                 var regexpVariable = new RegExp('^' + value + '$', 'i');
                 var isShortMonth =
                     !/\s+/.test(item.name) &&
