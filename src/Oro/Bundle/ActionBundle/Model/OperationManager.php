@@ -9,8 +9,8 @@ use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 
 class OperationManager
 {
-    const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Action:form.html.twig';
-    const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Action:page.html.twig';
+    const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Operation:form.html.twig';
+    const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Operation:page.html.twig';
 
     /** @var OperationRegistry */
     protected $operationRegistry;

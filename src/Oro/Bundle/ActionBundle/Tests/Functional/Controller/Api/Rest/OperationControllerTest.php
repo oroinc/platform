@@ -44,7 +44,7 @@ class OperationControllerTest extends WebTestCase
      */
     protected function tearDown()
     {
-        $this->cacheProvider->delete(ConfigurationProvider::OPROOT_NODE_NAME);
+        $this->cacheProvider->delete(ConfigurationProvider::ROOT_NODE_NAME);
 
         parent::tearDown();
     }
@@ -76,9 +76,9 @@ class OperationControllerTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_api_action_execute_actions',
+                'oro_api_action_execute_operations',
                 [
-                    'actionName' => 'oro_action_test_action',
+                    'operationName' => 'oro_action_test_action',
                     'route' => $route,
                     'datagrid' => $datagrid,
                     'entityId' => $entityId ? $this->entity->getId() : null,
@@ -112,7 +112,7 @@ class OperationControllerTest extends WebTestCase
                 'entities' => [],
                 'routes' => [],
                 'datagrids' => [],
-                'functions' => [['@assign_value' => ['$message', self::MESSAGE_NEW]]],
+                'actions' => [['@assign_value' => ['$message', self::MESSAGE_NEW]]],
             ]
         ];
 

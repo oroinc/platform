@@ -34,7 +34,7 @@ services:
         arguments:
             - @service_container
             - []
-        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.function_factory" instead
+        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.action_factory" instead
 
     oro_workflow.action.tree:
         class: %oro_workflow.action.tree.class%
@@ -132,7 +132,7 @@ services:
             - @oro_workflow.manager
         tags:
             - { name: oro_workflow.action, alias: start_workflow }
-            - { name: oro_action.function, alias: start_workflow }
+            - { name: oro_action.action, alias: start_workflow }
 
     oro_workflow.action.redirect:
         class: %oro_workflow.action.redirect.class%

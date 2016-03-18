@@ -9,17 +9,17 @@
     {% set indexUrl = path(oro_entity_route(className, 'name')) %}
 
     {% oro_title_set({
-        titleTemplate : "%entity% - %actionName% - %label% - %pluralLabel%",
+        titleTemplate : "%entity% - %operationName% - %label% - %pluralLabel%",
         params : {
             "%entity%": entity.__toString,
-            "%actionName%": action.definition.label|trans,
+            "%operationName%": operation.definition.label|trans,
             "%label%": entityLabel,
             "%pluralLabel%": oro_entity_config_value(className, 'plural_label')|trans
         }
     }) %}
 {% else %}
     {% set indexUrl = '' %}
-    {% oro_title_set({titleTemplate : action.definition.label|trans}) %}
+    {% oro_title_set({titleTemplate : operation.definition.label|trans}) %}
 {% endif %}
 
 {% block pageHeader %}
@@ -33,7 +33,7 @@
 
         {{ parent() }}
     {% else %}
-        {% include 'OroUIBundle::page_title_block.html.twig' with { title: action.definition.label|trans } %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: operation.definition.label|trans } %}
     {% endif %}
 {% endblock pageHeader %}
 
@@ -45,12 +45,12 @@
 
 {% block content_data %}
     {% if id is not defined %}
-        {% set id = 'action-page-' ~ action.name %}
+        {% set id = 'action-page-' ~ operation.name %}
     {% endif %}
 
     {% if data is not defined %}
         {% set dataBlocks = [{
-            'title': action.definition.label|trans,
+            'title': operation.definition.label|trans,
             'class': 'active',
             'subblocks': [{
                 'data': [

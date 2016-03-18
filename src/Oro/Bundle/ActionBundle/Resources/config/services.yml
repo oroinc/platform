@@ -7,12 +7,9 @@ parameters:
     oro_action.operation_registry.class: Oro\Bundle\ActionBundle\Model\OperationRegistry
     oro_action.action_group_registry.class: Oro\Bundle\ActionBundle\Model\ActionGroupRegistry
     oro_action.operation_manager.class: Oro\Bundle\ActionBundle\Model\OperationManager
-    oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
-    oro_action.attribute_assembler.class: Oro\Bundle\ActionBundle\Model\AttributeAssembler
     oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
-    oro_action.form_options_assembler.class: Oro\Bundle\ActionBundle\Model\FormOptionsAssembler
-    oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\ActionFormManager
+    oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\OperationFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_action.datagrid.operation_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
@@ -111,11 +108,6 @@ services:
 
     oro_action.options_assembler:
         class: %oro_action.options_assembler.class%
-        calls:
-            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
-
-    oro_action.form_options_assembler:
-        class: %oro_action.form_options_assembler.class%
         calls:
             - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
 

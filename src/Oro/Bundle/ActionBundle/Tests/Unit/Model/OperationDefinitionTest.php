@@ -31,7 +31,7 @@ class OperationDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['name1' => ['func1', 'func2']], $this->definition->getActions());
     }
 
-    public function testGetAllowedFunctions()
+    public function testGetAllowedActions()
     {
         $this->assertEquals(
             [OperationDefinition::PREACTIONS, OperationDefinition::FORM_INIT],

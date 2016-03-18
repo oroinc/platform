@@ -90,20 +90,20 @@ class OperationExtension extends AbstractExtension
     }
 
     /**
-     * @param array $actionsConfig
+     * @param array $operationsConfig
      * @param array $datagridContext
      * @return Operation[]
      */
-    protected function getOperations(array $actionsConfig, array $datagridContext)
+    protected function getOperations(array $operationsConfig, array $datagridContext)
     {
         $result = [];
 
-        $actions = $this->operationManager->getOperations($datagridContext, false);
+        $operations = $this->operationManager->getOperations($datagridContext, false);
 
-        foreach ($actions as $actionName => $action) {
-            $actionName = strtolower($actionName);
-            if (!array_key_exists($actionName, $actionsConfig)) {
-                $result[$actionName] = $action;
+        foreach ($operations as $operationName => $action) {
+            $operationName = strtolower($operationName);
+            if (!array_key_exists($operationName, $operationsConfig)) {
+                $result[$operationName] = $action;
             }
         }
 

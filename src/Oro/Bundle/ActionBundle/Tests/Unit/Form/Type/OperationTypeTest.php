@@ -5,17 +5,17 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Form\Type;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener;
-use Oro\Bundle\ActionBundle\Form\Type\ActionType;
-use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeManager;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
+use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 
 use Oro\Component\Action\Model\ContextAccessor;
 use Oro\Component\Testing\Unit\FormIntegrationTestCase;
 
-class ActionTypeTest extends FormIntegrationTestCase
+class OperationTypeTest extends FormIntegrationTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
     protected $operationManager;
@@ -23,7 +23,7 @@ class ActionTypeTest extends FormIntegrationTestCase
     /** @var RequiredAttributesListener */
     protected $requiredAttributesListener;
 
-    /** @var ActionType */
+    /** @var OperationType */
     protected $formType;
 
     protected function setUp()
@@ -36,7 +36,7 @@ class ActionTypeTest extends FormIntegrationTestCase
 
         $this->requiredAttributesListener = new RequiredAttributesListener();
 
-        $this->formType = new ActionType(
+        $this->formType = new OperationType(
             $this->operationManager,
             $this->requiredAttributesListener,
             new ContextAccessor()
@@ -95,9 +95,9 @@ class ActionTypeTest extends FormIntegrationTestCase
     {
         return [
             'existing data' => [
-                'defaultData' => $this->createActionData(['field1' => 'data1', 'field2' => 'data2']),
+                'defaultData' => $this->createOperationData(['field1' => 'data1', 'field2' => 'data2']),
                 'inputOptions' => [
-                    'action' => $this->createAction(),
+                    'operation' => $this->createOperation(),
                     'attribute_fields' => [
                         'field1'  => [
                             'form_type' => 'text',
@@ -111,7 +111,7 @@ class ActionTypeTest extends FormIntegrationTestCase
                     ],
                 ],
                 'submittedData' => ['field1' => 'data1', 'field2' => 'data2'],
-                'expectedData' => $this->createActionData(['field1' => 'data1', 'field2' => 'data2']),
+                'expectedData' => $this->createOperationData(['field1' => 'data1', 'field2' => 'data2']),
                 'expectedChildrenOptions' => [
                     'field1'  => [
                         'required' => true,
@@ -124,9 +124,9 @@ class ActionTypeTest extends FormIntegrationTestCase
                 ]
             ],
             'new data' => [
-                'defaultData' => $this->createActionData(),
+                'defaultData' => $this->createOperationData(),
                 'inputOptions' => [
-                    'action' => $this->createAction(),
+                    'operation' => $this->createOperation(),
                     'attribute_fields' => [
                         'field1'  => [
                             'form_type' => 'text'
@@ -137,7 +137,7 @@ class ActionTypeTest extends FormIntegrationTestCase
                     ],
                 ],
                 'submittedData' => ['field1' => 'data1', 'field2' => 'data2'],
-                'expectedData' => $this->createActionData(['field1' => 'data1', 'field2' => 'data2'], true),
+                'expectedData' => $this->createOperationData(['field1' => 'data1', 'field2' => 'data2'], true),
                 'expectedChildrenOptions' => [
                     'field1'  => [
                         'required' => false,
@@ -150,14 +150,14 @@ class ActionTypeTest extends FormIntegrationTestCase
                 ]
             ],
             'with default values' => [
-                'defaultData' => $this->createActionData(
+                'defaultData' => $this->createOperationData(
                     [
                         'default_field1' => 'default_field1_value',
                         'default_field2' => 'default_field2_value'
                     ]
                 ),
                 'inputOptions' => [
-                    'action' => $this->createAction(),
+                    'operation' => $this->createOperation(),
                     'attribute_fields' => [
                         'field1'  => [
                             'form_type' => 'text'
@@ -172,7 +172,7 @@ class ActionTypeTest extends FormIntegrationTestCase
                     ]
                 ],
                 'submittedData' => [],
-                'expectedData' => $this->createActionData(
+                'expectedData' => $this->createOperationData(
                     [
                         'field1' => null,
                         'field2' => null,
@@ -191,7 +191,7 @@ class ActionTypeTest extends FormIntegrationTestCase
                         'label' => 'Field2 Label'
                     ]
                 ],
-                'expectedDefaultData' => $this->createActionData(
+                'expectedDefaultData' => $this->createOperationData(
                     [
                         'field1' => 'default_field1_value',
                         'field2' => 'default_field2_value'
@@ -225,7 +225,7 @@ class ActionTypeTest extends FormIntegrationTestCase
         return [
             [
                 'options' => [
-                    'action' => $this->createAction(),
+                    'operation' => $this->createOperation(),
                     'attribute_fields' => [
                         'field'  => [
                             'form_type' => 'text'
@@ -238,7 +238,7 @@ class ActionTypeTest extends FormIntegrationTestCase
             ],
             [
                 'options' => [
-                    'action' => $this->createAction(true),
+                    'operation' => $this->createOperation(true),
                     'attribute_fields' => [
                         'field'  => [
                             'form_type' => 'text'
@@ -246,19 +246,20 @@ class ActionTypeTest extends FormIntegrationTestCase
                     ],
                 ],
                 'exception' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
-                'message' => 'Invalid reference to unknown attribute "field" of action "test_operation".',
-                'context' => $this->createActionData()
+                'message' => 'Invalid reference to unknown attribute "field" of operation "test_operation".',
+                'context' => $this->createOperationData()
             ],
             [
                 'options' => [
-                    'action' => $this->createAction(),
+                    'operation' => $this->createOperation(),
                     'attribute_fields' => [
                         'field' => null
                     ],
                 ],
                 'exception' => 'Symfony\Component\Form\Exception\InvalidConfigurationException',
-                'message' => 'Parameter "form_type" must be defined for attribute "field" in action "test_operation".',
-                'context' => $this->createActionData()
+                'message' => 'Parameter "form_type" must be defined for attribute "field" ' .
+                    'in operation "test_operation".',
+                'context' => $this->createOperationData()
             ]
         ];
     }
@@ -268,7 +269,7 @@ class ActionTypeTest extends FormIntegrationTestCase
      * @param bool $modified
      * @return ActionData
      */
-    protected function createActionData(array $data = [], $modified = false)
+    protected function createOperationData(array $data = [], $modified = false)
     {
         $actionData = new ActionData($data);
 
@@ -284,7 +285,7 @@ class ActionTypeTest extends FormIntegrationTestCase
      * @param bool $noAttributes
      * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function createAction($noAttributes = false)
+    protected function createOperation($noAttributes = false)
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|AttributeManager $attributeManager */
         $attributeManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeManager')

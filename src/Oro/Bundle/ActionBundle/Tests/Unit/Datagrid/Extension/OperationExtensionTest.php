@@ -56,7 +56,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ->with(self::PROVIDER_ALIAS)
             ->willReturn($provider);
 
-        /* @var $optionsHelper OptionsHelper|\PHPUnit_Framework_MockObject_MockObjec */
+        /* @var $optionsHelper OptionsHelper|\PHPUnit_Framework_MockObject_MockObject */
         $optionsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\OptionsHelper')
             ->disableOriginalConstructor()
             ->getMock();

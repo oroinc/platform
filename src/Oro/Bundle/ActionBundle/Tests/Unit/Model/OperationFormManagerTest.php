@@ -8,10 +8,10 @@ use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Model\ActionFormManager;
+use Oro\Bundle\ActionBundle\Model\OperationFormManager;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 
-class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
+class OperationFormManagerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|Operation */
     protected $operation;
@@ -25,7 +25,7 @@ class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper */
     protected $contextHelper;
 
-    /** @var ActionFormManager */
+    /** @var OperationFormManager */
     protected $manager;
 
     protected function setUp()
@@ -44,15 +44,15 @@ class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->manager = new ActionFormManager($this->formFactory, $this->operationManager, $this->contextHelper);
+        $this->manager = new OperationFormManager($this->formFactory, $this->operationManager, $this->contextHelper);
     }
 
     protected function tearDown()
     {
-        unset($this->manager, $this->formFactory, $this->operationManager, $this->contextHelper, $this->action);
+        unset($this->manager, $this->formFactory, $this->operationManager, $this->contextHelper, $this->operation);
     }
 
-    public function testGetActionForm()
+    public function testGetOperationForm()
     {
         /** @var \PHPUnit_Framework_MockObject_MockObject|OperationDefinition $definition */
         $definition = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationDefinition')
@@ -90,7 +90,7 @@ class ActionFormManagerTest extends \PHPUnit_Framework_TestCase
                 $data,
                 [
                     'some_option' => 'option_value',
-                    'action' => $this->operation
+                    'operation' => $this->operation
                 ]
             )
             ->willReturn($form);

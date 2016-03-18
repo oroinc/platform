@@ -29,7 +29,7 @@ define(function(require) {
             confirmation: {},
             showDialog: false,
             hasDialog: false,
-            dialogOptions: {},
+            dialogOptions: {}
         },
 
         /**

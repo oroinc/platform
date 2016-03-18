@@ -220,4 +220,4 @@ services:
             - @oro_tag.helper.taggable_helper
         tags:
             - { name: oro_workflow.action, alias: copy_tagging }
-            - { name: oro_action.function, alias: copy_tagging }
+            - { name: oro_action.action, alias: copy_tagging }

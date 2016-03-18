@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -110,7 +110,7 @@ class WidgetControllerTest extends WebTestCase
                 'oro_action_widget_form',
                 [
                     '_widgetContainer' => 'dialog',
-                    'actionName' => 'oro_action_test_action',
+                    'operationName' => 'oro_action_test_action',
                     'entityId' => $this->entityId,
                     'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
                 ]

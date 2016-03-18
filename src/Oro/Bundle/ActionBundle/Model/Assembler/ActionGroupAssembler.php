@@ -63,16 +63,16 @@ class ActionGroupAssembler extends AbstractAssembler
     }
 
     /**
-     * @param string $actionName
+     * @param string $actionGroupName
      * @param array $options
      * @return ActionGroupDefinition
      */
-    protected function assembleDefinition($actionName, array $options)
+    protected function assembleDefinition($actionGroupName, array $options)
     {
         $definition = new ActionGroupDefinition();
 
         $definition
-            ->setName($actionName)
+            ->setName($actionGroupName)
             ->setConditions($this->getOption($options, 'conditions', []))
             ->setActions($this->getOption($options, 'actions', []))
             ->setParameters($this->getOption($options, 'parameters', []));
