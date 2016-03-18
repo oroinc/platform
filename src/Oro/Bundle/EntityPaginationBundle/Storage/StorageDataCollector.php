@@ -103,14 +103,18 @@ class StorageDataCollector
             $dataSource = $dataGrid->getDatasource();
             $dataGrid->getAcceptor()->acceptDatasource($dataSource);
 
-            $alias = $dataGrid->getConfig()->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_ALIAS_PATH);
+            $config = $dataGrid->getConfig();
+            $alias = null;
+
+            if ($config) {
+                $alias = $config->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_ALIAS_PATH);
+            }
 
             if ($alias !== null) {
                 $entityName = $alias;
             } else {
                 $entityName = $this->getEntityName($dataSource);
             }
-
 
             $stateHash = $this->generateStateHash($dataGrid);
 
