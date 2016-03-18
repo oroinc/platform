@@ -28,7 +28,7 @@ define([
         {
             value: 'not variable-1',
             isDateVariable: false,
-            rawValue: ''
+            rawValue: 'not variable-1'
         },
         {
             value: 'current day without year',
@@ -41,10 +41,8 @@ define([
         it('should work as expected', function() {
             data.forEach(function(item) {
                 expect(dateVariableHelper.isDateVariable(item.value)).toBe(item.isDateVariable);
-                if (item.isDateVariable) {
-                    expect(dateVariableHelper.formatRawValue(item.value)).toEqual(item.rawValue);
-                    expect(dateVariableHelper.formatDisplayValue(item.rawValue)).toEqual(item.value);
-                }
+                expect(dateVariableHelper.formatDisplayValue(item.rawValue)).toEqual(item.value);
+                expect(dateVariableHelper.formatRawValue(item.value)).toEqual(item.rawValue);
             });
         });
     });
