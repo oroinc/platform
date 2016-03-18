@@ -134,7 +134,7 @@ class OptionsHelper
     }
 
     /**
-     * @param aray $options
+     * @param array $options
      * @param array $source
      * @param string $sourceKey
      */
