@@ -116,14 +116,14 @@ oro:
         sorters:
             not_selected: 'No sorting'
             undefined:
-                ascending: High to Low
-                descending: Low to High
+                ascending: Low to High
+                descending: High to Low
             string:
                 ascending: A to Z
                 descending: Z to A
             number:
-                ascending: High to Low
-                descending: Low to High
+                ascending: Low to High
+                descending: High to Low
             currency:
-                ascending: High to Low
-                descending: Low to High
+                ascending: Low to High
+                descending: High to Low
