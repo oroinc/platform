@@ -417,10 +417,11 @@ define(function(require) {
             var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
             this.internalSetDialogPosition(position, leftShift, topShift);
-            /*
-             * Left and Width adjustments
-             * **************************
-             */
+            this.leftAndWidthAdjustments(dialog, containerEl);
+            this.topAndHeightAdjustments(dialog, containerEl);
+        },
+
+        leftAndWidthAdjustments: function(dialog, containerEl) {
             // containerEl.offsetLeft will only work if offsetParent is document.body
             var left = parseFloat(dialog.css('left')) - containerEl.offsetLeft;
             var width = parseFloat(dialog.css('width'));
@@ -442,10 +443,9 @@ define(function(require) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
             }
-            /*
-             * Top and Height adjustments
-             * **************************
-             */
+        },
+
+        topAndHeightAdjustments: function(dialog, containerEl) {
             // containerEl.offsetTop will only work if offsetParent is document.body
             var top = parseFloat(dialog.css('top')) - containerEl.offsetTop;
             var height = parseFloat(dialog.css('height'));
