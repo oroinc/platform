@@ -117,6 +117,10 @@ define(function(require) {
             }
         },
 
+        /**
+         * @param {Object} response
+         * @param {jQuery.Event} e
+         */
         doResponse: function(response, e) {
             mediator.execute('hideLoading');
 

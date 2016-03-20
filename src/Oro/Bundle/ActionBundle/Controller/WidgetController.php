@@ -51,14 +51,13 @@ class WidgetController extends Controller
     public function formAction(Request $request, $actionName)
     {
         $data = $this->getContextHelper()->getActionData();
-        $errors = new ArrayCollection();
 
         $params = [
             '_wid' => $request->get('_wid'),
             'fromUrl' => $request->get('fromUrl'),
             'action' => $this->getOperationManager()->getOperation($actionName, $data),
             'actionData' => $data,
-            'errors' => null,
+            'errors' => new ArrayCollection(),
             'messages' => [],
         ];
 
@@ -71,7 +70,7 @@ class WidgetController extends Controller
             $form->handleRequest($request);
 
             if ($form->isValid()) {
-                $this->getOperationManager()->execute($actionName, $data, $errors);
+                $this->getOperationManager()->execute($actionName, $data, $params['errors']);
 
                 $params['response'] = $this->getResponse($data);
 
@@ -83,7 +82,7 @@ class WidgetController extends Controller
         } catch (\Exception $e) {
             $params = array_merge($params, $this->getErrorResponse(
                 $params,
-                $this->getErrorMessages($e, $errors)
+                $this->getErrorMessages($e, $params['errors'])
             ));
         }
 

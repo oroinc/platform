@@ -242,13 +242,4 @@ class Operation
 
         return $this->operationActionGroups;
     }
-//
-//    /**
-//     * @param ActionData $data
-//     * @return ActionGroupsMappingIterator|ActionGroupExecutionArgs[]
-//     */
-//    public function getActionGroupsIterator(ActionData $data)
-//    {
-//        return new ActionGroupsMappingIterator($this->getOperationActionGroups(), $data);
-//    }
 }
