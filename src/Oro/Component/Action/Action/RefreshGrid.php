@@ -2,6 +2,8 @@
 
 namespace Oro\Component\Action\Action;
 
+use Symfony\Component\PropertyAccess\PropertyPath;
+
 use Oro\Component\Action\Exception\InvalidParameterException;
 
 class RefreshGrid extends AbstractAction
@@ -16,7 +18,13 @@ class RefreshGrid extends AbstractAction
      */
     protected function executeAction($context)
     {
-        $this->contextAccessor->setValue($context, 'refreshGrid', $this->gridNames);
+        $property = new PropertyPath('refreshGrid');
+
+        $gridNames = $this->contextAccessor->getValue($context, $property);
+
+        $gridNames = array_unique(array_merge((array)$gridNames, $this->gridNames));
+
+        $this->contextAccessor->setValue($context, $property, $gridNames);
     }
 
     /**
@@ -28,7 +36,7 @@ class RefreshGrid extends AbstractAction
             throw new InvalidParameterException('Gridname parameter must be specified');
         }
 
-        $this->gridNames = array_unique($options);
+        $this->gridNames = $options;
 
         return $this;
     }

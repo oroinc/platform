@@ -56,14 +56,10 @@ class OperationManager
      * @param ActionData $actionData
      * @param Collection|null $errors
      * @return ActionData
-     * @throws \Exception
      */
     public function execute($operationName, ActionData $actionData, Collection $errors = null)
     {
-        $operation = $this->getOperation($operationName, $actionData);
-        foreach ($operation->getActionGroupsIterator($actionData) as $executionArgs) {
-            $executionArgs->execute($this->actionGroupRegistry, $errors);
-        }
+        $this->getOperation($operationName, $actionData)->execute($actionData, $errors);
 
         return $actionData;
     }

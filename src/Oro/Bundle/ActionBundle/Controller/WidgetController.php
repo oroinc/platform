@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Controller;
 
+use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
@@ -11,7 +12,9 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
 use Symfony\Component\HttpFoundation\Session\Session;
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
@@ -55,6 +58,8 @@ class WidgetController extends Controller
             'fromUrl' => $request->get('fromUrl'),
             'action' => $this->getOperationManager()->getOperation($actionName, $data),
             'actionData' => $data,
+            'errors' => null,
+            'messages' => [],
         ];
 
         try {
@@ -66,7 +71,7 @@ class WidgetController extends Controller
             $form->handleRequest($request);
 
             if ($form->isValid()) {
-                $data = $this->getOperationManager()->execute($actionName, $data, $errors);
+                $this->getOperationManager()->execute($actionName, $data, $errors);
 
                 $params['response'] = $this->getResponse($data);
 
@@ -76,9 +81,10 @@ class WidgetController extends Controller
             }
 
         } catch (\Exception $e) {
-            if (!$errors->count()) {
-                $errors->add(['message' => $e->getMessage()]);
-            }
+            $params = array_merge($params, $this->getErrorResponse(
+                $params,
+                $this->getErrorMessages($e, $errors)
+            ));
         }
 
         if (isset($form)) {
@@ -86,7 +92,6 @@ class WidgetController extends Controller
         }
 
         $params['context'] = $data->getValues();
-        $params['errors'] = $errors;
 
         return $this->render($this->getOperationManager()->getFrontendTemplate($actionName), $params);
     }
@@ -125,6 +130,56 @@ class WidgetController extends Controller
     }
 
     /**
+     * @param \Exception $e
+     * @param Collection $errors
+     * @return ArrayCollection
+     */
+    protected function getErrorMessages(\Exception $e, Collection $errors = null)
+    {
+        $messages = new ArrayCollection();
+
+        if (!$errors->count()) {
+            $messages->add(['message' => $e->getMessage()]);
+        } else {
+            foreach ($errors as $key => $error) {
+                $messages->set($key, [
+                    'message' => sprintf('%s: %s', $e->getMessage(), $error['message']),
+                    'parameters' => $error['parameters'],
+                ]);
+            }
+        }
+
+        return $messages;
+    }
+
+    /**
+     * @param array $params
+     * @param Collection $messages
+     * @return array
+     */
+    protected function getErrorResponse(array $params, Collection $messages)
+    {
+        /* @var $flashBag FlashBagInterface */
+        $flashBag = $this->get('session')->getFlashBag();
+
+        if (!empty($params['_wid'])) {
+            return [
+                'errors' => $messages,
+                'messages' => $flashBag->all(),
+            ];
+        }
+
+        /* @var $translator TranslatorInterface */
+        $translator = $this->get('translator');
+
+        foreach ($messages as $message) {
+            $flashBag->add('error', $translator->trans($message['message'], $message['parameters']));
+        }
+
+        return [];
+    }
+
+    /**
      * @param ActionData $context
      * @return array
      */
@@ -133,7 +188,10 @@ class WidgetController extends Controller
         /* @var $session Session */
         $session = $this->get('session');
 
-        $response = [];
+        $response = [
+            'success' => true,
+        ];
+
         if ($context->getRedirectUrl()) {
             $response['redirectUrl'] = $context->getRedirectUrl();
         } elseif ($context->getRefreshGrid()) {

@@ -24,8 +24,6 @@ services:
             - @oro_entity.doctrine_helper
             - @logger
             - %kernel.debug%
-        calls:
-            - [addConfigurationProvider, [@oro_action.configuration.provider.action_groups, 'action_groups']]
 
     oro_action.configuration.provider.operations:
         class: %oro_action.configuration.provider.class%

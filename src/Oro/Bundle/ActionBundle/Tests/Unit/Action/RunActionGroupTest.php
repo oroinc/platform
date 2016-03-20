@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Action;
 
+use Doctrine\Common\Collections\ArrayCollection;
+
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
@@ -171,12 +173,22 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     {
         $actionData1 = new ActionData(['data' => (object)['paramValue' => 'value']]);
 
+        $expectedData1 = (new ActionData(['param' => 'value', 'errors' => new ArrayCollection()]));
+
         $actionDataWithAttributeApplied = new ActionData(['param' => 'value']);
-        $actionDataWithAttributeApplied['new_param_data'] = 'return value';
+        $actionDataWithAttributeApplied->redirectUrl = 'url2';
+        $actionDataWithAttributeApplied->refreshGrid = ['grid1', 'grid2'];
+        $actionDataWithAttributeApplied['new_param_data'] = new ActionData([
+            'redirectUrl' => 'url2',
+            'refreshGrid' => ['grid2'],
+        ]);
 
         return [
-            'without attribute' => [
-                'contextParams' => ['param' => 'value'],
+            'without attribute and pass errors' => [
+                'contextParams' => [
+                    'param' => 'value',
+                    'errors' => new ArrayCollection(),
+                ],
                 'options' => [
                     RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
                     RunActionGroup::OPTION_PARAMETERS_MAP => [
@@ -184,20 +196,27 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'arguments' => $actionData1,
-                'return' => 'not matters',
-                'expected' => new ActionData(['param' => 'value'])
+                'return' => new ActionData([]),
+                'expected' => $expectedData1
             ],
-            'with attribute' => [
-                'contextParams' => ['param' => 'value'],
+            'with attribute and merge context' => [
+                'contextParams' => [
+                    'param' => 'value',
+                    'redirectUrl' => 'url1',
+                    'refreshGrid' => ['grid1'],
+                ],
                 'options' => [
                     RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
                     RunActionGroup::OPTION_PARAMETERS_MAP => [
                         'paramValue' => new PropertyPath('param')
                     ],
-                    RunActionGroup::OPTION_ATTRIBUTE => new PropertyPath('new_param_data')
+                    RunActionGroup::OPTION_ATTRIBUTE => new PropertyPath('new_param_data'),
                 ],
                 'arguments' => $actionData1,
-                'return' => 'return value',
+                'return' => new ActionData([
+                    'redirectUrl' => 'url2',
+                    'refreshGrid' => ['grid2'],
+                ]),
                 'expected' => $actionDataWithAttributeApplied
             ]
         ];

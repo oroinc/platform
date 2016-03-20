@@ -76,7 +76,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'enabled' => true,
                         'preactions' => [],
                         'preconditions' => [],
-                        'action_groups' => [],
+                        'actions' => [],
                         'form_init' => [],
                         'attributes' => [],
                         'frontend_options' => [
@@ -153,6 +153,9 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'preconditions' => [
                             '@equal' => ['$field1', 'value1'],
                         ],
+                        'actions' => [
+                            '@action1' => [],
+                        ],
                         'form_init' => [
                             '@assign_value' => ['$field1', 'value2'],
                         ],
@@ -162,15 +165,6 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'label' => 'Test Attribute Label'
                             ]
                         ],
-                        'action_groups' => [
-                            [
-                                'name' => 'demo_expire_quote',
-                                'arguments_mapping' => [
-                                    'data' => '$.data',
-                                    'date' => '$.currentDate'
-                                ]
-                            ]
-                        ]
                     ],
                 ],
                 'expected' => [
@@ -193,6 +187,9 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         ],
                         'preconditions' => [
                             '@equal' => ['$field1', 'value1'],
+                        ],
+                        'actions' => [
+                            '@action1' => [],
                         ],
                         'form_init' => [
                             '@assign_value' => ['$field1', 'value2'],
@@ -245,15 +242,6 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'icon' => 'test'
                             ]
                         ],
-                        'action_groups' => [
-                            [
-                                'name' => 'demo_expire_quote',
-                                'arguments_mapping' => [
-                                    'data' => '$.data',
-                                    'date' => '$.currentDate'
-                                ]
-                            ]
-                        ]
                     ]
                 ],
             ],
@@ -270,8 +258,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
             $this->invalidAttributeProvider(),
             $this->invalidFormOptionsProvider(),
             $this->invalidAttributesProvider(),
-            $this->invalidDatagridOptionsProvider(),
-            $this->invalidActionGroupsProvider()
+            $this->invalidDatagridOptionsProvider()
         );
     }
 
@@ -713,98 +700,6 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                 'message' => 'Invalid configuration for path "operations.oper1.datagrid_options": ' .
                     'Must be specified only one parameter "mass_action_provider" or "mass_action"'
             ],
-        ];
-    }
-
-    /**
-     * @return array
-     */
-    protected function invalidActionGroupsProvider()
-    {
-        return [
-            'incorrect operation[action_groups]' => [
-                'input' => [
-                    'oper1' => [
-                        'label' => 'Test Label',
-                        'action_groups' => '',
-                    ],
-                ],
-                'message' => 'Invalid type for path "operations.oper1.action_groups". Expected array, but got string'
-            ],
-            'incorrect operation[action_groups][0]' => [
-                'input' => [
-                    'oper1' => [
-                        'label' => 'Test Label',
-                        'action_groups' => [
-                            'bad_value'
-                        ],
-                    ],
-                ],
-                'message' => 'Invalid type for path "operations.oper1.action_groups.0". Expected array, but got string'
-            ],
-            'incorrect operation[action_groups][name]' => [
-                'input' => [
-                    'oper1' => [
-                        'label' => 'Test Label',
-                        'action_groups' => [
-                            [
-                                'name' => []
-                            ]
-                        ],
-                    ],
-                ],
-                'message' => 'Invalid type for path "operations.oper1.action_groups.0.name". ' .
-                    'Expected scalar, but got array'
-            ],
-            'incorrect operation[action_groups][arguments_mapping]' => [
-                'input' => [
-                    'oper1' => [
-                        'label' => 'Test Label',
-                        'action_groups' => [
-                            [
-                                'name' => 'test_name',
-                                'arguments_mapping' => ''
-                            ]
-                        ],
-                    ],
-                ],
-                'message' => 'Invalid type for path "operations.oper1.action_groups.0.arguments_mapping". ' .
-                    'Expected array, but got string'
-            ],
-            'incorrect operation[action_groups][arguments_mapping][test]' => [
-                'input' => [
-                    'oper1' => [
-                        'label' => 'Test Label',
-                        'action_groups' => [
-                            [
-                                'name' => 'test_name',
-                                'arguments_mapping' => [
-                                    'test' => []
-                                ]
-                            ]
-                        ],
-                    ],
-                ],
-                'message' => 'Invalid type for path "operations.oper1.action_groups.0.arguments_mapping.test". ' .
-                    'Expected scalar, but got array'
-            ],
-            'empty operation[action_groups][arguments_mapping][test]' => [
-                'input' => [
-                    'oper1' => [
-                        'label' => 'Test Label',
-                        'action_groups' => [
-                            [
-                                'name' => 'test_name',
-                                'arguments_mapping' => [
-                                    'test' => null
-                                ]
-                            ]
-                        ],
-                    ],
-                ],
-                'message' => 'The path "operations.oper1.action_groups.0.arguments_mapping.test" cannot contain ' .
-                    'an empty value, but got null'
-            ]
         ];
     }
 }
