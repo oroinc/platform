@@ -40,7 +40,7 @@ class DoSomething implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-	    // do some work here
+        // do some work here
     }
 }
 ```
