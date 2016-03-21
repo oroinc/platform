@@ -130,15 +130,18 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     'dialogUrl' => 'dialog-url',
                 ],
                 'expected' => [
-                    'hasDialog' => false,
-                    'showDialog' => false,
-                    'dialogOptions' => [
-                        'title' => 'action1',
-                        'dialogOptions' => [],
+                    'options' => [
+                        'hasDialog' => false,
+                        'showDialog' => false,
+                        'dialogOptions' => [
+                            'title' => 'action1',
+                            'dialogOptions' => [],
+                        ],
+                        'executionUrl' => 'execution-url',
+                        'dialogUrl' => 'dialog-url',
+                        'url' => 'execution-url',
                     ],
-                    'executionUrl' => 'execution-url',
-                    'dialogUrl' => 'dialog-url',
-                    'url' => 'execution-url',
+                    'data' => [],
                 ],
             ],
             'optional parameters' => [
@@ -165,22 +168,26 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     'dialogUrl' => 'dialog-url2',
                 ],
                 'expected' => [
-                    'hasDialog' => false,
-                    'showDialog' => false,
-                    'dialogOptions' => [
-                        'title' => 'action2',
-                        'dialogOptions' => [],
+                    'options' => [
+                        'hasDialog' => false,
+                        'showDialog' => false,
+                        'dialogOptions' => [
+                            'title' => 'action2',
+                            'dialogOptions' => [],
+                        ],
+                        'executionUrl' => 'execution-url2',
+                        'dialogUrl' => 'dialog-url2',
+                        'url' => 'execution-url2',
+                        'confirmation' => [
+                            'option1' => 'value1',
+                            'key1' => 'value1',
+                        ],
                     ],
-                    'executionUrl' => 'execution-url2',
-                    'dialogUrl' => 'dialog-url2',
-                    'url' => 'execution-url2',
-                    'confirmation' => [
-                        'option1' => 'value1',
+                    'data' => [
+                        'page-component-module' => 'module1',
+                        'page-component-options' => ['option2' => 'value2'],
                         'key1' => 'value1',
                     ],
-                    'pageComponentModule' => 'module1',
-                    'pageComponentOptions' => ['option2' => 'value2'],
-                    'key1' => 'value1',
                 ],
             ],
             'full context and parameters' => [
@@ -203,15 +210,18 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     'dialogUrl' => 'dialog-url3',
                 ],
                 'expected' => [
-                    'hasDialog' => true,
-                    'showDialog' => true,
-                    'dialogOptions' => [
-                        'title' => 'action3',
-                        'dialogOptions' => ['option1' => 'value1'],
+                    'options' => [
+                        'hasDialog' => true,
+                        'showDialog' => true,
+                        'dialogOptions' => [
+                            'title' => 'action3',
+                            'dialogOptions' => ['option1' => 'value1'],
+                        ],
+                        'executionUrl' => 'execution-url3',
+                        'dialogUrl' => 'dialog-url3',
+                        'url' => 'dialog-url3',
                     ],
-                    'executionUrl' => 'execution-url3',
-                    'dialogUrl' => 'dialog-url3',
-                    'url' => 'dialog-url3',
+                    'data' => [],
                 ],
             ],
         ];

@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -28,9 +27,6 @@ class ActionGroup
     /** @var ActionGroupDefinition */
     private $definition;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
-
     /** @var Parameter[] */
     private $parameters;
 
@@ -38,20 +34,17 @@ class ActionGroup
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param ParameterAssembler $parameterAssembler
-     * @param DoctrineHelper $doctrineHelper
      * @param ActionGroupDefinition $definition
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
         ParameterAssembler $parameterAssembler,
-        DoctrineHelper $doctrineHelper,
         ActionGroupDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->parameterAssembler = $parameterAssembler;
-        $this->doctrineHelper = $doctrineHelper;
         $this->definition = $definition;
     }
 

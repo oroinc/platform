@@ -9,7 +9,6 @@ use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
 use Oro\Bundle\ActionBundle\Model\Parameter;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -41,16 +40,10 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->actionGroup = new ActionGroup(
             $this->actionFactory,
             $this->conditionFactory,
             new ParameterAssembler(),
-            $doctrineHelper,
             new ActionGroupDefinition()
         );
 

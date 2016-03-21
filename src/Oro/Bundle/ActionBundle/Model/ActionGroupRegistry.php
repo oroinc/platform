@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Oro\Bundle\ActionBundle\Exception\ActionNotFoundException;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 
 class ActionGroupRegistry
@@ -35,6 +36,22 @@ class ActionGroupRegistry
         $this->loadActionGroups();
 
         return array_key_exists($name, $this->actionGroups) ? $this->actionGroups[$name] : null;
+    }
+
+    /**
+     * @param $name
+     * @return ActionGroup
+     * @throws ActionNotFoundException
+     */
+    public function get($name)
+    {
+        $this->loadActionGroups();
+
+        if (array_key_exists($name, $this->actionGroups)) {
+            return $this->actionGroups[$name];
+        } else {
+            throw new ActionNotFoundException($name);
+        }
     }
 
     protected function loadActionGroups()

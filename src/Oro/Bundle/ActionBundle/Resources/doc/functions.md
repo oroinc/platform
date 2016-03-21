@@ -10,25 +10,27 @@ Table of Contents
 Run Action
 ----------
 
-**Class:** Oro\Bundle\ActionBundle\Action\RunAction
+**Class:** Oro\Bundle\ActionBundle\Action\RunActionGroup
 
-**Alias:** run_action
+**Alias:** run_action_group
 
-**Description:** Run action.
+**Description:** Run actions named group.
 
 **Parameters:**
  - attribute - attribute where action result value should be set (optional)
- - action - action name
- - entity_class - class of Entity for ActionData
- - entity_id - id of Entity for ActionData
+ - action_group - action group name
+ - arguments - array of named arguments for action group (optional by action_group arguments declaration)  
+    argName: value 
+ **note** to see what arguments are supported by action proceed to its configuration definition section `arguments`
 
 **Configuration Example**
 ```
-- @run_action:
+- @run_action_group:
     attribute: $.result
-    action: acme_demo_action
-    entity_class: Acme\Bundle\DemoBundle\Entity\User
-    entity_id: $.user.id
+    action_group: acme_demo_action
+    arguments:
+        entity_class: Acme\Bundle\DemoBundle\Entity\User
+        entity_id: $.user.id
 ```
 
 

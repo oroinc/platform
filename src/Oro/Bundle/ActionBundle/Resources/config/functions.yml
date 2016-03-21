@@ -25,7 +25,7 @@ parameters:
     oro_action.function.assign_constant_value.class: Oro\Component\Action\Action\AssignConstantValue
     oro_action.function.call_service_method.class: Oro\Component\Action\Action\CallServiceMethod
     oro_action.function.refresh_grid.class: Oro\Component\Action\Action\RefreshGrid
-    oro_action.function.run_action.class: Oro\Bundle\ActionBundle\Action\RunAction
+    oro_action.function.run_action_group.class: Oro\Bundle\ActionBundle\Action\RunActionGroup
     oro_action.function.find_entities.class: Oro\Component\Action\Action\FindEntities
 
 services:
@@ -215,14 +215,13 @@ services:
         tags:
             - { name: oro_action.function, alias: refresh_grid }
 
-    oro_action.function.run_action:
-        class: %oro_action.function.run_action.class%
+    oro_action.function.run_action_group:
+        class: %oro_action.function.run_action_group.class%
         arguments:
+            - @oro_action.action_group_registry
             - @oro_action.context_accessor
-            - @oro_action.operation_manager
-            - @oro_action.helper.context
         tags:
-            - { name: oro_action.function, alias: run_action }
+            - { name: oro_action.function, alias: run_action_group }
 
     oro_action.function.find_entities:
         class: %oro_action.function.find_entities.class%

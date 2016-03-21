@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
+use Doctrine\Common\Collections\Collection;
+
 class ActionGroupExecutionArgs
 {
     /** @var string */
@@ -23,7 +25,7 @@ class ActionGroupExecutionArgs
     /**
      * @return string
      */
-    public function getName()
+    public function getActionGroupName()
     {
         return $this->name;
     }
@@ -47,5 +49,15 @@ class ActionGroupExecutionArgs
     public function getActionData()
     {
         return new ActionData(['data' => (object)$this->parameters]);
+    }
+
+    /**
+     * @param ActionGroupRegistry $registry
+     * @param Collection|null $errors
+     * @return ActionData
+     */
+    public function execute(ActionGroupRegistry $registry, Collection $errors = null)
+    {
+        return $registry->get($this->getActionGroupName())->execute($this->getActionData(), $errors);
     }
 }

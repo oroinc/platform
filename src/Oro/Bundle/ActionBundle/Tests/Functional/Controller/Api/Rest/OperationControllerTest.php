@@ -44,7 +44,7 @@ class OperationControllerTest extends WebTestCase
      */
     protected function tearDown()
     {
-        $this->cacheProvider->delete(ConfigurationProvider::OPROOT_NODE_NAME);
+        $this->cacheProvider->delete(ConfigurationProvider::ROOT_NODE_NAME);
 
         parent::tearDown();
     }

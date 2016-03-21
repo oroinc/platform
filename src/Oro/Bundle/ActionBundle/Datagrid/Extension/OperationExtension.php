@@ -171,7 +171,9 @@ class OperationExtension extends AbstractExtension
             return false;
         }
 
-        return $this->optionsHelper->getFrontendOptions($operation, $context);
+        $frontendOptions = $this->optionsHelper->getFrontendOptions($operation, $context);
+
+        return $frontendOptions['options'];
     }
 
     /**

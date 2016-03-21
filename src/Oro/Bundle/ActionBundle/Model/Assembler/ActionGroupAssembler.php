@@ -54,7 +54,6 @@ class ActionGroupAssembler extends AbstractAssembler
                 $this->actionFactory,
                 $this->conditionFactory,
                 $this->parameterAssembler,
-                $this->doctrineHelper,
                 $this->assembleDefinition($actionGroupName, $options)
             );
         }
