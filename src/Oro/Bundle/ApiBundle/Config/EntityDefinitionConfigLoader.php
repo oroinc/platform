@@ -60,12 +60,6 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
                 $this->callSetter($definition, $this->methodMap[$key], $value);
             } elseif (ConfigUtil::FIELDS === $key) {
                 $this->loadFields($definition, $value);
-            } elseif (ConfigUtil::FILTERS === $key) {
-                $this->loadFilters($definition, $value);
-            } elseif (ConfigUtil::SORTERS === $key) {
-                $this->loadSorters($definition, $value);
-            } elseif (ConfigUtil::ACTIONS === $key) {
-                $this->loadActions($definition, $value);
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadSection($definition, $this->factory->getLoader($key), $key, $value);
             } else {
@@ -86,51 +80,6 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
                     $name,
                     $this->factory->getLoader(ConfigUtil::FIELDS)->load(null !== $config ? $config : [])
                 );
-            }
-        }
-    }
-
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param array|null             $config
-     */
-    protected function loadFilters(EntityDefinitionConfig $definition, array $config = null)
-    {
-        if (!empty($config)) {
-            /** @var FiltersConfig $filters */
-            $filters = $this->factory->getLoader(ConfigUtil::FILTERS)->load($config);
-            if (!$filters->isEmpty()) {
-                $this->setValue($definition, ConfigUtil::FILTERS, $filters);
-            }
-        }
-    }
-
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param array|null             $config
-     */
-    protected function loadSorters(EntityDefinitionConfig $definition, array $config = null)
-    {
-        if (!empty($config)) {
-            /** @var SortersConfig $sorters */
-            $sorters = $this->factory->getLoader(ConfigUtil::SORTERS)->load($config);
-            if (!$sorters->isEmpty()) {
-                $this->setValue($definition, ConfigUtil::SORTERS, $sorters);
-            }
-        }
-    }
-
-    /**
-     * @param EntityDefinitionConfig $definition
-     * @param array|null             $config
-     */
-    protected function loadActions(EntityDefinitionConfig $definition, array $config = null)
-    {
-        if (!empty($config)) {
-            /** @var ActionsConfig $actions */
-            $actions = $this->factory->getLoader(ConfigUtil::ACTIONS)->load($config);
-            if (!$actions->isEmpty()) {
-                $this->setValue($definition, ConfigUtil::ACTIONS, $actions);
             }
         }
     }

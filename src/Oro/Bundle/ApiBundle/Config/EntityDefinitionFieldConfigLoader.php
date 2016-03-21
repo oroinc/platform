@@ -70,10 +70,8 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
                 $this->callSetter($field, $this->methodMap[$key], $value);
             } elseif (ConfigUtil::FIELDS === $key) {
                 $this->loadTargetFields($field, $value);
-            } elseif (ConfigUtil::FILTERS === $key) {
-                $this->loadTargetFilters($field, $value);
-            } elseif (ConfigUtil::SORTERS === $key) {
-                $this->loadTargetSorters($field, $value);
+            } elseif ($this->factory->hasLoader($key)) {
+                $this->loadTargetSection($field, $this->factory->getLoader($key), $key, $value);
             } else {
                 $this->setValue($field, $key, $value);
             }
@@ -104,30 +102,28 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
 
     /**
      * @param EntityDefinitionFieldConfig $field
+     * @param ConfigLoaderInterface       $loader
+     * @param string                      $sectionName
      * @param array|null                  $config
      */
-    protected function loadTargetFilters(EntityDefinitionFieldConfig $field, array $config = null)
-    {
+    protected function loadTargetSection(
+        EntityDefinitionFieldConfig $field,
+        ConfigLoaderInterface $loader,
+        $sectionName,
+        array $config = null
+    ) {
         if (!empty($config)) {
-            /** @var FiltersConfig $filters */
-            $filters = $this->factory->getLoader(ConfigUtil::FILTERS)->load($config);
-            if (!$filters->isEmpty()) {
-                $this->setValue($field->getOrCreateTargetEntity(), ConfigUtil::FILTERS, $filters);
+            $section = $loader->load($config);
+            $isEmpty = false;
+            if (is_object($section)) {
+                if (method_exists($section, 'isEmpty') && $section->isEmpty()) {
+                    $isEmpty = true;
+                }
+            } elseif (empty($section)) {
+                $isEmpty = true;
             }
-        }
-    }
-
-    /**
-     * @param EntityDefinitionFieldConfig $field
-     * @param array|null                  $config
-     */
-    protected function loadTargetSorters(EntityDefinitionFieldConfig $field, array $config = null)
-    {
-        if (!empty($config)) {
-            /** @var SortersConfig $sorters */
-            $sorters = $this->factory->getLoader(ConfigUtil::SORTERS)->load($config);
-            if (!$sorters->isEmpty()) {
-                $this->setValue($field->getOrCreateTargetEntity(), ConfigUtil::SORTERS, $sorters);
+            if (!$isEmpty) {
+                $this->setValue($field->getOrCreateTargetEntity(), $sectionName, $section);
             }
         }
     }
