@@ -51,7 +51,7 @@ Now we can run this action_group with something like:
         parameters_mapping:
             who: $.myInstanceWithVariousType 
 ```
-We are skipping `what` parameter, as it is not required and its `default` value is good for us. 
+Here we skip `what` parameter, as it is not required and its `default` value is good for us. 
 To see syntax of `@run_action_group` see [the actions section](./actions.md#run-action-group-run_action_group)
 
 
