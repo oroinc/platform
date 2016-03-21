@@ -10,17 +10,8 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
 {
     /** @var array */
     protected $methodMap = [
-        EntityDefinitionConfig::EXCLUSION_POLICY     => 'setExclusionPolicy',
         EntityDefinitionConfig::DISABLE_PARTIAL_LOAD => ['disablePartialLoad', 'enablePartialLoad'],
-        EntityDefinitionConfig::ORDER_BY             => 'setOrderBy',
-        EntityDefinitionConfig::MAX_RESULTS          => 'setMaxResults',
-        EntityDefinitionConfig::HINTS                => 'setHints',
         EntityDefinitionConfig::POST_SERIALIZE       => 'setPostSerializeHandler',
-        EntityDefinitionConfig::LABEL                => 'setLabel',
-        EntityDefinitionConfig::PLURAL_LABEL         => 'setPluralLabel',
-        EntityDefinitionConfig::DESCRIPTION          => 'setDescription',
-        EntityDefinitionConfig::DELETE_HANDLER       => 'setDeleteHandler',
-        EntityDefinitionConfig::ACL_RESOURCE         => 'setAclResource',
     ];
 
     /** @var ConfigLoaderFactory */
@@ -56,14 +47,12 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
         }
 
         foreach ($config as $key => $value) {
-            if (isset($this->methodMap[$key])) {
-                $this->callSetter($definition, $this->methodMap[$key], $value);
-            } elseif (ConfigUtil::FIELDS === $key) {
+            if (ConfigUtil::FIELDS === $key) {
                 $this->loadFields($definition, $value);
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadSection($definition, $this->factory->getLoader($key), $key, $value);
             } else {
-                $this->setValue($definition, $key, $value);
+                $this->loadConfigValue($definition, $key, $value, $this->methodMap);
             }
         }
     }

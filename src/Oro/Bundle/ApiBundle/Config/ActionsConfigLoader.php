@@ -6,8 +6,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
 {
     /** @var array */
     protected $methodMap = [
-        ActionConfig::EXCLUDE      => 'setExcluded',
-        ActionConfig::ACL_RESOURCE => 'setAclResource',
+        ActionConfig::EXCLUDE => 'setExcluded',
     ];
 
     /**
@@ -34,11 +33,7 @@ class ActionsConfigLoader extends AbstractConfigLoader
     {
         $action = new ActionConfig();
         foreach ($config as $key => $value) {
-            if (isset($this->methodMap[$key])) {
-                $this->callSetter($action, $this->methodMap[$key], $value);
-            } else {
-                $this->setValue($action, $key, $value);
-            }
+            $this->loadConfigValue($action, $key, $value, $this->methodMap);
         }
 
         return $action;
