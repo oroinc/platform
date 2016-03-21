@@ -13,6 +13,15 @@ define(function(require) {
          */
         defaults: _.extend({}, VariableDatePickerView.prototype.defaults, dateTimePickerViewMixin.defaults),
 
+        partsDateTimeValidation: {
+            value: function(date, time) {
+                return this.dateVariableHelper.isDateVariable(date) ||
+                    this.dateValueHelper.isValid(date) ||
+                    (moment(date, this.getDateFormat(), true).isValid() &&
+                     moment(time, this.getTimeFormat(), true).isValid());
+            }
+        },
+
         /**
          * Returns supper prototype for datetime picker view mixin
          *
@@ -30,7 +39,10 @@ define(function(require) {
          */
         updateTimeFieldState: function() {
             var value = this.$el.val();
-            if (this.dateVariableHelper.isDateVariable(value) || this.dayValueHelper.isDayValue(value)) {
+            if ((!this.$variables || this.$variables.dateVariables('getPart') !== 'value') ||
+                this.dateVariableHelper.isDateVariable(value) ||
+                this.dateValueHelper.isValid(value)
+            ) {
                 this.$frontTimeField.val('').attr('disabled', 'disabled');
             } else {
                 this.$frontTimeField.removeAttr('disabled');
@@ -44,18 +56,25 @@ define(function(require) {
          */
         checkConsistency: function(target) {
             dateTimePickerViewMixin.checkConsistency.apply(this, arguments);
+            VariableDateTimePickerView.__super__.checkConsistency.apply(this, arguments);
 
             var date = this.$frontDateField.val();
             var time = this.$frontTimeField.val();
-            var isVariable = this.dateVariableHelper.isDateVariable(date);
-            var isDay = this.dayValueHelper.isDayValue(date);
-            var isValidDate = moment(date, this.getDateFormat(), true).isValid();
-            var isValidTime = moment(time, this.getTimeFormat(), true).isValid();
 
-            if (!this._preventFrontendUpdate && !target && !isVariable && !isDay && (!isValidDate || !isValidTime)) {
+            if (!this._preventFrontendUpdate && !target && !this._isDateTimeValid(date, time)) {
                 this.$frontDateField.val('');
                 this.$frontTimeField.val('');
             }
+        },
+
+        _isDateTimeValid: function(date, time) {
+            var part = this.$variables.dateVariables('getPart');
+            var validator = this.partsDateTimeValidation[part];
+            if (!validator) {
+                return true;
+            }
+
+            return validator.call(this, date, time);
         },
 
         /**
@@ -66,13 +85,16 @@ define(function(require) {
         getBackendFormattedValue: function() {
             var value = this.$frontDateField.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
-                value = this.dateVariableHelper.formatRawValue(value);
-            } else if (this.dayValueHelper.isDayValue(value)) {
-                value = this.dayValueHelper.formatRawValue(value);
-            } else {
-                value = dateTimePickerViewMixin.getBackendFormattedValue.call(this);
+                return this.dateVariableHelper.formatRawValue(value);
             }
-            return value;
+
+            if (this.$variables.dateVariables('getPart') === 'value') {
+                return this.dateValueHelper.isValid(value) ?
+                    this.dateValueHelper.formatRawValue(value) :
+                    dateTimePickerViewMixin.getBackendFormattedValue.call(this);
+            }
+
+            return this.getBackendPartFormattedValue();
         },
 
         /**
@@ -83,13 +105,16 @@ define(function(require) {
         getFrontendFormattedDate: function() {
             var value = this.$el.val();
             if (this.dateVariableHelper.isDateVariable(value)) {
-                value = this.dateVariableHelper.formatDisplayValue(value);
-            } else if (this.dayValueHelper.isDayValue(value)) {
-                value = this.dayValueHelper.formatDisplayValue(value);
-            } else {
-                value = dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
+                return this.dateVariableHelper.formatDisplayValue(value);
             }
-            return value;
+
+            if (this.$variables.dateVariables('getPart') === 'value') {
+                return this.dateValueHelper.isValid(value) ?
+                    this.dateValueHelper.formatDisplayValue(value) :
+                    dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
+            }
+
+            return this.getFrontendPartFormattedDate();
         }
     }));
 

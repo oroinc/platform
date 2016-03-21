@@ -417,10 +417,11 @@ define(function(require) {
             var containerEl = $(this.options.dialogOptions.limitTo || document.body)[0];
             var dialog = this.widget.closest('.ui-dialog');
             this.internalSetDialogPosition(position, leftShift, topShift);
-            /*
-             * Left and Width adjustments
-             * **************************
-             */
+            this.leftAndWidthAdjustments(dialog, containerEl);
+            this.topAndHeightAdjustments(dialog, containerEl);
+        },
+
+        leftAndWidthAdjustments: function(dialog, containerEl) {
             // containerEl.offsetLeft will only work if offsetParent is document.body
             var left = parseFloat(dialog.css('left')) - containerEl.offsetLeft;
             var width = parseFloat(dialog.css('width'));
@@ -442,14 +443,18 @@ define(function(require) {
                     dialog.css('min-width', containerEl.clientWidth - left);
                 }
             }
-            /*
-             * Top and Height adjustments
-             * **************************
-             */
+        },
+
+        topAndHeightAdjustments: function(dialog, containerEl) {
             // containerEl.offsetTop will only work if offsetParent is document.body
             var top = parseFloat(dialog.css('top')) - containerEl.offsetTop;
             var height = parseFloat(dialog.css('height'));
             var minHeight = parseFloat(dialog.css('min-height'));
+            var windowHeight = parseFloat($(window).height());
+            if (containerEl.clientHeight > windowHeight) {
+                top = (windowHeight - height) / 2;
+                dialog.css('top', top);
+            }
             if (top < 0) {
                 dialog.css('top', containerEl.offsetTop);
                 top = 0;
@@ -465,6 +470,19 @@ define(function(require) {
                 dialog.css('height', containerEl.clientHeight - top);
                 if (minHeight > containerEl.clientHeight - top) {
                     dialog.css('min-height', containerEl.clientHeight - top);
+                }
+            }
+            var posY = dialog.offset().top - $(window).scrollTop();
+            if (posY + height > windowHeight) {
+                if (windowHeight - top < this.options.dialogOptions.minHeight &&
+                    this.options.dialogOptions.minHeight <= windowHeight) {
+                    dialog.css('top', windowHeight - this.options.dialogOptions.minHeight + containerEl.offsetTop);
+                    dialog.css('height', this.options.dialogOptions.minHeight);
+                    return;
+                }
+                dialog.css('height', windowHeight - posY);
+                if (minHeight > windowHeight - posY) {
+                    dialog.css('min-height', windowHeight - posY);
                 }
             }
         },
