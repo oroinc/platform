@@ -70,6 +70,7 @@ class RestApiController extends FOSRestController
      * @param Request $request
      *
      * @ApiDoc(description="Delete entity", resource=true, views={"rest_plain", "rest_json_api"})
+     *
      * @return Response
      */
     public function deleteAction(Request $request)
