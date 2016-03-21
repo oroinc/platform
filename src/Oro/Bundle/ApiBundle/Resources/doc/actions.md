@@ -8,6 +8,7 @@ Table of Contents
     - [**collect_resources** Action](#collect_resources-action)
     - [**get** Action](#get-action)
     - [**get_list** Action](#get_list-action)
+    - [**delete** Action](#delete-action)
     - [**customize_loaded_data** Action](#customize_loaded_data-action)
     - [**get_config** Action](#get_config-action)
     - [**get_relation_config** Action](#get_relation_config-action)
@@ -117,6 +118,31 @@ This action has the following processor groups:
 | normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `cgetAction` method of [RestApiController](../../Controller/RestApiController.php).
+
+delete Action
+----------
+
+This action is intended to delete an entity by its identifier.
+
+The context class: [DeleteContext](../../Processor/Delete/DeleteContext.php). Also see  [Context class](#context-class) for more details.
+
+The main processor class: [DeleteProcessor](../../Processor/DeleteProcessor.php).
+
+Existing worker processors: [processors.delete.yml](../../Resources/config/processors.delete.yml) or run `php app/console oro:api:debug delete`.
+
+This action has the following processor groups:
+
+| Group Name | Responsibility of Processors | Description |
+| --- | --- | --- |
+| initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| security_check | Checking whether an access to the requested resource is granted | |
+| normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| build_query | Building a query that will be used to load data | |
+| load_data | Loading data | Loads data that should be deleted to the context's result |
+| delete_data | Deletes data | Deletes data from the context's result and sets result to null|
+| normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+
+Example of usage you can find in the `deleteAction` method of [RestApiController](../../Controller/RestApiController.php).
 
 customize_loaded_data Action
 ----------------------------
