@@ -25,7 +25,7 @@ parameters:
     oro_workflow.workflow.action.assign_constant_value.class:  Oro\Component\Action\Action\AssignConstantValue
     oro_workflow.workflow.action.transit_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\TransitWorkflow
     oro_workflow.action.call_service_method.class: Oro\Component\Action\Action\CallServiceMethod
-    oro_workflow.action.run_action.class: Oro\Bundle\ActionBundle\Action\RunAction
+    oro_workflow.action.run_action_group.class: Oro\Bundle\ActionBundle\Action\RunActionGroup
     oro_workflow.action.find_entities.class: Oro\Component\Action\Action\FindEntities
 
 services:
@@ -223,14 +223,13 @@ services:
         tags:
             - { name: oro_workflow.action, alias: call_service_method }
 
-    oro_workflow.action.run_action:
-        class: %oro_workflow.action.run_action.class%
+    oro_workflow.action.run_action_group:
+        class: %oro_workflow.action.run_action_group.class%
         arguments:
+            - @oro_action.action_group_registry
             - @oro_action.context_accessor
-            - @oro_action.operation_manager
-            - @oro_action.helper.context
         tags:
-            - { name: oro_workflow.action, alias: run_action }
+            - { name: oro_workflow.action, alias: run_action_group }
 
     oro_workflow.action.find_entities:
         class: %oro_workflow.action.find_entities.class%

@@ -59,24 +59,18 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideIterationValues
      * @param array $opActionGroups
-     * @param array $accessorAts
+     * @param array $context
      * @param array $expected
      */
     public function testIterationThroughValues(
         array $opActionGroups,
-        array $accessorAts,
+        array $context,
         array $expected
     ) {
         /* @var $contextAccessor ContextAccessor|\PHPUnit_Framework_MockObject_MockObject */
         $contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')->getMock();
 
-        $data = new ActionData();
-
-        foreach ($accessorAts as $at => $acGetValue) {
-            $contextAccessor->expects($this->at($at))
-                ->method('getValue')
-                ->with($data, $acGetValue['pp'])->willReturn($acGetValue['return']);
-        }
+        $data = new ActionData($context);
 
         $instance = new ActionGroupsMappingIterator($opActionGroups, $data, $contextAccessor);
 
@@ -101,14 +95,14 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $mockOpActionGroupSimplePath->expects($this->once())->method('getName')->willReturn('OAGSimplePath');
         $mockOpActionGroupSimplePath->expects($this->once())->method('getParametersMapping')->willReturn(
-            ['arg1' => $p1 = new PropertyPath('val1path')]
+            ['arg1' => new PropertyPath('val1path')]
         );
 
         $mockOpActionGroupDeepPaths = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationActionGroup')
             ->getMock();
         $mockOpActionGroupDeepPaths->expects($this->once())->method('getName')->willReturn('OAGDeepPaths');
         $mockOpActionGroupDeepPaths->expects($this->once())->method('getParametersMapping')->willReturn(
-            ['arg1' => ['property' => $p2 = new PropertyPath('val1path'), 'value' => 'val1']]
+            ['arg1' => ['property' => new PropertyPath('val1path'), 'value' => 'val1']]
         );
 
         return [
@@ -124,9 +118,7 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
             ],
             'simple property path' => [
                 [$mockOpActionGroupSimplePath],
-                [
-                    ['pp' => $p1, 'return' => 'val1']
-                ],
+                ['val1path' => 'val1'],
                 [
                     new ActionGroupExecutionArgs(
                         'OAGSimplePath',
@@ -136,9 +128,7 @@ class ActionGroupsMappingIteratorTest extends \PHPUnit_Framework_TestCase
             ],
             'deep property path and values' => [
                 [$mockOpActionGroupDeepPaths],
-                [
-                    ['pp' => $p2, 'return' => 'valFromPP1']
-                ],
+                ['val1path' => 'valFromPP1'],
                 [
                     new ActionGroupExecutionArgs(
                         'OAGDeepPaths',

@@ -78,6 +78,37 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $actionGroup ? $actionGroup->getDefinition()->getName() : $actionGroup);
     }
 
+    public function testGet()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getConfiguration')
+            ->willReturn(
+                [
+                    'action_group1' => [
+                        'label' => 'Label1'
+                    ]
+                ]
+            );
+
+        $group = $this->registry->get('action_group1');
+
+        $this->assertEquals('action_group1', $group->getDefinition()->getName());
+    }
+
+    public function testGetException()
+    {
+        $this->configurationProvider->expects($this->once())
+            ->method('getConfiguration')
+            ->willReturn([]);
+
+        $this->setExpectedException(
+            'Oro\Bundle\ActionBundle\Exception\ActionNotFoundException',
+            'Action with name "not exists" not found'
+        );
+
+        $this->registry->get('not exists');
+    }
+
     /**
      * @return array
      */

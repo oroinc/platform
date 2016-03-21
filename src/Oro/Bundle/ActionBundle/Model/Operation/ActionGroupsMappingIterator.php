@@ -2,12 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Model\Operation;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
-
-use Oro\Component\Action\Model\ContextAccessor;
-
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
+use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersMapper;
 use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 
 /**
@@ -19,19 +16,19 @@ class ActionGroupsMappingIterator extends \ArrayIterator
     /** @var ActionData */
     private $data;
 
-    /** @var ContextAccessor */
-    private $accessor;
+    /** @var ParametersMapper */
+    private $mapper;
 
     /**
      * @param array|OperationActionGroup[] $actionGroups
      * @param ActionData $data
-     * @param ContextAccessor|null $accessor
      */
-    public function __construct(array $actionGroups, ActionData $data, ContextAccessor $accessor = null)
+    public function __construct(array $actionGroups, ActionData $data)
     {
         parent::__construct($actionGroups);
+
         $this->data = $data;
-        $this->accessor = $accessor ?: new ContextAccessor();
+        $this->mapper = new ParametersMapper();
     }
 
     /**
@@ -51,22 +48,8 @@ class ActionGroupsMappingIterator extends \ArrayIterator
     {
         $executionArgs = new ActionGroupExecutionArgs($operationActionGroup->getName());
 
-        foreach ($operationActionGroup->getParametersMapping() as $parameterName => $value) {
-            if ($value instanceof PropertyPathInterface) {
-                $value = $this->accessor->getValue($this->data, $value);
-            } elseif (is_array($value)) {
-                array_walk_recursive(
-                    $value,
-                    function (&$element) {
-                        if ($element instanceof PropertyPathInterface) {
-                            $element = $this->accessor->getValue($this->data, $element);
-                        }
-                    }
-                );
-            }
+        $this->mapper->mapToArgs($executionArgs, $operationActionGroup->getParametersMapping(), $this->data);
 
-            $executionArgs->addParameter($parameterName, $value);
-        }
 
         return $executionArgs;
     }

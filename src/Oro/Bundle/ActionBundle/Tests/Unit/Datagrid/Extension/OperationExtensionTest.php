@@ -62,7 +62,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $optionsHelper->expects($this->any())
             ->method('getFrontendOptions')
-            ->willReturn(['option1' => 'value1', 'option2' => 'value2']);
+            ->willReturn(['options' => ['option1' => 'value1', 'option2' => 'value2']]);
 
         $this->extension = new OperationExtension(
             $this->manager,
