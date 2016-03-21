@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
-use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
@@ -11,6 +10,7 @@ use Symfony\Component\Console\Helper\TableSeparator;
 
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
+use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;

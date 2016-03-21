@@ -29,7 +29,7 @@ class DumpConfigCommand extends AbstractDebugCommand
         'filters'        => 'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
         'sorters'        => 'Oro\Bundle\ApiBundle\Config\SortersConfigExtra',
         'virtual_fields' => 'Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra',
-        'descriptions'   => 'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra',
+        'descriptions'   => 'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra'
     ];
 
     /**
