@@ -7,6 +7,7 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\DateRangeFilterType;
 use Oro\Bundle\FilterBundle\Expression\Date\Compiler;
 use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class DateFilterUtility
 {
@@ -123,6 +124,11 @@ class DateFilterUtility
                 $field = $this->getEnforcedTimezoneFunction('YEAR', $field);
                 break;
             case DateModifierInterface::PART_VALUE:
+                if (strpos($field, 'MONTH') === false && $this->containsMonthVariable($data)) {
+                    $field = $this->getEnforcedTimezoneFunction('MONTH', $field);
+                    $data['date_start'] = $this->formatDate($data['date_start'], 'm');
+                    $data['date_end'] = $this->formatDate($data['date_end'], 'm');
+                }
             default:
                 break;
         }
@@ -130,6 +136,21 @@ class DateFilterUtility
         return array_merge($data, ['field' => $field]);
     }
 
+    /**
+     * @param mixed $date
+     * @param string $format
+     *
+     * @return mixed
+     */
+    protected function formatDate($date, $format)
+    {
+        if (!$date instanceof \DateTime) {
+            return $date;
+        }
+
+        return $date->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()))
+            ->format($format);
+    }
     /**
      * variable 'this day without year' search all today records without year
      * text 'January 16' search all January 16 records without year
@@ -145,9 +166,7 @@ class DateFilterUtility
         foreach ($fields as $field) {
             $originalKey = $field.'_original';
             if ($this->allowToModifyFieldToDayWithMonth($data, $originalKey, $field)) {
-                    $data[$field] = $data[$field]
-                        ->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()))
-                        ->format('md');
+                    $data[$field] = $this->formatDate($data[$field], 'md');
                     $isModifyAllowed = true;
             }
         }
@@ -168,17 +187,52 @@ class DateFilterUtility
      * @param string $field
      * @return bool
      */
-    protected function allowToModifyFieldToDayWithMonth($data, $originalKey, $field)
+    protected function allowToModifyFieldToDayWithMonth(array $data, $originalKey, $field)
     {
-        if (!$data[$originalKey]) {
-            return false;
-        }
-        $expression = $this->expressionCompiler->compile($data[$originalKey], true);
+        $expression = $this->compileExpression($data, $originalKey);
+
         return
-            $expression instanceof ExpressionResult &&
+            $expression &&
             $data[$field] instanceof \DateTime &&
             ($expression->getVariableType() == DateModifierInterface::VAR_THIS_DAY_W_Y ||
              $expression->getSourceType() == ExpressionResult::TYPE_DAYMONTH);
+    }
+
+    /**
+     * @param array $data
+     *
+     * @return bool
+     */
+    protected function containsMonthVariable(array $data)
+    {
+        return ArrayUtil::some(
+            function($field) use ($data) {
+                $expr = $this->compileExpression($data, $field);
+
+                return $expr && $expr->getVariableType() == DateModifierInterface::VAR_THIS_MONTH_W_Y;
+            },
+            [
+                'date_start_original',
+                'date_end_original',
+            ]
+        );
+    }
+
+    /**
+     * @param array $data
+     * @param string $key
+     *
+     * @return ExpressionResult|null
+     */
+    protected function compileExpression(array $data, $key)
+    {
+        if (!$data[$key]) {
+            return null;
+        }
+
+        $result = $this->expressionCompiler->compile($data[$key], true);
+
+        return $result instanceof ExpressionResult ? $result : null;
     }
 
     /**
