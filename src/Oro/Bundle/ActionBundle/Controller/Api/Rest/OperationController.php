@@ -76,6 +76,7 @@ class OperationController extends FOSRestController
      * @param int $code
      * @param string $message
      * @param Collection $errorMessages
+     * @return Response
      */
     protected function handleResponse(
         ActionData $data,

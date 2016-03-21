@@ -93,7 +93,6 @@ class RunActionGroup extends AbstractAction
      */
     protected function executeAction($context)
     {
-        /* @var $context ActionData */
         if (null === $this->executionArgs) {
             throw new \BadMethodCallException('Uninitialized action execution.');
         }
@@ -101,13 +100,34 @@ class RunActionGroup extends AbstractAction
         $this->parametersMapper->mapToArgs($this->executionArgs, $this->parametersMap, $context);
 
         $errors = $this->contextAccessor->getValue($context, $this->errors) ?: null;
-
         $result = $this->executionArgs->execute($this->actionGroupRegistry, $errors);
 
         if ($this->attribute) {
             $this->contextAccessor->setValue($context, $this->attribute, $result);
         }
 
-        $context->merge($result);
+        $this->transferValue($context, $result, 'redirectUrl');
+        $this->transferValue($context, $result, 'refreshGrid');
+    }
+
+    /**
+     * @param ActionData $to
+     * @param ActionData $from
+     * @param string $property
+     */
+    protected function transferValue($to, $from, $property)
+    {
+        $property = new PropertyPath($property);
+
+        $origValue = $this->contextAccessor->getValue($to, $property);
+        $newValue = $this->contextAccessor->getValue($from, $property);
+
+        if (is_array($origValue) || is_array($newValue)) {
+            $newValue = array_merge((array)$origValue, (array)$newValue);
+        }
+
+        if (null !== $newValue) {
+            $this->contextAccessor->setValue($to, $property, $newValue);
+        }
     }
 }

@@ -29,36 +29,6 @@ class ActionData extends AbstractStorage implements EntityAwareInterface
     }
 
     /**
-     * @return array
-     */
-    protected function getMergeKeys()
-    {
-        return ['redirectUrl', 'refreshGrid'];
-    }
-
-    /**
-     * @param ActionData $data
-     */
-    public function merge(ActionData $data = null)
-    {
-        if (!$data) {
-            return;
-        }
-
-        foreach ($this->getMergeKeys() as $key) {
-            $value = $data->offsetGet($key);
-
-            if (is_array($value)) {
-                $value = array_merge($this->offsetGet($key), $value);
-            }
-
-            if (null !== $value) {
-                $this->offsetSet($key, $value);
-            }
-        }
-    }
-
-    /**
      * @param string $name
      * @return mixed
      */
