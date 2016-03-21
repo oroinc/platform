@@ -6,7 +6,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var TabsView = require('oroui/js/app/views/tabs-view');
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
-    var DayValueHelper = require('orofilter/js/day-value-helper');
+    var DateValueHelper = require('orofilter/js/date-value-helper');
     var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     var moment = require('moment');
     var localeSettings = require('orolocale/js/locale-settings');
@@ -36,7 +36,7 @@ define(function(require) {
         partsDateValidation: {
             value: function(date) {
                 return this.dateVariableHelper.isDateVariable(date) ||
-                    this.dayValueHelper.isDayValue(date) ||
+                    this.dateValueHelper.isValid(date) ||
                     moment(date, this.getDateFormat(), true).isValid();
             },
             dayofweek: function(date) {
@@ -104,7 +104,7 @@ define(function(require) {
 
             _.extend(this, _.pick(options, ['backendFormat']));
             this.dateVariableHelper = new DateVariableHelper(options.datePickerOptions.dateVars);
-            this.dayValueHelper = new DayValueHelper(options.dayFormats);
+            this.dateValueHelper = new DateValueHelper(options.dayFormats);
             VariableDatePickerView.__super__.initialize.apply(this, arguments);
         },
 
@@ -266,8 +266,8 @@ define(function(require) {
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return this.dayValueHelper.isDayValue(value) ?
-                    this.dayValueHelper.formatRawValue(value) :
+                return this.dateValueHelper.isValid(value) ?
+                    this.dateValueHelper.formatRawValue(value) :
                     VariableDatePickerView.__super__.getBackendFormattedValue.call(this);
             }
 
@@ -299,8 +299,8 @@ define(function(require) {
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return this.dayValueHelper.isDayValue(value) ?
-                    this.dayValueHelper.formatDisplayValue(value) :
+                return this.dateValueHelper.isValid(value) ?
+                    this.dateValueHelper.formatDisplayValue(value) :
                     VariableDatePickerView.__super__.getFrontendFormattedDate.call(this);
             }
 

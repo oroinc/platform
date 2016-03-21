@@ -16,7 +16,7 @@ define(function(require) {
         partsDateTimeValidation: {
             value: function(date, time) {
                 return this.dateVariableHelper.isDateVariable(date) ||
-                    this.dayValueHelper.isDayValue(date) ||
+                    this.dateValueHelper.isValid(date) ||
                     (moment(date, this.getDateFormat(), true).isValid() &&
                      moment(time, this.getTimeFormat(), true).isValid());
             }
@@ -41,7 +41,7 @@ define(function(require) {
             var value = this.$el.val();
             if ((!this.$variables || this.$variables.dateVariables('getPart') !== 'value') ||
                 this.dateVariableHelper.isDateVariable(value) ||
-                this.dayValueHelper.isDayValue(value)
+                this.dateValueHelper.isValid(value)
             ) {
                 this.$frontTimeField.val('').attr('disabled', 'disabled');
             } else {
@@ -89,8 +89,8 @@ define(function(require) {
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return this.dayValueHelper.isDayValue(value) ?
-                    this.dayValueHelper.formatRawValue(value) :
+                return this.dateValueHelper.isValid(value) ?
+                    this.dateValueHelper.formatRawValue(value) :
                     dateTimePickerViewMixin.getBackendFormattedValue.call(this);
             }
 
@@ -109,8 +109,8 @@ define(function(require) {
             }
 
             if (this.$variables.dateVariables('getPart') === 'value') {
-                return this.dayValueHelper.isDayValue(value) ?
-                    this.dayValueHelper.formatDisplayValue(value) :
+                return this.dateValueHelper.isValid(value) ?
+                    this.dateValueHelper.formatDisplayValue(value) :
                     dateTimePickerViewMixin.getFrontendFormattedDate.call(this);
             }
 
