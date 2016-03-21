@@ -114,7 +114,7 @@ class CustomProductDeleteHandler extends DeleteHandler
         
         $deleteGranted = ... // here some custom checks for Product entity
         if (!deleteGranted) {
-            throw new ForbiddenException('self delete');
+            throw new ForbiddenException('forbidden for some reason');
         }
     }
 }                   
