@@ -8,6 +8,7 @@ Table of Contents
  - ["exclusions" configuration section & "exclude" flag](#exclusions-configuration-section--exclude-flag)
  - ["entities" configuration section](#entities-configuration-section)
  - ["relations" configuration section](#relations-configuration-section)
+ - ["actions" configuration section](#actions-configuration-section)
 
 Overview
 --------
@@ -164,6 +165,7 @@ Each entity can have next properties:
 * **order_by** *array* The property can be used to configure default ordering. The item key is the name of a field. The value can be `ASC` or `DESC`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **post_serialize** *callable* A handler to be used to modify serialized data.
+* **delete_handler** A delete handler service name to be used to delete data in delete action.
 
 Example:
 
@@ -176,6 +178,7 @@ oro_api:
             description:          "Acme Entities description"
             inherit:              false
             exclusion_policy:     all
+            delete_handler:       acme.demo.test_entity.delete_handler
             disable_partial_load: false
             max_results:          25
             order_by:
@@ -330,3 +333,31 @@ The `relations` configuration section describes a configuration of an entity if 
 
 
 Please refer to [actions](./actions.md#context-class) documentation section for more detail about **how to use configuration** in Data API logic.
+
+"actions" configuration section
+-------------------------------
+
+The `actions` configuration section allows to configure action-specific configuration parameters. Now supports `get`, `get_list` and `delete` actions.
+
+Each action can have next parameters:
+
+* **excluded** *boolean* Indicates that action is disabled for entity. By default `false`.
+* **acl_resource** *string* This parameter allow to change default permition that will be used for ACL checks to the given ACL resource. If this value sets to null - ACL check will be disable for given action.
+
+An example of `actions` section configuration:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeFirstEntity:
+            actions:
+                delete: false #delete action for AcmeFirstEntity will be disabled
+                get:
+                    excluded: true #the same as delete action, get action will be disabled too
+                get_list:
+                    acl_resource: acme_view_resource #changes the VIEW permition (by default for get_list action) to ACL resource acme_view_resource
+       Acme\Bundle\AcmeBundle\Entity\AcmeSecondEntity:
+            actions:
+                get:
+                    acl_resource: ~ #turns off ACL checks for get action for AcmeSecondEntity
+```
