@@ -12,10 +12,7 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
     protected $methodMap = [
         EntityDefinitionFieldConfig::EXCLUDE          => 'setExcluded',
         EntityDefinitionFieldConfig::COLLAPSE         => 'setCollapsed',
-        EntityDefinitionFieldConfig::PROPERTY_PATH    => 'setPropertyPath',
         EntityDefinitionFieldConfig::DATA_TRANSFORMER => 'setDataTransformers',
-        EntityDefinitionFieldConfig::LABEL            => 'setLabel',
-        EntityDefinitionFieldConfig::DESCRIPTION      => 'setDescription',
     ];
 
     /** @var array */
@@ -26,9 +23,6 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
         EntityDefinitionConfig::MAX_RESULTS          => 'setMaxResults',
         EntityDefinitionConfig::HINTS                => 'setHints',
         EntityDefinitionConfig::POST_SERIALIZE       => 'setPostSerializeHandler',
-        EntityDefinitionConfig::LABEL                => 'setLabel',
-        EntityDefinitionConfig::PLURAL_LABEL         => 'setPluralLabel',
-        EntityDefinitionConfig::DESCRIPTION          => 'setDescription',
     ];
 
     /** @var ConfigLoaderFactory */
@@ -66,14 +60,12 @@ class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
         foreach ($config as $key => $value) {
             if (isset($this->targetEntityMethodMap[$key])) {
                 $this->callSetter($field->getOrCreateTargetEntity(), $this->targetEntityMethodMap[$key], $value);
-            } elseif (isset($this->methodMap[$key])) {
-                $this->callSetter($field, $this->methodMap[$key], $value);
             } elseif (ConfigUtil::FIELDS === $key) {
                 $this->loadTargetFields($field, $value);
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadTargetSection($field, $this->factory->getLoader($key), $key, $value);
             } else {
-                $this->setValue($field, $key, $value);
+                $this->loadConfigValue($field, $key, $value, $this->methodMap);
             }
         }
     }
