@@ -4,7 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
 use Symfony\Component\Validator\Constraint;
 
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassChecking;
+use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 
@@ -15,16 +15,18 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
 {
     const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_method_name';
 
-    /** @var ExtendClassChecking */
+    /** @var ClassMethodNameChecker */
     protected $extendClassChecking;
 
     /**
      * @param FieldNameValidationHelper $validationHelper
-     * @param ExtendClassChecking       $extendClassChecking
+     * @param ClassMethodNameChecker    $extendClassChecking
      *
      */
-    public function __construct(FieldNameValidationHelper $validationHelper, ExtendClassChecking $extendClassChecking)
-    {
+    public function __construct(
+        FieldNameValidationHelper $validationHelper,
+        ClassMethodNameChecker $extendClassChecking
+    ) {
         parent::__construct($validationHelper);
 
         $this->extendClassChecking = $extendClassChecking;
@@ -44,19 +46,12 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
             );
         }
 
-        $className = $value->getEntity()->getClassName();
-        $fieldName = $value->getFieldName();
+        $className  = $value->getEntity()->getClassName();
+        $fieldName  = $value->getFieldName();
+        $methodName = $this->extendClassChecking->getConflictMethodName($className, $fieldName);
 
-        if ($this->extendClassChecking->hasGetter($className, $fieldName)) {
-            $this->addViolation($constraint->message, 'getters', $className);
-        }
-
-        if ($this->extendClassChecking->hasSetter($className, $fieldName)) {
-            $this->addViolation($constraint->message, 'setters', $className);
-        }
-
-        if ($this->extendClassChecking->hasRemover($className, $fieldName)) {
-            $this->addViolation($constraint->message, 'remover', $className);
+        if (!empty($methodName)) {
+            $this->addViolation($constraint->message, $methodName, '');
         }
     }
 }
