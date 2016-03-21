@@ -2,12 +2,14 @@
 
 namespace Oro\Bundle\ActionBundle\Action;
 
-use Doctrine\Common\Collections\ArrayCollection;
+use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\ContextAccessor;
 
+use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
@@ -30,8 +32,11 @@ class RunActionGroup extends AbstractAction
     /** @var ActionGroupExecutionArgs */
     protected $executionArgs;
 
-    /** @var mixed */
+    /** @var string|PropertyPathInterface */
     protected $attribute;
+
+    /** @var PropertyPathInterface */
+    protected $errors;
 
     /**
      * @param ActionGroupRegistry $actionGroupRegistry
@@ -77,7 +82,8 @@ class RunActionGroup extends AbstractAction
             $this->parametersMap = $parametersMap;
         }
 
-        $this->attribute = array_key_exists(self::OPTION_ATTRIBUTE, $options) ? $options[self::OPTION_ATTRIBUTE] : null;
+        $this->attribute = $this->getOption($options, self::OPTION_ATTRIBUTE);
+        $this->errors = new PropertyPath('errors');
 
         return $this;
     }
@@ -87,18 +93,21 @@ class RunActionGroup extends AbstractAction
      */
     protected function executeAction($context)
     {
+        /* @var $context ActionData */
         if (null === $this->executionArgs) {
             throw new \BadMethodCallException('Uninitialized action execution.');
         }
 
         $this->parametersMapper->mapToArgs($this->executionArgs, $this->parametersMap, $context);
 
-        $errors = new ArrayCollection();
+        $errors = $this->contextAccessor->getValue($context, $this->errors) ?: null;
 
         $result = $this->executionArgs->execute($this->actionGroupRegistry, $errors);
 
         if ($this->attribute) {
             $this->contextAccessor->setValue($context, $this->attribute, $result);
         }
+
+        $context->merge($result);
     }
 }

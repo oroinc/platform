@@ -65,14 +65,5 @@
         }%}
     {% endif %}
 
-    {% if errors|length and formErrors is not defined %}
-        {% set formErrors %}
-            {% for error in errors %}
-                <li>{{ error.message | trans(error.parameters|default([]))}}</li>
-            {% endfor %}
-        {% endset %}
-        {% set data = data|merge({'formErrors' : formErrors ~ data.formErrors|default('')}) %}
-    {% endif %}
-
     {{ parent() }}
 {% endblock content_data %}
