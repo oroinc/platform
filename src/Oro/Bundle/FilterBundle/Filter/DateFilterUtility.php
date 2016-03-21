@@ -129,6 +129,7 @@ class DateFilterUtility
                     $data['date_start'] = $this->formatDate($data['date_start'], 'm');
                     $data['date_end'] = $this->formatDate($data['date_end'], 'm');
                 }
+                break;
             default:
                 break;
         }
@@ -206,7 +207,7 @@ class DateFilterUtility
     protected function containsMonthVariable(array $data)
     {
         return ArrayUtil::some(
-            function($field) use ($data) {
+            function ($field) use ($data) {
                 $expr = $this->compileExpression($data, $field);
 
                 return $expr && $expr->getVariableType() == DateModifierInterface::VAR_THIS_MONTH_W_Y;
