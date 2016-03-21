@@ -1,14 +1,12 @@
 Operations
 ==========
 
-Table of Contents
------------------
- - [What are Operations?](#what-are-operations)
- - [How it works?](#how-it-works)
- - [Operation Configuration](#operation-configuration)
- - [Configuration Validation](#configuration-validation)
- - [Default Operations](#default-operations)
-
+* [What are Operations?](#what-are-operations)
+* [How it works?](#how-it-works)
+* [Operation Configuration](#operation-configuration)
+* [Configuration Validation](#configuration-validation)
+* [Default Operations](#default-operations)
+  * [Questions and Answers](#questions-and-answers)
 
 What are Operations?
 -----------------
