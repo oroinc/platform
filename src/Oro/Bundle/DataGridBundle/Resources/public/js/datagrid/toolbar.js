@@ -44,7 +44,7 @@ define([
             pagesize: '[data-grid-pagesize]',
             actionsPanel: '[data-grid-actions-panel]',
             extraActionsPanel: '[data-grid-extra-actions-panel]',
-            sortingDropdown: '.sorting'
+            sortingDropdown: '[data-grid-sorting]'
         },
 
         /**
