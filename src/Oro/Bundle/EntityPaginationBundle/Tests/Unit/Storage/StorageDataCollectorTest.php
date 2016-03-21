@@ -7,6 +7,7 @@ use Symfony\Component\HttpFoundation\Request;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
+use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\EntityPaginationBundle\Storage\StorageDataCollector;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 
@@ -156,7 +157,7 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
 
         $this->setPaginationEnabled(true);
         $this->setPaginationLimit($paginationLimit);
-        $this->buildDataGrid(true, array_merge($state, ['pager' => []]), $scope, $entityIds, $paginationLimit);
+        $this->buildDataGrid(true, $state, $scope, $entityIds, $paginationLimit);
         $this->storage->expects($this->once())
             ->method('hasData')
             ->with(self::ENTITY_NAME, $hash, $scope)
@@ -278,6 +279,9 @@ class StorageDataCollectorTest extends \PHPUnit_Framework_TestCase
         $dataGrid->expects($this->any())
             ->method('getDatasource')
             ->will($this->returnValue($dataSource));
+        $dataGrid->expects($this->any())
+            ->method('getParameters')
+            ->will($this->returnValue(new ParameterBag($state)));
 
         $this->pager->expects($this->any())
             ->method('setQueryBuilder')

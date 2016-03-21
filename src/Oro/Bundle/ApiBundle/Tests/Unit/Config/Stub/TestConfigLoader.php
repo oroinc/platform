@@ -18,16 +18,16 @@ class TestConfigLoader extends AbstractConfigLoader implements ConfigLoaderInter
      */
     public function load(array $config)
     {
-        $sorters = new TestConfig();
+        $result = new TestConfig();
 
         foreach ($config as $key => $value) {
             if (isset($this->methodMap[$key])) {
-                $this->callSetter($sorters, $this->methodMap[$key], $value);
+                $this->callSetter($result, $this->methodMap[$key], $value);
             } else {
-                $this->setValue($sorters, $key, $value);
+                $this->setValue($result, $key, $value);
             }
         }
 
-        return $sorters;
+        return $result;
     }
 }

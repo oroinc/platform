@@ -108,18 +108,8 @@ class ProcessorBag implements ProcessorBagInterface
     {
         $this->ensureInitialized();
 
-        $processors = $this->processors;
-        // remove "priority" attribute in debug mode
-        if ($this->debug) {
-            foreach ($processors as &$item) {
-                foreach ($item as &$processor) {
-                    unset($processor['attributes']['priority']);
-                }
-            }
-        }
-
         return new ProcessorIterator(
-            $processors,
+            $this->processors,
             $context,
             $this->processorApplicableChecker,
             $this->processorFactory
@@ -274,7 +264,13 @@ class ProcessorBag implements ProcessorBagInterface
         $this->processorApplicableChecker = new ChainApplicableChecker();
         $this->registerApplicableChecker(new GroupRangeApplicableChecker());
         $this->registerApplicableChecker(new SkipGroupApplicableChecker());
-        $this->registerApplicableChecker(new MatchApplicableChecker());
+        $matchApplicableChecker = new MatchApplicableChecker();
+        // add the "priority" attribute to the ignore list,
+        // as it is added by LoadProcessorsCompilerPass to processors' attributes only in debug mode
+        if ($this->debug) {
+            $matchApplicableChecker->addIgnoredAttribute('priority');
+        }
+        $this->registerApplicableChecker($matchApplicableChecker);
         if (!empty($this->initialData['checkers'])) {
             $checkers = $this->sortByPriorityAndFlatten($this->initialData['checkers']);
             foreach ($checkers as $checker) {
