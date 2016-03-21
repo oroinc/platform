@@ -171,17 +171,20 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
      */
     public function executeActionDataProvider()
     {
-        $actionData1 = new ActionData(['data' => (object)['paramValue' => 'value']]);
+        $actionData1 = $this->createActionData(['data' => (object)['paramValue' => 'value']]);
 
-        $expectedData1 = (new ActionData(['param' => 'value', 'errors' => new ArrayCollection()]));
-
-        $actionDataWithAttributeApplied = new ActionData(['param' => 'value']);
-        $actionDataWithAttributeApplied->redirectUrl = 'url2';
-        $actionDataWithAttributeApplied->refreshGrid = ['grid1', 'grid2'];
-        $actionDataWithAttributeApplied['new_param_data'] = new ActionData([
-            'redirectUrl' => 'url2',
-            'refreshGrid' => ['grid2'],
-        ]);
+        $actionDataWithAttributeApplied = $this->createActionData(
+            [
+                'param' => 'value',
+                'redirectUrl' => 'url2',
+                'refreshGrid' => ['grid1', 'grid2'],
+                'new_param_data' => new ActionData([
+                    'redirectUrl' => 'url2',
+                    'refreshGrid' => ['grid2'],
+                ])
+            ],
+            true
+        );
 
         return [
             'without attribute and pass errors' => [
@@ -197,7 +200,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                 ],
                 'arguments' => $actionData1,
                 'return' => new ActionData([]),
-                'expected' => $expectedData1
+                'expected' => $this->createActionData(['param' => 'value', 'errors' => new ArrayCollection()])
             ],
             'with attribute and merge context' => [
                 'contextParams' => [
@@ -213,12 +216,31 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                     RunActionGroup::OPTION_ATTRIBUTE => new PropertyPath('new_param_data'),
                 ],
                 'arguments' => $actionData1,
-                'return' => new ActionData([
-                    'redirectUrl' => 'url2',
-                    'refreshGrid' => ['grid2'],
-                ]),
+                'return' => new ActionData(['redirectUrl' => 'url2', 'refreshGrid' => ['grid2']]),
                 'expected' => $actionDataWithAttributeApplied
             ]
         ];
+    }
+
+    /**
+     * @param array $data
+     * @param bool $modified
+     * @return null|ActionData
+     */
+    protected function createActionData(array $data, $modified = false)
+    {
+        $actionData = null;
+
+        if ($modified) {
+            $actionData = new ActionData();
+
+            foreach ($data as $name => $value) {
+                $actionData->$name = $value;
+            }
+        } else {
+            $actionData = new ActionData($data);
+        }
+
+        return $actionData;
     }
 }
