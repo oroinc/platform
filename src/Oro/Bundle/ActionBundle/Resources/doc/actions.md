@@ -8,7 +8,7 @@ Table of Contents
  - [Create Date](#create-date-create_date)
 
 Run Action Group `@run_action_group`
-------------------------
+------------------------------------
 
 **Class:** Oro\Bundle\ActionBundle\Action\RunActionGroup
 
@@ -19,7 +19,7 @@ Run Action Group `@run_action_group`
 **Options:**
  - attribute - attribute where action group execution result value should be set (optional)
  - action_group - action group name
- - parameters_mapping - 
+ - parameters_mapping - map of parameters to be passed to action_group context from current one
     
 
 **Configuration Example**
