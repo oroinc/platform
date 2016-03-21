@@ -2,22 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
-use Oro\Bundle\ApiBundle\Processor\MetadataProcessor;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class MetadataProvider
 {
-    /** @var MetadataProcessor */
+    /** @var ActionProcessorInterface */
     protected $processor;
 
     /**
-     * @param MetadataProcessor $processor
+     * @param ActionProcessorInterface $processor
      */
-    public function __construct(MetadataProcessor $processor)
+    public function __construct(ActionProcessorInterface $processor)
     {
         $this->processor = $processor;
     }

@@ -4,12 +4,12 @@ namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataContext;
-use Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -20,18 +20,18 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  */
 class SetDataCustomizationHandler implements ProcessorInterface
 {
-    /** @var CustomizeLoadedDataProcessor */
+    /** @var ActionProcessorInterface */
     protected $customizationProcessor;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
     /**
-     * @param CustomizeLoadedDataProcessor $customizationProcessor
-     * @param DoctrineHelper               $doctrineHelper
+     * @param ActionProcessorInterface $customizationProcessor
+     * @param DoctrineHelper           $doctrineHelper
      */
     public function __construct(
-        CustomizeLoadedDataProcessor $customizationProcessor,
+        ActionProcessorInterface $customizationProcessor,
         DoctrineHelper $doctrineHelper
     ) {
         $this->customizationProcessor = $customizationProcessor;

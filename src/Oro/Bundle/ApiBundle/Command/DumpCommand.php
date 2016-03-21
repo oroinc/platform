@@ -3,11 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Command;
 
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
@@ -17,7 +15,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
-class DumpCommand extends ContainerAwareCommand
+class DumpCommand extends AbstractDebugCommand
 {
     /**
      * {@inheritdoc}
@@ -26,21 +24,15 @@ class DumpCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:api:dump')
-            ->setDescription('Dumps all resources available through Data API.')
+            ->setDescription('Dumps all resources available through Data API.');
             // @todo: API version is not supported for now
             //->addArgument(
             //    'version',
             //    InputArgument::OPTIONAL,
             //    'API version',
             //    Version::LATEST
-            //)
-            ->addOption(
-                'request-type',
-                null,
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'The request type',
-                [RequestType::REST, RequestType::JSON_API]
-            );
+            //);
+        parent::configure();
     }
 
     /**
@@ -48,7 +40,7 @@ class DumpCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $requestType = new RequestType($input->getOption('request-type'));
+        $requestType = $this->getRequestType($input);
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;

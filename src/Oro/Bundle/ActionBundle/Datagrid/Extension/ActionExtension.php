@@ -171,7 +171,9 @@ class ActionExtension extends AbstractExtension
             return false;
         }
 
-        return $this->optionsHelper->getFrontendOptions($action, $context);
+        $frontendOptions = $this->optionsHelper->getFrontendOptions($action, $context);
+
+        return $frontendOptions['options'];
     }
 
     /**

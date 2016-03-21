@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeValueContext;
-use Oro\Bundle\ApiBundle\Processor\NormalizeValueProcessor;
 use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 
 /**
@@ -13,7 +13,7 @@ class ValueNormalizer
 {
     const DEFAULT_REQUIREMENT = '.+';
 
-    /** @var NormalizeValueProcessor */
+    /** @var ActionProcessorInterface */
     protected $processor;
 
     /** @var string[] */
@@ -32,9 +32,9 @@ class ValueNormalizer
     ];
 
     /**
-     * @param NormalizeValueProcessor $processor
+     * @param ActionProcessorInterface $processor
      */
-    public function __construct(NormalizeValueProcessor $processor)
+    public function __construct(ActionProcessorInterface $processor)
     {
         $this->processor = $processor;
     }
