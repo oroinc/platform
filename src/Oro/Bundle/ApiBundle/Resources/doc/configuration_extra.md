@@ -30,7 +30,8 @@ Methods:
 As a simplest example take a look into [DescriptionConfigExtra](../../Processor/Config/ConfigContext/DescriptionsConfigExtra.php) - the extra configuration to add a human-readable descriptions of entities and its' fields. 
 
 ```php
-<? php
+<?php
+
 namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
@@ -91,7 +92,8 @@ As an example:
 ```
 
 ```php
-<? php
+<?php
+
 namespace Oro\Bundle\ApiBundle\Processor\Get;
 
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -137,7 +139,8 @@ As an example, take a look into:
 - processor - [SetDescriptionForEntity](../../Processor/Config/GetConfig/SetDescriptionForEntity.php)
 
 ```php
-<? php
+<?php
+
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
 use Oro\Component\ChainProcessor\ContextInterface;
