@@ -2,26 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-use Oro\Bundle\ApiBundle\Config\Traits;
-
 class ActionsConfig
 {
-    use Traits\ConfigTrait;
-
-    /** Indicates that action excluded or not */
-    const EXCLUDE = 'exclude';
-
-    /** ACL resource for action */
-    const ACL_RESOURCE = 'acl_resource';
-
-    /** Delete handler for delete action */
-    const DELETE_HANDLER = 'delete_handler';
-
-    /** Default delete handler service that will be used in case if delete_handler parameter is not set */
-    const DEFAULT_DELETE_HANDLER = 'oro_soap.handler.delete';
-
-    /** @var array */
-    protected $items = [];
+    /** @var ActionConfig[] [action name => ActionConfig, ...] */
+    private $actions = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
@@ -30,54 +14,13 @@ class ActionsConfig
      */
     public function toArray()
     {
-        return $this->items;
-    }
-
-    /**
-     * Indicates whether the entity does not have a configuration.
-     *
-     * @return bool
-     */
-    public function isEmpty()
-    {
-        return empty($this->items);
-    }
-
-    /**
-     * Gets action configs.
-     *
-     * @param string $action
-     *
-     * @return array
-     */
-    public function getAction($action)
-    {
-        return $this->has($action) ? $this->get($action) : [];
-    }
-
-    /**
-     * Returns false if given action is disabled for entity.
-     *
-     * @param $action
-     *
-     * @return bool
-     */
-    public function isEnabled($action)
-    {
-        return !($this->getAction($action)
-            && isset($this->get($action)[self::EXCLUDE])
-            && $this->get($action)[self::EXCLUDE] === true);
-    }
-
-    /**
-     * @return array
-     */
-    public function getExcluded()
-    {
         $result = [];
-        foreach ($this->items as $action => $data) {
-            if (isset($data[self::EXCLUDE]) && $data[self::EXCLUDE] === true) {
-                $result[] = $action;
+        if (!empty($this->actions)) {
+            foreach ($this->actions as $actionName => $action) {
+                $actionConfig = $action->toArray();
+                if (!empty($actionConfig)) {
+                    $result[$actionName] = $actionConfig;
+                }
             }
         }
 
@@ -85,51 +28,78 @@ class ActionsConfig
     }
 
     /**
-     * Returns false in case if acl protection was turned off for action.
-     *
-     * @param $action
+     * Indicates whether there is a configuration at least one action.
      *
      * @return bool
      */
-    public function isAclProtected($action)
+    public function isEmpty()
     {
-        return !($this->has($action)
-            && isset($this->get($action)[self::ACL_RESOURCE])
-            && $this->get($action)[self::ACL_RESOURCE] === null);
-
+        return empty($this->actions);
     }
 
     /**
-     * Returns acl resource for given action.
-     *
-     * @param $action
-     *
-     * @return null|string
+     * Make a deep copy of object.
      */
-    public function getAclResource($action)
+    public function __clone()
     {
-        if (!$this->has($action)) {
-            return;
-        }
-
-        $action = $this->get($action);
-        if (!isset($action[self::ACL_RESOURCE])) {
-            return;
-        }
-
-        return $action[self::ACL_RESOURCE];
+        array_walk(
+            $this->actions,
+            function (&$action) {
+                $action = clone $action;
+            }
+        );
     }
 
     /**
-     * Returns delete handler service name for delete action.
+     * Gets the configuration for all actions.
      *
-     * @return string
+     * @return ActionConfig[] [action name => ActionConfig, ...]
      */
-    public function getDeleteHandler()
+    public function getActions()
     {
-        $deleteAction = $this->getAction('delete');
-        return array_key_exists(self::DELETE_HANDLER, $deleteAction)
-            ? $deleteAction[self::DELETE_HANDLER]
-            : self::DEFAULT_DELETE_HANDLER;
+        return $this->actions;
+    }
+
+    /**
+     * Gets the configuration of the action.
+     *
+     * @param string $actionName
+     *
+     * @return ActionConfig|null
+     */
+    public function getAction($actionName)
+    {
+        return isset($this->actions[$actionName])
+            ? $this->actions[$actionName]
+            : null;
+    }
+
+    /**
+     * Adds the configuration of the action.
+     *
+     * @param string            $actionName
+     * @param ActionConfig|null $action
+     *
+     * @return ActionConfig
+     */
+    public function addAction($actionName, ActionConfig $action = null)
+    {
+        if (null === $action) {
+            $action = new ActionConfig();
+        }
+
+        $this->actions[$actionName] = $action;
+
+        return $action;
+    }
+
+    /**
+     * Removes the configuration of the action.
+     *
+     * @param string $actionName
+     */
+    public function removeAction($actionName)
+    {
+        unset($this->actions[$actionName]);
     }
 }

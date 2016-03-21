@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Config;
 
-abstract class AbstractConfigLoader
+abstract class AbstractConfigLoader implements ConfigLoaderInterface
 {
     /**
      * @param object          $config

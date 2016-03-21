@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
+use Oro\Bundle\ApiBundle\Config\ActionConfig;
+use Oro\Bundle\ApiBundle\Config\ActionsConfigExtra;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Processor;
@@ -11,6 +13,7 @@ use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
+use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
@@ -40,6 +43,33 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     ) {
         parent::__construct($configExtensionRegistry, $configLoaderFactory, $entityHierarchyProvider);
         $this->configBag = $configBag;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function saveConfig(ConfigContext $context, array $config)
+    {
+        $targetAction = $context->getTargetAction();
+        if ($targetAction && !empty($config[ActionsConfigExtra::NAME][$targetAction])) {
+            $config = $this->mergeActionConfig($config, $config[ActionsConfigExtra::NAME][$targetAction]);
+        }
+
+        parent::saveConfig($context, $config);
+    }
+
+    /**
+     * @param array $config
+     * @param array $actionConfig
+     *
+     * @return array
+     */
+    protected function mergeActionConfig(array $config, array $actionConfig)
+    {
+        return array_merge(
+            $config,
+            array_diff_key($actionConfig, [ActionConfig::EXCLUDE => true])
+        );
     }
 
     /**

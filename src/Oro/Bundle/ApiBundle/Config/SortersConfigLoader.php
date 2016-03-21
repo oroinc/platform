@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class SortersConfigLoader extends AbstractConfigLoader implements ConfigLoaderInterface
+class SortersConfigLoader extends AbstractConfigLoader
 {
     /** @var array */
     protected $methodMap = [

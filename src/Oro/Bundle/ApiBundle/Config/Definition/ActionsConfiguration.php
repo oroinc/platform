@@ -2,9 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Config\ActionsConfig;
+use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
-use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
+
+use Oro\Bundle\ApiBundle\Config\ActionConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ActionsConfiguration extends AbstractConfigurationSection implements ConfigurationSectionInterface
 {
@@ -17,40 +19,17 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
         array $preProcessCallbacks,
         array $postProcessCallbacks
     ) {
-        $sectionName = 'actions';
-        /** @var ArrayNodeDefinition $parentNode */
-        $parentNode = $node->end();
-
-        $parentNode
-            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
-            ->beforeNormalization()
-            ->always(
-                function ($value) use ($preProcessCallbacks, $sectionName) {
-                    return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
-                }
-            );
-        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
-
-        $parentNode->useAttributeAsKey('name')
-                ->prototype('array')
-                ->info('Actions configuration')
-                ->treatFalseLike(array(ActionsConfig::EXCLUDE => true))
-                ->treatTrueLike(array(ActionsConfig::EXCLUDE => false))
-                ->treatNullLike(array(ActionsConfig::EXCLUDE => false))
-                ->children()
-                    ->booleanNode(ActionsConfig::EXCLUDE)->cannotBeEmpty()->defaultFalse()->end()
-                    ->scalarNode(ActionsConfig::DELETE_HANDLER)->cannotBeEmpty()->end()
-                    ->scalarNode(ActionsConfig::ACL_RESOURCE)->end();
-
-        $parentNode
-            ->validate()
-            ->always(
-                function ($value) use ($postProcessCallbacks, $sectionName) {
-                    // validate delete_handler values
-                    $this->validateDeleteHandlerParameter($value);
-                    return $this->callProcessConfigCallbacks($value, $postProcessCallbacks, $sectionName);
-                }
-            );
+        /** @var NodeBuilder $actionNode */
+        $actionNode = $node->end()
+            ->useAttributeAsKey('name')
+            ->prototype('array')
+                ->treatFalseLike([ActionConfig::EXCLUDE => true])
+                ->treatTrueLike([ActionConfig::EXCLUDE => false])
+                ->treatNullLike([ActionConfig::EXCLUDE => false])
+                ->children();
+        $actionNode
+            ->booleanNode(ActionConfig::EXCLUDE)->cannotBeEmpty()->end();
+        $this->configureActionNode($actionNode, $configureCallbacks, $preProcessCallbacks, $postProcessCallbacks);
     }
 
     /**
@@ -62,21 +41,38 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
     }
 
     /**
-     * Validates delete_handler parameter. It can exists only at 'delete' action.
-     *
-     * @param array $value
+     * @param NodeBuilder $node
+     * @param array       $configureCallbacks
+     * @param array       $preProcessCallbacks
+     * @param array       $postProcessCallbacks
      */
-    protected function validateDeleteHandlerParameter(array $value)
-    {
-        foreach ($value as $actionName => $actionConfig) {
-            if ($actionName !== 'delete' && array_key_exists(ActionsConfig::DELETE_HANDLER, $actionConfig)) {
-                throw new InvalidConfigurationException(
-                    sprintf(
-                        'The "%s" action does not supports delete_handler parameter.',
-                        $actionName
-                    )
+    protected function configureActionNode(
+        NodeBuilder $node,
+        array $configureCallbacks,
+        array $preProcessCallbacks,
+        array $postProcessCallbacks
+    ) {
+        $sectionName = ConfigUtil::ACTIONS . '.action';
+
+        /** @var ArrayNodeDefinition $parentNode */
+        $parentNode = $node->end();
+        $parentNode
+            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
+            ->beforeNormalization()
+                ->always(
+                    function ($value) use ($preProcessCallbacks, $sectionName) {
+                        return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
+                    }
                 );
-            }
-        }
+        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
+        $node
+            ->scalarNode(ActionConfig::ACL_RESOURCE)->end();
+        $parentNode
+            ->validate()
+                ->always(
+                    function ($value) use ($postProcessCallbacks, $sectionName) {
+                        return $this->callProcessConfigCallbacks($value, $postProcessCallbacks, $sectionName);
+                    }
+                );
     }
 }

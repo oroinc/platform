@@ -7,12 +7,8 @@ class ApiResource
     /** @var string */
     protected $entityClass;
 
-    /**
-     * List of excluded actions
-     *
-     * @var array
-     */
-    protected $excludedActions;
+    /** @var string[] */
+    protected $excludedActions = [];
 
     /**
      * @param $entityClass
@@ -20,14 +16,6 @@ class ApiResource
     public function __construct($entityClass)
     {
         $this->entityClass = $entityClass;
-    }
-
-    /**
-     * @return string
-     */
-    public function getEntityClass()
-    {
-        return $this->entityClass;
     }
 
     /**
@@ -41,7 +29,19 @@ class ApiResource
     }
 
     /**
-     * @return array
+     * Gets the class name of the entity.
+     *
+     * @return string
+     */
+    public function getEntityClass()
+    {
+        return $this->entityClass;
+    }
+
+    /**
+     * Gets a list of actions that must not be available for the entity.
+     *
+     * @return string[]
      */
     public function getExcludedActions()
     {
@@ -49,9 +49,11 @@ class ApiResource
     }
 
     /**
-     * @param array $excludedActions
+     * Sets a list of actions that must not be available for the entity.
+     *
+     * @param string[] $excludedActions
      */
-    public function setExcludedActions($excludedActions)
+    public function setExcludedActions(array $excludedActions)
     {
         $this->excludedActions = $excludedActions;
     }

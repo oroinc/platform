@@ -1,18 +1,17 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Delete;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
+use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class GetProcessorTestCase extends \PHPUnit_Framework_TestCase
+class DeleteProcessorTestCase extends \PHPUnit_Framework_TestCase
 {
     const TEST_VERSION      = '1.1';
     const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var GetContext */
+    /** @var DeleteContext */
     protected $context;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -21,7 +20,7 @@ class GetProcessorTestCase extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadataProvider;
 
-    protected function setUp()
+    public function setUp()
     {
         $this->configProvider   = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -30,13 +29,12 @@ class GetProcessorTestCase extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->context = new GetContext($this->configProvider, $this->metadataProvider);
+        $this->context = new DeleteContext($this->configProvider, $this->metadataProvider);
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $this->context->setConfigExtras(
             [
                 new EntityDefinitionConfigExtra($this->context->getAction()),
-                new FiltersConfigExtra()
             ]
         );
     }

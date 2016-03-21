@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class FiltersConfigLoader extends AbstractConfigLoader implements ConfigLoaderInterface
+class FiltersConfigLoader extends AbstractConfigLoader
 {
     /** @var array */
     protected $methodMap = [

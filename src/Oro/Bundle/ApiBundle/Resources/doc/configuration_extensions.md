@@ -185,9 +185,8 @@ An example of configuration section loader:
 namespace Acme\Bundle\AcmeBundle\Api;
 
 use Oro\Bundle\ApiBundle\Config\AbstractConfigLoader;
-use Oro\Bundle\ApiBundle\Config\ConfigLoaderInterface;
 
-class MyConfigLoader extends AbstractConfigLoader implements ConfigLoaderInterface
+class MyConfigLoader extends AbstractConfigLoader
 {
     /** @var array */
     protected $methodMap = [

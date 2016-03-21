@@ -38,21 +38,16 @@ services:
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -100 }
 
-    oro_api.collect_resources.add_excluded_actions_config:
-        class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddActionsToResources
+    oro_api.collect_resources.add_excluded_actions:
+        class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActions
         arguments:
             - @oro_api.config_provider
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -110 }
 
-    oro_api.collect_resources.exclude_delete_for_dictionaries:
-        class: Oro\Bundle\ApiBundle\Processor\CollectResources\ExcludeDeleteForDictionaries
+    oro_api.collect_resources.add_excluded_actions_for_dictionaries:
+        class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActionsForDictionaries
         arguments:
             - @oro_entity.dictionary_value_list_provider
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -120 }
-
-    oro_api.collect_resources.restore_delete_for_dictionaries:
-        class: Oro\Bundle\ApiBundle\Processor\CollectResources\RestoreDeleteForDictionaries
-        tags:
-            - { name: oro.api.processor, action: collect_resources, priority: -130 }

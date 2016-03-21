@@ -18,7 +18,6 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
     /**
      * @param array $fieldFilters The list of fields that should be returned for a specified type of an entity.
      *                            [entity type => [field name, ...], ...]
-     *
      */
     public function __construct(array $fieldFilters)
     {

@@ -3,17 +3,23 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Config\Definition\ActionsConfiguration;
-use Symfony\Component\Config\Definition\Builder\NodeBuilder;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class ActionsConfigExtension extends AbstractConfigExtension
 {
+    /**
+     * {@inheritdoc}
+     */
     public function getEntityConfigurationSections()
     {
-        return ['actions' => new ActionsConfiguration()];
+        return [ConfigUtil::ACTIONS => new ActionsConfiguration()];
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getEntityConfigurationLoaders()
     {
-        return ['actions' => new ActionsConfigLoader()];
+        return [ConfigUtil::ACTIONS => new ActionsConfigLoader()];
     }
 }
