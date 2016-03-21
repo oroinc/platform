@@ -222,29 +222,4 @@ class Theme
         }
         return $default;
     }
-
-    /**
-     * @return ThemeImageType[]
-     */
-    public function getImageTypes()
-    {
-        if (!$this->imageTypes) {
-            $this->prepareImageTypes();
-        }
-
-        return $this->imageTypes;
-    }
-
-    /**
-     * @return ThemeImageType[]
-     */
-    public function prepareImageTypes()
-    {
-        $config = $this->getDataByKey('images', ['types' => []])['types'];
-
-        foreach ($config as $name => $type) {
-            $dimensions = $type['dimensions'] ?: [];
-            $this->imageTypes[] = new ThemeImageType($name, $type['label'], $dimensions, $type['max_number']);
-        }
-    }
 }
