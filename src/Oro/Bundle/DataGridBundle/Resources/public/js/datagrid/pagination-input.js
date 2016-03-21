@@ -21,9 +21,9 @@ define([
 
         /** @property */
         events: {
-            'click a': 'onChangePage',
-            'blur input': 'onChangePageByInput',
-            'change input': 'onChangePageByInput',
+            'click [data-grid-pagination-trigger]': 'onChangePage',
+            'blur [data-grid-pagination-trigger-input]': 'onChangePageByInput',
+            'change [data-grid-pagination-trigger-input]': 'onChangePageByInput',
             'keyup input': function(e) {
                 if (e.which === 13) {
                     // fix for IE 8, bacause change event is not fired when enter is pressed

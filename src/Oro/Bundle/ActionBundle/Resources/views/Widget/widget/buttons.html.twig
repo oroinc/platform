@@ -4,11 +4,8 @@
     {% set groups = {} %}
 
     {% for action in actions %}
-        {% set actionUrl = action.hasForm() ? path(dialogRoute|default('oro_action_widget_form'), {actionName: action.name, fromUrl: fromUrl}|merge(context)) : null %}
         {% set params = {
             'label': action.definition.label|trans,
-            'path': path(executionRoute|default('oro_api_action_execute_actions'), {actionName: action.name}|merge(context)),
-            'actionUrl': actionUrl,
             'buttonOptions': action.definition.buttonOptions,
             'frontendOptions': action.definition.frontendOptions,
         } %}
@@ -21,7 +18,6 @@
                         'params':params|merge({buttonOptions: params.buttonOptions|merge({'class': params.buttonOptions.class|default('') ~ ' action-button'})}),
                         'context': context,
                         'onlyLink': true,
-                        'fromUrl': fromUrl,
                         'actionData': actionData,
                     } %}
                 </li>
@@ -34,7 +30,6 @@
                 {% include template with {
                     'params': params|merge({buttonOptions: params.buttonOptions|merge({'class': params.buttonOptions.class|default('back icons-holder-text') ~ ' btn action-button'})}),
                     'context': context,
-                    'fromUrl': fromUrl,
                     'actionData': actionData
                 } %}
             {% endset %}

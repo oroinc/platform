@@ -5,7 +5,6 @@ define(function(require) {
 
     var ModelAction = require('oro/datagrid/action/model-action');
     var ActionManager = require('oroaction/js/action-manager');
-    var routing = require('routing');
 
     var ActionWidgetAction = ModelAction.extend({
 
@@ -13,21 +12,7 @@ define(function(require) {
          * @property {Object}
          */
         options: {
-            datagrid: null,
-            confirmation: null,
-            showDialog: null,
-            hasDialog: null,
-            executionRoute: null,
-            dialogRoute: null,
-            dialogOptions: {
-                title: 'Action',
-                allowMaximize: false,
-                allowMinimize: false,
-                modal: true,
-                resizable: false,
-                maximizedHeightDecreaseBy: 'minimize-bar',
-                width: 550
-            }
+            actionName: null
         },
 
         /**
@@ -41,19 +26,9 @@ define(function(require) {
         initialize: function() {
             ActionWidgetAction.__super__.initialize.apply(this, arguments);
 
-            var routeParams = this._getRouteParams();
+            var config = this.model.get('action_configuration') || {};
 
-            var options = {
-                showDialog: this.options.showDialog,
-                hasDialog: this.options.hasDialog,
-                dialogUrl: routing.generate(this.options.dialogRoute, routeParams),
-                dialogOptions: this.options.dialogOptions,
-                url: routing.generate(this.options.executionRoute, routeParams),
-                confirmation: Boolean(this.options.confirmation),
-                messages: {
-                    confirm_content: this.options.confirmation
-                }
-            };
+            var options = config[this.options.actionName.toLowerCase()] || {};
 
             this.actionManager = new ActionManager(options);
         },
@@ -63,20 +38,6 @@ define(function(require) {
          */
         run: function() {
             this.actionManager.execute();
-        },
-
-        /**
-         * @return {Object}
-         */
-        _getRouteParams: function() {
-            var entityId = this.model[this.model.idAttribute];
-
-            return {
-                'actionName': this.options.actionName,
-                'entityId': entityId,
-                'entityClass': this.options.entityClass,
-                'datagrid': this.options.datagrid
-            };
         },
 
         dispose: function() {

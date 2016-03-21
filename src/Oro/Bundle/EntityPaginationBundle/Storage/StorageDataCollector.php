@@ -9,10 +9,9 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
-use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
 
 class StorageDataCollector
 {
@@ -197,13 +196,7 @@ class StorageDataCollector
      */
     protected function generateStateHash(DatagridInterface $dataGrid)
     {
-        $state = $dataGrid->getMetadata()->offsetGetByPath('[state]');
-        $data = [
-            'filters' => !empty($state['filters']) ? $state['filters'] : [],
-            'sorters' => !empty($state['sorters']) ? $state['sorters'] : [],
-        ];
-
-        return md5(json_encode($data));
+        return md5(json_encode($dataGrid->getParameters()->all()));
     }
 
     /**

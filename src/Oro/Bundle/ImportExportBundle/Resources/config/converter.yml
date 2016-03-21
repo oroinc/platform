@@ -14,6 +14,8 @@ services:
         arguments:
             - @oro_importexport.field.field_helper
             - @oro_importexport.data_converter.relation_calculator
+        calls:
+            - [setDispatcher, [@event_dispatcher]]
 
     oro_importexport.data_converter.template_fixture.configurable:
         class: %oro_importexport.data_converter.configurable.class%
@@ -21,6 +23,8 @@ services:
         arguments:
             - @oro_importexport.field.field_helper
             - @oro_importexport.data_converter.template_fixture.relation_calculator
+        calls:
+            - [setDispatcher, [@event_dispatcher]]
 
     oro_importexport.data_converter.relation_calculator:
         class: %oro_importexport.data_converter.relation_calculator.class%
