@@ -29,6 +29,14 @@ class TraceableProcessor implements ProcessorInterface
     }
 
     /**
+     * @return ProcessorInterface
+     */
+    public function getProcessor()
+    {
+        return $this->processor;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)

@@ -72,11 +72,6 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
 
-    oro_api.get.initialize_actions_config_extras:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SetActionsConfig
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 10 }
-
     oro_api.get.set_default_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultMaxRelatedEntities
         tags:
@@ -104,8 +99,8 @@ services:
     oro_api.get.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - @oro_security.security_facade
             - @oro_api.doctrine_helper
+            - @oro_security.security_facade
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
@@ -140,6 +135,7 @@ services:
     oro_api.get.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
         arguments:
+            - @oro_api.doctrine_helper
             - @oro_security.acl_helper
             - @oro_security.acl.annotation_provider
             - VIEW

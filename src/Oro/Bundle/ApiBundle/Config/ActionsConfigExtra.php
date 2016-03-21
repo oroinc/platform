@@ -3,10 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class ActionsConfigExtra implements ConfigExtraInterface, ConfigExtraSectionInterface
+/**
+ * An instance of this class can be added to the config extras of the Context
+ * to request the configuration of all actions.
+ */
+class ActionsConfigExtra implements ConfigExtraSectionInterface
 {
-    const NAME = 'actions';
+    const NAME = ConfigUtil::ACTIONS;
 
     /**
      * {@inheritdoc}
@@ -29,7 +34,7 @@ class ActionsConfigExtra implements ConfigExtraInterface, ConfigExtraSectionInte
      */
     public function isInheritable()
     {
-        return true;
+        return false;
     }
 
     /**

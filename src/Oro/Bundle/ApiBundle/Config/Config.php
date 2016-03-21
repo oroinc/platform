@@ -156,7 +156,7 @@ class Config implements \IteratorAggregate
      */
     public function hasActions()
     {
-        return $this->has('actions');
+        return $this->has(ConfigUtil::ACTIONS);
     }
 
     /**
@@ -166,7 +166,7 @@ class Config implements \IteratorAggregate
      */
     public function getActions()
     {
-        return $this->get('actions');
+        return $this->get(ConfigUtil::ACTIONS);
     }
 
     /**
@@ -176,6 +176,6 @@ class Config implements \IteratorAggregate
      */
     public function setActions(ActionsConfig $actions = null)
     {
-        $this->set('actions', $actions);
+        $this->set(ConfigUtil::ACTIONS, $actions);
     }
 }

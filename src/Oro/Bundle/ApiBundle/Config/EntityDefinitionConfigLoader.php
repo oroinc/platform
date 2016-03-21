@@ -19,6 +19,8 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
         EntityDefinitionConfig::LABEL                => 'setLabel',
         EntityDefinitionConfig::PLURAL_LABEL         => 'setPluralLabel',
         EntityDefinitionConfig::DESCRIPTION          => 'setDescription',
+        EntityDefinitionConfig::DELETE_HANDLER       => 'setDeleteHandler',
+        EntityDefinitionConfig::ACL_RESOURCE         => 'setAclResource',
     ];
 
     /** @var ConfigLoaderFactory */
@@ -62,7 +64,7 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
                 $this->loadFilters($definition, $value);
             } elseif (ConfigUtil::SORTERS === $key) {
                 $this->loadSorters($definition, $value);
-            } elseif ('actions' === $key) {
+            } elseif (ConfigUtil::ACTIONS === $key) {
                 $this->loadActions($definition, $value);
             } elseif ($this->factory->hasLoader($key)) {
                 $this->loadSection($definition, $this->factory->getLoader($key), $key, $value);
@@ -125,10 +127,10 @@ class EntityDefinitionConfigLoader extends AbstractConfigLoader implements
     protected function loadActions(EntityDefinitionConfig $definition, array $config = null)
     {
         if (!empty($config)) {
-            /** @var SortersConfig $sorters */
-            $actions = $this->factory->getLoader('actions')->load($config);
+            /** @var ActionsConfig $actions */
+            $actions = $this->factory->getLoader(ConfigUtil::ACTIONS)->load($config);
             if (!$actions->isEmpty()) {
-                $this->setValue($definition, 'actions', $actions);
+                $this->setValue($definition, ConfigUtil::ACTIONS, $actions);
             }
         }
     }

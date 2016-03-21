@@ -54,29 +54,38 @@ abstract class LoadFromConfigBag implements ProcessorInterface
 
         $config = $this->loadConfig($context->getClassName(), $context->getVersion());
         if (!empty($config)) {
-            $extras = $context->getExtras();
-            foreach ($extras as $extra) {
-                $sectionName = $extra->getName();
-                if ($extra instanceof ConfigExtraSectionInterface
-                    && !empty($config[$sectionName])
-                    && !$context->has($sectionName)
-                ) {
-                    $context->set(
-                        $sectionName,
-                        $this->loadConfigObject($extra->getConfigType(), $config[$sectionName])
-                    );
-                }
-            }
-
-            $sectionNames = $this->getAllConfigSectionNames();
-            foreach ($sectionNames as $sectionName) {
-                unset($config[$sectionName]);
-            }
-
-            $context->setResult(
-                $this->loadConfigObject(ConfigUtil::DEFINITION, $config)
-            );
+            $this->saveConfig($context, $config);
         }
+    }
+
+    /**
+     * @param ConfigContext $context
+     * @param array         $config
+     */
+    protected function saveConfig(ConfigContext $context, array $config)
+    {
+        $extras = $context->getExtras();
+        foreach ($extras as $extra) {
+            $sectionName = $extra->getName();
+            if ($extra instanceof ConfigExtraSectionInterface
+                && !empty($config[$sectionName])
+                && !$context->has($sectionName)
+            ) {
+                $context->set(
+                    $sectionName,
+                    $this->loadConfigObject($extra->getConfigType(), $config[$sectionName])
+                );
+            }
+        }
+
+        $sectionNames = $this->getAllConfigSectionNames();
+        foreach ($sectionNames as $sectionName) {
+            unset($config[$sectionName]);
+        }
+
+        $context->setResult(
+            $this->loadConfigObject(ConfigUtil::DEFINITION, $config)
+        );
     }
 
     /**

@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
-class TestConfigSection implements ConfigExtraInterface, ConfigExtraSectionInterface
+class TestConfigSection implements ConfigExtraSectionInterface
 {
     /** @var string */
     protected $name;

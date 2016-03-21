@@ -4,15 +4,16 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Delete;
 
 use Oro\Bundle\ApiBundle\Processor\Delete\ValidateLoadedResult;
 
-class ValidateLoadedResultTest extends DeleteContextTestCase
+class ValidateLoadedResultTest extends DeleteProcessorTestCase
 {
     /** @var ValidateLoadedResult */
     protected $processor;
 
     public function setUp()
     {
-        $this->processor = new ValidateLoadedResult();
         parent::setUp();
+
+        $this->processor = new ValidateLoadedResult();
     }
 
     /**
