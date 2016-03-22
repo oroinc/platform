@@ -36,6 +36,7 @@ The following table shows all actions provided out of the box:
 | [collect_resources](#collect_resources-action) | Returns a list of all resources available through Data API |
 | [get](#get-action) | Returns an entity by its identifier |
 | [get_list](#get_list-action) | Returns a list of entities |
+| [delete](#delete-action) | Deletes an entity by its identifier |
 | [customize_loaded_data](#customize_loaded_data-action) | Makes modifications of data loaded by [get](#get-action) or [get_list](#get_list-action) actions |
 | [get_config](#get_config-action) | Returns a configuration of an entity |
 | [get_relation_config](#get_relation_config-action) | Returns a configuration of an entity if it is used in a relationship |
@@ -137,9 +138,9 @@ This action has the following processor groups:
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
-| build_query | Building a query that will be used to load data | |
-| load_data | Loading data | Loads data that should be deleted to the context's result |
-| delete_data | Deletes data | Deletes data from the context's result and sets result to null|
+| build_query | Building a query that will be used to load an entity to be deleted | |
+| load_data | Loading data | Loads an entity that should be deleted and save it in the `result` property of the context |
+| delete_data | Deletes data | Deletes the entity stored in the `result` property of the context |
 | normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `deleteAction` method of [RestApiController](../../Controller/RestApiController.php).

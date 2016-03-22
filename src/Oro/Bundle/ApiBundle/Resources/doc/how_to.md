@@ -13,8 +13,7 @@ Table of Contents
 Turn on API for entity
 ----------------------
 
-By default, API for entities is disabled. To turn on API for some entity, You should add this entity to the `api.yml` file
-at `Resources/config/oro/api.yml` of your bundle:
+By default, API for entities is disabled. To turn on API for some entity, You should add this entity to `Resources/config/oro/api.yml` of your bundle:
 
 
 ```yaml
@@ -23,19 +22,18 @@ oro_api:
         Acme\Bundle\ProductBundle\Product: ~
 ```
 
-This example will turns on API for the Product entity with default configuration.
-
-
 Change ACL resource for entity actions
 --------------------------------------
 
-By default, all the actions uses the next entity's permissions to check access:
+By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
 
-* *get* action: **VIEW** permission;
-* *get_list* action: **VIEW** permission;
-* *delete* action: **DELETE** permission;
+| Action | Permission |
+| --- | --- |
+| get | VIEW |
+| get_list | VIEW |
+| delete | DELETE |
 
-In case if You want to change an action permission to another, or disable access checks, for some action, you can do it with `acl_resource` parameter from `actions` section. For example, lets's change it for `delete` and `get` actions and turn off access checks for `get_list` action.
+In case if you want to change an action permission to another, or disable access checks, for some action, you can do it with `acl_resource` parameter from `actions` section. For example, lets's change it for `delete` and `get` actions and turn off access checks for `get_list` action.
 
 For this you should implement an ACL resource with @ACL annotation in controller class, or with resource definition in `Resources/config/acl.yml` file of your bundle:
 
@@ -92,7 +90,7 @@ If your entity's delete process should be different, you can change default dele
 
 For example, lets's add some custom checks for Product entity.
 
-To do this, first of all, You should create own delete handler. It should be extended from the standart [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php):
+To do this, first of all, you should create own delete handler. It should be extended from the standart [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php):
 
 ```php
 <?php

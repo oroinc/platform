@@ -165,7 +165,7 @@ Each entity can have next properties:
 * **order_by** *array* The property can be used to configure default ordering. The item key is the name of a field. The value can be `ASC` or `DESC`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **post_serialize** *callable* A handler to be used to modify serialized data.
-* **delete_handler** A delete handler service name to be used to delete data in delete action.
+* **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) action. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
 
 Example:
 
@@ -178,7 +178,6 @@ oro_api:
             description:          "Acme Entities description"
             inherit:              false
             exclusion_policy:     all
-            delete_handler:       acme.demo.test_entity.delete_handler
             disable_partial_load: false
             max_results:          25
             order_by:
@@ -188,7 +187,8 @@ oro_api:
                 - HINT_TRANSLATABLE
                 - { name: HINT_FILTER_BY_CURRENT_USER }
                 - { name: HINT_CUSTOM_OUTPUT_WALKER, value: "Acme\Bundle\AcmeBundle\AST_Walker_Class"}
-            post_serialize: ["Acme\Bundle\AcmeBundle\Serializer\MySerializationHandler", "serialize"]
+            post_serialize:       ["Acme\Bundle\AcmeBundle\Serializer\MySerializationHandler", "serialize"]
+            delete_handler:       acme.demo.test_entity.delete_handler
             excluded:             false
             fields:
                 ...
@@ -337,27 +337,63 @@ Please refer to [actions](./actions.md#context-class) documentation section for 
 "actions" configuration section
 -------------------------------
 
-The `actions` configuration section allows to configure action-specific configuration parameters. Now supports `get`, `get_list` and `delete` actions.
+The [actions](./actions.md) configuration section allows to specify action-specific options. The options from this section will be added to the entity configuration. If an option exists in both entity and action configurations the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration. Now `get`, `get_list` and `delete` actions are supported.
 
 Each action can have next parameters:
 
 * **excluded** *boolean* Indicates that action is disabled for entity. By default `false`.
-* **acl_resource** *string* This parameter allow to change default permition that will be used for ACL checks to the given ACL resource. If this value sets to null - ACL check will be disable for given action.
+* **description** *string* The entity description for the action.
+* **acl_resource** *string* The name of ACL resource that should be used to protect an entity in the scope of this action. The `null` can be used to disable ACL check.
 
-An example of `actions` section configuration:
+By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
+
+| Action | Permission |
+| --- | --- |
+| get | VIEW |
+| get_list | VIEW |
+| delete | DELETE |
+
+
+Examples of `actions` section configuration:
+
+Exclude `delete` action for entity:
 
 ```yaml
 oro_api:
     entities:
-        Acme\Bundle\AcmeBundle\Entity\AcmeFirstEntity:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
-                delete: false #delete action for AcmeFirstEntity will be disabled
-                get:
-                    excluded: true #the same as delete action, get action will be disabled too
+                delete: false
+```
+
+Exclude action for entity. Short syntax:
+                
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete: false
+```                      
+
+Change the VIEW permission (which is default permission for get_list action) to ACL resource acme_view_resource:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
                 get_list:
-                    acl_resource: acme_view_resource #changes the VIEW permition (by default for get_list action) to ACL resource acme_view_resource
-       Acme\Bundle\AcmeBundle\Entity\AcmeSecondEntity:
+                    acl_resource: acme_view_resource
+```  
+
+Turn off ACL checks for `get` action for entity:
+
+```yaml
+oro_api:
+    entities:
+       Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
                 get:
-                    acl_resource: ~ #turns off ACL checks for get action for AcmeSecondEntity
+                    acl_resource: ~
 ```
