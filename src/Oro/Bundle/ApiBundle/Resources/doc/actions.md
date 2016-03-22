@@ -8,6 +8,7 @@ Table of Contents
     - [**collect_resources** Action](#collect_resources-action)
     - [**get** Action](#get-action)
     - [**get_list** Action](#get_list-action)
+    - [**delete** Action](#delete-action)
     - [**customize_loaded_data** Action](#customize_loaded_data-action)
     - [**get_config** Action](#get_config-action)
     - [**get_relation_config** Action](#get_relation_config-action)
@@ -35,6 +36,7 @@ The following table shows all actions provided out of the box:
 | [collect_resources](#collect_resources-action) | Returns a list of all resources available through Data API |
 | [get](#get-action) | Returns an entity by its identifier |
 | [get_list](#get_list-action) | Returns a list of entities |
+| [delete](#delete-action) | Deletes an entity by its identifier |
 | [customize_loaded_data](#customize_loaded_data-action) | Makes modifications of data loaded by [get](#get-action) or [get_list](#get_list-action) actions |
 | [get_config](#get_config-action) | Returns a configuration of an entity |
 | [get_relation_config](#get_relation_config-action) | Returns a configuration of an entity if it is used in a relationship |
@@ -117,6 +119,31 @@ This action has the following processor groups:
 | normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `cgetAction` method of [RestApiController](../../Controller/RestApiController.php).
+
+delete Action
+----------
+
+This action is intended to delete an entity by its identifier.
+
+The context class: [DeleteContext](../../Processor/Delete/DeleteContext.php). Also see  [Context class](#context-class) for more details.
+
+The main processor class: [DeleteProcessor](../../Processor/DeleteProcessor.php).
+
+Existing worker processors: [processors.delete.yml](../../Resources/config/processors.delete.yml) or run `php app/console oro:api:debug delete`.
+
+This action has the following processor groups:
+
+| Group Name | Responsibility of Processors | Description |
+| --- | --- | --- |
+| initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
+| security_check | Checking whether an access to the requested resource is granted | |
+| normalize_input | Preparing input data to be ready to use by processors from the next groups | |
+| build_query | Building a query that will be used to load an entity to be deleted | |
+| load_data | Loading an entity that should be deleted and save it in the `result` property of the context | |
+| delete_data | Deleting the entity stored in the `result` property of the context | |
+| normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
+
+Example of usage you can find in the `deleteAction` method of [RestApiController](../../Controller/RestApiController.php).
 
 customize_loaded_data Action
 ----------------------------
