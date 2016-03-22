@@ -8,6 +8,7 @@ define(function(require) {
     /**
      * DayValueHelper provides validation passed value and formatting it into Display/Raw formats
      *
+     * @deprecated use DateValueHelper instead
      * @param {Array|string} dayFormats list of day formats or single day format (first format is considered as main)
      * @constructor
      */
