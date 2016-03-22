@@ -98,9 +98,9 @@ action_groups:
     DELETE:
         parameters:
             data: ~
-        acl_resource: [DELETE, $data]
+        acl_resource: [DELETE, $.data]
         actions:
             - @call_service_method:
                 service: oro_action.handler.delete
                 method: handleDelete
-                method_parameters: [$data]
+                method_parameters: [$.data]

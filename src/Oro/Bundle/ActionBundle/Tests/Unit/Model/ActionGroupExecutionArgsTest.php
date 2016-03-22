@@ -62,7 +62,7 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
         $errorsCollection = new ArrayCollection();
 
         $mockActionGroup->expects($this->once())->method('execute')
-            ->with(new ActionData(['data' => (object)['arg1' => 'val1']]), $errorsCollection)
+            ->with(new ActionData(['arg1' => 'val1']), $errorsCollection)
             ->willReturn('ok');
 
         $this->assertEquals('ok', $instance->execute($mockRegistry, $errorsCollection));
@@ -75,47 +75,41 @@ class ActionGroupExecutionArgsTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'no args' => [
-                'expected' => new ActionData(['data' => (object)[]]),
+                'expected' => new ActionData(),
                 'parameters' => []
             ],
             'few' => [
                 'expected' => new ActionData(
                     [
-                        'data' => (object)[
-                            'arg1' => 'val1',
-                            'arg2' => 'val2'
-                        ]
+                        'arg1' => 'val1',
+                        'arg2' => 'val2',
                     ]
                 ),
                 'parameters' => [
                     ['arg1', 'val1'],
-                    ['arg2', 'val2']
+                    ['arg2', 'val2'],
                 ]
             ],
             'many' => [
                 'expected' => new ActionData(
                     [
-                        'data' => (object)[
-                            'arg1' => 'val1',
-                            'arg2' => 'val1',
-                            'arg3' => 'val1',
-                            'arg4' => 'val1',
-                        ]
+                        'arg1' => 'val1',
+                        'arg2' => 'val1',
+                        'arg3' => 'val1',
+                        'arg4' => 'val1',
                     ]
                 ),
                 'parameters' => [
                     ['arg1', 'val1'],
                     ['arg2', 'val1'],
                     ['arg3', 'val1'],
-                    ['arg4', 'val1']
+                    ['arg4', 'val1'],
                 ],
             ],
             'overrides' => [
                 'expected' => new ActionData(
                     [
-                        'data' => (object)[
-                            'arg1' => 'val2'
-                        ]
+                        'arg1' => 'val2',
                     ]
                 ),
                 'parameters' => [
