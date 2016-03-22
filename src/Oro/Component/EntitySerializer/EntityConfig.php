@@ -71,6 +71,25 @@ class EntityConfig
     }
 
     /**
+     * Make a deep copy of object.
+     */
+    public function __clone()
+    {
+        $this->items = array_map(
+            function ($value) {
+                return is_object($value) ? clone $value : $value;
+            },
+            $this->items
+        );
+        $this->fields = array_map(
+            function ($field) {
+                return clone $field;
+            },
+            $this->fields
+        );
+    }
+
+    /**
      * Checks whether the configuration attribute exists.
      *
      * @param string $key

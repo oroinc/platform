@@ -85,8 +85,13 @@ define([
      */
     function getErrorPlacement(element) {
         var $targetElem = getErrorTarget(element);
-        var $errorHolder = $targetElem.parent();
-        return $errorHolder.is('.fields-row') ? $errorHolder : $targetElem;
+        var $errorHolder = $targetElem.closest('.fields-row');
+
+        if (!$errorHolder.length) {
+            return $targetElem;
+        }
+
+        return $($errorHolder.find('.fields-row-error').get(0) || $errorHolder);
     }
 
     // turn off adding rules from attributes
@@ -124,7 +129,11 @@ define([
      */
     $.validator.prototype.hideElementErrors = function(element) {
         var $placement = getErrorPlacement(element);
-        $placement.next('.' + this.settings.errorClass).remove();
+        if ($placement.is('.fields-row-error')) {
+            $placement.find('.' + this.settings.errorClass).remove();
+        } else {
+            $placement.next('.' + this.settings.errorClass).remove();
+        }
         this.settings.unhighlight.call(this, element, this.settings.errorClass, this.settings.validClass);
         return this;
     };
@@ -267,8 +276,13 @@ define([
         errorPlacement: function(label, $el) {
             var $placement = getErrorPlacement($el);
             // we need this to remove server side error, because js does not know about it
-            $placement.next('.' + this.errorClass).remove();
-            label.insertAfter($placement);
+            if ($placement.is('.fields-row-error')) {
+                $placement.find('.' + this.errorClass);
+                label.appendTo($placement);
+            } else {
+                $placement.next('.' + this.errorClass).remove();
+                label.insertAfter($placement);
+            }
         },
         highlight: function(element) {
             this.settings.unhighlight.call(this, element);

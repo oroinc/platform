@@ -27,6 +27,7 @@ parameters:
     oro_action.function.refresh_grid.class: Oro\Component\Action\Action\RefreshGrid
     oro_action.function.run_action_group.class: Oro\Bundle\ActionBundle\Action\RunActionGroup
     oro_action.function.find_entities.class: Oro\Component\Action\Action\FindEntities
+    oro_action.function.assign_url.class: Oro\Component\Action\Action\AssignUrl
 
 services:
     oro_action.context_accessor:
@@ -230,3 +231,11 @@ services:
             - @doctrine
         tags:
             - { name: oro_action.function, alias: find_entities }
+
+    oro_action.function.assign_url:
+        class: %oro_action.function.assign_url.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @router
+        tags:
+            - { name: oro_action.function, alias: assign_url }

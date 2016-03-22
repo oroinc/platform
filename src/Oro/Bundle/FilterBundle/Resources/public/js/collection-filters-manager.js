@@ -51,8 +51,7 @@ define([
             if (this.ignoreFiltersUpdateEvents) {
                 return;
             }
-            this.collection.state.currentPage = 1;
-            this.collection.fetch({reset: true});
+            this._updateView();
 
             CollectionFiltersManager.__super__._onFilterUpdated.apply(this, arguments);
         },
@@ -76,6 +75,27 @@ define([
             this._applyState(collection.state.filters || {});
             this._resetHintContainer();
             this.ignoreFiltersUpdateEvents = false;
+        },
+
+        /**
+         * Triggers when filter select is changed
+         *
+         * @protected
+         */
+        _onChangeFilterSelect: function() {
+            CollectionFiltersManager.__super__._onChangeFilterSelect.apply(this, arguments);
+
+            this._updateView();
+        },
+
+        /**
+         * Triggers update filter state
+         *
+         * @protected
+         */
+        _updateView: function() {
+            this.collection.state.currentPage = 1;
+            this.collection.fetch({reset: true});
         },
 
         /**

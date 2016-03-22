@@ -60,6 +60,7 @@ define(function(require) {
             };
             this.options = $.extend(true, thisOptions, this.options, options || {});
             this.$el = options._sourceElement;
+            this.$el.attr('autocomplete', 'off');
 
             if (this.options.route_name) {
                 this.url = routing.generate(

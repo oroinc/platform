@@ -1,5 +1,5 @@
 parameters:
-    oro_layout.php.renderer.class:           Symfony\Component\Form\FormRenderer
+    oro_layout.php.renderer.class:           Oro\Component\Layout\Renderer
     oro_layout.php.renderer.engine.class:    Symfony\Component\Form\Extension\Templating\TemplatingRendererEngine
     oro_layout.php.layout_renderer.class:    Oro\Component\Layout\LayoutRenderer
     oro_layout.php.templating.helper.class:  Oro\Component\Layout\Templating\Helper\LayoutHelper

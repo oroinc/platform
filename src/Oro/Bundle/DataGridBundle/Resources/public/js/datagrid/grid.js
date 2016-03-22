@@ -47,18 +47,10 @@ define(function(require) {
         className: 'oro-datagrid',
 
         /** @property */
-        template: _.template(
-            '<div class="toolbar"></div>' +
-            '<div class="other-scroll-container">' +
-                '<div class="other-scroll"><div></div></div>' +
-                '<div class="container-fluid grid-scrollable-container">' +
-                    '<div class="grid-container">' +
-                        '<table class="grid table-hover table table-bordered table-condensed"></table>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="no-data"></div>' +
-            '</div>'
-        ),
+        templateSelector: '#template-datagrid-grid',
+
+        /** @property */
+        template: '',
 
         /** @property */
         noDataTemplate: _.template('<span><%= hint %><span>'),
@@ -66,7 +58,11 @@ define(function(require) {
         /** @property {Object} */
         selectors: {
             grid:        '.grid',
-            toolbar:     '.toolbar',
+            toolbar:     '[data-grid-toolbar]',
+            toolbars: {
+                top: '[data-grid-toolbar=top]',
+                bottom: '[data-grid-toolbar=bottom]'
+            },
             noDataBlock: '.no-data',
             filterBox:   '.filter-box',
             loadingMaskContainer: '.other-scroll-container',
@@ -84,6 +80,9 @@ define(function(require) {
 
         /** @property {orodatagrid.datagrid.Toolbar} */
         toolbar: Toolbar,
+
+        /** @property {Object} */
+        toolbars: {},
 
         /** @property {orodatagrid.datagrid.MetadataModel} */
         metadataModel: null,
@@ -107,7 +106,11 @@ define(function(require) {
                 addResetAction: true,
                 addRefreshAction: true,
                 addColumnManager: true,
-                columnManager: {}
+                columnManager: {},
+                placement: {
+                    top: true,
+                    bottom: false
+                }
             },
             rowClickAction:         undefined,
             multipleSorting:        true,
@@ -172,8 +175,7 @@ define(function(require) {
 
             // Init properties values based on options and defaults
             _.extend(this, this.defaults, opts);
-            this.toolbarOptions = {};
-            _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
+            this._initToolbars(opts);
             this.exportOptions = {};
             _.extend(this.exportOptions, opts.exportOptions);
 
@@ -188,7 +190,7 @@ define(function(require) {
 
             this._initColumns(opts);
 
-            this.toolbar = this._createToolbar(this.toolbarOptions);
+            this.template = _.template($(opts.template || this.templateSelector).html());
 
             // use columns collection as event bus since there is no alternatives
             this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
@@ -203,6 +205,16 @@ define(function(require) {
             this._listenToCollectionEvents();
             this._listenToContentEvents();
             this._listenToCommands();
+        },
+
+        /**
+         * @param {Object} opts
+         * @private
+         */
+        _initToolbars: function(opts) {
+            this.toolbars = {};
+            this.toolbarOptions = {};
+            _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
         },
 
         /**
@@ -225,11 +237,14 @@ define(function(require) {
             delete this.resetAction;
             delete this.exportAction;
 
-            subviews = ['header', 'body', 'footer', 'toolbar', 'loadingMask'];
+            subviews = ['header', 'body', 'footer', 'loadingMask'];
             _.each(subviews, function(viewName) {
                 this[viewName].dispose();
                 delete this[viewName];
             }, this);
+
+            this.callToolbar('dispose');
+            delete this.toolbars;
 
             Grid.__super__.dispose.call(this);
         },
@@ -669,7 +684,36 @@ define(function(require) {
          * Renders grid toolbar.
          */
         renderToolbar: function() {
-            this.$(this.selectors.toolbar).append(this.toolbar.render().$el);
+            var self = this;
+            _.each(this.toolbarOptions.placement, function(enabled, position) {
+                if (enabled) {
+                    self.$(self.selectors.toolbars[position]).append(self.getToolbar(position).render().$el);
+                }
+            });
+        },
+
+        /**
+         * Lazy init for toolbar
+         *
+         * @param {String} placement
+         */
+        getToolbar: function(placement) {
+            if (this.toolbars[placement]) {
+                return this.toolbars[placement];
+            }
+
+            this.toolbars[placement] = this._createToolbar({el: this.$(this.selectors.toolbars[placement])});
+
+            return this.toolbars[placement];
+        },
+
+        /**
+         * Call method for all toolbars
+         *
+         * @param {String} method
+         */
+        callToolbar: function(method) {
+            _.invoke(this.toolbars, method);
         },
 
         /**
@@ -748,7 +792,7 @@ define(function(require) {
          */
         showLoading: function() {
             this.loadingMask.show();
-            this.toolbar.disable();
+            this.callToolbar('disable');
             this.trigger('disable');
         },
 
@@ -757,7 +801,7 @@ define(function(require) {
          */
         hideLoading: function() {
             this.loadingMask.hide();
-            this.toolbar.enable();
+            this.callToolbar('enable');
             this.trigger('enable');
         },
 

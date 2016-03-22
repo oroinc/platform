@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Tests\Unit\Twig;
 
+use Oro\Component\Layout\BlockView;
+
 use Oro\Bundle\LayoutBundle\Twig\LayoutExtension;
 
 class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
@@ -80,15 +82,39 @@ class LayoutExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $filters = $this->extension->getFilters();
 
-        $this->assertCount(1, $filters);
+        $this->assertCount(2, $filters);
 
-        /** @var \Twig_SimpleFilter $filter */
-        $this->assertInstanceOf('Twig_SimpleFilter', $filters[0]);
-        $filter = $filters[0];
-        $this->assertEquals('block_text', $filter->getName());
-        $callable = $filter->getCallable();
-        $this->assertNotNull($callable);
-        $this->assertSame($this->textHelper, $callable[0]);
-        $this->assertEquals('processText', $callable[1]);
+        /** @var \Twig_SimpleFilter $blockTextFilter */
+        $blockTextFilter = $filters[0];
+        $this->assertInstanceOf('Twig_SimpleFilter', $blockTextFilter);
+        $this->assertEquals('block_text', $blockTextFilter->getName());
+        $this->assertEquals([$this->textHelper, 'processText'], $blockTextFilter->getCallable());
+
+        /** @var \Twig_SimpleFilter $mergeContextFilter */
+        $mergeContextFilter = $filters[1];
+        $this->assertInstanceOf('Twig_SimpleFilter', $mergeContextFilter);
+        $this->assertEquals('merge_context', $mergeContextFilter->getName());
+        $this->assertEquals([$this->extension, 'mergeContext'], $mergeContextFilter->getCallable());
+    }
+
+    public function testMergeContext()
+    {
+        $parent = new BlockView();
+        $firstChild = new BlockView();
+        $secondChild = new BlockView();
+
+        $parent->children['first'] = $firstChild;
+        $parent->children['second'] = $secondChild;
+
+        $name = 'name';
+        $value = 'value';
+
+        $this->assertEquals($parent, $this->extension->mergeContext($parent, [$name => $value]));
+
+        /** @var BlockView $view */
+        foreach ([$parent, $firstChild, $secondChild] as $view) {
+            $this->assertArrayHasKey($name, $view->vars);
+            $this->assertEquals($value, $view->vars[$name]);
+        }
     }
 }
