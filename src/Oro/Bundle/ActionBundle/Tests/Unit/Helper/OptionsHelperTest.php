@@ -2,10 +2,9 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
+use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\ActionBundle\Model\Action;
@@ -14,23 +13,24 @@ use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 
 use Oro\Component\Action\Model\ContextAccessor;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class OptionsHelperTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $contextHelper;
 
-    /** @var ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $applicationsHelper;
+    /** @var ApplicationsUrlHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $applicationsUrlHelper;
 
     /** @var OptionsAssembler|\PHPUnit_Framework_MockObject_MockObject */
     protected $optionsAssembler;
 
-    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $router;
-
     /** @var OptionsHelper */
     protected $helper;
+
+    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $mockTranslator;
 
     /**
      * {@inheritdoc}
@@ -40,20 +40,23 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->applicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
+
+        $this->applicationsUrlHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->optionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+
+        $this->mockTranslator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
 
         $this->helper = new OptionsHelper(
             $this->contextHelper,
-            $this->applicationsHelper,
             $this->optionsAssembler,
             new ContextAccessor(),
-            $this->router
+            $this->applicationsUrlHelper,
+            $this->mockTranslator
         );
     }
 
@@ -83,23 +86,26 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('assemble')
             ->willReturn($inputData['buttonOptions']);
 
-        $this->applicationsHelper->expects($this->once())
-            ->method('getExecutionRoute')
-            ->willReturn('execution_route');
-
-        $this->applicationsHelper->expects($this->once())
-            ->method('getDialogRoute')
-            ->willReturn('dialog_route');
-
-        $this->router->expects($this->at(0))
-            ->method('generate')
-            ->with('execution_route', $inputData['routerContext'])
+        $this->applicationsUrlHelper->expects($this->once())
+            ->method('getExecutionUrl')
+            ->with($inputData['routerContext'])
             ->willReturn($inputData['executionUrl']);
 
-        $this->router->expects($this->at(1))
-            ->method('generate')
-            ->with('dialog_route', $inputData['routerContext'])
+        $this->applicationsUrlHelper->expects($this->once())
+            ->method('getDialogUrl')
+            ->with($inputData['routerContext'])
             ->willReturn($inputData['dialogUrl']);
+
+        $this->mockTranslator->expects($this->once())
+            ->method('trans')
+            ->willReturnCallback(
+                function ($label) {
+                    if (strpos($label, '3')) {
+                        return null;
+                    }
+                    return strtoupper($label);
+                }
+            );
 
         $this->assertEquals(
             $expectedData,
@@ -134,7 +140,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'hasDialog' => false,
                         'showDialog' => false,
                         'dialogOptions' => [
-                            'title' => 'action1',
+                            'title' => 'ACTION1', //translated
                             'dialogOptions' => [],
                         ],
                         'executionUrl' => 'execution-url',
@@ -172,7 +178,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'hasDialog' => false,
                         'showDialog' => false,
                         'dialogOptions' => [
-                            'title' => 'action2',
+                            'title' => 'ACTION2', //translated
                             'dialogOptions' => [],
                         ],
                         'executionUrl' => 'execution-url2',
@@ -214,7 +220,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'hasDialog' => true,
                         'showDialog' => true,
                         'dialogOptions' => [
-                            'title' => 'action3',
+                            'title' => 'action3', //NOT TRANSLATED (see closure for translator mock return)
                             'dialogOptions' => ['option1' => 'value1'],
                         ],
                         'executionUrl' => 'execution-url3',
