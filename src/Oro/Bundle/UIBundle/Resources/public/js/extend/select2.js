@@ -275,7 +275,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
             });
             this.setVal(val);
             self.postprocessResults();
-        },
+        };
 
         /**
          * Makes it possible to render multiselect with 10 000 selected business units
@@ -295,16 +295,17 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
             var choice = enableChoice ? enabledItem : disabledItem;
             var id = this.id(data);
             var formatted;
-            var cssClass;
 
             formatted = this.opts.formatSelection(data, choice.find('div'), this.opts.escapeMarkup);
+            /* jshint ignore:start */
             if (formatted != undefined) {
                 choice.find('div').replaceWith('<div>' + formatted + '</div>');
             }
-            cssClass = this.opts.formatSelectionCssClass(data, choice.find('div'));
+            var cssClass = this.opts.formatSelectionCssClass(data, choice.find('div'));
             if (cssClass != undefined) {
                 choice.addClass(cssClass);
             }
+            /* jshint ignore:end */
 
             if (enableChoice) {
                 choice.find('.select2-search-choice-close')
