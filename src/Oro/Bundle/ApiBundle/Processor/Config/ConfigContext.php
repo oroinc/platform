@@ -176,11 +176,11 @@ class ConfigContext extends ApiContext
      *
      * @return ConfigExtraInterface[]
      */
-    public function getInheritableExtras()
+    public function getPropagableExtras()
     {
         $result = [];
         foreach ($this->extras as $extra) {
-            if ($extra->isInheritable()) {
+            if ($extra->isPropagable()) {
                 $result[] = $extra;
             }
         }
