@@ -59,7 +59,18 @@ define(function(require) {
         // plain object with variable id => variable title
         variables = _.toArray(this.dateVariables);
         variables.unshift({});
-        this.index = _.extend.apply(_, variables);
+
+        this.objectIndex = _.chain(_.extend.apply(_, variables))
+            .map(function(name, key) {
+                return {
+                    key: key,
+                    name: name
+                };
+            })
+            .sortBy(function(item) {
+                return -item.name.length;
+            })
+            .value();
     }
 
     DateVariableHelper.prototype = {
@@ -73,16 +84,16 @@ define(function(require) {
             var result;
             var self = this;
             //replace -5 +60 modifiers to '', we need clear variable
-            value = value.replace(/([\-+]+(\d+)?)/, '');
+            value = value.replace(/( *[\-+]+ *(\d+)?)/, '');
 
-            result = _.some(this.index, function(displayValue, index) {
+            result = _.some(this.objectIndex, function(item) {
                 var regexpVariable = new RegExp('^' + value + '$', 'i');
                 var isShortMonth =
-                        !/\s+/.test(displayValue) &&
-                        regexpVariable.test(displayValue.substr(0, 3)) &&
-                        self.dateVariables.month[index];
+                        !/\s+/.test(item.name) &&
+                        regexpVariable.test(item.name.substr(0, 3)) &&
+                        self.dateVariables.month[item.key];
 
-                return value === '{{' + index + '}}' || regexpVariable.test(displayValue) || isShortMonth;
+                return value === '{{' + item.key + '}}' || regexpVariable.test(item.name) || isShortMonth;
             });
             return result;
         },
@@ -94,12 +105,9 @@ define(function(require) {
          * @returns {string}
          */
         formatDisplayValue: function(value) {
-            for (var i in this.index) {
-                if (this.index.hasOwnProperty(i)) {
-                    value = value.replace(new RegExp('\\{+' + i + '\\}+', 'gi'), this.index[i]);
-                }
-            }
-            return value;
+            return _.reduce(this.objectIndex, function(value, item) {
+                return value.replace(new RegExp('\\{+' + item.key + '\\}+', 'gi'), item.name);
+            }, value);
         },
 
         /**
@@ -110,21 +118,20 @@ define(function(require) {
          */
         formatRawValue: function(value) {
             var displayValue = null;
-            for (var i in this.index) {
-                if (this.index.hasOwnProperty(i)) {
-                    var regexpVariable = new RegExp('^' + value + '$', 'i');
-                    var isShortMonth =
-                        !/\s+/.test(this.index[i]) &&
-                        regexpVariable.test(this.index[i].substr(0, 3)) &&
-                        this.dateVariables.month[i];
-                    if (isShortMonth) {
-                        displayValue = this.index[i].substr(0, 3);
-                    } else {
-                        displayValue = this.index[i];
-                    }
-                    value = value.replace(new RegExp(displayValue, 'gi'), '{{' + i + '}}');
+            _.each(this.objectIndex, function(item) {
+                var regexpVariable = new RegExp('^' + value + '$', 'i');
+                var isShortMonth =
+                    !/\s+/.test(item.name) &&
+                    regexpVariable.test(item.name.substr(0, 3)) &&
+                    this.dateVariables.month[item.key];
+                if (isShortMonth) {
+                    displayValue = item.name.substr(0, 3);
+                } else {
+                    displayValue = item.name;
                 }
-            }
+                value = value.replace(new RegExp(displayValue, 'gi'), '{{' + item.key + '}}');
+            }, this);
+
             return value;
         }
     };
