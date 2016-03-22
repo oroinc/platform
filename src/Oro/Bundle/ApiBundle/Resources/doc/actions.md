@@ -139,8 +139,8 @@ This action has the following processor groups:
 | security_check | Checking whether an access to the requested resource is granted | |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | build_query | Building a query that will be used to load an entity to be deleted | |
-| load_data | Loading data | Loads an entity that should be deleted and save it in the `result` property of the context |
-| delete_data | Deletes data | Deletes the entity stored in the `result` property of the context |
+| load_data | Loading an entity that should be deleted and save it in the `result` property of the context | |
+| delete_data | Deleting the entity stored in the `result` property of the context | |
 | normalize_result | Building the action result | The processors from this group are executed even if a processor from previous groups throws an exception. Details how it is implemented you can find in [RequestActionProcessor](../../Processor/RequestActionProcessor.php). |
 
 Example of usage you can find in the `deleteAction` method of [RestApiController](../../Controller/RestApiController.php).
