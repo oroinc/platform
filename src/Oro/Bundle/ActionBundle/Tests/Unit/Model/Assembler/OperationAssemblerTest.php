@@ -45,7 +45,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->assembler, $this->functionFactory, $this->conditionFactory, $this->attributeAssembler);
+        unset($this->assembler, $this->conditionFactory, $this->attributeAssembler);
     }
 
     /**
@@ -273,8 +273,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $assembler = new OperationActionGroupAssembler();
         $assembler->addConfigurationPass(
-            $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
-                ->getMock()
+            $this->getMock('Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
         );
 
         return $assembler;

@@ -31,7 +31,6 @@ class OperationType extends AbstractType
     protected $contextAccessor;
 
     /**
-     * OperationType constructor.
      * @param OperationManager $operationManager
      * @param RequiredAttributesListener $requiredAttributesListener
      * @param ContextAccessor $contextAccessor
