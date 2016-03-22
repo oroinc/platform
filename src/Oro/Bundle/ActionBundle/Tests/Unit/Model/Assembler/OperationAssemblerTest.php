@@ -88,6 +88,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'])
             ->setPreconditions([])
             ->setActions('preactions', [])
+            ->setActions('actions', [])
             ->setActions('form_init', [])
             ->setFormType(OperationType::NAME);
 
@@ -102,6 +103,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setAttributes(['config_attr'])
             ->setPreconditions(['config_pre_cond'])
             ->setActions('preactions', ['config_pre_func'])
+            ->setActions('actions', ['@action' => 'action_config'])
             ->setActions('form_init', ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
@@ -123,6 +125,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                 ]
             ])
             ->setActions('preactions', ['config_pre_func'])
+            ->setActions('actions', ['@action' => 'action_config'])
             ->setActions('form_init', ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
@@ -168,6 +171,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         'attributes' => ['config_attr'],
                         'preactions' => ['config_pre_func'],
                         'preconditions' => ['config_pre_cond'],
+                        'actions' => ['@action' => 'action_config'],
                         'form_init' => ['config_form_init_func'],
                         'form_options' => ['config_form_options'],
                         'frontend_options' => ['config_frontend_options'],
@@ -200,6 +204,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         'attributes' => ['config_attr'],
                         'preactions' => ['config_pre_func'],
                         'preconditions' => ['config_pre_cond'],
+                        'actions' => ['@action' => 'action_config'],
                         'form_init' => ['config_form_init_func'],
                         'form_options' => ['config_form_options'],
                         'frontend_options' => ['config_frontend_options'],

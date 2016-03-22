@@ -104,28 +104,16 @@ define(function(require) {
                     .done(_.bind(function(response) {
                         this.doResponse(response, e);
                     }, this))
-                    .fail(function(jqXHR) {
-                        var message = __('Could not perform action');
-                        if (jqXHR.statusText) {
-                            message += ': ' + jqXHR.statusText;
-                        }
+                    .fail(_.bind(function(jqXHR) {
+                        var response = _.defaults(jqXHR.responseJSON, {
+                            success: false,
+                            message: ''
+                        });
 
-                        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-                            message += ': ' + jqXHR.responseJSON.message;
-                        }
+                        response.message = __('Could not perform action') + ': ' + response.message;
 
-                        var messages = jqXHR.responseJSON.messages || {};
-
-                        mediator.execute('hideLoading');
-
-                        if (_.isEmpty(messages)) {
-                            messenger.notificationFlashMessage('error', message);
-                        } else {
-                            _.each(messages, function(submessage) {
-                                messenger.notificationFlashMessage('error', message + ': ' + submessage);
-                            });
-                        }
-                    });
+                        this.doResponse(response);
+                    }, this));
             }
         },
 
@@ -144,18 +132,30 @@ define(function(require) {
                 });
             }
 
+            if (!response.success) {
+                var messages = response.messages || {};
+
+                if (_.isEmpty(messages)) {
+                    messenger.notificationFlashMessage('error', response.message);
+                } else {
+                    _.each(messages, function(submessage) {
+                        messenger.notificationFlashMessage('error', response.message + ': ' + submessage);
+                    });
+                }
+            }
+
             if (response.redirectUrl) {
                 if (e !== undefined) {
                     e.stopImmediatePropagation();
                 }
                 this.doRedirect(response.redirectUrl);
+            } else if (response.reloadPage) {
+                this.doPageReload();
             } else if (response.refreshGrid) {
                 _.each(response.refreshGrid, function(gridname) {
                     mediator.trigger('datagrid:doRefresh:' + gridname);
                 });
                 this.doWidgetReload();
-            } else {
-                this.doPageReload();
             }
         },
 

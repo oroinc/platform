@@ -48,7 +48,7 @@ class ActionGroupExecutionArgs
      */
     public function getActionData()
     {
-        return new ActionData(['data' => (object)$this->parameters]);
+        return new ActionData($this->parameters);
     }
 
     /**

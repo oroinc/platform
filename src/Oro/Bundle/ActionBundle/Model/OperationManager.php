@@ -57,10 +57,7 @@ class OperationManager
      */
     public function execute($operationName, ActionData $actionData, Collection $errors = null)
     {
-        $operation = $this->getOperation($operationName, $actionData);
-        foreach ($operation->getActionGroupsIterator($actionData) as $executionArgs) {
-            $actionData = $executionArgs->execute($this->actionGroupRegistry, $errors);
-        }
+        $this->getOperation($operationName, $actionData)->execute($actionData, $errors);
 
         return $actionData;
     }

@@ -4,10 +4,10 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
-use Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -108,6 +108,18 @@ class Operation
     public function init(ActionData $data)
     {
         $this->executeActions($data, OperationDefinition::FORM_INIT);
+    }
+
+    /**
+     * @param ActionData $data
+     * @param Collection $errors
+     * @throws ForbiddenOperationException
+     */
+    public function execute(ActionData $data, Collection $errors = null)
+    {
+        $data['errors'] = $errors;
+
+        $this->executeActions($data, OperationDefinition::ACTIONS);
     }
 
     /**
@@ -229,14 +241,5 @@ class Operation
         }
 
         return $this->operationActionGroups;
-    }
-
-    /**
-     * @param ActionData $data
-     * @return ActionGroupsMappingIterator|ActionGroupExecutionArgs[]
-     */
-    public function getActionGroupsIterator(ActionData $data)
-    {
-        return new ActionGroupsMappingIterator($this->getOperationActionGroups(), $data);
     }
 }

@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
+use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -52,12 +52,12 @@ class ActionGroup
      * @param ActionData $data
      * @param Collection $errors
      * @return ActionData
-     * @throws ForbiddenActionException
+     * @throws ForbiddenOperationException
      */
     public function execute(ActionData $data, Collection $errors = null)
     {
         if (!$this->isAllowed($data, $errors)) {
-            throw new ForbiddenActionException(
+            throw new ForbiddenOperationException(
                 sprintf('ActionGroup "%s" is not allowed', $this->definition->getName())
             );
         }

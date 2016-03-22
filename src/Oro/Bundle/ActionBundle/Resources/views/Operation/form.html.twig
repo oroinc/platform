@@ -11,6 +11,19 @@
                 });
         </script>
     {% else %}
+        {% block messages %}
+            {% if messages|length %}
+                {% for type, items in messages %}
+                <div class="alert alert-{{ type }}">
+                    <ul>
+                        {% for item in items %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endblock %}
         {% block errors %}
             {% if errors|length %}
                 <div class="alert alert-error">

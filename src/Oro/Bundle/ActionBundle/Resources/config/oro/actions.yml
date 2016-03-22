@@ -34,12 +34,10 @@ operations:
             title: oro.action.edit_entity
         button_options:
             icon: icon-edit
-        action_groups:
-            -
-                name: UPDATE
-                parameters_mapping:
-                    route: $.routes[update]
-                    id: $id
+        actions:
+            - @redirect:
+                route: $.routes[update]
+                route_parameters: {id: $id}
 
     DELETE:
         extends: CRUD_ACTION
@@ -83,41 +81,26 @@ operations:
                     entityLabel: $.entityLabel
         button_options:
             icon: icon-trash
-        action_groups:
-            -
-                name: DELETE
+        actions:
+            - @run_action_group:
+                action_group: DELETE
                 parameters_mapping:
                     entity: $.data
-                    entity_label: $.entityLabel
-                    route: $.routes[name]
-
-action_groups:
-    UPDATE:
-        parameters:
-            id: ~
-            route:
-                type: string
-        actions:
-            - @redirect:
-                route: $route
-                route_parameters: {id: $id}
-    DELETE:
-        parameters:
-            entity: ~
-            route:
-                type: string
-            entity_label:
-                type: string
-        actions:
-            - @call_service_method:
-                service: oro_action.handler.delete
-                method: handleDelete
-                method_parameters: [$entity]
-
             - @flash_message:
                 message: oro.action.delete_message
                 type: 'info'
                 message_parameters:
-                    entityLabel: $entity_label
+                    entityLabel: $.entityLabel
             - @redirect:
-                route: $route
+                route: $.routes[name]
+
+action_groups:
+    DELETE:
+        parameters:
+            data: ~
+        acl_resource: [DELETE, $.data]
+        actions:
+            - @call_service_method:
+                service: oro_action.handler.delete
+                method: handleDelete
+                method_parameters: [$.data]

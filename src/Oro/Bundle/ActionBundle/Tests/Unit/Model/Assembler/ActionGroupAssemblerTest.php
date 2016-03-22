@@ -80,20 +80,20 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                 '@and' => [
                     [
                         '@has_value' => [
-                            'parameters' => ['$arg2'],
-                            'message' => '$arg2 is required',
+                            'parameters' => ['$.arg2'],
+                            'message' => '$.arg2 is required',
                         ]
                     ],
                     [
                         '@has_value' => [
-                            'parameters' => ['$arg3'],
-                            'message' => 'Error Message: $arg3 is required',
+                            'parameters' => ['$.arg3'],
+                            'message' => 'Error Message: $.arg3 is required',
                         ]
                     ],
                     [
                         '@type' => [
-                            'parameters' => ['$arg3', 'string'],
-                            'message' => 'Error Message: $arg3 must be of type "{{ type }}", "{{ value }}" given',
+                            'parameters' => ['$.arg3', 'string'],
+                            'message' => 'Error Message: $.arg3 must be of type "{{ type }}", "{{ value }}" given',
                         ]
                     ],
                     ['@condition' => 'config_conditions'],
@@ -109,20 +109,20 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                     ['@acl_granted' => 'test_acl'],
                     [
                         '@has_value' => [
-                            'parameters' => ['$arg2'],
-                            'message' => '$arg2 is required',
+                            'parameters' => ['$.arg2'],
+                            'message' => '$.arg2 is required',
                         ]
                     ],
                     [
                         '@has_value' => [
-                            'parameters' => ['$arg3'],
-                            'message' => 'Error Message: $arg3 is required',
+                            'parameters' => ['$.arg3'],
+                            'message' => 'Error Message: $.arg3 is required',
                         ]
                     ],
                     [
                         '@type' => [
-                            'parameters' => ['$arg3', 'string'],
-                            'message' => 'Error Message: $arg3 must be of type "{{ type }}", "{{ value }}" given',
+                            'parameters' => ['$.arg3', 'string'],
+                            'message' => 'Error Message: $.arg3 must be of type "{{ type }}", "{{ value }}" given',
                         ]
                     ],
                     ['@condition' => 'config_conditions']

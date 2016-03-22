@@ -112,7 +112,7 @@ class ActionGroupAssembler extends AbstractAssembler
         $conditions = [];
 
         foreach ($parameters as $name => $parameter) {
-            $action = '$' . $name;
+            $action = '$.' . $name;
             $message = !empty($parameter['message']) ? $parameter['message'] . ': ' : '';
 
             if (!empty($parameter['required'])) {

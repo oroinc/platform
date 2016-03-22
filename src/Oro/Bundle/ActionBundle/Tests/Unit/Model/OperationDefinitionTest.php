@@ -34,7 +34,7 @@ class OperationDefinitionTest extends \PHPUnit_Framework_TestCase
     public function testGetAllowedActions()
     {
         $this->assertEquals(
-            [OperationDefinition::PREACTIONS, OperationDefinition::FORM_INIT],
+            [OperationDefinition::PREACTIONS, OperationDefinition::FORM_INIT, OperationDefinition::ACTIONS],
             OperationDefinition::getAllowedActions()
         );
     }

@@ -385,8 +385,6 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->willReturn(function ($param1, $param2) use ($actionData) {
                 $this->assertSame($actionData, $param1);
                 $this->assertSame($this->errorsCollection, $param2);
-
-                return true;
             });
 
         $this->operationRegistry->expects($this->once())
@@ -409,9 +407,6 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
                 'actionData' => new ActionData()
             ],
             'with entity' => [
-                'actionData' => new ActionData(['data' => new \stdClass])
-            ],
-            'exception' => [
                 'actionData' => new ActionData(['data' => new \stdClass])
             ],
         ];
@@ -674,22 +669,7 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
         $operationActionGroup = new OperationActionGroup();
         $operationActionGroup->setName('test_actionGroup');
 
-        $mockActionGroupArgs = $this->getMockBuilder(
-            'Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs'
-        )->disableOriginalConstructor()->getMock();
-
-        $mockActionGroupArgs->expects($this->once())->method('execute')
-            ->with(
-                $this->actionGroupRegistry,
-                $this->errorsCollection
-            );
-
         $operation->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
-        $operation->expects($this->once())->method('getActionGroupsIterator')->willReturn(
-            [
-                $mockActionGroupArgs
-            ]
-        );
 
         return $operation;
     }

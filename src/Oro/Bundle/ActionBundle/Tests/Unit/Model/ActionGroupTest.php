@@ -89,12 +89,12 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
 
         if ($exceptionMessage) {
             $this->setExpectedException(
-                'Oro\Bundle\ActionBundle\Exception\ForbiddenActionException',
+                'Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException',
                 $exceptionMessage
             );
         }
 
-        $this->actionGroup->execute($data, $errors);
+        $this->assertSame($data, $this->actionGroup->execute($data, $errors));
 
         $this->assertEmpty($errors->toArray());
     }
