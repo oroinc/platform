@@ -337,13 +337,13 @@ Please refer to [actions](./actions.md#context-class) documentation section for 
 "actions" configuration section
 -------------------------------
 
-The [actions](./actions.md) configuration section allows to specify action-specific options. The options from this section will be added to the entity configuration. If an option exists in both entity and action configurations the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration. Now `get`, `get_list` and `delete` actions are supported.
+The `actions` configuration section allows to specify action-specific options. The options from this section will be added to the entity configuration. If an option exists in both entity and action configurations the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration. Now `get`, `get_list` and `delete` actions are supported.
 
 Each action can have next parameters:
 
-* **excluded** *boolean* Indicates that action is disabled for entity. By default `false`.
+* **exclude** *boolean* Indicates whether the action is disabled for entity. By default `false`.
 * **description** *string* The entity description for the action.
-* **acl_resource** *string* The name of ACL resource that should be used to protect an entity in the scope of this action. The `null` can be used to disable ACL check.
+* **acl_resource** *string* The name of ACL resource that should be used to protect an entity in a scope of this action. The `null` can be used to disable access checks.
 
 By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
 
@@ -356,17 +356,18 @@ By default, the following permissions are used to restrict access to an entity i
 
 Examples of `actions` section configuration:
 
-Exclude `delete` action for entity:
+Disable `delete` action for an entity:
 
 ```yaml
 oro_api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             actions:
-                delete: false
+                delete:
+                    exclude: true
 ```
 
-Exclude action for entity. Short syntax:
+Also a short syntax can be used:
                 
 ```yaml
 oro_api:
@@ -376,7 +377,7 @@ oro_api:
                 delete: false
 ```                      
 
-Change the VIEW permission (which is default permission for get_list action) to ACL resource acme_view_resource:
+Set custom ACL resource for the `get_list` action:
 
 ```yaml
 oro_api:
@@ -387,7 +388,7 @@ oro_api:
                     acl_resource: acme_view_resource
 ```  
 
-Turn off ACL checks for `get` action for entity:
+Turn off access checks for the `get` action:
 
 ```yaml
 oro_api:
