@@ -58,17 +58,39 @@ To see the configuration for a particular request type you can use the `request-
 php app/console oro:api:config:dump users --request-type=rest --request-type=json_api
 ```
 
-If you want to see human-readable representation of an entity and its fields, you can use the `with-descriptions` option:
-
-```bash
-php app/console oro:api:config:dump users --with-descriptions
-```
-
 The `section` option can be used to see a configuration of an entity when it is referenced by another entity:
 
 ```bash
 php app/console oro:api:config:dump addresses --section=relations
 ```
+
+By default no extra configuration data are added into output, but they can be added with the `--extra` option.
+The value for `extra` option can be: filters, sorters, virtual_fields, descriptions or FQCN of a ConfigExtraSectionInterface or ConfigExtraInterface, e.g.
+
+to show `sorters`
+
+```bash
+php app/console oro:api:config:dump users --extra=sorters
+```
+
+to see human-readable representation of an entity and its fields
+
+```bash
+php app/console oro:api:config:dump users --extra=descriptions
+```
+
+or if a new extra section was added just pass the FQCN of a ConfigExtra
+
+```bash
+php app/console oro:api:config:dump users --extra="Acme\Bundle\AcmeBundle\Config\AcmeConfigExtra"
+```
+
+or it's also possible to pass multiple options
+
+```bash
+php app/console oro:api:config:dump users --extra=sorters --extra=descriptions --extra=filters --extra="Acme\Bundle\AcmeBundle\Config\AcmeConfigExtra"
+```
+
 
 ### oro:api:metadata:dump
 This command shows metadata for a particular entity.

@@ -1040,4 +1040,3 @@ services:
         class: %oro_email.model.email_activity_updates.class%
         arguments:
             - @oro_email.provider.emailowners.provider
-            - @oro_entity.doctrine_helper

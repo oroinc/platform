@@ -6,6 +6,7 @@ use Doctrine\Common\DataFixtures\DependentFixtureInterface;
 use Doctrine\Common\DataFixtures\Executor\ORMExecutor;
 use Doctrine\Common\DataFixtures\Purger\ORMPurger;
 use Doctrine\Common\DataFixtures\ReferenceRepository;
+use Doctrine\DBAL\Connection;
 
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
 
@@ -75,6 +76,11 @@ abstract class WebTestCase extends BaseWebTestCase
     private static $loadedFixtures = [];
 
     /**
+     * @var Connection[]
+     */
+    private static $connections = [];
+
+    /**
      * @var ReferenceRepository
      */
     private static $referenceRepository;
@@ -88,6 +94,19 @@ abstract class WebTestCase extends BaseWebTestCase
                 $prop->setValue($this, null);
             }
         }
+
+        /**
+         * We should collect and close (in tearDownAfterClass) all opened DB connection
+         *  to avoid exceeding the `max_connections` limitation.
+         * Due all test cases runs in single process.
+         */
+        /** @var Connection[] $connections */
+        $connections = self::getContainer()->get('doctrine')->getConnections();
+        foreach ($connections as $connection) {
+            if ($connection->isConnected()) {
+                self::$connections[] = $connection;
+            }
+        }
     }
 
     public static function tearDownAfterClass()
@@ -96,10 +115,25 @@ abstract class WebTestCase extends BaseWebTestCase
             if (self::getDbIsolationSetting()) {
                 self::$clientInstance->rollbackTransaction();
             }
+
+            self::cleanUpConnections();
+
             self::$clientInstance = null;
             self::$soapClientInstance = null;
             self::$loadedFixtures = [];
         }
+    }
+
+    /**
+     * Closes opened DB connections to avoid exceeding the `max_connections` limitation.
+     */
+    public static function cleanUpConnections()
+    {
+        $connections = self::$connections;
+        foreach ($connections as $connection) {
+            $connection->close();
+        }
+        self::$connections = [];
     }
 
     /**
@@ -336,7 +370,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $loader = $this->getFixtureLoader($classNames);
         $fixtures = array_values($loader->getFixtures());
 
-        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $em = $this->getContainer()->get('doctrine')->getManager();
         $executor = new ORMExecutor($em, new ORMPurger($em));
         $executor->execute($fixtures, true);
         self::$referenceRepository = $executor->getReferenceRepository();

@@ -127,6 +127,7 @@ services:
         arguments:
             - @oro_workflow.manager
             - @oro_workflow.handler.transition_helper
+            - @logger
 
     oro_workflow.handler.start_transition_handler:
         class: %oro_workflow.handler.start_transition_handler.class%

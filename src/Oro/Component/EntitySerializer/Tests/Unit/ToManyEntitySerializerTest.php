@@ -174,12 +174,12 @@ class ToManyEntitySerializerTest extends EntitySerializerTestCase
             . ') entity',
             [
                 [
-                    'entityId'        => 123,
-                    'relatedEntityId' => 10,
+                    'entityId'        => '123',
+                    'relatedEntityId' => '10',
                 ],
                 [
-                    'entityId'        => 123,
-                    'relatedEntityId' => 20,
+                    'entityId'        => '123',
+                    'relatedEntityId' => '20',
                 ],
             ]
         );
