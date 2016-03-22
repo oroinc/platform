@@ -1,5 +1,5 @@
-Configuration Reference
-=======================
+Configuration Extra & ExtraSection Reference
+============================================
 
 Table of Contents
 -----------------
@@ -10,24 +10,32 @@ Table of Contents
 Overview
 --------
 
-For cases when some additional configuration data are required inside a context depending on request type the [ConfigExtraInterface](#configextrainterface) should be used.
+Config extras are the way to get varying configuration information. 
 
-Additionally, to the `ConfigExtraInterface` if some additional configuration section is required the [ConfigExtraSectionInterface](#configextrasectioninterface) should be used. This interface can be used to tell the Context that an additional data should be available as additional configuration section. So, the methods "hasConfigOf", "getConfigOf" and "setConfigOf" can be used to manipulate those data.
+For cases when some additional configuration property is required in a configuration the [ConfigExtraInterface](#configextrainterface) should be used.
 
+Additionally, to the `ConfigExtraInterface` if some additional configuration section is required the [ConfigExtraSectionInterface](#configextrasectioninterface) should be used. This interface can be used to tell the Context that an additional data should be available as additional configuration section. So, the methods "hasConfigOf", "getConfigOf" and "setConfigOf" inside the context can be used to manipulate those data.
+
+The main difference between `ConfigExtraInterface` and `ConfigExtraSectionInterface` is that the last one manipulates with a whole configuration section instead a single property.
+
+Also, please take a look into [Configuration Reference](./configuration.md) for more details about config structure, sections, properties etc. 
 
 ConfigExtraInterface
 --------------------
 
-Class: [ConfigExtraInterface](/../../Config/ConfigExtraInterface.php)
+Interface class: [ConfigExtraInterface](../../Config/ConfigExtraInterface.php)
 
 Methods:
+
  * **getName** - Gets the unique string identifier of additional data.
- * **configureContext** - Modifies the context ([ConfigContext](../../Processor/Config/ConfigContext.php)) to make it possible to get required additional data.
- * **isInheritable** - The method indicates whether this config extra is applicable to nested configs.
  * **getCacheKeyPart** - Gets a string that should be used as a part of a cache key used by config providers.
  
+ Both methods `getName` and `getCachedKeyPart` in most cases will returns the same value because it's applicable as unique identifier as well as a cache key part.
  
-As a simplest example take a look into [DescriptionConfigExtra](../../Processor/Config/ConfigContext/DescriptionsConfigExtra.php) - the extra configuration to add a human-readable descriptions of entities and its' fields. 
+ * **configureContext** - Modifies the context ([ConfigContext](../../Processor/Config/ConfigContext.php)) to make it possible to get required additional data. The method will be empty if context do not need any modifications. The more complex example is [FilterFieldsConfigExtra](../../Config/FilterFieldsConfigExtra.php).
+ * **isPropagable** - The method indicates whether this config extra is applicable to nested configs.
+
+And as a simplest example take a look into [DescriptionConfigExtra](../../Processor/Config/ConfigContext/DescriptionsConfigExtra.php) - the extra configuration to add a human-readable descriptions of entities and its' fields. 
 
 ```php
 <?php
@@ -59,7 +67,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isInheritable()
+    public function isPropagable()
     {
         return true;
     }
@@ -74,12 +82,8 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
 }
 ```
 
-Both methods `getName` and `getCachedKeyPart` in most cases will returns the same value because it's applicable as unique identifier as well as a cache key part.
-The method `configureContext` is empty because we do not need any modification inside the context.
-The method `isInheritable` returns `True` because we need all nesting configs to know about our extra configuration.
 
-
-But the only implementation of `ConfigExtraInterface` do not means it will be automatically added into context. So, to add extra configuration into Context the corresponding [processor](./processors.md#overview) should call `addConfigExtra` with new instance of corresponding extra configuration as an argument. Typically the instantiation of extra configuration is the responsibility of some processor from `initialization` group, but depending on actual needs it can be registered in any processor.
+But the only creation of a class that implements the `ConfigExtraInterface` not enough. To add extra configuration some [processor](./processors.md#overview) should call `addConfigExtra` with new instance of that extra configuration as an argument. Typically the instantiation of extra configuration is the responsibility of some processor from `initialization` group, but depending on actual needs it can be added in any processor.
 
 
 As an example:
@@ -120,13 +124,12 @@ class InitializeConfigExtras implements ProcessorInterface
 }
 ```
 
-After the extra configuration have been added into Context we will need some another processor(s) which will take the responsibility to manipulate the Context in order to realize the logic it was designed for. So, as mentioned in first example, the extra configuration [DescriptionConfigExtra](../../Processor/Config/ConfigContext/DescriptionsConfigExtra.php) tells that a human-readable descriptions should be added. Do to it we have a couple of processors that adds a description for entity, fields and filters respectively into Context.
+After the extra configuration have been added, some another processor(s) should be added to take the responsibility for manipulating the Context in order to realize the logic for which the configuration extra was designed for. So, as mentioned in first example, the extra configuration [DescriptionsConfigExtra](../../Processor/Config/ConfigContext/DescriptionsConfigExtra.php) tells that a human-readable descriptions should be added. And there are a couple of processors that add a description for [entity](../../Processor/Config/GetConfig/SetDescriptionForEntity.php), [fields](../../Processor/Config/Shared/SetDescriptionForFields.php) and [filters](../../Processor/Config/Shared/SetDescriptionForFilters.php) respectively.
 
-As an example, take a look into:
-
-- definition - [processors.get_config.yml](../config/processors.get_config.yml)
+All those processors registered as a service, e.g. [processors.get_config.yml](../config/processors.get_config.yml)
 
 ```yaml
+    ...
     oro_api.get_config.set_description_for_entity:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDescriptionForEntity
         arguments:
@@ -134,87 +137,19 @@ As an example, take a look into:
             - @oro_entity_config.provider.entity
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition&descriptions, priority: -200 }
+    ...
 ```
 
-- processor - [SetDescriptionForEntity](../../Processor/Config/GetConfig/SetDescriptionForEntity.php)
-
-```php
-<?php
-
-namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
-
-use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Model\Label;
-use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
-use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
-
-/**
- * Adds "label", "plural_label" and "description" attributes for the entity.
- */
-class SetDescriptionForEntity implements ProcessorInterface
-{
-    /** @var EntityClassNameProviderInterface */
-    protected $entityClassNameProvider;
-
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
-
-    /**
-     * @param EntityClassNameProviderInterface $entityClassNameProvider
-     * @param ConfigProvider                   $entityConfigProvider
-     */
-    public function __construct(
-        EntityClassNameProviderInterface $entityClassNameProvider,
-        ConfigProvider $entityConfigProvider
-    ) {
-        $this->entityClassNameProvider = $entityClassNameProvider;
-        $this->entityConfigProvider    = $entityConfigProvider;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function process(ContextInterface $context)
-    {
-        /** @var ConfigContext $context */
-
-        $definition = $context->getResult();
-        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
-            // expected completed configs
-            return;
-        }
-
-        $entityClass = $context->getClassName();
-        if (!$definition->hasLabel()) {
-            $entityName = $this->entityClassNameProvider->getEntityClassName($entityClass);
-            if ($entityName) {
-                $definition->setLabel($entityName);
-            }
-        }
-        if (!$definition->hasPluralLabel()) {
-            $entityPluralName = $this->entityClassNameProvider->getEntityClassPluralName($entityClass);
-            if ($entityPluralName) {
-                $definition->setPluralLabel($entityPluralName);
-            }
-        }
-        if (!$definition->hasDescription() && $this->entityConfigProvider->hasConfig($entityClass)) {
-            $definition->setDescription(
-                new Label($this->entityConfigProvider->getConfig($entityClass)->get('description'))
-            );
-        }
-    }
-}
-
-```
+Please note, the processor tagged with an extra attribute - `extra: definition&descriptions`. This means that the processor will be executed only if the extra configuration, in this case `definition` and `description` were requested. For more details see [processors](./processors.md#processor-conditions).
 
 
 ConfigExtraSectionInterface
 ---------------------------
 
-Class: [ConfigExtraSectionInterface](../../Config/ConfigExtraSectionInterface.php).
+Interface class: [ConfigExtraSectionInterface](../../Config/ConfigExtraSectionInterface.php).
 
 Methods:
  * **getConfigType** - Gets the configuration type that can be loaded into this section.
 
+As mentioned at the beginning classes that implements a `ConfigExtraSectionInterface` works with whole sections.
+As an examples take a look into [filters](../../Config/FiltersConfigExtra.php), [sorters](../../Config/SortersConfigExtra.php) and the  processors to complete [filters](../../Processor/Config/Shared/CompleteFilters.php) and [sorters](../../Processor/Config/Shared/CompleteSorters.php) respectively.
