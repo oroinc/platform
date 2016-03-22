@@ -214,21 +214,34 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
         }
 
         function indexOf(value, array) {
-            var i = 0, l = array.length;
+            var i = 0;
+            var l = array.length;
             for (; i < l; i = i + 1) {
-                if (equal(value, array[i])) return i;
+                if (equal(value, array[i])) {
+                    return i;
+                }
             }
             return -1;
         }
 
         function equal(a, b) {
-            if (a === b) return true;
-            if (a === undefined || b === undefined) return false;
-            if (a === null || b === null) return false;
+            if (a === b) {
+                return true;
+            }
+            if (a === undefined || b === undefined) {
+                return false;
+            }
+            if (a === null || b === null) {
+                return false;
+            }
             // Check whether 'a' or 'b' is a string (primitive or object).
             // The concatenation of an empty string (+'') converts its argument to a string's primitive.
-            if (a.constructor === String) return a+'' === b+''; // a+'' - in case 'a' is a String object
-            if (b.constructor === String) return b+'' === a+''; // b+'' - in case 'b' is a String object
+            if (a.constructor === String) {
+                return a + '' === b + '';
+            }
+            if (b.constructor === String) {
+                return b + '' === a + '';
+            }
             return false;
         }
 
@@ -242,10 +255,12 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
         };
 
         prototype.updateSelection = function(data) {
-            var ids = [], filtered = [], self = this;
+            var ids = [];
+            var filtered = [];
+            var self = this;
 
             // filter out duplicates
-            $(data).each(function () {
+            $(data).each(function() {
                 if (indexOf(self.id(this), ids) < 0) {
                     ids.push(self.id(this));
                     filtered.push(this);
@@ -253,9 +268,9 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
             });
             data = filtered;
 
-            this.selection.find(".select2-search-choice").remove();
+            this.selection.find('.select2-search-choice').remove();
             var val = this.getVal();
-            $(data).each(function () {
+            $(data).each(function() {
                 self.addSelectedChoiceOptimized(this, val);
             });
             this.setVal(val);
@@ -266,51 +281,56 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
          * Makes it possible to render multiselect with 10 000 selected business units
          */
         prototype.addSelectedChoiceOptimized = function(data, val) {
-            var enableChoice = !data.locked,
-                enabledItem = $(
-                    "<li class='select2-search-choice'>" +
-                    "    <div></div>" +
-                    "    <a href='#' onclick='return false;' class='select2-search-choice-close' tabindex='-1'></a>" +
-                    "</li>"),
-                disabledItem = $(
-                    "<li class='select2-search-choice select2-locked'>" +
-                    "<div></div>" +
-                    "</li>");
-            var choice = enableChoice ? enabledItem : disabledItem,
-                id = this.id(data),
-                formatted,
-                cssClass;
+            var enableChoice = !data.locked;
+            var enabledItem = $(
+                    '<li class=\'select2-search-choice\'>' +
+                    '    <div></div>' +
+                    '    <a href=\'#\' onclick=\'return false;\' ' +
+                    'class=\'select2-search-choice-close\' tabindex=\'-1\'></a>' +
+                    '</li>');
+            var disabledItem = $(
+                    '<li class=\'select2-search-choice select2-locked\'>' +
+                    '<div></div>' +
+                    '</li>');
+            var choice = enableChoice ? enabledItem : disabledItem;
+            var id = this.id(data);
+            var formatted;
+            var cssClass;
 
-            formatted=this.opts.formatSelection(data, choice.find("div"), this.opts.escapeMarkup);
+            formatted = this.opts.formatSelection(data, choice.find('div'), this.opts.escapeMarkup);
             if (formatted != undefined) {
-                choice.find("div").replaceWith("<div>"+formatted+"</div>");
+                choice.find('div').replaceWith('<div>' + formatted + '</div>');
             }
-            cssClass=this.opts.formatSelectionCssClass(data, choice.find("div"));
+            cssClass = this.opts.formatSelectionCssClass(data, choice.find('div'));
             if (cssClass != undefined) {
                 choice.addClass(cssClass);
             }
 
-            if(enableChoice){
-              choice.find(".select2-search-choice-close")
-                  .on("mousedown", killEvent)
-                  .on("click dblclick", this.bind(function (e) {
-                  if (!this.isInterfaceEnabled()) return;
+            if (enableChoice) {
+                choice.find('.select2-search-choice-close')
+                    .on('mousedown', killEvent)
+                    .on('click dblclick', this.bind(function(e) {
+                    if (!this.isInterfaceEnabled()) {
+                        return;
+                    }
 
-                  $(e.target).closest(".select2-search-choice").fadeOut('fast', this.bind(function(){
-                      this.unselect($(e.target));
-                      this.selection.find(".select2-search-choice-focus").removeClass("select2-search-choice-focus");
-                      this.close();
-                      this.focusSearch();
-                  })).dequeue();
-                  killEvent(e);
-              })).on("focus", this.bind(function () {
-                  if (!this.isInterfaceEnabled()) return;
-                  this.container.addClass("select2-container-active");
-                  this.dropdown.addClass("select2-drop-active");
-              }));
+                    $(e.target).closest('.select2-search-choice').fadeOut('fast', this.bind(function() {
+                        this.unselect($(e.target));
+                        this.selection.find('.select2-search-choice-focus').removeClass('select2-search-choice-focus');
+                        this.close();
+                        this.focusSearch();
+                    })).dequeue();
+                    killEvent(e);
+                })).on('focus', this.bind(function() {
+                    if (!this.isInterfaceEnabled()) {
+                        return;
+                    }
+                    this.container.addClass('select2-container-active');
+                    this.dropdown.addClass('select2-drop-active');
+                }));
             }
 
-            choice.data("select2-data", data);
+            choice.data('select2-data', data);
             choice.insertBefore(this.searchContainer);
 
             val.push(id);
