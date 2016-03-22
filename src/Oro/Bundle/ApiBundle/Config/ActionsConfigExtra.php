@@ -32,7 +32,7 @@ class ActionsConfigExtra implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function isInheritable()
+    public function isPropagable()
     {
         return false;
     }

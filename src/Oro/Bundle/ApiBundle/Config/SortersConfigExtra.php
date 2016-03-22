@@ -32,7 +32,7 @@ class SortersConfigExtra implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function isInheritable()
+    public function isPropagable()
     {
         return true;
     }

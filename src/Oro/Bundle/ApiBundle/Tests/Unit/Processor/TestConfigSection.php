@@ -36,7 +36,7 @@ class TestConfigSection implements ConfigExtraSectionInterface
     /**
      * {@inheritdoc}
      */
-    public function isInheritable()
+    public function isPropagable()
     {
         return true;
     }
