@@ -27,12 +27,12 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         $this->configurationProvider =
             $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory $doctrineHelper */
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory $actionFactory */
         $actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory $doctrineHelper */
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory $conditionFactory */
         $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();

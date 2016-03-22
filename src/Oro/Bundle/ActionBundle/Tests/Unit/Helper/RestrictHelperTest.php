@@ -18,14 +18,16 @@ class RestrictHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @dataProvider restrictActionsByGroupDataProvider
-     * @param array $actionsValues
+     * @dataProvider restrictOperationsByGroupDataProvider
+     * @param array $operationsValues
      * @param string|array|null|bool $definedGroups
-     * @param string[] $expectedActions
+     * @param string[] $expectedOperations
      */
-    public function testRestrictActionsByGroup($actionsValues, $definedGroups, $expectedActions)
+    public function testRestrictOperationsByGroup($operationsValues, $definedGroups, $expectedOperations)
     {
-        foreach ($actionsValues as $actionName => $buttonOptions) {
+        /** @var Operation[] $operations */
+        $operations = [];
+        foreach ($operationsValues as $operationName => $buttonOptions) {
             /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
             $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
                 ->disableOriginalConstructor()
@@ -33,68 +35,68 @@ class RestrictHelperTest extends \PHPUnit_Framework_TestCase
             $operationDefinition = new OperationDefinition();
             $operationDefinition->setButtonOptions($buttonOptions);
             $operation->expects($this->any())->method('getDefinition')->willReturn($operationDefinition);
-            $operations[$actionName] = $operation;
+            $operations[$operationName] = $operation;
         }
-        /** @var Operation[] $actions */
-        $restrictedActions = $this->helper->restrictActionsByGroup($operations, $definedGroups);
-        foreach ($expectedActions as $expectedActionName) {
-            $this->assertArrayHasKey($expectedActionName, $operations);
-            $this->assertArrayHasKey($expectedActionName, $restrictedActions);
+
+        $restrictedOperations = $this->helper->restrictOperationsByGroup($operations, $definedGroups);
+        foreach ($expectedOperations as $expectedOperationName) {
+            $this->assertArrayHasKey($expectedOperationName, $operations);
+            $this->assertArrayHasKey($expectedOperationName, $restrictedOperations);
             $this->assertEquals(
-                spl_object_hash($operations[$expectedActionName]),
-                spl_object_hash($restrictedActions[$expectedActionName])
+                spl_object_hash($operations[$expectedOperationName]),
+                spl_object_hash($restrictedOperations[$expectedOperationName])
             );
         }
-        foreach ($restrictedActions as $actionName => $restrictedAction) {
-            $this->assertContains($actionName, $expectedActions);
+        foreach ($restrictedOperations as $operationName => $restrictedOperation) {
+            $this->assertContains($operationName, $expectedOperations);
         }
     }
 
     /**
      * @return array
      */
-    public function restrictActionsByGroupDataProvider()
+    public function restrictOperationsByGroupDataProvider()
     {
         return [
             'groupIsString' => [
-                'actionsValues' => [
-                    //actionName //button options
-                    'action0' => ['group' => null],
-                    'action2' => ['group' => 'group1'],
-                    'action3' => ['group' => 'group2'],
-                    'action4' => []
+                'operationsValues' => [
+                    //operationName //button options
+                    'operation0' => ['group' => null],
+                    'operation2' => ['group' => 'group1'],
+                    'operation3' => ['group' => 'group2'],
+                    'operation4' => []
                 ],
                 'definedGroups' => 'group1',
-                'expectedActions' => ['action2']
+                'expectedOperations' => ['operation2']
             ],
             'groupIsArray' => [
-                'actionsValues' => [
-                    'action0' => ['group' => null],
-                    'action2' => ['group' => 'group1'],
-                    'action3' => ['group' => 'group2'],
-                    'action4' => []
+                'operationsValues' => [
+                    'operation0' => ['group' => null],
+                    'operation2' => ['group' => 'group1'],
+                    'operation3' => ['group' => 'group2'],
+                    'operation4' => []
                 ],
                 'definedGroups' => ['group1', 'group2'],
-                'expectedActions' => ['action2', 'action3']
+                'expectedOperations' => ['operation2', 'operation3']
             ],
             'groupIsFalse' => [
-                'actionsValues' => [
-                    'action0' => ['group' => null],
-                    'action2' => ['group' => 'group1'],
-                    'action3' => ['group' => 'group2'],
-                    'action4' => []
+                'operationsValues' => [
+                    'operation0' => ['group' => null],
+                    'operation2' => ['group' => 'group1'],
+                    'operation3' => ['group' => 'group2'],
+                    'operation4' => []
                 ],
                 'definedGroups' => false,
-                'expectedActions' => ['action4']
+                'expectedOperations' => ['operation4']
             ],
             'groupIsNull' => [
-                'actionsValues' => [
-                    'action0' => ['group' => null],
-                    'action1' => ['group' => 'group1'],
-                    'action2' => []
+                'operationsValues' => [
+                    'operation0' => ['group' => null],
+                    'operation1' => ['group' => 'group1'],
+                    'operation2' => []
                 ],
                 'definedGroups' => null,
-                'expectedActions' => ['action0', 'action1', 'action2']
+                'expectedOperations' => ['operation0', 'operation1', 'operation2']
             ],
         ];
     }

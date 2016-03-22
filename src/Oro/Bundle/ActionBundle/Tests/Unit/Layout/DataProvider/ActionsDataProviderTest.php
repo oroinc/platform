@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
@@ -177,7 +178,7 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getOperations')
             ->will($this->returnValue($actions));
         $this->restrictHelper->expects($this->once())
-            ->method('restrictActionsByGroup')
+            ->method('restrictOperationsByGroup')
             ->with($actions, $groups)
             ->will($this->returnArgument(0));
         $this->translator->expects($this->atLeastOnce())

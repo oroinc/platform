@@ -68,16 +68,16 @@ class OptionsHelper
             $operation->getDefinition()->getButtonOptions()
         );
 
-        $actionName = $operation->getName();
+        $operationName = $operation->getName();
 
         $executionUrl = $this->router->generate(
             $this->applicationsHelper->getExecutionRoute(),
-            array_merge($actionContext, ['actionName' => $actionName])
+            array_merge($actionContext, ['operationName' => $operationName])
         );
 
         $dialogUrl = $this->router->generate(
             $this->applicationsHelper->getDialogRoute(),
-            array_merge($actionContext, ['actionName' => $actionName])
+            array_merge($actionContext, ['operationName' => $operationName])
         );
 
         $options = [
@@ -134,7 +134,7 @@ class OptionsHelper
     }
 
     /**
-     * @param aray $options
+     * @param array $options
      * @param array $source
      * @param string $sourceKey
      */

@@ -26,6 +26,7 @@ class WidgetController extends Controller
      * @Route("/buttons", name="oro_action_widget_buttons")
      * @Template()
      *
+     * @param Request $request
      * @return array
      */
     public function buttonsAction(Request $request)
@@ -34,7 +35,7 @@ class WidgetController extends Controller
         $applicationsHelper = $this->getApplicationsHelper();
 
         return [
-            'actions' => $this->getOperationManager()->getOperations(),
+            'operations' => $this->getOperationManager()->getOperations(),
             'context' => $contextHelper->getContext(),
             'actionData' => $contextHelper->getActionData(),
             'dialogRoute' => $applicationsHelper->getDialogRoute(),
@@ -44,20 +45,20 @@ class WidgetController extends Controller
     }
 
     /**
-     * @Route("/form/{actionName}", name="oro_action_widget_form")
+     * @Route("/form/{operationName}", name="oro_action_widget_form")
      *
      * @param Request $request
-     * @param string $actionName
+     * @param string $operationName
      * @return Response
      */
-    public function formAction(Request $request, $actionName)
+    public function formAction(Request $request, $operationName)
     {
         $data = $this->getContextHelper()->getActionData();
 
         $params = [
             '_wid' => $request->get('_wid'),
             'fromUrl' => $request->get('fromUrl'),
-            'action' => $this->getOperationManager()->getOperation($actionName, $data),
+            'operation' => $this->getOperationManager()->getOperation($operationName, $data),
             'actionData' => $data,
             'errors' => new ArrayCollection(),
             'messages' => [],
@@ -65,14 +66,14 @@ class WidgetController extends Controller
 
         try {
             /** @var Form $form */
-            $form = $this->get('oro_action.form_manager')->getOperationForm($actionName, $data);
+            $form = $this->get('oro_action.form_manager')->getOperationForm($operationName, $data);
 
             $data['form'] = $form;
 
             $form->handleRequest($request);
 
             if ($form->isValid()) {
-                $this->getOperationManager()->execute($actionName, $data, $params['errors']);
+                $this->getOperationManager()->execute($operationName, $data, $params['errors']);
 
                 $params['response'] = $this->getResponse($data);
 
@@ -94,7 +95,7 @@ class WidgetController extends Controller
 
         $params['context'] = $data->getValues();
 
-        return $this->render($this->getOperationManager()->getFrontendTemplate($actionName), $params);
+        return $this->render($this->getOperationManager()->getFrontendTemplate($operationName), $params);
     }
 
     /**

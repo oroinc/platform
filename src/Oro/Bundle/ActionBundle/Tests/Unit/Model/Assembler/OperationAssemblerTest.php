@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
-use Oro\Bundle\ActionBundle\Form\Type\ActionType;
+use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
@@ -45,7 +45,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->assembler, $this->functionFactory, $this->conditionFactory, $this->attributeAssembler);
+        unset($this->assembler, $this->conditionFactory, $this->attributeAssembler);
     }
 
     /**
@@ -90,7 +90,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setActions('preactions', [])
             ->setActions('actions', [])
             ->setActions('form_init', [])
-            ->setFormType(ActionType::NAME);
+            ->setFormType(OperationType::NAME);
 
         $definition2 = clone $definition1;
         $definition2
@@ -108,7 +108,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
-            ->setFormType(ActionType::NAME);
+            ->setFormType(OperationType::NAME);
 
         $definition3 = clone $definition2;
         $definition3
@@ -130,7 +130,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
-            ->setFormType(ActionType::NAME);
+            ->setFormType(OperationType::NAME);
 
         return [
             'no data' => [
@@ -273,8 +273,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
     {
         $assembler = new OperationActionGroupAssembler();
         $assembler->addConfigurationPass(
-            $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
-                ->getMock()
+            $this->getMock('Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
         );
 
         return $assembler;

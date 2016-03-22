@@ -21,26 +21,26 @@ use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
- * @Rest\RouteResource("actions")
+ * @Rest\RouteResource("operations")
  * @Rest\NamePrefix("oro_api_action_")
  */
 class OperationController extends FOSRestController
 {
     /**
-     * @ApiDoc(description="Execute action", resource=true)
+     * @ApiDoc(description="Execute operation", resource=true)
      * @AclAncestor("oro_action")
      * @Rest\Get
      *
-     * @param string $actionName
+     * @param string $operationName
      * @return Response
      */
-    public function executeAction($actionName)
+    public function executeAction($operationName)
     {
         $data = $this->getContextHelper()->getActionData();
         $errors = new ArrayCollection();
 
         try {
-            $this->getOperationManager()->execute($actionName, $data, $errors);
+            $this->getOperationManager()->execute($operationName, $data, $errors);
         } catch (ActionNotFoundException $e) {
             return $this->handleResponse($data, Codes::HTTP_NOT_FOUND, $e->getMessage(), $errors);
         } catch (ForbiddenOperationException $e) {

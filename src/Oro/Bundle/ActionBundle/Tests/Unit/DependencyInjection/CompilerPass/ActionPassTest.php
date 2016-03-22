@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 
-use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\FunctionPass;
+use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ActionPass;
 
-class FunctionPassTest extends AbstractPassTest
+class ActionPassTest extends AbstractPassTest
 {
     protected function setUp()
     {
         parent::setUp();
 
-        $this->compilerPass = new FunctionPass();
+        $this->compilerPass = new ActionPass();
     }
 
     /**
@@ -18,7 +18,7 @@ class FunctionPassTest extends AbstractPassTest
      */
     protected function getServiceId()
     {
-        return FunctionPass::FUNCTION_FACTORY_SERVICE_ID;
+        return ActionPass::ACTION_FACTORY_SERVICE_ID;
     }
 
     /**
@@ -26,7 +26,7 @@ class FunctionPassTest extends AbstractPassTest
      */
     protected function getTag()
     {
-        return FunctionPass::FUNCTION_TAG;
+        return ActionPass::ACTION_TAG;
     }
 
     /**
