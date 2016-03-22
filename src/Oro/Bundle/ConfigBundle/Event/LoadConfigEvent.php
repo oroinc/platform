@@ -16,7 +16,7 @@ class LoadConfigEvent extends Event
     /** @var string */
     protected $key;
 
-    /** @var array */
+    /** @var array|string */
     protected $value;
 
     /** @var bool */
@@ -25,7 +25,7 @@ class LoadConfigEvent extends Event
     /**
      * @param ConfigManager $configManager
      * @param string $key
-     * @param array $value
+     * @param array|string $value
      * @param bool $full
      */
     public function __construct(ConfigManager $configManager, $key, $value, $full)
@@ -53,7 +53,7 @@ class LoadConfigEvent extends Event
     }
 
     /**
-     * @return array
+     * @return array|string
      */
     public function getValue()
     {
@@ -61,7 +61,7 @@ class LoadConfigEvent extends Event
     }
 
     /**
-     * @param array $value
+     * @param array|string $value
      */
     public function setValue($value)
     {
