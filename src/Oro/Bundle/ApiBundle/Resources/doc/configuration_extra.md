@@ -23,7 +23,7 @@ Also, please take a look into [Configuration Reference](./configuration.md) for 
 ConfigExtraInterface
 --------------------
 
-Interface class: [ConfigExtraInterface](../../Config/ConfigExtraInterface.php)
+Interface: [ConfigExtraInterface](../../Config/ConfigExtraInterface.php)
 
 Methods:
 
@@ -146,7 +146,7 @@ Please note, the processor tagged with an extra attribute - `extra: definition&d
 ConfigExtraSectionInterface
 ---------------------------
 
-Interface class: [ConfigExtraSectionInterface](../../Config/ConfigExtraSectionInterface.php).
+Interface: [ConfigExtraSectionInterface](../../Config/ConfigExtraSectionInterface.php).
 
 Methods:
  * **getConfigType** - Gets the configuration type that can be loaded into this section.
