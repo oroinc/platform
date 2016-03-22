@@ -27,6 +27,9 @@ define([
                     className: 'grid-cell grid-header-cell'
                 }
             };
+            if (column.get('name')) {
+                cellOptions.themeOptions.className += ' grid-header-cell-' + column.get('name');
+            }
             this.columns.trigger('configureInitializeOptions', HeaderCell, cellOptions);
             return new HeaderCell(cellOptions);
         },

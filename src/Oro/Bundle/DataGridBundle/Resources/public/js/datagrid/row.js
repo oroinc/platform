@@ -199,6 +199,9 @@ define([
                     className: 'grid-cell grid-body-cell'
                 }
             };
+            if (column.get('name')) {
+                cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
+            }
             var Cell = column.get('cell');
             this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
             var cell = new Cell(cellOptions);
