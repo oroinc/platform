@@ -12,8 +12,6 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
-use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
@@ -38,9 +36,8 @@ class OperationController extends FOSRestController
      */
     public function executeAction($actionName)
     {
-        $errors = new ArrayCollection();
-
         $data = $this->getContextHelper()->getActionData();
+        $errors = new ArrayCollection();
 
         try {
             $this->getOperationManager()->execute($actionName, $data, $errors);
@@ -84,9 +81,6 @@ class OperationController extends FOSRestController
         $message = '',
         Collection $errorMessages = null
     ) {
-        /* @var $session Session */
-        $session = $this->get('session');
-
         $response = [
             'success' => $code === Codes::HTTP_OK,
             'message' => $message,
@@ -95,7 +89,7 @@ class OperationController extends FOSRestController
 
         if ($data->getRefreshGrid() || !$response['success']) {
             $response['refreshGrid'] = $data->getRefreshGrid();
-            $response['flashMessages'] = $session->getFlashBag()->all();
+            $response['flashMessages'] = $this->get('session')->getFlashBag()->all();
         } elseif ($data->getRedirectUrl()) {
             $response['redirectUrl'] = $data->getRedirectUrl();
         } else {
@@ -103,14 +97,25 @@ class OperationController extends FOSRestController
         }
 
         if (count($errorMessages)) {
-            /* @var $translator TranslatorInterface */
-            $translator = $this->get('translator');
-
-            foreach ($errorMessages as $errorMessage) {
-                $response['messages'][] = $translator->trans($errorMessage['message'], $errorMessage['parameters']);
-            }
+            $response['messages'] = $this->prepareMessages($errorMessages->toArray());
         }
 
         return $this->handleView($this->view($response, $code));
+    }
+
+    /**
+     * @param array $messages
+     * @return array
+     */
+    protected function prepareMessages(array $messages)
+    {
+        $translator = $this->get('translator');
+        $result = [];
+
+        foreach ($messages as $message) {
+            $result[] = $translator->trans($message['message'], $message['parameters']);
+        }
+
+        return $result;
     }
 }

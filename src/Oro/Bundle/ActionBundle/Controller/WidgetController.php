@@ -13,7 +13,6 @@ use Symfony\Component\Form\Form;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface;
-use Symfony\Component\HttpFoundation\Session\Session;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
@@ -31,12 +30,15 @@ class WidgetController extends Controller
      */
     public function buttonsAction(Request $request)
     {
+        $contextHelper = $this->getContextHelper();
+        $applicationsHelper = $this->getApplicationsHelper();
+
         return [
             'actions' => $this->getOperationManager()->getOperations(),
-            'context' => $this->getContextHelper()->getContext(),
-            'actionData' => $this->getContextHelper()->getActionData(),
-            'dialogRoute' => $this->getApplicationsHelper()->getDialogRoute(),
-            'executionRoute' => $this->getApplicationsHelper()->getExecutionRoute(),
+            'context' => $contextHelper->getContext(),
+            'actionData' => $contextHelper->getActionData(),
+            'dialogRoute' => $applicationsHelper->getDialogRoute(),
+            'executionRoute' => $applicationsHelper->getExecutionRoute(),
             'fromUrl' => $request->get('fromUrl'),
         ];
     }
@@ -184,18 +186,13 @@ class WidgetController extends Controller
      */
     protected function getResponse(ActionData $context)
     {
-        /* @var $session Session */
-        $session = $this->get('session');
-
-        $response = [
-            'success' => true,
-        ];
+        $response = ['success' => true];
 
         if ($context->getRedirectUrl()) {
             $response['redirectUrl'] = $context->getRedirectUrl();
         } elseif ($context->getRefreshGrid()) {
             $response['refreshGrid'] = $context->getRefreshGrid();
-            $response['flashMessages'] = $session->getFlashBag()->all();
+            $response['flashMessages'] = $this->get('session')->getFlashBag()->all();
         }
 
         return $response;
