@@ -10,6 +10,7 @@ class OperationDefinition
 {
     const PREACTIONS = 'preactions';
     const FORM_INIT = 'form_init';
+    const ACTIONS = 'actions';
 
     const PRECONDITIONS = 'preconditions';
 
@@ -84,7 +85,7 @@ class OperationDefinition
      */
     public static function getAllowedActions()
     {
-        return [self::PREACTIONS, self::FORM_INIT];
+        return [self::PREACTIONS, self::FORM_INIT, self::ACTIONS];
     }
 
     /**

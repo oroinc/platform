@@ -131,6 +131,36 @@ class OperationTest extends \PHPUnit_Framework_TestCase
         $this->operation->init($this->data);
     }
 
+    public function testExecute()
+    {
+        $config = [
+            ['actions', ['actions']],
+        ];
+
+        $actions = [
+            'actions' => $this->createAction($this->once(), $this->data),
+        ];
+
+        $this->definition->expects($this->any())
+            ->method('getActions')
+            ->willReturnMap($config);
+
+        $this->actionFactory->expects($this->any())
+            ->method('create')
+            ->willReturnCallback(function ($type, $config) use ($actions) {
+                return $actions[$config[0]];
+            });
+
+        $errors = new ArrayCollection();
+
+        $this->assertArrayNotHasKey('errors', $this->data);
+
+        $this->operation->execute($this->data, $errors);
+
+        $this->assertArrayHasKey('errors', $this->data);
+        $this->assertSame($errors, $this->data['errors']);
+    }
+
     /**
      * @param array $inputData
      * @param array $expectedData
@@ -359,60 +389,5 @@ class OperationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf('Oro\Bundle\ActionBundle\Model\AttributeManager', $attributeManager);
         $this->assertEquals(new ArrayCollection(['test_attr' => $attribute]), $attributeManager->getAttributes());
-    }
-
-    /**
-     * @param array $actionGroupsConfig
-     * @param ActionData $actionData
-     * @dataProvider providerGetActionGroupIterator
-     */
-    public function testGetActionGroupsIteratorReturnsIt(array $actionGroupsConfig, ActionData $actionData)
-    {
-        $this->definition->expects($this->once())->method('getActionGroups')->willReturn($actionGroupsConfig);
-
-        if ($actionGroupsConfig) {
-            $this->actionGroupAssembler->expects($this->once())->method('assemble')->with($actionGroupsConfig)
-                ->willReturn($actionGroupsConfig);
-        }
-
-        $iterator = $this->operation->getActionGroupsIterator($actionData);
-
-        $this->assertInstanceOf(
-            'Oro\Bundle\ActionBundle\Model\Operation\ActionGroupsMappingIterator',
-            $iterator
-        );
-
-        $this->assertEquals(
-            new Operation\ActionGroupsMappingIterator(
-                $actionGroupsConfig,
-                $actionData
-            ),
-            $iterator
-        );
-    }
-
-    /**
-     * @return array
-     */
-    public function providerGetActionGroupIterator()
-    {
-        return [
-            'no mapping' => [
-                'definition config' => [],
-                'actionData' => new ActionData()
-            ],
-            'with values' => [
-                'definition config' => ['arg1' => 'value1'],
-                'actionData' => new ActionData()
-            ],
-            'without values - with context' => [
-                'definition config' => [],
-                'actionData' => new ActionData(['dataKey' => 'datavalue'])
-            ],
-            'both' => [
-                'definition config' => [],
-                'actionData' => new ActionData(['dataKey' => 'datavalue'])
-            ]
-        ];
     }
 }
