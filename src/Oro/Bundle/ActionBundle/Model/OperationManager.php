@@ -46,9 +46,7 @@ class OperationManager
     {
         $actionData = $this->contextHelper->getActionData($context);
 
-        $this->execute($operationName, $actionData, $errors);
-
-        return $actionData;
+        return $this->execute($operationName, $actionData, $errors);
     }
 
     /**

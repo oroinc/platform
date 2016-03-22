@@ -1,4 +1,4 @@
-actions:
+operations:
     CRUD_ACTION:
         label: CRUD_ACTION
         button_options:
@@ -16,7 +16,7 @@ actions:
         groups:
             - view_navButtons
             - datagridRowAction
-        prefunctions:
+        preactions:
             - @tree:
                 conditions:
                     @not_blank: $.data
@@ -29,15 +29,15 @@ actions:
         preconditions:
             @and:
                 - @not_blank: $.routes[update]
-        functions:
-            - @redirect:
-                route: $.routes[update]
-                route_parameters: {id: $id}
         label: oro.action.edit
         frontend_options:
             title: oro.action.edit_entity
         button_options:
             icon: icon-edit
+        actions:
+            - @redirect:
+                route: $.routes[update]
+                route_parameters: {id: $id}
 
     DELETE:
         extends: CRUD_ACTION
@@ -49,7 +49,7 @@ actions:
             - view_navButtons
             - update_navButtons
             - datagridRowAction
-        prefunctions:
+        preactions:
             - @tree:
                 conditions:
                     @not_blank: $.data
@@ -71,18 +71,6 @@ actions:
             @and:
                 - @not_blank: $.routes[name]
                 - @not_blank: $.routes[delete]
-        functions:
-            - @call_service_method:
-                service: oro_action.handler.delete
-                method: handleDelete
-                method_parameters: [$.data]
-
-            - @flash_message:
-                message: oro.action.delete_message
-                type: 'info'
-                message_parameters:
-                    entityLabel: $.entityLabel
-            - @redirect: {route: $.routes[name]}
         label: oro.action.delete
         frontend_options:
             title: oro.action.delete_entity
@@ -93,3 +81,26 @@ actions:
                     entityLabel: $.entityLabel
         button_options:
             icon: icon-trash
+        actions:
+            - @run_action_group:
+                action_group: DELETE
+                parameters_mapping:
+                    entity: $.data
+            - @flash_message:
+                message: oro.action.delete_message
+                type: 'info'
+                message_parameters:
+                    entityLabel: $.entityLabel
+            - @redirect:
+                route: $.routes[name]
+
+action_groups:
+    DELETE:
+        parameters:
+            data: ~
+        acl_resource: [DELETE, $.data]
+        actions:
+            - @call_service_method:
+                service: oro_action.handler.delete
+                method: handleDelete
+                method_parameters: [$.data]

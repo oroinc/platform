@@ -8,7 +8,7 @@ operations:
 
 action_groups:
     group2:
-        arguments:
+        parameters:
             $.date:
                 type: DateTime
                 message: No data specified!

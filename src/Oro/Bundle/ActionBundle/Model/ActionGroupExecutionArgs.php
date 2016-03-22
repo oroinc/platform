@@ -10,16 +10,16 @@ class ActionGroupExecutionArgs
     private $name;
 
     /** @var ActionData */
-    private $arguments = [];
+    private $parameters = [];
 
     /**
      * @param string $actionGroupName
-     * @param array $arguments
+     * @param array $parameters
      */
-    public function __construct($actionGroupName, array $arguments = [])
+    public function __construct($actionGroupName, array $parameters = [])
     {
         $this->name = $actionGroupName;
-        $this->arguments = $arguments;
+        $this->parameters = $parameters;
     }
 
     /**
@@ -35,26 +35,26 @@ class ActionGroupExecutionArgs
      * @param mixed $value
      * @return $this
      */
-    public function addArgument($name, $value)
+    public function addParameter($name, $value)
     {
-        $this->arguments[$name] = $value;
+        $this->parameters[$name] = $value;
 
         return $this;
     }
 
     /**
-     * Creates new instance of action data with default root element as arguments object \stdClass
+     * Creates new instance of action data with default root element as parameters object \stdClass
      * @return ActionData
      */
     public function getActionData()
     {
-        return new ActionData(['data' => (object)$this->arguments]);
+        return new ActionData($this->parameters);
     }
 
     /**
      * @param ActionGroupRegistry $registry
      * @param Collection|null $errors
-     * @return mixed
+     * @return ActionData
      */
     public function execute(ActionGroupRegistry $registry, Collection $errors = null)
     {

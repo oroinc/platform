@@ -17,8 +17,8 @@ class ActionGroupAssembler extends AbstractAssembler
     /** @var ConditionFactory */
     private $conditionFactory;
 
-    /** @var ArgumentAssembler */
-    private $argumentAssembler;
+    /** @var ParameterAssembler */
+    private $parameterAssembler;
 
     /** @var DoctrineHelper */
     private $doctrineHelper;
@@ -26,18 +26,18 @@ class ActionGroupAssembler extends AbstractAssembler
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
-     * @param ArgumentAssembler $argumentAssembler
+     * @param ParameterAssembler $parameterAssembler
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
-        ArgumentAssembler $argumentAssembler,
+        ParameterAssembler $parameterAssembler,
         DoctrineHelper $doctrineHelper
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
-        $this->argumentAssembler = $argumentAssembler;
+        $this->parameterAssembler = $parameterAssembler;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -53,7 +53,7 @@ class ActionGroupAssembler extends AbstractAssembler
             $actionGroups[$actionGroupName] = new ActionGroup(
                 $this->actionFactory,
                 $this->conditionFactory,
-                $this->argumentAssembler,
+                $this->parameterAssembler,
                 $this->assembleDefinition($actionGroupName, $options)
             );
         }
@@ -74,7 +74,7 @@ class ActionGroupAssembler extends AbstractAssembler
             ->setName($actionName)
             ->setConditions($this->getOption($options, 'conditions', []))
             ->setActions($this->getOption($options, 'actions', []))
-            ->setArguments($this->getOption($options, 'arguments', []));
+            ->setParameters($this->getOption($options, 'parameters', []));
 
         $this->addConditions($definition, $options);
 
@@ -89,7 +89,7 @@ class ActionGroupAssembler extends AbstractAssembler
     {
         $conditions = array_merge(
             $this->getAclConditions($this->getOption($options, 'acl_resource')),
-            $this->getArgumentsConditions($this->getOption($options, 'arguments', []))
+            $this->getParametersConditions($this->getOption($options, 'parameters', []))
         );
 
         if ($currentConditions = $definition->getConditions()) {
@@ -100,22 +100,22 @@ class ActionGroupAssembler extends AbstractAssembler
     }
 
     /**
-     * @param array $arguments
+     * @param array $parameters
      * @return array
      */
-    protected function getArgumentsConditions(array $arguments)
+    protected function getParametersConditions(array $parameters)
     {
-        if (!$arguments) {
+        if (!$parameters) {
             return [];
         }
 
         $conditions = [];
 
-        foreach ($arguments as $name => $argument) {
-            $action = '$' . $name;
-            $message = !empty($argument['message']) ? $argument['message'] . ': ' : '';
+        foreach ($parameters as $name => $parameter) {
+            $action = '$.' . $name;
+            $message = !empty($parameter['message']) ? $parameter['message'] . ': ' : '';
 
-            if (!empty($argument['required'])) {
+            if (!empty($parameter['required'])) {
                 $conditions[] = [
                     '@has_value' => [
                         'parameters' => [$action],
@@ -124,10 +124,10 @@ class ActionGroupAssembler extends AbstractAssembler
                 ];
             }
 
-            if (!empty($argument['type'])) {
+            if (!empty($parameter['type'])) {
                 $conditions[] = [
                     '@type' => [
-                        'parameters' => [$action, $argument['type']],
+                        'parameters' => [$action, $parameter['type']],
                         'message' => sprintf(
                             '%s%s must be of type "{{ type }}", "{{ value }}" given',
                             $message,

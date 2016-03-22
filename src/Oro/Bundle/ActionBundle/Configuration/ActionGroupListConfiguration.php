@@ -30,7 +30,7 @@ class ActionGroupListConfiguration implements ConfigurationDefinitionInterface
             ->prototype('array')
             ->children()
                 ->variableNode('acl_resource')->end()
-                ->arrayNode('arguments')
+                ->arrayNode('parameters')
                     ->useAttributeAsKey('name')
                     ->prototype('array')
                         ->children()

@@ -6,7 +6,7 @@ operations:
 
 action_groups:
     group1:
-        arguments:
+        parameters:
             $.data:
                 type: Oro\Bundle\TestBundle\Entity\Test
                 required: true

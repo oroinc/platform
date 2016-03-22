@@ -5,7 +5,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 use Doctrine\Common\Collections\Collection;
 
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
-use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -21,37 +21,37 @@ class ActionGroup
     /** @var ConditionFactory */
     private $conditionFactory;
 
-    /** @var ArgumentAssembler */
-    private $argumentAssembler;
+    /** @var ParameterAssembler */
+    private $parameterAssembler;
 
     /** @var ActionGroupDefinition */
     private $definition;
 
-    /** @var Argument[] */
-    private $arguments;
+    /** @var Parameter[] */
+    private $parameters;
 
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
-     * @param ArgumentAssembler $argumentAssembler
+     * @param ParameterAssembler $parameterAssembler
      * @param ActionGroupDefinition $definition
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
-        ArgumentAssembler $argumentAssembler,
+        ParameterAssembler $parameterAssembler,
         ActionGroupDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
-        $this->argumentAssembler = $argumentAssembler;
+        $this->parameterAssembler = $parameterAssembler;
         $this->definition = $definition;
     }
 
     /**
      * @param ActionData $data
      * @param Collection $errors
-     * @return mixed
+     * @return ActionData
      * @throws ForbiddenOperationException
      */
     public function execute(ActionData $data, Collection $errors = null)
@@ -61,8 +61,9 @@ class ActionGroup
                 sprintf('ActionGroup "%s" is not allowed', $this->definition->getName())
             );
         }
+        $this->executeActions($data);
 
-        return $this->executeActions($data);
+        return $data;
     }
 
     /**
@@ -94,7 +95,6 @@ class ActionGroup
 
     /**
      * @param ActionData $data
-     * @return ActionData
      */
     protected function executeActions(ActionData $data)
     {
@@ -104,23 +104,21 @@ class ActionGroup
                 $actions->execute($data);
             }
         }
-
-        return $data;
     }
 
     /**
      * @return array
      */
-    public function getArguments()
+    public function getParameters()
     {
-        if ($this->arguments === null) {
-            $this->arguments = [];
-            $argumentsConfig = $this->definition->getArguments();
-            if ($argumentsConfig) {
-                $this->arguments = $this->argumentAssembler->assemble($argumentsConfig);
+        if ($this->parameters === null) {
+            $this->parameters = [];
+            $parametersConfig = $this->definition->getParameters();
+            if ($parametersConfig) {
+                $this->parameters = $this->parameterAssembler->assemble($parametersConfig);
             }
         }
 
-        return $this->arguments;
+        return $this->parameters;
     }
 }

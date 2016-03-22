@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
-use Oro\Bundle\ActionBundle\Model\Argument;
+use Oro\Bundle\ActionBundle\Model\Parameter;
 
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
-class ArgumentTest extends \PHPUnit_Framework_TestCase
+class ParameterTest extends \PHPUnit_Framework_TestCase
 {
     use EntityTestCaseTrait;
 
-    /** @var Argument */
-    protected $argument;
+    /** @var Parameter */
+    protected $parameter;
 
     protected function setUp()
     {
-        $this->argument = new Argument();
+        $this->parameter = new Parameter();
     }
 
     protected function tearDown()
@@ -26,7 +26,7 @@ class ArgumentTest extends \PHPUnit_Framework_TestCase
     public function testGettersAndSetters()
     {
         static::assertPropertyAccessors(
-            $this->argument,
+            $this->parameter,
             [
                 ['name', 'test'],
                 ['type', 'TestType'],

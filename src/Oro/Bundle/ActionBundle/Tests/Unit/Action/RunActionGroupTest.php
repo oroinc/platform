@@ -171,7 +171,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
      */
     public function executeActionDataProvider()
     {
-        $actionData1 = $this->createActionData(['data' => (object)['paramValue' => 'value']]);
+        $actionData1 = $this->createActionData(['paramValue' => 'value']);
 
         $actionDataWithAttributeApplied = $this->createActionData(
             [

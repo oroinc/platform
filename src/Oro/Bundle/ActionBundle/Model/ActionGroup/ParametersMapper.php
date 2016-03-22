@@ -32,7 +32,7 @@ class ParametersMapper
         $this->assertTraversable($parametersMap);
 
         foreach ($parametersMap as $argName => $argValue) {
-            $args->addArgument($argName, $this->readValue($context, $argValue));
+            $args->addParameter($argName, $this->readValue($context, $argValue));
         }
     }
 

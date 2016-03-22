@@ -14,7 +14,7 @@ class ActionGroupDefinition
     private $conditions = [];
 
     /** @var array */
-    private $arguments = [];
+    private $parameters = [];
 
     /**
      * @return string
@@ -76,18 +76,18 @@ class ActionGroupDefinition
     /**
      * @return array
      */
-    public function getArguments()
+    public function getParameters()
     {
-        return $this->arguments;
+        return $this->parameters;
     }
 
     /**
-     * @param array $arguments
+     * @param array $parameters
      * @return $this
      */
-    public function setArguments(array $arguments)
+    public function setParameters(array $parameters)
     {
-        $this->arguments = $arguments;
+        $this->parameters = $parameters;
 
         return $this;
     }

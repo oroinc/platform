@@ -4,8 +4,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
-use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -45,7 +45,7 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assembler = new ActionGroupAssembler(
             $actionFactory,
             $conditionFactory,
-            new ArgumentAssembler(),
+            new ParameterAssembler(),
             $doctrineHelper
         );
 

@@ -2,17 +2,17 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 
-use Oro\Bundle\ActionBundle\Model\Argument;
-use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
+use Oro\Bundle\ActionBundle\Model\Parameter;
 
-class ArgumentAssemblerTest extends \PHPUnit_Framework_TestCase
+class ParameterAssemblerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ArgumentAssembler */
+    /** @var ParameterAssembler */
     protected $assembler;
 
     protected function setUp()
     {
-        $this->assembler = new ArgumentAssembler();
+        $this->assembler = new ParameterAssembler();
     }
 
     protected function tearDown()
@@ -38,16 +38,16 @@ class ArgumentAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function assembleProvider()
     {
-        $argument1 = new Argument();
-        $argument1->setName('minimum_name');
+        $parameter1 = new Parameter();
+        $parameter1->setName('minimum_name');
 
-        $argument2 = new Argument();
-        $argument2
+        $parameter2 = new Parameter();
+        $parameter2
             ->setName('maximum_name')
             ->setType('type1')
             ->setDefault(['default value'])
             ->setRequired(true)
-            ->setMessage('Please provide argument');
+            ->setMessage('Please provide parameter');
 
         return [
             'no data' => [
@@ -59,7 +59,7 @@ class ArgumentAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     'minimum_name' => [],
                 ],
-                'expected' => ['minimum_name' => $argument1],
+                'expected' => ['minimum_name' => $parameter1],
             ],
 
             'maximum data' => [
@@ -68,10 +68,10 @@ class ArgumentAssemblerTest extends \PHPUnit_Framework_TestCase
                         'type' => 'type1',
                         'default' => ['default value'],
                         'required' => true,
-                        'message' => 'Please provide argument',
+                        'message' => 'Please provide parameter',
                     ]
                 ],
-                'expected' => ['maximum_name' => $argument2],
+                'expected' => ['maximum_name' => $parameter2],
             ],
         ];
     }

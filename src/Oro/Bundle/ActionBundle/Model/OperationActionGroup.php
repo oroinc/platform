@@ -8,7 +8,7 @@ class OperationActionGroup
     private $name;
 
     /** @var array */
-    private $argumentsMapping = [];
+    private $parametersMapping = [];
 
     /**
      * @return string
@@ -32,18 +32,18 @@ class OperationActionGroup
     /**
      * @return array
      */
-    public function getArgumentsMapping()
+    public function getParametersMapping()
     {
-        return $this->argumentsMapping;
+        return $this->parametersMapping;
     }
 
     /**
-     * @param array $argumentsMapping
+     * @param array $parametersMapping
      * @return $this
      */
-    public function setArgumentsMapping(array $argumentsMapping)
+    public function setParametersMapping(array $parametersMapping)
     {
-        $this->argumentsMapping = $argumentsMapping;
+        $this->parametersMapping = $parametersMapping;
 
         return $this;
     }

@@ -2,39 +2,39 @@
 
 namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
-use Oro\Bundle\ActionBundle\Model\Argument;
+use Oro\Bundle\ActionBundle\Model\Parameter;
 
-class ArgumentAssembler extends AbstractAssembler
+class ParameterAssembler extends AbstractAssembler
 {
     /**
      * @param array $configuration
-     * @return Argument[]
+     * @return Parameter[]
      */
     public function assemble(array $configuration)
     {
-        $arguments = [];
+        $parameters = [];
         foreach ($configuration as $name => $options) {
-            $arguments[$name] = $this->assembleArgument($name, $options);
+            $parameters[$name] = $this->assembleParameter($name, $options);
         }
 
-        return $arguments;
+        return $parameters;
     }
 
     /**
      * @param string $name
      * @param array $options
-     * @return Argument
+     * @return Parameter
      */
-    protected function assembleArgument($name, array $options = [])
+    protected function assembleParameter($name, array $options = [])
     {
-        $argument = new Argument();
-        $argument
+        $parameter = new Parameter();
+        $parameter
             ->setName($name)
             ->setType($this->getOption($options, 'type'))
             ->setMessage($this->getOption($options, 'message', ''))
             ->setDefault($this->getOption($options, 'default'))
             ->setRequired($this->getOption($options, 'required', false));
 
-        return $argument;
+        return $parameter;
     }
 }

@@ -46,9 +46,9 @@ class ParametersMapperTest extends \PHPUnit_Framework_TestCase
         $mockExecutionArgs = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs')
             ->disableOriginalConstructor()->getMock();
 
-        $mockExecutionArgs->expects($this->at(0))->method('addArgument')->with('arg1', 'val1');
-        $mockExecutionArgs->expects($this->at(1))->method('addArgument')->with('arg2', ['embedded' => 'val2']);
-        $mockExecutionArgs->expects($this->at(2))->method('addArgument')->with('arg3', 'simple value');
+        $mockExecutionArgs->expects($this->at(0))->method('addParameter')->with('arg1', 'val1');
+        $mockExecutionArgs->expects($this->at(1))->method('addParameter')->with('arg2', ['embedded' => 'val2']);
+        $mockExecutionArgs->expects($this->at(2))->method('addParameter')->with('arg3', 'simple value');
 
         $instance->mapToArgs(
             $mockExecutionArgs,
