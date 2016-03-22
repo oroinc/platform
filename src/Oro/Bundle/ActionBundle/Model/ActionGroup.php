@@ -104,8 +104,6 @@ class ActionGroup
                 $actions->execute($data);
             }
         }
-
-        return $data;
     }
 
     /**
