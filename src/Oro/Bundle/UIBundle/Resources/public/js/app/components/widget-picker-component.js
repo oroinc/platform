@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var WidgetPickerComponent;
@@ -28,7 +28,7 @@ define(function (require) {
          * @param {Array} options
          * @protected
          */
-        _createViews: function (options) {
+        _createViews: function(options) {
             var widgetPickerFilterModel = new WidgetPickerFilterModel();
             this.widgetPickerCollectionView = new WidgetPickerCollectionView(
                 _.defaults(options, {

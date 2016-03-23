@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var WidgetPickerModel;
@@ -20,20 +20,20 @@ define(function (require) {
          *
          * @returns {String}
          */
-        getName: function(){
-            return this.get('widgetName')
+        getName: function() {
+            return this.get('widgetName');
         },
 
         /**
          * @returns {Array}
          */
-        getData: function () {
+        getData: function() {
             var attributes = _.clone(this.getAttributes());
-            delete attributes['added'];
+            delete attributes.added;
             return attributes;
         },
 
-        increaseAddedCounter: function () {
+        increaseAddedCounter: function() {
             this.set('added', this.get('added') + 1);
         }
     });

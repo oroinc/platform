@@ -73,10 +73,10 @@ define(function(require) {
 
         getAvailableWidgets: function() {
             var Widgets = this.getWidgets();
-            return _.map(this.options.availableWidgets, function(widgetObject, widgetName){
+            return _.map(this.options.availableWidgets, function(widgetObject, widgetName) {
                 return _.extend(widgetObject, {
                     widgetName: widgetName,
-                    added: Widgets.filter(function(widget){
+                    added: Widgets.filter(function(widget) {
                         return widget.get('widgetName') === widgetName;
                     }).length
                 });
@@ -130,11 +130,11 @@ define(function(require) {
             });
 
             $content.sortable({
-                axis:        'y',
+                axis: 'y',
                 containment: 'parent',
-                delay:       WIDGET_SORT_DELAY,
-                revert:      true,
-                tolerance:   'pointer',
+                delay: WIDGET_SORT_DELAY,
+                revert: true,
+                tolerance: 'pointer',
                 start: function(event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -167,11 +167,11 @@ define(function(require) {
             });
 
             $content.sortable({
-                axis:        'y',
+                axis: 'y',
                 containment: 'parent',
-                delay:       WIDGET_SORT_DELAY,
-                revert:      true,
-                tolerance:   'pointer',
+                delay: WIDGET_SORT_DELAY,
+                revert: true,
+                tolerance: 'pointer',
                 start: function(event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);

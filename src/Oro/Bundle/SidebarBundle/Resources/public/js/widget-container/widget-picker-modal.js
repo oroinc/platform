@@ -1,4 +1,3 @@
-
 define(function(require) {
     'use strict';
 
@@ -48,7 +47,7 @@ define(function(require) {
             Modal.prototype.open.apply(this, arguments);
             var WidgetPickerCollection = new BaseCollection(
                 this.options.sidebar.getAvailableWidgets(),
-                { model: WidgetPickerModel }
+                {model: WidgetPickerModel}
             );
             this.component = new WidgetPickerComponent({
                 el: this.$content,
@@ -59,10 +58,10 @@ define(function(require) {
 
         /**
          *
-         * @param {WidgetPickerModel} widgetModel
+         * @param {WidgetPickerModel} widgetPickerModel
          * @param {Function} afterLoadFunc
          */
-        loadWidget: function (widgetPickerModel, afterLoadFunc) {
+        loadWidget: function(widgetPickerModel, afterLoadFunc) {
             var position = this.options.sidebar.getPosition();
             var widgets = this.options.sidebar.getWidgets();
             var widgetData = widgetPickerModel.getData();
@@ -79,7 +78,7 @@ define(function(require) {
             widgets.push(widget);
             widget
                 .save()
-                .then(function(){
+                .then(function() {
                     afterLoadFunc();
                     widgetPickerModel.increaseAddedCounter();
                 });

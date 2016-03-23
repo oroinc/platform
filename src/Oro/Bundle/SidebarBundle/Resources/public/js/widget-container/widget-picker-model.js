@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var WidgetPickerModel;
@@ -7,9 +7,9 @@ define(function (require) {
 
     WidgetPickerModel = BaseModel.extend({
 
-        initialize: function (options) {
+        initialize: function(options) {
             if (options.description) {
-                this.set('description',  __(options.description));
+                this.set('description', __(options.description));
             }
             WidgetPickerModel.__super__.initialize.apply(this, arguments);
         }

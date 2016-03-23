@@ -1,4 +1,4 @@
-define(function (require) {
+define(function(require) {
     'use strict';
 
     var WidgetPickerItemView;
@@ -11,7 +11,7 @@ define(function (require) {
 
         events: {
             'click .widget-picker-collapse': '_toggleWidget',
-            'click .widget-picker-add-btn' : '_onClickAddWidget'
+            'click .widget-picker-add-btn': '_onClickAddWidget'
         },
 
         listen: {
@@ -21,15 +21,15 @@ define(function (require) {
             'unblock_add_btn': '_unblockAddBtn'
         },
 
-        _blockAddBtn: function () {
+        _blockAddBtn: function() {
             this.$('.widget-picker-add-btn').addClass('disabled');
         },
 
-        _unblockAddBtn: function () {
+        _unblockAddBtn: function() {
             this.$('.widget-picker-add-btn').removeClass('disabled');
         },
 
-        _addLoadingClassToBtnWrapper: function(){
+        _addLoadingClassToBtnWrapper: function() {
             this.$el.addClass('loading-widget-content');
         },
 
@@ -38,7 +38,7 @@ define(function (require) {
             this.listenTo(this.filterModel, 'change:search', this.render);
         },
 
-        _changeAddedCount: function () {
+        _changeAddedCount: function() {
             this.$el.removeClass('loading-widget-content');
             if (this.model.get('added') === 1) {
                 this.$('.added').removeClass('hidden');
@@ -51,7 +51,7 @@ define(function (require) {
          * @param {Event} e
          * @protected
          */
-        _onClickAddWidget: function (e) {
+        _onClickAddWidget: function(e) {
             e.preventDefault();
             this.trigger('widget_add', this.model, this);
         },
@@ -61,7 +61,7 @@ define(function (require) {
          * @param {Event} e
          * @protected
          */
-        _toggleWidget: function (e) {
+        _toggleWidget: function(e) {
             e.preventDefault();
             this.$('.widget-picker-collapse').toggleClass('collapsed-state');
             this.$('.widget-picker-description').fadeToggle();

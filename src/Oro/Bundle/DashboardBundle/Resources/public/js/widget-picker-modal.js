@@ -47,7 +47,7 @@ define(function(require) {
             Modal.prototype.open.apply(this, arguments);
             var WidgetPickerCollection = new BaseCollection(
                 this.options.dashboard.getAvailableWidgets(),
-                { model: WidgetPickerModel }
+                {model: WidgetPickerModel}
             );
             this.component = new WidgetPickerComponent({
                 el: this.$content,
@@ -61,7 +61,7 @@ define(function(require) {
          * @param {WidgetPickerModel} widgetModel
          * @param {Function} afterLoadFunc
          */
-        loadWidget: function (widgetModel, afterLoadFunc) {
+        loadWidget: function(widgetModel, afterLoadFunc) {
             $.post(
                 routing.generate('oro_api_post_dashboard_widget_add_widget'),
                 {
