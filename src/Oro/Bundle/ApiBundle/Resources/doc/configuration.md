@@ -8,6 +8,7 @@ Table of Contents
  - ["exclusions" configuration section & "exclude" flag](#exclusions-configuration-section--exclude-flag)
  - ["entities" configuration section](#entities-configuration-section)
  - ["relations" configuration section](#relations-configuration-section)
+ - ["actions" configuration section](#actions-configuration-section)
 
 Overview
 --------
@@ -164,6 +165,7 @@ Each entity can have next properties:
 * **order_by** *array* The property can be used to configure default ordering. The item key is the name of a field. The value can be `ASC` or `DESC`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **post_serialize** *callable* A handler to be used to modify serialized data.
+* **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) action. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
 
 Example:
 
@@ -185,7 +187,8 @@ oro_api:
                 - HINT_TRANSLATABLE
                 - { name: HINT_FILTER_BY_CURRENT_USER }
                 - { name: HINT_CUSTOM_OUTPUT_WALKER, value: "Acme\Bundle\AcmeBundle\AST_Walker_Class"}
-            post_serialize: ["Acme\Bundle\AcmeBundle\Serializer\MySerializationHandler", "serialize"]
+            post_serialize:       ["Acme\Bundle\AcmeBundle\Serializer\MySerializationHandler", "serialize"]
+            delete_handler:       acme.demo.test_entity.delete_handler
             excluded:             false
             fields:
                 ...
@@ -330,3 +333,68 @@ The `relations` configuration section describes a configuration of an entity if 
 
 
 Please refer to [actions](./actions.md#context-class) documentation section for more detail about **how to use configuration** in Data API logic.
+
+"actions" configuration section
+-------------------------------
+
+The `actions` configuration section allows to specify action-specific options. The options from this section will be added to the entity configuration. If an option exists in both entity and action configurations the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration. Now `get`, `get_list` and `delete` actions are supported.
+
+Each action can have next parameters:
+
+* **exclude** *boolean* Indicates whether the action is disabled for entity. By default `false`.
+* **description** *string* The entity description for the action.
+* **acl_resource** *string* The name of ACL resource that should be used to protect an entity in a scope of this action. The `null` can be used to disable access checks.
+
+By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
+
+| Action | Permission |
+| --- | --- |
+| get | VIEW |
+| get_list | VIEW |
+| delete | DELETE |
+
+
+Examples of `actions` section configuration:
+
+Disable `delete` action for an entity:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete:
+                    exclude: true
+```
+
+Also a short syntax can be used:
+                
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete: false
+```                      
+
+Set custom ACL resource for the `get_list` action:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                get_list:
+                    acl_resource: acme_view_resource
+```  
+
+Turn off access checks for the `get` action:
+
+```yaml
+oro_api:
+    entities:
+       Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                get:
+                    acl_resource: ~
+```
