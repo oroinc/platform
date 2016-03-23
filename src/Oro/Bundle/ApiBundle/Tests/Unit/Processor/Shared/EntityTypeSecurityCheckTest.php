@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
+use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
+
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
-use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 class EntityTypeSecurityCheckTest extends OrmRelatedTestCase
 {
