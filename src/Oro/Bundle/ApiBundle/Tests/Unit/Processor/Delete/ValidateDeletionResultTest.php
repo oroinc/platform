@@ -26,6 +26,9 @@ class ValidateDeletionResultTest extends DeleteProcessorTestCase
         $this->processor->process($this->context);
     }
 
+    /**
+     * Test process without exceptions
+     */
     public function testProcess()
     {
         $this->processor->process($this->context);
