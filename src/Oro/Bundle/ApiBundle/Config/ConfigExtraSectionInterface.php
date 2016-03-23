@@ -11,7 +11,9 @@ namespace Oro\Bundle\ApiBundle\Config;
 interface ConfigExtraSectionInterface extends ConfigExtraInterface
 {
     /**
-     * Gets the configuration type that can be loaded into this section.
+     * Returns the configuration type that should be loaded into this section.
+     * This string is used by ConfigLoaderFactory to find the appropriate loader.
+     * @see Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory
      *
      * @return string
      */
