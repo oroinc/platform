@@ -5,16 +5,14 @@ parameters:
     oro_action.helper.restrict.class: Oro\Bundle\ActionBundle\Helper\RestrictHelper
     oro_action.helper.options.class: Oro\Bundle\ActionBundle\Helper\OptionsHelper
     oro_action.helper.applications_url.class: Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper
-    oro_action.registry.class: Oro\Bundle\ActionBundle\Model\ActionRegistry
-    oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager
-    oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
-    oro_action.attribute_assembler.class: Oro\Bundle\ActionBundle\Model\AttributeAssembler
+    oro_action.operation_registry.class: Oro\Bundle\ActionBundle\Model\OperationRegistry
+    oro_action.action_group_registry.class: Oro\Bundle\ActionBundle\Model\ActionGroupRegistry
+    oro_action.operation_manager.class: Oro\Bundle\ActionBundle\Model\OperationManager
     oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
-    oro_action.form_options_assembler.class: Oro\Bundle\ActionBundle\Model\FormOptionsAssembler
-    oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\ActionFormManager
+    oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\OperationFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
-    oro_action.datagrid.action_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\ActionExtension
+    oro_action.datagrid.operation_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
     oro_action.layout.block_type.action_line_buttons.class: Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType
@@ -44,12 +42,6 @@ services:
     oro_action.helper.restrict:
         class: %oro_action.helper.restrict.class%
 
-    oro_action.helper.applications_url:
-        class: %oro_action.helper.applications_url.class%
-        arguments:
-            - @oro_action.helper.applications
-            - @router
-
     oro_action.helper.options:
         class: %oro_action.helper.options.class%
         arguments:
@@ -59,33 +51,31 @@ services:
             - @oro_action.helper.applications_url
             - @translator
 
-    oro_action.registry:
-        class: %oro_action.registry.class%
+    oro_action.helper.applications_url:
+        class: %oro_action.helper.applications_url.class%
         arguments:
-            - @oro_action.configuration.provider
-            - @oro_action.assembler
+            - @oro_action.helper.applications
+            - @router
+
+    oro_action.operation_registry:
+        class: %oro_action.operation_registry.class%
+        arguments:
+            - @oro_action.configuration.provider.operations
+            - @oro_action.assembler.operation
             - @oro_action.helper.applications
 
-    oro_action.manager:
-        class: %oro_action.manager.class%
+    oro_action.action_group_registry:
+        class: %oro_action.action_group_registry.class%
         arguments:
-            - @oro_action.registry
-            - @oro_entity.doctrine_helper
+            - @oro_action.configuration.provider.action_groups
+            - @oro_action.assembler.action_group
+
+    oro_action.operation_manager:
+        class: %oro_action.operation_manager.class%
+        arguments:
+            - @oro_action.operation_registry
+            - @oro_action.action_group_registry
             - @oro_action.helper.context
-
-    oro_action.assembler:
-        class: %oro_action.assembler.class%
-        arguments:
-            - @oro_action.function_factory
-            - @oro_action.expression.factory
-            - @oro_action.attribute_assembler
-            - @oro_action.form_options_assembler
-            - @oro_entity.doctrine_helper
-
-    oro_action.attribute_assembler:
-        class: %oro_action.attribute_assembler.class%
-        arguments:
-            - @oro_action.attribute_guesser
 
     oro_action.attribute_guesser:
         class: %oro_action.attribute_guesser.class%
@@ -128,16 +118,11 @@ services:
         calls:
             - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
 
-    oro_action.form_options_assembler:
-        class: %oro_action.form_options_assembler.class%
-        calls:
-            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
-
     oro_action.form_manager:
         class: %oro_action.form_manager.class%
         arguments:
             - @form.factory
-            - @oro_action.manager
+            - @oro_action.operation_manager
             - @oro_action.helper.context
 
     oro_action.api_manager:
@@ -147,10 +132,10 @@ services:
             - ''
             - @doctrine.orm.entity_manager
 
-    oro_action.datagrid.extension.action:
-        class: %oro_action.datagrid.action_extension.class%
+    oro_action.datagrid.extension.operation:
+        class: %oro_action.datagrid.operation_extension.class%
         arguments:
-            - @oro_action.manager
+            - @oro_action.operation_manager
             - @oro_action.helper.context
             - @oro_action.datagrid.mass_action_provider.registry
             - @oro_action.helper.options
@@ -187,7 +172,7 @@ services:
     oro_action.layout.data_provider.actions_data_rpovider:
         class: %oro_action.layout.data_provider.actions_data_rpovider.class%
         arguments:
-            - @oro_action.manager
+            - @oro_action.operation_manager
             - @oro_action.helper.restrict
             - @translator
         tags:

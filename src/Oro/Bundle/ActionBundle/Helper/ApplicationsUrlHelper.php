@@ -12,6 +12,10 @@ class ApplicationsUrlHelper
     /** @var RouterInterface */
     private $router;
 
+    /**
+     * @param ApplicationsHelper $applicationsHelper
+     * @param RouterInterface $router
+     */
     public function __construct(ApplicationsHelper $applicationsHelper, RouterInterface $router)
     {
         $this->applicationsHelper = $applicationsHelper;

@@ -15,3 +15,4 @@ oro.sidebar:
   sticky_note_widget:
       settings: Sticky Note settings
       content: Note content
+      description: "This widget allows you to create notes quickly"

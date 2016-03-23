@@ -4,8 +4,8 @@ namespace Oro\Bundle\ActionBundle\Helper;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 
 use Oro\Component\Action\Model\ContextAccessor;
@@ -49,18 +49,18 @@ class OptionsHelper
     }
 
     /**
-     * @param Action $action
+     * @param Operation $operation
      * @param array $context
      * @return array
      */
-    public function getFrontendOptions(Action $action, array $context = null)
+    public function getFrontendOptions(Operation $operation, array $context = null)
     {
         $actionContext = $this->contextHelper->getContext($context);
         $actionData = $this->contextHelper->getActionData($actionContext);
 
         return [
-            'options' => $this->createOptions($action, $actionData, $actionContext),
-            'data' => $this->createData($action, $actionData)
+            'options' => $this->createOptions($operation, $actionData, $actionContext),
+            'data' => $this->createData($operation, $actionData)
         ];
     }
 
@@ -81,7 +81,7 @@ class OptionsHelper
      */
     protected function resolveValues(ActionData $data, array $options)
     {
-        foreach ($options as $key => &$value) {
+        foreach ($options as &$value) {
             if (is_array($value)) {
                 $value = $this->resolveValues($data, $value);
             } else {
@@ -107,40 +107,41 @@ class OptionsHelper
     }
 
     /**
-     * @param Action $action
+     * @param Operation $operation
      * @param ActionData $actionData
      * @param array $actionContext
      * @return array
      */
-    protected function createOptions(Action $action, ActionData $actionData, array $actionContext)
+    protected function createOptions(Operation $operation, ActionData $actionData, array $actionContext)
     {
-        $actionName = $action->getName();
+        $operationName = $operation->getName();
 
         $frontendOptions = $this->resolveOptions(
             $actionData,
-            $action->getDefinition()->getFrontendOptions()
+            $operation->getDefinition()->getFrontendOptions()
         );
 
         $executionUrl = $this->applicationsUrlHelper->getExecutionUrl(
-            array_merge($actionContext, ['actionName' => $actionName])
+            array_merge($actionContext, ['operationName' => $operationName])
         );
 
         $dialogUrl = $this->applicationsUrlHelper->getDialogUrl(
-            array_merge($actionContext, ['actionName' => $actionName])
+            array_merge($actionContext, ['operationName' => $operationName])
         );
 
-        $label = $action->getDefinition()->getLabel();
+        $label = $operation->getDefinition()->getLabel();
+        $title = !empty($frontendOptions['title']) ? $frontendOptions['title'] : $label;
 
         $options = [
-            'hasDialog' => $action->hasForm(),
+            'hasDialog' => $operation->hasForm(),
             'showDialog' => !empty($frontendOptions['show_dialog']),
             'dialogOptions' => [
-                'title' => $this->translator->trans($label) ?: $label,
+                'title' => $this->translator->trans($title),
                 'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
             ],
             'executionUrl' => $executionUrl,
             'dialogUrl' => $dialogUrl,
-            'url' => $action->hasForm() ? $dialogUrl : $executionUrl,
+            'url' => $operation->hasForm() ? $dialogUrl : $executionUrl,
         ];
 
         $this->addOption($options, $frontendOptions, 'confirmation');
@@ -149,15 +150,15 @@ class OptionsHelper
     }
 
     /**
-     * @param Action $action
+     * @param Operation $operation
      * @param ActionData $actionData
      * @return array
      */
-    protected function createData(Action $action, ActionData $actionData)
+    protected function createData(Operation $operation, ActionData $actionData)
     {
         $buttonOptions = $this->resolveOptions(
             $actionData,
-            $action->getDefinition()->getButtonOptions()
+            $operation->getDefinition()->getButtonOptions()
         );
 
         $data = [];
@@ -166,8 +167,6 @@ class OptionsHelper
 
         if (!empty($buttonOptions['data'])) {
             $data = array_merge($data, $buttonOptions['data']);
-
-            return $data;
         }
 
         return $data;

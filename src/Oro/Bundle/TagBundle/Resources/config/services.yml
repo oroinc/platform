@@ -223,7 +223,7 @@ services:
             - @oro_tag.helper.taggable_helper
         tags:
             - { name: oro_workflow.action, alias: copy_tagging }
-            - { name: oro_action.function, alias: copy_tagging }
+            - { name: oro_action.action, alias: copy_tagging }
 
     oro_tag.event_listener.import_export_tags_subscriber:
         class: %oro_tag.event_listener.import_export_tags_subscriber.class%
