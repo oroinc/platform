@@ -211,9 +211,6 @@ config:
         'oroui/js/app/views/widget-picker/widget-picker-item-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-item-view.js'
         'oroui/js/app/models/widget-picker/widget-picker-filter-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-filter-model.js'
         'oroui/js/app/models/widget-picker/widget-picker-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-model.js'
-        'oroui/templates/widget-picker/widget-picker-filter-view.html': 'bundles/oroui/templates/widget-picker/widget-picker-filter-view.html'
-        'oroui/templates/widget-picker/widget-picker-item-view.html': 'bundles/oroui/templates/widget-picker/widget-picker-item-view.html'
-        'oroui/templates/widget-picker/widget-picker-modal-template.html': 'bundles/oroui/templates/widget-picker/widget-picker-modal-template.html'
 
         'autolinker': 'bundles/oroui/lib/autolinker.min.js'
     appmodules:
