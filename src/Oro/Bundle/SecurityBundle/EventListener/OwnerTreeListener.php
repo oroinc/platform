@@ -35,6 +35,14 @@ class OwnerTreeListener implements ContainerAwareInterface
      */
     protected $container;
 
+    /*
+     * @return array
+     */
+    private static function getUserFieldsToIgnore()
+    {
+        return array('lastLogin', 'loginCount');
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -90,6 +98,22 @@ class OwnerTreeListener implements ContainerAwareInterface
     {
         foreach ($entities as $entity) {
             if (in_array(ClassUtils::getRealClass($entity), $this->securityClasses, true)) {
+                $entityClass = ClassUtils::getRealClass($entity);
+                $userEntityClass = $this->container->getParameter('oro_user.entity.class');
+
+                if ($entityClass ===  $userEntityClass) {
+                    $changeSet = $this->container
+                        ->get('doctrine.orm.entity_manager')
+                        ->getUnitOfWork()
+                        ->getEntityChangeSet($entity);
+
+                    $fieldsToIgnore = $this->getUserFieldsToIgnore();
+                    $changedFields = array_keys($changeSet);
+
+                    if ($fieldsToIgnore == $changedFields) {
+                        continue;
+                    }
+                }
                 return true;
             }
         }
