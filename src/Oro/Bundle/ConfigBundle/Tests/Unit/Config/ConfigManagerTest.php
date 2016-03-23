@@ -10,7 +10,7 @@ use Oro\Bundle\ConfigBundle\Config\ConfigValueBag;
 use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
-use Oro\Bundle\ConfigBundle\Event\LoadConfigEvent;
+use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 
 class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -125,7 +125,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $loadEvent = new LoadConfigEvent($this->manager, 'oro_user.greeting', 'old value', false);
+        $loadEvent = new ConfigGetEvent($this->manager, 'oro_user.greeting', 'old value', false);
 
         $this->userScopeManager->expects($this->once())
             ->method('getChanges')
@@ -144,7 +144,7 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->expects($this->exactly(3))
             ->method('dispatch')
             ->withConsecutive(
-                [LoadConfigEvent::NAME, $loadEvent],
+                [ConfigGetEvent::NAME, $loadEvent],
                 [ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent],
                 [ConfigUpdateEvent::EVENT_NAME, $afterEvent]
             );
@@ -194,9 +194,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
-        $firstOldValueLoadEvent = new LoadConfigEvent($this->manager, 'oro_user.greeting', 'old value', false);
-        $secondOldValueLoadEvent = new LoadConfigEvent($this->manager, 'oro_user.level', '2000', false);
-        $secondNewValueLoadEvent = new LoadConfigEvent($this->manager, 'oro_user.level', '20', false);
+        $firstOldValueLoadEvent = new ConfigGetEvent($this->manager, 'oro_user.greeting', 'old value', false);
+        $secondOldValueLoadEvent = new ConfigGetEvent($this->manager, 'oro_user.level', '2000', false);
+        $secondNewValueLoadEvent = new ConfigGetEvent($this->manager, 'oro_user.level', '20', false);
 
         $this->userScopeManager->expects($this->once())
             ->method('save')
@@ -211,10 +211,10 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         $this->dispatcher->expects($this->exactly(5))
             ->method('dispatch')
             ->withConsecutive(
-                [LoadConfigEvent::NAME, $firstOldValueLoadEvent],
-                [LoadConfigEvent::NAME, $secondOldValueLoadEvent],
+                [ConfigGetEvent::NAME, $firstOldValueLoadEvent],
+                [ConfigGetEvent::NAME, $secondOldValueLoadEvent],
                 [ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent],
-                [LoadConfigEvent::NAME, $secondNewValueLoadEvent],
+                [ConfigGetEvent::NAME, $secondNewValueLoadEvent],
                 [ConfigUpdateEvent::EVENT_NAME, $afterEvent]
             );
 

@@ -6,9 +6,9 @@ use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 use Symfony\Component\EventDispatcher\Event;
 
-class LoadConfigEvent extends Event
+class ConfigGetEvent extends Event
 {
-    const NAME = 'oro_config.load_config';
+    const NAME = 'oro_config.get';
 
     /** @var ConfigManager */
     protected $configManager;

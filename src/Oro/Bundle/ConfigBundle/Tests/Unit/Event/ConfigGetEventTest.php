@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
-use Oro\Bundle\ConfigBundle\Event\LoadConfigEvent;
+use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 
-class LoadConfigEventTest extends \PHPUnit_Framework_TestCase
+class ConfigGetEventTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject*/
     protected $configManager;
@@ -28,11 +28,15 @@ class LoadConfigEventTest extends \PHPUnit_Framework_TestCase
         $value = 'value';
         $full = true;
 
-        $event = new LoadConfigEvent($this->configManager, $key, $value, $full);
+        $event = new ConfigGetEvent($this->configManager, $key, $value, $full);
 
         $this->assertSame($this->configManager, $event->getConfigManager());
         $this->assertEquals($key, $event->getKey());
         $this->assertEquals($value, $event->getValue());
         $this->assertEquals($full, $event->isFull());
+
+        $newValue = 'new_value';
+        $event->setValue($newValue);
+        $this->assertEquals($newValue, $event->getValue());
     }
 }
