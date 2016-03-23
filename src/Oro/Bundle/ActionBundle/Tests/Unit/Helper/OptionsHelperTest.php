@@ -196,7 +196,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
-            'no dialog title' => [
+            'not translated title' => [
                 'input' => [
                     'context' => [
                         'param1' => 'value1',
@@ -237,7 +237,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     'buttonOptions' => [],
                     'frontendOptions' => [
                         'show_dialog' => true,
-                        'title' => 'operation3 title',
+                        'title' => 'Custom dialog title',
                         'options' => ['option1' => 'value1'],
                     ],
                     'routerContext' => [
@@ -252,7 +252,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'hasDialog' => true,
                         'showDialog' => true,
                         'dialogOptions' => [
-                            'title' => 'operation3 title', //NOT TRANSLATED (see closure for translator mock return)
+                            'title' => 'CUSTOM DIALOG TITLE',
                             'dialogOptions' => ['option1' => 'value1'],
                         ],
                         'executionUrl' => 'execution-url3',
