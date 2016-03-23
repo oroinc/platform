@@ -30,12 +30,28 @@ class OperationDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['func1', 'func2'], $this->definition->getActions('name1'));
         $this->assertEquals(['name1' => ['func1', 'func2']], $this->definition->getActions());
     }
+    
+    public function testSetAndGetConditions()
+    {
+        $this->definition->setConditions('name1', ['cond1', 'cond2']);
+
+        $this->assertEquals(['cond1', 'cond2'], $this->definition->getConditions('name1'));
+        $this->assertEquals(['name1' => ['cond1', 'cond2']], $this->definition->getConditions());
+    }
 
     public function testGetAllowedActions()
     {
         $this->assertEquals(
             [OperationDefinition::PREACTIONS, OperationDefinition::FORM_INIT, OperationDefinition::ACTIONS],
             OperationDefinition::getAllowedActions()
+        );
+    }
+
+    public function testGetAllowedConditions()
+    {
+        $this->assertEquals(
+            [OperationDefinition::PRECONDITIONS, OperationDefinition::CONDITIONS],
+            OperationDefinition::getAllowedConditions()
         );
     }
 
@@ -62,7 +78,6 @@ class OperationDefinitionTest extends \PHPUnit_Framework_TestCase
                 ['formOptions', ['config1', 'config2'], []],
                 ['formType', 'test_form_type'],
                 ['attributes', ['config1', 'config2'], []],
-                ['preconditions', ['cond1', 'cond2'], []],
                 ['actionGroups', ['action_group1', 'action_group2'], []]
             ]
         );

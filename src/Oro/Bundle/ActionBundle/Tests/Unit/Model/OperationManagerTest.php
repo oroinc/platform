@@ -641,17 +641,11 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /* @var $operationActionGroupAssembler \PHPUnit_Framework_MockObject_MockObject|OperationActionGroupAssembler */
-        $operationActionGroupAssembler = $this->getMockBuilder(
-            'Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler'
-        )->disableOriginalConstructor()->getMock();
-
         return new Operation(
             $actionFactory,
             $conditionFactory,
             $attributeAssembler,
             $formOptionsAssembler,
-            $operationActionGroupAssembler,
             $definition
         );
     }

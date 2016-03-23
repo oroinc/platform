@@ -76,6 +76,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'enabled' => true,
                         'preactions' => [],
                         'preconditions' => [],
+                        'conditions' => [],
                         'actions' => [],
                         'form_init' => [],
                         'attributes' => [],
@@ -153,6 +154,9 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'preconditions' => [
                             '@equal' => ['$field1', 'value1'],
                         ],
+                        'conditions' => [
+                            '@equal' => ['$field2', 'value2'],
+                        ],
                         'actions' => [
                             '@action1' => [],
                         ],
@@ -187,6 +191,9 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         ],
                         'preconditions' => [
                             '@equal' => ['$field1', 'value1'],
+                        ],
+                        'conditions' => [
+                            '@equal' => ['$field2', 'value2'],
                         ],
                         'actions' => [
                             '@action1' => [],

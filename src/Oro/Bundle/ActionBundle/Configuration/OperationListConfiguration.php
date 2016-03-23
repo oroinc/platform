@@ -92,6 +92,7 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
         ->end();
 
         $this->appendActionsNodes($children);
+        $this->appendConditionsNodes($children);
 
         return $builder;
     }
@@ -102,6 +103,19 @@ class OperationListConfiguration implements ConfigurationDefinitionInterface
     protected function appendActionsNodes($builder)
     {
         foreach (OperationDefinition::getAllowedActions() as $nodeName) {
+            $builder
+                ->arrayNode($nodeName)
+                    ->prototype('variable')->end()
+                ->end();
+        }
+    }
+
+    /**
+     * @param NodeBuilder $builder
+     */
+    protected function appendConditionsNodes(NodeBuilder $builder)
+    {
+        foreach (OperationDefinition::getAllowedConditions() as $nodeName) {
             $builder
                 ->arrayNode($nodeName)
                     ->prototype('variable')->end()
