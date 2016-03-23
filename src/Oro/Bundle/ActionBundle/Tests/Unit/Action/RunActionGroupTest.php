@@ -30,7 +30,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     {
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->actionGroupRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupRegistry')
+        $this->mockActionGroupRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
