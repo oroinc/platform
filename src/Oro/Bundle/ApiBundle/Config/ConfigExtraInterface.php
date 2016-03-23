@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 interface ConfigExtraInterface
 {
     /**
-     * Gets a string that uniquely identifies a type of additional data.
+     * Returns a string which is used as unique identifier of configuration data.
      *
      * @return string
      */
@@ -24,14 +24,14 @@ interface ConfigExtraInterface
     public function configureContext(ConfigContext $context);
 
     /**
-     * Indicates whether this config extra is applicable to nested configs.
+     * Indicates whether this config extra should be used when a configuration of related entities will be built.
      *
      * @return bool
      */
     public function isPropagable();
 
     /**
-     * Returns a string that should be used as a part of a cache key used by config providers.
+     * Returns a string that should be added to a cache key used by by config providers.
      *
      * @return string|null
      */
