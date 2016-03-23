@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigValueBag;
+use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
+use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 
 class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,13 +20,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigDefinitionImmutableBag */
     protected $bag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
     protected $dispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $globalScopeManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $userScopeManager;
 
     /**
@@ -121,6 +125,8 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
+        $loadEvent = new ConfigGetEvent($this->manager, 'oro_user.greeting', 'old value', false);
+
         $this->userScopeManager->expects($this->once())
             ->method('getChanges')
             ->willReturn($changes);
@@ -135,14 +141,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->dispatcher->expects($this->exactly(2))
-            ->method('dispatch');
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(3))
             ->method('dispatch')
-            ->with(ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent);
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(ConfigUpdateEvent::EVENT_NAME, $afterEvent);
+            ->withConsecutive(
+                [ConfigGetEvent::NAME, $loadEvent],
+                [ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent],
+                [ConfigUpdateEvent::EVENT_NAME, $afterEvent]
+            );
 
         $this->manager->flush();
     }
@@ -189,6 +194,10 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         );
 
+        $firstOldValueLoadEvent = new ConfigGetEvent($this->manager, 'oro_user.greeting', 'old value', false);
+        $secondOldValueLoadEvent = new ConfigGetEvent($this->manager, 'oro_user.level', '2000', false);
+        $secondNewValueLoadEvent = new ConfigGetEvent($this->manager, 'oro_user.level', '20', false);
+
         $this->userScopeManager->expects($this->once())
             ->method('save')
             ->with($normalizedData)
@@ -199,14 +208,15 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $this->dispatcher->expects($this->exactly(2))
-            ->method('dispatch');
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(5))
             ->method('dispatch')
-            ->with(ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent);
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(ConfigUpdateEvent::EVENT_NAME, $afterEvent);
+            ->withConsecutive(
+                [ConfigGetEvent::NAME, $firstOldValueLoadEvent],
+                [ConfigGetEvent::NAME, $secondOldValueLoadEvent],
+                [ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent],
+                [ConfigGetEvent::NAME, $secondNewValueLoadEvent],
+                [ConfigUpdateEvent::EVENT_NAME, $afterEvent]
+            );
 
         $this->manager->save($data);
     }
@@ -231,6 +241,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getFromParentParamProvider
+     * @param string $parameterName
+     * @param bool $full
+     * @param mixed $expectedResult
      */
     public function testGetFromParentScope($parameterName, $full, $expectedResult)
     {
@@ -268,6 +281,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function getFromParentParamProvider()
     {
         return [
