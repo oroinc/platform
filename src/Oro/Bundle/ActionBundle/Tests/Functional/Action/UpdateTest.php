@@ -44,8 +44,13 @@ class UpdateTest extends WebTestCase
         $response = json_decode($result->getContent(), true);
 
         $this->assertEquals(
-            $response,
-            ['redirectUrl' => $this->getUrl('oro_test_item_update', ['id' => $item->getId()])]
+            [
+                'success' => true,
+                'message' => '',
+                'messages' => [],
+                'redirectUrl' => $this->getUrl('oro_test_item_update', ['id' => $item->getId()])
+            ],
+            $response
         );
     }
 }

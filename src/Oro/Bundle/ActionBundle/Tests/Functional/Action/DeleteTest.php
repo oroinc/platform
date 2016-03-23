@@ -44,8 +44,13 @@ class DeleteTest extends WebTestCase
         $response = json_decode($result->getContent(), true);
 
         $this->assertEquals(
-            $response,
-            ['redirectUrl' => $this->getUrl('oro_test_item_index', ['id' => $item->getId()])]
+            [
+                'success' => true,
+                'message' => '',
+                'messages' => [],
+                'redirectUrl' => $this->getUrl('oro_test_item_index', ['id' => $item->getId()])
+            ],
+            $response
         );
     }
 }

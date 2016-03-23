@@ -85,7 +85,7 @@ operations:
             - @run_action_group:
                 action_group: DELETE
                 parameters_mapping:
-                    entity: $.data
+                    data: $.data
             - @flash_message:
                 message: oro.action.delete_message
                 type: 'info'
