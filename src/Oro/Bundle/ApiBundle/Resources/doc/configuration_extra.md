@@ -50,8 +50,8 @@ There are a list of existing configuration extras that implement this interface:
 - [SortersConfigExtra](../../Config/SortersConfigExtra.php)
 - [ActionsConfigExtra](../../Config/ActionsConfigExtra.php)
 
-Example of simple configuration extra
--------------------------------------
+Example of configuration extra
+------------------------------
 
 Let's take a look into [DescriptionsConfigExtra](../../Processor/Config/ConfigContext/DescriptionsConfigExtra.php) which is used to request human-readable descriptions of entities and its' fields.
 
