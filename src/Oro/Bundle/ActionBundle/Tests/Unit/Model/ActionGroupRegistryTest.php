@@ -55,29 +55,6 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    /**
-     * @dataProvider findByNameDataProvider
-     *
-     * @param string $actionGroupName
-     * @param string|null $expected
-     */
-    public function testFindByName($actionGroupName, $expected)
-    {
-        $this->configurationProvider->expects($this->once())
-            ->method('getConfiguration')
-            ->willReturn(
-                [
-                    'action_group1' => [
-                        'label' => 'Label1'
-                    ]
-                ]
-            );
-
-        $actionGroup = $this->registry->findByName($actionGroupName);
-
-        $this->assertEquals($expected, $actionGroup ? $actionGroup->getDefinition()->getName() : $actionGroup);
-    }
-
     public function testGet()
     {
         $this->configurationProvider->expects($this->once())
@@ -107,22 +84,5 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->registry->get('not exists');
-    }
-
-    /**
-     * @return array
-     */
-    public function findByNameDataProvider()
-    {
-        return [
-            'invalid actionGroup name' => [
-                'actionGroupName' => 'test',
-                'expected' => null
-            ],
-            'valid actionGroup name' => [
-                'actionGroupName' => 'action_group1',
-                'expected' => 'action_group1'
-            ],
-        ];
     }
 }

@@ -8,7 +8,7 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
 
 use Oro\Component\Action\Model\ContextAccessor;
 
-class ParametersMapper
+class PropertyMapper
 {
     /** @var ContextAccessor */
     private $accessor;
@@ -27,12 +27,26 @@ class ParametersMapper
      * @param array|\Traversable $parametersMap
      * @param mixed $context
      */
-    public function mapToArgs(ActionGroupExecutionArgs $args, $parametersMap, $context)
+    public function toArgs(ActionGroupExecutionArgs $args, $parametersMap, $context)
     {
         $this->assertTraversable($parametersMap);
 
         foreach ($parametersMap as $argName => $argValue) {
             $args->addParameter($argName, $this->readValue($context, $argValue));
+        }
+    }
+
+    /**
+     * @param array|\ArrayAccess|object $from context source
+     * @param array|\Traversable $map
+     * @param array|\ArrayAccess|object $to context target
+     */
+    public function transfer(&$from, $map, &$to)
+    {
+        $this->assertTraversable($map);
+
+        foreach ($map as $target => $source) {
+            $this->accessor->setValue($to, $target, $this->readValue($from, $source));
         }
     }
 

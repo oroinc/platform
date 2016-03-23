@@ -4,21 +4,21 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\ActionGroup;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
-use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersMapper;
+use Oro\Bundle\ActionBundle\Model\ActionGroup\PropertyMapper;
 
-class ParametersMapperTest extends \PHPUnit_Framework_TestCase
+class PropertyMapperTest extends \PHPUnit_Framework_TestCase
 {
     public function testAccessorUsage()
     {
         $mockAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')->getMock();
-        $instance = new ParametersMapper($mockAccessor);
+        $instance = new PropertyMapper($mockAccessor);
 
         $this->assertAttributeSame($mockAccessor, 'accessor', $instance);
     }
 
     public function testAccessorEnsured()
     {
-        $instance = new ParametersMapper();
+        $instance = new PropertyMapper();
 
         $this->assertAttributeInstanceOf('Oro\Component\Action\Model\ContextAccessor', 'accessor', $instance);
     }
@@ -27,7 +27,7 @@ class ParametersMapperTest extends \PHPUnit_Framework_TestCase
     {
         $mockContextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')->getMock();
 
-        $instance = new ParametersMapper($mockContextAccessor);
+        $instance = new PropertyMapper($mockContextAccessor);
 
         $pp1 = new PropertyPath('contextParam1');
         $pp2 = new PropertyPath('contextParam2');
@@ -50,7 +50,7 @@ class ParametersMapperTest extends \PHPUnit_Framework_TestCase
         $mockExecutionArgs->expects($this->at(1))->method('addParameter')->with('arg2', ['embedded' => 'val2']);
         $mockExecutionArgs->expects($this->at(2))->method('addParameter')->with('arg3', 'simple value');
 
-        $instance->mapToArgs(
+        $instance->toArgs(
             $mockExecutionArgs,
             [
                 'arg1' => new PropertyPath('contextParam1'),
@@ -65,7 +65,7 @@ class ParametersMapperTest extends \PHPUnit_Framework_TestCase
 
     public function testNonTraversableAssertionException()
     {
-        $instance = new ParametersMapper();
+        $instance = new PropertyMapper();
 
         $mockExecutionArgs = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs')
             ->disableOriginalConstructor()->getMock();
@@ -75,6 +75,30 @@ class ParametersMapperTest extends \PHPUnit_Framework_TestCase
             'Parameters map must be array or implements \Traversable interface'
         );
 
-        $instance->mapToArgs($mockExecutionArgs, (object)[], []);
+        $instance->toArgs($mockExecutionArgs, (object)[], []);
+    }
+
+
+    public function testTransfer()
+    {
+        $mockContextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')->getMock();
+
+        $instance = new PropertyMapper($mockContextAccessor);
+
+        $from = (object)['k' => 'v'];
+        $to = (object)['t' => null];
+
+        $sourcePropertyPath = new PropertyPath('source');
+
+        $mockContextAccessor->expects($this->once())
+            ->method('getValue')
+            ->with($from, $sourcePropertyPath)
+            ->willReturn('data');
+
+        $mockContextAccessor->expects($this->once())
+            ->method('setValue')
+            ->with($to, 'target', 'data');
+
+        $instance->transfer($from, ['target' => $sourcePropertyPath], $to);
     }
 }
