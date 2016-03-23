@@ -6,38 +6,34 @@ use Doctrine\Common\Util\ClassUtils;
 
 use JMS\JobQueueBundle\Entity\Job;
 
+use Oro\Bundle\EmailBundle\Entity\EmailAddress;
+use Oro\Bundle\EmailBundle\Entity\EmailOwnerInterface;
 use Oro\Bundle\EmailBundle\Provider\EmailOwnersProvider;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class EmailActivityUpdates
 {
     /** @var EmailOwnersProvider */
     protected $emailOwnersProvider;
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var object[] */
-    protected $possibleEntitiesOwnedByEmails = [];
+    /** @var EmailAddress[] */
+    protected $updatedEmailAddresses = [];
 
     /**
      * @param EmailOwnersProvider $emailOwnersProvider
-     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(EmailOwnersProvider $emailOwnersProvider, DoctrineHelper $doctrineHelper)
+    public function __construct(EmailOwnersProvider $emailOwnersProvider)
     {
         $this->emailOwnersProvider = $emailOwnersProvider;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
-     * @param object[] $entities
+     * @param EmailAddress[] $emailAddresses
      */
-    public function processCreatedEntities(array $entities)
+    public function processUpdatedEmailAddresses(array $emailAddresses)
     {
-        $this->possibleEntitiesOwnedByEmails = array_merge(
-            $this->possibleEntitiesOwnedByEmails,
-            $entities
+        $this->updatedEmailAddresses = array_merge(
+            $this->updatedEmailAddresses,
+            $emailAddresses
         );
     }
 
@@ -54,37 +50,46 @@ class EmailActivityUpdates
     }
 
     /**
-     * @return object[]
+     * @return EmailOwnerInterface[]
      */
     protected function filterEntitiesToUpdate()
     {
+        $owners = array_map(
+            function (EmailAddress $emailAddress) {
+                return $emailAddress->getOwner();
+            },
+            $this->updatedEmailAddresses
+        );
+
         return array_filter(
-            $this->possibleEntitiesOwnedByEmails,
-            function ($entity) {
-                return $this->emailOwnersProvider->hasEmailsByOwnerEntity($entity);
+            $owners,
+            function (EmailOwnerInterface $owner = null) {
+                return $owner && $this->emailOwnersProvider->hasEmailsByOwnerEntity($owner);
             }
         );
     }
 
     protected function clearPendingEntities()
     {
-        $this->possibleEntitiesOwnedByEmails = [];
+        $this->updatedEmailAddresses = [];
     }
 
     /**
-     * @param object[] $entitiesOwnedByEmails
+     * @param EmailOwnerInterface[] $entitiesOwnedByEmails
+     *
+     * @return array
      */
     protected function createJobsArgs(array $entitiesOwnedByEmails)
     {
         return array_reduce(
             $entitiesOwnedByEmails,
-            function ($jobsArgsByClass, $emailOwner) {
+            function ($jobsArgsByClass, EmailOwnerInterface $emailOwner) {
                 $class = ClassUtils::getClass($emailOwner);
                 if (!isset($jobsArgsByClass[$class])) {
                     $jobsArgsByClass[$class] = [$class];
                 }
 
-                $jobsArgsByClass[$class][] = $this->doctrineHelper->getSingleEntityIdentifier($emailOwner);
+                $jobsArgsByClass[$class][] = $emailOwner->getId();
 
                 return $jobsArgsByClass;
             },

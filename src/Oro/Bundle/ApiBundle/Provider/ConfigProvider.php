@@ -2,24 +2,24 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
-use Oro\Bundle\ApiBundle\Processor\Config\ConfigProcessor;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class ConfigProvider extends AbstractConfigProvider
 {
-    /** @var ConfigProcessor */
+    /** @var ActionProcessorInterface */
     protected $processor;
 
     /** @var array */
     protected $cache = [];
 
     /**
-     * @param ConfigProcessor $processor
+     * @param ActionProcessorInterface $processor
      */
-    public function __construct(ConfigProcessor $processor)
+    public function __construct(ActionProcessorInterface $processor)
     {
         $this->processor = $processor;
     }
@@ -42,7 +42,7 @@ class ConfigProvider extends AbstractConfigProvider
 
         $cacheKey = $this->buildCacheKey($className, $version, $requestType, $extras);
         if (array_key_exists($cacheKey, $this->cache)) {
-            return $this->cache[$cacheKey];
+            return clone $this->cache[$cacheKey];
         }
 
         /** @var ConfigContext $context */
@@ -55,6 +55,6 @@ class ConfigProvider extends AbstractConfigProvider
 
         $this->cache[$cacheKey] = $config;
 
-        return $config;
+        return clone $config;
     }
 }

@@ -125,11 +125,8 @@ class ActionsDataProvider implements DataProviderInterface
                 'name' => $definition->getName(),
                 'label' => $this->translator->trans($definition->getLabel()),
                 'title' => $this->translator->trans($title),
-                'hasForm' => $action->hasForm(),
-                'showDialog' => !empty($frontendOptions['show_dialog']),
                 'icon' =>  $icon,
-                'buttonOptions' => $buttonOptions,
-                'frontendOptions' => $frontendOptions
+                'action' => $action,
             ];
         }
 

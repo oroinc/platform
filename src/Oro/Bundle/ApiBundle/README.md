@@ -9,9 +9,5 @@ To achieve this, this bundle is implemented based on two ORO components: [ChainP
 
 **Notes**:
  - For now only GET requests for REST and JSON.API are implemented.
- - This documentation is not full and it will be completed soon.
 
-Table of Contents
------------------
- - [Configuration](./Resources/doc/configuration.md)
- - [Debug commands](./Resources/doc/debug_commands.md)
+Please see [documentation](./Resources/doc/index.md) for more details.

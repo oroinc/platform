@@ -59,7 +59,8 @@ services:
 
     oro_tracking.importexport.data_converter.data:
         class: %oro_tracking.importexport.data_converter.data.class%
-        parent: oro_importexport.data_converter.configurable
+        arguments:
+            - @oro_importexport.field.field_helper
 
     oro_tracking.importexport.strategy.data:
         parent: oro_importexport.strategy.configurable_add_or_replace
