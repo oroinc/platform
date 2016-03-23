@@ -90,6 +90,7 @@ class WidgetControllerTest extends WebTestCase
     /**
      * @dataProvider formOperationDataProvider
      *
+     * @param string $entity
      * @param array $inputData
      * @param array $submittedData
      * @param array $expectedFormData
@@ -97,6 +98,7 @@ class WidgetControllerTest extends WebTestCase
      * @param string $expectedMessage
      */
     public function testFormOperation(
+        $entity,
         array $inputData,
         array $submittedData,
         array $expectedFormData,
@@ -105,16 +107,19 @@ class WidgetControllerTest extends WebTestCase
     ) {
         $this->cacheProvider->save(self::ROOT_NODE_NAME, $this->getConfigurationForFormOperation());
 
-        $this->assertEntityFields($inputData);
+        $entity = $this->getReference($entity);
+
+        $this->assertEntityFields($entity, $inputData);
 
         $crawler = $this->client->request(
             'GET',
             $this->getUrl(
                 'oro_action_widget_form',
                 [
+                    '_wid' => 'test-uuid',
                     '_widgetContainer' => 'dialog',
                     'operationName' => 'oro_action_test_operation',
-                    'entityId' => $this->entityId,
+                    'entityId' => $entity->getId(),
                     'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
                 ]
             )
@@ -131,7 +136,7 @@ class WidgetControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertContains($expectedMessage, $crawler->html());
-        $this->assertEntityFields($expectedData);
+        $this->assertEntityFields($entity, $expectedData);
     }
 
     /**
@@ -177,6 +182,7 @@ class WidgetControllerTest extends WebTestCase
     {
         return [
             'valid operation' => [
+                'entity' => LoadTestEntityData::TEST_ENTITY_1,
                 'inputData' => [
                     'message' => 'test message',
                     'description' => null
@@ -195,6 +201,7 @@ class WidgetControllerTest extends WebTestCase
                 'expectedMessage' => 'widget.trigger(\'formSave\', {"success":true});'
             ],
             'operation not allowed' => [
+                'entity' => LoadTestEntityData::TEST_ENTITY_2,
                 'inputData' => [
                     'message' => 'new message',
                     'description' => 'Test Description'
@@ -214,6 +221,7 @@ class WidgetControllerTest extends WebTestCase
                 'expectedMessage' => 'Operation "oro_action_test_operation" is not allowed.'
             ],
             'operation not allowed (constraint message)' => [
+                'entity' => LoadTestEntityData::TEST_ENTITY_2,
                 'inputData' => [
                     'message' => 'new message',
                     'description' => 'Test Description'
@@ -233,6 +241,7 @@ class WidgetControllerTest extends WebTestCase
                 'expectedMessage' => 'Please, write other description.'
             ],
             'operation with form error' => [
+                'entity' => LoadTestEntityData::TEST_ENTITY_2,
                 'inputData' => [
                     'message' => 'new message',
                     'description' => 'Test Description'
@@ -255,11 +264,12 @@ class WidgetControllerTest extends WebTestCase
     }
 
     /**
+     * @param object $entity
      * @param array $fields
      */
-    protected function assertEntityFields(array $fields)
+    protected function assertEntityFields($entity, array $fields)
     {
-        $entity = $this->getEntity($this->entityId);
+        $entity = $this->getEntity($entity->getId());
 
         foreach ($fields as $name => $value) {
             $this->assertEquals($value, $this->getPropertyAccessor()->getValue($entity, $name));
