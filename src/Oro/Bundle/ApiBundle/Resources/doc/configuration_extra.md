@@ -13,7 +13,7 @@ Overview
 
 The configuration extras are the way to get varying configuration information.
 
-There are two type of the configuration extras:
+There are two types of the configuration extras:
 
 - a configuration extra that is used to request additional configuration options for existing configuration sections. This extra is represented by `Oro\Bundle\ApiBundle\Config\ConfigExtraInterface`.
 - a configuration extra that is used to request additional configuration section. This extra is represented by `Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface`.
@@ -88,7 +88,7 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
 }
 ```
 
-This configuration extra is added to the Context by the [InitializeConfigExtras](../../Processor/Processor/Get/InitializeConfigExtras.php) processor which belongs to `initialize` group:
+This configuration extra is added to the Context by the [InitializeConfigExtras](../../Processor/Get/InitializeConfigExtras.php) processor which belongs to `initialize` group:
 
 ```php
 <?php
