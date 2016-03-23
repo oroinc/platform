@@ -34,4 +34,10 @@ class ValidateLoadedResultTest extends DeleteProcessorTestCase
         $this->context->setResult(null);
         $this->processor->process($this->context);
     }
+
+    public function testProcess()
+    {
+        $this->context->setResult(new \stdClass());
+        $this->processor->process($this->context);
+    }
 }
