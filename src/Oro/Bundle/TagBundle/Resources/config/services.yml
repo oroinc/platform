@@ -19,6 +19,9 @@ parameters:
 
     oro_tag.workflow.action.copy_tagging.class: Oro\Bundle\TagBundle\Workflow\Action\CopyTagging
 
+    oro_tag.event_listener.import_export_tags_subscriber.class: Oro\Bundle\TagBundle\EventListener\ImportExportTagsSubscriber
+    oro_tag.tag_import.manager.class: Oro\Bundle\TagBundle\Manager\TagImportManager
+
 services:
     oro_tag.tag.manager:
         class: %oro_tag.tag.manager.class%
@@ -221,3 +224,22 @@ services:
         tags:
             - { name: oro_workflow.action, alias: copy_tagging }
             - { name: oro_action.function, alias: copy_tagging }
+
+    oro_tag.event_listener.import_export_tags_subscriber:
+        class: %oro_tag.event_listener.import_export_tags_subscriber.class%
+        arguments:
+            - @oro_tag.link.tag_import.manager
+        tags:
+            - { name: kernel.event_subscriber }
+            - { name: doctrine.event_listener, event: onFlush }
+            - { name: doctrine.event_listener, event: postFlush }
+
+    oro_tag.link.tag_import.manager:
+        tags:
+            - { name: oro_service_link, service: oro_tag.tag_import.manager }
+
+    oro_tag.tag_import.manager:
+        class: %oro_tag.tag_import.manager.class%
+        arguments:
+            - @oro_tag.tag.manager
+            - @oro_tag.helper.taggable_helper

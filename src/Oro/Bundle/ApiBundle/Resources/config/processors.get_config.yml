@@ -57,10 +57,10 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, priority: -160 }
 
-    oro_api.get_config.set_data_item_customization_handler:
-        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataItemCustomizationHandler
+    oro_api.get_config.set_data_customization_handler:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDataCustomizationHandler
         arguments:
-            - @oro_api.customize_data_item.processor
+            - @oro_api.customize_loaded_data.processor
             - @oro_api.doctrine_helper
         tags:
             - { name: oro.api.processor, action: get_config, priority: -160 }

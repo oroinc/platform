@@ -16,6 +16,8 @@ class ContextHelper
     const ENTITY_ID_PARAM = 'entityId';
     const ENTITY_CLASS_PARAM = 'entityClass';
     const DATAGRID_PARAM = 'datagrid';
+    const GROUP_PARAM = 'group';
+    const FROM_URL_PARAM = 'fromUrl';
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -57,6 +59,8 @@ class ContextHelper
                 self::ENTITY_ID_PARAM => $this->getRequestParameter(self::ENTITY_ID_PARAM),
                 self::ENTITY_CLASS_PARAM => $this->getRequestParameter(self::ENTITY_CLASS_PARAM),
                 self::DATAGRID_PARAM => $this->getRequestParameter(self::DATAGRID_PARAM),
+                self::GROUP_PARAM => $this->getRequestParameter(self::GROUP_PARAM),
+                self::FROM_URL_PARAM => $this->getRequestParameter(self::FROM_URL_PARAM),
             ];
         }
 
@@ -76,7 +80,7 @@ class ContextHelper
         }
         $params = [
             self::ROUTE_PARAM => $request->get('_route'),
-            'fromUrl' => $request->getRequestUri()
+            self::FROM_URL_PARAM => $request->getRequestUri()
         ];
 
         $entity = array_key_exists('entity', $context) && is_object($context['entity']) ? $context['entity'] : null;
@@ -144,6 +148,8 @@ class ContextHelper
                 self::ENTITY_ID_PARAM => null,
                 self::ENTITY_CLASS_PARAM => null,
                 self::DATAGRID_PARAM => null,
+                self::GROUP_PARAM => null,
+                self::FROM_URL_PARAM => null,
             ],
             $context
         );
@@ -179,8 +185,11 @@ class ContextHelper
         $array = [];
         foreach ($properties as $property) {
             $array[$property] = $this->propertyAccessor->getValue($context, sprintf('[%s]', $property));
+            if (is_array($array[$property])) {
+                ksort($array[$property]);
+            }
         }
-        array_multisort($array);
+        ksort($array);
 
         return md5(json_encode($array, JSON_NUMERIC_CHECK));
     }

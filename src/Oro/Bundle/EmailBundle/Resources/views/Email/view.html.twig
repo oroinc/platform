@@ -29,6 +29,8 @@
     <li>{{ 'oro.ui.created_at'|trans }}: {{ breadcrumbs.entity.created ? breadcrumbs.entity.created|oro_format_datetime : 'N/A' }}</li>
 {% endblock stats %}
 
+{% block navButtons %}{% endblock navButtons %}
+
 {% block content_data %}
     {% set id = 'email-profile' %}
     {% set attributes = [

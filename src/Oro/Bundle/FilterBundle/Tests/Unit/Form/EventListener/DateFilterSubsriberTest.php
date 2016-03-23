@@ -188,18 +188,6 @@ class DateFilterSubscriberTest extends \PHPUnit_Framework_TestCase
                     'value' => ['start' => '{{'.DateModifierInterface::VAR_THIS_DAY_W_Y.'}}']
                 ]
             ],
-            'should change part to "month" with "march" variable'  => [
-                [
-                    'part' => DateModifierInterface::PART_QUARTER,
-                    'type' => AbstractDateFilterType::TYPE_EQUAL,
-                    'value' => ['start' => '{{'.DateModifierInterface::VAR_MARCH.'}}']
-                ],
-                [
-                    'part' => DateModifierInterface::PART_MONTH,
-                    'type' => AbstractDateFilterType::TYPE_EQUAL,
-                    'value' => ['start' => '{{'.DateModifierInterface::VAR_MARCH.'}}']
-                ]
-            ]
         ];
     }
 }

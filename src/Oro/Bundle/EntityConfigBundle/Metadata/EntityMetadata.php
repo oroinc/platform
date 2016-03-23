@@ -38,6 +38,11 @@ class EntityMetadata extends MergeableClassMetadata
     public $defaultValues;
 
     /**
+     * @var array
+     */
+    public $routes = [];
+
+    /**
      * {@inheritdoc}
      */
     public function merge(MergeableInterface $object)
@@ -50,6 +55,7 @@ class EntityMetadata extends MergeableClassMetadata
             $this->routeName     = $object->routeName;
             $this->routeView     = $object->routeView;
             $this->routeCreate   = $object->routeCreate;
+            $this->routes        = $object->routes;
             $this->mode          = $object->mode;
         }
     }
@@ -66,6 +72,7 @@ class EntityMetadata extends MergeableClassMetadata
                 $this->routeName,
                 $this->routeView,
                 $this->routeCreate,
+                $this->routes,
                 $this->mode,
                 parent::serialize(),
             )
@@ -83,6 +90,7 @@ class EntityMetadata extends MergeableClassMetadata
             $this->routeName,
             $this->routeView,
             $this->routeCreate,
+            $this->routes,
             $this->mode,
             $parentStr
             ) = unserialize($str);
@@ -98,17 +106,33 @@ class EntityMetadata extends MergeableClassMetadata
      */
     public function getRoute($routeType = 'view', $strict = false)
     {
-        if (in_array($routeType, ['view', 'name', 'create'])) {
-            $propertyName = 'route' . ucfirst($routeType);
+        $propertyName = 'route' . ucfirst($routeType);
 
+        if (property_exists($this, $propertyName)) {
             if ($this->{$propertyName}) {
                 return $this->{$propertyName};
             } elseif (false === $strict) {
                 return $this->generateDefaultRoute($routeType);
             }
+        } elseif (array_key_exists($routeType, $this->routes)) {
+            return $this->routes[$routeType];
         }
 
         throw new \LogicException(sprintf('No route "%s" found for entity "%s"', $routeType, $this->name));
+    }
+
+    /**
+     * @param string $routeType
+     * @param bool $strict
+     * @return bool
+     */
+    public function hasRoute($routeType = 'view', $strict = false)
+    {
+        $propertyName = 'route' . ucfirst($routeType);
+
+        return (property_exists($this, $propertyName) && !$strict) ||
+            (property_exists($this, $propertyName) && $strict && $this->{$propertyName}) ||
+            array_key_exists($routeType, $this->routes);
     }
 
     /**

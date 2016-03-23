@@ -152,4 +152,16 @@ class ActionDataTest extends \PHPUnit_Framework_TestCase
             $data->getValues(['foo', 'baz', 'tango', 'test'])
         );
     }
+
+    public function testGetScalarValues()
+    {
+        $data = new ActionData([
+            'key1' => ['param1'],
+            'key2' => 'value2',
+            'key3' => 3,
+            'key4' => new \stdClass(),
+        ]);
+
+        $this->assertEquals(['key2' => 'value2', 'key3' => 3], $data->getScalarValues());
+    }
 }
