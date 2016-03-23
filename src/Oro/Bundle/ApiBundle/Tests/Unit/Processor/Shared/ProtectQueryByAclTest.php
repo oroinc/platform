@@ -63,7 +63,7 @@ class ProtectQueryByAclTest extends OrmRelatedTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWOConfig()
+    public function testProcessWithoutConfig()
     {
         $className = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product';
         $this->context->setClassName($className);

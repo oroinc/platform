@@ -60,7 +60,6 @@ class GetRestPlainApiTest extends ApiTestCase
             if (!in_array('delete', $excludedActions)) {
                 // test delete request
                 $this->checkDeleteRequest($entityAlias, $id, $excludedActions);
-
             }
         }
 
