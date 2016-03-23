@@ -67,7 +67,7 @@ class WorkflowManager
 
     /**
      * @param WorkflowItem $workflowItem
-     * @return Collection
+     * @return Collection|Transition[]
      */
     public function getTransitionsByWorkflowItem(WorkflowItem $workflowItem)
     {

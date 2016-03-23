@@ -9,21 +9,36 @@ use Oro\Bundle\ActionBundle\Model\ActionDefinition;
 use Oro\Bundle\ActionBundle\Model\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\FormOptionsAssembler;
 
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+
 use Oro\Component\Action\Action\ActionFactory as FunctionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
 class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
 {
+    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var ActionAssembler */
     protected $assembler;
 
     protected function setUp()
     {
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityClass')
+            ->willReturnCallback(function ($class) {
+                return $class;
+            });
+
         $this->assembler = new ActionAssembler(
             $this->getFunctionFactory(),
             $this->getConditionFactory(),
             $this->getAttributeAssembler(),
-            $this->getFormOptionsAssembler()
+            $this->getFormOptionsAssembler(),
+            $this->doctrineHelper
         );
     }
 
@@ -69,7 +84,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
         $definition1
             ->setName('minimum_name')
             ->setLabel('My Label')
-            ->setEntities(['My\Entity'])
+            ->setEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'])
             ->setConditions('conditions', [])
             ->setConditions('preconditions', [])
             ->setFunctions('prefunctions', [])
@@ -77,12 +92,12 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setFunctions('functions', [])
             ->setFormType(ActionType::NAME);
 
-        $definition2 = new ActionDefinition();
+        $definition2 = clone $definition1;
         $definition2
             ->setName('maximum_name')
-            ->setLabel('My Label')
-            ->setEntities(['My\Entity'])
+            ->setSubstituteAction('test_action_to_substitute')
             ->setRoutes(['my_route'])
+            ->setGroups(['my_group'])
             ->setEnabled(false)
             ->setApplications(['application1'])
             ->setAttributes(['config_attr'])
@@ -96,15 +111,14 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setOrder(77)
             ->setFormType(ActionType::NAME);
 
-        $definition3 = new ActionDefinition();
+        $definition3 = clone $definition2;
         $definition3
             ->setName('maximum_name_and_acl')
-            ->setLabel('My Label')
-            ->setEntities(['My\Entity'])
-            ->setRoutes(['my_route'])
             ->setEnabled(false)
             ->setApplications(['application1'])
             ->setAttributes(['config_attr'])
+            ->setForAllEntities(true)
+            ->setExcludeEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'])
             ->setConditions('preconditions', [
                 '@and' => [
                     ['@acl_granted' => 'test_acl'],
@@ -130,7 +144,7 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'minimum_name' => [
                         'label' => 'My Label',
                         'entities' => [
-                            'My\Entity'
+                            '\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'
                         ],
                     ]
                 ]
@@ -149,8 +163,10 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     'maximum_name' => [
                         'label' => 'My Label',
-                        'entities' => ['My\Entity'],
+                        'substitute_action' => 'test_action_to_substitute',
+                        'entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                         'routes' => ['my_route'],
+                        'groups' => ['my_group'],
                         'enabled' => false,
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
@@ -178,9 +194,13 @@ class ActionAssemblerTest extends \PHPUnit_Framework_TestCase
                 [
                     'maximum_name_and_acl' => [
                         'label' => 'My Label',
-                        'entities' => ['My\Entity'],
+                        'substitute_action' => 'test_action_to_substitute',
+                        'entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'],
                         'routes' => ['my_route'],
+                        'groups' => ['my_group'],
                         'enabled' => false,
+                        'for_all_entities' => true,
+                        'exclude_entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'],
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
                         'conditions' => ['config_cond'],
