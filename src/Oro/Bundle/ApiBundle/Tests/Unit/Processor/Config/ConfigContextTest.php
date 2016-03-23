@@ -62,9 +62,9 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $this->context->get(ConfigContext::EXTRA));
     }
 
-    public function testGetInheritableExtras()
+    public function testGetPropagableExtras()
     {
-        $this->assertSame([], $this->context->getInheritableExtras());
+        $this->assertSame([], $this->context->getPropagableExtras());
 
         $extras = [
             new TestConfigExtra('test'),
@@ -73,11 +73,11 @@ class ConfigContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setExtras($extras);
         $this->assertEquals(
             [new TestConfigSection('test_section')],
-            $this->context->getInheritableExtras()
+            $this->context->getPropagableExtras()
         );
 
         $this->context->setExtras([]);
-        $this->assertSame([], $this->context->getInheritableExtras());
+        $this->assertSame([], $this->context->getPropagableExtras());
     }
 
     public function testFilters()

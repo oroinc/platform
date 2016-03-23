@@ -384,32 +384,6 @@ class ExpressionResultTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function testMonthsVariables()
-    {
-        $token = $this->getMockBuilder('Oro\Bundle\FilterBundle\Expression\Date\Token')
-            ->disableOriginalConstructor()
-            ->setMethods(array('is', 'getValue', '__toString'))
-            ->getMock();
-        $token
-            ->expects($this->any())
-            ->method('is')
-            ->will($this->returnValue(Token::TYPE_VARIABLE));
-        $token
-            ->expects($this->any())
-            ->method('getValue')
-            ->will($this->returnValue(DateModifierProvider::VAR_MARCH));
-        $token
-            ->expects($this->any())
-            ->method('__toString')
-            ->will($this->returnValue('march'));
-
-        $expression = new ExpressionResult($token);
-        $result = $expression->getValue();
-
-        $this->assertNotNull($result);
-        $this->assertEquals('march', strtolower($result->format('F')));
-    }
-
     /**
      * @param int|\DateTime $time
      * @param ExpressionResult $expression

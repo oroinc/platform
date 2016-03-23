@@ -28,7 +28,7 @@ interface ConfigExtraInterface
      *
      * @return bool
      */
-    public function isInheritable();
+    public function isPropagable();
 
     /**
      * Returns a string that should be used as a part of a cache key used by config providers.

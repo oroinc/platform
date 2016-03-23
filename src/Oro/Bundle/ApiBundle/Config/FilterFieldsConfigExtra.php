@@ -43,7 +43,7 @@ class FilterFieldsConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isInheritable()
+    public function isPropagable()
     {
         return false;
     }
