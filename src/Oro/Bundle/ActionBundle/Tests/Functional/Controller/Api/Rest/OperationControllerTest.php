@@ -13,8 +13,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class OperationControllerTest extends WebTestCase
 {
-    const MESSAGE_DEFAULT = 'test message';
+    const ROOT_NODE_NAME = 'operations';
 
+    const MESSAGE_DEFAULT = 'test message';
     const MESSAGE_NEW = 'new test message';
 
     /** @var TestActivity */
@@ -30,7 +31,7 @@ class OperationControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateWsseAuthHeader());
 
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider');
+        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
         $this->loadFixtures([
             'Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData',
         ]);
@@ -44,7 +45,7 @@ class OperationControllerTest extends WebTestCase
      */
     protected function tearDown()
     {
-        $this->cacheProvider->delete(ConfigurationProvider::ROOT_NODE_NAME);
+        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
 
         parent::tearDown();
     }
@@ -69,7 +70,7 @@ class OperationControllerTest extends WebTestCase
         $statusCode,
         $message
     ) {
-        $this->cacheProvider->save(ConfigurationProvider::ROOT_NODE_NAME, $config);
+        $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
 
         $this->assertEquals(self::MESSAGE_DEFAULT, $this->entity->getMessage());
 
