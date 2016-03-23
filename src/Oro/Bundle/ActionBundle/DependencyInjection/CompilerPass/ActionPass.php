@@ -6,10 +6,10 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 
-class FunctionPass extends AbstractPass
+class ActionPass extends AbstractPass
 {
-    const FUNCTION_TAG = 'oro_action.function';
-    const FUNCTION_FACTORY_SERVICE_ID = 'oro_action.function_factory';
+    const ACTION_TAG = 'oro_action.action';
+    const ACTION_FACTORY_SERVICE_ID = 'oro_action.action_factory';
 
     const EVENT_DISPATCHER_SERVICE = 'event_dispatcher';
     const EVENT_DISPATCHER_AWARE_ACTION = 'Oro\Component\Action\Action\EventDispatcherAwareActionInterface';
@@ -19,7 +19,7 @@ class FunctionPass extends AbstractPass
      */
     public function process(ContainerBuilder $container)
     {
-        $this->processTypes($container, self::FUNCTION_FACTORY_SERVICE_ID, self::FUNCTION_TAG);
+        $this->processTypes($container, self::ACTION_FACTORY_SERVICE_ID, self::ACTION_TAG);
     }
 
     /**

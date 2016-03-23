@@ -1,5 +1,5 @@
-Functions
-=========
+Actions
+=======
 
 Table of Contents
 -----------------

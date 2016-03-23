@@ -24,7 +24,7 @@ Table of Contents
    - [Example](#example-5)
  - [Pre Conditions and Conditions Configuration](#pre-conditions-and-conditions-configuration)
    - [Example](#example-6)
- - [Pre Functions, Form Init Functions and Functions Configuration](#pre-functions-form-init-functions-and-functions-configuration)
+ - [Pre Actions, Form Init Actions and Actions Configuration](#pre-actions-form-init-actions-and-actions-configuration)
    - [Example](#example-7)
 
 Overview
@@ -34,7 +34,7 @@ Configuration of Action declares all aspects related to specific action:
 
 * basic properties of action like name, label, order, acl resource, etc
 * entities or routes or datagrids that is related to action
-* conditions and functions
+* conditions and actions
 * attributes involved in action
 * frontend configuration
 * action dialog parameters
@@ -147,7 +147,7 @@ Single action configuration has next properties:
     Action button will be shown only if user have expected permissions.
 * **frontend_options**
     Contains configuration for Frontend Options
-* **prefunctions**
+* **preactions**
     Contains configuration for Pre Conditions
 * **preconditions**
     Contains configuration for Pre Conditions
@@ -158,11 +158,11 @@ Single action configuration has next properties:
 * **form_options**
     Contains configuration for Transitions
 * **form_init**
-    Contains configuration for Form Init Functions
+    Contains configuration for Form Init Actions
 * **conditions**
     Contains configuration for Conditions
-* **functions**
-    Contains configuration for Functions
+* **actions**
+    Contains configuration for Actions
 
 Example
 -------
@@ -183,7 +183,7 @@ actions:                                             # root elements
         acl_resource: acme_demo_action_view          # ACL resource name that will be checked on pre conditions step
         frontend_options:                            # configuration for Frontend Options
                                                      # ...
-        prefunctions:                                # configuration for Pre Functions
+        preactions:                                  # configuration for Pre Actions
                                                      # ...
         preconditions:                               # configuration for Pre Conditions
                                                      # ...
@@ -193,11 +193,11 @@ actions:                                             # root elements
                                                      # ...
         form_options:                                # configuration for Form Options
                                                      # ...
-        form_init:                                   # configuration for Form Init Functions
+        form_init:                                   # configuration for Form Init Actions
                                                      # ...
         conditions:                                  # configuration for Conditions
                                                      # ...
-        functions:                                   # configuration for Functions
+        actions:                                     # configuration for Actions
                                                      # ...
 ```
 
@@ -515,22 +515,22 @@ actions:
             @not_empty: [$group]
 ```
 
-Pre Functions, Form Init Functions and Functions Configuration
-==============================================================
+Pre Actions, Form Init Actions and Actions Configuration
+========================================================
 
-* **prefunctions**
-    Configuration of Pre Functions that may be performed before pre conditions, conditions, form init functions and post
-    functions. It can be used to prepare some data in Action Data that will be used in pre conditions validation.
+* **preactions**
+    Configuration of Pre Actions that may be performed before pre conditions, conditions, form init actions and post
+    actions. It can be used to prepare some data in Action Data that will be used in pre conditions validation.
 * **form_init**
-    Configuration of Form Init Functions that may be performed on Action Data before conditions and functions.
+    Configuration of Form Init Actions that may be performed on Action Data before conditions and actions.
     One of possible init actions usage scenario is to fill attributes with default values, which will be used in action
     form if it exist.
-* **functions**
-    Configuration of Functions that must be performed after all previous steps are performed. This is main action step
+* **actions**
+    Configuration of Actions that must be performed after all previous steps are performed. This is main action step
     that must contain action logic. It will be performed only after conditions will be qualified.
 
-Similarly to Conditions - alias of Function starts from "@" symbol and must refer to registered Functions. For example
-"@assign_value" refers to Function which set specified value to attribute in Action Data.
+Similarly to Conditions - alias of Action starts from "@" symbol and must refer to registered Actions. For example
+"@assign_value" refers to Action which set specified value to attribute in Action Data.
 
 Example
 -------
@@ -539,11 +539,11 @@ Example
 actions:
     demo_action:
         # ...
-        prefunctions:
+        preactions:
             - @assign_value: [$name, 'User Name']
         form_init:
             - @assign_value: [$group, 'Group Name']
-        functions:
+        actions:
             - @create_entity:
                 class: Acme\Bundle\DemoBundle\Entity\User
                 attribute: $user

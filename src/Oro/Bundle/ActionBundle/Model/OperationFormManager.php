@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 
-class ActionFormManager
+class OperationFormManager
 {
     /** @var FormFactoryInterface */
     protected $formFactory;
@@ -34,18 +34,18 @@ class ActionFormManager
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param ActionData $data
      * @return Form
      */
-    public function getOperationForm($actionName, ActionData $data)
+    public function getOperationForm($operationName, ActionData $data)
     {
-        $operation = $this->operationManager->getOperation($actionName, $data);
+        $operation = $this->operationManager->getOperation($operationName, $data);
 
         return $this->formFactory->create(
             $operation->getDefinition()->getFormType(),
             $data,
-            array_merge($operation->getFormOptions($data), ['action' => $operation])
+            array_merge($operation->getFormOptions($data), ['operation' => $operation])
         );
     }
 }

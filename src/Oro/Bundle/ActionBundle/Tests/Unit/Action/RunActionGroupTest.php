@@ -24,23 +24,23 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     protected $mockActionGroupRegistry;
 
     /** @var RunActionGroup */
-    protected $function;
+    protected $actionGroup;
 
     protected function setUp()
     {
         $this->eventDispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $this->mockActionGroupRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupRegistry')
+        $this->actionGroupRegistry = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupRegistry')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->function = new RunActionGroup($this->mockActionGroupRegistry, new ContextAccessor());
-        $this->function->setDispatcher($this->eventDispatcher);
+        $this->actionGroup = new RunActionGroup($this->mockActionGroupRegistry, new ContextAccessor());
+        $this->actionGroup->setDispatcher($this->eventDispatcher);
     }
 
     protected function tearDown()
     {
-        unset($this->function, $this->eventDispatcher, $this->mockActionGroupRegistry);
+        unset($this->actionGroup, $this->eventDispatcher, $this->mockActionGroupRegistry);
     }
 
     public function testOptionNamesRequirements()
@@ -71,13 +71,13 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 
         $this->assertInstanceOf(
             'Oro\Component\Action\Action\ActionInterface',
-            $this->function->initialize($options)
+            $this->actionGroup->initialize($options)
         );
 
         $this->assertAttributeInstanceOf(
             'Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs',
             'executionArgs',
-            $this->function
+            $this->actionGroup
         );
     }
 
@@ -94,7 +94,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 
         $this->mockActionGroupRegistry->expects($this->once())->method('getNames')->willReturn([self::ACTION_NAME]);
 
-        $this->function->initialize($inputData);
+        $this->actionGroup->initialize($inputData);
     }
 
     /**
@@ -154,7 +154,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     public function testExecuteActionWithoutInitialization()
     {
         $this->setExpectedException('\BadMethodCallException', 'Uninitialized action execution.');
-        $this->function->execute([]);
+        $this->actionGroup->execute([]);
     }
 
     /**
@@ -195,8 +195,8 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
             ->with($arguments)
             ->willReturn($returnVal);
 
-        $this->function->initialize($options);
-        $this->function->execute($data);
+        $this->actionGroup->initialize($options);
+        $this->actionGroup->execute($data);
 
         $this->assertEquals($expected, $data);
     }

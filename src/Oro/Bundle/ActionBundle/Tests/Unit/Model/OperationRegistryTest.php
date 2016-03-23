@@ -135,7 +135,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($expected, array_keys($this->registry->find($entityClass, $route, $datagrid, $group)));
 
-        // get actions from local cache
+        // get operations from local cache
         $this->assertEquals($expected, array_keys($this->registry->find($entityClass, $route, $datagrid, $group)));
     }
 
@@ -245,14 +245,14 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'group' => null,
                 'expected' => ['operation10', 'operation13', 'operation14']
             ],
-            'entity3 substitution of action15 by action16' => [
+            'entity3 substitution of operation15 by operation16' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity3',
                 'route' => null,
                 'datagrid' =>  null,
                 'group' => null,
                 'expected' => ['operation13', 'operation14']
             ],
-            'action17 matched by group but no substitution and no appearance' => [
+            'operation17 matched by group but no substitution and no appearance' => [
                 'entityClass' => null,
                 'route' => null,
                 'datagrid' =>  null,
@@ -272,10 +272,10 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider findByNameDataProvider
      *
-     * @param string $actionName
+     * @param string $operationName
      * @param string|null $expected
      */
-    public function testFindByName($actionName, $expected)
+    public function testFindByName($operationName, $expected)
     {
         $this->configurationProvider->expects($this->once())
             ->method('getConfiguration')
@@ -287,7 +287,7 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 ]
             );
 
-        $operation = $this->registry->findByName($actionName);
+        $operation = $this->registry->findByName($operationName);
 
         $this->assertEquals($expected, $operation ? $operation->getName() : $operation);
     }
@@ -298,11 +298,11 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
     public function findByNameDataProvider()
     {
         return [
-            'invalid action name' => [
+            'invalid operation name' => [
                 'operationName' => 'test',
                 'expected' => null
             ],
-            'valid action name' => [
+            'valid operation name' => [
                 'operationName' => 'operation1',
                 'expected' => 'operation1'
             ],

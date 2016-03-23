@@ -38,7 +38,7 @@ order of display buttons. More options see in [Configuration](#configuration).
 * **ActionDefinition** - part of the Action model that contains raw data from action's configuration.
 
 * **Action Data** - container aggregated some data, that will be available on each step of Action. Some of values
-associated with some Attribute. Those values can be entered by user directly or assigned via Functions.
+associated with some Attribute. Those values can be entered by user directly or assigned via Actions.
 
 * **Attribute** - entity that represent one value in Action, used to render field value on a step form.
 Attribute knows about its type (string, object, entity etc.) and additional options.
@@ -46,10 +46,10 @@ Attribute contains name and label as additional parameters.
 
 * **Condition** - defines whether specific Action is allowed with specified input data. Conditions can be nested.
 
-* **Functions** - operations are assigned to Action and executed when Action is performed.
-There are two kind of actions: Pre Functions, Form Init Functions and Functions.
-The difference between them is that Pre Functions are executed before Action button redder, Form Init Functions are
-executed before Action and Functions are executed after Action.
+* **Actions** - operations are assigned to Action and executed when Action is performed.
+There are two kind of actions: Pre Actions, Form Init Actions and Actions.
+The difference between them is that Pre Actions are executed before Action button redder, Form Init Actions are
+executed before Action and Actions are executed after Action.
 Actions can be used to perform any operations with data in Action Data or other entities.
 
 How it works?
@@ -59,7 +59,7 @@ Each action relates to the some entity types (i.e. consists full class name) or\
 where action should be displayed or\and datagrids. Before page loading Action Bundle chooses actions that
 are corresponded to page's entity\route. Then these actions checking for Pre conditions.
 If all Pre conditions are met - Action's button is displaying.
-After user click on the button - all functions will be executed if pre conditions and conditions are met.
+After user click on the button - all actions will be executed if pre conditions and conditions are met.
 
 Configuration
 -------------
@@ -142,15 +142,15 @@ actions:
             attribute_default_values:                               # (optional) define default values for attributes
                 demo_attr: $demo                                    # use attribute name and property path or simple string for attribute value
 
-        form_init:                                                  # (optional) any needed functions which will execute before showing form dialog
-            - @assign_value:                                        # function alias
-                conditions:                                         # (optional) conditions list to allow current function
+        form_init:                                                  # (optional) any needed actions which will execute before showing form dialog
+            - @assign_value:                                        # action alias
+                conditions:                                         # (optional) conditions list to allow current action
                     @empty: $description                            # condition definition
-                parameters: [$.demo_attr, 'Demo Data']              # parameters of current function
+                parameters: [$.demo_attr, 'Demo Data']              # parameters of current action
 
-        prefunctions:                                               # (optional) any needed pre functions which will execute before pre conditions
-            - @create_datetime:                                     # function alias
-                attribute: $.date                                   # function parameters
+        preactions:                                                 # (optional) any needed pre actions which will execute before pre conditions
+            - @create_datetime:                                     # action alias
+                attribute: $.date                                   # action parameters
 
         preconditions:                                              # (optional) pre conditions for display Action button
             @gt: [$updatedAt, $.date]                               # condition definition
@@ -158,15 +158,15 @@ actions:
         conditions:                                                 # (optional) pre conditions for display Action button
             @gt: [$updatedAt, $.date]                               # condition definition
 
-        functions:                                                  # (optional) any needed functions which will execute after click on th button
-            - @assign_value: [$expired, true]                       # function definition
+        actions:                                                    # (optional) any needed actions which will execute after click on th button
+            - @assign_value: [$expired, true]                       # action definition
 ```
 
 This configuration describes action that relates to the ``MyEntity`` entity. On the View page (acme_demo_myentity_view)
 of this entity (in case of field 'updatedAt' > new DateTime('now')) will be displayed button with label
-"adme.demo.myentity.actions.myentity_action". After click on this button - will run postfunction "assign_value" and set
+"adme.demo.myentity.actions.myentity_action". After click on this button - will run action "assign_value" and set
 field 'expired' to `true`.
-If `form_options` are specified after click on button will be shown form dialog with attributes fields. And functions
+If `form_options` are specified after click on button will be shown form dialog with attributes fields. And actions
 will run only on form submit.
 
 Configuration Validation
