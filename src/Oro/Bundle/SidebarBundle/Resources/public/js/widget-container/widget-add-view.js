@@ -58,7 +58,7 @@ define(function(require) {
 
         /**
          *
-         * @param $control
+         * @param {jQuery} $control
          * @returns {Function}
          * @protected
          */
@@ -66,10 +66,10 @@ define(function(require) {
             $control.addClass('disabled');
             var sidebarContainer = $control.parents('.sidebar-widget-container');
             sidebarContainer.addClass('loading-widget-content');
-            return function (){
+            return function () {
                 $control.removeClass('disabled');
                 sidebarContainer.removeClass('loading-widget-content');
-            }
+            };
         },
 
         /**
