@@ -57,7 +57,7 @@ abstract class ApiTestCase extends WebTestCase
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
 
-            $entities[$entityClass] = [$entityClass];
+            $entities[$entityClass] = [$entityClass, $resource->getExcludedActions()];
         }
 
         return $entities;
