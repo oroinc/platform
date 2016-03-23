@@ -106,9 +106,6 @@ use Oro\Bundle\ApiBundle\Processor\Context;
  */
 class InitializeConfigExtras implements ProcessorInterface
 {
-    /**
-     * {@inheritdoc}
-     */
     public function process(ContextInterface $context)
     {
         /** @var Context $context */
