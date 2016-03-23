@@ -34,7 +34,7 @@ The [ConfigExtraInterface](../../Config/ConfigExtraInterface.php) has the follow
  * **getName** - Returns a string which is used as unique identifier of configuration data.
  * **getCacheKeyPart** - Returns a string that should be added to a cache key used by [configuration providers](../../Provider/AbstractConfigProvider.php). In most cases this method returns the same value as the `getName` method. But some more complicated extras can build the cache key part based on own properties, e.g. [MaxRelatedEntitiesConfigExtra](../../Config/MaxRelatedEntitiesConfigExtra.php).
  * **configureContext** - This method can be used to add additional values into the [ConfigContext](../../Processor/Config/ConfigContext.php). For example, the mentioned above [MaxRelatedEntitiesConfigExtra](../../Config/MaxRelatedEntitiesConfigExtra.php) adds the maximum number of related entities into the context of the [get_config](./actions.md#get_config-action) action and this value is used by the [SetMaxRelatedEntities](../../Processor/Config/GetConfig/SetMaxRelatedEntities.php) processor to make necessary modifications to the configuration.
- * **isPropagable** - Indicates whether this config extra should be used when a configuration of related entities will be built. For example [DescriptionsConfigExtra](../../Processor/Config/DescriptionsConfigExtra.php) is propagable and it means that we will get human-readable descriptions of main entity and all the related entities. If this extra was not propagable the descriptions of main entity would be returned.
+ * **isPropagable** - Indicates whether this config extra should be used when a configuration of related entities will be built. For example [DescriptionsConfigExtra](../../Config/DescriptionsConfigExtra.php) is propagable and it means that we will get human-readable descriptions of main entity and all the related entities. If this extra was not propagable the descriptions of main entity would be returned.
 
 
 ConfigExtraSectionInterface
@@ -53,7 +53,7 @@ There are a list of existing configuration extras that implement this interface:
 Example of configuration extra
 ------------------------------
 
-Let's take a look into [DescriptionsConfigExtra](../../Processor/Config/DescriptionsConfigExtra.php) which is used to request human-readable descriptions of entities and its' fields.
+Let's take a look into [DescriptionsConfigExtra](../../Config/DescriptionsConfigExtra.php) which is used to request human-readable descriptions of entities and its' fields.
 
 ```php
 <?php
