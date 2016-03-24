@@ -7,7 +7,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
  * Unset the "X-Include-Delete-Count" response header
- *  in case if it was requested by "X-Include: deleteCount" request header and an error occurred in deletion process.
+ *  in case if it was requested by "X-Include: deleteCount" request header but an error occurred in deletion process.
  */
 class UnsetDeleteCountHeader implements ProcessorInterface
 {
