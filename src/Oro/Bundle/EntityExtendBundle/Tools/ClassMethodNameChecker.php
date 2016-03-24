@@ -11,52 +11,42 @@ class ClassMethodNameChecker
     protected $gettersPrefix = ['get', 'is', 'has'];
 
     /** @var array */
-    protected $settersPrefix = ['set', 'setDefault', 'add'];
+    protected $settersPrefix = ['set'];
 
     /** @var array */
-    protected $removerPrefix = ['remove'];
+    protected $removerPrefix = ['remove', 'setDefault', 'add'];
 
     /**
      * @param string $className
      * @param string $property
-     * @param bool   $checkGetters
-     * @param bool   $checkSetters
-     * @param bool   $checkRemovers
      *
      * @return string
      */
-    public function getConflictMethodName(
-        $className,
-        $property,
-        $checkGetters = true,
-        $checkSetters = true,
-        $checkRemovers = true
-    ) {
-        if ($checkGetters) {
-            $result = $this->checkMethod($property, $className, $this->gettersPrefix);
+    public function hasGetters($className, $property)
+    {
+        return $this->checkMethod($property, $className, $this->gettersPrefix);
+    }
 
-            if (!empty($result)) {
-                return $result;
-            }
-        }
+    /**
+     * @param string $className
+     * @param string $property
+     *
+     * @return string
+     */
+    public function hasSetters($className, $property)
+    {
+        return $this->checkMethod($property, $className, $this->settersPrefix);
+    }
 
-        if ($checkSetters) {
-            $result = $this->checkMethod($property, $className, $this->settersPrefix);
-
-            if (!empty($result)) {
-                return $result;
-            }
-        }
-
-        if ($checkRemovers) {
-            $result = $this->checkMethod($property, $className, $this->removerPrefix);
-
-            if (!empty($result)) {
-                return $result;
-            }
-        }
-
-        return $this->checkMethod($property, $className, ['']);
+    /**
+     * @param string $className
+     * @param string $property
+     *
+     * @return string
+     */
+    public function hasRelationMethods($className, $property)
+    {
+        return $this->checkMethod($property, $className, $this->removerPrefix);
     }
 
     /**

@@ -7,6 +7,7 @@ use Symfony\Component\Validator\Constraint;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
 use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 
 /**
  * Validates method name for uniqueness for field name.
@@ -16,20 +17,18 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
     const ALIAS = 'oro_entity_extend.validator.unique_extend_entity_method_name';
 
     /** @var ClassMethodNameChecker */
-    protected $extendClassChecking;
+    protected $methodNameChecker;
 
     /**
      * @param FieldNameValidationHelper $validationHelper
-     * @param ClassMethodNameChecker    $extendClassChecking
+     * @param ClassMethodNameChecker    $methodNameChecker
      *
      */
-    public function __construct(
-        FieldNameValidationHelper $validationHelper,
-        ClassMethodNameChecker $extendClassChecking
-    ) {
+    public function __construct(FieldNameValidationHelper $validationHelper, ClassMethodNameChecker $methodNameChecker)
+    {
         parent::__construct($validationHelper);
 
-        $this->extendClassChecking = $extendClassChecking;
+        $this->methodNameChecker = $methodNameChecker;
     }
 
     /**
@@ -48,10 +47,25 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
 
         $className  = $value->getEntity()->getClassName();
         $fieldName  = $value->getFieldName();
-        $methodName = $this->extendClassChecking->getConflictMethodName($className, $fieldName);
+        $type       = $value->getType();
+        $getterName = $this->methodNameChecker->hasGetters($className, $fieldName);
 
-        if (!empty($methodName)) {
-            $this->addViolation($constraint->message, $methodName, '');
+        if (strlen($getterName) > 0) {
+            $this->addViolation($constraint->message, $getterName, '');
+        }
+
+        $settersName = $this->methodNameChecker->hasSetters($className, $fieldName);
+
+        if (strlen($settersName) > 0) {
+            $this->addViolation($constraint->message, $settersName, '');
+        }
+
+        if (in_array($type, RelationType::$anyToAnyRelations, false)) {
+            $relationMethodsName = $this->methodNameChecker->hasRelationMethods($className, $fieldName);
+
+            if (strlen($relationMethodsName) > 0) {
+                $this->addViolation($constraint->message, $relationMethodsName, '');
+            }
         }
     }
 }
