@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Component\ChainProcessor\ProcessorBag;
+
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Component\ChainProcessor\ProcessorBag;
 
 class DeleteListProcessor extends RequestActionProcessor
 {
