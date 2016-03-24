@@ -66,3 +66,19 @@ oro_api:
                     priority: -60
                 normalize_result:
                     priority: -70
+        delete_list:
+            processing_groups:
+                initialize:
+                    priority: -10
+                security_check:
+                    priority: -20
+                normalize_input:
+                    priority: -30
+                build_query:
+                    priority: -40
+                load_data:
+                    priority: -50
+                delete_data:
+                    priority: -60
+                normalize_result:
+                    priority: -70

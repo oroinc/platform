@@ -1,0 +1,211 @@
+services:
+    oro_api.delete_list.processor:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteListProcessor
+        public: false
+        arguments:
+            - @oro_api.processor_bag
+            - delete_list
+            - @oro_api.config_provider
+            - @oro_api.metadata_provider
+        tags:
+            - { name: oro.api.action_processor }
+    
+    #
+    # initialize
+    #
+
+    oro_api.delete_list.check_request_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CheckRequestType
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 250 }
+
+    oro_api.delete_list.validate_request_type_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 210 }
+
+    oro_api.delete_list.validate_class_name_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 210 }
+
+    oro_api.delete_list.normalize_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 200 }
+
+    oro_api.delete_list.initialize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
+        arguments:
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 200 }
+
+    oro_api.delete_list.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 50 }
+
+    oro_api.delete_list.json_api.normalize_include_parameter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludeParameter
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: 50 }
+
+    oro_api.delete_list.normalize_entity_class:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 20 }
+
+    oro_api.delete_list.initialize_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\InitializeConfigExtras
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 10 }
+
+    oro_api.delete_list.register_filters:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\RegisterFilters
+        arguments:
+            - @oro_api.filter_factory
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, priority: -50 }
+
+    oro_api.delete_list.json_api.normalize_filter_keys:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\NormalizeFilterKeys
+        arguments:
+            - @oro_api.doctrine_helper
+            - @translator
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: -50 }
+
+    #
+    # security_check
+    #
+
+    oro_api.delete_list.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_security.security_facade
+            - DELETE
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }
+
+    #
+    # normalize_input
+    #
+
+    oro_api.delete_list.normalize_filter_values:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\NormalizeFilterValues
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: -10 }
+
+    #
+    # build_query
+    #
+
+    oro_api.delete_list.build_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\BuildCriteria
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: 50 }
+
+    oro_api.delete_list.complete_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -50 }
+
+    oro_api.delete_list.optimize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\OptimizeCriteria
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -60 }
+
+    oro_api.delete_list.protect_query_by_acl:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_security.acl_helper
+            - @oro_security.acl.annotation_provider
+            - DELETE
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -90 }
+
+    oro_api.delete_list.build_query:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\BuildQuery
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -100 }
+
+    #
+    # load_data
+    #
+
+#    oro_api.delete_list.load_data_by_entity_serializer:
+#        class: Oro\Bundle\ApiBundle\Processor\GetList\LoadDataByEntitySerializer
+#        arguments:
+#            - @oro_api.entity_serializer
+#        tags:
+#            - { name: oro.api.processor, action: delete_list, group: load_data, priority: -10 }
+
+    oro_api.delete_list.load_data_by_orm_query:
+        class: Oro\Bundle\ApiBundle\Processor\GetList\LoadDataByOrmQuery
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: load_data, priority: -20 }
+
+    #
+    # delete_data
+    #
+
+    oro_api.delete_list.delete_data_by_handler:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListDataByDeleteHandler
+        arguments:
+            - @oro_api.doctrine_helper
+            - @service_container
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }
+
+    oro_api.delete_list.validate_deletion_result:
+            class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateDeletionResult
+            tags:
+                - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -200 }
+
+    #
+    # normalize_result
+    #
+
+    oro_api.delete_list.rest.set_http_response_status_code:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
+        arguments:
+           - 204
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest, priority: -10 }
+
+    oro_api.delete_list.normalize_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors
+        arguments:
+            - @translator
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -10 }
+
+    oro_api.delete_list.json_api.build_json_api_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\BuildSingleItemJsonApiDocument
+        arguments:
+            - @oro_api.json_api.document_builder_factory
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: json_api, priority: -20 }
+
+    oro_api.delete_list.process_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -100 }
+
+    oro_api.delete_list.json_api.set_response_content_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: json_api, priority: -250 }
