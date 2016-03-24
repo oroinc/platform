@@ -6,9 +6,9 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\PropertyAccess\PropertyPath;
 use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
-use Oro\Component\Action\OptionsResolverTrait;
 use Oro\Component\Action\Action\AbstractAction;
 use Oro\Component\Action\Model\ContextAccessor;
+use Oro\Component\Action\OptionsResolverTrait;
 
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupExecutionArgs;
@@ -17,6 +17,7 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 class RunActionGroup extends AbstractAction
 {
     use OptionsResolverTrait;
+
     const OPTION_ACTION_GROUP   = 'action_group';
     const OPTION_PARAMETERS_MAP = 'parameters_mapping';
     const OPTION_ATTRIBUTES     = 'attributes';
@@ -79,11 +80,9 @@ class RunActionGroup extends AbstractAction
             self::OPTION_ATTRIBUTES,
             function ($value) {
                 foreach ($value as $target => $source) {
-                    if (!is_string($target) && !$target instanceof PropertyPathInterface) {
-                        return false;
-                    }
-
-                    if (!$source instanceof PropertyPathInterface) {
+                    if ((!is_string($target) && !$target instanceof PropertyPathInterface) ||
+                        (!$source instanceof PropertyPathInterface)
+                    ) {
                         return false;
                     }
                 }

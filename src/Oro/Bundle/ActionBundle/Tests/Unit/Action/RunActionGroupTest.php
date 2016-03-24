@@ -15,7 +15,7 @@ use Oro\Component\Action\Model\ContextAccessor;
 
 class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 {
-    const ACTION_NAME = 'test_action';
+    const ACTION_GROUP_NAME = 'test_action_group';
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|EventDispatcherInterface */
     protected $eventDispatcher;
@@ -59,7 +59,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
         ];
 
         $options = [
-            RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
+            RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_GROUP_NAME,
             RunActionGroup::OPTION_PARAMETERS_MAP => $parametersMap,
             RunActionGroup::OPTION_ATTRIBUTES => [],
             RunActionGroup::OPTION_ATTRIBUTE => new PropertyPath('path')
@@ -67,7 +67,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
 
         $this->mockActionGroupRegistry->expects($this->once())
             ->method('getNames')
-            ->willReturn([self::ACTION_NAME]);
+            ->willReturn([self::ACTION_GROUP_NAME]);
 
         $this->assertInstanceOf(
             'Oro\Component\Action\Action\ActionInterface',
@@ -92,7 +92,10 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException($exception, $exceptionMessage);
 
-        $this->mockActionGroupRegistry->expects($this->once())->method('getNames')->willReturn([self::ACTION_NAME]);
+        $this->mockActionGroupRegistry
+            ->expects($this->once())
+            ->method('getNames')
+            ->willReturn([self::ACTION_GROUP_NAME]);
 
         $this->actionGroup->initialize($inputData);
     }
@@ -121,11 +124,11 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedException' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
                 'expectedExceptionMessage' => 'The option "action_group" with value "non existent" is invalid. ' .
-                    'Accepted values are: "test_action".'
+                    'Accepted values are: "test_action_group".'
             ],
             'bad parameters map type' => [
                 'inputData' => [
-                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
+                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_GROUP_NAME,
                     RunActionGroup::OPTION_PARAMETERS_MAP => 'string is not supported'
                 ],
                 'expectedException' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
@@ -138,7 +141,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
             ],
             'bad attribute' => [
                 'inputData' => [
-                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
+                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_GROUP_NAME,
                     RunActionGroup::OPTION_ATTRIBUTE => '$.nonConvertedPropertyPath'
                 ],
                 'expectedException' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
@@ -182,12 +185,12 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
         //during initialize
         $this->mockActionGroupRegistry->expects($this->once())
             ->method('getNames')
-            ->willReturn([self::ACTION_NAME]);
+            ->willReturn([self::ACTION_GROUP_NAME]);
 
         //during execute
         $this->mockActionGroupRegistry->expects($this->once())
             ->method('get')
-            ->with(self::ACTION_NAME)
+            ->with(self::ACTION_GROUP_NAME)
             ->willReturn($mockActionGroup);
 
         $mockActionGroup->expects($this->once())
@@ -215,7 +218,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                     'errors' => new ArrayCollection(),
                 ],
                 'options' => [
-                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
+                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_GROUP_NAME,
                     RunActionGroup::OPTION_PARAMETERS_MAP => [
                         'paramValue' => new PropertyPath('param')
                     ]
@@ -229,7 +232,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                     'param' => 'value',
                 ],
                 'options' => [
-                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
+                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_GROUP_NAME,
                     RunActionGroup::OPTION_PARAMETERS_MAP => [
                         'paramValue' => new PropertyPath('param')
                     ],
@@ -250,7 +253,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                     'param' => 'value',
                 ],
                 'options' => [
-                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_NAME,
+                    RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_GROUP_NAME,
                     RunActionGroup::OPTION_PARAMETERS_MAP => [
                         'paramValue' => new PropertyPath('param')
                     ],
