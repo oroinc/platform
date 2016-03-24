@@ -155,13 +155,18 @@ services:
     # delete_data
     #
 
+    oro_api.delete_list.set_delete_count_header:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteCountHeader
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }
+
     oro_api.delete_list.delete_data_by_handler:
         class: Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListDataByDeleteHandler
         arguments:
             - @oro_api.doctrine_helper
             - @service_container
         tags:
-            - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }
+            - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -20 }
 
     oro_api.delete_list.validate_deletion_result:
             class: Oro\Bundle\ApiBundle\Processor\Delete\ValidateDeletionResult
@@ -192,6 +197,11 @@ services:
             - @oro_api.json_api.document_builder_factory
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: json_api, priority: -20 }
+
+    oro_api.delete_list.unset_delete_count_header:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\UnsetDeleteCountHeader
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -30 }
 
     oro_api.delete_list.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
