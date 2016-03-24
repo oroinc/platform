@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Controller;
 
-use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -14,6 +13,7 @@ use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
+use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
