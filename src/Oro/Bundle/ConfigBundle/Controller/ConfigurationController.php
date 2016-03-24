@@ -51,7 +51,7 @@ class ConfigurationController extends Controller
 
                 // recreate form to drop values for fields with use_parent_scope_value
                 $form = $provider->getForm($activeSubGroup);
-                $form->setData($this->get('oro_config.manager')->getSettingsByForm($form));
+                $form->setData($this->get('oro_config.global')->getSettingsByForm($form));
             }
         }
 
