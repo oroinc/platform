@@ -11,6 +11,7 @@ class ActionConfig
     use Traits\ExcludeTrait;
     use Traits\AclResourceTrait;
     use Traits\DescriptionTrait;
+    use Traits\MaxResultsTrait;
 
     /** a flag indicates whether the action should not be available for the entity */
     const EXCLUDE = ConfigUtil::EXCLUDE;
@@ -20,6 +21,9 @@ class ActionConfig
 
     /** the entity description for the action  */
     const DESCRIPTION = EntityDefinitionConfig::DESCRIPTION;
+
+    /** the maximum number of items in the result */
+    const MAX_RESULTS = EntityDefinitionConfig::MAX_RESULTS;
 
     /** @var array */
     protected $items = [];
