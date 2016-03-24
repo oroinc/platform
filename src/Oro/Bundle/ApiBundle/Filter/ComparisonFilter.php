@@ -5,9 +5,13 @@ namespace Oro\Bundle\ApiBundle\Filter;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\Common\Collections\Expr\Expression;
 
+/**
+ * A filter that can be used to filter data by a field value.
+ * Also this filter supports different kind of comparison:
+ * "equal", "not equal", "less than", "less than or equal", "greater than", "greater than or equal".
+ */
 class ComparisonFilter extends StandaloneFilter
 {
-    const EQ  = '=';
     const NEQ = '<>';
     const LT  = '<';
     const LTE = '<=';
@@ -44,7 +48,7 @@ class ComparisonFilter extends StandaloneFilter
     {
         return
             parent::isArrayAllowed($operator)
-            && in_array(null !== $operator ? $operator : self::EQ, [self::EQ, self::NEQ], true);
+            && (null === $operator || in_array($operator, [self::EQ, self::NEQ], true));
     }
 
     /**
@@ -101,6 +105,27 @@ class ComparisonFilter extends StandaloneFilter
             );
         }
 
+        if (in_array($operator, $this->operators, true)) {
+            $expr = $this->doBuildExpression($field, $operator, $value);
+            if (null !== $expr) {
+                return $expr;
+            }
+        }
+
+        throw new \InvalidArgumentException(
+            sprintf('Unsupported operator: "%s". Field: "%s".', $operator, $field)
+        );
+    }
+
+    /**
+     * @param string $field
+     * @param string $operator
+     * @param mixed  $value
+     *
+     * @return Expression|null
+     */
+    protected function doBuildExpression($field, $operator, $value)
+    {
         switch ($operator) {
             case self::EQ:
                 return is_array($value)
@@ -118,10 +143,8 @@ class ComparisonFilter extends StandaloneFilter
                 return Criteria::expr()->gte($field, $value);
             case self::LTE:
                 return Criteria::expr()->lte($field, $value);
+            default:
+                return null;
         }
-
-        throw new \InvalidArgumentException(
-            sprintf('Unsupported operator: "%s". Field: "%s".', $operator, $field)
-        );
     }
 }

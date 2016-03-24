@@ -249,13 +249,7 @@ services:
     oro_api.filter_factory.default:
         class: Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory
         public: false
-        calls:
-            - [addFilter, [ 'integer', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'unsignedInteger', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'string', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'boolean', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'datetime', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'entityAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'entityPluralAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+        arguments:
+            - @property_accessor
         tags:
             - { name: oro.api.filter_factory, priority: -10 }

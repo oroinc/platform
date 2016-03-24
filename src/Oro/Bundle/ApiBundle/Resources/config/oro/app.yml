@@ -13,6 +13,18 @@ security:
             context: main
 
 oro_api:
+    filters:
+        string: ~
+        boolean: ~
+        integer:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        unsignedInteger:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        datetime:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        entityAlias: ~
+        entityPluralAlias: ~
+
     actions:
         get_list:
             processing_groups:
