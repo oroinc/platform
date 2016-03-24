@@ -88,27 +88,15 @@ class TestEntity
         $this->description = $description;
     }
 
-    /**
-     * @return string
-     */
     public function getComplex()
     {
-        return $this->getName() . $this->getDescription();
     }
 
-    /**
-     * @param $value
-     */
-    public function setSomeOne($value)
+    public function setSomeOne()
     {
-
     }
 
-    /**
-     * @param $value
-     */
-    public function addSomeOne($value)
+    public function addSomeOne()
     {
-
     }
 }
