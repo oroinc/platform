@@ -97,6 +97,11 @@ services:
     # normalize_input
     #
 
+    oro_api.delete_list.validate_filter_values:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\ValidateFilterValues
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: 0 }
+
     oro_api.delete_list.normalize_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\GetList\NormalizeFilterValues
         arguments:
@@ -122,6 +127,11 @@ services:
 
     oro_api.delete_list.optimize_criteria:
         class: Oro\Bundle\ApiBundle\Processor\GetList\OptimizeCriteria
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: -60 }
+
+    oro_api.delete_list.set_delete_limit:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -60 }
 
