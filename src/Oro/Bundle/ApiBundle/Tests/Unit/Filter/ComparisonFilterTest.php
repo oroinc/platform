@@ -20,6 +20,16 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        $this->comparisonFilter->setSupportedOperators(
+            [
+                ComparisonFilter::EQ,
+                ComparisonFilter::NEQ,
+                ComparisonFilter::LT,
+                ComparisonFilter::LTE,
+                ComparisonFilter::GT,
+                ComparisonFilter::GTE,
+            ]
+        );
     }
 
     /**
@@ -52,6 +62,50 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage Unsupported operator: "<>". Field: "fieldName".
+     */
+    public function testUnsupportedOperatorWhenOperatorsAreNotSpecified()
+    {
+        $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        $comparisonFilter->setField('fieldName');
+        $comparisonFilter->apply(new Criteria(), new FilterValue('path', 'value', ComparisonFilter::NEQ));
+    }
+
+    public function testFilterWhenOperatorsAreNotSpecified()
+    {
+        $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        $comparisonFilter->setField('fieldName');
+
+        $this->assertEquals(['='], $comparisonFilter->getSupportedOperators());
+
+        $criteria = new Criteria();
+        $comparisonFilter->apply($criteria, new FilterValue('path', 'value', ComparisonFilter::EQ));
+
+        $this->assertEquals(
+            new Criteria(new Comparison('fieldName', ComparisonFilter::EQ, 'value')),
+            $criteria
+        );
+    }
+
+    public function testFilterWhenOnlyEqualOperatorIsSpecified()
+    {
+        $comparisonFilter = new ComparisonFilter(DataType::INTEGER);
+        $comparisonFilter->setSupportedOperators([ComparisonFilter::EQ]);
+        $comparisonFilter->setField('fieldName');
+
+        $this->assertEquals(['='], $comparisonFilter->getSupportedOperators());
+
+        $criteria = new Criteria();
+        $comparisonFilter->apply($criteria, new FilterValue('path', 'value', ComparisonFilter::EQ));
+
+        $this->assertEquals(
+            new Criteria(new Comparison('fieldName', ComparisonFilter::EQ, 'value')),
+            $criteria
+        );
+    }
+
+    /**
      * @param string      $fieldName
      * @param bool        $isArrayAllowed
      * @param FilterValue $filterValue
@@ -69,6 +123,8 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
         if ($filterValue) {
             $this->assertSame($isArrayAllowed, $this->comparisonFilter->isArrayAllowed($filterValue->getOperator()));
         }
+
+        $this->assertEquals(['=', '<>', '<', '<=', '>', '>='], $this->comparisonFilter->getSupportedOperators());
 
         $criteria = new Criteria();
         $this->comparisonFilter->apply($criteria, $filterValue);

@@ -286,6 +286,10 @@ class RestDocHandler implements HandlerInterface
                 if (!empty($default)) {
                     $options['default'] = $default;
                 }
+                $operators = $filter->getSupportedOperators();
+                if (!empty($operators) && !(count($operators) === 1 && $operators[0] === StandaloneFilter::EQ)) {
+                    $options['operators'] = implode(',', $operators);
+                }
                 $annotation->addFilter($key, $options);
             }
         }

@@ -8,6 +8,7 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfigExtension;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
@@ -16,6 +17,9 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 
+/**
+ * Tests extensions config tree definitions
+ */
 class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -33,6 +37,7 @@ class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
         $configExtensionRegistry = new ConfigExtensionRegistry();
         $configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
+        $configExtensionRegistry->addExtension(new ActionsConfigExtension());
         $configExtensionRegistry->addExtension(new TestConfigExtension());
 
         list(

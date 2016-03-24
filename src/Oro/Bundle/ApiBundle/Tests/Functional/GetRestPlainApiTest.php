@@ -30,11 +30,12 @@ class GetRestPlainApiTest extends ApiTestCase
     }
 
     /**
-     * @param string $entityClass
+     * @param string   $entityClass
+     * @param string[] $excludedActions
      *
      * @dataProvider getEntities
      */
-    public function testGetListRestRequests($entityClass)
+    public function testRestRequests($entityClass, $excludedActions)
     {
         $entityAlias = $this->valueNormalizer->normalizeValue(
             $entityClass,
@@ -42,14 +43,7 @@ class GetRestPlainApiTest extends ApiTestCase
             $this->getRequestType()
         );
 
-        /**
-         * @TODO: Fix AbandonedCartBundle/Acl/Voter/AbandonedCartVoter (CRM-4733)
-         */
-        if ($entityAlias === 'abandonedcartcampaigns') {
-            $this->markTestSkipped('Should be deleted after fix of AbandonedCartVoter.');
-        }
-
-        // test get list request
+        // test "get list" request
         $this->client->request(
             'GET',
             $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'limit' => 1])
@@ -59,30 +53,55 @@ class GetRestPlainApiTest extends ApiTestCase
 
         $id = $this->getGetEntityId($entityClass, $this->jsonToArray($response->getContent()));
         if (null !== $id) {
-            // test get request
-            $this->client->request(
-                'GET',
-                $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
-            );
-            $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 200, $entityAlias, 'get');
-
-            // test delete request
-            $this->client->request(
-                'DELETE',
-                $this->getUrl('oro_rest_api_delete', ['entity' => $entityAlias, 'id' => $id])
-            );
-            $response = $this->client->getResponse();
-            if ($response->getStatusCode() == 204) {
-                // check if entity was really deleted
-                $this->client->request(
-                    'GET',
-                    $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
-                );
-                $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 404, $entityAlias, 'get');
+            // test "get" request
+            if (!in_array('get', $excludedActions, true)) {
+                // test get request
+                $this->checkGetRequest($entityAlias, $id, 200);
+            }
+            // test "delete" request
+            if (!in_array('delete', $excludedActions, true)) {
+                // test delete request
+                $this->checkDeleteRequest($entityAlias, $id, $excludedActions);
             }
         }
 
         self::cleanUpConnections();
+    }
+
+    /**
+     * @param string   $entityAlias
+     * @param mixed    $id
+     * @param string[] $excludedActions
+     */
+    protected function checkDeleteRequest($entityAlias, $id, $excludedActions)
+    {
+        $this->client->request(
+            'DELETE',
+            $this->getUrl('oro_rest_api_delete', ['entity' => $entityAlias, 'id' => $id])
+        );
+        $response = $this->client->getResponse();
+        if ($response->getStatusCode() == 204 && !in_array('get', $excludedActions, true)) {
+            // check if entity was really deleted
+            $this->client->request(
+                'GET',
+                $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
+            );
+            $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 404, $entityAlias, 'get');
+        }
+    }
+
+    /**
+     * @param string  $entityAlias
+     * @param mixed   $id
+     * @param integer $expectedStatus
+     */
+    protected function checkGetRequest($entityAlias, $id, $expectedStatus)
+    {
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id])
+        );
+        $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 200, $entityAlias, 'get');
     }
 
     /**
