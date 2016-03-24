@@ -37,8 +37,8 @@ class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
         $configExtensionRegistry = new ConfigExtensionRegistry();
         $configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
-        $configExtensionRegistry->addExtension(new TestConfigExtension());
         $configExtensionRegistry->addExtension(new ActionsConfigExtension());
+        $configExtensionRegistry->addExtension(new TestConfigExtension());
 
         list(
             $extraSections,
