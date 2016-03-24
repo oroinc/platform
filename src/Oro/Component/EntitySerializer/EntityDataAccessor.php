@@ -54,29 +54,25 @@ class EntityDataAccessor implements DataAccessorInterface
 
             $accessor = 'get' . $suffix;
             if ($refl->hasMethod($accessor)) {
-                $method = $refl->getMethod($accessor);
-                $value  = $method->invoke($object);
+                $value = $object->{$accessor}();
 
                 return true;
             }
             $accessor = 'is' . $suffix;
             if ($refl->hasMethod($accessor)) {
-                $method = $refl->getMethod($accessor);
-                $value  = $method->invoke($object);
+                $value = $object->{$accessor}();
 
                 return true;
             }
             $accessor = 'has' . $suffix;
             if ($refl->hasMethod($accessor)) {
-                $method = $refl->getMethod($accessor);
-                $value  = $method->invoke($object);
+                $value = $object->{$accessor}();
 
                 return true;
             }
             $accessor = $suffix;
             if ($refl->hasMethod($accessor)) {
-                $method = $refl->getMethod($accessor);
-                $value  = $method->invoke($object);
+                $value = $object->{$accessor}();
 
                 return true;
             }

@@ -17,9 +17,10 @@ use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
  */
 class ExpressionResult
 {
-    const TYPE_INT  = 1;
-    const TYPE_DATE = 2;
-    const TYPE_TIME = 3;
+    const TYPE_INT      = 1;
+    const TYPE_DATE     = 2;
+    const TYPE_TIME     = 3;
+    const TYPE_DAYMONTH = 4;
 
     /** @var int */
     private $variableType = null;
@@ -44,6 +45,7 @@ class ExpressionResult
 
                 switch ($value->getValue()) {
                     case DateModifierInterface::VAR_TODAY:
+                    case DateModifierInterface::VAR_THIS_DAY_W_Y:
                         $dateValue->startOfDay();
                         break;
                     case DateModifierInterface::VAR_SOW:
@@ -54,6 +56,7 @@ class ExpressionResult
                         break;
                     case DateModifierInterface::VAR_SOM:
                     case DateModifierInterface::VAR_THIS_MONTH:
+                    case DateModifierInterface::VAR_THIS_MONTH_W_Y:
                         $dateValue->firstOfMonth();
                         break;
                     case DateModifierInterface::VAR_FMQ:
@@ -85,6 +88,10 @@ class ExpressionResult
             } elseif ($value->is(Token::TYPE_INTEGER)) {
                 $this->sourceType = self::TYPE_INT;
                 $this->value      = $value->getValue();
+            } elseif ($value->is(Token::TYPE_DAYMONTH)) { //03-20, [month]-[day]
+                $this->sourceType = self::TYPE_DAYMONTH;
+                //don't worry about date(Y), later we get only day and month
+                $this->value      = Carbon::parse(date('Y').'-'.$value->getValue(), new \DateTimeZone($timezone));
             }
         }
     }
@@ -144,6 +151,7 @@ class ExpressionResult
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
+                case DateModifierInterface::VAR_THIS_DAY_W_Y:
                 case DateModifierInterface::VAR_SOW:
                 case DateModifierInterface::VAR_SOM:
                 case DateModifierInterface::VAR_SOQ:
@@ -156,6 +164,7 @@ class ExpressionResult
                     break;
                 case DateModifierInterface::VAR_FMQ:
                 case DateModifierInterface::VAR_THIS_MONTH:
+                case DateModifierInterface::VAR_THIS_MONTH_W_Y:
                     $dateValue->addMonths($value->getValue());
                     break;
                 case DateModifierInterface::VAR_THIS_QUARTER:
@@ -194,6 +203,7 @@ class ExpressionResult
                 case DateModifierInterface::VAR_NOW:
                 case DateModifierInterface::VAR_TODAY:
                 case DateModifierInterface::VAR_THIS_DAY:
+                case DateModifierInterface::VAR_THIS_DAY_W_Y:
                 case DateModifierInterface::VAR_SOW:
                 case DateModifierInterface::VAR_SOM:
                 case DateModifierInterface::VAR_SOQ:
@@ -206,6 +216,7 @@ class ExpressionResult
                     break;
                 case DateModifierInterface::VAR_FMQ:
                 case DateModifierInterface::VAR_THIS_MONTH:
+                case DateModifierInterface::VAR_THIS_MONTH_W_Y:
                     $dateValue->subMonths($value->getValue());
                     break;
                 case DateModifierInterface::VAR_THIS_QUARTER:
@@ -235,6 +246,7 @@ class ExpressionResult
                     break;
                 case DateModifierInterface::VAR_FMQ:
                 case DateModifierInterface::VAR_THIS_MONTH:
+                case DateModifierInterface::VAR_THIS_MONTH_W_Y:
                     $this->value -= $value->getValue()->month;
                     break;
                 case DateModifierInterface::VAR_THIS_QUARTER:

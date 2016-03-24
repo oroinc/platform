@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
-use Oro\Bundle\ApiBundle\Processor\ActionProcessorBag;
+use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -47,7 +47,7 @@ class RestDocHandler implements HandlerInterface
     /** @var RestDocViewDetector */
     protected $docViewDetector;
 
-    /** @var ActionProcessorBag */
+    /** @var ActionProcessorBagInterface */
     protected $processorBag;
 
     /** @var EntityClassNameProviderInterface */
@@ -62,9 +62,12 @@ class RestDocHandler implements HandlerInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var RequestType */
+    protected $requestType;
+
     /**
      * @param RestDocViewDetector              $docViewDetector
-     * @param ActionProcessorBag               $processorBag
+     * @param ActionProcessorBagInterface      $processorBag
      * @param EntityClassNameProviderInterface $entityClassNameProvider
      * @param EntityAliasResolver              $entityAliasResolver
      * @param DoctrineHelper                   $doctrineHelper
@@ -72,7 +75,7 @@ class RestDocHandler implements HandlerInterface
      */
     public function __construct(
         RestDocViewDetector $docViewDetector,
-        ActionProcessorBag $processorBag,
+        ActionProcessorBagInterface $processorBag,
         EntityClassNameProviderInterface $entityClassNameProvider,
         EntityAliasResolver $entityAliasResolver,
         DoctrineHelper $doctrineHelper,
@@ -84,6 +87,7 @@ class RestDocHandler implements HandlerInterface
         $this->entityAliasResolver     = $entityAliasResolver;
         $this->doctrineHelper          = $doctrineHelper;
         $this->valueNormalizer         = $valueNormalizer;
+        $this->requestType             = new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -147,9 +151,9 @@ class RestDocHandler implements HandlerInterface
         $context = $processor->createContext();
         $context->removeConfigExtra(SortersConfigExtra::NAME);
         $context->addConfigExtra(new DescriptionsConfigExtra());
-        $context->setRequestType(RequestType::REST);
+        $context->getRequestType()->add(RequestType::REST);
         if ('rest_json_api' === $this->docViewDetector->getView()) {
-            $context->setRequestType(RequestType::JSON_API);
+            $context->getRequestType()->add(RequestType::JSON_API);
         }
         $context->setLastGroup('initialize');
         if ($entityClass) {
@@ -260,7 +264,7 @@ class RestDocHandler implements HandlerInterface
                     'description' => $filter->getDescription(),
                     'requirement' => $this->valueNormalizer->getRequirement(
                         $filter->getDataType(),
-                        [RequestType::REST, RequestType::JSON_API],
+                        $this->requestType,
                         $filter->isArrayAllowed()
                     )
                 ];

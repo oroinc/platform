@@ -30,10 +30,20 @@ define([
 
         DOUBLE_CLICK_WAIT_TIMEOUT: 170,
 
+        template: null,
+
+        themeOptions: {
+            view: '',
+            optionPrefix: 'row',
+            className: 'grid-row',
+            actionSelector: ''
+        },
+
         /**
          * @inheritDoc
          */
         initialize: function(options) {
+            _.extend(this, _.pick(options, ['themeOptions', 'template']));
             Row.__super__.initialize.apply(this, arguments);
 
             this.listenTo(this.columns, 'sort', this.updateCellsOrder);
@@ -117,11 +127,19 @@ define([
         onMouseUp: function(e) {
             this.clickPermit = false;
             // remember selection and target
-            var exclude = 'a, .dropdown, .skip-row-click';
             var $target = this.$(e.target);
-            // if the target is an action element, skip toggling the email
-            if ($target.is(exclude) || $target.parents(exclude).length) {
-                return;
+            var exclude;
+            if (this.themeOptions.actionSelector) {
+                exclude = this.themeOptions.actionSelector;
+                if (!$target.is(exclude) && !$target.parents(exclude).length) {
+                    return;
+                }
+            } else {
+                exclude = 'a, .dropdown, .skip-row-click';
+                // if the target is an action element, skip toggling the email
+                if ($target.is(exclude) || $target.parents(exclude).length) {
+                    return;
+                }
             }
 
             if (this.mouseDownSelection !== this.getSelectedText()) {
@@ -174,10 +192,19 @@ define([
          * @inheritDoc
          */
         makeCell: function(column) {
-            var cell = new (column.get('cell'))({
+            var cellOptions = {
                 column: column,
-                model: this.model
-            });
+                model: this.model,
+                themeOptions: {
+                    className: 'grid-cell grid-body-cell'
+                }
+            };
+            if (column.get('name')) {
+                cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
+            }
+            var Cell = column.get('cell');
+            this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
+            var cell = new Cell(cellOptions);
             if (column.has('align')) {
                 cell.$el.removeClass('align-left align-center align-right');
                 cell.$el.addClass('align-' + column.get('align'));
@@ -190,6 +217,17 @@ define([
             this.columns.trigger('afterMakeCell', this, cell);
 
             return cell;
+        },
+
+        render: function() {
+            if (this.template) {
+                this.$el.html(this.template({
+                    model: this.model ? this.model.attributes : {},
+                    themeOptions: this.themeOptions ? this.themeOptions : {}
+                }));
+                return this;
+            }
+            return Row.__super__.render.apply(this, arguments);
         }
     });
 

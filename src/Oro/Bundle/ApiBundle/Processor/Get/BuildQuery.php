@@ -6,6 +6,9 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Builds ORM QueryBuilder object that will be used to get an entity by its identifier.
+ */
 class BuildQuery implements ProcessorInterface
 {
     /** @var DoctrineHelper */

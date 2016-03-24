@@ -55,6 +55,28 @@ define(function(require) {
          */
         show: function(tabName) {
             this.$('[href^="#' + tabName + '-"]').tab('show');
+        },
+
+        updateTabsVisibility: function() {
+            var visibleTabShown = false;
+            _.each(this.data.tabs, function(tab) {
+                var visible = !_.isFunction(tab.isVisible) || tab.isVisible();
+                this.setTabVisibility(tab.name, visible);
+
+                if (visible && !visibleTabShown) {
+                    this.show(tab.name);
+                    visibleTabShown = true;
+                }
+            }, this);
+        },
+
+        /**
+         * @param {String} tabName
+         * @param {Boolean} visible
+         */
+        setTabVisibility: function(tabName, visible) {
+            var method = visible ? 'show' : 'hide';
+            this.$('li:has(a.' + tabName + ')')[method]();
         }
     });
 

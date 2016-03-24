@@ -27,6 +27,7 @@ use Oro\Bundle\UserBundle\Migrations\Schema\v1_16\AddRelationToMailbox;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\ChangeEmailUserFolderRelation as ChangeEmailUserFolderRelation;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\AddEmailUserColumn;
 use Oro\Bundle\UserBundle\Migrations\Schema\v1_18\DropEmailUserColumn;
+use Oro\Bundle\UserBundle\Migrations\Schema\v1_19\AddFirstNameLastNameIndex;
 
 /**
  * @SuppressWarnings(PHPMD.TooManyMethods)
@@ -48,7 +49,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_18';
+        return 'v1_20';
     }
 
     /**
@@ -127,6 +128,7 @@ class OroUserBundleInstaller implements
         ChangeEmailUserFolderRelation::updateOroEmailUserTable($schema);
         AddEmailUserColumn::updateOroEmailUserTable($schema);
         DropEmailUserColumn::updateOroEmailUserTable($schema);
+        AddFirstNameLastNameIndex::addFirstNameLastNameIndex($schema);
     }
 
     /**

@@ -6,8 +6,11 @@ use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
 
+use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
-use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigLoader;
+use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
+use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
+use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 
 class ConfigLoaderTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,8 +19,12 @@ class ConfigLoaderTest extends \PHPUnit_Framework_TestCase
      */
     public function testLoaders($configType, $config, $expected)
     {
-        $configLoaderFactory = new ConfigLoaderFactory();
-        $configLoaderFactory->setLoader('test_section', new TestConfigLoader());
+        $configExtensionRegistry = new ConfigExtensionRegistry();
+        $configExtensionRegistry->addExtension(new FiltersConfigExtension());
+        $configExtensionRegistry->addExtension(new SortersConfigExtension());
+        $configExtensionRegistry->addExtension(new TestConfigExtension());
+
+        $configLoaderFactory = new ConfigLoaderFactory($configExtensionRegistry);
 
         $result = $configLoaderFactory->getLoader($configType)->load($config);
         $this->assertEquals($expected, $result->toArray());

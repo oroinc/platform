@@ -4,9 +4,9 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Step;
 use Oro\Bundle\WorkflowBundle\Model\StepAssembler;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
 
 class StepAssemblerTest extends \PHPUnit_Framework_TestCase
 {
@@ -21,7 +21,7 @@ class StepAssemblerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\AssemblerException
+     * @expectedException \Oro\Component\Action\Exception\AssemblerException
      * @dataProvider invalidOptionsDataProvider
      * @param array $configuration
      */

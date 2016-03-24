@@ -233,18 +233,14 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
 
     public function testGetAllMetadata()
     {
-        $em              = $this->getMock('Doctrine\ORM\EntityManagerInterface');
-        $metadataFactory = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $om              = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
+        $metadataFactory = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadataFactory');
 
-        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $classMetadata = $this->getMock('Doctrine\Common\Persistence\Mapping\ClassMetadata');
 
         $allMetadata = [$classMetadata];
 
-        $em->expects($this->once())
+        $om->expects($this->once())
             ->method('getMetadataFactory')
             ->willReturn($metadataFactory);
         $metadataFactory->expects($this->once())
@@ -253,7 +249,7 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame(
             $allMetadata,
-            SafeDatabaseChecker::getAllMetadata($em)
+            SafeDatabaseChecker::getAllMetadata($om)
         );
     }
 
@@ -262,15 +258,15 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAllMetadataShouldHandleExpectedExceptions($exception)
     {
-        $em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
 
-        $em->expects($this->once())
+        $om->expects($this->once())
             ->method('getMetadataFactory')
             ->willThrowException($exception);
 
         $this->assertSame(
             [],
-            SafeDatabaseChecker::getAllMetadata($em)
+            SafeDatabaseChecker::getAllMetadata($om)
         );
     }
 
@@ -290,12 +286,12 @@ class SafeDatabaseCheckerTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetAllMetadataShouldRethrowUnexpectedException()
     {
-        $em = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $om = $this->getMock('Doctrine\Common\Persistence\ObjectManager');
 
-        $em->expects($this->once())
+        $om->expects($this->once())
             ->method('getMetadataFactory')
             ->willThrowException(new \Exception('unexpected'));
 
-        SafeDatabaseChecker::getAllMetadata($em);
+        SafeDatabaseChecker::getAllMetadata($om);
     }
 }

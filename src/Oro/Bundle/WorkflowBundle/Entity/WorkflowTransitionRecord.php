@@ -119,7 +119,7 @@ class WorkflowTransitionRecord
     }
 
     /**
-     * @param mixed $workflowItem
+     * @param WorkflowItem $workflowItem
      * @return WorkflowTransitionRecord
      */
     public function setWorkflowItem($workflowItem)
@@ -129,7 +129,7 @@ class WorkflowTransitionRecord
     }
 
     /**
-     * @return mixed
+     * @return WorkflowItem
      */
     public function getWorkflowItem()
     {

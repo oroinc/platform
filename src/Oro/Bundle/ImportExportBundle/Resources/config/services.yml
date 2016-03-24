@@ -6,6 +6,8 @@ parameters:
 services:
     oro_importexport.template_fixture.entity_registry:
         class: %oro_importexport.template_fixture.entity_registry.class%
+        calls:
+            - [setDispatcher, [@event_dispatcher]]
 
     oro_importexport.template_fixture.manager:
         class: %oro_importexport.template_fixture.manager.class%
@@ -15,7 +17,7 @@ services:
     oro_importexport.action.execute_job:
         class: %oro_importexport.action.execute_job.class%
         arguments:
-            - @oro_workflow.context_accessor
+            - @oro_action.context_accessor
             - @oro_importexport.job_executor
         tags:
             - { name: oro_workflow.action, alias: execute_job }

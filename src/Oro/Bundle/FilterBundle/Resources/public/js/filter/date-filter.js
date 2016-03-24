@@ -9,8 +9,11 @@ define(function(require) {
     var ChoiceFilter = require('./choice-filter');
     var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
+    var DateValueHelper = require('orofilter/js/date-value-helper');
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
     var localeSettings = require('orolocale/js/locale-settings');
+    var layout = require('oroui/js/layout');
+
     require('orofilter/js/datevariables-widget');
 
     /**
@@ -99,29 +102,52 @@ define(function(require) {
             between:    1,
             notBetween: 2,
             moreThan:   3,
-            lessThan:   4
+            lessThan:   4,
+            equal:      5,
+            notEqual:   6
         },
+
+        /**
+         * @property
+         */
+        dateParts: [],
 
         /**
          * Date parts
          *
          * @property
          */
-        dateParts: [],
+        datePartTooltips: {
+            week: 'oro.filter.date.part.week.tooltip',
+            day: 'oro.filter.date.part.day.tooltip',
+            quarter: 'oro.filter.date.part.quarter.tooltip',
+            dayofyear: 'oro.filter.date.part.dayofyear.tooltip',
+            year:  'oro.filter.date.part.year.tooltip'
+        },
 
         hasPartsElement: false,
+
+        /**
+         * List of acceptable day formats
+         * @type {Array.<string>}
+         */
+        dayFormats: null,
 
         events: {
             'change select': 'onChangeFilterType'
         },
 
         /**
+         * @param {Object} options
+         * @param {Array.<string>=} options.dayFormats List of acceptable day formats
          * @inheritDoc
          */
-        initialize: function() {
+        initialize: function(options) {
+            this.dayFormats = options && options.dayFormats || [datetimeFormatter.getDayFormat()];
             // make own copy of options
             this.dateWidgetOptions = $.extend(true, {}, this.dateWidgetOptions, this.externalWidgetOptions);
             this.dateVariableHelper = new DateVariableHelper(this.dateWidgetOptions.dateVars);
+            this.dateValueHelper = new DateValueHelper(this.dayFormats.slice());
 
             //parts rendered only if theme exist
             this.hasPartsElement = (this.templateTheme !== '');
@@ -144,8 +170,14 @@ define(function(require) {
             // temp code to keep backward compatible
             if ($.isPlainObject(this.dateParts)) {
                 this.dateParts = _.map(this.dateParts, function(option, i) {
-                    return {value: i.toString(), label: option};
-                });
+                    var value = i.toString();
+
+                    return {
+                        value: value,
+                        label: option,
+                        tooltip: this._getPartTooltip(value)
+                    };
+                }, this);
             }
 
             if (_.isUndefined(this.emptyPart)) {
@@ -189,6 +221,12 @@ define(function(require) {
                 } else if (this.typeValues.lessThan === type) {
                     this.$('.filter-separator, .filter-start-date').hide();
                     this.subview('start').setValue('');
+                } else if (this.typeValues.equal === type) {
+                    this.$('.filter-separator, .filter-end-date').hide();
+                    this.subview('end').setValue('');
+                } else if (this.typeValues.notEqual === type) {
+                    this.$('.filter-separator, .filter-start-date').hide();
+                    this.subview('start').setValue('');
                 }
             } else {
                 // it's part
@@ -196,6 +234,11 @@ define(function(require) {
                 this.subview('start').setValue('');
                 this.subview('end').setPart(value);
                 this.subview('end').setValue('');
+
+                this.$(this.criteriaValueSelectors.date_part)
+                    .closest('.dropdown')
+                    .find('.dropdown-toggle')
+                    .attr('title', this._getPartTooltip(value));
             }
         },
 
@@ -220,7 +263,8 @@ define(function(require) {
                         name: this.name + '_part',
                         choices: this.dateParts,
                         selectedChoice: value.part,
-                        selectedChoiceLabel: selectedPartLabel
+                        selectedChoiceLabel: selectedPartLabel,
+                        selectedChoiceTooltip: this._getPartTooltip(value.part)
                     })
                 );
             }
@@ -230,7 +274,8 @@ define(function(require) {
                     name: this.name,
                     choices: this.choices,
                     selectedChoice: value.type,
-                    selectedChoiceLabel: selectedChoiceLabel
+                    selectedChoiceLabel: selectedChoiceLabel,
+                    popoverContent: __('oro.filter.date.info')
                 })
             );
 
@@ -248,6 +293,7 @@ define(function(require) {
 
             this._renderSubViews();
             this.changeFilterType(value.type);
+            layout.initPopover(this.$el);
 
             this._criteriaRenderd = true;
         },
@@ -296,7 +342,8 @@ define(function(require) {
                 },
                 datePickerOptions: this.dateWidgetOptions,
                 dropdownTemplate: this._getTemplate(this.dropdownTemplateSelector),
-                backendFormat: datetimeFormatter.getDateFormat()
+                backendFormat: datetimeFormatter.getDateFormat(),
+                dayFormats: this.dayFormats.slice()
             });
             return options;
         },
@@ -385,6 +432,8 @@ define(function(require) {
         _toDisplayValue: function(value) {
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
+            } else if (this.dateValueHelper.isValid(value)) {
+                value = this.dateValueHelper.formatDisplayValue(value);
             } else if (datetimeFormatter.isBackendDateValid(value)) {
                 value = datetimeFormatter.formatDate(value);
             }
@@ -400,6 +449,8 @@ define(function(require) {
         _toRawValue: function(value) {
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
+            } else if (this.dateValueHelper.isValid(value)) {
+                value = this.dateValueHelper.formatRawValue(value);
             } else if (datetimeFormatter.isDateValid(value)) {
                 value = datetimeFormatter.convertDateToBackendFormat(value);
             }
@@ -427,6 +478,9 @@ define(function(require) {
          * @inheritDoc
          */
         _readDOMValue: function() {
+            this.subview('start').checkConsistency();
+            this.subview('end').checkConsistency();
+
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.date_type),
                 //empty default parts value if parts not exist
@@ -455,6 +509,10 @@ define(function(require) {
             }
 
             return selectedChoiceLabel;
+        },
+
+        _getPartTooltip: function(part) {
+            return this.datePartTooltips[part] ? __(this.datePartTooltips[part]) : null;
         }
     });
 

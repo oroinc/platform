@@ -42,7 +42,7 @@ class OroSimpleColorChoiceType extends AbstractSimpleColorPickerType
     {
         parent::buildView($view, $form, $options);
 
-        FormUtils::appendClass($view, 'no-uniform');
+        FormUtils::appendClass($view, 'no-input-widget');
         $view->vars['translatable']      = $options['translatable'];
         $view->vars['allow_empty_color'] = $options['allow_empty_color'];
         $view->vars['empty_color']       = $options['empty_color'];

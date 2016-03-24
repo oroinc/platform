@@ -107,19 +107,13 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 'definition'      => [
                     'fields' => [
                         'field1' => [
-                            'definition' => [
-                                'property_path' => 'realField1'
-                            ]
+                            'property_path' => 'realField1'
                         ],
                         'field2' => [
-                            'definition' => [
-                                'property_path' => 'realField2',
-                                'fields'        => [
-                                    'field21' => [
-                                        'definition' => [
-                                            'property_path' => 'realField21'
-                                        ]
-                                    ]
+                            'property_path' => 'realField2',
+                            'fields'        => [
+                                'field21' => [
+                                    'property_path' => 'realField21'
                                 ]
                             ],
                             'filters'    => [
@@ -131,26 +125,22 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                             ]
                         ],
                         'field3' => [
-                            'definition' => [
-                                'property_path' => 'realField3',
-                                'fields'        => [
-                                    'field31' => [
-                                        'property_path' => 'realField31',
+                            'property_path' => 'realField3',
+                            'fields'        => [
+                                'field31' => [
+                                    'property_path' => 'realField31',
+                                ],
+                                'field32' => [
+                                    'property_path' => 'realField32',
+                                    'fields'        => [
+                                        'field321' => [
+                                            'property_path' => 'realField321',
+                                        ]
                                     ],
-                                    'field32' => [
-                                        'definition' => [
-                                            'property_path' => 'realField32',
-                                            'fields'        => [
-                                                'field321' => [
-                                                    'property_path' => 'realField321',
-                                                ]
-                                            ]
-                                        ],
-                                        'filters'    => [
-                                            'fields' => [
-                                                'field321' => [
-                                                    'data_type' => 'string',
-                                                ]
+                                    'filters'    => [
+                                        'fields' => [
+                                            'field321' => [
+                                                'data_type' => 'string',
                                             ]
                                         ]
                                     ]
@@ -201,12 +191,10 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                             'property_path' => 'realField1'
                         ],
                         'field2' => [
-                            'definition' => [
-                                'property_path' => 'realField2',
-                                'fields'        => [
-                                    'field21' => [
-                                        'property_path' => 'realField21',
-                                    ]
+                            'property_path' => 'realField2',
+                            'fields'        => [
+                                'field21' => [
+                                    'property_path' => 'realField21',
                                 ]
                             ],
                             'filters'    => [
@@ -249,21 +237,11 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
      */
     public function testProcessForManageableEntity($definition, $filters, $expectedFilters)
     {
-        $rootMetadata           = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $toOne1Metadata         = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $toOne1toOne11Metadata  = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $toOne1toMany11Metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $toMany1Metadata        = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $rootMetadata           = $this->getClassMetadataMock();
+        $toOne1Metadata         = $this->getClassMetadataMock();
+        $toOne1toOne11Metadata  = $this->getClassMetadataMock();
+        $toOne1toMany11Metadata = $this->getClassMetadataMock();
+        $toMany1Metadata        = $this->getClassMetadataMock();
 
         $rootMetadata->expects($this->any())
             ->method('hasAssociation')
@@ -334,26 +312,24 @@ class NormalizeFiltersTest extends ConfigProcessorTestCase
                 'definition'      => [
                     'fields' => [
                         'toOne1'  => [
-                            'definition' => [
-                                'fields' => [
-                                    'toOne1_toOne11'  => [
-                                        'filters' => [
-                                            'fields' => [
-                                                'toOne1_toOne11_field111' => [
-                                                    'data_type' => 'string'
-                                                ]
+                            'fields' => [
+                                'toOne1_toOne11'  => [
+                                    'filters' => [
+                                        'fields' => [
+                                            'toOne1_toOne11_field111' => [
+                                                'data_type' => 'string'
                                             ]
                                         ]
-                                    ],
-                                    'toOne1_toMany11' => [
-                                        'filters' => [
-                                            'fields' => [
-                                                'toOne1_toMany11_field111' => [
-                                                    'data_type' => 'string'
-                                                ]
+                                    ]
+                                ],
+                                'toOne1_toMany11' => [
+                                    'filters' => [
+                                        'fields' => [
+                                            'toOne1_toMany11_field111' => [
+                                                'data_type' => 'string'
                                             ]
                                         ]
-                                    ],
+                                    ]
                                 ],
                             ],
                             'filters'    => [

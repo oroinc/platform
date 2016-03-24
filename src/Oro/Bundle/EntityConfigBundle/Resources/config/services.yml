@@ -9,6 +9,7 @@ parameters:
     oro_entity_config.twig.extension.config.class:              Oro\Bundle\EntityConfigBundle\Twig\ConfigExtension
     oro_entity_config.migration.post_up.listener.class:         Oro\Bundle\EntityConfigBundle\EventListener\PostUpMigrationListener
     oro_entity_config.translation.helper.class: Oro\Bundle\EntityConfigBundle\Translation\ConfigTranslationHelper
+    oro_entity_config.helper.entity_config.class:               Oro\Bundle\EntityConfigBundle\Helper\EntityConfigHelper
 
 services:
     oro_entity_config.link.entity_manager:
@@ -48,6 +49,12 @@ services:
         arguments:
             - @oro_entity_config.link.entity_manager
             - @oro_entity_config.config_model_lock_object
+
+    oro_entity_config.helper.entity_config:
+        class: %oro_entity_config.helper.entity_config.class%
+        arguments:
+            - @oro_entity_config.provider.entity
+            - @oro_security.acl.group_provider.chain
 
     oro_entity_config.audit_manager:
         public: false

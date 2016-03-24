@@ -7,21 +7,29 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Yaml\Yaml;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Component\ChainProcessor\ProcessorBag;
+
 use Oro\Bundle\ApiBundle\Config\Config;
-use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
-use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\RelationConfigProvider;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
-class DumpConfigCommand extends ContainerAwareCommand
+class DumpConfigCommand extends AbstractDebugCommand
 {
+    /**
+     * @var array
+     */
+    protected $knownExtras = [
+        'filters'        => 'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
+        'sorters'        => 'Oro\Bundle\ApiBundle\Config\SortersConfigExtra',
+        'virtual_fields' => 'Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra',
+        'descriptions'   => 'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra'
+    ];
+
     /**
      * {@inheritdoc}
      */
@@ -43,12 +51,6 @@ class DumpConfigCommand extends ContainerAwareCommand
             //    Version::LATEST
             //)
             ->addOption(
-                'request-type',
-                null,
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'The request type'
-            )
-            ->addOption(
                 'section',
                 null,
                 InputOption::VALUE_REQUIRED,
@@ -56,11 +58,19 @@ class DumpConfigCommand extends ContainerAwareCommand
                 'entities'
             )
             ->addOption(
-                'with-descriptions',
+                'extra',
                 null,
-                InputOption::VALUE_NONE,
-                'Whether human-readable descriptions should be added'
+                InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
+                'Whether any extra configuration data should be displayed. ' .
+                sprintf(
+                    'Can be %s or FQCN of a class implements "%s" or "%s"',
+                    '"' . implode('", "', array_keys($this->knownExtras)) . '"',
+                    'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface',
+                    'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'
+                ),
+                []
             );
+        parent::configure();
     }
 
     /**
@@ -72,14 +82,46 @@ class DumpConfigCommand extends ContainerAwareCommand
         $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
 
         $entityClass = $entityClassNameHelper->resolveEntityClass($input->getArgument('entity'), true);
-        $requestType = $input->getOption('request-type');
+        $requestType = $this->getRequestType($input);
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
 
-        $extras = [new FiltersConfigExtra(), new SortersConfigExtra()];
-        if ($input->getOption('with-descriptions')) {
-            $extras[] = new DescriptionsConfigExtra();
+        $extras = [];
+
+        $extraOptions = $input->getOption('extra');
+        foreach ($extraOptions as $extraName) {
+            if (array_key_exists($extraName, $this->knownExtras)) {
+                $extras[] = new $this->knownExtras[$extraName];
+                continue;
+            }
+
+            if (false === strpos($extraName, '\\')) {
+                throw new \InvalidArgumentException(
+                    sprintf('Unknown value "%s" for option `--extra`.', $extraName)
+                );
+            }
+
+            if (!class_exists($extraName)) {
+                throw new \InvalidArgumentException(
+                    sprintf('Class "%s" passed as value for option `--extra` not found.', $extraName)
+                );
+            }
+
+            if (!is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface', true)
+                && !is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface', true)
+            ) {
+                throw new \InvalidArgumentException(
+                    sprintf(
+                        'Class "%s" passed as value for option `--extra` do not implements ' .
+                        '`Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface` or '.
+                        '`Oro\Bundle\ApiBundle\Config\ConfigExtraInterface`.',
+                        $extraName
+                    )
+                );
+            }
+
+            $extras[] = new $extraName;
         }
 
         /** @var ProcessorBag $processorBag */
@@ -111,14 +153,14 @@ class DumpConfigCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string   $entityClass
-     * @param string   $version
-     * @param string[] $requestType
-     * @param array    $extras
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
+     * @param array       $extras
      *
      * @return array
      */
-    protected function getConfig($entityClass, $version, array $requestType, array $extras)
+    protected function getConfig($entityClass, $version, RequestType $requestType, array $extras)
     {
         /** @var ConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.config_provider');
@@ -135,14 +177,14 @@ class DumpConfigCommand extends ContainerAwareCommand
     }
 
     /**
-     * @param string   $entityClass
-     * @param string   $version
-     * @param string[] $requestType
-     * @param array    $extras
+     * @param string      $entityClass
+     * @param string      $version
+     * @param RequestType $requestType
+     * @param array       $extras
      *
      * @return array
      */
-    protected function getRelationConfig($entityClass, $version, array $requestType, array $extras)
+    protected function getRelationConfig($entityClass, $version, RequestType $requestType, array $extras)
     {
         /** @var RelationConfigProvider $configProvider */
         $configProvider = $this->getContainer()->get('oro_api.relation_config_provider');
@@ -170,7 +212,11 @@ class DumpConfigCommand extends ContainerAwareCommand
         $data = $config->toArray();
 
         // add known sections in predefined order
-        foreach ([ConfigUtil::DEFINITION, ConfigUtil::FILTERS, ConfigUtil::SORTERS] as $sectionName) {
+        if (!empty($data[ConfigUtil::DEFINITION])) {
+            $result = $data[ConfigUtil::DEFINITION];
+        }
+        unset($data[ConfigUtil::DEFINITION]);
+        foreach ([ConfigUtil::FILTERS, ConfigUtil::SORTERS] as $sectionName) {
             if (array_key_exists($sectionName, $data)) {
                 $result[$sectionName] = $data[$sectionName];
             }
