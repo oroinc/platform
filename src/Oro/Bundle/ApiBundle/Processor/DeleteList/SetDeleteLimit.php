@@ -8,9 +8,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 /**
  * Limits number of records should be deleted to 100
  */
-class NormalizePaging implements ProcessorInterface
+class SetDeleteLimit implements ProcessorInterface
 {
-    const PAGE_LIMIT = 100;
+    const DELETE_LIMIT = 100;
 
     /**
      * {@inheritdoc}
@@ -25,7 +25,12 @@ class NormalizePaging implements ProcessorInterface
         }
 
         $criteria = $context->getCriteria();
-        $criteria->setFirstResult(1);
-        $criteria->setMaxResults(self::PAGE_LIMIT);
+
+        if ($criteria->getMaxResults()) {
+            // max results already set
+            return;
+        }
+
+        $criteria->setMaxResults(self::DELETE_LIMIT);
     }
 }

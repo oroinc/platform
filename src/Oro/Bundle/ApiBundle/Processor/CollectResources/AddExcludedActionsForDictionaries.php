@@ -38,7 +38,7 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
         $resources = $context->getResult();
         foreach ($resources as $resource) {
             if (isset($dictionaryEntities[$resource->getEntityClass()])) {
-                $this->addExcludedAction($resource, ['delete', 'delete_list'], $actionsConfig);
+                $this->addExcludedActions($resource, ['delete', 'delete_list'], $actionsConfig);
             }
         }
     }
@@ -48,7 +48,7 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
      * @param array           $actionNames
      * @param ActionsConfig[] $actionsConfig
      */
-    protected function addExcludedAction(ApiResource $resource, array $actionNames, array $actionsConfig)
+    protected function addExcludedActions(ApiResource $resource, array $actionNames, array $actionsConfig)
     {
         $excludeActions = $resource->getExcludedActions();
         $entityClass = $resource->getEntityClass();

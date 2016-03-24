@@ -130,8 +130,8 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -60 }
 
-    oro_api.delete_list.normalize_paging:
-        class: Oro\Bundle\ApiBundle\Processor\DeleteList\NormalizePaging
+    oro_api.delete_list.set_delete_limits:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -60 }
 
