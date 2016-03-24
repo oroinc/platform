@@ -31,6 +31,141 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_search', $searchExtension->getAlias());
     }
 
+    public function testGetDefaultStrategy()
+    {
+        $searchExtension = new OroSearchExtension(array(), $this->container);
+        $this->assertEquals('replace', $searchExtension->getDefaultStrategy());
+    }
+
+    public function testGetStrategy()
+    {
+        $searchExtension = new OroSearchExtension(array(), $this->container);
+        $fieldName = 'fields';
+        $this->assertEquals('replace', $searchExtension->getStrategy($fieldName));
+    }
+
+    /**
+     * @dataProvider testMergeConfigProvider
+     *
+     * @param array $expected
+     * @param array $secondConfig
+     */
+    public function testMergeConfig($secondConfig, $expected)
+    {
+        $searchExtension = new OroSearchExtension(array(), $this->container);
+
+        $firstConfig = [
+            'alias'           => 'test_alias',
+            'title_fields'    => ['name'],
+            'search_template' => 'test_template',
+            'fields'          => [
+                [
+                    'name'          => 'name',
+                    'target_type'   => 'text',
+                    'target_fields' => ['name']
+                ]
+            ]
+        ];
+
+        $result = $searchExtension->mergeConfig($firstConfig, $secondConfig);
+        $this->assertEquals(ksort($expected), ksort($result));
+    }
+
+    public function testMergeConfigProvider()
+    {
+        $secondConfig = [
+            [
+                'alias'           => 'test_alias',
+                'title_fields'    => ['id'],
+                'fields'          => [
+                    [
+                        'name'          => 'subject',
+                        'target_type'   => 'text',
+                        'target_fields' => ['subject']
+                    ]
+                ]
+            ],
+            [
+                'alias'           => 'test_alias',
+                'title_fields'    => ['id', 'name'],
+                'fields'          => [
+                    [
+                        'name'          => 'name',
+                        'target_type'   => 'text',
+                        'target_fields' => ['name']
+                    ],
+                    [
+                        'name'          => 'subject',
+                        'target_type'   => 'text',
+                        'target_fields' => ['subject']
+                    ]
+                ]
+            ],
+            [
+                'alias'           => 'test_alias',
+                'title_fields'    => ['name'],
+                'search_template' => 'test_template'
+            ]
+        ];
+
+        $expected = [
+            [
+                'alias'           => 'test_alias',
+                'title_fields'    => ['id'],
+                'search_template' => 'test_template',
+                'fields'          => [
+                    [
+                        'name'          => 'name',
+                        'target_type'   => 'text',
+                        'target_fields' => ['name']
+                    ],
+                    [
+                        'name'          => 'subject',
+                        'target_type'   => 'text',
+                        'target_fields' => ['subject']
+                    ]
+                ]
+            ],
+            [
+                'alias'           => 'test_alias',
+                'title_fields'    => ['id', 'name'],
+                'search_template' => 'test_template',
+                'fields'          => [
+                    [
+                        'name'          => 'name',
+                        'target_type'   => 'text',
+                        'target_fields' => ['name']
+                    ],
+                    [
+                        'name'          => 'subject',
+                        'target_type'   => 'text',
+                        'target_fields' => ['subject']
+                    ]
+                ]
+            ],
+            [
+                'alias'           => 'test_alias',
+                'title_fields'    => ['name'],
+                'search_template' => 'test_template',
+                'fields'          => [
+                    [
+                        'name'          => 'name',
+                        'target_type'   => 'text',
+                        'target_fields' => ['name']
+                    ]
+                ]
+            ]
+        ];
+
+        $data =  [
+            'Test replace'                => ['secondConfig' => $secondConfig[0], 'expected' => $expected[0]],
+            'Test append'                 => ['secondConfig' => $secondConfig[1], 'expected' => $expected[1]],
+            'Test append with no changes' => ['secondConfig' => $secondConfig[2], 'expected' => $expected[2]]
+        ];
+
+        return $data;
+    }
+
     public function testLoadWithConfigInFiles()
     {
         $searchExtension = new OroSearchExtension();
