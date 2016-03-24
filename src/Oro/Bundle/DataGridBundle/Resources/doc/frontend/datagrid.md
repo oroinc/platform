@@ -29,4 +29,4 @@ Datagrid listens on mediator for events:
 ###DOM events
 Datagrid emits DOM events on its $el element:
 
-- `datagrid:change:<gridName` - `model`
+- `datagrid:change:<gridName>` - `model`
