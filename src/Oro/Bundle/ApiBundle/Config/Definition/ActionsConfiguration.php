@@ -66,7 +66,11 @@ class ActionsConfiguration extends AbstractConfigurationSection implements Confi
                 );
         $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
         $node
-            ->scalarNode(ActionConfig::ACL_RESOURCE)->end();
+            ->scalarNode(ActionConfig::ACL_RESOURCE)->end()
+            ->scalarNode(ActionConfig::DESCRIPTION)->end()
+            ->integerNode(ActionConfig::MAX_RESULTS)
+                ->min(-1)
+            ->end();
         $parentNode
             ->validate()
                 ->always(
