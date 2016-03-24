@@ -86,15 +86,13 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         $this->groups     = [];
 
         // we should support filters that comes from request body and from URI part
-        $queryString = $this->request->getQueryString();
-        if (!$queryString) {
-            $queryString = $this->request->getContent();
-        }
+        $requestData = $this->request->getContent() . '&' . $this->request->getQueryString() ;
+
         $matchResult = preg_match_all(
             '/(?P<key>((?P<group>[\w\d-\.]+)(?P<path>(%5B[\w\d-\.]+%5D)*)))'
             . '(?P<operator>(<|>|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))'
             . '(?P<value>[^&]+)/',
-            $queryString,
+            $requestData,
             $matches,
             PREG_SET_ORDER
         );

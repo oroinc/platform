@@ -2,64 +2,23 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Delete;
 
-use Symfony\Component\DependencyInjection\Container;
-
-use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\ChainProcessor\ContextInterface;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
+use Oro\Bundle\ApiBundle\Processor\Shared\DeleteDataByDeleteHandler as BaseProcessor;
 
 /**
- * Deletes object by DeleteProcessHandler.
+ * Deletes object by DeleteHandler.
  */
-class DeleteDataByDeleteHandler implements ProcessorInterface
+class DeleteDataByDeleteHandler extends BaseProcessor
 {
-    const DEFAULT_DELETE_HANDLER = 'oro_soap.handler.delete';
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /** @var Container */
-    protected $container;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     * @param Container      $container
-     */
-    public function __construct(DoctrineHelper $doctrineHelper, Container $container)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-        $this->container = $container;
-    }
-
     /**
      * {@inheritdoc}
      */
-    public function process(ContextInterface $context)
+    protected function processDelete(ContextInterface $context, DeleteHandler $handler)
     {
-        /** @var DeleteContext $context */
-
-        $entity = $context->getResult();
-        if (!is_object($entity)) {
-            // entity already deleted or not supported
-            return;
-        }
-
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
-        }
-
-        $deleteHandlerServiceId = $context->getConfig()->getDeleteHandler();
-        if (!$deleteHandlerServiceId) {
-            $deleteHandlerServiceId = self::DEFAULT_DELETE_HANDLER;
-        }
-
-        $deleteHandler = $this->container->get($deleteHandlerServiceId);
-        if ($deleteHandler instanceof DeleteHandler) {
-            $deleteHandler->processDelete($entity, $this->doctrineHelper->getEntityManagerForClass($entityClass));
-            $context->removeResult();
-        }
+        $handler->processDelete(
+            $context->getResult(),
+            $this->doctrineHelper->getEntityManagerForClass($context->getClassName())
+        );
     }
 }
