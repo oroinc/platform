@@ -22,10 +22,10 @@ class OptionsHelper
     protected $contextAccessor;
 
     /** @var TranslatorInterface */
-    private $translator;
+    protected $translator;
 
     /** @var ApplicationsUrlHelper */
-    private $applicationsUrlHelper;
+    protected $applicationsUrlHelper;
 
     /**
      * @param ContextHelper $contextHelper
@@ -114,23 +114,14 @@ class OptionsHelper
      */
     protected function createOptions(Operation $operation, ActionData $actionData, array $actionContext)
     {
-        $operationName = $operation->getName();
+        $actionContext = array_merge($actionContext, ['operationName' => $operation->getName()]);
 
-        $frontendOptions = $this->resolveOptions(
-            $actionData,
-            $operation->getDefinition()->getFrontendOptions()
-        );
+        $executionUrl = $this->applicationsUrlHelper->getExecutionUrl($actionContext);
+        $dialogUrl = $this->applicationsUrlHelper->getDialogUrl($actionContext);
 
-        $executionUrl = $this->applicationsUrlHelper->getExecutionUrl(
-            array_merge($actionContext, ['operationName' => $operationName])
-        );
+        $frontendOptions = $this->resolveOptions($actionData, $operation->getDefinition()->getFrontendOptions());
 
-        $dialogUrl = $this->applicationsUrlHelper->getDialogUrl(
-            array_merge($actionContext, ['operationName' => $operationName])
-        );
-
-        $label = $operation->getDefinition()->getLabel();
-        $title = !empty($frontendOptions['title']) ? $frontendOptions['title'] : $label;
+        $title = isset($frontendOptions['title']) ? $frontendOptions['title'] : $operation->getDefinition()->getLabel();
 
         $options = [
             'hasDialog' => $operation->hasForm(),

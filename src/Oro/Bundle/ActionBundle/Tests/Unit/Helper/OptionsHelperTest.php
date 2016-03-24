@@ -273,22 +273,15 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
     protected function getOperation($operationName, $hasForm = false)
     {
         $definition = new OperationDefinition();
-        $definition
-            ->setName($operationName)
-            ->setLabel($operationName);
+        $definition->setName($operationName)->setLabel($operationName);
 
         $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->setMethods(['getDefinition', 'hasForm'])
             ->getMock();
 
-        $operation->expects($this->any())
-            ->method('getDefinition')
-            ->willReturn($definition);
-
-        $operation->expects($this->any())
-            ->method('hasForm')
-            ->willReturn($hasForm);
+        $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $operation->expects($this->any())->method('hasForm')->willReturn($hasForm);
 
         return $operation;
     }

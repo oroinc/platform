@@ -2,14 +2,17 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
+use Symfony\Component\Routing\RouterInterface;
+
+use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
 
 class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \Oro\Bundle\ActionBundle\Helper\ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $mockApplicationsHelper;
 
-    /** @var \Symfony\Component\Routing\RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
+    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $mockRouter;
 
     /** @var ApplicationsUrlHelper */
@@ -18,18 +21,18 @@ class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $this->mockApplicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
-            ->disableOriginalConstructor()->getMock();
-        $this->mockRouter = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')
+            ->disableOriginalConstructor()
             ->getMock();
+
+        $this->mockRouter = $this->getMock('Symfony\Component\Routing\RouterInterface');
 
         $this->instance = new ApplicationsUrlHelper($this->mockApplicationsHelper, $this->mockRouter);
     }
 
     public function testGetExecutionUrl()
     {
-        $parameters = [
-            'param1' => 'val1'
-        ];
+        $parameters = ['param1' => 'val1'];
+
         $this->mockApplicationsHelper->expects($this->once())
             ->method('getExecutionRoute')
             ->willReturn('extension_route');
@@ -44,9 +47,8 @@ class ApplicationsUrlHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetDialogUrl()
     {
-        $parameters = [
-            'param1' => 'val1'
-        ];
+        $parameters = ['param1' => 'val1'];
+        
         $this->mockApplicationsHelper->expects($this->once())
             ->method('getDialogRoute')
             ->willReturn('dialog_route');
