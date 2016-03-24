@@ -35,8 +35,8 @@ class GetRestJsonApiTest extends ApiTestCase
     }
 
     /**
-     * @param string $entityClass
-     * @param array $excludedActions
+     * @param string   $entityClass
+     * @param string[] $excludedActions
      *
      * @dataProvider getEntities
      */
@@ -48,7 +48,7 @@ class GetRestJsonApiTest extends ApiTestCase
             $this->getRequestType()
         );
 
-        // test get list request
+        // test "get list" request
         $this->client->request(
             'GET',
             $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'page[size]' => 1]),
@@ -64,12 +64,12 @@ class GetRestJsonApiTest extends ApiTestCase
 
         $id = $this->getGetEntityId($this->jsonToArray($response->getContent()));
         if (null !== $id) {
-            if (!in_array('get', $excludedActions)) {
-                // test get request
+            // test "get" request
+            if (!in_array('get', $excludedActions, true)) {
                 $this->checkGetRequest($entityAlias, $id, 200);
             }
-            if (!in_array('delete', $excludedActions)) {
-                // test delete request
+            // test "delete" request
+            if (!in_array('delete', $excludedActions, true)) {
                 $this->checkDeleteRequest($entityAlias, $id, $excludedActions);
 
             }
@@ -79,9 +79,9 @@ class GetRestJsonApiTest extends ApiTestCase
     }
 
     /**
-     * @param string $entityAlias
-     * @param integer $id
-     * @param array $excludedActions
+     * @param string   $entityAlias
+     * @param mixed    $id
+     * @param string[] $excludedActions
      */
     protected function checkDeleteRequest($entityAlias, $id, $excludedActions)
     {
@@ -106,15 +106,15 @@ class GetRestJsonApiTest extends ApiTestCase
             ];
             $this->assertContains($data['errors'][0]['detail'], $errors);
             $this->assertEquals(403, $response->getStatusCode());
-        } elseif(!in_array('get', $excludedActions)){
+        } elseif (!in_array('get', $excludedActions, true)) {
             // check if entity was really deleted
             $this->checkGetRequest($entityAlias, $id, 404);
         }
     }
 
     /**
-     * @param string $entityAlias
-     * @param integer $id
+     * @param string  $entityAlias
+     * @param mixed   $id
      * @param integer $expectedStatus
      */
     protected function checkGetRequest($entityAlias, $id, $expectedStatus)

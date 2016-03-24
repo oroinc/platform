@@ -45,7 +45,7 @@ abstract class ApiTestCase extends WebTestCase
     abstract protected function getRequestType();
 
     /**
-     * @return array
+     * @return array [entity class => [entity class, [excluded action, ...]], ...]
      */
     public function getEntities()
     {

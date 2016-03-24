@@ -30,8 +30,8 @@ class GetRestPlainApiTest extends ApiTestCase
     }
 
     /**
-     * @param string $entityClass
-     * @param array $excludedActions
+     * @param string   $entityClass
+     * @param string[] $excludedActions
      *
      * @dataProvider getEntities
      */
@@ -43,7 +43,7 @@ class GetRestPlainApiTest extends ApiTestCase
             $this->getRequestType()
         );
 
-        // test get list request
+        // test "get list" request
         $this->client->request(
             'GET',
             $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'limit' => 1])
@@ -53,11 +53,13 @@ class GetRestPlainApiTest extends ApiTestCase
 
         $id = $this->getGetEntityId($entityClass, $this->jsonToArray($response->getContent()));
         if (null !== $id) {
-            if (!in_array('get', $excludedActions)) {
+            // test "get" request
+            if (!in_array('get', $excludedActions, true)) {
                 // test get request
                 $this->checkGetRequest($entityAlias, $id, 200);
             }
-            if (!in_array('delete', $excludedActions)) {
+            // test "delete" request
+            if (!in_array('delete', $excludedActions, true)) {
                 // test delete request
                 $this->checkDeleteRequest($entityAlias, $id, $excludedActions);
             }
@@ -67,9 +69,9 @@ class GetRestPlainApiTest extends ApiTestCase
     }
 
     /**
-     * @param string $entityAlias
-     * @param integer $id
-     * @param array $excludedActions
+     * @param string   $entityAlias
+     * @param mixed    $id
+     * @param string[] $excludedActions
      */
     protected function checkDeleteRequest($entityAlias, $id, $excludedActions)
     {
@@ -78,7 +80,7 @@ class GetRestPlainApiTest extends ApiTestCase
             $this->getUrl('oro_rest_api_delete', ['entity' => $entityAlias, 'id' => $id])
         );
         $response = $this->client->getResponse();
-        if ($response->getStatusCode() == 204 && !in_array('get', $excludedActions)) {
+        if ($response->getStatusCode() == 204 && !in_array('get', $excludedActions, true)) {
             // check if entity was really deleted
             $this->client->request(
                 'GET',
@@ -89,8 +91,8 @@ class GetRestPlainApiTest extends ApiTestCase
     }
 
     /**
-     * @param string $entityAlias
-     * @param integer $id
+     * @param string  $entityAlias
+     * @param mixed   $id
      * @param integer $expectedStatus
      */
     protected function checkGetRequest($entityAlias, $id, $expectedStatus)
