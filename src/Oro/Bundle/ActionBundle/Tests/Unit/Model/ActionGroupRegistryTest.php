@@ -16,9 +16,6 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationProvider;
 
-    /** @var ActionGroupAssembler */
-    protected $assembler;
-
     /** @var ActionGroupRegistry */
     protected $registry;
 
@@ -42,7 +39,7 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->assembler = new ActionGroupAssembler(
+        $assembler = new ActionGroupAssembler(
             $actionFactory,
             $conditionFactory,
             new ParameterAssembler(),
@@ -51,7 +48,7 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
 
         $this->registry = new ActionGroupRegistry(
             $this->configurationProvider,
-            $this->assembler
+            $assembler
         );
     }
 
@@ -76,6 +73,23 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         $actionGroup = $this->registry->findByName($actionGroupName);
 
         $this->assertEquals($expected, $actionGroup ? $actionGroup->getDefinition()->getName() : $actionGroup);
+    }
+
+    /**
+     * @return array
+     */
+    public function findByNameDataProvider()
+    {
+        return [
+            'invalid actionGroup name' => [
+                'actionGroupName' => 'test',
+                'expected' => null
+            ],
+            'valid actionGroup name' => [
+                'actionGroupName' => 'action_group1',
+                'expected' => 'action_group1'
+            ],
+        ];
     }
 
     public function testGet()
@@ -107,22 +121,5 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->registry->get('not exists');
-    }
-
-    /**
-     * @return array
-     */
-    public function findByNameDataProvider()
-    {
-        return [
-            'invalid actionGroup name' => [
-                'actionGroupName' => 'test',
-                'expected' => null
-            ],
-            'valid actionGroup name' => [
-                'actionGroupName' => 'action_group1',
-                'expected' => 'action_group1'
-            ],
-        ];
     }
 }
