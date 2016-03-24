@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
  * Removes paging properties (FirstResult and MaxResults) from the Criteria object
@@ -18,7 +19,7 @@ class NormalizePaging implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var Context $context */
 
         if ($context->hasQuery()) {
             // a query is already built
@@ -27,7 +28,7 @@ class NormalizePaging implements ProcessorInterface
 
         $criteria = $context->getCriteria();
 
-        // check if a paging disabled
+        // check if a paging is disabled
         if (self::UNLIMITED_RESULT === $criteria->getMaxResults()) {
             $criteria->setFirstResult(null);
             $criteria->setMaxResults(null);

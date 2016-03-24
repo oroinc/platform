@@ -6,11 +6,11 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Limits number of records should be deleted to 100
+ * Sets the maximum number of entities that can be deleted by one request. By default 100.
  */
 class SetDeleteLimit implements ProcessorInterface
 {
-    const DELETE_LIMIT = 100;
+    const DEFAULT_MAX_ENTITIES_TO_DELETE = 100;
 
     /**
      * {@inheritdoc}
@@ -25,12 +25,12 @@ class SetDeleteLimit implements ProcessorInterface
         }
 
         $criteria = $context->getCriteria();
-
-        if ($criteria->getMaxResults()) {
-            // max results already set
-            return;
+        if (null === $criteria->getMaxResults()) {
+            $limit = $context->getConfig()->getMaxResults();
+            if (null === $limit) {
+                $limit = self::DEFAULT_MAX_ENTITIES_TO_DELETE;
+            }
+            $criteria->setMaxResults($limit);
         }
-
-        $criteria->setMaxResults(self::DELETE_LIMIT);
     }
 }

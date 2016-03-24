@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
-use Oro\Bundle\ApiBundle\Processor\GetList\NormalizePaging;
+use Oro\Bundle\ApiBundle\Processor\Shared\NormalizePaging;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizePagingTest extends GetListProcessorTestCase
 {
