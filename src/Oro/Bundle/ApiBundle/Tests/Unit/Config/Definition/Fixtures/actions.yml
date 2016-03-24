@@ -83,6 +83,14 @@ invalid_actions_definition_exclude_flag_type:
     expected: []
     error: 'Invalid type for path "entity.actions.delete.exclude". Expected boolean, but got string.'
 
+invalid_actions_definition_unknown_property:
+    config:
+        actions:
+            delete:
+                test: test
+    expected: []
+    error: 'Unrecognized option "test" under "entity.actions.delete"'
+
 actions_collections:
     config:
         actions:
