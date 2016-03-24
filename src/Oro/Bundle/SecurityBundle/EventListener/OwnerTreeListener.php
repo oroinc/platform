@@ -10,6 +10,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProviderInterface;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 
 class OwnerTreeListener implements ContainerAwareInterface
 {
@@ -98,10 +99,7 @@ class OwnerTreeListener implements ContainerAwareInterface
     {
         foreach ($entities as $entity) {
             if (in_array(ClassUtils::getRealClass($entity), $this->securityClasses, true)) {
-                $entityClass = ClassUtils::getRealClass($entity);
-                $userEntityClass = $this->container->getParameter('oro_user.entity.class');
-
-                if ($entityClass ===  $userEntityClass) {
+                if ($entity instanceof UserInterface) {
                     $changeSet = $this->container
                         ->get('doctrine.orm.entity_manager')
                         ->getUnitOfWork()
