@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\EntityBundle\Provider\ChainDictionaryValueListProvider;
 
 /**
- * Disables the "delete" action for dictionary entities.
+ * Disables the "delete" and "delete_list" actions for dictionary entities.
  */
 class AddExcludedActionsForDictionaries implements ProcessorInterface
 {
@@ -38,34 +38,38 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
         $resources = $context->getResult();
         foreach ($resources as $resource) {
             if (isset($dictionaryEntities[$resource->getEntityClass()])) {
-                $this->addExcludedAction($resource, 'delete', $actionsConfig);
+                $this->addExcludedAction($resource, ['delete', 'delete_list'], $actionsConfig);
             }
         }
     }
 
     /**
      * @param ApiResource     $resource
-     * @param string          $actionName
+     * @param array           $actionNames
      * @param ActionsConfig[] $actionsConfig
      */
-    protected function addExcludedAction(ApiResource $resource, $actionName, array $actionsConfig)
+    protected function addExcludedAction(ApiResource $resource, array $actionNames, array $actionsConfig)
     {
         $excludeActions = $resource->getExcludedActions();
-        if (in_array($actionName, $excludeActions, true)) {
-            // the action is already added to the exclude list
-            return;
-        }
-
         $entityClass = $resource->getEntityClass();
-        if (isset($actionsConfig[$entityClass])) {
-            $action = $actionsConfig[$entityClass]->getAction($actionName);
-            if (null !== $action && $action->hasExcluded()) {
-                // the "exclude" flag for the action is set manually in 'Resources/config/oro/api.yml'
-                return;
+
+        foreach ($actionNames as $actionName) {
+            if (in_array($actionName, $excludeActions, true)) {
+                // the action is already added to the exclude list
+                continue;
             }
+
+            if (isset($actionsConfig[$entityClass])) {
+                $action = $actionsConfig[$entityClass]->getAction($actionName);
+                if (null !== $action && $action->hasExcluded()) {
+                    // the "exclude" flag for the action is set manually in 'Resources/config/oro/api.yml'
+                    continue;
+                }
+            }
+
+            $excludeActions[] = $actionName;
         }
 
-        $excludeActions[] = $actionName;
         $resource->setExcludedActions($excludeActions);
     }
 }
