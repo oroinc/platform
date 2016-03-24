@@ -32,6 +32,7 @@ class OroApiExtension extends Extension
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
         $loader->load('processors.delete.yml');
+        $loader->load('processors.delete_list.yml');
 
         /**
          * To load configuration we need fully configured config tree builder, that's why all configuration extensions

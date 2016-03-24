@@ -58,6 +58,9 @@ class CompleteFilters extends CompleteSection
                 if (!$filter->hasDataType()) {
                     $filter->setDataType($dataType);
                 }
+                if (!$filter->hasArrayAllowed()) {
+                    $filter->setArrayAllowed();
+                }
             }
         }
     }

@@ -30,3 +30,14 @@ oro_rest_api_delete:
         _action: delete
     options:
         group: rest_api
+
+oro_rest_api_delete_list:
+    path: /api/{entity}.{_format}
+    methods: [DELETE]
+    requirements:
+        entity: (?:(?!(soap|rest)$)[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApi:deleteList
+        _action: delete_list
+    options:
+        group: rest_api

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Controller;
 
+use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
@@ -79,6 +80,27 @@ class RestApiController extends FOSRestController
         /** @var DeleteContext $context */
         $context = $this->getContext($processor, $request);
         $context->setId($request->attributes->get('id'));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Delete a list of entities
+     *
+     * @param Request $request
+     *
+     * @ApiDoc(description="Delete entities", resource=true, views={"rest_plain", "rest_json_api"})
+     *
+     * @return Response
+     */
+    public function deleteListAction(Request $request)
+    {
+        $processor = $this->getProcessor($request);
+        /** @var DeleteListContext $context */
+        $context = $this->getContext($processor, $request);
+        $context->setFilterValues(new RestFilterValueAccessor($request));
 
         $processor->process($context);
 
