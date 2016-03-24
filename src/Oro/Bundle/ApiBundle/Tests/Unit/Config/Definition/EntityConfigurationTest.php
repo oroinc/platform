@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config\Definition;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfigExtension;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\Processor;
 use Symfony\Component\Finder\Finder;
@@ -16,6 +17,9 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Tests\Unit\Config\Stub\TestConfigExtension;
 
+/**
+ * Tests extensions config tree definitions
+ */
 class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -33,6 +37,7 @@ class EntityConfigurationTest extends \PHPUnit_Framework_TestCase
         $configExtensionRegistry = new ConfigExtensionRegistry();
         $configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
+        $configExtensionRegistry->addExtension(new ActionsConfigExtension());
         $configExtensionRegistry->addExtension(new TestConfigExtension());
 
         list(

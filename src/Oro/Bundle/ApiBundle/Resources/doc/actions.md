@@ -176,14 +176,14 @@ class ComputeUserFullName implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-		$data = $context->getResult();
+        $data = $context->getResult();
         if (!empty($data)
             && empty($data['fullName'])
             && array_key_exists('firstName', $data)
             && array_key_exists('lastName', $data)
         ) {
-	        $data['fullName'] = $data['firstName'] . ' ' . $data['lastName'];
-	        $context->setResult($data);
+            $data['fullName'] = $data['firstName'] . ' ' . $data['lastName'];
+            $context->setResult($data);
         }
     }
 }
