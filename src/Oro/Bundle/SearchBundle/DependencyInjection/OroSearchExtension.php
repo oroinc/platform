@@ -4,6 +4,7 @@ namespace Oro\Bundle\SearchBundle\DependencyInjection;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
@@ -13,6 +14,22 @@ use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroSearchExtension extends Extension
 {
+    /**
+     * Merge strategy.
+     */
+    const STRATEGY_APPEND  = 'append';
+    const STRATEGY_REPLACE = 'replace';
+
+    /**
+     * Default merge strategy params
+     *
+     * @var array $optionsToMerge
+     */
+    protected $mergeOptions = [
+        'title_fields'  => self::STRATEGY_REPLACE,
+        'fields'        => self::STRATEGY_APPEND
+    ];
+
     /**
      * @param  array            $configs
      * @param  ContainerBuilder $container
@@ -27,7 +44,14 @@ class OroSearchExtension extends Extension
         $engineResources     = $configurationLoader->load($container);
 
         foreach ($engineResources as $resource) {
-            $configPart += $resource->data;
+            foreach ($resource->data as $key => $value) {
+                if (isset($configPart[$key])) {
+                    $first = $configPart[$key];
+                    $configPart[$key] = $this->mergeConfig($first, $value);
+                } else {
+                    $configPart[$key] = $value;
+                }
+            }
         }
 
         // merge entity configuration with main configuration
@@ -63,13 +87,61 @@ class OroSearchExtension extends Extension
     }
 
     /**
-     * @param ContainerBuilder $container
-     * @param array            $config
-     * @deprecated since 1.8 Please use oro_search.provider.search_mapping service for mapping config
+     * Merge configs data
+     * By default used replace strategy:
+     * - fields data from first config will replaced with data from second config
+     * - new fields will be added
+     * Complex config fields provided as array will be merged using replace or append strategy
+     * according to merge options
+     *
+     * @param array $first
+     * @param array $second
+     * @return array
      */
-    protected function setEntitiesConfigParameter(ContainerBuilder $container, array $config)
+    public function mergeConfig($first, $second)
     {
-        $container->setParameter('oro_search.entities_config', $config);
+        foreach ($second as $idx => $value) {
+            if (!array_key_exists($idx, $first)) {
+                $first[$idx] = $value;
+            } else {
+                if (is_array($value)) {
+                    if ($this->getStrategy($idx) === self::STRATEGY_APPEND) {
+                        $mergedArray = ArrayUtil::arrayMergeRecursiveDistinct($first[$idx], $value);
+                        $first[$idx] = array_unique($mergedArray, SORT_REGULAR);
+                    } else {
+                        $first[$idx] = $value;
+                    }
+                } else {
+                    $first[$idx] = $value;
+                }
+            }
+        }
+
+        return $first;
+    }
+
+    /**
+     * Default merge Strategy getter.
+     *
+     * @return string
+     */
+    public function getDefaultStrategy()
+    {
+        return self::STRATEGY_REPLACE;
+    }
+
+    /**
+     * Merge strategy getter.
+     *
+     * @param string $fieldName
+     * @return string
+     */
+    public function getStrategy($fieldName)
+    {
+        if (array_key_exists($fieldName, $this->mergeOptions)) {
+            return $this->mergeOptions[$fieldName];
+        }
+        return $this->getDefaultStrategy();
     }
 
     /**
@@ -80,5 +152,15 @@ class OroSearchExtension extends Extension
     public function getAlias()
     {
         return 'oro_search';
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     * @deprecated since 1.8 Please use oro_search.provider.search_mapping service for mapping config
+     */
+    protected function setEntitiesConfigParameter(ContainerBuilder $container, array $config)
+    {
+        $container->setParameter('oro_search.entities_config', $config);
     }
 }
