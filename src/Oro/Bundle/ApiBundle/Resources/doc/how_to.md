@@ -45,7 +45,7 @@ oro_api:
         Acme\Bundle\ProductBundle\Product:
             actions:
                 delete:
-                    acl_resource: access_entity_view              
+                    acl_resource: access_entity_view
 ```
 
 If there is `access_entity_view` ACL resource:
