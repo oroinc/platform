@@ -146,13 +146,6 @@ services:
     # load_data
     #
 
-#    oro_api.delete_list.load_data_by_entity_serializer:
-#        class: Oro\Bundle\ApiBundle\Processor\GetList\LoadDataByEntitySerializer
-#        arguments:
-#            - @oro_api.entity_serializer
-#        tags:
-#            - { name: oro.api.processor, action: delete_list, group: load_data, priority: -10 }
-
     oro_api.delete_list.load_data_by_orm_query:
         class: Oro\Bundle\ApiBundle\Processor\GetList\LoadDataByOrmQuery
         tags:

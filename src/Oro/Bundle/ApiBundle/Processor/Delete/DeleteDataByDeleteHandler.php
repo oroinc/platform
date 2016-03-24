@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Processor\Delete;
 
 use Oro\Component\ChainProcessor\ContextInterface;
+
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\ApiBundle\Processor\Shared\DeleteDataByDeleteHandler as BaseProcessor;
 
