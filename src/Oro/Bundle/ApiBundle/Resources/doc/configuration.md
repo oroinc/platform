@@ -331,9 +331,6 @@ oro_api:
 
 The `relations` configuration section describes a configuration of an entity if it is used in a relationship. This section is absolutely identical to the [entities](#entities-configuration-section) section, the only difference is the `exclude` flag for an entity - it's not available under this configuration section.
 
-
-Please refer to [actions](./actions.md#context-class) documentation section for more detail about **how to use configuration** in Data API logic.
-
 "actions" configuration section
 -------------------------------
 
