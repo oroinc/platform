@@ -34,17 +34,6 @@ class OroApiExtension extends Extension
         $loader->load('processors.delete.yml');
         $loader->load('processors.delete_list.yml');
 
-        /**
-         * To load configuration we need fully configured config tree builder, that's why all configuration extensions
-         *   should be registered before.
-         */
-        $this->registerTaggedServices(
-            $container,
-            self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
-            self::CONFIG_EXTENSION_TAG,
-            'addExtension'
-        );
-
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');
             $this->registerDebugService(
