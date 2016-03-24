@@ -19,7 +19,7 @@ class UnsetDeleteCountHeader implements ProcessorInterface
         /** @var DeleteListContext $context */
 
         if (!$context->getResponseHeaders()->has(SetDeleteCountHeader::HEADER_NAME)) {
-            // total delete count header was not set
+            // delete count header was not set
             return;
         }
 

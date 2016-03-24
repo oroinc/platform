@@ -24,19 +24,19 @@ class SetDeleteCountHeader implements ProcessorInterface
         /** @var DeleteListContext $context */
 
         if ($context->getResponseHeaders()->has(self::HEADER_NAME)) {
-            // total count header is already set
+            // delete count header is already set
             return;
         }
 
         $xInclude = $context->getRequestHeaders()->get(Context::INCLUDE_HEADER);
         if (empty($xInclude) || !in_array(self::HEADER_VALUE, $xInclude, true)) {
-            // total count is not requested
+            // delete count is not requested
             return;
         }
 
-        $totalCount = count($context->getResult());
-        if (null !== $totalCount) {
-            $context->getResponseHeaders()->set(self::HEADER_NAME, $totalCount);
+        $result = $context->getResult();
+        if (null !== $result && is_array($result)) {
+            $context->getResponseHeaders()->set(self::HEADER_NAME, count($result));
         }
     }
 }
