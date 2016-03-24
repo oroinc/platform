@@ -89,7 +89,7 @@ class MyConfigExtension extends AbstractConfigExtension
     {
         return [
             'entities.entity' => function (array $config) {
-	            // do something
+                // do something
                 return $config;
             }
         ];
@@ -102,7 +102,7 @@ class MyConfigExtension extends AbstractConfigExtension
     {
         return [
             'entities.entity' => function (array $config) {
-	            // do something
+                // do something
                 return $config;
             }
         ];
@@ -131,7 +131,7 @@ class MyConfiguration implements ConfigurationSectionInterface
         array $preProcessCallbacks,
         array $postProcessCallbacks
     ) {
-	    $node->scalarNode('some_option');
+        $node->scalarNode('some_option');
     }
 }
 ```
@@ -166,7 +166,7 @@ class MyConfiguration extends AbstractConfigurationSection implements Configurat
                     }
                 );
         $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
-	    $node->scalarNode('some_option');
+        $node->scalarNode('some_option');
         $parentNode
             ->validate()
                 ->always(

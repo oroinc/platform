@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Config;
 
+use Oro\Bundle\ApiBundle\Config\ActionsConfigExtension;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\Finder\SplFileInfo;
 use Symfony\Component\Yaml\Yaml;
@@ -22,6 +23,7 @@ class ConfigLoaderTest extends \PHPUnit_Framework_TestCase
         $configExtensionRegistry = new ConfigExtensionRegistry();
         $configExtensionRegistry->addExtension(new FiltersConfigExtension());
         $configExtensionRegistry->addExtension(new SortersConfigExtension());
+        $configExtensionRegistry->addExtension(new ActionsConfigExtension());
         $configExtensionRegistry->addExtension(new TestConfigExtension());
 
         $configLoaderFactory = new ConfigLoaderFactory($configExtensionRegistry);
