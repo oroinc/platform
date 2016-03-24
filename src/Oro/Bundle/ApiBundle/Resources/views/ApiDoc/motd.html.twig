@@ -121,7 +121,7 @@
          * Add the operators selector for filters
          */
         $('.toggler').on('click', function() {
-            var $container = $(this).closest('.get.operation'),
+            var $container = $(this).closest('.operation'),
                 $form = $container.find('.pane.sandbox form')
             $container.find('.pane.content>table>tbody table td:contains(Operators)').each(function (index, el) {
                 var $el = $(el),
@@ -143,7 +143,7 @@
          * A handler to add operators to the sandbox AJAX requests
          */
         $.ajaxPrefilter(function(options) {
-            if (options.type != 'GET' || options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
+            if (options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
                 return;
             }
 
