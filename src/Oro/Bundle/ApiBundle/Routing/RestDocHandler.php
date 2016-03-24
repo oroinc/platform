@@ -19,7 +19,6 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
 class RestDocHandler implements HandlerInterface
@@ -67,9 +66,6 @@ class RestDocHandler implements HandlerInterface
     /** @var EntityClassNameProviderInterface */
     protected $entityClassNameProvider;
 
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -83,7 +79,6 @@ class RestDocHandler implements HandlerInterface
      * @param RestDocViewDetector              $docViewDetector
      * @param ActionProcessorBagInterface      $processorBag
      * @param EntityClassNameProviderInterface $entityClassNameProvider
-     * @param EntityAliasResolver              $entityAliasResolver
      * @param DoctrineHelper                   $doctrineHelper
      * @param ValueNormalizer                  $valueNormalizer
      */
@@ -91,14 +86,12 @@ class RestDocHandler implements HandlerInterface
         RestDocViewDetector $docViewDetector,
         ActionProcessorBagInterface $processorBag,
         EntityClassNameProviderInterface $entityClassNameProvider,
-        EntityAliasResolver $entityAliasResolver,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer
     ) {
         $this->docViewDetector         = $docViewDetector;
         $this->processorBag            = $processorBag;
         $this->entityClassNameProvider = $entityClassNameProvider;
-        $this->entityAliasResolver     = $entityAliasResolver;
         $this->doctrineHelper          = $doctrineHelper;
         $this->valueNormalizer         = $valueNormalizer;
         $this->requestType             = new RequestType([RequestType::REST, RequestType::JSON_API]);
@@ -117,9 +110,12 @@ class RestDocHandler implements HandlerInterface
             return;
         }
 
-        $entityClass = $this->getEntityClass($route);
-        if ($entityClass) {
+        $entityType = $this->getEntityType($route);
+        if ($entityType) {
+            $entityClass = $this->getEntityClass($entityType);
             $config = $this->getConfig($action, $entityClass);
+
+            $annotation->setSection($entityType);
             $this->setDescription($annotation, $action, $config->getConfig()->toArray(), $entityClass);
             if ($this->hasAttribute($route, RestRouteOptionsResolver::ID_PLACEHOLDER)) {
                 $this->addIdRequirement(
@@ -143,18 +139,28 @@ class RestDocHandler implements HandlerInterface
      *
      * @return string|null
      */
-    protected function getEntityClass(Route $route)
+    protected function getEntityType(Route $route)
     {
-        $pluralAlias = $route->getDefault(RestRouteOptionsResolver::ENTITY_ATTRIBUTE);
-
-        return $pluralAlias
-            ? $this->entityAliasResolver->getClassByPluralAlias($pluralAlias)
-            : null;
+        return $route->getDefault(RestRouteOptionsResolver::ENTITY_ATTRIBUTE);
     }
 
     /**
-     * @param string      $action
-     * @param string|null $entityClass
+     * @param string $entityType
+     *
+     * @return string
+     */
+    protected function getEntityClass($entityType)
+    {
+        return $this->valueNormalizer->normalizeValue(
+            $entityType,
+            DataType::ENTITY_CLASS,
+            $this->requestType
+        );
+    }
+
+    /**
+     * @param string $action
+     * @param string $entityClass
      *
      * @return Context
      */
@@ -170,9 +176,7 @@ class RestDocHandler implements HandlerInterface
             $context->getRequestType()->add(RequestType::JSON_API);
         }
         $context->setLastGroup('initialize');
-        if ($entityClass) {
-            $context->setClassName($entityClass);
-        }
+        $context->setClassName($entityClass);
 
         $processor->process($context);
 

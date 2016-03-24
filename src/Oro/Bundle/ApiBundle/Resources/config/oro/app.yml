@@ -1,6 +1,7 @@
 nelmio_api_doc:
     motd:
         template: OroApiBundle::ApiDoc/motd.html.twig
+    default_sections_opened: false
 
 security:
     firewalls:
