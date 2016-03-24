@@ -61,7 +61,7 @@ abstract class DeleteDataByDeleteHandler implements ProcessorInterface
     }
 
     /**
-     * Deletes context's result by delete handler
+     * Deletes entity(es) stored in the result property of the Context using the delete handler
      *
      * @param ContextInterface $context
      * @param DeleteHandler    $handler
