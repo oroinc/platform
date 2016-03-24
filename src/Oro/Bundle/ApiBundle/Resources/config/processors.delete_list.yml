@@ -130,7 +130,7 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -60 }
 
-    oro_api.delete_list.set_delete_limits:
+    oro_api.delete_list.set_delete_limit:
         class: Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteLimit
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -60 }
