@@ -98,10 +98,7 @@ class OwnerTreeListener implements ContainerAwareInterface
     {
         foreach ($entities as $entity) {
             if (in_array(ClassUtils::getRealClass($entity), $this->securityClasses, true)) {
-                $entityClass = ClassUtils::getRealClass($entity);
-                $userEntityClass = $this->container->getParameter('oro_user.entity.class');
-
-                if ($entityClass ===  $userEntityClass) {
+                if ($entity instanceof UserInterface) {
                     $changeSet = $this->container
                         ->get('doctrine.orm.entity_manager')
                         ->getUnitOfWork()
@@ -114,7 +111,7 @@ class OwnerTreeListener implements ContainerAwareInterface
                         continue;
                     }
                 }
-                 return true;
+                return true;
             }
         }
     }
