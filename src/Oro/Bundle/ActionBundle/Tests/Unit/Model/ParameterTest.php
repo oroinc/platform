@@ -15,7 +15,7 @@ class ParameterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->parameter = new Parameter();
+        $this->parameter = new Parameter('test');
     }
 
     protected function tearDown()
@@ -23,17 +23,81 @@ class ParameterTest extends \PHPUnit_Framework_TestCase
         unset($this->actionGroupDefinition);
     }
 
-    public function testGettersAndSetters()
+    public function testSimpleGettersAndSetters()
     {
+        $this->assertEquals('test', $this->parameter->getName());
         static::assertPropertyAccessors(
             $this->parameter,
             [
-                ['name', 'test'],
                 ['type', 'TestType'],
                 ['message', 'Test Message'],
-                ['default', ['Test Default Value']],
-                ['required', true, false],
             ]
         );
+    }
+
+    public function testDefaultBehavior()
+    {
+        $this->assertFalse($this->parameter->hasMessage());
+        $this->parameter->setMessage(null);
+        $this->assertFalse($this->parameter->hasMessage());
+        $this->parameter->setMessage('');
+        $this->assertFalse($this->parameter->hasMessage());
+        $this->parameter->setMessage(false);
+        $this->assertFalse($this->parameter->hasMessage());
+
+        $this->assertTrue($this->parameter->isRequired());
+        $this->assertFalse($this->parameter->hasDefault());
+        $this->assertFalse($this->parameter->hasTypeHint());
+
+        $this->setExpectedException(
+            'LogicException',
+            'Parameter `test` has no default value set. ' .
+            'Please check `hasDefault() === true` or `isRequired() === false` before default value retrieval'
+        );
+
+        $this->parameter->getDefault();
+    }
+
+    /**
+     * @dataProvider defaultValueProvider
+     * @param $value
+     */
+    public function testGetDefaultValue($value)
+    {
+        $this->parameter->setDefault($value);
+
+        $this->assertTrue($this->parameter->hasDefault());
+
+        $this->assertSame($value, $this->parameter->getDefault());
+    }
+
+    /**
+     * @return array
+     */
+    public function defaultValueProvider()
+    {
+        return [
+            [''],
+            ['test'],
+            [0],
+            [1],
+            [null],
+            [true],
+            [false],
+            [[]],
+            [(object)[]]
+        ];
+    }
+
+    public function testToString()
+    {
+        $this->assertEquals('test', (string)$this->parameter);
+    }
+
+    public function testNoDefaultConstant()
+    {
+        $this->parameter->setDefault(Parameter::NO_DEFAULT);
+
+        $this->assertFalse($this->parameter->hasDefault());
     }
 }

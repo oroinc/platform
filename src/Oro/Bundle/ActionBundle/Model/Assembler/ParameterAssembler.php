@@ -27,13 +27,11 @@ class ParameterAssembler extends AbstractAssembler
      */
     protected function assembleParameter($name, array $options = [])
     {
-        $parameter = new Parameter();
+        $parameter = new Parameter($name);
         $parameter
-            ->setName($name)
             ->setType($this->getOption($options, 'type'))
             ->setMessage($this->getOption($options, 'message', ''))
-            ->setDefault($this->getOption($options, 'default'))
-            ->setRequired($this->getOption($options, 'required', false));
+            ->setDefault($this->getOption($options, 'default', Parameter::NO_DEFAULT));
 
         return $parameter;
     }

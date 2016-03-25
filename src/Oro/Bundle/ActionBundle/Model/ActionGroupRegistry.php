@@ -3,7 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
-use Oro\Bundle\ActionBundle\Exception\ActionNotFoundException;
+use Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 
 class ActionGroupRegistry
@@ -41,7 +41,7 @@ class ActionGroupRegistry
     /**
      * @param $name
      * @return ActionGroup
-     * @throws ActionNotFoundException
+     * @throws ActionGroupNotFoundException
      */
     public function get($name)
     {
@@ -50,7 +50,7 @@ class ActionGroupRegistry
         if (array_key_exists($name, $this->actionGroups)) {
             return $this->actionGroups[$name];
         } else {
-            throw new ActionNotFoundException($name);
+            throw new ActionGroupNotFoundException($name);
         }
     }
 
@@ -63,10 +63,7 @@ class ActionGroupRegistry
         $this->actionGroups = [];
 
         $configuration = $this->configurationProvider->getConfiguration();
-        $actionGroups = $this->assembler->assemble($configuration);
+        $this->actionGroups = $this->assembler->assemble($configuration);
 
-        foreach ($actionGroups as $actionGroup) {
-            $this->actionGroups[$actionGroup->getDefinition()->getName()] = $actionGroup;
-        }
     }
 }

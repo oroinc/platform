@@ -90,7 +90,7 @@ class SystemAwareResolverTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * Data provider for testResolve
+     * Data provider for testResolveOk
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function resolveProvider()

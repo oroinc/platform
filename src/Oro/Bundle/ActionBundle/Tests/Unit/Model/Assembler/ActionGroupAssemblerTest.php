@@ -22,7 +22,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             $this->getActionFactory(),
             $this->getConditionFactory(),
             $this->getParameterAssembler(),
-            $this->getDoctrineHelper()
+            $this->getParametersResolver()
         );
     }
 
@@ -52,9 +52,9 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
     public function assembleProvider()
     {
         $parameterAssembler = $this->getParameterAssembler();
+        $parametersResolver = $this->getParametersResolver();
         $actionFactory = $this->getActionFactory();
         $conditionFactory = $this->getConditionFactory();
-        $doctrineHelper = $this->getDoctrineHelper();
 
         $definition1 = new ActionGroupDefinition();
         $definition1
@@ -78,24 +78,6 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             ])
             ->setConditions([
                 '@and' => [
-                    [
-                        '@has_value' => [
-                            'parameters' => ['$.arg2'],
-                            'message' => '$.arg2 is required',
-                        ]
-                    ],
-                    [
-                        '@has_value' => [
-                            'parameters' => ['$.arg3'],
-                            'message' => 'Error Message: $.arg3 is required',
-                        ]
-                    ],
-                    [
-                        '@type' => [
-                            'parameters' => ['$.arg3', 'string'],
-                            'message' => 'Error Message: $.arg3 must be of type "{{ type }}", "{{ value }}" given',
-                        ]
-                    ],
                     ['@condition' => 'config_conditions'],
                 ]
             ])
@@ -107,24 +89,6 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setConditions([
                 '@and' => [
                     ['@acl_granted' => 'test_acl'],
-                    [
-                        '@has_value' => [
-                            'parameters' => ['$.arg2'],
-                            'message' => '$.arg2 is required',
-                        ]
-                    ],
-                    [
-                        '@has_value' => [
-                            'parameters' => ['$.arg3'],
-                            'message' => 'Error Message: $.arg3 is required',
-                        ]
-                    ],
-                    [
-                        '@type' => [
-                            'parameters' => ['$.arg3', 'string'],
-                            'message' => 'Error Message: $.arg3 must be of type "{{ type }}", "{{ value }}" given',
-                        ]
-                    ],
                     ['@condition' => 'config_conditions']
                 ]
              ])
@@ -141,7 +105,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         'label' => 'My Label',
                         'entities' => [
                             '\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'
-                        ],
+                        ]
                     ]
                 ]
                 ,
@@ -150,6 +114,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         $actionFactory,
                         $conditionFactory,
                         $parameterAssembler,
+                        $parametersResolver,
                         $definition1
                     )
                 ],
@@ -157,6 +122,10 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
             'maximum data' => [
                 [
                     'maximum_name' => [
+                        'conditions' => [
+                            '@condition' => 'config_conditions',
+                        ],
+                        'actions' => ['config_actions'],
                         'parameters' => [
                             'arg1' => [],
                             'arg2' => [
@@ -167,11 +136,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                                 'type' => 'string',
                                 'message' => 'Error Message',
                             ],
-                        ],
-                        'conditions' => [
-                            '@condition' => 'config_conditions',
-                        ],
-                        'actions' => ['config_actions'],
+                        ]
                     ]
                 ],
                 'expected' => [
@@ -179,6 +144,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         $actionFactory,
                         $conditionFactory,
                         $parameterAssembler,
+                        $parametersResolver,
                         $definition2
                     )
                 ],
@@ -207,6 +173,7 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
                         $actionFactory,
                         $conditionFactory,
                         $parameterAssembler,
+                        $parametersResolver,
                         $definition3
                     )
                 ],
@@ -250,5 +217,15 @@ class ActionGroupAssemblerTest extends \PHPUnit_Framework_TestCase
     protected function getParameterAssembler()
     {
         return new ParameterAssembler();
+    }
+
+    /**
+     * @return ActionGroup\ParametersResolver|\PHPUnit_Framework_MockObject_MockObject
+     */
+    private function getParametersResolver()
+    {
+        return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver')
+            ->disableOriginalConstructor()
+            ->getMock();
     }
 }

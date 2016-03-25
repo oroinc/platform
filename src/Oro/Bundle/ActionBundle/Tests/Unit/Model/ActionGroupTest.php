@@ -30,6 +30,9 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     /** @var ActionData */
     protected $data;
 
+    /** @var \Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver|\PHPUnit_Framework_MockObject_MockObject */
+    protected $parametersResolver;
+
     protected function setUp()
     {
         $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
@@ -40,10 +43,15 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->parametersResolver = $this->getMockBuilder(
+            'Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver'
+        )->disableOriginalConstructor()->getMock();
+
         $this->actionGroup = new ActionGroup(
             $this->actionFactory,
             $this->conditionFactory,
             new ParameterAssembler(),
+            $this->parametersResolver,
             new ActionGroupDefinition()
         );
 
@@ -89,7 +97,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
 
         if ($exceptionMessage) {
             $this->setExpectedException(
-                'Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException',
+                'Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException',
                 $exceptionMessage
             );
         }
@@ -190,8 +198,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
      */
     public function getParametersProvider()
     {
-        $parameter1 = new Parameter();
-        $parameter1->setName('parameter1');
+        $parameter1 = new Parameter('parameter1');
 
         return [
             'no parameters' => [

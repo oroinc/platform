@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Command;
 
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Util\Debug;
 
 use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
@@ -23,7 +24,7 @@ class DumpActionConfigurationCommand extends ContainerAwareCommand
     {
         $this->setName('oro:action:configuration:dump')
             ->setDescription('Dump action configuration')
-            ->addArgument('operation', InputArgument::OPTIONAL, 'Names of the operation that should be dumped')
+            ->addArgument('name', InputArgument::OPTIONAL, 'Names of the name of node that should be dumped')
             ->addOption('action-group', null, InputOption::VALUE_NONE, 'Dump action_group')
             ->addOption('assemble', null, InputOption::VALUE_NONE, 'Assemble configuration');
     }
@@ -33,13 +34,15 @@ class DumpActionConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Load actions ...');
+
 
         $errors = new ArrayCollection();
 
         if ($input->getOption('action-group')) {
+            $output->writeln('Load action_groups ...');
             $provider = $this->getActionGroupsProvider();
         } else {
+            $output->writeln('Load operations ...');
             $provider = $this->getOperationsProvider();
         }
 
@@ -58,11 +61,11 @@ class DumpActionConfigurationCommand extends ContainerAwareCommand
         }
 
         if ($configuration) {
-            $operation = $input->getArgument('operation');
+            $name = $input->getArgument('name');
 
-            if ($operation && isset($configuration[$operation])) {
-                $output->writeln($operation);
-                print_r($configuration[$operation]);
+            if ($name && isset($configuration[$name])) {
+                $output->writeln($name);
+                Debug::dump($configuration[$name], 100);
             } else {
                 foreach (array_keys($configuration) as $key) {
                     $output->writeln($key);
