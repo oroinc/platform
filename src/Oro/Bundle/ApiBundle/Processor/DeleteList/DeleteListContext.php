@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
-use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\ListContext;
 
-class DeleteListContext extends Context
+class DeleteListContext extends ListContext
 {
 }

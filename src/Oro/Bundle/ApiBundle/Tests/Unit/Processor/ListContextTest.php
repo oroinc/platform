@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Processor\ListContext;
 
-class GetListContextTest extends \PHPUnit_Framework_TestCase
+class ListContextTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $configProvider;
@@ -12,7 +12,7 @@ class GetListContextTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $metadataProvider;
 
-    /** @var GetListContext */
+    /** @var ListContext */
     protected $context;
 
     protected function setUp()
@@ -24,7 +24,7 @@ class GetListContextTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->context = new GetListContext($this->configProvider, $this->metadataProvider);
+        $this->context = new ListContext($this->configProvider, $this->metadataProvider);
     }
 
     public function testTotalCountCallback()
@@ -35,6 +35,6 @@ class GetListContextTest extends \PHPUnit_Framework_TestCase
 
         $this->context->setTotalCountCallback($totalCountCallback);
         $this->assertEquals($totalCountCallback, $this->context->getTotalCountCallback());
-        $this->assertEquals($totalCountCallback, $this->context->get(GetListContext::TOTAL_COUNT_CALLBACK));
+        $this->assertEquals($totalCountCallback, $this->context->get(ListContext::TOTAL_COUNT_CALLBACK));
     }
 }

@@ -1,12 +1,18 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\ApiBundle\Processor\GetList\SetTotalCountHeader;
+
+use Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 {
+    const REQUEST_INCLUDE_HEADER_NAME      = 'X-Include';
+    const REQUEST_TOTAL_COUNT_HEADER_VALUE = 'totalCount';
+    const RESPONSE_TOTAL_COUNT_HEADER_NAME = 'X-Include-Total-Count';
+
     /** @var SetTotalCountHeader */
     protected $processor;
 
@@ -29,15 +35,20 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
     {
         $this->processor->process($this->context);
 
-        $this->assertFalse($this->context->getResponseHeaders()->has('X-Include-Total-Count'));
+        $this->assertFalse($this->context->getResponseHeaders()->has(self::RESPONSE_TOTAL_COUNT_HEADER_NAME));
     }
 
     public function testProcessOnExistingHeader()
     {
-        $this->context->getResponseHeaders()->set('X-Include-Total-Count', 13);
+        $testCount = 135;
+
+        $this->context->getResponseHeaders()->set(self::RESPONSE_TOTAL_COUNT_HEADER_NAME, $testCount);
         $this->processor->process($this->context);
 
-        $this->assertEquals(13, $this->context->getResponseHeaders()->get('X-Include-Total-Count'));
+        $this->assertEquals(
+            $testCount,
+            $this->context->getResponseHeaders()->get(self::RESPONSE_TOTAL_COUNT_HEADER_NAME)
+        );
     }
 
     public function testProcessWithTotalCallback()
@@ -49,10 +60,16 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
                 return $testCount;
             }
         );
-        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->getRequestHeaders()->set(
+            self::REQUEST_INCLUDE_HEADER_NAME,
+            [self::REQUEST_TOTAL_COUNT_HEADER_VALUE]
+        );
         $this->processor->process($this->context);
 
-        $this->assertEquals($testCount, $this->context->getResponseHeaders()->get('X-Include-Total-Count'));
+        $this->assertEquals(
+            $testCount,
+            $this->context->getResponseHeaders()->get(self::RESPONSE_TOTAL_COUNT_HEADER_NAME)
+        );
     }
 
     public function testProcessWithWrongTotalCallback()
@@ -63,7 +80,10 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
         );
 
         $this->context->setTotalCountCallback(new \stdClass());
-        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->getRequestHeaders()->set(
+            self::REQUEST_INCLUDE_HEADER_NAME,
+            [self::REQUEST_TOTAL_COUNT_HEADER_VALUE]
+        );
         $this->processor->process($this->context);
     }
 
@@ -79,7 +99,10 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
                 return 'non integer value';
             }
         );
-        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->getRequestHeaders()->set(
+            self::REQUEST_INCLUDE_HEADER_NAME,
+            [self::REQUEST_TOTAL_COUNT_HEADER_VALUE]
+        );
         $this->processor->process($this->context);
     }
 
@@ -100,12 +123,18 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
                 }
             );
 
-        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->getRequestHeaders()->set(
+            self::REQUEST_INCLUDE_HEADER_NAME,
+            [self::REQUEST_TOTAL_COUNT_HEADER_VALUE]
+        );
         $this->context->setQuery($query);
         $this->processor->process($this->context);
 
         // mocked fetchColumn method in StatementMock returns null value (0 records in db)
-        $this->assertEquals(0, $this->context->getResponseHeaders()->get('X-Include-Total-Count'));
+        $this->assertEquals(
+            0,
+            $this->context->getResponseHeaders()->get(self::RESPONSE_TOTAL_COUNT_HEADER_NAME)
+        );
     }
 
     public function testProcessQuery()
@@ -114,12 +143,18 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
 
-        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->getRequestHeaders()->set(
+            self::REQUEST_INCLUDE_HEADER_NAME,
+            [self::REQUEST_TOTAL_COUNT_HEADER_VALUE]
+        );
         $this->context->setQuery($query->getQuery());
         $this->processor->process($this->context);
 
         // mocked fetchColumn method in StatementMock returns null value (0 records in db)
-        $this->assertEquals(0, $this->context->getResponseHeaders()->get('X-Include-Total-Count'));
+        $this->assertEquals(
+            0,
+            $this->context->getResponseHeaders()->get(self::RESPONSE_TOTAL_COUNT_HEADER_NAME)
+        );
     }
 
     public function testProcessOnWrongQuery()
@@ -131,7 +166,10 @@ class SetTotalCountHeaderTest extends GetListProcessorOrmRelatedTestCase
             . '"stdClass" given.'
         );
 
-        $this->context->getRequestHeaders()->set('X-Include', ['totalCount']);
+        $this->context->getRequestHeaders()->set(
+            self::REQUEST_INCLUDE_HEADER_NAME,
+            [self::REQUEST_TOTAL_COUNT_HEADER_VALUE]
+        );
         $this->context->setQuery(new \stdClass());
         $this->processor->process($this->context);
     }

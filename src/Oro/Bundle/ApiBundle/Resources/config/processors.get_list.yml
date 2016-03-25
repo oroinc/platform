@@ -259,7 +259,7 @@ services:
     #
 
     oro_api.get_list.set_total_count_header:
-        class: Oro\Bundle\ApiBundle\Processor\GetList\SetTotalCountHeader
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader
         arguments:
             - @oro_batch.orm.query_builder.count_query_optimizer
         tags:
@@ -273,6 +273,11 @@ services:
     #
     # normalize_result
     #
+
+    oro_api.get_list.remove_total_count_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveTotalCountHeader
+        tags:
+            - { name: oro.api.processor, action: get_list, group: normalize_result, priority: 100 }
 
     oro_api.get_list.rest.set_http_response_status_code:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
