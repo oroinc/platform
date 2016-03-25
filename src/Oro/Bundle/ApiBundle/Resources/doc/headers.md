@@ -64,7 +64,7 @@ The following table describes all existing *keys* for `X-Include` header.
 Add new X-Include key
 ---------------------
 
-Also it is possible to add own *key* to the `X-Include` header. To do this you have to do the following things:
+Also it is possible to add own *key* to the `X-Include` header. To do this you have to:
 
 - create a processor that will handle your *key*
 
