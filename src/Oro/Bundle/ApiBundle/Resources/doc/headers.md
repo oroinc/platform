@@ -28,7 +28,7 @@ It will return
 ```
 
 Notes:
-- to generate WSSE header you can use `php app/console oro:wsse:generate-header YOUR_API_KEY` command.
+- to generate WSSE header you can run `php app/console oro:wsse:generate-header YOUR_API_KEY`
 
 Existing X-Include keys
 -----------------------
