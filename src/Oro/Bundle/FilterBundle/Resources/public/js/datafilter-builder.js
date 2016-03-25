@@ -94,10 +94,13 @@ define([
                 return;
             }
 
-            var url = routing.generate('oro_datagrid_filter_metadata', {
+            var params = {
                 gridName: gridName,
                 filterNames: _.map(this.filterLoaders, _.property('name'))
-            });
+            };
+            params[this.metadata.options.gridName] = this.metadata.gridParams;
+
+            var url = routing.generate('oro_datagrid_filter_metadata', params);
 
             var self = this;
             $.get(url)

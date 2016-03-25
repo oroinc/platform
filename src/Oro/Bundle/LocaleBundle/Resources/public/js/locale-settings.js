@@ -344,6 +344,21 @@ define(['underscore', 'orolocale/js/locale-settings/data'
         },
 
         /**
+         * Gets week day names array where names are sorted by locale
+         *
+         * @param {string} [width] "wide" - default |"abbreviated"|"short"|"narrow"
+         * @returns {Array}
+         */
+        getSortedDayOfWeekNames: function(width) {
+            var dowNames = this.getCalendarDayOfWeekNames(width, true);
+            _.times(this.getCalendarFirstDayOfWeek() - 1, function() {
+                dowNames.push(dowNames.shift());
+            });
+
+            return dowNames;
+        },
+
+        /**
          * Gets first day of week starting from 1.
          *
          * @returns {int}
