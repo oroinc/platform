@@ -345,7 +345,7 @@ Creating new action
 
 To create a new action you need to create two classes:
 
-- **context** - This class represents an context in scope of which an action is executed. Actually an instance of this class is used to store input and output data and share data between processors. This class must extend [ApiContext](../../Processor/ApiContext.php). Also, depending on your needs, you can use another classes derived from the [ApiContext](../../Processor/ApiContext.php), for example [Context](../../Processor/Context.php) or [SingleItemContext](../../Processor/SingleItemContext.php).
+- **context** - This class represents an context in scope of which an action is executed. Actually an instance of this class is used to store input and output data and share data between processors. This class must extend [ApiContext](../../Processor/ApiContext.php). Also, depending on your needs, you can use another classes derived from the [ApiContext](../../Processor/ApiContext.php), for example [Context](../../Processor/Context.php), [SingleItemContext](../../Processor/SingleItemContext.php) or [ListContext](../../Processor/ListContext.php).
 - **main processor** - This class is the main entry point for an action and responsible for creating an instance of the context class and executing all worker processors. This class must extend [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php) and implement the `createContextObject` method. Also, depending on your needs, you can use another classes derived from the [ActionProcessor](../../../../Component/ChainProcessor/ActionProcessor.php), for example [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
 
 ```php

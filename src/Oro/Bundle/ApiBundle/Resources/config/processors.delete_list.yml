@@ -170,8 +170,15 @@ services:
     # delete_data
     #
 
-    oro_api.delete_list.set_delete_count_header:
-        class: Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeleteCountHeader
+    oro_api.delete_list.set_total_count_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader
+        arguments:
+            - @oro_batch.orm.query_builder.count_query_optimizer
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }
+
+    oro_api.delete_list.set_deleted_count_header:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\SetDeletedCountHeader
         tags:
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }
 
@@ -191,6 +198,16 @@ services:
     #
     # normalize_result
     #
+
+    oro_api.delete_list.remove_deleted_count_header:
+        class: Oro\Bundle\ApiBundle\Processor\DeleteList\RemoveDeletedCountHeader
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: 100 }
+
+    oro_api.delete_list.remove_total_count_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RemoveTotalCountHeader
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: 100 }
 
     oro_api.delete_list.rest.set_http_response_status_code:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
@@ -212,11 +229,6 @@ services:
             - @oro_api.json_api.document_builder_factory
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: json_api, priority: -20 }
-
-    oro_api.delete_list.unset_delete_count_header:
-        class: Oro\Bundle\ApiBundle\Processor\DeleteList\UnsetDeleteCountHeader
-        tags:
-            - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -30 }
 
     oro_api.delete_list.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
