@@ -10,6 +10,7 @@ namespace Oro\Bundle\ApiBundle\Request;
 final class DataType
 {
     const INTEGER             = 'integer';
+    const BIGINT              = 'bigint';
     const UNSIGNED_INTEGER    = 'unsignedInteger';
     const STRING              = 'string';
     const BOOLEAN             = 'boolean';
