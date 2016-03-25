@@ -17,6 +17,14 @@
 {%- endblock %}
 
 {% block block_attributes -%}
+    {% set renderer = 'block_attributes_base' %}
+    {% if attr_renderer is defined %}
+        {% set renderer = attr_renderer %}
+    {% endif %}
+    {{ block(renderer) }}
+{%- endblock %}
+
+{% block block_attributes_base -%}
     {% if attr.class is defined %}
         {% set attr = attr|merge({
             class: attr.class|replace({'{{ class_prefix }}': class_prefix})
