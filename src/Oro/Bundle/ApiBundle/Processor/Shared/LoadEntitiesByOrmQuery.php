@@ -1,24 +1,25 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Get;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\ListContext;
 
 /**
- * Loads data using ORM QueryBuilder object.
+ * Loads entities using ORM QueryBuilder object.
  */
-class LoadDataByOrmQuery implements ProcessorInterface
+class LoadEntitiesByOrmQuery implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetContext $context */
+        /** @var ListContext $context */
 
         if ($context->hasResult()) {
             // result data are already retrieved
@@ -27,9 +28,9 @@ class LoadDataByOrmQuery implements ProcessorInterface
 
         $query = $context->getQuery();
         if ($query instanceof QueryBuilder) {
-            $context->setResult($query->getQuery()->getOneOrNullResult());
+            $context->setResult($query->getQuery()->getResult());
         } elseif ($query instanceof Query) {
-            $context->setResult($query->getOneOrNullResult());
+            $context->setResult($query->getResult());
         }
     }
 }

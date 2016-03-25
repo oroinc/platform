@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 
 /**
- * Checks if filter values was set.
+ * Checks whether at least one filter is provided.
  */
 class ValidateFilterValues implements ProcessorInterface
 {
@@ -25,17 +25,17 @@ class ValidateFilterValues implements ProcessorInterface
         }
 
         $filterValues = $context->getFilterValues();
-        $filters      = $context->getFilters();
-        $valuesExist = false;
+        $filters = $context->getFilters();
+        $hasFilters = false;
         foreach ($filters as $filterKey => $filter) {
             if ($filterValues->has($filterKey)) {
-                $valuesExist = true;
+                $hasFilters = true;
                 break;
             }
         }
 
-        if (!$valuesExist) {
-            throw new BadRequestHttpException('Filters does not set.');
+        if (!$hasFilters) {
+            throw new BadRequestHttpException('At least one filter must be provided.');
         }
     }
 }

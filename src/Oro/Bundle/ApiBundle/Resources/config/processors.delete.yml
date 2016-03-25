@@ -103,7 +103,7 @@ services:
     #
 
     oro_api.delete.load_data_by_orm_query:
-        class: Oro\Bundle\ApiBundle\Processor\Get\LoadDataByOrmQuery
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery
         tags:
             - { name: oro.api.processor, action: delete, group: load_data, priority: -20 }
 

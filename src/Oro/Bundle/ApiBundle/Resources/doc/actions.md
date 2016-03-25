@@ -310,11 +310,11 @@ General methods:
 
 Entity configuration related methods:
 
-- **getConfigExtras()** - Gets a list of [requests for additional configuration data](../../Config/ConfigExtraInterface.php).
-- **setConfigExtras(extras)** - Sets a list of requests for additional configuration data.
-- **hasConfigExtra(extraName)** - Checks whether some additional configuration data is requested.
-- **addConfigExtra(extra)** - Adds a request for some additional configuration data.
-- **removeConfigExtra(extraName)** - Removes a request for some additional configuration data.
+- **getConfigExtras()** - Gets a list of [requests for configuration data](../../Config/ConfigExtraInterface.php).
+- **setConfigExtras(extras)** - Sets a list of requests for configuration data.
+- **hasConfigExtra(extraName)** - Checks whether some configuration data is requested.
+- **addConfigExtra(extra)** - Adds a request for some configuration data.
+- **removeConfigExtra(extraName)** - Removes a request for some configuration data.
 - **hasConfig()** - Checks whether a configuration of an entity exists.
 - **getConfig()** - Gets a [configuration of an entity](../../Config/EntityDefinitionConfig.php).
 - **setConfig(config)** - Sets a custom configuration of an entity. This method can be used to completely override the default configuration of an entity.

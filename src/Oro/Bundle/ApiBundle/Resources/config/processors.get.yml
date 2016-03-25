@@ -154,14 +154,14 @@ services:
     #
 
     oro_api.get.load_data_by_entity_serializer:
-        class: Oro\Bundle\ApiBundle\Processor\Get\LoadDataByEntitySerializer
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer
         arguments:
             - @oro_api.entity_serializer
         tags:
             - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
 
     oro_api.get.load_data_by_orm_query:
-        class: Oro\Bundle\ApiBundle\Processor\Get\LoadDataByOrmQuery
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery
         tags:
             - { name: oro.api.processor, action: get, group: load_data, priority: -20 }
 

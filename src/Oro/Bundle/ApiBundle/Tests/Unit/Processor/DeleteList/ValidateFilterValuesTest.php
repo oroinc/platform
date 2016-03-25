@@ -48,7 +48,7 @@ class ValidateFilterValuesTest extends DeleteListProcessorTestCase
 
     /**
      * @expectedException \Symfony\Component\HttpKernel\Exception\BadRequestHttpException
-     * @expectedExceptionMessage Filters does not set.
+     * @expectedExceptionMessage At least one filter must be provided.
      */
     public function testProcessOnEmptyFilterValues()
     {
