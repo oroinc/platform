@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Request;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class RestFilterValueAccessor implements FilterValueAccessorInterface
 {
@@ -86,16 +86,17 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
         $this->groups     = [];
 
         // we should support filters that comes from request body and from URI part
-        $requestData = $this->request->getContent() . '&' . $this->request->getQueryString() ;
+        $requestData = $this->request->getContent() . '&' . $this->request->getQueryString();
 
         $matchResult = preg_match_all(
-            '/(?P<key>((?P<group>[\w\d-\.]+)(?P<path>(%5B[\w\d-\.]+%5D)*)))'
+            '/(?P<key>((?P<group>[\w\d-\.]+)(?P<path>((\[[\w\d-\.]+\])|(%5B[\w\d-\.]+%5D))*)))'
             . '(?P<operator>(<|>|%3C|%3E)?=|<>|%3C%3E|(<|>|%3C|%3E))'
             . '(?P<value>[^&]+)/',
             $requestData,
             $matches,
             PREG_SET_ORDER
         );
+
         if (false !== $matchResult) {
             foreach ($matches as $match) {
                 $key   = strtolower(rawurldecode($match['key']));
