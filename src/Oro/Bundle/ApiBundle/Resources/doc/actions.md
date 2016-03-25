@@ -155,7 +155,7 @@ This action is intended to delete a list of entities.
 The entities list is builded based on input filters. Please take into account that at least one filter must be specified, otherwise an error raises.
 
 By default the maximum number of entities that can be deleted by one request is 100. This limit was introduced to minimize impact on the server.
-You can change this limit for an entity in config, but please test your limit carefully because a big limit may make a big impact to the server. 
+You can change this limit for an entity in `Resources/config/acl.yml`, but please test your limit carefully because a big limit may make a big impact to the server. 
 An example how to change default limit you can read at [how-to](how_to.md#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request).
 
 The context class: [DeleteListContext](../../Processor/DeleteList/DeleteListContext.php). Also see [Context class](#context-class) for more details.
