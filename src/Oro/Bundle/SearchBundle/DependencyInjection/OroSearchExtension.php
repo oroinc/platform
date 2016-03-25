@@ -46,8 +46,8 @@ class OroSearchExtension extends Extension
         foreach ($engineResources as $resource) {
             foreach ($resource->data as $key => $value) {
                 if (isset($configPart[$key])) {
-                    $first = $configPart[$key];
-                    $configPart[$key] = $this->mergeConfig($first, $value);
+                    $firstConfig = $configPart[$key];
+                    $configPart[$key] = $this->mergeConfig($firstConfig, $value);
                 } else {
                     $configPart[$key] = $value;
                 }
@@ -94,40 +94,30 @@ class OroSearchExtension extends Extension
      * Complex config fields provided as array will be merged using replace or append strategy
      * according to merge options
      *
-     * @param array $first
-     * @param array $second
+     * @param array $firstConfig
+     * @param array $secondConfig
      * @return array
      */
-    public function mergeConfig($first, $second)
+    public function mergeConfig(array $firstConfig, array $secondConfig)
     {
-        foreach ($second as $idx => $value) {
-            if (!array_key_exists($idx, $first)) {
-                $first[$idx] = $value;
+        foreach ($secondConfig as $nodeName => $value) {
+            if (!array_key_exists($nodeName, $firstConfig)) {
+                $firstConfig[$nodeName] = $value;
             } else {
                 if (is_array($value)) {
-                    if ($this->getStrategy($idx) === self::STRATEGY_APPEND) {
-                        $mergedArray = ArrayUtils::arrayMergeRecursiveDistinct($first[$idx], $value);
-                        $first[$idx] = array_unique($mergedArray, SORT_REGULAR);
+                    if ($this->getStrategy($nodeName) === self::STRATEGY_APPEND) {
+                        $mergedArray = ArrayUtils::arrayMergeRecursiveDistinct($firstConfig[$nodeName], $value);
+                        $firstConfig[$nodeName] = array_unique($mergedArray, SORT_REGULAR);
                     } else {
-                        $first[$idx] = $value;
+                        $firstConfig[$nodeName] = $value;
                     }
                 } else {
-                    $first[$idx] = $value;
+                    $firstConfig[$nodeName] = $value;
                 }
             }
         }
 
-        return $first;
-    }
-
-    /**
-     * Default merge Strategy getter.
-     *
-     * @return string
-     */
-    public function getDefaultStrategy()
-    {
-        return self::STRATEGY_REPLACE;
+        return $firstConfig;
     }
 
     /**
@@ -145,6 +135,16 @@ class OroSearchExtension extends Extension
     }
 
     /**
+     * Default merge Strategy getter.
+     *
+     * @return string
+     */
+    public function getDefaultStrategy()
+    {
+        return self::STRATEGY_REPLACE;
+    }
+
+    /**
      * Get alias
      *
      * @return string
@@ -157,7 +157,8 @@ class OroSearchExtension extends Extension
     /**
      * @param ContainerBuilder $container
      * @param array            $config
-     * @deprecated since 1.8 Please use oro_search.provider.search_mapping service for mapping config
+     * @deprecated since 1.8, will be removed after 1.11
+     * Please use oro_search.provider.search_mapping service for mapping config
      */
     protected function setEntitiesConfigParameter(ContainerBuilder $container, array $config)
     {
