@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Processor\DeleteList;
 
 use Oro\Component\ChainProcessor\ContextInterface;
-
 use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\ApiBundle\Processor\Shared\DeleteDataByDeleteHandler as BaseProcessor;
 
@@ -17,6 +16,8 @@ class DeleteListDataByDeleteHandler extends BaseProcessor
      */
     protected function processDelete(ContextInterface $context, DeleteHandler $handler)
     {
+        /** @var DeleteListContext $context */
+
         $entityList = $context->getResult();
         $entityManager = $this->doctrineHelper->getEntityManagerForClass($context->getClassName());
         $entityManager->getConnection()->beginTransaction();
@@ -27,6 +28,8 @@ class DeleteListDataByDeleteHandler extends BaseProcessor
             $entityManager->getConnection()->commit();
         } catch (\Exception $e) {
             $entityManager->getConnection()->rollBack();
+
+            throw $e;
         }
     }
 }
