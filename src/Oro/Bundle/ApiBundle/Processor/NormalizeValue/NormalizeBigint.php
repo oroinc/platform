@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\NormalizeValue;
 
-
 class NormalizeBigint extends AbstractProcessor
 {
     const REQUIREMENT = '-?\d+';
@@ -12,7 +11,7 @@ class NormalizeBigint extends AbstractProcessor
      */
     protected function getDataTypeString()
     {
-        return 'integer';
+        return 'big integer';
     }
 
     /**
@@ -20,7 +19,7 @@ class NormalizeBigint extends AbstractProcessor
      */
     protected function getDataTypePluralString()
     {
-        return 'integers';
+        return 'big integers';
     }
 
     /**
