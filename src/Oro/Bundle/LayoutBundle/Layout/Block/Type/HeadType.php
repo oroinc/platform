@@ -4,6 +4,8 @@ namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Component\Layout\OptionValueBag;
+use Oro\Component\Layout\StringOptionValueBuilder;
 use Oro\Component\Layout\Block\Type\AbstractContainerType;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
@@ -26,6 +28,17 @@ class HeadType extends AbstractContainerType
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
         $view->vars['title'] = $options['title'];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    {
+        $title = $view->vars['title'];
+        if ($title instanceof OptionValueBag) {
+            $view->vars['title'] = $title->buildValue(new StringOptionValueBuilder());
+        }
     }
 
     /**
