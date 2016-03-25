@@ -36,7 +36,7 @@ class OwnerTreeListener implements ContainerAwareInterface
      */
     protected $container;
 
-    /*
+    /**
      * @return array
      */
     protected function getUserFieldsToIgnore()
