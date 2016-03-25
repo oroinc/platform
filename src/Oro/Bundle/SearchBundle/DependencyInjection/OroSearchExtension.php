@@ -4,7 +4,7 @@ namespace Oro\Bundle\SearchBundle\DependencyInjection;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
-use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\FileLocator;
@@ -106,7 +106,7 @@ class OroSearchExtension extends Extension
             } else {
                 if (is_array($value)) {
                     if ($this->getStrategy($idx) === self::STRATEGY_APPEND) {
-                        $mergedArray = ArrayUtil::arrayMergeRecursiveDistinct($first[$idx], $value);
+                        $mergedArray = ArrayUtils::arrayMergeRecursiveDistinct($first[$idx], $value);
                         $first[$idx] = array_unique($mergedArray, SORT_REGULAR);
                     } else {
                         $first[$idx] = $value;
