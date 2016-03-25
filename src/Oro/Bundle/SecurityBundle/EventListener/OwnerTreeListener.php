@@ -114,6 +114,8 @@ class OwnerTreeListener implements ContainerAwareInterface
                 return true;
             }
         }
+
+        return false;
     }
 
     /**
