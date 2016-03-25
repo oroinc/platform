@@ -23,6 +23,10 @@ oro_api:
             supported_operators: ['=', '<>', '<', '<=', '>', '>=']
         unsignedInteger:
             supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        decimal:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        float:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
         datetime:
             supported_operators: ['=', '<>', '<', '<=', '>', '>=']
         entityAlias: ~

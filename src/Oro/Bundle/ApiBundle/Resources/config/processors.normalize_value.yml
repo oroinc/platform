@@ -30,6 +30,21 @@ services:
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: unsignedInteger, priority: -10 }
 
+    oro_api.normalize_value.boolean:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeBoolean
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: boolean, priority: -10 }
+
+    oro_api.normalize_value.decimal:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: decimal, priority: -10 }
+
+    oro_api.normalize_value.float:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: float, priority: -10 }
+
     oro_api.normalize_value.entity_class:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityClass
         arguments:
@@ -61,11 +76,6 @@ services:
     #
     # REST API processors
     #
-
-    oro_api.normalize_value.rest.boolean:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeBoolean
-        tags:
-            - { name: oro.api.processor, action: normalize_value, requestType: rest, dataType: boolean, priority: -10 }
 
     oro_api.normalize_value.rest.datetime:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDateTime
