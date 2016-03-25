@@ -20,6 +20,11 @@ services:
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: integer, priority: -10 }
 
+    oro_api.normalize_value.bigint:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeBigint
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: bigint, priority: -10 }
+
     oro_api.normalize_value.unsigned_integer:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeUnsignedInteger
         tags:

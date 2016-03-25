@@ -48,6 +48,10 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
                 new Processor\NormalizeString()
             ],
             [
+                $this->addProcessor($processorBag, 'bigint', DataType::BIGINT),
+                new Processor\NormalizeBigint()
+            ],
+            [
                 $this->addProcessor($processorBag, 'integer', DataType::INTEGER),
                 new Processor\NormalizeInteger()
             ],
@@ -369,6 +373,18 @@ class ValueNormalizerTest extends \PHPUnit_Framework_TestCase
             ['test_entities', 'test_entities', DataType::ENTITY_TYPE, [RequestType::REST], false],
             ['Test\Entity', 'test_entities', DataType::ENTITY_CLASS, [RequestType::REST], false],
             ['Test\Entity', 'Test\Entity', DataType::ENTITY_CLASS, [RequestType::REST], false],
+
+            [123456789013245678901, 123456789013245678901, DataType::BIGINT, [RequestType::REST], true],
+            [123, 123, DataType::BIGINT, [RequestType::REST], false],
+            [[123, 456], [123, 456], DataType::BIGINT, [RequestType::REST], true],
+            [[123, 456], [123, 456], DataType::BIGINT, [RequestType::REST], false],
+            ['0', '0', DataType::BIGINT, [RequestType::REST], true],
+            ['0', '0', DataType::BIGINT, [RequestType::REST], false],
+            ['123', '123', DataType::BIGINT, [RequestType::REST], true],
+            ['123', '123', DataType::BIGINT, [RequestType::REST], false],
+            ['-123', '-123', DataType::BIGINT, [RequestType::REST], true],
+            ['-123', '-123', DataType::BIGINT, [RequestType::REST], false],
+            [[123, -456], '123,-456', DataType::BIGINT, [RequestType::REST], true],
         ];
     }
 
