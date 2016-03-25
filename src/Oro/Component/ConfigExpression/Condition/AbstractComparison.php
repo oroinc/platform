@@ -43,17 +43,17 @@ abstract class AbstractComparison extends AbstractCondition implements ContextAc
             );
         }
 
-        if (isset($options['left'])) {
+        if (array_key_exists('left', $options)) {
             $this->left = $options['left'];
-        } elseif (isset($options[0])) {
+        } elseif (array_key_exists(0, $options)) {
             $this->left = $options[0];
         } else {
             throw new Exception\InvalidArgumentException('Option "left" is required.');
         }
 
-        if (isset($options['right'])) {
+        if (array_key_exists('right', $options)) {
             $this->right = $options['right'];
-        } elseif (isset($options[1])) {
+        } elseif (array_key_exists(1, $options)) {
             $this->right = $options[1];
         } else {
             throw new Exception\InvalidArgumentException('Option "right" is required.');
