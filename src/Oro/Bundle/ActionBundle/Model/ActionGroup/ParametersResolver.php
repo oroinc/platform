@@ -14,6 +14,13 @@ use Oro\Bundle\ActionBundle\Model\Parameter;
 
 class ParametersResolver
 {
+    /** @var array */
+    private static $typeAliases = array(
+        'boolean' => 'bool',
+        'integer' => 'int',
+        'double' => 'float',
+    );
+
     /**
      * @param ActionData $data
      * @param ActionGroup $actionGroup
@@ -30,15 +37,16 @@ class ParametersResolver
 
             if ($data->offsetExists($parameterName)) {
                 if ($parameter->hasTypeHint()) {
-                    $typeError = $this->isInvalidType(
+                    $valid = $this->isValidType(
                         $data->offsetGet($parameterName),
-                        $parameter->getType()
+                        $parameter->getType(),
+                        $message
                     );
-                    if ($typeError) {
+                    if (false === $valid) {
                         $this->addViolation(
                             $violations,
                             $parameter,
-                            $typeError,
+                            $message,
                             $data->offsetGet($parameterName)
                         );
                     }
@@ -69,6 +77,47 @@ class ParametersResolver
     }
 
     /**
+     * @param string $value
+     * @param string $type
+     * @param $message
+     * @return string|true Error message or null
+     */
+    private function isValidType($value, $type, &$message)
+    {
+        $type = array_key_exists($type, self::$typeAliases) ? self::$typeAliases[$type] : $type;
+
+        if (function_exists($isFunction = 'is_' . $type)) {
+            if ($isFunction($value)) {
+                return true;
+            }
+        }
+
+        if ($value instanceof $type) {
+            return true;
+        }
+
+        $message = sprintf(
+            'Value %s is expected to be of type "%s", but is of type "%s".',
+            $this->formatValue($value),
+            $type,
+            is_object($value) ? get_class($value) : gettype($value)
+        );
+
+        return false;
+    }
+
+    /**
+     * @param array $violations
+     * @param Collection $errors
+     */
+    private function delegateErrors(array &$violations, Collection $errors)
+    {
+        foreach ($violations as $errorBody) {
+            $errors->add($errorBody);
+        }
+    }
+
+    /**
      * @param array $violations reference to violations array that will be modified with new one
      * @param Parameter $parameter
      * @param string $reason message of violation
@@ -90,44 +139,9 @@ class ParametersResolver
                 '{{ reason }}' => $reason,
                 '{{ parameter }}' => $parameterName,
                 '{{ type }}' => $parameter->getType(),
-                '{{ value }}' => $value
+                '{{ value }}' => $this->formatValue($value)
             ]
         ];
-    }
-
-    /**
-     * @param array $violations
-     * @param Collection $errors
-     */
-    private function delegateErrors(array &$violations, Collection $errors)
-    {
-        foreach ($violations as $errorBody) {
-            $errors->add($errorBody);
-        }
-    }
-
-    /**
-     * @param string $value
-     * @param string $type
-     * @return string|true Error message or null
-     */
-    private function isInvalidType($value, $type)
-    {
-
-        if (function_exists($isFunction = 'is_' . $type)) {
-            return !$isFunction($value);
-        }
-
-        if ($value instanceof $type) {
-            return false;
-        }
-
-        return sprintf(
-            'Value %s is expected to be of type "%s", but is of type "%s".',
-            $this->formatValue($value),
-            $type,
-            is_object($value) ? get_class($value) : gettype($value)
-        );
     }
 
     /**

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\ActionGroup;
 
+use Doctrine\Common\Collections\ArrayCollection;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\Parameter;
@@ -10,6 +11,13 @@ class ParametersResolverTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ParametersResolver */
     protected $resolver;
+
+    /** @var array */
+    private static $typeAliases = [
+        'boolean' => 'bool',
+        'integer' => 'int',
+        'double' => 'float',
+    ];
 
     protected function setUp()
     {
@@ -31,7 +39,6 @@ class ParametersResolverTest extends \PHPUnit_Framework_TestCase
 
         $mockActionGroup->expects($this->once())->method('getParameters')->willReturn($parameters);
 
-
         $this->resolver->resolve($data, $mockActionGroup);
 
         $this->assertEquals($data, $expected);
@@ -45,6 +52,9 @@ class ParametersResolverTest extends \PHPUnit_Framework_TestCase
         $stringRequiredParam = new Parameter('param1');
         $stringRequiredParam->setType('string');
 
+        $objectRequiredParam = new Parameter('parameter_parameter');
+        $objectRequiredParam->setType('Oro\Bundle\ActionBundle\Model\Parameter');
+
         $mixedRequiredParam = new Parameter('param2');
 
         $optionalParam = new Parameter('param3');
@@ -53,12 +63,16 @@ class ParametersResolverTest extends \PHPUnit_Framework_TestCase
         $expectedModifiedData = new ActionData(['param3' => 'default value']);
         $expectedModifiedData->setModified(true);
 
-
         return [
-            'typed param' => [
+            'typed scalar param' => [
                 new ActionData(['param1' => 'stringValue']),
                 [$stringRequiredParam],
                 new ActionData(['param1' => 'stringValue'])
+            ],
+            'typed object param' => [
+                new ActionData(['parameter_parameter' => $stringRequiredParam]),
+                [$objectRequiredParam],
+                new ActionData(['parameter_parameter' => $stringRequiredParam])
             ],
             'non-typed param' => [
                 new ActionData(['param2' => 'any value']),
@@ -73,5 +87,169 @@ class ParametersResolverTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @dataProvider resolveViolationsTypeProvider
+     * @param ActionData $data
+     * @param array $parameters
+     * @param array $exception
+     * @param array $expectedErrors
+     * @throws \Oro\Component\Action\Exception\InvalidParameterException
+     */
+    public function testResolveViolationType(
+        ActionData $data,
+        array $parameters,
+        array $exception,
+        array $expectedErrors
+    ) {
+        $mockActionGroup = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup')
+            ->disableOriginalConstructor()
+            ->getMock();
 
+        $mockActionGroup->expects($this->once())
+            ->method('getParameters')
+            ->willReturn($parameters);
+
+        $mockDefinition = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroupDefinition')
+            ->getMock();
+
+        $mockActionGroup->expects($this->once())
+            ->method('getDefinition')
+            ->willReturn($mockDefinition);
+
+        $mockDefinition->expects($this->once())
+            ->method('getName')
+            ->willReturn('testActionGroup');
+
+        list($exceptionType, $exceptionMessage) = $exception;
+
+        $errors = new ArrayCollection([]);
+
+        try {
+            $this->resolver->resolve($data, $mockActionGroup, $errors);
+        } catch (\Exception $exception) {
+            $this->assertInstanceOf($exceptionType, $exception);
+            $this->assertEquals($exceptionMessage, $exception->getMessage());
+        }
+
+        $this->assertEquals($expectedErrors, $errors->getValues());
+    }
+
+    /**
+     * @return array
+     */
+    public function resolveViolationsTypeProvider()
+    {
+        return [
+            'bool' => $this->violationTypeProviderArgs(
+                'boolean_param',
+                123,
+                'bool',
+                'integer',
+                '123'
+            ),
+            'string' => $this->violationTypeProviderArgs(
+                'string_param',
+                true,
+                'string',
+                'boolean',
+                'true'
+            ),
+            'integer' => $this->violationTypeProviderArgs(
+                'integer_param',
+                false,
+                'integer',
+                'boolean',
+                'false'
+            ),
+            'array' => $this->violationTypeProviderArgs(
+                'array_param',
+                'string',
+                'array',
+                'string',
+                '"string"'
+            ),
+            'object' => $this->violationTypeProviderArgs(
+                'object_param',
+                [],
+                'stdClass',
+                'array',
+                'array',
+                'custom message'
+            ),
+            'complex object' => $this->violationTypeProviderArgs(
+                'complex object comp',
+                new ActionData(),
+                'Oro\Bundle\ActionBundle\Model\Parameter',
+                'Oro\Bundle\ActionBundle\Model\ActionData',
+                'Oro\Bundle\ActionBundle\Model\ActionData'
+            ),
+            'float' => $this->violationTypeProviderArgs(
+                'float',
+                null,
+                'float',
+                'NULL',
+                'null'
+            ),
+            'null' => $this->violationTypeProviderArgs(
+                'null',
+                tmpfile(),
+                'null',
+                'resource',
+                'resource'
+            )
+        ];
+    }
+
+    /**
+     * @param string $paramName
+     * @param mixed $value
+     * @param string $type
+     * @param string $gotType
+     * @param string $gotValue
+     * @param null $customMessage
+     * @return array
+     */
+    private function violationTypeProviderArgs(
+        $paramName,
+        $value,
+        $type,
+        $gotType,
+        $gotValue,
+        $customMessage = null
+    ) {
+        $typedParam = new Parameter($paramName);
+        $typedParam->setType($type);
+
+        if ($customMessage) {
+            $typedParam->setMessage($customMessage);
+        }
+
+        $msg = $customMessage ?: 'Parameter `{{ parameter }}` validation failure. Reason: {{ reason }}.';
+
+        return [
+            'data' => new ActionData([$paramName => $value]),
+            'paramDefinitions' => [$typedParam],
+            'exception' => [
+                'Oro\Component\Action\Exception\InvalidParameterException',
+                'Trying to execute ActionGroup "testActionGroup" with invalid or missing parameter(s): ' .
+                sprintf('"%s"', $paramName)
+            ],
+            'errors' => [
+                [
+                    'message' => $msg,
+                    'parameters' => [
+                        '{{ reason }}' => sprintf(
+                            'Value %s is expected to be of type "%s", but is of type "%s".',
+                            $gotValue,
+                            array_key_exists($type, self::$typeAliases) ? self::$typeAliases[$type] : $type,
+                            $gotType
+                        ),
+                        '{{ parameter }}' => $paramName,
+                        '{{ type }}' => $type,
+                        '{{ value }}' => $gotValue,
+                    ]
+                ]
+            ]
+        ];
+    }
 }
