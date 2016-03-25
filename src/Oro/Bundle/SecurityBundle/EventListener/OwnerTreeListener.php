@@ -39,9 +39,9 @@ class OwnerTreeListener implements ContainerAwareInterface
     /*
      * @return array
      */
-    private static function getUserFieldsToIgnore()
+    protected function getUserFieldsToIgnore()
     {
-        return array('lastLogin', 'loginCount');
+        return ['lastLogin', 'loginCount'];
     }
 
     /**
@@ -108,7 +108,7 @@ class OwnerTreeListener implements ContainerAwareInterface
                     $fieldsToIgnore = $this->getUserFieldsToIgnore();
                     $changedFields = array_keys($changeSet);
 
-                    if ($fieldsToIgnore == $changedFields) {
+                    if (array_diff_key($changedFields, array_flip($fieldsToIgnore))) {
                         continue;
                     }
                 }
