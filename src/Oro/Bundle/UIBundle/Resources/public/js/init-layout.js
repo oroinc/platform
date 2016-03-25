@@ -476,6 +476,44 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             .remove();
     });
 
+    $(document).on('click', '.frontend-add-list-item', function(e) {
+        e.preventDefault();
+        debugger;
+        if ($(this).attr('disabled')) {
+            return;
+        }
+        var containerSelector = $(this).data('container') || '.collection-fields-list';
+        var $listContainer = $(this).closest('.row-oro').find(containerSelector).first();
+
+        var $container = $(this).closest('.row-oro');
+        //var $listContainer1 = $(this).closest('table');
+        var rowCountAdd = $(containerSelector).data('row-count-add') || 1;
+        var collectionInfo = getOroCollectionInfo($listContainer);
+
+        for (var i = 1; i <= rowCountAdd; i++) {
+            var nextItemHtml = getOroCollectionNextItemHtml(collectionInfo);
+
+            collectionInfo.nextIndex++;
+            $container.find('table.grid').append(nextItemHtml)
+                .trigger('content:changed')
+                .data('last-index', collectionInfo.nextIndex);
+        }
+
+        $listContainer.find('input.position-input').each(function(i, el) {
+            $(el).val(i);
+        });
+    });
+
+    $(document).on('click', '.frontend-removeLineItem', function(e) {
+        e.preventDefault();
+        if ($(this).attr('disabled')) {
+            return;
+        }
+        $(this).closest('tbody.line_item')
+            .remove();
+    });
+
+
     /**
      * Support for [data-focusable] attribute
      */

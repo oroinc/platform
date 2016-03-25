@@ -18,3 +18,4 @@ data:
                 - 'bundles/oroui/css/less/oro/filter.less'
                 - 'bundles/oroui/css/less/oro/loading-mask.less'
                 - 'bundles/oroui/css/less/oro/select2.less'
+                - 'bundles/oroui/css/less/desktop/form.less'
