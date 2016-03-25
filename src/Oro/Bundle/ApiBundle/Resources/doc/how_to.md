@@ -34,6 +34,7 @@ By default, the following permissions are used to restrict access to an entity i
 | get | VIEW |
 | get_list | VIEW |
 | delete | DELETE |
+| delete_list | DELETE |
 
 In case if you want to change permission or disable access checks for some action, you can use the `acl_resource` option of `actions` configuration section.
 
