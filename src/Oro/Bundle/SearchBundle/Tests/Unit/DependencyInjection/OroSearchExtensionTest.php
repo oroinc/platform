@@ -41,7 +41,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $searchExtension = new OroSearchExtension(array(), $this->container);
         $fieldName = 'fields';
-        $this->assertEquals('replace', $searchExtension->getStrategy($fieldName));
+        $this->assertEquals('append', $searchExtension->getStrategy($fieldName));
     }
 
     /**
@@ -92,7 +92,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
                     [
                         'name'          => 'name',
                         'target_type'   => 'text',
-                        'target_fields' => ['name']
+                        'target_fields' => ['name', 'all_text']
                     ],
                     [
                         'name'          => 'subject',
@@ -134,7 +134,7 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
                     [
                         'name'          => 'name',
                         'target_type'   => 'text',
-                        'target_fields' => ['name']
+                        'target_fields' => ['name', 'all_text']
                     ],
                     [
                         'name'          => 'subject',
