@@ -107,7 +107,7 @@ class OwnerTreeListener implements ContainerAwareInterface
                     $fieldsToIgnore = $this->getUserFieldsToIgnore();
                     $changedFields = array_keys($changeSet);
 
-                    if ($fieldsToIgnore == $changedFields) {
+                    if (array_diff_key($changedFields, array_flip($fieldsToIgnore))) {
                         continue;
                     }
                 }
