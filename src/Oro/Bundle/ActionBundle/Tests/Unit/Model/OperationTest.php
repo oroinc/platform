@@ -17,7 +17,6 @@ use Oro\Component\Action\Condition\Configurable as ConfigurableCondition;
 use Oro\Component\ConfigExpression\ExpressionFactory;
 
 /**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  * @SuppressWarnings(PHPMD.TooManyMethods)
  */
 class OperationTest extends \PHPUnit_Framework_TestCase
@@ -125,9 +124,9 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     /**
      * @param ActionData $data
      * @param array $config
-     * @param array $functions
+     * @param array $actions
      * @param array $conditions
-     * @param string $actionName
+     * @param string $operationName
      * @param string $exceptionMessage
      *
      * @dataProvider executeProvider
@@ -135,19 +134,19 @@ class OperationTest extends \PHPUnit_Framework_TestCase
     public function testExecute(
         ActionData $data,
         array $config,
-        array $functions,
+        array $actions,
         array $conditions,
-        $actionName,
+        $operationName,
         $exceptionMessage = ''
     ) {
-        $this->definition->expects($this->any())->method('getName')->willReturn($actionName);
+        $this->definition->expects($this->any())->method('getName')->willReturn($operationName);
         $this->definition->expects($this->any())->method('getFunctions')->will($this->returnValueMap($config));
         $this->definition->expects($this->any())->method('getConditions')->will($this->returnValueMap($config));
 
         $this->actionFactory->expects($this->any())
             ->method('create')
-            ->willReturnCallback(function ($type, $config) use ($functions) {
-                return $functions[$config[0]];
+            ->willReturnCallback(function ($type, $config) use ($actions) {
+                return $actions[$config[0]];
             });
 
         $this->conditionFactory->expects($this->any())
@@ -185,8 +184,8 @@ class OperationTest extends \PHPUnit_Framework_TestCase
         $data = new ActionData();
 
         $config = [
-            ['prefunctions', ['prefunctions']],
-            ['functions', ['functions']],
+            ['preactions', ['preactions']],
+            ['actions', ['actions']],
             ['preconditions', ['preconditions']],
             ['conditions', ['conditions']],
         ];
@@ -195,76 +194,46 @@ class OperationTest extends \PHPUnit_Framework_TestCase
             '!isPreConditionAllowed' => [
                 'data' => $data,
                 'config' => $config,
-                'functions' => [
-                    'prefunctions' => $this->createAction($this->once(), $data),
-                    'functions' => $this->createAction($this->never(), $data),
+                'actions' => [
+                    'preactions' => $this->createAction($this->once(), $data),
+                    'actions' => $this->createAction($this->never(), $data),
                 ],
                 'conditions' => [
                     'preconditions' => $this->createCondition($this->once(), $data, false),
                     'conditions' => $this->createCondition($this->never(), $data, true),
                 ],
-                'actionName' => 'TestName1',
+                'operationName' => 'TestName1',
                 'exception' => 'Operation "TestName1" is not allowed.'
             ],
             '!isConditionAllowed' => [
                 'data' => $data,
                 'config' => $config,
-                'functions' => [
-                    'prefunctions' => $this->createAction($this->once(), $data),
-                    'functions' => $this->createAction($this->never(), $data),
+                'actions' => [
+                    'preactions' => $this->createAction($this->once(), $data),
+                    'actions' => $this->createAction($this->never(), $data),
                 ],
                 'conditions' => [
                     'preconditions' => $this->createCondition($this->once(), $data, true),
                     'conditions' => $this->createCondition($this->once(), $data, false),
                 ],
-                'actionName' => 'TestName2',
+                'operationName' => 'TestName2',
                 'exception' => 'Operation "TestName2" is not allowed.'
             ],
             'isAllowed' => [
                 'data' => $data,
                 'config' => $config,
-                'functions' => [
-                    'prefunctions' => $this->createAction($this->once(), $data),
-                    'functions' => $this->createAction($this->once(), $data),
+                'actions' => [
+                    'preactions' => $this->createAction($this->once(), $data),
+                    'actions' => $this->createAction($this->once(), $data),
                 ],
                 'conditions' => [
                     'preconditions' => $this->createCondition($this->once(), $data, true),
                     'conditions' => $this->createCondition($this->once(), $data, true),
                 ],
-                'actionName' => 'TestName3',
+                'operationName' => 'TestName3',
             ],
         ];
     }
-
-//    public function testExecute()
-//    {
-//        $config = [
-//            ['actions', ['actions']],
-//        ];
-//
-//        $actions = [
-//            'actions' => $this->createAction($this->once(), $this->data),
-//        ];
-//
-//        $this->definition->expects($this->any())
-//            ->method('getActions')
-//            ->willReturnMap($config);
-//
-//        $this->actionFactory->expects($this->any())
-//            ->method('create')
-//            ->willReturnCallback(function ($type, $config) use ($actions) {
-//                return $actions[$config[0]];
-//            });
-//
-//        $errors = new ArrayCollection();
-//
-//        $this->assertArrayNotHasKey('errors', $this->data);
-//
-//        $this->operation->execute($this->data, $errors);
-//
-//        $this->assertArrayHasKey('errors', $this->data);
-//        $this->assertSame($errors, $this->data['errors']);
-//    }
 
     /**
      * @param array $inputData

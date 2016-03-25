@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration;
 
 use Oro\Bundle\ActionBundle\Configuration\OperationListConfiguration;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
 {
@@ -74,11 +75,11 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'datagrids' => [],
                         'order' => 0,
                         'enabled' => true,
-                        'preactions' => [],
-                        'preconditions' => [],
-                        'conditions' => [],
-                        'actions' => [],
-                        'form_init' => [],
+                        OperationDefinition::PREACTIONS => [],
+                        OperationDefinition::PRECONDITIONS => [],
+                        OperationDefinition::CONDITIONS => [],
+                        OperationDefinition::ACTIONS => [],
+                        OperationDefinition::FORM_INIT => [],
                         'attributes' => [],
                         'frontend_options' => [
                             'options' => [],
@@ -148,19 +149,19 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                                 'attribute_1' => 'value 1',
                             ]
                         ],
-                        'preactions' => [
+                        OperationDefinition::PREACTIONS => [
                             '@create_date' => [],
                         ],
-                        'preconditions' => [
+                        OperationDefinition::PRECONDITIONS => [
                             '@equal' => ['$field1', 'value1'],
                         ],
-                        'conditions' => [
+                        OperationDefinition::CONDITIONS => [
                             '@equal' => ['$field2', 'value2'],
                         ],
-                        'actions' => [
+                        OperationDefinition::ACTIONS => [
                             '@action1' => [],
                         ],
-                        'form_init' => [
+                        OperationDefinition::FORM_INIT => [
                             '@assign_value' => ['$field1', 'value2'],
                         ],
                         'attributes' => [
@@ -186,19 +187,19 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'datagrids' => ['datagrid_1', 'datagrid_2'],
                         'order' => 15,
                         'enabled' => false,
-                        'preactions' => [
+                        OperationDefinition::PREACTIONS => [
                             '@create_date' => [],
                         ],
-                        'preconditions' => [
+                        OperationDefinition::PRECONDITIONS => [
                             '@equal' => ['$field1', 'value1'],
                         ],
-                        'conditions' => [
+                        OperationDefinition::CONDITIONS => [
                             '@equal' => ['$field2', 'value2'],
                         ],
-                        'actions' => [
+                        OperationDefinition::ACTIONS => [
                             '@action1' => [],
                         ],
-                        'form_init' => [
+                        OperationDefinition::FORM_INIT => [
                             '@assign_value' => ['$field1', 'value2'],
                         ],
                         'attributes' => [

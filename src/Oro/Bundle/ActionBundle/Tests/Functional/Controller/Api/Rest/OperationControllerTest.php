@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller\Api\Rest;
 
-use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
@@ -113,7 +113,7 @@ class OperationControllerTest extends WebTestCase
                 'entities' => [],
                 'routes' => [],
                 'datagrids' => [],
-                'actions' => [['@assign_value' => ['$message', self::MESSAGE_NEW]]],
+                OperationDefinition::ACTIONS => [['@assign_value' => ['$message', self::MESSAGE_NEW]]],
             ]
         ];
 
@@ -124,7 +124,7 @@ class OperationControllerTest extends WebTestCase
                     [
                         'oro_action_test_action' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            'preconditions' => ['@equal' => ['$message', self::MESSAGE_DEFAULT]],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', self::MESSAGE_DEFAULT]],
                         ],
                     ]
                 ),
@@ -141,7 +141,7 @@ class OperationControllerTest extends WebTestCase
                     [
                         'oro_action_test_action' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            'preconditions' => ['@equal' => ['$message', 'test message wrong']],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message wrong']],
                         ],
                     ]
                 ),

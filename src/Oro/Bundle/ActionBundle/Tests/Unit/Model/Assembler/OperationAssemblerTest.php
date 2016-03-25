@@ -84,11 +84,11 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setName('minimum_name')
             ->setLabel('My Label')
             ->setEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'])
-            ->setConditions('conditions', [])
-            ->setConditions('preconditions', [])
-            ->setActions('preactions', [])
-            ->setActions('actions', [])
-            ->setActions('form_init', [])
+            ->setConditions(OperationDefinition::CONDITIONS, [])
+            ->setConditions(OperationDefinition::PRECONDITIONS, [])
+            ->setActions(OperationDefinition::PREACTIONS, [])
+            ->setActions(OperationDefinition::ACTIONS, [])
+            ->setActions(OperationDefinition::FORM_INIT, [])
             ->setFormType(OperationType::NAME);
 
         $definition2 = clone $definition1;
@@ -100,11 +100,11 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setEnabled(false)
             ->setApplications(['application1'])
             ->setAttributes(['config_attr'])
-            ->setConditions('preconditions', ['config_pre_cond'])
-            ->setConditions('conditions', ['config_cond'])
-            ->setActions('preactions', ['config_pre_func'])
-            ->setActions('actions', ['@action' => 'action_config'])
-            ->setActions('form_init', ['config_form_init_func'])
+            ->setConditions(OperationDefinition::PRECONDITIONS, ['config_pre_cond'])
+            ->setConditions(OperationDefinition::CONDITIONS, ['config_cond'])
+            ->setActions(OperationDefinition::PREACTIONS, ['config_pre_func'])
+            ->setActions(OperationDefinition::ACTIONS, ['@action' => 'action_config'])
+            ->setActions(OperationDefinition::FORM_INIT, ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
@@ -119,7 +119,7 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setForAllEntities(true)
             ->setExcludeEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'])
             ->setConditions(
-                'preconditions',
+                OperationDefinition::PRECONDITIONS,
                 [
                     '@and' => [
                         ['@acl_granted' => 'test_acl'],
@@ -127,9 +127,9 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                     ]
                 ]
             )
-            ->setActions('preactions', ['config_pre_func'])
-            ->setActions('actions', ['@action' => 'action_config'])
-            ->setActions('form_init', ['config_form_init_func'])
+            ->setActions(OperationDefinition::PREACTIONS, ['config_pre_func'])
+            ->setActions(OperationDefinition::ACTIONS, ['@action' => 'action_config'])
+            ->setActions(OperationDefinition::FORM_INIT, ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
@@ -171,11 +171,11 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         'enabled' => false,
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
-                        'preactions' => ['config_pre_func'],
-                        'preconditions' => ['config_pre_cond'],
-                        'conditions' => ['config_cond'],
-                        'actions' => ['@action' => 'action_config'],
-                        'form_init' => ['config_form_init_func'],
+                        OperationDefinition::PREACTIONS => ['config_pre_func'],
+                        OperationDefinition::PRECONDITIONS => ['config_pre_cond'],
+                        OperationDefinition::CONDITIONS => ['config_cond'],
+                        OperationDefinition::ACTIONS => ['@action' => 'action_config'],
+                        OperationDefinition::FORM_INIT => ['config_form_init_func'],
                         'form_options' => ['config_form_options'],
                         'frontend_options' => ['config_frontend_options'],
                         'order' => 77,
@@ -204,11 +204,11 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         'exclude_entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'],
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
-                        'preactions' => ['config_pre_func'],
-                        'preconditions' => ['config_pre_cond'],
-                        'conditions' => ['config_cond'],
-                        'actions' => ['@action' => 'action_config'],
-                        'form_init' => ['config_form_init_func'],
+                        OperationDefinition::PREACTIONS => ['config_pre_func'],
+                        OperationDefinition::PRECONDITIONS => ['config_pre_cond'],
+                        OperationDefinition::CONDITIONS => ['config_cond'],
+                        OperationDefinition::ACTIONS => ['@action' => 'action_config'],
+                        OperationDefinition::FORM_INIT => ['config_form_init_func'],
                         'form_options' => ['config_form_options'],
                         'frontend_options' => ['config_frontend_options'],
                         'order' => 77,

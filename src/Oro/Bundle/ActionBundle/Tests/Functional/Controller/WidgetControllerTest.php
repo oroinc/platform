@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
@@ -328,7 +329,7 @@ class WidgetControllerTest extends WebTestCase
                     [
                         'oro_action_test_operation' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            'preconditions' => ['@equal' => ['$message', 'test message']],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message']],
                         ],
                     ]
                 ),
@@ -343,7 +344,7 @@ class WidgetControllerTest extends WebTestCase
                     [
                         'oro_action_test_operation' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            'preconditions' => ['@equal' => ['$message', 'test message wrong']],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message wrong']],
                         ],
                     ]
                 ),
@@ -519,15 +520,15 @@ class WidgetControllerTest extends WebTestCase
                     ],
                     'attribute_default_values' => ['message_attr' => '$message']
                 ],
-                'preactions' => [],
-                'preconditions' => [],
-                'form_init' => [
+                OperationDefinition::PREACTIONS => [],
+                OperationDefinition::PRECONDITIONS => [],
+                OperationDefinition::FORM_INIT => [
                     ['@assign_value' => [
-                        'conditions' => ['@empty' => '$description'],
+                        OperationDefinition::CONDITIONS => ['@empty' => '$description'],
                         'parameters' => ['$.descr_attr', 'Test Description'],
                     ]]
                 ],
-                'conditions' => [
+                OperationDefinition::CONDITIONS => [
                     '@and' => [
                         [
                             '@not' => [['@equal' => ['$message', '$.message_attr']]]
@@ -540,7 +541,7 @@ class WidgetControllerTest extends WebTestCase
                         ]
                     ]
                 ],
-                'actions' => [
+                OperationDefinition::ACTIONS => [
                     ['@assign_value' => ['$message', '$.message_attr']],
                     ['@assign_value' => ['$description', '$.descr_attr']]
                 ]
@@ -556,19 +557,19 @@ class WidgetControllerTest extends WebTestCase
         return [
             'default group' => [
                 'group' => '',
-                'actions' => [],
+                OperationDefinition::ACTIONS => [],
             ],
             'view_navButtons' => [
                 'group' => 'view_navButtons',
-                'actions' => ['Edit', 'Delete'],
+                OperationDefinition::ACTIONS => ['Edit', 'Delete'],
             ],
             'update_navButtons' => [
                 'group' => 'update_navButtons',
-                'actions' => ['Delete'],
+                OperationDefinition::ACTIONS => ['Delete'],
             ],
             'datagridRowAction' => [
                 'group' => 'datagridRowAction',
-                'actions' => ['Edit', 'Delete'],
+                OperationDefinition::ACTIONS => ['Edit', 'Delete'],
             ],
         ];
     }
