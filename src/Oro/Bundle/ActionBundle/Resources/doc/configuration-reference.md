@@ -509,7 +509,7 @@ Example
 actions:
     demo_action:
         # ...
-        pre_conditions:
+        preconditions:
             @equal: [$name, 'John Dow']
         conditions:
             @not_empty: [$group]
