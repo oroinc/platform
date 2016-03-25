@@ -1,16 +1,17 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\ListContext;
 use Oro\Bundle\SearchBundle\Query\Query as SearchQuery;
 use Oro\Bundle\SearchBundle\Engine\Indexer as SearchIndex;
 
 /**
- * Loads data by SearchBundle query.
+ * Loads entities using search query.
  */
-class LoadDataBySearchQuery implements ProcessorInterface
+class LoadEntitiesBySearchQuery implements ProcessorInterface
 {
     /** @var SearchIndex */
     protected $searchIndex;
@@ -28,7 +29,7 @@ class LoadDataBySearchQuery implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var ListContext $context */
 
         if ($context->hasResult()) {
             // result data are already retrieved

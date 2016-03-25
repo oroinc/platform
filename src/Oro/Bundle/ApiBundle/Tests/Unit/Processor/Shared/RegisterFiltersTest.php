@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\FilterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
-use Oro\Bundle\ApiBundle\Processor\GetList\RegisterFilters;
+use Oro\Bundle\ApiBundle\Processor\Shared\RegisterFilters;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class RegisterFiltersTest extends GetListProcessorTestCase
 {
@@ -83,11 +84,13 @@ class RegisterFiltersTest extends GetListProcessorTestCase
 
         $filters = $this->context->getFilters();
         $this->assertEquals(2, $filters->count());
+        /** @var ComparisonFilter $idFilter */
         $idFilter = $filters->get('id');
         $this->assertEquals('integer', $idFilter->getDataType());
         $this->assertFalse($idFilter->isArrayAllowed());
         $this->assertNull($idFilter->getDefaultValue());
         $this->assertEquals('idFieldDescription', $idFilter->getDescription());
+        /** @var ComparisonFilter $nameFilter */
         $nameFilter = $filters->get('name');
         $this->assertEquals('string', $nameFilter->getDataType());
         $this->assertTrue($nameFilter->isArrayAllowed());

@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
-use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\NormalizeFilterKeys;
+use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFilterKeys;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class NormalizeFilterKeysTest extends GetListProcessorOrmRelatedTestCase

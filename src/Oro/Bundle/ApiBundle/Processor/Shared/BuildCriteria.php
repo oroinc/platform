@@ -1,9 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
  * Applies all requested filters to the Criteria object.
@@ -15,7 +16,7 @@ class BuildCriteria implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var Context $context */
 
         if ($context->hasQuery()) {
             // a query is already built

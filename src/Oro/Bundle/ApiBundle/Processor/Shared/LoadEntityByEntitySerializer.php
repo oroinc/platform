@@ -1,18 +1,19 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\EntitySerializer\EntitySerializer;
+use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
- * Loads data through the EntitySerializer component.
+ * Loads entity using the EntitySerializer component.
  * As returned data is already normalized, the "normalize_data" group will be skipped.
  */
-class LoadDataByEntitySerializer implements ProcessorInterface
+class LoadEntityByEntitySerializer implements ProcessorInterface
 {
     /** @var EntitySerializer */
     protected $entitySerializer;
@@ -30,7 +31,7 @@ class LoadDataByEntitySerializer implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var Context $context */
 
         if ($context->hasResult()) {
             // data already retrieved
@@ -49,9 +50,16 @@ class LoadDataByEntitySerializer implements ProcessorInterface
             return;
         }
 
-        $context->setResult(
-            $this->entitySerializer->serialize($query, $config)
-        );
+        $result = $this->entitySerializer->serialize($query, $config);
+        if (empty($result)) {
+            $result = null;
+        } elseif (count($result) === 1) {
+            $result = reset($result);
+        } else {
+            throw new \RuntimeException('The result must have one or zero items.');
+        }
+
+        $context->setResult($result);
 
         // data returned by the EntitySerializer are already normalized
         $context->skipGroup('normalize_data');

@@ -1,12 +1,13 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Doctrine\Common\Collections\Expr\Comparison;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
-use Oro\Bundle\ApiBundle\Processor\GetList\BuildQuery;
+use Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
 class BuildQueryTest extends GetListProcessorOrmRelatedTestCase
 {

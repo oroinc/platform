@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList\JsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Model\Label;
-use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
@@ -40,7 +40,7 @@ class NormalizeFilterKeys implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var Context $context */
 
         if ($context->hasQuery()) {
             // a query is already built

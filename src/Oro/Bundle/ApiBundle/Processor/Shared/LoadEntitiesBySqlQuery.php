@@ -1,23 +1,24 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\DoctrineUtils\ORM\SqlQuery;
 use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
+use Oro\Bundle\ApiBundle\Processor\ListContext;
 
 /**
- * Loads data using SqlQueryBuilder object.
+ * Loads entities using SqlQueryBuilder object.
  */
-class LoadDataBySqlQuery implements ProcessorInterface
+class LoadEntitiesBySqlQuery implements ProcessorInterface
 {
     /**
      * {@inheritdoc}
      */
     public function process(ContextInterface $context)
     {
-        /** @var GetListContext $context */
+        /** @var ListContext $context */
 
         if ($context->hasResult()) {
             // result data are already retrieved

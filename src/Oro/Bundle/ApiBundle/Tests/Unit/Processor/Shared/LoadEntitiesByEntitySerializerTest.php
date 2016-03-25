@@ -1,19 +1,20 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-use Oro\Bundle\ApiBundle\Processor\GetList\LoadDataByEntitySerializer;
+use Oro\Bundle\ApiBundle\Processor\Shared\LoadEntitiesByEntitySerializer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
-class LoadDataByEntitySerializerTest extends GetListProcessorOrmRelatedTestCase
+class LoadEntitiesByEntitySerializerTest extends GetListProcessorOrmRelatedTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $serializer;
 
-    /** @var LoadDataByEntitySerializer */
+    /** @var LoadEntitiesByEntitySerializer */
     protected $processor;
 
     protected function setUp()
@@ -24,7 +25,7 @@ class LoadDataByEntitySerializerTest extends GetListProcessorOrmRelatedTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->processor = new LoadDataByEntitySerializer($this->serializer);
+        $this->processor = new LoadEntitiesByEntitySerializer($this->serializer);
     }
 
     public function testProcessWithResult()

@@ -7,7 +7,7 @@ use Oro\Bundle\SoapBundle\Handler\DeleteHandler;
 use Oro\Bundle\ApiBundle\Processor\Shared\DeleteDataByDeleteHandler as BaseProcessor;
 
 /**
- * Deletes objects list by DeleteHandler.
+ * Deletes entities by DeleteHandler.
  */
 class DeleteListDataByDeleteHandler extends BaseProcessor
 {

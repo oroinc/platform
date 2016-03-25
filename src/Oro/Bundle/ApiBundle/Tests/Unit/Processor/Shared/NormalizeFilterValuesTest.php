@@ -1,10 +1,11 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
-use Oro\Bundle\ApiBundle\Processor\GetList\NormalizeFilterValues;
+use Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
 class NormalizeFilterValuesTest extends GetListProcessorTestCase
 {
