@@ -19,6 +19,8 @@ oro_api:
         boolean: ~
         integer:
             supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        bigint:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
         unsignedInteger:
             supported_operators: ['=', '<>', '<', '<=', '>', '>=']
         datetime:
