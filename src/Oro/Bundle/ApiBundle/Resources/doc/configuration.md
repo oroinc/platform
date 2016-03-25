@@ -165,7 +165,7 @@ Each entity can have next properties:
 * **order_by** *array* The property can be used to configure default ordering. The item key is the name of a field. The value can be `ASC` or `DESC`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **post_serialize** *callable* A handler to be used to modify serialized data.
-* **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) action. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
+* **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
 
 Example:
 
@@ -349,6 +349,7 @@ By default, the following permissions are used to restrict access to an entity i
 | get | VIEW |
 | get_list | VIEW |
 | delete | DELETE |
+| delete_list | DELETE |
 
 
 Examples of `actions` section configuration:
