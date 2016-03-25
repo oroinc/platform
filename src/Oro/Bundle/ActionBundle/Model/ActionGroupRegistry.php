@@ -54,6 +54,16 @@ class ActionGroupRegistry
         }
     }
 
+    /**
+     * @return array
+     */
+    public function getNames()
+    {
+        $this->loadActionGroups();
+
+        return array_keys($this->actionGroups);
+    }
+
     protected function loadActionGroups()
     {
         if ($this->actionGroups !== null) {
@@ -64,6 +74,5 @@ class ActionGroupRegistry
 
         $configuration = $this->configurationProvider->getConfiguration();
         $this->actionGroups = $this->assembler->assemble($configuration);
-
     }
 }

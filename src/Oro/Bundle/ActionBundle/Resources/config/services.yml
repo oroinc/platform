@@ -4,6 +4,7 @@ parameters:
     oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
     oro_action.helper.restrict.class: Oro\Bundle\ActionBundle\Helper\RestrictHelper
     oro_action.helper.options.class: Oro\Bundle\ActionBundle\Helper\OptionsHelper
+    oro_action.helper.applications_url.class: Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper
     oro_action.operation_registry.class: Oro\Bundle\ActionBundle\Model\OperationRegistry
     oro_action.action_group_registry.class: Oro\Bundle\ActionBundle\Model\ActionGroupRegistry
     oro_action.operation_manager.class: Oro\Bundle\ActionBundle\Model\OperationManager
@@ -45,9 +46,15 @@ services:
         class: %oro_action.helper.options.class%
         arguments:
             - @oro_action.helper.context
-            - @oro_action.helper.applications
             - @oro_action.options_assembler
             - @oro_action.context_accessor
+            - @oro_action.helper.applications_url
+            - @translator
+
+    oro_action.helper.applications_url:
+        class: %oro_action.helper.applications_url.class%
+        arguments:
+            - @oro_action.helper.applications
             - @router
 
     oro_action.operation_registry:
