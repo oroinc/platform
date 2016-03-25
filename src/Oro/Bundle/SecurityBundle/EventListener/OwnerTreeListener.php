@@ -38,7 +38,7 @@ class OwnerTreeListener implements ContainerAwareInterface
     /*
      * @return array
      */
-    private static function getUserFieldsToIgnore()
+    protected function getUserFieldsToIgnore()
     {
         return array('lastLogin', 'loginCount');
     }
