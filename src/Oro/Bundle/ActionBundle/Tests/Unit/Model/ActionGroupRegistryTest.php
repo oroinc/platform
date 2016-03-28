@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
@@ -36,6 +37,7 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ParametersResolver $mockParametersResolver */
         $mockParametersResolver = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver')
             ->disableOriginalConstructor()
             ->getMock();

@@ -30,9 +30,6 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
     /** @var ActionData */
     protected $data;
 
-    /** @var \Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver|\PHPUnit_Framework_MockObject_MockObject */
-    protected $parametersResolver;
-
     protected function setUp()
     {
         $this->actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
@@ -43,7 +40,8 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->parametersResolver = $this->getMockBuilder(
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ParametersResolver $parametersResolver */
+        $parametersResolver = $this->getMockBuilder(
             'Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver'
         )->disableOriginalConstructor()->getMock();
 
@@ -51,7 +49,7 @@ class ActionGroupTest extends \PHPUnit_Framework_TestCase
             $this->actionFactory,
             $this->conditionFactory,
             new ParameterAssembler(),
-            $this->parametersResolver,
+            $parametersResolver,
             new ActionGroupDefinition()
         );
 

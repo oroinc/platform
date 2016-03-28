@@ -60,7 +60,7 @@ class ParameterTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider defaultValueProvider
-     * @param $value
+     * @param mixed $value
      */
     public function testGetDefaultValue($value)
     {

@@ -34,8 +34,6 @@ class DumpActionConfigurationCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-
-
         $errors = new ArrayCollection();
 
         if ($input->getOption('action-group')) {

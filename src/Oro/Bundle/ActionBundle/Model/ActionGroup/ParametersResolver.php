@@ -15,11 +15,11 @@ use Oro\Bundle\ActionBundle\Model\Parameter;
 class ParametersResolver
 {
     /** @var array */
-    private static $typeAliases = array(
+    private static $typeAliases = [
         'boolean' => 'bool',
         'integer' => 'int',
         'double' => 'float',
-    );
+    ];
 
     /**
      * @param ActionData $data
@@ -32,7 +32,6 @@ class ParametersResolver
         $violations = [];
 
         foreach ($actionGroup->getParameters() as $parameter) {
-
             $parameterName = $parameter->getName();
 
             if ($data->offsetExists($parameterName)) {
@@ -61,7 +60,6 @@ class ParametersResolver
         }
 
         if (0 !== count($violations)) {
-
             if (null !== $errors) {
                 $this->delegateErrors($violations, $errors);
             }
@@ -79,21 +77,17 @@ class ParametersResolver
     /**
      * @param string $value
      * @param string $type
-     * @param $message
+     * @param string $message
      * @return string|true Error message or null
      */
     private function isValidType($value, $type, &$message)
     {
         $type = array_key_exists($type, self::$typeAliases) ? self::$typeAliases[$type] : $type;
 
-        if (function_exists($isFunction = 'is_' . $type)) {
-            if ($isFunction($value)) {
+        if ((function_exists($isFunction = 'is_' . $type) && $isFunction($value)) ||
+            ($value instanceof $type)
+        ) {
                 return true;
-            }
-        }
-
-        if ($value instanceof $type) {
-            return true;
         }
 
         $message = sprintf(

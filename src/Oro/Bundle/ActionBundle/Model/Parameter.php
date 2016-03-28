@@ -90,6 +90,7 @@ class Parameter
 
     /**
      * @return mixed
+     * @throws \LogicException
      */
     public function getDefault()
     {
