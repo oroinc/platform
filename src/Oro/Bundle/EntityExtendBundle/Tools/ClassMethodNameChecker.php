@@ -14,7 +14,7 @@ class ClassMethodNameChecker
     protected $settersPrefix = ['set'];
 
     /** @var array */
-    protected $removerPrefix = ['remove', 'setDefault', 'add'];
+    protected $relationPrefix = ['remove', 'setDefault', 'add'];
 
     /**
      * @param string $className
@@ -22,7 +22,7 @@ class ClassMethodNameChecker
      *
      * @return string
      */
-    public function hasGetters($className, $property)
+    public function getGetters($className, $property)
     {
         return $this->checkMethod($property, $className, $this->gettersPrefix);
     }
@@ -33,7 +33,7 @@ class ClassMethodNameChecker
      *
      * @return string
      */
-    public function hasSetters($className, $property)
+    public function getSetters($className, $property)
     {
         return $this->checkMethod($property, $className, $this->settersPrefix);
     }
@@ -44,9 +44,9 @@ class ClassMethodNameChecker
      *
      * @return string
      */
-    public function hasRelationMethods($className, $property)
+    public function getRelationMethods($className, $property)
     {
-        return $this->checkMethod($property, $className, $this->removerPrefix);
+        return $this->checkMethod($property, $className, $this->relationPrefix);
     }
 
     /**

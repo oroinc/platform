@@ -45,7 +45,7 @@ parameters:
     oro_entity_extend.field_type_provider.class:              Oro\Bundle\EntityExtendBundle\Provider\FieldTypeProvider
 
     # helpers
-    oro_entity_extend.helper.extend_class_checking.class: Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker
+    oro_entity_extend.helper.class_method_name_checker.class: Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker
 
 services:
     oro_entity_extend.entity.cache.warmer:
@@ -473,5 +473,5 @@ services:
                 - manyToMany
 
     # Helpers
-    oro_entity_extend.helper.extend_class_checking:
-        class: %oro_entity_extend.helper.extend_class_checking.class%
+    oro_entity_extend.helper.class_method_name_checker:
+        class: %oro_entity_extend.helper.class_method_name_checker.class%
