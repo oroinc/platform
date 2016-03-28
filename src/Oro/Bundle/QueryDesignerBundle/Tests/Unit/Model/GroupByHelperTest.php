@@ -72,6 +72,19 @@ class GroupByHelperTest extends \PHPUnit_Framework_TestCase
                 'groupBy' => null,
                 'expected' => [],
             ],
+            'with group_concat' => [
+                'selects' => [
+                    'min(alias.field)',
+                    'group_concat(alias.field)',
+                    'GROUP_CONCAT(alias.field)',
+                    'group_concat(alias.field separated \'-sep-\')',
+                    'group_concat(alias.field) as field1',
+                    'GROUP_CONCAT(alias.field) as field2',
+                    'group_concat(alias.field separated \'-sep-\') as field3',
+                ],
+                'groupBy' => null,
+                'expected' => [],
+            ],
         ];
     }
 }

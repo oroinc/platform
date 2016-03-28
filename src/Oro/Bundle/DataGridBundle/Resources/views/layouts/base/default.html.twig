@@ -1,6 +1,6 @@
 {% block datagrid_widget %}
     {% import 'OroDataGridBundle::macros.html.twig' as dataGrid %}
-    {{ dataGrid.renderGrid(grid_full_name, grid_parameters) }}
+    {{ dataGrid.renderGrid(grid_full_name, grid_parameters, grid_render_parameters) }}
 {% endblock %}
 
 {% block taggable_datagrid_widget %}
