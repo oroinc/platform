@@ -6,91 +6,47 @@ use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
 
 class ClassMethodNameCheckerTest extends \PHPUnit_Framework_TestCase
 {
-    const CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
+    const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
+
+    /** @var ClassMethodNameChecker */
+    protected $checker;
+
+    protected function setUp()
+    {
+        $this->checker = new ClassMethodNameChecker();
+    }
 
     /**
-     * @dataProvider hasGettersDataProvider
+     * @dataProvider getMethodsDataProvider
+     *
+     * @param $property
+     * @param $prefixes
+     * @param array $result
      */
-    public function testHasGetters($field, $hasResult)
+    public function testGetMethods($property, $prefixes, array $result)
     {
-        $methodNameChecker = new ClassMethodNameChecker();
-
-        $result = $methodNameChecker->hasGetters(self::CLASS_NAME, $field);
-
-        if (!$hasResult) {
-            self::assertEquals(0, strlen($result));
-        } else {
-            self::assertGreaterThan(0, strlen($result));
-        }
+        $this->assertEquals($result, $this->checker->getMethods($property, self::TEST_CLASS_NAME, $prefixes));
     }
 
     /**
      * @return array
      */
-    public function hasGettersDataProvider()
+    public function getMethodsDataProvider()
     {
         return [
-            ['name', true],
-            ['email', false],
-            ['complex', true],
-        ];
-    }
-
-    /**
-     * @dataProvider hasSettersDataProvider
-     */
-    public function testHasSetters($field, $hasResult)
-    {
-        $methodNameChecker = new ClassMethodNameChecker();
-
-        $result = $methodNameChecker->hasSetters(self::CLASS_NAME, $field);
-
-        if (!$hasResult) {
-            self::assertEquals(0, strlen($result));
-        } else {
-            self::assertGreaterThan(0, strlen($result));
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function hasSettersDataProvider()
-    {
-        return [
-            ['name', true],
-            ['email', false],
-            ['complex', false],
-            ['someOne', true],
-        ];
-    }
-
-    /**
-     * @dataProvider hasRelationMethodsDataProvider
-     */
-    public function testTasRelationMethods($field, $hasResult)
-    {
-        $methodNameChecker = new ClassMethodNameChecker();
-
-        $result = $methodNameChecker->hasRelationMethods(self::CLASS_NAME, $field);
-
-        if (!$hasResult) {
-            self::assertEquals(0, strlen($result));
-        } else {
-            self::assertGreaterThan(0, strlen($result));
-        }
-    }
-
-    /**
-     * @return array
-     */
-    public function hasRelationMethodsDataProvider()
-    {
-        return [
-            ['name', false],
-            ['email', false],
-            ['complex', false],
-            ['someOne', true],
+            'two methods' => ['name', ClassMethodNameChecker::$setters, ['setName']],
+            'one setter' => ['name', ['set'], ['setName']],
+            'getters' => ['name', ClassMethodNameChecker::$getters, ['getName', 'isName']],
+            'relations methods' => ['name', ClassMethodNameChecker::$relationMethods, ['setDefaultName', 'addName']],
+            'empty' => [
+                'newProperty',
+                array_merge(
+                    ClassMethodNameChecker::$getters,
+                    ClassMethodNameChecker::$setters,
+                    ClassMethodNameChecker::$relationMethods
+                ),
+                []
+            ]
         ];
     }
 }

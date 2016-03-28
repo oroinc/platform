@@ -13,7 +13,7 @@ use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 
 class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestCase
 {
-    const ENTITY_CLASS = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestClass';
+    const TEST_CLASS_NAME = 'Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools\TestEntity';
 
     /** @var UniqueExtendEntityFieldValidator */
     protected $validator;
@@ -26,16 +26,8 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
             ->disableOriginalConstructor()
             ->getMock();
-
-        $this->methodNameChecker = $this
-            ->getMockBuilder('Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $extendConfigProvider = new ConfigProviderMock($configManager, 'extend');
-
         $this->validator = new UniqueExtendEntityMethodNameValidator(
-            new FieldNameValidationHelper($extendConfigProvider),
+            new FieldNameValidationHelper(new ConfigProviderMock($configManager, 'extend')),
             $this->methodNameChecker
         );
     }
@@ -45,54 +37,27 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
      *
      * @param string $fieldName
      * @param string $type
-     * @param bool   $hasMethod
-     * @param string $getter
-     * @param string $setter
-     * @param string $hasRelation
+     * @param        $hasMethods
      */
-    public function testValidate($fieldName, $type, $hasMethod, $getter = '', $setter = '', $hasRelation = '')
+    public function testValidate($fieldName, $type, $hasMethods)
     {
-        $entity = new EntityConfigModel(self::ENTITY_CLASS);
+        $entity = new EntityConfigModel(self::TEST_CLASS_NAME);
         $field  = new FieldConfigModel($fieldName, $type);
         $entity->addField($field);
-
         $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $this->validator->initialize($context);
-
         $constraint = new UniqueExtendEntityMethodName();
-        $violation  = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
 
-        $this->methodNameChecker->expects(self::once())
-            ->method('getGetters')
-            ->willReturn($getter);
-
-        $this->methodNameChecker->expects(self::once())
-            ->method('getSetters')
-            ->willReturn($setter);
-
-
-        if (strlen($hasRelation) > 0) {
-            $this->methodNameChecker->expects(self::once())
-                ->method('getRelationMethods')
-                ->willReturn($hasRelation);
-        } else {
-            $this->methodNameChecker->expects(self::never())
-                ->method('hasRelationMethods');
-        }
-
-        if (strlen($getter) > 0 || strlen($setter) > 0 || strlen($hasRelation) > 0) {
+        if ($hasMethods) {
+            $violation = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
             $context->expects(self::once())
                 ->method('buildViolation')
                 ->with($constraint->message)
                 ->willReturn($violation);
-        }
-
-        if ($hasMethod) {
             $violation->expects(self::once())
                 ->method('atPath')
                 ->with('fieldName')
                 ->willReturnSelf();
-
             $violation->expects(self::once())
                 ->method('addViolation');
         }
@@ -106,10 +71,9 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
     public function validateProvider()
     {
         return [
-            'With getter'          => ['email', 'string', true, 'getEmail'],
-            'Without conflicts'    => ['noOne', 'string', false],
-            'With relations field' => ['email', 'manyToOne', true, '', '', 'addEmail'],
-            'With setter'          => ['email', 'string', true, '', 'setEmail'],
+            'has conflict methods' => ['name', 'string', true],
+            'without conflicts'    => ['noOne', 'string', false],
+            'with relations field' => ['someField', 'manyToOne', true],
         ];
     }
 
@@ -121,7 +85,6 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
         $field   = '';
         $context = $this->getMock('Symfony\Component\Validator\Context\ExecutionContextInterface');
         $this->validator->initialize($context);
-
         $constraint = new UniqueExtendEntityMethodName();
 
         $this->validator->validate($field, $constraint);
