@@ -118,8 +118,34 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
         list($users, $bUnits) = $this->getTestData();
 
-        $userRepo->expects($this->any())
-            ->method('findAll')
+        $qb = $this->getMockBuilder('\Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $query = $this->getMockBuilder('\Doctrine\ORM\AbstractQuery')
+            ->setMethods(['setParameter', 'getArrayResult'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+
+        $userRepo
+            ->expects($this->once())
+            ->method('createQueryBuilder')
+            ->will($this->returnValue($qb));
+        $qb
+            ->expects($this->any())
+            ->method('leftJoin')
+            ->will($this->returnValue($qb));
+        $qb
+            ->expects($this->once())
+            ->method('select')
+            ->will($this->returnValue($qb));
+        $qb
+            ->expects($this->once())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+        $query
+            ->expects($this->once())
+            ->method('getArrayResult')
             ->will($this->returnValue($users));
 
         $qb = $this->getMockBuilder('\Doctrine\ORM\QueryBuilder')
@@ -194,50 +220,62 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getTestData()
     {
-        $organization = new Organization();
-        $this->setId($organization, 1);
 
-        $mainBu = new BusinessUnit();
-        $this->setId($mainBu, 1);
-        $mainBu->setOrganization($organization);
+        $organization = [
+            'id' => 1
+        ];
 
-        $bu2 = new BusinessUnit();
-        $this->setId($bu2, 2);
-        $bu2->setOrganization($organization);
+        $mainBu = [
+            'id'            => 1,
+            'organization'  => $organization
+        ];
 
-        $childBu = new BusinessUnit();
-        $this->setId($childBu, 3);
-        $childBu->setOrganization($organization);
-        $childBu->setOwner($mainBu);
 
-        $user1 = new User();
-        $this->setId($user1, 1);
-        $user1->setOwner($mainBu);
-        $user1->addBusinessUnit($mainBu);
-        $user1->setOrganizations(new ArrayCollection([$organization]));
+        $bu2 = [
+            'id'            => 2,
+            'organization'  => $organization
+        ];
 
-        $user2 = new User();
-        $this->setId($user2, 2);
-        $user2->setOwner($bu2);
-        $user2->addBusinessUnit($bu2);
-        $user2->setOrganizations(new ArrayCollection([$organization]));
+        $childBu = [
+            'id'            => 3,
+            'organization'  => $organization,
+            'owner'         => $mainBu
+        ];
 
-        $user3 = new User();
-        $this->setId($user3, 3);
-        $user3->setOwner($childBu);
-        $user3->addBusinessUnit($childBu);
-        $user3->setOrganizations(new ArrayCollection([$organization]));
+        $user1 = [
+            'id'            => 1,
+            'owner'         => $mainBu,
+            'businessUnits' => [$mainBu],
+            'organizations' => [$organization]
+        ];
 
-        $user3 = new User();
-        $this->setId($user3, 4);
-        $user3->addBusinessUnit($childBu);
-        $user3->setOrganizations(new ArrayCollection([$organization]));
+        $user2 = [
+            'id'            => 2,
+            'owner'         => $bu2,
+            'businessUnits' => [$bu2],
+            'organizations' => [$organization]
+        ];
+
+        $user3 = [
+            'id'            => 3,
+            'owner'         => $childBu,
+            'businessUnits' => [$childBu, $bu2],
+            'organizations' => [$organization]
+        ];
+
+        $user4 = [
+            'id'            => 4,
+            'owner'         => null,
+            'businessUnits' => [$childBu],
+            'organizations' => [$organization]
+        ];
 
         return [
             [
                 $user1,
                 $user2,
-                $user3
+                $user3,
+                $user4
             ],
             [
                 [
