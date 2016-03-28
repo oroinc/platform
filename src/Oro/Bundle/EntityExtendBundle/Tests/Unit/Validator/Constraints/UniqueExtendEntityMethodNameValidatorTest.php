@@ -18,9 +18,6 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
     /** @var UniqueExtendEntityFieldValidator */
     protected $validator;
 
-    /** @var ClassMethodNameChecker */
-    protected $methodNameChecker;
-
     protected function setUp()
     {
         $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
@@ -28,7 +25,7 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
             ->getMock();
         $this->validator = new UniqueExtendEntityMethodNameValidator(
             new FieldNameValidationHelper(new ConfigProviderMock($configManager, 'extend')),
-            $this->methodNameChecker
+            new ClassMethodNameChecker()
         );
     }
 
