@@ -52,10 +52,7 @@ class ParametersResolverTest extends \PHPUnit_Framework_TestCase
         $stringRequiredParam = new Parameter('param1');
         $stringRequiredParam->setType('string');
 
-        $objectRequiredParam = new Parameter('parameter_parameter');
-        $objectRequiredParam->setType('Oro\Bundle\ActionBundle\Model\Parameter');
-
-        $mixedRequiredParam = new Parameter('param2');
+        $mixedRequiredParam = new Parameter('param4');
 
         $optionalParam = new Parameter('param3');
         $optionalParam->setDefault('default value');
@@ -69,15 +66,20 @@ class ParametersResolverTest extends \PHPUnit_Framework_TestCase
                 [$stringRequiredParam],
                 new ActionData(['param1' => 'stringValue'])
             ],
+            'typed class param' => [
+                new ActionData(['param2' => $stringRequiredParam]),
+                [$this->requiredTypedParameter('param2', 'Oro\Bundle\ActionBundle\Model\Parameter')],
+                new ActionData(['param2' => $stringRequiredParam])
+            ],
             'typed object param' => [
-                new ActionData(['parameter_parameter' => $stringRequiredParam]),
-                [$objectRequiredParam],
-                new ActionData(['parameter_parameter' => $stringRequiredParam])
+                new ActionData(['param3' => $stringRequiredParam]),
+                [$this->requiredTypedParameter('param3', 'object')],
+                new ActionData(['param3' => $stringRequiredParam])
             ],
             'non-typed param' => [
-                new ActionData(['param2' => 'any value']),
+                new ActionData(['param4' => 'any value']),
                 [$mixedRequiredParam],
-                new ActionData(['param2' => 'any value'])
+                new ActionData(['param4' => 'any value'])
             ],
             'optional param' => [
                 new ActionData([]),
@@ -85,6 +87,19 @@ class ParametersResolverTest extends \PHPUnit_Framework_TestCase
                 $expectedModifiedData
             ]
         ];
+    }
+
+    /**
+     * @param string $name
+     * @param string $type
+     * @return Parameter
+     */
+    private function requiredTypedParameter($name, $type)
+    {
+        $parameter = new Parameter($name);
+        $parameter->setType($type);
+
+        return $parameter;
     }
 
     /**
