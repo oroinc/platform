@@ -107,11 +107,12 @@ class ActionsDataProvider implements DataProviderInterface
      */
     public function getByGroup($groups = null)
     {
-        if (!$this->context->data()->has('entity')) {
-            return [];
+        if ($this->context && $this->context->data()->has('entity')) {
+            $context = $this->contextHelper->getActionParameters(['entity' => $this->context->data()->get('entity')]);
+        } else {
+            $context = null;
         }
 
-        $context = $this->contextHelper->getActionParameters(['entity' => $this->context->data()->get('entity')]);
         $actions = $this->restrictHelper->restrictActionsByGroup($this->actionManager->getActions($context), $groups);
 
         return $this->getPreparedData($actions);
