@@ -471,20 +471,16 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         if ($(this).attr('disabled')) {
             return;
         }
-        $(this).closest('*[data-content]')
-            .trigger('content:remove')
-            .remove();
-    });
 
-    $(document).on('click', '.frontend-removeLineItem', function(e) {
-        e.preventDefault();
-        if ($(this).attr('disabled')) {
-            return;
+        var item, closest = '*[data-content]';
+        if ($(this).data('closest')) {
+            closest = $(this).data('closest');
         }
-        $(this).closest('tbody.line_item')
+
+        item = $(this).closest(closest);
+        item.trigger('content:remove')
             .remove();
     });
-
 
     /**
      * Support for [data-focusable] attribute
