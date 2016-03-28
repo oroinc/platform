@@ -16,7 +16,7 @@ class ClassMethodNameChecker
      * @param string $className
      * @param array  $prefixes
      *
-     * @return string
+     * @return array
      */
     public function getMethods($property, $className, array $prefixes)
     {
