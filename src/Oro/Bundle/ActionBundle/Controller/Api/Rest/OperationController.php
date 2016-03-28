@@ -12,45 +12,44 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\HttpFoundation\Session\Session;
 
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Exception\ActionNotFoundException;
-use Oro\Bundle\ActionBundle\Exception\ForbiddenActionException;
+use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
 /**
- * @Rest\RouteResource("actions")
+ * @Rest\RouteResource("operations")
  * @Rest\NamePrefix("oro_api_action_")
  */
 class OperationController extends FOSRestController
 {
     /**
-     * @ApiDoc(description="Execute action", resource=true)
+     * @ApiDoc(description="Execute operation", resource=true)
      * @AclAncestor("oro_action")
      * @Rest\Get
      *
-     * @param string $actionName
+     * @param string $operationName
      * @return Response
      */
-    public function executeAction($actionName)
+    public function executeAction($operationName)
     {
+        $data = $this->getContextHelper()->getActionData();
         $errors = new ArrayCollection();
 
         try {
-            $data = $this->getOperationManager()->executeByContext($actionName, null, $errors);
+            $this->getOperationManager()->execute($operationName, $data, $errors);
         } catch (ActionNotFoundException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND, $errors);
-        } catch (ForbiddenActionException $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_FORBIDDEN, $errors);
+            return $this->handleResponse($data, Codes::HTTP_NOT_FOUND, $e->getMessage(), $errors);
+        } catch (ForbiddenOperationException $e) {
+            return $this->handleResponse($data, Codes::HTTP_FORBIDDEN, $e->getMessage(), $errors);
         } catch (\Exception $e) {
-            return $this->handleError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR, $errors);
+            return $this->handleResponse($data, Codes::HTTP_INTERNAL_SERVER_ERROR, $e->getMessage(), $errors);
         }
 
-        return $this->handleView(
-            $this->view($this->getResponse($data), Codes::HTTP_OK)
-        );
+        return $this->handleResponse($data);
     }
 
     /**
@@ -62,55 +61,61 @@ class OperationController extends FOSRestController
     }
 
     /**
-     * @param string $message
-     * @param int $code
-     * @param Collection $errorMessages
-     * @return Response
+     * @return ContextHelper
      */
-    protected function handleError($message, $code, Collection $errorMessages)
+    protected function getContextHelper()
     {
-        $messages = [];
-
-        if (count($errorMessages)) {
-            $translator = $this->get('translator');
-
-            foreach ($errorMessages as $errorMessage) {
-                $messages[] = $translator->trans($errorMessage['message'], $errorMessage['parameters']);
-            }
-        }
-
-        return $this->handleView(
-            $this->view($this->formatErrorResponse($message, $messages), $code)
-        );
-    }
-
-    /**
-     * @param string $message
-     * @param array $messages
-     * @return array
-     */
-    protected function formatErrorResponse($message, array $messages = [])
-    {
-        return ['message' => $message, 'messages' => $messages];
+        return $this->get('oro_action.helper.context');
     }
 
     /**
      * @param ActionData $data
-     * @return array
+     * @param int $code
+     * @param string $message
+     * @param Collection $errorMessages
+     * @return Response
      */
-    protected function getResponse(ActionData $data)
-    {
-        /* @var $session Session */
-        $session = $this->get('session');
+    protected function handleResponse(
+        ActionData $data,
+        $code = Codes::HTTP_OK,
+        $message = '',
+        Collection $errorMessages = null
+    ) {
+        $response = [
+            'success' => $code === Codes::HTTP_OK,
+            'message' => $message,
+            'messages' => [],
+        ];
 
-        $response = [];
-        if ($data->getRedirectUrl()) {
-            $response['redirectUrl'] = $data->getRedirectUrl();
-        } elseif ($data->getRefreshGrid()) {
+        if ($data->getRefreshGrid() || !$response['success']) {
             $response['refreshGrid'] = $data->getRefreshGrid();
-            $response['flashMessages'] = $session->getFlashBag()->all();
+            $response['flashMessages'] = $this->get('session')->getFlashBag()->all();
+        } elseif ($data->getRedirectUrl()) {
+            $response['redirectUrl'] = $data->getRedirectUrl();
+        } else {
+            $response['reloadPage'] = true;
         }
 
-        return $response;
+        if (count($errorMessages)) {
+            $response['messages'] = $this->prepareMessages($errorMessages->toArray());
+        }
+
+        return $this->handleView($this->view($response, $code));
+    }
+
+    /**
+     * @param array $messages
+     * @return array
+     */
+    protected function prepareMessages(array $messages)
+    {
+        $translator = $this->get('translator');
+        $result = [];
+
+        foreach ($messages as $message) {
+            $result[] = $translator->trans($message['message'], $message['parameters']);
+        }
+
+        return $result;
     }
 }

@@ -9,8 +9,8 @@ use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 
 class OperationManager
 {
-    const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Action:form.html.twig';
-    const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Action:page.html.twig';
+    const DEFAULT_FORM_TEMPLATE = 'OroActionBundle:Operation:form.html.twig';
+    const DEFAULT_PAGE_TEMPLATE = 'OroActionBundle:Operation:page.html.twig';
 
     /** @var OperationRegistry */
     protected $operationRegistry;
@@ -46,9 +46,7 @@ class OperationManager
     {
         $actionData = $this->contextHelper->getActionData($context);
 
-        $this->execute($operationName, $actionData, $errors);
-
-        return $actionData;
+        return $this->execute($operationName, $actionData, $errors);
     }
 
     /**
@@ -56,14 +54,10 @@ class OperationManager
      * @param ActionData $actionData
      * @param Collection|null $errors
      * @return ActionData
-     * @throws \Exception
      */
     public function execute($operationName, ActionData $actionData, Collection $errors = null)
     {
-        $operation = $this->getOperation($operationName, $actionData);
-        foreach ($operation->getActionGroupsIterator($actionData) as $executionArgs) {
-            $executionArgs->execute($this->actionGroupRegistry, $errors);
-        }
+        $this->getOperation($operationName, $actionData)->execute($actionData, $errors);
 
         return $actionData;
     }

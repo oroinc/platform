@@ -88,15 +88,15 @@ class ConnectionControllerManager
 
     /**
      * @param Request $request
-     * $param sting $formParentName
+     * @param string  $formParentName
      *
      * @return FormInterface
      */
     public function getCheckGmailConnectionForm($request, $formParentName)
     {
         $data = null;
-        $id = $request->get('id', false);
-        if (false !== $id) {
+        $id = $request->get('id', null);
+        if (!empty($id)) {
             $data = $this->doctrine->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
         }
 

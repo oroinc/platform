@@ -29,7 +29,7 @@ class OperationActionGroupTest extends \PHPUnit_Framework_TestCase
             $this->operationActionGroup,
             [
                 ['name', 'test'],
-                ['argumentsMapping', ['argument1', 'argument2'], []],
+                ['parametersMapping', ['parameter1', 'parameter2'], []],
             ]
         );
     }

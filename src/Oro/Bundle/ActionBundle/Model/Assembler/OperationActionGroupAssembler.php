@@ -33,7 +33,7 @@ class OperationActionGroupAssembler extends AbstractAssembler
         $operationActionGroup = new OperationActionGroup();
         $operationActionGroup
             ->setName($options['name'])
-            ->setArgumentsMapping($this->passConfiguration($this->getOption($options, 'arguments_mapping', [])));
+            ->setParametersMapping($this->passConfiguration($this->getOption($options, 'parameters_mapping', [])));
 
         return $operationActionGroup;
     }

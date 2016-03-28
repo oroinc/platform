@@ -31,7 +31,7 @@ class ActionGroupDefinitionTest extends \PHPUnit_Framework_TestCase
                 ['name', 'test'],
                 ['actions', ['config1', 'config2'], []],
                 ['conditions', ['config1', 'config2'], []],
-                ['arguments', ['config1', 'config2'], []],
+                ['parameters', ['config1', 'config2'], []],
             ]
         );
     }

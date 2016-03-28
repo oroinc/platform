@@ -2,29 +2,14 @@
 
 namespace Oro\Component\Action\Action;
 
-use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\PropertyAccess\PropertyPath;
+use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
 use Oro\Component\Action\Model\ContextAccessor;
 
-class Redirect extends AbstractAction
+class Redirect extends AssignUrl
 {
-    /**
-     * @var RouterInterface
-     */
-    protected $router;
-
-    /**
-     * @var string
-     */
-    protected $redirectPath;
-
-    /**
-     * @var array
-     */
-    protected $options;
-
     /**
      * @param ContextAccessor $contextAccessor
      * @param RouterInterface $router
@@ -32,27 +17,9 @@ class Redirect extends AbstractAction
      */
     public function __construct(ContextAccessor $contextAccessor, RouterInterface $router, $redirectPath)
     {
-        parent::__construct($contextAccessor);
+        parent::__construct($contextAccessor, $router);
 
-        $this->router = $router;
-        $this->redirectPath = $redirectPath;
-    }
-
-    /**
-     * {@inheritDoc}
-     */
-    protected function executeAction($context)
-    {
-        $route = $this->getRoute($context);
-        if ($route) {
-            $routeParameters = $this->getRouteParameters($context);
-            $url = $this->router->generate($route, $routeParameters);
-        } else {
-            $url = $this->getUrl($context);
-        }
-
-        $urlProperty = new PropertyPath($this->redirectPath);
-        $this->contextAccessor->setValue($context, $urlProperty, $url);
+        $this->urlAttribute = $redirectPath;
     }
 
     /**
@@ -73,6 +40,7 @@ class Redirect extends AbstractAction
             throw new InvalidParameterException('Route parameters must be an array');
         }
 
+        $this->urlAttribute = new PropertyPath($this->urlAttribute);
         $this->options = $options;
 
         return $this;
@@ -84,34 +52,14 @@ class Redirect extends AbstractAction
      */
     protected function getUrl($context)
     {
-        return !empty($this->options['url'])
-            ? $this->contextAccessor->getValue($context, $this->options['url'])
-            : null;
-    }
-
-    /**
-     * @param mixed $context
-     * @return string|null
-     */
-    protected function getRoute($context)
-    {
-        return !empty($this->options['route'])
-            ? $this->contextAccessor->getValue($context, $this->options['route'])
-            : null;
-    }
-
-    /**
-     * @param mixed $context
-     * @return array
-     */
-    protected function getRouteParameters($context)
-    {
-        $routeParameters = $this->getOption($this->options, 'route_parameters', array());
-
-        foreach ($routeParameters as $name => $value) {
-            $routeParameters[$name] = $this->contextAccessor->getValue($context, $value);
+        if ($this->getRoute($context)) {
+            $url = parent::getUrl($context);
+        } else {
+            $url = !empty($this->options['url'])
+                ? $this->contextAccessor->getValue($context, $this->options['url'])
+                : null;
         }
 
-        return $routeParameters;
+        return $url;
     }
 }

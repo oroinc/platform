@@ -4,15 +4,13 @@ parameters:
     oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
     oro_action.helper.restrict.class: Oro\Bundle\ActionBundle\Helper\RestrictHelper
     oro_action.helper.options.class: Oro\Bundle\ActionBundle\Helper\OptionsHelper
+    oro_action.helper.applications_url.class: Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper
     oro_action.operation_registry.class: Oro\Bundle\ActionBundle\Model\OperationRegistry
     oro_action.action_group_registry.class: Oro\Bundle\ActionBundle\Model\ActionGroupRegistry
     oro_action.operation_manager.class: Oro\Bundle\ActionBundle\Model\OperationManager
-    oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
-    oro_action.attribute_assembler.class: Oro\Bundle\ActionBundle\Model\AttributeAssembler
     oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
     oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
-    oro_action.form_options_assembler.class: Oro\Bundle\ActionBundle\Model\FormOptionsAssembler
-    oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\ActionFormManager
+    oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\OperationFormManager
     oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_action.datagrid.operation_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
@@ -48,9 +46,15 @@ services:
         class: %oro_action.helper.options.class%
         arguments:
             - @oro_action.helper.context
-            - @oro_action.helper.applications
             - @oro_action.options_assembler
             - @oro_action.context_accessor
+            - @oro_action.helper.applications_url
+            - @translator
+
+    oro_action.helper.applications_url:
+        class: %oro_action.helper.applications_url.class%
+        arguments:
+            - @oro_action.helper.applications
             - @router
 
     oro_action.operation_registry:
@@ -111,11 +115,6 @@ services:
 
     oro_action.options_assembler:
         class: %oro_action.options_assembler.class%
-        calls:
-            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
-
-    oro_action.form_options_assembler:
-        class: %oro_action.form_options_assembler.class%
         calls:
             - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
 

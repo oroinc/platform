@@ -29,9 +29,9 @@ class DeleteTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_api_action_execute_actions',
+                'oro_api_action_execute_operations',
                 [
-                    'actionName' => 'DELETE',
+                    'operationName' => 'DELETE',
                     'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\Item',
                     'entityId' => $item->getId(),
                 ]

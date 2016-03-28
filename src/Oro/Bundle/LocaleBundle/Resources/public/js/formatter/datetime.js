@@ -26,6 +26,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          */
         backendFormats: {
             'day':      'MM-DD',
+            'month':    'MM',
             'date':     'YYYY-MM-DD',
             'time':     'HH:mm:ss',
             'datetime': 'YYYY-MM-DD[T]HH:mm:ssZZ',
@@ -84,6 +85,13 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          */
         getBackendDayFormat: function() {
             return this.backendFormats.day;
+        },
+
+        /**
+         * @returns {string}
+         */
+        getBackendMonthFormat: function() {
+            return this.backendFormats.month;
         },
 
         /**

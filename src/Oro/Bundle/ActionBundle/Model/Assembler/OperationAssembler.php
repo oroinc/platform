@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Doctrine\ORM\ORMException;
 
-use Oro\Bundle\ActionBundle\Form\Type\ActionType;
+use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -108,7 +108,7 @@ class OperationAssembler extends AbstractAssembler
             ->setApplications($this->getOption($options, 'applications', []))
             ->setEnabled($this->getOption($options, 'enabled', true))
             ->setOrder($this->getOption($options, 'order', 0))
-            ->setFormType($this->getOption($options, 'form_type', ActionType::NAME))
+            ->setFormType($this->getOption($options, 'form_type', OperationType::NAME))
             ->setButtonOptions($this->getOption($options, 'button_options', []))
             ->setFrontendOptions($this->getOption($options, 'frontend_options', []))
             ->setDatagridOptions($this->getOption($options, 'datagrid_options', []))

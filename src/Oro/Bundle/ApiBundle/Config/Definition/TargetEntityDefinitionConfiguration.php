@@ -176,7 +176,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
         array $preProcessCallbacks,
         array $postProcessCallbacks
     ) {
-        $sectionName = $this->sectionName . '.' . EntityDefinitionConfig::FIELDS;
+        $sectionName = $this->sectionName . '.field';
         if (!empty($this->parentSectionName)) {
             $sectionName = $this->parentSectionName . '.' . $sectionName;
         }

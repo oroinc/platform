@@ -99,7 +99,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             [
                 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1' => [
                     'group1' => [
-                        'arguments' => [
+                        'parameters' => [
                             '$.data' => [
                                 'type' => 'Oro\Bundle\TestBundle\Entity\Test',
                                 'required' => true
@@ -115,7 +115,7 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 ],
                 'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2' => [
                     'group2' => [
-                        'arguments' => [
+                        'parameters' => [
                             '$.date' => [
                                 'type' => 'DateTime',
                                 'message' => 'No data specified!'

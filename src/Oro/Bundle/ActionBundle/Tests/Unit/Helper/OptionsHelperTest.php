@@ -3,15 +3,15 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Helper;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
+use Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
-use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 
 use Oro\Component\Action\Model\ContextAccessor;
 
@@ -20,17 +20,17 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
     /** @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject */
     protected $contextHelper;
 
-    /** @var ApplicationsHelper|\PHPUnit_Framework_MockObject_MockObject */
-    protected $applicationsHelper;
+    /** @var ApplicationsUrlHelper|\PHPUnit_Framework_MockObject_MockObject */
+    protected $applicationsUrlHelper;
 
     /** @var OptionsAssembler|\PHPUnit_Framework_MockObject_MockObject */
     protected $optionsAssembler;
 
-    /** @var RouterInterface|\PHPUnit_Framework_MockObject_MockObject */
-    protected $router;
-
     /** @var OptionsHelper */
     protected $helper;
+
+    /** @var TranslatorInterface|\PHPUnit_Framework_MockObject_MockObject */
+    protected $mockTranslator;
 
     /**
      * {@inheritdoc}
@@ -40,20 +40,23 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
         $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->applicationsHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsHelper')
+
+        $this->applicationsUrlHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ApplicationsUrlHelper')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->optionsAssembler = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->router = $this->getMock('Symfony\Component\Routing\RouterInterface');
+
+        $this->mockTranslator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')->getMock();
 
         $this->helper = new OptionsHelper(
             $this->contextHelper,
-            $this->applicationsHelper,
             $this->optionsAssembler,
             new ContextAccessor(),
-            $this->router
+            $this->applicationsUrlHelper,
+            $this->mockTranslator
         );
     }
 
@@ -83,27 +86,30 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
             ->method('assemble')
             ->willReturn($inputData['buttonOptions']);
 
-        $this->applicationsHelper->expects($this->once())
-            ->method('getExecutionRoute')
-            ->willReturn('execution_route');
-
-        $this->applicationsHelper->expects($this->once())
-            ->method('getDialogRoute')
-            ->willReturn('dialog_route');
-
-        $this->router->expects($this->at(0))
-            ->method('generate')
-            ->with('execution_route', $inputData['routerContext'])
+        $this->applicationsUrlHelper->expects($this->once())
+            ->method('getExecutionUrl')
+            ->with($inputData['routerContext'])
             ->willReturn($inputData['executionUrl']);
 
-        $this->router->expects($this->at(1))
-            ->method('generate')
-            ->with('dialog_route', $inputData['routerContext'])
+        $this->applicationsUrlHelper->expects($this->once())
+            ->method('getDialogUrl')
+            ->with($inputData['routerContext'])
             ->willReturn($inputData['dialogUrl']);
+
+        $this->mockTranslator->expects($this->once())
+            ->method('trans')
+            ->willReturnCallback(
+                function ($label) {
+                    if (strpos($label, '3')) {
+                        return $label;
+                    }
+                    return strtoupper($label);
+                }
+            );
 
         $this->assertEquals(
             $expectedData,
-            $this->helper->getFrontendOptions($inputData['action'], $inputData['context'])
+            $this->helper->getFrontendOptions($inputData['operation'], $inputData['context'])
         );
     }
 
@@ -119,12 +125,12 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'context' => [],
                     'actionData' => new ActionData(),
-                    'action' => $this->getOperation('action1'),
+                    'operation' => $this->getOperation('operation1'),
                     'buttonOptions' => [],
                     'frontendOptions' => [],
                     'formOptions' => [],
                     'routerContext' => [
-                        'actionName' => 'action1',
+                        'operationName' => 'operation1',
                     ],
                     'executionUrl' => 'execution-url',
                     'dialogUrl' => 'dialog-url',
@@ -134,7 +140,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'hasDialog' => false,
                         'showDialog' => false,
                         'dialogOptions' => [
-                            'title' => 'action1',
+                            'title' => 'OPERATION1', //translated
                             'dialogOptions' => [],
                         ],
                         'executionUrl' => 'execution-url',
@@ -148,7 +154,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                 'input' => [
                     'context' => [],
                     'actionData' => new ActionData(['key1' => 'value1']),
-                    'action' => $this->getOperation('action2'),
+                    'operation' => $this->getOperation('operation2'),
                     'frontendOptions' => [
                         'confirmation' => [
                             'option1' => 'value1',
@@ -162,7 +168,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                     'formOptions' => [],
                     'routerContext' => [
-                        'actionName' => 'action2',
+                        'operationName' => 'operation2',
                     ],
                     'executionUrl' => 'execution-url2',
                     'dialogUrl' => 'dialog-url2',
@@ -172,7 +178,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'hasDialog' => false,
                         'showDialog' => false,
                         'dialogOptions' => [
-                            'title' => 'action2',
+                            'title' => 'OPERATION2', //translated
                             'dialogOptions' => [],
                         ],
                         'executionUrl' => 'execution-url2',
@@ -190,21 +196,53 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                     ],
                 ],
             ],
+            'not translated title' => [
+                'input' => [
+                    'context' => [
+                        'param1' => 'value1',
+                    ],
+                    'actionData' => new ActionData(),
+                    'operation' => $this->getOperation('operation3', true),
+                    'buttonOptions' => [],
+                    'frontendOptions' => [],
+                    'routerContext' => [
+                        'param1' => 'value1',
+                        'operationName' => 'operation3',
+                    ],
+                    'executionUrl' => 'execution-url3',
+                    'dialogUrl' => 'dialog-url3',
+                ],
+                'expected' => [
+                    'options' => [
+                        'hasDialog' => true,
+                        'showDialog' => false,
+                        'dialogOptions' => [
+                            'title' => 'operation3', //NOT TRANSLATED (see closure for translator mock return)
+                            'dialogOptions' => [],
+                        ],
+                        'executionUrl' => 'execution-url3',
+                        'dialogUrl' => 'dialog-url3',
+                        'url' => 'dialog-url3',
+                    ],
+                    'data' => [],
+                ],
+            ],
             'full context and parameters' => [
                 'input' => [
                     'context' => [
                         'param1' => 'value1',
                     ],
                     'actionData' => new ActionData(),
-                    'action' => $this->getOperation('action3', true),
+                    'operation' => $this->getOperation('operation3', true),
                     'buttonOptions' => [],
                     'frontendOptions' => [
                         'show_dialog' => true,
+                        'title' => 'Custom dialog title',
                         'options' => ['option1' => 'value1'],
                     ],
                     'routerContext' => [
                         'param1' => 'value1',
-                        'actionName' => 'action3',
+                        'operationName' => 'operation3',
                     ],
                     'executionUrl' => 'execution-url3',
                     'dialogUrl' => 'dialog-url3',
@@ -214,7 +252,7 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
                         'hasDialog' => true,
                         'showDialog' => true,
                         'dialogOptions' => [
-                            'title' => 'action3',
+                            'title' => 'CUSTOM DIALOG TITLE',
                             'dialogOptions' => ['option1' => 'value1'],
                         ],
                         'executionUrl' => 'execution-url3',
@@ -228,30 +266,23 @@ class OptionsHelperTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param bool $hasForm
      * @return Operation|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getOperation($actionName, $hasForm = false)
+    protected function getOperation($operationName, $hasForm = false)
     {
         $definition = new OperationDefinition();
-        $definition
-            ->setName($actionName)
-            ->setLabel($actionName);
+        $definition->setName($operationName)->setLabel($operationName);
 
-        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
+        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->setMethods(['getDefinition', 'hasForm'])
             ->getMock();
 
-        $action->expects($this->any())
-            ->method('getDefinition')
-            ->willReturn($definition);
+        $operation->expects($this->any())->method('getDefinition')->willReturn($definition);
+        $operation->expects($this->any())->method('hasForm')->willReturn($hasForm);
 
-        $action->expects($this->any())
-            ->method('hasForm')
-            ->willReturn($hasForm);
-
-        return $action;
+        return $operation;
     }
 }

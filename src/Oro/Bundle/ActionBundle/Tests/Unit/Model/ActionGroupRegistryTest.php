@@ -4,8 +4,8 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
-use Oro\Bundle\ActionBundle\Model\Assembler\ArgumentAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
+use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -16,9 +16,6 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationProvider;
 
-    /** @var ActionGroupAssembler */
-    protected $assembler;
-
     /** @var ActionGroupRegistry */
     protected $registry;
 
@@ -27,12 +24,12 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         $this->configurationProvider =
             $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory $doctrineHelper */
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ActionFactory $actionFactory */
         $actionFactory = $this->getMockBuilder('Oro\Component\Action\Action\ActionFactory')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory $doctrineHelper */
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ExpressionFactory $conditionFactory */
         $conditionFactory = $this->getMockBuilder('Oro\Component\ConfigExpression\ExpressionFactory')
             ->disableOriginalConstructor()
             ->getMock();
@@ -42,16 +39,16 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->assembler = new ActionGroupAssembler(
+        $assembler = new ActionGroupAssembler(
             $actionFactory,
             $conditionFactory,
-            new ArgumentAssembler(),
+            new ParameterAssembler(),
             $doctrineHelper
         );
 
         $this->registry = new ActionGroupRegistry(
             $this->configurationProvider,
-            $this->assembler
+            $assembler
         );
     }
 
@@ -76,6 +73,23 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         $actionGroup = $this->registry->findByName($actionGroupName);
 
         $this->assertEquals($expected, $actionGroup ? $actionGroup->getDefinition()->getName() : $actionGroup);
+    }
+
+    /**
+     * @return array
+     */
+    public function findByNameDataProvider()
+    {
+        return [
+            'invalid actionGroup name' => [
+                'actionGroupName' => 'test',
+                'expected' => null
+            ],
+            'valid actionGroup name' => [
+                'actionGroupName' => 'action_group1',
+                'expected' => 'action_group1'
+            ],
+        ];
     }
 
     public function testGet()
@@ -107,22 +121,5 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->registry->get('not exists');
-    }
-
-    /**
-     * @return array
-     */
-    public function findByNameDataProvider()
-    {
-        return [
-            'invalid actionGroup name' => [
-                'actionGroupName' => 'test',
-                'expected' => null
-            ],
-            'valid actionGroup name' => [
-                'actionGroupName' => 'action_group1',
-                'expected' => 'action_group1'
-            ],
-        ];
     }
 }

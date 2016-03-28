@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ActionBundle\Helper;
 
-use Symfony\Component\Routing\RouterInterface;
+use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
+use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OptionsAssembler;
 
 use Oro\Component\Action\Model\ContextAccessor;
@@ -15,37 +15,37 @@ class OptionsHelper
     /** @var ContextHelper */
     protected $contextHelper;
 
-    /** @var ApplicationsHelper */
-    protected $applicationsHelper;
-
     /** @var OptionsAssembler */
     protected $optionsAssembler;
 
     /** @var ContextAccessor */
     protected $contextAccessor;
 
-    /** @var RouterInterface */
-    protected $router;
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /** @var ApplicationsUrlHelper */
+    protected $applicationsUrlHelper;
 
     /**
      * @param ContextHelper $contextHelper
-     * @param ApplicationsHelper $applicationsHelper
      * @param OptionsAssembler $optionsAssembler
      * @param ContextAccessor $contextAccessor
-     * @param RouterInterface $router
+     * @param ApplicationsUrlHelper $applicationsUrlHelper
+     * @param TranslatorInterface $translator
      */
     public function __construct(
         ContextHelper $contextHelper,
-        ApplicationsHelper $applicationsHelper,
         OptionsAssembler $optionsAssembler,
         ContextAccessor $contextAccessor,
-        RouterInterface $router
+        ApplicationsUrlHelper $applicationsUrlHelper,
+        TranslatorInterface $translator
     ) {
         $this->contextHelper = $contextHelper;
-        $this->applicationsHelper = $applicationsHelper;
         $this->optionsAssembler = $optionsAssembler;
         $this->contextAccessor = $contextAccessor;
-        $this->router = $router;
+        $this->applicationsUrlHelper = $applicationsUrlHelper;
+        $this->translator = $translator;
     }
 
     /**
@@ -58,51 +58,10 @@ class OptionsHelper
         $actionContext = $this->contextHelper->getContext($context);
         $actionData = $this->contextHelper->getActionData($actionContext);
 
-        $frontendOptions = $this->resolveOptions(
-            $actionData,
-            $operation->getDefinition()->getFrontendOptions()
-        );
-
-        $buttonOptions = $this->resolveOptions(
-            $actionData,
-            $operation->getDefinition()->getButtonOptions()
-        );
-
-        $actionName = $operation->getName();
-
-        $executionUrl = $this->router->generate(
-            $this->applicationsHelper->getExecutionRoute(),
-            array_merge($actionContext, ['actionName' => $actionName])
-        );
-
-        $dialogUrl = $this->router->generate(
-            $this->applicationsHelper->getDialogRoute(),
-            array_merge($actionContext, ['actionName' => $actionName])
-        );
-
-        $options = [
-            'hasDialog' => $operation->hasForm(),
-            'showDialog' => !empty($frontendOptions['show_dialog']),
-            'dialogOptions' => [
-                'title' => $operation->getDefinition()->getLabel(),
-                'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
-            ],
-            'executionUrl' => $executionUrl,
-            'dialogUrl' => $dialogUrl,
-            'url' => $operation->hasForm() ? $dialogUrl : $executionUrl,
+        return [
+            'options' => $this->createOptions($operation, $actionData, $actionContext),
+            'data' => $this->createData($operation, $actionData)
         ];
-
-        $data = [];
-
-        $this->addOption($options, $frontendOptions, 'confirmation');
-        $this->addOption($data, $buttonOptions, 'page_component_module');
-        $this->addOption($data, $buttonOptions, 'page_component_options');
-
-        if (!empty($buttonOptions['data'])) {
-            $data = array_merge($data, $buttonOptions['data']);
-        }
-
-        return ['options' => $options, 'data' => $data];
     }
 
     /**
@@ -122,11 +81,11 @@ class OptionsHelper
      */
     protected function resolveValues(ActionData $data, array $options)
     {
-        foreach ($options as $key => $value) {
+        foreach ($options as &$value) {
             if (is_array($value)) {
-                $options[$key] = $this->resolveValues($data, $value);
+                $value = $this->resolveValues($data, $value);
             } else {
-                $options[$key] = $this->contextAccessor->getValue($data, $value);
+                $value = $this->contextAccessor->getValue($data, $value);
             }
         }
 
@@ -134,7 +93,7 @@ class OptionsHelper
     }
 
     /**
-     * @param aray $options
+     * @param array $options
      * @param array $source
      * @param string $sourceKey
      */
@@ -145,5 +104,62 @@ class OptionsHelper
         if (!empty($source[$sourceKey])) {
             $options[$optionsKey] = $source[$sourceKey];
         }
+    }
+
+    /**
+     * @param Operation $operation
+     * @param ActionData $actionData
+     * @param array $actionContext
+     * @return array
+     */
+    protected function createOptions(Operation $operation, ActionData $actionData, array $actionContext)
+    {
+        $actionContext = array_merge($actionContext, ['operationName' => $operation->getName()]);
+
+        $executionUrl = $this->applicationsUrlHelper->getExecutionUrl($actionContext);
+        $dialogUrl = $this->applicationsUrlHelper->getDialogUrl($actionContext);
+
+        $frontendOptions = $this->resolveOptions($actionData, $operation->getDefinition()->getFrontendOptions());
+
+        $title = isset($frontendOptions['title']) ? $frontendOptions['title'] : $operation->getDefinition()->getLabel();
+
+        $options = [
+            'hasDialog' => $operation->hasForm(),
+            'showDialog' => !empty($frontendOptions['show_dialog']),
+            'dialogOptions' => [
+                'title' => $this->translator->trans($title),
+                'dialogOptions' => !empty($frontendOptions['options']) ? $frontendOptions['options'] : []
+            ],
+            'executionUrl' => $executionUrl,
+            'dialogUrl' => $dialogUrl,
+            'url' => $operation->hasForm() ? $dialogUrl : $executionUrl,
+        ];
+
+        $this->addOption($options, $frontendOptions, 'confirmation');
+
+        return $options;
+    }
+
+    /**
+     * @param Operation $operation
+     * @param ActionData $actionData
+     * @return array
+     */
+    protected function createData(Operation $operation, ActionData $actionData)
+    {
+        $buttonOptions = $this->resolveOptions(
+            $actionData,
+            $operation->getDefinition()->getButtonOptions()
+        );
+
+        $data = [];
+        $this->addOption($data, $buttonOptions, 'page_component_module');
+        $this->addOption($data, $buttonOptions, 'page_component_options');
+
+        if (!empty($buttonOptions['data'])) {
+            $data = array_merge($data, $buttonOptions['data']);
+        }
+
+        return $data;
     }
 }

@@ -43,7 +43,7 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     'test' => [
-                        'arguments' => [],
+                        'parameters' => [],
                         'conditions' => [],
                         'actions' => []
                     ]
@@ -53,7 +53,7 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                 'config' => [
                     'test' => [
                         'acl_resource' => ['EDIT', new \stdClass()],
-                        'arguments' => [
+                        'parameters' => [
                             'arg1' => [
                                 'type' => 'string',
                                 'message' => 'Exception message',
@@ -73,7 +73,7 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                 'expected' => [
                     'test' => [
                         'acl_resource' => ['EDIT', new \stdClass()],
-                        'arguments' => [
+                        'parameters' => [
                             'arg1' => [
                                 'type' => 'string',
                                 'message' => 'Exception message',
@@ -124,72 +124,72 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'Invalid type for path "action_groups.group1". Expected array, but got string'
             ],
-            'incorrect action_groups[arguments]' => [
+            'incorrect action_groups[parameters]' => [
                 'input' => [
                     'group1' => [
-                        'arguments' => 'not array value'
+                        'parameters' => 'not array value'
                     ]
                 ],
-                'message' => 'Invalid type for path "action_groups.group1.arguments". Expected array, but got string'
+                'message' => 'Invalid type for path "action_groups.group1.parameters". Expected array, but got string'
             ],
-            'incorrect array action_groups[arguments]' => [
+            'incorrect array action_groups[parameters]' => [
                 'input' => [
                     'group1' => [
-                        'arguments' => ['not array value']
+                        'parameters' => ['not array value']
                     ]
                 ],
-                'message' => 'Invalid type for path "action_groups.group1.arguments.0". Expected array, but got string'
+                'message' => 'Invalid type for path "action_groups.group1.parameters.0". Expected array, but got string'
             ],
-            'incorrect action_groups[arguments][type]' => [
+            'incorrect action_groups[parameters][type]' => [
                 'input' => [
                     'group1' => [
-                        'arguments' => [
+                        'parameters' => [
                             'arg1' => [
                                 'type' => []
                             ]
                         ]
                     ]
                 ],
-                'message' => 'Invalid type for path "action_groups.group1.arguments.arg1.type". ' .
+                'message' => 'Invalid type for path "action_groups.group1.parameters.arg1.type". ' .
                     'Expected scalar, but got array'
             ],
-            'incorrect action_groups[arguments][message]' => [
+            'incorrect action_groups[parameters][message]' => [
                 'input' => [
                     'group1' => [
-                        'arguments' => [
+                        'parameters' => [
                             'arg1' => [
                                 'message' => []
                             ]
                         ]
                     ]
                 ],
-                'message' => 'Invalid type for path "action_groups.group1.arguments.arg1.message". ' .
+                'message' => 'Invalid type for path "action_groups.group1.parameters.arg1.message". ' .
                     'Expected scalar, but got array'
             ],
-            'incorrect action_groups[arguments][default]' => [
+            'incorrect action_groups[parameters][default]' => [
                 'input' => [
                     'group1' => [
-                        'arguments' => [
+                        'parameters' => [
                             'arg1' => [
                                 'default' => []
                             ]
                         ]
                     ]
                 ],
-                'message' => 'Invalid type for path "action_groups.group1.arguments.arg1.default". ' .
+                'message' => 'Invalid type for path "action_groups.group1.parameters.arg1.default". ' .
                     'Expected scalar, but got array'
             ],
-            'incorrect action_groups[arguments][required]' => [
+            'incorrect action_groups[parameters][required]' => [
                 'input' => [
                     'group1' => [
-                        'arguments' => [
+                        'parameters' => [
                             'arg1' => [
                                 'required' => 'bool'
                             ]
                         ]
                     ]
                 ],
-                'message' => 'Invalid type for path "action_groups.group1.arguments.arg1.required". ' .
+                'message' => 'Invalid type for path "action_groups.group1.parameters.arg1.required". ' .
                     'Expected boolean, but got string'
             ],
             'incorrect action_groups[conditions]' => [

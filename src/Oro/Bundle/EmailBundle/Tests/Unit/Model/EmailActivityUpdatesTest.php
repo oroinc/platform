@@ -6,9 +6,8 @@ use JMS\JobQueueBundle\Entity\Job;
 
 use Oro\Bundle\EmailBundle\Model\EmailActivityUpdates;
 use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwner;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmail;
-use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestThread;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwnerWithoutEmail as SecondEmailOwner;
+use Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\EmailAddress;
 
 class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
 {
@@ -31,15 +30,12 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
         $emailOwnersProvider->expects($this->any())
             ->method('hasEmailsByOwnerEntity')
             ->will($this->returnCallback(function ($entity) {
-                return ($entity instanceof TestEmailOwner || $entity instanceof TestThread) &&
+                return ($entity instanceof TestEmailOwner || $entity instanceof SecondEmailOwner) &&
                     in_array($entity->getId(), $this->fixtures['ownersWithEmails']);
             }));
 
-        $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
-
         $this->emailActivityUpdates = new EmailActivityUpdates(
-            $emailOwnersProvider,
-            new DoctrineHelper($registry)
+            $emailOwnersProvider
         );
     }
 
@@ -48,7 +44,7 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
      */
     public function test(array $entities, array $expectedJobs)
     {
-        $this->emailActivityUpdates->processCreatedEntities($entities);
+        $this->emailActivityUpdates->processUpdatedEmailAddresses($entities);
         $actualJobs = $this->emailActivityUpdates->createJobs();
         $this->assertCount(count($actualJobs), $expectedJobs);
         array_map([$this, 'assertJobs'], $expectedJobs, $actualJobs);
@@ -57,21 +53,19 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
     public function testProvider()
     {
         return [
-            '0 email owners with emails' => [
-                [
-                    new TestEmailOwner(3),
-                    new TestEmail(4),
-                    new TestEmail(2),
-                ],
+            '0 email addresses' => [
+                [],
                 [],
             ],
-            '2 email owners with emails' => [
+            '3 email email addresses with 2 owners' => [
                 [
-                    new TestEmailOwner(1),
-                    new TestEmailOwner(2),
-                    new TestEmailOwner(3),
-                    new TestEmail(4),
-                    new TestEmail(2),
+                    (new EmailAddress())
+                        ->setOwner(new TestEmailOwner(1)),
+                    (new EmailAddress())
+                        ->setOwner(new TestEmailOwner(2)),
+                    (new EmailAddress())
+                        ->setOwner(new TestEmailOwner(3)),
+                    (new EmailAddress()),
                 ],
                 [
                     new Job(
@@ -84,14 +78,16 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
                     ),
                 ],
             ],
-            '3 email owners of 2 types with emails' => [
+            '4 email owners of 2 types of owners with emails' => [
                 [
-                    new TestEmailOwner(1),
-                    new TestEmailOwner(2),
-                    new TestEmailOwner(3),
-                    new TestThread(1),
-                    new TestEmail(4),
-                    new TestEmail(2),
+                    (new EmailAddress())
+                        ->setOwner(new TestEmailOwner(1)),
+                    (new EmailAddress())
+                        ->setOwner(new TestEmailOwner(2)),
+                    (new EmailAddress())
+                        ->setOwner(new TestEmailOwner(3)),
+                    (new EmailAddress())
+                        ->setOwner(new SecondEmailOwner(1)),
                 ],
                 [
                     new Job(
@@ -105,7 +101,7 @@ class EmailActivityUpdatesTest extends \PHPUnit_Framework_TestCase
                     new Job(
                         'oro:email:update-email-owner-associations',
                         [
-                            'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestThread',
+                            'Oro\Bundle\EmailBundle\Tests\Unit\Entity\TestFixtures\TestEmailOwnerWithoutEmail',
                             1,
                         ]
                     ),

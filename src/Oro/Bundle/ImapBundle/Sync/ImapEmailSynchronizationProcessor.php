@@ -481,7 +481,13 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function checkOnOldEmailForMailbox(EmailFolder $folder, Email $email, $mailbox)
     {
-        if ($mailbox && $folder->getSynchronizedAt() > $email->getSentAt()) {
+        /**
+         * @description Will select max of those dates because emails in folder `sent` could have no received date
+         *              or same date.
+         */
+        $dateForCheck = max($email->getReceivedAt(), $email->getSentAt());
+
+        if ($mailbox && $folder->getSynchronizedAt() > $dateForCheck) {
             $this->logger->info(
                 sprintf(
                     'Skip "%s" (UID: %d) email, because it was sent earlier than the last synchronization was done',
@@ -676,8 +682,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emails = $this->manager->getEmails($searchQuery);
         } else {
             $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
+
             $this->logger->info(sprintf('Previous max email UID "%s"', $lastUid));
-            $emails = $this->manager->getEmailsUidBased(sprintf('%s:*', ++$lastUid));
+
+            $emails = $this->manager->getEmailsUidBased($lastUid);
         }
 
         return $emails;

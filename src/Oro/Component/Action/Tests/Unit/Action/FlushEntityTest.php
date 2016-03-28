@@ -50,28 +50,16 @@ class FlushEntityTest extends \PHPUnit_Framework_TestCase
      * @param array $data
      * @param array $options
      * @param mixed $entity
+     * @param bool $flushException
      */
-    public function testExecute(array $data, array $options, $entity)
+    public function testExecute(array $data, array $options, $entity, $flushException = false)
     {
         $context = new ActionData($data);
+        $this->assertEntityManagerCalled($entity, $flushException);
 
-        /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject $em */
-        $em = $this->getMockBuilder('Doctrine\ORM\EntityManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $em->expects($this->once())
-            ->method('persist')
-            ->with($entity);
-
-        $em->expects($this->once())
-            ->method('flush')
-            ->with($entity);
-
-        $this->registry->expects($this->once())
-            ->method('getManagerForClass')
-            ->with(ClassUtils::getClass($entity))
-            ->willReturn($em);
+        if ($flushException) {
+            $this->setExpectedException('\Exception', 'Flush exception');
+        }
 
         $this->action->initialize($options);
         $this->action->execute($context);
@@ -100,6 +88,39 @@ class FlushEntityTest extends \PHPUnit_Framework_TestCase
                 ['entity' => new PropertyPath('attribute')],
                 $entity
             ],
+            [
+                ['attribute' => $entity],
+                ['entity' => new PropertyPath('attribute')],
+                $entity,
+                true
+            ],
         ];
+    }
+
+    /**
+     * @param mixed $entity
+     * @param bool $throwException
+     */
+    protected function assertEntityManagerCalled($entity, $throwException = false)
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager $entityManager */
+        $entityManager = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $entityManager->expects($this->once())->method('beginTransaction');
+
+        if ($throwException) {
+            $entityManager->expects($this->once())
+                ->method('flush')
+                ->willThrowException(new \Exception('Flush exception'));
+            $entityManager->expects($this->once())->method('rollback');
+        } else {
+            $entityManager->expects($this->once())->method('persist');
+            $entityManager->expects($this->once())->method('flush');
+            $entityManager->expects($this->once())->method('commit');
+        }
+
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
+            ->with(ClassUtils::getClass($entity))
+            ->willReturn($entityManager);
     }
 }
