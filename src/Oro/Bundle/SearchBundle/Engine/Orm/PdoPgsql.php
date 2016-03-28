@@ -97,7 +97,7 @@ class PdoPgsql extends BaseDriver
      */
     protected function setFieldValueStringParameter(QueryBuilder $qb, $index, $fieldValue, $searchCondition)
     {
-        $notContains = !in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS]);
+        $notContains = !in_array($searchCondition, [Query::OPERATOR_CONTAINS, Query::OPERATOR_EQUALS], true);
         $searchArray = explode(Query::DELIMITER, $fieldValue);
 
         foreach ($searchArray as $key => $string) {
