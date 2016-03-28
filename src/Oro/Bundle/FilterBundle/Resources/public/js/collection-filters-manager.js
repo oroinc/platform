@@ -154,7 +154,8 @@ define([
                 var shortName = '__' + name;
                 var filterState;
 
-                // Reset to initial state, should be removed after 
+                //Reset to initial state,
+                //todo: should be removed after complete story about filter states
                 if (filter.defaultEnabled === false && filter.enabled === true) {
                     this.disableFilter(filter);
                 }
