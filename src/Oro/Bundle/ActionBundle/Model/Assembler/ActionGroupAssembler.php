@@ -4,7 +4,6 @@ namespace Oro\Bundle\ActionBundle\Model\Assembler;
 
 use Oro\Bundle\ActionBundle\Model\ActionGroup;
 use Oro\Bundle\ActionBundle\Model\ActionGroupDefinition;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
@@ -20,25 +19,25 @@ class ActionGroupAssembler extends AbstractAssembler
     /** @var ParameterAssembler */
     private $parameterAssembler;
 
-    /** @var DoctrineHelper */
-    private $doctrineHelper;
+    /**@var ActionGroup\ParametersResolver */
+    private $parametersResolver;
 
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param ParameterAssembler $parameterAssembler
-     * @param DoctrineHelper $doctrineHelper
+     * @param ActionGroup\ParametersResolver $parametersResolver
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
         ParameterAssembler $parameterAssembler,
-        DoctrineHelper $doctrineHelper
+        ActionGroup\ParametersResolver $parametersResolver
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->parameterAssembler = $parameterAssembler;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->parametersResolver = $parametersResolver;
     }
 
     /**
@@ -54,6 +53,7 @@ class ActionGroupAssembler extends AbstractAssembler
                 $this->actionFactory,
                 $this->conditionFactory,
                 $this->parameterAssembler,
+                $this->parametersResolver,
                 $this->assembleDefinition($actionGroupName, $options)
             );
         }
@@ -87,58 +87,13 @@ class ActionGroupAssembler extends AbstractAssembler
      */
     protected function addConditions(ActionGroupDefinition $definition, array $options)
     {
-        $conditions = array_merge(
-            $this->getAclConditions($this->getOption($options, 'acl_resource')),
-            $this->getParametersConditions($this->getOption($options, 'parameters', []))
-        );
+        $conditions = $this->getAclConditions($this->getOption($options, 'acl_resource'));
 
         if ($currentConditions = $definition->getConditions()) {
             $conditions = array_merge($conditions, [$currentConditions]);
         }
 
         $definition->setConditions($conditions ? ['@and' => $conditions] : []);
-    }
-
-    /**
-     * @param array $parameters
-     * @return array
-     */
-    protected function getParametersConditions(array $parameters)
-    {
-        if (!$parameters) {
-            return [];
-        }
-
-        $conditions = [];
-
-        foreach ($parameters as $name => $parameter) {
-            $action = '$.' . $name;
-            $message = !empty($parameter['message']) ? $parameter['message'] . ': ' : '';
-
-            if (!empty($parameter['required'])) {
-                $conditions[] = [
-                    '@has_value' => [
-                        'parameters' => [$action],
-                        'message' => sprintf('%s%s is required', $message, $action),
-                    ]
-                ];
-            }
-
-            if (!empty($parameter['type'])) {
-                $conditions[] = [
-                    '@type' => [
-                        'parameters' => [$action, $parameter['type']],
-                        'message' => sprintf(
-                            '%s%s must be of type "{{ type }}", "{{ value }}" given',
-                            $message,
-                            $action
-                        ),
-                    ]
-                ];
-            }
-        }
-
-        return $conditions;
     }
 
     /**

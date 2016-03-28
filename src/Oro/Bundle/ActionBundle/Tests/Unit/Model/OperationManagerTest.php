@@ -255,8 +255,8 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     {
         if (!$operation || !$isAvailable) {
             $this->setExpectedException(
-                '\Oro\Bundle\ActionBundle\Exception\ActionNotFoundException',
-                sprintf('Action with name "%s" not found', $operationName)
+                '\Oro\Bundle\ActionBundle\Exception\OperationNotFoundException',
+                sprintf('Operation with name "%s" not found', $operationName)
             );
         }
 
@@ -412,8 +412,8 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @expectedException \Oro\Bundle\ActionBundle\Exception\ActionNotFoundException
-     * @expectedExceptionMessage Action with name "test_operation" not found
+     * @expectedException \Oro\Bundle\ActionBundle\Exception\OperationNotFoundException
+     * @expectedExceptionMessage Operation with name "test_operation" not found
      */
     public function testExecuteByContextException()
     {

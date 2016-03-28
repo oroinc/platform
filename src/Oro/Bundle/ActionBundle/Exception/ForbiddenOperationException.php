@@ -2,6 +2,6 @@
 
 namespace Oro\Bundle\ActionBundle\Exception;
 
-class ForbiddenOperationException extends \Exception
+class ForbiddenOperationException extends ForbiddenExecutionException
 {
 }

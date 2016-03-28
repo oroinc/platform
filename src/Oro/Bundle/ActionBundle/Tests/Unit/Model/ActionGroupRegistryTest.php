@@ -3,10 +3,10 @@
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
 use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
+use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\ActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory;
@@ -15,6 +15,9 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
 {
     /** @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject */
     protected $configurationProvider;
+
+    /** @var ActionGroupAssembler */
+    protected $assembler;
 
     /** @var ActionGroupRegistry */
     protected $registry;
@@ -34,21 +37,21 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ParametersResolver $mockParametersResolver */
+        $mockParametersResolver = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver')
             ->disableOriginalConstructor()
             ->getMock();
 
-        $assembler = new ActionGroupAssembler(
+        $this->assembler = new ActionGroupAssembler(
             $actionFactory,
             $conditionFactory,
             new ParameterAssembler(),
-            $doctrineHelper
+            $mockParametersResolver
         );
 
         $this->registry = new ActionGroupRegistry(
             $this->configurationProvider,
-            $assembler
+            $this->assembler
         );
     }
 
@@ -116,8 +119,8 @@ class ActionGroupRegistryTest extends \PHPUnit_Framework_TestCase
             ->willReturn([]);
 
         $this->setExpectedException(
-            'Oro\Bundle\ActionBundle\Exception\ActionNotFoundException',
-            'Action with name "not exists" not found'
+            'Oro\Bundle\ActionBundle\Exception\ActionGroupNotFoundException',
+            'ActionGroup with name "not exists" not found'
         );
 
         $this->registry->get('not exists');

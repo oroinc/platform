@@ -16,7 +16,7 @@ use Symfony\Component\HttpFoundation\Response;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Model\ActionData;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
-use Oro\Bundle\ActionBundle\Exception\ActionNotFoundException;
+use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 
@@ -41,7 +41,7 @@ class OperationController extends FOSRestController
 
         try {
             $this->getOperationManager()->execute($operationName, $data, $errors);
-        } catch (ActionNotFoundException $e) {
+        } catch (OperationNotFoundException $e) {
             return $this->handleResponse($data, Codes::HTTP_NOT_FOUND, $e->getMessage(), $errors);
         } catch (ForbiddenOperationException $e) {
             return $this->handleResponse($data, Codes::HTTP_FORBIDDEN, $e->getMessage(), $errors);

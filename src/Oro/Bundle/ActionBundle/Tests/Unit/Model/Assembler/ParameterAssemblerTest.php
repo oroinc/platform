@@ -38,15 +38,12 @@ class ParameterAssemblerTest extends \PHPUnit_Framework_TestCase
      */
     public function assembleProvider()
     {
-        $parameter1 = new Parameter();
-        $parameter1->setName('minimum_name');
+        $parameter1 = new Parameter('minimum_name');
 
-        $parameter2 = new Parameter();
+        $parameter2 = new Parameter('maximum_name');
         $parameter2
-            ->setName('maximum_name')
             ->setType('type1')
             ->setDefault(['default value'])
-            ->setRequired(true)
             ->setMessage('Please provide parameter');
 
         return [

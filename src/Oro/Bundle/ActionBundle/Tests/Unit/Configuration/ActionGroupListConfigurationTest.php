@@ -57,8 +57,7 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                             'arg1' => [
                                 'type' => 'string',
                                 'message' => 'Exception message',
-                                'default' => 'test string',
-                                'required' => false
+                                'default' => 'test string'
                             ],
                             'arg2' => []
                         ],
@@ -77,12 +76,9 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                             'arg1' => [
                                 'type' => 'string',
                                 'message' => 'Exception message',
-                                'default' => 'test string',
-                                'required' => false
+                                'default' => 'test string'
                             ],
-                            'arg2' => [
-                                'required' => true
-                            ]
+                            'arg2' => []
                         ],
                         'conditions' => [
                             '@equal' => ['a1', 'b1']
@@ -178,19 +174,6 @@ class ActionGroupListConfigurationTest extends \PHPUnit_Framework_TestCase
                 ],
                 'message' => 'Invalid type for path "action_groups.group1.parameters.arg1.default". ' .
                     'Expected scalar, but got array'
-            ],
-            'incorrect action_groups[parameters][required]' => [
-                'input' => [
-                    'group1' => [
-                        'parameters' => [
-                            'arg1' => [
-                                'required' => 'bool'
-                            ]
-                        ]
-                    ]
-                ],
-                'message' => 'Invalid type for path "action_groups.group1.parameters.arg1.required". ' .
-                    'Expected boolean, but got string'
             ],
             'incorrect action_groups[conditions]' => [
                 'input' => [

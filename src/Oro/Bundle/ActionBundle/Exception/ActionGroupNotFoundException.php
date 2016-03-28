@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ActionBundle\Exception;
 
-class ActionNotFoundException extends \Exception
+class ActionGroupNotFoundException extends \RuntimeException
 {
     /**
      * @param string $name
      */
     public function __construct($name)
     {
-        parent::__construct(sprintf('Action with name "%s" not found', $name));
+        parent::__construct(sprintf('ActionGroup with name "%s" not found', $name));
     }
 }
