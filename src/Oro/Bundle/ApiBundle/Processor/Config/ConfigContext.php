@@ -18,6 +18,9 @@ class ConfigContext extends ApiContext
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
+    /** the name of the action for which the configuration is built */
+    const TARGET_ACTION = 'targetAction';
+
     /** the maximum number of related entities that can be retrieved */
     const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
 
@@ -54,6 +57,30 @@ class ConfigContext extends ApiContext
     }
 
     /**
+     * Gets the name of the action for which the configuration is built
+     *
+     * @return string|null
+     */
+    public function getTargetAction()
+    {
+        return $this->get(self::TARGET_ACTION);
+    }
+
+    /**
+     * Sets the name of the action for which the configuration is built
+     *
+     * @param string|null $action
+     */
+    public function setTargetAction($action)
+    {
+        if ($action) {
+            $this->set(self::TARGET_ACTION, $action);
+        } else {
+            $this->remove(self::TARGET_ACTION);
+        }
+    }
+
+    /**
      * Gets the maximum number of related entities that can be retrieved
      *
      * @return int|null
@@ -87,6 +114,26 @@ class ConfigContext extends ApiContext
     public function hasExtra($extraName)
     {
         return in_array($extraName, $this->get(self::EXTRA), true);
+    }
+
+    /**
+     * Gets a request for additional configuration data.
+     *
+     * @param string $extraName
+     *
+     * @return ConfigExtraInterface|null
+     */
+    public function getExtra($extraName)
+    {
+        $result = null;
+        foreach ($this->extras as $extra) {
+            if ($extra->getName() === $extraName) {
+                $result = $extra;
+                break;
+            }
+        }
+
+        return $result;
     }
 
     /**
@@ -129,11 +176,11 @@ class ConfigContext extends ApiContext
      *
      * @return ConfigExtraInterface[]
      */
-    public function getInheritableExtras()
+    public function getPropagableExtras()
     {
         $result = [];
         foreach ($this->extras as $extra) {
-            if ($extra->isInheritable()) {
+            if ($extra->isPropagable()) {
                 $result[] = $extra;
             }
         }

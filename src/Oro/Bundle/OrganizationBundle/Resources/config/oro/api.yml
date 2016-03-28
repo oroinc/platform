@@ -1,4 +1,11 @@
 oro_api:
     entities:
-        Oro\Bundle\OrganizationBundle\Entity\BusinessUnit: ~
-        Oro\Bundle\OrganizationBundle\Entity\Organization: ~
+        Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
+            delete_handler: oro_organization.business_unit.handler.delete
+            actions:
+                delete:
+                    exclude: false # set manually because this entity is marked as a dictionary
+
+        Oro\Bundle\OrganizationBundle\Entity\Organization:
+            actions:
+                delete: false

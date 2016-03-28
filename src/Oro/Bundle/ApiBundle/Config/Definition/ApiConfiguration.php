@@ -98,13 +98,13 @@ class ApiConfiguration implements ConfigurationInterface
     {
         $parentNode
             ->arrayNode(self::EXCLUSIONS_SECTION)
-            ->prototype('array')
-            ->children()
-            ->scalarNode(self::ENTITY_ATTRIBUTE)
-            ->isRequired()
-            ->cannotBeEmpty()
-            ->end()
-            ->scalarNode(self::FIELD_ATTRIBUTE)->end();
+                ->prototype('array')
+                ->children()
+                    ->scalarNode(self::ENTITY_ATTRIBUTE)
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->scalarNode(self::FIELD_ATTRIBUTE)->end();
     }
 
     /**
@@ -125,9 +125,9 @@ class ApiConfiguration implements ConfigurationInterface
     ) {
         $node = $parentNode
             ->arrayNode($entityConfiguration->getSectionName())
-            ->useAttributeAsKey('name')
-            ->prototype('array')
-            ->children();
+                ->useAttributeAsKey('name')
+                ->prototype('array')
+                ->children();
         $entityConfiguration->configure($node, $configureCallbacks, $preProcessCallbacks, $postProcessCallbacks);
 
         return $node;

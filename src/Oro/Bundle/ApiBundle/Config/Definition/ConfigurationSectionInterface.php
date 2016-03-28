@@ -20,4 +20,13 @@ interface ConfigurationSectionInterface
         array $preProcessCallbacks,
         array $postProcessCallbacks
     );
+
+    /**
+     * Checks if section can be added to the given configuration section
+     *
+     * @param string $section Configuration section, f.e. entities.entity, relations.entity etc
+     *
+     * @return bool
+     */
+    public function isApplicable($section);
 }

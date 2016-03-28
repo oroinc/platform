@@ -60,7 +60,7 @@ class CompleteDefinitionOfAssociationsByConfig implements ProcessorInterface
             $entityClass,
             $context->getVersion(),
             $context->getRequestType(),
-            $context->getInheritableExtras()
+            $context->getPropagableExtras()
         );
     }
 

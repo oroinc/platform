@@ -61,7 +61,9 @@ define(function(require) {
             _.extend(this, options || {});
 
             this.$el.data('inputWidget', this);
-            this.widgetFunction = _.bind(this.$el[this.widgetFunctionName], this.$el);
+            if (!this.widgetFunction) {
+                this.widgetFunction = _.bind(this.$el[this.widgetFunctionName], this.$el);
+            }
 
             if (this.containerClassSuffix) {
                 this.containerClass += '-' + this.containerClassSuffix;

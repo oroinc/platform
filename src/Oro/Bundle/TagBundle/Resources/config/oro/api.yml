@@ -1,3 +1,6 @@
 oro_api:
     entities:
-        Oro\Bundle\TagBundle\Entity\Tag: ~
+        Oro\Bundle\TagBundle\Entity\Tag:
+            actions:
+                delete:
+                    exclude: false # set manually because this entity is marked as a dictionary

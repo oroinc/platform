@@ -138,8 +138,8 @@ services:
     oro_api.get_list.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - @security.authorization_checker
             - @oro_api.doctrine_helper
+            - @oro_security.security_facade
             - VIEW
         tags:
             - { name: oro.api.processor, action: get_list, group: security_check, priority: 10 }
@@ -196,7 +196,9 @@ services:
     oro_api.get_list.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
         arguments:
+            - @oro_api.doctrine_helper
             - @oro_security.acl_helper
+            - @oro_security.acl.annotation_provider
             - VIEW
         tags:
             - { name: oro.api.processor, action: get_list, group: build_query, priority: -90 }
