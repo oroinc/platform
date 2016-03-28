@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Action;
 use Oro\Bundle\ActionBundle\Model\ActionManager;
@@ -19,6 +20,11 @@ class ActionsDataProvider implements DataProviderInterface
     protected $actionManager;
 
     /**
+     * @var ContextHelper
+     */
+    protected $contextHelper;
+
+    /**
      * @var RestrictHelper
      */
     protected $restrictHelper;
@@ -29,16 +35,24 @@ class ActionsDataProvider implements DataProviderInterface
     protected $translator;
 
     /**
+     * @var ContextInterface
+     */
+    protected $context;
+
+    /**
      * @param ActionManager $actionManager
+     * @param ContextHelper $contextHelper
      * @param RestrictHelper $restrictHelper
      * @param TranslatorInterface $translator
      */
     public function __construct(
         ActionManager $actionManager,
+        ContextHelper $contextHelper,
         RestrictHelper $restrictHelper,
         TranslatorInterface $translator
     ) {
         $this->actionManager = $actionManager;
+        $this->contextHelper = $contextHelper;
         $this->restrictHelper = $restrictHelper;
         $this->translator = $translator;
     }
@@ -93,7 +107,12 @@ class ActionsDataProvider implements DataProviderInterface
      */
     public function getByGroup($groups = null)
     {
-        $actions = $this->restrictHelper->restrictActionsByGroup($this->actionManager->getActions(), $groups);
+        if (!$this->context->data()->has('entity')) {
+            return [];
+        }
+
+        $context = $this->contextHelper->getActionParameters(['entity' => $this->context->data()->get('entity')]);
+        $actions = $this->restrictHelper->restrictActionsByGroup($this->actionManager->getActions($context), $groups);
 
         return $this->getPreparedData($actions);
     }
@@ -138,6 +157,8 @@ class ActionsDataProvider implements DataProviderInterface
      */
     public function getData(ContextInterface $context)
     {
+        $this->context = $context;
+
         return $this;
     }
 }

@@ -181,6 +181,7 @@ services:
         class: %oro_action.layout.data_provider.actions_data_rpovider.class%
         arguments:
             - @oro_action.manager
+            - @oro_action.helper.context
             - @oro_action.helper.restrict
             - @translator
         tags:
