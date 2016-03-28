@@ -4,10 +4,6 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\Tools;
 
 class TestEntity
 {
-    public function getId()
-    {
-    }
-
     public function getName()
     {
     }
@@ -16,23 +12,19 @@ class TestEntity
     {
     }
 
-    public function getDescription()
+    public function addName()
     {
     }
 
-    public function setDescription()
+    public function isName()
     {
     }
 
-    public function getComplex()
+    public function setDefaultName()
     {
     }
 
-    public function setSomeOne()
-    {
-    }
-
-    public function addSomeOne()
+    public function addSomeField()
     {
     }
 }

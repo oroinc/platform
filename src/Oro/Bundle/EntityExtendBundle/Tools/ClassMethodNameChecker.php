@@ -4,78 +4,39 @@ namespace Oro\Bundle\EntityExtendBundle\Tools;
 
 class ClassMethodNameChecker
 {
+    public static $getters         = ['get', 'is', 'has'];
+    public static $setters         = ['set'];
+    public static $relationMethods = ['remove', 'setDefault', 'add'];
+
     /** @var \ReflectionClass[] */
     protected $reflectionCache = [];
 
-    /** @var array */
-    protected $gettersPrefix = ['get', 'is', 'has'];
-
-    /** @var array */
-    protected $settersPrefix = ['set'];
-
-    /** @var array */
-    protected $relationPrefix = ['remove', 'setDefault', 'add'];
-
-    /**
-     * @param string $className
-     * @param string $property
-     *
-     * @return string
-     */
-    public function getGetters($className, $property)
-    {
-        return $this->checkMethod($property, $className, $this->gettersPrefix);
-    }
-
-    /**
-     * @param string $className
-     * @param string $property
-     *
-     * @return string
-     */
-    public function getSetters($className, $property)
-    {
-        return $this->checkMethod($property, $className, $this->settersPrefix);
-    }
-
-    /**
-     * @param string $className
-     * @param string $property
-     *
-     * @return string
-     */
-    public function getRelationMethods($className, $property)
-    {
-        return $this->checkMethod($property, $className, $this->relationPrefix);
-    }
-
     /**
      * @param string $property
      * @param string $className
-     * @param array  $searching
+     * @param array  $prefixes
      *
      * @return string
      */
-    protected function checkMethod($property, $className, array $searching)
+    public function getMethods($property, $className, array $prefixes)
     {
         $suffix     = $this->camelize($property);
         $reflection = $this->getReflectionClass($className);
-
-        foreach ($searching as $prefix) {
+        $result     = [];
+        foreach ($prefixes as $prefix) {
             if ($reflection->hasMethod($prefix . $suffix)) {
-                return $prefix . $suffix;
+                $result[] = $prefix . $suffix;
             }
         }
 
-        return '';
+        return $result;
     }
 
     /**
-     * Camelizes a given string.
      *
      * @param string $string Some string
      *
-     * @return string The camelized version of the string
+     * @return string
      */
     protected function camelize($string)
     {
