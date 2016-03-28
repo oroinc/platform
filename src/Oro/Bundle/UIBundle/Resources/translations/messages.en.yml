@@ -110,4 +110,6 @@ oro:
             404: 'The page you requested could not be found. Please make sure the path you used is correct.'
             403: "You don't have permission to access this page."
             maintenance: 'The System is currently under maintenance and should be available in a few minutes.'
+        filter:
+            by: Filter By
 'Click to go back': 'Click to go back'

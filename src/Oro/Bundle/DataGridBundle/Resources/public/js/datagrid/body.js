@@ -25,6 +25,11 @@ define([
         /** @property {String} */
         rowClassName: undefined,
 
+        themeOptions: {
+            optionPrefix: 'body',
+            className: 'grid-body'
+        },
+
         /**
          * @inheritDoc
          */
@@ -39,7 +44,30 @@ define([
                 this.rowClassName = opts.rowClassName;
             }
 
-            Body.__super__.initialize.apply(this, arguments);
+            this.backgridInitialize(opts);
+        },
+
+        /**
+         * Create this function instead of original Body.__super__.initialize to customize options for subviews
+         *
+         * @param {Object} options
+         */
+        backgridInitialize: function(options) {
+            this.columns = options.columns;
+
+            this.row = options.row || Row;
+            this.createRows();
+
+            this.emptyText = options.emptyText;
+            this._unshiftEmptyRowMayBe();
+
+            var collection = this.collection;
+            this.listenTo(collection, 'add', this.insertRow);
+            this.listenTo(collection, 'remove', this.removeRow);
+            this.listenTo(collection, 'sort', this.refresh);
+            this.listenTo(collection, 'reset', this.refresh);
+            this.listenTo(collection, 'backgrid:sort', this.sort);
+            this.listenTo(collection, 'backgrid:edited', this.moveToNextCell);
 
             this._listenToRowsEvents(this.rows);
         },
@@ -59,6 +87,17 @@ define([
             Body.__super__.dispose.call(this);
         },
 
+        createRows: function() {
+            this.rows = this.collection.map(function(model) {
+                var rowOptions = {
+                    columns: this.columns,
+                    model: model
+                };
+                this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
+                return new this.row(rowOptions);
+            }, this);
+        },
+
         /**
          * @inheritDoc
          */
@@ -69,8 +108,26 @@ define([
                 row.dispose();
             });
             this.rows = [];
-            Body.__super__.refresh.apply(this, arguments);
+            this.backgridRefresh();
             this._listenToRowsEvents(this.rows);
+            return this;
+        },
+
+        /**
+         * Create this function instead of original Body.__super__.refresh to customize options for subviews
+         */
+        backgridRefresh: function() {
+            for (var i = 0; i < this.rows.length; i++) {
+                this.rows[i].remove();
+            }
+
+            this.createRows();
+            this._unshiftEmptyRowMayBe();
+
+            this.render();
+
+            this.collection.trigger('backgrid:refresh', this);
+
             return this;
         },
 
