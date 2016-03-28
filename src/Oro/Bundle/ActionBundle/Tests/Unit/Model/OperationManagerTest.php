@@ -11,7 +11,6 @@ use Oro\Bundle\ActionBundle\Model\ActionGroupRegistry;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
-use Oro\Bundle\ActionBundle\Model\OperationActionGroup;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
@@ -660,8 +659,6 @@ class OperationManagerTest extends \PHPUnit_Framework_TestCase
         $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->getMock();
-        $operationActionGroup = new OperationActionGroup();
-        $operationActionGroup->setName('test_actionGroup');
 
         $operation->expects($this->once())->method('isAvailable')->willReturn($isAvailable);
 
