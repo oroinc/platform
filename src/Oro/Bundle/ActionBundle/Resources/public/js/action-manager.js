@@ -149,13 +149,13 @@ define(function(require) {
                     e.stopImmediatePropagation();
                 }
                 this.doRedirect(response.redirectUrl);
-            } else if (response.reloadPage) {
-                this.doPageReload();
             } else if (response.refreshGrid) {
                 _.each(response.refreshGrid, function(gridname) {
                     mediator.trigger('datagrid:doRefresh:' + gridname);
                 });
                 this.doWidgetReload();
+            } else {
+                this.doPageReload();
             }
         },
 
