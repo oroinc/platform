@@ -4,8 +4,9 @@ define([
     'orotranslation/js/translator',
     './pagination-input',
     './page-size',
-    './actions-panel'
-], function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel) {
+    './actions-panel',
+    './sorting/dropdown'
+], function(_, Backbone, __, PaginationInput, PageSize, ActionsPanel, SortingDropdown) {
     'use strict';
 
     var Toolbar;
@@ -29,6 +30,9 @@ define([
         pageSize: PageSize,
 
         /** @property */
+        sortingDropdown: SortingDropdown,
+
+        /** @property */
         actionsPanel: ActionsPanel,
 
         /** @property */
@@ -39,7 +43,8 @@ define([
             pagination: '[data-grid-pagination]',
             pagesize: '[data-grid-pagesize]',
             actionsPanel: '[data-grid-actions-panel]',
-            extraActionsPanel: '[data-grid-extra-actions-panel]'
+            extraActionsPanel: '[data-grid-extra-actions-panel]',
+            sortingDropdown: '[data-grid-sorting]'
         },
 
         /**
@@ -65,6 +70,13 @@ define([
                 actionsPanel: new this.actionsPanel(_.extend({className: ''}, options.actionsPanel)),
                 extraActionsPanel: new this.extraActionsPanel()
             };
+
+            if (options.addSorting) {
+                this.subviews.sortingDropdown = new this.sortingDropdown({
+                    collection: this.collection,
+                    columns: options.columns,
+                });
+            }
 
             if (options.actions) {
                 this.subviews.actionsPanel.setActions(options.actions);
@@ -135,6 +147,10 @@ define([
             this.$(this.selector.pagination).replaceWith($pagination);
             this.$(this.selector.pagesize).append(this.subviews.pageSize.render().$el);
             this.$(this.selector.actionsPanel).append(this.subviews.actionsPanel.render().$el);
+            if (this.subviews.sortingDropdown) {
+                this.$(this.selector.sortingDropdown).append(this.subviews.sortingDropdown.render().$el);
+            }
+
             if (this.subviews.extraActionsPanel.haveActions()) {
                 this.$(this.selector.extraActionsPanel).append(this.subviews.extraActionsPanel.render().$el);
             } else {
