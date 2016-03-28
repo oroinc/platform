@@ -12,9 +12,6 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\ConfigExpression\ExpressionFactory as ConditionFactory;
 
-/**
- * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
- */
 class OperationAssembler extends AbstractAssembler
 {
     /** @var ActionFactory */
@@ -29,9 +26,6 @@ class OperationAssembler extends AbstractAssembler
     /** @var FormOptionsAssembler */
     private $formOptionsAssembler;
 
-    /** @var OperationActionGroupAssembler */
-    private $operationActionGroupAssembler;
-
     /** @var DoctrineHelper */
     private $doctrineHelper;
 
@@ -43,7 +37,6 @@ class OperationAssembler extends AbstractAssembler
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
-     * @param OperationActionGroupAssembler $operationActionGroupAssembler
      * @param DoctrineHelper $doctrineHelper
      */
     public function __construct(
@@ -51,14 +44,12 @@ class OperationAssembler extends AbstractAssembler
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
         FormOptionsAssembler $formOptionsAssembler,
-        OperationActionGroupAssembler $operationActionGroupAssembler,
         DoctrineHelper $doctrineHelper
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->attributeAssembler = $attributeAssembler;
         $this->formOptionsAssembler = $formOptionsAssembler;
-        $this->operationActionGroupAssembler = $operationActionGroupAssembler;
         $this->doctrineHelper = $doctrineHelper;
     }
 
@@ -76,7 +67,6 @@ class OperationAssembler extends AbstractAssembler
                 $this->conditionFactory,
                 $this->attributeAssembler,
                 $this->formOptionsAssembler,
-                $this->operationActionGroupAssembler,
                 $this->assembleDefinition($operationName, $options)
             );
         }
@@ -114,8 +104,11 @@ class OperationAssembler extends AbstractAssembler
             ->setDatagridOptions($this->getOption($options, 'datagrid_options', []))
             ->setAttributes($this->getOption($options, 'attributes', []))
             ->setFormOptions($this->getOption($options, 'form_options', []))
-            ->setPreconditions($this->getOption($options, 'preconditions', []))
             ->setActionGroups($this->getOption($options, 'action_groups', []));
+
+        foreach (OperationDefinition::getAllowedConditions() as $name) {
+            $operationDefinition->setConditions($name, $this->getOption($options, $name, []));
+        }
 
         foreach (OperationDefinition::getAllowedActions() as $name) {
             $operationDefinition->setActions($name, $this->getOption($options, $name, []));
@@ -136,14 +129,14 @@ class OperationAssembler extends AbstractAssembler
             return;
         }
 
-        $definition = $operationDefinition->getPreconditions();
+        $definition = $operationDefinition->getConditions(OperationDefinition::PRECONDITIONS);
 
         $newDefinition = ['@and' => [['@acl_granted' => $aclResource]]];
         if ($definition) {
             $newDefinition['@and'][] = $definition;
         }
 
-        $operationDefinition->setPreconditions($newDefinition);
+        $operationDefinition->setConditions(OperationDefinition::PRECONDITIONS, $newDefinition);
     }
 
     /**
