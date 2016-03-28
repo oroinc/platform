@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityBundle\Model;
 
-class EntityAlias
+class EntityAlias implements \Serializable
 {
     /** @var string */
     private $alias;
@@ -13,39 +13,10 @@ class EntityAlias
     /**
      * @param string $alias
      * @param string $pluralAlias
-     *
-     * @throws \InvalidArgumentException if the given aliases are not valid
      */
     public function __construct($alias, $pluralAlias)
     {
-        if (empty($alias)) {
-            throw new \InvalidArgumentException('The entity alias should not be empty.');
-        } elseif (!preg_match('/^[a-z][a-z0-9_]*$/D', $alias)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The string "%s" cannot be used as an entity alias '
-                    . 'because it contains illegal characters. '
-                    . 'The valid alias should start with a letter and only contain '
-                    . 'lower case letters, numbers and underscores ("_").',
-                    $alias
-                )
-            );
-        }
-        if (empty($pluralAlias)) {
-            throw new \InvalidArgumentException('The entity plural alias should not be empty.');
-        } elseif (!preg_match('/^[a-z][a-z0-9_]*$/D', $pluralAlias)) {
-            throw new \InvalidArgumentException(
-                sprintf(
-                    'The string "%s" cannot be used as an entity plural alias '
-                    . 'because it contains illegal characters. '
-                    . 'The valid alias should start with a letter and only contain '
-                    . 'lower case letters, numbers and underscores ("_").',
-                    $pluralAlias
-                )
-            );
-        }
-
-        $this->alias       = $alias;
+        $this->alias = $alias;
         $this->pluralAlias = $pluralAlias;
     }
 
@@ -63,5 +34,21 @@ class EntityAlias
     public function getPluralAlias()
     {
         return $this->pluralAlias;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function serialize()
+    {
+        return serialize([$this->alias, $this->pluralAlias]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function unserialize($serialized)
+    {
+        list($this->alias, $this->pluralAlias) = unserialize($serialized);
     }
 }
