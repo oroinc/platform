@@ -27,26 +27,29 @@ define([
             'click .item-remove-button': 'close'
         },
 
-        map: {
-            'namePrefix': 'prefix',
-            'nameSuffix': 'suffix',
-            'firstName': 'first_name',
-            'middleNamem': 'iddle_name',
-            'lastName': 'last_name',
-            'organization': 'organization',
-            'street': 'street',
-            'street2': 'street2',
-            'city': 'city',
-            'country': 'country',
-            'countryIso2': 'country_iso2',
-            'countryIso3': 'country_iso3',
-            'postalCode': 'postal_code',
-            'region': 'region',
-            'regionText': 'region',
-            'regionCode': 'region_code'
+        options: {
+            map: {
+                'namePrefix': 'prefix',
+                'nameSuffix': 'suffix',
+                'firstName': 'first_name',
+                'middleNamem': 'iddle_name',
+                'lastName': 'last_name',
+                'organization': 'organization',
+                'street': 'street',
+                'street2': 'street2',
+                'city': 'city',
+                'country': 'country',
+                'countryIso2': 'country_iso2',
+                'countryIso3': 'country_iso3',
+                'postalCode': 'postal_code',
+                'region': 'region',
+                'regionText': 'region',
+                'regionCode': 'region_code'
+            }
         },
 
-        initialize: function() {
+        initialize: function(options) {
+            this.options.map = _.defaults(options.map || {}, this.options.map);
             this.$el.attr('id', 'address-book-' + this.model.id);
             this.template = _.template($('#template-addressbook-item').html());
             this.listenTo(this.model, 'destroy', this.remove);
@@ -90,7 +93,7 @@ define([
 
         prepareData: function(data) {
             var mappedData = {};
-            var map = this.map;
+            var map = this.options.map;
 
             if (data) {
                 _.each(data, function(value, key) {
