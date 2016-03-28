@@ -90,6 +90,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         $businessUnitClass = $this->getOwnershipMetadataProvider()->getLocalLevelClass();
 
         /** @var User[] $users */
+
         $users = $this->getManagerForClass($userClass)
             ->getRepository($userClass)
             ->createQueryBuilder('u')
@@ -132,7 +133,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
 
         foreach ($users as $user) {
             $owner = $user['owner'];
-            $tree->addBasicEntity($user['id'], $owner['id'] ? $owner['id'] : null);
+            $tree->addBasicEntity($user['id'], isset($owner['id']) ? $owner['id'] : null);
 
             foreach ($user['organizations'] as $organization) {
                 $tree->addGlobalEntity($user['id'], $organization['id']);
