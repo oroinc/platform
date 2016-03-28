@@ -20,8 +20,8 @@ class RunActionGroup extends AbstractAction
 
     const OPTION_ACTION_GROUP   = 'action_group';
     const OPTION_PARAMETERS_MAP = 'parameters_mapping';
-    const OPTION_ATTRIBUTES     = 'attributes';
-    const OPTION_ATTRIBUTE      = 'attribute';
+    const OPTION_RESULTS        = 'results';
+    const OPTION_RESULT         = 'result';
     const ERRORS_DEFAULT_KEY    = 'errors';
 
     /** @var ActionGroupRegistry */
@@ -66,8 +66,8 @@ class RunActionGroup extends AbstractAction
         $resolver->setDefined(
             [
                 self::OPTION_PARAMETERS_MAP,
-                self::OPTION_ATTRIBUTES,
-                self::OPTION_ATTRIBUTE
+                self::OPTION_RESULTS,
+                self::OPTION_RESULT
             ]
         );
 
@@ -77,7 +77,7 @@ class RunActionGroup extends AbstractAction
         );
 
         $resolver->setAllowedValues(
-            self::OPTION_ATTRIBUTES,
+            self::OPTION_RESULTS,
             function ($value) {
                 foreach ($value as $target => $source) {
                     if ((!is_string($target) && !$target instanceof PropertyPathInterface) ||
@@ -92,17 +92,17 @@ class RunActionGroup extends AbstractAction
         );
 
         $resolver->setAllowedTypes(
-            self::OPTION_ATTRIBUTE,
+            self::OPTION_RESULT,
             ['null', 'Symfony\Component\PropertyAccess\PropertyPathInterface']
         );
 
-        $resolver->setAllowedTypes(self::OPTION_ATTRIBUTES, ['array']);
+        $resolver->setAllowedTypes(self::OPTION_RESULTS, ['array']);
 
         $resolver->setDefaults(
             [
                 self::OPTION_PARAMETERS_MAP => [],
-                self::OPTION_ATTRIBUTES => [],
-                self::OPTION_ATTRIBUTE => null
+                self::OPTION_RESULTS => [],
+                self::OPTION_RESULT => null
             ]
         );
     }
@@ -134,13 +134,13 @@ class RunActionGroup extends AbstractAction
         $result = $this->executionArgs->execute($this->actionGroupRegistry, $errors);
 
         //set results through attributes map if any
-        if (0 !== count($this->options[self::OPTION_ATTRIBUTES])) {
-            $this->propertyMapper->transfer($result, $this->options[self::OPTION_ATTRIBUTES], $context);
+        if (0 !== count($this->options[self::OPTION_RESULTS])) {
+            $this->propertyMapper->transfer($result, $this->options[self::OPTION_RESULTS], $context);
         }
 
         //set result through single property path if exists
-        if (null !== $this->options[self::OPTION_ATTRIBUTE]) {
-            $this->contextAccessor->setValue($context, $this->options[self::OPTION_ATTRIBUTE], $result);
+        if (null !== $this->options[self::OPTION_RESULT]) {
+            $this->contextAccessor->setValue($context, $this->options[self::OPTION_RESULT], $result);
         }
     }
 }

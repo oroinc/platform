@@ -17,8 +17,8 @@ Run Action Group `@run_action_group`
 **Description:** Runs named (action group)[./action-groups.md] with passed parameters.
 
 **Options:**
- - attribute - (optional) attribute where action group execution result value should be set (optional)
- - attributes - (optional) mapping attributes from result-context
+ - result - (optional) property path where where to put action group execution context value
+ - results - (optional) mapping result values PropertyPaths from action-group-context to current context keys
  - action_group - action group name
  - parameters_mapping - map of parameters to be passed to action_group context from current one
 
@@ -26,8 +26,8 @@ Run Action Group `@run_action_group`
 **Configuration Example**
 ```
 - @run_action_group:
-    attribute: $.result
-    attributes: 
+    result: $.result
+    results: 
         result_entity_id: $.demo_new_attribute
     action_group: acme_demo_action_group
     parameters_mapping:
@@ -37,8 +37,8 @@ Run Action Group `@run_action_group`
 
  This config will execute configured **action group** with name `acme_demo_action_group` and parameters gathered under
 `parameters_mapping` section.
- After execution of **action group** actions body, processed ActionData will be returned and assigned to `$.result`
-attribute of caller context. $.result_entity_id will have the value of $.demo_new_attribute from Action Group's context.
+ After execution of **action group** actions configuration body, processed ActionData (e.g. context) will be returned and assigned to `$.result` attribute of caller context. 
+ And `$.result_entity_id` will have the value of `$.demo_new_attribute` from Action Group's context.
  
  Please note, that all parameters must pass validation and will be accessible under root node of ActionData in
 action_group execution body. 

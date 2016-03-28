@@ -47,8 +47,8 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertEquals(RunActionGroup::OPTION_ACTION_GROUP, 'action_group');
         $this->assertEquals(RunActionGroup::OPTION_PARAMETERS_MAP, 'parameters_mapping');
-        $this->assertEquals(RunActionGroup::OPTION_ATTRIBUTES, 'attributes');
-        $this->assertEquals(RunActionGroup::OPTION_ATTRIBUTE, 'attribute');
+        $this->assertEquals(RunActionGroup::OPTION_RESULTS, 'results');
+        $this->assertEquals(RunActionGroup::OPTION_RESULT, 'result');
     }
 
     public function testInitialize()
@@ -61,8 +61,8 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
         $options = [
             RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_GROUP_NAME,
             RunActionGroup::OPTION_PARAMETERS_MAP => $parametersMap,
-            RunActionGroup::OPTION_ATTRIBUTES => [],
-            RunActionGroup::OPTION_ATTRIBUTE => new PropertyPath('path')
+            RunActionGroup::OPTION_RESULTS => [],
+            RunActionGroup::OPTION_RESULT => new PropertyPath('path')
         ];
 
         $this->mockActionGroupRegistry->expects($this->once())
@@ -142,13 +142,13 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
             'bad attribute' => [
                 'inputData' => [
                     RunActionGroup::OPTION_ACTION_GROUP => self::ACTION_GROUP_NAME,
-                    RunActionGroup::OPTION_ATTRIBUTE => '$.nonConvertedPropertyPath'
+                    RunActionGroup::OPTION_RESULT => '$.nonConvertedPropertyPath'
                 ],
                 'expectedException' => 'Symfony\Component\OptionsResolver\Exception\InvalidOptionsException',
                 'expectedExceptionMessage' => sprintf(
-                    'The option "attribute" with value "$.nonConvertedPropertyPath"' .
+                    'The option "%s" with value "$.nonConvertedPropertyPath"' .
                     ' is expected to be of type "null" or "Symfony\Component\PropertyAccess\PropertyPathInterface"',
-                    RunActionGroup::OPTION_ATTRIBUTE
+                    RunActionGroup::OPTION_RESULT
                 )
             ]
         ];
@@ -236,7 +236,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                     RunActionGroup::OPTION_PARAMETERS_MAP => [
                         'paramValue' => new PropertyPath('param')
                     ],
-                    RunActionGroup::OPTION_ATTRIBUTES => ['result' => new PropertyPath('a')],
+                    RunActionGroup::OPTION_RESULTS => ['result' => new PropertyPath('a')],
                 ],
                 'arguments' => $actionData,
                 'return' => new ActionData(['a' => 'A', 'b' => ['B']]),
@@ -257,7 +257,7 @@ class RunActionGroupTest extends \PHPUnit_Framework_TestCase
                     RunActionGroup::OPTION_PARAMETERS_MAP => [
                         'paramValue' => new PropertyPath('param')
                     ],
-                    RunActionGroup::OPTION_ATTRIBUTE => new PropertyPath('all'),
+                    RunActionGroup::OPTION_RESULT => new PropertyPath('all'),
                 ],
                 'arguments' => $actionData,
                 'return' => new ActionData(['a' => 'A', 'b' => ['B']]),
