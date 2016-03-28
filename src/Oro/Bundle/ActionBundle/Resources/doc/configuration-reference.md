@@ -33,7 +33,7 @@ Configuration of Operation declares all aspects related to specific operation:
 
 * basic properties of operation like name, label, order, acl resource, etc
 * entities or routes or datagrids that is related to operation
-* conditions and functions
+* conditions and actions
 * attributes involved in operation
 * frontend configuration
 * operation dialog parameters
@@ -96,7 +96,7 @@ some nodes which located on the same level of node `replace` - value of these no
 _last_ configuration from queue.
 
 Defining an Operation
-==================
+=====================
 
 Root element of configuration is "operations". Under this element operations can be defined.
 
@@ -157,7 +157,7 @@ Single operation configuration has next properties:
 * **form_options**
     Contains configuration for Transitions
 * **form_init**
-    Contains configuration for Form Init Functions
+    Contains configuration for Form Init Actions
 * **conditions**
     Contains configuration for Conditions
 * **actions**
@@ -192,7 +192,7 @@ operations:                                             # root elements
                                                         # ...
         form_options:                                   # configuration for Form Options
                                                         # ...
-        form_init:                                      # configuration for Form Init Functions
+        form_init:                                      # configuration for Form Init Actions
                                                         # ...
         conditions:                                     # configuration for Conditions
                                                         # ...
@@ -219,25 +219,23 @@ Matching properties are:
 How it works? **Filters** discards all non matched operations and applied first before matchers.
 Then, **matchers**, in turn, collect all operations, among filtered, where any of comparison met though `OR` statement.
 E.g.
- if `datagrid` `OR` `route` will be met in context and present in operation config then that operation will be added to result
- list.
+ if `datagrid` `OR` `route` will be met in context and present in operation config then that operation will be added to 
+result list.
 
 Substitution of Operation
-======================
+=========================
 
-When parameter `substitute_operation` is defined and it corresponds to other operation name that should be displayed (e.g.
-matched by context)
-substitution happens. In other words, operation that define substitution will be positioned in UI instead of operation that
-defined in parameter.
+When parameter `substitute_operation` is defined and it corresponds to other operation name that should be displayed
+(e.g. matched by context) substitution happens. In other words, operation that define substitution will be positioned in
+UI instead of operation that defined in parameter.
 For replacement operation (e.g. operation that have `substitute_operation` parameter) the same
 [matching and filter mechanisms](#matching-and-filter-mechanism) are applied as for normal operation
 with one important difference: **if no matching or filtering criteria are specified than that operation will be matched
 automatically - always**.
 But after all - operations that did not make any replacement (in context) will be cleared from final result list.
 
-
 Button Options Configuration
-==============================
+============================
 
 Button Options allow to change operation button style, override button template and add some data attributes.
 
@@ -310,8 +308,8 @@ Frontend Options configuration has next options:
     for JS - placed in jsmessages.*.yml
 * **show_dialog**
     *boolean*
-    By default this value is `true`. It mean that on operation execution, if form parameters are set, will be shown modal
-    dialog with form. Otherwise will be shown separate page (like entity update page) with form.
+    By default this value is `true`. It mean that on operation execution, if form parameters are set, will be shown
+    modal dialog with form. Otherwise will be shown separate page (like entity update page) with form.
 
 Example
 -------
@@ -341,8 +339,8 @@ Attributes. Each attribute must to have a type and may have options.
 Single attribute can be described with next configuration:
 
 * **unique name**
-    Attributes should have unique name in scope of Operation that they belong to. Form configuration references attributes
-    by this value.
+    Attributes should have unique name in scope of Operation that they belong to. Form configuration references
+    attributes by this value.
 * **type**
     *string*
     Type of attribute. Next types are supported:
@@ -401,10 +399,11 @@ operations:
 Datagrid Options Configuration
 ==============================
 
-Datagrid options allow to define options of datagrid mass operation. It provide two way to set mass operation configuration:
-using service which return array of mas operation configurations or set inline configuration of mass operation.
+ Datagrid options allow to define options of datagrid mass operation. It provide two way to set mass operation
+configuration: using service which return array of mas operation configurations or set inline configuration of mass
+operation.
 
-Single datagrid options can be described with next configuration:
+ Single datagrid options can be described with next configuration:
 
 * **mass_action_provider**
     *string*
@@ -515,15 +514,15 @@ operations:
 ```
 
 Pre Actions, Form Init Actions and Actions Configuration
-==============================================================
+========================================================
 
 * **preactions**
-    Configuration of Pre Actions that may be performed before pre conditions, conditions, form init functions and
-    actions. It can be used to prepare some data in Action Data that will be used in pre conditions validation.
+    Configuration of Pre Actions that may be performed before pre conditions, conditions, form init actions and actions.
+    It can be used to prepare some data in Action Data that will be used in pre conditions validation.
 * **form_init**
-    Configuration of Form Init Actions that may be performed on Action Data before conditions and functions.
-    One of possible init operations usage scenario is to fill attributes with default values, which will be used in operation
-    form if it exist.
+    Configuration of Form Init Actions that may be performed on Action Data before conditions and actions.
+    One of possible init operations usage scenario is to fill attributes with default values, which will be used in
+    operation form if it exist.
 * **actions**
     Configuration of Actions that must be performed after all previous steps are performed. This is main operation step
     that must contain operation logic. It will be performed only after conditions will be qualified.

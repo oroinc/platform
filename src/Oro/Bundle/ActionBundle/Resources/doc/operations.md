@@ -1,15 +1,15 @@
 Operations
 ==========
 
-* [What are Operations?](#what-are-operations)
-* [How it works?](#how-it-works)
-* [Operation Configuration](#operation-configuration)
-* [Configuration Validation](#configuration-validation)
-* [Default Operations](#default-operations)
-  * [Questions and Answers](#questions-and-answers)
+  * [What are Operations?](#what-are-operations)
+  * [How it works?](#how-it-works)
+  * [Operation Configuration](#operation-configuration)
+  * [Configuration Validation](#configuration-validation)
+  * [Default Operations](#default-operations)
+    * [Questions and Answers](#questions-and-answers)
 
 What are Operations?
------------------
+--------------------
 
 *Operations* provide possibility to assign any interaction with user by specifying them to:
  - Entity classes;
@@ -29,11 +29,11 @@ Each *operation* relates to the some entity types (i.e. consists full class name
 where operations should be displayed or\and datagrids. Before page loading, ActionBundle chooses *operations* that have 
 corresponded page entity|route. Then these *operations* are checking for their Pre conditions. If all Pre conditions 
 are met - Operation's button is displaying.
-After a user clicks on the button - all performed operations (and underlined functions) will be executed 
+After a user clicks on the button - all performed operations (and underlined actions) will be executed 
 if preconditions of *operation* and conditions of *action groups* are met.
 
 Operation Configuration
--------------
+-----------------------
 
 All operations can be described in configuration file ``actions.yml`` under corresponded bundle in `config/oro` 
 resource directory.
@@ -119,28 +119,31 @@ operations:
             attribute_default_values:                               # (optional) define default values for attributes
                 demo_attr: $demo                                    # use attribute name and property path or simple string for attribute value
 
-        form_init:                                                  # (optional) any needed functions which will execute before showing form dialog
-            - @assign_value:                                        # function alias
-                conditions:                                         # (optional) conditions list to allow current function
+        form_init:                                                  # (optional) any needed actions which will execute before showing form dialog
+            - @assign_value:                                        # action alias
+                conditions:                                         # (optional) conditions list to allow current action
                     @empty: $description                            # condition definition
-                parameters: [$.demo_attr, 'Demo Data']              # parameters of current function
+                parameters: [$.demo_attr, 'Demo Data']              # parameters of current action
 
-        preactions:                                                 # (optional) any needed pre functions which will execute before pre conditions
-            - @create_datetime:                                     # function alias
-                attribute: $.date                                   # function parameters
+        preactions:                                                 # (optional) any needed pre actions which will execute before pre conditions
+            - @create_datetime:                                     # action alias
+                attribute: $.date                                   # action parameters
 
         preconditions:                                              # (optional) pre conditions for display Action button
             @gt: [$updatedAt, $.date]                               # condition definition
+            
+        conditions:                                                 # (optional) conditions for execution Action button
+            @equal: [$expired, false]                               # condition definition
 
-        actions:                                                    # (optional) any needed functions which will execute after click on th button
-            - @assign_value: [$expired, true]                        # function definition
+        actions:                                                    # (optional) any needed actions which will execute after click on th button
+            - @assign_value: [$expired, true]                       # action definition
 ```
 
- This configuration describes operation that relates to the ``MyEntity`` entity. On the View page (acme_demo_myentity_view)
-of this entity (in case of field 'updatedAt' > new DateTime('now')) will be displayed button with label
-"adme.demo.myentity.operations.myentity_operation". After click on this button - will run postfunction "assign_value"
-and set field 'expired' to `true`.
- If `form_options` are specified after click on button will be shown form dialog with attributes fields. And functions
+ This configuration describes operation that relates to the ``MyEntity`` entity. On the View page 
+(acme_demo_myentity_view) of this entity (in case of field 'updatedAt' > new DateTime('now')) will be displayed button
+with label "adme.demo.myentity.operations.myentity_operation". After click on this button - if property `expired` of the
+entity = false - will run actions "assign_value" that set field 'expired' to `true`.
+ If `form_options` are specified after click on button will be shown form dialog with attributes fields. And actions
 will run only on form submit.
 
 Configuration Validation
@@ -156,7 +159,7 @@ php app/console oro:action:configuration:validate
 
 
 Default Operations
----------------
+------------------
 
 **Oro Action Bundle** defines several system wide default operations for common purpose. Those are basic CRUD-called
 operations for entities:
@@ -199,8 +202,8 @@ operations:
 ```
   Here is custom modification through substitution mechanism. When operation mentioned in `substitute_operation` field 
 will be replaced by current one.
-  Additionally there present limitation in field `entities` that will pick this custom action for substitution of default
-one only when context will be matched by that entity.
+  Additionally there present limitation in field `entities` that will pick this custom action for substitution of
+default one only when context will be matched by that entity.
 For those who need to make full replacement of operation instead of extended copy of it - `extends` field can be omitted
 and own, totally custom, body defined.
 

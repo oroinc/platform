@@ -17,26 +17,33 @@ Run Action Group `@run_action_group`
 **Description:** Runs named (action group)[./action-groups.md] with passed parameters.
 
 **Options:**
- - attribute - attribute where action group execution result value should be set (optional)
+ - attribute - (optional) attribute where action group execution result value should be set (optional)
+ - attributes - (optional) mapping attributes from result-context
  - action_group - action group name
  - parameters_mapping - map of parameters to be passed to action_group context from current one
-    
+
 
 **Configuration Example**
 ```
-- @run_action:
+- @run_action_group:
     attribute: $.result
+    attributes: 
+        result_entity_id: $.demo_new_attribute
     action_group: acme_demo_action_group
     parameters_mapping:
         entity_class: Acme\Bundle\DemoBundle\Entity\User
         entity_id: $.user.id
 ```
 
-This config will execute configured **action group** with name `acme_demo_action_group` and parameters gathered under `parameters_mapping` section.
- After execution of **action group** actions body, all processed ActionData will be returned and assigned to `$.result` attribute of caller context.
+ This config will execute configured **action group** with name `acme_demo_action_group` and parameters gathered under
+`parameters_mapping` section.
+ After execution of **action group** actions body, processed ActionData will be returned and assigned to `$.result`
+attribute of caller context. $.result_entity_id will have the value of $.demo_new_attribute from Action Group's context.
  
- Please note, that all parameters must pass validation and will be accessible under root node of ActionData in action_group execution body. 
- E.g. `$entity_class` and `$entity_id` respectively to their names. See (Action Groups)[./action-groups.md] documentation for more details.
+ Please note, that all parameters must pass validation and will be accessible under root node of ActionData in
+action_group execution body. 
+ E.g. `$.entity_class` and `$.entity_id` respectively to their names. See (Action Groups)[./action-groups.md]
+documentation for more details.
 
 Format Name
 -----------
