@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller\Api\Rest;
 
-use Oro\Bundle\ActionBundle\Configuration\ConfigurationProvider;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Entity\TestActivity;
@@ -13,8 +13,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
  */
 class OperationControllerTest extends WebTestCase
 {
-    const MESSAGE_DEFAULT = 'test message';
+    const ROOT_NODE_NAME = 'operations';
 
+    const MESSAGE_DEFAULT = 'test message';
     const MESSAGE_NEW = 'new test message';
 
     /** @var TestActivity */
@@ -30,7 +31,7 @@ class OperationControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateWsseAuthHeader());
 
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider');
+        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
         $this->loadFixtures([
             'Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData',
         ]);
@@ -44,7 +45,7 @@ class OperationControllerTest extends WebTestCase
      */
     protected function tearDown()
     {
-        $this->cacheProvider->delete(ConfigurationProvider::ROOT_NODE_NAME);
+        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
 
         parent::tearDown();
     }
@@ -69,7 +70,7 @@ class OperationControllerTest extends WebTestCase
         $statusCode,
         $message
     ) {
-        $this->cacheProvider->save(ConfigurationProvider::ROOT_NODE_NAME, $config);
+        $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
 
         $this->assertEquals(self::MESSAGE_DEFAULT, $this->entity->getMessage());
 
@@ -112,7 +113,7 @@ class OperationControllerTest extends WebTestCase
                 'entities' => [],
                 'routes' => [],
                 'datagrids' => [],
-                'actions' => [['@assign_value' => ['$message', self::MESSAGE_NEW]]],
+                OperationDefinition::ACTIONS => [['@assign_value' => ['$message', self::MESSAGE_NEW]]],
             ]
         ];
 
@@ -123,7 +124,7 @@ class OperationControllerTest extends WebTestCase
                     [
                         'oro_action_test_action' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            'preconditions' => ['@equal' => ['$message', self::MESSAGE_DEFAULT]],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', self::MESSAGE_DEFAULT]],
                         ],
                     ]
                 ),
@@ -140,7 +141,7 @@ class OperationControllerTest extends WebTestCase
                     [
                         'oro_action_test_action' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            'preconditions' => ['@equal' => ['$message', 'test message wrong']],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message wrong']],
                         ],
                     ]
                 ),

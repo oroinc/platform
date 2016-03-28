@@ -3,7 +3,6 @@ parameters:
     oro_action.assembler.attribute.class: Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler
     oro_action.assembler.form_options.class: Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler
     oro_action.assembler.operation.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler
-    oro_action.assembler.operation_action_group.class: Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler
     oro_action.assembler.parameter.class: Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler
 
 services:
@@ -14,7 +13,6 @@ services:
             - @oro_action.expression.factory
             - @oro_action.assembler.attribute
             - @oro_action.assembler.form_options
-            - @oro_action.assembler.operation_action_group
             - @oro_entity.doctrine_helper
 
     oro_action.assembler.action_group:
@@ -27,11 +25,6 @@ services:
 
     oro_action.assembler.parameter:
         class: %oro_action.assembler.parameter.class%
-
-    oro_action.assembler.operation_action_group:
-        class: %oro_action.assembler.operation_action_group.class%
-        calls:
-            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
 
     oro_action.assembler.attribute:
         class: %oro_action.assembler.attribute.class%

@@ -6,7 +6,6 @@ use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
-use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationRegistry;
@@ -45,9 +44,6 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
     protected $registry;
 
     private $contextHelper;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationActionGroupAssembler*/
-    private $mockOperationActionGroupAssembler;
 
     protected function setUp()
     {
@@ -98,16 +94,11 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 return $class;
             });
 
-        $this->mockOperationActionGroupAssembler = $this->getMockBuilder(
-            'Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler'
-        )->disableOriginalConstructor()->getMock();
-
         $this->assembler = new OperationAssembler(
             $this->actionFactory,
             $this->conditionFactory,
             $this->attributeAssembler,
             $this->formOptionsAssembler,
-            $this->mockOperationActionGroupAssembler,
             $this->doctrineHelper
         );
 

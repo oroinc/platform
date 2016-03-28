@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 /**
  * @SuppressWarnings(PHPMD.TooManyFields)
  * @SuppressWarnings(PHPMD.ExcessivePublicCount)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class OperationDefinition
 {
@@ -13,6 +14,7 @@ class OperationDefinition
     const ACTIONS = 'actions';
 
     const PRECONDITIONS = 'preconditions';
+    const CONDITIONS = 'conditions';
 
     /** @var string */
     private $name;
@@ -75,7 +77,7 @@ class OperationDefinition
     private $actions = [];
 
     /** @var array */
-    private $preconditions = [];
+    private $conditions = [];
 
     /** @var array */
     private $actionGroups = [];
@@ -86,6 +88,14 @@ class OperationDefinition
     public static function getAllowedActions()
     {
         return [self::PREACTIONS, self::FORM_INIT, self::ACTIONS];
+    }
+
+    /**
+     * @return array
+     */
+    public static function getAllowedConditions()
+    {
+        return [self::PRECONDITIONS, self::CONDITIONS];
     }
 
     /**
@@ -437,20 +447,26 @@ class OperationDefinition
     }
 
     /**
+     * @param string $name
      * @return array
      */
-    public function getPreconditions()
+    public function getConditions($name = null)
     {
-        return $this->preconditions;
+        if ($name === null) {
+            return $this->conditions;
+        }
+
+        return isset($this->conditions[$name]) ? $this->conditions[$name] : [];
     }
 
     /**
+     * @param string $name
      * @param array $data
      * @return $this
      */
-    public function setPreconditions(array $data)
+    public function setConditions($name, array $data)
     {
-        $this->preconditions = $data;
+        $this->conditions[$name] = $data;
 
         return $this;
     }

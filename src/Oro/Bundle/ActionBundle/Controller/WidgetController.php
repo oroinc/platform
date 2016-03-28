@@ -141,7 +141,7 @@ class WidgetController extends Controller
         $messages = new ArrayCollection();
 
         if (!$errors->count()) {
-            $messages->add(['message' => $e->getMessage()]);
+            $messages->add(['message' => $e->getMessage(), 'parameters' => []]);
         } else {
             foreach ($errors as $key => $error) {
                 $messages->set($key, [

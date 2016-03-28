@@ -5,7 +5,6 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\Assembler;
 use Oro\Bundle\ActionBundle\Form\Type\OperationType;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
-use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\OperationAssembler;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
@@ -38,7 +37,6 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             $this->getConditionFactory(),
             $this->getAttributeAssembler(),
             $this->getFormOptionsAssembler(),
-            $this->getOperationActionGroupAssembler(),
             $this->doctrineHelper
         );
     }
@@ -86,10 +84,11 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setName('minimum_name')
             ->setLabel('My Label')
             ->setEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1'])
-            ->setPreconditions([])
-            ->setActions('preactions', [])
-            ->setActions('actions', [])
-            ->setActions('form_init', [])
+            ->setConditions(OperationDefinition::CONDITIONS, [])
+            ->setConditions(OperationDefinition::PRECONDITIONS, [])
+            ->setActions(OperationDefinition::PREACTIONS, [])
+            ->setActions(OperationDefinition::ACTIONS, [])
+            ->setActions(OperationDefinition::FORM_INIT, [])
             ->setFormType(OperationType::NAME);
 
         $definition2 = clone $definition1;
@@ -101,10 +100,11 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setEnabled(false)
             ->setApplications(['application1'])
             ->setAttributes(['config_attr'])
-            ->setPreconditions(['config_pre_cond'])
-            ->setActions('preactions', ['config_pre_func'])
-            ->setActions('actions', ['@action' => 'action_config'])
-            ->setActions('form_init', ['config_form_init_func'])
+            ->setConditions(OperationDefinition::PRECONDITIONS, ['config_pre_cond'])
+            ->setConditions(OperationDefinition::CONDITIONS, ['config_cond'])
+            ->setActions(OperationDefinition::PREACTIONS, ['config_pre_func'])
+            ->setActions(OperationDefinition::ACTIONS, ['@action' => 'action_config'])
+            ->setActions(OperationDefinition::FORM_INIT, ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
@@ -118,15 +118,18 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
             ->setAttributes(['config_attr'])
             ->setForAllEntities(true)
             ->setExcludeEntities(['Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'])
-            ->setPreconditions([
-                '@and' => [
-                    ['@acl_granted' => 'test_acl'],
-                    ['config_pre_cond']
+            ->setConditions(
+                OperationDefinition::PRECONDITIONS,
+                [
+                    '@and' => [
+                        ['@acl_granted' => 'test_acl'],
+                        ['config_pre_cond']
+                    ]
                 ]
-            ])
-            ->setActions('preactions', ['config_pre_func'])
-            ->setActions('actions', ['@action' => 'action_config'])
-            ->setActions('form_init', ['config_form_init_func'])
+            )
+            ->setActions(OperationDefinition::PREACTIONS, ['config_pre_func'])
+            ->setActions(OperationDefinition::ACTIONS, ['@action' => 'action_config'])
+            ->setActions(OperationDefinition::FORM_INIT, ['config_form_init_func'])
             ->setFormOptions(['config_form_options'])
             ->setFrontendOptions(['config_frontend_options'])
             ->setOrder(77)
@@ -153,7 +156,6 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
-                        $this->getOperationActionGroupAssembler(),
                         $definition1
                     )
                 ],
@@ -169,10 +171,11 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         'enabled' => false,
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
-                        'preactions' => ['config_pre_func'],
-                        'preconditions' => ['config_pre_cond'],
-                        'actions' => ['@action' => 'action_config'],
-                        'form_init' => ['config_form_init_func'],
+                        OperationDefinition::PREACTIONS => ['config_pre_func'],
+                        OperationDefinition::PRECONDITIONS => ['config_pre_cond'],
+                        OperationDefinition::CONDITIONS => ['config_cond'],
+                        OperationDefinition::ACTIONS => ['@action' => 'action_config'],
+                        OperationDefinition::FORM_INIT => ['config_form_init_func'],
                         'form_options' => ['config_form_options'],
                         'frontend_options' => ['config_frontend_options'],
                         'order' => 77,
@@ -184,7 +187,6 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
-                        $this->getOperationActionGroupAssembler(),
                         $definition2
                     )
                 ],
@@ -202,10 +204,11 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         'exclude_entities' => ['\Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity2'],
                         'applications' => ['application1'],
                         'attributes' => ['config_attr'],
-                        'preactions' => ['config_pre_func'],
-                        'preconditions' => ['config_pre_cond'],
-                        'actions' => ['@action' => 'action_config'],
-                        'form_init' => ['config_form_init_func'],
+                        OperationDefinition::PREACTIONS => ['config_pre_func'],
+                        OperationDefinition::PRECONDITIONS => ['config_pre_cond'],
+                        OperationDefinition::CONDITIONS => ['config_cond'],
+                        OperationDefinition::ACTIONS => ['@action' => 'action_config'],
+                        OperationDefinition::FORM_INIT => ['config_form_init_func'],
                         'form_options' => ['config_form_options'],
                         'frontend_options' => ['config_frontend_options'],
                         'order' => 77,
@@ -218,7 +221,6 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
                         $this->getConditionFactory(),
                         $this->getAttributeAssembler(),
                         $this->getFormOptionsAssembler(),
-                        $this->getOperationActionGroupAssembler(),
                         $definition3
                     )
                 ],
@@ -264,18 +266,5 @@ class OperationAssemblerTest extends \PHPUnit_Framework_TestCase
         return $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler')
             ->disableOriginalConstructor()
             ->getMock();
-    }
-
-    /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|OperationActionGroupAssembler
-     */
-    protected function getOperationActionGroupAssembler()
-    {
-        $assembler = new OperationActionGroupAssembler();
-        $assembler->addConfigurationPass(
-            $this->getMock('Oro\Bundle\ActionBundle\Model\ConfigurationPass\ReplacePropertyPath')
-        );
-
-        return $assembler;
     }
 }

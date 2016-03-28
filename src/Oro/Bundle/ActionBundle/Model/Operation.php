@@ -7,7 +7,6 @@ use Doctrine\Common\Collections\Collection;
 use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
 use Oro\Bundle\ActionBundle\Model\Assembler\AttributeAssembler;
 use Oro\Bundle\ActionBundle\Model\Assembler\FormOptionsAssembler;
-use Oro\Bundle\ActionBundle\Model\Assembler\OperationActionGroupAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
 use Oro\Component\Action\Action\ActionInterface;
@@ -30,17 +29,14 @@ class Operation
     /** @var FormOptionsAssembler */
     private $formOptionsAssembler;
 
-    /** @var OperationActionGroupAssembler */
-    private $operationActionGroupAssembler;
-
     /** @var OperationDefinition */
     private $definition;
 
     /** @var ActionInterface[] */
     private $actions = [];
 
-    /** @var AbstractCondition */
-    private $preconditions;
+    /** @var AbstractCondition[] */
+    private $conditions = [];
 
     /** @var AttributeManager[] */
     private $attributeManagers = [];
@@ -48,15 +44,11 @@ class Operation
     /** @var array */
     private $formOptions;
 
-    /** @var OperationActionGroup[] */
-    private $operationActionGroups;
-
     /**
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param AttributeAssembler $attributeAssembler
      * @param FormOptionsAssembler $formOptionsAssembler
-     * @param OperationActionGroupAssembler $operationActionGroupAssembler
      * @param OperationDefinition $definition
      */
     public function __construct(
@@ -64,14 +56,12 @@ class Operation
         ConditionFactory $conditionFactory,
         AttributeAssembler $attributeAssembler,
         FormOptionsAssembler $formOptionsAssembler,
-        OperationActionGroupAssembler $operationActionGroupAssembler,
         OperationDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->attributeAssembler = $attributeAssembler;
         $this->formOptionsAssembler = $formOptionsAssembler;
-        $this->operationActionGroupAssembler = $operationActionGroupAssembler;
         $this->definition = $definition;
     }
 
@@ -114,13 +104,17 @@ class Operation
      */
     public function execute(ActionData $data, Collection $errors = null)
     {
+        if (!$this->isAllowed($data, $errors)) {
+            throw new ForbiddenOperationException(sprintf('Operation "%s" is not allowed.', $this->getName()));
+        }
+
         $data['errors'] = $errors;
 
         $this->executeActions($data, OperationDefinition::ACTIONS);
     }
 
     /**
-     * Check that action is available to show
+     * Check that operation is available to show
      *
      * @param ActionData $data
      * @param Collection $errors
@@ -128,9 +122,36 @@ class Operation
      */
     public function isAvailable(ActionData $data, Collection $errors = null)
     {
+        if ($this->hasForm()) {
+            return $this->isPreConditionAllowed($data, $errors);
+        } else {
+            return $this->isAllowed($data, $errors);
+        }
+    }
+
+    /**
+     * Check is operation allowed to execute
+     *
+     * @param ActionData $data
+     * @param Collection|null $errors
+     * @return bool
+     */
+    protected function isAllowed(ActionData $data, Collection $errors = null)
+    {
+        return $this->isPreConditionAllowed($data, $errors) &&
+            $this->evaluateConditions($data, OperationDefinition::CONDITIONS, $errors);
+    }
+
+    /**
+     * @param ActionData $data
+     * @param Collection $errors
+     * @return bool
+     */
+    protected function isPreConditionAllowed(ActionData $data, Collection $errors = null)
+    {
         $this->executeActions($data, OperationDefinition::PREACTIONS);
 
-        return $this->evaluatePreconditions($data, $errors);
+        return $this->evaluateConditions($data, OperationDefinition::PRECONDITIONS, $errors);
     }
 
     /**
@@ -195,20 +216,23 @@ class Operation
 
     /**
      * @param ActionData $data
+     * @param string $name
      * @param Collection $errors
      * @return boolean
      */
-    protected function evaluatePreconditions(ActionData $data, Collection $errors = null)
+    protected function evaluateConditions(ActionData $data, $name, Collection $errors = null)
     {
-        $this->preconditions = false;
+        if (!array_key_exists($name, $this->conditions)) {
+            $this->conditions[$name] = false;
 
-        $config = $this->definition->getPreconditions();
-        if ($config) {
-            $this->preconditions = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $config);
+            $config = $this->definition->getConditions($name);
+            if ($config) {
+                $this->conditions[$name] = $this->conditionFactory->create(ConfigurableCondition::ALIAS, $config);
+            }
         }
 
-        if ($this->preconditions instanceof ConfigurableCondition) {
-            return $this->preconditions->evaluate($data, $errors);
+        if ($this->conditions[$name] instanceof ConfigurableCondition) {
+            return $this->conditions[$name]->evaluate($data, $errors);
         }
 
         return true;
@@ -222,21 +246,5 @@ class Operation
         $formOptionsConfig = $this->definition->getFormOptions();
 
         return !empty($formOptionsConfig['attribute_fields']);
-    }
-
-    /**
-     * @return OperationActionGroup[]
-     */
-    protected function getOperationActionGroups()
-    {
-        if ($this->operationActionGroups === null) {
-            $this->operationActionGroups = [];
-            $config = $this->definition->getActionGroups();
-            if ($config) {
-                $this->operationActionGroups = $this->operationActionGroupAssembler->assemble($config);
-            }
-        }
-
-        return $this->operationActionGroups;
     }
 }
