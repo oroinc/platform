@@ -30,7 +30,7 @@ File `<bundleResourceRoot>/config/oro/action.yml`
 action_groups:                                  # root node for action groups
     demo_flash_greetings_to:                    # name of action group
         parameters:                             # parameters declaration node
-            what:                               # name of parameter
+            what:                               # name of the parameter
                 type: AcmeBundle/String/Phrase  # (optional, default = any) type validation of parameter (available types: integer, string, boolean, array, double, object, PHP class)
                 message: "Bad type"             # (optional) message to be prompted if parameter validation failure met
                 default: "Hello"                # (optional) default value for optional parameter, if not set then parameter `what` is required
@@ -77,17 +77,17 @@ Call from PHP
 All named action groups internally gathered under registry service `oro_action.action_group_registry`, which is the
 instance of [`\Oro\Bundle\ActionBundle\Model\ActionGroupRegistry`](../../Model/ActionGroupRegistry.php) class. 
 It has simple api to `get` **action group** ([`\Oro\Bundle\ActionBundle\Model\ActionGroup`](../../Model/ActionGroup.php)) 
-configured instance and perform its execution by invocation of `\Oro\Bundle\ActionBundle\Model\ActionGroup::execute` method wth proper params.
+configured instance and perform its execution by invocation of `\Oro\Bundle\ActionBundle\Model\ActionGroup::execute` method with proper params.
 
 
 Recommendations
 ---------------
 
 **User Interface** 
-In example above we've use in `actions` block action called `@flash_message`. That action was mentioned only for 
+In the example above we've used in `actions` block action called `@flash_message`. That action was mentioned only for 
 example purpose.
-Usually you should not perform any user interface related actions in **action group** `actions` set. Because they can 
-be called or used in scope of actions that have no available user interface environment in runtime. 
+Usually, you should not perform any user interface related actions in **action group** `actions` set. Because they can 
+be called or used in the scope of actions that have no available user interface environment in runtime. 
 
 Using result of action group
 ----------------------------
