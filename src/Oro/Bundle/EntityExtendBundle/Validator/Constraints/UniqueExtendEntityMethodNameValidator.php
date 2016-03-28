@@ -48,20 +48,20 @@ class UniqueExtendEntityMethodNameValidator extends AbstractFieldValidator
         $className  = $value->getEntity()->getClassName();
         $fieldName  = $value->getFieldName();
         $type       = $value->getType();
-        $getterName = $this->methodNameChecker->hasGetters($className, $fieldName);
+        $getterName = $this->methodNameChecker->getGetters($className, $fieldName);
 
         if (strlen($getterName) > 0) {
             $this->addViolation($constraint->message, $getterName, '');
         }
 
-        $settersName = $this->methodNameChecker->hasSetters($className, $fieldName);
+        $settersName = $this->methodNameChecker->getSetters($className, $fieldName);
 
         if (strlen($settersName) > 0) {
             $this->addViolation($constraint->message, $settersName, '');
         }
 
         if (in_array($type, RelationType::$anyToAnyRelations, false)) {
-            $relationMethodsName = $this->methodNameChecker->hasRelationMethods($className, $fieldName);
+            $relationMethodsName = $this->methodNameChecker->getRelationMethods($className, $fieldName);
 
             if (strlen($relationMethodsName) > 0) {
                 $this->addViolation($constraint->message, $relationMethodsName, '');

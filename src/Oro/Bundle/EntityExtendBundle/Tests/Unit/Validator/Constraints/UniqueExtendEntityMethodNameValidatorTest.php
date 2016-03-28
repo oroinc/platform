@@ -63,17 +63,17 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
         $violation  = $this->getMock('Symfony\Component\Validator\Violation\ConstraintViolationBuilderInterface');
 
         $this->methodNameChecker->expects(self::once())
-            ->method('hasGetters')
+            ->method('getGetters')
             ->willReturn($getter);
 
         $this->methodNameChecker->expects(self::once())
-            ->method('hasSetters')
+            ->method('getSetters')
             ->willReturn($setter);
 
 
         if (strlen($hasRelation) > 0) {
             $this->methodNameChecker->expects(self::once())
-                ->method('hasRelationMethods')
+                ->method('getRelationMethods')
                 ->willReturn($hasRelation);
         } else {
             $this->methodNameChecker->expects(self::never())
