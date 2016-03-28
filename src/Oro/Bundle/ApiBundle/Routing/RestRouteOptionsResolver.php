@@ -96,7 +96,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
-     * @return array [[entity class, entity plural alias], ...]
+     * @return array [[entity class, entity plural alias, [excluded action, ...]], ...]
      */
     protected function getSupportedEntities()
     {
@@ -114,7 +114,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 if (!empty($pluralAlias)) {
                     $this->supportedEntities[] = [
                         $className,
-                        $pluralAlias
+                        $pluralAlias,
+                        $resource->getExcludedActions()
                     ];
                 }
             }
@@ -126,14 +127,20 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param array                   $entities [[entity class, entity plural alias], ...]
+     * @param array                   $entities [[entity class, entity plural alias, [excluded action, ...]], ...]
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
         $routeName = $routes->getName($route);
 
+        $action = $route->getDefault('_action');
         foreach ($entities as $entity) {
-            list($className, $pluralAlias) = $entity;
+            list($className, $pluralAlias, $excludedActions) = $entity;
+
+            // check if given action is excluded for the entity
+            if (in_array($action, $excludedActions)) {
+                continue;
+            }
 
             $existingRoute = $routes->getByPath(
                 str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $route->getPath()),

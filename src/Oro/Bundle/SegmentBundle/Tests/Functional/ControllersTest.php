@@ -256,6 +256,8 @@ class ControllersTest extends WebTestCase
     {
         $this->assertEquals(count($expected), $totalCount);
         for ($i = 0; $i < $totalCount; $i++) {
+            // unset datagrid system info
+            unset($actual[$i]['action_configuration']);
             //compare by value
             $this->assertEquals(array_values($expected[$i]), array_values($actual[$i]));
         }

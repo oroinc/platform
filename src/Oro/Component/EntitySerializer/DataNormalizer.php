@@ -44,16 +44,17 @@ class DataNormalizer
         $fields = $config->getFields();
         foreach ($fields as $field => $fieldConfig) {
             $targetConfig = $fieldConfig->getTargetEntity();
-            $propertyPath = $fieldConfig->getPropertyPath();
-            if ($propertyPath
-                && !$fieldConfig->isExcluded()
-                && (!array_key_exists($field, $row) || null !== $row[$field])
-            ) {
-                $renaming     =
-                    null !== $targetConfig
-                    && !$fieldConfig->isCollapsed()
-                    && $targetConfig->hasField($propertyPath);
-                $this->applyPropertyPath($row, $field, $propertyPath, $renaming);
+            if (!$fieldConfig->isExcluded()) {
+                $propertyPath = $fieldConfig->getPropertyPath();
+                if ($propertyPath
+                    && (!array_key_exists($field, $row) || null !== $row[$field])
+                ) {
+                    $renaming     =
+                        null !== $targetConfig
+                        && !$fieldConfig->isCollapsed()
+                        && $targetConfig->hasField($propertyPath);
+                    $this->applyPropertyPath($row, $field, $propertyPath, $renaming);
+                }
             }
             if (null !== $targetConfig && !empty($row[$field]) && is_array($row[$field])) {
                 if (array_key_exists(0, $row[$field])) {

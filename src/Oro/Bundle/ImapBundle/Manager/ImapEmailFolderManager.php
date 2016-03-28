@@ -67,7 +67,7 @@ class ImapEmailFolderManager
             // merge synced and existing folders
             $emailFolderModels = $this->mergeFolders($emailFolderModels, $existingFolders);
             // mark old folders as outdated
-            $this->removeOutdated($existingFolders);
+            $this->markAsOutdated($existingFolders);
 
             // flush changes
             $this->em->flush();
@@ -109,11 +109,14 @@ class ImapEmailFolderManager
     /**
      * @param ArrayCollection|ImapEmailFolder[] $existingFolders
      */
-    protected function removeOutdated($existingFolders)
+    protected function markAsOutdated($existingFolders)
     {
+        $outdatedAt = new \DateTime('now', new \DateTimeZone('UTC'));
         /** @var ImapEmailFolder $existingFolder */
         foreach ($existingFolders as $existingFolder) {
-            $this->em->getRepository('OroImapBundle:ImapEmailFolder')->removeFolder($existingFolder);
+            $emailFolder = $existingFolder->getFolder();
+            $emailFolder->setOutdatedAt($outdatedAt);
+            $emailFolder->setSyncEnabled(false);
         }
     }
 

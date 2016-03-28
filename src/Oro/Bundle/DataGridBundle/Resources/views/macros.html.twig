@@ -39,6 +39,7 @@
             enableViews: renderParams.enableViews is defined ? renderParams.enableViews : enableFilters,
             showViewsInNavbar: renderParams.showViewsInNavbar is defined ? renderParams.showViewsInNavbar : false,
             inputName: oro_datagrid_build_inputname(datagrid.name),
+            themeOptions: renderParams.themeOptions|default({})
         } %}
 
         <div id="{{ gridId }}"

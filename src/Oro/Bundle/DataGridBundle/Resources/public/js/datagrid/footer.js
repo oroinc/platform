@@ -31,10 +31,16 @@ define([
 
         renderable: false,
 
+        themeOptions: {
+            optionPrefix: 'footer',
+            className: 'grid-footer'
+        },
+
         /**
          * @inheritDoc
          */
         initialize: function(options) {
+            _.extend(this, _.pick(options, ['themeOptions']));
             var state;
 
             this.rows = [];

@@ -27,6 +27,7 @@ parameters:
     oro_workflow.action.call_service_method.class: Oro\Component\Action\Action\CallServiceMethod
     oro_workflow.action.run_action.class: Oro\Bundle\ActionBundle\Action\RunAction
     oro_workflow.action.find_entities.class: Oro\Component\Action\Action\FindEntities
+    oro_workflow.action.assign_url.class: Oro\Component\Action\Action\AssignUrl
 
 services:
     oro_workflow.action_factory:
@@ -239,3 +240,12 @@ services:
             - @doctrine
         tags:
             - { name: oro_workflow.action, alias: find_entities }
+
+
+    oro_workflow.action.assign_url:
+        class: %oro_workflow.action.assign_url.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @router
+        tags:
+            - { name: oro_workflow.action, alias: assign_url }

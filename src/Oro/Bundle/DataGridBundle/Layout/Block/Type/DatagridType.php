@@ -35,11 +35,13 @@ class DatagridType extends AbstractType
             ->setRequired(['grid_name'])
             ->setOptional(['grid_scope'])
             ->setDefaults(['grid_parameters' => []])
+            ->setDefaults(['grid_render_parameters' => []])
             ->setAllowedTypes(
                 [
-                    'grid_name'       => 'string',
-                    'grid_scope'      => 'string',
-                    'grid_parameters' => 'array'
+                    'grid_name' => 'string',
+                    'grid_scope' => 'string',
+                    'grid_parameters' => 'array',
+                    'grid_render_parameters' => 'array'
                 ]
             )
             ->setNormalizers(
@@ -56,8 +58,9 @@ class DatagridType extends AbstractType
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        $view->vars['grid_name']       = $options['grid_name'];
+        $view->vars['grid_name'] = $options['grid_name'];
         $view->vars['grid_parameters'] = $options['grid_parameters'];
+        $view->vars['grid_render_parameters'] = $options['grid_render_parameters'];
         if (!empty($options['grid_scope'])) {
             $view->vars['grid_scope']     = $options['grid_scope'];
             $view->vars['grid_full_name'] = $this->nameStrategy->buildGridFullName(

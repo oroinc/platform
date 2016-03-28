@@ -95,7 +95,7 @@ class ActionDefinitionConfigurationValidator
 
         $optionsPath = $this->getPath($path, $sectionName);
         $options = $config[$sectionName];
-        
+
         $this->assertTemplate($options, $optionsPath, 'template');
     }
 
@@ -162,6 +162,10 @@ class ActionDefinitionConfigurationValidator
      */
     protected function validateRoutes(array $items, $path)
     {
+        if (!$items) {
+            return;
+        }
+
         $routeCollection = $this->router->getRouteCollection();
 
         foreach ($items as $key => $item) {

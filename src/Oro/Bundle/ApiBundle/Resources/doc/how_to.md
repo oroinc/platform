@@ -1,0 +1,119 @@
+How to
+======
+
+
+Table of Contents
+-----------------
+ - [Turn on API for entity](#overview)
+ - [Change ACL resource for action](#change-acl-resource-for-action)
+ - [Disable access checks for action](#disable-access-checks-for-action)
+ - [Disable entity action](#disable-entity-action)
+ - [Change delete handler for entity](#change-delete-handler-for-entity)
+
+
+Turn on API for entity
+----------------------
+
+By default, API for entities is disabled. To turn on API for some entity, you should add this entity to `Resources/config/oro/api.yml` of your bundle:
+
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\ProductBundle\Product: ~
+```
+
+Change ACL resource for action
+------------------------------
+
+By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
+
+| Action | Permission |
+| --- | --- |
+| get | VIEW |
+| get_list | VIEW |
+| delete | DELETE |
+
+In case if you want to change permission or disable access checks for some action, you can use the `acl_resource` option of `actions` configuration section.
+
+For example, lets's change permissions for `delete` action. You can do at `Resources/config/oro/api.yml` of your bundle: 
+
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\ProductBundle\Product:
+            actions:
+                delete:
+                    acl_resource: access_entity_view
+```
+
+If there is `access_entity_view` ACL resource:
+
+```yaml   
+access_entity_view:
+    type: entity
+    class: Acme\Bundle\ProductBundle\Product
+    permission: VIEW
+```
+
+As result, the `VIEW` permission will be used instead of `DELETE` permission.
+
+
+Disable access checks for action
+--------------------------------
+ 
+You can disable access checks for some action by setting `null` as a value to `acl_resource` option in `Resources/config/acl.yml`:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\ProductBundle\Product:
+            actions:
+                get_list:
+                    acl_resource: ~                
+```
+ 
+Disable entity action
+----------------------
+
+When you add an entity to the API, all the actions will be available by default.
+
+In case if an action should not be accessible, you can disable it in `Resources/config/acl.yml`:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\ProductBundle\Product:
+            actions:
+                delete:
+                    excluded: true                     
+```
+
+Also, you can use short syntax:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\ProductBundle\Product:
+            actions:
+                delete: false                    
+```
+
+Change delete handler for entity
+--------------------------------
+
+By default, entity deletion is processed by [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).
+
+If your want to use another delete handler, you can set it in `delete_handler` option in in `Resources/config/acl.yml`:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\ProductBundle\Product:
+            delete_handler: acme.demo.product_delete_handler                  
+```
+
+Please note, that the value of `delete_handler` option is the service id.
+
+Also, you can create own delete handler. The handler class must be derived from [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).

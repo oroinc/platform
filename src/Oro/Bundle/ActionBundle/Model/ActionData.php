@@ -81,4 +81,20 @@ class ActionData extends AbstractStorage implements EntityAwareInterface
 
         return $result;
     }
+
+    /**
+     * @return array
+     */
+    public function getScalarValues()
+    {
+        $scalars = [];
+
+        foreach ($this->data as $key => $value) {
+            if (is_scalar($value)) {
+                $scalars[$key] = $value;
+            }
+        }
+
+        return $scalars;
+    }
 }

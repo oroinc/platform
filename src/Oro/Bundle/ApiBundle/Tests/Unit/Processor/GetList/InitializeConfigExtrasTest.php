@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetList\InitializeConfigExtras;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\TestConfigExtra;
 
@@ -30,7 +30,7 @@ class InitializeConfigExtrasTest extends GetListProcessorTestCase
 
         $this->assertCount(4, $this->context->getConfigExtras());
         $this->assertTrue($this->context->hasConfigExtra($existingExtra->getName()));
-        $this->assertTrue($this->context->hasConfigExtra(VirtualFieldsConfigExtra::NAME));
+        $this->assertTrue($this->context->hasConfigExtra(EntityDefinitionConfigExtra::NAME));
         $this->assertTrue($this->context->hasConfigExtra(FiltersConfigExtra::NAME));
         $this->assertTrue($this->context->hasConfigExtra(SortersConfigExtra::NAME));
     }

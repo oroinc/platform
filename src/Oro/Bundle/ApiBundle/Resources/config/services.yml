@@ -15,6 +15,7 @@ services:
         public: false
         arguments:
             - @oro_api.processor_factory
+            - %kernel.debug%
 
     oro_api.processor_factory:
         class: Oro\Component\ChainProcessor\ChainProcessorFactory
@@ -73,12 +74,12 @@ services:
         class: Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer
         public: false
 
-    oro_api.customize_data_item.processor:
-        class: Oro\Bundle\ApiBundle\Processor\CustomizeDataItemProcessor
+    oro_api.customize_loaded_data.processor:
+        class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor
         public: false
         arguments:
             - @oro_api.processor_bag
-            - customize_data_item
+            - customize_loaded_data
 
     oro_api.resources_loader:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesLoader
@@ -101,7 +102,11 @@ services:
         public: false
         tags:
             - { name: oro_api.config_extension }
-
+    oro_api.config_extension.actions:
+        class: Oro\Bundle\ApiBundle\Config\ActionsConfigExtension
+        public: false
+        tags:
+            - { name: oro_api.config_extension }
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false
@@ -244,13 +249,7 @@ services:
     oro_api.filter_factory.default:
         class: Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory
         public: false
-        calls:
-            - [addFilter, [ 'integer', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'unsignedInteger', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'string', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'boolean', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'datetime', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'entityAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'entityPluralAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+        arguments:
+            - @property_accessor
         tags:
             - { name: oro.api.filter_factory, priority: -10 }

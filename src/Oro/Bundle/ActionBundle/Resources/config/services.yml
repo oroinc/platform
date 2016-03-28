@@ -1,20 +1,33 @@
 parameters:
+    oro_action.handler.delete.class: Oro\Bundle\ActionBundle\Handler\DeleteHandler
     oro_action.helper.context.class: Oro\Bundle\ActionBundle\Helper\ContextHelper
     oro_action.helper.applications.class: Oro\Bundle\ActionBundle\Helper\ApplicationsHelper
     oro_action.helper.restrict.class: Oro\Bundle\ActionBundle\Helper\RestrictHelper
+    oro_action.helper.options.class: Oro\Bundle\ActionBundle\Helper\OptionsHelper
+    oro_action.registry.class: Oro\Bundle\ActionBundle\Model\ActionRegistry
     oro_action.manager.class: Oro\Bundle\ActionBundle\Model\ActionManager
     oro_action.assembler.class: Oro\Bundle\ActionBundle\Model\ActionAssembler
     oro_action.attribute_assembler.class: Oro\Bundle\ActionBundle\Model\AttributeAssembler
     oro_action.attribute_guesser.class: Oro\Bundle\ActionBundle\Model\AttributeGuesser
+    oro_action.options_assembler.class: Oro\Bundle\ActionBundle\Model\OptionsAssembler
     oro_action.form_options_assembler.class: Oro\Bundle\ActionBundle\Model\FormOptionsAssembler
     oro_action.form_manager.class: Oro\Bundle\ActionBundle\Model\ActionFormManager
+    oro_action.api_manager.class: Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_action.datagrid.action_extension.class: Oro\Bundle\ActionBundle\Datagrid\Extension\ActionExtension
     oro_action.datagrid.action.action_widget_action.class: Oro\Bundle\ActionBundle\Datagrid\Action\ActionWidgetAction
     oro_action.datagrid.mass_action_provider.registry.class: Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry
     oro_action.layout.block_type.action_line_buttons.class: Oro\Bundle\ActionBundle\Layout\Block\Type\ActionLineButtonsType
     oro_action.layout.block_type.action_combined_buttons.class: Oro\Bundle\ActionBundle\Layout\Block\Type\ActionCombinedButtonsType
     oro_action.layout.data_provider.actions_data_rpovider.class: Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider
+
 services:
+    oro_action.handler.delete:
+        class: %oro_action.handler.delete.class%
+        arguments:
+            - @oro_soap.handler.delete
+            - @oro_action.api_manager
+            - @oro_entity.doctrine_helper
+
     oro_action.helper.context:
         class: %oro_action.helper.context.class%
         arguments:
@@ -30,14 +43,28 @@ services:
     oro_action.helper.restrict:
         class: %oro_action.helper.restrict.class%
 
-    oro_action.manager:
-        class: %oro_action.manager.class%
+    oro_action.helper.options:
+        class: %oro_action.helper.options.class%
         arguments:
-            - @oro_entity.doctrine_helper
             - @oro_action.helper.context
+            - @oro_action.helper.applications
+            - @oro_action.options_assembler
+            - @oro_action.context_accessor
+            - @router
+
+    oro_action.registry:
+        class: %oro_action.registry.class%
+        arguments:
             - @oro_action.configuration.provider
             - @oro_action.assembler
             - @oro_action.helper.applications
+
+    oro_action.manager:
+        class: %oro_action.manager.class%
+        arguments:
+            - @oro_action.registry
+            - @oro_entity.doctrine_helper
+            - @oro_action.helper.context
 
     oro_action.assembler:
         class: %oro_action.assembler.class%
@@ -46,6 +73,7 @@ services:
             - @oro_action.expression.factory
             - @oro_action.attribute_assembler
             - @oro_action.form_options_assembler
+            - @oro_entity.doctrine_helper
 
     oro_action.attribute_assembler:
         class: %oro_action.attribute_assembler.class%
@@ -88,6 +116,11 @@ services:
             - [addFormTypeMapping, ["boolean", "checkbox"]]
             - [addFormTypeMapping, ["float", "number"]]
 
+    oro_action.options_assembler:
+        class: %oro_action.options_assembler.class%
+        calls:
+            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+
     oro_action.form_options_assembler:
         class: %oro_action.form_options_assembler.class%
         calls:
@@ -100,13 +133,22 @@ services:
             - @oro_action.manager
             - @oro_action.helper.context
 
+    oro_action.api_manager:
+        class: %oro_action.api_manager.class%
+        parent: oro_soap.manager.entity_manager.abstract
+        arguments:
+            - ''
+            - @doctrine.orm.entity_manager
+
     oro_action.datagrid.extension.action:
         class: %oro_action.datagrid.action_extension.class%
         arguments:
             - @oro_action.manager
             - @oro_action.helper.context
-            - @oro_action.helper.applications
             - @oro_action.datagrid.mass_action_provider.registry
+            - @oro_action.helper.options
+        calls:
+            - [setGroups, [['', 'datagridRowAction']]]
         tags:
             - { name: oro_datagrid.extension }
         lazy: true

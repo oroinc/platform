@@ -99,8 +99,8 @@ services:
     oro_api.get.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - @security.authorization_checker
             - @oro_api.doctrine_helper
+            - @oro_security.security_facade
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
@@ -135,13 +135,15 @@ services:
     oro_api.get.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
         arguments:
+            - @oro_api.doctrine_helper
             - @oro_security.acl_helper
+            - @oro_security.acl.annotation_provider
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -90 }
 
     oro_api.get.build_query:
-        class: Oro\Bundle\ApiBundle\Processor\Get\BuildQuery
+        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
             - @oro_api.doctrine_helper
         tags:
@@ -205,7 +207,7 @@ services:
             - { name: oro.api.processor, action: get, group: normalize_result, priority: -10 }
 
     oro_api.get.json_api.build_json_api_document:
-        class: Oro\Bundle\ApiBundle\Processor\Get\JsonApi\BuildJsonApiDocument
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\BuildSingleItemJsonApiDocument
         arguments:
             - @oro_api.json_api.document_builder_factory
         tags:

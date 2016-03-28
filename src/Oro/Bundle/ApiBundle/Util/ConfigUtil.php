@@ -15,6 +15,12 @@ class ConfigUtil extends BaseConfigUtil
     /** the name of sorters configuration section */
     const SORTERS = 'sorters';
 
+    /** the name of actions configuration section */
+    const ACTIONS = 'actions';
+
     /** a flag indicates whether an entity configuration should be merged with a configuration of a parent entity */
     const INHERIT = 'inherit';
+
+    /** the name of ACL resource */
+    const ACL_RESOURCE = 'acl_resource';
 }

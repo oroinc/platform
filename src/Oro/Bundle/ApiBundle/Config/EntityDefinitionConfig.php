@@ -15,6 +15,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     use Traits\LabelTrait;
     use Traits\PluralLabelTrait;
     use Traits\DescriptionTrait;
+    use Traits\AclResourceTrait;
 
     /** a human-readable representation of the entity */
     const LABEL = 'label';
@@ -24,6 +25,12 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /** a human-readable description of the entity */
     const DESCRIPTION = 'description';
+
+    /** the name of ACL resource */
+    const ACL_RESOURCE = 'acl_resource';
+
+    /** a handler that should be used to delete the entity */
+    const DELETE_HANDLER = 'delete_handler';
 
     /**
      * {@inheritdoc}
@@ -218,6 +225,32 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
             $this->items[self::HINTS] = $hints;
         } else {
             unset($this->items[self::HINTS]);
+        }
+    }
+
+    /**
+     * Gets a handler that should be used to delete the entity.
+     *
+     * @return string|null The service id
+     */
+    public function getDeleteHandler()
+    {
+        return array_key_exists(self::DELETE_HANDLER, $this->items)
+            ? $this->items[self::DELETE_HANDLER]
+            : null;
+    }
+
+    /**
+     * Sets a handler that should be used to delete the entity.
+     *
+     * @param string|null $handler The service id
+     */
+    public function setDeleteHandler($handler = null)
+    {
+        if (null !== $handler) {
+            $this->items[self::DELETE_HANDLER] = $handler;
+        } else {
+            unset($this->items[self::DELETE_HANDLER]);
         }
     }
 }

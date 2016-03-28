@@ -46,10 +46,12 @@ datagrid:
         ....
 
         sorters:
+            toolbar_sorting: true #optional, show additional sorting control in toolbar
             columns:
                 label:  # column name for view layer
                     data_name: o.label   # property in result set (column name or alias), if main entity has alias
                                          # like in this example it will be added automatically
+                    type: string #optional, affect labels in toolbar sorting
                 someColumn:
                     data_name: someAlias
                     apply_callback: callable # if you want to apply some operations instead of just adding ORDER BY

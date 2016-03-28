@@ -1,0 +1,49 @@
+empty:
+    config: []
+    expected: []
+
+null_actions:
+    config:
+        actions: ~
+    expected: []
+
+empty_actions:
+    config:
+        actions: []
+    expected: []
+
+null_actions_action:
+    config:
+        actions:
+            view_action: ~
+    expected: []
+
+null_actions_action_exclude_property:
+    config:
+        actions:
+            view_action:
+                exclude: ~
+    expected:
+        actions:
+            view_action:
+                exclude: false
+
+full:
+    config:
+        actions:
+            view_action: ~
+            create_action: []
+            update_action:
+                acl_resource: update_action_acl_resource
+            delete_action:
+                exclude: false
+                acl_resource: delete_action_acl_resource
+    expected:
+        actions:
+            create_action: []
+            update_action:
+                acl_resource: update_action_acl_resource
+            delete_action:
+                exclude: false
+                acl_resource: delete_action_acl_resource
+
