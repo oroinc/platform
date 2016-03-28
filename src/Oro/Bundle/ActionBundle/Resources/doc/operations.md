@@ -7,6 +7,7 @@ Operations
   * [Configuration Validation](#configuration-validation)
   * [Default Operations](#default-operations)
     * [Questions and Answers](#questions-and-answers)
+  * [Operation Diagram](#operation-diagram)
 
 What are Operations?
 --------------------
@@ -30,7 +31,7 @@ where operations should be displayed or\and datagrids. Before page loading, Acti
 corresponded page entity|route. Then these *operations* are checking for their Pre conditions. If all Pre conditions 
 are met - Operation's button is displaying.
 After a user clicks on the button - all performed operations (and underlined actions) will be executed 
-if preconditions of *operation* and conditions of *action groups* are met.
+if preconditions of *operation* and conditions of *actions* are met.
 
 Operation Configuration
 -----------------------
@@ -207,5 +208,10 @@ default one only when context will be matched by that entity.
 For those who need to make full replacement of operation instead of extended copy of it - `extends` field can be omitted
 and own, totally custom, body defined.
 
-  See [substitution](./configuration-reference.md#substitution-of-operations) section in
+  See [substitution](./configuration-reference.md#substitution-of-operation) section in
 config documentation](./configuration-reference.md) for more details.
+
+
+Operation Diagram
+-----------------
+Following diagram shows operation processes logic in graphical representation: ![Operation Diagram](images/operation.png)
