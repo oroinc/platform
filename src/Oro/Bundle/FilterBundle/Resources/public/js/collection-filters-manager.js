@@ -85,7 +85,8 @@ define([
         _onChangeFilterSelect: function() {
             CollectionFiltersManager.__super__._onChangeFilterSelect.apply(this, arguments);
 
-            this._updateView();
+            this._beforeCollectionFetch(this.collection);
+            this._onUpdateCollectionState(this.collection);
         },
 
         /**
@@ -152,6 +153,16 @@ define([
             _.each(this.filters, function(filter, name) {
                 var shortName = '__' + name;
                 var filterState;
+
+                // Reset to initial state, should be removed after 
+                if (filter.defaultEnabled === false && filter.enabled === true) {
+                    this.disableFilter(filter);
+                }
+
+                if (filter.defaultEnabled === true && filter.enabled === false) {
+                    this.enableFilter(filter);
+                }
+
                 if (_.has(state, name)) {
                     filterState = state[name];
                     if (!_.isObject(filterState)) {

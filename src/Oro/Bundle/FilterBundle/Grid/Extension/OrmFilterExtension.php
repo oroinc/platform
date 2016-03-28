@@ -2,29 +2,34 @@
 
 namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
+use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\EntityBundle\ORM\Registry;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Filter\FilterInterface;
-use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
+use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OrmFilterExtension extends AbstractExtension
 {
     /**
      * Query param
      */
-    const FILTER_ROOT_PARAM     = '_filter';
+    const FILTER_ROOT_PARAM = '_filter';
     const MINIFIED_FILTER_PARAM = 'f';
 
     /** @var FilterInterface[] */
@@ -33,12 +38,31 @@ class OrmFilterExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
+    /** @var Registry */
+    protected $registry;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
+    /** @var AclHelper */
+    protected $aclHelper;
+
     /**
      * @param TranslatorInterface $translator
+     * @param Registry            $registry
+     * @param SecurityFacade      $securityFacade
+     * @param AclHelper           $aclHelper
      */
-    public function __construct(TranslatorInterface $translator)
-    {
-        $this->translator = $translator;
+    public function __construct(
+        TranslatorInterface $translator,
+        Registry $registry,
+        SecurityFacade $securityFacade,
+        AclHelper $aclHelper
+    ) {
+        $this->translator     = $translator;
+        $this->registry       = $registry;
+        $this->securityFacade = $securityFacade;
+        $this->aclHelper      = $aclHelper;
     }
 
     /**
@@ -111,9 +135,35 @@ class OrmFilterExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $filtersState        = $data->offsetGetByPath('[state][filters]', []);
+        $currentUser = $this->getCurrentUser();
+        if (!$currentUser) {
+            return;
+        }
+
+        $gridName  = $config->getName();
+        $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
+
+        $currentState = $data->offsetGet('state');
+
+        /** Get columns data from grid view */
+        $currentGridView = null;
+
+        if (isset($currentState['gridView'])) {
+            foreach ($gridViews as $gridView) {
+                if ((int)$currentState['gridView'] === $gridView->getId()) {
+                    $currentGridView = $gridView;
+                    break;
+                }
+            }
+        }
+        $filtersState = $data->offsetGetByPath('[state][filters]', []);
+
         $initialFiltersState = $filtersState;
         $filtersMetaData     = [];
+
+        if ($currentGridView) {
+            $filtersState = array_merge($currentGridView->getFiltersData(), $filtersState);
+        }
 
         $filters       = $this->getFiltersToApply($config);
         $values        = $this->getValuesToApply($config);
@@ -151,8 +201,9 @@ class OrmFilterExtension extends AbstractExtension
 
     /**
      * @param FilterInterface $filter
-     * @param mixed $value
-     * @param array $state
+     * @param mixed           $value
+     * @param array           $state
+     *
      * @return array
      */
     protected function updateFiltersState(FilterInterface $filter, $value, array $state)
@@ -193,7 +244,7 @@ class OrmFilterExtension extends AbstractExtension
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
             $minifiedParameters = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
-            $filters = [];
+            $filters            = [];
 
             if (array_key_exists(self::MINIFIED_FILTER_PARAM, $minifiedParameters)) {
                 $filters = $minifiedParameters[self::MINIFIED_FILTER_PARAM];
@@ -303,4 +354,56 @@ class OrmFilterExtension extends AbstractExtension
     {
         return isset($values[$key]) ? $values[$key] : $default;
     }
+
+
+    /**
+     * @return GridViewRepository
+     */
+    protected function getGridViewRepository()
+    {
+        return $this->registry->getRepository('OroDataGridBundle:GridView');
+    }
+
+    /**
+     * @return UserInterface
+     */
+    protected function getCurrentUser()
+    {
+        $user = $this->securityFacade->getLoggedUser();
+        if ($user instanceof UserInterface) {
+            return $user;
+        }
+
+        return null;
+    }
+
+//    /**
+//     * @param $filters
+//     * @param $values
+//     * @param $datasourceAdapter
+//     */
+//    protected function buildDefaultFilterData($filters, $values, $datasourceAdapter)
+//    {
+//        foreach ($filters as $filter) {
+//            $value = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
+//
+//            if ($value !== false) {
+//                $form = $filter->getForm();
+//                if (!$form->isSubmitted()) {
+//                    $form->submit($value);
+//                }
+//
+//                if ($form->isValid()) {
+//                    $data = $form->getData();
+//                    if (isset($value['value']['start'])) {
+//                        $data['value']['start_original'] = $value['value']['start'];
+//                    }
+//                    if (isset($value['value']['end'])) {
+//                        $data['value']['end_original'] = $value['value']['end'];
+//                    }
+//                    $filter->apply($datasourceAdapter, $data);
+//                }
+//            }
+//        }
+//    }
 }

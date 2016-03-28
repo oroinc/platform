@@ -13,6 +13,9 @@ services:
         class: %oro_filter.extension.orm_filter.class%
         arguments:
             - @translator
+            - @doctrine
+            - @oro_security.security_facade
+            - @oro_security.acl_helper
         tags:
             - { name: oro_datagrid.extension }
 
