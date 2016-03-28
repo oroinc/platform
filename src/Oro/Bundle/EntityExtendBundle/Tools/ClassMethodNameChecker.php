@@ -21,11 +21,11 @@ class ClassMethodNameChecker
     protected $relationPrefix = ['remove', 'setDefault', 'add'];
 
     /**
-     * @param string $property
-     * @param string $className
-     * @param array  $prefixes
+     * @param       $property
+     * @param       $className
+     * @param array $prefixes
      *
-     * @return string
+     * @return array
      */
     public function getMethods($property, $className, array $prefixes)
     {

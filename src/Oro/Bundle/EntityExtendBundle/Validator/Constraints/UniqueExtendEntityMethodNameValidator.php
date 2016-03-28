@@ -2,12 +2,13 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Validator\Constraints;
 
+use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
 use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
-use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 /**
  * Validates method name for uniqueness for field name.
@@ -20,14 +21,10 @@ class UniqueExtendEntityMethodNameValidator extends ConstraintValidator
     protected $methodNameChecker;
 
     /**
-     * @param FieldNameValidationHelper $validationHelper
      * @param ClassMethodNameChecker    $methodNameChecker
-     *
      */
-    public function __construct(FieldNameValidationHelper $validationHelper, ClassMethodNameChecker $methodNameChecker)
+    public function __construct(ClassMethodNameChecker $methodNameChecker)
     {
-        parent::__construct($validationHelper);
-
         $this->methodNameChecker = $methodNameChecker;
     }
 
@@ -64,5 +61,23 @@ class UniqueExtendEntityMethodNameValidator extends ConstraintValidator
         if (!empty($methods)) {
             $this->addViolation($constraint->message, implode(', ', $methods), '');
         }
+    }
+
+    /**
+     * @param string $message
+     * @param string $newFieldName
+     * @param string $existingFieldName
+     */
+    protected function addViolation($message, $newFieldName, $existingFieldName)
+    {
+        /** @var ExecutionContextInterface $context */
+        $context = $this->context;
+        $context
+            ->buildViolation(
+                $message,
+                ['{{ value }}' => $newFieldName, '{{ field }}' => $existingFieldName]
+            )
+            ->atPath('fieldName')
+            ->addViolation();
     }
 }

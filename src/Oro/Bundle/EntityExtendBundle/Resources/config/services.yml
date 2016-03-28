@@ -170,7 +170,6 @@ services:
     oro_entity_extend.validator.unique_extend_entity_method_name_validator:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
         arguments:
-            - @oro_entity_extend.extend.field_name_validation_helper
             - @oro_entity_extend.tools.class_method_name_checker
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
@@ -434,35 +433,5 @@ services:
         tags:
             - { name: oro_entity.dictionary_value_list_provider, priority: -90 }
 
-    oro_entity_extend.field_type_provider:
-        class: %oro_entity_extend.field_type_provider.class%
-        public: false
-        arguments:
-            - @oro_entity_config.config_manager
-            -
-                - string
-                - integer
-                - smallint
-                - bigint
-                - boolean
-                - decimal
-                - date
-                - datetime
-                - text
-                - float
-                - money
-                - percent
-                - file
-                - image
-                - enum
-                - multiEnum
-            -
-                #BAP-5875
-                #- oneToOne
-                - oneToMany
-                - manyToOne
-                - manyToMany
-
-    # Helpers
     oro_entity_extend.tools.class_method_name_checker:
         class: Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker

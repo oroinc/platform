@@ -4,12 +4,10 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Validator\Constraints;
 
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
-use Oro\Bundle\EntityConfigBundle\Tests\Unit\ConfigProviderMock;
 use Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityFieldValidator;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodName;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator;
-use Oro\Bundle\EntityExtendBundle\Validator\FieldNameValidationHelper;
 
 class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestCase
 {
@@ -18,18 +16,9 @@ class UniqueExtendEntityMethodNameValidatorTest extends \PHPUnit_Framework_TestC
     /** @var UniqueExtendEntityFieldValidator */
     protected $validator;
 
-    /** @var ClassMethodNameChecker */
-    protected $methodNameChecker;
-
     protected function setUp()
     {
-        $configManager = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\ConfigManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->validator = new UniqueExtendEntityMethodNameValidator(
-            new FieldNameValidationHelper(new ConfigProviderMock($configManager, 'extend')),
-            $this->methodNameChecker
-        );
+        $this->validator = new UniqueExtendEntityMethodNameValidator(new ClassMethodNameChecker());
     }
 
     /**
