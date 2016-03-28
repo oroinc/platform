@@ -4,7 +4,7 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\ActionBundle\Exception\ActionNotFoundException;
+use Oro\Bundle\ActionBundle\Exception\OperationNotFoundException;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 
 class OperationManager
@@ -106,13 +106,13 @@ class OperationManager
      * @param ActionData $actionData
      * @param bool $checkAvailable
      * @return Operation
-     * @throws ActionNotFoundException
+     * @throws OperationNotFoundException
      */
     public function getOperation($operationName, ActionData $actionData, $checkAvailable = true)
     {
         $operation = $this->operationRegistry->findByName($operationName);
         if (!$operation instanceof Operation || ($checkAvailable && !$operation->isAvailable($actionData))) {
-            throw new ActionNotFoundException($operationName);
+            throw new OperationNotFoundException($operationName);
         }
 
         return $operation;

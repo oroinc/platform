@@ -4,6 +4,8 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 class Parameter
 {
+    const NO_DEFAULT = INF;
+
     /* @var string */
     private $name;
 
@@ -11,13 +13,18 @@ class Parameter
     private $type;
 
     /* @var string */
-    private $message;
+    private $message = '';
 
     /* @var mixed */
-    private $default;
+    private $default = self::NO_DEFAULT;
 
-    /** @var bool */
-    private $required = false;
+    /**
+     * @param string $name
+     */
+    public function __construct($name)
+    {
+        $this->name = (string)$name;
+    }
 
     /**
      * @return string
@@ -28,22 +35,19 @@ class Parameter
     }
 
     /**
-     * @param string $name
-     * @return $this
-     */
-    public function setName($name)
-    {
-        $this->name = $name;
-
-        return $this;
-    }
-
-    /**
      * @return string
      */
     public function getType()
     {
         return $this->type;
+    }
+
+    /**
+     * @return bool
+     */
+    public function hasTypeHint()
+    {
+        return $this->type !== null;
     }
 
     /**
@@ -66,21 +70,41 @@ class Parameter
     }
 
     /**
+     * @return bool
+     */
+    public function hasMessage()
+    {
+        return $this->message !== '';
+    }
+
+    /**
      * @param string $message
      * @return $this
      */
     public function setMessage($message)
     {
-        $this->message = $message;
+        $this->message = (string)$message;
 
         return $this;
     }
 
     /**
      * @return mixed
+     * @throws \LogicException
      */
     public function getDefault()
     {
+        if (!$this->hasDefault()) {
+            throw new \LogicException(
+                sprintf(
+                    'Parameter `%s` has no default value set. Please check `%s` or `%s` before default value retrieval',
+                    $this->name,
+                    'hasDefault() === true',
+                    'isRequired() === false'
+                )
+            );
+        }
+
         return $this->default;
     }
 
@@ -96,21 +120,26 @@ class Parameter
     }
 
     /**
+     * @return bool
+     */
+    public function hasDefault()
+    {
+        return $this->default !== self::NO_DEFAULT;
+    }
+
+    /**
      * @return boolean
      */
     public function isRequired()
     {
-        return $this->required;
+        return $this->default === self::NO_DEFAULT;
     }
 
     /**
-     * @param boolean $required
-     * @return $this
+     * @return string
      */
-    public function setRequired($required)
+    public function __toString()
     {
-        $this->required = $required;
-
-        return $this;
+        return $this->name;
     }
 }

@@ -4,7 +4,8 @@ namespace Oro\Bundle\ActionBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
-use Oro\Bundle\ActionBundle\Exception\ForbiddenOperationException;
+use Oro\Bundle\ActionBundle\Exception\ForbiddenActionGroupException;
+use Oro\Bundle\ActionBundle\Model\ActionGroup\ParametersResolver;
 use Oro\Bundle\ActionBundle\Model\Assembler\ParameterAssembler;
 
 use Oro\Component\Action\Action\ActionFactory;
@@ -24,6 +25,9 @@ class ActionGroup
     /** @var ParameterAssembler */
     private $parameterAssembler;
 
+    /** @var ParametersResolver */
+    private $parametersResolver;
+
     /** @var ActionGroupDefinition */
     private $definition;
 
@@ -34,30 +38,35 @@ class ActionGroup
      * @param ActionFactory $actionFactory
      * @param ConditionFactory $conditionFactory
      * @param ParameterAssembler $parameterAssembler
+     * @param ParametersResolver $parametersResolver
      * @param ActionGroupDefinition $definition
      */
     public function __construct(
         ActionFactory $actionFactory,
         ConditionFactory $conditionFactory,
         ParameterAssembler $parameterAssembler,
+        ParametersResolver $parametersResolver,
         ActionGroupDefinition $definition
     ) {
         $this->actionFactory = $actionFactory;
         $this->conditionFactory = $conditionFactory;
         $this->parameterAssembler = $parameterAssembler;
         $this->definition = $definition;
+        $this->parametersResolver = $parametersResolver;
     }
 
     /**
      * @param ActionData $data
      * @param Collection $errors
      * @return ActionData
-     * @throws ForbiddenOperationException
+     * @throws ForbiddenActionGroupException
      */
     public function execute(ActionData $data, Collection $errors = null)
     {
+        $this->parametersResolver->resolve($data, $this, $errors);
+
         if (!$this->isAllowed($data, $errors)) {
-            throw new ForbiddenOperationException(
+            throw new ForbiddenActionGroupException(
                 sprintf('ActionGroup "%s" is not allowed', $this->definition->getName())
             );
         }
@@ -107,7 +116,7 @@ class ActionGroup
     }
 
     /**
-     * @return array
+     * @return array|Parameter[]
      */
     public function getParameters()
     {
