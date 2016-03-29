@@ -353,7 +353,6 @@ services:
         arguments:
             - @mailer
             - @service_container
-            - @oro_imap.imap_email_google_oauth2_manager
 
     # Email template API
     oro_email.manager.emailtemplate.api:
