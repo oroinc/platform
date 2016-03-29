@@ -27,15 +27,6 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')
                 ->disableOriginalConstructor()
                 ->getMock();
-//        $this->emailOrigin->expects($this->any())
-//            ->method('getSmtpHost')
-//            ->will($this->returnValue('smtp.gmail.com'));
-//        $this->emailOrigin->expects($this->any())
-//            ->method('getSmtpPort')
-//            ->will($this->returnValue(465));
-//        $this->emailOrigin->expects($this->any())
-//            ->method('getUser')
-//            ->will($this->returnValue('user1'));
 
         $managerClass = 'Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager';
         $this->imapEmailGoogleOauth2Manager = $this->getMockBuilder($managerClass)
