@@ -11,6 +11,8 @@ use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
+use Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
@@ -114,9 +116,14 @@ class RestDocHandler implements HandlerInterface
         if ($entityType) {
             $entityClass = $this->getEntityClass($entityType);
             $config = $this->getConfig($action, $entityClass);
+            $statusCodes = $config->getConfig()->getStatusCodes();
+            $config->getConfig()->setStatusCodes();
 
             $annotation->setSection($entityType);
             $this->setDescription($annotation, $action, $config->getConfig()->toArray(), $entityClass);
+            if ($statusCodes) {
+                $this->setStatusCodes($annotation, $statusCodes);
+            }
             if ($this->hasAttribute($route, RestRouteOptionsResolver::ID_PLACEHOLDER)) {
                 $this->addIdRequirement(
                     $annotation,
@@ -170,7 +177,8 @@ class RestDocHandler implements HandlerInterface
         /** @var Context $context */
         $context = $processor->createContext();
         $context->removeConfigExtra(SortersConfigExtra::NAME);
-        $context->addConfigExtra(new DescriptionsConfigExtra());
+        $context->addConfigExtra(new DescriptionsConfigExtra($action));
+        $context->addConfigExtra(new StatusCodesConfigExtra($action));
         $context->getRequestType()->add(RequestType::REST);
         if ('rest_json_api' === $this->docViewDetector->getView()) {
             $context->getRequestType()->add(RequestType::JSON_API);
@@ -228,6 +236,20 @@ class RestDocHandler implements HandlerInterface
         }
         if ($documentation) {
             $annotation->setDocumentation($documentation);
+        }
+    }
+
+    /**
+     * @param ApiDoc            $annotation
+     * @param StatusCodesConfig $statusCodes
+     */
+    protected function setStatusCodes(ApiDoc $annotation, StatusCodesConfig $statusCodes)
+    {
+        $codes = $statusCodes->getCodes();
+        foreach ($codes as $statusCode => $code) {
+            if (!$code->isExcluded()) {
+                $annotation->addStatusCode($statusCode, $code->getDescription());
+            }
         }
     }
 
