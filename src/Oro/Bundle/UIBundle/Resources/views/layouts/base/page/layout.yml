@@ -6,8 +6,10 @@ layout:
             items:
                 head:
                     blockType: head
+                title:
+                    blockType: title
                     options:
-                        title: OroPlatform
+                        value: OroPlatform
                 meta_charset:
                     blockType: meta
                     options:
@@ -36,6 +38,7 @@ layout:
             tree:
                 root:
                     head:
+                        title: ~
                         meta_charset: ~
                         meta_viewport: ~
                         styles: ~
