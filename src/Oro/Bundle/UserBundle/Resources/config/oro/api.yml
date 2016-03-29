@@ -10,3 +10,5 @@ oro_api:
             actions:
                 delete:
                     exclude: false # set manually because this entity is marked as a dictionary
+                delete_list:
+                    exclude: false # set manually because this entity is marked as a dictionary

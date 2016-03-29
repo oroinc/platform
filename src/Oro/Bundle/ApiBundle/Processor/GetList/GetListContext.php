@@ -2,30 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\GetList;
 
-use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\ListContext;
 
-class GetListContext extends Context
+class GetListContext extends ListContext
 {
-    /** a callback that can be used to calculate the total number of records in a list of entities */
-    const TOTAL_COUNT_CALLBACK = 'totalCountCallback';
-
-    /**
-     * Gets a callback that can be used to calculate the total number of records in a list of entities
-     *
-     * @return callable|null
-     */
-    public function getTotalCountCallback()
-    {
-        return $this->get(self::TOTAL_COUNT_CALLBACK);
-    }
-
-    /**
-     * Sets a callback that can be used to calculate the total number of records in a list of entities
-     *
-     * @param callable|null $totalCount
-     */
-    public function setTotalCountCallback($totalCount)
-    {
-        $this->set(self::TOTAL_COUNT_CALLBACK, $totalCount);
-    }
 }

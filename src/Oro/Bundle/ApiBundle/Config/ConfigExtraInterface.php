@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 
 /**
- * Provides an interface for different kind requests for additional configuration data.
+ * Provides an interface for different kind requests for configuration data.
  */
 interface ConfigExtraInterface
 {

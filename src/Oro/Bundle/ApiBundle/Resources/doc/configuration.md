@@ -60,6 +60,7 @@ oro_api:
         ...
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            exclude: ~
             ...
             fields:
                 ...
@@ -69,7 +70,8 @@ oro_api:
             sorters:
                 fields:
                     ...
-            exclude: ~
+            actions:
+                ...
         ...
     relations:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
@@ -165,7 +167,7 @@ Each entity can have next properties:
 * **order_by** *array* The property can be used to configure default ordering. The item key is the name of a field. The value can be `ASC` or `DESC`.
 * **hints** *array* Sets [Doctrine query hints](http://doctrine-orm.readthedocs.org/projects/doctrine-orm/en/latest/reference/dql-doctrine-query-language.html#query-hints). Each item can be a string or an array with `name` and `value` keys. The string value is a short form of `[name: hint name]`.
 * **post_serialize** *callable* A handler to be used to modify serialized data.
-* **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) action. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
+* **delete_handler** *string* The id of a service that should be used to delete entity by the [delete](./actions.md#delete-action) and [delete_list](./actions.md#delete_list-action) actions. By default the [oro_soap.handler.delete](../../../SoapBundle/Handler/DeleteHandler.php) service is used.
 
 Example:
 
@@ -341,6 +343,7 @@ Each action can have next parameters:
 * **exclude** *boolean* Indicates whether the action is disabled for entity. By default `false`.
 * **description** *string* The entity description for the action.
 * **acl_resource** *string* The name of ACL resource that should be used to protect an entity in a scope of this action. The `null` can be used to disable access checks.
+* **status_codes** *array* The possible response status codes for the action.
 
 By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
 
@@ -349,6 +352,7 @@ By default, the following permissions are used to restrict access to an entity i
 | get | VIEW |
 | get_list | VIEW |
 | delete | DELETE |
+| delete_list | DELETE |
 
 
 Examples of `actions` section configuration:
@@ -394,4 +398,54 @@ oro_api:
             actions:
                 get:
                     acl_resource: ~
+```
+
+Add additional status code for `delete` action:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete:
+                    status_codes:
+                        '417': 'Returned when expectations failed'
+```
+
+or
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete:
+                    status_codes:
+                        '417':
+                            description: 'Returned when expectations failed'
+```
+
+Remove existing status code for `delete` action:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete:
+                    status_codes:
+                        '417': false
+```
+
+or
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete:
+                    status_codes:
+                        '417':
+                            exclude: true
 ```

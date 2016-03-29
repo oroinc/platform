@@ -4,9 +4,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements
-    ConfigLoaderInterface,
-    ConfigLoaderFactoryAwareInterface
+class EntityDefinitionFieldConfigLoader extends AbstractConfigLoader implements ConfigLoaderFactoryAwareInterface
 {
     /** @var array */
     protected $methodMap = [

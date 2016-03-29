@@ -57,6 +57,8 @@ The following table describes existing sections for which new options can be add
 | filters.field  | Add a filter options |
 | sorters | Add options to `sorters` section |
 | sorters.field  | Add a sorter options |
+| actions.action | Add an action options |
+| actions.action.status_code | Add a response status code options |
 |||
 
 An example:
