@@ -60,6 +60,7 @@ oro_api:
         ...
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            exclude: ~
             ...
             fields:
                 ...
@@ -69,7 +70,8 @@ oro_api:
             sorters:
                 fields:
                     ...
-            exclude: ~
+            actions:
+                ...
         ...
     relations:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
@@ -341,6 +343,7 @@ Each action can have next parameters:
 * **exclude** *boolean* Indicates whether the action is disabled for entity. By default `false`.
 * **description** *string* The entity description for the action.
 * **acl_resource** *string* The name of ACL resource that should be used to protect an entity in a scope of this action. The `null` can be used to disable access checks.
+* **status_codes** *array* The possible response status codes for the action.
 
 By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
 
@@ -395,4 +398,54 @@ oro_api:
             actions:
                 get:
                     acl_resource: ~
+```
+
+Add additional status code for `delete` action:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete:
+                    status_codes:
+                        '417': 'Returned when expectations failed'
+```
+
+or
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete:
+                    status_codes:
+                        '417':
+                            description: 'Returned when expectations failed'
+```
+
+Remove existing status code for `delete` action:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete:
+                    status_codes:
+                        '417': false
+```
+
+or
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                delete:
+                    status_codes:
+                        '417':
+                            exclude: true
 ```

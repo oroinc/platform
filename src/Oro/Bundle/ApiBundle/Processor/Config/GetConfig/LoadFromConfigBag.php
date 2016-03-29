@@ -2,17 +2,20 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\GetConfig;
 
-use Oro\Bundle\ApiBundle\Config\ActionConfig;
-use Oro\Bundle\ApiBundle\Config\ActionsConfigExtra;
 use Symfony\Component\Config\Definition\Builder\TreeBuilder;
 use Symfony\Component\Config\Definition\NodeInterface;
 use Symfony\Component\Config\Definition\Processor;
 
+use Oro\Bundle\ApiBundle\Config\ActionConfig;
+use Oro\Bundle\ApiBundle\Config\ActionsConfigExtra;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityConfiguration;
 use Oro\Bundle\ApiBundle\Config\Definition\EntityDefinitionConfiguration;
+use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
+use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
+use Oro\Bundle\ApiBundle\Config\StatusCodesConfigLoader;
 use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Processor\Config\Shared\LoadFromConfigBag as BaseLoadFromConfigBag;
 use Oro\Bundle\ApiBundle\Provider\ConfigBag;
@@ -52,10 +55,31 @@ class LoadFromConfigBag extends BaseLoadFromConfigBag
     {
         $targetAction = $context->getTargetAction();
         if ($targetAction && !empty($config[ActionsConfigExtra::NAME][$targetAction])) {
-            $config = $this->mergeActionConfig($config, $config[ActionsConfigExtra::NAME][$targetAction]);
+            $actionConfig = $config[ActionsConfigExtra::NAME][$targetAction];
+            if (array_key_exists(ActionConfig::STATUS_CODES, $actionConfig)
+                && $context->hasExtra(DescriptionsConfigExtra::NAME)
+            ) {
+                $config[ActionConfig::STATUS_CODES] = $this->loadStatusCodes(
+                    $actionConfig[ActionConfig::STATUS_CODES]
+                );
+            }
+            unset($actionConfig[ActionConfig::STATUS_CODES]);
+            $config = $this->mergeActionConfig($config, $actionConfig);
         }
 
         parent::saveConfig($context, $config);
+    }
+
+    /**
+     * @param array $statusCodesConfig
+     *
+     * @return StatusCodesConfig
+     */
+    protected function loadStatusCodes(array $statusCodesConfig)
+    {
+        $statusCodesLoader = new StatusCodesConfigLoader();
+
+        return $statusCodesLoader->load($statusCodesConfig);
     }
 
     /**

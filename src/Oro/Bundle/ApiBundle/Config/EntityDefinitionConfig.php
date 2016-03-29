@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @method EntityDefinitionFieldConfig[] getFields()
@@ -17,6 +18,7 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     use Traits\DescriptionTrait;
     use Traits\AclResourceTrait;
     use Traits\MaxResultsTrait;
+    use Traits\StatusCodesTrait;
 
     /** a human-readable representation of the entity */
     const LABEL = 'label';
@@ -32,6 +34,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /** a handler that should be used to delete the entity */
     const DELETE_HANDLER = 'delete_handler';
+
+    /** response status codes */
+    const STATUS_CODES = ConfigUtil::STATUS_CODES;
 
     /**
      * {@inheritdoc}

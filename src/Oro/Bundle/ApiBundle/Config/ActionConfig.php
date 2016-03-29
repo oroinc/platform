@@ -12,6 +12,7 @@ class ActionConfig
     use Traits\AclResourceTrait;
     use Traits\DescriptionTrait;
     use Traits\MaxResultsTrait;
+    use Traits\StatusCodesTrait;
 
     /** a flag indicates whether the action should not be available for the entity */
     const EXCLUDE = ConfigUtil::EXCLUDE;
@@ -25,6 +26,9 @@ class ActionConfig
     /** the maximum number of items in the result */
     const MAX_RESULTS = EntityDefinitionConfig::MAX_RESULTS;
 
+    /** the maximum number of items in the result */
+    const STATUS_CODES = EntityDefinitionConfig::STATUS_CODES;
+
     /** @var array */
     protected $items = [];
 
@@ -35,7 +39,17 @@ class ActionConfig
      */
     public function toArray()
     {
-        return $this->items;
+        $result = $this->items;
+
+        $keys = array_keys($result);
+        foreach ($keys as $key) {
+            $value = $result[$key];
+            if (is_object($value) && method_exists($value, 'toArray')) {
+                $result[$key] = $value->toArray();
+            }
+        }
+
+        return $result;
     }
 
     /**

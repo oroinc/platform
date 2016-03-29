@@ -102,11 +102,13 @@ services:
         public: false
         tags:
             - { name: oro_api.config_extension }
+
     oro_api.config_extension.actions:
         class: Oro\Bundle\ApiBundle\Config\ActionsConfigExtension
         public: false
         tags:
             - { name: oro_api.config_extension }
+
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false

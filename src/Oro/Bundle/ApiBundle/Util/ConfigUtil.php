@@ -18,6 +18,9 @@ class ConfigUtil extends BaseConfigUtil
     /** the name of actions configuration section */
     const ACTIONS = 'actions';
 
+    /** the name of response status codes configuration section */
+    const STATUS_CODES = 'status_codes';
+
     /** a flag indicates whether an entity configuration should be merged with a configuration of a parent entity */
     const INHERIT = 'inherit';
 

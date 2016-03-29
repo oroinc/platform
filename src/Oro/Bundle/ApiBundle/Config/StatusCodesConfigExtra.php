@@ -7,17 +7,17 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * An instance of this class can be added to the config extras of the Context
- * to request a general entity information including information about fields.
+ * to request an information about possible response status codes for the specified action.
  */
-class EntityDefinitionConfigExtra implements ConfigExtraInterface
+class StatusCodesConfigExtra implements ConfigExtraInterface
 {
-    const NAME = ConfigUtil::DEFINITION;
+    const NAME = ConfigUtil::STATUS_CODES;
 
     /** @var string */
     protected $action;
 
     /**
-     * @param string $action The name of the action for which the configuration is requested
+     * @param string $action The name of the action for which the status codes are requested
      */
     public function __construct($action = null)
     {
@@ -45,7 +45,7 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
      */
     public function isPropagable()
     {
-        return true;
+        return false;
     }
 
     /**
