@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Update;
 
-use Oro\Bundle\ApiBundle\Processor\UpdateContext as ParentContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemUpdateContext;
 
-class UpdateContext extends ParentContext
+class UpdateContext extends SingleItemUpdateContext
 {
 }

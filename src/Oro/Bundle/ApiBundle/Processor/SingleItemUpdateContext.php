@@ -4,7 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Symfony\Component\Form\Form;
 
-class UpdateContext extends SingleItemContext
+class SingleItemUpdateContext extends SingleItemContext
 {
     /** A form for entity update process */
     const FORM = 'form';

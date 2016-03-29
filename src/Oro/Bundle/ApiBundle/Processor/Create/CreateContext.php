@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Create;
 
-use Oro\Bundle\ApiBundle\Processor\UpdateContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemUpdateContext;
 
-class CreateContext extends UpdateContext
+class CreateContext extends SingleItemUpdateContext
 {
 }
