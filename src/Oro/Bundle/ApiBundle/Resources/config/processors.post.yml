@@ -32,13 +32,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
         tags:
             - { name: oro.api.processor, action: post, group: initialize, priority: 200 }
-#
-#    oro_api.post.initialize_criteria:
-#        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
-#        arguments:
-#            - @oro_entity.orm.entity_class_resolver
-#        tags:
-#            - { name: oro.api.processor, action: post, group: initialize, priority: 200 }
 
     oro_api.post.normalize_include_header:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
