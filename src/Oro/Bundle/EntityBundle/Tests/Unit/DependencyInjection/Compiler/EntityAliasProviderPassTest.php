@@ -26,7 +26,7 @@ class EntityAliasProviderPassTest extends \PHPUnit_Framework_TestCase
 
         $container->expects($this->once())
             ->method('hasDefinition')
-            ->with(EntityAliasProviderPass::RESOLVER_SERVICE)
+            ->with(EntityAliasProviderPass::LOADER_SERVICE)
             ->will($this->returnValue(false));
         $container->expects($this->never())
             ->method('findTaggedServiceIds');
@@ -38,24 +38,33 @@ class EntityAliasProviderPassTest extends \PHPUnit_Framework_TestCase
     {
         $container = new ContainerBuilder();
 
-        $resolver  = new Definition();
-        $provider1 = new Definition();
-        $provider2 = new Definition();
-        $provider3 = new Definition();
-        $provider4 = new Definition();
+        $loader = new Definition();
 
-        $provider1->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME, ['priority' => -100]);
-        $provider2->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME, ['priority' => 100]);
-        $provider3->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME);
-        $provider4->addTag(EntityAliasProviderPass::PROVIDER_TAG_NAME, ['priority' => -150]);
+        $classProvider1 = new Definition();
+        $classProvider2 = new Definition();
+
+        $aliasProvider1 = new Definition();
+        $aliasProvider2 = new Definition();
+        $aliasProvider3 = new Definition();
+        $aliasProvider4 = new Definition();
+
+        $classProvider1->addTag(EntityAliasProviderPass::CLASS_PROVIDER_TAG_NAME);
+        $classProvider2->addTag(EntityAliasProviderPass::CLASS_PROVIDER_TAG_NAME);
+
+        $aliasProvider1->addTag(EntityAliasProviderPass::ALIAS_PROVIDER_TAG_NAME, ['priority' => -100]);
+        $aliasProvider2->addTag(EntityAliasProviderPass::ALIAS_PROVIDER_TAG_NAME, ['priority' => 100]);
+        $aliasProvider3->addTag(EntityAliasProviderPass::ALIAS_PROVIDER_TAG_NAME);
+        $aliasProvider4->addTag(EntityAliasProviderPass::ALIAS_PROVIDER_TAG_NAME, ['priority' => -150]);
 
         $container->addDefinitions(
             [
-                EntityAliasProviderPass::RESOLVER_SERVICE => $resolver,
-                'provider1'                               => $provider1,
-                'provider2'                               => $provider2,
-                'provider3'                               => $provider3,
-                'provider4'                               => $provider4,
+                EntityAliasProviderPass::LOADER_SERVICE => $loader,
+                'classProvider1'                        => $classProvider1,
+                'classProvider2'                        => $classProvider2,
+                'aliasProvider1'                        => $aliasProvider1,
+                'aliasProvider2'                        => $aliasProvider2,
+                'aliasProvider3'                        => $aliasProvider3,
+                'aliasProvider4'                        => $aliasProvider4,
             ]
         );
 
@@ -63,12 +72,14 @@ class EntityAliasProviderPassTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                ['addProvider', [new Reference('provider2')]],
-                ['addProvider', [new Reference('provider3')]],
-                ['addProvider', [new Reference('provider1')]],
-                ['addProvider', [new Reference('provider4')]],
+                ['addEntityClassProvider', [new Reference('classProvider1')]],
+                ['addEntityClassProvider', [new Reference('classProvider2')]],
+                ['addEntityAliasProvider', [new Reference('aliasProvider2')]],
+                ['addEntityAliasProvider', [new Reference('aliasProvider3')]],
+                ['addEntityAliasProvider', [new Reference('aliasProvider1')]],
+                ['addEntityAliasProvider', [new Reference('aliasProvider4')]],
             ],
-            $resolver->getMethodCalls()
+            $loader->getMethodCalls()
         );
     }
 }

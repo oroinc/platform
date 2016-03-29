@@ -1,49 +1,63 @@
-empty:
-    config: []
-    expected: []
-
-null_actions:
-    config:
-        actions: ~
-    expected: []
-
 empty_actions:
-    config:
-        actions: []
+    config: []
     expected: []
 
 null_actions_action:
     config:
-        actions:
-            view_action: ~
+        get: ~
     expected: []
 
 null_actions_action_exclude_property:
     config:
-        actions:
-            view_action:
-                exclude: ~
+        get:
+            exclude: ~
     expected:
-        actions:
-            view_action:
-                exclude: false
+        get:
+            exclude: false
+
+empty_status_codes:
+    config:
+        get:
+            status_codes: []
+    expected: []
+
+add_status_codes_full_syntax:
+    config:
+        get:
+            status_codes:
+                '417':
+                    description: 'Returned when expectations failed'
+    expected:
+        get:
+            status_codes:
+                '417':
+                    description: 'Returned when expectations failed'
+
+delete_status_codes_full_syntax:
+    config:
+        get:
+            status_codes:
+                '417':
+                    exclude: true
+    expected:
+        get:
+            status_codes:
+                '417':
+                    exclude: true
 
 full:
     config:
-        actions:
-            view_action: ~
-            create_action: []
-            update_action:
-                acl_resource: update_action_acl_resource
-            delete_action:
-                exclude: false
-                acl_resource: delete_action_acl_resource
+        get: ~
+        create: []
+        update:
+            acl_resource: update_action_acl_resource
+        delete:
+            exclude: false
+            acl_resource: delete_action_acl_resource
     expected:
-        actions:
-            create_action: []
-            update_action:
-                acl_resource: update_action_acl_resource
-            delete_action:
-                exclude: false
-                acl_resource: delete_action_acl_resource
+        update:
+            acl_resource: update_action_acl_resource
+        delete:
+            exclude: false
+            acl_resource: delete_action_acl_resource
 

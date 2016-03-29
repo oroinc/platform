@@ -91,27 +91,99 @@ invalid_actions_definition_unknown_property:
     expected: []
     error: 'Unrecognized option "test" under "entity.actions.delete"'
 
+null_status_codes:
+    config:
+        actions:
+            get:
+                status_codes: ~
+    expected:
+        actions:
+            get: []
+
+empty_status_codes:
+    config:
+        actions:
+            get:
+                status_codes: []
+    expected:
+        actions:
+            get: []
+
+add_status_codes_short_syntax:
+    config:
+        actions:
+            get:
+                status_codes:
+                    '417': 'Returned when expectations failed'
+    expected:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        description: 'Returned when expectations failed'
+
+add_status_codes_full_syntax:
+    config:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        description: 'Returned when expectations failed'
+    expected:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        description: 'Returned when expectations failed'
+
+delete_status_codes_short_syntax:
+    config:
+        actions:
+            get:
+                status_codes:
+                    '417': false
+    expected:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        exclude: true
+
+delete_status_codes_full_syntax:
+    config:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        exclude: true
+    expected:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        exclude: true
+
 actions_collections:
     config:
         actions:
             create:
                 exclude: true
                 acl_resource: create_acl_resource
-            view:
+            get:
                 exclude: false
                 acl_resource: view_acl_resource
             delete:
                 acl_resource: delete_acl_resource
-            assign: ~
+            update: ~
     expected:
         actions:
             create:
                 exclude: true
                 acl_resource: create_acl_resource
-            view:
+            get:
                 exclude: false
                 acl_resource: view_acl_resource
             delete:
                 acl_resource: delete_acl_resource
-            assign:
+            update:
                 exclude: false

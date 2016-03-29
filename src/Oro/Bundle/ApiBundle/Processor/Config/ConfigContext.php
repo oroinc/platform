@@ -24,7 +24,7 @@ class ConfigContext extends ApiContext
     /** the maximum number of related entities that can be retrieved */
     const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
 
-    /** a list of requests for additional configuration data that should be retrieved */
+    /** a list of requests for configuration data that should be retrieved */
     const EXTRA = 'extra';
 
     /** @var ConfigExtraInterface[] */
@@ -105,7 +105,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Checks whether some additional configuration data is requested.
+     * Checks whether some configuration data is requested.
      *
      * @param string $extraName
      *
@@ -117,7 +117,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets a request for additional configuration data.
+     * Gets a request for configuration data.
      *
      * @param string $extraName
      *
@@ -137,7 +137,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets a list of requests for additional configuration data.
+     * Gets a list of requests for configuration data.
      *
      * @return ConfigExtraInterface[]
      */
@@ -147,7 +147,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Sets requests for additional configuration data.
+     * Sets requests for configuration data.
      *
      * @param ConfigExtraInterface[] $extras
      *
@@ -171,7 +171,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets a list of requests for additional configuration data that can be used
+     * Gets a list of requests for configuration data that can be used
      * to get configuration of related entities.
      *
      * @return ConfigExtraInterface[]

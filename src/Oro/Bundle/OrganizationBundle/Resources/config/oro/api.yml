@@ -5,7 +5,10 @@ oro_api:
             actions:
                 delete:
                     exclude: false # set manually because this entity is marked as a dictionary
+                delete_list:
+                    exclude: false # set manually because this entity is marked as a dictionary
 
         Oro\Bundle\OrganizationBundle\Entity\Organization:
             actions:
                 delete: false
+                delete_list: false

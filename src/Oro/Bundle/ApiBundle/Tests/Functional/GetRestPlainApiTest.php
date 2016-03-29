@@ -69,6 +69,58 @@ class GetRestPlainApiTest extends ApiTestCase
     }
 
     /**
+     * @param string   $entityClass
+     * @param string[] $excludedActions
+     *
+     * @dataProvider getEntities
+     */
+    public function testDeleteList($entityClass, $excludedActions)
+    {
+        if (in_array('delete_list', $excludedActions, true)) {
+            return;
+        }
+
+        $entityAlias = $this->valueNormalizer->normalizeValue(
+            $entityClass,
+            DataType::ENTITY_TYPE,
+            $this->getRequestType()
+        );
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_rest_api_cget', ['entity' => $entityAlias, 'limit' => 1])
+        );
+        $response = $this->client->getResponse();
+        if ($response->getStatusCode() === 200) {
+            $id = [];
+            $content = $this->jsonToArray($response->getContent());
+            if (count($content)) {
+                $idField = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass)[0];
+                foreach ($content as $item) {
+                    $id[] = $item[$idField];
+                }
+                $this->client->request(
+                    'DELETE',
+                    $this->getUrl(
+                        'oro_rest_api_delete_list',
+                        ['entity' => $entityAlias, 'id' => implode(',', $id)]
+                    )
+                );
+                $response = $this->client->getResponse();
+                if ($response->getStatusCode() == 204 && !in_array('get', $excludedActions, true)) {
+                    // check if entity was really deleted
+                    $this->client->request(
+                        'GET',
+                        $this->getUrl('oro_rest_api_get', ['entity' => $entityAlias, 'id' => $id[0]])
+                    );
+                    $this->assertApiResponseStatusCodeEquals($this->client->getResponse(), 404, $entityAlias, 'get');
+                }
+            }
+        }
+
+        self::cleanUpConnections();
+    }
+
+    /**
      * @param string   $entityAlias
      * @param mixed    $id
      * @param string[] $excludedActions
