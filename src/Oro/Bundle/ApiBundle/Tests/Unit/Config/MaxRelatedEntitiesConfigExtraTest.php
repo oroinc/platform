@@ -30,9 +30,9 @@ class MaxRelatedEntitiesConfigExtraTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testIsInheritable()
+    public function testIsPropagable()
     {
-        $this->assertTrue($this->extra->isInheritable());
+        $this->assertTrue($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()

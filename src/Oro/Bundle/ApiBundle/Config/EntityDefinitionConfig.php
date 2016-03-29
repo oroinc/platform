@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Component\EntitySerializer\FieldConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 /**
  * @method EntityDefinitionFieldConfig[] getFields()
@@ -15,6 +16,9 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     use Traits\LabelTrait;
     use Traits\PluralLabelTrait;
     use Traits\DescriptionTrait;
+    use Traits\AclResourceTrait;
+    use Traits\MaxResultsTrait;
+    use Traits\StatusCodesTrait;
 
     /** a human-readable representation of the entity */
     const LABEL = 'label';
@@ -24,6 +28,15 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
 
     /** a human-readable description of the entity */
     const DESCRIPTION = 'description';
+
+    /** the name of ACL resource */
+    const ACL_RESOURCE = 'acl_resource';
+
+    /** a handler that should be used to delete the entity */
+    const DELETE_HANDLER = 'delete_handler';
+
+    /** response status codes */
+    const STATUS_CODES = ConfigUtil::STATUS_CODES;
 
     /**
      * {@inheritdoc}
@@ -168,46 +181,6 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
     }
 
     /**
-     * Indicates whether the maximum number of items is set.
-     *
-     * @return bool
-     */
-    public function hasMaxResults()
-    {
-        return array_key_exists(self::MAX_RESULTS, $this->items);
-    }
-
-    /**
-     * Gets the maximum number of items in the result.
-     *
-     * @return int|null The requested maximum number of items, NULL or -1 if not limited
-     */
-    public function getMaxResults()
-    {
-        return array_key_exists(self::MAX_RESULTS, $this->items)
-            ? $this->items[self::MAX_RESULTS]
-            : null;
-    }
-
-    /**
-     * Sets the maximum number of items in the result.
-     * Set NULL to use a default limit.
-     * Set -1 (it means unlimited), zero or positive value to set own limit.
-     *
-     * @param int|null $maxResults The maximum number of items, NULL or -1 to set unlimited
-     */
-    public function setMaxResults($maxResults = null)
-    {
-        if (null === $maxResults) {
-            unset($this->items[self::MAX_RESULTS]);
-        } else {
-            $maxResults = (int)$maxResults;
-
-            $this->items[self::MAX_RESULTS] = $maxResults >= 0 ? $maxResults : -1;
-        }
-    }
-
-    /**
      * Sets Doctrine query hints.
      *
      * @param array|null $hints
@@ -218,6 +191,32 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
             $this->items[self::HINTS] = $hints;
         } else {
             unset($this->items[self::HINTS]);
+        }
+    }
+
+    /**
+     * Gets a handler that should be used to delete the entity.
+     *
+     * @return string|null The service id
+     */
+    public function getDeleteHandler()
+    {
+        return array_key_exists(self::DELETE_HANDLER, $this->items)
+            ? $this->items[self::DELETE_HANDLER]
+            : null;
+    }
+
+    /**
+     * Sets a handler that should be used to delete the entity.
+     *
+     * @param string|null $handler The service id
+     */
+    public function setDeleteHandler($handler = null)
+    {
+        if (null !== $handler) {
+            $this->items[self::DELETE_HANDLER] = $handler;
+        } else {
+            unset($this->items[self::DELETE_HANDLER]);
         }
     }
 }

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
@@ -14,6 +15,7 @@ use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
 class DumpCommand extends AbstractDebugCommand
 {
@@ -24,8 +26,13 @@ class DumpCommand extends AbstractDebugCommand
     {
         $this
             ->setName('oro:api:dump')
-            ->setDescription('Dumps all resources available through Data API.');
-            // @todo: API version is not supported for now
+            ->setDescription('Dumps all resources available through Data API.')
+            ->addArgument(
+                'entity',
+                InputArgument::OPTIONAL,
+                'The entity class name or alias'
+            );
+           // @todo: API version is not supported for now
             //->addArgument(
             //    'version',
             //    InputArgument::OPTIONAL,
@@ -40,6 +47,12 @@ class DumpCommand extends AbstractDebugCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
+        $entityClass = $input->getArgument('entity');
+        if ($entityClass) {
+            /** @var EntityClassNameHelper $entityClassNameHelper */
+            $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
+            $entityClass = $entityClassNameHelper->resolveEntityClass($entityClass, true);
+        }
         $requestType = $this->getRequestType($input);
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
@@ -54,6 +67,9 @@ class DumpCommand extends AbstractDebugCommand
 
         $i = 0;
         foreach ($resources as $resource) {
+            if ($entityClass && $resource->getEntityClass() !== $entityClass) {
+                continue;
+            }
             if ($i > 0) {
                 $table->addRow(new TableSeparator());
             }
@@ -93,6 +109,11 @@ class DumpCommand extends AbstractDebugCommand
         $entityClassNameProvider = $this->getContainer()->get('oro_entity.entity_class_name_provider');
         $result['Name']          = $entityClassNameProvider->getEntityClassName($entityClass);
         $result['Plural Name']   = $entityClassNameProvider->getEntityClassPluralName($entityClass);
+
+        $excludedActions = $resource->getExcludedActions();
+        if (!empty($excludedActions)) {
+            $result['Excluded Actions'] = implode(', ', $excludedActions);
+        }
 
         return $result;
     }

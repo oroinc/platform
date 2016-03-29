@@ -61,7 +61,7 @@ class ExpandRelatedEntities implements ProcessorInterface
             $context->get(ExpandRelatedEntitiesConfigExtra::NAME),
             $context->getVersion(),
             $context->getRequestType(),
-            $context->getInheritableExtras()
+            $context->getPropagableExtras()
         );
     }
 

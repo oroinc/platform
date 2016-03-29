@@ -1,0 +1,63 @@
+empty_actions:
+    config: []
+    expected: []
+
+null_actions_action:
+    config:
+        get: ~
+    expected: []
+
+null_actions_action_exclude_property:
+    config:
+        get:
+            exclude: ~
+    expected:
+        get:
+            exclude: false
+
+empty_status_codes:
+    config:
+        get:
+            status_codes: []
+    expected: []
+
+add_status_codes_full_syntax:
+    config:
+        get:
+            status_codes:
+                '417':
+                    description: 'Returned when expectations failed'
+    expected:
+        get:
+            status_codes:
+                '417':
+                    description: 'Returned when expectations failed'
+
+delete_status_codes_full_syntax:
+    config:
+        get:
+            status_codes:
+                '417':
+                    exclude: true
+    expected:
+        get:
+            status_codes:
+                '417':
+                    exclude: true
+
+full:
+    config:
+        get: ~
+        create: []
+        update:
+            acl_resource: update_action_acl_resource
+        delete:
+            exclude: false
+            acl_resource: delete_action_acl_resource
+    expected:
+        update:
+            acl_resource: update_action_acl_resource
+        delete:
+            exclude: false
+            acl_resource: delete_action_acl_resource
+
