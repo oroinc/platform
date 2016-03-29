@@ -57,6 +57,20 @@ class RestDocHandler implements HandlerInterface
             'description_key'      => EntityDefinitionConfig::PLURAL_LABEL,
             'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
         ],
+        'post' => [
+            'description'          => 'Create {name}',
+            'fallback_description' => 'Create {class}',
+            'get_name_method'      => 'getEntityClassName',
+            'description_key'      => EntityDefinitionConfig::LABEL,
+            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
+        ],
+        'put' => [
+            'description'          => 'Update {name}',
+            'fallback_description' => 'Update {class}',
+            'get_name_method'      => 'getEntityClassName',
+            'description_key'      => EntityDefinitionConfig::LABEL,
+            'documentation_key'    => EntityDefinitionConfig::DESCRIPTION
+        ],
     ];
 
     /** @var RestDocViewDetector */

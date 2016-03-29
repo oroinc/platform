@@ -41,3 +41,26 @@ oro_rest_api_delete_list:
         _action: delete_list
     options:
         group: rest_api
+
+oro_rest_post:
+    path: /api/{entity}.{_format}
+    methods: [POST]
+    requirements:
+        entity: (?:(?!(soap|rest)$)[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApi:post
+        _action: post
+    options:
+        group: rest_api
+
+oro_rest_put:
+    path: /api/{entity}/{id}.{_format}
+    methods: [PUT]
+    requirements:
+        entity: (?:(?!(soap|rest)$)[^/]+)
+    defaults:
+        _controller: OroApiBundle:RestApi:put
+        _action: put
+    options:
+        group: rest_api
+

@@ -16,6 +16,8 @@ use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
+use Oro\Bundle\ApiBundle\Processor\Post\PostContext;
+use Oro\Bundle\ApiBundle\Processor\Put\PutContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
@@ -101,6 +103,47 @@ class RestApiController extends FOSRestController
         /** @var DeleteListContext $context */
         $context = $this->getContext($processor, $request);
         $context->setFilterValues(new RestFilterValueAccessor($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Update an entity
+     *
+     * @param Request $request
+     *
+     * @ApiDoc(description="Update an entity", resource=true, views={"rest_plain", "rest_json_api"})
+     *
+     * @return Response
+     */
+    public function putAction(Request $request)
+    {
+        $processor = $this->getProcessor($request);
+        /** @var PutContext $context */
+        $context = $this->getContext($processor, $request);
+        $context->setId($request->attributes->get('id'));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Create an entity
+     *
+     * @param Request $request
+     *
+     * @ApiDoc(description="Create an entity", resource=true, views={"rest_plain", "rest_json_api"})
+     *
+     * @return Response
+     */
+    public function postAction(Request $request)
+    {
+        $processor = $this->getProcessor($request);
+        /** @var PostContext $context */
+        $context = $this->getContext($processor, $request);
 
         $processor->process($context);
 

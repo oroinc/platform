@@ -101,3 +101,21 @@ oro_api:
                     priority: -60
                 normalize_result:
                     priority: -70
+        post:
+            processing_groups:
+                initialize:
+                    priority: -10
+                security_check:
+                    priority: -20
+        put:
+            processing_groups:
+                initialize:
+                    priority: -10
+                security_check:
+                    priority: -20
+                normalize_input:
+                    priority: -30
+                build_query:
+                    priority: -40
+                load_data:
+                    priority: -50
