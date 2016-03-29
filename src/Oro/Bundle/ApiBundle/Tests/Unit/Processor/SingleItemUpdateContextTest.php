@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\ApiBundle\Processor\UpdateContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemUpdateContext;
 
-class UpdateContextTest extends \PHPUnit_Framework_TestCase
+class SingleItemUpdateContextTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var UpdateContext */
+    /** @var SingleItemUpdateContext */
     protected $context;
 
     protected function setUp()
@@ -18,7 +18,7 @@ class UpdateContextTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->context = new UpdateContext($configProvider, $metadataProvider);
+        $this->context = new SingleItemUpdateContext($configProvider, $metadataProvider);
     }
 
     public function testForm()

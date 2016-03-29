@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Processor;
 
 use Oro\Component\ChainProcessor\ProcessorBag;
 
-use Oro\Bundle\ApiBundle\Processor\Put\PutContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
+use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 
-class PutProcessor extends RequestActionProcessor
+class UpdateProcessor extends RequestActionProcessor
 {
     /** @var ConfigProvider */
     protected $configProvider;
@@ -39,6 +39,6 @@ class PutProcessor extends RequestActionProcessor
      */
     protected function createContextObject()
     {
-        return new PutContext($this->configProvider, $this->metadataProvider);
+        return new UpdateContext($this->configProvider, $this->metadataProvider);
     }
 }
