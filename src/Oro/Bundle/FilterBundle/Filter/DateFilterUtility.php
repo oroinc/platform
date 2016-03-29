@@ -210,7 +210,14 @@ class DateFilterUtility
             function ($field) use ($data) {
                 $expr = $this->compileExpression($data, $field);
 
-                return $expr && $expr->getVariableType() == DateModifierInterface::VAR_THIS_MONTH_W_Y;
+                return $expr && (
+                        $expr->getVariableType() === DateModifierInterface::VAR_THIS_MONTH_W_Y ||
+                        (
+                            $expr->getSourceType() === ExpressionResult::TYPE_INT &&
+                            $data['date_start'] instanceof \DateTime &&
+                            $data['date_end'] instanceof \DateTime
+                        )
+                );
             },
             [
                 'date_start_original',
