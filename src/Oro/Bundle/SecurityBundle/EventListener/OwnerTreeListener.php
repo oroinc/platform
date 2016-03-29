@@ -96,21 +96,21 @@ class OwnerTreeListener implements ContainerAwareInterface
      */
     protected function checkEntities(array $entities)
     {
+        $uow = $this->container
+            ->get('doctrine.orm.entity_manager')
+            ->getUnitOfWork();
+        $fieldsToIgnore = $this->getUserFieldsToIgnore();
         foreach ($entities as $entity) {
             if (in_array(ClassUtils::getRealClass($entity), $this->securityClasses, true)) {
                 if ($entity instanceof UserInterface) {
-                    $changeSet = $this->container
-                        ->get('doctrine.orm.entity_manager')
-                        ->getUnitOfWork()
-                        ->getEntityChangeSet($entity);
-
-                    $fieldsToIgnore = $this->getUserFieldsToIgnore();
+                    $changeSet     = $uow->getEntityChangeSet($entity);
                     $changedFields = array_keys($changeSet);
 
                     if (array_diff_key($changedFields, array_flip($fieldsToIgnore))) {
                         continue;
                     }
                 }
+
                 return true;
             }
         }
