@@ -2,9 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
@@ -36,7 +36,7 @@ class GetListProcessorTestCase extends \PHPUnit_Framework_TestCase
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $this->context->setConfigExtras(
             [
-                new VirtualFieldsConfigExtra(),
+                new EntityDefinitionConfigExtra($this->context->getAction()),
                 new FiltersConfigExtra(),
                 new SortersConfigExtra()
             ]

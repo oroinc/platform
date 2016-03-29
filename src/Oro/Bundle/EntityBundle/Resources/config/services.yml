@@ -283,10 +283,30 @@ services:
     oro_entity.entity_alias_resolver:
         class: %oro_entity.entity_alias_resolver.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity.entity_manager_bag
+            - @oro_entity.entity_alias_loader
+            - @oro_entity.entity_alias_cache
             - %kernel.debug%
         lazy: true
+
+    oro_entity.entity_alias_cache:
+        parent: oro.cache.abstract
+        public: false
+        calls:
+            - [ setNamespace, [ 'oro_entity_aliases' ] ]
+
+    oro_entity.entity_alias_loader:
+        class: Oro\Bundle\EntityBundle\Provider\EntityAliasLoader
+        public: false
+        lazy: true
+
+    oro_entity.entity_class_provider.orm:
+        class: Oro\Bundle\EntityBundle\ORM\OrmEntityClassProvider
+        public: false
+        arguments:
+            - @oro_entity.doctrine_helper
+            - @oro_entity.entity_manager_bag
+        tags:
+            - { name: oro_entity.class_provider }
 
     oro_entity.entity_alias_config_bag:
         class: %oro_entity.entity_alias_config_bag.class%

@@ -4,17 +4,11 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class SortersConfigLoader extends AbstractConfigLoader implements ConfigLoaderInterface
+class SortersConfigLoader extends AbstractConfigLoader
 {
     /** @var array */
-    protected $methodMap = [
-        SortersConfig::EXCLUSION_POLICY => 'setExclusionPolicy',
-    ];
-
-    /** @var array */
     protected $fieldMethodMap = [
-        SorterFieldConfig::EXCLUDE       => 'setExcluded',
-        SorterFieldConfig::PROPERTY_PATH => 'setPropertyPath',
+        SorterFieldConfig::EXCLUDE => 'setExcluded',
     ];
 
     /**
@@ -23,14 +17,11 @@ class SortersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
     public function load(array $config)
     {
         $sorters = new SortersConfig();
-
         foreach ($config as $key => $value) {
-            if (isset($this->methodMap[$key])) {
-                $this->callSetter($sorters, $this->methodMap[$key], $value);
-            } elseif (ConfigUtil::FIELDS === $key) {
+            if (ConfigUtil::FIELDS === $key) {
                 $this->loadFields($sorters, $value);
             } else {
-                $this->setValue($sorters, $key, $value);
+                $this->loadConfigValue($sorters, $key, $value);
             }
         }
 
@@ -60,11 +51,7 @@ class SortersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
         $sorter = new SorterFieldConfig();
         if (!empty($config)) {
             foreach ($config as $key => $value) {
-                if (isset($this->fieldMethodMap[$key])) {
-                    $this->callSetter($sorter, $this->fieldMethodMap[$key], $value);
-                } else {
-                    $this->setValue($sorter, $key, $value);
-                }
+                $this->loadConfigValue($sorter, $key, $value, $this->fieldMethodMap);
             }
         }
 

@@ -19,9 +19,9 @@ class VirtualFieldsConfigExtraTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(VirtualFieldsConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testIsInheritable()
+    public function testIsPropagable()
     {
-        $this->assertTrue($this->extra->isInheritable());
+        $this->assertTrue($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()
