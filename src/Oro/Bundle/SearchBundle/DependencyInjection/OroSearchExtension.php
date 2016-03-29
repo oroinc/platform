@@ -97,7 +97,7 @@ class OroSearchExtension extends Extension
      * @param array $firstConfig
      * @param array $secondConfig
      * @return array
-     * @deprecated Since 1.9, will be removed after 1.11.
+     * @deprecated Since 1.8, will be removed after 1.11.
      *
      * @todo: it is a temporary workaround to add ability to merge configs until improvement BAP-10010 is implemented
      */
