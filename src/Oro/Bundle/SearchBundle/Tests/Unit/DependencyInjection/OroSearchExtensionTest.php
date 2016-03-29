@@ -47,13 +47,24 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider testMergeConfigProvider
      *
-     * @param array $expected
+     * @param array $firstConfig
      * @param array $secondConfig
+     * @param array $expected
      */
-    public function testMergeConfig($secondConfig, $expected)
+    public function testMergeConfig(array $firstConfig, array $secondConfig, array $expected)
     {
-        $searchExtension = new OroSearchExtension(array(), $this->container);
+        $searchExtension = new OroSearchExtension([], $this->container);
+        $result = $searchExtension->mergeConfig($firstConfig, $secondConfig);
+        $this->assertEquals(ksort($expected), ksort($result));
+    }
 
+    /**
+     * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testMergeConfigProvider()
+    {
         $firstConfig = [
             'alias'           => 'test_alias',
             'title_fields'    => ['name'],
@@ -67,12 +78,6 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $result = $searchExtension->mergeConfig($firstConfig, $secondConfig);
-        $this->assertEquals(ksort($expected), ksort($result));
-    }
-
-    public function testMergeConfigProvider()
-    {
         $secondConfig = [
             [
                 'alias'           => 'test_alias',
@@ -158,9 +163,21 @@ class OroSearchExtensionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $data =  [
-            'Test replace'                => ['secondConfig' => $secondConfig[0], 'expected' => $expected[0]],
-            'Test append'                 => ['secondConfig' => $secondConfig[1], 'expected' => $expected[1]],
-            'Test append with no changes' => ['secondConfig' => $secondConfig[2], 'expected' => $expected[2]]
+            'Test replace' => [
+                'firstConfig' => $firstConfig,
+                'secondConfig' => $secondConfig[0],
+                'expected' => $expected[0]
+            ],
+            'Test append' => [
+                'firstConfig' => $firstConfig,
+                'secondConfig' => $secondConfig[1],
+                'expected' => $expected[1]
+            ],
+            'Test append with no changes' => [
+                'firstConfig' => $firstConfig,
+                'secondConfig' => $secondConfig[2],
+                'expected' => $expected[2]
+            ]
         ];
 
         return $data;
