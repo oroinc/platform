@@ -19,6 +19,15 @@ class DeleteListDataByDeleteHandler extends BaseProcessor
         /** @var DeleteListContext $context */
 
         $entityList = $context->getResult();
+        if (!is_array($entityList) && !$entityList instanceof \Traversable) {
+            throw new \RuntimeException(
+                sprintf(
+                    'The result property of the Context should be array or Traversable, "%s" given.',
+                    is_object($entityList) ? get_class($entityList) : gettype($entityList)
+                )
+            );
+        }
+
         $entityManager = $this->doctrineHelper->getEntityManagerForClass($context->getClassName());
         $entityManager->getConnection()->beginTransaction();
         try {
