@@ -12,12 +12,12 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\Create\CreateContext;
 use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
 use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
-use Oro\Bundle\ApiBundle\Processor\Post\PostContext;
-use Oro\Bundle\ApiBundle\Processor\Put\PutContext;
+use Oro\Bundle\ApiBundle\Processor\Update\UpdateContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequestHeaders;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
@@ -121,7 +121,7 @@ class RestApiController extends FOSRestController
     public function putAction(Request $request)
     {
         $processor = $this->getProcessor($request);
-        /** @var PutContext $context */
+        /** @var UpdateContext $context */
         $context = $this->getContext($processor, $request);
         $context->setId($request->attributes->get('id'));
 
@@ -142,7 +142,7 @@ class RestApiController extends FOSRestController
     public function postAction(Request $request)
     {
         $processor = $this->getProcessor($request);
-        /** @var PostContext $context */
+        /** @var CreateContext $context */
         $context = $this->getContext($processor, $request);
 
         $processor->process($context);

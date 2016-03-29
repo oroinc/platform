@@ -1,0 +1,188 @@
+services:
+    oro_api.update.processor:
+        class: Oro\Bundle\ApiBundle\Processor\UpdateProcessor
+        public: false
+        arguments:
+            - @oro_api.processor_bag
+            - update
+            - @oro_api.config_provider
+            - @oro_api.metadata_provider
+        tags:
+            - { name: oro.api.action_processor }
+    #
+    # initialize
+    #
+
+    oro_api.update.check_request_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CheckRequestType
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: 250 }
+
+    oro_api.update.validate_request_type_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestTypeExists
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: 210 }
+
+    oro_api.update.validate_class_name_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateClassNameExists
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: 210 }
+
+    oro_api.update.normalize_version:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeVersion
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: 200 }
+
+    oro_api.update.initialize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
+        arguments:
+            - @oro_entity.orm.entity_class_resolver
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: 200 }
+
+    oro_api.update.normalize_include_header:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: 50 }
+
+    oro_api.update.json_api.normalize_include_parameter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludeParameter
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, requestType: json_api, priority: 50 }
+
+    oro_api.update.initialize_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\Get\InitializeConfigExtras
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: 10 }
+
+    oro_api.update.set_default_max_related_entities:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultMaxRelatedEntities
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: -10 }
+
+    oro_api.update.normalize_entity_class:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: 20 }
+
+    #
+    # security_check
+    #
+
+    oro_api.update.entity_type_security_check:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_security.security_facade
+            - EDIT
+        tags:
+            - { name: oro.api.processor, action: update, group: security_check, priority: 10 }
+    #
+    # normalize_input
+    #
+
+    oro_api.update.validate_entity_id_exists:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateEntityIdExists
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, priority: -100 }
+
+    oro_api.update.rest.normalize_entity_id:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
+        arguments:
+            - @oro_api.rest.entity_id_transformer
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: rest, priority: -110 }
+
+    #
+    # build_query
+    #
+
+    oro_api.update.complete_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: update, group: build_query, priority: -50 }
+
+    oro_api.update.protect_query_by_acl:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_security.acl_helper
+            - @oro_security.acl.annotation_provider
+            - EDIT
+        tags:
+            - { name: oro.api.processor, action: update, group: build_query, priority: -90 }
+
+    oro_api.update.build_query:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: update, group: build_query, priority: -100 }
+
+    #
+    # load_data
+    #
+
+    oro_api.update.load_data_by_orm_query:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery
+        tags:
+            - { name: oro.api.processor, action: update, group: load_data, priority: -20 }
+
+    #
+    # normalize_data
+    #
+
+    oro_api.update.initialize_entity_proxy:
+        class: Oro\Bundle\ApiBundle\Processor\Get\InitializeEntityProxy
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_data, priority: 10 }
+
+    oro_api.update.normalize_data:
+        class: Oro\Bundle\ApiBundle\Processor\Get\NormalizeData
+        arguments:
+            - @oro_api.object_normalizer
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_data, priority: -10 }
+
+    #
+    # normalize_result
+    #
+    oro_api.update.rest.set_http_response_status_code:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: rest, priority: -10 }
+
+    oro_api.update.normalize_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors
+        arguments:
+            - @translator
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: -10 }
+
+    oro_api.update.json_api.build_json_api_document:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\BuildSingleItemJsonApiDocument
+        arguments:
+            - @oro_api.json_api.document_builder_factory
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -20 }
+
+    oro_api.update.process_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: -100 }
+
+    oro_api.update.json_api.validate_result_schema:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateResultSchema
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -200 }
+
+    oro_api.update.json_api.set_response_content_type:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetResponseContentType
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, requestType: json_api, priority: -250 }

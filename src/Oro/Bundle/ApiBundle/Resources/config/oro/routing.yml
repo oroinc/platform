@@ -49,7 +49,7 @@ oro_rest_post:
         entity: (?:(?!(soap|rest)$)[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:post
-        _action: post
+        _action: create
     options:
         group: rest_api
 
@@ -60,7 +60,7 @@ oro_rest_put:
         entity: (?:(?!(soap|rest)$)[^/]+)
     defaults:
         _controller: OroApiBundle:RestApi:put
-        _action: put
+        _action: update
     options:
         group: rest_api
 
