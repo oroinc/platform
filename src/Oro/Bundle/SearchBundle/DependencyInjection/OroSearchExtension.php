@@ -160,7 +160,7 @@ class OroSearchExtension extends Extension
     /**
      * @param ContainerBuilder $container
      * @param array            $config
-     * @deprecated since 1.8, will be removed after 1.11
+     * @deprecated since 1.9, will be removed after 1.11
      * Please use oro_search.provider.search_mapping service for mapping config
      */
     protected function setEntitiesConfigParameter(ContainerBuilder $container, array $config)
