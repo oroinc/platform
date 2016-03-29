@@ -8,9 +8,14 @@
     margin-bottom: 7px;
   }
 }
+.workflow-steps-placeholder {
+  order: 500;
+  margin: 0 auto;
+}
 .workflow-step-list {
   list-style: none outside none;
   margin: 0;
+  height: 32px;
   li:before {
     background: url("../../images/workflow-sprite.png") no-repeat 50% -8px;
     width:100%;
@@ -24,12 +29,13 @@
   li {
     display: inline-block;
     color: #a2a2a2;
-    padding: 0 14px 5px;
+    padding: 6px 14px 5px;
     margin: 0 -4px 0 0;
     text-align: center;
     position: relative;
     overflow: hidden;
     font-size: 11px;
+    line-height: 21px;
   }
   .step-name {
     a.edit-step {

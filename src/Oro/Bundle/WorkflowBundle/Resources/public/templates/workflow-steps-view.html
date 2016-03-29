@@ -1,0 +1,9 @@
+<% if (typeof steps !== 'undefined' && steps.length > 0) { %>
+    <ul class="workflow-step-list nav <%= steps.length > 1 ? 'more-than-one-step' : 0 %>">
+        <% for (var i = 0; i < steps.length; i++ ) { %>
+        <li class="<%= steps[i].name === currentStep.name ? 'current' : (steps[i].processed ? 'processed' : '') %>">
+            <%= steps[i].label %>
+        </li>
+        <% } %>
+    </ul>
+<% } %>
