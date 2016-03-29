@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -24,7 +23,6 @@ use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
-use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
@@ -164,7 +162,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * @param ImapEmailFolder $imapFolder
      * @param \DateTime $startDate
      */
-    protected function checkFlags(ImapEmailfolder $imapFolder, $startDate)
+    protected function checkFlags(ImapEmailFolder $imapFolder, $startDate)
     {
         try {
             $uids = $this->manager->getUnseenEmailUIDs($startDate);
@@ -481,7 +479,13 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function checkOnOldEmailForMailbox(EmailFolder $folder, Email $email, $mailbox)
     {
-        if ($mailbox && $folder->getSynchronizedAt() > $email->getSentAt()) {
+        /**
+         * @description Will select max of those dates because emails in folder `sent` could have no received date
+         *              or same date.
+         */
+        $dateForCheck = max($email->getReceivedAt(), $email->getSentAt());
+
+        if ($mailbox && $folder->getSynchronizedAt() > $dateForCheck) {
             $this->logger->info(
                 sprintf(
                     'Skip "%s" (UID: %d) email, because it was sent earlier than the last synchronization was done',
@@ -676,8 +680,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emails = $this->manager->getEmails($searchQuery);
         } else {
             $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
+
             $this->logger->info(sprintf('Previous max email UID "%s"', $lastUid));
-            $emails = $this->manager->getEmailsUidBased(sprintf('%s:*', ++$lastUid));
+
+            $emails = $this->manager->getEmailsUidBased($lastUid);
         }
 
         return $emails;

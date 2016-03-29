@@ -4,12 +4,20 @@ namespace Oro\Bundle\TestFrameworkBundle\Entity;
 
 use Doctrine\ORM\Mapping as ORM;
 
+use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * @ORM\Table(name="test_search_item")
  * @ORM\Entity
+ * @Config(
+ *      routeName="oro_test_item_index",
+ *      routeView="oro_test_item_view",
+ *      routeCreate="oro_test_item_create",
+ *      routeUpdate="oro_test_item_update",
+ *      routeDelete="oro_test_item_delete",
+ * )
  */
 class Item implements TestFrameworkEntityInterface
 {
@@ -119,6 +127,14 @@ class Item implements TestFrameworkEntityInterface
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
      */
     protected $organization;
+
+    /**
+     * @return int
+     */
+    public function getId()
+    {
+        return $this->id;
+    }
 
     public function __set($name, $value)
     {

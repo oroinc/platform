@@ -8,37 +8,44 @@ use Symfony\Component\DependencyInjection\Reference;
 
 class EntityAliasProviderPass implements CompilerPassInterface
 {
-    const RESOLVER_SERVICE = 'oro_entity.entity_alias_resolver';
-    const PROVIDER_TAG_NAME = 'oro_entity.alias_provider';
+    const LOADER_SERVICE          = 'oro_entity.entity_alias_loader';
+    const ALIAS_PROVIDER_TAG_NAME = 'oro_entity.alias_provider';
+    const CLASS_PROVIDER_TAG_NAME = 'oro_entity.class_provider';
 
     /**
      * {@inheritdoc}
      */
     public function process(ContainerBuilder $container)
     {
-        if (!$container->hasDefinition(self::RESOLVER_SERVICE)) {
+        if (!$container->hasDefinition(self::LOADER_SERVICE)) {
             return;
         }
 
         // find providers
-        $providers      = [];
-        $taggedServices = $container->findTaggedServiceIds(self::PROVIDER_TAG_NAME);
+        $classProviders = [];
+        $aliasProviders = [];
+        $taggedServices = $container->findTaggedServiceIds(self::CLASS_PROVIDER_TAG_NAME);
         foreach ($taggedServices as $id => $attributes) {
-            $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-            $providers[$priority][] = new Reference($id);
+            $classProviders[] = new Reference($id);
         }
-        if (empty($providers)) {
-            return;
+        $taggedServices = $container->findTaggedServiceIds(self::ALIAS_PROVIDER_TAG_NAME);
+        foreach ($taggedServices as $id => $attributes) {
+            $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+            $aliasProviders[$priority][] = new Reference($id);
         }
-
-        // sort by priority and flatten
-        krsort($providers);
-        $providers = call_user_func_array('array_merge', $providers);
+        if (!empty($aliasProviders)) {
+            // sort by priority and flatten
+            krsort($aliasProviders);
+            $aliasProviders = call_user_func_array('array_merge', $aliasProviders);
+        }
 
         // register
-        $resolverDef = $container->getDefinition(self::RESOLVER_SERVICE);
-        foreach ($providers as $provider) {
-            $resolverDef->addMethodCall('addProvider', [$provider]);
+        $resolverDef = $container->getDefinition(self::LOADER_SERVICE);
+        foreach ($classProviders as $classProvider) {
+            $resolverDef->addMethodCall('addEntityClassProvider', [$classProvider]);
+        }
+        foreach ($aliasProviders as $aliasProvider) {
+            $resolverDef->addMethodCall('addEntityAliasProvider', [$aliasProvider]);
         }
     }
 }

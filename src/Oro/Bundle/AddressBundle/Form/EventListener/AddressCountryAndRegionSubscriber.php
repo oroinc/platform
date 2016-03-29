@@ -69,11 +69,14 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
 
         if ($country->hasRegions()) {
             if ($form->has('region')) {
-                $config = $form->get('region')->getConfig()->getOptions();
+                $regionTypeConfig = $form->get('region')->getConfig();
+                $config = $regionTypeConfig->getOptions();
                 unset($config['choice_list']);
                 unset($config['choices']);
+                $formType = $regionTypeConfig->getType()->getName();
             } else {
                 $config = array();
+                $formType = 'oro_region';
             }
 
             $config['country'] = $country;
@@ -86,7 +89,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             $form->add(
                 $this->factory->createNamed(
                     'region',
-                    'oro_region',
+                    $formType,
                     $address->getRegion(),
                     $config
                 )
@@ -124,7 +127,7 @@ class AddressCountryAndRegionSubscriber implements EventSubscriberInterface
             $form->add(
                 $this->factory->createNamed(
                     'region',
-                    'oro_region',
+                    $form->get('region')->getConfig()->getType()->getName(),
                     null,
                     $config
                 )

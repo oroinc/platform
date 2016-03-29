@@ -4,21 +4,12 @@ namespace Oro\Bundle\ApiBundle\Config;
 
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
-class FiltersConfigLoader extends AbstractConfigLoader implements ConfigLoaderInterface
+class FiltersConfigLoader extends AbstractConfigLoader
 {
     /** @var array */
-    protected $methodMap = [
-        FiltersConfig::EXCLUSION_POLICY => 'setExclusionPolicy',
-    ];
-
-    /** @var array */
     protected $fieldMethodMap = [
-        FilterFieldConfig::EXCLUDE       => 'setExcluded',
-        FilterFieldConfig::PROPERTY_PATH => 'setPropertyPath',
-        FilterFieldConfig::DATA_TYPE     => 'setDataType',
-        FilterFieldConfig::ALLOW_ARRAY   => 'setArrayAllowed',
-        FilterFieldConfig::DEFAULT_VALUE => 'setDefaultValue',
-        FilterFieldConfig::DESCRIPTION   => 'setDescription',
+        FilterFieldConfig::EXCLUDE     => 'setExcluded',
+        FilterFieldConfig::ALLOW_ARRAY => 'setArrayAllowed',
     ];
 
     /**
@@ -27,14 +18,11 @@ class FiltersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
     public function load(array $config)
     {
         $filters = new FiltersConfig();
-
         foreach ($config as $key => $value) {
-            if (isset($this->methodMap[$key])) {
-                $this->callSetter($filters, $this->methodMap[$key], $value);
-            } elseif (ConfigUtil::FIELDS === $key) {
+            if (ConfigUtil::FIELDS === $key) {
                 $this->loadFields($filters, $value);
             } else {
-                $this->setValue($filters, $key, $value);
+                $this->loadConfigValue($filters, $key, $value);
             }
         }
 
@@ -64,11 +52,7 @@ class FiltersConfigLoader extends AbstractConfigLoader implements ConfigLoaderIn
         $filter = new FilterFieldConfig();
         if (!empty($config)) {
             foreach ($config as $key => $value) {
-                if (isset($this->fieldMethodMap[$key])) {
-                    $this->callSetter($filter, $this->fieldMethodMap[$key], $value);
-                } else {
-                    $this->setValue($filter, $key, $value);
-                }
+                $this->loadConfigValue($filter, $key, $value, $this->fieldMethodMap);
             }
         }
 

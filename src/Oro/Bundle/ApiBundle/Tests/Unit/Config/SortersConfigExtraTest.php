@@ -19,9 +19,9 @@ class SortersConfigExtraTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(SortersConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testIsInheritable()
+    public function testIsPropagable()
     {
-        $this->assertTrue($this->extra->isInheritable());
+        $this->assertTrue($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()

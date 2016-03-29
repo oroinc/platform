@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Definition;
 
-use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
 use Oro\Bundle\ApiBundle\Config\SorterFieldConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfig;
+use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 
 class SortersConfiguration extends AbstractConfigurationSection implements ConfigurationSectionInterface
 {
@@ -66,7 +66,7 @@ class SortersConfiguration extends AbstractConfigurationSection implements Confi
         array $preProcessCallbacks,
         array $postProcessCallbacks
     ) {
-        $sectionName = ConfigUtil::SORTERS . '.' . SortersConfig::FIELDS;
+        $sectionName = ConfigUtil::SORTERS . '.field';
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();

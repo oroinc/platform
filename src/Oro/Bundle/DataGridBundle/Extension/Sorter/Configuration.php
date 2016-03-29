@@ -13,6 +13,7 @@ class Configuration implements ConfigurationInterface
     const COLUMNS_PATH         = '[sorters][columns]';
     const MULTISORT_PATH       = '[sorters][multiple_sorting]';
     const DEFAULT_SORTERS_PATH = '[sorters][default]';
+    const TOOLBAR_SORTING_PATH = '[sorters][toolbar_sorting]';
 
     /**
      * {@inheritDoc}
@@ -28,6 +29,7 @@ class Configuration implements ConfigurationInterface
                         ->children()
                             ->scalarNode(PropertyInterface::DATA_NAME_KEY)->isRequired()->end()
                             ->booleanNode(PropertyInterface::DISABLED_KEY)->end()
+                            ->scalarNode(PropertyInterface::TYPE_KEY)->end()
                             ->variableNode('apply_callback')->end()
                         ->end()
                     ->end()
@@ -37,6 +39,7 @@ class Configuration implements ConfigurationInterface
                         ->values([OrmSorterExtension::DIRECTION_DESC, OrmSorterExtension::DIRECTION_ASC])->end()
                     ->end()
                     ->booleanNode('multiple_sorting')->end()
+                    ->booleanNode('toolbar_sorting')->end()
                 ->end()
             ->end();
 
