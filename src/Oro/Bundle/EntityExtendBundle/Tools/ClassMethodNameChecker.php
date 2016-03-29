@@ -8,9 +8,6 @@ class ClassMethodNameChecker
     public static $setters         = ['set'];
     public static $relationMethods = ['remove', 'setDefault', 'add'];
 
-    /** @var \ReflectionClass[] */
-    protected $reflectionCache = [];
-
     /**
      * @param string $property
      * @param string $className
@@ -21,7 +18,7 @@ class ClassMethodNameChecker
     public function getMethods($property, $className, array $prefixes)
     {
         $suffix     = $this->camelize($property);
-        $reflection = $this->getReflectionClass($className);
+        $reflection = new \ReflectionClass($className);
         $result     = [];
         foreach ($prefixes as $prefix) {
             if ($reflection->hasMethod($prefix . $suffix)) {
@@ -41,24 +38,5 @@ class ClassMethodNameChecker
     protected function camelize($string)
     {
         return strtr(ucwords(strtr($string, ['_' => ' '])), [' ' => '']);
-    }
-
-    /**
-     * Gets an instance of \ReflectionClass for the given class name
-     *
-     * @param string $className
-     *
-     * @return \ReflectionClass
-     */
-    protected function getReflectionClass($className)
-    {
-        if (isset($this->reflectionCache[$className])) {
-            return $this->reflectionCache[$className];
-        }
-
-        $reflectionClass                   = new \ReflectionClass($className);
-        $this->reflectionCache[$className] = $reflectionClass;
-
-        return $reflectionClass;
     }
 }
