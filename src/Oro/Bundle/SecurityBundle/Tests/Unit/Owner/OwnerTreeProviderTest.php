@@ -3,18 +3,15 @@
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Owner;
 
 use Doctrine\Common\Cache\CacheProvider;
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Tests\Unit\Stub\OwnershipMetadataProviderStub;
-use Oro\Bundle\UserBundle\Entity\User;
 
 class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 {
@@ -204,6 +201,9 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
         $tree = $this->treeProvider->getTree();
         $this->assertEquals(1, $tree->getBusinessUnitOrganizationId(1));
         $this->assertEquals([1], $tree->getUserOrganizationIds(1));
+        $this->assertEquals([1], $tree->getUsersAssignedToBU(1));
+        $this->assertEquals([1, 2, 3], $tree->getBusinessUnitsIdByUserOrganizations(3));
+        $this->assertEquals([3, 4], $tree->getUsersAssignedToBU(3));
     }
 
     /**
@@ -220,7 +220,6 @@ class OwnerTreeProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getTestData()
     {
-
         $organization = [
             'id' => 1
         ];
