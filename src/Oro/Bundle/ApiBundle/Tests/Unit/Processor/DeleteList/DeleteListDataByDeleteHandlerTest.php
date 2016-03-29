@@ -3,7 +3,6 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\DeleteList;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
-
 use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListDataByDeleteHandler;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User;
 
@@ -65,7 +64,7 @@ class DeleteListDataByDeleteHandlerTest extends DeleteListProcessorTestCase
 
     /**
      * @expectedException \RuntimeException
-     * @expectedExceptionMessage Expected content result of type array or Traversable and ArrayAccess, object given.
+     * @expectedExceptionMessage The result property of the Context should be array or Traversable, "stdClass" given.
      */
     public function testProcessForNotArrayResult()
     {
