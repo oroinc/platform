@@ -164,3 +164,8 @@ services:
             - @assets.packages
         tags:
             - { name: oro_layout.expression, alias: asset }
+
+    oro_layout.helper:
+        class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
+        arguments:
+            - @request_stack

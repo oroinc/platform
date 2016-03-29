@@ -13,6 +13,17 @@ use Oro\Bundle\ApiBundle\Processor\Context;
  */
 class SetHttpResponseStatusCode implements ProcessorInterface
 {
+    /** @var int */
+    protected $okStatusCode;
+
+    /**
+     * @param int $statusCode
+     */
+    public function __construct($statusCode = Response::HTTP_OK)
+    {
+        $this->okStatusCode = $statusCode;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -26,7 +37,7 @@ class SetHttpResponseStatusCode implements ProcessorInterface
             return;
         }
 
-        $statusCode = Response::HTTP_OK;
+        $statusCode = $this->okStatusCode;
         if ($context->hasErrors()) {
             $groupedCodes = [];
             foreach ($context->getErrors() as $error) {

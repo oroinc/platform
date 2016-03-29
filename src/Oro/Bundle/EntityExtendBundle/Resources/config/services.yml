@@ -460,3 +460,10 @@ services:
                 - oneToMany
                 - manyToOne
                 - manyToMany
+
+    oro_entity_extend.entity_alias_config_listener:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\EntityAliasConfigListener
+        arguments:
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }

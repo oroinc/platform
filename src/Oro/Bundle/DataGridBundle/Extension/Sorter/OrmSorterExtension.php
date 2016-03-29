@@ -10,31 +10,32 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
+use Oro\Bundle\DataGridBundle\Extension\Toolbar\ToolbarExtension;
 
 class OrmSorterExtension extends AbstractExtension
 {
     /**
      * Query param
      */
-    const SORTERS_ROOT_PARAM     = '_sort_by';
+    const SORTERS_ROOT_PARAM = '_sort_by';
     const MINIFIED_SORTERS_PARAM = 's';
 
     /**
      * Ascending sorting direction
      */
-    const DIRECTION_ASC = "ASC";
+    const DIRECTION_ASC = 'ASC';
 
     /**
      * Descending sorting direction
      */
-    const DIRECTION_DESC = "DESC";
+    const DIRECTION_DESC = 'DESC';
 
     /**
      * {@inheritDoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $columns      = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
+        $columns = $config->offsetGetByPath(Configuration::COLUMNS_PATH);
         $isApplicable = $config->getDatasourceType() === OrmDatasource::TYPE
             && is_array($columns);
 
@@ -77,15 +78,46 @@ class OrmSorterExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $multisort = $config->offsetGetByPath(Configuration::MULTISORT_PATH, false);
-        $sorters   = $this->getSorters($config);
+        $toolbarSort = $config->offsetGetByPath(Configuration::TOOLBAR_SORTING_PATH, false);
+        $multiSort = $config->offsetGetByPath(Configuration::MULTISORT_PATH, false);
+        if ($toolbarSort && $multiSort) {
+            throw new LogicException('Columns multiple_sorting cannot be enabled for toolbar_sorting');
+        }
+
+        $this->processColumns($config, $data);
+
+        $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multiSort]);
+        $toolbarOptions = $data->offsetGetByPath(ToolbarExtension::TOOLBAR_OPTION_PATH, []);
+        $toolbarOptions['addSorting'] = $toolbarSort;
+        $data->offsetSetByPath(ToolbarExtension::TOOLBAR_OPTION_PATH, $toolbarOptions);
+
+        $this->setMetadataStates($config, $data);
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @param MetadataObject $data
+     */
+    protected function processColumns(DatagridConfiguration $config, MetadataObject $data)
+    {
+        $toolbarSort = $config->offsetGetByPath(Configuration::TOOLBAR_SORTING_PATH, false);
+
+        $sorters = $this->getSorters($config);
 
         $proceed = [];
+
         foreach ($data->offsetGetOr('columns', []) as $key => $column) {
-            if (isset($column['name']) && isset($sorters[$column['name']])) {
-                $data->offsetSetByPath(sprintf('[columns][%s][sortable]', $key), true);
-                $proceed [] = $column['name'];
+            if (!array_key_exists('name', $column) || !array_key_exists($column['name'], $sorters)) {
+                continue;
             }
+            if ($toolbarSort && array_key_exists(PropertyInterface::TYPE_KEY, $sorters[$column['name']])) {
+                $data->offsetSetByPath(
+                    sprintf('[columns][%s][sortingType]', $key),
+                    $sorters[$column['name']][PropertyInterface::TYPE_KEY]
+                );
+            }
+            $data->offsetSetByPath(sprintf('[columns][%s][sortable]', $key), true);
+            $proceed[] = $column['name'];
         }
 
         $extraSorters = array_diff(array_keys($sorters), $proceed);
@@ -94,10 +126,15 @@ class OrmSorterExtension extends AbstractExtension
                 sprintf('Could not found column(s) "%s" for sorting', implode(', ', $extraSorters))
             );
         }
+    }
 
-        $data->offsetAddToArray(MetadataObject::OPTIONS_KEY, ['multipleSorting' => $multisort]);
-
-        $sortersState        = $this->getSortersState($config, $data);
+    /**
+     * @param DatagridConfiguration $config
+     * @param MetadataObject $data
+     */
+    protected function setMetadataStates(DatagridConfiguration $config, MetadataObject $data)
+    {
+        $sortersState = $this->getSortersState($config, $data);
         $initialSortersState = $this->getSortersState($config, $data, false);
 
         $data->offsetAddToArray('initialState', ['sorters' => $initialSortersState]);
@@ -155,7 +192,7 @@ class OrmSorterExtension extends AbstractExtension
                 // remove disabled sorter
                 unset($sorters[$name]);
             } else {
-                $definition     = is_array($definition) ? $definition : [];
+                $definition = is_array($definition) ? $definition : [];
                 $sorters[$name] = $definition;
             }
         }
@@ -179,23 +216,23 @@ class OrmSorterExtension extends AbstractExtension
 
         $defaultSorters = $config->offsetGetByPath(Configuration::DEFAULT_SORTERS_PATH, []);
         if ($readParameters) {
-            $sortBy = $this->getParameters()->get(self::SORTERS_ROOT_PARAM) ? : $defaultSorters;
+            $sortBy = $this->getParameters()->get(self::SORTERS_ROOT_PARAM) ?: $defaultSorters;
         } else {
             $sortBy = $defaultSorters;
         }
 
         // if default sorter was not specified, just take first sortable column
         if (!$sortBy && $sorters) {
-            $names           = array_keys($sorters);
+            $names = array_keys($sorters);
             $firstSorterName = reset($names);
-            $sortBy          = [$firstSorterName => self::DIRECTION_ASC];
+            $sortBy = [$firstSorterName => self::DIRECTION_ASC];
         }
 
         foreach ($sortBy as $column => $direction) {
             $sorter = isset($sorters[$column]) ? $sorters[$column] : false;
 
             if ($sorter !== false) {
-                $direction       = $this->normalizeDirection($direction);
+                $direction = $this->normalizeDirection($direction);
                 $result[$column] = [$direction, $sorter];
             }
         }
