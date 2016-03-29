@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
+use Oro\Component\ChainProcessor\ProcessorBag;
+
 use Oro\Bundle\ApiBundle\Processor\Post\PostContext;
 use Oro\Bundle\ApiBundle\Provider\ConfigProvider;
 use Oro\Bundle\ApiBundle\Provider\MetadataProvider;
-use Oro\Component\ChainProcessor\ProcessorBag;
 
 class PostProcessor extends RequestActionProcessor
 {
@@ -28,6 +29,7 @@ class PostProcessor extends RequestActionProcessor
         MetadataProvider $metadataProvider
     ) {
         parent::__construct($processorBag, $action);
+
         $this->configProvider   = $configProvider;
         $this->metadataProvider = $metadataProvider;
     }
