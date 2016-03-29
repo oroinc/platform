@@ -3,38 +3,38 @@
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
-use Symfony\Component\Security\Core\Authorization\AuthorizationCheckerInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class EntityTypeSecurityCheck implements ProcessorInterface
 {
-    /** @var AuthorizationCheckerInterface */
-    protected $securityContext;
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
     /** @var string */
     protected $permission;
 
     /**
-     * @param AuthorizationCheckerInterface $securityContext
-     * @param DoctrineHelper                $doctrineHelper
-     * @param string                        $permission
+     * @param DoctrineHelper $doctrineHelper
+     * @param SecurityFacade $securityFacade
+     * @param string         $permission
      */
     public function __construct(
-        AuthorizationCheckerInterface $securityContext,
         DoctrineHelper $doctrineHelper,
+        SecurityFacade $securityFacade,
         $permission
     ) {
-        $this->securityContext = $securityContext;
-        $this->doctrineHelper  = $doctrineHelper;
-        $this->permission      = $permission;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->securityFacade = $securityFacade;
+        $this->permission = $permission;
     }
 
     /**
@@ -44,13 +44,25 @@ class EntityTypeSecurityCheck implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
+        $config = $context->getConfig();
+
+        $isGranted = true;
+        if (!$config || !$config->hasAclResource()) {
+            $entityClass = $context->getClassName();
+            if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
+                $isGranted = $this->securityFacade->isGranted(
+                    $this->permission,
+                    new ObjectIdentity('entity', $entityClass)
+                );
+            }
+        } else {
+            $aclResource = $config->getAclResource();
+            if ($aclResource) {
+                $isGranted = $this->securityFacade->isGranted($aclResource);
+            }
         }
 
-        if (!$this->securityContext->isGranted($this->permission, new ObjectIdentity('entity', $entityClass))) {
+        if (!$isGranted) {
             throw new AccessDeniedException();
         }
     }

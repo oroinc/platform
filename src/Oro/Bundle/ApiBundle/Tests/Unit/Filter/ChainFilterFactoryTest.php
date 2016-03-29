@@ -3,64 +3,46 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
 use Oro\Bundle\ApiBundle\Filter\ChainFilterFactory;
-use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
 
 class ChainFilterFactoryTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var ChainFilterFactory */
-    protected $filterFactory;
 
-    /** @var SimpleFilterFactory */
-    protected $simpleFilterFactory;
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function setUp()
+    public function testChainFactory()
     {
-        $this->filterFactory = new ChainFilterFactory();
+        $chainFactory = new ChainFilterFactory();
+        $childFactory1 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
+        $childFactory2 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterFactoryInterface');
+        $chainFactory->addFilterFactory($childFactory1);
+        $chainFactory->addFilterFactory($childFactory2);
 
-        $this->simpleFilterFactory = new SimpleFilterFactory();
-        $filters = $this->getFilters();
-        foreach ($filters as $filter) {
-            list($type, $className, $exists) = $filter;
-            if ($exists) {
-                $this->simpleFilterFactory->addFilter($type, $className);
-            }
-        }
-    }
+        $knownFilter1 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+        $knownFilter2 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+        $knownFilter31 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
+        $knownFilter32 = $this->getMock('Oro\Bundle\ApiBundle\Filter\FilterInterface');
 
-    public function testAddCreateFilterFactory()
-    {
-        $this->filterFactory->addFilterFactory($this->simpleFilterFactory);
+        $childFactory1->expects($this->any())
+            ->method('createFilter')
+            ->willReturnMap(
+                [
+                    ['known1', $knownFilter1],
+                    ['known3', $knownFilter31],
+                    ['unknown1', null],
+                ]
+            );
+        $childFactory2->expects($this->any())
+            ->method('createFilter')
+            ->willReturnMap(
+                [
+                    ['known2', $knownFilter2],
+                    ['known3', $knownFilter32],
+                    ['unknown2', null],
+                ]
+            );
 
-        $filters = $this->getFilters();
-        foreach ($filters as $filter) {
-            list($type, , $exists) = $filter;
-
-            if ($exists) {
-                $this->assertNotNull($this->filterFactory->createFilter($type));
-            } else {
-                $this->assertNull($this->filterFactory->createFilter($type));
-            }
-        }
-    }
-
-    /**
-     * @return array
-     */
-    protected function getFilters()
-    {
-        return [
-            ['integer',           'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['unsignedInteger',   'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['string',            'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['boolean',           'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['datetime',          'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['entityAlias',       'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['entityPluralAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['doNotExistingOne',  'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', false],
-            ['doNotExistingTwo',  'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', false],
-        ];
+        $this->assertSame($knownFilter1, $chainFactory->createFilter('known1'));
+        $this->assertSame($knownFilter2, $chainFactory->createFilter('known2'));
+        $this->assertSame($knownFilter31, $chainFactory->createFilter('known3'));
+        $this->assertNull($chainFactory->createFilter('unknown1'));
+        $this->assertNull($chainFactory->createFilter('unknown2'));
     }
 }

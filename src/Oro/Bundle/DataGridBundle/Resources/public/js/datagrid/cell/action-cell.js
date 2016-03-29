@@ -88,7 +88,7 @@ define([
         events: {
             'click': '_showDropdown',
             'mouseover .dropdown-toggle': '_showDropdown',
-            'mouseleave .dropdown-menu': '_hideDropdown',
+            'mouseleave .dropdown-menu, .dropdown-menu__placeholder': '_hideDropdown',
             'click .dropdown-close .icon-remove': '_hideDropdown'
         },
 

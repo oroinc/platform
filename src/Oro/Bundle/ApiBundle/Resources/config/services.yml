@@ -103,6 +103,12 @@ services:
         tags:
             - { name: oro_api.config_extension }
 
+    oro_api.config_extension.actions:
+        class: Oro\Bundle\ApiBundle\Config\ActionsConfigExtension
+        public: false
+        tags:
+            - { name: oro_api.config_extension }
+
     oro_api.config_bag:
         class: Oro\Bundle\ApiBundle\Provider\ConfigBag
         public: false
@@ -226,7 +232,6 @@ services:
             - @oro_api.rest.doc_view_detector
             - @oro_api.action_processor_bag
             - @oro_entity.entity_class_name_provider
-            - @oro_entity.entity_alias_resolver
             - @oro_api.doctrine_helper
             - @oro_api.value_normalizer
         tags:
@@ -245,13 +250,7 @@ services:
     oro_api.filter_factory.default:
         class: Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory
         public: false
-        calls:
-            - [addFilter, [ 'integer', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'unsignedInteger', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'string', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'boolean', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'datetime', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'entityAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
-            - [addFilter, [ 'entityPluralAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'] ]
+        arguments:
+            - @property_accessor
         tags:
             - { name: oro.api.filter_factory, priority: -10 }

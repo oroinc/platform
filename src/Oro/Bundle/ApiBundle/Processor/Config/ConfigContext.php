@@ -18,10 +18,13 @@ class ConfigContext extends ApiContext
     /** FQCN of an entity */
     const CLASS_NAME = 'class';
 
+    /** the name of the action for which the configuration is built */
+    const TARGET_ACTION = 'targetAction';
+
     /** the maximum number of related entities that can be retrieved */
     const MAX_RELATED_ENTITIES = 'maxRelatedEntities';
 
-    /** a list of requests for additional configuration data that should be retrieved */
+    /** a list of requests for configuration data that should be retrieved */
     const EXTRA = 'extra';
 
     /** @var ConfigExtraInterface[] */
@@ -54,6 +57,30 @@ class ConfigContext extends ApiContext
     }
 
     /**
+     * Gets the name of the action for which the configuration is built
+     *
+     * @return string|null
+     */
+    public function getTargetAction()
+    {
+        return $this->get(self::TARGET_ACTION);
+    }
+
+    /**
+     * Sets the name of the action for which the configuration is built
+     *
+     * @param string|null $action
+     */
+    public function setTargetAction($action)
+    {
+        if ($action) {
+            $this->set(self::TARGET_ACTION, $action);
+        } else {
+            $this->remove(self::TARGET_ACTION);
+        }
+    }
+
+    /**
      * Gets the maximum number of related entities that can be retrieved
      *
      * @return int|null
@@ -78,7 +105,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Checks whether some additional configuration data is requested.
+     * Checks whether some configuration data is requested.
      *
      * @param string $extraName
      *
@@ -90,7 +117,27 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets a list of requests for additional configuration data.
+     * Gets a request for configuration data.
+     *
+     * @param string $extraName
+     *
+     * @return ConfigExtraInterface|null
+     */
+    public function getExtra($extraName)
+    {
+        $result = null;
+        foreach ($this->extras as $extra) {
+            if ($extra->getName() === $extraName) {
+                $result = $extra;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * Gets a list of requests for configuration data.
      *
      * @return ConfigExtraInterface[]
      */
@@ -100,7 +147,7 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Sets requests for additional configuration data.
+     * Sets requests for configuration data.
      *
      * @param ConfigExtraInterface[] $extras
      *
@@ -124,16 +171,16 @@ class ConfigContext extends ApiContext
     }
 
     /**
-     * Gets a list of requests for additional configuration data that can be used
+     * Gets a list of requests for configuration data that can be used
      * to get configuration of related entities.
      *
      * @return ConfigExtraInterface[]
      */
-    public function getInheritableExtras()
+    public function getPropagableExtras()
     {
         $result = [];
         foreach ($this->extras as $extra) {
-            if ($extra->isInheritable()) {
+            if ($extra->isPropagable()) {
                 $result[] = $extra;
             }
         }
