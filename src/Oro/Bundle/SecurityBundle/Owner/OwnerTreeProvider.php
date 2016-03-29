@@ -140,7 +140,7 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
 
                 foreach ($user['businessUnits'] as $businessUnit) {
                     if ($organization['id'] == $businessUnit['organization']['id']) {
-                        $tree->addLocalEntityToBasic($user['id'], $organization['id'], $businessUnit['id']);
+                        $tree->addLocalEntityToBasic($user['id'], $businessUnit['id'], $organization['id']);
                     }
                 }
             }
