@@ -131,8 +131,9 @@ class OwnerDeletionManager
         foreach ($this->ownershipProvider->getConfigs(null, true) as $config) {
             if (in_array(
                 $config->get('owner_type'),
-                [OwnershipType::OWNER_TYPE_USER, OwnershipType::OWNER_TYPE_BUSINESS_UNIT])
-            ) {
+                [OwnershipType::OWNER_TYPE_USER, OwnershipType::OWNER_TYPE_BUSINESS_UNIT],
+                true
+            )) {
                 $entityClassName = $config->getId()->getClassName();
                 $organizationFieldName = $this->ownershipMetadata
                     ->getMetadata($entityClassName)
