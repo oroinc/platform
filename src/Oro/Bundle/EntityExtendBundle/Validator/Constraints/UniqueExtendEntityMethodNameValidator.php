@@ -48,11 +48,12 @@ class UniqueExtendEntityMethodNameValidator extends ConstraintValidator
         }
         $fieldName = $value->getFieldName();
         $type      = $value->getType();
-        $getters   = $this->methodNameChecker
-            ->getMethods($fieldName, $className, ClassMethodNameChecker::$getters);
-        $setters = $this->methodNameChecker
-            ->getMethods($fieldName, $className, ClassMethodNameChecker::$setters);
-        $methods = array_merge($getters, $setters);
+
+        $methods = $this->methodNameChecker->getMethods(
+            $fieldName,
+            $className,
+            array_merge(ClassMethodNameChecker::$getters, ClassMethodNameChecker::$setters)
+        );
         if (in_array($type, RelationType::$anyToAnyRelations, false)) {
             $relationMethods = $this->methodNameChecker
                 ->getMethods($fieldName, $className, ClassMethodNameChecker::$relationMethods);
