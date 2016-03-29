@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SecurityBundle\EventListener;
 
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\UnitOfWork;
 
 use Symfony\Component\Security\Core\Util\ClassUtils;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
@@ -81,9 +82,9 @@ class OwnerTreeListener implements ContainerAwareInterface
         }
 
         $uow = $args->getEntityManager()->getUnitOfWork();
-        $this->needWarmup = $this->checkEntities($uow->getScheduledEntityInsertions())
-            || $this->checkEntities($uow->getScheduledEntityUpdates())
-            || $this->checkEntities($uow->getScheduledEntityDeletions());
+        $this->needWarmup = $this->checkEntities($uow, $uow->getScheduledEntityInsertions())
+            || $this->checkEntities($uow, $uow->getScheduledEntityUpdates())
+            || $this->checkEntities($uow, $uow->getScheduledEntityDeletions());
 
         if ($this->needWarmup) {
             $this->getTreeProvider()->clear();
@@ -91,14 +92,13 @@ class OwnerTreeListener implements ContainerAwareInterface
     }
 
     /**
-     * @param array $entities
+     * @param UnitOfWork $uow
+     * @param array      $entities
+     *
      * @return bool
      */
-    protected function checkEntities(array $entities)
+    protected function checkEntities(UnitOfWork $uow, array $entities)
     {
-        $uow = $this->container
-            ->get('doctrine.orm.entity_manager')
-            ->getUnitOfWork();
         $fieldsToIgnore = $this->getUserFieldsToIgnore();
         foreach ($entities as $entity) {
             if (in_array(ClassUtils::getRealClass($entity), $this->securityClasses, true)) {
