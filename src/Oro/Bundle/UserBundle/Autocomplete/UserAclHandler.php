@@ -99,7 +99,6 @@ class UserAclHandler implements SearchHandlerInterface
         $observer = new OneShotIsGrantedObserver();
         $this->aclVoter->addOneShotIsGrantedObserver($observer);
         if ($this->getSecurityContext()->isGranted($permission, $object)) {
-            $results = [];
             if ($searchById) {
                 $results = $this->searchById($search);
             } else {
@@ -123,6 +122,9 @@ class UserAclHandler implements SearchHandlerInterface
                 $results = $query->getResult();
 
                 $hasMore = count($results) == $perPage;
+                if ($hasMore) {
+                    $results = array_slice($results, 0, $perPage - 1);
+                }
             }
 
             $resultsData = [];

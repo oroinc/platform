@@ -1,16 +1,16 @@
 {% import 'OroUIBundle::macros.html.twig' as UI %}
-{% if actions|length %}
+{% if operations|length %}
     {% set buttons = {} %}
     {% set groups = {} %}
 
-    {% for action in actions %}
+    {% for operation in operations %}
         {% set params = {
-            'label': action.definition.label|trans,
-            'buttonOptions': action.definition.buttonOptions,
-            'frontendOptions': action.definition.frontendOptions,
+            'label': operation.definition.label|trans,
+            'buttonOptions': operation.definition.buttonOptions,
+            'frontendOptions': operation.definition.frontendOptions,
         } %}
-        {% set template = params.buttonOptions.template|default('OroActionBundle:Action:button.html.twig') %}
-        {% set groupName = action.definition.buttonOptions.group|default(null) %}
+        {% set template = params.buttonOptions.template|default('OroActionBundle:Operation:button.html.twig') %}
+        {% set groupName = operation.definition.buttonOptions.group|default(null) %}
         {% if groupName %}
             {% set link %}
                 <li>

@@ -1,0 +1,69 @@
+{% extends 'OroUIBundle:actions:update.html.twig' %}
+
+{% set formAction = app.request.uri  %}
+{% set entity = context.data %}
+
+{% if entity %}
+    {% set className = oro_class_name(context.data) %}
+    {% set entityLabel = oro_entity_config_value(className, 'label')|trans %}
+    {% set indexUrl = path(oro_entity_route(className, 'name')) %}
+
+    {% oro_title_set({
+        titleTemplate : "%entity% - %operationName% - %label% - %pluralLabel%",
+        params : {
+            "%entity%": entity.__toString,
+            "%operationName%": operation.definition.label|trans,
+            "%label%": entityLabel,
+            "%pluralLabel%": oro_entity_config_value(className, 'plural_label')|trans
+        }
+    }) %}
+{% else %}
+    {% set indexUrl = '' %}
+    {% oro_title_set({titleTemplate : operation.definition.label|trans}) %}
+{% endif %}
+
+{% block pageHeader %}
+    {% if entity %}
+        {% set breadcrumbs = {
+            'entity':      entity,
+            'indexPath':   indexUrl,
+            'indexLabel':  entityLabel,
+            'entityTitle': entity|default('N/A'|trans)
+        } %}
+
+        {{ parent() }}
+    {% else %}
+        {% include 'OroUIBundle::page_title_block.html.twig' with { title: operation.definition.label|trans } %}
+    {% endif %}
+{% endblock pageHeader %}
+
+{% block navButtons %}
+    {{ UI.cancelButton(fromUrl|default(indexUrl)) }}
+
+    {{ UI.dropdownSaveButton({'html': UI.saveAndStayButton('Submit')}) }}
+{% endblock navButtons %}
+
+{% block content_data %}
+    {% if id is not defined %}
+        {% set id = 'action-page-' ~ operation.name %}
+    {% endif %}
+
+    {% if data is not defined %}
+        {% set dataBlocks = [{
+            'title': operation.definition.label|trans,
+            'class': 'active',
+            'subblocks': [{
+                'data': [
+                    form_widget(form)
+                ]
+            }]
+        }] %}
+
+        {% set data = {
+            'formErrors': formErrors|default(''),
+            'dataBlocks': dataBlocks
+        }%}
+    {% endif %}
+
+    {{ parent() }}
+{% endblock content_data %}

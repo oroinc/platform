@@ -38,20 +38,19 @@ class ActionFactory
     public function create($type, array $options = array(), ExpressionInterface $condition = null)
     {
         if (!$type) {
-            throw new \RunTimeException('The action type must be defined');
+            throw new \RuntimeException('The action type must be defined');
         }
 
-        $id = isset($this->types[$type]) ? $this->types[$type] : false;
+        $id = array_key_exists($type, $this->types) ? $this->types[$type] : false;
 
         if (!$id) {
-            throw new \RunTimeException(sprintf('No attached service to action type named `%s`', $type));
+            throw new \RuntimeException(sprintf('No attached service to action type named `%s`', $type));
         }
 
-        /** @var ActionInterface $action */
         $action = $this->container->get($id);
 
         if (!$action instanceof ActionInterface) {
-            throw new \RunTimeException(sprintf('The service `%s` must implement `ActionInterface`', $id));
+            throw new \RuntimeException(sprintf('The service `%s` must implement `ActionInterface`', $id));
         }
 
         $action->initialize($options);

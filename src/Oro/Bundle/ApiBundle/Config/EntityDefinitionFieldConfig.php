@@ -11,6 +11,7 @@ use Oro\Component\EntitySerializer\FieldConfig;
 class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInterface
 {
     use Traits\ConfigTrait;
+    use Traits\ExcludeTrait;
     use Traits\LabelTrait;
     use Traits\DescriptionTrait;
 
@@ -70,24 +71,6 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     public function createAndSetTargetEntity()
     {
         return $this->setTargetEntity(new EntityDefinitionConfig());
-    }
-
-    /**
-     * Indicates whether the exclusion flag is set explicitly.
-     *
-     * @return bool
-     */
-    public function hasExcluded()
-    {
-        return array_key_exists(self::EXCLUDE, $this->items);
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setExcluded($exclude = true)
-    {
-        $this->items[self::EXCLUDE] = $exclude;
     }
 
     /**

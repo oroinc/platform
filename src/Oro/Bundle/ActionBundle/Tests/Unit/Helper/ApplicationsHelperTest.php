@@ -7,8 +7,8 @@ use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
 use Symfony\Component\Security\Core\User\UserInterface;
 
 use Oro\Bundle\ActionBundle\Helper\ApplicationsHelper;
-use Oro\Bundle\ActionBundle\Model\Action;
-use Oro\Bundle\ActionBundle\Model\ActionDefinition;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\UserBundle\Entity\User;
 
 class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
@@ -44,7 +44,7 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExecutionRoute()
     {
-        $this->assertEquals('oro_api_action_execute_actions', $this->helper->getExecutionRoute());
+        $this->assertEquals('oro_api_action_execute_operations', $this->helper->getExecutionRoute());
     }
 
     /**
@@ -143,22 +143,22 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $applications
-     * @return Action
+     * @return Operation
      */
     protected function createAction(array $applications)
     {
-        $definition = new ActionDefinition();
+        $definition = new OperationDefinition();
         $definition->setApplications($applications);
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Action $action */
-        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
+        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->getMock();
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('getDefinition')
             ->willReturn($definition);
 
-        return $action;
+        return $operation;
     }
 
     /**

@@ -10,6 +10,7 @@ use Symfony\Component\Console\Helper\TableSeparator;
 
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
+use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -104,6 +105,10 @@ class DebugCommand extends AbstractDebugCommand
         foreach ($processors as $processor) {
             if ($i > 0) {
                 $table->addRow(new TableSeparator());
+            }
+
+            if ($processor instanceof TraceableProcessor) {
+                $processor = $processor->getProcessor();
             }
 
             $processorColumn      = sprintf(

@@ -175,7 +175,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                 'exclusion_policy' => 'all',
                 'fields'           => [
                     'field1'       => [
-                        'data_type' => 'string'
+                        'data_type' => 'string',
+                        'allow_array' => true
                     ],
                     'field2'       => [
                         'exclude' => true
@@ -184,7 +185,8 @@ class CompleteFiltersTest extends ConfigProcessorTestCase
                         'exclude' => true
                     ],
                     'field5'       => [
-                        'data_type' => 'integer'
+                        'data_type' => 'integer',
+                        'allow_array' => true
                     ],
                     'association1' => [
                         'data_type'   => 'integer',

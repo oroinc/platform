@@ -12,6 +12,8 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Processor\Delete\DeleteContext;
+use Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListContext;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Processor\GetList\GetListContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -56,6 +58,48 @@ class RestApiController extends FOSRestController
         /** @var GetContext $context */
         $context = $this->getContext($processor, $request);
         $context->setId($request->attributes->get('id'));
+        $context->setFilterValues(new RestFilterValueAccessor($request));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Delete an entity
+     *
+     * @param Request $request
+     *
+     * @ApiDoc(description="Delete entity", resource=true, views={"rest_plain", "rest_json_api"})
+     *
+     * @return Response
+     */
+    public function deleteAction(Request $request)
+    {
+        $processor = $this->getProcessor($request);
+        /** @var DeleteContext $context */
+        $context = $this->getContext($processor, $request);
+        $context->setId($request->attributes->get('id'));
+
+        $processor->process($context);
+
+        return $this->buildResponse($context);
+    }
+
+    /**
+     * Delete a list of entities
+     *
+     * @param Request $request
+     *
+     * @ApiDoc(description="Delete entities", resource=true, views={"rest_plain", "rest_json_api"})
+     *
+     * @return Response
+     */
+    public function deleteListAction(Request $request)
+    {
+        $processor = $this->getProcessor($request);
+        /** @var DeleteListContext $context */
+        $context = $this->getContext($processor, $request);
         $context->setFilterValues(new RestFilterValueAccessor($request));
 
         $processor->process($context);
