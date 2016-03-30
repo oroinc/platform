@@ -19,9 +19,9 @@ class DescriptionsConfigExtraTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(DescriptionsConfigExtra::NAME, $this->extra->getName());
     }
 
-    public function testIsInheritable()
+    public function testIsPropagable()
     {
-        $this->assertTrue($this->extra->isInheritable());
+        $this->assertTrue($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()

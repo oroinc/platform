@@ -2,22 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
-use Doctrine\Common\Collections\Criteria;
-
+/**
+ * A filter that can be used to filter entity fields that should be returned.
+ */
 class FieldsFilter extends StandaloneFilter
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function apply(Criteria $criteria, FilterValue $value = null)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createExpression(FilterValue $value = null)
-    {
-        return null;
-    }
 }

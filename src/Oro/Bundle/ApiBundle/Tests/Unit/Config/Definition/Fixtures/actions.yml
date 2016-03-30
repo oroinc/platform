@@ -1,0 +1,189 @@
+empty:
+    config: []
+    expected: []
+
+empty_root:
+    config:
+        actions: []
+    expected: []
+
+null_actions:
+    config:
+        actions: ~
+    expected: []
+
+null_action_default_exclude:
+    config:
+        actions:
+            delete: ~
+    expected:
+        actions:
+            delete:
+                exclude: false
+
+exclude_true:
+    config:
+        actions:
+            delete:
+                exclude: true
+    expected:
+        actions:
+            delete:
+                exclude: true
+
+null_acl_resource:
+    config:
+        actions:
+            delete:
+                acl_resource: ~
+    expected:
+        actions:
+            delete:
+                acl_resource: ~
+
+null_acl_resource_and_null_exclude:
+    config:
+        actions:
+            delete:
+                exclude: ~
+                acl_resource: ~
+    expected:
+        actions:
+            delete:
+                exclude: true
+                acl_resource: ~
+
+acl_resource_and_exclude:
+    config:
+        actions:
+            delete:
+                exclude: true
+                acl_resource: test_acl_resource
+    expected:
+        actions:
+            delete:
+                exclude: true
+                acl_resource: test_acl_resource
+
+invalid_actions_definition:
+    config:
+        actions:
+            delete:
+                delete:
+                    exclude: true
+                    acl_resource: test_acl_resource
+    expected: []
+    error: 'Unrecognized option "delete" under "entity.actions.delete"'
+
+invalid_actions_definition_exclude_flag_type:
+    config:
+        actions:
+            delete:
+                exclude: test
+    expected: []
+    error: 'Invalid type for path "entity.actions.delete.exclude". Expected boolean, but got string.'
+
+invalid_actions_definition_unknown_property:
+    config:
+        actions:
+            delete:
+                test: test
+    expected: []
+    error: 'Unrecognized option "test" under "entity.actions.delete"'
+
+null_status_codes:
+    config:
+        actions:
+            get:
+                status_codes: ~
+    expected:
+        actions:
+            get: []
+
+empty_status_codes:
+    config:
+        actions:
+            get:
+                status_codes: []
+    expected:
+        actions:
+            get: []
+
+add_status_codes_short_syntax:
+    config:
+        actions:
+            get:
+                status_codes:
+                    '417': 'Returned when expectations failed'
+    expected:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        description: 'Returned when expectations failed'
+
+add_status_codes_full_syntax:
+    config:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        description: 'Returned when expectations failed'
+    expected:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        description: 'Returned when expectations failed'
+
+delete_status_codes_short_syntax:
+    config:
+        actions:
+            get:
+                status_codes:
+                    '417': false
+    expected:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        exclude: true
+
+delete_status_codes_full_syntax:
+    config:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        exclude: true
+    expected:
+        actions:
+            get:
+                status_codes:
+                    '417':
+                        exclude: true
+
+actions_collections:
+    config:
+        actions:
+            create:
+                exclude: true
+                acl_resource: create_acl_resource
+            get:
+                exclude: false
+                acl_resource: view_acl_resource
+            delete:
+                acl_resource: delete_acl_resource
+            update: ~
+    expected:
+        actions:
+            create:
+                exclude: true
+                acl_resource: create_acl_resource
+            get:
+                exclude: false
+                acl_resource: view_acl_resource
+            delete:
+                acl_resource: delete_acl_resource
+            update:
+                exclude: false

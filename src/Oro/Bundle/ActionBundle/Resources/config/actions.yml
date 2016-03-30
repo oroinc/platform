@@ -1,95 +1,241 @@
-actions:
-    CRUD_ACTION:
-        label: CRUD_ACTION
-        button_options:
-            template: OroActionBundle:Action:crud-button.html.twig
-        preconditions:
-            @and:
-                - @not_blank: $.data
+parameters:
+    oro_action.context_accessor.class: Oro\Component\Action\Model\ContextAccessor
+    oro_action.action_factory.class: Oro\Component\Action\Action\ActionFactory
+    oro_action.action_assembler.class: Oro\Component\Action\Action\ActionAssembler
 
-    UPDATE:
-        extends: CRUD_ACTION
-        acl_resource: [EDIT, $.data]
-        order: 10
-        for_all_entities: true
-        for_all_datagrids: true
-        groups:
-            - view_navButtons
-            - datagridRowAction
-        prefunctions:
-            - @tree:
-                conditions:
-                    @not_blank: $.data
-                actions:
-                    - @call_service_method:
-                        service: oro_entity_config.helper.entity_config
-                        method: getRoutes
-                        method_parameters: [$.data, ['update']]
-                        attribute: $.routes
-        preconditions:
-            @and:
-                - @not_blank: $.routes[update]
-        functions:
-            - @redirect:
-                route: $.routes[update]
-                route_parameters: {id: $id}
-        label: oro.action.edit
-        frontend_options:
-            title: oro.action.edit_entity
-        button_options:
-            icon: icon-edit
+    oro_action.action.tree.class: Oro\Component\Action\Action\TreeExecutor
+    oro_action.action.configurable.class: Oro\Component\Action\Action\Configurable
+    oro_action.action.create_datetime.class: Oro\Component\Action\Action\CreateDateTime
+    oro_action.action.call_method.class: Oro\Component\Action\Action\CallMethod
+    oro_action.action.assign_value.class: Oro\Component\Action\Action\AssignValue
+    oro_action.action.unset_value.class: Oro\Component\Action\Action\UnsetValue
+    oro_action.action.create_object.class: Oro\Component\Action\Action\CreateObject
+    oro_action.action.create_date.class: Oro\Bundle\ActionBundle\Action\CreateDate
+    oro_action.action.create_entity.class: Oro\Component\Action\Action\CreateEntity
+    oro_action.action.flush_entity.class: Oro\Component\Action\Action\FlushEntity
+    oro_action.action.request_entity.class: Oro\Component\Action\Action\RequestEntity
+    oro_action.action.redirect.class: Oro\Component\Action\Action\Redirect
+    oro_action.action.format_string.class: Oro\Component\Action\Action\FormatString
+    oro_action.action.assign_active_user.class: Oro\Component\Action\Action\AssignActiveUser
+    oro_action.action.format_name.class: Oro\Bundle\ActionBundle\Action\FormatName
+    oro_action.action.traverse.class: Oro\Component\Action\Action\Traverse
+    oro_action.action.translate.class: Oro\Component\Action\Action\TranslateAction
+    oro_action.action.flash_message.class: Oro\Component\Action\Action\FlashMessage
+    oro_action.action.remove_entity.class: Oro\Component\Action\Action\RemoveEntity
+    oro_action.action.assign_constant_value.class: Oro\Component\Action\Action\AssignConstantValue
+    oro_action.action.call_service_method.class: Oro\Component\Action\Action\CallServiceMethod
+    oro_action.action.refresh_grid.class: Oro\Component\Action\Action\RefreshGrid
+    oro_action.action.run_action_group.class: Oro\Bundle\ActionBundle\Action\RunActionGroup
+    oro_action.action.find_entities.class: Oro\Component\Action\Action\FindEntities
+    oro_action.action.assign_url.class: Oro\Component\Action\Action\AssignUrl
 
-    DELETE:
-        extends: CRUD_ACTION
-        acl_resource: [DELETE, $.data]
-        order: 20
-        for_all_entities: true
-        for_all_datagrids: true
-        groups:
-            - view_navButtons
-            - update_navButtons
-            - datagridRowAction
-        prefunctions:
-            - @tree:
-                conditions:
-                    @not_blank: $.data
-                actions:
-                    - @call_service_method:
-                        service: oro_entity_config.helper.entity_config
-                        method: getRoutes
-                        method_parameters: [$.data, ['name', 'delete']]
-                        attribute: $.routes
-                    - @call_service_method:
-                        service: oro_entity_config.helper.entity_config
-                        method: getConfigValue
-                        method_parameters: [$.data, 'label']
-                        attribute: $.entityLabel
-                    - @trans:
-                        id: $.entityLabel
-                        attribute: $.entityLabel
-        preconditions:
-            @and:
-                - @not_blank: $.routes[name]
-                - @not_blank: $.routes[delete]
-        functions:
-            - @call_service_method:
-                service: oro_action.handler.delete
-                method: handleDelete
-                method_parameters: [$.data]
+services:
+    oro_action.context_accessor:
+        class: %oro_action.context_accessor.class%
 
-            - @flash_message:
-                message: oro.action.delete_message
-                type: 'info'
-                message_parameters:
-                    entityLabel: $.entityLabel
-            - @redirect: {route: $.routes[name]}
-        label: oro.action.delete
-        frontend_options:
-            title: oro.action.delete_entity
-            confirmation:
-                title: oro.action.delete_entity
-                message: oro.action.delete_confirm
-                message_parameters:
-                    entityLabel: $.entityLabel
-        button_options:
-            icon: icon-trash
+    oro_action.action_factory:
+        class: %oro_action.action_factory.class%
+        arguments:
+            - @service_container
+            - []
+
+    oro_action.action_assembler:
+        class: %oro_action.action_assembler.class%
+        arguments:
+            - @oro_action.action_factory
+            - @oro_action.expression.factory
+        calls:
+            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+
+    oro_action.action.tree:
+        class: %oro_action.action.tree.class%
+        arguments:
+            - @?logger
+        tags:
+            - { name: oro_action.action, alias: tree }
+
+    oro_action.action.configurable:
+        class: %oro_action.action.configurable.class%
+        arguments:
+            - @oro_action.action_assembler
+        tags:
+            - { name: oro_action.action, alias: configurable }
+
+    oro_action.action.create_datetime:
+        class: %oro_action.action.create_datetime.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.action, alias: create_datetime }
+
+    oro_action.action.call_method:
+        class: %oro_action.action.call_method.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.action, alias: call_method }
+
+    oro_action.action.assign_value:
+        class: %oro_action.action.assign_value.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.action, alias: assign_value }
+
+    oro_action.action.unset_value:
+        class: %oro_action.action.unset_value.class%
+        arguments:
+            - @oro_action.action.assign_value
+        tags:
+            - { name: oro_action.action, alias: unset_value }
+
+    oro_action.action.create_object:
+        class: %oro_action.action.create_object.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.action, alias: create_object }
+
+    oro_action.action.create_date:
+        class: %oro_action.action.create_date.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_locale.settings
+        tags:
+            - { name: oro_action.action, alias: create_date }
+
+    oro_action.action.create_entity:
+        class: %oro_action.action.create_entity.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.action, alias: create_entity }
+
+    oro_action.action.flush_entity:
+        class: %oro_action.action.flush_entity.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.action, alias: flush_entity }
+
+    oro_action.action.request_entity:
+        class: %oro_action.action.request_entity.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.action, alias: request_entity|find_entity }
+
+    oro_action.action.redirect:
+        class: %oro_action.action.redirect.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @router
+            - 'redirectUrl'
+        tags:
+            - { name: oro_action.action, alias: redirect }
+
+    oro_action.action.format_string:
+        class: %oro_action.action.format_string.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.action, alias: format_string }
+
+    oro_action.action.assign_active_user:
+        class: %oro_action.action.assign_active_user.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @security.context
+        tags:
+            - { name: oro_action.action, alias: assign_active_user|get_active_user }
+
+    oro_action.action.format_name:
+        class: %oro_action.action.format_name.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_entity.entity_name_resolver
+        tags:
+            - { name: oro_action.action, alias: format_name }
+
+    oro_action.action.traverse:
+        class: %oro_action.action.traverse.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @oro_action.action.configurable
+        tags:
+            - { name: oro_action.action, alias: traverse|foreach }
+
+    oro_action.action.translate:
+        class: %oro_action.action.translate.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @translator
+        tags:
+            - { name: oro_action.action, alias: translate|trans }
+
+    oro_action.action.flash_message:
+        class: %oro_action.action.flash_message.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @translator
+        calls:
+            - [setRequest, [@?request=]]
+        tags:
+            - { name: oro_action.action, alias: flash_message }
+
+    oro_action.action.remove_entity:
+        class: %oro_action.action.remove_entity.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.action, alias: remove_entity }
+
+    oro_action.action.assign_constant_value:
+        class: %oro_action.action.assign_constant_value.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.action, alias: assign_constant_value }
+
+    oro_action.action.call_service_method:
+        class: %oro_action.action.call_service_method.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @service_container
+        tags:
+            - { name: oro_action.action, alias: call_service_method }
+
+    oro_action.action.refresh_grid:
+        class: %oro_action.action.refresh_grid.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.action, alias: refresh_grid }
+
+    oro_action.action.run_action_group:
+        class: %oro_action.action.run_action_group.class%
+        arguments:
+            - @oro_action.action_group_registry
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_action.action, alias: run_action_group }
+
+    oro_action.action.find_entities:
+        class: %oro_action.action.find_entities.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @doctrine
+        tags:
+            - { name: oro_action.action, alias: find_entities }
+
+    oro_action.action.assign_url:
+        class: %oro_action.action.assign_url.class%
+        arguments:
+            - @oro_action.context_accessor
+            - @router
+        tags:
+            - { name: oro_action.action, alias: assign_url }

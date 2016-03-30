@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Filter;
 
+use Symfony\Component\PropertyAccess\PropertyAccessor;
+
+use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
 use Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory;
 
 class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
@@ -14,51 +17,48 @@ class SimpleFilterFactoryTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->filterFactory = new SimpleFilterFactory();
+        $this->filterFactory = new SimpleFilterFactory(new PropertyAccessor());
     }
 
-    public function testAddCreateFilter()
+    public function testForUnknownFilter()
     {
-        /**
-         * test Add filters
-         */
-        $filters = $this->getFilters();
-        foreach ($filters as $index => $filter) {
-            list($type, $className, $exists) = $filter;
-            if ($exists) {
-                $this->filterFactory->addFilter($type, $className);
-            }
-        }
-
-        /**
-         * test Create filters
-         */
-        foreach ($filters as $index => $filter) {
-            list($type, , $exists) = $filter;
-
-            if ($exists) {
-                $this->assertNotNull($this->filterFactory->createFilter($type));
-            } else {
-                $this->assertNull($this->filterFactory->createFilter($type));
-            }
-        }
+        $this->assertNull($this->filterFactory->createFilter('unknown'));
     }
 
-    /**
-     * @return array
-     */
-    protected function getFilters()
+    public function testForFilterWithoutAdditionalParameters()
     {
-        return [
-            ['integer',           'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['unsignedInteger',   'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['string',            'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['boolean',           'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['datetime',          'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['entityAlias',       'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['entityPluralAlias', 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', true],
-            ['doNotExistingOne',  'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', false],
-            ['doNotExistingTwo',  'Oro\Bundle\ApiBundle\Filter\ComparisonFilter', false],
-        ];
+        $dataType = 'string';
+
+        $this->filterFactory->addFilter(
+            $dataType,
+            'Oro\Bundle\ApiBundle\Filter\ComparisonFilter'
+        );
+
+        $expectedFilter = new ComparisonFilter($dataType);
+
+        $this->assertEquals(
+            $expectedFilter,
+            $this->filterFactory->createFilter($dataType)
+        );
+    }
+
+    public function testForFilterWithAdditionalParameters()
+    {
+        $dataType = 'string';
+        $supportedOperators = ['=', '<>'];
+
+        $this->filterFactory->addFilter(
+            $dataType,
+            'Oro\Bundle\ApiBundle\Filter\ComparisonFilter',
+            ['supported_operators' => $supportedOperators]
+        );
+
+        $expectedFilter = new ComparisonFilter($dataType);
+        $expectedFilter->setSupportedOperators($supportedOperators);
+
+        $this->assertEquals(
+            $expectedFilter,
+            $this->filterFactory->createFilter($dataType)
+        );
     }
 }

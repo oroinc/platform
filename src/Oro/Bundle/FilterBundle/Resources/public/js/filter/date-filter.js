@@ -284,7 +284,8 @@ define(function(require) {
                 this.template({
                     inputClass: this.inputClass,
                     value: displayValue,
-                    parts: parts
+                    parts: parts,
+                    popoverContent: __('oro.filter.date.info')
                 })
             );
 
@@ -294,6 +295,16 @@ define(function(require) {
             this._renderSubViews();
             this.changeFilterType(value.type);
             layout.initPopover(this.$el);
+
+            if (value) {
+                this._updateTooltipVisibility(value.part);
+            }
+            this.on('update', _.bind(function() {
+                var value = this.getValue();
+                if (value) {
+                    this._updateTooltipVisibility(value.part);
+                }
+            }, this));
 
             this._criteriaRenderd = true;
         },
@@ -513,6 +524,14 @@ define(function(require) {
 
         _getPartTooltip: function(part) {
             return this.datePartTooltips[part] ? __(this.datePartTooltips[part]) : null;
+        },
+
+        _updateTooltipVisibility: function(part) {
+            if (part === 'value') {
+                this.$('.field-condition-date-popover').removeClass('hide');
+            } else {
+                this.$('.field-condition-date-popover').addClass('hide');
+            }
         }
     });
 

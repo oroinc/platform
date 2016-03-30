@@ -26,8 +26,7 @@ class EntityAliasCacheWarmerTest extends \PHPUnit_Framework_TestCase
         $cacheDir = 'test';
 
         $this->entityAliasResolver->expects($this->once())
-            ->method('warmUp')
-            ->with($cacheDir);
+            ->method('warmUpCache');
 
         $this->cacheWarmer->warmUp($cacheDir);
     }

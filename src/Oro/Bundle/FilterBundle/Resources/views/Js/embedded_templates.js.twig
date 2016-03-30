@@ -81,6 +81,11 @@
 </script>
 
 <script type="text/template" id="date-filter-template-embedded">
+    <% if (obj.popoverContent) { %>
+    <div class="field-condition-date-popover">
+        <i class="icon-info-sign" data-content="<%= popoverContent %>" data-placement="bottom" data-toggle="popover"></i>
+    </div>
+    <% } %>
     <span> <%= _.__('oro.filter.embedded.date.field_to_value') %> </span>
     <%= parts.join('') %>:
     <div />
