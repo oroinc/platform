@@ -1,3 +1,3 @@
 oro_action_api:
-    resource: '@OroActionBundle/Controller/Api/Rest/ActionController.php'
+    resource: '@OroActionBundle/Controller/Api/Rest/OperationController.php'
     type:     rest
