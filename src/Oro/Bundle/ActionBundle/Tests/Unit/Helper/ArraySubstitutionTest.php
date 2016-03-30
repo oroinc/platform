@@ -34,7 +34,7 @@ class ArraySubstitutionTest extends \PHPUnit_Framework_TestCase
                     'target' => 'replacement'
                 ],
                 [
-                    'target' => ['targetActionBody'],
+                    'target' => ['targetOperationBody'],
                     'replacement' => ['replacementActionBody']
                 ],
                 [

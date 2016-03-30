@@ -5,6 +5,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\DependencyInjection\CompilerPass;
 use Doctrine\Common\Cache\CacheProvider;
 
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\Definition;
 
 use Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass\ConfigurationPass;
@@ -18,12 +19,6 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerBuilder */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|Definition */
-    protected $configProviderDefinition;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject|CacheProvider */
-    protected $cacheProvider;
-
     /** @var ConfigurationPass */
     protected $compilerPass;
 
@@ -33,21 +28,12 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->configProviderDefinition = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->cacheProvider = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
-            ->setMethods(['deleteAll'])
-            ->disableOriginalConstructor()
-            ->getMockForAbstractClass();
-
         $this->compilerPass = new ConfigurationPass();
     }
 
     protected function tearDown()
     {
-        unset($this->compilerPass, $this->cacheProvider, $this->configProviderDefinition, $this->container);
+        unset($this->compilerPass, $this->container);
     }
 
     public function testProcess()
@@ -59,26 +45,127 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
             ->clear()
             ->setBundles([$bundle1->getName() => get_class($bundle1), $bundle2->getName() => get_class($bundle2)]);
 
-        $this->cacheProvider->expects($this->once())
-            ->method('deleteAll')
-            ->willReturn(true);
+        $operations = $actionGroups = null;
 
-        $this->container->expects($this->once())
+        $this->container->expects($this->exactly(2))
             ->method('hasDefinition')
-            ->with(ConfigurationPass::PROVIDER_SERVICE_ID)
             ->willReturn(true);
-        $this->container->expects($this->once())
+        $this->container->expects($this->exactly(2))
             ->method('getDefinition')
-            ->with(ConfigurationPass::PROVIDER_SERVICE_ID)
-            ->willReturn($this->configProviderDefinition);
-        $this->container->expects($this->once())
+            ->willReturnMap([
+                [ConfigurationPass::OPERATIONS_PROVIDER, $this->getConfigProviderDefinitionMock($operations)],
+                [ConfigurationPass::ACTION_GROUPS_PROVIDER, $this->getConfigProviderDefinitionMock($actionGroups)]
+            ]);
+        $this->container->expects($this->exactly(2))
+            ->method('has')
+            ->willReturn(true);
+        $this->container->expects($this->exactly(2))
             ->method('get')
-            ->with(ConfigurationPass::CACHE_SERVICE_ID)
-            ->willReturn($this->cacheProvider);
+            ->willReturnMap([
+                [
+                    ConfigurationPass::OPERATIONS_CACHE,
+                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                    $this->getCacheProviderMock()
+                ],
+                [
+                    ConfigurationPass::ACTION_GROUPS_CACHE,
+                    ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE,
+                    $this->getCacheProviderMock()
+                ]
+            ]);
 
-        $result = null;
+        $this->compilerPass->process($this->container);
 
-        $this->configProviderDefinition->expects($this->once())
+        $this->assertEquals(
+            [
+                'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1' => [
+                    'test_operation1' => [
+                        'label' => 'Test Operation 1'
+                    ],
+                    'test_operation2' => [
+                        'label' => 'Test Operation 2'
+                    ],
+                ],
+                'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2' => [
+                    'test_operation4' => [
+                        'label' => 'Test Operation 4'
+                    ]
+                ]
+            ],
+            $operations
+        );
+
+        $this->assertEquals(
+            [
+                'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1' => [
+                    'group1' => [
+                        'parameters' => [
+                            '$.data' => [
+                                'type' => 'Oro\Bundle\TestBundle\Entity\Test',
+                                'required' => true
+                            ]
+                        ],
+                        'conditions' => [
+                            '@gt' => ['$updatedAt', '$.date']
+                        ],
+                        'actions' => [
+                            ['@assign_value' => ['$expired', true]]
+                        ]
+                    ]
+                ],
+                'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2' => [
+                    'group2' => [
+                        'parameters' => [
+                            '$.date' => [
+                                'type' => 'DateTime',
+                                'message' => 'No data specified!'
+                            ]
+                        ],
+                        'conditions' => [
+                            '@gt' => ['$updatedAt', '$.date']
+                        ],
+                        'actions' => [
+                            ['@assign_value' => ['$expired', true]]
+                        ]
+                    ]
+                ]
+            ],
+            $actionGroups
+        );
+    }
+
+    public function testProcessWithoutConfigurationProvider()
+    {
+        $this->container->expects($this->exactly(2))
+            ->method('has')
+            ->willReturnMap([
+                [ConfigurationPass::OPERATIONS_CACHE, false],
+                [ConfigurationPass::ACTION_GROUPS_CACHE, false]
+            ]);
+        $this->container->expects($this->never())->method('get')->with($this->anything());
+
+        $this->container->expects($this->exactly(2))
+            ->method('hasDefinition')
+            ->willReturnMap([
+                [ConfigurationPass::OPERATIONS_PROVIDER, false],
+                [ConfigurationPass::ACTION_GROUPS_PROVIDER, false]
+            ]);
+
+        $this->container->expects($this->never())->method('getDefinition')->with($this->anything());
+
+        $this->compilerPass->process($this->container);
+    }
+
+    /**
+     * @param array $result
+     * @return \PHPUnit_Framework_MockObject_MockObject|Definition
+     */
+    protected function getConfigProviderDefinitionMock(&$result)
+    {
+        $mock = $this->getMockBuilder('Symfony\Component\DependencyInjection\Definition')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mock->expects($this->once())
             ->method('replaceArgument')
             ->willReturnCallback(
                 function ($index, $argument) use (&$result) {
@@ -88,46 +175,22 @@ class ConfigurationPassTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $this->compilerPass->process($this->container);
-
-        $this->assertEquals(
-            [
-                'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle1\TestBundle1' => [
-                    'test_action1' => [
-                        'label' => 'Test Action 1'
-                    ],
-                    'test_action2' => [
-                        'label' => 'Test Action 2'
-                    ],
-                ],
-                'Oro\Bundle\ActionBundle\Tests\Unit\Fixtures\Bundles\TestBundle2\TestBundle2' => [
-                    'test_action4' => [
-                        'label' => 'Test Action 4'
-                    ]
-                ]
-            ],
-            $result
-        );
+        return $mock;
     }
 
-    public function testProcessWithoutConfigurationProvider()
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|CacheProvider
+     */
+    protected function getCacheProviderMock()
     {
-        $this->cacheProvider->expects($this->once())
+        $mock = $this->getMockBuilder('Doctrine\Common\Cache\CacheProvider')
+            ->setMethods(['deleteAll'])
+            ->disableOriginalConstructor()
+            ->getMockForAbstractClass();
+        $mock->expects($this->once())
             ->method('deleteAll')
             ->willReturn(true);
 
-        $this->container->expects($this->once())
-            ->method('hasDefinition')
-            ->with(ConfigurationPass::PROVIDER_SERVICE_ID)
-            ->willReturn(false);
-        $this->container->expects($this->never())
-            ->method('getDefinition')
-            ->with(ConfigurationPass::PROVIDER_SERVICE_ID);
-        $this->container->expects($this->once())
-            ->method('get')
-            ->with(ConfigurationPass::CACHE_SERVICE_ID)
-            ->willReturn($this->cacheProvider);
-
-        $this->compilerPass->process($this->container);
+        return $mock;
     }
 }
