@@ -66,6 +66,7 @@ class FlushEntity extends AbstractAction
 
     /**
      * {@inheritdoc}
+     * @throws \Exception
      */
     protected function executeAction($context)
     {
@@ -73,8 +74,16 @@ class FlushEntity extends AbstractAction
 
         /** @var EntityManager $entityManager */
         $entityManager = $this->registry->getManagerForClass(ClassUtils::getClass($entity));
-        $entityManager->persist($entity);
-        $entityManager->flush($entity);
+        $entityManager->beginTransaction();
+
+        try {
+            $entityManager->persist($entity);
+            $entityManager->flush($entity);
+            $entityManager->commit();
+        } catch (\Exception $e) {
+            $entityManager->rollback();
+            throw $e;
+        }
     }
 
     /**

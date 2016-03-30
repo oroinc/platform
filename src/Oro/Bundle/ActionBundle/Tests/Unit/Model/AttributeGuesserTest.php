@@ -2,41 +2,32 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Unit\Model;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
+use Symfony\Component\Form\FormRegistry;
 use Symfony\Component\Form\Guess\TypeGuess;
 use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ActionBundle\Model\AttributeGuesser;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
-/**
- * @SuppressWarnings(PHPMD.TooManyMethods)
- */
 class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var AttributeGuesser
-     */
+    /* @var AttributeGuesser */
     protected $guesser;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /* @var \PHPUnit_Framework_MockObject_MockObject|FormRegistry */
     protected $formRegistry;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /* @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry */
     protected $managerRegistry;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /* @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     protected $entityConfigProvider;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /* @var \PHPUnit_Framework_MockObject_MockObject|ConfigProvider */
     protected $formConfigProvider;
 
     protected function setUp()
@@ -66,7 +57,13 @@ class AttributeGuesserTest extends \PHPUnit_Framework_TestCase
 
     protected function tearDown()
     {
-        unset($this->managerRegistry, $this->entityConfigProvider, $this->guesser);
+        unset(
+            $this->formRegistry,
+            $this->managerRegistry,
+            $this->entityConfigProvider,
+            $this->guesser,
+            $this->formConfigProvider
+        );
     }
 
     /**
