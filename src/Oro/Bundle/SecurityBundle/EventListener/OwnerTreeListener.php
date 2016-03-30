@@ -103,10 +103,8 @@ class OwnerTreeListener implements ContainerAwareInterface
         foreach ($entities as $entity) {
             if (in_array(ClassUtils::getRealClass($entity), $this->securityClasses, true)) {
                 if ($entity instanceof UserInterface) {
-                    $changeSet     = $uow->getEntityChangeSet($entity);
-                    $changedFields = array_keys($changeSet);
-
-                    if (array_diff_key($changedFields, array_flip($fieldsToIgnore))) {
+                    $changeSet = $uow->getEntityChangeSet($entity);
+                    if (!array_diff(array_keys($changeSet), $fieldsToIgnore)) {
                         continue;
                     }
                 }
