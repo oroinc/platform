@@ -1,6 +1,0 @@
-skiped_config:
-    test_action3:
-        label: Test Action 3
-actions:
-    test_action4:
-        label: Test Action 4
