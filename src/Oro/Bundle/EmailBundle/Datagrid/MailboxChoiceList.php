@@ -59,7 +59,7 @@ class MailboxChoiceList
         }
         foreach ($systemMailboxes as $mailbox) {
             if ($mailbox->getOrigin() !== null) {
-                $choiceList[$mailbox->getOrigin()->getId()] = $mailbox->getLabel();
+                $choiceList[$mailbox->getOrigin()->getId()] = str_replace('@', '\@', $mailbox->getLabel());
             }
         }
 
