@@ -60,7 +60,10 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
             return;
         }
 
-        $this->values = array_values(array_diff($this->values, $value));
+        // array_diff can't be used because of string conversion
+        $this->values = array_values(array_filter($this->values, function ($existingValue) use ($value) {
+            return !in_array($existingValue, $value, true);
+        }));
     }
 
     /**

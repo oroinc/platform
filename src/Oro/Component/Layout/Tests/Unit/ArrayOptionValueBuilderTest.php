@@ -29,6 +29,15 @@ class ArrayOptionValueBuilderTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(['val1', 'replaced_val3', 'val4'], $builder->get());
     }
 
+    public function testRemoveWithDifferentTypes()
+    {
+        $builder = new ArrayOptionValueBuilder();
+        $builder->add(['val1']);
+        $builder->add([['val2']]);
+        $builder->remove([['val2']]);
+        $this->assertEquals(['val1'], $builder->get());
+    }
+
     /**
      * @expectedException \Oro\Component\Layout\Exception\UnexpectedTypeException
      */
