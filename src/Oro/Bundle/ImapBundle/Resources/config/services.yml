@@ -23,6 +23,7 @@ parameters:
     oro_imap.form.configuration_gmail_type.class:    Oro\Bundle\ImapBundle\Form\Type\ConfigurationGmailType
 
     oro_imap.listener.user_email_origin.class:       Oro\Bundle\ImapBundle\EventListener\UserEmailOriginListener
+    oro_imap.listener.send_email_transport_listener.class: Oro\Bundle\ImapBundle\EventListener\SendEmailTransportListener
 
     oro_imap.imap_email_google_oauth2_manager.class: Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager
 
@@ -171,3 +172,11 @@ services:
             - %oro_imap.user_form_name%
             - %oro_imap.email_mailbox_form_name%
             - %oro_imap.email_mailbox_form_type%
+
+    oro_imap.listener.send_email_transport_listener:
+        class: %oro_imap.listener.send_email_transport_listener.class%
+        arguments:
+            - @oro_security.encoder.mcrypt
+            - @oro_imap.imap_email_google_oauth2_manager
+        tags:
+            - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }
