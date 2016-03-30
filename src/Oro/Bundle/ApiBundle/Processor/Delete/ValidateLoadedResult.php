@@ -8,7 +8,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
 /**
- * Validates loaded object.
+ * Checks whether an entity is loaded.
  */
 class ValidateLoadedResult implements ProcessorInterface
 {

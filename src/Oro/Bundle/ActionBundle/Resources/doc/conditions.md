@@ -8,7 +8,7 @@ Table of Contents
 
 Add Custom Condition
 -------------------------
-The conditions are based on the [ConfigExpression](../../../../../../../../../../platform/blob/master/src/Oro/Component/ConfigExpression/README.md) component.
+The conditions are based on the [ConfigExpression](/src/Oro/Component/ConfigExpression/README.md) component.
 
 To add custom condition simply add a service to DIC with the tag "oro_action.condition", for example:
 

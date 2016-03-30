@@ -32,6 +32,7 @@ class OroApiExtension extends Extension
         $loader->load('processors.get_list.yml');
         $loader->load('processors.get.yml');
         $loader->load('processors.delete.yml');
+        $loader->load('processors.delete_list.yml');
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');

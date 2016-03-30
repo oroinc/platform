@@ -9,6 +9,7 @@ Table of Contents
  - [Disable access checks for action](#disable-access-checks-for-action)
  - [Disable entity action](#disable-entity-action)
  - [Change delete handler for entity](#change-delete-handler-for-entity)
+ - [Change the maximum number of entities that can be deleted by one request](#change-the-maximum-number-of-entities-that-can-be-deleted-by-one-request)
 
 
 Turn on API for entity
@@ -33,6 +34,7 @@ By default, the following permissions are used to restrict access to an entity i
 | get | VIEW |
 | get_list | VIEW |
 | delete | DELETE |
+| delete_list | DELETE |
 
 In case if you want to change permission or disable access checks for some action, you can use the `acl_resource` option of `actions` configuration section.
 
@@ -71,7 +73,7 @@ oro_api:
         Acme\Bundle\ProductBundle\Product:
             actions:
                 get_list:
-                    acl_resource: ~                
+                    acl_resource: ~
 ```
  
 Disable entity action
@@ -87,7 +89,7 @@ oro_api:
         Acme\Bundle\ProductBundle\Product:
             actions:
                 delete:
-                    excluded: true                     
+                    excluded: true
 ```
 
 Also, you can use short syntax:
@@ -97,7 +99,7 @@ oro_api:
     entities:
         Acme\Bundle\ProductBundle\Product:
             actions:
-                delete: false                    
+                delete: false
 ```
 
 Change delete handler for entity
@@ -105,15 +107,42 @@ Change delete handler for entity
 
 By default, entity deletion is processed by [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).
 
-If your want to use another delete handler, you can set it in `delete_handler` option in in `Resources/config/acl.yml`:
+If your want to use another delete handler, you can set it by the `delete_handler` option in `Resources/config/acl.yml`:
 
 ```yaml
 oro_api:
     entities:
         Acme\Bundle\ProductBundle\Product:
-            delete_handler: acme.demo.product_delete_handler                  
+            delete_handler: acme.demo.product_delete_handler
 ```
 
 Please note, that the value of `delete_handler` option is the service id.
 
 Also, you can create own delete handler. The handler class must be derived from [DeleteHandler](../../../SoapBundle/Handler/DeleteHandler.php).
+
+Change the maximum number of entities that can be deleted by one request
+------------------------------------------------------------------------
+
+By default, the [delete_list](./actions.md#delete_list-action) action can delete not more than 100 entities. This limit is set by the [SetDeleteLimit](../../Processor/DeleteList/SetDeleteLimit.php) processor.
+
+If your want to use another limit, you can set it by the `max_results` option in `Resources/config/acl.yml`:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\ProductBundle\Product:
+            actions:
+                delete_list:
+                    max_results: 200
+```
+
+Also you can remove the limit at all. To do this, set `-1` as a value for the `max_results` option:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\ProductBundle\Product:
+            actions:
+                delete_list:
+                    max_results: -1
+```

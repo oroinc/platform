@@ -9,6 +9,9 @@ class ActionsConfigLoader extends AbstractConfigLoader
         ActionConfig::EXCLUDE => 'setExcluded',
     ];
 
+    /** @var StatusCodesConfigLoader */
+    private $statusCodesConfigLoader;
+
     /**
      * {@inheritdoc}
      */
@@ -33,9 +36,27 @@ class ActionsConfigLoader extends AbstractConfigLoader
     {
         $action = new ActionConfig();
         foreach ($config as $key => $value) {
-            $this->loadConfigValue($action, $key, $value, $this->methodMap);
+            if (ActionConfig::STATUS_CODES === $key) {
+                $this->loadStatusCodes($action, $value);
+            } else {
+                $this->loadConfigValue($action, $key, $value, $this->methodMap);
+            }
         }
 
         return $action;
+    }
+
+    /**
+     * @param ActionConfig $action
+     * @param array        $statusCodes
+     */
+    protected function loadStatusCodes(ActionConfig $action, array $statusCodes)
+    {
+        if (!empty($statusCodes)) {
+            if (null === $this->statusCodesConfigLoader) {
+                $this->statusCodesConfigLoader = new StatusCodesConfigLoader();
+            }
+            $action->setStatusCodes($this->statusCodesConfigLoader->load($statusCodes));
+        }
     }
 }

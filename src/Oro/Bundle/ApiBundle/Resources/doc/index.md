@@ -7,4 +7,5 @@ OroApiBundle Documentation
  - [Actions](./actions.md)
  - [Processors](./processors.md)
  - [Debug commands](./debug_commands.md)
+ - [**X-Include** header](./headers.md)
  - [How To](./how_to.md)

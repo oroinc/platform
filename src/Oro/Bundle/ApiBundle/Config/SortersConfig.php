@@ -132,7 +132,7 @@ class SortersConfig implements EntityConfigInterface
      *
      * @param string $fieldName
      *
-     * @return FilterFieldConfig
+     * @return SorterFieldConfig
      */
     public function getOrAddField($fieldName)
     {
