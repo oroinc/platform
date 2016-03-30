@@ -44,6 +44,17 @@ class DeleteHandler
         }
 
         $em = $manager->getObjectManager();
+        $this->processDelete($entity, $em);
+    }
+
+    /**
+     * Deletes given entity object.
+     *
+     * @param object        $entity
+     * @param ObjectManager $em
+     */
+    public function processDelete($entity, ObjectManager $em)
+    {
         $this->checkPermissions($entity, $em);
         $this->deleteEntity($entity, $em);
         $em->flush();
@@ -60,7 +71,7 @@ class DeleteHandler
     {
         if ($this->ownerDeletionManager->isOwner($entity) && $this->ownerDeletionManager->hasAssignments($entity)) {
             throw new ForbiddenException('has assignments');
-        };
+        }
     }
 
     /**

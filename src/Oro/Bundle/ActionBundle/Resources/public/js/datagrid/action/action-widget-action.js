@@ -12,7 +12,7 @@ define(function(require) {
          * @property {Object}
          */
         options: {
-            actionName: null
+            operationName: null
         },
 
         /**
@@ -28,7 +28,7 @@ define(function(require) {
 
             var config = this.model.get('action_configuration') || {};
 
-            var options = config[this.options.actionName.toLowerCase()] || {};
+            var options = config[this.options.operationName.toLowerCase()] || {};
 
             this.actionManager = new ActionManager(options);
         },

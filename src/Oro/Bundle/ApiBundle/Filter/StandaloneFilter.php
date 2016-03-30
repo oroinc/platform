@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
+use Doctrine\Common\Collections\Criteria;
+
 /**
  * A base class for filters that can be used independently from other filters.
  */
 abstract class StandaloneFilter implements FilterInterface
 {
+    const EQ = '=';
+
     /** @var string */
     protected $dataType;
 
@@ -22,6 +26,9 @@ abstract class StandaloneFilter implements FilterInterface
     /** @var callable|null */
     protected $defaultValueToStringConverter;
 
+    /** @var string[] */
+    protected $operators;
+
     /**
      * @param string              $dataType
      * @param string|null         $description
@@ -34,10 +41,11 @@ abstract class StandaloneFilter implements FilterInterface
         $defaultValue = null,
         $defaultValueToStringConverter = null
     ) {
-        $this->dataType                      = $dataType;
-        $this->description                   = $description;
-        $this->defaultValue                  = $defaultValue;
+        $this->dataType = $dataType;
+        $this->description = $description;
+        $this->defaultValue = $defaultValue;
         $this->defaultValueToStringConverter = $defaultValueToStringConverter;
+        $this->operators = [self::EQ];
     }
 
     /**
@@ -150,5 +158,40 @@ abstract class StandaloneFilter implements FilterInterface
     public function setDefaultValueToStringConverter($converter)
     {
         $this->defaultValueToStringConverter = $converter;
+    }
+
+    /**
+     * Gets a list of operators supported by this filter.
+     *
+     * @return string[] The list of operators
+     */
+    public function getSupportedOperators()
+    {
+        return $this->operators;
+    }
+
+    /**
+     * Sets a list of operators supported by this filter.
+     *
+     * @param string[] $operators
+     */
+    public function setSupportedOperators(array $operators)
+    {
+        $this->operators = $operators;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function apply(Criteria $criteria, FilterValue $value = null)
+    {
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createExpression(FilterValue $value = null)
+    {
+        return null;
     }
 }

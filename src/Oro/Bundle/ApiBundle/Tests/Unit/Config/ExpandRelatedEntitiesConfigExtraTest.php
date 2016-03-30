@@ -30,9 +30,9 @@ class ExpandRelatedEntitiesConfigExtraTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testIsInheritable()
+    public function testIsPropagable()
     {
-        $this->assertFalse($this->extra->isInheritable());
+        $this->assertFalse($this->extra->isPropagable());
     }
 
     public function testCacheKeyPart()

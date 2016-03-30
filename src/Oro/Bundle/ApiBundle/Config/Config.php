@@ -148,4 +148,34 @@ class Config implements \IteratorAggregate
     {
         $this->set(ConfigUtil::SORTERS, $sorters);
     }
+
+    /**
+     * Checks whether the configuration of actions.
+     *
+     * @return bool
+     */
+    public function hasActions()
+    {
+        return $this->has(ConfigUtil::ACTIONS);
+    }
+
+    /**
+     * Gets the configuration of actions.
+     *
+     * @return ActionsConfig|null
+     */
+    public function getActions()
+    {
+        return $this->get(ConfigUtil::ACTIONS);
+    }
+
+    /**
+     * Sets the configuration of actions.
+     *
+     * @param ActionsConfig|null $actions
+     */
+    public function setActions(ActionsConfig $actions = null)
+    {
+        $this->set(ConfigUtil::ACTIONS, $actions);
+    }
 }

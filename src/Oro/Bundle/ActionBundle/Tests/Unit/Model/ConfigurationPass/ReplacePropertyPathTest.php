@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Unit\Configuration\ConfigurationPass;
+namespace Oro\Bundle\ActionBundle\Tests\Unit\Model\ConfigurationPass;
 
 use Symfony\Component\PropertyAccess\PropertyPath;
 
