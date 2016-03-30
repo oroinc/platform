@@ -217,7 +217,8 @@ class ConfigurationCompilerPass implements CompilerPassInterface
             );
         }
         if ($container->hasDefinition(self::API_FORM_EXTENSION_SERVICE_ID)) {
-            $container->getDefinition(self::API_FORM_EXTENSION_SERVICE_ID)->setPublic(true);
+            $apiFormExtensionDef = $container->getDefinition(self::API_FORM_EXTENSION_SERVICE_ID);
+            $apiFormExtensionDef->setPublic(true);
             $apiFormDef->addMethodCall(
                 'addExtension',
                 [SwitchableFormRegistry::API_EXTENSION, self::API_FORM_EXTENSION_SERVICE_ID]
@@ -243,7 +244,10 @@ class ConfigurationCompilerPass implements CompilerPassInterface
                 self::API_FORM_TYPE_GUESSER_TAG
             );
 
-            $this->loadApiFormServices($container);
+            // load form types, form type extensions and form type guessers for Data API form extension
+            $apiFormExtensionDef->replaceArgument(1, $this->getApiFormTypes($container));
+            $apiFormExtensionDef->replaceArgument(2, $this->getApiFormTypeExtensions($container));
+            $apiFormExtensionDef->replaceArgument(3, $this->getApiFormTypeGuessers($container));
         }
     }
 
@@ -316,20 +320,6 @@ class ConfigurationCompilerPass implements CompilerPassInterface
                 }
             }
         }
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     *
-     * @see \Symfony\Bundle\FrameworkBundle\DependencyInjection\Compiler\FormPass
-     * @see \Oro\Bundle\FormBundle\DependencyInjection\Compiler\FormGuesserCompilerPass
-     */
-    protected function loadApiFormServices(ContainerBuilder $container)
-    {
-        $apiFormExtensionDef = $container->getDefinition(self::API_FORM_EXTENSION_SERVICE_ID);
-        $apiFormExtensionDef->replaceArgument(1, $this->getApiFormTypes($container));
-        $apiFormExtensionDef->replaceArgument(2, $this->getApiFormTypeExtensions($container));
-        $apiFormExtensionDef->replaceArgument(3, $this->getApiFormTypeGuessers($container));
     }
 
     /**
