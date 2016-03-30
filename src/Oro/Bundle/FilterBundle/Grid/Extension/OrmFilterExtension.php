@@ -6,7 +6,6 @@ use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\EntityBundle\ORM\Registry;
-
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -376,34 +375,4 @@ class OrmFilterExtension extends AbstractExtension
 
         return null;
     }
-
-//    /**
-//     * @param $filters
-//     * @param $values
-//     * @param $datasourceAdapter
-//     */
-//    protected function buildDefaultFilterData($filters, $values, $datasourceAdapter)
-//    {
-//        foreach ($filters as $filter) {
-//            $value = isset($values[$filter->getName()]) ? $values[$filter->getName()] : false;
-//
-//            if ($value !== false) {
-//                $form = $filter->getForm();
-//                if (!$form->isSubmitted()) {
-//                    $form->submit($value);
-//                }
-//
-//                if ($form->isValid()) {
-//                    $data = $form->getData();
-//                    if (isset($value['value']['start'])) {
-//                        $data['value']['start_original'] = $value['value']['start'];
-//                    }
-//                    if (isset($value['value']['end'])) {
-//                        $data['value']['end_original'] = $value['value']['end'];
-//                    }
-//                    $filter->apply($datasourceAdapter, $data);
-//                }
-//            }
-//        }
-//    }
 }
