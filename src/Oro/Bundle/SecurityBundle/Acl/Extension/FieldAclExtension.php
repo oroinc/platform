@@ -22,33 +22,33 @@ class FieldAclExtension extends EntityAclExtension
 
     const IDENTITY = 0;
 
-    // These access levels give a user access to own records and objects that are shared with the user.
-    const MASK_VIEW_BASIC         = 1;          // 1 << 0     + IDENTITY
-    const MASK_CREATE_BASIC       = 2;          // 1 << 1     + IDENTITY
-    const MASK_EDIT_BASIC         = 4;          // 1 << 2     + IDENTITY
+    /**
+         basic  - access to own records and objects that are shared with the user
+         local  - access to records in all business units are assigned to the user
+         deep   - access to records in all business units are assigned to the user
+                  and all business units subordinate to business units are assigned to the user.
+         global - access to all records within the organization,
+                  regardless of the business unit hierarchical level to which the domain object belongs
+                  or the user is assigned to
+         system - access to all records within the system
+     */
+    const MASK_VIEW_BASIC         = 1;
+    const MASK_VIEW_LOCAL         = 2;
+    const MASK_VIEW_DEEP          = 4;
+    const MASK_VIEW_GLOBAL        = 8;
+    const MASK_VIEW_SYSTEM        = 16;
 
-    // These access levels give a user access to records in all business units are assigned to the user.
-    const MASK_VIEW_LOCAL         = 64;         // 1 << 6     + IDENTITY
-    const MASK_CREATE_LOCAL       = 128;        // 1 << 7     + IDENTITY
-    const MASK_EDIT_LOCAL         = 256;        // 1 << 8     + IDENTITY
+    const MASK_CREATE_BASIC       = 32;
+    const MASK_CREATE_LOCAL       = 64;
+    const MASK_CREATE_DEEP        = 128;
+    const MASK_CREATE_GLOBAL      = 256;
+    const MASK_CREATE_SYSTEM      = 512;
 
-    // These access levels give a user access to records in all business units are assigned to the user
-    // and all business units subordinate to business units are assigned to the user.
-    const MASK_VIEW_DEEP          = 4096;       // 1 << 12    + IDENTITY
-    const MASK_CREATE_DEEP        = 8192;       // 1 << 13    + IDENTITY
-    const MASK_EDIT_DEEP          = 16384;      // 1 << 14    + IDENTITY
-
-    // These access levels give a user access to all records within the organization,
-    // regardless of the business unit hierarchical level to which the domain object belongs
-    // or the user is assigned to.
-    const MASK_VIEW_GLOBAL        = 262144;     // 1 << 18    + IDENTITY
-    const MASK_CREATE_GLOBAL      = 524288;     // 1 << 19    + IDENTITY
-    const MASK_EDIT_GLOBAL        = 1048576;    // 1 << 20    + IDENTITY
-
-    // These access levels give a user access to all records within the system.
-    const MASK_VIEW_SYSTEM        = 16777216;   // 1 << 24    + IDENTITY
-    const MASK_CREATE_SYSTEM      = 33554432;   // 1 << 25    + IDENTITY
-    const MASK_EDIT_SYSTEM        = 67108864;   // 1 << 26    + IDENTITY
+    const MASK_EDIT_BASIC         = 1024;
+    const MASK_EDIT_LOCAL         = 2048;
+    const MASK_EDIT_DEEP          = 4096;
+    const MASK_EDIT_GLOBAL        = 8192;
+    const MASK_EDIT_SYSTEM        = 16384;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
