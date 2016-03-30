@@ -112,14 +112,14 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                         'Test\Association1Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getInheritableExtras(),
+                        $this->context->getPropagableExtras(),
                         $this->createRelationConfigObject()
                     ],
                     [
                         'Test\Association2Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getInheritableExtras(),
+                        $this->context->getPropagableExtras(),
                         $this->createRelationConfigObject(
                             [
                                 'exclusion_policy' => 'all',
@@ -134,7 +134,7 @@ class CompleteDefinitionOfAssociationsByConfigTest extends ConfigProcessorTestCa
                         'Test\Association3Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getInheritableExtras(),
+                        $this->context->getPropagableExtras(),
                         $this->createRelationConfigObject(
                             [
                                 'exclusion_policy' => 'all',
