@@ -292,7 +292,8 @@ class EntitiesController extends Controller
 
                 return $this->get('oro_ui.router')->redirectAfterSave(
                     ['route' => 'oro_entity_update', 'parameters' => ['entityName' => $entityName, 'id'=> $id]],
-                    ['route' => 'oro_entity_view', 'parameters' => ['entityName' => $entityName, 'id' => $id]]
+                    ['route' => 'oro_entity_view', 'parameters' => ['entityName' => $entityName, 'id' => $id]],
+                    $record
                 );
             }
         }

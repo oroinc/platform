@@ -85,7 +85,8 @@ class MailboxController extends Controller
                     'route' => 'oro_email_mailbox_update',
                     'parameters' => ['id' => $mailbox->getId()]
                 ],
-                $this->getRedirectData($request)
+                $this->getRedirectData($request),
+                $mailbox
             );
         }
 

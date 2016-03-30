@@ -133,7 +133,8 @@ class SystemCalendarEventController extends Controller
                     [
                         'route'      => 'oro_system_calendar_view',
                         'parameters' => ['id' => $entity->getSystemCalendar()->getId()]
-                    ]
+                    ],
+                    $entity
                 );
             }
             $saved = true;

@@ -658,18 +658,41 @@
     </div>
 {% endmacro %}
 
-{% macro saveAndCloseButton(label) %}
-    {% if label is empty %}
-        {% set label = 'Save and Close'|trans %}
+{% macro saveAndCloseButton(params) %}
+    {% set buttonParams = {
+        'type': 'submit',
+        'class': 'btn-success',
+        'label': 'Save and Close'|trans,
+        'action': 'save_and_stay'
+    } %}
+
+    {% if params is iterable  %}
+        {% set buttonParams = buttonParams|merge(params) %}
+    {% elseif params is not empty %}
+        {% set buttonParams = buttonParams|merge({'label': params}) %}
     {% endif %}
-    {{ _self.buttonType({'type': 'submit', 'class': 'btn-success', 'label': label}) }}
+
+    {{ _self.buttonType(buttonParams) }}
 {% endmacro %}
 
-{% macro saveAndStayButton(label) %}
-    {% if label is empty %}
-        {% set label = 'Save'|trans %}
+{% macro saveAndStayButton(params) %}
+    {% set buttonParams = {
+        'type': 'button',
+        'class': 'btn-success main-group',
+        'label': 'Save'|trans,
+        'action': 'save_and_stay'
+    } %}
+
+    {% if params is iterable  %}
+        {% set buttonParams = buttonParams|merge(params) %}
+    {% elseif params is not empty %}
+        {% set buttonParams = buttonParams|merge({'label': params}) %}
     {% endif %}
-    {{ _self.buttonType({'type': 'button', 'class': 'btn-success main-group', 'label': label, 'action': 'save_and_stay'}) }}
+
+    {{ _self.buttonType(buttonParams) }}
+{% endmacro %}
+
+{% macro %}
 {% endmacro %}
 
 {#

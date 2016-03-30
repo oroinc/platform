@@ -24,9 +24,30 @@
 
 {% block navButtons %}
     {{ UI.cancelButton(path('oro_dashboard_index')) }}
-    {% set html = UI.saveAndCloseButton() %}
+    {% set html = UI.saveAndCloseButton(
+        {
+            'action': {
+                'route': 'oro_dashboard_view',
+                'params': {
+                    'id': 'entity.id',
+                    'change_dashboard': true,
+                    '_enableContentProviders': 'mainMenu'
+                }
+            }|json_encode
+        }
+    ) %}
     {% if form.vars.value.id or resource_granted('oro_dashboard_update') %}
-        {% set html = html ~ UI.saveAndStayButton() %}
+        {% set html = html ~ UI.saveAndStayButton(
+            {
+                'action': {
+                    'route': 'oro_dashboard_update',
+                    'params': {
+                        'id': 'entity.id',
+                        '_enableContentProviders': 'mainMenu'
+                    }
+                }|json_encode
+            }
+        ) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}
 {% endblock %}

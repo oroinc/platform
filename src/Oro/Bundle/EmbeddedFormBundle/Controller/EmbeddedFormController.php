@@ -159,7 +159,8 @@ class EmbeddedFormController extends Controller
                 [
                     'route' => 'oro_embedded_form_view',
                     'parameters' => ['id' => $entity->getId()],
-                ]
+                ],
+                $entity
             );
 
         }

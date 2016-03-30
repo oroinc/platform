@@ -137,7 +137,8 @@ class SystemCalendarController extends Controller
 
                 return $this->get('oro_ui.router')->redirectAfterSave(
                     ['route' => 'oro_system_calendar_update', 'parameters' => ['id' => $entity->getId()]],
-                    ['route' => 'oro_system_calendar_view', 'parameters' => ['id' => $entity->getId()]]
+                    ['route' => 'oro_system_calendar_view', 'parameters' => ['id' => $entity->getId()]],
+                    $entity
                 );
             }
             $saved = true;

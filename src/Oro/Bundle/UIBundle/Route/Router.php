@@ -6,12 +6,18 @@ use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
+
+use Doctrine\Common\Util\ClassUtils;
+
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class Router
 {
     const ACTION_PARAMETER     = 'input_action';
     const ACTION_SAVE_AND_STAY = 'save_and_stay';
+    const ACTION_SAVE_CLOSE = 'save_and_close';
 
     /**
      * @var Request
@@ -29,54 +35,35 @@ class Router
     protected $securityFacade;
 
     /**
+     * @var PropertyAccessor
+     */
+    protected $propertyAccessor;
+
+    /**
+     * @var ConfigManager
+     */
+    protected $configManager;
+
+    /**
      * Constructor
      *
      * @param Request        $request
      * @param SymfonyRouter  $router
      * @param SecurityFacade $securityFacade
+     * @param ConfigManager  $configManager
      */
-    public function __construct(Request $request, SymfonyRouter $router, SecurityFacade $securityFacade)
-    {
-        $this->request        = $request;
-        $this->router         = $router;
+    public function __construct(
+        Request $request,
+        SymfonyRouter $router,
+        SecurityFacade $securityFacade,
+        ConfigManager $configManager
+    ) {
+        $this->request = $request;
+        $this->router = $router;
         $this->securityFacade = $securityFacade;
-    }
+        $this->configManager = $configManager;
 
-    /**
-     * "Save and Stay" and "Save and Close" buttons handler
-     *
-     * @param array $saveButtonRoute   array with router data for save and stay button
-     * @param array $saveAndCloseRoute array with router data for save and close button
-     * @param int   $status            redirect status
-     *
-     * @return RedirectResponse
-     * @throws \LogicException
-     * @deprecated To be removed in 1.1. Use redirectAfterSave method instead
-     */
-    public function actionRedirect(array $saveButtonRoute, array $saveAndCloseRoute, $status = 302)
-    {
-        if ($this->request->get(self::ACTION_PARAMETER) == self::ACTION_SAVE_AND_STAY) {
-            $routeData = $saveButtonRoute;
-        } else {
-            $routeData = $saveAndCloseRoute;
-        }
-
-        if (!isset($routeData['route'])) {
-            throw new \LogicException('Parameter "route" is not defined.');
-        } else {
-            $routeName = $routeData['route'];
-        }
-
-        $params = isset($routeData['parameters']) ? $routeData['parameters'] : array();
-
-        return new RedirectResponse(
-            $this->router->generate(
-                $routeName,
-                $params,
-                UrlGeneratorInterface::ABSOLUTE_PATH
-            ),
-            $status
-        );
+        $this->propertyAccessor = new PropertyAccessor();
     }
 
     /**
@@ -93,15 +80,23 @@ class Router
      *                                  this parameter.
      * @return RedirectResponse
      * @throws \InvalidArgumentException If a route date is not valid
+     * @deprecated Will be removed in 1.11. Use redirectToAfterSaveAction instead
      */
-    public function redirectAfterSave(array $saveAndStayRoute, array $saveAndCloseRoute, $entity = null)
+    public function redirectAfterSave(array $saveAndStayRoute = [], array $saveAndCloseRoute = [], $entity = null)
     {
-        if ($this->request->get(self::ACTION_PARAMETER) == self::ACTION_SAVE_AND_STAY &&
-            ($entity === null || $this->securityFacade->isGranted('EDIT', $entity))
-        ) {
-            $routeData = $saveAndStayRoute;
-        } else {
-            $routeData = $saveAndCloseRoute;
+        switch ($this->request->get(self::ACTION_PARAMETER)) {
+            case self::ACTION_SAVE_AND_STAY:
+                $routeData = $saveAndStayRoute;
+                break;
+            case self::ACTION_SAVE_CLOSE:
+                $routeData = $saveAndCloseRoute;
+                break;
+            default:
+                if (is_null($entity)) {
+                    throw new \InvalidArgumentException('Entity must be provided');
+                }
+
+                return $this->redirectToAfterSaveAction($entity);
         }
 
         if (!isset($routeData['route'])) {
@@ -115,5 +110,66 @@ class Router
         return new RedirectResponse(
             $this->router->generate($routeData['route'], $params)
         );
+    }
+
+    /**
+     * @param $entity
+     *
+     * @return RedirectResponse
+     */
+    public function redirectToAfterSaveAction($entity)
+    {
+        $route = $this->request->get(self::ACTION_PARAMETER);
+        if (empty($route)) {
+            return $this->getRedirectToDefaultActionResponse($entity);
+        }
+
+        $route = json_decode($route, true);
+        if (empty($route['route'])) {
+            throw new \InvalidArgumentException('The "route" attribute required');
+        }
+
+        $routeParams = [];
+        if (isset($route['params'])) {
+            $routeParams = array_map(function ($parameter) use ($entity) {
+                if (strpos($parameter, 'entity.') === 0) {
+                    return $this->propertyAccessor->getValue($entity, str_replace('entity.', '', $parameter));
+                }
+
+                return $parameter;
+            }, $route['params']);
+        }
+
+        return new RedirectResponse(
+            $this->router->generate($route['route'], $routeParams)
+        );
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return array
+     */
+    protected function getRedirectToDefaultActionResponse($entity)
+    {
+        $entityClass = ClassUtils::getClass($entity);
+        $metadata = $this->configManager->getEntityMetadata($entityClass);
+
+        if (!isset($metadata)) {
+            throw new \InvalidArgumentException("Entity '$entityClass' metadata not found");
+        }
+
+        if (!empty($metadata->routeView)) {
+            return new RedirectResponse(
+                $this->router->generate($metadata->routeView, ['id' => $entity->getId()])
+            );
+        }
+        if (!empty($metadata->routeName)) {
+            return new RedirectResponse(
+                $this->router->generate($metadata->routeName)
+            );
+        }
+
+        throw new \InvalidArgumentException("Default redirect action not found for '$entityClass'");
     }
 }
