@@ -48,7 +48,7 @@ abstract class CacheCommand extends ContainerAwareCommand
     protected function warmup(OutputInterface $output)
     {
         $this->warmupExtendedEntityCache($output);
-        // Doctrine metadata, proxies and depended caches might be invalid after extended entities cache generation
+        // Doctrine metadata, proxies and dependent caches might be invalid after extended entities cache generation
         $this->warmupMetadataCache($output);
         $this->warmupProxies($output);
         $this->warmupEntityAliasesCache($output);
