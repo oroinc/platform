@@ -2,14 +2,12 @@
 
 namespace Oro\Bundle\ActionBundle\Model;
 
-use Oro\Component\ConfigExpression\ConfigurationPass\ConfigurationPassInterface;
+use Oro\Bundle\ActionBundle\Model\Assembler\ConfigurationPassesAwareInterface;
+use Oro\Bundle\ActionBundle\Model\Assembler\ConfigurationPassesAwareTrait;
 
-class OptionsAssembler
+class OptionsAssembler implements ConfigurationPassesAwareInterface
 {
-    /**
-     * @var ConfigurationPassInterface[]
-     */
-    protected $configurationPasses = array();
+    use ConfigurationPassesAwareTrait;
 
     /**
      * @param array $options
@@ -18,26 +16,5 @@ class OptionsAssembler
     public function assemble(array $options)
     {
         return $this->passConfiguration($options);
-    }
-
-    /**
-     * @param ConfigurationPassInterface $configurationPass
-     */
-    public function addConfigurationPass(ConfigurationPassInterface $configurationPass)
-    {
-        $this->configurationPasses[] = $configurationPass;
-    }
-
-    /**
-     * @param array $data
-     * @return array
-     */
-    protected function passConfiguration(array $data)
-    {
-        foreach ($this->configurationPasses as $configurationPass) {
-            $data = $configurationPass->passConfiguration($data);
-        }
-
-        return $data;
     }
 }

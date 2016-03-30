@@ -1,0 +1,22 @@
+{% set linkTitle = params.frontendOptions.title|default(params.label)|trans %}
+{% set linkLabel = params.label %}
+
+{% block button %}
+    {% set options = oro_action_frontend_options(operation) %}
+    {% if onlyLink is not defined %}<div class="pull-left btn-group icons-holder">{% endif %}
+        {% block link %}
+            <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
+                href="{{ options.options.url|default('javascript:void(0);') }}"
+                class="{{ params.buttonOptions.class|default('back icons-holder-text action-button') }} {{ params.buttonOptions.aCss|default('') }}"
+                title="{{ linkTitle }}"
+                {% for name,value in options.data %}
+                    data-{{ name }}="{{ value is iterable ? value|json_encode : value}}"
+                {% endfor %}
+                data-options="{{ options.options|json_encode }}"
+            >
+                <i class="{{ params.buttonOptions.icon|default('') }} {{ params.buttonOptions.iCss|default('') }} hide-text">{{ linkLabel }}</i>
+                {{ linkLabel|trim }}
+            </a>
+        {% endblock %}
+    {% if onlyLink is not defined %}</div>{% endif %}
+{% endblock %}
