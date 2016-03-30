@@ -29,6 +29,9 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider evaluateDataProvider
+     * @param array $options
+     * @param array $context
+     * @param mixed $expectedValue
      */
     public function testEvaluate(array $options, array $context, $expectedValue)
     {
@@ -41,15 +44,20 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
         $rightKey = end($keys);
         $leftKey  = reset($keys);
 
-        $this->contextAccessor->expects($this->at(0))
-            ->method('getValue')
-            ->with($context, $left)
-            ->will($this->returnValue($context[$leftKey]));
+        $this->contextAccessor->expects($this->any())
+            ->method('hasValue')
+            ->will($this->returnValue(true));
 
-        $this->contextAccessor->expects($this->at(1))
+        $this->contextAccessor->expects($this->any())
             ->method('getValue')
-            ->with($context, $right)
-            ->will($this->returnValue($context[$rightKey]));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$context, $left, $context[$leftKey]],
+                        [$context, $right, $context[$rightKey]],
+                    ]
+                )
+            );
 
         $this->condition->expects($this->once())
             ->method('doCompare')
@@ -59,6 +67,9 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedValue, $this->condition->evaluate($context));
     }
 
+    /**
+     * @return array
+     */
     public function evaluateDataProvider()
     {
         return [
@@ -145,30 +156,25 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
         $message = 'Compare {{ left }} with {{ right }}.';
         $this->condition->setMessage($message);
 
-        $this->contextAccessor->expects($this->at(0))
-            ->method('getValue')
-            ->with($context, $left)
-            ->will($this->returnValue($context[$leftKey]));
+        $this->contextAccessor->expects($this->any())
+            ->method('hasValue')
+            ->will($this->returnValue(true));
 
-        $this->contextAccessor->expects($this->at(1))
+        $this->contextAccessor->expects($this->any())
             ->method('getValue')
-            ->with($context, $right)
-            ->will($this->returnValue($context[$rightKey]));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$context, $left, $context[$leftKey]],
+                        [$context, $right, $context[$rightKey]],
+                    ]
+                )
+            );
 
         $this->condition->expects($this->once())
             ->method('doCompare')
             ->with($context[$leftKey], $context[$rightKey])
             ->will($this->returnValue(false));
-
-        $this->contextAccessor->expects($this->at(2))
-            ->method('getValue')
-            ->with($context, $left)
-            ->will($this->returnValue($context[$leftKey]));
-
-        $this->contextAccessor->expects($this->at(3))
-            ->method('getValue')
-            ->with($context, $right)
-            ->will($this->returnValue($context[$rightKey]));
 
         $errors = new ArrayCollection();
 
