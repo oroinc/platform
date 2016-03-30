@@ -255,7 +255,7 @@ class Processor
         if ($emailOrigin instanceof UserEmailOrigin) {
             /* Modify transport smtp settings */
             if ($emailOrigin->isSmtpConfigured()) {
-                $this->mailer->prepareTransport($emailOrigin);
+                $this->mailer->prepareSmtpTransport($emailOrigin);
             }
         }
 

@@ -56,7 +56,7 @@ class DirectMailer extends \Swift_Mailer
      *
      * @param EmailOrigin $emailOrigin
      */
-    public function prepareTransport($emailOrigin)
+    public function prepareSmtpTransport($emailOrigin)
     {
         if (!$this->smtpTransport) {
             /** @var EventDispatcherInterface $eventDispatcher */
