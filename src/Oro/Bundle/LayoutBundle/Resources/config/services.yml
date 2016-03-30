@@ -98,6 +98,11 @@ services:
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
+    oro_layout.layout_context_configurator.title:
+        class: Oro\Bundle\LayoutBundle\Layout\Extension\TitleContextConfigurator
+        tags:
+            - { name: layout.context_configurator, priority: -100 }
+
     oro_layout.block_type_extension.visible:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\VisibleExtension
         tags:
