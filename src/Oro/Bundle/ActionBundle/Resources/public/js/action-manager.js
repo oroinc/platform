@@ -29,7 +29,7 @@ define(function(require) {
             confirmation: {},
             showDialog: false,
             hasDialog: false,
-            dialogOptions: {},
+            dialogOptions: {}
         },
 
         /**
@@ -104,19 +104,16 @@ define(function(require) {
                     .done(_.bind(function(response) {
                         this.doResponse(response, e);
                     }, this))
-                    .fail(function(jqXHR) {
-                        var message = __('Could not perform action');
-                        if (jqXHR.statusText) {
-                            message += ': ' + jqXHR.statusText;
-                        }
+                    .fail(_.bind(function(jqXHR) {
+                        var response = _.defaults(jqXHR.responseJSON, {
+                            success: false,
+                            message: ''
+                        });
 
-                        if (jqXHR.responseJSON && jqXHR.responseJSON.message) {
-                            message += ': ' + jqXHR.responseJSON.message;
-                        }
+                        response.message = __('Could not perform action') + ': ' + response.message;
 
-                        mediator.execute('hideLoading');
-                        messenger.notificationFlashMessage('error', message);
-                    });
+                        this.doResponse(response);
+                    }, this));
             }
         },
 
@@ -133,6 +130,18 @@ define(function(require) {
                         messenger.notificationFlashMessage(type, message);
                     });
                 });
+            }
+
+            if (!response.success) {
+                var messages = response.messages || {};
+
+                if (_.isEmpty(messages)) {
+                    messenger.notificationFlashMessage('error', response.message);
+                } else {
+                    _.each(messages, function(submessage) {
+                        messenger.notificationFlashMessage('error', response.message + ': ' + submessage);
+                    });
+                }
             }
 
             if (response.redirectUrl) {

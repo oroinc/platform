@@ -73,10 +73,10 @@ UPGRADE FROM 1.9 to 1.10
 - Class `Oro\Bundle\WorkflowBundle\Model\Event\ExecuteActionEvents` marked as deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents` instead.
 - `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_BEFORE` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_BEFORE` instead.
 - `Oro\Bundle\WorkflowBundle\Event\ExecuteActionEvents::HANDLE_AFTER` is deprecated. Use `Oro\Component\Action\Event\ExecuteActionEvents::HANDLE_AFTER` instead.
-- Service `oro_workflow.action_assembler` is deprecated. Use `oro_action.function_assembler` instead.
+- Service `oro_workflow.action_assembler` is deprecated. Use `oro_action.action_assembler` instead.
 - Service `oro_workflow.attribute_guesser` is deprecated. Use `oro_action.attribute_guesser` instead.
 - Service `oro_workflow.context_accessor` is deprecated. Use `oro_action.context_accessor` instead.
-- Service `oro_workflow.action_factory` is deprecated. Use `oro_action.function_factory` instead.
+- Service `oro_workflow.action_factory` is deprecated. Use `oro_action.action_factory` instead.
 - Service `oro_workflow.configuration_pass.replace_property_path` is deprecated. Use `oro_action.configuration_pass.replace_property_path` instead.
 - The constructor of the `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` class was changed. Third argument `LoggerInterface` (@logger service) was added.
 - Added error logging in `Oro\Bundle\WorkflowBundle\Handler\TransitionHandler` at handle method.
