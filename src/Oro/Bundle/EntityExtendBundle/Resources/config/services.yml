@@ -167,6 +167,13 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
 
+    oro_entity_extend.validator.unique_extend_entity_method_name_validator:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
+        arguments:
+            - @oro_entity_extend.tools.class_method_name_checker
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
+
     oro_entity_extend.validator.unique_enum_name:
         class: %oro_entity_extend.validator.unique_enum_name.class%
         arguments:
@@ -425,3 +432,6 @@ services:
             - @doctrine
         tags:
             - { name: oro_entity.dictionary_value_list_provider, priority: -90 }
+
+    oro_entity_extend.tools.class_method_name_checker:
+        class: Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker

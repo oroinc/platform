@@ -7,6 +7,8 @@ Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel:
     constraints:
         - oro_entity_extend:UniqueExtendEntityField:
             groups: [fieldName]
+        - oro_entity_extend:UniqueExtendEntityMethodName:
+            groups: [fieldName]
     properties:
         fieldName:
             - NotBlank: ~
