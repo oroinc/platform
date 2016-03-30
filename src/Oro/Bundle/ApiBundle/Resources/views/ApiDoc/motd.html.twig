@@ -121,20 +121,23 @@
          * Add the operators selector for filters
          */
         $('.toggler').on('click', function() {
-            var $container = $(this).closest('.get.operation'),
+            var $container = $(this).closest('.operation'),
                 $form = $container.find('.pane.sandbox form')
             $container.find('.pane.content>table>tbody table td:contains(Operators)').each(function (index, el) {
                 var $el = $(el),
                     filterId = $el.closest('table').parent().prev().text(),
                     operators = $el.next().text(),
-                    options = '';
+                    options = '',
+                    $operatorEl = null;
                 if (filterId) {
-                    operators = operators.split(',');
-                    for (var i = 0; i < operators.length; i++) {
-                        options += '<option value="' + operators[i] + '">' + operators[i] + '</option>'
+                    $operatorEl = $form.find("input.key[value='" + escapeSelector(filterId) + "']").next();
+                    if ($operatorEl.length && $operatorEl.prop("tagName") == 'SPAN' && $operatorEl.text() == '=') {
+                        operators = operators.split(',');
+                        for (var i = 0; i < operators.length; i++) {
+                            options += '<option value="' + operators[i] + '">' + operators[i] + '</option>'
+                        }
+                        $operatorEl.replaceWith('<select class="operator">' + options + '</select>');
                     }
-                    $form.find("input[value='" + escapeSelector(filterId) + "']").next()
-                        .replaceWith('<select class="operator">' + options + '</select>');
                 }
             });
         });
@@ -143,7 +146,7 @@
          * A handler to add operators to the sandbox AJAX requests
          */
         $.ajaxPrefilter(function(options) {
-            if (options.type != 'GET' || options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
+            if (options.headers['X-API-Sandbox-Operation-ID'] === undefined) {
                 return;
             }
 

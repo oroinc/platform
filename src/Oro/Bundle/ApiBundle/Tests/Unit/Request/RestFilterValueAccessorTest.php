@@ -8,35 +8,18 @@ use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 
 class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
 {
-    public function testAccessor()
+    /**
+     * @param Request $request
+     * @param array   $queryValues
+     * @param bool    $isEmptyRequest
+     *
+     * @dataProvider requestProvider
+     */
+    public function testAccessor(Request $request, $queryValues = [], $isEmptyRequest = false)
     {
-        $queryStringValues = [
-            'prm1=val1'                          => ['prm1', '=', 'val1'],
-            'prm2<>val2'                         => ['prm2', '<>', 'val2'],
-            'prm3<val3'                          => ['prm3', '<', 'val3'],
-            'prm4<=val4'                         => ['prm4', '<=', 'val4'],
-            'prm5>val5'                          => ['prm5', '>', 'val5'],
-            'prm6>=val6'                         => ['prm6', '>=', 'val6'],
-            'prm7%3C%3Eval7'                     => ['prm7', '<>', 'val7'],
-            'prm8%3Cval8'                        => ['prm8', '<', 'val8'],
-            'prm9%3C=val9'                       => ['prm9', '<=', 'val9'],
-            'prm10%3Eval10'                      => ['prm10', '>', 'val10'],
-            'prm11%3E=val11'                     => ['prm11', '>=', 'val11'],
-            'prm12<><val12>'                     => ['prm12', '<>', '<val12>'],
-            'prm_13=%3Cval13%3E'                 => ['prm_13', '=', '<val13>'],
-            'page[number]=123'                   => ['page[number]', '=', '123', 'number'],
-            'page%5Bsize%5D=456'                 => ['page[size]', '=', '456', 'size'],
-            'filter[address.country]=US'         => ['filter[address.country]', '=', 'US', 'address.country'],
-            'filter%5Baddress.region%5D=NY'      => ['filter[address.region]', '=', 'NY', 'address.region'],
-            'filter[address][type]=billing'      => ['filter[address][type]', '=', 'billing', 'address.type'],
-            'filter%5Baddress%5D%5Bcode%5D=Z123' => ['filter[address][code]', '=', 'Z123', 'address.code'],
-        ];
-
-        $request = Request::create('http://test.com?' . implode('&', array_keys($queryStringValues)));
-
         $accessor = new RestFilterValueAccessor($request);
 
-        foreach ($queryStringValues as $itemKey => $itemValue) {
+        foreach ($queryValues as $itemKey => $itemValue) {
             list($key, $operator, $value) = $itemValue;
             $path = isset($itemValue[3]) ? $itemValue[3] : $key;
             $this->assertTrue($accessor->has($key), sprintf('has - %s', $itemKey));
@@ -50,7 +33,12 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($accessor->get('unknown'), 'get - unknown');
 
         // test getAll
-        $this->assertCount(count($queryStringValues), $accessor->getAll(), 'getAll');
+        $this->assertCount(count($queryValues), $accessor->getAll(), 'getAll');
+
+        if ($isEmptyRequest) {
+            // empty request without filters, no additional asserts required
+            return;
+        }
 
         // test getAll for a group
         $filterValues = $accessor->getAll('prm1');
@@ -78,5 +66,68 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
             $filterValues['filter[address][code]']->getValue(),
             'value - getAll(filter)[address][code]'
         );
+    }
+
+    public function requestProvider()
+    {
+        $queryStringValues = [
+            'prm1=val1'                          => ['prm1', '=', 'val1'],
+            'prm2<>val2'                         => ['prm2', '<>', 'val2'],
+            'prm3<val3'                          => ['prm3', '<', 'val3'],
+            'prm4<=val4'                         => ['prm4', '<=', 'val4'],
+            'prm5>val5'                          => ['prm5', '>', 'val5'],
+            'prm6>=val6'                         => ['prm6', '>=', 'val6'],
+            'prm7%3C%3Eval7'                     => ['prm7', '<>', 'val7'],
+            'prm8%3Cval8'                        => ['prm8', '<', 'val8'],
+            'prm9%3C=val9'                       => ['prm9', '<=', 'val9'],
+            'prm10%3Eval10'                      => ['prm10', '>', 'val10'],
+            'prm11%3E=val11'                     => ['prm11', '>=', 'val11'],
+            'prm12<><val12>'                     => ['prm12', '<>', '<val12>'],
+            'prm_13=%3Cval13%3E'                 => ['prm_13', '=', '<val13>'],
+            'page[number]=123'                   => ['page[number]', '=', '123', 'number'],
+            'page%5Bsize%5D=456'                 => ['page[size]', '=', '456', 'size'],
+            'filter[address.country]=US'         => ['filter[address.country]', '=', 'US', 'address.country'],
+            'filter%5Baddress.region%5D=NY'      => ['filter[address.region]', '=', 'NY', 'address.region'],
+            'filter[address][type]=billing'      => ['filter[address][type]', '=', 'billing', 'address.type'],
+            'filter%5Baddress%5D%5Bcode%5D=Z123' => ['filter[address][code]', '=', 'Z123', 'address.code'],
+        ];
+
+        return [
+            'testWithQueryString' => [
+                'request' => Request::create(
+                    'http://test.com?' . implode('&', array_keys($queryStringValues))
+                ),
+                'queryValues' => $queryStringValues
+            ],
+            'testWithContent'     => [
+                'request' => Request::create(
+                    'http://test.com',
+                    'GET',
+                    [],
+                    [],
+                    [],
+                    [],
+                    implode('&', array_keys($queryStringValues))
+                ),
+                'queryValues' => $queryStringValues
+            ],
+            'testWithQueryStringAndContent' => [
+                'request' => Request::create(
+                    'http://test.com?' . implode('&', array_chunk(array_keys($queryStringValues), 10)[0]),
+                    'GET',
+                    [],
+                    [],
+                    [],
+                    [],
+                    implode('&', array_chunk(array_keys($queryStringValues), 10)[1])
+                ),
+                'queryValues' => $queryStringValues,
+            ],
+            'testEmpty' => [
+                'request' => Request::create('http://test.com'),
+                'queryValues' => [],
+                'isEmptyValues' => true,
+            ]
+        ];
     }
 }

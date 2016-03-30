@@ -10,6 +10,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Bundle\FrameworkBundle\Console\Application as ConsoleApplication;
 
 use Oro\Bundle\CacheBundle\Provider\DirectoryAwareFileCacheInterface;
+use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityExtendBundle\Extend\EntityProxyGenerator;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendClassLoadingUtils;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
@@ -47,9 +48,10 @@ abstract class CacheCommand extends ContainerAwareCommand
     protected function warmup(OutputInterface $output)
     {
         $this->warmupExtendedEntityCache($output);
-        // Doctrine metadata and proxies might be invalid after extended entities cache generation
+        // Doctrine metadata, proxies and dependent caches might be invalid after extended entities cache generation
         $this->warmupMetadataCache($output);
         $this->warmupProxies($output);
+        $this->warmupEntityAliasesCache($output);
     }
 
     /**
@@ -65,7 +67,7 @@ abstract class CacheCommand extends ContainerAwareCommand
         $cacheDir = $dumper->getCacheDir();
         if (empty($this->cacheDir) || $this->cacheDir === $cacheDir) {
             $dumper->dump();
-            $this->setClassAliases($cacheDir, true);
+            $this->setClassAliases($cacheDir);
         } else {
             $dumper->setCacheDir($this->cacheDir);
             try {
@@ -75,7 +77,7 @@ abstract class CacheCommand extends ContainerAwareCommand
                 $dumper->setCacheDir($cacheDir);
                 throw $e;
             }
-            $this->setClassAliases($this->cacheDir, true);
+            $this->setClassAliases($this->cacheDir);
         }
     }
 
@@ -154,6 +156,20 @@ abstract class CacheCommand extends ContainerAwareCommand
                 throw $e;
             }
         }
+    }
+
+    /**
+     * Warms up entity aliases cache
+     *
+     * @param OutputInterface $output
+     */
+    protected function warmupEntityAliasesCache(OutputInterface $output)
+    {
+        $output->writeln('Warm up entity aliases cache');
+
+        /** @var EntityAliasResolver $entityAliasResolver */
+        $entityAliasResolver = $this->getContainer()->get('oro_entity.entity_alias_resolver');
+        $entityAliasResolver->warmUpCache();
     }
 
     /**

@@ -29,9 +29,9 @@ class DeleteTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_api_action_execute_actions',
+                'oro_api_action_execute_operations',
                 [
-                    'actionName' => 'DELETE',
+                    'operationName' => 'DELETE',
                     'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\Item',
                     'entityId' => $item->getId(),
                 ]
@@ -44,8 +44,13 @@ class DeleteTest extends WebTestCase
         $response = json_decode($result->getContent(), true);
 
         $this->assertEquals(
-            $response,
-            ['redirectUrl' => $this->getUrl('oro_test_item_index', ['id' => $item->getId()])]
+            [
+                'success' => true,
+                'message' => '',
+                'messages' => [],
+                'redirectUrl' => $this->getUrl('oro_test_item_index', ['id' => $item->getId()])
+            ],
+            $response
         );
     }
 }

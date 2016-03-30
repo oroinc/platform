@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
- * Sets an initial list of requests for additional configuration data.
+ * Sets an initial list of requests for configuration data.
  */
 class InitializeConfigExtras implements ProcessorInterface
 {

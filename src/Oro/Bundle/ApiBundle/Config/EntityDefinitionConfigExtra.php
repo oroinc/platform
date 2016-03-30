@@ -53,6 +53,8 @@ class EntityDefinitionConfigExtra implements ConfigExtraInterface
      */
     public function getCacheKeyPart()
     {
-        return self::NAME;
+        return $this->action
+            ? self::NAME . ':' . $this->action
+            : self::NAME;
     }
 }

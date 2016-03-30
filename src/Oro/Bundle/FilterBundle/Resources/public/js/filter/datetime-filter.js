@@ -53,6 +53,15 @@ define(function(require) {
             'hideTimepicker input': '_preventClickOutsideCriteria'
         },
 
+        _renderCriteria: function() {
+            DatetimeFilter.__super__._renderCriteria.apply(this, arguments);
+
+            var value = this.getValue();
+            if (value) {
+                this._updateTimeVisibility(value.part);
+            }
+        },
+
         /**
          * Handle click outside of criteria popup to hide it
          *
@@ -138,6 +147,7 @@ define(function(require) {
          */
         _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
+                this._updateTimeVisibility(newValue.part);
                 var start = this.subview('start');
                 var end = this.subview('end');
                 if (start && start.updateFront) {
@@ -164,6 +174,14 @@ define(function(require) {
             }
 
             subView.updateFront();
+        },
+
+        _updateTimeVisibility: function(part) {
+            if (part === 'value') {
+                this.$('.timepicker-input').removeClass('hide');
+            } else {
+                this.$('.timepicker-input').addClass('hide');
+            }
         }
     });
 

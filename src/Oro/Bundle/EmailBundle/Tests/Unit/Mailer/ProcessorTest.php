@@ -360,6 +360,7 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
             $this->assertEquals(sprintf($expectedMessageData['body'], 'cid:' . $id), $message->getBody());
         } else {
             $this->assertEquals($expectedMessageData['body'], $model->getBody());
+            $this->assertEquals($expectedMessageData['body'], $message->getBody());
         };
     }
 
@@ -389,6 +390,26 @@ class ProcessorTest extends \PHPUnit_Framework_TestCase
                     'type' => 'text/html'
                 ],
                 true
+            ],
+            [
+                [
+                    'from' => 'from@test.com',
+                    'to' => ['to@test.com'],
+                    'cc' => ['Cc <cc@test.com>'],
+                    'bcc' => ['Bcc <bcc@test.com>'],
+                    'subject' => 'subject',
+                    'body' => 'body <img src="http://sth.com/cool-image.png">',
+                    'type' => 'html'
+                ],
+                [
+                    'from' => ['from@test.com'],
+                    'to' => ['to@test.com'],
+                    'cc' => ['cc@test.com' => 'Cc'],
+                    'bcc' => ['bcc@test.com' => 'Bcc'],
+                    'subject' => 'subject',
+                    'body' => 'body <img src="http://sth.com/cool-image.png">',
+                    'type' => 'text/html'
+                ],
             ],
             [
                 [
