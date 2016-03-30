@@ -14,7 +14,7 @@ class TitleTypeTest extends BlockTypeTestCase
     {
         $this->assertEquals(
             [
-                'value' => '',
+                'value' => [],
                 'separator' => '',
                 'reverse' => false,
                 'resolve_value_bags' => false,

@@ -8,8 +8,6 @@ layout:
                     blockType: head
                 title:
                     blockType: title
-                    options:
-                        value: OroPlatform
                 meta_charset:
                     blockType: meta
                     options:

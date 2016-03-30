@@ -20,7 +20,7 @@ class TitleType extends AbstractType
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
         $resolver->setDefaults([
-            'value' => '',
+            'value' => [],
             'separator' => '',
             'reverse' => false,
             'resolve_value_bags' => false,
