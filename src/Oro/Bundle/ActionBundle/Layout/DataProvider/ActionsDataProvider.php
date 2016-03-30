@@ -113,7 +113,10 @@ class ActionsDataProvider implements DataProviderInterface
             $context = null;
         }
 
-        $actions = $this->restrictHelper->restrictOperationsByGroup($this->operationManager->getOperations($context), $groups);
+        $actions = $this->restrictHelper->restrictOperationsByGroup(
+            $this->operationManager->getOperations($context),
+            $groups
+        );
 
         return $this->getPreparedData($actions);
     }
