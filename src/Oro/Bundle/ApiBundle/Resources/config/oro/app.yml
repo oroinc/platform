@@ -32,6 +32,34 @@ oro_api:
         entityAlias: ~
         entityPluralAlias: ~
 
+    form_types:
+        - form.type.form
+        - form.type.collection
+        - form.type.choice
+        - form.type.integer
+        - form.type.number
+        - form.type.money
+        - form.type.percent
+        - form.type.date
+        - form.type.time
+        - form.type.datetime
+        - form.type.timezone
+        - form.type.birthday
+        - form.type.text
+        - form.type.email
+        - form.type.url
+        - form.type.password
+        - form.type.repeated
+
+    form_type_extensions:
+        - form.type_extension.form.http_foundation
+        - form.type_extension.form.validator
+        - form.type_extension.repeated.validator
+        - form.type_extension.form.data_collector
+
+    form_type_guessers:
+        - form.type_guesser.validator
+
     actions:
         get_list:
             processing_groups:

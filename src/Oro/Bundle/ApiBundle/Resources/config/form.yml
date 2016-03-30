@@ -1,0 +1,15 @@
+services:
+    oro_api.form.switchable_extension:
+        public: false
+        class: Oro\Bundle\ApiBundle\Form\Extension\SwitchableDependencyInjectionExtension
+        arguments:
+            - "@service_container"
+
+    oro_api.form.extension:
+        public: false
+        class: "%form.extension.class%"
+        arguments:
+            - "@service_container"
+            - [] # All services with tag "oro.api.form.type" are inserted here by ConfigurationCompilerPass
+            - [] # All services with tag "oro.api.form.type_extension" are inserted here by ConfigurationCompilerPass
+            - [] # All services with tag "oro.api.form.type_guesser" are inserted here by ConfigurationCompilerPass
