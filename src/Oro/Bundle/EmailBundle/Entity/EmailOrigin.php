@@ -15,7 +15,8 @@ use Oro\Bundle\UserBundle\Entity\User;
  *
  * @ORM\Table(name="oro_email_origin",
  *      indexes={
- *          @ORM\Index(name="IDX_mailbox_name", columns={"mailbox_name"})
+ *          @ORM\Index(name="IDX_mailbox_name", columns={"mailbox_name"}),
+ *          @ORM\Index(name="isActive_name_idx", columns={"isActive", "name"})
  *      }
  * )
  * @ORM\Entity

@@ -4,9 +4,10 @@ namespace Oro\Bundle\ActionBundle\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
-use Oro\Bundle\ActionBundle\Model\Action;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 
 use Oro\Component\Layout\ContextInterface;
 use Oro\Component\Layout\DataProviderInterface;
@@ -14,9 +15,14 @@ use Oro\Component\Layout\DataProviderInterface;
 class ActionsDataProvider implements DataProviderInterface
 {
     /**
-     * @var ActionManager
+     * @var OperationManager
      */
-    protected $actionManager;
+    protected $operationManager;
+
+    /**
+     * @var ContextHelper
+     */
+    protected $contextHelper;
 
     /**
      * @var RestrictHelper
@@ -29,16 +35,24 @@ class ActionsDataProvider implements DataProviderInterface
     protected $translator;
 
     /**
-     * @param ActionManager $actionManager
+     * @var ContextInterface
+     */
+    protected $context;
+
+    /**
+     * @param OperationManager $operationManager
+     * @param ContextHelper $contextHelper
      * @param RestrictHelper $restrictHelper
      * @param TranslatorInterface $translator
      */
     public function __construct(
-        ActionManager $actionManager,
+        OperationManager $operationManager,
+        ContextHelper $contextHelper,
         RestrictHelper $restrictHelper,
         TranslatorInterface $translator
     ) {
-        $this->actionManager = $actionManager;
+        $this->operationManager = $operationManager;
+        $this->contextHelper = $contextHelper;
         $this->restrictHelper = $restrictHelper;
         $this->translator = $translator;
     }
@@ -93,24 +107,33 @@ class ActionsDataProvider implements DataProviderInterface
      */
     public function getByGroup($groups = null)
     {
-        $actions = $this->restrictHelper->restrictActionsByGroup($this->actionManager->getActions(), $groups);
+        if ($this->context && $this->context->data()->has('entity')) {
+            $context = $this->contextHelper->getActionParameters(['entity' => $this->context->data()->get('entity')]);
+        } else {
+            $context = null;
+        }
+
+        $actions = $this->restrictHelper->restrictOperationsByGroup(
+            $this->operationManager->getOperations($context),
+            $groups
+        );
 
         return $this->getPreparedData($actions);
     }
 
     /**
-     * @param Action[] $actions
+     * @param Operation[] $operations
      * @return array
      */
-    protected function getPreparedData(array $actions = [])
+    protected function getPreparedData(array $operations = [])
     {
         $data = [];
-        foreach ($actions as $action) {
-            if (!$action->getDefinition()->isEnabled()) {
+        foreach ($operations as $operation) {
+            if (!$operation->getDefinition()->isEnabled()) {
                 continue;
             }
 
-            $definition = $action->getDefinition();
+            $definition = $operation->getDefinition();
 
             $frontendOptions = $definition->getFrontendOptions();
             $buttonOptions = $definition->getButtonOptions();
@@ -125,8 +148,10 @@ class ActionsDataProvider implements DataProviderInterface
                 'name' => $definition->getName(),
                 'label' => $this->translator->trans($definition->getLabel()),
                 'title' => $this->translator->trans($title),
+//                'hasDialog' => $operation->hasForm(),
+//                'showDialog' => !empty($frontendOptions['show_dialog']),
                 'icon' =>  $icon,
-                'action' => $action,
+                'action' => $operation,
             ];
         }
 
@@ -138,6 +163,8 @@ class ActionsDataProvider implements DataProviderInterface
      */
     public function getData(ContextInterface $context)
     {
+        $this->context = $context;
+
         return $this;
     }
 }
