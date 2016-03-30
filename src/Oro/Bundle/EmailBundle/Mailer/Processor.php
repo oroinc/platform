@@ -317,6 +317,8 @@ class Processor
                             return sprintf('<img%ssrc="%s"', $imgConfig, $id);
                         }
                     }
+
+                    return $matches[0];
                 },
                 $body
             );
