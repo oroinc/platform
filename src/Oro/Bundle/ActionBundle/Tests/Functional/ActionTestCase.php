@@ -12,33 +12,38 @@ abstract class ActionTestCase extends WebTestCase
     /**
      * @return string
      */
-    protected function getActionExecutionRoute()
+    protected function getOperationExecutionRoute()
     {
-        return 'oro_api_action_execute_actions';
+        return 'oro_api_action_execute_operations';
     }
 
     /**
      * @return string
      */
-    protected function getActionDialogRoute()
+    protected function getOperationDialogRoute()
     {
         return 'oro_action_widget_form';
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param mixed $entityId
      * @param string $entityClass
      * @param array $data
      * @param array $server
      * @return Crawler
      */
-    protected function assertExecuteAction($actionName, $entityId, $entityClass, array $data = [], array $server = [])
-    {
+    protected function assertExecuteOperation(
+        $operationName,
+        $entityId,
+        $entityClass,
+        array $data = [],
+        array $server = []
+    ) {
         $url = $this->getUrl(
-            $this->getActionExecutionRoute(),
+            $this->getOperationExecutionRoute(),
             array_merge([
-                'actionName' => $actionName,
+                'operationName' => $operationName,
                 'entityId' => $entityId,
                 'entityClass' => $entityClass,
             ], $data)
@@ -52,17 +57,22 @@ abstract class ActionTestCase extends WebTestCase
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param mixed $entityId
      * @param string $entityClass
      * @param array $data
      * @param array $server
      * @return Crawler
      */
-    protected function assertActionForm($actionName, $entityId, $entityClass, array $data = [], array $server = [])
-    {
-        $url = $this->getUrl($this->getActionDialogRoute(), array_merge([
-                'actionName' => $actionName,
+    protected function assertOperationForm(
+        $operationName,
+        $entityId,
+        $entityClass,
+        array $data = [],
+        array $server = []
+    ) {
+        $url = $this->getUrl($this->getOperationDialogRoute(), array_merge([
+                'operationName' => $operationName,
                 'entityId' => $entityId,
                 'entityClass' => $entityClass,
                 '_widgetContainer' => 'dialog',
@@ -82,7 +92,7 @@ abstract class ActionTestCase extends WebTestCase
      * @param Form $form
      * @param string $message
      */
-    protected function assertActionFormSubmitted(Form $form, $message)
+    protected function assertOperationFormSubmitted(Form $form, $message)
     {
         $this->client->followRedirects(true);
         $crawler = $this->client->submit($form);

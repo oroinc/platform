@@ -1,0 +1,83 @@
+{% block widget_content %}
+<div class="widget-content">
+    {% block widget_content_inner %}
+    {% if response is defined %}
+        <script type="text/javascript">
+            require(['oroui/js/widget-manager'],
+                function(widgetManager) {
+                    widgetManager.getWidgetInstance({{ app.request.get('_wid')|json_encode|raw }}, function(widget) {
+                        widget.trigger('formSave', {{ response|json_encode|raw }});
+                    });
+                });
+        </script>
+    {% else %}
+        {% block messages %}
+            {% if messages|length %}
+                {% for type, items in messages %}
+                <div class="alert alert-{{ type }}">
+                    <ul>
+                        {% for item in items %}
+                            <li>{{ item }}</li>
+                        {% endfor %}
+                    </ul>
+                </div>
+                {% endfor %}
+            {% endif %}
+        {% endblock %}
+        {% block errors %}
+            {% if errors|length %}
+                <div class="alert alert-error">
+                    <ul>
+                    {% block errors_inner %}
+                        {% for error in errors %}
+                            <li>{{ error.message | trans(error.parameters|default([]))}}</li>
+                        {% endfor %}
+                    {% endblock %}
+                    </ul>
+                </div>
+            {% endif %}
+        {% endblock %}
+        {% if form is defined %}
+            {% block form_errors %}
+                {% if form.vars.errors|length > 0 %}
+                    <div class="alert alert-error">
+                        {% block form_errors_inner %}
+                            {{ form_errors(form) }}
+                        {% endblock %}
+                    </div>
+                {% endif %}
+            {% endblock %}
+
+            {% block form %}
+                {{ form_start(form, {
+                    'method': 'POST',
+                    'action': app.request.uri,
+                    'attr': {
+                        'class': 'form-dialog',
+                        'data-nohash': 'true',
+                        'data-disable-autofocus': 'true',
+                        'id': form.vars.id,
+                    },
+                }) }}
+                    {% block form_inner %}
+                        {% block form_widget %}
+                            {{ form_widget(form) }}
+                        {% endblock %}
+
+                        {% block form_actions %}
+                            <div class="widget-actions form-actions">
+                                {% block form_actions_inner %}
+                                    <button class="btn" type="reset">{{ 'Cancel'|trans }}</button>
+                                    <button class="btn btn-success" type="submit">{{ 'Submit'|trans }}</button>
+                                {% endblock %}
+                            </div>
+                        {% endblock %}
+                    {% endblock %}
+                {{ form_end(form) }}
+                {{ oro_form_js_validation(form) }}
+            {% endblock %}
+        {% endif %}
+    {% endif %}
+    {% endblock %}
+</div>
+{% endblock %}
