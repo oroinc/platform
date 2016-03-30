@@ -9,7 +9,9 @@ use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
 /**
  * Email Recipient
  *
- * @ORM\Table(name="oro_email_recipient")
+ * @ORM\Table(name="oro_email_recipient", indexes={
+ *     @ORM\Index("email_id_type_idx", columns = {"email_id", "type"})
+ * })
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRecipientRepository")
  */
 class EmailRecipient
