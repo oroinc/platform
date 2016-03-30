@@ -50,15 +50,42 @@ class RefreshGridTest extends \PHPUnit_Framework_TestCase
         $this->action->initialize([]);
     }
 
-    public function testExecuteMethod()
+    /**
+     * @param array $inputData
+     * @param array $expectedData
+     *
+     * @dataProvider executeMethodProvider
+     */
+    public function testExecuteMethod(array $inputData, array $expectedData)
     {
-        $gridname = 'test_grid';
+        $context = new StubStorage($inputData['context']);
 
-        $context = new StubStorage(['param' => 'value']);
-
-        $this->action->initialize([$gridname]);
+        $this->action->initialize($inputData['options']);
         $this->action->execute($context);
 
-        $this->assertEquals(['param' => 'value', 'refreshGrid' => [$gridname]], $context->getValues());
+        $this->assertEquals($expectedData, $context->getValues());
+    }
+
+    /**
+     * @return array
+     */
+    public function executeMethodProvider()
+    {
+        return [
+            'add grid' => [
+                'input' => [
+                    'context' => ['param1' => 'value1'],
+                    'options' => ['grid1']
+                ],
+                'expected' => ['param1' => 'value1', 'refreshGrid' => ['grid1']],
+            ],
+            'merge grids' => [
+                'input' => [
+                    'context' => ['param2' => 'value2', 'refreshGrid' => ['grid1']],
+                    'options' => ['grid2', 'grid2']
+                ],
+                'expected' => ['param2' => 'value2', 'refreshGrid' => ['grid1', 'grid2']],
+            ],
+        ];
     }
 }

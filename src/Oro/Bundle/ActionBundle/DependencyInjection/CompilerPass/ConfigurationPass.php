@@ -5,50 +5,82 @@ namespace Oro\Bundle\ActionBundle\DependencyInjection\CompilerPass;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
-
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 
 class ConfigurationPass implements CompilerPassInterface
 {
-    const CACHE_SERVICE_ID = 'oro_action.cache.provider';
-    const PROVIDER_SERVICE_ID = 'oro_action.configuration.provider';
+    const OPERATIONS_CACHE = 'oro_action.cache.provider.operations';
+    const OPERATIONS_PROVIDER = 'oro_action.configuration.provider.operations';
+    const OPERATIONS_NODE_NAME = 'operations';
+
+    const ACTION_GROUPS_CACHE = 'oro_action.cache.provider.action_groups';
+    const ACTION_GROUPS_PROVIDER = 'oro_action.configuration.provider.action_groups';
+    const ACTION_GROUPS_NODE_NAME = 'action_groups';
+
+    const CONFIG_FILE_PATH = 'Resources/config/oro/actions.yml';
+
+    /** @var CumulativeConfigLoader */
+    protected $loader;
 
     /**
      * {@inheritDoc}
      */
     public function process(ContainerBuilder $container)
     {
-        $this->registerConfigFiles($container);
+        $this->registerConfiguration(
+            $container,
+            self::OPERATIONS_PROVIDER,
+            self::OPERATIONS_CACHE,
+            self::OPERATIONS_NODE_NAME
+        );
+        $this->registerConfiguration(
+            $container,
+            self::ACTION_GROUPS_PROVIDER,
+            self::ACTION_GROUPS_CACHE,
+            self::ACTION_GROUPS_NODE_NAME
+        );
     }
 
     /**
      * @param ContainerBuilder $container
+     * @param string $configurationProvider
+     * @param string $cache
+     * @param string $nodeName
      */
-    protected function registerConfigFiles(ContainerBuilder $container)
+    protected function registerConfiguration(ContainerBuilder $container, $configurationProvider, $cache, $nodeName)
     {
-        if ($container->hasDefinition(self::PROVIDER_SERVICE_ID)) {
-            $configLoader = new CumulativeConfigLoader(
-                'oro_action',
-                new YamlCumulativeFileLoader('Resources/config/actions.yml')
-            );
-
+        if ($container->hasDefinition($configurationProvider)) {
             $config = [];
 
-            $resources = $configLoader->load($container);
+            $resources = $this->getLoader()->load($container);
             foreach ($resources as $resource) {
-                if (array_key_exists(ActionConfigurationProvider::ROOT_NODE_NAME, (array)$resource->data) &&
-                    is_array($resource->data[ActionConfigurationProvider::ROOT_NODE_NAME])
-                ) {
-                    $config[$resource->bundleClass] = $resource->data[ActionConfigurationProvider::ROOT_NODE_NAME];
+                if (array_key_exists($nodeName, (array)$resource->data) && is_array($resource->data[$nodeName])) {
+                    $config[$resource->bundleClass] = $resource->data[$nodeName];
                 }
             }
 
-            $providerDef = $container->getDefinition(self::PROVIDER_SERVICE_ID);
+            $providerDef = $container->getDefinition($configurationProvider);
             $providerDef->replaceArgument(3, $config);
         }
 
-        $container->get(self::CACHE_SERVICE_ID)->deleteAll();
+        if ($container->has($cache)) {
+            $container->get($cache)->deleteAll();
+        }
+    }
+
+    /**
+     * @return CumulativeConfigLoader
+     */
+    protected function getLoader()
+    {
+        if (!$this->loader) {
+            $this->loader = new CumulativeConfigLoader(
+                'oro_action',
+                new YamlCumulativeFileLoader(self::CONFIG_FILE_PATH)
+            );
+        }
+
+        return $this->loader;
     }
 }
