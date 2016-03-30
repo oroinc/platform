@@ -23,6 +23,7 @@ class AnnotationDriverTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test_route_name', $metadata->routeName);
         $this->assertEquals('test_route_view', $metadata->routeView);
         $this->assertEquals('test_route_create', $metadata->routeCreate);
+        $this->assertEquals(['custom' => 'test_route_custom'], $metadata->routes);
         $this->assertEquals('default', $metadata->mode);
         $this->assertEquals(
             [

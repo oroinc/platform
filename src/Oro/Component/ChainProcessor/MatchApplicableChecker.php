@@ -12,6 +12,25 @@ namespace Oro\Component\ChainProcessor;
  */
 class MatchApplicableChecker implements ApplicableCheckerInterface
 {
+    /** @var string[] */
+    protected $ignoredAttributes;
+
+    /**
+     * @param string[] $ignoredAttributes
+     */
+    public function __construct(array $ignoredAttributes = ['group'])
+    {
+        $this->ignoredAttributes = $ignoredAttributes;
+    }
+
+    /**
+     * @param string $attribute
+     */
+    public function addIgnoredAttribute($attribute)
+    {
+        $this->ignoredAttributes[] = $attribute;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -19,7 +38,9 @@ class MatchApplicableChecker implements ApplicableCheckerInterface
     {
         $result = self::APPLICABLE;
         foreach ($processorAttributes as $key => $value) {
-            if ($key === 'group' || (!is_scalar($value) && !is_array($value))) {
+            if (in_array($key, $this->ignoredAttributes, true)
+                || (!is_scalar($value) && !is_array($value))
+            ) {
                 continue;
             }
             if (!$context->has($key)) {

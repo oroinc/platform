@@ -60,6 +60,8 @@ class ImportExportTest extends WebTestCase
         }
 
         $manager->flush();
+
+        parent::tearDown();
     }
 
     public function testImport()

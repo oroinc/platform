@@ -208,11 +208,15 @@ class FormType extends AbstractFormType
     protected function setClassPrefixToFormView(FormView $formView, $classPrefix)
     {
         $formView->vars['class_prefix'] = $classPrefix;
-        if (empty($formView->children)) {
+
+        if (empty($formView->children) && !isset($formView->vars['prototype'])) {
             return;
         }
         foreach ($formView->children as $child) {
             $this->setClassPrefixToFormView($child, $classPrefix);
+        }
+        if (isset($formView->vars['prototype'])) {
+            $this->setClassPrefixToFormView($formView->vars['prototype'], $classPrefix);
         }
     }
 }

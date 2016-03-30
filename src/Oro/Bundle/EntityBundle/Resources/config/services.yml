@@ -1,4 +1,11 @@
 parameters:
+    # override Doctrine Registry
+    doctrine.class: Oro\Bundle\EntityBundle\ORM\Registry
+    # override Doctrine event manager
+    doctrine.dbal.connection.event_manager.class: Oro\Bundle\EntityBundle\Event\OroEventManager
+    # override Doctrine MappingDriverChain
+    doctrine.orm.metadata.driver_chain.class: Oro\Bundle\EntityBundle\ORM\MappingDriverChain
+
     oro_entity.listener.navigation_listener.class:                                     Oro\Bundle\EntityBundle\EventListener\NavigationListener
     oro_entity.datagrid_helper.class:                                                  Oro\Bundle\EntityBundle\Grid\GridHelper
     oro_entity.event_listener.custom_entity_grid_listener.class:                       Oro\Bundle\EntityBundle\EventListener\CustomEntityGridListener
@@ -20,15 +27,7 @@ parameters:
     oro_entity.twig.extension.entity.class:                                            Oro\Bundle\EntityBundle\Twig\EntityExtension
     oro_entity.routing_helper.class:                                                   Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper
     oro_entity.extension.unique_entity_extension.class:                                Oro\Bundle\EntityBundle\Form\Extension\UniqueEntityExtension
-
-    # override default Doctrine event manager class
-    doctrine.dbal.connection.event_manager.class:                  Oro\Bundle\EntityBundle\Event\OroEventManager
-
-    # override Doctrine MappingDriverChain
-    doctrine.orm.metadata.driver_chain.class: Oro\Bundle\EntityBundle\ORM\MappingDriverChain
-
     oro_entity.listener.orm.generated_value_strategy_listener.class: Oro\Bundle\EntityBundle\EventListener\ORM\GeneratedValueStrategyListener
-
     oro_entity.migration.extension.change_type.class: Oro\Bundle\EntityBundle\Migrations\Extension\ChangeTypeExtension
     oro_entity.entity_alias_resolver.class:                  Oro\Bundle\EntityBundle\ORM\EntityAliasResolver
     oro_entity.entity_alias_config_bag.class:                Oro\Bundle\EntityBundle\Provider\EntityAliasConfigBag
