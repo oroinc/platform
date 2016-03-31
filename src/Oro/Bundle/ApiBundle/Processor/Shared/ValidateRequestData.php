@@ -4,8 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-
-use Oro\Bundle\ApiBundle\Processor\SingleItemUpdateContext;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 /**
  * Makes sure that the request data is not empty.
@@ -17,7 +16,7 @@ class ValidateRequestData implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var SingleItemUpdateContext $context */
+        /** @var FormContext $context */
 
         $requestData = $context->getRequestData();
         if (empty($requestData)) {

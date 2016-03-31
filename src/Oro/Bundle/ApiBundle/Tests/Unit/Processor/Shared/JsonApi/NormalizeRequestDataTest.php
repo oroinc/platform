@@ -3,10 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData;
-use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\SingleItemUpdateContextTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextTestCase;
 
-class NormalizeRequestDataTest extends SingleItemUpdateContextTestCase
+class NormalizeRequestDataTest extends FormContextTestCase
 {
     /** @var NormalizeRequestData */
     protected $processor;
@@ -17,9 +16,11 @@ class NormalizeRequestDataTest extends SingleItemUpdateContextTestCase
     public function setUp()
     {
         parent::setUp();
+
         $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
             ->getMock();
+
         $this->processor = new NormalizeRequestData($this->valueNormalizer);
     }
 
@@ -35,34 +36,34 @@ class NormalizeRequestDataTest extends SingleItemUpdateContextTestCase
     {
         $inputData = [
             'data' => [
-                'attributes' => [
+                'attributes'    => [
                     'firstName' => 'John',
-                    'lastName' => 'Doe'
+                    'lastName'  => 'Doe'
                 ],
                 'relationships' => [
-                    'toOneRelation' => [
+                    'toOneRelation'       => [
                         'data' => [
                             'type' => 'users',
-                            'id' => '89'
+                            'id'   => '89'
                         ]
                     ],
-                    'toManyRelation' => [
+                    'toManyRelation'      => [
                         'data' => [
                             [
                                 'type' => 'groups',
-                                'id' => '1'
+                                'id'   => '1'
                             ],
                             [
                                 'type' => 'groups',
-                                'id' => '2'
+                                'id'   => '2'
                             ],
                             [
                                 'type' => 'groups',
-                                'id' => '3'
+                                'id'   => '3'
                             ]
                         ]
                     ],
-                    'emptyToOneRelation' => ['data' => null],
+                    'emptyToOneRelation'  => ['data' => null],
                     'emptyToManyRelation' => ['data' => []]
                 ]
             ]
@@ -73,35 +74,37 @@ class NormalizeRequestDataTest extends SingleItemUpdateContextTestCase
         $requestType = $this->context->getRequestType();
         $this->valueNormalizer->expects($this->any())
             ->method('normalizeValue')
-            ->willReturnMap([
-                ['users', 'entityClass', $requestType, false, 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User'],
-                ['groups', 'entityClass', $requestType, false, 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Groups']
-            ]);
+            ->willReturnMap(
+                [
+                    ['users', 'entityClass', $requestType, false, 'Test\User'],
+                    ['groups', 'entityClass', $requestType, false, 'Test\Groups']
+                ]
+            );
 
         $this->processor->process($this->context);
 
         $expectedData = [
-            'firstName' => 'John',
-            'lastName' => 'Doe',
-            'toOneRelation' => [
-                'id' => '89',
-                'class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User'
+            'firstName'           => 'John',
+            'lastName'            => 'Doe',
+            'toOneRelation'       => [
+                'id'    => '89',
+                'class' => 'Test\User'
             ],
-            'toManyRelation' => [
+            'toManyRelation'      => [
                 [
-                    'id' => '1',
-                    'class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Groups'
+                    'id'    => '1',
+                    'class' => 'Test\Groups'
                 ],
                 [
-                    'id' => '2',
-                    'class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Groups'
+                    'id'    => '2',
+                    'class' => 'Test\Groups'
                 ],
                 [
-                    'id' => '3',
-                    'class' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Groups'
+                    'id'    => '3',
+                    'class' => 'Test\Groups'
                 ]
             ],
-            'emptyToOneRelation' => [],
+            'emptyToOneRelation'  => [],
             'emptyToManyRelation' => []
         ];
 

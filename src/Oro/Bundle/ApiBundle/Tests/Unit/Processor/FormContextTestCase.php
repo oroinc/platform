@@ -3,15 +3,15 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
-use Oro\Bundle\ApiBundle\Processor\SingleItemUpdateContext;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class SingleItemUpdateContextTestCase extends \PHPUnit_Framework_TestCase
+class FormContextTestCase extends \PHPUnit_Framework_TestCase
 {
     const TEST_VERSION      = '1.1';
     const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var SingleItemUpdateContext */
+    /** @var FormContext */
     protected $context;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -29,7 +29,7 @@ class SingleItemUpdateContextTestCase extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->context = new SingleItemUpdateContext($this->configProvider, $this->metadataProvider);
+        $this->context = new FormContextStub($this->configProvider, $this->metadataProvider);
         $this->context->setVersion(self::TEST_VERSION);
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $this->context->setConfigExtras(

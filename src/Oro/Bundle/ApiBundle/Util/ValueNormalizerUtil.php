@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 class ValueNormalizerUtil
 {
     /**
-     * Converts the entity class name to the entity type corresponding to a given request type.
+     * Converts the entity class name to the entity type corresponding to the given request type.
      *
      * @param ValueNormalizer $valueNormalizer
      * @param string          $entityClass
@@ -18,7 +18,7 @@ class ValueNormalizerUtil
      *
      * @return string|null
      *
-     * @throws \Exception if the the entity type was not found and $throwException is TRUE
+     * @throws \Exception if the entity type was not found and $throwException is TRUE
      */
     public static function convertToEntityType(
         ValueNormalizer $valueNormalizer,
@@ -42,7 +42,7 @@ class ValueNormalizerUtil
     }
 
     /**
-     * Converts the entity type to the class name corresponding to a given request type.
+     * Converts the entity type corresponding to the given request type to the class name.
      *
      * @param ValueNormalizer $valueNormalizer
      * @param string          $entityType
@@ -51,7 +51,7 @@ class ValueNormalizerUtil
      *
      * @return string|null
      *
-     * @throws \Exception if the the entity class was not found and $throwException is TRUE
+     * @throws \Exception if the entity type is not associated with any class and $throwException is TRUE
      */
     public static function convertToEntityClass(
         ValueNormalizer $valueNormalizer,

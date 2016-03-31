@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
-use Oro\Bundle\ApiBundle\Processor\SingleItemUpdateContext;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 
-class SingleItemUpdateContextTest extends \PHPUnit_Framework_TestCase
+class FormContextTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var SingleItemUpdateContext */
+    /** @var FormContext */
     protected $context;
 
     protected function setUp()
@@ -18,7 +18,14 @@ class SingleItemUpdateContextTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->context = new SingleItemUpdateContext($configProvider, $metadataProvider);
+        $this->context = new FormContextStub($configProvider, $metadataProvider);
+    }
+
+    public function testRequestData()
+    {
+        $requestData = [];
+        $this->context->setRequestData($requestData);
+        $this->assertSame($requestData, $this->context->getRequestData());
     }
 
     public function testForm()
@@ -30,13 +37,5 @@ class SingleItemUpdateContextTest extends \PHPUnit_Framework_TestCase
         $this->context->setForm($form);
         $this->assertTrue($this->context->hasForm());
         $this->assertSame($form, $this->context->getForm());
-    }
-
-
-    public function testRequestData()
-    {
-        $requestData = [];
-        $this->context->setRequestData($requestData);
-        $this->assertSame($requestData, $this->context->getRequestData());
     }
 }

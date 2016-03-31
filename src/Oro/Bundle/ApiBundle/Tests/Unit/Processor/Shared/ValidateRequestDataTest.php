@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestData;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\SingleItemUpdateContextTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextTestCase;
 
-class ValidateRequestDataTest extends SingleItemUpdateContextTestCase
+class ValidateRequestDataTest extends FormContextTestCase
 {
     /** @var ValidateRequestData */
     protected $processor;

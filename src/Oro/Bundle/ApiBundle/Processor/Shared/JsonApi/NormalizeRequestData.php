@@ -2,12 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
-use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-
-use Oro\Bundle\ApiBundle\Processor\SingleItemUpdateContext;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
@@ -32,7 +31,7 @@ class NormalizeRequestData implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var SingleItemUpdateContext $context */
+        /** @var FormContext $context */
 
         $requestData = $context->getRequestData();
 
@@ -44,21 +43,21 @@ class NormalizeRequestData implements ProcessorInterface
         $relations = [];
         if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $requestData[JsonApiDoc::DATA])) {
             $requestType = $context->getRequestType();
-            foreach ($requestData[JsonApiDoc::DATA][JsonApiDoc::RELATIONSHIPS] as $relationName => $data) {
-                $data = $data[JsonApiDoc::DATA];
+            foreach ($requestData[JsonApiDoc::DATA][JsonApiDoc::RELATIONSHIPS] as $name => $value) {
+                $data = $value[JsonApiDoc::DATA];
 
                 // Relation data can be null in case -to-one and an empty array in case -to-many relation.
                 // In this case we should process this relation data as empty relation
-                if ($data === null || empty ($data)) {
-                    $relations[$relationName] = [];
+                if (null === $data || empty($data)) {
+                    $relations[$name] = [];
                     continue;
                 }
 
                 if (array_keys($data) !== range(0, count($data) - 1)) {
-                    $relations[$relationName] = $this->normalizeItemData($data, $requestType);
+                    $relations[$name] = $this->normalizeItemData($data, $requestType);
                 } else {
                     foreach ($data as $collectionItem) {
-                        $relations[$relationName][]= $this->normalizeItemData($collectionItem, $requestType);
+                        $relations[$name][] = $this->normalizeItemData($collectionItem, $requestType);
                     }
                 }
             }
@@ -89,7 +88,7 @@ class NormalizeRequestData implements ProcessorInterface
 
         return [
             'class' => $entityClass,
-            'id' => $collectionItem[JsonApiDoc::ID]
+            'id'    => $collectionItem[JsonApiDoc::ID]
         ];
     }
 }
