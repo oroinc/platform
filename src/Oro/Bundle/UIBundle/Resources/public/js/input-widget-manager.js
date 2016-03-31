@@ -151,7 +151,10 @@ define(function(require) {
                 options = {};
             }
             options.$el = $input;
-            return new Widget(options);
+            var widget = new Widget(options);
+            if (!widget.isInitialized()) {
+                widget.dispose();
+            }
         },
 
         /**
