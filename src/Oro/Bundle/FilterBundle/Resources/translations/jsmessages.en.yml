@@ -4,8 +4,8 @@
 "Selected Rows": "Selected Rows"
 "All": "All"
 "Input Label": "Input Label"
-"more than": "more than"
-"less than": "less than"
+"more than": "later than"
+"less than": "earlier than"
 "before": "before"
 "after": "after"
 "from": "from"
@@ -25,9 +25,37 @@ oro:
                     You can also use them to create expressions.<br/>
                     For example:<br/>
                     "today - 2" will be evaluated as the day before yesterday.
+            days:
+                title: Days
+            months:
+                title: Months
             tab:
                 calendar: Calendar
                 variables: Variables
+                days: Days
+                months: Months
+            info: >
+                In addition to exact dates, the filter supports entry of days and months.
+                Delete the year from the date in order to filter records that fall into
+                this date of any year (e.g. customers that have birthdays on November 15th);
+                delete the year and the day to filter records by entire months
+                (e.g. all orders placed between January and March). Both long and short month
+                names are supported.
+            placeholder:
+                value: Choose a date
+                dayofweek: Choose a day
+                week: Type a week
+                day: Type a day
+                month: Type a month
+                quarter: Type a quarter
+                dayofyear: Type a day of year
+                year: Type a year
+            part:
+                week.tooltip: Number of the week (1 - 53)
+                day.tooltip: Number of the day in month (1 - 31)
+                quarter.tooltip: Number of the quarter of year (1 - 4)
+                dayofyear.tooltip: Number of the day in year (1 - 366)
+                year.tooltip: Gregorian year, starting from 1 AD
         embedded:
             choice:
                 field_to_value: field value

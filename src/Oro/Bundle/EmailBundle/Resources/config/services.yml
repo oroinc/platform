@@ -353,7 +353,6 @@ services:
         arguments:
             - @mailer
             - @service_container
-            - @oro_imap.imap_email_google_oauth2_manager
 
     # Email template API
     oro_email.manager.emailtemplate.api:
@@ -1039,4 +1038,3 @@ services:
         class: %oro_email.model.email_activity_updates.class%
         arguments:
             - @oro_email.provider.emailowners.provider
-            - @oro_entity.doctrine_helper

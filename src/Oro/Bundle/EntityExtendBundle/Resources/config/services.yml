@@ -166,6 +166,14 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
 
+    oro_entity_extend.validator.unique_extend_entity_method_name_validator:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
+        arguments:
+            - @oro_entity_extend.extend.field_name_validation_helper
+            - @oro_entity_extend.tools.class_method_name_checker
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
+
     oro_entity_extend.validator.default_relation_field:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationFieldValidator
         arguments:
@@ -350,8 +358,9 @@ services:
             - { name: kernel.event_listener, event: oro.entity_extend_event.before_value_render, method: beforeValueRender }
 
     oro_entity_extend.importexport.normalizer.enum:
-        parent: oro_importexport.serializer.configurable_entity_normalizer
         class: %oro_entity_extend.importexport.normalizer.enum.class%
+        arguments:
+            - @oro_importexport.field.field_helper
         tags:
             - { name: oro_importexport.normalizer, priority: 20 }
 
@@ -459,3 +468,7 @@ services:
                 - oneToMany
                 - manyToOne
                 - manyToMany
+
+    # Helpers
+    oro_entity_extend.tools.class_method_name_checker:
+        class: Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker

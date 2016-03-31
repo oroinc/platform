@@ -48,7 +48,7 @@ class JqueryUiDateTimeFormatConverterTest extends AbstractFormatConverterTestCas
     {
         return [
             'en default' => ["M d", self::LOCALE_EN],
-            'ru default' => ["d.M", self::LOCALE_RU],
+            'ru default' => ["dd.mm", self::LOCALE_RU],
         ];
     }
 

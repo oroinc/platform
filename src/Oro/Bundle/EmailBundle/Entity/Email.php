@@ -22,7 +22,8 @@ use Oro\Bundle\EmailBundle\Model\ExtendEmail;
  *      name="oro_email",
  *      indexes={
  *          @ORM\Index(name="IDX_email_message_id", columns={"message_id"}),
- *          @ORM\Index(name="oro_email_is_head", columns={"is_head"})
+ *          @ORM\Index(name="oro_email_is_head", columns={"is_head"}),
+ *          @ORM\Index(name="IDX_sent", columns={"sent"}),
  *      }
  * )
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailRepository")
