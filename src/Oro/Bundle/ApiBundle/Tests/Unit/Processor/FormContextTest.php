@@ -30,12 +30,10 @@ class FormContextTest extends \PHPUnit_Framework_TestCase
 
     public function testForm()
     {
-        $this->assertFalse($this->context->hasForm());
         $form = $this->getMockBuilder('Symfony\Component\Form\Form')
             ->disableOriginalConstructor()
             ->getMock();
         $this->context->setForm($form);
-        $this->assertTrue($this->context->hasForm());
         $this->assertSame($form, $this->context->getForm());
     }
 }

@@ -2,15 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 
 interface FormContext extends ContextInterface
 {
-    /** A form for entity update process */
-    const FORM = 'form';
+    /** Input data */
+    const REQUEST_DATA = 'requestData';
 
-    /** Request data that should be set to entity */
-    const REQUEST_DATA = 'request_data';
+    /** The form builder */
+    const FORM_BUILDER = 'formBuilder';
+
+    /** The form */
+    const FORM = 'form';
 
     /**
      * Returns request data.
@@ -20,30 +24,37 @@ interface FormContext extends ContextInterface
     public function getRequestData();
 
     /**
-     * Sets request data to the Context.
+     * Sets request data.
      *
      * @param array $requestData
      */
     public function setRequestData(array $requestData);
 
     /**
-     * Checks if form was set to the Context.
+     * Gets the form builder.
      *
-     * @return bool
+     * @return FormBuilderInterface|null
      */
-    public function hasForm();
+    public function getFormBuilder();
 
     /**
-     * Gets a form.
+     * Sets the form builder.
      *
-     * @return Form
+     * @param FormBuilderInterface|null $formBuilder
+     */
+    public function setFormBuilder(FormBuilderInterface $formBuilder = null);
+
+    /**
+     * Gets the form.
+     *
+     * @return FormInterface|null
      */
     public function getForm();
 
     /**
-     * Sets a form.
+     * Sets the form.
      *
-     * @param Form $form
+     * @param FormInterface|null $form
      */
-    public function setForm(Form $form);
+    public function setForm(FormInterface $form = null);
 }

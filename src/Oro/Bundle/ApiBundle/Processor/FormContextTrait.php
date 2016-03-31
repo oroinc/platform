@@ -3,6 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Processor;
 
 use Symfony\Component\Form\Form;
+use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
 
 /**
  * @method bool has($key)
@@ -32,19 +34,29 @@ trait FormContextTrait
     }
 
     /**
-     * Checks if form was set to the Context.
+     * Gets a form builder.
      *
-     * @return bool
+     * @return FormBuilderInterface|null
      */
-    public function hasForm()
+    public function getFormBuilder()
     {
-        return $this->has(FormContext::FORM);
+        return $this->get(FormContext::FORM);
+    }
+
+    /**
+     * Sets a form builder.
+     *
+     * @param FormBuilderInterface|null $formBuilder
+     */
+    public function setFormBuilder(FormBuilderInterface $formBuilder = null)
+    {
+        $this->set(FormContext::FORM, $formBuilder);
     }
 
     /**
      * Gets a form.
      *
-     * @return Form
+     * @return FormInterface|null
      */
     public function getForm()
     {
@@ -54,9 +66,9 @@ trait FormContextTrait
     /**
      * Sets a form.
      *
-     * @param Form $form
+     * @param FormInterface|null $form
      */
-    public function setForm(Form $form)
+    public function setForm(FormInterface $form = null)
     {
         $this->set(FormContext::FORM, $form);
     }
