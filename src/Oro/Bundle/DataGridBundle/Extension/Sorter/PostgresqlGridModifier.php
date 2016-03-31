@@ -15,6 +15,8 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class PostgresqlGridModifier extends AbstractExtension
 {
+    const PRIORITY = -251;
+
     /** @var ContainerInterface */
     protected $container;
 
@@ -45,7 +47,7 @@ class PostgresqlGridModifier extends AbstractExtension
      */
     public function getPriority()
     {
-        return -251;
+        return self::PRIORITY;
     }
 
     /**
@@ -58,8 +60,7 @@ class PostgresqlGridModifier extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
-        $identifier = null;
-        $entityClassName = $this->getEntity($config);
+        $entityClassName = $this->getEntityClassName($config);
 
         if (!$entityClassName) {
             return;
@@ -71,9 +72,7 @@ class PostgresqlGridModifier extends AbstractExtension
         $alias = false;
 
         $metadata = $queryBuilder->getEntityManager()->getClassMetadata($entityClassName);
-        if ($metadata) {
-            $identifier = $metadata->getIdentifier()[0];
-        }
+        $identifier = $metadata->getSingleIdentifierFieldName();
 
         /** @var From $fromPart */
         foreach ($fromParts as $fromPart) {
@@ -83,7 +82,7 @@ class PostgresqlGridModifier extends AbstractExtension
             }
         }
 
-        if ($alias && $identifier) {
+        if ($alias) {
             $field = $alias . '.' . $identifier;
             $orderBy = $queryBuilder->getDQLPart('orderBy');
             if (!isset($orderBy[$field])) {
@@ -97,18 +96,18 @@ class PostgresqlGridModifier extends AbstractExtension
      *
      * @return null|string
      */
-    protected function getEntity(DatagridConfiguration $config)
+    protected function getEntityClassName(DatagridConfiguration $config)
     {
         $entityClassName = $config->offsetGetByPath('[extended_entity_name]');
-        if (!$entityClassName) {
-            $from = $config->offsetGetByPath('[source][query][from]');
-            if (!$from) {
-                return null;
-            }
-
-            $entityClassName = $this->entityClassResolver->getEntityClass($from[0]['table']);
+        if ($entityClassName) {
+            return $entityClassName;
         }
 
-        return $entityClassName;
+        $from = $config->offsetGetByPath('[source][query][from]');
+        if (count($from) !== 0) {
+            return $this->entityClassResolver->getEntityClass($from[0]['table']);
+        }
+
+        return null;
     }
 }
