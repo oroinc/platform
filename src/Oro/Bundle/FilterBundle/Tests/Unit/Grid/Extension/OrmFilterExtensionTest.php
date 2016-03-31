@@ -12,15 +12,6 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $registry;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $securityFacade;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $aclHelper;
-
     /** @var OrmFilterExtension */
     protected $extension;
 
@@ -28,21 +19,7 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
-        $this->registry = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\Registry')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->aclHelper = $this->getMockBuilder('Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper')
-            ->disableOriginalConstructor()->getMock();
-
-        $this->extension = new OrmFilterExtension(
-            $this->translator,
-            $this->registry,
-            $this->securityFacade,
-            $this->aclHelper
-        );
+        $this->extension = new OrmFilterExtension($this->translator);
     }
 
     /**
@@ -54,7 +31,7 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
     public function testSetParameters(array $input, array $expected)
     {
         $this->extension->setParameters(new ParameterBag($input));
-        
+
         self::assertEquals($expected, $this->extension->getParameters()->all());
     }
 
