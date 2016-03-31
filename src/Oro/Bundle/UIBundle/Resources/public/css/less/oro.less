@@ -2661,18 +2661,19 @@ label.radio.error {
   border-bottom: 1px solid #f2f2f2;
   padding:0;
   background-color: #fff;
-  display: flex;
-  flex-direction: row;
-  flex-wrap: wrap;
-  justify-content: flex-end; // new lines of items will be attached to the right side of container
   #bookmark-buttons{
-    order: 1000;
+    float: right;
   }
   #before-content-addition {
     order: 900;
   }
   #breadcrumb {
-    order: 1;
+    float:left;
+  }
+  &:after {
+    display: block;
+    content: "";
+    clear: both;
   }
 }
 
