@@ -37,12 +37,23 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
 
-        $right = end($options);
-        $left  = reset($options);
-
         $keys     = array_keys($context);
-        $rightKey = end($keys);
         $leftKey  = reset($keys);
+        $rightKey = null;
+        if (count($context) > 1) {
+            $rightKey = end($keys);
+        }
+
+        if ($leftKey && array_key_exists($leftKey, $context)) {
+            $left = $context[$leftKey];
+        } else {
+            $left = $options[0];
+        }
+        if ($rightKey && array_key_exists($rightKey, $context)) {
+            $right = $context[$rightKey];
+        } else {
+            $right = $options[1];
+        }
 
         $this->contextAccessor->expects($this->any())
             ->method('hasValue')
@@ -50,18 +61,15 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
 
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$context, $left, $context[$leftKey]],
-                        [$context, $right, $context[$rightKey]],
-                    ]
-                )
+            ->willReturnCallback(
+                function ($context, $value) {
+                    return $value instanceof PropertyPath ? $context[(string)$value] : $value;
+                }
             );
 
         $this->condition->expects($this->once())
             ->method('doCompare')
-            ->with($context[$leftKey], $context[$rightKey])
+            ->with($left, $right)
             ->will($this->returnValue($expectedValue));
 
         $this->assertEquals($expectedValue, $this->condition->evaluate($context));
@@ -166,30 +174,25 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
         $message = 'Compare {{ left }} with {{ right }}.';
         $this->condition->setMessage($message);
 
-        $this->contextAccessor->expects($this->at(0))
-            ->method('getValue')
-            ->with($context, $left)
-            ->will($this->returnValue($context[$leftKey]));
+        $this->contextAccessor->expects($this->any())
+            ->method('hasValue')
+            ->will($this->returnValue(true));
 
-        $this->contextAccessor->expects($this->at(1))
+        $this->contextAccessor->expects($this->any())
             ->method('getValue')
-            ->with($context, $right)
-            ->will($this->returnValue($context[$rightKey]));
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$context, $left, $context[$leftKey]],
+                        [$context, $right, $context[$rightKey]],
+                    ]
+                )
+            );
 
         $this->condition->expects($this->once())
             ->method('doCompare')
             ->with($context[$leftKey], $context[$rightKey])
             ->will($this->returnValue(false));
-
-        $this->contextAccessor->expects($this->at(2))
-            ->method('getValue')
-            ->with($context, $left)
-            ->will($this->returnValue($context[$leftKey]));
-
-        $this->contextAccessor->expects($this->at(3))
-            ->method('getValue')
-            ->with($context, $right)
-            ->will($this->returnValue($context[$rightKey]));
 
         $errors = new ArrayCollection();
 
