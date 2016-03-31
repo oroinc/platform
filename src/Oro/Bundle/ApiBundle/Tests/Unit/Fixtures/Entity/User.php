@@ -26,7 +26,7 @@ class User
 
     /**
      * @ORM\ManyToOne(targetEntity="Category")
-     * @ORM\JoinColumn(name="category_name", referencedColumnName="name")
+     * @ORM\JoinColumn(name="category_name", referencedColumnName="name", nullable=false)
      **/
     protected $category;
 

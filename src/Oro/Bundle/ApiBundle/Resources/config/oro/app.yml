@@ -64,6 +64,45 @@ oro_api:
     form_type_guessers:
         - form.type_guesser.validator
 
+    form_type_guesses:
+        # default types
+        integer:
+            form_type: integer
+        smallint:
+            form_type: integer
+        bigint:
+            form_type: integer
+        boolean:
+            form_type: boolean
+        decimal:
+            form_type: number
+        float:
+            form_type: number
+        date:
+            form_type: date
+        time:
+            form_type: time
+            options:
+                model_timezone: UTC
+                view_timezone: UTC
+        datetime:
+            form_type: datetime
+            options:
+                model_timezone: UTC
+                view_timezone: UTC
+        datetimetz:
+            form_type: datetime
+            options:
+                model_timezone: UTC
+                view_timezone: UTC
+        text:
+            form_type: textarea
+        # custom types
+        percent:
+            form_type: percent
+        money:
+            form_type: money
+
     actions:
         get_list:
             processing_groups:
@@ -141,10 +180,18 @@ oro_api:
                     priority: -20
                 normalize_input:
                     priority: -30
-                normalize_data:
+                load_data:
+                    priority: -40
+                build_form:
+                    priority: -50
+                bind_data:
                     priority: -60
-                normalize_result:
+                save_data:
                     priority: -70
+                normalize_data:
+                    priority: -80
+                normalize_result:
+                    priority: -90
         update:
             processing_groups:
                 initialize:
@@ -157,7 +204,13 @@ oro_api:
                     priority: -40
                 load_data:
                     priority: -50
-                normalize_data:
+                build_form:
                     priority: -60
-                normalize_result:
+                bind_data:
                     priority: -70
+                save_data:
+                    priority: -80
+                normalize_data:
+                    priority: -90
+                normalize_result:
+                    priority: -100
