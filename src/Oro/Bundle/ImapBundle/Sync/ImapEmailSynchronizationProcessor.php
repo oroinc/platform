@@ -121,40 +121,47 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $imapFolders = $this->getSyncEnabledImapFolders($origin);
         foreach ($imapFolders as $imapFolder) {
             $folder = $imapFolder->getFolder();
-            $this->manager->selectFolder($folder->getFullName());
+            $folderName = $folder->getFullName();
+            try {
+                $this->manager->selectFolder($folderName);
 
-            $this->em->transactional(function () use ($imapFolder, $folder) {
-                $existingUids = $this->manager->getEmailUIDs();
+                $this->em->transactional(function () use ($imapFolder, $folder) {
+                    $existingUids = $this->manager->getEmailUIDs();
 
-                $staleImapEmailsQb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
-                $staleImapEmailsQb
-                    ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
-                    ->setParameter('imap_folder', $imapFolder);
-
-                if ($existingUids) {
+                    $staleImapEmailsQb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
                     $staleImapEmailsQb
-                        ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
-                        ->setParameter('uids', $existingUids);
-                }
+                        ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
+                        ->setParameter('imap_folder', $imapFolder);
 
-                $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
-                    ->setPageCallback(function () {
-                        $this->em->flush();
-                        $this->em->clear();
-                    });
+                    if ($existingUids) {
+                        $staleImapEmailsQb
+                            ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
+                            ->setParameter('uids', $existingUids);
+                    }
 
-                /* @var $staleImapEmails ImapEmail[] */
-                foreach ($staleImapEmails as $imapEmail) {
-                    $email = $imapEmail->getEmail();
-                    $email->getEmailUsers()->forAll(function ($key, EmailUser $emailUser) use ($folder) {
-                        $emailUser->removeFolder($folder);
-                        if (!$emailUser->getFolders()->count()) {
-                            $this->em->remove($emailUser);
-                        }
-                    });
-                    $this->em->remove($imapEmail);
-                }
-            });
+                    $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
+                        ->setPageCallback(function () {
+                            $this->em->flush();
+                            $this->em->clear();
+                        });
+
+                    /* @var $staleImapEmails ImapEmail[] */
+                    foreach ($staleImapEmails as $imapEmail) {
+                        $email = $imapEmail->getEmail();
+                        $email->getEmailUsers()->forAll(function ($key, EmailUser $emailUser) use ($folder) {
+                            $emailUser->removeFolder($folder);
+                            if (!$emailUser->getFolders()->count()) {
+                                $this->em->remove($emailUser);
+                            }
+                        });
+                        $this->em->remove($imapEmail);
+                    }
+                });
+            } catch (UnselectableFolderException $e) {
+                $this->logger->info(
+                    sprintf('The folder "%s" cannot be selected for remove email and was skipped.', $folderName)
+                );
+            }
         }
     }
 

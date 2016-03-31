@@ -18,9 +18,9 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     protected $modified;
 
     /**
-     * Constructor
+     * @param array $data
      */
-    public function __construct(array $data = array())
+    public function __construct(array $data = [])
     {
         $this->data = $data;
         $this->modified = false;
@@ -35,10 +35,11 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function set($name, $value)
     {
-        if (!isset($this->data[$name]) || $this->data[$name] != $value) {
+        if (!array_key_exists($name, $this->data) || $this->data[$name] !== $value) {
             $this->data[$name] = $value;
             $this->modified = true;
         }
+
         return $this;
     }
 
@@ -53,6 +54,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
         foreach ($data as $name => $value) {
             $this->set($name, $value);
         }
+
         return $this;
     }
 
@@ -64,7 +66,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function get($name)
     {
-        if (isset($this->data[$name])) {
+        if (array_key_exists($name, $this->data)) {
             return $this->data[$name];
         } else {
             return null;
@@ -77,13 +79,13 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      * @param array $names Optional list of names of values that should be filtered
      * @return array
      */
-    public function getValues(array $names = array())
+    public function getValues(array $names = [])
     {
         if (!$names) {
             return $this->data;
         }
 
-        $result = array();
+        $result = [];
 
         foreach ($names as $name) {
             $result[$name] = $this->get($name);
@@ -111,10 +113,11 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function remove($name)
     {
-        if (isset($this->data[$name])) {
+        if (array_key_exists($name, $this->data)) {
             unset($this->data[$name]);
             $this->modified = true;
         }
+
         return $this;
     }
 
@@ -125,7 +128,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
      */
     public function isEmpty()
     {
-        return empty($this->data);
+        return 0 === count($this->data);
     }
 
     /**
@@ -145,6 +148,7 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     public function setModified($modified)
     {
         $this->modified = $modified;
+
         return $this;
     }
 
@@ -221,6 +225,14 @@ abstract class AbstractStorage implements \ArrayAccess, \IteratorAggregate, \Cou
     public function count()
     {
         return count($this->data);
+    }
+
+    /**
+     * @return array
+     */
+    public function toArray()
+    {
+        return $this->data;
     }
 
     /**
