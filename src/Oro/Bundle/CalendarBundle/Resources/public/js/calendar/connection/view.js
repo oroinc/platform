@@ -355,7 +355,7 @@ define([
         },
 
         _addVisibilityButtonEventListener: function($connection, model) {
-            $connection.on('click.' + this.cid, this.selectors.visibilityButton, _.bind(function(e) {
+            $connection.on('click.' + this.cid, _.bind(function(e) {
                 if (this._initActionSyncObject()) {
                     this.toggleCalendar(model);
                 }
