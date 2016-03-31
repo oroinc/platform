@@ -29,45 +29,47 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider evaluateDataProvider
+     * @param array $options
+     * @param array $context
+     * @param mixed $expectedValue
      */
     public function testEvaluate(array $options, array $context, $expectedValue)
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
 
-        $keys     = array_keys($context);
-        $leftKey  = reset($keys);
-        $rightKey = null;
-        if (count($context) > 1) {
-            $rightKey = end($keys);
-        }
+        $right = end($options);
+        $left  = reset($options);
 
-        if ($leftKey && array_key_exists($leftKey, $context)) {
-            $left = $context[$leftKey];
-        } else {
-            $left = $options[0];
-        }
-        if ($rightKey && array_key_exists($rightKey, $context)) {
-            $right = $context[$rightKey];
-        } else {
-            $right = $options[1];
-        }
+        $keys     = array_keys($context);
+        $rightKey = end($keys);
+        $leftKey  = reset($keys);
+
+        $this->contextAccessor->expects($this->any())
+            ->method('hasValue')
+            ->will($this->returnValue(true));
 
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
-            ->willReturnCallback(
-                function ($context, $value) {
-                    return $value instanceof PropertyPath ? $context[(string)$value] : $value;
-                }
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$context, $left, $context[$leftKey]],
+                        [$context, $right, $context[$rightKey]],
+                    ]
+                )
             );
 
         $this->condition->expects($this->once())
             ->method('doCompare')
-            ->with($left, $right)
+            ->with($context[$leftKey], $context[$rightKey])
             ->will($this->returnValue($expectedValue));
 
         $this->assertEquals($expectedValue, $this->condition->evaluate($context));
     }
 
+    /**
+     * @return array
+     */
     public function evaluateDataProvider()
     {
         return [

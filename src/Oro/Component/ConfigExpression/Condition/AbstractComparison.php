@@ -68,8 +68,8 @@ abstract class AbstractComparison extends AbstractCondition implements ContextAc
     protected function getMessageParameters($context)
     {
         return [
-            '{{ left }}'  => $this->resolveValue($context, $this->left),
-            '{{ right }}' => $this->resolveValue($context, $this->right)
+            '{{ left }}'  => $this->resolveValue($context, $this->left, false),
+            '{{ right }}' => $this->resolveValue($context, $this->right, false)
         ];
     }
 
@@ -79,8 +79,8 @@ abstract class AbstractComparison extends AbstractCondition implements ContextAc
     protected function isConditionAllowed($context)
     {
         return $this->doCompare(
-            $this->resolveValue($context, $this->left),
-            $this->resolveValue($context, $this->right)
+            $this->resolveValue($context, $this->left, false),
+            $this->resolveValue($context, $this->right, false)
         );
     }
 
