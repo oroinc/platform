@@ -17,7 +17,7 @@ UPGRADE FROM 1.9 to 1.10
 - Method `getAllShortMetadata` was added to `Oro\Bundle\EntityBundle\ORM\DoctrineHelper`. Using of this method instead of the `getAllMetadata` method can give significant performance gain.
 
 ####PlatformBundle
-- Before this changes configs from `app.yml` were loading by newest - first. Now they are loading like newest - last. Method `prepend()` in `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` now will load resources from bundle in recursive way `$resources = array_reverse($configLoader->load());`
+- Method `prepend()` in `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` was changed. Now the configuration from `Resources\config\oro\app.yml` is loaded in reverce order. It means that bundles that are loaded later can override configuration of bundles loaded before.
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder` - removed all constants for masks and their groups.
