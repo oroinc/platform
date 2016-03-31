@@ -1,12 +1,10 @@
 define(function(require) {
     'use strict';
 
-    var $ = require('jquery');
-    var Backbone = require('backbone');
+    var BaseModel = require('oroui/js/app/models/base/model');
     var BaseController = require('oroui/js/app/controllers/base/controller');
     var mediator = require('oroui/js/mediator');
-    var workflowStepsModel = new Backbone.Model();
-    var workflowStepsView;
+    var workflowStepsModel = new BaseModel();
 
     mediator.setHandler('workflowSteps:update', function(data) {
         workflowStepsModel.set(data);
@@ -25,9 +23,9 @@ define(function(require) {
     BaseController.loadBeforeAction([
         'oroworkflow/js/app/views/page-element/workflow-steps-view'
     ], function(WorkflowStepView) {
-        workflowStepsView = new WorkflowStepView({
+        BaseController.addToReuse('workflowSteps', WorkflowStepView, {
             model: workflowStepsModel,
-            el: $('.workflow-steps-placeholder'),
+            el: '.workflow-steps-placeholder',
             autoRender: true
         });
     });
