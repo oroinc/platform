@@ -84,9 +84,7 @@ define([
          */
         _onChangeFilterSelect: function() {
             CollectionFiltersManager.__super__._onChangeFilterSelect.apply(this, arguments);
-
-            this._beforeCollectionFetch(this.collection);
-            this._onUpdateCollectionState(this.collection);
+            this._updateView();
         },
 
         /**

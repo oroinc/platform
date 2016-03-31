@@ -2,10 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Grid\Extension;
 
-use Symfony\Component\Security\Core\User\UserInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EntityBundle\ORM\Registry;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -16,12 +14,10 @@ use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
-use Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository;
+
 use Oro\Bundle\FilterBundle\Filter\FilterUtility;
 use Oro\Bundle\FilterBundle\Filter\FilterInterface;
 use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OrmFilterExtension extends AbstractExtension
 {
@@ -37,31 +33,12 @@ class OrmFilterExtension extends AbstractExtension
     /** @var TranslatorInterface */
     protected $translator;
 
-    /** @var Registry */
-    protected $registry;
-
-    /** @var SecurityFacade */
-    protected $securityFacade;
-
-    /** @var AclHelper */
-    protected $aclHelper;
-
     /**
      * @param TranslatorInterface $translator
-     * @param Registry            $registry
-     * @param SecurityFacade      $securityFacade
-     * @param AclHelper           $aclHelper
      */
-    public function __construct(
-        TranslatorInterface $translator,
-        Registry $registry,
-        SecurityFacade $securityFacade,
-        AclHelper $aclHelper
-    ) {
-        $this->translator     = $translator;
-        $this->registry       = $registry;
-        $this->securityFacade = $securityFacade;
-        $this->aclHelper      = $aclHelper;
+    public function __construct(TranslatorInterface $translator)
+    {
+        $this->translator = $translator;
     }
 
     /**
@@ -127,35 +104,9 @@ class OrmFilterExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
-        $currentUser = $this->getCurrentUser();
-        if (!$currentUser) {
-            return;
-        }
-
-        $gridName  = $config->getName();
-        $gridViews = $this->getGridViewRepository()->findGridViews($this->aclHelper, $currentUser, $gridName);
-
-        $currentState = $data->offsetGet('state');
-
-        /** Get columns data from grid view */
-        $currentGridView = null;
-
-        if (isset($currentState['gridView'])) {
-            foreach ($gridViews as $gridView) {
-                if ((int)$currentState['gridView'] === $gridView->getId()) {
-                    $currentGridView = $gridView;
-                    break;
-                }
-            }
-        }
-        $filtersState = $data->offsetGetByPath('[state][filters]', []);
-
+        $filtersState        = $data->offsetGetByPath('[state][filters]', []);
         $initialFiltersState = $filtersState;
         $filtersMetaData     = [];
-
-        if ($currentGridView) {
-            $filtersState = array_merge($currentGridView->getFiltersData(), $filtersState);
-        }
 
         $filters       = $this->getFiltersToApply($config);
         $values        = $this->getValuesToApply($config);
@@ -345,27 +296,5 @@ class OrmFilterExtension extends AbstractExtension
     protected function getFilterValue(array $values, $key, $default = false)
     {
         return isset($values[$key]) ? $values[$key] : $default;
-    }
-
-
-    /**
-     * @return GridViewRepository
-     */
-    protected function getGridViewRepository()
-    {
-        return $this->registry->getRepository('OroDataGridBundle:GridView');
-    }
-
-    /**
-     * @return UserInterface
-     */
-    protected function getCurrentUser()
-    {
-        $user = $this->securityFacade->getLoggedUser();
-        if ($user instanceof UserInterface) {
-            return $user;
-        }
-
-        return null;
     }
 }
