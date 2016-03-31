@@ -92,6 +92,8 @@ services:
 
     oro_api.update.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData
+        arguments:
+            - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -95 }
 

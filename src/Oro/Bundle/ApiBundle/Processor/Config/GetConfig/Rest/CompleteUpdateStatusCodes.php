@@ -28,6 +28,12 @@ class CompleteUpdateStatusCodes extends CompleteStatusCodes
                 $this->createStatusCode('Returned when no permissions to update the entity')
             );
         }
+        if (!$statusCodes->hasCode(Response::HTTP_NOT_FOUND)) {
+            $statusCodes->addCode(
+                Response::HTTP_NOT_FOUND,
+                $this->createStatusCode('Returned when the entity is not found')
+            );
+        }
 
         parent::addStatusCodes($statusCodes);
     }

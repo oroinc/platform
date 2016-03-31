@@ -63,6 +63,8 @@ services:
 
     oro_api.create.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData
+        arguments:
+            - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -95 }
 

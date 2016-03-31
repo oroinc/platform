@@ -40,4 +40,37 @@ class ValueNormalizerUtil
 
         return null;
     }
+
+    /**
+     * Converts the entity type to the class name corresponding to a given request type.
+     *
+     * @param ValueNormalizer $valueNormalizer
+     * @param string          $entityType
+     * @param RequestType     $requestType
+     * @param bool            $throwException
+     *
+     * @return string|null
+     *
+     * @throws \Exception if the the entity class was not found and $throwException is TRUE
+     */
+    public static function convertToEntityClass(
+        ValueNormalizer $valueNormalizer,
+        $entityType,
+        RequestType $requestType,
+        $throwException = true
+    ) {
+        try {
+            return $valueNormalizer->normalizeValue(
+                $entityType,
+                DataType::ENTITY_CLASS,
+                $requestType
+            );
+        } catch (\Exception $e) {
+            if ($throwException) {
+                throw $e;
+            }
+        }
+
+        return null;
+    }
 }
