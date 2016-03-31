@@ -56,6 +56,10 @@ define(function(require) {
             }
         },
 
+        /**
+         * Implement this method in child class if widget can not be initialized for some reason
+         * @returns {boolean}
+         */
         isInitialized: function() {
             return true;
         },
