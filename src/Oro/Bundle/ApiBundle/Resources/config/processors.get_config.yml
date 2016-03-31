@@ -78,6 +78,16 @@ services:
         tags:
             - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: delete_list, requestType: rest, priority: -160 }
 
+    oro_api.get_config.complete_status_codes.create:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteCreateStatusCodes
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: create, requestType: rest, priority: -160 }
+
+    oro_api.get_config.complete_status_codes.update:
+        class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\Rest\CompleteUpdateStatusCodes
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: status_codes, targetAction: update, requestType: rest, priority: -160 }
+
     oro_api.get_config.set_max_related_entities:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetMaxRelatedEntities
         arguments:

@@ -31,4 +31,12 @@ class SingleItemUpdateContextTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->context->hasForm());
         $this->assertSame($form, $this->context->getForm());
     }
+
+
+    public function testRequestData()
+    {
+        $requestData = [];
+        $this->context->setRequestData($requestData);
+        $this->assertSame($requestData, $this->context->getRequestData());
+    }
 }

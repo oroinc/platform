@@ -124,6 +124,7 @@ class RestApiController extends FOSRestController
         /** @var UpdateContext $context */
         $context = $this->getContext($processor, $request);
         $context->setId($request->attributes->get('id'));
+        $context->setRequestData($request->request->all());
 
         $processor->process($context);
 
@@ -144,6 +145,7 @@ class RestApiController extends FOSRestController
         $processor = $this->getProcessor($request);
         /** @var CreateContext $context */
         $context = $this->getContext($processor, $request);
+        $context->setRequestData($request->request->all());
 
         $processor->process($context);
 

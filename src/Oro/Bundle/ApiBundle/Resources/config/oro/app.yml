@@ -1,3 +1,7 @@
+fos_rest:
+    view:
+        mime_types: {'json': ['application/json', 'application/x-json', '', 'application/vnd.api+json']}
+
 nelmio_api_doc:
     motd:
         template: OroApiBundle::ApiDoc/motd.html.twig
@@ -135,6 +139,8 @@ oro_api:
                     priority: -10
                 security_check:
                     priority: -20
+                normalize_input:
+                    priority: -30
                 normalize_data:
                     priority: -60
                 normalize_result:

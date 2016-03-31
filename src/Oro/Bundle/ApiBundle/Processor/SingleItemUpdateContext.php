@@ -9,6 +9,9 @@ class SingleItemUpdateContext extends SingleItemContext
     /** A form for entity update process */
     const FORM = 'form';
 
+    /** Request data that should be set to entity */
+    const REQUEST_DATA = 'request_data';
+
     /**
      * Gets a form.
      *
@@ -37,5 +40,25 @@ class SingleItemUpdateContext extends SingleItemContext
     public function hasForm()
     {
         return $this->has(self::FORM);
+    }
+
+    /**
+     * Sets request data to context.
+     *
+     * @param array $requestData
+     */
+    public function setRequestData(array $requestData)
+    {
+        $this->set(self::REQUEST_DATA, $requestData);
+    }
+
+    /**
+     * Returns request data.
+     *
+     * @return array|null
+     */
+    public function getRequestData()
+    {
+        return $this->get(self::REQUEST_DATA);
     }
 }

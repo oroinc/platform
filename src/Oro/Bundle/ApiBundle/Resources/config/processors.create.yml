@@ -53,6 +53,20 @@ services:
             - { name: oro.api.processor, action: create, group: initialize, priority: 20 }
 
     #
+    # normalize_input
+    #
+
+    oro_api.create.validate_request_data:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestData
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, priority: -90 }
+
+    oro_api.create.normalize_request_data:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -95 }
+
+    #
     # security_check
     #
 
