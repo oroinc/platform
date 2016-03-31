@@ -28,9 +28,9 @@ class ThemeImageType
      * @param string $name
      * @param string $label
      * @param array $dimensions
-     * @param int $maxNumber
+     * @param int|null $maxNumber
      */
-    public function __construct($name, $label, array $dimensions, $maxNumber)
+    public function __construct($name, $label, array $dimensions, $maxNumber = null)
     {
         $this->name = $name;
         $this->label = $label;
