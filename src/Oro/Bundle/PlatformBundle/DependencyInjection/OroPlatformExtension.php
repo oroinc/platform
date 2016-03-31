@@ -34,8 +34,8 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             $securityConfig = $container->getExtensionConfig('security');
         }
 
-        $resources    = $configLoader->load();
-        $extensions   = $container->getExtensions();
+        $resources  = array_reverse($configLoader->load());
+        $extensions = $container->getExtensions();
         foreach ($resources as $resource) {
             foreach ($resource->data as $name => $config) {
                 if (!empty($extensions[$name])) {
