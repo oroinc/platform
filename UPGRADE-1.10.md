@@ -16,9 +16,6 @@ UPGRADE FROM 1.9 to 1.10
 - The constructor of the `Oro\Bundle\EntityBundle\Provider\AllEntityHierarchyProvider` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, EntityManagerBag $entityManagerBag)`. After: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, ManagerBagInterface $managerBag)`.
 - Method `getAllShortMetadata` was added to `Oro\Bundle\EntityBundle\ORM\DoctrineHelper`. Using of this method instead of the `getAllMetadata` method can give significant performance gain.
 
-####PlatformBundle
-- Method `prepend()` in `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` was changed. Now the configuration from `Resources\config\oro\app.yml` is loaded in reverce order. It means that bundles that are loaded later can override configuration of bundles loaded before.
-
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder` - removed all constants for masks and their groups.
 - `Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder` - now allow custom Permissions (see [permissions.md](./src/Oro/Bundle/SecurityBundle/Resources/doc/permissions.md)
