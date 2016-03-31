@@ -216,8 +216,8 @@ define([
 
         originalShow.apply(this, arguments);
     };
-    var originalHide = Popover.prototype.hide;
 
+    var originalHide = Popover.prototype.hide;
     Popover.prototype.hide = function() {
         clearInterval(this.trackPositionInterval);
         originalHide.apply(this, arguments);
