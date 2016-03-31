@@ -7,6 +7,9 @@ use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+/**
+ * Converts JSON API data to plain array.
+ */
 class NormalizeRequestData implements ProcessorInterface
 {
     /**

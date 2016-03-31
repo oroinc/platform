@@ -6,6 +6,9 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 
+/**
+ * Adds possible status codes for the "update" action executed in scope of REST API.
+ */
 class CompleteUpdateStatusCodes extends CompleteStatusCodes
 {
     /**
