@@ -5,23 +5,39 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Bundle\SecurityBundle\Metadata\AclAnnotationProvider;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class ProtectQueryByAcl implements ProcessorInterface
 {
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
     /** @var AclHelper */
     protected $aclHelper;
+
+    /** @var AclAnnotationProvider */
+    protected $aclAnnotationProvider;
 
     /** @var string */
     protected $permission;
 
     /**
-     * @param AclHelper $aclHelper
-     * @param string    $permission
+     * @param DoctrineHelper        $doctrineHelper
+     * @param AclHelper             $aclHelper
+     * @param AclAnnotationProvider $aclAnnotationProvider
+     * @param string                $permission
      */
-    public function __construct(AclHelper $aclHelper, $permission)
-    {
-        $this->aclHelper  = $aclHelper;
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        AclHelper $aclHelper,
+        AclAnnotationProvider $aclAnnotationProvider,
+        $permission
+    ) {
+        $this->doctrineHelper = $doctrineHelper;
+        $this->aclHelper = $aclHelper;
+        $this->aclAnnotationProvider = $aclAnnotationProvider;
         $this->permission = $permission;
     }
 
@@ -37,10 +53,32 @@ class ProtectQueryByAcl implements ProcessorInterface
             return;
         }
 
-        $this->aclHelper->applyAclToCriteria(
-            $context->getClassName(),
-            $context->getCriteria(),
-            $this->permission
-        );
+        $entityClass = $context->getClassName();
+        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
+            // only manageable entities are supported
+            return;
+        }
+
+        $config = $context->getConfig();
+
+        $permission = null;
+        if (!$config || !$config->hasAclResource()) {
+            $permission = $this->permission;
+        } else {
+            $aclResource = $config->getAclResource();
+            if ($aclResource) {
+                $aclAnnotation = $this->aclAnnotationProvider->findAnnotationById($aclResource);
+                if ($aclAnnotation
+                    && $aclAnnotation->getType() === 'entity'
+                    && $aclAnnotation->getClass() === $entityClass
+                ) {
+                    $permission = $aclAnnotation->getPermission();
+                }
+            }
+        }
+
+        if ($permission) {
+            $this->aclHelper->applyAclToCriteria($entityClass, $context->getCriteria(), $permission);
+        }
     }
 }

@@ -30,11 +30,11 @@ class ReplacePropertyPath implements ConfigurationPassInterface
      */
     public function passConfiguration(array $data)
     {
-        foreach ($data as $key => $value) {
+        foreach ($data as &$value) {
             if (is_array($value)) {
-                $data[$key] = $this->passConfiguration($value);
+                $value = $this->passConfiguration($value);
             } elseif ($this->isStringPropertyPath($value)) {
-                $data[$key] = $this->parsePropertyPath($value);
+                $value = $this->parsePropertyPath($value);
             }
         }
 

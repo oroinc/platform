@@ -188,4 +188,12 @@ class BusinessUnitController extends RestController implements ClassResourceInte
     {
         return $this->get('oro_organization.form.handler.business_unit.api');
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getDeleteHandler()
+    {
+        return $this->get('oro_organization.business_unit.handler.delete');
+    }
 }

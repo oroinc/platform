@@ -17,6 +17,7 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     const ACTION_PROCESSOR_TAG              = 'oro.api.action_processor';
     const FILTER_FACTORY_SERVICE_ID         = 'oro_api.filter_factory';
     const FILTER_FACTORY_TAG                = 'oro.api.filter_factory';
+    const DEFAULT_FILTER_FACTORY_SERVICE_ID = 'oro_api.filter_factory.default';
     const EXCLUSION_PROVIDER_SERVICE_ID     = 'oro_api.entity_exclusion_provider';
     const EXCLUSION_PROVIDER_TAG            = 'oro_entity.exclusion_provider.api';
     const VIRTUAL_FIELD_PROVIDER_SERVICE_ID = 'oro_api.virtual_field_provider';
@@ -30,6 +31,8 @@ class ConfigurationCompilerPass implements CompilerPassInterface
         $config = $this->getConfig($container);
 
         $this->registerProcessingGroups($container, $config);
+
+        $this->registerFilters($container, $config);
 
         $this->registerActionProcessors($container);
 
@@ -70,6 +73,25 @@ class ConfigurationCompilerPass implements CompilerPassInterface
                         );
                     }
                 }
+            }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    protected function registerFilters(ContainerBuilder $container, array $config)
+    {
+        $filterFactoryServiceDef = $this->findDefinition($container, self::DEFAULT_FILTER_FACTORY_SERVICE_ID);
+        if (null !== $filterFactoryServiceDef) {
+            foreach ($config['filters'] as $dataType => $parameters) {
+                $filterClassName = $parameters['class'];
+                unset($parameters['class']);
+                $filterFactoryServiceDef->addMethodCall(
+                    'addFilter',
+                    [$dataType, $filterClassName, $parameters]
+                );
             }
         }
     }

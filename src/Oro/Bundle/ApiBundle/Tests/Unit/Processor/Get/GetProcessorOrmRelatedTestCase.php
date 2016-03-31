@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Get;
 
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
-use Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Get\GetContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
@@ -38,7 +38,7 @@ class GetProcessorOrmRelatedTestCase extends OrmRelatedTestCase
         $this->context->getRequestType()->add(self::TEST_REQUEST_TYPE);
         $this->context->setConfigExtras(
             [
-                new VirtualFieldsConfigExtra(),
+                new EntityDefinitionConfigExtra($this->context->getAction()),
                 new FiltersConfigExtra()
             ]
         );
