@@ -33,7 +33,7 @@ class SingleItemUpdateContext extends SingleItemContext
     }
 
     /**
-     * Checks if form was set to context.
+     * Checks if form was set to the Context.
      *
      * @return bool
      */
@@ -43,7 +43,7 @@ class SingleItemUpdateContext extends SingleItemContext
     }
 
     /**
-     * Sets request data to context.
+     * Sets request data to the Context.
      *
      * @param array $requestData
      */
