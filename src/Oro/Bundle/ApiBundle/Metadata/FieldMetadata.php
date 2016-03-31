@@ -4,11 +4,11 @@ namespace Oro\Bundle\ApiBundle\Metadata;
 
 class FieldMetadata extends PropertyMetadata
 {
-    /** the maximum length of a field */
+    /** the maximum length of the field data */
     const MAX_LENGTH = 'maxLength';
 
     /**
-     * Gets the maximum length of a field.
+     * Gets the maximum length of the field data.
      *
      * @return int
      */
@@ -18,7 +18,7 @@ class FieldMetadata extends PropertyMetadata
     }
 
     /**
-     * Sets the maximum length of a field.
+     * Sets the maximum length of the field data.
      *
      * @param int $maxLength
      */
