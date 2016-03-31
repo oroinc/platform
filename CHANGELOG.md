@@ -1,3 +1,16 @@
+CHANGELOG for 1.9.0
+===================
+This changelog references the relevant changes (new features, changes and bugs) done in 1.9.0 versions.
+* 1.9.0 (2016-02-15)
+ * Inline editing in grids
+ * Grid column management
+ * New UX for Tags
+ * Automated REST API for GET requests
+ * Performance improvements
+ * Apply range filters for numerical fields in grids
+ * Manage field tooltips from the UI
+ * Override calendar-view.js in customizations
+
 CHANGELOG for 1.8.0
 ===================
 This changelog references the relevant changes (new features, changes and bugs) done in 1.8.0 versions.
