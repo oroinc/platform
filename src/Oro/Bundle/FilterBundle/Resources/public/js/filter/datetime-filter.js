@@ -53,6 +53,15 @@ define(function(require) {
             'hideTimepicker input': '_preventClickOutsideCriteria'
         },
 
+        _renderCriteria: function() {
+            DatetimeFilter.__super__._renderCriteria.apply(this, arguments);
+
+            var value = this.getValue();
+            if (value) {
+                this._updateTimeVisibility(value.part);
+            }
+        },
+
         /**
          * Handle click outside of criteria popup to hide it
          *
@@ -104,8 +113,8 @@ define(function(require) {
             var momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
-            } else if (this.dayValueHelper.isDayValue(value)) {
-                value = this.dayValueHelper.formatDisplayValue(value);
+            } else if (this.dateValueHelper.isValid(value)) {
+                value = this.dateValueHelper.formatDisplayValue(value);
             } else if (datetimeFormatter.isValueValid(value, this.backendFormat)) {
                 momentInstance = moment(value, this.backendFormat, true);
                 value = momentInstance.format(datetimeFormatter.getDateTimeFormat());
@@ -124,8 +133,8 @@ define(function(require) {
             var momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
-            } else if (this.dayValueHelper.isDayValue(value)) {
-                value = this.dayValueHelper.formatRawValue(value);
+            } else if (this.dateValueHelper.isValid(value)) {
+                value = this.dateValueHelper.formatRawValue(value);
             } else if (datetimeFormatter.isDateTimeValid(value)) {
                 momentInstance = moment(value, datetimeFormatter.getDateTimeFormat(), true);
                 value = momentInstance.format(this.backendFormat);
@@ -136,17 +145,9 @@ define(function(require) {
         /**
          * @inheritDoc
          */
-        _readDOMValue: function() {
-            this.subview('start').checkConsistency();
-            this.subview('end').checkConsistency();
-            return DatetimeFilter.__super__._readDOMValue.apply(this, arguments);
-        },
-
-        /**
-         * @inheritDoc
-         */
         _triggerUpdate: function(newValue, oldValue) {
             if (!tools.isEqualsLoosely(newValue, oldValue)) {
+                this._updateTimeVisibility(newValue.part);
                 var start = this.subview('start');
                 var end = this.subview('end');
                 if (start && start.updateFront) {
@@ -156,6 +157,30 @@ define(function(require) {
                     end.updateFront();
                 }
                 this.trigger('update');
+            }
+        },
+
+        _renderSubViews: function() {
+            DatetimeFilter.__super__._renderSubViews.apply(this, arguments);
+            var value = this._readDOMValue();
+            this._updateDateTimePickerSubView('start', value);
+            this._updateDateTimePickerSubView('end', value);
+        },
+
+        _updateDateTimePickerSubView: function(subViewName, viewValue) {
+            var subView = this.subview(subViewName);
+            if (!subView || !subView.updateFront) {
+                return;
+            }
+
+            subView.updateFront();
+        },
+
+        _updateTimeVisibility: function(part) {
+            if (part === 'value') {
+                this.$('.timepicker-input').removeClass('hide');
+            } else {
+                this.$('.timepicker-input').addClass('hide');
             }
         }
     });

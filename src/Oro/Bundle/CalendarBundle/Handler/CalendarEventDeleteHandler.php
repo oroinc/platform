@@ -97,9 +97,15 @@ class CalendarEventDeleteHandler extends DeleteHandler
         }
 
         $em = $manager->getObjectManager();
-        $this->checkPermissions($entity, $em);
-        $this->deleteEntity($entity, $em);
-        $em->flush();
+        $this->processDelete($entity, $em);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function processDelete($entity, ObjectManager $em)
+    {
+        parent::processDelete($entity, $em);
         $this->emailSendProcessor->sendDeleteEventNotification($entity);
     }
 }

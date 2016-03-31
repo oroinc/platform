@@ -4,6 +4,7 @@ define(function(require) {
     var EmailFolderTreeView;
     var $ = require('jquery');
     var _ = require('underscore');
+    var mediator = require('oroui/js/mediator');
     var BaseView = require('oroui/js/app/views/base/view');
 
     EmailFolderTreeView = BaseView.extend({
@@ -31,6 +32,7 @@ define(function(require) {
             this.checkAllSelector = options.checkAllSelector;
             this.relatedCheckboxesSelector = options.relatedCheckboxesSelector;
             this.$(this.checkAllSelector).on('change' + this.eventNamespace(), _.bind(this._onCheckAllChange, this));
+            this.listenTo(mediator, 'serializeFolderCollection', this._serializeFolderCollection);
         },
 
         dispose: function() {
@@ -63,9 +65,13 @@ define(function(require) {
             );
         },
 
-        _onSubmit: function() {
+        _serializeFolderCollection: function() {
             var folders = this._inputCollectionData(this.$('.folder-list').children());
             this.$(this.dataInputSelector).val(JSON.stringify(folders));
+        },
+
+        _onSubmit: function() {
+            this._serializeFolderCollection();
         },
 
         _onCheckAllChange: function(e) {

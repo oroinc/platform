@@ -1,0 +1,9 @@
+{% if has_operations(params) %}
+    <div class="pull-left">
+        {{ oro_widget_render({
+            'widgetType': 'block',
+            'url': path(oro_action_widget_route(), params),
+            'alias': 'action_buttons_widget',
+        }) }}
+    </div>
+{% endif %}

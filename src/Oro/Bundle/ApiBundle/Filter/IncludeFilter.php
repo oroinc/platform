@@ -2,22 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Filter;
 
-use Doctrine\Common\Collections\Criteria;
-
+/**
+ * A filter that can be used to add a list of related entities to the result.
+ */
 class IncludeFilter extends StandaloneFilter
 {
-    /**
-     * {@inheritdoc}
-     */
-    public function apply(Criteria $criteria, FilterValue $value = null)
-    {
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createExpression(FilterValue $value = null)
-    {
-        return null;
-    }
 }

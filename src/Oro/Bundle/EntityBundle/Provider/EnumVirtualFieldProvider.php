@@ -5,7 +5,6 @@ namespace Oro\Bundle\EntityBundle\Provider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 
-use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -81,9 +80,13 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
             return;
         }
 
-        $this->virtualFields[$className] = [];
+        $em = $this->getManagerForClass($className);
+        if (!$em) {
+            return;
+        }
 
-        $metadata         = $this->getManagerForClass($className)->getClassMetadata($className);
+        $this->virtualFields[$className] = [];
+        $metadata = $em->getClassMetadata($className);
         $associationNames = $metadata->getAssociationNames();
         foreach ($associationNames as $associationName) {
             if (!$this->extendConfigProvider->hasConfig($className, $associationName)) {
@@ -133,22 +136,16 @@ class EnumVirtualFieldProvider implements VirtualFieldProviderInterface
      *
      * @param string $className
      *
-     * @return EntityManager
-     *
-     * @throws InvalidEntityException
+     * @return EntityManager|null
      */
     protected function getManagerForClass($className)
     {
-        $manager = null;
         try {
-            $manager = $this->doctrine->getManagerForClass($className);
+            return $this->doctrine->getManagerForClass($className);
         } catch (\ReflectionException $ex) {
             // ignore not found exception
         }
-        if (!$manager) {
-            throw new InvalidEntityException(sprintf('The "%s" entity was not found.', $className));
-        }
 
-        return $manager;
+        return null;
     }
 }

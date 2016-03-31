@@ -135,7 +135,8 @@ class DateFilterSubscriber implements EventSubscriberInterface
                     $data,
                     function ($data) use ($compiler) {
                         // html5 format for intl
-                        return $data instanceof \DateTime ? $data->format('Y-m-d H:i') : $data;
+                        return $data instanceof \DateTime ? $data->format('Y-m-d H:i') :
+                            (is_numeric($data) ? sprintf('2015-%\'.02d-01 00:00', $data) : $data);
                     }
                 );
                 break;
@@ -250,18 +251,6 @@ class DateFilterSubscriber implements EventSubscriberInterface
                         $data['part']=DateModifierInterface::PART_VALUE;
                         break;
                     case DateModifierInterface::VAR_THIS_MONTH:
-                    case DateModifierInterface::VAR_JANUARY:
-                    case DateModifierInterface::VAR_FEBRUARY:
-                    case DateModifierInterface::VAR_MARCH:
-                    case DateModifierInterface::VAR_APRIL:
-                    case DateModifierInterface::VAR_MAY:
-                    case DateModifierInterface::VAR_JUNE:
-                    case DateModifierInterface::VAR_JULY:
-                    case DateModifierInterface::VAR_AUGUST:
-                    case DateModifierInterface::VAR_SEPTEMBER:
-                    case DateModifierInterface::VAR_OCTOBER:
-                    case DateModifierInterface::VAR_NOVEMBER:
-                    case DateModifierInterface::VAR_DECEMBER:
                         $data['part']=DateModifierInterface::PART_MONTH;
                         break;
                 }

@@ -5,7 +5,7 @@ namespace Oro\Component\ChainProcessor;
 /**
  * The base class for action processors.
  */
-class ActionProcessor extends ChainProcessor
+class ActionProcessor extends ChainProcessor implements ActionProcessorInterface
 {
     /** @var string */
     protected $action;
@@ -21,9 +21,7 @@ class ActionProcessor extends ChainProcessor
     }
 
     /**
-     * Gets an action that is handled by the processor.
-     *
-     * @return string
+     * {@inheritdoc}
      */
     public function getAction()
     {
@@ -31,9 +29,7 @@ class ActionProcessor extends ChainProcessor
     }
 
     /**
-     * Creates an instance of Context this processor works with.
-     *
-     * @return Context
+     * {@inheritdoc}
      */
     final public function createContext()
     {

@@ -4,20 +4,27 @@ namespace Oro\Bundle\ActionBundle\Tests\Unit\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ActionBundle\Model\Action;
-use Oro\Bundle\ActionBundle\Model\ActionDefinition;
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
-use Oro\Bundle\ActionBundle\Model\ActionManager;
+use Oro\Bundle\ActionBundle\Model\Operation;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
+use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Layout\DataProvider\ActionsDataProvider;
 
 use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\LayoutContext;
 
 class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
 {
     /**
-     * @var ActionManager|\PHPUnit_Framework_MockObject_MockObject
+     * @var OperationManager|\PHPUnit_Framework_MockObject_MockObject
      */
-    protected $actionManager;
+    protected $operationManager;
+
+    /**
+     * @var ContextHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $contextHelper;
 
     /**
      * @var RestrictHelper|\PHPUnit_Framework_MockObject_MockObject
@@ -39,7 +46,11 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
      */
     protected function setUp()
     {
-        $this->actionManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\ActionManager')
+        $this->operationManager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -49,7 +60,12 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
 
-        $this->dataProvider = new ActionsDataProvider($this->actionManager, $this->restrictHelper, $this->translator);
+        $this->dataProvider = new ActionsDataProvider(
+            $this->operationManager,
+            $this->contextHelper,
+            $this->restrictHelper,
+            $this->translator
+        );
     }
 
     public function testGetData()
@@ -63,6 +79,27 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
     {
         $groups = 'test';
         $expected = $this->assertGetByGroups($groups);
+        $this->assertEquals($expected, $this->dataProvider->getByGroup($groups));
+    }
+
+    public function testGetByGroupWithEntity()
+    {
+        $entity = new \stdClass();
+
+        $layoutContext = new LayoutContext();
+        $layoutContext->data()->set('entity', 'entity', $entity);
+
+        $actionContext = ['entityId' => null, 'entityClass' => '\stdClass'];
+
+        $this->assertSame($this->dataProvider, $this->dataProvider->getData($layoutContext));
+
+        $this->contextHelper->expects($this->once())
+            ->method('getActionParameters')
+            ->with(['entity' => $entity])
+            ->willReturn($actionContext);
+
+        $groups = 'test';
+        $expected = $this->assertGetByGroups($groups, $actionContext);
         $this->assertEquals($expected, $this->dataProvider->getByGroup($groups));
     }
 
@@ -116,50 +153,51 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @param string $actionName
+     * @param string $operationName
      * @param string $label
      * @param bool $enabled
      * @param array $frontendOptions
      * @param array $buttonOptions
      * @param bool $hasForm
-     * @return \PHPUnit_Framework_MockObject_MockObject|Action
+     * @return \PHPUnit_Framework_MockObject_MockObject|Operation
      */
-    protected function getAction(
-        $actionName,
+    protected function getOperation(
+        $operationName,
         $label,
         $enabled = true,
         array $frontendOptions = [],
         array $buttonOptions = [],
         $hasForm = false
     ) {
-        $definition = new ActionDefinition();
+        $definition = new OperationDefinition();
         $definition->setEnabled($enabled);
-        $definition->setName($actionName);
+        $definition->setName($operationName);
         $definition->setLabel($label);
         $definition->setFrontendOptions($frontendOptions);
         $definition->setButtonOptions($buttonOptions);
 
-        $action = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Action')
+        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
             ->disableOriginalConstructor()
             ->getMock();
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('getDefinition')
             ->will($this->returnValue($definition));
-        $action->expects($this->any())
+        $operation->expects($this->any())
             ->method('hasForm')
             ->will($this->returnValue($hasForm));
 
-        return $action;
+        return $operation;
     }
 
     /**
      * @param mixed $groups
+     * @param array $actionsContext
      * @return array
      */
-    protected function assertGetByGroups($groups)
+    protected function assertGetByGroups($groups, array $actionsContext = null)
     {
-        $actionOne = $this->getAction('action1', 'action1_label');
-        $actionTwo = $this->getAction(
+        $actionOne = $this->getOperation('action1', 'action1_label');
+        $actionTwo = $this->getOperation(
             'action2',
             'action2_label',
             true,
@@ -167,14 +205,15 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
             ['icon' => 'icon'],
             true
         );
-        $actionThree = $this->getAction('action3', 'action3_label', false);
+        $actionThree = $this->getOperation('action3', 'action3_label', false);
         $actions = [$actionOne, $actionTwo, $actionThree];
 
-        $this->actionManager->expects($this->once())
-            ->method('getActions')
+        $this->operationManager->expects($this->once())
+            ->method('getOperations')
+            ->with($actionsContext)
             ->will($this->returnValue($actions));
         $this->restrictHelper->expects($this->once())
-            ->method('restrictActionsByGroup')
+            ->method('restrictOperationsByGroup')
             ->with($actions, $groups)
             ->will($this->returnArgument(0));
         $this->translator->expects($this->atLeastOnce())
@@ -186,21 +225,15 @@ class ActionsDataProviderTest extends \PHPUnit_Framework_TestCase
                 'name' => 'action1',
                 'label' => 'action1_label',
                 'title' => 'action1_label',
-                'hasForm' => false,
-                'showDialog' => false,
                 'icon' => '',
-                'buttonOptions' => [],
-                'frontendOptions' => []
+                'action' => $actionOne,
             ],
             [
                 'name' => 'action2',
                 'label' => 'action2_label',
                 'title' => 'title',
-                'hasForm' => true,
-                'showDialog' => true,
                 'icon' => 'icon',
-                'buttonOptions' => ['icon' => 'icon'],
-                'frontendOptions' => ['title' => 'title', 'show_dialog' => true]
+                'action' => $actionTwo
             ]
         ];
 

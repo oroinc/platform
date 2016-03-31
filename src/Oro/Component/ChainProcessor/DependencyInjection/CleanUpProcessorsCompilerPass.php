@@ -6,7 +6,7 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 
 /**
- * This DI compiler pass can be used to move processors does not depend on any service
+ * This DI compiler pass can be used to move processors do not depend on any service
  * from DI container to a separate factory.
  * It allows you to define all processors in DI configuration files and not worry about a size of DI container.
  */

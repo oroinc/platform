@@ -128,28 +128,28 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                         'Test\Association1Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getInheritableExtras(),
+                        $this->context->getPropagableExtras(),
                         $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
                     ],
                     [
                         'Test\Association2Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getInheritableExtras(),
+                        $this->context->getPropagableExtras(),
                         $this->createRelationConfigObject(['exclusion_policy' => 'all'], ['attr' => 'val'])
                     ],
                     [
                         'Test\Association3Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getInheritableExtras(),
+                        $this->context->getPropagableExtras(),
                         $this->createRelationConfigObject(['exclusion_policy' => 'all'])
                     ],
                     [
                         'Test\Association4Target',
                         $this->context->getVersion(),
                         $this->context->getRequestType(),
-                        $this->context->getInheritableExtras(),
+                        $this->context->getPropagableExtras(),
                         $this->createRelationConfigObject()
                     ],
                 ]
@@ -215,7 +215,7 @@ class ExpandRelatedEntitiesTest extends ConfigProcessorTestCase
                 $this->context->getVersion(),
                 $this->context->getRequestType(),
                 array_merge(
-                    $this->context->getInheritableExtras(),
+                    $this->context->getPropagableExtras(),
                     [new ExpandRelatedEntitiesConfigExtra(['association11'])]
                 )
             )

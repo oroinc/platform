@@ -47,26 +47,16 @@ define(function(require) {
         className: 'oro-datagrid',
 
         /** @property */
-        template: _.template(
-            '<div class="toolbar"></div>' +
-            '<div class="other-scroll-container">' +
-                '<div class="other-scroll"><div></div></div>' +
-                '<div class="container-fluid grid-scrollable-container">' +
-                    '<div class="grid-container">' +
-                        '<table class="grid table-hover table table-bordered table-condensed"></table>' +
-                    '</div>' +
-                '</div>' +
-                '<div class="no-data"></div>' +
-            '</div>'
-        ),
-
-        /** @property */
         noDataTemplate: _.template('<span><%= hint %><span>'),
 
         /** @property {Object} */
         selectors: {
             grid:        '.grid',
-            toolbar:     '.toolbar',
+            toolbar:     '[data-grid-toolbar]',
+            toolbars: {
+                top: '[data-grid-toolbar=top]',
+                bottom: '[data-grid-toolbar=bottom]'
+            },
             noDataBlock: '.no-data',
             filterBox:   '.filter-box',
             loadingMaskContainer: '.other-scroll-container',
@@ -84,6 +74,9 @@ define(function(require) {
 
         /** @property {orodatagrid.datagrid.Toolbar} */
         toolbar: Toolbar,
+
+        /** @property {Object} */
+        toolbars: {},
 
         /** @property {orodatagrid.datagrid.MetadataModel} */
         metadataModel: null,
@@ -107,7 +100,12 @@ define(function(require) {
                 addResetAction: true,
                 addRefreshAction: true,
                 addColumnManager: true,
-                columnManager: {}
+                addSorting: false,
+                columnManager: {},
+                placement: {
+                    top: true,
+                    bottom: false
+                }
             },
             rowClickAction:         undefined,
             multipleSorting:        true,
@@ -121,6 +119,13 @@ define(function(require) {
          * This start index required to display new columns at end of already sorted columns set
          */
         DEFAULT_COLUMN_START_INDEX: 1000,
+
+        /** @property */
+        template: require('tpl!orodatagrid/templates/datagrid/grid.html'),
+
+        themeOptions: {
+            optionPrefix: 'grid',
+        },
 
         /**
          * Initialize grid
@@ -141,7 +146,6 @@ define(function(require) {
          */
         initialize: function(options) {
             var opts = options || {};
-            this.subviews = [];
             this.pluginManager = new PluginManager(this);
             if (options.plugins) {
                 this.pluginManager.enable(options.plugins);
@@ -152,28 +156,60 @@ define(function(require) {
                 this.$el.addClass(_.result(this, 'className'));
             }
 
-            // Check required options
+            this._validateOptions(opts);
+
+            this._initProperties(opts);
+
+            // use columns collection as event bus since there is no alternatives
+            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
+                this.trigger('afterMakeCell', row, cell);
+            });
+            if (this.themeOptionsConfigurator) {
+                this.listenTo(this.columns, 'configureInitializeOptions', this.themeOptionsConfigurator);
+            }
+
+            this.trigger('beforeBackgridInitialize');
+            this.backgridInitialize(options);
+            this.trigger('afterBackgridInitialize');
+
+            // Listen and proxy events
+            this._listenToCollectionEvents();
+            this._listenToContentEvents();
+            this._listenToCommands();
+        },
+
+        /**
+         * @param {Object} options
+         * @private
+         */
+        _validateOptions: function(opts) {
             if (!opts.collection) {
                 throw new TypeError('"collection" is required');
             }
-            this.collection = opts.collection;
-
             if (!opts.columns) {
                 throw new TypeError('"columns" is required');
             }
+            if (!opts.metadataModel) {
+                throw new TypeError('"metadataModel" is required');
+            }
+        },
+
+        /**
+         * Init properties values based on options and defaults
+         *
+         * @param {Object} opts
+         * @private
+         */
+        _initProperties: function(opts) {
+            this.subviews = [];
+            this.collection = opts.collection;
 
             if (opts.columns.length === 0) {
                 this.noColumnsFlag = true;
             }
 
-            if (!opts.metadataModel) {
-                throw new TypeError('"metadataModel" is required');
-            }
-
-            // Init properties values based on options and defaults
             _.extend(this, this.defaults, opts);
-            this.toolbarOptions = {};
-            _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
+            this._initToolbars(opts);
             this.exportOptions = {};
             _.extend(this.exportOptions, opts.exportOptions);
 
@@ -187,22 +223,69 @@ define(function(require) {
             }
 
             this._initColumns(opts);
+        },
 
-            this.toolbar = this._createToolbar(this.toolbarOptions);
+        /**
+         * Create this function instead of original Grid.__super__.initialize to customize options for subviews
+         * @param options
+         */
+        backgridInitialize: function(options) {
+            this.columns = options.columns;
 
-            // use columns collection as event bus since there is no alternatives
-            this.listenTo(this.columns, 'afterMakeCell', function(row, cell) {
-                this.trigger('afterMakeCell', row, cell);
+            var filteredOptions = _.omit(
+                options,
+                ['el', 'id', 'attributes', 'className', 'tagName', 'events', 'themeOptions']
+            );
+
+            this.header = options.header || this.header;
+            var headerOptions = _.extend({}, filteredOptions);
+            this.columns.trigger('configureInitializeOptions', this.header, headerOptions);
+            if (headerOptions.themeOptions.hide) {
+                this.header = null;
+            }
+
+            this.body = options.body || this.body;
+            var bodyOptions = _.extend({}, filteredOptions);
+            this.columns.trigger('configureInitializeOptions', this.body, bodyOptions);
+
+            this.footer = options.footer || this.footer;
+            var footerOptions = _.extend({}, filteredOptions);
+            this.columns.trigger('configureInitializeOptions', this.footer, footerOptions);
+            if (footerOptions.themeOptions.hide) {
+                this.footer = null;
+            }
+
+            // must construct body first so it listens to backgrid:sort first
+            this.body = new this.body(bodyOptions);
+
+            if (this.header) {
+                this.header = new this.header(headerOptions);
+            }
+
+            if (this.footer) {
+                this.footer = new this.footer(footerOptions);
+            }
+
+            this.listenTo(this.columns, 'reset', function() {
+                if (this.header) {
+                    this.header = new (this.header.remove().constructor)(headerOptions);
+                }
+                this.body = new (this.body.remove().constructor)(bodyOptions);
+                if (this.footer) {
+                    this.footer = new (this.footer.remove().constructor)(footerOptions);
+                }
+                this.render();
             });
+        },
 
-            this.trigger('beforeBackgridInitialize');
-            Grid.__super__.initialize.apply(this, arguments);
-            this.trigger('afterBackgridInitialize');
-
-            // Listen and proxy events
-            this._listenToCollectionEvents();
-            this._listenToContentEvents();
-            this._listenToCommands();
+        /**
+         * @param {Object} opts
+         * @private
+         */
+        _initToolbars: function(opts) {
+            this.toolbars = {};
+            this.toolbarOptions = {};
+            _.extend(this.toolbarOptions, this.defaults.toolbarOptions, opts.toolbarOptions);
         },
 
         /**
@@ -225,11 +308,16 @@ define(function(require) {
             delete this.resetAction;
             delete this.exportAction;
 
-            subviews = ['header', 'body', 'footer', 'toolbar', 'loadingMask'];
+            subviews = ['header', 'body', 'footer', 'loadingMask'];
             _.each(subviews, function(viewName) {
-                this[viewName].dispose();
-                delete this[viewName];
+                if (this[viewName]) {
+                    this[viewName].dispose();
+                    delete this[viewName];
+                }
             }, this);
+
+            this.callToolbar('dispose');
+            delete this.toolbars;
 
             Grid.__super__.dispose.call(this);
         },
@@ -351,8 +439,10 @@ define(function(require) {
          * @returns {{selectedModels: *, inset: boolean}}
          */
         getSelectionState: function() {
-            var selectAllHeader = this.header.row.cells[0];
-            return selectAllHeader.getSelectionState();
+            if (this.header) {
+                var selectAllHeader = this.header.row.cells[0];
+                return selectAllHeader.getSelectionState();
+            }
         },
 
         /**
@@ -373,7 +463,8 @@ define(function(require) {
             var toolbarOptions = {
                 collection:   this.collection,
                 actions:      this._getToolbarActions(),
-                extraActions: this._getToolbarExtraActions()
+                extraActions: this._getToolbarExtraActions(),
+                columns:      this.columns
             };
             _.defaults(toolbarOptions, options);
 
@@ -548,11 +639,13 @@ define(function(require) {
             this.listenTo(this.columns, 'change:renderable', function() {
                 this.trigger('content:update');
             });
-            this.listenTo(this.header.row, 'columns:reorder', function() {
-                // triggers content:update event in separate process
-                // to give time body's rows to finish reordering
-                _.defer(_.bind(this.trigger, this, 'content:update'));
-            });
+            if (this.header) {
+                this.listenTo(this.header.row, 'columns:reorder', function() {
+                    // triggers content:update event in separate process
+                    // to give time body's rows to finish reordering
+                    _.defer(_.bind(this.trigger, this, 'content:update'));
+                });
+            }
         },
 
         /**
@@ -621,7 +714,9 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            this.$el.html(this.template());
+            this.$el.html(this.template({
+                tableTagName: this.themeOptions.tagName || 'table'
+            }));
             this.$grid = this.$(this.selectors.grid);
 
             this.renderToolbar();
@@ -656,7 +751,9 @@ define(function(require) {
          * Renders the grid's header, then footer, then finally the body.
          */
         renderGrid: function() {
-            this.$grid.append(this.header.render().$el);
+            if (this.header) {
+                this.$grid.append(this.header.render().$el);
+            }
             if (this.footer) {
                 this.$grid.append(this.footer.render().$el);
             }
@@ -669,7 +766,37 @@ define(function(require) {
          * Renders grid toolbar.
          */
         renderToolbar: function() {
-            this.$(this.selectors.toolbar).append(this.toolbar.render().$el);
+            var self = this;
+            _.each(this.toolbarOptions.placement, function(enabled, position) {
+                if (enabled) {
+                    self.$(self.selectors.toolbars[position]).append(self.getToolbar(position).render().$el);
+                }
+            });
+        },
+
+        /**
+         * Lazy init for toolbar
+         *
+         * @param {String} placement
+         */
+        getToolbar: function(placement) {
+            if (this.toolbars[placement]) {
+                return this.toolbars[placement];
+            }
+
+            var toolbarOptions = _.extend(this.toolbarOptions, {el: this.$(this.selectors.toolbars[placement])});
+            this.toolbars[placement] = this._createToolbar(toolbarOptions);
+
+            return this.toolbars[placement];
+        },
+
+        /**
+         * Call method for all toolbars
+         *
+         * @param {String} method
+         */
+        callToolbar: function(method) {
+            _.invoke(this.toolbars, method);
         },
 
         /**
@@ -692,7 +819,7 @@ define(function(require) {
                 entityHint: (this.entityHint || __('oro.datagrid.entityHint')).toLowerCase()
             };
             var message = _.isEmpty(this.collection.state.filters) ?
-                        'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
+                'oro.datagrid.no.entities' : 'oro.datagrid.no.results';
             message = this.noColumnsFlag ? 'oro.datagrid.no.columns' : message;
 
             this.$(this.selectors.noDataBlock).html($(this.noDataTemplate({
@@ -748,7 +875,7 @@ define(function(require) {
          */
         showLoading: function() {
             this.loadingMask.show();
-            this.toolbar.disable();
+            this.callToolbar('disable');
             this.trigger('disable');
         },
 
@@ -757,7 +884,7 @@ define(function(require) {
          */
         hideLoading: function() {
             this.loadingMask.hide();
-            this.toolbar.enable();
+            this.callToolbar('enable');
             this.trigger('enable');
         },
 
@@ -873,6 +1000,9 @@ define(function(require) {
          * @return {Backgrid.Cell}
          */
         findHeaderCellByIndex: function(columnI) {
+            if (!this.header) {
+                return null;
+            }
             try {
                 return _.findWhere(this.header.row.cells, {
                     column: this.columns.at(columnI)

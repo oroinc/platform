@@ -1,15 +1,18 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Twig;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Symfony\Component\Routing\RouterInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerInterface */
