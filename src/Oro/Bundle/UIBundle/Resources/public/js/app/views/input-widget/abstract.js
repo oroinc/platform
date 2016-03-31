@@ -50,8 +50,14 @@ define(function(require) {
                 this.widgetFunction();
             }
 
-            this.findContainer();
-            this.getContainer().addClass(this.containerClass);
+            if (this.isInitialized()) {
+                this.findContainer();
+                this.getContainer().addClass(this.containerClass);
+            }
+        },
+
+        isInitialized: function() {
+            return true;
         },
 
         /**
