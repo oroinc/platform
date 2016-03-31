@@ -16,6 +16,9 @@ UPGRADE FROM 1.9 to 1.10
 - The constructor of the `Oro\Bundle\EntityBundle\Provider\AllEntityHierarchyProvider` class was changed. Before: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, EntityManagerBag $entityManagerBag)`. After: `__construct(DoctrineHelper $doctrineHelper, ConfigProvider $extendConfigProvider, ManagerBagInterface $managerBag)`.
 - Method `getAllShortMetadata` was added to `Oro\Bundle\EntityBundle\ORM\DoctrineHelper`. Using of this method instead of the `getAllMetadata` method can give significant performance gain.
 
+####PlatformBundle
+- Before this changes configs from `app.yml` were loading by newest - first. Now they are loading like newest - last. Method `prepend()` in `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` now will load resources from bundle in recursive way `$resources = array_reverse($configLoader->load());`
+
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder` - removed all constants for masks and their groups.
 - `Oro\Bundle\SecurityBundle\Acl\Extension\EntityMaskBuilder` - now allow custom Permissions (see [permissions.md](./src/Oro/Bundle/SecurityBundle/Resources/doc/permissions.md)
