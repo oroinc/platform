@@ -4,19 +4,21 @@ namespace Oro\Bundle\ActionBundle\Cache;
 
 use Symfony\Component\HttpKernel\CacheWarmer\CacheWarmerInterface;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 
 class CacheWarmer implements CacheWarmerInterface
 {
-    /** @var ActionConfigurationProvider */
-    private $provider;
+    /**
+     * @var array|ConfigurationProviderInterface[]
+     */
+    private $providers = [];
 
     /**
-     * @param ActionConfigurationProvider $provider
+     * @param ConfigurationProviderInterface $provider
      */
-    public function __construct(ActionConfigurationProvider $provider)
+    public function addProvider(ConfigurationProviderInterface $provider)
     {
-        $this->provider = $provider;
+        $this->providers[] = $provider;
     }
 
     /**
@@ -24,7 +26,9 @@ class CacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        $this->provider->warmUpCache();
+        foreach ($this->providers as $provider) {
+            $provider->warmUpCache();
+        }
     }
 
     /**
