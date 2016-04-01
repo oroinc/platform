@@ -36,7 +36,7 @@ class ExcludeCollectionValuedRelations implements ProcessorInterface
             return;
         }
 
-        $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName());
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $definition = $context->getResult();
         $fields = $definition->getFields();
         foreach ($fields as $fieldName => $field) {

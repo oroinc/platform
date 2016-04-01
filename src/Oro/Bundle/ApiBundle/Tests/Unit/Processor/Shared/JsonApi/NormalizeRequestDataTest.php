@@ -3,9 +3,9 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
-class NormalizeRequestDataTest extends FormContextTestCase
+class NormalizeRequestDataTest extends FormProcessorTestCase
 {
     /** @var NormalizeRequestData */
     protected $processor;

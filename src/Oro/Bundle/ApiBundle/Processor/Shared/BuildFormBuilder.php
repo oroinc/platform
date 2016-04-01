@@ -39,6 +39,10 @@ class BuildFormBuilder implements ProcessorInterface
             // the form builder is already built
             return;
         }
+        if ($context->hasForm()) {
+            // the form is already built
+            return;
+        }
 
         $formBuilder = $this->formFactory->createBuilder(
             'form',
