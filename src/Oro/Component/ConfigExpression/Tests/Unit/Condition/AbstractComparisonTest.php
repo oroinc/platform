@@ -37,12 +37,23 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
     {
         $this->assertSame($this->condition, $this->condition->initialize($options));
 
-        $right = end($options);
-        $left  = reset($options);
-
         $keys     = array_keys($context);
-        $rightKey = end($keys);
         $leftKey  = reset($keys);
+        $rightKey = null;
+        if (count($context) > 1) {
+            $rightKey = end($keys);
+        }
+
+        if ($leftKey && array_key_exists($leftKey, $context)) {
+            $left = $context[$leftKey];
+        } else {
+            $left = $options[0];
+        }
+        if ($rightKey && array_key_exists($rightKey, $context)) {
+            $right = $context[$rightKey];
+        } else {
+            $right = $options[1];
+        }
 
         $this->contextAccessor->expects($this->any())
             ->method('hasValue')
@@ -50,18 +61,15 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
 
         $this->contextAccessor->expects($this->any())
             ->method('getValue')
-            ->will(
-                $this->returnValueMap(
-                    [
-                        [$context, $left, $context[$leftKey]],
-                        [$context, $right, $context[$rightKey]],
-                    ]
-                )
+            ->willReturnCallback(
+                function ($context, $value) {
+                    return $value instanceof PropertyPath ? $context[(string)$value] : $value;
+                }
             );
 
         $this->condition->expects($this->once())
             ->method('doCompare')
-            ->with($context[$leftKey], $context[$rightKey])
+            ->with($left, $right)
             ->will($this->returnValue($expectedValue));
 
         $this->assertEquals($expectedValue, $this->condition->evaluate($context));
@@ -84,6 +92,11 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
                 true
             ],
             [
+                [null, null],
+                [],
+                true
+            ],
+            [
                 ['left' => new PropertyPath('foo'), 'right' => new PropertyPath('bar')],
                 ['foo' => 'fooValue', 'bar' => 'barValue'],
                 false
@@ -92,7 +105,12 @@ class AbstractComparisonTest extends \PHPUnit_Framework_TestCase
                 [new PropertyPath('foo'), new PropertyPath('bar')],
                 ['foo' => 'fooValue', 'bar' => 'barValue'],
                 false
-            ]
+            ],
+            [
+                [new PropertyPath('foo'), null],
+                ['foo' => 'fooValue'],
+                false
+            ],
         ];
     }
 
