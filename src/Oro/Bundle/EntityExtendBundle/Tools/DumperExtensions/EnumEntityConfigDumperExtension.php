@@ -275,7 +275,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                 ],
-                'importexport' => ['identity' => true]
+                'importexport' => ['identity' => false]
             ]
         );
         $this->configManager->createConfigFieldModel($enumValueClassName, 'name', 'string');
@@ -287,7 +287,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
                 ],
-                'datagrid'     => ['is_visible' => false]
+                'datagrid'     => ['is_visible' => false],
+                'importexport' => ['identity' => true],
             ]
         );
         $this->configManager->createConfigFieldModel($enumValueClassName, 'priority', 'integer');
