@@ -31,6 +31,13 @@ interface FormContext extends ContextInterface
     public function setRequestData(array $requestData);
 
     /**
+     * Checks whether the form builder exists.
+     *
+     * @return bool
+     */
+    public function hasFormBuilder();
+
+    /**
      * Gets the form builder.
      *
      * @return FormBuilderInterface|null
@@ -43,6 +50,13 @@ interface FormContext extends ContextInterface
      * @param FormBuilderInterface|null $formBuilder
      */
     public function setFormBuilder(FormBuilderInterface $formBuilder = null);
+
+    /**
+     * Checks whether the form exists.
+     *
+     * @return bool
+     */
+    public function hasForm();
 
     /**
      * Gets the form.
