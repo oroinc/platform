@@ -18,19 +18,17 @@ class BuildForm implements ProcessorInterface
     {
         /** @var FormContext $context */
 
-        $form = $context->getForm();
-        if (null !== $form) {
-            // a form is already built
+        if ($context->hasForm()) {
+            // the form is already built
             return;
         }
-        $formBuilder = $context->getFormBuilder();
-        if (null === $formBuilder) {
-            // a form cannot be built because a form builder does not exist
+        if (!$context->hasFormBuilder()) {
+            // the form cannot be built because the form builder does not exist
             return;
         }
 
         // build the form and add it to the Context
-        $context->setForm($formBuilder->getForm());
+        $context->setForm($context->getFormBuilder()->getForm());
         // remove the form builder from the Context
         $context->setFormBuilder();
     }

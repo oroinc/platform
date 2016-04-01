@@ -35,9 +35,8 @@ class BuildFormBuilder implements ProcessorInterface
     {
         /** @var FormContext $context */
 
-        $formBuilder = $context->getFormBuilder();
-        if (null !== $formBuilder) {
-            // a form builder is already built
+        if ($context->hasFormBuilder()) {
+            // the form builder is already built
             return;
         }
 
