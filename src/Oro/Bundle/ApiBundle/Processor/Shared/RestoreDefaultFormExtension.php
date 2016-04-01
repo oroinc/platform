@@ -10,6 +10,9 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
  * Switches to default form extension.
+ * As before the forms were switched in Data API mode (see the InitializeApiFormExtension processor)
+ * and an action called this processor can work in different contexts, we should returns the forms
+ * to the original state to prevent possible collisions.
  */
 class RestoreDefaultFormExtension implements ProcessorInterface
 {
