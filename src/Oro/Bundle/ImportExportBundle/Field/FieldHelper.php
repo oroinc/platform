@@ -248,7 +248,8 @@ class FieldHelper
             return $this->getPropertyAccessor()->getValue($object, $fieldName);
         } catch (\Exception $e) {
             $class = ClassUtils::getClass($object);
-            while(!property_exists($class, $fieldName) && $class = get_parent_class($class));
+            while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+            }
 
             if ($class) {
                 $reflection = new \ReflectionProperty($class, $fieldName);
@@ -272,7 +273,8 @@ class FieldHelper
             $this->getPropertyAccessor()->setValue($object, $fieldName, $value);
         } catch (\Exception $e) {
             $class = ClassUtils::getClass($object);
-            while(!property_exists($class, $fieldName) && $class = get_parent_class($class));
+            while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+            }
 
             if ($class) {
                 $reflection = new \ReflectionProperty($class, $fieldName);
