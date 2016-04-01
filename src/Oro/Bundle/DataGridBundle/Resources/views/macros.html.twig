@@ -46,6 +46,10 @@
              data-page-component-module="orodatagrid/js/app/components/datagrid-component"
              data-page-component-name="{{ options.gridName }}"
              data-page-component-options="{{ options|json_encode }}"
-             {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}></div>
+             {% if renderParams.cssClass is defined %} class="{{ renderParams.cssClass }}" {% endif %}>
+             {% if renderParams.viewLoading|default(false) %}
+                 {% include "OroUIBundle::view_loading.html.twig" %}
+             {% endif %}
+        </div>
     {% endif %}
 {% endmacro %}

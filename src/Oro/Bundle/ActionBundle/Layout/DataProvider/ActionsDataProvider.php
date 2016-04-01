@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Layout\DataProvider;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\RestrictHelper;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\OperationManager;
@@ -19,6 +20,11 @@ class ActionsDataProvider implements DataProviderInterface
     protected $operationManager;
 
     /**
+     * @var ContextHelper
+     */
+    protected $contextHelper;
+
+    /**
      * @var RestrictHelper
      */
     protected $restrictHelper;
@@ -29,16 +35,24 @@ class ActionsDataProvider implements DataProviderInterface
     protected $translator;
 
     /**
+     * @var ContextInterface
+     */
+    protected $context;
+
+    /**
      * @param OperationManager $operationManager
+     * @param ContextHelper $contextHelper
      * @param RestrictHelper $restrictHelper
      * @param TranslatorInterface $translator
      */
     public function __construct(
         OperationManager $operationManager,
+        ContextHelper $contextHelper,
         RestrictHelper $restrictHelper,
         TranslatorInterface $translator
     ) {
         $this->operationManager = $operationManager;
+        $this->contextHelper = $contextHelper;
         $this->restrictHelper = $restrictHelper;
         $this->translator = $translator;
     }
@@ -93,7 +107,16 @@ class ActionsDataProvider implements DataProviderInterface
      */
     public function getByGroup($groups = null)
     {
-        $actions = $this->restrictHelper->restrictOperationsByGroup($this->operationManager->getOperations(), $groups);
+        if ($this->context && $this->context->data()->has('entity')) {
+            $context = $this->contextHelper->getActionParameters(['entity' => $this->context->data()->get('entity')]);
+        } else {
+            $context = null;
+        }
+
+        $actions = $this->restrictHelper->restrictOperationsByGroup(
+            $this->operationManager->getOperations($context),
+            $groups
+        );
 
         return $this->getPreparedData($actions);
     }
@@ -140,6 +163,8 @@ class ActionsDataProvider implements DataProviderInterface
      */
     public function getData(ContextInterface $context)
     {
+        $this->context = $context;
+
         return $this;
     }
 }
