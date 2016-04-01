@@ -221,13 +221,32 @@ define([
 
         render: function() {
             if (this.template) {
-                this.$el.html(this.template({
-                    model: this.model ? this.model.attributes : {},
-                    themeOptions: this.themeOptions ? this.themeOptions : {}
-                }));
-                return this;
+                return this.renderCustomTemplate();
+            } else {
+                return Row.__super__.render.apply(this, arguments);
             }
-            return Row.__super__.render.apply(this, arguments);
+        },
+
+        renderCustomTemplate: function() {
+            var $checkbox;
+            this.$el.html(this.template({
+                model: this.model ? this.model.attributes : {},
+                themeOptions: this.themeOptions ? this.themeOptions : {}
+            }));
+            $checkbox = this.$(':checkbox');
+            if ($checkbox.length) {
+                this.listenTo(this.model, 'backgrid:select', function(model, checked) {
+                    $checkbox.prop('checked', checked);
+                });
+                $checkbox.on('change' + this.eventNamespace(), _.bind(function(e) {
+                    this.model.trigger('backgrid:selected', this.model, $checkbox.prop('checked'));
+                }, this));
+                $checkbox.on('click' + this.eventNamespace(), function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            return this;
         }
     });
 

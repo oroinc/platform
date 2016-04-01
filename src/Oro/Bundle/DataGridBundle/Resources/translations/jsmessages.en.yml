@@ -99,6 +99,7 @@ oro:
                 	<li><span style="font-family: monospace">Escape</span> - Quit</li>
                 </ul>
         mass_action:
+            title: Mass Actions
             delete:
                 selected_message: >
                     You have selected {{ selected }} records.<br/>

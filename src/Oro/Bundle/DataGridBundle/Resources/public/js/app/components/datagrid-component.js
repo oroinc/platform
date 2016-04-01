@@ -17,6 +17,7 @@ define(function(require) {
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
+    var ToolbarMassActionPlugin = require('orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin');
     var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
     var DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
 
@@ -89,6 +90,8 @@ define(function(require) {
                 throw new Error('Option inputName has to be specified');
             }
 
+            options.metadata.options.toolbarOptions =
+                $.extend(true, options.metadata.options.toolbarOptions, options.toolbarOptions);
             options.$el = $(options.el);
             options.gridName = options.gridName || options.metadata.options.gridName;
             options.builders = options.builders || [];
@@ -267,16 +270,20 @@ define(function(require) {
             // mass actions
             var massActions = this.buildMassActionsOptions(this.metadata.massActions);
 
-            if (tools.isMobile()) {
-                plugins.push(FloatingHeaderPlugin);
-            } else {
-                if (this.metadata.enableFullScreenLayout) {
+            if (!this.themeOptions.headerHide) {
+                if (tools.isMobile()) {
+                    plugins.push(FloatingHeaderPlugin);
+                } else if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
                 }
             }
 
             if (metadata.options.toolbarOptions.addColumnManager) {
                 plugins.push(ColumnManagerPlugin);
+            }
+
+            if (this.themeOptions.showMassActionOnToolbar) {
+                plugins.push(ToolbarMassActionPlugin);
             }
 
             return {

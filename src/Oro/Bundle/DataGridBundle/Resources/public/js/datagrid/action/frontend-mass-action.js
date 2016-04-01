@@ -22,7 +22,7 @@ define([
          */
         execute: function() {
             var selectionState = this.datagrid.getSelectionState();
-            if (_.isEmpty(selectionState.selectedModels) && selectionState.inset) {
+            if (selectionState.selectedModels.length === 0 && selectionState.inset) {
                 messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
             } else {
                 mediator.trigger('datagrid:mass:frontend:execute:' + this.datagrid.name, this);

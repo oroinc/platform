@@ -14,6 +14,7 @@ define(function(require) {
     var GridFooter = require('./footer');
     var GridColumns = require('./columns');
     var Toolbar = require('./toolbar');
+    var SelectState = require('./select-state-model');
     var ActionColumn = require('./column/action-column');
     var SelectRowCell = require('oro/datagrid/cell/select-row-cell');
     var SelectAllHeaderCell = require('./header-cell/select-all-header-cell');
@@ -89,6 +90,8 @@ define(function(require) {
 
         /** @property true when no one column configured to be shown in th grid */
         noColumnsFlag: false,
+
+        selectState: null,
 
         /**
          * @property {Object} Default properties values
@@ -260,6 +263,9 @@ define(function(require) {
 
             if (this.header) {
                 this.header = new this.header(headerOptions);
+                this.selectState = this.header.row.cells[0].selectState;
+            } else {
+                this.selectState = new SelectState();
             }
 
             if (this.footer) {
@@ -276,6 +282,103 @@ define(function(require) {
                 }
                 this.render();
             });
+
+            this.listenTo(this.collection, {
+                'backgrid:selected': this.onSelectRow,
+                'backgrid:selectAll': this.selectAll,
+                'backgrid:selectAllVisible': this.selectAllVisible,
+                'backgrid:selectNone': this.selectNone,
+                'backgrid:isSelected': this.isSelected,
+                'backgrid:getSelected': this.getSelected
+            });
+        },
+
+        onSelectRow: function(model, status) {
+            if (status) {
+                this.selectState.get('rows').add(model);
+            } else {
+                this.selectState.get('rows').remove(model);
+            }
+            this.selectState.set('inset', true);
+        },
+
+        /**
+         * Performs selection of all possible models:
+         *  - reset to initial state
+         *  - change type of set type as not-inset
+         *  - marks all models in collection as selected
+         *  start to collect models which have to be excluded
+         */
+        selectAll: function() {
+            this.selectState.get('rows').reset();
+            this.collection.each(function(model) {
+                model.trigger('backgrid:select', model, true);
+            });
+            this.selectState.set('inset', false);
+        },
+
+        /**
+         * Reset selection of all possible models:
+         *  - reset to initial state
+         *  - change type of set type as inset
+         *  - marks all models in collection as not selected
+         *  start to collect models which have to be included
+         */
+        selectNone: function() {
+            this.selectState.get('rows').reset();
+            this.collection.each(function(model) {
+                model.trigger('backgrid:select', model, false);
+            });
+            this.selectState.set('inset', false);
+        },
+
+        /**
+         * Performs selection of all visible models:
+         *  - if necessary reset to initial state
+         *  - marks all models in collection as selected
+         */
+        selectAllVisible: function() {
+            this.selectState.get('rows').reset();
+            this.collection.each(function(model) {
+                model.trigger('backgrid:select', model, true);
+            });
+            this.selectState.set('inset', true);
+        },
+
+        /**
+         * Checks if model is selected
+         *  - updates passed obj {selected: true} or {selected: false}
+         *
+         * @param {Backbone.Model} model
+         * @param {Object} obj
+         */
+        isSelected: function(model, obj) {
+            if ($.isPlainObject(obj)) {
+                obj.selected = void 0 !== this.selectState.get('rows').find(function(item) {
+                    return item.cid === model.cid;
+                });
+            }
+        },
+
+        /**
+         * Collects selected models
+         *  - updates passed obj
+         *  {
+         *      inset: true,// or false
+         *      selected: [
+         *          // array of models' ids
+         *      ]
+         *  }
+         *
+         * @param {Object} obj
+         */
+        getSelected: function(obj) {
+            if ($.isEmptyObject(obj)) {
+                obj.selected = this.selectState.get('rows').map(function(model) {
+                    return model.id || model.cid;
+                });
+                obj.inset = this.selectState.get('inset');
+            }
         },
 
         /**
@@ -439,10 +542,11 @@ define(function(require) {
          * @returns {{selectedModels: *, inset: boolean}}
          */
         getSelectionState: function() {
-            if (this.header) {
-                var selectAllHeader = this.header.row.cells[0];
-                return selectAllHeader.getSelectionState();
-            }
+            var state = {
+                selectedModels: this.selectState.get('rows'),
+                inset: this.selectState.get('inset')
+            };
+            return state;
         },
 
         /**

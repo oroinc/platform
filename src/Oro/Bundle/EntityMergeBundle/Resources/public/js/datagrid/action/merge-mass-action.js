@@ -39,7 +39,7 @@ define([
             var maxLength = this.max_element_count;
             var selectionState = this.datagrid.getSelectionState();
             var isInset = selectionState.inset;
-            var length = Object.keys(selectionState.selectedModels).length;
+            var length = selectionState.selectedModels.length;
 
             if (!isInset) {
                 totalRecords = this.datagrid.collection.state.totalRecords;
