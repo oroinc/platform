@@ -1,3 +1,8 @@
+# we should add application/vnd.api+json content type as "json" type to be able to recive processed JSON.API data from the Request
+fos_rest:
+    view:
+        mime_types: {'json': ['application/json', 'application/x-json', 'application/vnd.api+json']}
+
 nelmio_api_doc:
     motd:
         template: OroApiBundle::ApiDoc/motd.html.twig
@@ -59,6 +64,45 @@ oro_api:
 
     form_type_guessers:
         - form.type_guesser.validator
+
+    form_type_guesses:
+        # default types
+        integer:
+            form_type: integer
+        smallint:
+            form_type: integer
+        bigint:
+            form_type: integer
+        boolean:
+            form_type: boolean
+        decimal:
+            form_type: number
+        float:
+            form_type: number
+        date:
+            form_type: date
+        time:
+            form_type: time
+            options:
+                model_timezone: UTC
+                view_timezone: UTC
+        datetime:
+            form_type: datetime
+            options:
+                model_timezone: UTC
+                view_timezone: UTC
+        datetimetz:
+            form_type: datetime
+            options:
+                model_timezone: UTC
+                view_timezone: UTC
+        text:
+            form_type: textarea
+        # custom types
+        percent:
+            form_type: percent
+        money:
+            form_type: money
 
     actions:
         get_list:

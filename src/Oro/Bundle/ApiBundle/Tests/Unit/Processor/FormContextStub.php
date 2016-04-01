@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Create;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\FormContextTrait;
 
-class CreateContext extends Context implements FormContext
+class FormContextStub extends Context implements FormContext
 {
     use FormContextTrait;
 }
