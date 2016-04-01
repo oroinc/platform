@@ -7,8 +7,8 @@ use Symfony\Component\Form\Form;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 
+use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\SingleItemUpdateContext;
 
 /**
  * Collects form errors occurred due create or update requests and adds them into context.
@@ -17,7 +17,7 @@ class CollectFormErrors implements ProcessorInterface
 {
     public function process(ContextInterface $context)
     {
-        /** @var $context SingleItemUpdateContext */
+        /** @var $context FormContext */
 
         if (false === $context->hasForm()) {
             throw new \RuntimeException('The form must be set in the context.');
@@ -35,14 +35,28 @@ class CollectFormErrors implements ProcessorInterface
             return;
         }
 
-        $formErrors = $form->getErrors(true, true);
-        foreach ($formErrors as $error) {
+        // collect form global errors
+        foreach ($form->getErrors() as $error) {
             $errorObject = new Error();
 
             $errorObject->setPropertyName($error->getOrigin()->getName());
             $errorObject->setDetail($error->getMessage());
 
             $context->addError($errorObject);
+        }
+
+        // collect form childes errors
+        foreach ($form as $child) {
+            if (!$child->isValid()) {
+                foreach ($child->getErrors() as $error) {
+                    $errorObject = new Error();
+
+                    $errorObject->setPropertyName($child->getName());
+                    $errorObject->setDetail($error->getMessage());
+
+                    $context->addError($errorObject);
+                }
+            }
         }
     }
 }
