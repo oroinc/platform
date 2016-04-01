@@ -53,7 +53,7 @@ class UpdateImportExportIdentityQuery implements MigrationQuery, ConnectionAware
 
         $arrayType = Type::getType(Type::TARRAY);
         $updatedFields = array_map(
-            function(array $row) use ($arrayType, $identity) {
+            function (array $row) use ($arrayType, $identity) {
                 $data = $arrayType
                     ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
 
@@ -70,7 +70,7 @@ class UpdateImportExportIdentityQuery implements MigrationQuery, ConnectionAware
 
         array_walk(
             $updatedFields,
-            function(array $field) {
+            function (array $field) {
                 $this->connection->update(
                     'oro_entity_config_field',
                     ['data' => $field['data']],
