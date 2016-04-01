@@ -9,6 +9,7 @@ services:
             - @oro_api.metadata_provider
         tags:
             - { name: oro.api.action_processor }
+
     #
     # initialize
     #
@@ -64,6 +65,15 @@ services:
             - CREATE
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 10 }
+
+    #
+    # bind_data
+    #
+
+    oro_api.create.collect_form_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CollectFormErrors
+        tags:
+            - { name: oro.api.processor, action: create, group: bind_data, priority: -10 }
 
     #
     # normalize_data

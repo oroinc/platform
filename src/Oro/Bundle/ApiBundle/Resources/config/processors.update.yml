@@ -135,6 +135,15 @@ services:
             - { name: oro.api.processor, action: update, group: load_data, priority: -20 }
 
     #
+    # bind_data
+    #
+
+    oro_api.update.collect_form_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CollectFormErrors
+        tags:
+            - { name: oro.api.processor, action: update, group: bind_data, priority: -10 }
+
+    #
     # normalize_data
     #
 
