@@ -8,7 +8,7 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Oro\Bundle\ActionBundle\Command\ValidateActionConfigurationCommand;
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface;
 use Oro\Bundle\ActionBundle\Tests\Unit\Command\Stub\OutputStub;
 
 class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
@@ -19,7 +19,7 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
     protected $command;
 
     /**
-     * @var ActionConfigurationProvider|\PHPUnit_Framework_MockObject_MockObject
+     * @var ConfigurationProviderInterface|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $provider;
 
@@ -40,14 +40,12 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->provider = $this->getMockBuilder('Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->provider = $this->getMock('Oro\Bundle\ActionBundle\Configuration\ConfigurationProviderInterface');
 
         $this->container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $this->container->expects($this->any())
             ->method('get')
-            ->with('oro_action.configuration.provider', 1)
+            ->with('oro_action.configuration.provider.operations', 1)
             ->willReturn($this->provider);
 
         $this->input = $this->getMock('Symfony\Component\Console\Input\InputInterface');
@@ -73,7 +71,7 @@ class ValidateActionConfigurationCommandTest extends \PHPUnit_Framework_TestCase
     public function testExecute(array $inputData, array $expectedData)
     {
         $this->provider->expects($this->once())
-            ->method('getActionConfiguration')
+            ->method('getConfiguration')
             ->with(true, $this->isInstanceOf('Doctrine\Common\Collections\Collection'))
             ->willReturnCallback(
                 function ($ignoreCache, Collection $errors) use ($inputData) {

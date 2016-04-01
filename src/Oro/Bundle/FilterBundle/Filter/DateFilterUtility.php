@@ -206,11 +206,14 @@ class DateFilterUtility
      */
     protected function containsMonthVariable(array $data)
     {
-        return ArrayUtil::some(
+        return ($data['date_start'] instanceof \DateTime || $data['date_end'] instanceof \DateTime) && ArrayUtil::some(
             function ($field) use ($data) {
                 $expr = $this->compileExpression($data, $field);
 
-                return $expr && $expr->getVariableType() == DateModifierInterface::VAR_THIS_MONTH_W_Y;
+                return $expr && (
+                    $expr->getVariableType() === DateModifierInterface::VAR_THIS_MONTH_W_Y ||
+                    $expr->getSourceType() === ExpressionResult::TYPE_INT
+                );
             },
             [
                 'date_start_original',
