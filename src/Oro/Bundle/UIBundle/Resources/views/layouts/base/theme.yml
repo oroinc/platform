@@ -13,7 +13,4 @@ data:
                 - 'bundles/oroui/css/jquery-ui-1.10.2.custom.css'
                 - 'bundles/oroui/css/less/uniform.less'
                 - 'bundles/oroui/css/less/font-awesome.less'
-                - 'bundles/oroui/css/less/oro/datagrid.less'
-                - 'bundles/oroui/css/less/oro/datepicker.less'
-                - 'bundles/oroui/css/less/oro/filter.less'
-                - 'bundles/oroui/css/less/oro/loading-mask.less'
+                - 'bundles/oroui/css/less/base.less'
