@@ -357,6 +357,12 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($this->context->getConfigOf('section1'));
         $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
         $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+
+        // test remove config
+        $this->context->setConfig();
+        $this->assertFalse($this->context->hasConfig());
+        $this->assertFalse($this->context->hasConfigOf('section1'));
+        $this->assertFalse($this->context->has(Context::CONFIG_PREFIX . 'section1'));
     }
 
     public function testConfigWhenItIsSetExplicitlyForSection()
@@ -668,6 +674,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($metadata, $this->context->getMetadata());
         $this->assertTrue($this->context->has(Context::METADATA));
         $this->assertSame($metadata, $this->context->get(Context::METADATA));
+
+        // test remove metadata
+        $this->context->setMetadata();
+        $this->assertFalse($this->context->hasMetadata());
     }
 
     public function testMetadataExtras()
@@ -728,10 +738,10 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
     public function testQuery()
     {
+        $query = new \stdClass();
+
         $this->assertFalse($this->context->hasQuery());
         $this->assertNull($this->context->getQuery());
-
-        $query = new \stdClass();
 
         $this->context->setQuery($query);
         $this->assertTrue($this->context->hasQuery());
@@ -739,7 +749,8 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($query, $this->context->get(Context::QUERY));
 
         $this->context->setQuery(null);
-        $this->assertTrue($this->context->hasQuery());
+        $this->assertFalse($this->context->hasQuery());
+        $this->assertNull($this->context->getQuery());
     }
 
     public function testCriteria()

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 
@@ -10,6 +9,7 @@ use Symfony\Component\Form\FormInterface;
  * @method bool has($key)
  * @method mixed get($key)
  * @method void set($key, $value)
+ * @method void remove($key)
  */
 trait FormContextTrait
 {
@@ -34,27 +34,51 @@ trait FormContextTrait
     }
 
     /**
-     * Gets a form builder.
+     * Checks whether the form builder exists.
+     *
+     * @return bool
+     */
+    public function hasFormBuilder()
+    {
+        return $this->has(FormContext::FORM_BUILDER);
+    }
+
+    /**
+     * Gets the form builder.
      *
      * @return FormBuilderInterface|null
      */
     public function getFormBuilder()
     {
-        return $this->get(FormContext::FORM);
+        return $this->get(FormContext::FORM_BUILDER);
     }
 
     /**
-     * Sets a form builder.
+     * Sets the form builder.
      *
      * @param FormBuilderInterface|null $formBuilder
      */
     public function setFormBuilder(FormBuilderInterface $formBuilder = null)
     {
-        $this->set(FormContext::FORM, $formBuilder);
+        if ($formBuilder) {
+            $this->set(FormContext::FORM_BUILDER, $formBuilder);
+        } else {
+            $this->remove(FormContext::FORM_BUILDER);
+        }
     }
 
     /**
-     * Gets a form.
+     * Checks whether the form exists.
+     *
+     * @return bool
+     */
+    public function hasForm()
+    {
+        return $this->has(FormContext::FORM);
+    }
+
+    /**
+     * Gets the form.
      *
      * @return FormInterface|null
      */
@@ -64,12 +88,16 @@ trait FormContextTrait
     }
 
     /**
-     * Sets a form.
+     * Sets the form.
      *
      * @param FormInterface|null $form
      */
     public function setForm(FormInterface $form = null)
     {
-        $this->set(FormContext::FORM, $form);
+        if ($form) {
+            $this->set(FormContext::FORM, $form);
+        } else {
+            $this->remove(FormContext::FORM);
+        }
     }
 }

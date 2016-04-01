@@ -215,7 +215,11 @@ class Context extends ApiContext implements ContextInterface
      */
     public function setQuery($query)
     {
-        $this->set(self::QUERY, $query);
+        if ($query) {
+            $this->set(self::QUERY, $query);
+        } else {
+            $this->remove(self::QUERY);
+        }
     }
 
     /**
@@ -374,10 +378,15 @@ class Context extends ApiContext implements ContextInterface
      */
     public function setConfig(EntityDefinitionConfig $definition = null)
     {
-        $this->set($this->getConfigKey(), $definition);
-
-        // make sure that all config sections are added to the context
-        $this->ensureAllConfigSectionsSet();
+        if ($definition) {
+            $this->set($this->getConfigKey(), $definition);
+            // make sure that all config sections are added to the context
+            $this->ensureAllConfigSectionsSet();
+        } else {
+            $this->remove($this->getConfigKey());
+            // make sure that all config sections are removed from the context
+            $this->ensureAllConfigSectionsSet(true);
+        }
     }
 
     /**
@@ -521,16 +530,24 @@ class Context extends ApiContext implements ContextInterface
     }
 
     /**
-     * Makes sure that all config sections are added to the context.
+     * Makes sure that all config sections are added to (or removed from) the context.
+     *
+     * @param bool $remove
      */
-    protected function ensureAllConfigSectionsSet()
+    protected function ensureAllConfigSectionsSet($remove = false)
     {
         $configExtras = $this->getConfigExtras();
         foreach ($configExtras as $configExtra) {
             if ($configExtra instanceof ConfigExtraSectionInterface) {
                 $key = self::CONFIG_PREFIX . $configExtra->getName();
-                if (!$this->has($key)) {
-                    $this->set($key, null);
+                if ($remove) {
+                    if ($this->has($key)) {
+                        $this->remove($key);
+                    }
+                } else {
+                    if (!$this->has($key)) {
+                        $this->set($key, null);
+                    }
                 }
             }
         }
@@ -658,7 +675,11 @@ class Context extends ApiContext implements ContextInterface
      */
     public function setMetadata(EntityMetadata $metadata = null)
     {
-        $this->set(self::METADATA, $metadata);
+        if ($metadata) {
+            $this->set(self::METADATA, $metadata);
+        } else {
+            $this->remove(self::METADATA);
+        }
     }
 
     /**
