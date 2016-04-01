@@ -354,7 +354,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.id.label',
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ],
-                                'importexport' => ['identity' => true]
+                                'importexport' => ['identity' => false],
                             ],
                             'type'    => 'string'
                         ],
@@ -468,8 +468,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ],
                                 'importexport' => [
-                                    'identity' => true
-                                ]
+                                    'identity' => false,
+                                ],
                             ],
                             'type'    => 'string',
                         ],

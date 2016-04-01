@@ -201,8 +201,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                     ],
                     'importexport' => [
-                        'identity' => true
-                    ]
+                        'identity' => false,
+                    ],
                 ]
             ]
         );
@@ -219,7 +219,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     'datagrid' => [
                         'is_visible' => false
                     ]
-                ]
+                ],
+                'importexport' => [
+                    'identity' => true,
+                ],
             ]
         );
         $table->addColumn(
