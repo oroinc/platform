@@ -103,7 +103,8 @@ define(function(require) {
          */
         initDataGrid: function(options) {
             this.$el = $('<div>');
-            $(options.el).append(this.$el);
+            this.$componentEl = options.$el;
+            options.$el.append(this.$el);
             this.gridName = options.gridName;
             this.inputName = options.inputName;
             this.data = options.data;
@@ -188,6 +189,7 @@ define(function(require) {
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();
+            this.$componentEl.find('.view-loading').remove();
             mediator.trigger('datagrid:rendered', grid);
 
             if (options.routerEnabled !== false) {
