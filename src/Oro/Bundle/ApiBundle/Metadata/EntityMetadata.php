@@ -150,7 +150,7 @@ class EntityMetadata extends ParameterBag
     /**
      * Gets metadata for all fields.
      *
-     * @return FieldMetadata[]
+     * @return FieldMetadata[] [field name => FieldMetadata, ...]
      */
     public function getFields()
     {
@@ -222,7 +222,7 @@ class EntityMetadata extends ParameterBag
     /**
      * Gets metadata for all associations.
      *
-     * @return AssociationMetadata[]
+     * @return AssociationMetadata[] [association name => AssociationMetadata, ...]
      */
     public function getAssociations()
     {

@@ -147,6 +147,30 @@ services:
             - { name: oro.api.processor, action: update, group: load_data, priority: -20 }
 
     #
+    # build_form
+    #
+
+    oro_api.update.initialize_api_form_extension:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeApiFormExtension
+        arguments:
+            - @form.registry
+            - @oro_api.form.guesser.metadata
+        tags:
+            - { name: oro.api.processor, action: update, group: build_form, priority: 250 }
+
+    oro_api.update.build_form_builder:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
+        arguments:
+            - @form.factory
+        tags:
+            - { name: oro.api.processor, action: update, group: build_form, priority: 100 }
+
+    oro_api.update.build_form:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\BuildForm
+        tags:
+            - { name: oro.api.processor, action: update, group: build_form, priority: -10 }
+
+    #
     # bind_data
     #
 
@@ -174,6 +198,15 @@ services:
     #
     # normalize_result
     #
+
+    oro_api.update.restore_default_form_extension:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
+        arguments:
+            - @form.registry
+            - @oro_api.form.guesser.metadata
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_result, priority: 250 }
+
     oro_api.update.rest.set_http_response_status_code:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
         tags:

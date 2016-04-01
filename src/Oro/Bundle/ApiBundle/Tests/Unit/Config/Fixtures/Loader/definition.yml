@@ -304,3 +304,37 @@ extra_sections:
         another_section:
             exclusion_policy: none
             extra: true
+
+field_form:
+    config:
+        fields:
+            field1:
+                form_type: ~
+            field2:
+                form_type: ""
+            field3:
+                form_type: integer
+            field4:
+                form_type: integer
+                form_options: ~
+            field5:
+                form_type: integer
+                form_options: []
+            field6:
+                form_type: integer
+                form_options:
+                    option1: value1
+    expected:
+        fields:
+            field1: ~
+            field2: ~
+            field3:
+                form_type: integer
+            field4:
+                form_type: integer
+            field5:
+                form_type: integer
+            field6:
+                form_type: integer
+                form_options:
+                    option1: value1

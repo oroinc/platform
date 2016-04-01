@@ -206,6 +206,20 @@ Each field can have next properties:
 
 * **label** *string* A human-readable representation of the field. Used in auto generated documentation only.
 * **description** *string* A human-readable description of the field. Used in auto generated documentation only.
+
+Example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
+            fields:
+                field1:
+                    label:       "Acme name"
+                    description: "Acme description"
+```
+
 * **property_path** *string* The property path to reach the fields' value. Can be used to rename a field or to access to a field of related entity.
 
 Example:
@@ -269,11 +283,24 @@ oro_api:
             ...
             fields:
                 field1:
-                    label:            "Acme name"
-                    description:      "Acme name description"
-                    property_path:    "firstName"
-                field2:
                     exclude: true
+```
+
+* **form_type** *string* The form type that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
+* **form_options** *array* The form options that should be used for the field in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions.
+
+Example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            ...
+            fields:
+                field1:
+                    form_type: text
+                    form_options:
+                        trim: false
 ```
 
 * **filters** - This section describes fields by which the result data can be filtered. It contains two properties: `exclusion_policy` and `fields`.

@@ -9,9 +9,9 @@ use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CollectFormErrors;
-use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormContextTestCase;
+use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
-class CollectFormErrorsTest extends FormContextTestCase
+class CollectFormErrorsTest extends FormProcessorTestCase
 {
     /** @var CollectFormErrors */
     protected $processor;
