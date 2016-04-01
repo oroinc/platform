@@ -52,6 +52,12 @@ or
 php app/console oro:api:config:dump users
 ```
 
+If you want to see the configuration that is used for a particular action you can use the `action` option:
+
+```bash
+php app/console oro:api:config:dump users --action=get
+```
+
 To see the configuration for a particular request type you can use the `request-type` option:
 
 ```bash
@@ -103,6 +109,12 @@ or
 
 ```bash
 php app/console oro:api:metadata:dump users
+```
+
+If you want to see entity metadata that is used for a particular action you can use the `action` option:
+
+```bash
+php app/console oro:api:metadata:dump users --action=get
 ```
 
 If you want to see entity metadata that is used for a particular request type you can use the `request-type` option:

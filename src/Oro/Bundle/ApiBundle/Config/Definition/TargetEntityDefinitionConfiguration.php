@@ -198,7 +198,14 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
             ->booleanNode(EntityDefinitionFieldConfig::COLLAPSE)->end()
             ->variableNode(EntityDefinitionFieldConfig::DATA_TRANSFORMER)->end()
             ->scalarNode(EntityDefinitionFieldConfig::LABEL)->cannotBeEmpty()->end()
-            ->scalarNode(EntityDefinitionFieldConfig::DESCRIPTION)->cannotBeEmpty()->end();
+            ->scalarNode(EntityDefinitionFieldConfig::DESCRIPTION)->cannotBeEmpty()->end()
+            ->scalarNode(EntityDefinitionFieldConfig::FORM_TYPE)->end()
+            ->arrayNode(EntityDefinitionFieldConfig::FORM_OPTIONS)
+                ->useAttributeAsKey('name')
+                ->performNoDeepMerging()
+                ->prototype('variable')
+                ->end()
+            ->end();
         $parentNode
             ->validate()
                 ->always(
@@ -221,6 +228,12 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
     {
         if (empty($config[EntityDefinitionFieldConfig::DATA_TRANSFORMER])) {
             unset($config[EntityDefinitionFieldConfig::DATA_TRANSFORMER]);
+        }
+        if (empty($config[EntityDefinitionFieldConfig::FORM_TYPE])) {
+            unset($config[EntityDefinitionFieldConfig::FORM_TYPE]);
+        }
+        if (empty($config[EntityDefinitionFieldConfig::FORM_OPTIONS])) {
+            unset($config[EntityDefinitionFieldConfig::FORM_OPTIONS]);
         }
 
         return $config;

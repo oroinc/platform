@@ -14,12 +14,19 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     use Traits\ExcludeTrait;
     use Traits\LabelTrait;
     use Traits\DescriptionTrait;
+    use Traits\FormFieldTrait;
 
     /** a human-readable representation of the field */
     const LABEL = 'label';
 
     /** a human-readable description of the field */
     const DESCRIPTION = 'description';
+
+    /** the form type that should be used for the field */
+    const FORM_TYPE = 'form_type';
+
+    /** the form options that should be used for the field */
+    const FORM_OPTIONS = 'form_options';
 
     /**
      * {@inheritdoc}

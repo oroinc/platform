@@ -77,7 +77,7 @@ class DumpConfigCommand extends AbstractDebugCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'The name of action for which the configuration should be displayed.' .
-                'Can be "get", "get_list", "delete", etc.'
+                'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.'
             );
         parent::configure();
     }
@@ -243,9 +243,9 @@ class DumpConfigCommand extends AbstractDebugCommand
             }
         }
         // add other sections
-        foreach ($data as $sectionName => $config) {
+        foreach ($data as $sectionName => $sectionConfig) {
             if (!array_key_exists($sectionName, $result)) {
-                $result[$sectionName] = $config;
+                $result[$sectionName] = $sectionConfig;
             }
         }
 
