@@ -431,6 +431,9 @@ class JsonApiDocumentBuilder
         if ($error->getTitle()) {
             $result['title'] = $error->getTitle();
         }
+        if ($error->getPropertyName()) {
+            $result['source'] = $error->getPropertyName();
+        }
 
         return $result;
     }

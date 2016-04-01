@@ -2,8 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Model;
 
-use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
 
 /**
  * Represents an error happened during the processing of an action.
@@ -18,6 +19,9 @@ class Error
 
     /** @var string|Label|null */
     protected $detail;
+
+    /** @var string|null */
+    protected $propertyName;
 
     /** @var \Exception|null */
     protected $innerException;
@@ -72,6 +76,26 @@ class Error
     public function getDetail()
     {
         return $this->detail;
+    }
+
+    /**
+     * Sets a property name specific to this occurrence of the problem.
+     *
+     * @param string|null $propertyName
+     */
+    public function setPropertyName($propertyName)
+    {
+        $this->propertyName = $propertyName;
+    }
+
+    /**
+     * Gets a property name specific to this occurrence of the problem.
+     *
+     * @return string|null
+     */
+    public function getPropertyName()
+    {
+        return $this->propertyName;
     }
 
     /**
