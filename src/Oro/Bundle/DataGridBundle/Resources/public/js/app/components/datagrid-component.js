@@ -74,6 +74,7 @@ define(function(require) {
             $.when.apply($, promises).always(function() {
                 self.subComponents = _.compact(arguments);
                 self._resolveDeferredInit();
+                self.$componentEl.find('.view-loading').remove();
                 self.$el.show();
                 self.grid.trigger('shown');
             });
@@ -104,7 +105,7 @@ define(function(require) {
         initDataGrid: function(options) {
             this.$el = $('<div>');
             this.$componentEl = options.$el;
-            options.$el.append(this.$el);
+            this.$componentEl.append(this.$el);
             this.gridName = options.gridName;
             this.inputName = options.inputName;
             this.data = options.data;
@@ -189,7 +190,6 @@ define(function(require) {
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();
-            this.$componentEl.find('.view-loading').remove();
             mediator.trigger('datagrid:rendered', grid);
 
             if (options.routerEnabled !== false) {
