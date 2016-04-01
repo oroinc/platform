@@ -22,7 +22,7 @@ services:
             - @oro_workflow.expression.factory
         calls:
             - [addConfigurationPass, [@oro_workflow.configuration_pass.replace_property_path]]
-        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.function_assembler" instead
+        deprecated: The "%service_id%" service is deprecated since since 1.10. Use "oro_action.action_assembler" instead
 
     oro_workflow.expression.assembler:
         class: Oro\Component\ConfigExpression\ExpressionAssembler

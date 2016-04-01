@@ -50,8 +50,18 @@ define(function(require) {
                 this.widgetFunction();
             }
 
-            this.findContainer();
-            this.getContainer().addClass(this.containerClass);
+            if (this.isInitialized()) {
+                this.findContainer();
+                this.getContainer().addClass(this.containerClass);
+            }
+        },
+
+        /**
+         * Implement this method in child class if widget can not be initialized for some reason
+         * @returns {boolean}
+         */
+        isInitialized: function() {
+            return true;
         },
 
         /**

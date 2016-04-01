@@ -2,40 +2,31 @@
 
 namespace Oro\Bundle\EmailBundle\Tests\Unit\Mailer;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
+
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 
 class DirectMailerTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|\Swift_Mailer */
     protected $baseMailer;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
     protected $container;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $userEmailOrigin;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $imapEmailGoogleOauth2Manager;
+    /** @var \PHPUnit_Framework_MockObject_MockObject|EmailOrigin */
+    protected $emailOrigin;
 
     protected function setUp()
     {
         $this->baseMailer = $this->getMailerMock();
         $this->container  = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
 
-        $this->userEmailOrigin =
-            $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
+        $this->emailOrigin =
+            $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\EmailOrigin')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $this->userEmailOrigin->expects($this->any())
-            ->method('getSmtpHost')
-            ->will($this->returnValue('smtp.gmail.com'));
-        $this->userEmailOrigin->expects($this->any())
-            ->method('getSmtpPort')
-            ->will($this->returnValue(465));
-        $this->userEmailOrigin->expects($this->any())
-            ->method('getUser')
-            ->will($this->returnValue('user1'));
 
         $managerClass = 'Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager';
         $this->imapEmailGoogleOauth2Manager = $this->getMockBuilder($managerClass)
@@ -47,7 +38,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     public function testSendNonSpooled()
     {
         $message          = new \Swift_Message();
-        $failedRecipients = array();
+        $failedRecipients = [];
         $transport        = $this->getMock('\Swift_Transport');
 
         $this->baseMailer->expects($this->once())
@@ -71,14 +62,14 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $transport->expects($this->once())
             ->method('stop');
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
+        $mailer = new DirectMailer($this->baseMailer, $this->container);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
     public function testSendSpooled()
     {
         $message          = new \Swift_Message();
-        $failedRecipients = array();
+        $failedRecipients = [];
         $transport        = $this->getMockBuilder('\Swift_Transport_SpoolTransport')
             ->disableOriginalConstructor()
             ->getMock();
@@ -91,17 +82,17 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $this->container->expects($this->once())
             ->method('getParameter')
             ->with('swiftmailer.mailers')
-            ->will($this->returnValue(array('test1' => null, 'test2' => null)));
+            ->will($this->returnValue(['test1' => null, 'test2' => null]));
         $this->container->expects($this->any())
             ->method('get')
             ->will(
                 $this->returnValueMap(
                     // 1 = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE
-                    array(
-                        array('swiftmailer.mailer.test1', 1, $this->getMailerMock()),
-                        array('swiftmailer.mailer.test2', 1, $this->baseMailer),
-                        array('swiftmailer.mailer.test2.transport.real', 1, $realTransport),
-                    )
+                    [
+                        ['swiftmailer.mailer.test1', 1, $this->getMailerMock()],
+                        ['swiftmailer.mailer.test2', 1, $this->baseMailer],
+                        ['swiftmailer.mailer.test2.transport.real', 1, $realTransport],
+                    ]
                 )
             );
 
@@ -120,7 +111,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $realTransport->expects($this->once())
             ->method('stop');
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
+        $mailer = new DirectMailer($this->baseMailer, $this->container);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
@@ -130,7 +121,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
     public function testSendWithException()
     {
         $message          = new \Swift_Message();
-        $failedRecipients = array();
+        $failedRecipients = [];
         $transport        = $this->getMock('\Swift_Transport');
 
         $this->baseMailer->expects($this->once())
@@ -154,77 +145,45 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
         $transport->expects($this->once())
             ->method('stop');
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
-        $this->assertEquals(1, $mailer->send($message, $failedRecipients));
-    }
-
-    public function testSendWithSmtpConfigured()
-    {
-        $message          = new \Swift_Message();
-        $failedRecipients = array();
-        $transport        = $this->getMock('\Swift_SmtpTransport');
-
-        $this->baseMailer->expects($this->once())
-            ->method('getTransport')
-            ->will($this->returnValue($transport));
-        $this->container->expects($this->never())
-            ->method('getParameter');
-        $transport->expects($this->at(0))
-            ->method('isStarted')
-            ->will($this->returnValue(false));
-        $transport->expects($this->once())
-            ->method('start');
-        $transport->expects($this->at(2))
-            ->method('isStarted')
-            ->will($this->returnValue(true));
-        $transport->expects($this->once())
-            ->method('send')
-            ->with($this->identicalTo($message), $this->identicalTo($failedRecipients))
-            ->will($this->returnValue(1));
-        $transport->expects($this->once())
-            ->method('stop');
-
-        $encoder = $this->getMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
-        $this->container->expects($this->any())
-            ->method('get')
-            ->with($this->equalTo('oro_security.encoder.mcrypt'))
-            ->will($this->returnValue($encoder));
-
-        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
-
-        $transport->expects($this->once())->method('setHost');
-        $transport->expects($this->once())->method('setPort');
-
-        $mailer->prepareSmtpTransport($this->userEmailOrigin);
-
+        $mailer = new DirectMailer($this->baseMailer, $this->container);
         $this->assertEquals(1, $mailer->send($message, $failedRecipients));
     }
 
     public function testCreateSmtpTransport()
     {
-        $transport = $this->getMock('\Swift_Transport');
+        $transportMock = $this->getMock('\Swift_Transport');
+        $smtpTransportMock = $this->getMockBuilder('\Swift_Transport_EsmtpTransport')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $event = $this->getMockBuilder('Oro\Bundle\EmailBundle\Event\SendEmailTransport')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $dispatcher = $this->getMockBuilder('Symfony\Component\EventDispatcher\EventDispatcherInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $dispatcher->expects($this->once())
+            ->method('dispatch')
+            ->willReturn($event);
+        $event->expects($this->once())
+            ->method('getTransport')
+            ->willReturn($smtpTransportMock);
 
         $this->baseMailer->expects($this->once())
             ->method('getTransport')
-            ->will($this->returnValue($transport));
-        $this->container->expects($this->never())
-            ->method('getParameter');
+            ->will($this->returnValue($transportMock));
 
-        $encoder = $this->getMock('Oro\Bundle\SecurityBundle\Encoder\Mcrypt');
-        $this->container->expects($this->any())
+        $this->container->expects($this->once())
             ->method('get')
-            ->with($this->equalTo('oro_security.encoder.mcrypt'))
-            ->will($this->returnValue($encoder));
+            ->willReturn($dispatcher);
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
-
-        $transport->expects($this->never())->method('setHost');
-        $transport->expects($this->never())->method('setPort');
-
-        $mailer->prepareSmtpTransport($this->userEmailOrigin);
+        $mailer = new DirectMailer($this->baseMailer, $this->container);
+        $mailer->prepareSmtpTransport($this->emailOrigin);
         $smtpTransport = $mailer->getTransport();
 
-        $this->assertInstanceOf('\Swift_SmtpTransport', $smtpTransport);
+        $this->assertInstanceOf('\Swift_Transport_EsmtpTransport', $smtpTransport);
+
+        $mailer->prepareSmtpTransport($this->emailOrigin);
     }
 
     /**
@@ -238,7 +197,7 @@ class DirectMailerTest extends \PHPUnit_Framework_TestCase
             ->method('getTransport')
             ->will($this->returnValue($transport));
 
-        $mailer = new DirectMailer($this->baseMailer, $this->container, $this->imapEmailGoogleOauth2Manager);
+        $mailer = new DirectMailer($this->baseMailer, $this->container);
         $plugin = $this->getMock('\Swift_Events_EventListener');
         $mailer->registerPlugin($plugin);
     }
