@@ -5,9 +5,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\JsonApi;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\FormBuilder;
 use Symfony\Component\Form\Forms;
-use Symfony\Component\Validator\Constraints\Length;
-use Symfony\Component\Validator\Constraints\NotBlank;
-use Symfony\Component\Validator\Constraints\NotNull;
+use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CollectFormErrors;
@@ -129,10 +127,10 @@ class CollectFormErrorsTest extends FormContextTestCase
                 'data' => [],
                 'constraints' => [
                     [
-                        new NotBlank()
+                        new Constraints\NotBlank()
                     ],
                     [
-                        new NotBlank()
+                        new Constraints\NotBlank()
                     ]
                 ],
                 'errors' => 2 // both fields empty
@@ -144,13 +142,13 @@ class CollectFormErrorsTest extends FormContextTestCase
                 ],
                 'constraints' => [
                     [
-                        new NotBlank()
+                        new Constraints\NotBlank()
                     ],
                     [
-                        new NotBlank(),
+                        new Constraints\NotBlank(),
                     ]
                 ],
-                'errors' => 2 // one field empty, extra data
+                'errors' => 2 // 2nd field empty and extra data
             ],
             'invalid_values' => [
                 'data' => [
@@ -159,11 +157,11 @@ class CollectFormErrorsTest extends FormContextTestCase
                 ],
                 'constraints' => [
                     [
-                        new NotBlank(),
-                        new NotNull()
+                        new Constraints\NotBlank(),
+                        new Constraints\NotNull()
                     ],
                     [
-                        new Length(['min' => 2, 'max' => 4])
+                        new Constraints\Length(['min' => 2, 'max' => 4])
                     ]
                 ],
                 'errors' => 3
