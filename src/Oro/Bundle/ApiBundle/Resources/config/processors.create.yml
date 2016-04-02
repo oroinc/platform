@@ -39,13 +39,6 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: initialize, priority: 50 }
 
-    oro_api.create.json_api.normalize_include_parameter:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludeParameter
-        arguments:
-            - @oro_api.value_normalizer
-        tags:
-            - { name: oro.api.processor, action: create, group: initialize, requestType: json_api, priority: 50 }
-
     oro_api.create.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:

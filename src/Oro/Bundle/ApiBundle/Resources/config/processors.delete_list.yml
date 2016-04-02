@@ -46,13 +46,6 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 50 }
 
-    oro_api.delete_list.json_api.normalize_include_parameter:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludeParameter
-        arguments:
-            - @oro_api.value_normalizer
-        tags:
-            - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: 50 }
-
     oro_api.delete_list.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
