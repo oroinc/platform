@@ -10,9 +10,11 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 /**
- * Sets "fields[]" filter into the Context.
+ * Handles "fields[]" filters.
+ * These filters are used to specify which fields of primary
+ * or related entities should be returned.
  */
-class NormalizeFieldsParameter implements ProcessorInterface
+class HandleFieldsFilter implements ProcessorInterface
 {
     const FILTER_KEY = 'fields';
 

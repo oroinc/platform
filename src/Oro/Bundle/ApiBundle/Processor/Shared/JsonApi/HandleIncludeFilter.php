@@ -10,9 +10,10 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 /**
- * Sets "include" filter into the Context.
+ * Handles "include" filter.
+ * This filter is used to specify which related entities should be returned.
  */
-class NormalizeIncludeParameter implements ProcessorInterface
+class HandleIncludeFilter implements ProcessorInterface
 {
     const FILTER_KEY = 'include';
 
