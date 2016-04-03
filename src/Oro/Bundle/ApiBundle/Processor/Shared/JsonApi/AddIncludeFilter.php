@@ -13,7 +13,7 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
  * Adds "include" filter.
  * This filter can be used to specify which related entities should be returned.
  */
-class SetIncludeFilter implements ProcessorInterface
+class AddIncludeFilter implements ProcessorInterface
 {
     const FILTER_KEY = 'include';
 

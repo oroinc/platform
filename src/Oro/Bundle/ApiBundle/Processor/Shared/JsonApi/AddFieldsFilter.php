@@ -18,7 +18,7 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
  * These filters can be used to specify which fields of primary
  * or related entities should be returned.
  */
-class SetFieldsFilter implements ProcessorInterface
+class AddFieldsFilter implements ProcessorInterface
 {
     const FILTER_KEY          = 'fields';
     const FILTER_KEY_TEMPLATE = 'fields[%s]';
