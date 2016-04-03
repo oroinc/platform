@@ -15,7 +15,8 @@ use Oro\Bundle\BatchBundle\ORM\Query\QueryCountCalculator;
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
 
 /**
- * Calculates and sets the total number of records to "X-Include-Total-Count" response header,
+ * Calculates and sets the total number of records and sets it
+ * to "X-Include-Total-Count" response header,
  * in case if it was requested by "X-Include: totalCount" request header.
  */
 class SetTotalCountHeader implements ProcessorInterface

@@ -9,6 +9,10 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
+/**
+ * Adds "include" filter.
+ * This filter can be used to specify which related entities should be returned.
+ */
 class SetIncludeFilter implements ProcessorInterface
 {
     const FILTER_KEY = 'include';

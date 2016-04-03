@@ -8,7 +8,8 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Builds ORM QueryBuilder object that will be used to get a list of entities by the Criteria object.
+ * Builds ORM QueryBuilder object that will be used to get a list of entities
+ * based on the Criteria object.
  */
 class BuildQuery implements ProcessorInterface
 {

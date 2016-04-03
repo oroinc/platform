@@ -13,6 +13,11 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
+/**
+ * Adds "fields[]" filters.
+ * These filters can be used to specify which fields of primary
+ * or related entities should be returned.
+ */
 class SetFieldsFilter implements ProcessorInterface
 {
     const FILTER_KEY          = 'fields';

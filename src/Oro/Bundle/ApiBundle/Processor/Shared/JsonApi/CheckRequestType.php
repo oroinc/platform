@@ -12,7 +12,8 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 /**
- * Sets the request type to "json_api" if the corresponding 'Content-Type' header was received.
+ * Adds "json_api" request type if the "Content-Type" header
+ * contains "application/vnd.api+json".
  */
 class CheckRequestType implements ProcessorInterface
 {
