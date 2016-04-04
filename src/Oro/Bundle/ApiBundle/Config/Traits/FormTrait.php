@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Config\Traits;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 
 /**
  * @property array $items
  */
-trait FormFieldTrait
+trait FormTrait
 {
     /**
      * Gets the form type that should be used for the field.
@@ -16,8 +16,8 @@ trait FormFieldTrait
      */
     public function getFormType()
     {
-        return array_key_exists(EntityDefinitionFieldConfig::FORM_TYPE, $this->items)
-            ? $this->items[EntityDefinitionFieldConfig::FORM_TYPE]
+        return array_key_exists(EntityDefinitionConfig::FORM_TYPE, $this->items)
+            ? $this->items[EntityDefinitionConfig::FORM_TYPE]
             : null;
     }
 
@@ -29,9 +29,9 @@ trait FormFieldTrait
     public function setFormType($formType)
     {
         if ($formType) {
-            $this->items[EntityDefinitionFieldConfig::FORM_TYPE] = $formType;
+            $this->items[EntityDefinitionConfig::FORM_TYPE] = $formType;
         } else {
-            unset($this->items[EntityDefinitionFieldConfig::FORM_TYPE]);
+            unset($this->items[EntityDefinitionConfig::FORM_TYPE]);
         }
     }
 
@@ -42,8 +42,8 @@ trait FormFieldTrait
      */
     public function getFormOptions()
     {
-        return array_key_exists(EntityDefinitionFieldConfig::FORM_OPTIONS, $this->items)
-            ? $this->items[EntityDefinitionFieldConfig::FORM_OPTIONS]
+        return array_key_exists(EntityDefinitionConfig::FORM_OPTIONS, $this->items)
+            ? $this->items[EntityDefinitionConfig::FORM_OPTIONS]
             : null;
     }
 
@@ -55,9 +55,9 @@ trait FormFieldTrait
     public function setFormOptions($formOptions)
     {
         if ($formOptions) {
-            $this->items[EntityDefinitionFieldConfig::FORM_OPTIONS] = $formOptions;
+            $this->items[EntityDefinitionConfig::FORM_OPTIONS] = $formOptions;
         } else {
-            unset($this->items[EntityDefinitionFieldConfig::FORM_OPTIONS]);
+            unset($this->items[EntityDefinitionConfig::FORM_OPTIONS]);
         }
     }
 }

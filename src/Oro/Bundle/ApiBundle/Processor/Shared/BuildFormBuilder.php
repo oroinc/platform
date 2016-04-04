@@ -44,27 +44,41 @@ class BuildFormBuilder implements ProcessorInterface
             return;
         }
 
+        $config = $context->getConfig();
+
         $formBuilder = $this->formFactory->createNamedBuilder(
             null,
-            'form',
+            $config->getFormType() ?: 'form',
             null,
-            $this->getFormOptions($context)
+            $this->getFormOptions($context, $config)
         );
         $this->addFormFields($formBuilder, $context->getMetadata(), $context->getConfig());
         $context->setFormBuilder($formBuilder);
     }
 
     /**
-     * @param FormContext $context
+     * @param FormContext            $context
+     * @param EntityDefinitionConfig $config
      *
      * @return array
      */
-    protected function getFormOptions(FormContext $context)
+    protected function getFormOptions(FormContext $context, EntityDefinitionConfig $config)
     {
-        return [
-            'data_class'           => $context->getClassName(),
-            'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
-        ];
+        $options = $config->getFormOptions();
+        if (null === $options) {
+            $options = [];
+        }
+        if (!array_key_exists('data_class', $options)) {
+            $options['data_class'] = $context->getClassName();
+        }
+        if (!array_key_exists('validation_groups', $options)) {
+            $options['validation_groups'] = ['Default', 'api'];
+        }
+        if (!array_key_exists('extra_fields_message', $options)) {
+            $options['extra_fields_message'] = 'This form should not contain extra fields: "{{ extra_fields }}"';
+        }
+
+        return $options;
     }
 
     /**

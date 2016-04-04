@@ -116,6 +116,12 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
         if (empty($config[EntityDefinitionConfig::POST_SERIALIZE])) {
             unset($config[EntityDefinitionConfig::POST_SERIALIZE]);
         }
+        if (empty($config[EntityDefinitionConfig::FORM_TYPE])) {
+            unset($config[EntityDefinitionConfig::FORM_TYPE]);
+        }
+        if (empty($config[EntityDefinitionConfig::FORM_OPTIONS])) {
+            unset($config[EntityDefinitionConfig::FORM_OPTIONS]);
+        }
         if (empty($config[EntityDefinitionConfig::FIELDS])) {
             unset($config[EntityDefinitionConfig::FIELDS]);
         }
@@ -161,7 +167,14 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
                     ->end()
                 ->end()
             ->end()
-            ->variableNode(EntityDefinitionConfig::POST_SERIALIZE)->end();
+            ->variableNode(EntityDefinitionConfig::POST_SERIALIZE)->end()
+            ->scalarNode(EntityDefinitionConfig::FORM_TYPE)->end()
+            ->arrayNode(EntityDefinitionConfig::FORM_OPTIONS)
+                ->useAttributeAsKey('name')
+                ->performNoDeepMerging()
+                ->prototype('variable')
+                ->end()
+            ->end();
     }
 
     /**

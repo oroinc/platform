@@ -18,6 +18,13 @@ class TestObject
     private $title;
 
     /**
+     * @var string
+     * @Assert\Length(min=5, groups={"api"})
+     * @Assert\Length(min=3, groups={"ui"})
+     */
+    private $description;
+
+    /**
      * @return int
      */
     public function getId()
@@ -47,5 +54,21 @@ class TestObject
     public function setTitle($title)
     {
         $this->title = $title;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
+     * @param string $description
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
     }
 }

@@ -200,6 +200,26 @@ oro_api:
                 ...
 ```
 
+* **form_type** *string* The form type that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default the `form` form type is used.
+* **form_options** *array* The form options that should be used for the entity in [create](./actions.md#create-action) and [update](./actions.md#update-action) actions. By default the following options is set:
+
+| Option Name | Option Value |
+| --- | --- |
+| data_class | The class name of the entity |
+| validation_groups | ['Default', 'api'] |
+| extra_fields_message | This form should not contain extra fields: "{{ extra_fields }}" |
+
+Example:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            form_type: acme_entity.api_form
+            form_options:
+                validation_groups: ['Default', 'api', 'my_group']
+```
+
 * **fields** - This section describes entity fields' configuration.
 
 Each field can have next properties:

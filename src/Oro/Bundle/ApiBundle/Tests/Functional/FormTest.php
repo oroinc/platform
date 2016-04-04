@@ -81,6 +81,45 @@ class FormTest extends WebTestCase
         $this->assertFalse($form->isValid(), 'isValid');
     }
 
+    public function testValidationConstraintFromAllGroups()
+    {
+        $this->switchToApiFormExtension();
+
+        $form = $this->getForm();
+        $object = new TestObject();
+        $form->setData($object);
+
+        $form->submit(['id' => 123, 'title' => 'test', 'description' => '12']);
+        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
+        $this->assertTrue($form->isValid(), 'isValid');
+    }
+
+    public function testValidationConstraintFromApiGroup()
+    {
+        $this->switchToApiFormExtension();
+
+        $form = $this->getForm(['validation_groups' => ['Default', 'api']]);
+        $object = new TestObject();
+        $form->setData($object);
+
+        $form->submit(['id' => 123, 'title' => 'test', 'description' => '1234']);
+        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
+        $this->assertFalse($form->isValid(), 'isValid');
+    }
+
+    public function testValidationConstraintFromUiGroup()
+    {
+        $this->switchToApiFormExtension();
+
+        $form = $this->getForm(['validation_groups' => ['Default', 'ui']]);
+        $object = new TestObject();
+        $form->setData($object);
+
+        $form->submit(['id' => 123, 'title' => 'test', 'description' => '1234']);
+        $this->assertTrue($form->isSubmitted(), 'isSubmitted');
+        $this->assertTrue($form->isValid(), 'isValid');
+    }
+
     /**
      * @expectedException \Symfony\Component\OptionsResolver\Exception\UndefinedOptionsException
      */
@@ -167,6 +206,7 @@ class FormTest extends WebTestCase
         $form = $this->getRootForm($options);
         $form->add('id', 'integer');
         $form->add('title', 'text');
+        $form->add('description', 'text');
 
         return $form;
     }
