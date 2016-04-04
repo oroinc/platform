@@ -133,6 +133,17 @@ services:
             - { name: oro.api.processor, action: create, group: bind_data, priority: -100 }
 
     #
+    # save_data
+    #
+
+    oro_api.create.save_orm_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Create\SaveOrmEntity
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: create, group: save_data, priority: -10 }
+
+    #
     # normalize_data
     #
 

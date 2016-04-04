@@ -178,6 +178,17 @@ services:
             - { name: oro.api.processor, action: update, group: bind_data, priority: -100 }
 
     #
+    # save_data
+    #
+
+    oro_api.update.save_orm_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Update\SaveOrmEntity
+        arguments:
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: update, group: save_data, priority: -10 }
+
+    #
     # normalize_data
     #
 
