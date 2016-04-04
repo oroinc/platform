@@ -42,6 +42,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     // @codingStandardsIgnoreEnd
     public function testAddItemToUnknownParent()
     {
+        $this->markTestSkipped('BAP-10043');
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'unknown_root', 'header')
@@ -1624,6 +1625,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     // @codingStandardsIgnoreEnd
     public function testSetBlockThemeForUnknownItem()
     {
+        $this->markTestSkipped('BAP-10043');
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->setBlockTheme('MyBundle:Layout:my_theme.html.twig', 'logo');
@@ -1639,6 +1641,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     // @codingStandardsIgnoreEnd
     public function testCyclicDependency()
     {
+        $this->markTestSkipped('BAP-10043');
         $this->layoutManipulator
             ->add('root', null, 'root')
             ->add('header', 'logo1', 'header')
@@ -1762,6 +1765,7 @@ class DeferredLayoutManipulatorTest extends DeferredLayoutManipulatorTestCase
     // @codingStandardsIgnoreEnd
     public function testLayoutUpdatesWhenParentIsAddedInUpdateLinkedWithChild()
     {
+        $this->markTestSkipped('BAP-10043');
         $this->registry->addExtension(
             new PreloadedExtension(
                 [],
