@@ -79,9 +79,6 @@ abstract class AbstractEmailFixture extends AbstractFixture implements
         /** @var \Symfony\Component\Finder\SplFileInfo $file  */
         foreach ($files as $file) {
             $fileName = str_replace(array('.html.twig', '.html', '.txt.twig', '.txt'), '', $file->getFilename());
-            if (preg_match('#[/\\\]([\w]+Bundle)[/\\\]#', $file->getPath(), $match)) {
-                $fileName = $match[1] . ':' . $fileName;
-            }
 
             $format = 'html';
             if (preg_match('#\.(html|txt)(\.twig)?#', $file->getFilename(), $match)) {

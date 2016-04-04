@@ -147,4 +147,21 @@ define(['jquery', 'jquery-ui'], function($) {
         };
     }());
     /* datepicker extend:end */
+
+    /* dialog extend:start*/
+    (function() {
+        var oldMoveToTop = $.ui.dialog.prototype._moveToTop;
+        $.widget('ui.dialog', $.ui.dialog, {
+            /**
+             * Replace method because some browsers return string 'auto' if property z-index not specified. 
+             * */
+            _moveToTop: function() {
+                if (typeof this.uiDialog.css('z-index') === 'string') {
+                    this.uiDialog.css('z-index', 0);
+                }
+                oldMoveToTop.apply(this);
+            }
+        });
+    }());
+    /* dialog extend:end*/
 });
