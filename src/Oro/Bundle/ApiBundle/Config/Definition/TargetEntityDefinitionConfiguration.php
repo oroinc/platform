@@ -208,6 +208,7 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
         $node
             ->booleanNode(EntityDefinitionFieldConfig::EXCLUDE)->end()
             ->scalarNode(EntityDefinitionFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end()
+            ->scalarNode(EntityDefinitionFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
             ->booleanNode(EntityDefinitionFieldConfig::COLLAPSE)->end()
             ->variableNode(EntityDefinitionFieldConfig::DATA_TRANSFORMER)->end()
             ->scalarNode(EntityDefinitionFieldConfig::LABEL)->cannotBeEmpty()->end()

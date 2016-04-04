@@ -4,14 +4,13 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Loader;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
+use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
 class OroApiExtension extends Extension
 {
@@ -25,6 +24,7 @@ class OroApiExtension extends Extension
     {
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
         $loader->load('services.yml');
+        $loader->load('data_transformers.yml');
         $loader->load('form.yml');
         $loader->load('processors.normalize_value.yml');
         $loader->load('processors.collect_resources.yml');
@@ -39,29 +39,29 @@ class OroApiExtension extends Extension
 
         if ($container->getParameter('kernel.debug')) {
             $loader->load('debug.yml');
-            $this->registerDebugService(
+            DependencyInjectionUtil::registerDebugService(
                 $container,
                 'oro_api.action_processor_bag',
                 'Oro\Bundle\ApiBundle\Debug\TraceableActionProcessorBag'
             );
-            $this->registerDebugService(
+            DependencyInjectionUtil::registerDebugService(
                 $container,
                 'oro_api.processor_factory',
                 'Oro\Component\ChainProcessor\Debug\TraceableProcessorFactory'
             );
-            $this->registerDebugService($container, 'oro_api.collect_resources.processor');
-            $this->registerDebugService($container, 'oro_api.customize_loaded_data.processor');
-            $this->registerDebugService($container, 'oro_api.get_config.processor');
-            $this->registerDebugService($container, 'oro_api.get_relation_config.processor');
-            $this->registerDebugService($container, 'oro_api.get_metadata.processor');
-            $this->registerDebugService($container, 'oro_api.normalize_value.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.collect_resources.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.customize_loaded_data.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.get_config.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.get_relation_config.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.get_metadata.processor');
+            DependencyInjectionUtil::registerDebugService($container, 'oro_api.normalize_value.processor');
         }
 
         /**
          * To load configuration we need fully configured config tree builder, that's why all configuration extensions
          *   should be registered before.
          */
-        $this->registerTaggedServices(
+        DependencyInjectionUtil::registerTaggedServices(
             $container,
             self::CONFIG_EXTENSION_REGISTRY_SERVICE_ID,
             self::CONFIG_EXTENSION_TAG,
@@ -69,33 +69,6 @@ class OroApiExtension extends Extension
         );
 
         $this->loadApiConfiguration($container);
-    }
-
-    /**
-     * Replaces a regular service with the debug one
-     *
-     * @param ContainerBuilder $container
-     * @param string           $serviceId
-     * @param string           $debugServiceClassName
-     */
-    protected function registerDebugService(
-        ContainerBuilder $container,
-        $serviceId,
-        $debugServiceClassName = 'Oro\Component\ChainProcessor\Debug\TraceableActionProcessor'
-    ) {
-        $definition = $container->findDefinition($serviceId);
-        $definition->setPublic(false);
-        $container->setDefinition($serviceId . '.debug.parent', $definition);
-        $debugDefinition = new Definition(
-            $debugServiceClassName,
-            [
-                new Reference($serviceId . '.debug.parent'),
-                new Reference('oro_api.profiler.logger')
-            ]
-        );
-        $debugDefinition->setPublic(false);
-        $container->setDefinition($serviceId . '.debug', $debugDefinition);
-        $container->setAlias($serviceId, $serviceId . '.debug');
     }
 
     /**
@@ -131,41 +104,5 @@ class OroApiExtension extends Extension
 
         $chainProviderDef = $container->getDefinition('oro_api.entity_exclusion_provider');
         $chainProviderDef->replaceArgument(1, $inclusions);
-    }
-
-
-    /**
-     * @param ContainerBuilder $container
-     * @param string           $chainServiceId
-     * @param string           $tagName
-     * @param string           $addMethodName
-     */
-    protected function registerTaggedServices(ContainerBuilder $container, $chainServiceId, $tagName, $addMethodName)
-    {
-        $chainServiceDef = $container->hasDefinition($chainServiceId)
-            ? $container->getDefinition($chainServiceId)
-            : null;
-
-        if (null !== $chainServiceDef) {
-            // find services
-            $services       = [];
-            $taggedServices = $container->findTaggedServiceIds($tagName);
-            foreach ($taggedServices as $id => $attributes) {
-                $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-                $services[$priority][] = new Reference($id);
-            }
-            if (empty($services)) {
-                return;
-            }
-
-            // sort by priority and flatten
-            krsort($services);
-            $services = call_user_func_array('array_merge', $services);
-
-            // register
-            foreach ($services as $service) {
-                $chainServiceDef->addMethodCall($addMethodName, [$service]);
-            }
-        }
     }
 }

@@ -205,6 +205,7 @@ oro_api:
 
 Each field can have next properties:
 
+* **data_type** *string* The data type of the field value. Can be `boolean`, `integer`, `string`, etc.
 * **label** *string* A human-readable representation of the field. Used in auto generated documentation only.
 * **description** *string* A human-readable description of the field. Used in auto generated documentation only.
 
@@ -217,6 +218,7 @@ oro_api:
             ...
             fields:
                 field1:
+                    data_type:   time
                     label:       "Acme name"
                     description: "Acme description"
 ```

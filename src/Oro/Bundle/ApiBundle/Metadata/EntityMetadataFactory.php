@@ -39,14 +39,18 @@ class EntityMetadataFactory
     /**
      * @param ClassMetadata $classMetadata
      * @param string        $fieldName
+     * @param string|null   $fieldType
      *
      * @return FieldMetadata
      */
-    public function createFieldMetadata(ClassMetadata $classMetadata, $fieldName)
+    public function createFieldMetadata(ClassMetadata $classMetadata, $fieldName, $fieldType = null)
     {
+        if (!$fieldType) {
+            $fieldType = (string)$classMetadata->getTypeOfField($fieldName);
+        }
         $fieldMetadata = new FieldMetadata();
         $fieldMetadata->setName($fieldName);
-        $fieldMetadata->setDataType($classMetadata->getTypeOfField($fieldName));
+        $fieldMetadata->setDataType($fieldType);
         $fieldMetadata->setIsNullable($classMetadata->isNullable($fieldName));
         $mapping = $classMetadata->getFieldMapping($fieldName);
         if (isset($mapping['length'])) {
