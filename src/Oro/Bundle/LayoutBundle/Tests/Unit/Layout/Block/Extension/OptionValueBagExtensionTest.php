@@ -61,11 +61,11 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
 
         /** @var BlockInterface|\PHPUnit_Framework_MockObject_MockObject $block */
         $block = $this->getMock('Oro\Component\Layout\BlockInterface');
-        $block->expects($this->once())
+        $block->expects($this->any())
             ->method('getContext')
             ->willReturn($context);
 
-        $this->extension->finishView($view, $block, []);
+        $this->extension->finishView($view, $block, ['resolve_value_bags' => $actual['resolve_value_bags']]);
         $this->assertEquals($expected, $view->vars);
     }
 
@@ -76,20 +76,27 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'not applied' => [
-                'actual' => [],
-                'expected' => [],
+                'actual' => [
+                    'resolve_value_bags' => true,
+                ],
+                'expected' => [
+                    'resolve_value_bags' => true,
+                ],
                 'isApplied' => false,
             ],
             'empty bag' => [
                 'actual' => [
+                    'resolve_value_bags' => true,
                     'option' => $this->createOptionValueBag([])
                 ],
                 'expected' => [
+                    'resolve_value_bags' => true,
                     'option' => '',
                 ]
             ],
             'string arguments' => [
                 'actual' => [
+                    'resolve_value_bags' => true,
                     'option' => $this->createOptionValueBag([
                         ['method' => 'add', 'arguments' => ['first']],
                         ['method' => 'add', 'arguments' => ['second']],
@@ -98,22 +105,26 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
                     ])
                 ],
                 'expected' => [
+                    'resolve_value_bags' => true,
                     'option' => 'result',
                 ]
             ],
             'array arguments' => [
                 'actual' => [
+                    'resolve_value_bags' => true,
                     'option' => $this->createOptionValueBag([
                         ['method' => 'add', 'arguments' => [['one', 'two', 'three']]],
                         ['method' => 'remove', 'arguments' => [['one', 'three']]],
                     ])
                 ],
                 'expected' => [
+                    'resolve_value_bags' => true,
                     'option' => ['two']
                 ],
             ],
             'recursive processing' => [
                 'actual' => [
+                    'resolve_value_bags' => true,
                     'first_level_option_1' => $this->createOptionValueBag([
                         ['method' => 'add', 'arguments' => ['first_level']],
                     ]),
@@ -125,13 +136,30 @@ class OptionValueBagExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
                 'expected' => [
+                    'resolve_value_bags' => true,
                     'first_level_option_1' => 'first_level',
                     'first_level_option_2' => [
                         'second_level_option_1' => null,
                         'second_level_option_2' => ['second_level']
                     ]
                 ]
-            ]
+            ],
+            'disabled' => [
+                'actual' => [
+                    'resolve_value_bags' => false,
+                    'option' => $this->createOptionValueBag([
+                        ['method' => 'add', 'arguments' => [['one', 'two', 'three']]],
+                        ['method' => 'remove', 'arguments' => [['one', 'three']]],
+                    ])
+                ],
+                'expected' => [
+                    'resolve_value_bags' => false,
+                    'option' => $this->createOptionValueBag([
+                        ['method' => 'add', 'arguments' => [['one', 'two', 'three']]],
+                        ['method' => 'remove', 'arguments' => [['one', 'three']]],
+                    ])
+                ],
+            ],
         ];
     }
 
