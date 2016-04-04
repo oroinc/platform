@@ -145,10 +145,8 @@ class ApiConfiguration implements ConfigurationInterface
     {
         if (array_key_exists(ConfigUtil::EXCLUDE, $entityConfig)) {
             if ($entityConfig[ConfigUtil::EXCLUDE]) {
-                if (!$this->hasEntityExclusion($config[self::EXCLUSIONS_SECTION], $entityClass)) {
-                    $config[self::EXCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
-                }
-            } elseif (!$this->hasEntityInclusion($config[self::INCLUSIONS_SECTION], $entityClass)) {
+                $config[self::EXCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
+            } else {
                 $config[self::INCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
             }
             unset($entityConfig[ConfigUtil::EXCLUDE]);
@@ -157,7 +155,6 @@ class ApiConfiguration implements ConfigurationInterface
             foreach ($entityConfig[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
                 if (array_key_exists(ConfigUtil::EXCLUDE, $fieldConfig)
                     && !$fieldConfig[ConfigUtil::EXCLUDE]
-                    && !$this->hasFieldInclusion($config[self::INCLUSIONS_SECTION], $entityClass, $fieldName)
                 ) {
                     $config[self::INCLUSIONS_SECTION][] = [
                         self::ENTITY_ATTRIBUTE => $entityClass,
@@ -166,74 +163,5 @@ class ApiConfiguration implements ConfigurationInterface
                 }
             }
         }
-    }
-
-    /**
-     * @param array  $exclusions
-     * @param string $entityClass
-     *
-     * @return bool
-     */
-    protected function hasEntityExclusion($exclusions, $entityClass)
-    {
-        $result = false;
-        foreach ($exclusions as $exclusion) {
-            if (array_key_exists(self::ENTITY_ATTRIBUTE, $exclusion)
-                && $exclusion[self::ENTITY_ATTRIBUTE] === $entityClass
-                && count($exclusion) === 1
-            ) {
-                $result = true;
-                break;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array  $inclusions
-     * @param string $entityClass
-     *
-     * @return bool
-     */
-    protected function hasEntityInclusion($inclusions, $entityClass)
-    {
-        $result = false;
-        foreach ($inclusions as $inclusion) {
-            if (array_key_exists(self::ENTITY_ATTRIBUTE, $inclusion)
-                && $inclusion[self::ENTITY_ATTRIBUTE] === $entityClass
-                && count($inclusion) === 1
-            ) {
-                $result = true;
-                break;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * @param array  $inclusions
-     * @param string $entityClass
-     * @param string $fieldName
-     *
-     * @return bool
-     */
-    protected function hasFieldInclusion($inclusions, $entityClass, $fieldName)
-    {
-        $result = false;
-        foreach ($inclusions as $inclusion) {
-            if (array_key_exists(self::ENTITY_ATTRIBUTE, $inclusion)
-                && array_key_exists(self::FIELD_ATTRIBUTE, $inclusion)
-                && $inclusion[self::ENTITY_ATTRIBUTE] === $entityClass
-                && $inclusion[self::FIELD_ATTRIBUTE] === $fieldName
-                && count($inclusion) === 2
-            ) {
-                $result = true;
-                break;
-            }
-        }
-
-        return $result;
     }
 }
