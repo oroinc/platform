@@ -658,41 +658,51 @@
     </div>
 {% endmacro %}
 
-{% macro saveAndCloseButton(params) %}
-    {% set buttonParams = {
+{% macro saveAndCloseButton(buttonParams) %}
+    {% set defaultButtonParams = {
         'type': 'submit',
         'class': 'btn-success',
         'label': 'Save and Close'|trans,
-        'action': 'save_and_stay'
+        'action': 'save_and_close'
     } %}
 
-    {% if params is iterable  %}
-        {% set buttonParams = buttonParams|merge(params) %}
-    {% elseif params is not empty %}
-        {% set buttonParams = buttonParams|merge({'label': params}) %}
+    {# avoid BC break #}
+    {% if buttonParams and buttonParams is not iterable %}
+        {% set buttonParams = {'label': buttonParams} %}
     {% endif %}
 
-    {{ _self.buttonType(buttonParams) }}
+    {{ _self.saveActionButton(defaultButtonParams, buttonParams) }}
 {% endmacro %}
 
-{% macro saveAndStayButton(params) %}
-    {% set buttonParams = {
+{% macro saveAndStayButton(buttonParams) %}
+    {% set defaultButtonParams = {
         'type': 'button',
         'class': 'btn-success main-group',
         'label': 'Save'|trans,
         'action': 'save_and_stay'
     } %}
 
-    {% if params is iterable  %}
-        {% set buttonParams = buttonParams|merge(params) %}
-    {% elseif params is not empty %}
-        {% set buttonParams = buttonParams|merge({'label': params}) %}
+    {# avoid BC break #}
+    {% if buttonParams and buttonParams is not iterable  %}
+        {% set buttonParams = {'label': buttonParams} %}
+    {% endif %}
+
+    {{ _self.saveActionButton(defaultButtonParams, buttonParams) }}
+{% endmacro %}
+
+{% macro saveActionButton(defaultButtonParams, buttonParams) %}
+    {% if buttonParams is iterable  %}
+        {% set buttonParams = defaultButtonParams|merge(buttonParams) %}
+    {% else %}
+        {% set buttonParams = defaultButtonParams %}
+    {% endif %}
+
+    {# prepare action parameter #}
+    {% if buttonParams.action is iterable %}
+        {% set buttonParams = buttonParams|merge({'action': buttonParams.action|json_encode}) %}
     {% endif %}
 
     {{ _self.buttonType(buttonParams) }}
-{% endmacro %}
-
-{% macro %}
 {% endmacro %}
 
 {#

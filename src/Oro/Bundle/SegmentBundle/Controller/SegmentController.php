@@ -116,11 +116,7 @@ class SegmentController extends Controller
                 $this->get('oro_segment.static_segment_manager')->run($entity);
             }
 
-            return $this->get('oro_ui.router')->redirectAfterSave(
-                ['route' => 'oro_segment_update', 'parameters' => ['id' => $entity->getId()]],
-                ['route' => 'oro_segment_view', 'parameters' => ['id' => $entity->getId()]],
-                $entity
-            );
+            return $this->get('oro_ui.router')->redirectToAfterSaveAction($entity);
         }
 
         return [

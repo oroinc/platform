@@ -63,6 +63,8 @@ class UpdateHandler
     }
 
     /**
+     * @deprecated since 1.9 and will be removed after 1.11. Use handleEntityUpdateRequest method instead
+     *
      * @param object $entity
      * @param FormInterface $form
      * @param array|callable $saveAndStayRoute
@@ -109,24 +111,27 @@ class UpdateHandler
     /**
      * @param object $entity
      * @param FormInterface $form
+     * @param string $saveMessage
+     * @param null|object $formHandler
      * @param callable|null $resultCallback
-     * @return array
+     * @return array|RedirectResponse
      */
-    protected function getResult($entity, FormInterface $form, $resultCallback = null)
-    {
-        if (is_callable($resultCallback)) {
-            $result = call_user_func($resultCallback, $entity, $form, $this->request);
-        } else {
-            $result = array(
-                'form' => $form->createView()
-            );
+    public function handleEntityUpdateRequest(
+        $entity,
+        FormInterface $form,
+        $saveMessage,
+        $formHandler = null,
+        $resultCallback = null
+    ) {
+        if ($formHandler) {
+            if (method_exists($formHandler, 'process') && $formHandler->process($entity)) {
+                return $this->constructResponse($form, $entity, $saveMessage, $resultCallback);
+            }
+        } elseif ($this->saveForm($form, $entity)) {
+            return $this->constructResponse($form, $entity, $saveMessage, $resultCallback);
         }
-        if (!array_key_exists('entity', $result)) {
-            $result['entity'] = $entity;
-        }
-        $result['isWidgetContext'] = (bool)$this->request->get('_wid', false);
 
-        return $result;
+        return $this->getResult($entity, $form, $resultCallback);
     }
 
     /**
@@ -179,6 +184,8 @@ class UpdateHandler
     }
 
     /**
+     * @deprecated since 1.9 and will be removed after 1.11
+     *
      * @param FormInterface $form
      * @param object $entity
      * @param array|callable $saveAndStayRoute
@@ -215,6 +222,51 @@ class UpdateHandler
 
             return $this->router->redirectAfterSave($saveAndStayRoute, $saveAndCloseRoute, $entity);
         }
+    }
+
+    /**
+     * @param FormInterface $form
+     * @param object $entity
+     * @param               $saveMessage
+     * @param null          $resultCallback
+     *
+     * @return array|RedirectResponse
+     */
+    protected function constructResponse(FormInterface $form, $entity, $saveMessage, $resultCallback = null)
+    {
+        if ($this->request->get('_wid')) {
+            $result = $this->getResult($entity, $form, $resultCallback);
+            $result['savedId'] = $this->doctrineHelper->getSingleEntityIdentifier($entity);
+
+            return $result;
+        } else {
+            $this->session->getFlashBag()->add('success', $saveMessage);
+
+            return $this->router->redirectToAfterSaveAction($entity);
+        }
+    }
+
+    /**
+     * @param object $entity
+     * @param FormInterface $form
+     * @param callable|null $resultCallback
+     * @return array
+     */
+    protected function getResult($entity, FormInterface $form, $resultCallback = null)
+    {
+        if (is_callable($resultCallback)) {
+            $result = call_user_func($resultCallback, $entity, $form, $this->request);
+        } else {
+            $result = array(
+                'form' => $form->createView()
+            );
+        }
+        if (!array_key_exists('entity', $result)) {
+            $result['entity'] = $entity;
+        }
+        $result['isWidgetContext'] = (bool)$this->request->get('_wid', false);
+
+        return $result;
     }
 
     /**

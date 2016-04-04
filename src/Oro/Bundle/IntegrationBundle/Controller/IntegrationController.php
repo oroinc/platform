@@ -180,22 +180,7 @@ class IntegrationController extends Controller
                 $this->get('translator')->trans('oro.integration.controller.integration.message.saved')
             );
 
-            return $this->get('oro_ui.router')->redirectAfterSave(
-                [
-                    'route' => 'oro_integration_update',
-                    'parameters' => [
-                        'id' => $integration->getId(),
-                        '_enableContentProviders' => 'mainMenu'
-                    ]
-                ],
-                [
-                    'route' => 'oro_integration_index',
-                    'parameters' => [
-                        '_enableContentProviders' => 'mainMenu'
-                    ]
-                ],
-                $integration
-            );
+            return $this->get('oro_ui.router')->redirectToAfterSaveAction($integration);
         }
         $form = $this->getForm();
 

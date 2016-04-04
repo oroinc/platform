@@ -5,9 +5,7 @@ namespace Oro\Bundle\UIBundle\Route;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 
-use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Component\PropertyAccess\PropertyAccessor;
@@ -40,13 +38,6 @@ class Router
     protected $propertyAccessor;
 
     /**
-     * @var ConfigManager
-     */
-    protected $configManager;
-
-    /**
-     * Constructor
-     *
      * @param Request        $request
      * @param SymfonyRouter  $router
      * @param SecurityFacade $securityFacade
@@ -61,7 +52,6 @@ class Router
         $this->request = $request;
         $this->router = $router;
         $this->securityFacade = $securityFacade;
-        $this->configManager = $configManager;
 
         $this->propertyAccessor = new PropertyAccessor();
     }
@@ -92,10 +82,6 @@ class Router
                 $routeData = $saveAndCloseRoute;
                 break;
             default:
-                if (is_null($entity)) {
-                    throw new \InvalidArgumentException('Entity must be provided');
-                }
-
                 return $this->redirectToAfterSaveAction($entity);
         }
 
@@ -113,15 +99,15 @@ class Router
     }
 
     /**
-     * @param $entity
+     * @param array|object|null $context
      *
      * @return RedirectResponse
      */
-    public function redirectToAfterSaveAction($entity)
+    public function redirectToAfterSaveAction($context)
     {
         $route = $this->request->get(self::ACTION_PARAMETER);
         if (empty($route)) {
-            return $this->getRedirectToDefaultActionResponse($entity);
+            throw new \InvalidArgumentException('Input action required');
         }
 
         $route = json_decode($route, true);
@@ -131,45 +117,23 @@ class Router
 
         $routeParams = [];
         if (isset($route['params'])) {
-            $routeParams = array_map(function ($parameter) use ($entity) {
-                if (strpos($parameter, 'entity.') === 0) {
-                    return $this->propertyAccessor->getValue($entity, str_replace('entity.', '', $parameter));
-                }
+            $routeParams = $route['params'];
+            if ($context) {
+                $resolveEntityRelatedParamsCallback = function ($parameter) use ($context) {
+                    if (strpos($parameter, '$.') === 0) {
+                        $parameterParts = explode('$.', $parameter, 2);
+                        return $this->propertyAccessor->getValue($context, $parameterParts[1]);
+                    }
 
-                return $parameter;
-            }, $route['params']);
+                    return $parameter;
+                };
+
+                $routeParams = array_map($resolveEntityRelatedParamsCallback, $routeParams);
+            }
         }
 
         return new RedirectResponse(
             $this->router->generate($route['route'], $routeParams)
         );
-    }
-
-    /**
-     * @param object $entity
-     *
-     * @return array
-     */
-    protected function getRedirectToDefaultActionResponse($entity)
-    {
-        $entityClass = ClassUtils::getClass($entity);
-        $metadata = $this->configManager->getEntityMetadata($entityClass);
-
-        if (!isset($metadata)) {
-            throw new \InvalidArgumentException("Entity '$entityClass' metadata not found");
-        }
-
-        if (!empty($metadata->routeView)) {
-            return new RedirectResponse(
-                $this->router->generate($metadata->routeView, ['id' => $entity->getId()])
-            );
-        }
-        if (!empty($metadata->routeName)) {
-            return new RedirectResponse(
-                $this->router->generate($metadata->routeName)
-            );
-        }
-
-        throw new \InvalidArgumentException("Default redirect action not found for '$entityClass'");
     }
 }

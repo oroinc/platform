@@ -143,11 +143,7 @@ class CalendarEventController extends Controller
                     $this->get('translator')->trans('oro.calendar.controller.event.saved.message')
                 );
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    ['route' => 'oro_calendar_event_update', 'parameters' => ['id' => $entity->getId()]],
-                    ['route' => 'oro_calendar_event_view', 'parameters' => ['id' => $entity->getId()]],
-                    $entity
-                );
+                return $this->get('oro_ui.router')->redirectToAfterSaveAction($entity);
             }
             $saved = true;
         }

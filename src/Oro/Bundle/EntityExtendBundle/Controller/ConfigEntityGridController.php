@@ -149,10 +149,7 @@ class ConfigEntityGridController extends Controller
                     $this->get('translator')->trans('oro.entity_extend.controller.config_entity.message.saved')
                 );
 
-                return $this->get('oro_ui.router')->redirectAfterSave(
-                    ['route' => 'oro_entityconfig_update', 'parameters' => ['id' => $entityModel->getId()]],
-                    ['route' => 'oro_entityconfig_view', 'parameters' => ['id' => $entityModel->getId()]]
-                );
+                return $this->get('oro_ui.router')->redirectToAfterSaveAction($entityModel);
             }
         }
 

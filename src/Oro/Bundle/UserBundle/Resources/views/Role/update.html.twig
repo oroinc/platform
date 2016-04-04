@@ -21,16 +21,16 @@
         {{ UI.buttonSeparator() }}
     {% endif %}
     {{ UI.cancelButton(path('oro_user_role_index')) }}
-    {% set html = UI.buttonType({'type': 'button', 'class': 'btn-success role-submit', 'label': 'Save and Close'|trans}) %}
+    {% set html = UI.saveAndCloseButton({
+        'type': 'button',
+        'class': 'btn-success role-submit',
+        'action': {'route': 'oro_user_role_index'}
+    }) %}
     {% if form.vars.value.id or resource_granted('oro_user_role_update') %}
         {# button attribute 'action' is avoided because of there is unacceptable submit binding on .action-button in init-layout.js #}
-        {% set html = html ~ UI.buttonType({
-            'type': 'button',
+        {% set html = html ~ UI.saveAndStayButton({
             'class': 'btn-success main-group role-submit',
-            'label': 'Save'|trans,
-            'data': {
-                'action': 'save_and_stay'
-            }
+            'action': {'route': 'oro_user_role_update', 'params': {'id': '$.id'}}
         }) %}
     {% endif %}
     {{ UI.dropdownSaveButton({'html': html}) }}

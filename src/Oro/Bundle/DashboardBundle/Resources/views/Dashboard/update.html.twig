@@ -29,11 +29,11 @@
             'action': {
                 'route': 'oro_dashboard_view',
                 'params': {
-                    'id': 'entity.id',
+                    'id': '$.id',
                     'change_dashboard': true,
                     '_enableContentProviders': 'mainMenu'
                 }
-            }|json_encode
+            }
         }
     ) %}
     {% if form.vars.value.id or resource_granted('oro_dashboard_update') %}
@@ -42,10 +42,10 @@
                 'action': {
                     'route': 'oro_dashboard_update',
                     'params': {
-                        'id': 'entity.id',
+                        'id': '$.id',
                         '_enableContentProviders': 'mainMenu'
                     }
-                }|json_encode
+                }
             }
         ) %}
     {% endif %}
