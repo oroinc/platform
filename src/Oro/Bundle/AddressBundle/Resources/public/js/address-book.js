@@ -36,7 +36,8 @@ define([
             'addressListUrl': null,
             'addressCreateUrl': null,
             'addressUpdateUrl': null,
-            'mapView': Googlemaps
+            'mapView': Googlemaps,
+            'addressMapOptions': {}
         },
         noDataMessage: __('Empty Address Book'),
         attributes: {
@@ -146,7 +147,8 @@ define([
         addAddress: function(address) {
             if (!this.$el.find('#address-book-' + address.id).length) {
                 var addressView = new AddressView({
-                    model: address
+                    model: address,
+                    map: this.options.addressMapOptions
                 });
                 addressView.on('edit', _.bind(this.editAddress, this));
                 this.$addressesContainer.append(addressView.render().$el);

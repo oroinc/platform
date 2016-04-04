@@ -27,7 +27,29 @@ define([
             'click .item-remove-button': 'close'
         },
 
-        initialize: function() {
+        options: {
+            map: {
+                'namePrefix': 'prefix',
+                'nameSuffix': 'suffix',
+                'firstName': 'first_name',
+                'middleNamem': 'iddle_name',
+                'lastName': 'last_name',
+                'organization': 'organization',
+                'street': 'street',
+                'street2': 'street2',
+                'city': 'city',
+                'country': 'country',
+                'countryIso2': 'country_iso2',
+                'countryIso3': 'country_iso3',
+                'postalCode': 'postal_code',
+                'region': 'region',
+                'regionText': 'region',
+                'regionCode': 'region_code'
+            }
+        },
+
+        initialize: function(options) {
+            this.options.map = _.defaults(options.map || {}, this.options.map);
             this.$el.attr('id', 'address-book-' + this.model.id);
             this.template = _.template($('#template-addressbook-item').html());
             this.listenTo(this.model, 'destroy', this.remove);
@@ -60,28 +82,28 @@ define([
 
         render: function() {
             var data = this.model.toJSON();
-            data.formatted_address = addressFormatter.format({
-                prefix: data.namePrefix,
-                suffix: data.nameSuffix,
-                first_name: data.firstName,
-                middle_name: data.middleName,
-                last_name: data.lastName,
-                organization: data.organization,
-                street: data.street,
-                street2: data.street2,
-                city: data.city,
-                country: data.country,
-                country_iso2: data.countryIso2,
-                country_iso3: data.countryIso3,
-                postal_code: data.postalCode,
-                region: data.region || data.regionText,
-                region_code: data.regionCode
-            }, null, '\n');
+            var mappedData = this.prepareData(data);
+            data.formatted_address = addressFormatter.format(mappedData, null, '\n');
             this.$el.append(this.template(data));
             if (this.model.get('primary')) {
                 this.activate();
             }
             return this;
+        },
+
+        prepareData: function(data) {
+            var mappedData = {};
+            var map = this.options.map;
+
+            if (data) {
+                _.each(data, function(value, key) {
+                    if (map[key]) {
+                        mappedData[map[key]] = mappedData[map[key]] || value;
+                    }
+                });
+            }
+
+            return mappedData;
         }
     });
 });
