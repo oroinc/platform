@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList;
 
-use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataExtra;
+use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataConfigExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
@@ -32,7 +32,7 @@ class InitializeConfigExtrasTest extends GetListProcessorTestCase
         $this->assertCount(5, $this->context->getConfigExtras());
         $this->assertTrue($this->context->hasConfigExtra($existingExtra->getName()));
         $this->assertTrue($this->context->hasConfigExtra(EntityDefinitionConfigExtra::NAME));
-        $this->assertTrue($this->context->hasConfigExtra(CustomizeLoadedDataExtra::NAME));
+        $this->assertTrue($this->context->hasConfigExtra(CustomizeLoadedDataConfigExtra::NAME));
         $this->assertTrue($this->context->hasConfigExtra(FiltersConfigExtra::NAME));
         $this->assertTrue($this->context->hasConfigExtra(SortersConfigExtra::NAME));
     }
