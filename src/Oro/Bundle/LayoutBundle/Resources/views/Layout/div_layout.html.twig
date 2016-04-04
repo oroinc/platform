@@ -125,7 +125,7 @@
 {% endblock %}
 
 {% block form_end_widget %}
-    {{ form_end(form) }}
+    {{ form_end(form,  {'render_rest': render_rest}) }}
 {% endblock %}
 
 {% block form_field_widget %}
