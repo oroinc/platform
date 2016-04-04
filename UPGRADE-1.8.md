@@ -262,7 +262,6 @@ Removed parameters `websocket_host` and `websocket_port` from `parameters.yml`. 
  - `andWhere`, `orWhere`, `where`, `getOptions`, `setMaxResults`, `getMaxResults`, `setFirstResult`, `getFirstResult`, `setOrderBy`, `getOrderBy`, `getOrderType`, `getOrderDirection` methods are deprecated for `Oro\Bundle\SearchBundle\Query\Query` class. Use `getCriteria` and `getCriteria` methods what will return and set Criteria of query.
  - Every Search request now is ACL protected. So, search results will contain only records what current user can see.
  - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::setEntitiesConfigParameter` deprecated since 1.8. Will be removed after 1.11. Please use oro_search.provider.search_mapping service for mapping config instead.
- - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::mergeConfig` deprecated since 1.8. Will be removed after 1.11.
 
 ####ActivirtBundle
  - Added entity config parameter `show_on_page` to `Oro/Bundle/ActivityBundle/Resources/config/entity_config.yml`
