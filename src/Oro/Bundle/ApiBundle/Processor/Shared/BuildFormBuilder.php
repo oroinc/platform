@@ -45,14 +45,17 @@ class BuildFormBuilder implements ProcessorInterface
         }
 
         $config = $context->getConfig();
+        $formType = $config->getFormType() ?: 'form';
 
         $formBuilder = $this->formFactory->createNamedBuilder(
             null,
-            $config->getFormType() ?: 'form',
+            $formType,
             null,
             $this->getFormOptions($context, $config)
         );
-        $this->addFormFields($formBuilder, $context->getMetadata(), $context->getConfig());
+        if ('form' === $formType) {
+            $this->addFormFields($formBuilder, $context->getMetadata(), $config);
+        }
         $context->setFormBuilder($formBuilder);
     }
 

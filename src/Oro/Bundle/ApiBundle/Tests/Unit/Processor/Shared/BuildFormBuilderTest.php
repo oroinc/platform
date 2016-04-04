@@ -45,6 +45,38 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->assertSame($form, $this->context->getForm());
     }
 
+    public function testProcessForCustomForm()
+    {
+        $entityClass = 'Test\Entity';
+        $formType = 'test_form';
+        $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
+
+        $config = new EntityDefinitionConfig();
+        $config->setFormType($formType);
+        $config->setFormOptions(['validation_groups' => ['Default', 'api', 'my_group']]);
+
+        $this->formFactory->expects($this->once())
+            ->method('createNamedBuilder')
+            ->with(
+                null,
+                $formType,
+                null,
+                [
+                    'data_class'           => $entityClass,
+                    'validation_groups'    => ['Default', 'api', 'my_group'],
+                    'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"'
+                ]
+            )
+            ->willReturn($formBuilder);
+        $formBuilder->expects($this->never())
+            ->method('add');
+
+        $this->context->setClassName($entityClass);
+        $this->context->setConfig($config);
+        $this->processor->process($this->context);
+        $this->assertSame($formBuilder, $this->context->getFormBuilder());
+    }
+
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
