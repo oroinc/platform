@@ -34,7 +34,13 @@
 {% endblock %}
 
 {% block oro_acl_label_widget %}
-    <strong>{{ value|trans }}</strong>
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+    <strong>
+        {{ value|trans }}
+        {% if form.parent.parent.vars.value.description %}
+                {{ UI.tooltip(form.parent.parent.vars.value.description|trans) }}
+        {% endif %}
+    </strong>
     {% set type = type|default('hidden') %}
     {{ block('form_widget_simple') }}
 {% endblock %}
