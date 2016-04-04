@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  * to request customize loaded data handlers.
  * See details in documentations about "customize_loaded_data" action.
  */
-class CustomizeLoadedDataExtra implements ConfigExtraInterface
+class CustomizeLoadedDataConfigExtra implements ConfigExtraInterface
 {
     const NAME = 'customize_loaded_data';
 
