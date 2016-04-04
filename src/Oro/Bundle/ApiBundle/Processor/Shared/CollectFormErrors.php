@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Symfony\Component\Form\Form;
 
