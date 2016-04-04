@@ -118,10 +118,10 @@ class OroApiExtension extends Extension
             $config
         );
 
-        $exclusions = $config['exclusions'];
-        unset($config['exclusions']);
-        $inclusions = $config['inclusions'];
-        unset($config['inclusions']);
+        $exclusions = $config[ApiConfiguration::EXCLUSIONS_SECTION];
+        unset($config[ApiConfiguration::EXCLUSIONS_SECTION]);
+        $inclusions = $config[ApiConfiguration::INCLUSIONS_SECTION];
+        unset($config[ApiConfiguration::INCLUSIONS_SECTION]);
 
         $configBagDef = $container->getDefinition('oro_api.config_bag');
         $configBagDef->replaceArgument(0, $config);

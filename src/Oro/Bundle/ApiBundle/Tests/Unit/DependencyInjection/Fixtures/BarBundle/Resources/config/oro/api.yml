@@ -1,13 +1,7 @@
 oro_api:
-    exclusions:
-        - { entity: Test\Entity1 }
-        - { entity: Test\Entity2 }
-
-    inclusions:
-        - { entity: Test\Entity1 }
-
     entities:
-        Test\Entity1: ~
+        Test\Entity1:
+            exclude: true
         Test\Entity2: ~
         Test\Entity3:
             exclude: true
@@ -48,7 +42,7 @@ oro_api:
         Test\Entity6: ~
         Test\Entity10: ~
         Test\Entity12:
-            exclude: false
+            exclude: true
             fields:
                 field1:
-                    exclude: false
+                    exclude: true

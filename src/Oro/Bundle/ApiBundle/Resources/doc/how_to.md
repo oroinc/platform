@@ -28,7 +28,7 @@ oro_api:
 Turn on API for entity disabled in Resources/config/oro/entity.yml
 ------------------------------------------------------------------
 
-The `exclusions` section of `Resources/config/oro/entity.yml` configuration file is used to make an entity or a field not accessible for a user. Also such entities and fields are not accessible via Data API as well. But it is possible that by some reasons you want to override such rules for Data API. It can be done using `inclusions` section or `exclude` option in `Resources/config/oro/api.yml`.
+The `exclusions` section of `Resources/config/oro/entity.yml` configuration file is used to make an entity or a field not accessible for a user. Also such entities and fields are not accessible via Data API as well. But it is possible that by some reasons you want to override such rules for Data API. It can be done using `exclude` option in `Resources/config/oro/api.yml`.
 
 Let's imagine that you have the following `Resources/config/oro/entity.yml`:
 
@@ -39,16 +39,7 @@ oro_entity:
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
 ```
 
-To override these rules in Data API you can use any of the following `Resources/config/oro/api.yml`:
-
-```yaml
-oro_api:
-    inclusions:
-        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity1 }
-        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
-```
-
-or
+To override these rules in Data API you can use the following `Resources/config/oro/api.yml`:
 
 ```yaml
 oro_api:

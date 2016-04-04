@@ -52,9 +52,6 @@ class ApiConfiguration implements ConfigurationInterface
             $postProcessCallbacks
             ) = $this->extensionRegistry->getConfigurationSettings();
 
-        $this->addExclusionsSection($children);
-        $this->addInclusionsSection($children);
-
         $entityNode = $this->addEntitySection(
             $children,
             new EntityConfiguration(
@@ -94,38 +91,6 @@ class ApiConfiguration implements ConfigurationInterface
     }
 
     /**
-     * @param NodeBuilder $parentNode
-     */
-    protected function addExclusionsSection(NodeBuilder $parentNode)
-    {
-        $parentNode
-            ->arrayNode(self::EXCLUSIONS_SECTION)
-                ->prototype('array')
-                ->children()
-                    ->scalarNode(self::ENTITY_ATTRIBUTE)
-                        ->isRequired()
-                        ->cannotBeEmpty()
-                    ->end()
-                    ->scalarNode(self::FIELD_ATTRIBUTE)->end();
-    }
-
-    /**
-     * @param NodeBuilder $parentNode
-     */
-    protected function addInclusionsSection(NodeBuilder $parentNode)
-    {
-        $parentNode
-            ->arrayNode(self::INCLUSIONS_SECTION)
-                ->prototype('array')
-                ->children()
-                    ->scalarNode(self::ENTITY_ATTRIBUTE)
-                        ->isRequired()
-                        ->cannotBeEmpty()
-                    ->end()
-                    ->scalarNode(self::FIELD_ATTRIBUTE)->end();
-    }
-
-    /**
      * @param NodeBuilder         $parentNode
      * @param EntityConfiguration $entityConfiguration
      * @param array               $configureCallbacks
@@ -158,6 +123,8 @@ class ApiConfiguration implements ConfigurationInterface
      */
     protected function postProcessConfig(array $config)
     {
+        $config[self::EXCLUSIONS_SECTION] = [];
+        $config[self::INCLUSIONS_SECTION] = [];
         if (!empty($config[self::ENTITIES_SECTION])) {
             foreach ($config[self::ENTITIES_SECTION] as $entityClass => &$entityConfig) {
                 if (!empty($entityConfig)) {

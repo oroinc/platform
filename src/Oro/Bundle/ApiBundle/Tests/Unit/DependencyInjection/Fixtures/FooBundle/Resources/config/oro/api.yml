@@ -1,6 +1,7 @@
 oro_api:
     entities:
-        Test\Entity1: ~
+        Test\Entity1:
+            exclude: true
         Test\Entity2:
             exclude: true
         Test\Entity3: ~

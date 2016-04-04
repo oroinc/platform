@@ -148,7 +148,6 @@ class OroApiExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $this->assertEquals(
             [
-                ['entity' => 'Test\Entity1'],
                 ['entity' => 'Test\Entity12'],
                 ['entity' => 'Test\Entity12', 'field' => 'field1'],
             ],
