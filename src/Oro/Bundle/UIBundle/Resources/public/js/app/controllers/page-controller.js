@@ -281,7 +281,7 @@ define([
                 query._rand = Math.random();
                 query = utils.queryParams.stringify(query);
                 url = pathname + (query && ('?' + query));
-                location.replace(url);
+                location[options.replace ? 'replace' : 'assign'](url);
             } else if (options.redirect) {
                 this.publishEvent('page:redirect');
                 _.extend(options, {forceStartup: true, force: true, redirection: true});
