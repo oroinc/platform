@@ -6,6 +6,7 @@ Table of Contents
  - [Overview](#overview)
  - [Configuration structure](#configuration-structure)
  - ["exclusions" configuration section & "exclude" flag](#exclusions-configuration-section--exclude-flag)
+ - ["inclusions" configuration section](#inclusions-configuration-section)
  - ["entities" configuration section](#entities-configuration-section)
  - ["relations" configuration section](#relations-configuration-section)
  - ["actions" configuration section](#actions-configuration-section)
@@ -58,6 +59,8 @@ Top level configuration example:
 oro_api:
     exclusions:
         ...
+    inclusions:
+        ...
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
             exclude: ~
@@ -94,7 +97,7 @@ The `exclusions` configuration section describes whether whole entity or some of
 
 Each item has next properties:
 
-* **entity** *string* The fully-Qualified Class Name of an entity.
+* **entity** *string* The Fully-Qualified Class Name of an entity.
 * **field** *string* The name of a field. This is optional property.
 
 Example:
@@ -149,6 +152,29 @@ oro_entity:
         # exclude field1 of Acme\Bundle\AcmeBundle\Entity\Entity2 entity
         - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
 ```
+
+"inclusions" configuration section
+----------------------------------
+
+The `inclusions` configuration section can be used to override exclude rules declared in `Resources/config/oro/entity.yml`.
+
+Each item has next properties:
+
+* **entity** *string* The Fully-Qualified Class Name of an entity.
+* **field** *string* The name of a field. This is optional property.
+
+Example:
+
+```yaml
+oro_api:
+    inclusions:
+        # override exclude rule for an entity
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity1 }
+        # override exclude rule for a field
+        - { entity: Acme\Bundle\AcmeBundle\Entity\AcmeEntity2, field: field1 }
+```
+
+Also you can find an example how to use this section in [how-to](how_to.md#turn-on-api-for-entity-disabled-in-resourcesconfigoroentityyml).
 
 "entities" configuration section
 --------------------------------
