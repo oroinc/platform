@@ -169,7 +169,7 @@ oro:
                 popup.question: Are you sure you want to proceed?
         action:
             password_management:
-                label: Manage users' passwords
+                label: Manage passwords
                 description: Reset or change passwords of other users
 
         security:

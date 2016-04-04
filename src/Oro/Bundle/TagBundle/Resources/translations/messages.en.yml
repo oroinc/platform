@@ -29,9 +29,9 @@ oro:
         organization.label:  Organization
 
         action:
-            assign_unassign: "Tag assign/unassign"
+            assign_unassign: "Assign/unassign tags"
             unassign_global: 
-                label: "Unassign all tags from entities"
+                label: "Unassign other tags"
                 description: "Remove tags other than users' own"
 
         tagging:
