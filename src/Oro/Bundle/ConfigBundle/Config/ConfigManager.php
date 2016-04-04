@@ -296,6 +296,12 @@ class ConfigManager
             }
         }
 
+        $event = new ConfigGetEvent($this, $name, $value, $full);
+        $this->eventDispatcher->dispatch(ConfigGetEvent::NAME, $event);
+        $this->eventDispatcher->dispatch(sprintf('%s.%s', ConfigGetEvent::NAME, $name), $event);
+
+        $value = $event->getValue();
+
         if (null === $value) {
             list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);
             if (!empty($this->settings[$section][$key])) {
@@ -308,10 +314,7 @@ class ConfigManager
             }
         }
 
-        $event = new ConfigGetEvent($this, $name, $value, $full);
-        $this->eventDispatcher->dispatch(ConfigGetEvent::NAME, $event);
-
-        return $event->getValue();
+        return $value;
     }
 
     /**
