@@ -64,4 +64,6 @@ oro:
             name.label:           Name
             label.label:          Label
         action:
-            read_dictionaries: "Read address dictionaries"
+            read_dictionaries:
+                label: "Read address dictionaries"
+                description: "See drop-down menus for Countries, streets, etc. in the Address forms"

@@ -30,7 +30,9 @@ oro:
 
         action:
             assign_unassign: "Tag assign/unassign"
-            unassign_global: "Unassign all tags from entities"
+            unassign_global: 
+                label: "Unassign all tags from entities"
+                description: "Remove tags other than users' own"
 
         tagging:
             alias.label:         Alias
