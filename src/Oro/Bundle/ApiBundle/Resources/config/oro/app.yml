@@ -51,6 +51,7 @@ oro_api:
         - form.type.timezone
         - form.type.birthday
         - form.type.text
+        - form.type.textarea
         - form.type.email
         - form.type.url
         - form.type.password
@@ -81,21 +82,32 @@ oro_api:
             form_type: number
         date:
             form_type: date
+            options:
+                widget: single_text
+                format: "yyyy-MM-dd" # HTML5
         time:
             form_type: time
             options:
                 model_timezone: UTC
                 view_timezone: UTC
+                with_seconds: true
+                widget: single_text
         datetime:
             form_type: datetime
             options:
                 model_timezone: UTC
                 view_timezone: UTC
+                with_seconds: true
+                widget: single_text
+                format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
         datetimetz:
             form_type: datetime
             options:
                 model_timezone: UTC
                 view_timezone: UTC
+                with_seconds: true
+                widget: single_text
+                format: "yyyy-MM-dd'T'HH:mm:ssZZZZZ" # HTML5
         text:
             form_type: textarea
         # custom types

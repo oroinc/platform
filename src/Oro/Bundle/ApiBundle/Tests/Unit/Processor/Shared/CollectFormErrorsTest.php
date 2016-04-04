@@ -8,6 +8,8 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 
+use Doctrine\Common\Annotations\AnnotationReader;
+
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
@@ -106,6 +108,34 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         );
     }
 
+    public function testProcessWithInvalidPropertyWhichDoesNotRegisteredInFormButHasValidationConstraint()
+    {
+        $dataClass = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\FormValidation\TestObject';
+        $data = new $dataClass();
+
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true, 'data_class' => $dataClass])
+            ->add('id', 'integer')
+            ->getForm();
+        $form->setData($data);
+        $form->submit(
+            [
+                'id' => 123,
+            ]
+        );
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($form->isValid());
+        $this->assertTrue($this->context->hasErrors());
+        $this->assertEquals(
+            [
+                $this->createErrorObject('This value should not be blank.', 'title'),
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     public function testProcessWithInvalidValues()
     {
         $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
@@ -139,12 +169,11 @@ class CollectFormErrorsTest extends FormProcessorTestCase
      */
     protected function createFormBuilder()
     {
+        $validator = Validation::createValidatorBuilder()
+            ->enableAnnotationMapping(new AnnotationReader())
+            ->getValidator();
         $formFactory = Forms::createFormFactoryBuilder()
-            ->addExtensions(
-                [
-                    new ValidatorExtension(Validation::createValidator())
-                ]
-            )
+            ->addExtensions([new ValidatorExtension($validator)])
             ->getFormFactory();
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 

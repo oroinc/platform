@@ -44,7 +44,8 @@ class BuildFormBuilder implements ProcessorInterface
             return;
         }
 
-        $formBuilder = $this->formFactory->createBuilder(
+        $formBuilder = $this->formFactory->createNamedBuilder(
+            null,
             'form',
             null,
             $this->getFormOptions($context)

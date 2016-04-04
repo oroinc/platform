@@ -88,8 +88,9 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $metadata->addAssociation($association3);
 
         $this->formFactory->expects($this->once())
-            ->method('createBuilder')
+            ->method('createNamedBuilder')
             ->with(
+                null,
                 'form',
                 null,
                 [

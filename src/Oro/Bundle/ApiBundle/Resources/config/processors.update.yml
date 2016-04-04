@@ -45,22 +45,17 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: initialize, priority: 50 }
 
-    oro_api.update.initialize_config_extras:
-        class: Oro\Bundle\ApiBundle\Processor\Get\InitializeConfigExtras
-        tags:
-            - { name: oro.api.processor, action: update, group: initialize, priority: 10 }
-
-    oro_api.update.set_default_max_related_entities:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SetDefaultMaxRelatedEntities
-        tags:
-            - { name: oro.api.processor, action: update, group: initialize, priority: -10 }
-
     oro_api.update.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
             - @oro_api.value_normalizer
         tags:
             - { name: oro.api.processor, action: update, group: initialize, priority: 20 }
+
+    oro_api.update.initialize_config_extras:
+        class: Oro\Bundle\ApiBundle\Processor\Update\InitializeConfigExtras
+        tags:
+            - { name: oro.api.processor, action: update, group: initialize, priority: 10 }
 
     #
     # security_check
@@ -137,7 +132,7 @@ services:
     oro_api.update.load_data_by_orm_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByOrmQuery
         tags:
-            - { name: oro.api.processor, action: update, group: load_data, priority: -20 }
+            - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
 
     #
     # build_form
@@ -167,10 +162,20 @@ services:
     # bind_data
     #
 
-    oro_api.update.collect_form_errors:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CollectFormErrors
+    oro_api.update.set_form_data:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SetFormData
         tags:
-            - { name: oro.api.processor, action: update, group: bind_data, priority: -10 }
+            - { name: oro.api.processor, action: update, group: bind_data, priority: 10 }
+
+    oro_api.update.submit_form:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm
+        tags:
+            - { name: oro.api.processor, action: update, group: bind_data, priority: -50 }
+
+    oro_api.update.collect_form_errors:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors
+        tags:
+            - { name: oro.api.processor, action: update, group: bind_data, priority: -100 }
 
     #
     # normalize_data
