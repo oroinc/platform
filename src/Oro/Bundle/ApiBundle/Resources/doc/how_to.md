@@ -5,6 +5,7 @@ How to
 Table of Contents
 -----------------
  - [Turn on API for entity](#overview)
+ - [Turn on API for entity disabled in **Resources/config/oro/entity.yml**](#turn_on_api_for_entity_disabled_in_resources_config_oro_entity_yml)
  - [Change ACL resource for action](#change-acl-resource-for-action)
  - [Disable access checks for action](#disable-access-checks-for-action)
  - [Disable entity action](#disable-entity-action)
@@ -22,6 +23,42 @@ By default, API for entities is disabled. To turn on API for some entity, you sh
 oro_api:
     entities:
         Acme\Bundle\ProductBundle\Product: ~
+```
+
+Turn on API for entity disabled in Resources/config/oro/entity.yml
+------------------------------------------------------------------
+
+The `exclusions` section of `Resources/config/oro/entity.yml` configuration file is used to make an entity or a field not accessible for a user. Also such entities and fields are not accessible via Data API as well. But it is possible that by some reasons you want to override such rules for Data API. It can be done using `inclusions` section or `exclude` option in `Resources/config/oro/api.yml`.
+
+Let's imagine that you have the following `Resources/config/oro/entity.yml`:
+
+```yaml
+oro_entity:
+    exclusions:
+        - { entity: Acme\Bundle\AcmeBundle\Entity\Entity1 }
+        - { entity: Acme\Bundle\AcmeBundle\Entity\Entity2, field: field1 }
+```
+
+To override these rules in Data API you can use any of the following `Resources/config/oro/api.yml`:
+
+```yaml
+oro_api:
+    inclusions:
+        - { entity: Acme\Bundle\AcmeBundle\Entity\Entity1 }
+        - { entity: Acme\Bundle\AcmeBundle\Entity\Entity2, field: field1 }
+```
+
+or
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\Entity1:
+            exclude: false # override exclude rule from entity.yml
+        Acme\Bundle\AcmeBundle\Entity\Entity2:
+            fields:
+                field1:
+                    exclude: false # override exclude rule from entity.yml
 ```
 
 Change ACL resource for action

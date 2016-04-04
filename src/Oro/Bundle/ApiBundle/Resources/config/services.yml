@@ -137,15 +137,18 @@ services:
             - @oro_api.get_relation_config.processor
 
     oro_api.entity_exclusion_provider:
-        class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
+        class: Oro\Bundle\ApiBundle\Provider\ChainExclusionProvider
         public: false
+        arguments:
+            - @oro_entity.entity_hierarchy_provider
+            - [] # include rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
 
     oro_api.entity_exclusion_provider.config:
         class: Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
         public: false
         arguments:
             - @oro_entity.entity_hierarchy_provider
-            - [] # exclusion rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
+            - [] # exclude rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
         tags:
             - { name: oro_entity.exclusion_provider.api, priority: 60 }
 

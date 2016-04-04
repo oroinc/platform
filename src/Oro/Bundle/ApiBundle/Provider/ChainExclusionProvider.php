@@ -1,30 +1,30 @@
 <?php
 
-namespace Oro\Bundle\EntityBundle\Provider;
+namespace Oro\Bundle\ApiBundle\Provider;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-/**
- * Provide exclude logic to filter entities and fields based on exclude rules
- */
-class ConfigExclusionProvider implements ExclusionProviderInterface
+use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider as BaseExclusionProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
+
+class ChainExclusionProvider extends BaseExclusionProvider
 {
     /** @var EntityHierarchyProvider */
     protected $entityHierarchyProvider;
 
     /** @var array */
-    protected $excludeRules = [];
+    protected $includeRules = [];
 
     /**
      * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param array                   $excludeRules
+     * @param array                   $includeRules
      */
     public function __construct(
         EntityHierarchyProvider $entityHierarchyProvider,
-        $excludeRules
+        $includeRules
     ) {
         $this->entityHierarchyProvider = $entityHierarchyProvider;
-        $this->excludeRules            = $excludeRules;
+        $this->includeRules = $includeRules;
     }
 
     /**
@@ -32,7 +32,11 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredEntity($className)
     {
-        return $this->isMatched($this->getEntityProperties($className));
+        if ($this->isMatched($this->getEntityProperties($className))) {
+            return false;
+        }
+
+        return parent::isIgnoredEntity($className);
     }
 
     /**
@@ -40,7 +44,11 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        return $this->isMatched($this->getFieldProperties($metadata, $fieldName));
+        if ($this->isMatched($this->getFieldProperties($metadata, $fieldName))) {
+            return false;
+        }
+
+        return parent::isIgnoredField($metadata, $fieldName);
     }
 
     /**
@@ -48,13 +56,18 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
-        return $this->isMatched($this->getFieldProperties($metadata, $associationName));
+        if ($this->isMatched($this->getFieldProperties($metadata, $associationName))) {
+            return false;
+        }
+
+        return parent::isIgnoredRelation($metadata, $associationName);
     }
 
     /**
      * Returns properties for entity object
      *
      * @param string $className
+     *
      * @return array
      */
     protected function getEntityProperties($className)
@@ -69,27 +82,28 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      *
      * @param ClassMetadata $metadata
      * @param string        $fieldName
+     *
      * @return array
      */
     protected function getFieldProperties(ClassMetadata $metadata, $fieldName)
     {
         return [
             'entity' => $metadata->getName(),
-            'field'  => $fieldName,
-            'type'   => $metadata->getTypeOfField($fieldName)
+            'field'  => $fieldName
         ];
     }
 
     /**
-     * Checks if the object (entity or field) with the given properties matches at least one exclusion rule
+     * Checks if the object (entity or field) with the given properties matches at least one include rule
      *
      * @param array $objectProperties
+     *
      * @return bool
      */
     protected function isMatched($objectProperties)
     {
         $result = false;
-        foreach ($this->excludeRules as $rule) {
+        foreach ($this->includeRules as $rule) {
             if ($this->isRuleMatched($rule, $objectProperties)) {
                 $result = true;
                 break;
@@ -104,6 +118,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      *
      * @param array $rule
      * @param array $objectProperties
+     *
      * @return bool
      */
     protected function isRuleMatched($rule, $objectProperties)
@@ -131,6 +146,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
      *
      * @param string $entityClassName
      * @param string $className
+     *
      * @return bool
      */
     protected function isEntityMatched($entityClassName, $className)

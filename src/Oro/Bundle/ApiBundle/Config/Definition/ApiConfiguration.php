@@ -12,6 +12,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 class ApiConfiguration implements ConfigurationInterface
 {
     const EXCLUSIONS_SECTION = 'exclusions';
+    const INCLUSIONS_SECTION = 'inclusions';
     const ENTITY_ATTRIBUTE   = 'entity';
     const FIELD_ATTRIBUTE    = 'field';
     const ENTITIES_SECTION   = 'entities';
@@ -52,6 +53,7 @@ class ApiConfiguration implements ConfigurationInterface
             ) = $this->extensionRegistry->getConfigurationSettings();
 
         $this->addExclusionsSection($children);
+        $this->addInclusionsSection($children);
 
         $entityNode = $this->addEntitySection(
             $children,
@@ -108,6 +110,22 @@ class ApiConfiguration implements ConfigurationInterface
     }
 
     /**
+     * @param NodeBuilder $parentNode
+     */
+    protected function addInclusionsSection(NodeBuilder $parentNode)
+    {
+        $parentNode
+            ->arrayNode(self::INCLUSIONS_SECTION)
+                ->prototype('array')
+                ->children()
+                    ->scalarNode(self::ENTITY_ATTRIBUTE)
+                        ->isRequired()
+                        ->cannotBeEmpty()
+                    ->end()
+                    ->scalarNode(self::FIELD_ATTRIBUTE)->end();
+    }
+
+    /**
      * @param NodeBuilder         $parentNode
      * @param EntityConfiguration $entityConfiguration
      * @param array               $configureCallbacks
@@ -142,18 +160,45 @@ class ApiConfiguration implements ConfigurationInterface
     {
         if (!empty($config[self::ENTITIES_SECTION])) {
             foreach ($config[self::ENTITIES_SECTION] as $entityClass => &$entityConfig) {
-                if (!empty($entityConfig) && array_key_exists(ConfigUtil::EXCLUDE, $entityConfig)) {
-                    if ($entityConfig[ConfigUtil::EXCLUDE]
-                        && !$this->hasEntityExclusion($config[self::EXCLUSIONS_SECTION], $entityClass)
-                    ) {
-                        $config[self::EXCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
-                    }
-                    unset($entityConfig[ConfigUtil::EXCLUDE]);
+                if (!empty($entityConfig)) {
+                    $this->processExclusionsAndInclusions($config, $entityClass, $entityConfig);
                 }
             }
         }
 
         return $config;
+    }
+
+    /**
+     * @param array  $config
+     * @param string $entityClass
+     * @param array  $entityConfig
+     */
+    protected function processExclusionsAndInclusions(array &$config, $entityClass, array &$entityConfig)
+    {
+        if (array_key_exists(ConfigUtil::EXCLUDE, $entityConfig)) {
+            if ($entityConfig[ConfigUtil::EXCLUDE]) {
+                if (!$this->hasEntityExclusion($config[self::EXCLUSIONS_SECTION], $entityClass)) {
+                    $config[self::EXCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
+                }
+            } elseif (!$this->hasEntityInclusion($config[self::INCLUSIONS_SECTION], $entityClass)) {
+                $config[self::INCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
+            }
+            unset($entityConfig[ConfigUtil::EXCLUDE]);
+        }
+        if (!empty($entityConfig[ConfigUtil::FIELDS])) {
+            foreach ($entityConfig[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
+                if (array_key_exists(ConfigUtil::EXCLUDE, $fieldConfig)
+                    && !$fieldConfig[ConfigUtil::EXCLUDE]
+                    && !$this->hasFieldInclusion($config[self::INCLUSIONS_SECTION], $entityClass, $fieldName)
+                ) {
+                    $config[self::INCLUSIONS_SECTION][] = [
+                        self::ENTITY_ATTRIBUTE => $entityClass,
+                        self::FIELD_ATTRIBUTE  => $fieldName
+                    ];
+                }
+            }
+        }
     }
 
     /**
@@ -169,6 +214,53 @@ class ApiConfiguration implements ConfigurationInterface
             if (array_key_exists(self::ENTITY_ATTRIBUTE, $exclusion)
                 && $exclusion[self::ENTITY_ATTRIBUTE] === $entityClass
                 && count($exclusion) === 1
+            ) {
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array  $inclusions
+     * @param string $entityClass
+     *
+     * @return bool
+     */
+    protected function hasEntityInclusion($inclusions, $entityClass)
+    {
+        $result = false;
+        foreach ($inclusions as $inclusion) {
+            if (array_key_exists(self::ENTITY_ATTRIBUTE, $inclusion)
+                && $inclusion[self::ENTITY_ATTRIBUTE] === $entityClass
+                && count($inclusion) === 1
+            ) {
+                $result = true;
+                break;
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array  $inclusions
+     * @param string $entityClass
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    protected function hasFieldInclusion($inclusions, $entityClass, $fieldName)
+    {
+        $result = false;
+        foreach ($inclusions as $inclusion) {
+            if (array_key_exists(self::ENTITY_ATTRIBUTE, $inclusion)
+                && array_key_exists(self::FIELD_ATTRIBUTE, $inclusion)
+                && $inclusion[self::ENTITY_ATTRIBUTE] === $entityClass
+                && $inclusion[self::FIELD_ATTRIBUTE] === $fieldName
+                && count($inclusion) === 2
             ) {
                 $result = true;
                 break;

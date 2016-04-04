@@ -1,6 +1,8 @@
 oro_api:
     exclusions: ~
 
+    inclusions: ~
+
     entities: ~
 
     relations: ~
