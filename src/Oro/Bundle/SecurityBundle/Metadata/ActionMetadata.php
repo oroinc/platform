@@ -22,6 +22,11 @@ class ActionMetadata implements AclClassInfo, \Serializable
     protected $label;
 
     /**
+     * @var string
+     */
+    protected $description;
+
+    /**
      * Gets an action name
      *
      * @return string
@@ -52,17 +57,28 @@ class ActionMetadata implements AclClassInfo, \Serializable
     }
 
     /**
+     * Gets an action description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
      * Constructor
      *
      * @param string $name
      * @param string $group
      * @param string $label
      */
-    public function __construct($name = '', $group = '', $label = '')
+    public function __construct($name = '', $group = '', $label = '', $description = '')
     {
         $this->name  = $name;
         $this->group = $group;
         $this->label = $label;
+        $this->description = $description;
     }
 
     /**
@@ -74,7 +90,8 @@ class ActionMetadata implements AclClassInfo, \Serializable
             array(
                 $this->name,
                 $this->group,
-                $this->label
+                $this->label,
+                $this->description,
             )
         );
     }
@@ -87,7 +104,8 @@ class ActionMetadata implements AclClassInfo, \Serializable
         list(
             $this->name,
             $this->group,
-            $this->label
+            $this->label,
+            $this->description,
             ) = unserialize($serialized);
     }
 
@@ -104,6 +122,7 @@ class ActionMetadata implements AclClassInfo, \Serializable
         $result->name  = $data['name'];
         $result->group = $data['group'];
         $result->label = $data['label'];
+        $result->description = $data['description'];
 
         return $result;
     }
