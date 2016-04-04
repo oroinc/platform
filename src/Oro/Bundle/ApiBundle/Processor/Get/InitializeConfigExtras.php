@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Get;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\CustomizeLoadedDataExtra;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -21,6 +22,7 @@ class InitializeConfigExtras implements ProcessorInterface
         /** @var Context $context */
 
         $context->addConfigExtra(new EntityDefinitionConfigExtra($context->getAction()));
+        $context->addConfigExtra(new CustomizeLoadedDataExtra());
         $context->addConfigExtra(new FiltersConfigExtra());
     }
 }

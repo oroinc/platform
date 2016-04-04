@@ -109,7 +109,7 @@ services:
             - @oro_api.customize_loaded_data.processor
             - @oro_api.doctrine_helper
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, priority: -160 }
+            - { name: oro.api.processor, action: get_config, extra: definition&customize_loaded_data, priority: -160 }
 
     oro_api.get_config.set_description_for_entity:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\SetDescriptionForEntity
