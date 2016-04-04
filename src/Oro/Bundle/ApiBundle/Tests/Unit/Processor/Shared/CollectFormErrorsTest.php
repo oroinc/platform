@@ -8,7 +8,8 @@ use Symfony\Component\Form\Forms;
 use Symfony\Component\Validator\Constraints;
 use Symfony\Component\Validator\Validation;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\CollectFormErrors;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class CollectFormErrorsTest extends FormProcessorTestCase
@@ -26,146 +27,142 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->processor = new CollectFormErrors();
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The form must be set in the context.
-     */
     public function testProcessWithoutForm()
     {
         $this->processor->process($this->context);
+        $this->assertFalse($this->context->hasErrors());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage The form must be submitted.
-     */
-    public function testWithNotSubmitterForm()
+    public function testProcessWithNotSubmittedForm()
     {
-        $formFactory = Forms::createFormFactoryBuilder()
-            ->addExtensions([])
-            ->getFormFactory();
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $builder = new FormBuilder(null, null, $dispatcher, $formFactory);
-
-        $form = $builder->create('testForm', null, [])->getForm();
+        $form = $this->createFormBuilder()->create('testForm')->getForm();
 
         $this->context->setForm($form);
-
-        $this->processor->process($this->context);
-    }
-
-    public function testWithValidForm()
-    {
-        $formFactory = Forms::createFormFactoryBuilder()
-            ->addExtensions([])
-            ->getFormFactory();
-        $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
-        $builder = new FormBuilder(null, null, $dispatcher, $formFactory);
-
-        $form = $builder->create('testForm', null, ['compound' => true])
-            ->add('name', 'text')
-            ->add('description', 'text')
-            ->getForm();
-
-        $form->submit([]);
-
-        $this->context->setForm($form);
-
         $this->processor->process($this->context);
 
         $this->assertFalse($this->context->hasErrors());
     }
 
+    public function testProcessWithoutFormConstraints()
+    {
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
+            ->add('field1', 'text')
+            ->add('field2', 'text')
+            ->getForm();
+        $form->submit([]);
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($this->context->hasErrors());
+    }
+
+    public function testProcessWithEmptyData()
+    {
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
+            ->add('field1', 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field2', 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->getForm();
+        $form->submit([]);
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($form->isValid());
+        $this->assertTrue($this->context->hasErrors());
+        $this->assertEquals(
+            [
+                $this->createErrorObject('This value should not be blank.', 'field1'),
+                $this->createErrorObject('This value should not be blank.', 'field2')
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithInvalidDataKey()
+    {
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
+            ->add('field1', 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->add('field2', 'text', ['constraints' => [new Constraints\NotBlank()]])
+            ->getForm();
+        $form->submit(
+            [
+                'field1' => 'value',
+                'field3' => 'value'
+            ]
+        );
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($form->isValid());
+        $this->assertTrue($this->context->hasErrors());
+        $this->assertEquals(
+            [
+                $this->createErrorObject('This form should not contain extra fields.', 'testForm'),
+                $this->createErrorObject('This value should not be blank.', 'field2')
+            ],
+            $this->context->getErrors()
+        );
+    }
+
+    public function testProcessWithInvalidValues()
+    {
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
+            ->add('field1', 'text', ['constraints' => [new Constraints\NotBlank(), new Constraints\NotNull()]])
+            ->add('field2', 'text', ['constraints' => [new Constraints\Length(['min' => 2, 'max' => 4])]])
+            ->getForm();
+        $form->submit(
+            [
+                'field1' => null,
+                'field2' => 'value'
+            ]
+        );
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($form->isValid());
+        $this->assertTrue($this->context->hasErrors());
+        $this->assertEquals(
+            [
+                $this->createErrorObject('This value should not be blank.', 'field1'),
+                $this->createErrorObject('This value should not be null.', 'field1'),
+                $this->createErrorObject('This value is too long. It should have 4 characters or less.', 'field2')
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     /**
-     * @dataProvider dataProvider
+     * @return FormBuilder
      */
-    public function testWithConstraints($data = [], $constraints = [], $errors = 0)
+    protected function createFormBuilder()
     {
         $formFactory = Forms::createFormFactoryBuilder()
-            ->addExtensions([
-                new ValidatorExtension(Validation::createValidator())
-            ])
+            ->addExtensions(
+                [
+                    new ValidatorExtension(Validation::createValidator())
+                ]
+            )
             ->getFormFactory();
         $dispatcher = $this->getMock('Symfony\Component\EventDispatcher\EventDispatcherInterface');
 
-        $builder = new FormBuilder(null, null, $dispatcher, $formFactory);
-
-        $form = $builder->create('test', null, ['compound' => true])
-            ->add('field1', 'text', [
-                'constraints' => $constraints[0]
-            ])
-            ->add('field2', 'text', [
-                'constraints' => $constraints[1]
-            ])
-            ->getForm();
-
-        $form->submit($data);
-
-        $this->context->setForm($form);
-
-        $this->processor->process($this->context);
-
-        if ($errors) {
-            $this->assertFalse($form->isValid());
-            $this->assertTrue($this->context->hasErrors());
-        }
-        $this->assertCount($errors, $this->context->getErrors());
+        return new FormBuilder(null, null, $dispatcher, $formFactory);
     }
 
-    public function dataProvider()
+    /**
+     * @param string $errorMessage
+     * @param string $propertyPath
+     *
+     * @return Error
+     */
+    protected function createErrorObject($errorMessage, $propertyPath)
     {
-        return [
-            'no_constraints' => [
-                'data' => [],
-                'constraints' => [
-                    [],
-                    []
-                ],
-                'errors' => 0
-            ],
-            'empty_data' => [
-                'data' => [],
-                'constraints' => [
-                    [
-                        new Constraints\NotBlank()
-                    ],
-                    [
-                        new Constraints\NotBlank()
-                    ]
-                ],
-                'errors' => 2 // both fields empty
-            ],
-            'invalid_data_key' => [
-                'data' => [
-                    'field1' => 'value',
-                    'field3' => 'value'
-                ],
-                'constraints' => [
-                    [
-                        new Constraints\NotBlank()
-                    ],
-                    [
-                        new Constraints\NotBlank(),
-                    ]
-                ],
-                'errors' => 2 // 2nd field empty and extra data
-            ],
-            'invalid_values' => [
-                'data' => [
-                    'field1' => null,
-                    'field2' => 'value'
-                ],
-                'constraints' => [
-                    [
-                        new Constraints\NotBlank(),
-                        new Constraints\NotNull()
-                    ],
-                    [
-                        new Constraints\Length(['min' => 2, 'max' => 4])
-                    ]
-                ],
-                'errors' => 3
-            ]
-        ];
+        $error = new Error();
+        $error->setDetail($errorMessage);
+        $error->setPropertyName($propertyPath);
+
+        return $error;
     }
 }

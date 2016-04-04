@@ -2,46 +2,44 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
-use Symfony\Component\Form\Form;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Model\Error;
 
 /**
- * Collects form errors occurred due create or update requests and adds them into context.
+ * Collects errors occurred during the the form submit and adds them into the Context.
  */
 class CollectFormErrors implements ProcessorInterface
 {
+    /**
+     * {@inheritdoc}
+     */
     public function process(ContextInterface $context)
     {
         /** @var $context FormContext */
 
-        if (false === $context->hasForm()) {
-            throw new \RuntimeException('The form must be set in the context.');
+        if (!$context->hasForm()) {
+            // no form
+            return;
         }
 
-        /** @var Form $form */
         $form = $context->getForm();
-
-        if (false === $form->isSubmitted()) {
-            throw new \RuntimeException('The form must be submitted.');
+        if (!$form->isSubmitted()) {
+            // the form is not submitted
+            return;
         }
-
         if ($form->isValid()) {
-            // form valid, nothing to do
+            // the form does not have errors
             return;
         }
 
         // collect form global errors
         foreach ($form->getErrors() as $error) {
-            $errorObject = new Error();
-
-            $errorObject->setPropertyName($error->getOrigin()->getName());
-            $errorObject->setDetail($error->getMessage());
-
+            $errorObject = $this->createErrorObject(
+                $error->getMessage(),
+                $error->getOrigin()->getName()
+            );
             $context->addError($errorObject);
         }
 
@@ -49,14 +47,28 @@ class CollectFormErrors implements ProcessorInterface
         foreach ($form as $child) {
             if (!$child->isValid()) {
                 foreach ($child->getErrors() as $error) {
-                    $errorObject = new Error();
-
-                    $errorObject->setPropertyName($child->getName());
-                    $errorObject->setDetail($error->getMessage());
-
+                    $errorObject = $this->createErrorObject(
+                        $error->getMessage(),
+                        $child->getName()
+                    );
                     $context->addError($errorObject);
                 }
             }
         }
+    }
+
+    /**
+     * @param string $errorMessage
+     * @param string $propertyPath
+     *
+     * @return Error
+     */
+    protected function createErrorObject($errorMessage, $propertyPath)
+    {
+        $error = new Error();
+        $error->setDetail($errorMessage);
+        $error->setPropertyName($propertyPath);
+
+        return $error;
     }
 }
