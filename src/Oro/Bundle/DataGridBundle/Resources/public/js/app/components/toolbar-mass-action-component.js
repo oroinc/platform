@@ -39,6 +39,11 @@ define(function(require) {
             this.actionsPanel = new ActionsPanel({'actions': actions, el: options._sourceElement});
             this.actionsPanel.render();
 
+            this.listenTo(this.grid.collection, 'backgrid:refresh', function() {
+                if (this.actionsPanel.$el.is(':visible')) {
+                    this.actionsPanel.$el.dropdown('toggle');
+                }
+            });
             ToolbarMassActionComponent.__super__.initialize.apply(this, arguments);
         },
 

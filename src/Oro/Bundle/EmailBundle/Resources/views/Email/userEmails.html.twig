@@ -27,23 +27,23 @@
         {{ parent() }}
     <script id="template-user-email-grid-row" type="text/template">
         <div class="user-emails-row">
-            <div class="user-emails-row__top">
+            <div class="user-emails-row__top clearfix">
                 <div class="user-emails-row__select-row">
                     <input type="checkbox">
                 </div>
                 <div class="user-emails-row__contacts">
                     <%= model.contacts %>
                 </div>
-                <div class="user-emails-row__attachments">
-                    <%= model.attachments %>
-                </div>
                 <div class="user-emails-row__date">
                     <%= model.sentAt %>
                 </div>
+                <div class="user-emails-row__attachments">
+                    <%= model.attachments %>
+                </div>
             </div>
-        </div>
-        <div class="user-emails-row__subject">
-            <%= model.subject %>
+            <div class="user-emails-row__subject">
+                <%= model.subject %>
+            </div>
         </div>
     </script>
     {% endblock content_datagrid %}
