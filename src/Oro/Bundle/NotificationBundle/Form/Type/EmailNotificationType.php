@@ -25,14 +25,22 @@ class EmailNotificationType extends AbstractType
     protected $subscriber;
 
     /**
+     * @var string
+     */
+    protected $emailTemplatesUrl;
+
+    /**
      * @param BuildTemplateFormSubscriber $subscriber
-     * @param ConfigProvider              $ownershipConfigProvider
+     * @param ConfigProvider $ownershipConfigProvider
+     * @param string $emailTemplatesUrl
      */
     public function __construct(
         BuildTemplateFormSubscriber $subscriber,
-        ConfigProvider $ownershipConfigProvider
+        ConfigProvider $ownershipConfigProvider,
+        $emailTemplatesUrl
     ) {
         $this->subscriber = $subscriber;
+        $this->emailTemplatesUrl = $emailTemplatesUrl;
 
         $this->ownershipEntities = [];
         foreach ($ownershipConfigProvider->getConfigs() as $config) {
@@ -55,12 +63,16 @@ class EmailNotificationType extends AbstractType
             'oro_email_notification_entity_choice',
             array(
                 'label'       => 'oro.notification.emailnotification.entity_name.label',
+                'tooltip'     => 'oro.notification.emailnotification.entity_name.tooltip',
                 'required'    => true,
                 'attr'        => array(
                     'data-ownership-entities' => json_encode($this->ownershipEntities)
                 ),
                 'configs'     => array(
                     'allowClear' => true
+                ),
+                'tooltip_parameters' => array(
+                    'url' => $this->emailTemplatesUrl
                 ),
             )
         );
