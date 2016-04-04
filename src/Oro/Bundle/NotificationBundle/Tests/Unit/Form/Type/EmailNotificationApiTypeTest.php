@@ -26,8 +26,9 @@ class EmailNotificationApiTypeTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->once())
             ->method('getConfigs')
             ->will($this->returnValue([]));
+        $relativeUrl = '/email/emailtemplate';
 
-        $this->type = new EmailNotificationApiType($listener, $this->configProvider);
+        $this->type = new EmailNotificationApiType($listener, $this->configProvider, $relativeUrl);
     }
 
     public function testSetDefaultOptions()

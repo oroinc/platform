@@ -39,8 +39,9 @@ class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->once())
             ->method('getConfigs')
             ->will($this->returnValue([$config]));
+        $relativeUrl = '/email/emailtemplate';
 
-        $this->type = new EmailNotificationType($listener, $this->configProvider);
+        $this->type = new EmailNotificationType($listener, $this->configProvider, $relativeUrl);
     }
 
     public function testSetDefaultOptions()
