@@ -128,40 +128,30 @@ class ApiConfiguration implements ConfigurationInterface
         if (!empty($config[self::ENTITIES_SECTION])) {
             foreach ($config[self::ENTITIES_SECTION] as $entityClass => &$entityConfig) {
                 if (!empty($entityConfig)) {
-                    $this->processExclusionsAndInclusions($config, $entityClass, $entityConfig);
+                    if (array_key_exists(ConfigUtil::EXCLUDE, $entityConfig)) {
+                        if ($entityConfig[ConfigUtil::EXCLUDE]) {
+                            $config[self::EXCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
+                        } else {
+                            $config[self::INCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
+                        }
+                        unset($entityConfig[ConfigUtil::EXCLUDE]);
+                    }
+                    if (!empty($entityConfig[ConfigUtil::FIELDS])) {
+                        foreach ($entityConfig[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
+                            if (array_key_exists(ConfigUtil::EXCLUDE, $fieldConfig)
+                                && !$fieldConfig[ConfigUtil::EXCLUDE]
+                            ) {
+                                $config[self::INCLUSIONS_SECTION][] = [
+                                    self::ENTITY_ATTRIBUTE => $entityClass,
+                                    self::FIELD_ATTRIBUTE  => $fieldName
+                                ];
+                            }
+                        }
+                    }
                 }
             }
         }
 
         return $config;
-    }
-
-    /**
-     * @param array  $config
-     * @param string $entityClass
-     * @param array  $entityConfig
-     */
-    protected function processExclusionsAndInclusions(array &$config, $entityClass, array &$entityConfig)
-    {
-        if (array_key_exists(ConfigUtil::EXCLUDE, $entityConfig)) {
-            if ($entityConfig[ConfigUtil::EXCLUDE]) {
-                $config[self::EXCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
-            } else {
-                $config[self::INCLUSIONS_SECTION][] = [self::ENTITY_ATTRIBUTE => $entityClass];
-            }
-            unset($entityConfig[ConfigUtil::EXCLUDE]);
-        }
-        if (!empty($entityConfig[ConfigUtil::FIELDS])) {
-            foreach ($entityConfig[ConfigUtil::FIELDS] as $fieldName => $fieldConfig) {
-                if (array_key_exists(ConfigUtil::EXCLUDE, $fieldConfig)
-                    && !$fieldConfig[ConfigUtil::EXCLUDE]
-                ) {
-                    $config[self::INCLUSIONS_SECTION][] = [
-                        self::ENTITY_ATTRIBUTE => $entityClass,
-                        self::FIELD_ATTRIBUTE  => $fieldName
-                    ];
-                }
-            }
-        }
     }
 }
