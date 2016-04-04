@@ -471,8 +471,14 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         if ($(this).attr('disabled')) {
             return;
         }
-        $(this).closest('*[data-content]')
-            .trigger('content:remove')
+
+        var item, closest = '*[data-content]';
+        if ($(this).data('closest')) {
+            closest = $(this).data('closest');
+        }
+
+        item = $(this).closest(closest);
+        item.trigger('content:remove')
             .remove();
     });
 
