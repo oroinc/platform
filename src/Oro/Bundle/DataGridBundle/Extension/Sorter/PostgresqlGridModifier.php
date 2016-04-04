@@ -61,13 +61,13 @@ class PostgresqlGridModifier extends AbstractExtension
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
         $entityClassName = $this->getEntityClassName($config);
+        /** @var QueryBuilder $queryBuilder */
+        $queryBuilder = $datasource->getQueryBuilder();
 
         if (!$entityClassName) {
             return;
         }
 
-        /** @var QueryBuilder $queryBuilder */
-        $queryBuilder = $datasource->getQueryBuilder();
         $fromParts = $queryBuilder->getDQLPart('from');
         $alias = false;
 
@@ -82,7 +82,7 @@ class PostgresqlGridModifier extends AbstractExtension
             }
         }
 
-        if ($alias) {
+        if ($alias && $this->isAllowedAddingSorting($alias, $identifier, $queryBuilder)) {
             $field = $alias . '.' . $identifier;
             $orderBy = $queryBuilder->getDQLPart('orderBy');
             if (!isset($orderBy[$field])) {
@@ -109,5 +109,28 @@ class PostgresqlGridModifier extends AbstractExtension
         }
 
         return null;
+    }
+
+    /**
+     * @param string $alias
+     * @param string $identifier
+     * @param QueryBuilder $queryBuilder
+     * @return bool
+     */
+    protected function isAllowedAddingSorting($alias, $identifier, QueryBuilder $queryBuilder)
+    {
+        $groupByParts = $queryBuilder->getDQLPart('groupBy');
+
+        if (!count($groupByParts)) {
+            return true;
+        }
+
+        foreach ($groupByParts as $groupBy) {
+            if (in_array($alias.'.'.$identifier, $groupBy->getParts(), true) !== false) {
+                return true;
+            }
+        }
+
+        return false;
     }
 }
