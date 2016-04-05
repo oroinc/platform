@@ -34,9 +34,11 @@ trait ContextAccessorAwareTrait
     protected function resolveValue($context, $value, $strict = true)
     {
         if ($value instanceof PropertyPathInterface) {
-            return $strict || $this->contextAccessor->hasValue($context, $value)
-                ? $this->contextAccessor->getValue($context, $value)
-                : null;
+            if ($strict || $this->contextAccessor->hasValue($context, $value)) {
+                return $this->contextAccessor->getValue($context, $value);
+            }
+
+            return null;
         } elseif ($value instanceof ExpressionInterface) {
             return $value->evaluate($context, $this->errors);
         }
