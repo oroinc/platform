@@ -31,22 +31,26 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             }
 
             if (this.options.addButtonEvent) {
-                mediator.on(this.options.addButtonEvent, _.bind(this._addButton, this));
+                mediator.on(this.options.addButtonEvent, this._addButton, this);
             }
 
             // replaces button's separators
             this.element.find(this.options.separator).replaceWith('<li class="divider"></li>');
 
-            this.buttons = this._collectButtons();
-            this._proccedButtons();
+            this._proccedButtons(this._collectButtons());
         },
 
-        _proccedButtons: function() {
-            if (this.buttons.length <= 1) {
+        _destroy: function() {
+            delete this.group;
+            delete this.buttons;
+            mediator.off(this.options.addButtonEvent, this._addButton, this);
+        },
+
+        _proccedButtons: function($elems) {
+            this.buttons = $elems.clone(true);
+            if ($elems.length <= 1) {
                 return;
             }
-
-            var $elems = this.buttons.clone(true);
 
             if (this.group) {
                 this.group.remove();
@@ -82,8 +86,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         _addButton: function(data) {
             var $button = this._collectButtons($(this.options.buttonTemplate(data)));
             if ($button.length > 0) {
-                this.buttons = $button.add(this.buttons);
-                this._proccedButtons();
+                this._proccedButtons($button.add(this.buttons));
             }
         },
 
