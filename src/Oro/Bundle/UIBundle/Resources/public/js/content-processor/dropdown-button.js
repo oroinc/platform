@@ -21,6 +21,10 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             buttonTemplate: ''
         },
 
+        group: null,
+
+        buttons: null,
+
         _create: function() {
             if (this.options.buttonTemplate) {
                 this.options.buttonTemplate = _.template(this.options.buttonTemplate);
@@ -33,16 +37,16 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             // replaces button's separators
             this.element.find(this.options.separator).replaceWith('<li class="divider"></li>');
 
-            this.$elems = this._collectButtons();
+            this.buttons = this._collectButtons();
             this._proccedButtons();
         },
 
         _proccedButtons: function() {
-            if (this.$elems.length <= 1) {
+            if (this.buttons.length <= 1) {
                 return;
             }
 
-            var $elems = this.$elems.clone(true);
+            var $elems = this.buttons.clone(true);
 
             if (this.group) {
                 this.group.remove();
@@ -78,7 +82,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         _addButton: function(data) {
             var $button = this._collectButtons($(this.options.buttonTemplate(data)));
             if ($button.length > 0) {
-                this.$elems = $button.add(this.$elems);
+                this.buttons = $button.add(this.buttons);
                 this._proccedButtons();
             }
         },
@@ -86,11 +90,12 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         /**
          * Collects all buttons of the container
          *
+         * @param {jQuery|null} $element
          * @returns {*}
          * @private
          */
         _collectButtons: function($element) {
-            if ($element === undefined) {
+            if (!$element) {
                 $element = this.element;
             }
             return $element
