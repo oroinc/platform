@@ -193,9 +193,7 @@ class DynamicSegmentQueryBuilderTest extends SegmentDefinitionTestCase
                 )
             );
 
-        $entityHierarchyProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $entityHierarchyProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
         $entityHierarchyProvider
             ->expects($this->any())
             ->method('getHierarchy')

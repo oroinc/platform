@@ -13,11 +13,11 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
     protected $matcher;
 
     /**
-     * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param array                   $excludeRules
+     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
+     * @param array                            $excludeRules
      */
     public function __construct(
-        EntityHierarchyProvider $entityHierarchyProvider,
+        EntityHierarchyProviderInterface $entityHierarchyProvider,
         $excludeRules
     ) {
         $this->matcher = new EntityRuleMatcher($entityHierarchyProvider, $excludeRules);

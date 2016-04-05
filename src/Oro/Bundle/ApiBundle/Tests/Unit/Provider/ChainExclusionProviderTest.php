@@ -14,9 +14,7 @@ class ChainExclusionProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $hierarchyProvider = $this->getMockBuilder('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $hierarchyProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface');
 
         $this->chainProvider = new ChainExclusionProvider($hierarchyProvider, []);
 

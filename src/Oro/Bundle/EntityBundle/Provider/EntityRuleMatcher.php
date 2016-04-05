@@ -4,18 +4,18 @@ namespace Oro\Bundle\EntityBundle\Provider;
 
 class EntityRuleMatcher
 {
-    /** @var EntityHierarchyProvider */
+    /** @var EntityHierarchyProviderInterface */
     protected $entityHierarchyProvider;
 
     /** @var array */
     protected $rules = [];
 
     /**
-     * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param array                   $rules
+     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
+     * @param array                            $rules
      */
     public function __construct(
-        EntityHierarchyProvider $entityHierarchyProvider,
+        EntityHierarchyProviderInterface $entityHierarchyProvider,
         $rules
     ) {
         $this->entityHierarchyProvider = $entityHierarchyProvider;

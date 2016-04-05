@@ -5,7 +5,7 @@ namespace Oro\Bundle\ApiBundle\Provider;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider as BaseExclusionProvider;
-use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProviderInterface;
 use Oro\Bundle\EntityBundle\Provider\EntityRuleMatcher;
 
 class ChainExclusionProvider extends BaseExclusionProvider
@@ -14,11 +14,11 @@ class ChainExclusionProvider extends BaseExclusionProvider
     protected $matcher;
 
     /**
-     * @param EntityHierarchyProvider $entityHierarchyProvider
-     * @param array                   $includeRules
+     * @param EntityHierarchyProviderInterface $entityHierarchyProvider
+     * @param array                            $includeRules
      */
     public function __construct(
-        EntityHierarchyProvider $entityHierarchyProvider,
+        EntityHierarchyProviderInterface $entityHierarchyProvider,
         $includeRules
     ) {
         $this->matcher = new EntityRuleMatcher($entityHierarchyProvider, $includeRules);
