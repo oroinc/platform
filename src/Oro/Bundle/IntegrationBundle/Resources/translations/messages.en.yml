@@ -12,6 +12,8 @@ oro:
                 update: Update
                 delete: Delete
                 schedule_sync: Schedule Sync
+                activate: Activate
+                deactivate: Deactivate
 
         controller:
             integration:
@@ -96,3 +98,8 @@ oro:
         system_configuration:
             groups:
                 integrations.title: Integrations
+
+        notification:
+            channel:
+                activated: Integration has been activated successfully
+                deactivated: Integration has been deactivated successfully
