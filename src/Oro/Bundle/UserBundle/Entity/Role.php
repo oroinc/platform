@@ -83,7 +83,8 @@ class Role extends ExtendRole
     /**
      * Unset the id on copy
      */
-    public function __clone() {
+    public function __clone()
+    {
         $this->id = null;
     }
 
