@@ -1,11 +1,10 @@
-define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
+define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _, mediator) {
     'use strict';
 
     /**
      * Converts buttons sequence from container to group with main buttons
      * and rest buttons in dropdown
      */
-
     $.widget('oroui.dropdownButtonProcessor', {
         options: {
             separator: '.separator-btn',
@@ -17,20 +16,38 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             moreLabel: '',
             groupContainer: '<div class="btn-group pull-right"></div>',
             minItemQuantity: 1,
-            moreButtonAttrs: {}
+            moreButtonAttrs: {},
+            mediatorPrefix: '',
+            buttonTemplate: ''
         },
 
         _create: function() {
-            var $more;
-            var $group = $(this.options.groupContainer);
+            if (this.options.buttonTemplate) {
+                this.options.buttonTemplate = _.template(this.options.buttonTemplate);
+            }
+
+            if (this.options.mediatorPrefix) {
+                mediator.on(this.options.mediatorPrefix + ':add', _.bind(this._addButton, this));
+            }
 
             // replaces button's separators
             this.element.find(this.options.separator).replaceWith('<li class="divider"></li>');
 
-            var $elems = this._collectButtons();
-            if ($elems.length <= 1) {
+            this.$elems = this._collectButtons();
+            this._proccedButtons();
+        },
+
+        _proccedButtons: function() {
+            if (this.$elems.length <= 1) {
                 return;
             }
+
+            var $elems = this.$elems.clone(true);
+
+            if (this.group) {
+                this.group.remove();
+            }
+            this.group = $(this.options.groupContainer);
 
             var $main = this._mainButtons($elems);
             if (this.options.useMainButtonsClone) {
@@ -45,19 +62,25 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                     });
                 }
             }
-            $group.append($main);
+            this.group.append($main);
 
             // pushes rest buttons to dropdown
             $elems = $elems.not($main);
             if ($elems.length > this.options.minItemQuantity) {
-                $more = this._moreButton();
-                $group.append($more);
-
+                this.group.append(this._moreButton());
                 $elems = this._dropdownMenu($elems);
             }
-            $group.append($elems);
+            this.group.append($elems);
 
-            this.element.find('.btn-group').remove().end().prepend($group);
+            this.element.find('.btn-group').remove().end().prepend(this.group);
+        },
+
+        _addButton: function(data) {
+            var $button = this._collectButtons($(this.options.buttonTemplate(data)));
+            if ($button.length > 0) {
+                this.$elems = $button.add(this.$elems);
+                this._proccedButtons();
+            }
         },
 
         /**
@@ -66,8 +89,11 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          * @returns {*}
          * @private
          */
-        _collectButtons: function() {
-            return this.element
+        _collectButtons: function($element) {
+            if ($element === undefined) {
+                $element = this.element;
+            }
+            return $element
                 .find(this.options.includeButtons)
                 .not(this.options.excludeButtons)
                 .addClass('btn')
