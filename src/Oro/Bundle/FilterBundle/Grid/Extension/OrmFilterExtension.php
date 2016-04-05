@@ -112,7 +112,7 @@ class OrmFilterExtension extends AbstractExtension
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $filtersState        = $data->offsetGetByPath('[state][filters]', []);
-        $initialFiltersState = $filtersState;
+        $initialFiltersState = $data->offsetGetByPath('[initialState][filters]', []);
         $filtersMetaData     = [];
 
         $filters       = $this->getFiltersToApply($config);
