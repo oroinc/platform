@@ -72,7 +72,7 @@ abstract class OroKernel extends Kernel
             }
 
             // require instead of require_once used to correctly handle sub-requests
-            $bundles = require $cache;
+            $bundles = require $cache->getPath();
         }
 
         return $bundles;
