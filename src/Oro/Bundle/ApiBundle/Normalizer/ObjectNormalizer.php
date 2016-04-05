@@ -7,9 +7,9 @@ use Doctrine\Common\Util\ClassUtils;
 use Oro\Component\EntitySerializer\DataAccessorInterface;
 use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Component\EntitySerializer\EntityConfig;
+use Oro\Component\EntitySerializer\FieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Component\EntitySerializer\FieldConfig;
 
 class ObjectNormalizer
 {
@@ -167,9 +167,7 @@ class ObjectNormalizer
                             $childValue = [];
                             foreach ($value as $val) {
                                 $childVal = null;
-                                if ($this->dataAccessor->tryGetValue($val, $childFieldName, $childVal)) {
-                                    $childValue = $this->transformValue($entityClass, $fieldName, $childValue, $field);
-                                }
+                                $this->dataAccessor->tryGetValue($val, $childFieldName, $childVal);
                                 $childValue[] = $childVal;
                             }
                         } else {
@@ -177,7 +175,6 @@ class ObjectNormalizer
                             if (!$this->dataAccessor->tryGetValue($value, $childFieldName, $childValue)) {
                                 continue;
                             }
-                            $childValue = $this->transformValue($entityClass, $fieldName, $childValue, $field);
                         }
                         $value = $childValue;
                     } else {
