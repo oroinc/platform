@@ -472,7 +472,8 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             return;
         }
 
-        var item, closest = '*[data-content]';
+        var item;
+        var closest = '*[data-content]';
         if ($(this).data('closest')) {
             closest = $(this).data('closest');
         }

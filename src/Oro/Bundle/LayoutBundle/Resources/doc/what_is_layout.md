@@ -43,6 +43,7 @@ The **OroLayoutBundle** introduces a set of block types that allow to easily bui
 |-----------|------------|-------------|
 | `root` | [RootType.php](../../Layout/Block/Type/RootType.php) | `<html>` |
 | `head` | [HeadType.php](../../Layout/Block/Type/HeadType.php) | `<head>` |
+| `title` | [TitleType.php](../../Layout/Block/Type/TitleType.php) | `<title>` |
 | `meta` | [MetaType.php](../../Layout/Block/Type/MetaType.php) | `<meta>` |
 | `style` | [StyleType.php](../../Layout/Block/Type/StyleType.php) | `<style>` with content or `<link>` with external resource |
 | `script` | [ScriptType.php](../../Layout/Block/Type/ScriptType.php) | `<script>` |

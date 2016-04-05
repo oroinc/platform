@@ -153,11 +153,11 @@ define(['jquery', 'jquery-ui'], function($) {
         var oldMoveToTop = $.ui.dialog.prototype._moveToTop;
         $.widget('ui.dialog', $.ui.dialog, {
             /**
-             * Replace method because some browsers return string 'auto' if property z-index not specified. 
+             * Replace method because some browsers return string 'auto' if property z-index not specified.
              * */
             _moveToTop: function() {
                 if (typeof this.uiDialog.css('z-index') === 'string') {
-                    this.uiDialog.css('z-index', 0);
+                    this.uiDialog.css('z-index', 910);
                 }
                 oldMoveToTop.apply(this);
             }
