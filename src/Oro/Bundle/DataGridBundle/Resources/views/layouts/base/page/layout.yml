@@ -1,8 +1,8 @@
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'OroDataGridBundle:layouts:base/page/layout.html.twig'
-        - @addTree:
+        - '@addTree':
             items:
                 datagrid_toolbar:
                     blockType: container

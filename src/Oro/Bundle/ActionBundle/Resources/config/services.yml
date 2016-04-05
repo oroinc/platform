@@ -23,21 +23,21 @@ services:
     oro_action.handler.delete:
         class: %oro_action.handler.delete.class%
         arguments:
-            - @oro_soap.handler.delete
-            - @oro_action.api_manager
-            - @oro_entity.doctrine_helper
+            - '@oro_soap.handler.delete'
+            - '@oro_action.api_manager'
+            - '@oro_entity.doctrine_helper'
 
     oro_action.helper.context:
         class: %oro_action.helper.context.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @property_accessor
-            - @request_stack
+            - '@oro_entity.doctrine_helper'
+            - '@property_accessor'
+            - '@request_stack'
 
     oro_action.helper.applications:
         class: %oro_action.helper.applications.class%
         arguments:
-            - @security.token_storage
+            - '@security.token_storage'
 
     oro_action.helper.restrict:
         class: %oro_action.helper.restrict.class%
@@ -45,45 +45,45 @@ services:
     oro_action.helper.options:
         class: %oro_action.helper.options.class%
         arguments:
-            - @oro_action.helper.context
-            - @oro_action.options_assembler
-            - @oro_action.context_accessor
-            - @oro_action.helper.applications_url
-            - @translator
+            - '@oro_action.helper.context'
+            - '@oro_action.options_assembler'
+            - '@oro_action.context_accessor'
+            - '@oro_action.helper.applications_url'
+            - '@translator'
 
     oro_action.helper.applications_url:
         class: %oro_action.helper.applications_url.class%
         arguments:
-            - @oro_action.helper.applications
-            - @router
+            - '@oro_action.helper.applications'
+            - '@router'
 
     oro_action.operation_registry:
         class: %oro_action.operation_registry.class%
         arguments:
-            - @oro_action.configuration.provider.operations
-            - @oro_action.assembler.operation
-            - @oro_action.helper.applications
+            - '@oro_action.configuration.provider.operations'
+            - '@oro_action.assembler.operation'
+            - '@oro_action.helper.applications'
 
     oro_action.action_group_registry:
         class: %oro_action.action_group_registry.class%
         arguments:
-            - @oro_action.configuration.provider.action_groups
-            - @oro_action.assembler.action_group
+            - '@oro_action.configuration.provider.action_groups'
+            - '@oro_action.assembler.action_group'
 
     oro_action.operation_manager:
         class: %oro_action.operation_manager.class%
         arguments:
-            - @oro_action.operation_registry
-            - @oro_action.action_group_registry
-            - @oro_action.helper.context
+            - '@oro_action.operation_registry'
+            - '@oro_action.action_group_registry'
+            - '@oro_action.helper.context'
 
     oro_action.attribute_guesser:
         class: %oro_action.attribute_guesser.class%
         arguments:
-            - @form.registry
-            - @doctrine
-            - @oro_entity_config.provider.entity
-            - @oro_entity_config.provider.form
+            - '@form.registry'
+            - '@doctrine'
+            - '@oro_entity_config.provider.entity'
+            - '@oro_entity_config.provider.form'
         calls:
             # mapping from doctrine type to attribute parameters
             - [addDoctrineTypeMapping, ["string", "string"]]
@@ -116,29 +116,29 @@ services:
     oro_action.options_assembler:
         class: %oro_action.options_assembler.class%
         calls:
-            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+            - [addConfigurationPass,  ['@oro_action.configuration_pass.replace_property_path']]
 
     oro_action.form_manager:
         class: %oro_action.form_manager.class%
         arguments:
-            - @form.factory
-            - @oro_action.operation_manager
-            - @oro_action.helper.context
+            - '@form.factory'
+            - '@oro_action.operation_manager'
+            - '@oro_action.helper.context'
 
     oro_action.api_manager:
         class: %oro_action.api_manager.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - ''
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_action.datagrid.extension.operation:
         class: %oro_action.datagrid.operation_extension.class%
         arguments:
-            - @oro_action.operation_manager
-            - @oro_action.helper.context
-            - @oro_action.datagrid.mass_action_provider.registry
-            - @oro_action.helper.options
+            - '@oro_action.operation_manager'
+            - '@oro_action.helper.context'
+            - '@oro_action.datagrid.mass_action_provider.registry'
+            - '@oro_action.helper.options'
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:
@@ -148,7 +148,7 @@ services:
     oro_action.datagrid.action.action_widget_action:
         class: %oro_action.datagrid.action.action_widget_action.class%
         arguments:
-            - @translator
+            - '@translator'
         scope: prototype
         tags:
             - { name: oro_datagrid.extension.action.type, type: action-widget }
@@ -159,8 +159,8 @@ services:
     oro_action.layout.block_type.action_line_buttons:
         class: %oro_action.layout.block_type.action_line_buttons.class%
         arguments:
-            - @oro_action.helper.applications
-            - @oro_entity.doctrine_helper
+            - '@oro_action.helper.applications'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: layout.block_type, alias: action_line_buttons }
 
@@ -172,9 +172,9 @@ services:
     oro_action.layout.data_provider.actions_data_rpovider:
         class: %oro_action.layout.data_provider.actions_data_rpovider.class%
         arguments:
-            - @oro_action.operation_manager
-            - @oro_action.helper.context
-            - @oro_action.helper.restrict
-            - @translator
+            - '@oro_action.operation_manager'
+            - '@oro_action.helper.context'
+            - '@oro_action.helper.restrict'
+            - '@translator'
         tags:
             - { name: layout.data_provider, alias: actions }

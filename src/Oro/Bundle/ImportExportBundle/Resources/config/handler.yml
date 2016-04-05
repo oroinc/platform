@@ -10,31 +10,31 @@ services:
         class: %oro_importexport.handler.abstract.class%
         absract: true
         arguments:
-            - @oro_importexport.job_executor
-            - @oro_importexport.processor.registry
-            - @oro_importexport.file.file_system_operator
+            - '@oro_importexport.job_executor'
+            - '@oro_importexport.processor.registry'
+            - '@oro_importexport.file.file_system_operator'
 
     oro_importexport.handler.import.abstract:
         class: %oro_importexport.handler.import.abstract.class%
         absract: true
         parent: oro_importexport.handler.abstract
         calls:
-            - [setTranslator, [@translator]]
+            - [setTranslator,  ['@translator']]
 
     oro_importexport.handler.import.http:
         class: %oro_importexport.handler.import.http.class%
         parent: oro_importexport.handler.import.abstract
         calls:
-            - [setSession, [@session]]
-            - [setRouter, [@router]]
+            - [setSession,  ['@session']]
+            - [setRouter,  ['@router']]
         lazy: true
 
     oro_importexport.handler.export:
         class: %oro_importexport.handler.export.class%
         parent: oro_importexport.handler.abstract
         calls:
-            - [setMimeTypeGuesser, [@oro_importexport.file.mime_type_guesser]]
-            - [setRouter, [@router]]
+            - [setMimeTypeGuesser,  ['@oro_importexport.file.mime_type_guesser']]
+            - [setRouter,  ['@router']]
         lazy: true
 
     oro_importexport.handler.import.cli:

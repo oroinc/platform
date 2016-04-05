@@ -14,7 +14,7 @@ services:
         class:  Oro\Component\Layout\Extension\Theme\Model\DependencyInitializer
         public: false
         arguments:
-            - @service_container
+            - '@service_container'
         calls:
             - [addKnownDependency, ['\Oro\Component\ConfigExpression\ExpressionFactoryAwareInterface', 'setExpressionFactory', 'oro_layout.expression.factory']]
 
@@ -26,21 +26,21 @@ services:
         class:  %oro_layout.theme_manager.class%
         public: false
         arguments:
-            - @oro_layout.theme_factory
+            - '@oro_layout.theme_factory'
             - []
 
     oro_layout.loader:
         class:  Oro\Component\Layout\Loader\LayoutUpdateLoader
         public: false
         calls:
-            - [addDriver, [yml, @oro_layout.loader.yaml_driver]]
-            - [addDriver, [php, @oro_layout.loader.php_driver]]
+            - [addDriver, [yml, '@oro_layout.loader.yaml_driver']]
+            - [addDriver, [php, '@oro_layout.loader.php_driver']]
 
     oro_layout.loader.php_driver:
         class:  Oro\Component\Layout\Loader\Driver\PhpDriver
         public: false
         arguments:
-            - @oro_layout.layout_update_generator.php
+            - '@oro_layout.layout_update_generator.php'
             - %kernel.debug%
             - %oro_layout.cache_dir%
 
@@ -48,7 +48,7 @@ services:
         class:  Oro\Component\Layout\Loader\Driver\YamlDriver
         public: false
         arguments:
-            - @oro_layout.layout_update_generator.config
+            - '@oro_layout.layout_update_generator.config'
             - %kernel.debug%
             - %oro_layout.cache_dir%
 
@@ -60,14 +60,14 @@ services:
         class: Oro\Component\Layout\Extension\Theme\PathProvider\ThemePathProvider
         public: false
         arguments:
-            - @oro_layout.theme_manager
+            - '@oro_layout.theme_manager'
         tags:
             - { name: layout.resource.path_provider }
 
     oro_layout.layout_context_configurator.theme:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ThemeContextConfigurator
         calls:
-            - [setRequest, [@?request=]]
+            - [setRequest, ["@?request="]]
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
@@ -75,14 +75,14 @@ services:
         class: %oro_layout.theme_extension.class%
         arguments:
             - %oro_layout.theme_updates_resources%
-            - @oro_layout.loader
-            - @oro_layout.dependency_initializer
-            - @oro_layout.loader.path_provider
+            - '@oro_layout.loader'
+            - '@oro_layout.dependency_initializer'
+            - '@oro_layout.loader.path_provider'
 
     oro_layout.data_provider.theme:
         class: Oro\Component\Layout\Extension\Theme\DataProvider\ThemeDataProvider
         arguments:
-            - @oro_layout.theme_manager
+            - '@oro_layout.theme_manager'
         tags:
             - { name: layout.data_provider, alias: theme }
 
@@ -91,7 +91,7 @@ services:
         public: false
         arguments:
             - %oro_layout.theme_updates_resources%
-            - @oro_layout.loader
+            - '@oro_layout.loader'
         tags:
             - { name: kernel.cache_warmer }
 
@@ -99,13 +99,13 @@ services:
         class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
         public: false
         calls:
-            - [addExtension, [@oro_layout.layout_update_generator.extension.config_conditions]]
+            - [addExtension,  ['@oro_layout.layout_update_generator.extension.config_conditions']]
 
     oro_layout.layout_update_generator.extension.config_conditions:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension
         public: false
         arguments:
-            - @oro_layout.expression.assembler
+            - '@oro_layout.expression.assembler'
 
     oro_layout.layout_update_generator.php:
         class:  Oro\Component\Layout\Loader\Generator\PhpLayoutUpdateGenerator

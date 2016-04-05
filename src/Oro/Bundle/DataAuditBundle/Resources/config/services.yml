@@ -28,9 +28,9 @@ services:
     oro_dataaudit.filter.audit:
         class: %oro_dataaudit.filter.audit.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
-            - @oro_query_designer.query_designer.manager
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_query_designer.query_designer.manager'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: audit }
 
@@ -39,9 +39,9 @@ services:
         arguments:
             - %oro_dataaudit.loggable.entity.class%
             - %oro_dataaudit.loggable.entity_field.class%
-            - @oro_entity_config.provider.dataaudit
-            - @security.context.link
-            - @oro_dataaudit.loggable.audit_entity_mapper
+            - '@oro_entity_config.provider.dataaudit'
+            - '@security.context.link'
+            - '@oro_dataaudit.loggable.audit_entity_mapper'
 
     oro_dataaudit.loggable.audit_entity_mapper:
         class: %oro_dataaudit.loggable.audit_entity_mapper.class%
@@ -51,19 +51,19 @@ services:
 
     oro_dataaudit.metadata.metadata_factory:
         class:                                      %oro_dataaudit.metadata.metadata_factory.class%
-        arguments:                                  [@oro_dataaudit.metadata.annotation_driver]
+        arguments:                                  ['@oro_dataaudit.metadata.annotation_driver']
         public:                                     false
 
     oro_dataaudit.metadata.annotation_driver:
         class:                                      %oro_dataaudit.metadata.annotation_driver.class%
-        arguments:                                  [@annotation_reader]
+        arguments:                                  ['@annotation_reader']
         public:                                     false
 
     oro_dataaudit.listener.entity_listener:
         class:                                      %oro_dataaudit.listener.entity_listener.class%
         arguments:
-            - @oro_dataaudit.loggable.loggable_manager
-            - @oro_dataaudit.metadata.metadata_factory
+            - '@oro_dataaudit.loggable.loggable_manager'
+            - '@oro_dataaudit.metadata.metadata_factory'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: loadClassMetadata }
@@ -71,7 +71,7 @@ services:
 
     oro_dataaudit.listener.kernel_listener:
         class:                                      %oro_dataaudit.listener.kernel_listener.class%
-        arguments:                                  [@service_container]
+        arguments:                                  ['@service_container']
         tags:
             - { name: kernel.event_listener, event: kernel.request , method: onKernelRequest}
 
@@ -84,7 +84,7 @@ services:
     oro_dataaudit.dataaudit_grid_service:
         class: %oro_dataaudit.event_listener.dataaudit_grid_listener.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_dataaudit.event_listener.dataaudit_history_grid_listener:
         class: %oro_dataaudit.event_listener.dataaudit_history_grid_listener.class%
@@ -96,9 +96,9 @@ services:
     oro_dataaudit.event_listener.segment_widget_options_listener:
         class: %oro_dataaudit.event_listener.segment_widget_options_listener.class%
         arguments:
-            - @http_kernel
+            - '@http_kernel'
         calls:
-            - [setRequest, [@?request=]]
+            - [setRequest, ["@?request="]]
         tags:
             - { name: kernel.event_listener, event: oro_segment.widget_options_load, method: onLoad }
 
@@ -111,14 +111,14 @@ services:
     oro_dataaudit.placeholder.filter:
         class: %oro_dataaudit.placeholder.filter.class%
         arguments:
-            - @oro_entity_config.provider.dataaudit
+            - '@oro_entity_config.provider.dataaudit'
 
     oro_dataaudit.audit.manager.api:
         class: %oro_dataaudit.audit.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_dataaudit.loggable.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_dataaudit.migration.extension.audit_field:
         class: %oro_dataaudit.migration.extension.audit_field.class%

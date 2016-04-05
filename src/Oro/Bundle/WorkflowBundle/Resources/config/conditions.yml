@@ -2,7 +2,7 @@ services:
     oro_workflow.expression.extension:
         class: Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
-            - @service_container
+            - '@service_container'
             - {}
 
     oro_workflow.expression.context_accessor:
@@ -11,14 +11,14 @@ services:
     oro_workflow.expression.factory:
         class: Oro\Component\ConfigExpression\ExpressionFactory
         arguments:
-            - @oro_workflow.expression.context_accessor
+            - '@oro_workflow.expression.context_accessor'
         calls:
-            - [addExtension, [@oro_workflow.expression.extension]]
+            - [addExtension,  ['@oro_workflow.expression.extension']]
 
     oro_workflow.condition.configurable:
         class: Oro\Component\Action\Condition\Configurable
         arguments:
-            - @oro_workflow.expression.assembler
+            - '@oro_workflow.expression.assembler'
         tags:
             - { name: oro_workflow.condition, alias: configurable }
 
@@ -38,12 +38,12 @@ services:
             - { name: oro_workflow.condition, alias: not }
 
     oro_workflow.expression.true:
-        class: Oro\Component\ConfigExpression\Condition\True
+        class: Oro\Component\ConfigExpression\Condition\TrueCompatible
         tags:
             - { name: oro_workflow.condition, alias: "true" }
 
     oro_workflow.expression.false:
-        class: Oro\Component\ConfigExpression\Condition\False
+        class: Oro\Component\ConfigExpression\Condition\FalseCompatible
         tags:
             - { name: oro_workflow.condition, alias: "false" }
 
@@ -110,7 +110,7 @@ services:
     oro_workflow.expression.acl_granted:
         class: Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted
         arguments:
-            - @oro_security.security_facade
-            - @doctrine
+            - '@oro_security.security_facade'
+            - '@doctrine'
         tags:
             - { name: oro_workflow.condition, alias: acl|acl_granted }

@@ -37,95 +37,95 @@ services:
     oro_action.action_factory:
         class: %oro_action.action_factory.class%
         arguments:
-            - @service_container
+            - '@service_container'
             - []
 
     oro_action.action_assembler:
         class: %oro_action.action_assembler.class%
         arguments:
-            - @oro_action.action_factory
-            - @oro_action.expression.factory
+            - '@oro_action.action_factory'
+            - '@oro_action.expression.factory'
         calls:
-            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+            - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
 
     oro_action.action.tree:
         class: %oro_action.action.tree.class%
         arguments:
-            - @?logger
+            - "@?logger"
         tags:
             - { name: oro_action.action, alias: tree }
 
     oro_action.action.configurable:
         class: %oro_action.action.configurable.class%
         arguments:
-            - @oro_action.action_assembler
+            - '@oro_action.action_assembler'
         tags:
             - { name: oro_action.action, alias: configurable }
 
     oro_action.action.create_datetime:
         class: %oro_action.action.create_datetime.class%
         arguments:
-            - @oro_action.context_accessor
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_action.action, alias: create_datetime }
 
     oro_action.action.call_method:
         class: %oro_action.action.call_method.class%
         arguments:
-            - @oro_action.context_accessor
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_action.action, alias: call_method }
 
     oro_action.action.assign_value:
         class: %oro_action.action.assign_value.class%
         arguments:
-            - @oro_action.context_accessor
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_action.action, alias: assign_value }
 
     oro_action.action.unset_value:
         class: %oro_action.action.unset_value.class%
         arguments:
-            - @oro_action.action.assign_value
+            - '@oro_action.action.assign_value'
         tags:
             - { name: oro_action.action, alias: unset_value }
 
     oro_action.action.create_object:
         class: %oro_action.action.create_object.class%
         arguments:
-            - @oro_action.context_accessor
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_action.action, alias: create_object }
 
     oro_action.action.create_date:
         class: %oro_action.action.create_date.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_locale.settings
+            - '@oro_action.context_accessor'
+            - '@oro_locale.settings'
         tags:
             - { name: oro_action.action, alias: create_date }
 
     oro_action.action.create_entity:
         class: %oro_action.action.create_entity.class%
         arguments:
-            - @oro_action.context_accessor
-            - @doctrine
+            - '@oro_action.context_accessor'
+            - '@doctrine'
         tags:
             - { name: oro_action.action, alias: create_entity }
 
     oro_action.action.flush_entity:
         class: %oro_action.action.flush_entity.class%
         arguments:
-            - @oro_action.context_accessor
-            - @doctrine
+            - '@oro_action.context_accessor'
+            - '@doctrine'
         tags:
             - { name: oro_action.action, alias: flush_entity }
 
     oro_action.action.request_entity:
         class: %oro_action.action.request_entity.class%
         arguments:
-            - @oro_action.context_accessor
-            - @doctrine
+            - '@oro_action.context_accessor'
+            - '@doctrine'
         tags:
             - { name: oro_action.action, alias: request_entity|find_entity }
 
@@ -139,8 +139,8 @@ services:
     oro_action.action.redirect:
         class: %oro_action.action.redirect.class%
         arguments:
-            - @oro_action.context_accessor
-            - @router
+            - '@oro_action.context_accessor'
+            - '@router'
             - 'redirectUrl'
         tags:
             - { name: oro_action.action, alias: redirect }
@@ -148,102 +148,102 @@ services:
     oro_action.action.format_string:
         class: %oro_action.action.format_string.class%
         arguments:
-            - @oro_action.context_accessor
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_action.action, alias: format_string }
 
     oro_action.action.assign_active_user:
         class: %oro_action.action.assign_active_user.class%
         arguments:
-            - @oro_action.context_accessor
-            - @security.context
+            - '@oro_action.context_accessor'
+            - '@security.context'
         tags:
             - { name: oro_action.action, alias: assign_active_user|get_active_user }
 
     oro_action.action.format_name:
         class: %oro_action.action.format_name.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_entity.entity_name_resolver
+            - '@oro_action.context_accessor'
+            - '@oro_entity.entity_name_resolver'
         tags:
             - { name: oro_action.action, alias: format_name }
 
     oro_action.action.traverse:
         class: %oro_action.action.traverse.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_action.action.configurable
+            - '@oro_action.context_accessor'
+            - '@oro_action.action.configurable'
         tags:
             - { name: oro_action.action, alias: traverse|foreach }
 
     oro_action.action.translate:
         class: %oro_action.action.translate.class%
         arguments:
-            - @oro_action.context_accessor
-            - @translator
+            - '@oro_action.context_accessor'
+            - '@translator'
         tags:
             - { name: oro_action.action, alias: translate|trans }
 
     oro_action.action.flash_message:
         class: %oro_action.action.flash_message.class%
         arguments:
-            - @oro_action.context_accessor
-            - @translator
+            - '@oro_action.context_accessor'
+            - '@translator'
         calls:
-            - [setRequest, [@?request=]]
+            - [setRequest, ["@?request="]]
         tags:
             - { name: oro_action.action, alias: flash_message }
 
     oro_action.action.remove_entity:
         class: %oro_action.action.remove_entity.class%
         arguments:
-            - @oro_action.context_accessor
-            - @doctrine
+            - '@oro_action.context_accessor'
+            - '@doctrine'
         tags:
             - { name: oro_action.action, alias: remove_entity }
 
     oro_action.action.assign_constant_value:
         class: %oro_action.action.assign_constant_value.class%
         arguments:
-            - @oro_action.context_accessor
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_action.action, alias: assign_constant_value }
 
     oro_action.action.call_service_method:
         class: %oro_action.action.call_service_method.class%
         arguments:
-            - @oro_action.context_accessor
-            - @service_container
+            - '@oro_action.context_accessor'
+            - '@service_container'
         tags:
             - { name: oro_action.action, alias: call_service_method }
 
     oro_action.action.refresh_grid:
         class: %oro_action.action.refresh_grid.class%
         arguments:
-            - @oro_action.context_accessor
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_action.action, alias: refresh_grid }
 
     oro_action.action.run_action_group:
         class: %oro_action.action.run_action_group.class%
         arguments:
-            - @oro_action.action_group_registry
-            - @oro_action.context_accessor
+            - '@oro_action.action_group_registry'
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_action.action, alias: run_action_group }
 
     oro_action.action.find_entities:
         class: %oro_action.action.find_entities.class%
         arguments:
-            - @oro_action.context_accessor
-            - @doctrine
+            - '@oro_action.context_accessor'
+            - '@doctrine'
         tags:
             - { name: oro_action.action, alias: find_entities }
 
     oro_action.action.assign_url:
         class: %oro_action.action.assign_url.class%
         arguments:
-            - @oro_action.context_accessor
-            - @router
+            - '@oro_action.context_accessor'
+            - '@router'
         tags:
             - { name: oro_action.action, alias: assign_url }

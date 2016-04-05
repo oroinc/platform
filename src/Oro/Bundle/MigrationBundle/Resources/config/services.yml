@@ -17,29 +17,29 @@ services:
     oro_migration.data_fixtures.loader:
         class: %oro_migration.data_fixtures.loader.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @service_container
+            - '@doctrine.orm.entity_manager'
+            - '@service_container'
 
     oro_migration.migrations.loader:
         class: %oro_migration.migrations.loader.class%
         arguments:
-            - @kernel
-            - @doctrine.dbal.default_connection
-            - @service_container
-            - @event_dispatcher
+            - '@kernel'
+            - '@doctrine.dbal.default_connection'
+            - '@service_container'
+            - '@event_dispatcher'
 
     oro_migration.migrations.query_executor:
         class: %oro_migration.migrations.query_executor.class%
         arguments:
-            - @doctrine.dbal.default_connection
+            - '@doctrine.dbal.default_connection'
 
     oro_migration.migrations.executor:
         class: %oro_migration.migrations.executor.class%
         arguments:
-            - @oro_migration.migrations.query_executor
+            - '@oro_migration.migrations.query_executor'
         calls:
-            - [setExtensionManager, [@oro_migration.migrations.extension_manager]]
-            - [setNameGenerator, [@oro_migration.db_id_name_generator]]
+            - [setExtensionManager, ['@oro_migration.migrations.extension_manager']]
+            - [setNameGenerator, ['@oro_migration.db_id_name_generator']]
 
     oro_migration.migration.pre_up.listener:
         class: %oro_migration.migration.pre_up.listener.class%
@@ -62,13 +62,13 @@ services:
     oro_migration.tools.schema_dumper:
         class: %oro_migration.tools.schema_dumper.class%
         arguments:
-            - @twig
+            - '@twig'
         lazy: true
 
     oro_migration.twig.schema_dumper:
         class: %oro_migration.twig.schema_dumper.class%
         arguments:
-            - @doctrine
+            - '@doctrine'
         tags:
             - { name: twig.extension }
 

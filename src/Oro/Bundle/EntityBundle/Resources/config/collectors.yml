@@ -36,13 +36,13 @@ services:
         class: Oro\Bundle\EntityBundle\DataCollector\OrmLogger
         arguments:
             - %oro_entity.orm.hydrators%
-            - @doctrine
-            - @?debug.stopwatch
+            - '@doctrine'
+            - "@?debug.stopwatch"
 
     oro_entity.profiler.orm_data_collector:
         public: false
         class: Oro\Bundle\EntityBundle\DataCollector\OrmDataCollector
         arguments:
-            - @oro_entity.profiler.orm_logger
+            - '@oro_entity.profiler.orm_logger'
         tags:
             - { name: data_collector, template: OroEntityBundle:Collector:orm.html.twig, id: orm }

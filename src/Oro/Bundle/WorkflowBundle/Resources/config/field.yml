@@ -6,31 +6,31 @@ services:
     oro_workflow.field_generator:
         class: %oro_workflow.field_generator.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity_extend.extend.entity_processor
-            - @oro_workflow.entity_connector
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.extend.entity_processor'
+            - '@oro_workflow.entity_connector'
 
     oro_workflow.exclusion_provider:
         class: %oro_entity.exclusion_provider.chain.class%
         calls:
-            - [addProvider, [@oro_entity.exclusion_provider]]
-            - [addProvider, [@oro_entity.exclusion_provider.dictionary]]
+            - [addProvider,  ['@oro_entity.exclusion_provider']]
+            - [addProvider,  ['@oro_entity.exclusion_provider.dictionary']]
 
     oro_workflow.entity_provider:
         class: %oro_entity.entity_provider.class%
         parent: oro_entity.entity_provider.abstract
         calls:
-            - [setExclusionProvider, [@oro_workflow.exclusion_provider]]
+            - [setExclusionProvider,  ['@oro_workflow.exclusion_provider']]
 
     oro_workflow.entity_field_provider:
         class: %oro_workflow.entity_field_provider.class%
         parent: oro_entity.entity_field_provider.abstract
         calls:
-            - [setEntityProvider, [@oro_workflow.entity_provider]]
-            - [setExclusionProvider, [@oro_workflow.exclusion_provider]]
+            - [setEntityProvider,  ['@oro_workflow.entity_provider']]
+            - [setExclusionProvider,  ['@oro_workflow.exclusion_provider']]
 
     oro_workflow.entity_field_list_provider:
         class: %oro_entity.entity_field_list_provider.class%
         arguments:
-            - @oro_workflow.entity_field_provider
-            - @oro_workflow.entity_provider
+            - '@oro_workflow.entity_field_provider'
+            - '@oro_workflow.entity_provider'

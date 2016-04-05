@@ -1,8 +1,8 @@
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'OroUIBundle:layouts:base/page/layout.html.twig'
-        - @addTree:
+        - '@addTree':
             items:
                 head:
                     blockType: head
@@ -26,7 +26,7 @@ layout:
                 styles:
                     blockType: style
                     options:
-                        src: { @asset: $data.theme.data.assets.styles.output }
+                        src: { '@asset': $data.theme.data.assets.styles.output }
                 body:
                     blockType: body
                 scripts_before:
