@@ -282,6 +282,15 @@ services:
             - { name: oro.api.processor, action: get_config, extra: definition&sorters, priority: -140 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition&sorters, priority: -140 }
 
+    oro_api.get_config.set_data_transformers:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetDataTransformers
+        arguments:
+            - @oro_api.data_transformer_registry
+            - @oro_api.doctrine_helper
+        tags:
+            - { name: oro.api.processor, action: get_config, extra: definition&data_transformers, priority: -160 }
+            - { name: oro.api.processor, action: get_relation_config, extra: definition&data_transformers, priority: -160 }
+
     oro_api.get_config.set_description_for_fields:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetDescriptionForFields
         arguments:

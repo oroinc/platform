@@ -2,6 +2,7 @@ services:
     oro_api.data_transformer_registry:
         public: false
         class: Oro\Bundle\ApiBundle\DataTransformer\DataTransformerRegistry
+        lazy: true
 
     oro_api.data_transformer.datetime:
         public: false

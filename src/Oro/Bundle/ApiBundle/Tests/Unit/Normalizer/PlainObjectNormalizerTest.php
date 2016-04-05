@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity as Object;
@@ -24,7 +25,8 @@ class PlainObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->objectNormalizer = new ObjectNormalizer(
             new DoctrineHelper($doctrine),
-            new EntityDataAccessor()
+            new EntityDataAccessor(),
+            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'))
         );
 
         $this->objectNormalizer->addNormalizer(

@@ -11,7 +11,7 @@ class DateToStringTransformer extends BaseTransformer
         parent::__construct(
             'UTC',
             'UTC',
-            'yyyy-MM-dd',
+            \IntlDateFormatter::MEDIUM,
             \IntlDateFormatter::NONE,
             \IntlDateFormatter::GREGORIAN,
             'yyyy-MM-dd'

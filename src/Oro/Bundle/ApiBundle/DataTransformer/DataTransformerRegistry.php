@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\DataTransformer;
 
+/**
+ * Field data transformers registry.
+ * @see Oro\Component\EntitySerializer\EntityDataTransformer
+ */
 class DataTransformerRegistry
 {
     /** @var array */
@@ -11,7 +15,10 @@ class DataTransformerRegistry
      * Registers a data transformer for a given data type.
      *
      * @param string $dataType
-     * @param object $transformer
+     * @param mixed  $transformer Can be the id of a service in DIC,
+     *                            an instance of "Oro\Component\EntitySerializer\DataTransformerInterface"
+     *                            or "Symfony\Component\Form\DataTransformerInterface",
+     *                            or function ($class, $property, $value, $config) : mixed.
      */
     public function addDataTransformer($dataType, $transformer)
     {
@@ -23,7 +30,11 @@ class DataTransformerRegistry
      *
      * @param string $dataType
      *
-     * @return object|null
+     * @return mixed|null Can be NULL,
+     *                    the id of a service in DIC,
+     *                    an instance of "Oro\Component\EntitySerializer\DataTransformerInterface"
+     *                    or "Symfony\Component\Form\DataTransformerInterface",
+     *                    or function ($class, $property, $value, $config) : mixed.
      */
     public function getDataTransformer($dataType)
     {

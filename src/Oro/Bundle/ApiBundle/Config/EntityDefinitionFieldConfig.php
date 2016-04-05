@@ -113,6 +113,16 @@ class EntityDefinitionFieldConfig extends FieldConfig implements FieldConfigInte
     }
 
     /**
+     * Whether at least one data transformer exists.
+     *
+     * @return bool
+     */
+    public function hasDataTransformers()
+    {
+        return !empty($this->items[self::DATA_TRANSFORMER]);
+    }
+
+    /**
      * Sets the data transformers to be applies to the field value.
      *
      * @param string|array|null $dataTransformers

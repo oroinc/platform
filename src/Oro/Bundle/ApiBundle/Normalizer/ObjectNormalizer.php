@@ -5,9 +5,11 @@ namespace Oro\Bundle\ApiBundle\Normalizer;
 use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Component\EntitySerializer\DataAccessorInterface;
+use Oro\Component\EntitySerializer\DataTransformerInterface;
 use Oro\Component\EntitySerializer\EntityConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
+use Oro\Component\EntitySerializer\FieldConfig;
 
 class ObjectNormalizer
 {
@@ -19,6 +21,9 @@ class ObjectNormalizer
     /** @var DataAccessorInterface */
     protected $dataAccessor;
 
+    /** @var DataTransformerInterface */
+    protected $dataTransformer;
+
     /** @var array */
     private $normalizers = [];
 
@@ -26,13 +31,18 @@ class ObjectNormalizer
     private $sortedNormalizers;
 
     /**
-     * @param DoctrineHelper        $doctrineHelper
-     * @param DataAccessorInterface $dataAccessor
+     * @param DoctrineHelper           $doctrineHelper
+     * @param DataAccessorInterface    $dataAccessor
+     * @param DataTransformerInterface $dataTransformer
      */
-    public function __construct(DoctrineHelper $doctrineHelper, DataAccessorInterface $dataAccessor)
-    {
+    public function __construct(
+        DoctrineHelper $doctrineHelper,
+        DataAccessorInterface $dataAccessor,
+        DataTransformerInterface $dataTransformer
+    ) {
         $this->doctrineHelper = $doctrineHelper;
-        $this->dataAccessor   = $dataAccessor;
+        $this->dataAccessor = $dataAccessor;
+        $this->dataTransformer = $dataTransformer;
     }
 
     /**
@@ -138,6 +148,7 @@ class ObjectNormalizer
         }
 
         $result = [];
+        $entityClass = ClassUtils::getClass($object);
         $fields = $config->getFields();
         foreach ($fields as $fieldName => $field) {
             if ($field->isExcluded()) {
@@ -156,7 +167,9 @@ class ObjectNormalizer
                             $childValue = [];
                             foreach ($value as $val) {
                                 $childVal = null;
-                                $this->dataAccessor->tryGetValue($val, $childFieldName, $childVal);
+                                if ($this->dataAccessor->tryGetValue($val, $childFieldName, $childVal)) {
+                                    $childValue = $this->transformValue($entityClass, $fieldName, $childValue, $field);
+                                }
                                 $childValue[] = $childVal;
                             }
                         } else {
@@ -164,11 +177,14 @@ class ObjectNormalizer
                             if (!$this->dataAccessor->tryGetValue($value, $childFieldName, $childValue)) {
                                 continue;
                             }
+                            $childValue = $this->transformValue($entityClass, $fieldName, $childValue, $field);
                         }
                         $value = $childValue;
                     } else {
                         $value = $this->normalizeObjectByConfig($value, $targetEntity, $level + 1);
                     }
+                } else {
+                    $value = $this->transformValue($entityClass, $fieldName, $value, $field);
                 }
             }
             $result[$fieldName] = $value;
@@ -176,7 +192,7 @@ class ObjectNormalizer
 
         $postSerializeHandler = $config->getPostSerializeHandler();
         if (null !== $postSerializeHandler) {
-            $result = call_user_func($postSerializeHandler, $result);
+            $result = $this->postSerialize($result, $postSerializeHandler);
         }
 
         return $result;
@@ -266,5 +282,34 @@ class ObjectNormalizer
         }
 
         return null;
+    }
+
+    /**
+     * @param string           $entityClass
+     * @param string           $fieldName
+     * @param mixed            $fieldValue
+     * @param FieldConfig|null $fieldConfig
+     *
+     * @return mixed
+     */
+    protected function transformValue($entityClass, $fieldName, $fieldValue, FieldConfig $fieldConfig = null)
+    {
+        return $this->dataTransformer->transform(
+            $entityClass,
+            $fieldName,
+            $fieldValue,
+            null !== $fieldConfig ? $fieldConfig->toArray(true) : []
+        );
+    }
+
+    /**
+     * @param array    $item
+     * @param callable $handler
+     *
+     * @return array
+     */
+    protected function postSerialize(array $item, $handler)
+    {
+        return call_user_func($handler, $item);
     }
 }

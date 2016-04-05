@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry;
 use Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -30,7 +31,8 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
 
         $this->objectNormalizer = new ObjectNormalizer(
             new DoctrineHelper($doctrine),
-            new EntityDataAccessor()
+            new EntityDataAccessor(),
+            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'))
         );
 
         $this->objectNormalizer->addNormalizer(
@@ -91,6 +93,40 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             [
                 'id'    => 123,
                 'name1' => 'test_name'
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeSimpleObjectWithDataTransformers()
+    {
+        $object = new Object\Group();
+        $object->setId(123);
+        $object->setName('test_name');
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'   => null,
+                'name' => [
+                    'data_transformer' => [
+                        function ($class, $property, $value, $config) {
+                            return $value . sprintf(' (%s::%s)', $class, $property);
+                        }
+                    ]
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $object,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'   => 123,
+                'name' => 'test_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group::name)'
             ],
             $result
         );
@@ -269,6 +305,61 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'owner'     => [
                     'name'    => 'user_name',
                     'groups1' => []
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithToOneRelationsAndDataTransformers()
+    {
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'        => null,
+                'name'      => ['exclude' => true],
+                'category1' => [
+                    'exclusion_policy' => 'all',
+                    'property_path'    => 'category',
+                    'fields'           => 'label'
+                ],
+                'owner'     => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'    => [
+                            'data_transformer' => [
+                                function ($class, $property, $value, $config) {
+                                    return $value . sprintf(' (%s::%s)', $class, $property);
+                                }
+                            ]
+                        ],
+                        'groups1' => [
+                            'exclusion_policy' => 'all',
+                            'property_path'    => 'groups',
+                            'fields'           => 'id'
+                        ]
+                    ],
+                    'post_serialize'   => function (array $item) {
+                        $item['name'] .= '_additional';
+
+                        return $item;
+                    }
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $this->createProductObject(),
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'        => 123,
+                'category1' => 'category_label',
+                'owner'     => [
+                    'name'    => 'user_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User::name)_additional',
+                    'groups1' => [11, 22]
                 ]
             ],
             $result

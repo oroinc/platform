@@ -3,11 +3,12 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Normalizer;
 
 use Oro\Component\EntitySerializer\EntityDataAccessor;
+use Oro\Component\EntitySerializer\EntityDataTransformer;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\SearchItemNormalizer;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
-use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity as Entity;
+use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 use Oro\Bundle\SearchBundle\Query\Result\Item as SearchResultItem;
 
 class EntityObjectNormalizerTest extends OrmRelatedTestCase
@@ -21,7 +22,8 @@ class EntityObjectNormalizerTest extends OrmRelatedTestCase
 
         $this->objectNormalizer = new ObjectNormalizer(
             $this->doctrineHelper,
-            new EntityDataAccessor()
+            new EntityDataAccessor(),
+            new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'))
         );
 
         $this->objectNormalizer->addNormalizer(
