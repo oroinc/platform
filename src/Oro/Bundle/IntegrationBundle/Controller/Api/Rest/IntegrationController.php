@@ -8,6 +8,7 @@ use Nelmio\ApiDocBundle\Annotation\ApiDoc;
 
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
+use FOS\RestBundle\Controller\Annotations\Get;
 use FOS\RestBundle\Controller\Annotations\NamePrefix;
 use FOS\RestBundle\Controller\Annotations\RouteResource;
 
@@ -21,6 +22,90 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
  */
 class IntegrationController extends FOSRestController
 {
+    /**
+     * Activate integration
+     *
+     * Returns
+     * - HTTP_OK (200)
+     *
+     * @Get(
+     *      "/integrations/{id}/activate",
+     *      requirements={"version"="latest|v1"},
+     *      defaults={"version"="latest", "_format"="json"}
+     * )
+     * @ApiDoc(description="Activate integration", resource=true)
+     * @Acl(
+     *      id="oro_integration_update",
+     *      type="entity",
+     *      permission="EDIT",
+     *      class="OroIntegrationBundle:Channel"
+     * )
+     *
+     * @return Response
+     */
+    public function activateAction($id)
+    {
+        $integration = $this->getManager()->find($id);
+        
+        $integration->setEnabled(true);
+
+        $objectManager = $this->getManager()->getObjectManager();
+        $objectManager->persist($integration);
+        $objectManager->flush();
+
+        return $this->handleView(
+            $this->view(
+                array(
+                    'message'    => $this->get('translator')->trans('oro.integration.notification.channel.activated'),
+                    'successful' => true,
+                ),
+                Codes::HTTP_OK
+            )
+        );
+    }
+
+    /**
+     * Deactivate integration
+     *
+     * Returns
+     * - HTTP_OK (200)
+     *
+     * @Get(
+     *      "/integrations/{id}/deactivate",
+     *      requirements={"version"="latest|v1"},
+     *      defaults={"version"="latest", "_format"="json"}
+     * )
+     * @ApiDoc(description="Deactivate integration", resource=true)
+     * @Acl(
+     *      id="oro_integration_update",
+     *      type="entity",
+     *      permission="EDIT",
+     *      class="OroIntegrationBundle:Channel"
+     * )
+     *
+     * @return Response
+     */
+    public function deactivateAction($id)
+    {
+        $integration = $this->getManager()->find($id);
+
+        $integration->setEnabled(false);
+
+        $objectManager = $this->getManager()->getObjectManager();
+        $objectManager->persist($integration);
+        $objectManager->flush();
+
+        return $this->handleView(
+            $this->view(
+                array(
+                    'message'    => $this->get('translator')->trans('oro.integration.notification.channel.deactivated'),
+                    'successful' => true,
+                ),
+                Codes::HTTP_OK
+            )
+        );
+    }
+
     /**
      * REST DELETE
      *
