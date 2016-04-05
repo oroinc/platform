@@ -16,6 +16,9 @@ class ActionConfiguration
             $result = [];
             if ($record->getValue('enabled') === 'disabled') {
                 $result['schedule'] = false;
+                $result['deactivate'] = false;
+            } else {
+                $result['activate'] = false;
             }
 
             if ($record->getValue('editMode') == Channel::EDIT_MODE_DISALLOW) {
