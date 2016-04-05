@@ -98,8 +98,11 @@ class GridViewsExtension extends AbstractExtension
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $currentViewId = $this->getCurrentViewId($config->getName());
-        $this->setDefaultParams($config->getName());
-        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
+        // need to set [initialState][filters] from [state][filters]
+        // before [state][filters] will be set from default grid view
+        $filtersState        = $data->offsetGetByPath('[state][filters]', []);
+        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID, 'filters' => $filtersState]);
+        $this->setDefaultParams($config->getName(), $data);
         $data->offsetAddToArray('state', ['gridView' => $currentViewId]);
 
         $systemGridView = new View(self::DEFAULT_VIEW_ID);
@@ -120,8 +123,6 @@ class GridViewsExtension extends AbstractExtension
             $this->eventDispatcher->dispatch(GridViewsLoadEvent::EVENT_NAME, $event);
             $gridViews = $event->getGridViews();
         }
-
-        $this->updateFiltersState($data, $currentViewId, $gridViews);
 
         $data->offsetAddToArray(
             'gridViews',
@@ -193,9 +194,10 @@ class GridViewsExtension extends AbstractExtension
      * Sets default parameters.
      * Added filters and sorters for defined as default grid view for current logged user.
      *
-     * @param string $gridName
+     * @param string         $gridName
+     * @param MetadataObject $data
      */
-    protected function setDefaultParams($gridName)
+    protected function setDefaultParams($gridName, MetadataObject $data)
     {
         $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         if (!isset($params[self::VIEWS_PARAM_KEY])) {
@@ -206,6 +208,11 @@ class GridViewsExtension extends AbstractExtension
             if ($defaultGridView) {
                 $this->getParameters()->mergeKey('_filter', $defaultGridView->getFiltersData());
                 $this->getParameters()->mergeKey('_sort_by', $defaultGridView->getSortersData());
+                $filtersState = array_merge(
+                    $defaultGridView->getFiltersData(),
+                    $data->offsetGetByPath('[state][filters]', [])
+                );
+                $data->offsetSetByPath('[state][filters]', $filtersState);
             }
         }
         $this->getParameters()->set(ParameterBag::ADDITIONAL_PARAMETERS, $params);
@@ -243,26 +250,5 @@ class GridViewsExtension extends AbstractExtension
         }
 
         parent::setParameters($parameters);
-    }
-
-    /**
-     * @param MetadataObject $data
-     * @param int            $currentViewId
-     * @param array          $gridViews
-     */
-    protected function updateFiltersState(MetadataObject $data, $currentViewId, array $gridViews)
-    {
-        if ($currentViewId) {
-            foreach ($gridViews as $gridView) {
-                if ($currentViewId === $gridView['name']) {
-                    $filtersState = array_merge(
-                        $gridView['filters'],
-                        $data->offsetGetByPath('[state][filters]', [])
-                    );
-                    $data->offsetSetByPath('[state][filters]', $filtersState);
-                    break;
-                }
-            }
-        }
     }
 }
