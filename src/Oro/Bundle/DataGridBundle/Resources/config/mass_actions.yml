@@ -14,11 +14,11 @@ services:
     oro_datagrid.extension.mass_action.handler.delete:
         class: %oro_datagrid.extension.mass_action.handler.delete.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @translator
-            - @oro_security.security_facade
-            - @oro_datagrid.extension.mass_action.actions.ajax.mass_delete_limiter
-            - @request_stack
+            - '@doctrine.orm.entity_manager'
+            - '@translator'
+            - '@oro_security.security_facade'
+            - '@oro_datagrid.extension.mass_action.actions.ajax.mass_delete_limiter'
+            - '@request_stack'
 
     oro_datagrid.mass_action.parameters_parser:
         class: %oro_datagrid.mass_action.parameters_parser.class%
@@ -26,9 +26,9 @@ services:
     oro_datagrid.mass_action.dispatcher:
         class: %oro_datagrid.mass_action.dispatcher.class%
         arguments:
-            - @service_container
-            - @oro_datagrid.datagrid.manager
-            - @oro_security.acl_helper
+            - '@service_container'
+            - '@oro_datagrid.datagrid.manager'
+            - '@oro_security.acl_helper'
 
     oro_datagrid.extension.mass_action.type.ajax:
         class: %oro_datagrid.extension.mass_action.type.ajax.class%
@@ -69,4 +69,4 @@ services:
     oro_datagrid.extension.mass_action.actions.ajax.mass_delete_limiter:
         class: Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter
         arguments:
-            - @oro_security.acl_helper
+            - '@oro_security.acl_helper'

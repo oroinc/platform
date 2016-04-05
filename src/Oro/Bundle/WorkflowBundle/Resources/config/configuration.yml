@@ -26,7 +26,7 @@ services:
     oro_workflow.configuration.config.workflow_list:
         class: %oro_workflow.configuration.config.workflow_list.class%
         arguments:
-            - @oro_workflow.configuration.config.workflow_sole
+            - '@oro_workflow.configuration.config.workflow_sole'
 
     oro_workflow.configuration.handler.step:
         class: %oro_workflow.configuration.handler.step.class%
@@ -40,9 +40,9 @@ services:
     oro_workflow.configuration.handler.workflow:
         class: %oro_workflow.configuration.handler.workflow.class%
         calls:
-            - [addHandler, [@oro_workflow.configuration.handler.step]]
-            - [addHandler, [@oro_workflow.configuration.handler.attribute]]
-            - [addHandler, [@oro_workflow.configuration.handler.transition]]
+            - [addHandler,  ['@oro_workflow.configuration.handler.step']]
+            - [addHandler,  ['@oro_workflow.configuration.handler.attribute']]
+            - [addHandler,  ['@oro_workflow.configuration.handler.transition']]
 
     oro_workflow.configuration.config.process_definition_sole:
         class: %oro_workflow.configuration.config.process_definition_sole.class%
@@ -50,7 +50,7 @@ services:
     oro_workflow.configuration.config.process_definition_list:
         class: %oro_workflow.configuration.config.process_definition_list.class%
         arguments:
-            - @oro_workflow.configuration.config.process_definition_sole
+            - '@oro_workflow.configuration.config.process_definition_sole'
 
     oro_workflow.configuration.config.process_trigger_sole:
         class: %oro_workflow.configuration.config.process_trigger_sole.class%
@@ -58,33 +58,33 @@ services:
     oro_workflow.configuration.config.process_trigger_list:
         class: %oro_workflow.configuration.config.process_trigger_list.class%
         arguments:
-            - @oro_workflow.configuration.config.process_trigger_sole
+            - '@oro_workflow.configuration.config.process_trigger_sole'
 
     oro_workflow.configuration.provider.workflow_config:
         class: %oro_workflow.configuration.provider.workflow_config.class%
         arguments:
             - %kernel.bundles%
-            - @oro_workflow.configuration.config.workflow_list
+            - '@oro_workflow.configuration.config.workflow_list'
 
     oro_workflow.configuration.provider.process_config:
         class: %oro_workflow.configuration.provider.process_config.class%
         arguments:
             - %kernel.bundles%
-            - @oro_workflow.configuration.config.process_definition_list
-            - @oro_workflow.configuration.config.process_trigger_list
+            - '@oro_workflow.configuration.config.process_definition_list'
+            - '@oro_workflow.configuration.config.process_trigger_list'
 
     oro_workflow.configuration.builder.workflow_definition:
         class: %oro_workflow.configuration.builder.workflow_definition.class%
         arguments:
-            - @oro_workflow.workflow_assembler
-            - @oro_workflow.field_generator
+            - '@oro_workflow.workflow_assembler'
+            - '@oro_workflow.field_generator'
 
     oro_workflow.configuration.builder.workflow_definition.handle:
         class: %oro_workflow.configuration.builder.workflow_definition.handle.class%
         arguments:
-            - @oro_workflow.configuration.handler.workflow
-            - @oro_workflow.configuration.config.workflow_sole
-            - @oro_workflow.configuration.builder.workflow_definition
+            - '@oro_workflow.configuration.handler.workflow'
+            - '@oro_workflow.configuration.config.workflow_sole'
+            - '@oro_workflow.configuration.builder.workflow_definition'
 
     oro_workflow.configuration.builder.process_configuration:
         class: %oro_workflow.configuration.builder.process_configuration.class%

@@ -16,14 +16,14 @@ services:
     oro_attachment.form.type.file_config:
         class: %oro_attachment.form.type.file_config.class%
         arguments:
-            - @oro_entity_config.config_manager
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: form.type, alias: oro_attachment_file_config }
 
     oro_attachment.form.type.file:
         class: %oro_attachment.form.type.file.class%
         calls:
-            - [setEventSubscriber, [@oro_attachment.form.file_subscriber]]
+            - [setEventSubscriber,  ['@oro_attachment.form.file_subscriber']]
         tags:
             - { name: form.type, alias: oro_file }
 
@@ -34,15 +34,15 @@ services:
 
     oro_attachment.form.file_subscriber:
         class: %oro_attachment.form.file_subscriber.class%
-        arguments: [@oro_attachment.validator.file_config_validator]
+        arguments:  ['@oro_attachment.validator.file_config_validator']
 
     oro_attachment.validator.file_config_validator:
         class: %oro_attachment.validator.file_config_validator.class%
-        arguments: [@validator, @oro_entity_config.config_manager, @oro_config.global]
+        arguments:  ['@validator', '@oro_entity_config.config_manager', '@oro_config.global']
 
     oro_attachment.form.handler.attachment:
         class: %oro_attachment.form.handler.attachment.class%
         scope: request
         arguments:
-            - @request
-            - @doctrine.orm.entity_manager
+            - '@request'
+            - '@doctrine.orm.entity_manager'

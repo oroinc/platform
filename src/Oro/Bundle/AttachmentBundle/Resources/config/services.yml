@@ -32,40 +32,40 @@ services:
     oro_attachment.manager:
         class: %oro_attachment.manager.attachment_manager.class%
         arguments:
-          - @knp_gaufrette.filesystem_map
-          - @router
-          - @oro_security.security_facade.link
+          - '@knp_gaufrette.filesystem_map'
+          - '@router'
+          - '@oro_security.security_facade.link'
           - %oro_attachment.files%
-          - @oro_entity_extend.association_manager
+          - '@oro_entity_extend.association_manager'
 
     oro_attachment.association_helper:
         class: Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper
         public: false
         arguments:
-            - @oro_entity_config.config_manager
+            - '@oro_entity_config.config_manager'
 
     oro_attachment.manager.api:
         class: %oro_attachment.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_attachment.entity.class%
-            - @doctrine.orm.entity_manager
-            - @oro_security.security_facade
-            - @oro_attachment.manager
-            - @oro_entity.doctrine_helper
+            - '@doctrine.orm.entity_manager'
+            - '@oro_security.security_facade'
+            - '@oro_attachment.manager'
+            - '@oro_entity.doctrine_helper'
 
     oro_attachment.manager.file.api:
         class: %oro_attachment.manager.file.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_attachment.file.entity.class%
-            - @doctrine.orm.entity_manager
-            - @oro_security.security_facade
-            - @oro_attachment.manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_security.security_facade'
+            - '@oro_attachment.manager'
 
     oro_attachment.listener.file_listener:
         class: %oro_attachment.listener.file_listener.class%
-        arguments: [@oro_attachment.manager]
+        arguments:  ['@oro_attachment.manager']
         tags:
             - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: preUpdate }
@@ -74,15 +74,15 @@ services:
 
     oro_attachment.twig.file_extension:
         class: %oro_attachment.twig.file_extension.class%
-        arguments: [@oro_attachment.manager, @oro_entity_config.config_manager, @doctrine]
+        arguments:  ['@oro_attachment.manager', '@oro_entity_config.config_manager', '@doctrine']
         tags:
             - { name: twig.extension }
 
     oro_attachment.entity_config_dumper.extension.file:
         class: %oro_attachment.entity_config_dumper.extension.file.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity_extend.relation_builder
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.relation_builder'
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
@@ -106,16 +106,16 @@ services:
     oro_attachment.serializer.file_normalizer:
         class: %oro_attachment.serializer.file_normalizer.class%
         calls:
-            - [setAttachmentManager, [@oro_attachment.manager]]
-            - [setValidator, [@oro_attachment.validator.file_config_validator]]
+            - [setAttachmentManager,  ['@oro_attachment.manager']]
+            - [setValidator,  ['@oro_attachment.validator.file_config_validator']]
         tags:
             - { name: oro_importexport.normalizer}
 
     oro_attachment.placeholder.filter:
         class: %oro_attachment.placeholder.filter.class%
         arguments:
-            - @oro_attachment.association_helper
-            - @oro_entity.doctrine_helper
+            - '@oro_attachment.association_helper'
+            - '@oro_entity.doctrine_helper'
 
     oro_attachment.event_listener.attachment_grid_listener:
         class: %oro_attachment.attachment_grid_listener%
@@ -143,8 +143,8 @@ services:
     oro_attachment.provider.attachment:
         class: %oro_attachment.provider.attachment.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_attachment.association_helper
+            - '@doctrine.orm.entity_manager'
+            - '@oro_attachment.association_helper'
 
     oro_attachment.exclusion_provider:
         class: Oro\Bundle\AttachmentBundle\Provider\AttachmentExclusionProvider
@@ -155,27 +155,27 @@ services:
     oro_attachment.config:
         class: %oro_attachment.config.class%
         arguments:
-            - @oro_attachment.association_helper
+            - '@oro_attachment.association_helper'
 
     oro_attachment.formatter.image_encoded:
         class: %oro_attachment.formatter.image_encoded.class%
         arguments:
-          - @oro_attachment.manager
-          - @file_locator
+          - '@oro_attachment.manager'
+          - '@file_locator'
         tags:
           - { name: oro_formatter, formatter: image_encoded }
 
     oro_attachment.formatter.image_link:
         class: %oro_attachment.formatter.image_link.class%
         arguments:
-          - @oro_attachment.manager
-          - @translator
+          - '@oro_attachment.manager'
+          - '@translator'
         tags:
           - { name: oro_formatter, formatter: image_link }
 
     oro_attachment.formatter.image_src:
         class: %oro_attachment.formatter.image_src.class%
         arguments:
-          - @oro_attachment.manager
+          - '@oro_attachment.manager'
         tags:
           - { name: oro_formatter, formatter: image_src }

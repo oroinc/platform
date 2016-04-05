@@ -7,25 +7,25 @@ services:
     oro_importexport.template_fixture.entity_registry:
         class: %oro_importexport.template_fixture.entity_registry.class%
         calls:
-            - [setDispatcher, [@event_dispatcher]]
+            - [setDispatcher,  ['@event_dispatcher']]
 
     oro_importexport.template_fixture.manager:
         class: %oro_importexport.template_fixture.manager.class%
         arguments:
-            - @oro_importexport.template_fixture.entity_registry
+            - '@oro_importexport.template_fixture.entity_registry'
 
     oro_importexport.action.execute_job:
         class: %oro_importexport.action.execute_job.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_importexport.job_executor
+            - '@oro_action.context_accessor'
+            - '@oro_importexport.job_executor'
         tags:
             - { name: oro_workflow.action, alias: execute_job }
 
     oro_importexport.formatter.formatter_provider:
         class: Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider
         arguments:
-            - @service_container
+            - '@service_container'
             - []
             - []
         public: false
@@ -33,8 +33,8 @@ services:
     oro_importexport.formatter.excel_datetime:
         class: Oro\Bundle\ImportExportBundle\Formatter\ExcelDateTimeTypeFormatter
         arguments:
-            - @oro_locale.settings
-            - @translator
+            - '@oro_locale.settings'
+            - '@translator'
         tags:
             - { name: oro_importexport.formatter.formatter, data_type: datetime, format_type: excel}
             - { name: oro_importexport.formatter.formatter, data_type: date, format_type: excel}
@@ -43,7 +43,7 @@ services:
     oro_importexport.formatter.locale_number:
         class: Oro\Bundle\ImportExportBundle\Formatter\NumberTypeFormatter
         arguments:
-            - @oro_locale.settings
+            - '@oro_locale.settings'
         tags:
             - { name: oro_importexport.formatter.formatter, data_type: currency, format_type: excel }
             - { name: oro_importexport.formatter.formatter, data_type: percent, format_type: excel }

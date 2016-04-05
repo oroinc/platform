@@ -18,10 +18,10 @@ services:
     oro_workflow.serializer.data.serializer:
         class: %oro_workflow.serializer.data.serializer.class%
         arguments:
-          - [@oro_workflow.serializer.data.normalizer]
-          - [@serializer.encoder.json]
+          -  ['@oro_workflow.serializer.data.normalizer']
+          -  ['@serializer.encoder.json']
         calls:
-          - [setWorkflowRegistry, [@oro_workflow.registry]]
+          - [setWorkflowRegistry,  ['@oro_workflow.registry']]
 
     oro_workflow.serializer.data.normalizer:
         class: %oro_workflow.serializer.data.normalizer.class%
@@ -34,23 +34,23 @@ services:
     oro_workflow.serializer.data.attribute_normalizer.entity:
         class: %oro_workflow.serializer.data.attribute_normalizer.entity.class%
         arguments:
-            - @doctrine
-            - @oro_entity.doctrine_helper
+            - '@doctrine'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_workflow.attribute_normalizer }
 
     oro_workflow.serializer.data.attribute_normalizer.multiple_entity:
         class: %oro_workflow.serializer.data.attribute_normalizer.multiple_entity.class%
         arguments:
-            - @doctrine
-            - @oro_entity.doctrine_helper
+            - '@doctrine'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_workflow.attribute_normalizer }
 
     oro_workflow.serializer.handler.workflow_result:
         class: %oro_workflow.serializer.handler.workflow_result.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
         tags:
             -
               name: jms_serializer.handler
@@ -64,24 +64,24 @@ services:
         class: %oro_workflow.serializer.process.serializer.class%
         arguments:
           -
-              - @oro_workflow.serializer.process.normalizer.process_data
-              - @oro_workflow.serializer.process.normalizer.entity
-              - @oro_workflow.serializer.process.normalizer.object
-              - @oro_workflow.serializer.process.normalizer.traversable
-              - @oro_workflow.serializer.process.normalizer.scalar
+              - '@oro_workflow.serializer.process.normalizer.process_data'
+              - '@oro_workflow.serializer.process.normalizer.entity'
+              - '@oro_workflow.serializer.process.normalizer.object'
+              - '@oro_workflow.serializer.process.normalizer.traversable'
+              - '@oro_workflow.serializer.process.normalizer.scalar'
 
-          - [@serializer.encoder.json]
+          -  ['@serializer.encoder.json']
 
     oro_workflow.serializer.process.normalizer.process_data:
         class: %oro_workflow.serializer.process.normalizer.process_data.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
 
     oro_workflow.serializer.process.normalizer.entity:
         class: %oro_workflow.serializer.process.normalizer.entity.class%
         arguments:
-            - @doctrine
-            - @oro_entity.doctrine_helper
+            - '@doctrine'
+            - '@oro_entity.doctrine_helper'
 
     oro_workflow.serializer.process.normalizer.object:
         class: %oro_workflow.serializer.process.normalizer.object.class%

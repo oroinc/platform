@@ -6,26 +6,26 @@ services:
     oro_importexport.strategy.import.helper:
         class: %oro_importexport.strategy.import.helper.class%
         arguments:
-            - @doctrine
-            - @validator
-            - @translator
-            - @oro_importexport.field.field_helper
+            - '@doctrine'
+            - '@validator'
+            - '@translator'
+            - '@oro_importexport.field.field_helper'
         calls:
-            - [setConfigProvider, [@oro_entity_config.provider.extend]]
+            - [setConfigProvider,  ['@oro_entity_config.provider.extend']]
 
     oro_importexport.strategy.add:
         abstract: true
         arguments:
-            - @event_dispatcher
-            - @oro_importexport.strategy.import.helper
-            - @oro_importexport.field.field_helper
-            - @oro_importexport.field.database_helper
+            - '@event_dispatcher'
+            - '@oro_importexport.strategy.import.helper'
+            - '@oro_importexport.field.field_helper'
+            - '@oro_importexport.field.database_helper'
 
     oro_importexport.strategy.configurable_add_or_replace:
         class: %oro_importexport.strategy.configurable_add_or_replace.class%
         abstract: true
         arguments:
-            - @event_dispatcher
-            - @oro_importexport.strategy.import.helper
-            - @oro_importexport.field.field_helper
-            - @oro_importexport.field.database_helper
+            - '@event_dispatcher'
+            - '@oro_importexport.strategy.import.helper'
+            - '@oro_importexport.field.field_helper'
+            - '@oro_importexport.field.database_helper'

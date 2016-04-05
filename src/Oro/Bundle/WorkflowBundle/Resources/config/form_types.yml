@@ -14,7 +14,7 @@ parameters:
 services:
     oro_workflow.form.event_listener.default_values:
         class: %oro_workflow.form.event_listener.default_values.class%
-        arguments: [@oro_action.context_accessor]
+        arguments:  ['@oro_action.context_accessor']
 
     oro_workflow.form.event_listener.init_actions:
         class: %oro_workflow.form.event_listener.init_actions.class%
@@ -25,12 +25,12 @@ services:
     oro_workflow.form.type.attributes:
         class: %oro_workflow.form.type.attributes.class%
         arguments:
-            - @oro_workflow.registry
-            - @oro_workflow.attribute_guesser
-            - @oro_workflow.form.event_listener.default_values
-            - @oro_workflow.form.event_listener.init_actions
-            - @oro_workflow.form.event_listener.required_attributes
-            - @oro_action.context_accessor
+            - '@oro_workflow.registry'
+            - '@oro_workflow.attribute_guesser'
+            - '@oro_workflow.form.event_listener.default_values'
+            - '@oro_workflow.form.event_listener.init_actions'
+            - '@oro_workflow.form.event_listener.required_attributes'
+            - '@oro_action.context_accessor'
         tags:
             - { name: form.type, alias: oro_workflow_attributes }
 
@@ -42,14 +42,14 @@ services:
     oro_workflow.form.type.workflow_step_select:
         class: %oro_workflow.form.type.workflow_step_select.class%
         arguments:
-            - @oro_workflow.manager
+            - '@oro_workflow.manager'
         tags:
             - { name: form.type, alias: oro_workflow_step_select }
 
     oro_workflow.form.type.workflow_select:
         class: %oro_workflow.form.type.workflow_select.class%
         arguments:
-            - @doctrine
+            - '@doctrine'
         tags:
             - { name: form.type, alias: oro_workflow_select }
 
@@ -61,8 +61,8 @@ services:
     oro_workflow.form.type.applicable_entities:
         class: %oro_workflow.form.type.applicable_entities.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_workflow.entity_connector
+            - '@oro_entity_config.config_manager'
+            - '@oro_workflow.entity_connector'
         tags:
             - { name: form.type, alias: oro_workflow_applicable_entities }
 

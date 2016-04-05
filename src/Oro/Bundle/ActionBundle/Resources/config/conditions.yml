@@ -9,7 +9,7 @@ services:
     oro_action.expression.extension:
         class: %oro_action.expression.extension.class%
         arguments:
-            - @service_container
+            - '@service_container'
             - {}
 
     oro_action.expression.context_accessor:
@@ -18,21 +18,21 @@ services:
     oro_action.expression.factory:
         class: %oro_action.expression.factory.class%
         arguments:
-            - @oro_action.expression.context_accessor
+            - '@oro_action.expression.context_accessor'
         calls:
-            - [addExtension, [@oro_action.expression.extension]]
+            - [addExtension,  ['@oro_action.expression.extension']]
 
     oro_action.expression.assembler:
         class: %oro_action.expression.assembler.class%
         arguments:
-            - @oro_action.expression.factory
+            - '@oro_action.expression.factory'
         calls:
-            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+            - [addConfigurationPass,  ['@oro_action.configuration_pass.replace_property_path']]
 
     oro_action.condition.configurable:
         class: %oro_action.condition.configurable.class%
         arguments:
-            - @oro_action.expression.assembler
+            - '@oro_action.expression.assembler'
         tags:
             - { name: oro_action.condition, alias: configurable }
 
@@ -124,8 +124,8 @@ services:
     oro_action.expression.acl_granted:
         class: Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted
         arguments:
-            - @oro_security.security_facade
-            - @doctrine
+            - '@oro_security.security_facade'
+            - '@doctrine'
         tags:
             - { name: oro_action.condition, alias: acl|acl_granted }
 
