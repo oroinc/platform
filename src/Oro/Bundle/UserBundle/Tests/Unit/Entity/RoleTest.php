@@ -3,6 +3,7 @@
 namespace Oro\Bundle\UserBundle\Tests\Unit\Entity;
 
 use Oro\Bundle\UserBundle\Entity\Role;
+use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 
 class RoleTest extends \PHPUnit_Framework_TestCase
 {
@@ -39,5 +40,14 @@ class RoleTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($label, $role->getLabel());
         $this->assertEquals($label, (string)$role);
+    }
+
+    public function testClone()
+    {
+        $role = new Role();
+        ReflectionUtil::setId($role, 1);
+
+        $copy = clone $role;
+        $this->assertEmpty($copy->getId());
     }
 }

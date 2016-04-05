@@ -148,6 +148,8 @@ oro:
             label.label:  Label
             owner.label:  Owner
             has_role.label: Has role
+            clone_label_prefix: 'Copy of '
+            clone: 'Clone'
         invite:
             label: Send an Email Invitation
         privileges:
