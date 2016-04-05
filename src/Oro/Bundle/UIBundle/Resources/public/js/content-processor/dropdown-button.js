@@ -17,7 +17,7 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
             groupContainer: '<div class="btn-group pull-right"></div>',
             minItemQuantity: 1,
             moreButtonAttrs: {},
-            mediatorPrefix: '',
+            addButtonEvent: '',
             buttonTemplate: ''
         },
 
@@ -30,8 +30,8 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
                 this.options.buttonTemplate = _.template(this.options.buttonTemplate);
             }
 
-            if (this.options.mediatorPrefix) {
-                mediator.on(this.options.mediatorPrefix + ':add', _.bind(this._addButton, this));
+            if (this.options.addButtonEvent) {
+                mediator.on(this.options.addButtonEvent, _.bind(this._addButton, this));
             }
 
             // replaces button's separators
