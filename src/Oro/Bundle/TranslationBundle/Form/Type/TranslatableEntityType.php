@@ -82,7 +82,7 @@ class TranslatableEntityType extends AbstractType
 
             // get query builder
             if (!empty($options['query_builder'])) {
-                $queryBuilder = $options[   'query_builder'];
+                $queryBuilder = $options['query_builder'];
                 if ($queryBuilder instanceof \Closure) {
                     $queryBuilder = $queryBuilder($registry->getRepository($className));
                 }

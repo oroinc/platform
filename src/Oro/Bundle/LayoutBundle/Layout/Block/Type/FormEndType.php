@@ -2,9 +2,10 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Type;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 class FormEndType extends AbstractFormType
 {
