@@ -6,14 +6,12 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider as BaseExclusionProvider;
 use Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider;
+use Oro\Bundle\EntityBundle\Provider\EntityRuleMatcher;
 
 class ChainExclusionProvider extends BaseExclusionProvider
 {
-    /** @var EntityHierarchyProvider */
-    protected $entityHierarchyProvider;
-
-    /** @var array */
-    protected $includeRules = [];
+    /** @var EntityRuleMatcher */
+    protected $matcher;
 
     /**
      * @param EntityHierarchyProvider $entityHierarchyProvider
@@ -23,8 +21,7 @@ class ChainExclusionProvider extends BaseExclusionProvider
         EntityHierarchyProvider $entityHierarchyProvider,
         $includeRules
     ) {
-        $this->entityHierarchyProvider = $entityHierarchyProvider;
-        $this->includeRules = $includeRules;
+        $this->matcher = new EntityRuleMatcher($entityHierarchyProvider, $includeRules);
     }
 
     /**
@@ -32,7 +29,7 @@ class ChainExclusionProvider extends BaseExclusionProvider
      */
     public function isIgnoredEntity($className)
     {
-        if ($this->isMatched($this->getEntityProperties($className))) {
+        if ($this->matcher->isMatched($this->getEntityProperties($className))) {
             return false;
         }
 
@@ -44,7 +41,7 @@ class ChainExclusionProvider extends BaseExclusionProvider
      */
     public function isIgnoredField(ClassMetadata $metadata, $fieldName)
     {
-        if ($this->isMatched($this->getFieldProperties($metadata, $fieldName))) {
+        if ($this->matcher->isMatched($this->getFieldProperties($metadata, $fieldName))) {
             return false;
         }
 
@@ -56,7 +53,7 @@ class ChainExclusionProvider extends BaseExclusionProvider
      */
     public function isIgnoredRelation(ClassMetadata $metadata, $associationName)
     {
-        if ($this->isMatched($this->getFieldProperties($metadata, $associationName))) {
+        if ($this->matcher->isMatched($this->getFieldProperties($metadata, $associationName))) {
             return false;
         }
 
@@ -91,74 +88,5 @@ class ChainExclusionProvider extends BaseExclusionProvider
             'entity' => $metadata->getName(),
             'field'  => $fieldName
         ];
-    }
-
-    /**
-     * Checks if the object (entity or field) with the given properties matches at least one include rule
-     *
-     * @param array $objectProperties
-     *
-     * @return bool
-     */
-    protected function isMatched($objectProperties)
-    {
-        $result = false;
-        foreach ($this->includeRules as $rule) {
-            if ($this->isRuleMatched($rule, $objectProperties)) {
-                $result = true;
-                break;
-            }
-        }
-
-        return $result;
-    }
-
-    /**
-     * Checks if the object (entity or field) with the given properties matches the given rule
-     *
-     * @param array $rule
-     * @param array $objectProperties
-     *
-     * @return bool
-     */
-    protected function isRuleMatched($rule, $objectProperties)
-    {
-        $matchCount = 0;
-        foreach ($rule as $key => $val) {
-            if (isset($objectProperties[$key])) {
-                if ($key === 'entity') {
-                    // special case to compare entity class names
-                    if ($this->isEntityMatched($objectProperties[$key], $val)) {
-                        $matchCount++;
-                    }
-                } elseif ($objectProperties[$key] === $val) {
-                    $matchCount++;
-                }
-            }
-        }
-
-        return count($rule) === $matchCount;
-    }
-
-    /**
-     * Checks if $entityClassName is equal to $className
-     * or has $className as one of its parent entities/mapped superclasses
-     *
-     * @param string $entityClassName
-     * @param string $className
-     *
-     * @return bool
-     */
-    protected function isEntityMatched($entityClassName, $className)
-    {
-        if ($entityClassName === $className) {
-            return true;
-        }
-
-        return in_array(
-            $className,
-            $this->entityHierarchyProvider->getHierarchyForClassName($entityClassName),
-            true
-        );
     }
 }
