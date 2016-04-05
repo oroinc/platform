@@ -20,8 +20,6 @@ class FormEndType extends AbstractFormType
     }
 
     /**
-
-    /**
      * {@inheritdoc}
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
