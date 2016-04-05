@@ -1,0 +1,10 @@
+parameters:
+    oro_security.layout_context_configurator.security_facade.class: Oro\Bundle\SecurityBundle\Layout\Extension\SecurityFacadeContextConfigurator
+
+services:
+    oro_security.layout_context_configurator.security_facade:
+        class: %oro_security.layout_context_configurator.security_facade.class%
+        arguments:
+            - @oro_security.security_facade
+        tags:
+            - { name: layout.context_configurator }
