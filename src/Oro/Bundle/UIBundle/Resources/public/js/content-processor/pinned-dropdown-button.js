@@ -20,11 +20,12 @@ define(['./dropdown-button', 'oroui/js/persistent-storage'], function($, persist
         /**
          * Fetches buttons and creates index for them
          *
+         * @param {jQuery|null} $element
          * @returns {*}
          * @private
          */
-        _collectButtons: function() {
-            var $buttons = this._super();
+        _collectButtons: function($element) {
+            var $buttons = this._super($element);
             $buttons.filter(':not(.divider)').each(function(i) {
                 $(this).attr('data-button-index', '').data('button-index', i);
             });
