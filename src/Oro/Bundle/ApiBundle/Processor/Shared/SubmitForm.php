@@ -11,6 +11,22 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
  */
 class SubmitForm implements ProcessorInterface
 {
+
+    /**
+     * @var bool Whether to set fields to NULL
+     *           when they are missing in the
+     *           submitted data.
+     */
+    protected $clearMissing;
+
+    /**
+     * @param bool $clearMissing
+     */
+    public function __construct($clearMissing = false)
+    {
+        $this->clearMissing = $clearMissing;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -29,6 +45,12 @@ class SubmitForm implements ProcessorInterface
             return;
         }
 
-        $form->submit($context->getRequestData(), false);
+        // todo: should be deleted during relations process for API
+        $result = $context->getRequestData();
+        if (isset($result['owner'])) {
+            $result['owner'] = $result['owner']['id'];
+        }
+
+        $form->submit($result, $this->clearMissing);
     }
 }

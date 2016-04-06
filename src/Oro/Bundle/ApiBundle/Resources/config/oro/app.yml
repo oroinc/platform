@@ -56,6 +56,7 @@ oro_api:
         - form.type.url
         - form.type.password
         - form.type.repeated
+        - form.type.entity
 
     form_type_extensions:
         - form.type_extension.form.http_foundation

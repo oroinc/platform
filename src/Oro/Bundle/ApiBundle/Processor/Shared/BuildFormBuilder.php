@@ -106,6 +106,22 @@ class BuildFormBuilder implements ProcessorInterface
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             $fieldConfig = $config->getField($name);
+
+            // todo: should be deleted during relations process for API
+            if ($name === 'owner') {
+                $formBuilder->add(
+                    $name,
+                    'entity',
+                    array_merge(
+                        $this->getFormFieldOptions($fieldConfig),
+                        [
+                            'class' => 'Oro\Bundle\UserBundle\Entity\User'
+                        ]
+                    )
+                );
+                continue;
+            }
+
             $formBuilder->add(
                 $name,
                 $fieldConfig->getFormType(),
