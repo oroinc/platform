@@ -92,7 +92,6 @@ define([
             if (state.selected) {
                 this.$checkbox.prop('checked', 'checked');
             }
-            this.model.trigger('backgrid:selected', this.model, state.selected);
             return this;
         }
     });

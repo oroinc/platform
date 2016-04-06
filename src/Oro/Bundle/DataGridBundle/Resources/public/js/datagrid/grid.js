@@ -263,8 +263,11 @@ define(function(require) {
 
             if (this.header) {
                 this.header = new this.header(headerOptions);
-                this.selectState = this.header.row.cells[0].selectState;
-            } else {
+                if ('selectState' in this.header.row.cells[0]) {
+                    this.selectState = this.header.row.cells[0].selectState;
+                }
+            }
+            if (this.selectState === null) {
                 this.selectState = new SelectState();
             }
 
@@ -284,6 +287,8 @@ define(function(require) {
             });
 
             this.listenTo(this.collection, {
+                'remove': this.onCollectionModelRemove,
+                'updateState': this.onCollectionUpdateState,
                 'backgrid:selected': this.onSelectRow,
                 'backgrid:selectAll': this.selectAll,
                 'backgrid:selectAllVisible': this.selectAllVisible,
@@ -293,13 +298,20 @@ define(function(require) {
             });
         },
 
+        onCollectionUpdateState: function() {
+            this.selectState.reset();
+        },
+
+        onCollectionModelRemove: function(model) {
+            this.selectState.removeRow(model);
+        },
+
         onSelectRow: function(model, status) {
-            if (status) {
-                this.selectState.get('rows').add(model);
+            if (status === this.selectState.get('inset')) {
+                this.selectState.addRow(model);
             } else {
-                this.selectState.get('rows').remove(model);
+                this.selectState.removeRow(model);
             }
-            this.selectState.set('inset', true);
         },
 
         /**
@@ -310,11 +322,10 @@ define(function(require) {
          *  start to collect models which have to be excluded
          */
         selectAll: function() {
-            this.selectState.get('rows').reset();
             this.collection.each(function(model) {
                 model.trigger('backgrid:select', model, true);
             });
-            this.selectState.set('inset', false);
+            this.selectState.reset({'inset': false});
         },
 
         /**
@@ -325,11 +336,10 @@ define(function(require) {
          *  start to collect models which have to be included
          */
         selectNone: function() {
-            this.selectState.get('rows').reset();
             this.collection.each(function(model) {
                 model.trigger('backgrid:select', model, false);
             });
-            this.selectState.set('inset', false);
+            this.selectState.reset();
         },
 
         /**
@@ -338,11 +348,10 @@ define(function(require) {
          *  - marks all models in collection as selected
          */
         selectAllVisible: function() {
-            this.selectState.get('rows').reset();
+            this.selectState.reset();
             this.collection.each(function(model) {
                 model.trigger('backgrid:select', model, true);
             });
-            this.selectState.set('inset', true);
         },
 
         /**
@@ -354,9 +363,7 @@ define(function(require) {
          */
         isSelected: function(model, obj) {
             if ($.isPlainObject(obj)) {
-                obj.selected = void 0 !== this.selectState.get('rows').find(function(item) {
-                    return item.cid === model.cid;
-                });
+                obj.selected = this.selectState.hasRow(model) === this.selectState.get('inset');
             }
         },
 
@@ -374,9 +381,7 @@ define(function(require) {
          */
         getSelected: function(obj) {
             if ($.isEmptyObject(obj)) {
-                obj.selected = this.selectState.get('rows').map(function(model) {
-                    return model.id || model.cid;
-                });
+                obj.selected = this.selectState.get('rows');
                 obj.inset = this.selectState.get('inset');
             }
         },
@@ -539,11 +544,11 @@ define(function(require) {
         /**
          * Gets selection state
          *
-         * @returns {{selectedModels: *, inset: boolean}}
+         * @returns {{selectedIds: *, inset: boolean}}
          */
         getSelectionState: function() {
             var state = {
-                selectedModels: this.selectState.get('rows'),
+                selectedIds: this.selectState.get('rows'),
                 inset: this.selectState.get('inset')
             };
             return state;

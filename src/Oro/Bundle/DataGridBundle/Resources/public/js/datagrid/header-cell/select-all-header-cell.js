@@ -32,6 +32,10 @@ define([
 
         selectState: null,
 
+        events: {
+            'click [data-select]:checkbox': 'onCheckboxClick'
+        },
+
         /**
          * Initializer.
          * Subscribers on events listening
@@ -48,7 +52,6 @@ define([
             }
             this.selectState = new SelectStateModel();
             this.listenTo(this.selectState, 'change', debouncedUpdateState);
-            this.listenTo(this.selectState.get('rows'), 'add remove reset', debouncedUpdateState);
         },
 
         /**
@@ -66,12 +69,11 @@ define([
         /**
          * Updates state of selection (three states a checkbox: checked, unchecked, or indeterminate)
          */
-        updateState: function() {
-            var selectedRows = this.selectState.get('rows');
-            var inset = this.selectState.get('inset');
-            var $checkbox = this.$(':checkbox');
-            $checkbox.prop('indeterminate', inset);
-            $checkbox.prop('checked', selectedRows.length > 0);
+        updateState: function(selectState) {
+            this.$('[data-select]:checkbox').prop({
+                'indeterminate': !selectState.isEmpty(),
+                'checked': !selectState.get('inset')
+            });
         },
 
         /**
@@ -88,7 +90,7 @@ define([
         delegateEvents: function(events) {
             SelectAllHeaderCell.__super__.delegateEvents.call(this, events);
             // binds event handlers directly to dropdown-menu, because the menu can be attached to document body
-            this.$('.dropdown-menu').on('click' + this.eventNamespace(), _.bind(this.onClick, this));
+            this.$('.dropdown-menu').on('click' + this.eventNamespace(), _.bind(this.onDropdownClick, this));
             return this;
         },
 
@@ -97,34 +99,29 @@ define([
             return SelectAllHeaderCell.__super__.undelegateEvents.call(this);
         },
 
-        onClick: function(e) {
-            var $el = $(e.target);
-            if ($el.is('[data-select]')) {
-                // Handles click on checkbox selectAll/selectNone
-                if (this.selectState.get('inset') && this.selectState.get('rows').length === 0) {
-                    this.collection.trigger('backgrid:selectAll');
-                } else {
-                    this.collection.trigger('backgrid:selectNone');
-                }
-                if ($el.is(':checkbox')) {
-                    e.stopPropagation();
-                }
+        onCheckboxClick: function(e) {
+            if (this.selectState.get('inset') && this.selectState.isEmpty()) {
+                this.collection.trigger('backgrid:selectAll');
+            } else {
+                this.collection.trigger('backgrid:selectNone');
+            }
+            e.stopPropagation();
+        },
 
-            } else if ($el.is('[data-select-all]')) {
+        onDropdownClick: function(e) {
+            var $el = $(e.target);
+            if ($el.is('[data-select-all]')) {
                 // Handles click on selectAll button
                 this.collection.trigger('backgrid:selectAll');
-                e.preventDefault();
-
             } else if ($el.is('[data-select-all-visible]')) {
                 // Handles click on selectAllVisible button
                 this.collection.trigger('backgrid:selectAllVisible');
-                e.preventDefault();
 
             } else if ($el.is('[data-select-none]')) {
                 // Handles click on selectNone button
                 this.collection.trigger('backgrid:selectNone');
-                e.preventDefault();
             }
+            e.preventDefault();
         }
     });
 

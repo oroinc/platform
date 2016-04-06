@@ -56,7 +56,7 @@ define([
          */
         checkSelectionState: function() {
             var selectionState = this.datagrid.getSelectionState();
-            if (selectionState.selectedModels.length === 0 && selectionState.inset) {
+            if (selectionState.selectedIds.length === 0 && selectionState.inset) {
                 messenger.notificationFlashMessage('warning', __(this.messages.empty_selection));
                 return false;
             }
@@ -73,12 +73,9 @@ define([
         getActionParameters: function() {
             var selectionState = this.datagrid.getSelectionState();
             var collection = this.datagrid.collection;
-            var idValues = selectionState.selectedModels.map(function(model) {
-                return model.get(this.identifierFieldName);
-            }, this);
             var params = {
                 inset: selectionState.inset ? 1 : 0,
-                values: idValues.join(',')
+                values: selectionState.selectedIds.join(',')
             };
 
             params = collection.processFiltersParams(params, null, 'filters');

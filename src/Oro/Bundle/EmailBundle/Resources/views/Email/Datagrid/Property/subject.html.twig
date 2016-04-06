@@ -8,7 +8,7 @@
         {% if isNew == 1 %}
             <strong class="email-subject">{{ valueToShow }}</strong>
         {% else %}
-            <div class="email-subject">{{ valueToShow }}</div>
+            <span class="email-subject">{{ valueToShow }}</span>
         {% endif %}
         {% if emailBody.bodyContent is defined %}
             <div class="email-body">{{ EA.email_short_body(emailBody) }}</div>

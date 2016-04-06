@@ -221,10 +221,14 @@ define([
 
         render: function() {
             if (this.template) {
-                return this.renderCustomTemplate();
+                this.renderCustomTemplate();
             } else {
-                return Row.__super__.render.apply(this, arguments);
+                Row.__super__.render.apply(this, arguments);
             }
+            var state = {selected: false};
+            this.model.trigger('backgrid:isSelected', this.model, state);
+            this.$el.toggleClass('row-selected', state.selected);
+            return this;
         },
 
         renderCustomTemplate: function() {
@@ -233,7 +237,7 @@ define([
                 model: this.model ? this.model.attributes : {},
                 themeOptions: this.themeOptions ? this.themeOptions : {}
             }));
-            $checkbox = this.$(':checkbox');
+            $checkbox = this.$('[data-select-row]:checkbox');
             if ($checkbox.length) {
                 this.listenTo(this.model, 'backgrid:select', function(model, checked) {
                     $checkbox.prop('checked', checked);
