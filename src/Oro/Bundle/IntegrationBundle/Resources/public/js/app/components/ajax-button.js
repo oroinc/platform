@@ -19,7 +19,6 @@ define(function(require) {
         mediator.execute('showLoading');
         $.get(url, function(data) {
             mediator.execute('showFlashMessage', 'success', __(data.message));
-            sleep(2);
             mediator.execute('redirectTo', {url: options.redirect}, {redirect: true});
         }).error(function(data) {
             mediator.execute('showFlashMessage', 'error', __(data.message));
