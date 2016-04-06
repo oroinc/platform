@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -217,7 +218,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
                     ],
                     'datagrid' => [
-                        'is_visible' => false
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                     ]
                 ]
             ]
@@ -232,7 +233,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
                     ],
                     'datagrid' => [
-                        'is_visible' => false
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                     ]
                 ]
             ]
@@ -248,7 +249,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
                     ],
                     'datagrid'                              => [
-                        'is_visible' => false
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                     ]
                 ]
             ]

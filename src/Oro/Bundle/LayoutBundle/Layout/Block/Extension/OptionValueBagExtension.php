@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\LayoutBundle\Layout\Block\Extension;
 
+use Symfony\Component\OptionsResolver\OptionsResolverInterface;
+
 use Oro\Component\Layout\AbstractBlockTypeExtension;
 use Oro\Component\Layout\Action;
 use Oro\Component\Layout\ArrayOptionValueBuilder;
@@ -22,9 +24,17 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
     /**
      * {@inheritdoc}
      */
+    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    {
+        $resolver->setDefaults(['resolve_value_bags' => true]);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function normalizeOptions(array &$options, ContextInterface $context, DataAccessorInterface $data)
     {
-        if (false === $context->getOr('expressions_evaluate_deferred')) {
+        if ($options['resolve_value_bags'] && false === $context->getOr('expressions_evaluate_deferred')) {
             $this->resolveValueBags($options);
         }
     }
@@ -34,7 +44,7 @@ class OptionValueBagExtension extends AbstractBlockTypeExtension
      */
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
-        if (true === $block->getContext()->getOr('expressions_evaluate_deferred')) {
+        if ($options['resolve_value_bags'] && true === $block->getContext()->getOr('expressions_evaluate_deferred')) {
             $this->resolveValueBags($view->vars);
         }
     }
