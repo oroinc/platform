@@ -134,7 +134,7 @@ services:
         arguments:
             - @oro_action.context_accessor
         tags:
-            - { name: oro_workflow.action, alias: get_class_name }
+            - { name: oro_action.action, alias: get_class_name }
 
     oro_action.action.redirect:
         class: %oro_action.action.redirect.class%
