@@ -16,8 +16,11 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
     /** @var OwnerValidator */
     protected $validator;
 
+    /** @var Owner */
+    protected $constraint;
+
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $doctrineHelper;
+    protected $registry;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $ownershipMetadataProvider;
@@ -40,15 +43,15 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
     /** @var Entity */
     protected $testEntity;
 
-    protected $constraint;
-
+    /** @var User */
     protected $currentUser;
 
+    /** @var Organization */
     protected $currentOrg;
 
     protected function setUp()
     {
-        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
+        $this->registry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
         $this->ownershipMetadataProvider = $this
@@ -73,23 +76,17 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->validator = new OwnerValidator(
-            $this->doctrineHelper,
+            $this->registry,
+            $this->businessUnitManager,
             $this->ownershipMetadataProvider,
             $this->entityOwnerAccessor,
-            $this->businessUnitManager,
-            $this->aclVoter,
             $this->securityFacade,
-            $this->treeProvider
+            $this->treeProvider,
+            $this->aclVoter
         );
 
         $this->constraint = new Owner();
-
         $this->testEntity = new Entity();
-        $this->doctrineHelper->expects($this->once())
-            ->method('getEntityClass')
-            ->with($this->testEntity)
-            ->willReturn('Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity');
-
         $this->currentUser = new User();
         $this->currentUser->setId(12);
         $this->currentOrg = new Organization();
@@ -108,10 +105,10 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateOnNonSupportedEntity()
     {
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
             ->with('Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
-            ->willReturn(false);
+            ->willReturn(null);
 
         $this->ownershipMetadataProvider->expects($this->never())
             ->method('getMetadata');
@@ -121,8 +118,8 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
 
     public function testValidateOnNonACLProtectedEntity()
     {
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
             ->with('Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
             ->willReturn(true);
 
@@ -174,7 +171,6 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
     public function testValidateCreatedEntityWithUserOwner($owner, $ownerType, $isCreate, $isOwnerCorrect)
     {
         $ownershipMetadata = new OwnershipMetadata($ownerType, 'owner', 'owner', 'organization', 'organization');
-
         $this->testEntity->setOwner($owner);
         $this->aclVoter->expects($this->once())
             ->method('addOneShotIsGrantedObserver')
@@ -186,10 +182,17 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->doctrineHelper->expects($this->once())
-            ->method('isManageableEntity')
+        $classMetadata = $this->getMockBuilder('Doctrine\Common\Persistence\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()->getMock();
+        $om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
+            ->disableOriginalConstructor()->getMock();
+        $om->expects($this->once())
+            ->method('getClassMetadata')
+            ->willReturn($classMetadata);
+        $this->registry->expects($this->once())
+            ->method('getManagerForClass')
             ->with('Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
-            ->willReturn(true);
+            ->willReturn($om);
 
         $this->ownershipMetadataProvider->expects($this->once())
             ->method('getMetadata')
@@ -201,18 +204,17 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
                 ->method('isGranted')
                 ->with('CREATE', 'entity:Oro\Bundle\OrganizationBundle\Tests\Unit\Fixture\Entity\Entity')
                 ->willReturn(true);
+            $classMetadata->expects($this->once())->method('getIdentifierValues')->with($this->testEntity)
+                ->willReturn([]);
         } else {
             $this->testEntity->setId(234);
             $this->securityFacade->expects($this->once())
                 ->method('isGranted')
                 ->with('ASSIGN', $this->testEntity)
                 ->willReturn(true);
+            $classMetadata->expects($this->once())->method('getIdentifierValues')->with($this->testEntity)
+                ->willReturn([123]);
         }
-
-        $this->doctrineHelper->expects($this->any())
-            ->method('getSingleEntityIdentifier')
-            ->with($this->testEntity)
-            ->willReturn($this->testEntity->getId());
 
         if (in_array($ownerType, ['USER', 'BUSINESS_UNIT'], true)) {
             $this->businessUnitManager->expects($this->once())
@@ -235,36 +237,21 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($ownerTree);
         }
 
-        $this->entityOwnerAccessor->expects($this->any())
-            ->method('getOwner')
-            ->with($this->testEntity)
+        $this->entityOwnerAccessor->expects($this->any())->method('getOwner')->with($this->testEntity)
             ->willReturn($this->testEntity->getOwner());
-
         $context = $this->getMockBuilder('Symfony\Component\Validator\Context\ExecutionContext')
-            ->disableOriginalConstructor()
-            ->getMock();
-
+            ->disableOriginalConstructor()->getMock();
         $violation = $this->getMockBuilder('Symfony\Component\Validator\Violation\ConstraintViolationBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
+            ->disableOriginalConstructor()->getMock();
 
         if ($isOwnerCorrect) {
-            $violation->expects($this->never())
-                ->method('setParameter')
-                ->willReturnSelf();
-
-            $context->expects($this->never())
-                ->method('buildViolation')
-                ->with('The given value "%value%" cannot be set as "%owner%" for given entity for security reason.')
-                ->willReturn($violation);
+            $violation->expects($this->never())->method('setParameter');
+            $context->expects($this->never())->method('buildViolation');
         } else {
-            $violation->expects($this->exactly(2))
-                ->method('setParameter')
-                ->willReturnSelf();
-
+            $violation->expects($this->exactly(2))->method('setParameter')->willReturnSelf();
             $context->expects($this->once())
                 ->method('buildViolation')
-                ->with('The given value "%value%" cannot be set as "%owner%" for given entity for security reason.')
+                ->with('The given value {{ value }} cannot be set as {{ owner }} for given entity for security reason.')
                 ->willReturn($violation);
         }
 

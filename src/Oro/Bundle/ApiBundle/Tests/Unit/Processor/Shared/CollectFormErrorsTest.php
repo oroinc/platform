@@ -191,6 +191,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $error = new Error();
         $error->setDetail($errorMessage);
         $error->setPropertyName($propertyPath);
+        $error->setStatusCode(400);
 
         return $error;
     }

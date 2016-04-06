@@ -2,10 +2,12 @@
 
 namespace Oro\Bundle\OrganizationBundle\Validator\Constraints;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Util\ClassUtils;
+
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
@@ -18,9 +20,6 @@ use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class OwnerValidator extends ConstraintValidator
 {
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var OwnershipMetadataProvider */
     protected $ownershipMetadataProvider;
 
@@ -39,27 +38,31 @@ class OwnerValidator extends ConstraintValidator
     /** @var OwnerTreeProvider */
     protected $treeProvider;
 
+    /** @var ManagerRegistry */
+    protected $registry;
+
+    /** @var object */
     protected $object;
 
     /**
-     * @param DoctrineHelper            $doctrineHelper
+     * @param ManagerRegistry           $registry
+     * @param BusinessUnitManager       $businessUnitManager
      * @param OwnershipMetadataProvider $ownershipMetadataProvider
      * @param EntityOwnerAccessor       $entityOwnerAccessor
-     * @param BusinessUnitManager       $businessUnitManager
-     * @param AclVoter                  $aclVoter
      * @param SecurityFacade            $securityFacade
      * @param OwnerTreeProvider         $treeProvider
+     * @param AclVoter                  $aclVoter
      */
     public function __construct(
-        DoctrineHelper $doctrineHelper,
+        ManagerRegistry $registry,
+        BusinessUnitManager $businessUnitManager,
         OwnershipMetadataProvider $ownershipMetadataProvider,
         EntityOwnerAccessor $entityOwnerAccessor,
-        BusinessUnitManager $businessUnitManager,
-        AclVoter $aclVoter,
         SecurityFacade $securityFacade,
-        OwnerTreeProvider $treeProvider
+        OwnerTreeProvider $treeProvider,
+        AclVoter $aclVoter
     ) {
-        $this->doctrineHelper = $doctrineHelper;
+        $this->registry = $registry;
         $this->ownershipMetadataProvider = $ownershipMetadataProvider;
         $this->entityOwnerAccessor = $entityOwnerAccessor;
         $this->businessUnitManager = $businessUnitManager;
@@ -76,13 +79,14 @@ class OwnerValidator extends ConstraintValidator
     {
         $this->object = $value;
 
-        $entityClass = $this->doctrineHelper->getEntityClass($value);
-        if (!$this->doctrineHelper->isManageableEntity($entityClass)) {
+        $entityClass = ClassUtils::getClass($value);
+        $manager = $this->registry->getManagerForClass($entityClass);
+        if (!$manager) {
             return;
         }
 
-        $metadata = $this->getMetadata($entityClass);
-        if (!$metadata) {
+        $ownershipMetadata = $this->ownershipMetadataProvider->getMetadata($entityClass);
+        if (!$ownershipMetadata || !$ownershipMetadata->hasOwner()) {
             return;
         }
 
@@ -91,17 +95,23 @@ class OwnerValidator extends ConstraintValidator
             return;
         }
 
-        $entityId = $this->doctrineHelper->getSingleEntityIdentifier($value);
-        if ($entityId) {
+        $idValues = $manager->getClassMetadata($entityClass)->getIdentifierValues($value);
+        if (count($idValues) !== 0) {
             $accessLevel = $this->getAccessLevel('ASSIGN', $value);
         } else {
             $accessLevel = $this->getAccessLevel('CREATE', 'entity:' . $entityClass);
         }
 
-        if (!$this->isOwnerCorrect($metadata, $owner, $accessLevel)) {
+        if ($accessLevel === null) {
+            $isOwnerValid = false;
+        } else {
+            $isOwnerValid = $this->isValidOwner($ownershipMetadata, $owner, $accessLevel);
+        }
+
+        if (!$isOwnerValid) {
             $this->context->buildViolation($constraint->message)
-                ->setParameter('%value%', $owner->getId())
-                ->setParameter('%owner%', $metadata->getOwnerFieldName())
+                ->setParameter('{{ value }}', $owner->getId())
+                ->setParameter('{{ owner }}', $ownershipMetadata->getOwnerFieldName())
                 ->addViolation();
         }
     }
@@ -115,12 +125,8 @@ class OwnerValidator extends ConstraintValidator
      *
      * @return bool
      */
-    protected function isOwnerCorrect(OwnershipMetadataInterface $metadata, $owner, $accessLevel)
+    protected function isValidOwner(OwnershipMetadataInterface $metadata, $owner, $accessLevel)
     {
-        if ($accessLevel === null) {
-            return false;
-        }
-
         if ($metadata->isBasicLevelOwned()) {
             return $this->businessUnitManager->canUserBeSetAsOwner(
                 $this->securityFacade->getLoggedUser(),
@@ -146,22 +152,6 @@ class OwnerValidator extends ConstraintValidator
         }
 
         return true;
-    }
-
-    /**
-     * Get metadata for entity class
-     *
-     * @param string $entityClass
-     *
-     * @return bool|OwnershipMetadataInterface
-     */
-    protected function getMetadata($entityClass)
-    {
-        $metadata = $this->ownershipMetadataProvider->getMetadata($entityClass);
-
-        return $metadata->hasOwner()
-            ? $metadata
-            : false;
     }
 
     /**

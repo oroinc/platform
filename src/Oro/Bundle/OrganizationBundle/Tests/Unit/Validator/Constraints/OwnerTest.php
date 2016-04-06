@@ -17,7 +17,7 @@ class OwnerTest extends \PHPUnit_Framework_TestCase
     public function testMessage()
     {
         $this->assertEquals(
-            'The given value "%value%" cannot be set as "%owner%" for given entity for security reason.',
+            'The given value {{ value }} cannot be set as {{ owner }} for given entity for security reason.',
             $this->owner->message
         );
     }
