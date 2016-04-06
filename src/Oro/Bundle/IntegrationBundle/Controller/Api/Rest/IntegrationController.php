@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller\Api\Rest;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Symfony\Component\HttpFoundation\Response;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -46,7 +47,8 @@ class IntegrationController extends FOSRestController
     public function activateAction($id)
     {
         $integration = $this->getManager()->find($id);
-        
+
+        $integration->setPreviouslyEnabled($integration->isEnabled());
         $integration->setEnabled(true);
 
         $objectManager = $this->getManager()->getObjectManager();
@@ -87,8 +89,10 @@ class IntegrationController extends FOSRestController
      */
     public function deactivateAction($id)
     {
+        /** @var Channel $integration */
         $integration = $this->getManager()->find($id);
 
+        $integration->setPreviouslyEnabled($integration->isEnabled());
         $integration->setEnabled(false);
 
         $objectManager = $this->getManager()->getObjectManager();

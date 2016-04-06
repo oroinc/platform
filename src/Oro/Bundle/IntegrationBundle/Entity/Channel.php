@@ -115,6 +115,17 @@ class Channel
     protected $enabled;
 
     /**
+     * If the status is changed by a user the previous status has to be set.
+     * If the status is changed from the code, it has to be set to null.
+     * For example in the listener when a channel status is changed
+     *
+     * @var boolean
+     *
+     * @ORM\Column(name="previously_enabled", type="boolean", nullable=true)
+     */
+    protected $previouslyEnabled;
+
+    /**
      * @var User
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\UserBundle\Entity\User")
      * @ORM\JoinColumn(
@@ -477,5 +488,21 @@ class Channel
     public function __toString()
     {
         return (string)$this->getName();
+    }
+
+    /**
+     * @return boolean|null
+     */
+    public function getPreviouslyEnabled()
+    {
+        return $this->previouslyEnabled;
+    }
+
+    /**
+     * @param boolean|null $previouslyEnabled
+     */
+    public function setPreviouslyEnabled($previouslyEnabled)
+    {
+        $this->previouslyEnabled = $previouslyEnabled;
     }
 }

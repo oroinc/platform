@@ -19,29 +19,83 @@ class IntegrationControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader(), false);
         $this->entityManager = $this->client->getContainer()->get('doctrine')
             ->getManagerForClass('OroIntegrationBundle:Channel');
     }
 
-    public function testActivateDeactivate()
+    public function testShouldActivateIntegration()
     {
-        $channel = $this->createNewEnabledChannel();
+        $channel = $this->createChannel();
+        $channel->setEnabled(false);
 
-        $this->client->request('GET', $this->getUrl('oro_api_deactivate_integration', ['id' => $channel->getId()]));
+        $this->entityManager->persist($channel);
+        $this->entityManager->flush();
 
-        $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
-        
-        $channel = $this->refreshEntity($channel);
-        $this->assertFalse($channel->isEnabled());
+        $channelId = $channel->getId();
 
-        // activate process
-        $this->client->request('GET', $this->getUrl('oro_api_activate_integration', ['id' => $channel->getId()]));
+        $this->client->request('GET', $this->getUrl('oro_api_activate_integration', ['id' => $channelId]));
 
         $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
 
-        $channel = $this->refreshEntity($channel);
+        $channel = $this->findChannel($channel->getId());
         $this->assertTrue($channel->isEnabled());
+    }
+
+    public function testShouldDeactivateIntegration()
+    {
+        $channel = $this->createChannel();
+        $channel->setEnabled(true);
+
+        $this->entityManager->persist($channel);
+        $this->entityManager->flush();
+
+        $channelId = $channel->getId();
+
+        $this->client->request('GET', $this->getUrl('oro_api_deactivate_integration', ['id' => $channelId]));
+
+        $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
+
+        $channel = $this->findChannel($channel->getId());
+        $this->assertFalse($channel->isEnabled());
+    }
+
+    public function testShouldSetPreviouslyEnabledFieldOnActivate()
+    {
+        $channel = $this->createChannel();
+        $channel->setEnabled(false);
+        $channel->setPreviouslyEnabled(null);
+
+        $this->entityManager->persist($channel);
+        $this->entityManager->flush();
+
+        $channelId = $channel->getId();
+
+        $this->client->request('GET', $this->getUrl('oro_api_activate_integration', ['id' => $channelId]));
+
+        $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
+
+        $channel = $this->findChannel($channel->getId());
+        $this->assertFalse($channel->getPreviouslyEnabled());
+    }
+
+    public function testShouldSetPreviouslyEnabledFieldsOnDeactivate()
+    {
+        $channel = $this->createChannel();
+        $channel->setEnabled(true);
+        $channel->setPreviouslyEnabled(null);
+
+        $this->entityManager->persist($channel);
+        $this->entityManager->flush();
+
+        $channelId = $channel->getId();
+
+        $this->client->request('GET', $this->getUrl('oro_api_deactivate_integration', ['id' => $channelId]));
+
+        $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
+
+        $channel = $this->findChannel($channel->getId());
+        $this->assertTrue($channel->getPreviouslyEnabled());
     }
 
     /**
@@ -55,24 +109,32 @@ class IntegrationControllerTest extends WebTestCase
         $this->assertNotEmpty($result['message']);
     }
 
-    protected function refreshEntity(Channel $channel)
+    /**
+     * @param int $channelId
+     *
+     * @return Channel
+     */
+    protected function findChannel($channelId)
     {
-        return $this->entityManager->find('OroIntegrationBundle:Channel', $channel->getId());
+        return $this->entityManager->getRepository('OroIntegrationBundle:Channel')->createQueryBuilder('c')
+            ->where('c.id = :id')
+            ->setParameter('id', $channelId)
+            ->getQuery()
+            ->getSingleResult()
+        ;
     }
 
     /**
      * @return Channel
      */
-    protected function createNewEnabledChannel()
+    protected function createChannel()
     {
         $channel = new Channel();
         $channel->setName('aName');
         $channel->setType('aType');
         $channel->setEnabled(true);
-
-        $this->entityManager->persist($channel);
-        $this->entityManager->flush($channel);
-
+        $channel->setPreviouslyEnabled(null);
+        
         return $channel;
     }
 }
