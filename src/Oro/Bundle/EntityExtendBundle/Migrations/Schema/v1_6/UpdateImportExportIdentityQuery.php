@@ -21,7 +21,7 @@ class UpdateImportExportIdentityQuery implements MigrationQuery, ConnectionAware
      */
     public function getDescription()
     {
-        return 'Allows to import/export enums by name';
+        return 'Updates import/export identity option for enum fields';
     }
 
     /**
@@ -68,17 +68,14 @@ class UpdateImportExportIdentityQuery implements MigrationQuery, ConnectionAware
             $fields
         );
 
-        array_walk(
-            $updatedFields,
-            function (array $field) {
-                $this->connection->update(
-                    'oro_entity_config_field',
-                    ['data' => $field['data']],
-                    ['id' => $field['id']],
-                    [Type::TARRAY]
-                );
-            }
-        );
+        foreach ($updatedFields as $field) {
+            $this->connection->update(
+                'oro_entity_config_field',
+                ['data' => $field['data']],
+                ['id' => $field['id']],
+                [Type::TARRAY]
+            );
+        }
     }
 
     /**
