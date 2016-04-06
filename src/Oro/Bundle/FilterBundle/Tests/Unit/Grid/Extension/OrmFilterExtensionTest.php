@@ -9,20 +9,17 @@ use Oro\Bundle\FilterBundle\Grid\Extension\OrmFilterExtension;
 
 class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $translator;
 
-    /**
-     * @var OrmFilterExtension
-     */
+    /** @var OrmFilterExtension */
     protected $extension;
 
     protected function setUp()
     {
         $this->translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
-        $this->extension  = new OrmFilterExtension($this->translator);
+
+        $this->extension = new OrmFilterExtension($this->translator);
     }
 
     /**
@@ -34,7 +31,8 @@ class OrmFilterExtensionTest extends \PHPUnit_Framework_TestCase
     public function testSetParameters(array $input, array $expected)
     {
         $this->extension->setParameters(new ParameterBag($input));
-        $this->assertEquals($expected, $this->extension->getParameters()->all());
+
+        self::assertEquals($expected, $this->extension->getParameters()->all());
     }
 
     /**
