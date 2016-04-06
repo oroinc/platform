@@ -4,11 +4,11 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
-use Oro\Bundle\ImapBundle\Manager\ImapEmailGoogleOauth2Manager;
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool
@@ -25,23 +25,16 @@ class DirectMailer extends \Swift_Mailer
     /** @var ContainerInterface */
     protected $container;
 
-    /** @var ImapEmailGoogleOauth2Manager */
-    protected $imapEmailGoogleOauth2Manager;
-
     /**
      * Constructor
      *
      * @param \Swift_Mailer      $baseMailer
      * @param ContainerInterface $container
      */
-    public function __construct(
-        \Swift_Mailer $baseMailer,
-        ContainerInterface $container,
-        ImapEmailGoogleOauth2Manager $imapEmailGoogleOauth2Manager
-    ) {
+    public function __construct(\Swift_Mailer $baseMailer, ContainerInterface $container)
+    {
         $this->baseMailer = $baseMailer;
         $this->container  = $container;
-        $this->imapEmailGoogleOauth2Manager = $imapEmailGoogleOauth2Manager;
 
         $transport = $this->baseMailer->getTransport();
         if ($transport instanceof \Swift_Transport_SpoolTransport) {
@@ -61,40 +54,18 @@ class DirectMailer extends \Swift_Mailer
     /**
      * Set SmtpTransport instance or create a new if default mailer transport is not smtp
      *
-     * @param UserEmailOrigin $userEmailOrigin
+     * @param EmailOrigin $emailOrigin
      */
-    public function prepareSmtpTransport($userEmailOrigin)
+    public function prepareSmtpTransport($emailOrigin)
     {
         if (!$this->smtpTransport) {
-            $username = $userEmailOrigin->getUser();
-            /** @var Mcrypt $encoder */
-            $encoder  =  $this->container->get('oro_security.encoder.mcrypt');
-            $password = $encoder->decryptData($userEmailOrigin->getPassword());
-            $host     = $userEmailOrigin->getSmtpHost();
-            $port     = $userEmailOrigin->getSmtpPort();
-            $security = $userEmailOrigin->getSmtpEncryption();
-            $accessToken = $this->imapEmailGoogleOauth2Manager->getAccessTokenWithCheckingExpiration($userEmailOrigin);
-
-            $transport = $this->getTransport();
-            if ($transport instanceof \Swift_SmtpTransport
-                || $transport instanceof \Swift_Transport_EsmtpTransport) {
-                $transport->setHost($host);
-                $transport->setPort($port);
-                $transport->setEncryption($security);
-            } else {
-                $transport = \Swift_SmtpTransport::newInstance($host, $port, $security);
-            }
-
-            $transport->setUsername($username);
-
-            if ($accessToken === null) {
-                $transport->setPassword($password);
-            } else {
-                $transport->setAuthMode('XOAUTH2');
-                $transport->setPassword($accessToken);
-            }
-
-            $this->smtpTransport = $transport;
+            /** @var EventDispatcherInterface $eventDispatcher */
+            $eventDispatcher = $this->container->get('event_dispatcher');
+            $event = $eventDispatcher->dispatch(
+                SendEmailTransport::NAME,
+                new SendEmailTransport($emailOrigin, $this->getTransport())
+            );
+            $this->smtpTransport = $event->getTransport();
         }
     }
 

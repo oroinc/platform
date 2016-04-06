@@ -117,7 +117,7 @@ define(function(require) {
      */
     (function() {
         function makeFloating($dropdownMenu) {
-            var css = _.extend(_.pick($dropdownMenu[0].getBoundingClientRect(), ['top', 'left']), {
+            var css = _.extend(_.pick($dropdownMenu.offset(), ['top', 'left']), {
                 display: 'block',
                 width: $dropdownMenu.outerWidth(),
                 height: $dropdownMenu.outerHeight()
