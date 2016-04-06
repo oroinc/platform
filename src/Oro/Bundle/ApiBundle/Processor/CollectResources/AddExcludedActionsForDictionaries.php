@@ -20,8 +20,6 @@ class AddExcludedActionsForDictionaries implements ProcessorInterface
     protected $excludedActions;
 
     /**
-     * AddExcludedActionsForDictionaries constructor.
-     *
      * @param ChainDictionaryValueListProvider $dictionaryProvider
      * @param array                            $excludedActions
      */
