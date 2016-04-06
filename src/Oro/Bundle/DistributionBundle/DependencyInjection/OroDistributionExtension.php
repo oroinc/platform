@@ -44,7 +44,7 @@ class OroDistributionExtension extends Extension
             $reflection = new \ReflectionClass($bundle);
             $file       = dirname($reflection->getFilename()) . '/Resources/config/oro/assetic.yml';
             if (is_file($file)) {
-                $data = array_merge($data, Yaml::parse(realpath($file))['bundles']);
+                $data = array_merge($data, Yaml::parse(file_get_contents(realpath($file)))['bundles']);
             }
         }
 
@@ -63,7 +63,7 @@ class OroDistributionExtension extends Extension
             $reflection = new \ReflectionClass($bundle);
             $file       = dirname($reflection->getFilename()) . '/Resources/config/oro/twig.yml';
             if (is_file($file)) {
-                $data = array_merge($data, Yaml::parse(realpath($file))['bundles']);
+                $data = array_merge($data, Yaml::parse(file_get_contents(realpath($file)))['bundles']);
             }
         }
 

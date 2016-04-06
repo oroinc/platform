@@ -23,7 +23,7 @@ class YamlFixerTest extends \PHPUnit_Framework_TestCase
         YamlFixer::fixStrings($copyFile);
 
         try {
-            $result = (bool)Yaml::parse($copyFile);
+            $result = (bool)Yaml::parse(file_get_contents($copyFile));
         } catch (\Exception $e) {
             $result = false;
         }

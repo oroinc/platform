@@ -100,7 +100,7 @@ class LoadCountryData extends AbstractTranslatableEntityFixture implements
 
         $fileName = realpath($fileName);
 
-        return Yaml::parse($fileName);
+        return Yaml::parse(file_get_contents($fileName));
     }
 
     /**
