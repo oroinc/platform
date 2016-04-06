@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
-use Oro\Bundle\EntityExtendBundle\Extend\RelationType;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendConfigDumper;
 
 class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtension
@@ -114,7 +114,7 @@ class IndexEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensi
             if ($datagridConfigProvider->hasConfig($className, $fieldName)) {
                 $datagridConfig = $datagridConfigProvider->getConfig($className, $fieldName);
 
-                return $datagridConfig->get('is_visible', false, false);
+                return $datagridConfig->get('is_visible', false, DatagridScope::IS_VISIBLE_FALSE);
             }
         }
 

@@ -180,6 +180,26 @@ define([
     };
     var originalShow = Popover.prototype.show;
     Popover.prototype.show = function() {
+        if (this.$element.attr('data-container') && this.$element.attr('data-container').length > 0) {
+            this.options.container = this.$element.closest(this.$element.attr('data-container'));
+            if (!this.options.container.length) {
+                this.options.container = false;
+            }
+        }
+
+        if (this.options.container && this.$element.length) {
+            // if container option is specified - popover will be closed when position of $element is changed
+            var _this = this;
+            var el = this.$element[0];
+            var initialPos = el.getBoundingClientRect();
+            this.trackPositionInterval = setInterval(function() {
+                var currentPos = el.getBoundingClientRect();
+                if (currentPos.left !== initialPos.left || currentPos.top !== initialPos.top) {
+                    _this.hide();
+                }
+            }, 300);
+        }
+
         // remove adjustments made by applyPlacement
         if (this.$tip) {
             this.$tip.css({
@@ -195,5 +215,11 @@ define([
         }
 
         originalShow.apply(this, arguments);
+    };
+
+    var originalHide = Popover.prototype.hide;
+    Popover.prototype.hide = function() {
+        clearInterval(this.trackPositionInterval);
+        originalHide.apply(this, arguments);
     };
 });
