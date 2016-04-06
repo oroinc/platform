@@ -30,12 +30,12 @@ class RemoveExcludedEntities implements ProcessorInterface
     {
         /** @var CollectResourcesContext $context */
 
-        $context->setResult(
-            $context->getResult()->filter(
-                function (ApiResource $resource) {
-                    return !$this->entityExclusionProvider->isIgnoredEntity($resource->getEntityClass());
-                }
-            )
-        );
+        $resources = $context->getResult();
+        $entityClasses = array_keys($resources->toArray());
+        foreach ($entityClasses as $entityClass) {
+            if ($this->entityExclusionProvider->isIgnoredEntity($entityClass)) {
+                $resources->remove($entityClass);
+            }
+        }
     }
 }

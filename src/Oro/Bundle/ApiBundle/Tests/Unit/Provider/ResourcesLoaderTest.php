@@ -37,7 +37,7 @@ class ResourcesLoaderTest extends \PHPUnit_Framework_TestCase
                     $this->assertEquals($requestType, $context->getRequestType());
 
                     $context->getResult()->add(new ApiResource('Test\Entity1'));
-                    $context->getResult()->set(2, new ApiResource('Test\Entity3'));
+                    $context->getResult()->add(new ApiResource('Test\Entity3'));
                 }
             );
 

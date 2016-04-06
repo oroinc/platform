@@ -43,7 +43,7 @@ class RemoveExcludedEntitiesTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                1 => new ApiResource('Test\Entity2'),
+                'Test\Entity2' => new ApiResource('Test\Entity2'),
             ],
             $context->getResult()->toArray()
         );
