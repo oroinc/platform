@@ -14,6 +14,7 @@ parameters:
     oro_action.action.create_entity.class: Oro\Component\Action\Action\CreateEntity
     oro_action.action.flush_entity.class: Oro\Component\Action\Action\FlushEntity
     oro_action.action.request_entity.class: Oro\Component\Action\Action\RequestEntity
+    oro_action.action.get_class_name.class: Oro\Component\Action\Action\GetClassName
     oro_action.action.redirect.class: Oro\Component\Action\Action\Redirect
     oro_action.action.format_string.class: Oro\Component\Action\Action\FormatString
     oro_action.action.assign_active_user.class: Oro\Component\Action\Action\AssignActiveUser
@@ -127,6 +128,13 @@ services:
             - @doctrine
         tags:
             - { name: oro_action.action, alias: request_entity|find_entity }
+
+    oro_action.action.get_class_name:
+        class: %oro_action.action.get_class_name.class%
+        arguments:
+            - @oro_action.context_accessor
+        tags:
+            - { name: oro_workflow.action, alias: get_class_name }
 
     oro_action.action.redirect:
         class: %oro_action.action.redirect.class%
