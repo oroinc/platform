@@ -47,26 +47,30 @@
     {% if entity.id %}
         {% if not isEditModeDissalow %}
             {% if entity.enabled %}
-                {{ UI.button({
+                {{ _self.ajaxButton({
                 'aCss':  'btn-danger',
                 'iCss':  'icon-remove',
                 'label': 'oro.integration.deactivate'|trans,
-                'path': path('oro_integration_toggle', {'id': entity.id}),
                 'title': 'oro.integration.deactivate'|trans,
+                'dataId': entity.id,
+                'dataUrl': path('oro_api_deactivate_integration', {'id': entity.id}),
+                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'})
                 }) }}
             {% else %}
-                {{ UI.button({
+                {{ _self.ajaxButton({
                 'aCss':  'btn-success',
                 'iCss':  'icon-ok',
                 'label': 'oro.integration.activate'|trans,
-                'path': path('oro_integration_toggle', {'id': entity.id}),
                 'title': 'oro.integration.activate'|trans,
+                'dataId': entity.id,
+                'dataUrl': path('oro_api_activate_integration', {'id': entity.id}),
+                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'})
                 }) }}
             {% endif %}
             {{ UI.buttonSeparator() }}
         {% endif %}
 
-        {% if entity.enabled == true %}
+        {% if entity.enabled %}
         <div class="btn-group">
             {% set buttonsHtml %}
                 {{ UI.clientButton({
@@ -209,3 +213,14 @@
         });
     </script>
 {% endblock content_data %}
+
+{% macro ajaxButton(parameters) %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set dataAttributes = {
+        'page-component-module': 'orointegration/js/app/components/ajax-button',
+        'page-component-options': {'redirect': parameters.dataRedirect }|json_encode,
+    } %}
+
+    {{ UI.clientButton(parameters|merge({'dataAttributes': dataAttributes})) }}
+{% endmacro %}

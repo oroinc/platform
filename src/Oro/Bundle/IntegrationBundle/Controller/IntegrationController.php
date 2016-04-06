@@ -126,50 +126,6 @@ class IntegrationController extends Controller
     /**
      * @param Integration $integration
      *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     * @Route("/toggle/{id}", requirements={"id"="\d+"}, name="oro_integration_toggle")
-     * @Acl(
-     *      id="oro_integration_toggle",
-     *      type="entity",
-     *      permission="EDIT",
-     *      class="OroIntegrationBundle:Channel"
-     * )
-     */
-    public function toggleAction(Integration $integration)
-    {
-        if ($integration->isEnabled()) {
-            $integration->setEnabled(false);
-            $this->get('session')->getFlashBag()->add(
-                'success',
-                $this->get('translator')->trans('oro.integration.controller.integration.message.deactivated')
-            );
-
-        } else {
-            $integration->setEnabled(true);
-            $this->get('session')->getFlashBag()->add(
-                'success',
-                $this->get('translator')->trans('oro.integration.controller.integration.message.activated')
-            );
-        }
-
-        $em = $this->get('doctrine.orm.entity_manager');
-        $em->persist($integration);
-        $em->flush($integration);
-
-        return $this->redirect(
-            $this->generateUrl(
-                'oro_integration_update',
-                [
-                    'id'=>$integration->getid(),
-                    '_enableContentProviders' => 'mainMenu'
-                ]
-            )
-        );
-    }
-
-    /**
-     * @param Integration $integration
-     *
      * @return array
      */
     protected function update(Integration $integration)
