@@ -45,12 +45,6 @@ class SubmitForm implements ProcessorInterface
             return;
         }
 
-        // todo: should be deleted during relations process for API
-        $result = $context->getRequestData();
-        if (isset($result['owner'])) {
-            $result['owner'] = $result['owner']['id'];
-        }
-
-        $form->submit($result, $this->clearMissing);
+        $form->submit($context->getRequestData(), $this->clearMissing);
     }
 }

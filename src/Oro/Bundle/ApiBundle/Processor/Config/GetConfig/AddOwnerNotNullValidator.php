@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Adds owner NotNull validator to entity for Create action.
+ * Adds ownership NotNull validator to entity.
  */
 class AddOwnerNotNullValidator implements ProcessorInterface
 {

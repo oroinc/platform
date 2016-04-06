@@ -52,10 +52,6 @@ class AddOwnerValidator implements ProcessorInterface
         $ownerField = $ownershipMetadata->getOwnerFieldName();
         if (array_key_exists($ownerField, $fields)) {
             $field = $fields[$ownerField];
-            // turns on owner field.
-            // todo: should be deleted after BAP-10008
-            $field->setExcluded(false);
-
             $fieldOptions = $field->getFormOptions();
             $fieldOptions['constraints'][] = new NotBlank();
             $field->setFormOptions($fieldOptions);
