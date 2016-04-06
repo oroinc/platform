@@ -4,7 +4,6 @@
 {% form_theme form with oro_integration_themes(form) %}
 
 {% set entity = form.vars.value %}
-{% set isEditModeDissalow = entity.getEditMode == constant('Oro\\Bundle\\IntegrationBundle\\Entity\\Channel::EDIT_MODE_DISALLOW') %}
 {% set formAction = formAction is defined
     ? formAction
     : (entity.id ? path('oro_integration_update', { id: entity.id }) : path('oro_integration_create'))
@@ -28,7 +27,7 @@
 {% endblock breadcrumbs %}
 
 {% block navButtons %}
-    {% if entity.id and resource_granted('DELETE', entity) and not isEditModeDissalow %}
+    {% if entity.id and resource_granted('DELETE', entity) and edit_allowed %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_integration', {'id': entity.id}),
             'dataRedirect': path('oro_integration_index'),
@@ -45,7 +44,7 @@
     {{ UI.cancelButton(path('oro_integration_index')) }}
 
     {% if entity.id %}
-        {% if not isEditModeDissalow %}
+        {% if edit_allowed %}
             {% if entity.enabled %}
                 {{ _self.ajaxButton({
                 'aCss':  'btn-danger',

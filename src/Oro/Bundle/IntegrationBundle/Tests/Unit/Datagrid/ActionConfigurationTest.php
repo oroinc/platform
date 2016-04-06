@@ -40,6 +40,38 @@ class ActionConfigurationTest extends \PHPUnit_Framework_TestCase
         ), $result);
     }
 
+    public function testShouldReturnConfigForEditModeAllow()
+    {
+        $configuration = new ActionConfiguration();
+
+        $callable = $configuration->getIsSyncAvailableCondition();
+
+        $result = $callable(new ResultRecord(array(
+            'enabled' => 'enabled',
+            'editMode' => Channel::EDIT_MODE_ALLOW
+        )));
+
+        $this->assertEquals(array(
+            'activate' => false,
+        ), $result);
+    }
+
+    public function testShouldReturnConfigForEditModeForceAllow()
+    {
+        $configuration = new ActionConfiguration();
+
+        $callable = $configuration->getIsSyncAvailableCondition();
+
+        $result = $callable(new ResultRecord(array(
+            'enabled' => 'enabled',
+            'editMode' => Channel::EDIT_MODE_FORCED_ALLOW
+        )));
+
+        $this->assertEquals(array(
+            'activate' => false,
+        ), $result);
+    }
+
     public function testShouldReturnConfigForEditModeDisallow()
     {
         $configuration = new ActionConfiguration();
@@ -54,6 +86,7 @@ class ActionConfigurationTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(array(
             'activate' => false,
             'delete' => false,
+            'deactivate' => false,
         ), $result);
     }
 }

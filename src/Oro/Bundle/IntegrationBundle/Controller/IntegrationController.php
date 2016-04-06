@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -154,10 +156,11 @@ class IntegrationController extends Controller
             );
         }
         $form = $this->getForm();
-
+        
         return [
             'entity'   => $integration,
             'form'     => $form->createView(),
+            'edit_allowed' => EditModeUtils::isEditAllowed($integration->getEditMode()),
         ];
     }
 
