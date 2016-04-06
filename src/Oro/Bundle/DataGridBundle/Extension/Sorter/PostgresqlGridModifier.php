@@ -10,6 +10,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
+use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
@@ -60,6 +61,11 @@ class PostgresqlGridModifier extends AbstractExtension
      */
     public function visitDatasource(DatagridConfiguration $config, DatasourceInterface $datasource)
     {
+        //getQueryBuilder exists only in datagrid orm datasource
+        if (!$datasource instanceof OrmDatasource) {
+            return;
+        }
+
         $entityClassName = $this->getEntityClassName($config);
         /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $datasource->getQueryBuilder();
