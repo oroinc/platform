@@ -5,8 +5,6 @@ namespace Oro\Bundle\IntegrationBundle\Provider;
 class SoapClient extends \SoapClient
 {
     /**
-     * Overridden _doRequest method
-     *
      * {@inheritdoc}
      */
     public function __doRequest($request, $location, $action, $version, $one_way = 0)
