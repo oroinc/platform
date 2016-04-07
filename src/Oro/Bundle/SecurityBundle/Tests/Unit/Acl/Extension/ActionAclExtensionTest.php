@@ -140,4 +140,56 @@ class ActionAclExtensionTest extends \PHPUnit_Framework_TestCase
             ]
         ];
     }
+
+    /**
+     * @dataProvider getPermissionsProvider
+     *
+     * @param int|null $mask
+     * @param bool $setOnly
+     * @param bool $byCurrentGroup
+     * @param array $expected
+     */
+    public function testGetPermissions($mask, $setOnly, $byCurrentGroup, array $expected)
+    {
+        $this->assertEquals($expected, $this->extension->getPermissions($mask, $setOnly, $byCurrentGroup));
+    }
+
+    /**
+     * @return array
+     */
+    public function getPermissionsProvider()
+    {
+        return [
+            'mask = 0 and setOnly' => [
+                'mask' => 0,
+                'setOnly' => true,
+                'byCurrentGroup' => false,
+                'expected' => [],
+            ],
+            'null mask and setOnly' => [
+                'mask' => null,
+                'setOnly' => true,
+                'byCurrentGroup' => false,
+                'expected' => ['EXECUTE'],
+            ],
+            'mask = 0 and not setOnly' => [
+                'mask' => 0,
+                'setOnly' => false,
+                'byCurrentGroup' => false,
+                'expected' => ['EXECUTE'],
+            ],
+            'mask = 1 and setOnly' => [
+                'mask' => 1,
+                'setOnly' => true,
+                'byCurrentGroup' => false,
+                'expected' => ['EXECUTE'],
+            ],
+            'mask = 0 and setOnly and byCurrentGroup' => [
+                'mask' => 0,
+                'setOnly' => true,
+                'byCurrentGroup' => true,
+                'expected' => [],
+            ],
+        ];
+    }
 }
