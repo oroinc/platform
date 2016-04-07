@@ -2,16 +2,17 @@
 
 namespace Oro\Component\Action\Action;
 
-use Symfony\Component\PropertyAccess\PropertyPathInterface;
+use Doctrine\Common\Util\ClassUtils;
 
-use Doctrine\Common\Persistence\ManagerRegistry;
-use Doctrine\ORM\EntityManager;
+use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\Action\Exception\InvalidParameterException;
 
 class GetClassName extends AbstractAction
 {
-    /** @var array */
+    /**
+     * @var array
+     */
     protected $options;
 
     /**
@@ -20,7 +21,7 @@ class GetClassName extends AbstractAction
     protected function executeAction($context)
     {
         $object = $this->contextAccessor->getValue($context, $this->options['object']);
-        $this->contextAccessor->setValue($context, $this->options['attribute'], get_class($object));
+        $this->contextAccessor->setValue($context, $this->options['attribute'], ClassUtils::getClass($object));
     }
 
     /**
