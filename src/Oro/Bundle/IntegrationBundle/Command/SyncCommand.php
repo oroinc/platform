@@ -131,12 +131,6 @@ class SyncCommand extends AbstractSyncCronCommand
         /* @var Integration $integration */
         foreach ($integrations as $integration) {
             try {
-                if (false == $integration->isEnabled()) {
-                    $logger->info(sprintf('Skip sync for "%s" integration. It is not active', $integration->getName()));
-                    
-                    continue;
-                }
-                
                 $logger->info(sprintf('Run sync for "%s" integration.', $integration->getName()));
                 $this->updateToken($integration);
                 if ($batchSize) {
