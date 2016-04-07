@@ -215,7 +215,7 @@ define(function(require) {
                         $link.closest('.btn-group').toggleClass('open');
                     }
                 }
-                this.action.run();
+                this.action.run(e);
 
                 //  skip launcher functionality, if action was executed
                 e.preventDefault();
