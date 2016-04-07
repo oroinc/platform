@@ -47,18 +47,18 @@ class EntityTypeSecurityCheck implements ProcessorInterface
         $config = $context->getConfig();
 
         $isGranted = true;
-        if (!$config || !$config->hasAclResource()) {
+        if ($config && $config->hasAclResource()) {
+            $aclResource = $config->getAclResource();
+            if ($aclResource) {
+                $isGranted = $this->securityFacade->isGranted($aclResource);
+            }
+        } else {
             $entityClass = $context->getClassName();
             if ($this->doctrineHelper->isManageableEntityClass($entityClass)) {
                 $isGranted = $this->securityFacade->isGranted(
                     $this->permission,
                     new ObjectIdentity('entity', $entityClass)
                 );
-            }
-        } else {
-            $aclResource = $config->getAclResource();
-            if ($aclResource) {
-                $isGranted = $this->securityFacade->isGranted($aclResource);
             }
         }
 
