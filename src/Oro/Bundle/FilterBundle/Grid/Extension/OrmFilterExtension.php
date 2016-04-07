@@ -6,25 +6,25 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Filter\FilterInterface;
-use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
+
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
 class OrmFilterExtension extends AbstractExtension
 {
     /**
      * Query param
      */
-    const FILTER_ROOT_PARAM     = '_filter';
+    const FILTER_ROOT_PARAM = '_filter';
     const MINIFIED_FILTER_PARAM = 'f';
 
     /** @var FilterInterface[] */
@@ -112,7 +112,7 @@ class OrmFilterExtension extends AbstractExtension
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $filtersState        = $data->offsetGetByPath('[state][filters]', []);
-        $initialFiltersState = $filtersState;
+        $initialFiltersState = $data->offsetGetByPath('[initialState][filters]', []);
         $filtersMetaData     = [];
 
         $filters       = $this->getFiltersToApply($config);
@@ -151,8 +151,9 @@ class OrmFilterExtension extends AbstractExtension
 
     /**
      * @param FilterInterface $filter
-     * @param mixed $value
-     * @param array $state
+     * @param mixed           $value
+     * @param array           $state
+     *
      * @return array
      */
     protected function updateFiltersState(FilterInterface $filter, $value, array $state)
@@ -193,7 +194,7 @@ class OrmFilterExtension extends AbstractExtension
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
             $minifiedParameters = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
-            $filters = [];
+            $filters            = [];
 
             if (array_key_exists(self::MINIFIED_FILTER_PARAM, $minifiedParameters)) {
                 $filters = $minifiedParameters[self::MINIFIED_FILTER_PARAM];
