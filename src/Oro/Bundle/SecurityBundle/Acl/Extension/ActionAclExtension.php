@@ -138,7 +138,12 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
-        return array('EXECUTE');
+        $result = array();
+        if ($mask === null || !$setOnly || $mask !== 0) {
+            $result[] = 'EXECUTE';
+        }
+
+        return $result;
     }
 
     /**
