@@ -19,9 +19,16 @@ class IntegrationControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader(), false);
+        $this->initClient([], $this->generateWsseAuthHeader());
         $this->entityManager = $this->client->getContainer()->get('doctrine')
             ->getManagerForClass('OroIntegrationBundle:Channel');
+    }
+
+    protected function tearDown()
+    {
+        parent::tearDown();
+
+        $this->resetClient();
     }
 
     public function testShouldActivateIntegration()
