@@ -61,7 +61,7 @@ define([
             var value = this.datagrid.collection.stateHashValue();
 
             url = this.addUrlParameter(url, key, value);
-            mediator.execute('redirectTo', {url: url}, {event: options.event});
+            mediator.execute('redirectTo', {url: url}, options);
         },
 
         /**

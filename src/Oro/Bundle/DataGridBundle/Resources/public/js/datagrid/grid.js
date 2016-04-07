@@ -4,6 +4,7 @@ define(function(require) {
     var Grid;
     var $ = require('jquery');
     var _ = require('underscore');
+    var utils = require('chaplin').utils;
     var Backbone = require('backbone');
     var Backgrid = require('backgrid');
     var __ = require('orotranslation/js/translator');
@@ -657,6 +658,7 @@ define(function(require) {
          */
         _runRowClickAction: function(row, event) {
             var config;
+            var actionOptions = {};
             if (!this.rowClickAction) {
                 return;
             }
@@ -670,7 +672,10 @@ define(function(require) {
             }
             config = row.model.get('action_configuration');
             if (!config || config[action.name] !== false) {
-                action.run(event);
+                if (utils.modifierKeyPressed(event)) {
+                    actionOptions.target = '_blank';
+                }
+                action.run(actionOptions);
             }
         },
 

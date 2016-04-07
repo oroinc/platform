@@ -282,7 +282,7 @@ define([
             options = _.defaults(options, {
                 fullRedirect: this.fullRedirect
             });
-            if (options.event && utils.modifierKeyPressed(options.event)) {
+            if (options.target === '_blank') {
                 windowObject = window.open(getUrl(pathname, query), '_blank');
                 if (windowObject) {
                     windowObject.focus();

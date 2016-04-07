@@ -142,13 +142,12 @@ define([
         /**
          * Run action
          *
-         * @param {jQuery.Event} event
+         * @param {Object} options
          */
-        run: function(event) {
-            var options = {
-                doExecute: true,
-                event: event
-            };
+        run: function(options) {
+            var options = _.defaults(options, {
+                doExecute: true
+            });
             this.trigger('preExecute', this, options);
             if (options.doExecute) {
                 this.execute(options);

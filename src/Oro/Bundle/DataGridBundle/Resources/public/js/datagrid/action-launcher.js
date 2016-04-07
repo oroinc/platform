@@ -4,6 +4,7 @@ define(function(require) {
     var ActionLauncher;
     var $ = require('jquery');
     var _ = require('underscore');
+    var utils = require('chaplin').utils;
     var Backbone = require('backbone');
     var module = require('module');
 
@@ -202,6 +203,7 @@ define(function(require) {
         onClick: function(e) {
             var $link;
             var key;
+            var actionOptions = {};
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }
@@ -215,7 +217,10 @@ define(function(require) {
                         $link.closest('.btn-group').toggleClass('open');
                     }
                 }
-                this.action.run(e);
+                if (utils.modifierKeyPressed(e)) {
+                    actionOptions.target = '_blank';
+                }
+                this.action.run(actionOptions);
 
                 //  skip launcher functionality, if action was executed
                 e.preventDefault();
