@@ -19,7 +19,7 @@ interface FormContext extends ContextInterface
     /**
      * Returns request data.
      *
-     * @return array|null
+     * @return array
      */
     public function getRequestData();
 

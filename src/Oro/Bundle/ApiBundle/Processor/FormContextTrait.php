@@ -16,7 +16,7 @@ trait FormContextTrait
     /**
      * Returns request data.
      *
-     * @return array|null
+     * @return array
      */
     public function getRequestData()
     {

@@ -2,20 +2,46 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Update;
 
-use Doctrine\ORM\EntityManager;
-
-use Oro\Bundle\ApiBundle\Processor\Shared\SaveOrmEntity as BaseSaveOrmEntity;
+use Oro\Component\ChainProcessor\ContextInterface;
+use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Saves all changes of ORM entity to the database.
  */
-class SaveOrmEntity extends BaseSaveOrmEntity
+class SaveOrmEntity implements ProcessorInterface
 {
+    /** @var DoctrineHelper */
+    protected $doctrineHelper;
+
+    /**
+     * @param DoctrineHelper $doctrineHelper
+     */
+    public function __construct(DoctrineHelper $doctrineHelper)
+    {
+        $this->doctrineHelper = $doctrineHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
-    protected function saveEntity(EntityManager $em, $entity)
+    public function process(ContextInterface $context)
     {
+        /** @var SingleItemContext $context */
+
+        $entity = $context->getResult();
+        if (!is_object($entity)) {
+            // entity does not exist
+            return;
+        }
+
+        $em = $this->doctrineHelper->getEntityManager($entity, false);
+        if (!$em) {
+            // only manageable entities are supported
+            return;
+        }
+
         $em->flush($entity);
     }
 }

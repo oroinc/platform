@@ -158,16 +158,14 @@ class EntityObjectNormalizerTest extends OrmRelatedTestCase
         $product->setName('product_name');
         $product->setUpdatedAt(new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')));
 
-        $category = new Entity\Category();
-        $category->setName('category_name');
+        $category = new Entity\Category('category_name');
         $category->setLabel('category_label');
         $product->setCategory($category);
 
         $owner = new Entity\User();
         $owner->setId(456);
         $owner->setName('user_name');
-        $ownerCategory = new Entity\Category();
-        $ownerCategory->setName('owner_category_name');
+        $ownerCategory = new Entity\Category('owner_category_name');
         $ownerCategory->setLabel('owner_category_label');
         $owner->setCategory($ownerCategory);
         $ownerGroup1 = new Entity\Group();

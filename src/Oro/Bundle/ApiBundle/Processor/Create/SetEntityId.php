@@ -2,17 +2,16 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Create;
 
-use Doctrine\Common\Util\ClassUtils;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Saves new ORM entity to the database and save its identifier into the Context.
+ * Checks whether entity identifier exists in the Context,
+ * and if so, sets it to the entity.
  */
-class SaveOrmEntity implements ProcessorInterface
+class SetEntityId implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -32,29 +31,29 @@ class SaveOrmEntity implements ProcessorInterface
     {
         /** @var SingleItemContext $context */
 
-        $entity = $context->getResult();
-        if (!is_object($entity)) {
-            // entity does not exist
+        $entityId = $context->getId();
+        if (null === $entityId) {
+            // an entity id does not exist
             return;
         }
 
-        $em = $this->doctrineHelper->getEntityManager($entity, false);
-        if (!$em) {
+        $entity = $context->getResult();
+        if (!is_object($entity)) {
+            // an entity does not exist or has an unexpected type
+            return;
+        }
+
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($context->getClassName(), false);
+        if (null === $metadata) {
             // only manageable entities are supported
             return;
         }
 
-        $em->persist($entity);
-        $em->flush($entity);
-
-        // save entity id into the Context
-        $metadata = $em->getClassMetadata(ClassUtils::getClass($entity));
-        $id = $metadata->getIdentifierValues($entity);
-        if (!empty($id)) {
-            if (1 === count($id)) {
-                $id = reset($id);
-            }
-            $context->setId($id);
+        if ($metadata->usesIdGenerator()) {
+            // ignore entities with an identity generator
+            return;
         }
+
+        $this->doctrineHelper->setEntityIdentifier($entity, $entityId, $metadata);
     }
 }

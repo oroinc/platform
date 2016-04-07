@@ -7,9 +7,9 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 /**
- * Makes sure that the request data is not empty.
+ * Validates that the request data exist and not empty.
  */
-class ValidateRequestData implements ProcessorInterface
+class ValidateRequestDataExist implements ProcessorInterface
 {
     /**
      * {@inheritdoc}

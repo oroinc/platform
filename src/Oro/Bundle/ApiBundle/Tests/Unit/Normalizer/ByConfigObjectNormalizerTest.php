@@ -376,16 +376,14 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
         $product->setName('product_name');
         $product->setUpdatedAt(new \DateTime('2015-12-01 10:20:30', new \DateTimeZone('UTC')));
 
-        $category = new Object\Category();
-        $category->setName('category_name');
+        $category = new Object\Category('category_name');
         $category->setLabel('category_label');
         $product->setCategory($category);
 
         $owner = new Object\User();
         $owner->setId(456);
         $owner->setName('user_name');
-        $ownerCategory = new Object\Category();
-        $ownerCategory->setName('owner_category_name');
+        $ownerCategory = new Object\Category('owner_category_name');
         $ownerCategory->setLabel('owner_category_label');
         $owner->setCategory($ownerCategory);
         $ownerGroup1 = new Object\Group();

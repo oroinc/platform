@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Update;
 
-use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\Update\SaveOrmEntity;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
@@ -23,15 +22,6 @@ class SaveOrmEntityTest extends FormProcessorTestCase
             ->getMock();
 
         $this->processor = new SaveOrmEntity($this->doctrineHelper);
-    }
-
-    public function testProcessWhenValidationErrorsOccurs()
-    {
-        $this->doctrineHelper->expects($this->never())
-            ->method('getEntityManager');
-
-        $this->context->addError(new Error());
-        $this->processor->process($this->context);
     }
 
     public function testProcessWhenNoEntity()

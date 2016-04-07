@@ -39,7 +39,8 @@ class CollectFormErrors implements ProcessorInterface
         }
 
         // collect form global errors
-        foreach ($form->getErrors() as $error) {
+        $errors = $form->getErrors();
+        foreach ($errors as $error) {
             $errorObject = $this->createErrorObject(
                 $error->getMessage(),
                 $this->getFormErrorPropertyName($error)

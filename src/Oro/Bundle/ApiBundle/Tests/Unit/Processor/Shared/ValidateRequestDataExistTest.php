@@ -2,18 +2,27 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestData;
+use Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestDataExist;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
-class ValidateRequestDataTest extends FormProcessorTestCase
+class ValidateRequestDataExistTest extends FormProcessorTestCase
 {
-    /** @var ValidateRequestData */
+    /** @var ValidateRequestDataExist */
     protected $processor;
 
     public function setUp()
     {
         parent::setUp();
-        $this->processor = new ValidateRequestData();
+        $this->processor = new ValidateRequestDataExist();
+    }
+
+    /**
+     * @expectedException \RuntimeException
+     * @expectedExceptionMessage Request must have data.
+     */
+    public function testProcessOnNotExistingData()
+    {
+        $this->processor->process($this->context);
     }
 
     /**
@@ -26,7 +35,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         $this->processor->process($this->context);
     }
 
-    public function testProcessWithoutErrors()
+    public function testProcessWithData()
     {
         $this->context->setRequestData(['a' => 'b']);
         $this->processor->process($this->context);

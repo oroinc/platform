@@ -9,8 +9,8 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
- * Checks if there are any errors in the Context, and if so, localize all attributes
- * that are represented by the Label object.
+ * Checks if there are any errors in the Context,
+ * and if so, localizes all attributes that are represented by the Label object.
  */
 class NormalizeErrors implements ProcessorInterface
 {

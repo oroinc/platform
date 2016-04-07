@@ -99,8 +99,6 @@ class User
     }
 
     /**
-     * Gets the groups related to contact
-     *
      * @return Group[]|Collection
      */
     public function getGroups()

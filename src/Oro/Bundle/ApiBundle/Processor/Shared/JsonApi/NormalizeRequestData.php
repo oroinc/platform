@@ -36,27 +36,29 @@ class NormalizeRequestData implements ProcessorInterface
         $requestData = $context->getRequestData();
 
         if (!array_key_exists(JsonApiDoc::DATA, $requestData)) {
-            // a request data is already normalized
+            // the request data are already normalized
             return;
         }
 
+        $data = $requestData[JsonApiDoc::DATA];
+
         $relations = [];
-        if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $requestData[JsonApiDoc::DATA])) {
+        if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)) {
             $requestType = $context->getRequestType();
-            foreach ($requestData[JsonApiDoc::DATA][JsonApiDoc::RELATIONSHIPS] as $name => $value) {
-                $data = $value[JsonApiDoc::DATA];
+            foreach ($data[JsonApiDoc::RELATIONSHIPS] as $name => $value) {
+                $relationData = $value[JsonApiDoc::DATA];
 
                 // Relation data can be null in case -to-one and an empty array in case -to-many relation.
                 // In this case we should process this relation data as empty relation
-                if (null === $data || empty($data)) {
+                if (null === $relationData || empty($relationData)) {
                     $relations[$name] = [];
                     continue;
                 }
 
-                if (array_keys($data) !== range(0, count($data) - 1)) {
-                    $relations[$name] = $this->normalizeItemData($data, $requestType);
+                if (array_keys($relationData) !== range(0, count($relationData) - 1)) {
+                    $relations[$name] = $this->normalizeItemData($relationData, $requestType);
                 } else {
-                    foreach ($data as $collectionItem) {
+                    foreach ($relationData as $collectionItem) {
                         $relations[$name][] = $this->normalizeItemData($collectionItem, $requestType);
                     }
                 }
@@ -65,7 +67,7 @@ class NormalizeRequestData implements ProcessorInterface
 
         $context->setRequestData(
             array_merge(
-                $requestData[JsonApiDoc::DATA][JsonApiDoc::ATTRIBUTES],
+                $data[JsonApiDoc::ATTRIBUTES],
                 $relations
             )
         );

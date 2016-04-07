@@ -5,12 +5,24 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
+use Oro\Bundle\ApiBundle\Util\EntityInstantiator;
 
 /**
  * Creates new instance of the entity
  */
 class CreateEntity implements ProcessorInterface
 {
+    /** @var EntityInstantiator */
+    protected $entityInstantiator;
+
+    /**
+     * @param EntityInstantiator $entityInstantiator
+     */
+    public function __construct(EntityInstantiator $entityInstantiator)
+    {
+        $this->entityInstantiator = $entityInstantiator;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -23,18 +35,6 @@ class CreateEntity implements ProcessorInterface
             return;
         }
 
-        $context->setResult($this->createEntity($context));
-    }
-
-    /**
-     * @param Context $context
-     *
-     * @return object
-     */
-    protected function createEntity(Context $context)
-    {
-        $entityClass = $context->getClassName();
-
-        return new $entityClass();
+        $context->setResult($this->entityInstantiator->instantiate($context->getClassName()));
     }
 }

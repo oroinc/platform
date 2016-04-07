@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor;
 
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class FormProcessorTestCase extends \PHPUnit_Framework_TestCase
@@ -11,7 +12,7 @@ class FormProcessorTestCase extends \PHPUnit_Framework_TestCase
     const TEST_VERSION      = '1.1';
     const TEST_REQUEST_TYPE = RequestType::REST;
 
-    /** @var FormContext */
+    /** @var FormContext|SingleItemContext */
     protected $context;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
