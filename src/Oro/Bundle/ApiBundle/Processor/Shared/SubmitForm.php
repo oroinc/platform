@@ -13,14 +13,12 @@ class SubmitForm implements ProcessorInterface
 {
 
     /**
-     * @var bool Whether to set fields to NULL
-     *           when they are missing in the
-     *           submitted data.
+     * @var bool
      */
     protected $clearMissing;
 
     /**
-     * @param bool $clearMissing
+     * @param bool $clearMissing Whether to set fields to NULL when they are missing in the submitted data.
      */
     public function __construct($clearMissing = false)
     {

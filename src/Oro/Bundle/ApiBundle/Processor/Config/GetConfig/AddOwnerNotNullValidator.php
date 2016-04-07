@@ -51,7 +51,7 @@ class AddOwnerNotNullValidator implements ProcessorInterface
         $ownerField = $ownershipMetadata->getOwnerFieldName();
         if (array_key_exists($ownerField, $fields)) {
             $field = $fields[$ownerField];
-                       $fieldOptions = $field->getFormOptions();
+            $fieldOptions = $field->getFormOptions();
             $fieldOptions['constraints'][] = new NotNull();
             $field->setFormOptions($fieldOptions);
         }
