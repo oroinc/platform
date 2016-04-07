@@ -21,7 +21,8 @@ class GetClassName extends AbstractAction
     protected function executeAction($context)
     {
         $object = $this->contextAccessor->getValue($context, $this->options['object']);
-        $this->contextAccessor->setValue($context, $this->options['attribute'], ClassUtils::getClass($object));
+        $class = is_object($object) ? ClassUtils::getClass($object) : null;
+        $this->contextAccessor->setValue($context, $this->options['attribute'], $class);
     }
 
     /**

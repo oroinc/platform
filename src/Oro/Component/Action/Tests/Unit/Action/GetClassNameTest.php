@@ -66,13 +66,30 @@ class GetClassNameTest extends \PHPUnit_Framework_TestCase
         );
     }
 
-    public function testExecute()
+    /**
+     * @dataProvider objectDataProvider
+     * @param mixed $object
+     * @param string|null $class
+     */
+    public function testExecute($object, $class)
     {
-        $options = ['object' => new \stdClass(), 'attribute' => new PropertyPath('attribute')];
+        $options = ['object' => $object, 'attribute' => new PropertyPath('attribute')];
         $context = new ItemStub($options);
 
         $this->action->initialize($options);
         $this->action->execute($context);
-        $this->assertEquals($context->getData()['attribute'], 'stdClass');
+        $this->assertEquals($class, $context->getData()['attribute']);
+    }
+
+    /**
+     * @return array
+     */
+    public function objectDataProvider()
+    {
+        return [
+            [new \stdClass(), 'stdClass'],
+            ['string', null],
+            [new PropertyPath('unknown'), null]
+        ];
     }
 }
