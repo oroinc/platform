@@ -8,6 +8,11 @@ use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
 use Oro\Bundle\ApiBundle\Processor\RequestActionProcessor;
 
+/**
+ * Loads whole entity by its id using "get" action.
+ * We have to do it because the entity returned by "create" or "update" actions
+ * must be the same as the entity returned by "get" action
+ */
 class LoadNormalizedEntity implements ProcessorInterface
 {
     /** @var ActionProcessorBagInterface $processorBag */

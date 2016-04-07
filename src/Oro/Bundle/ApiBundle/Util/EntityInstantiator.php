@@ -30,9 +30,9 @@ class EntityInstantiator
     {
         $reflClass = new \ReflectionClass($className);
 
-        return $this->isInstantiableViaConstructor($reflClass)
-            ? $this->instantiateViaConstructor($reflClass)
-            : $this->instantiateViaReflection($reflClass);
+        return $this->mustBeInstantiatedWithoutConstructor($reflClass)
+            ? $this->instantiateViaReflection($reflClass)
+            : $this->instantiateViaConstructor($reflClass);
     }
 
     /**
@@ -40,16 +40,16 @@ class EntityInstantiator
      *
      * @return bool
      */
-    protected function isInstantiableViaConstructor(\ReflectionClass $reflClass)
+    protected function mustBeInstantiatedWithoutConstructor(\ReflectionClass $reflClass)
     {
         $constructor = $reflClass->getConstructor();
-        if (null === $constructor) {
-            return true;
-        }
 
         return
-            $constructor->isPublic()
-            && 0 === $constructor->getNumberOfRequiredParameters();
+            null !== $constructor
+            && (
+                !$constructor->isPublic()
+                || 0 !== $constructor->getNumberOfRequiredParameters()
+            );
     }
 
     /**

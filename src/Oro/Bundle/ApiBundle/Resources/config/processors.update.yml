@@ -193,15 +193,10 @@ services:
     # normalize_data
     #
 
-    oro_api.update.initialize_entity_proxy:
-        class: Oro\Bundle\ApiBundle\Processor\Get\InitializeEntityProxy
-        tags:
-            - { name: oro.api.processor, action: update, group: normalize_data, priority: 10 }
-
-    oro_api.update.normalize_data:
-        class: Oro\Bundle\ApiBundle\Processor\Get\NormalizeData
+    oro_api.update.load_normalized_entity:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity
         arguments:
-            - @oro_api.object_normalizer
+            - @oro_api.action_processor_bag
         tags:
             - { name: oro.api.processor, action: update, group: normalize_data, priority: -10 }
 
