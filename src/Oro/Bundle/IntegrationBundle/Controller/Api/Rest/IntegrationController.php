@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Controller\Api\Rest;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
 use Symfony\Component\HttpFoundation\Response;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -46,6 +47,7 @@ class IntegrationController extends FOSRestController
      */
     public function activateAction($id)
     {
+        /** @var Channel $integration */
         $integration = $this->getManager()->find($id);
 
         $integration->setPreviouslyEnabled($integration->isEnabled());
@@ -54,6 +56,8 @@ class IntegrationController extends FOSRestController
         $objectManager = $this->getManager()->getObjectManager();
         $objectManager->persist($integration);
         $objectManager->flush();
+        
+        $this->getSyncScheduler()->schedule($integration);
 
         return $this->handleView(
             $this->view(
@@ -155,5 +159,13 @@ class IntegrationController extends FOSRestController
     public function getManager()
     {
         return $this->get('oro_integration.manager.api');
+    }
+
+    /**
+     * @return SyncScheduler
+     */
+    protected function getSyncScheduler()
+    {
+        return $this->get('oro_integration.generic_sync_scheduler');
     }
 }

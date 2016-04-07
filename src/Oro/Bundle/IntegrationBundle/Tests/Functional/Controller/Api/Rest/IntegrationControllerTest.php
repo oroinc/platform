@@ -4,6 +4,8 @@ namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
 
+use JMS\JobQueueBundle\Entity\Job;
+use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -105,6 +107,27 @@ class IntegrationControllerTest extends WebTestCase
         $this->assertTrue($channel->getPreviouslyEnabled());
     }
 
+    public function testShouldScheduleSyncJobOnActivation()
+    {
+        //guard
+        $this->assertCount(0, $this->getScheduledSyncJobs());
+
+        $channel = $this->createChannel();
+        $channel->setEnabled(true);
+        $channel->setPreviouslyEnabled(null);
+
+        $this->entityManager->persist($channel);
+        $this->entityManager->flush();
+
+        $channelId = $channel->getId();
+
+        $this->client->request('GET', $this->getUrl('oro_api_activate_integration', ['id' => $channelId]));
+
+        $this->assertResult($this->getJsonResponseContent($this->client->getResponse(), 200));
+
+        $this->assertCount(1, $this->getScheduledSyncJobs());
+    }
+
     /**
      * @param array $result
      */
@@ -143,5 +166,14 @@ class IntegrationControllerTest extends WebTestCase
         $channel->setPreviouslyEnabled(null);
         
         return $channel;
+    }
+
+    /**
+     * @return array|Job[]
+     */
+    protected function getScheduledSyncJobs()
+    {
+        return $this->getContainer()->get('doctrine')->getRepository('JMSJobQueueBundle:Job')
+            ->findBy(['command' => SyncCommand::COMMAND_NAME]);
     }
 }
