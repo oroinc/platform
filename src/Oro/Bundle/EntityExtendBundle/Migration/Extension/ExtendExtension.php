@@ -219,10 +219,10 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     ],
                     'datagrid' => [
                         'is_visible' => DatagridScope::IS_VISIBLE_FALSE
-                    ]
-                ],
-                'importexport' => [
-                    'identity' => true,
+                    ],
+                    'importexport' => [
+                        'identity' => true,
+                    ],
                 ],
             ]
         );
