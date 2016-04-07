@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 
 /**
  * Checks whether a string representation of entity identifier exists in the Context,
- * and if so, converts it its original representation.
+ * and if so, converts it to its original type.
  */
 class NormalizeEntityId implements ProcessorInterface
 {
