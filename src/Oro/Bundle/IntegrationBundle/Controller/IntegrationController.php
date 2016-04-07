@@ -3,6 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
 use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -20,6 +21,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/integration")
@@ -77,7 +79,7 @@ class IntegrationController extends Controller
      * @Route("/schedule/{id}", requirements={"id"="\d+"}, name="oro_integration_schedule")
      * @AclAncestor("oro_integration_update")
      */
-    public function scheduleAction(Integration $integration)
+    public function scheduleAction(Integration $integration, Request $request)
     {
         if (false == $integration->isEnabled()) {
             return new JsonResponse([
@@ -86,16 +88,6 @@ class IntegrationController extends Controller
             ], Codes::HTTP_BAD_REQUEST);
         }
         
-        $force = (bool)$this->getRequest()->get('force', false);
-        $jobParameters = [
-            '--integration-id=' . $integration->getId(),
-            '-v'
-        ];
-        if ($force) {
-            $jobParameters[] = '--force';
-        }
-        $job = new Job(SyncCommand::COMMAND_NAME, $jobParameters);
-
         $status  = Codes::HTTP_OK;
         $response = [
             'successful' => true,
@@ -103,10 +95,8 @@ class IntegrationController extends Controller
         ];
 
         try {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $em->persist($job);
-            $em->flush($job);
-
+            $job = $this->getSyncScheduler()->schedule($integration, (bool) $request->get('force', false));
+            
             $jobViewLink = sprintf(
                 '<a href="%s" class="job-view-link">%s</a>',
                 $this->get('router')->generate('oro_cron_job_view', ['id' => $job->getId()]),
@@ -188,5 +178,13 @@ class IntegrationController extends Controller
         }
 
         return $form;
+    }
+
+    /**
+     * @return SyncScheduler
+     */
+    protected function getSyncScheduler()
+    {
+        return $this->get('oro_integration.generic_sync_scheduler');
     }
 }
