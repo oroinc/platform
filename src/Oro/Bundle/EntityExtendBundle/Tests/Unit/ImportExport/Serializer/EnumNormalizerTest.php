@@ -111,7 +111,7 @@ class EnumNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 new TestEnumValue($id, 'name', 100, true),
-                ['id' => $id],
+                ['name' => 'name'],
                 ['mode' => 'short']
             ]
         ];

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools\DumperExtensions;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
@@ -275,7 +276,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'id'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                 ],
-                'importexport' => ['identity' => true]
+                'importexport' => ['identity' => false]
             ]
         );
         $this->configManager->createConfigFieldModel($enumValueClassName, 'name', 'string');
@@ -287,7 +288,8 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'name'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
                 ],
-                'datagrid'     => ['is_visible' => false]
+                'datagrid'     => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                'importexport' => ['identity' => true],
             ]
         );
         $this->configManager->createConfigFieldModel($enumValueClassName, 'priority', 'integer');
@@ -299,7 +301,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'priority'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
                 ],
-                'datagrid' => ['is_visible' => false]
+                'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
             ]
         );
         $this->configManager->createConfigFieldModel($enumValueClassName, 'default', 'boolean');
@@ -311,7 +313,7 @@ class EnumEntityConfigDumperExtension extends AbstractEntityConfigDumperExtensio
                     'label'       => ExtendHelper::getEnumTranslationKey('label', $enumCode, 'default'),
                     'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
                 ],
-                'datagrid' => ['is_visible' => false]
+                'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
             ]
         );
     }
