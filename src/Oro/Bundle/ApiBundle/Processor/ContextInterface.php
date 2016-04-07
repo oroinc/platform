@@ -220,6 +220,13 @@ interface ContextInterface extends ComponentContextInterface
     public function removeConfigExtra($extraName);
 
     /**
+     * Gets names of all requested configuration sections.
+     *
+     * @return string[]
+     */
+    public function getConfigSections();
+
+    /**
      * Checks whether a configuration of an entity exists.
      *
      * @return bool

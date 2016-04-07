@@ -205,6 +205,22 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('test', $this->context->get(Context::CLASS_NAME));
     }
 
+    public function testGetConfigSections()
+    {
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2'),
+            new TestConfigExtra('extra1')
+        ];
+
+        $this->context->setConfigExtras($configExtras);
+
+        $this->assertEquals(
+            ['section1', 'section2'],
+            $this->context->getConfigSections()
+        );
+    }
+
     public function testLoadConfigByGetConfig()
     {
         $version      = '1.1';

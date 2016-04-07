@@ -355,6 +355,22 @@ class Context extends ApiContext implements ContextInterface
     /**
      * {@inheritdoc}
      */
+    public function getConfigSections()
+    {
+        $sections = [];
+        $configExtras = $this->getConfigExtras();
+        foreach ($configExtras as $configExtra) {
+            if ($configExtra instanceof ConfigExtraSectionInterface) {
+                $sections[] = $configExtra->getName();
+            }
+        }
+
+        return $sections;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function hasConfig()
     {
         return $this->has($this->getConfigKey());

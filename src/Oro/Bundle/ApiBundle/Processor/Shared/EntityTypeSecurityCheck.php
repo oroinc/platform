@@ -11,6 +11,11 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
+/**
+ * Validates whether an access to the type of entities specified
+ * in the "class" property of the Context is granted.
+ * The permission type is provided in $permission argument of the class constructor.
+ */
 class EntityTypeSecurityCheck implements ProcessorInterface
 {
     /** @var DoctrineHelper */
