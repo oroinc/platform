@@ -63,10 +63,10 @@ class RoleController extends Controller
     {
         /** @var TranslatorInterface $translator */
         $translator = $this->get('translator');
-        $clonePrefix = $translator->trans('oro.user.role.clone_label_prefix');
+        $clonedLabel = $translator->trans('oro.user.role.clone.label', array('%name%' => $entity->getLabel()));
 
         $clonedRole = clone $entity;
-        $clonedRole->setLabel($clonePrefix . $entity->getLabel());
+        $clonedRole->setLabel($clonedLabel);
 
         return $this->update($clonedRole);
     }
