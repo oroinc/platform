@@ -9,6 +9,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Model\Error;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolation;
 
 /**
@@ -100,6 +101,7 @@ class CollectFormErrors implements ProcessorInterface
         $error = new Error();
         $error->setDetail($errorMessage);
         $error->setPropertyName($propertyName);
+        $error->setStatusCode(Response::HTTP_BAD_REQUEST);
 
         return $error;
     }

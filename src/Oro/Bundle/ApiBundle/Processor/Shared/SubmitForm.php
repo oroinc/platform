@@ -11,6 +11,20 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
  */
 class SubmitForm implements ProcessorInterface
 {
+
+    /**
+     * @var bool
+     */
+    protected $clearMissing;
+
+    /**
+     * @param bool $clearMissing Whether to set fields to NULL when they are missing in the submitted data.
+     */
+    public function __construct($clearMissing = false)
+    {
+        $this->clearMissing = $clearMissing;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -29,6 +43,6 @@ class SubmitForm implements ProcessorInterface
             return;
         }
 
-        $form->submit($context->getRequestData(), false);
+        $form->submit($context->getRequestData(), $this->clearMissing);
     }
 }
