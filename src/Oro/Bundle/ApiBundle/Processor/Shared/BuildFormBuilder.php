@@ -106,6 +106,7 @@ class BuildFormBuilder implements ProcessorInterface
         $associations = $metadata->getAssociations();
         foreach ($associations as $name => $association) {
             $fieldConfig = $config->getField($name);
+
             $formBuilder->add(
                 $name,
                 $fieldConfig->getFormType(),
