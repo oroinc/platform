@@ -118,7 +118,7 @@ class RestApiController extends FOSRestController
      *
      * @return Response
      */
-    public function putAction(Request $request)
+    public function patchAction(Request $request)
     {
         $processor = $this->getProcessor($request);
         /** @var UpdateContext $context */

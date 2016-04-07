@@ -53,13 +53,13 @@ oro_rest_post:
     options:
         group: rest_api
 
-oro_rest_put:
+oro_rest_patch:
     path: /api/{entity}/{id}.{_format}
-    methods: [PUT]
+    methods: [PATCH]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApi:put
+        _controller: OroApiBundle:RestApi:patch
         _action: update
     options:
         group: rest_api
