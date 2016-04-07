@@ -52,23 +52,16 @@ class UpdateImportExportIdentityQuery implements MigrationQuery, ConnectionAware
             ->fetchAll(\PDO::FETCH_ASSOC);
 
         $arrayType = Type::getType(Type::TARRAY);
-        $updatedFields = array_map(
-            function (array $row) use ($arrayType, $identity) {
-                $data = $arrayType
-                    ->convertToPHPValue($row['data'], $this->connection->getDatabasePlatform());
+        foreach ($fields as $field) {
+            $data = $arrayType
+                ->convertToPHPValue($field['data'], $this->connection->getDatabasePlatform());
 
-                if (!isset($data['importexport'])) {
-                    $data['importexport'] = [];
-                }
-                $data['importexport']['identity'] = $identity;
-                $row['data'] = $data;
+            if (!isset($data['importexport'])) {
+                $data['importexport'] = [];
+            }
+            $data['importexport']['identity'] = $identity;
+            $field['data'] = $data;
 
-                return $row;
-            },
-            $fields
-        );
-
-        foreach ($updatedFields as $field) {
             $this->connection->update(
                 'oro_entity_config_field',
                 ['data' => $field['data']],
