@@ -168,8 +168,10 @@ oro_api:
                     priority: -50
                 delete_data:
                     priority: -60
-                normalize_result:
+                finalize:
                     priority: -70
+                normalize_result:
+                    priority: -80
         delete_list:
             processing_groups:
                 initialize:
@@ -184,8 +186,10 @@ oro_api:
                     priority: -50
                 delete_data:
                     priority: -60
-                normalize_result:
+                finalize:
                     priority: -70
+                normalize_result:
+                    priority: -80
         create:
             processing_groups:
                 initialize:
@@ -204,8 +208,10 @@ oro_api:
                     priority: -70
                 normalize_data:
                     priority: -80
-                normalize_result:
+                finalize:
                     priority: -90
+                normalize_result:
+                    priority: -100
         update:
             processing_groups:
                 initialize:
@@ -226,5 +232,7 @@ oro_api:
                     priority: -80
                 normalize_data:
                     priority: -90
-                normalize_result:
+                finalize:
                     priority: -100
+                normalize_result:
+                    priority: -110

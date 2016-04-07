@@ -179,6 +179,19 @@ services:
             - { name: oro.api.processor, action: create, group: normalize_data, priority: -10 }
 
     #
+    # finalize
+    #
+
+    oro_api.create.rest.set_location_header:
+        class: Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader
+        arguments:
+            - @router
+            - @oro_api.value_normalizer
+            - @oro_api.rest.entity_id_transformer
+        tags:
+            - { name: oro.api.processor, action: create, group: finalize, requestType: rest, priority: -10 }
+
+    #
     # normalize_result
     #
 
@@ -189,6 +202,11 @@ services:
             - @oro_api.form.guesser.metadata
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, priority: 250 }
+
+    oro_api.create.rest.remove_location_header:
+        class: Oro\Bundle\ApiBundle\Processor\Create\Rest\RemoveLocationHeader
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest, priority: 100 }
 
     oro_api.create.rest.set_http_response_status_code:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetHttpResponseStatusCode
