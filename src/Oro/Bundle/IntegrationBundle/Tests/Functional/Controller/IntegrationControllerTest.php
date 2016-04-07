@@ -1,7 +1,9 @@
 <?php
 
-namespace Oro\Bundle\IntegrationBundle\Tests\Functional;
+namespace Oro\Bundle\IntegrationBundle\Tests\Functional\Controller;
 
+use Doctrine\ORM\EntityManagerInterface;
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Symfony\Component\DomCrawler\Form;
 
 use Oro\Bundle\UserBundle\Entity\User;
@@ -13,12 +15,20 @@ use Oro\Bundle\OrganizationBundle\Migrations\Data\ORM\LoadOrganizationAndBusines
  */
 class IntegrationControllerTest extends WebTestCase
 {
+    /**
+     * @var EntityManagerInterface
+     */
+    protected $entityManager;
+
     protected function setUp()
     {
         $this->initClient(
             array(),
-            array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
+            array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1)),
         );
+
+        $this->entityManager = $this->client->getContainer()->get('doctrine')
+            ->getManagerForClass('OroIntegrationBundle:Channel');
     }
 
     /**
@@ -139,24 +149,37 @@ class IntegrationControllerTest extends WebTestCase
         return $integration;
     }
 
-    /**
-     * @param $integration
-     *
-     * @depends testUpdate
-     *
-     * @return string
-     */
-    public function testSchedule($integration)
+    public function testShouldScheduleSyncJobIfIntegrationActive()
     {
-        $this->client->request(
-            'GET',
-            $this->getUrl('oro_integration_schedule', array('id' => $integration['id']))
-        );
+        $channel = $this->createChannel();
+        $this->entityManager->persist($channel);
+        $this->entityManager->flush();
+
+        $this->client->request('GET', $this->getUrl('oro_integration_schedule', array('id' => $channel->getId())));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertNotEmpty($result);
+        $this->assertTrue($result['successful']);
         $this->assertNotEmpty($result['job_id']);
+    }
+
+    public function testShouldNotScheduleSyncJobIfIntegrationNotActive()
+    {
+        $channel = $this->createChannel();
+        $channel->setEnabled(false);
+
+        $this->entityManager->persist($channel);
+        $this->entityManager->flush();
+
+        $this->client->request('GET', $this->getUrl('oro_integration_schedule', array('id' => $channel->getId())));
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 400);
+
+
+        $this->assertNotEmpty($result);
+        $this->assertNotEmpty($result['message']);
+        $this->assertFalse($result['successful']);
     }
 
     /**
@@ -183,5 +206,18 @@ class IntegrationControllerTest extends WebTestCase
 
         $this->assertEmpty($result['data']);
         $this->assertEmpty($result['options']['totalRecords']);
+    }
+
+    /**
+     * @return Channel
+     */
+    protected function createChannel()
+    {
+        $channel = new Channel();
+        $channel->setName('aName');
+        $channel->setType('aType');
+        $channel->setEnabled(true);
+
+        return $channel;
     }
 }

@@ -79,6 +79,13 @@ class IntegrationController extends Controller
      */
     public function scheduleAction(Integration $integration)
     {
+        if (false == $integration->isEnabled()) {
+            return new JsonResponse([
+                'successful' => false,
+                'message'    => $this->get('translator')->trans('oro.integration.sync_error_integration_deactivated'),
+            ], Codes::HTTP_BAD_REQUEST);
+        }
+        
         $force = (bool)$this->getRequest()->get('force', false);
         $jobParameters = [
             '--integration-id=' . $integration->getId(),
