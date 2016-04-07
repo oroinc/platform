@@ -395,4 +395,31 @@ class ArrayUtil
 
         return $array;
     }
+
+    /**
+     * @param array $array
+     * @param array $path
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
+    public static function getIn(array $array, array $path, $defaultValue = null)
+    {
+        $propertyPath = implode(
+            '',
+            array_map(
+                function ($part) {
+                    return sprintf('[%s]', $part);
+                },
+                $path
+            )
+        );
+
+        $propertyAccessor = new PropertyAccessor();
+        if (!$propertyAccessor->isReadable($array, $propertyPath)) {
+            return $defaultValue;
+        }
+
+        return $propertyAccessor->getValue($array, $propertyPath);
+    }
 }
