@@ -454,7 +454,7 @@ class DebugCommand extends ContainerAwareCommand
                 }
             }
         }
-        $output->writeln(print_r($res, true));
+        $output->writeln($this->convertArrayToString($res));
     }
 
     /**
@@ -469,7 +469,7 @@ class DebugCommand extends ContainerAwareCommand
         if (!empty($attrName) && (isset($data[$attrName]) || array_key_exists($attrName, $data))) {
             $res = [$config->getId()->getScope() => [$attrName => $data[$attrName]]];
         }
-        $output->writeln(print_r($res, true));
+        $output->writeln($this->convertArrayToString($res));
     }
 
     /**
@@ -677,5 +677,32 @@ class DebugCommand extends ContainerAwareCommand
         /** @var ConfigManager $cm */
         $cm = $this->getContainer()->get('oro_entity_config.config_manager');
         $cm->clearCache();
+    }
+
+    /**
+     * Converts array to string and replace boolean values and null to appropriate strings equivalents
+     *
+     * @param array $array
+     *
+     * @return mixed
+     */
+    protected function convertArrayToString(array $array)
+    {
+        $replace = [
+            false => 'false',
+            true  => 'true',
+            null  => 'NULL',
+        ];
+
+        array_walk_recursive(
+            $array,
+            function (&$item) use ($replace) {
+                if (is_bool($item) || is_null($item)) {
+                    $item = $replace[$item];
+                }
+            }
+        );
+
+        return print_r($array, true);
     }
 }
