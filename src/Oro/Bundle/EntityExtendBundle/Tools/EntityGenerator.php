@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tools;
 
-use Symfony\Component\Yaml\Yaml;
+use Oro\Bundle\PlatformBundle\Yaml\Yaml;
 
 use CG\Generator\PhpClass;
 use CG\Core\DefaultGeneratorStrategy;

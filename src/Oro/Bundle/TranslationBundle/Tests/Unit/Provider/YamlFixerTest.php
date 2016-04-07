@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Provider;
 
-use Symfony\Component\Yaml\Yaml;
+use Oro\Bundle\PlatformBundle\Yaml\Yaml;
 
 use Oro\Bundle\TranslationBundle\Provider\YamlFixer;
 

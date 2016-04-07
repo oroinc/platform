@@ -3,7 +3,7 @@
 namespace Oro\Bundle\AddressBundle\Migrations\Data\ORM;
 
 use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
-use Symfony\Component\Yaml\Yaml;
+use Oro\Bundle\PlatformBundle\Yaml\Yaml;
 
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;

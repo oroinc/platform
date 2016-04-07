@@ -8,7 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
-use Symfony\Component\Yaml\Yaml;
+use Oro\Bundle\PlatformBundle\Yaml\Yaml;
 
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 use Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper;

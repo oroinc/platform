@@ -2,7 +2,7 @@
 
 namespace Oro\Component\Layout\Loader\Driver;
 
-use Symfony\Component\Yaml\Yaml;
+use Oro\Bundle\PlatformBundle\Yaml\Yaml;
 
 use Oro\Component\Layout\Loader\Generator\GeneratorData;
 

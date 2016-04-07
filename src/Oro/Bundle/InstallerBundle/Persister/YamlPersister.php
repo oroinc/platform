@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\InstallerBundle\Persister;
 
-use Symfony\Component\Yaml\Yaml;
+use Oro\Bundle\PlatformBundle\Yaml\Yaml;
 
 class YamlPersister
 {

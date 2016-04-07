@@ -2,7 +2,7 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
-use Symfony\Component\Yaml\Yaml;
+use Oro\Bundle\PlatformBundle\Yaml\Yaml;
 
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ConfigExpressions;
