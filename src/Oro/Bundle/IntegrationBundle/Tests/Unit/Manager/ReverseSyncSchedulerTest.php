@@ -6,12 +6,12 @@ use Doctrine\ORM\EntityManager;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
-use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
+use Oro\Bundle\IntegrationBundle\Manager\ReverseSyncScheduler;
 use Oro\Bundle\IntegrationBundle\Manager\TypesRegistry;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationType;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestConnector;
 
-class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
+class ReverseSyncSchedulerTest extends \PHPUnit_Framework_TestCase
 {
     /** @var EntityManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $em;
@@ -22,7 +22,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
     /** @var TypesRegistry */
     protected $typesRegistry;
 
-    /** @var SyncScheduler */
+    /** @var ReverseSyncScheduler */
     protected $scheduler;
 
     public function setUp()
@@ -32,7 +32,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
         $this->registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
 
         $this->typesRegistry = new TypesRegistry();
-        $this->scheduler     = new SyncScheduler($this->registry, $this->typesRegistry);
+        $this->scheduler     = new ReverseSyncScheduler($this->registry, $this->typesRegistry);
     }
 
     public function tearDown()

@@ -28,7 +28,7 @@ parameters:
     oro_integration.logger.strategy.class:                                Oro\Bundle\IntegrationBundle\Logger\LoggerStrategy
 
     oro_integration.delete_manager.class:                                 Oro\Bundle\IntegrationBundle\Manager\DeleteManager
-    oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
+    oro_integration.reverse_sync_scheduler.class:                         Oro\Bundle\IntegrationBundle\Manager\ReverseSyncScheduler
 
     oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
     oro_integration.provider.settings_provider.class:                     Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
@@ -204,8 +204,8 @@ services:
         class: %oro_integration.delete_manager.class%
         arguments: [ '@doctrine.orm.entity_manager' ]
 
-    oro_integration.sync_scheduler:
-        class: %oro_integration.sync_scheduler.class%
+    oro_integration.reverse_sync_scheduler:
+        class: %oro_integration.reverse_sync_scheduler.class%
         arguments:
             - '@doctrine'
             - '@oro_integration.manager.types_registry'
@@ -220,9 +220,9 @@ services:
             - '@oro_integration.logger.strategy'
         lazy: true
 
-    oro_integration.sync_scheduler.link:
+    oro_integration.reverse_sync_scheduler.link:
         tags:
-            - { name: oro_service_link,  service: oro_integration.sync_scheduler }
+            - { name: oro_service_link,  service: oro_integration.reverse_sync_scheduler }
 
     oro_integration.provider.settings_provider:
         class: %oro_integration.provider.settings_provider.class%

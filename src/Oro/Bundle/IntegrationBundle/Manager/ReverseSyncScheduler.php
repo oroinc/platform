@@ -15,7 +15,7 @@ use Oro\Bundle\IntegrationBundle\Provider\TwoWaySyncConnectorInterface;
 /**
  * This class is responsible for job scheduling needed for two way data sync.
  */
-class SyncScheduler
+class ReverseSyncScheduler
 {
     const JOB_NAME = 'oro:integration:reverse:sync';
 

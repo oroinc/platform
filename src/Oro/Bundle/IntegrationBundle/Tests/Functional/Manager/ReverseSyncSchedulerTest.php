@@ -8,7 +8,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestIntegrationType;
 use Oro\Bundle\IntegrationBundle\Tests\Unit\Fixture\TestTwoWayConnector;
 
-class SyncSchedulerTest extends WebTestCase
+class ReverseSyncSchedulerTest extends WebTestCase
 {
     protected function setUp()
     {
@@ -37,7 +37,7 @@ class SyncSchedulerTest extends WebTestCase
         $integration = new Integration();
         $integration->setType($integrationType);
 
-        $this->getContainer()->get('oro_integration.sync_scheduler')->schedule($integration, $connectorType, [], false);
+        $this->getContainer()->get('oro_integration.reverse_sync_scheduler')->schedule($integration, $connectorType, [], false);
         $this->assertEmpty($this->getScheduledJobs(), 'Should be empty before flush');
 
         $this->getContainer()->get('doctrine')->getManager()->flush();
@@ -61,12 +61,12 @@ class SyncSchedulerTest extends WebTestCase
         $integration = new Integration();
         $integration->setType($integrationType);
 
-        $this->getContainer()->get('oro_integration.sync_scheduler')->schedule($integration, $connectorType);
+        $this->getContainer()->get('oro_integration.reverse_sync_scheduler')->schedule($integration, $connectorType);
 
         $jobs = $this->getScheduledJobs();
         $this->assertNotEmpty($jobs);
 
-        $this->getContainer()->get('oro_integration.sync_scheduler')->schedule($integration, $connectorType);
+        $this->getContainer()->get('oro_integration.reverse_sync_scheduler')->schedule($integration, $connectorType);
         $jobs = $this->getScheduledJobs();
         $this->assertCount(1, $jobs, 'Should check do look up for already scheduled pending jobs');
     }
