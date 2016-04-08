@@ -32,6 +32,7 @@ define([
                     PageMainMenuView.__super__.render.call(this);
                     this.initRouteMatches();
                 } else {
+                    this._deferredRender();
                     this.initLayout()
                         .done(_.bind(this._resolveDeferredRender, this));
                 }
