@@ -20,7 +20,7 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         if (!empty($context['mode']) && $context['mode'] === 'short') {
-            return ['id' => $object->getId()];
+            return ['name' => $object->getName()];
         }
 
         return [
@@ -39,7 +39,7 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
         $reflection  = new \ReflectionClass($class);
 
         $args = [
-            'id' => $data['id'],
+            'id' => empty($data['id']) ? null : $data['id'],
             'name' => empty($data['name']) ? '' : $data['name'],
             'priority' => empty($data['priority']) ? 0 : $data['priority'],
             'default' => !empty($data['default'])
