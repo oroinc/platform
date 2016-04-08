@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
+use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 
 class StorageDataCollector
 {
@@ -106,7 +107,7 @@ class StorageDataCollector
             $alias = null;
 
             if ($config) {
-                $alias = $config->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_ALIAS_PATH);
+                $alias = $config->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_CONFIG_PATH);
             }
 
             $entityName = ($alias !== null ) ? $alias : $this->getEntityName($dataSource);
