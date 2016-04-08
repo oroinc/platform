@@ -103,7 +103,7 @@ define(function(require) {
 
         getMessage: function() {
             var message = this.get('message');
-            message = _.nl2br(_.escape(message));
+            message = _.nl2br(message);
             return message;
         }
     });
