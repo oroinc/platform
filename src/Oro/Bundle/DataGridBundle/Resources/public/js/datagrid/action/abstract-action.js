@@ -145,7 +145,7 @@ define([
          * @param {Object} options
          */
         run: function(options) {
-            var options = _.defaults(options, {
+            options = _.defaults(options, {
                 doExecute: true
             });
             this.trigger('preExecute', this, options);
