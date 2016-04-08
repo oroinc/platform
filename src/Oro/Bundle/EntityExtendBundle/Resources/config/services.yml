@@ -166,6 +166,14 @@ services:
         tags:
             - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_field }
 
+    oro_entity_extend.validator.unique_extend_entity_method_name_validator:
+        class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\UniqueExtendEntityMethodNameValidator
+        arguments:
+            - @oro_entity_extend.extend.field_name_validation_helper
+            - @oro_entity_extend.tools.class_method_name_checker
+        tags:
+            - { name: validator.constraint_validator, alias: oro_entity_extend.validator.unique_extend_entity_method_name }
+
     oro_entity_extend.validator.default_relation_field:
         class: Oro\Bundle\EntityExtendBundle\Validator\Constraints\DefaultRelationFieldValidator
         arguments:
@@ -460,3 +468,14 @@ services:
                 - oneToMany
                 - manyToOne
                 - manyToMany
+
+    oro_entity_extend.entity_alias_config_listener:
+        class: Oro\Bundle\EntityExtendBundle\EventListener\EntityAliasConfigListener
+        arguments:
+            - @oro_entity.entity_alias_resolver
+        tags:
+            - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
+
+    # Helpers
+    oro_entity_extend.tools.class_method_name_checker:
+        class: Oro\Bundle\EntityExtendBundle\Tools\ClassMethodNameChecker

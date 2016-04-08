@@ -18,6 +18,7 @@ define(function(require) {
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
     var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
+    var DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
 
     helpers = {
         cellType: function(type) {
@@ -73,6 +74,7 @@ define(function(require) {
             $.when.apply($, promises).always(function() {
                 self.subComponents = _.compact(arguments);
                 self._resolveDeferredInit();
+                self.$componentEl.find('.view-loading').remove();
                 self.$el.show();
                 self.grid.trigger('shown');
             });
@@ -102,7 +104,8 @@ define(function(require) {
          */
         initDataGrid: function(options) {
             this.$el = $('<div>');
-            $(options.el).append(this.$el);
+            this.$componentEl = options.$el;
+            this.$componentEl.append(this.$el);
             this.gridName = options.gridName;
             this.inputName = options.inputName;
             this.data = options.data;
@@ -114,6 +117,7 @@ define(function(require) {
                 rowActions: {},
                 massActions: {}
             });
+            this.themeOptions = options.themeOptions || {};
             this.metadataModel = new MetadataModel(this.metadata);
             this.modules = {};
 
@@ -182,6 +186,7 @@ define(function(require) {
 
             this.$el.hide();
             options.el = this.$el[0];
+            options.themeOptionsConfigurator(Grid, options);
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();
@@ -244,7 +249,7 @@ define(function(require) {
 
             // columns
             columns = _.map(metadata.columns, function(cell) {
-                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align',
+                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'sortingType', 'align',
                     'order', 'manageable', 'required'];
                 var cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
                 var extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
@@ -289,7 +294,8 @@ define(function(require) {
                 multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || massActions.length,
                 metadata: this.metadata,
                 metadataModel: this.metadataModel,
-                plugins: plugins
+                plugins: plugins,
+                themeOptionsConfigurator: DataGridThemeOptionsManager.createConfigurator(this.themeOptions)
             };
         },
 

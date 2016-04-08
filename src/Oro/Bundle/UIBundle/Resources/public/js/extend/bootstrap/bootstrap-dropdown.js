@@ -128,7 +128,10 @@ define(function(require) {
                 .after($placeholder)
                 .appendTo('body')
                 .addClass('dropdown-menu__floating')
-                .css(css);
+                .css(css)
+                .one('mouseleave', function(e) {
+                    $placeholder.trigger(e.type);
+                });
 
             function toClose() {
                 $placeholder.parent().trigger('tohide.bs.dropdown');

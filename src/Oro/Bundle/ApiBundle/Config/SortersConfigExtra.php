@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Util\ConfigUtil;
  * An instance of this class can be added to the config extras of the Context
  * to request an information about fields that can be used to sort a result.
  */
-class SortersConfigExtra implements ConfigExtraInterface, ConfigExtraSectionInterface
+class SortersConfigExtra implements ConfigExtraSectionInterface
 {
     const NAME = ConfigUtil::SORTERS;
 
@@ -32,7 +32,7 @@ class SortersConfigExtra implements ConfigExtraInterface, ConfigExtraSectionInte
     /**
      * {@inheritdoc}
      */
-    public function isInheritable()
+    public function isPropagable()
     {
         return true;
     }
