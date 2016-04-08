@@ -152,7 +152,6 @@ class AclPrivilege
      * @param string $description
      * @return AclPrivilege
      */
-
     public function setDescription($description)
     {
         $this->description = $description;
