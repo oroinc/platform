@@ -208,7 +208,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         prototype.postprocessResults = _.wrap(prototype.postprocessResults, function(original) {
             original.apply(this, _.rest(arguments));
             if (this.opts.dontSelectFirstOptionOnOpen) {
-                this.results.find(".select2-highlighted").removeClass("select2-highlighted");
+                this.results.find('.select2-highlighted').removeClass('select2-highlighted');
             }
         });
     }(Select2['class'].single.prototype));
@@ -348,7 +348,7 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         prototype.postprocessResults = _.wrap(prototype.postprocessResults, function(original) {
             original.apply(this, _.rest(arguments));
             if (this.opts.dontSelectFirstOptionOnOpen) {
-                this.results.find(".select2-highlighted").removeClass("select2-highlighted");
+                this.results.find('.select2-highlighted').removeClass('select2-highlighted');
             }
         });
     }(Select2['class'].multi.prototype));
