@@ -18,14 +18,6 @@ doctrine:
                 user:     %database_user%
                 password: %database_password%
                 charset:  UTF8
-            config:
-                driver:   %database_driver%
-                host:     %database_host%
-                port:     %database_port%
-                dbname:   %database_name%
-                user:     %database_user%
-                password: %database_password%
-                charset:  UTF8
     orm:
         default_entity_manager:      default
         auto_generate_proxy_classes: %kernel.debug%
@@ -44,7 +36,7 @@ doctrine:
                     type: service
                     id:   doctrine.metadata.cache
             config:
-                connection: config
+                connection: default
                 mappings: ~
                 metadata_cache_driver:
                     type: service
