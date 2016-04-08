@@ -44,7 +44,7 @@ class CollectFormErrors implements ProcessorInterface
         foreach ($errors as $error) {
             $errorObject = $this->createErrorObject(
                 $error->getMessage(),
-                $this->getFormErrorPropertyName($error)
+                $this->getFormErrorPropertyName($error, $form)
             );
             $context->addError($errorObject);
         }
@@ -65,11 +65,12 @@ class CollectFormErrors implements ProcessorInterface
     }
 
     /**
-     * @param FormError $error
+     * @param FormError     $error
+     * @param FormInterface $form
      *
      * @return string|null
      */
-    protected function getFormErrorPropertyName(FormError $error)
+    protected function getFormErrorPropertyName(FormError $error, FormInterface $form)
     {
         $result = null;
 
@@ -78,6 +79,10 @@ class CollectFormErrors implements ProcessorInterface
             $result = $cause->getPropertyPath();
             if (0 === strpos($result, 'data.')) {
                 $result = substr($result, 5);
+            }
+            // in case if propertyPath = 'data', this error can be an entity level error
+            if ($result === 'data' && !$form->has('data')) {
+                $result = '';
             }
         }
         if (!$result) {

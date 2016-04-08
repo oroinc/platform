@@ -3,6 +3,7 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
 
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\BuildJsonApiDocument;
@@ -83,7 +84,12 @@ class BuildJsonApiDocumentTest extends GetListProcessorTestCase
         $this->documentBuilderFactory->expects($this->once())
             ->method('createDocumentBuilder')
             ->willReturn($this->documentBuilder);
+        $config = new Config();
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($config);
 
+        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
         $this->context->addError($error);
         $this->processor->process($this->context);
 
@@ -104,7 +110,12 @@ class BuildJsonApiDocumentTest extends GetListProcessorTestCase
         $this->documentBuilderFactory->expects($this->exactly(2))
             ->method('createDocumentBuilder')
             ->willReturn($this->documentBuilder);
+        $config = new Config();
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->willReturn($config);
 
+        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
         $this->context->setResult(null);
         $this->processor->process($this->context);
 
