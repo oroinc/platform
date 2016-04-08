@@ -144,7 +144,11 @@ class ImportStrategyHelper
             foreach ($violations as $violation) {
                 $propertyPath = $violation->getPropertyPath();
                 if ($propertyPath) {
-                    $propertyPath .= ': ';
+                    $fieldHeader = $this->configurableDataConverter->getFieldHeaderWithRelation(
+                        $entityClassName,
+                        $propertyPath
+                    );
+                    $propertyPath = ($fieldHeader ?: $propertyPath) . ': ';
                 }
                 $errors[] = $propertyPath . $violation->getMessage();
             }
