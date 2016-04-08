@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
+use Doctrine\ORM\Query\Expr\Select;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
@@ -92,6 +93,9 @@ class PostgresqlGridModifier extends AbstractExtension
             $field = $alias . '.' . $identifier;
             $orderBy = $queryBuilder->getDQLPart('orderBy');
             if (!isset($orderBy[$field])) {
+                if ($this->isDistinct($queryBuilder)) {
+                    $this->ensureIdentifierSelected($queryBuilder, $field);
+                }
                 $queryBuilder->addOrderBy($field, 'ASC');
             }
         }
@@ -138,5 +142,55 @@ class PostgresqlGridModifier extends AbstractExtension
         }
 
         return false;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @return bool
+     */
+    protected function isDistinct(QueryBuilder $queryBuilder)
+    {
+        if ($queryBuilder->getDQLPart('distinct')) {
+            return true;
+        }
+
+        foreach ($queryBuilder->getDQLPart('select') as $select) {
+            $selectString = ltrim(strtolower((string)$select));
+            if (strpos($selectString, 'distinct ') === 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param string $field
+     */
+    protected function ensureIdentifierSelected(QueryBuilder $queryBuilder, $field)
+    {
+        $isSelected = false;
+        /** @var Select $select */
+        foreach ($queryBuilder->getDQLPart('select') as $select) {
+            $selectString = ltrim(strtolower((string)$select));
+            if (strpos($selectString, 'distinct ') === 0) {
+                $selectString = strpos($selectString, 9);
+            }
+            // if field itself or field with alias
+            if ($selectString === $field ||
+                (
+                    strpos($selectString, $field) === 0 &&
+                    strpos(strtolower(ltrim(substr($selectString, strlen($field)))), 'as ') === 0
+                )
+            ) {
+                $isSelected = true;
+                break;
+            }
+        }
+
+        if (!$isSelected) {
+            $queryBuilder->select($field);
+        }
     }
 }
