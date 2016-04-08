@@ -258,6 +258,11 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
                     str_replace(
                         '/',
                         DIRECTORY_SEPARATOR,
+                        $bundle2Dir . '/Resources/views/layouts/base/route_name2/update.yml'
+                    ),
+                    str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
                         $bundle2Dir . '/Resources/views/layouts/base/route_name2/update1.yml'
                     ),
                 ],

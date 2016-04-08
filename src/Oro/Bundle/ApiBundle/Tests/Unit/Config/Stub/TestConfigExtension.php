@@ -21,22 +21,22 @@ class TestConfigExtension extends AbstractConfigExtension
     public function getConfigureCallbacks()
     {
         return [
-            'entities.entity'        => function (NodeBuilder $node) {
+            'entities.entity'       => function (NodeBuilder $node) {
                 $node->scalarNode('entity_extra');
             },
-            'entities.entity.fields' => function (NodeBuilder $node) {
+            'entities.entity.field' => function (NodeBuilder $node) {
                 $node->scalarNode('field_extra');
             },
-            'filters'                => function (NodeBuilder $node) {
+            'filters'               => function (NodeBuilder $node) {
                 $node->scalarNode('filters_extra');
             },
-            'filters.fields'         => function (NodeBuilder $node) {
+            'filters.field'         => function (NodeBuilder $node) {
                 $node->scalarNode('filter_field_extra');
             },
-            'sorters'                => function (NodeBuilder $node) {
+            'sorters'               => function (NodeBuilder $node) {
                 $node->scalarNode('sorters_extra');
             },
-            'sorters.fields'         => function (NodeBuilder $node) {
+            'sorters.field'         => function (NodeBuilder $node) {
                 $node->scalarNode('sorter_field_extra');
             },
         ];
@@ -48,42 +48,42 @@ class TestConfigExtension extends AbstractConfigExtension
     public function getPostProcessCallbacks()
     {
         return [
-            'entities.entity'        => function (array $config) {
+            'entities.entity'       => function (array $config) {
                 if (!empty($config['entity_extra'])) {
                     $config['entity_extra'] .= ' (added by extension)';
                 }
 
                 return $config;
             },
-            'entities.entity.fields' => function (array $config) {
+            'entities.entity.field' => function (array $config) {
                 if (!empty($config['field_extra'])) {
                     $config['field_extra'] .= ' (added by extension)';
                 }
 
                 return $config;
             },
-            'filters'                => function (array $config) {
+            'filters'               => function (array $config) {
                 if (!empty($config['filters_extra'])) {
                     $config['filters_extra'] .= ' (added by extension)';
                 }
 
                 return $config;
             },
-            'filters.fields'         => function (array $config) {
+            'filters.field'         => function (array $config) {
                 if (!empty($config['filter_field_extra'])) {
                     $config['filter_field_extra'] .= ' (added by extension)';
                 }
 
                 return $config;
             },
-            'sorters'                => function (array $config) {
+            'sorters'               => function (array $config) {
                 if (!empty($config['sorters_extra'])) {
                     $config['sorters_extra'] .= ' (added by extension)';
                 }
 
                 return $config;
             },
-            'sorters.fields'         => function (array $config) {
+            'sorters.field'         => function (array $config) {
                 if (!empty($config['sorter_field_extra'])) {
                     $config['sorter_field_extra'] .= ' (added by extension)';
                 }

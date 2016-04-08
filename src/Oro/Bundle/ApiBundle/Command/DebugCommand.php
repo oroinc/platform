@@ -4,19 +4,18 @@ namespace Oro\Bundle\ApiBundle\Command;
 
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
+use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\ApiContext;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class DebugCommand extends ContainerAwareCommand
+class DebugCommand extends AbstractDebugCommand
 {
     /**
      * {@inheritdoc}
@@ -30,13 +29,8 @@ class DebugCommand extends ContainerAwareCommand
                 'action',
                 InputArgument::OPTIONAL,
                 'Shows a list of processors for a specified action'
-            )
-            ->addOption(
-                'request-type',
-                null,
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'The request type'
             );
+        parent::configure();
     }
 
     /**
@@ -48,7 +42,7 @@ class DebugCommand extends ContainerAwareCommand
         if (empty($action)) {
             $this->dumpActions($output);
         } else {
-            $this->dumpProcessors($output, $action, new RequestType($input->getOption('request-type')));
+            $this->dumpProcessors($output, $action, $this->getRequestType($input));
         }
     }
 
@@ -111,6 +105,10 @@ class DebugCommand extends ContainerAwareCommand
         foreach ($processors as $processor) {
             if ($i > 0) {
                 $table->addRow(new TableSeparator());
+            }
+
+            if ($processor instanceof TraceableProcessor) {
+                $processor = $processor->getProcessor();
             }
 
             $processorColumn      = sprintf(

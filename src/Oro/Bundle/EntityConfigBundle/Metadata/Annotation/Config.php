@@ -13,12 +13,27 @@ use Oro\Bundle\EntityConfigBundle\Exception\AnnotationException;
  */
 class Config
 {
+    /** @var string */
     public $mode = ConfigModel::MODE_DEFAULT;
+
+    /** @var string */
     public $routeName = '';
+
+    /** @var string */
     public $routeView = '';
+
+    /** @var string */
     public $routeCreate = '';
+
+    /** @var array */
     public $defaultValues = array();
 
+    /** @var array */
+    public $routes = [];
+
+    /**
+     * @param array $data
+     */
     public function __construct(array $data)
     {
         if (isset($data['mode'])) {
@@ -62,6 +77,26 @@ class Config
             throw new AnnotationException(
                 sprintf('Annotation "Config" give invalid parameter "mode" : "%s"', $this->mode)
             );
+        }
+
+        $this->collectRoutes($data);
+    }
+
+    /**
+     * @param array $data
+     */
+    protected function collectRoutes(array $data)
+    {
+        foreach ($data as $name => $value) {
+            if (strpos($name, 'route') !== 0 || property_exists($this, $name)) {
+                continue;
+            }
+
+            $routeName = lcfirst(str_replace('route', '', $name));
+
+            if (!array_key_exists($routeName, $this->routes) && strlen($routeName) > 0) {
+                $this->routes[$routeName] = $value;
+            }
         }
     }
 }

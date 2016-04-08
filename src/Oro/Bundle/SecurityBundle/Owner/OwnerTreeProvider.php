@@ -90,7 +90,23 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         $businessUnitClass = $this->getOwnershipMetadataProvider()->getLocalLevelClass();
 
         /** @var User[] $users */
-        $users = $this->getManagerForClass($userClass)->getRepository($userClass)->findAll();
+
+        $users = $this->getManagerForClass($userClass)
+            ->getRepository($userClass)
+            ->createQueryBuilder('u')
+            ->leftJoin('u.owner', 'owner')
+            ->leftJoin('u.organizations', 'organizations')
+            ->leftJoin('u.businessUnits', 'bu')
+            ->leftJoin('bu.organization', 'bu_organization')
+            ->select(
+                'partial u.{id}',
+                'partial owner.{id}',
+                'partial organizations.{id}',
+                'partial bu.{id}',
+                'partial bu_organization.{id}'
+            )
+            ->getQuery()
+            ->getArrayResult();
 
         /** @var BusinessUnit[] $businessUnits */
         $businessUnitsRepo = $this->getManagerForClass($businessUnitClass)->getRepository($businessUnitClass);
@@ -116,17 +132,15 @@ class OwnerTreeProvider extends AbstractOwnerTreeProvider
         $tree->buildTree();
 
         foreach ($users as $user) {
-            $owner = $user->getOwner();
-            $tree->addBasicEntity($user->getId(), $owner ? $owner->getId() : null);
-            foreach ($user->getOrganizations() as $organization) {
-                $organizationId = $organization->getId();
-                $tree->addGlobalEntity($user->getId(), $organizationId);
+            $owner = $user['owner'];
+            $tree->addBasicEntity($user['id'], isset($owner['id']) ? $owner['id'] : null);
 
-                $userBusinessUnits = $user->getBusinessUnits();
-                foreach ($userBusinessUnits as $businessUnit) {
-                    $buOrganizationId = $businessUnit->getOrganization()->getId();
-                    if ($organizationId == $buOrganizationId) {
-                        $tree->addLocalEntityToBasic($user->getId(), $businessUnit->getId(), $organizationId);
+            foreach ($user['organizations'] as $organization) {
+                $tree->addGlobalEntity($user['id'], $organization['id']);
+
+                foreach ($user['businessUnits'] as $businessUnit) {
+                    if ($organization['id'] == $businessUnit['organization']['id']) {
+                        $tree->addLocalEntityToBasic($user['id'], $businessUnit['id'], $organization['id']);
                     }
                 }
             }

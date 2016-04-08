@@ -3,7 +3,6 @@
     and not is_workflow_reset_allowed(entity)
     and resource_granted('oro_workflow')
 %}
-    <div class="workflow-steps-container">
     {{
         oro_widget_render({
             'widgetType': 'block',
@@ -14,5 +13,4 @@
             'alias': 'workflow_steps'
         })
     }}
-    </div>
 {% endif %}

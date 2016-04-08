@@ -11,6 +11,7 @@ use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 
 /**
  * Class Imap
+ *
  * @package Oro\Bundle\ImapBundle\Mail\Storage
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -292,7 +293,7 @@ class Imap extends \Zend\Mail\Storage\Imap
     }
 
     /**
-     * Searches UIDS by the given criteria
+     * Searches UIDS by the given criteria. Returns one uid usually last one.
      *
      * @param array $criteria
      *
@@ -321,6 +322,33 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         return $response;
+    }
+
+    /**
+     * This function returns uid array.
+     * Firstly we get unique id for all messages. Secondly we check if given id in $ids array we would use uidSearch
+     * to get last known uid.
+     *
+     * @param int  $id
+     * @param bool $isUid if true return uid else returns id
+     *
+     * @return array
+     */
+    public function getLastMessageIdsFromId($id, $isUid = true)
+    {
+        $ids    = $this->getUniqueId();
+        $search = array_flip($ids);
+        $result = [];
+
+        if (array_key_exists($id, $search)) {
+            $result = array_chunk($search, $search[$id], true);
+        }
+
+        if (empty($result[1])) {
+            return $this->uidSearch([sprintf('%s:*', ++$id)]);
+        }
+
+        return $isUid ? array_keys($result[1]) : array_values($result[1]);
     }
 
     /**
@@ -445,7 +473,7 @@ class Imap extends \Zend\Mail\Storage\Imap
         $authenticateParams = ['XOAUTH2', base64_encode("user=$email\1auth=Bearer $accessToken\1\1")];
         $this->protocol->sendRequest('AUTHENTICATE', $authenticateParams);
         while (true) {
-            $response = "";
+            $response = '';
             $isExtraServerChallenge = $this->protocol->readLine($response, '+', true);
             if ($isExtraServerChallenge) {
                 // Send empty client response.

@@ -4,6 +4,7 @@ namespace Oro\Bundle\OrganizationBundle\Ownership;
 
 use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\OrganizationBundle\Form\Type\OwnershipType;
 use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
@@ -78,6 +79,7 @@ class OwnerDeletionManager
      * Determines whether the given entity is an owner.
      *
      * @param object $entity
+     *
      * @return bool true if the given entity is User, BusinessUnit or Organization; otherwise, false
      */
     public function isOwner($entity)
@@ -89,17 +91,18 @@ class OwnerDeletionManager
      * Checks if the given owner owns at least one entity
      *
      * @param object $owner
+     *
      * @return bool
      */
     public function hasAssignments($owner)
     {
-        $result    = false;
+        $result = false;
         $ownerType = $this->getOwnerType($owner);
         if ($ownerType !== OwnershipType::OWNER_TYPE_NONE) {
             foreach ($this->ownershipProvider->getConfigs(null, true) as $config) {
                 if ($config->get('owner_type') === $ownerType) {
                     $entityClassName = $config->getId()->getClassName();
-                    $result          = $this->getAssignmentChecker($entityClassName)->hasAssignments(
+                    $result = $this->getAssignmentChecker($entityClassName)->hasAssignments(
                         $this->objectIdAccessor->getId($owner),
                         $entityClassName,
                         $this->ownershipMetadata->getMetadata($entityClassName)->getOwnerFieldName(),
@@ -116,10 +119,52 @@ class OwnerDeletionManager
     }
 
     /**
+     * Checks if the given organization owns at least one entity
+     *
+     * @param Organization $organization
+     *
+     * @return bool
+     */
+    public function hasOrganizationAssignments(Organization $organization)
+    {
+        $result = false;
+        foreach ($this->ownershipProvider->getConfigs(null, true) as $config) {
+            if (in_array(
+                $config->get('owner_type'),
+                [OwnershipType::OWNER_TYPE_USER, OwnershipType::OWNER_TYPE_BUSINESS_UNIT],
+                true
+            )) {
+                $entityClassName = $config->getId()->getClassName();
+                $organizationFieldName = $this->ownershipMetadata
+                    ->getMetadata($entityClassName)
+                    ->getGlobalOwnerFieldName();
+                $findResult = $this->em->getRepository($entityClassName)
+                    ->createQueryBuilder('entity')
+                    ->select('organization.id')
+                    ->innerJoin(sprintf('entity.%s', $organizationFieldName), 'organization')
+                    ->where('organization.id = :ownerId')
+                    ->setParameter('ownerId', $this->objectIdAccessor->getId($organization))
+                    ->setMaxResults(1)
+                    ->getQuery()
+                    ->getArrayResult();
+
+                $result = !empty($findResult);
+
+                if ($result) {
+                    break;
+                }
+            }
+        }
+
+        return $result;
+    }
+
+    /**
      * Gets an instance of OwnerAssignmentCheckerInterface responsible
      * for check owner assignment for the given entity class
      *
      * @param string $entityClassName
+     *
      * @return OwnerAssignmentCheckerInterface
      */
     protected function getAssignmentChecker($entityClassName)
@@ -133,6 +178,7 @@ class OwnerDeletionManager
      * Gets a string represents the type of the given owner
      *
      * @param mixed $owner
+     *
      * @return string
      */
     protected function getOwnerType($owner)

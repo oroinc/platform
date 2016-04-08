@@ -104,7 +104,9 @@ class GridViewApiHandler
     }
 
     /**
-     * @todo Remove once https://github.com/symfony/symfony/issues/5906 is fixed
+     * @todo Remove once https://github.com/symfony/symfony/issues/5906 is fixed.
+     *       After removing this method PLEASE CHECK saving filters in grid view
+     *       look in CollectionFiltersManager._onChangeFilterSelect()
      *
      * @param GridView $gridView
      */
@@ -112,7 +114,7 @@ class GridViewApiHandler
     {
         $filters = $gridView->getFiltersData();
         foreach ($filters as $name => $filter) {
-            if (array_key_exists('type', $filter) && $filter['type'] == null) {
+            if (is_array($filter) && array_key_exists('type', $filter) && $filter['type'] == null) {
                 $filters[$name]['type'] = '';
             }
         }

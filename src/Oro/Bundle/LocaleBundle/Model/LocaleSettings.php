@@ -451,4 +451,20 @@ class LocaleSettings
 
         return array_intersect_key($localeLabels, array_combine($codes, $codes));
     }
+
+    /**
+     * @return int
+     */
+    public function getFirstQuarterMonth()
+    {
+        return $this->get('oro_locale.quarter_start')['month'];
+    }
+
+    /**
+     * @return int
+     */
+    public function getFirstQuarterDay()
+    {
+        return $this->get('oro_locale.quarter_start')['day'];
+    }
 }
