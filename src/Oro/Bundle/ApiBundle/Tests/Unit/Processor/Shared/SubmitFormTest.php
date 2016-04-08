@@ -44,7 +44,21 @@ class SubmitFormTest extends FormProcessorTestCase
 
     public function testProcess()
     {
-        $requestData = ['field1' => 123];
+        $requestData = [
+            'field1' => 123,
+            'field2' => false,
+            'field3' => [
+                'key1' => false
+            ]
+        ];
+        $expectedRequestData = [
+            'field1' => 123,
+            'field2' => 'false',
+            'field3' => [
+                'key1' => false
+            ]
+        ];
+
         $form = $this->getMock('Symfony\Component\Form\FormInterface');
 
         $form->expects($this->once())
@@ -52,7 +66,7 @@ class SubmitFormTest extends FormProcessorTestCase
             ->willReturn(false);
         $form->expects($this->once())
             ->method('submit')
-            ->with($requestData, false);
+            ->with($expectedRequestData, false);
 
         $this->context->setRequestData($requestData);
         $this->context->setForm($form);

@@ -76,7 +76,7 @@ oro_api:
         bigint:
             form_type: integer
         boolean:
-            form_type: boolean
+            form_type: oro_api_boolean
         decimal:
             form_type: number
         float:

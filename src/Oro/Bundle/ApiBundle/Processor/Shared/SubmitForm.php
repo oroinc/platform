@@ -7,14 +7,11 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 /**
- * Submits the request data to the form.
+ * Transforms and validates the request data via the form from the Context.
  */
 class SubmitForm implements ProcessorInterface
 {
-
-    /**
-     * @var bool
-     */
+    /** @var bool */
     protected $clearMissing;
 
     /**
@@ -43,6 +40,30 @@ class SubmitForm implements ProcessorInterface
             return;
         }
 
-        $form->submit($context->getRequestData(), $this->clearMissing);
+        $form->submit($this->prepareRequestData($context->getRequestData()), $this->clearMissing);
+    }
+
+    /**
+     * @param array $requestData
+     *
+     * @return array
+     */
+    protected function prepareRequestData(array $requestData)
+    {
+        /**
+         * as Symfony Form treats false as NULL due to checkboxes
+         * @see Symfony\Component\Form\Form::submit
+         * we have to convert false to its string representation here
+         */
+        array_walk(
+            $requestData,
+            function (&$value) {
+                if (false === $value) {
+                    $value = 'false';
+                }
+            }
+        );
+
+        return $requestData;
     }
 }

@@ -20,3 +20,8 @@ services:
             - [] # Data type mappings are inserted here by ConfigurationCompilerPass
         tags:
             - { name: oro.api.form.type_guesser, priority: 10 }
+
+    oro_api.type.boolean:
+        class: Oro\Bundle\ApiBundle\Form\Type\BooleanType
+        tags:
+            - { name: oro.api.form.type, alias: oro_api_boolean }
