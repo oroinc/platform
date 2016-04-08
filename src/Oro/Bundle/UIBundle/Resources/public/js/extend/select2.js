@@ -1,4 +1,4 @@
-define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($, __, Select2) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'], function($, _, __, Select2) {
     'use strict';
 
     /**
@@ -167,6 +167,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
                 });
             }
         };
+
     }(Select2['class'].abstract.prototype));
 
     (function(prototype) {
@@ -203,6 +204,13 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
             this.pagePath = '';
             clear.apply(this, arguments);
         };
+
+        prototype.postprocessResults = _.wrap(prototype.postprocessResults, function(original) {
+            original.apply(this, _.rest(arguments));
+            if (this.opts.dontSelectFirstOptionOnOpen) {
+                this.results.find(".select2-highlighted").removeClass("select2-highlighted");
+            }
+        });
     }(Select2['class'].single.prototype));
 
     // Override methods of MultiSelect2 class
@@ -336,6 +344,13 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
 
             val.push(id);
         };
+
+        prototype.postprocessResults = _.wrap(prototype.postprocessResults, function(original) {
+            original.apply(this, _.rest(arguments));
+            if (this.opts.dontSelectFirstOptionOnOpen) {
+                this.results.find(".select2-highlighted").removeClass("select2-highlighted");
+            }
+        });
     }(Select2['class'].multi.prototype));
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
