@@ -4,7 +4,7 @@ define(function(require) {
     var ActionLauncher;
     var $ = require('jquery');
     var _ = require('underscore');
-    var utils = require('chaplin').utils;
+    var tools = require('oroui/js/tools');
     var Backbone = require('backbone');
     var module = require('module');
 
@@ -217,7 +217,7 @@ define(function(require) {
                         $link.closest('.btn-group').toggleClass('open');
                     }
                 }
-                if (utils.modifierKeyPressed(e)) {
+                if (tools.targetBlankEvent(e)) {
                     actionOptions.target = '_blank';
                 }
                 this.action.run(actionOptions);

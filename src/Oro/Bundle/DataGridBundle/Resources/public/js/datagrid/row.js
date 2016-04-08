@@ -2,13 +2,12 @@ define([
     'jquery',
     'underscore',
     'backgrid',
-    'chaplin'
-], function($, _, Backgrid, Chaplin) {
+    'oroui/js/tools'
+], function($, _, Backgrid, tools) {
     'use strict';
 
     var Row;
     var document = window.document;
-    var utils = Chaplin.utils;
 
     /**
      * Grid row.
@@ -177,7 +176,7 @@ define([
             if (!this.clickPermit) {
                 return;
             }
-            if (utils.modifierKeyPressed(e)) {
+            if (tools.targetBlankEvent(e)) {
                 options.target = '_blank';
                 clickFunction();
                 return;
