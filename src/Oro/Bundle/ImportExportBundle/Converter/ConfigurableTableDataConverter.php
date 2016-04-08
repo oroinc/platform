@@ -69,20 +69,23 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
 
         foreach ($fields as $field) {
             $fieldName = $field['name'];
-            $foundFieldByName = !$isSearchingIdentityField && $fieldName !== $initialFieldName;
+            $notFoundFieldName = !$isSearchingIdentityField && $fieldName !== $initialFieldName;
             $foundIdentifyField = $this->fieldHelper->getConfigValue($entityClassName, $fieldName, 'identity');
-            $foundFieldByIdentify = $isSearchingIdentityField && !$foundIdentifyField;
+            $notFoundFieldIdentify = $isSearchingIdentityField && !$foundIdentifyField;
 
-            if ($foundFieldByName || $foundFieldByIdentify) {
+            if ($notFoundFieldName || $notFoundFieldIdentify) {
                 continue;
             }
 
             if ($this->fieldHelper->isRelation($field) &&
                 !$this->fieldHelper->processRelationAsScalar($entityClassName, $fieldName)) {
-                $this->getFieldHeader2($field['related_entity_name'], null, true);
+                return
+                    $this->getFieldHeader($entityClassName, $field) .
+                    $this->relationDelimiter .
+                    $this->getFieldHeaderWithRelation($field['related_entity_name'], null, true);
             }
 
-            return $this->getFieldHeader($entityClassName, $initialFieldName);
+            return $this->getFieldHeader($entityClassName, $field);
         }
 
         return null;
