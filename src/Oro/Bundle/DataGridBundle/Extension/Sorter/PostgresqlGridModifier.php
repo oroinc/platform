@@ -175,7 +175,7 @@ class PostgresqlGridModifier extends AbstractExtension
         foreach ($queryBuilder->getDQLPart('select') as $select) {
             $selectString = ltrim(strtolower((string)$select));
             if (strpos($selectString, 'distinct ') === 0) {
-                $selectString = strpos($selectString, 9);
+                $selectString = substr($selectString, 9);
             }
             // if field itself or field with alias
             if ($selectString === $field ||
