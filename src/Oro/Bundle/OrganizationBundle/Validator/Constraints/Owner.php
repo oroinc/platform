@@ -9,7 +9,7 @@ use Symfony\Component\Validator\Constraint;
  */
 class Owner extends Constraint
 {
-    public $message = 'The given value {{ value }} cannot be set as {{ owner }} for given entity for security reason.';
+    public $message = 'You have no access to set this value as {{ owner }}.';
 
     /**
      * {@inheritdoc}

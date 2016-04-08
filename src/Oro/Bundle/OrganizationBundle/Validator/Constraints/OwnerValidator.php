@@ -5,6 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Validator\Constraints;
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\Form\Form;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
 
@@ -17,6 +18,7 @@ use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataInterface;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\OwnershipMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Symfony\Component\Validator\Context\ExecutionContextInterface;
 
 class OwnerValidator extends ConstraintValidator
 {
@@ -109,9 +111,12 @@ class OwnerValidator extends ConstraintValidator
         }
 
         if (!$isOwnerValid) {
-            $this->context->buildViolation($constraint->message)
-                ->setParameter('{{ value }}', $owner->getId())
-                ->setParameter('{{ owner }}', $ownershipMetadata->getOwnerFieldName())
+            $ownerFieldName = $ownershipMetadata->getOwnerFieldName();
+            /** @var ExecutionContextInterface $context */
+            $context = $this->context;
+            $context->buildViolation($constraint->message)
+                ->atPath($ownerFieldName)
+                ->setParameter('{{ owner }}', $ownerFieldName)
                 ->addViolation();
         }
     }

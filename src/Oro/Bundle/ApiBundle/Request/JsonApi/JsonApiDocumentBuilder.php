@@ -7,6 +7,7 @@ use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\EntityIdAccessor;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\ErrorHandler;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\ObjectAccessor;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\ObjectAccessorInterface;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -44,6 +45,9 @@ class JsonApiDocumentBuilder
     /** @var RequestType */
     protected $requestType;
 
+    /** @var ErrorHandler */
+    protected $errorHandler;
+
     /**
      * @param ValueNormalizer              $valueNormalizer
      * @param EntityIdTransformerInterface $entityIdTransformer
@@ -61,6 +65,7 @@ class JsonApiDocumentBuilder
             $this->entityIdTransformer
         );
         $this->requestType      = new RequestType([RequestType::JSON_API]);
+        $this->errorHandler = new ErrorHandler();
     }
 
     /**
@@ -120,15 +125,16 @@ class JsonApiDocumentBuilder
     /**
      * Sets error.
      *
-     * @param Error $error
+     * @param Error          $error
+     * @param EntityMetadata $metadata
      *
      * @return self
      */
-    public function setErrorObject(Error $error)
+    public function setErrorObject(Error $error, EntityMetadata $metadata = null)
     {
         $this->assertNoData();
 
-        $this->result[self::ERRORS] = [$this->handleError($error)];
+        $this->result[self::ERRORS] = [$this->errorHandler->handleError($error, $metadata)];
 
         return $this;
     }
@@ -137,16 +143,17 @@ class JsonApiDocumentBuilder
      * Sets errors collection.
      *
      * @param Error[] $errors
+     * @param EntityMetadata $metadata
      *
      * @return self
      */
-    public function setErrorCollection(array $errors)
+    public function setErrorCollection(array $errors, EntityMetadata $metadata = null)
     {
         $this->assertNoData();
 
         $errorsData = [];
         foreach ($errors as $error) {
-            $errorsData[] = $this->handleError($error);
+            $errorsData[] = $this->errorHandler->handleError($error, $metadata);
         }
         $this->result[self::ERRORS] = $errorsData;
 
@@ -412,29 +419,5 @@ class JsonApiDocumentBuilder
                 is_object($value) ? get_class($value) : gettype($value)
             )
         );
-    }
-
-    /**
-     * @param Error $error
-     *
-     * @return array
-     */
-    protected function handleError(Error $error)
-    {
-        $result = [];
-        if ($error->getStatusCode()) {
-            $result['code'] = (string)$error->getStatusCode();
-        }
-        if ($error->getDetail()) {
-            $result['detail'] = $error->getDetail();
-        }
-        if ($error->getTitle()) {
-            $result['title'] = $error->getTitle();
-        }
-        if ($error->getPropertyName()) {
-            $result['source'] = $error->getPropertyName();
-        }
-
-        return $result;
     }
 }

@@ -36,7 +36,7 @@ abstract class BuildJsonApiDocument implements ProcessorInterface
 
         if ($context->hasErrors()) {
             try {
-                $documentBuilder->setErrorCollection($context->getErrors());
+                $documentBuilder->setErrorCollection($context->getErrors(), $context->getMetadata());
                 // remove errors from the Context to avoid processing them by other processors
                 $context->resetErrors();
             } catch (\Exception $e) {
@@ -64,7 +64,7 @@ abstract class BuildJsonApiDocument implements ProcessorInterface
         $error = new Error();
         $error->setInnerException($e);
         $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
-        $documentBuilder->setErrorObject($error);
+        $documentBuilder->setErrorObject($error, $context->getMetadata());
     }
 
     /**

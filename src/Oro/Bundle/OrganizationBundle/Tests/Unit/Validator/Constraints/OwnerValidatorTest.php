@@ -248,11 +248,15 @@ class OwnerValidatorTest extends \PHPUnit_Framework_TestCase
             $violation->expects($this->never())->method('setParameter');
             $context->expects($this->never())->method('buildViolation');
         } else {
-            $violation->expects($this->exactly(2))->method('setParameter')->willReturnSelf();
+            $violation->expects($this->once())->method('setParameter')->willReturnSelf();
             $context->expects($this->once())
                 ->method('buildViolation')
-                ->with('The given value {{ value }} cannot be set as {{ owner }} for given entity for security reason.')
+                ->with('You have no access to set this value as {{ owner }}.')
                 ->willReturn($violation);
+            $violation->expects($this->once())
+                ->method('atPath')
+                ->with('owner')
+                ->willReturnSelf();
         }
 
         $this->validator->initialize($context);
