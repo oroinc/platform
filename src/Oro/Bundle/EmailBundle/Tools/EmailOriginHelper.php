@@ -140,8 +140,8 @@ class EmailOriginHelper
     protected function getInternalFilter(OrganizationInterface $organization = null)
     {
         return function ($item) use ($organization) {
-            return $item instanceof InternalEmailOrigin
-            && (!$organization || $item->getOrganization() === $organization);
+            return ($item->getOrganization() === $organization || !$organization)
+                        && $item instanceof InternalEmailOrigin;
         };
     }
 
