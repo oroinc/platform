@@ -202,7 +202,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                     ],
                     'importexport' => [
-                        'identity' => false,
+                        'identity' => true,
                     ],
                 ]
             ]
@@ -219,10 +219,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                     ],
                     'datagrid' => [
                         'is_visible' => DatagridScope::IS_VISIBLE_FALSE
-                    ]
-                ],
-                'importexport' => [
-                    'identity' => true,
+                    ],
                 ],
             ]
         );
