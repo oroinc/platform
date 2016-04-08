@@ -92,6 +92,19 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 10 }
 
+    # VIEW permissions are required to create an entity because the newly created entity should be returned in response
+    # the "security_check" group is disabled for the "get" action is executed by
+    # the "oro_api.create.load_normalized_entity" processor
+    # so, if you add own security processor there, add it here as well
+    oro_api.create.entity_type_security_check.view:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
+        arguments:
+            - @oro_api.doctrine_helper
+            - @oro_security.security_facade
+            - VIEW
+        tags:
+            - { name: oro.api.processor, action: create, group: security_check, priority: 5 }
+
     #
     # load_data
     #

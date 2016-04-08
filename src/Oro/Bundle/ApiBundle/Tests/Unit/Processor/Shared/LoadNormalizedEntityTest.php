@@ -77,6 +77,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
         $expectedGetContext->setRequestHeaders($this->context->getRequestHeaders());
         $expectedGetContext->setClassName($this->context->getClassName());
         $expectedGetContext->setId($this->context->getId());
+        $expectedGetContext->skipGroup('security_check');
         $expectedGetContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
 
         $getProcessor->expects($this->once())

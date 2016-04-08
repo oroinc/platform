@@ -52,6 +52,7 @@ class LoadNormalizedEntity implements ProcessorInterface
         /** @var GetContext $getContext */
         $getContext = $getProcessor->createContext();
         $getContext->setId($entityId);
+        $getContext->skipGroup('security_check');
         $getContext->skipGroup(RequestActionProcessor::NORMALIZE_RESULT_GROUP);
         $this->prepareGetContext($getContext, $context);
 
