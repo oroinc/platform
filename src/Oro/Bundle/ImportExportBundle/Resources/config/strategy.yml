@@ -10,6 +10,7 @@ services:
             - @validator
             - @translator
             - @oro_importexport.field.field_helper
+            - @oro_importexport.data_converter.configurable
         calls:
             - [setConfigProvider, [@oro_entity_config.provider.extend]]
 
