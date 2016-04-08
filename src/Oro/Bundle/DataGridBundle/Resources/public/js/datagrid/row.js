@@ -1,12 +1,14 @@
 define([
     'jquery',
     'underscore',
-    'backgrid'
-], function($, _, Backgrid) {
+    'backgrid',
+    'chaplin'
+], function($, _, Backgrid, Chaplin) {
     'use strict';
 
     var Row;
     var document = window.document;
+    var utils = Chaplin.utils;
 
     /**
      * Grid row.
@@ -129,9 +131,10 @@ define([
             // remember selection and target
             var $target = this.$(e.target);
             var exclude;
+            var allowed;
             if (this.themeOptions.actionSelector) {
-                exclude = this.themeOptions.actionSelector;
-                if (!$target.is(exclude) && !$target.parents(exclude).length) {
+                allowed = this.themeOptions.actionSelector;
+                if (!$target.is(allowed) && !$target.parents(allowed).length) {
                     return;
                 }
             } else {
@@ -154,23 +157,32 @@ define([
         },
 
         onClick: function(e) {
+            e.preventDefault();
             var _this = this;
-            if (this.clickPermit) {
-                this.clickTimeout = setTimeout(function() {
-                    if (_this.disposed) {
-                        return;
+            var options = {};
+            var clickFunction = function() {
+                if (_this.disposed) {
+                    return;
+                }
+                _this.trigger('clicked', _this, options);
+                for (var i = 0; i < _this.cells.length; i++) {
+                    var cell = _this.cells[i];
+                    if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
+                        cell.onRowClicked(_this, e);
                     }
-                    _this.trigger('clicked', _this, e);
-                    for (var i = 0; i < _this.cells.length; i++) {
-                        var cell = _this.cells[i];
-                        if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
-                            cell.onRowClicked(_this, e);
-                        }
-                    }
-                    _this.$el.removeClass('mouse-down');
-                    delete _this.clickTimeout;
-                }, this.DOUBLE_CLICK_WAIT_TIMEOUT);
+                }
+                _this.$el.removeClass('mouse-down');
+                delete _this.clickTimeout;
+            };
+            if (!this.clickPermit) {
+                return;
             }
+            if (utils.modifierKeyPressed(e)) {
+                options.target = '_blank';
+                clickFunction();
+                return;
+            }
+            this.clickTimeout = setTimeout(clickFunction, this.DOUBLE_CLICK_WAIT_TIMEOUT);
         },
 
         /**

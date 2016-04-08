@@ -261,7 +261,6 @@ define([
             var parser;
             var pathname;
             var query;
-            var windowObject;
             var getUrl = function(pathname, query) {
                 query = utils.queryParams.parse(query);
                 query._rand = Math.random();
@@ -283,10 +282,7 @@ define([
                 fullRedirect: this.fullRedirect
             });
             if (options.target === '_blank') {
-                windowObject = window.open(getUrl(pathname, query), '_blank');
-                if (windowObject) {
-                    windowObject.focus();
-                }
+                window.open(getUrl(pathname, query), '_blank');
                 return;
             }
             if (options.fullRedirect) {

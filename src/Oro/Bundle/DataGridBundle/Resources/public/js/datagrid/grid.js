@@ -4,7 +4,6 @@ define(function(require) {
     var Grid;
     var $ = require('jquery');
     var _ = require('underscore');
-    var utils = require('chaplin').utils;
     var Backbone = require('backbone');
     var Backgrid = require('backgrid');
     var __ = require('orotranslation/js/translator');
@@ -633,9 +632,9 @@ define(function(require) {
          * @private
          */
         _listenToContentEvents: function() {
-            this.listenTo(this.body, 'rowClicked', function(row, event) {
+            this.listenTo(this.body, 'rowClicked', function(row, options) {
                 this.trigger('rowClicked', this, row);
-                this._runRowClickAction(row, event);
+                this._runRowClickAction(row, options);
             });
             this.listenTo(this.columns, 'change:renderable', function() {
                 this.trigger('content:update');
@@ -653,12 +652,11 @@ define(function(require) {
          * Create row click action
          *
          * @param {orodatagrid.datagrid.Row} row
-         * @param {jQuery.Event} event
+         * @param {Object} options
          * @private
          */
-        _runRowClickAction: function(row, event) {
+        _runRowClickAction: function(row, options) {
             var config;
-            var actionOptions = {};
             if (!this.rowClickAction) {
                 return;
             }
@@ -672,10 +670,7 @@ define(function(require) {
             }
             config = row.model.get('action_configuration');
             if (!config || config[action.name] !== false) {
-                if (utils.modifierKeyPressed(event)) {
-                    actionOptions.target = '_blank';
-                }
-                action.run(actionOptions);
+                action.run(options);
             }
         },
 
