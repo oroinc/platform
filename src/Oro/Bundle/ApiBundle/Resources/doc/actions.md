@@ -85,7 +85,7 @@ Existing worker processors: [processors.get.yml](../../Resources/config/processo
 
 This action has the following processor groups:
 
-| Group Name | <nowrap>Responsibility of Processors</nowrap> | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted. | If you add a new processor in this group, it should be added in the **security_check** group of actions that execute this action, e.g. look at **security_check** group of [create](#create-action) or [update](#update-action) actions. |
@@ -111,7 +111,7 @@ Existing worker processors: [processors.get_list.yml](../../Resources/config/pro
 
 This action has the following processor groups:
 
-| Group Name | <nowrap>Responsibility of Processors</nowrap> | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | |
@@ -137,7 +137,7 @@ Existing worker processors: [processors.delete.yml](../../Resources/config/proce
 
 This action has the following processor groups:
 
-| Group Name | <nowrap>Responsibility of Processors</nowrap> | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | |
@@ -169,7 +169,7 @@ Existing worker processors: [processors.delete_list.yml](../../Resources/config/
 
 This action has the following processor groups:
 
-| Group Name | <nowrap>Responsibility of Processors</nowrap> | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | |
@@ -195,7 +195,7 @@ Existing worker processors: [processors.create.yml](../../Resources/config/proce
 
 This action has the following processor groups:
 
-| Group Name | <nowrap>Responsibility of Processors</nowrap> | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to a newly created entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.create.load_normalized_entity** processor. |
@@ -223,7 +223,7 @@ Existing worker processors: [processors.update.yml](../../Resources/config/proce
 
 This action has the following processor groups:
 
-| Group Name | <nowrap>Responsibility of Processors</nowrap> | Description |
+| Group Name | Responsibility&nbsp;of&nbsp;Processors | Description |
 | --- | --- | --- |
 | initialize | Initializing of the context | Also the processors from this group are executed when Data API documentation is generated. |
 | security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to updated entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.update.load_normalized_entity** processor. |
