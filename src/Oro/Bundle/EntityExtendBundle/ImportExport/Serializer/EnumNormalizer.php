@@ -2,12 +2,28 @@
 
 namespace Oro\Bundle\EntityExtendBundle\ImportExport\Serializer;
 
+use Doctrine\Common\Util\ClassUtils;
+
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
 {
+    /**
+     * @var FieldHelper
+     */
+    protected $fieldHelper;
+
+    /**
+     * @param FieldHelper $fieldHelper
+     */
+    public function __construct(FieldHelper $fieldHelper)
+    {
+        $this->fieldHelper = $fieldHelper;
+    }
+
     /**
      * @param AbstractEnumValue $object
      *
@@ -20,7 +36,7 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
         }
 
         if (!empty($context['mode']) && $context['mode'] === 'short') {
-            return ['name' => $object->getName()];
+            return $this->getShortData($object);
         }
 
         return [
@@ -62,5 +78,18 @@ class EnumNormalizer implements NormalizerInterface, DenormalizerInterface
     public function supportsNormalization($data, $format = null, array $context = [])
     {
         return $data instanceof AbstractEnumValue;
+    }
+
+    /**
+     * @param AbstractEnumValue $object
+     * @return array
+     */
+    protected function getShortData(AbstractEnumValue $object)
+    {
+        if ($this->fieldHelper->getConfigValue(ClassUtils::getClass($object), 'name', 'identity')) {
+            return ['name' => $object->getName()];
+        } else {
+            return ['id' => $object->getId()];
+        }
     }
 }

@@ -226,9 +226,9 @@ define([
             var order;
 
             if (direction === 'ascending') {
-                order = -1;
+                order = '-1';
             } else if (direction === 'descending') {
-                order = 1;
+                order = '1';
             } else {
                 order = null;
             }

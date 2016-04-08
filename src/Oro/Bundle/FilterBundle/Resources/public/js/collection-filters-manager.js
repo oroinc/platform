@@ -126,10 +126,10 @@ define([
                     if (!filter.isEmpty()) {
                         state[name] = filter.getValue();
                     } else if (!filter.defaultEnabled) {
-                        state[shortName] = 1;
+                        state[shortName] = '1';
                     }
                 } else if (filter.defaultEnabled) {
-                    state[shortName] = 0;
+                    state[shortName] = '0';
                 }
             }, this);
 
