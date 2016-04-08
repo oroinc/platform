@@ -20,7 +20,7 @@ class BooleanToStringTransformer implements DataTransformerInterface
             throw new TransformationFailedException('Expected a boolean.');
         }
 
-        return $value ? '1' : '0';
+        return $value ? 'true' : 'false';
     }
 
     /**

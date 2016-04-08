@@ -19,8 +19,8 @@ class BooleanToStringTransformerTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [null, ''],
-            [true, '1'],
-            [false, '0'],
+            [true, 'true'],
+            [false, 'false'],
         ];
     }
 
