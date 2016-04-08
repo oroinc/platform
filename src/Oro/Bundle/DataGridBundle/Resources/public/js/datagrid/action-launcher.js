@@ -217,7 +217,7 @@ define(function(require) {
                         $link.closest('.btn-group').toggleClass('open');
                     }
                 }
-                if (tools.targetBlankEvent(e)) {
+                if (tools.isTargetBlankEvent(e)) {
                     actionOptions.target = '_blank';
                 }
                 this.action.run(actionOptions);

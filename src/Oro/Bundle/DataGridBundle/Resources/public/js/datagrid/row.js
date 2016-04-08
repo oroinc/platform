@@ -176,7 +176,7 @@ define([
             if (!this.clickPermit) {
                 return;
             }
-            if (tools.targetBlankEvent(e)) {
+            if (tools.isTargetBlankEvent(e)) {
                 options.target = '_blank';
                 clickFunction();
                 return;

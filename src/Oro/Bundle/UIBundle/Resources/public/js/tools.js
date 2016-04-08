@@ -296,7 +296,7 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
         /**
          * @param {Object} event
          */
-        targetBlankEvent: function(event) {
+        isTargetBlankEvent: function(event) {
             var mouseMiddleButton = 2;
             return this.modifierKeyPressed(event) || event.which === mouseMiddleButton;
         }
