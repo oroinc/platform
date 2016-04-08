@@ -9,7 +9,7 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 class EntityPaginationExtension extends AbstractExtension
 {
     const ENTITY_PAGINATION_PATH = '[options][entity_pagination]';
-    const ENTITY_PAGINATION_CONFIG_PATH = '[options][entity_pagination_target]';
+    const ENTITY_PAGINATION_TARGET_PATH = '[options][entity_pagination_target]';
 
     /**
      * {@inheritdoc}
