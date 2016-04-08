@@ -65,7 +65,8 @@ class CollectFormErrors implements ProcessorInterface
     }
 
     /**
-     * @param FormError $error
+     * @param FormError     $error
+     * @param FormInterface $form
      *
      * @return string|null
      */
