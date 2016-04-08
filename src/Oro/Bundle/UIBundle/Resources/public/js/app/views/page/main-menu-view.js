@@ -31,6 +31,9 @@ define([
                 if (!_.isUndefined(data.mainMenu)) {
                     PageMainMenuView.__super__.render.call(this);
                     this.initRouteMatches();
+                } else {
+                    this.initLayout()
+                        .done(_.bind(this._resolveDeferredRender, this));
                 }
             } else {
                 this.initRouteMatches();
