@@ -4,6 +4,8 @@ namespace Oro\Bundle\DataGridBundle\Tests\Functional\Extension;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
+use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
 
@@ -12,12 +14,16 @@ use Oro\Bundle\EntityBundle\ORM\DatabaseDriverInterface;
  */
 class PostgresqlGridModifierTest extends WebTestCase
 {
+    protected $gridName = 'users-grid';
+    protected $gridParameters = [];
+    protected $identifier = 'u.id';
+
     /**
      * @var ContainerInterface
      */
     protected $container;
 
-    public function setUp()
+    protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
         $this->container = $this->client->getKernel()->getContainer();
@@ -43,9 +49,13 @@ class PostgresqlGridModifierTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_user_index'));
 
         $isFoundIdentifier = false;
-        $usersGrid = $this->container->get('oro_datagrid.datagrid.manager')->getDatagrid('users-grid');
+        $usersGrid = $this->container->get('oro_datagrid.datagrid.manager')->getDatagrid(
+            $this->gridName,
+            $this->gridParameters
+        );
         //this is just running my extension
         $usersGrid->getData();
+        /** @var QueryBuilder $queryBuilder */
         $queryBuilder = $usersGrid->getDatasource()->getQueryBuilder();
         $queryBuilder->setFirstResult(0)->setMaxResults(10);
         $idsWithLittleLimit = array_map($getIdFunction, $queryBuilder->getQuery()->getResult());
@@ -55,7 +65,7 @@ class PostgresqlGridModifierTest extends WebTestCase
 
         foreach ($orderByParts as $part) {
             $parts = $part->getParts();
-            if (in_array('u.id ASC', $parts, true) !== false) {
+            if (in_array($this->identifier . ' ASC', $parts, true) !== false) {
                 $isFoundIdentifier = true;
                 break;
             }
@@ -63,5 +73,8 @@ class PostgresqlGridModifierTest extends WebTestCase
 
         $this->assertTrue($isFoundIdentifier);
         $this->assertEquals($idsWithLargeLimit, $idsWithLittleLimit);
+
+        // make sure query builder valid
+        $queryBuilder->getQuery()->execute();
     }
 }
