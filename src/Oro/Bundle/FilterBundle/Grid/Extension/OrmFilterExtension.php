@@ -6,18 +6,18 @@ use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
-
 use Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Configuration as FormatterConfiguration;
 use Oro\Bundle\DataGridBundle\Extension\Formatter\Property\PropertyInterface;
-use Oro\Bundle\FilterBundle\Filter\FilterUtility;
-use Oro\Bundle\FilterBundle\Filter\FilterInterface;
-use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 use Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension;
+
+use Oro\Bundle\FilterBundle\Filter\FilterUtility;
+use Oro\Bundle\FilterBundle\Filter\FilterInterface;
+use Oro\Bundle\FilterBundle\Datasource\Orm\OrmFilterDatasourceAdapter;
 
 class OrmFilterExtension extends AbstractExtension
 {
@@ -112,21 +112,22 @@ class OrmFilterExtension extends AbstractExtension
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $filtersState        = $data->offsetGetByPath('[state][filters]', []);
-        $initialFiltersState = $filtersState;
+        $initialFiltersState = $data->offsetGetByPath('[initialState][filters]', []);
         $filtersMetaData     = [];
 
         $filters       = $this->getFiltersToApply($config);
         $values        = $this->getValuesToApply($config);
         $initialValues = $this->getValuesToApply($config, false);
         $lazy          = $data->offsetGetOr(MetadataObject::LAZY_KEY, true);
-
+        $filtersParams = $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
         foreach ($filters as $filter) {
             if (!$lazy) {
                 $filter->resolveOptions();
             }
-            $value        = $this->getFilterValue($values, $filter->getName());
-            $initialValue = $this->getFilterValue($initialValues, $filter->getName());
-
+            $name             = $filter->getName();
+            $value            = $this->getFilterValue($values, $name);
+            $initialValue     = $this->getFilterValue($initialValues, $name);
+            $filtersState        = $this->updateFilterStateEnabled($name, $filtersParams, $filtersState);
             $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
             $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
 
@@ -151,8 +152,9 @@ class OrmFilterExtension extends AbstractExtension
 
     /**
      * @param FilterInterface $filter
-     * @param mixed $value
-     * @param array $state
+     * @param mixed           $value
+     * @param array           $state
+     *
      * @return array
      */
     protected function updateFiltersState(FilterInterface $filter, $value, array $state)
@@ -193,7 +195,7 @@ class OrmFilterExtension extends AbstractExtension
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
             $minifiedParameters = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
-            $filters = [];
+            $filters            = [];
 
             if (array_key_exists(self::MINIFIED_FILTER_PARAM, $minifiedParameters)) {
                 $filters = $minifiedParameters[self::MINIFIED_FILTER_PARAM];
@@ -302,5 +304,24 @@ class OrmFilterExtension extends AbstractExtension
     protected function getFilterValue(array $values, $key, $default = false)
     {
         return isset($values[$key]) ? $values[$key] : $default;
+    }
+
+    /**
+     * Set state of filters(enable or disable) from parameters by special key - "__{$filterName}"
+     *
+     * @param string $name
+     * @param array  $filtersParams
+     * @param array  $state
+     *
+     * @return array
+     */
+    protected function updateFilterStateEnabled($name, array $filtersParams, array $state)
+    {
+        $filterEnabledKey = sprintf('__%s', $name);
+        if (isset($filtersParams[$filterEnabledKey])) {
+            $state[$filterEnabledKey] = $filtersParams[$filterEnabledKey];
+        }
+
+        return $state;
     }
 }

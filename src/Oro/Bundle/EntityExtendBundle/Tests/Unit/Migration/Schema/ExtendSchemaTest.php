@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\Schema;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\FieldTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Migration\ExtendOptionsManager;
@@ -111,7 +112,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
             [
                 'length'        => 100,
                 OroOptions::KEY => [
-                    'datagrid' => ['is_visible' => false, 'other' => 'val'],
+                    'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE, 'other' => 'val'],
                 ]
             ]
         );
@@ -122,7 +123,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                 'length'        => 100,
                 OroOptions::KEY => [
                     'extend'   => ['owner' => ExtendScope::OWNER_CUSTOM],
-                    'datagrid' => ['is_visible' => false],
+                    'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
                 ]
             ]
         );
@@ -169,7 +170,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
         $configurableColumn1->setOptions(
             [
                 OroOptions::KEY => [
-                    'datagrid' => ['is_visible' => true],
+                    'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_TRUE],
                     'form'     => ['is_enabled' => false],
                 ]
             ]
@@ -206,7 +207,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                         'configurable_column1' => [
                             'type'    => 'string',
                             'configs' => [
-                                'datagrid' => ['is_visible' => true, 'other' => 'val'],
+                                'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_TRUE, 'other' => 'val'],
                                 'form'     => ['is_enabled' => false],
                             ]
                         ],
@@ -214,7 +215,7 @@ class ExtendSchemaTest extends \PHPUnit_Framework_TestCase
                             'type'    => 'string',
                             'configs' => [
                                 'extend'   => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
-                                'datagrid' => ['is_visible' => false]
+                                'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
                             ]
                         ],
                         'ref_column1'          => [

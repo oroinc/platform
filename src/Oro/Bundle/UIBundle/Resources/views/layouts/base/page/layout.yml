@@ -17,6 +17,12 @@ layout:
                     options:
                         name: viewport
                         content: 'width=device-width, initial-scale=1'
+                theme_icon:
+                    blockType: external_resource
+                    options:
+                        visible: { @not_empty: $data.theme.icon }
+                        href: { @asset: $data.theme.icon }
+                        rel: shortcut icon
                 styles:
                     blockType: style
                     options:
@@ -39,6 +45,7 @@ layout:
                         title: ~
                         meta_charset: ~
                         meta_viewport: ~
+                        theme_icon: ~
                         styles: ~
                         scripts_before: ~
                         require_js: ~

@@ -31,6 +31,7 @@ namespace OroCRM\Bundle\AccountBundle\Migrations\Schema\v1_0;
 use Doctrine\DBAL\Schema\Schema;
 use Oro\Bundle\MigrationBundle\Migration\Migration;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class OroCRMAccountBundle implements Migration
@@ -44,7 +45,7 @@ class OroCRMAccountBundle implements Migration
             [
                 'oro_options' => [
                     'extend'   => ['owner' => ExtendScope::OWNER_CUSTOM],
-                    'datagrid' => ['is_visible' => false],
+                    'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
                     'merge'    => ['display' => true],
                 ]
             ]

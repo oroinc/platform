@@ -80,7 +80,7 @@ class CountQueryBuilderOptimizerTest extends OrmTestCase
                         ->from('Test:User', 'u')
                         ->select(['u.id', 'DISTINCT u.username']);
                 },
-                'expectedDQL' => 'SELECT u.id FROM Test:User u'
+                'expectedDQL' => 'SELECT DISTINCT u.username, u.id FROM Test:User u'
             ],
             'group_test' => [
                 'queryBuilder' => function ($em) {
