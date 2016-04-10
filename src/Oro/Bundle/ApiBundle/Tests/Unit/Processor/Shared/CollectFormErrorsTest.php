@@ -11,6 +11,7 @@ use Symfony\Component\Validator\Validation;
 use Doctrine\Common\Annotations\AnnotationReader;
 
 use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
@@ -74,8 +75,8 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->assertTrue($this->context->hasErrors());
         $this->assertEquals(
             [
-                $this->createErrorObject('This value should not be blank.', 'field1'),
-                $this->createErrorObject('This value should not be blank.', 'field2')
+                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field1'),
+                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field2')
             ],
             $this->context->getErrors()
         );
@@ -101,8 +102,12 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->assertTrue($this->context->hasErrors());
         $this->assertEquals(
             [
-                $this->createErrorObject('This form should not contain extra fields.', 'testForm'),
-                $this->createErrorObject('This value should not be blank.', 'field2')
+                $this->createErrorObject(
+                    'extra fields constraint',
+                    'This form should not contain extra fields.',
+                    'testForm'
+                ),
+                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field2')
             ],
             $this->context->getErrors()
         );
@@ -130,7 +135,7 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->assertTrue($this->context->hasErrors());
         $this->assertEquals(
             [
-                $this->createErrorObject('This value should not be blank.', 'title'),
+                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'title'),
             ],
             $this->context->getErrors()
         );
@@ -156,9 +161,13 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         $this->assertTrue($this->context->hasErrors());
         $this->assertEquals(
             [
-                $this->createErrorObject('This value should not be blank.', 'field1'),
-                $this->createErrorObject('This value should not be null.', 'field1'),
-                $this->createErrorObject('This value is too long. It should have 4 characters or less.', 'field2')
+                $this->createErrorObject('not blank constraint', 'This value should not be blank.', 'field1'),
+                $this->createErrorObject('not null constraint', 'This value should not be null.', 'field1'),
+                $this->createErrorObject(
+                    'length constraint',
+                    'This value is too long. It should have 4 characters or less.',
+                    'field2'
+                )
             ],
             $this->context->getErrors()
         );
@@ -181,17 +190,23 @@ class CollectFormErrorsTest extends FormProcessorTestCase
     }
 
     /**
-     * @param string $errorMessage
+     * @param string $title
+     * @param string $detail
      * @param string $propertyPath
      *
      * @return Error
      */
-    protected function createErrorObject($errorMessage, $propertyPath)
+    protected function createErrorObject($title, $detail, $propertyPath)
     {
         $error = new Error();
-        $error->setDetail($errorMessage);
-        $error->setPropertyName($propertyPath);
         $error->setStatusCode(400);
+        $error->setTitle($title);
+        $error->setDetail($detail);
+        if ($propertyPath) {
+            $errorSource = new ErrorSource();
+            $errorSource->setPropertyPath($propertyPath);
+            $error->setSource($errorSource);
+        }
 
         return $error;
     }

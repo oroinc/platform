@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument;
+namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 
 class ObjectAccessor implements ObjectAccessorInterface
 {

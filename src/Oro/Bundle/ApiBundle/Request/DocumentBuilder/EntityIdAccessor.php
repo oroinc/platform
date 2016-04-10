@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument;
+namespace Oro\Bundle\ApiBundle\Request\DocumentBuilder;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
@@ -21,7 +21,7 @@ class EntityIdAccessor
         ObjectAccessorInterface $objectAccessor,
         EntityIdTransformerInterface $entityIdTransformer
     ) {
-        $this->objectAccessor      = $objectAccessor;
+        $this->objectAccessor = $objectAccessor;
         $this->entityIdTransformer = $entityIdTransformer;
     }
 
@@ -37,7 +37,7 @@ class EntityIdAccessor
     {
         $result = null;
 
-        $idFieldNames      = $metadata->getIdentifierFieldNames();
+        $idFieldNames = $metadata->getIdentifierFieldNames();
         $idFieldNamesCount = count($idFieldNames);
         if ($idFieldNamesCount === 1) {
             $fieldName = reset($idFieldNames);

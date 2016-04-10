@@ -3,8 +3,8 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi\JsonApiDocument;
 
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\ArrayAccessor;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\EntityIdAccessor;
+use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ArrayAccessor;
+use Oro\Bundle\ApiBundle\Request\DocumentBuilder\EntityIdAccessor;
 
 class EntityIdAccessorTest extends \PHPUnit_Framework_TestCase
 {

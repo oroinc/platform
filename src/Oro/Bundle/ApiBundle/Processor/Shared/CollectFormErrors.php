@@ -4,13 +4,15 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
+use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Validator\ConstraintViolation;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Validator\ConstraintViolation;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
  * Collects errors occurred during the the form submit and adds them into the Context.
@@ -43,8 +45,8 @@ class CollectFormErrors implements ProcessorInterface
         $errors = $form->getErrors();
         foreach ($errors as $error) {
             $errorObject = $this->createErrorObject(
-                $error->getMessage(),
-                $this->getFormErrorPropertyName($error, $form)
+                $error,
+                $this->getFormErrorPropertyPath($error, $form)
             );
             $context->addError($errorObject);
         }
@@ -55,7 +57,7 @@ class CollectFormErrors implements ProcessorInterface
             if (!$child->isValid()) {
                 foreach ($child->getErrors() as $error) {
                     $errorObject = $this->createErrorObject(
-                        $error->getMessage(),
+                        $error,
                         $child->getName()
                     );
                     $context->addError($errorObject);
@@ -70,7 +72,7 @@ class CollectFormErrors implements ProcessorInterface
      *
      * @return string|null
      */
-    protected function getFormErrorPropertyName(FormError $error, FormInterface $form)
+    protected function getFormErrorPropertyPath(FormError $error, FormInterface $form)
     {
         $result = null;
 
@@ -82,7 +84,7 @@ class CollectFormErrors implements ProcessorInterface
             }
             // in case if propertyPath = 'data', this error can be an entity level error
             if ($result === 'data' && !$form->has('data')) {
-                $result = '';
+                $result = null;
             }
         }
         if (!$result) {
@@ -96,18 +98,57 @@ class CollectFormErrors implements ProcessorInterface
     }
 
     /**
-     * @param string      $errorMessage
-     * @param string|null $propertyName
+     * @param FormError   $formError
+     * @param string|null $propertyPath
      *
      * @return Error
      */
-    protected function createErrorObject($errorMessage, $propertyName = null)
+    protected function createErrorObject(FormError $formError, $propertyPath = null)
     {
         $error = new Error();
-        $error->setDetail($errorMessage);
-        $error->setPropertyName($propertyName);
+
         $error->setStatusCode(Response::HTTP_BAD_REQUEST);
 
+        $cause = $formError->getCause();
+        if ($cause instanceof ConstraintViolation) {
+            if ($this->isExtraFieldsConstraint($cause)) {
+                // special case "extra fields" constraint
+                // see comments of "isExtraFieldsConstraint" method for more details
+                $error->setTitle('extra fields constraint');
+            } else {
+                $constraint = $cause->getConstraint();
+                $error->setTitle(ValueNormalizerUtil::humanizeClassName(get_class($constraint), 'Constraint'));
+            }
+        } else {
+            // undefined constraint type
+            $error->setTitle('form constraint');
+        }
+
+        $error->setDetail($formError->getMessage());
+
+        if ($propertyPath) {
+            $errorSource = new ErrorSource();
+            $errorSource->setPropertyPath($propertyPath);
+            $error->setSource($errorSource);
+        }
+
         return $error;
+    }
+
+    /**
+     * Checks whether a given cause of a form error represents "extra fields" constraint.
+     * We have to do this because this type of validation does not have own validator
+     * and a validation is performed by main form validator.
+     * @see \Symfony\Component\Form\Extension\Validator\Constraints\FormValidator::validate
+     *
+     * @param ConstraintViolation $cause
+     *
+     * @return bool
+     */
+    protected function isExtraFieldsConstraint(ConstraintViolation $cause)
+    {
+        $parameters = $cause->getParameters();
+
+        return array_key_exists('{{ extra_fields }}', $parameters) && 1 === count($parameters);
     }
 }

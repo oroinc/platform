@@ -4,8 +4,6 @@ namespace Oro\Bundle\ApiBundle\Model;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\ApiBundle\Util\ExceptionUtil;
-
 /**
  * Represents an error happened during the processing of an action.
  */
@@ -14,14 +12,17 @@ class Error
     /** @var int|null */
     protected $statusCode;
 
+    /** @var string|null */
+    protected $code;
+
     /** @var string|Label|null */
     protected $title;
 
     /** @var string|Label|null */
     protected $detail;
 
-    /** @var string|null */
-    protected $propertyName;
+    /** @var ErrorSource|null */
+    protected $source;
 
     /** @var \Exception|null */
     protected $innerException;
@@ -39,11 +40,31 @@ class Error
     /**
      * Sets the HTTP status code applicable to this problem.
      *
-     * @param int $statusCode
+     * @param int|null $statusCode
      */
     public function setStatusCode($statusCode)
     {
         $this->statusCode = $statusCode;
+    }
+
+    /**
+     * Gets an application-specific error code.
+     *
+     * @return string|null
+     */
+    public function getCode()
+    {
+        return $this->code;
+    }
+
+    /**
+     * Sets an application-specific error code.
+     *
+     * @param string|null $code
+     */
+    public function setCode($code)
+    {
+        $this->code = $code;
     }
 
     /**
@@ -79,26 +100,6 @@ class Error
     }
 
     /**
-     * Sets a property name specific to this occurrence of the problem.
-     *
-     * @param string|null $propertyName
-     */
-    public function setPropertyName($propertyName)
-    {
-        $this->propertyName = $propertyName;
-    }
-
-    /**
-     * Gets a property name specific to this occurrence of the problem.
-     *
-     * @return string|null
-     */
-    public function getPropertyName()
-    {
-        return $this->propertyName;
-    }
-
-    /**
      * Sets a human-readable explanation specific to this occurrence of the problem.
      *
      * @param string|Label $detail
@@ -106,6 +107,26 @@ class Error
     public function setDetail($detail)
     {
         $this->detail = $detail;
+    }
+
+    /**
+     * Gets a source of this occurrence of the problem.
+     *
+     * @return ErrorSource|null
+     */
+    public function getSource()
+    {
+        return $this->source;
+    }
+
+    /**
+     * Sets a source of this occurrence of the problem.
+     *
+     * @param ErrorSource|null $source
+     */
+    public function setSource(ErrorSource $source = null)
+    {
+        $this->source = $source;
     }
 
     /**
@@ -121,18 +142,11 @@ class Error
     /**
      * Sets an exception object that caused this occurrence of the problem.
      *
-     * @param \Exception $exception
+     * @param \Exception|null $exception
      */
-    public function setInnerException(\Exception $exception)
+    public function setInnerException(\Exception $exception = null)
     {
         $this->innerException = $exception;
-
-        if (null === $this->statusCode) {
-            $this->statusCode = ExceptionUtil::getExceptionStatusCode($exception);
-        }
-        if (null === $this->detail) {
-            $this->detail = $exception->getMessage();
-        }
     }
 
     /**

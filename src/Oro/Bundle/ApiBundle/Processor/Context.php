@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor;
 use Oro\Component\ChainProcessor\ParameterBag;
 use Oro\Component\ChainProcessor\ParameterBagInterface;
 use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
+use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -516,21 +517,35 @@ class Context extends ApiContext implements ContextInterface
     {
         $entityClass = $this->getClassName();
         if (empty($entityClass)) {
+            $this->processLoadedConfig(null);
+
             throw new \RuntimeException(
                 'A class name must be set in the context before a configuration is loaded.'
             );
         }
 
-        // load config by a config provider
-        $config = $this->configProvider->getConfig(
-            $entityClass,
-            $this->getVersion(),
-            $this->getRequestType(),
-            $this->getConfigExtras()
-        );
+        try {
+            $config = $this->configProvider->getConfig(
+                $entityClass,
+                $this->getVersion(),
+                $this->getRequestType(),
+                $this->getConfigExtras()
+            );
+            $this->processLoadedConfig($config);
+        } catch (\Exception $e) {
+            $this->processLoadedConfig(null);
 
+            throw $e;
+        }
+    }
+
+    /**
+     * @param Config|null $config
+     */
+    protected function processLoadedConfig(Config $config = null)
+    {
         // add loaded config sections to the context
-        if (!$config->isEmpty()) {
+        if ($config && !$config->isEmpty()) {
             foreach ($config as $key => $value) {
                 $this->set(self::CONFIG_PREFIX . $key, $value);
             }
@@ -705,20 +720,34 @@ class Context extends ApiContext implements ContextInterface
     {
         $entityClass = $this->getClassName();
         if (empty($entityClass)) {
+            $this->processLoadedMetadata(null);
+
             throw new \RuntimeException(
                 'A class name must be set in the context before metadata are loaded.'
             );
         }
 
-        // load metadata by a metadata provider
-        $metadata = $this->metadataProvider->getMetadata(
-            $entityClass,
-            $this->getVersion(),
-            $this->getRequestType(),
-            $this->getMetadataExtras(),
-            $this->getConfig()
-        );
+        try {
+            $metadata = $this->metadataProvider->getMetadata(
+                $entityClass,
+                $this->getVersion(),
+                $this->getRequestType(),
+                $this->getMetadataExtras(),
+                $this->getConfig()
+            );
+            $this->processLoadedMetadata($metadata);
+        } catch (\Exception $e) {
+            $this->processLoadedMetadata(null);
 
+            throw $e;
+        }
+    }
+
+    /**
+     * @param EntityMetadata|null $metadata
+     */
+    protected function processLoadedMetadata(EntityMetadata $metadata = null)
+    {
         // add loaded metadata to the context
         $this->set(self::METADATA, $metadata);
     }

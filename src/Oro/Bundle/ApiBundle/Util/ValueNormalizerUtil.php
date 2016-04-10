@@ -9,6 +9,36 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 class ValueNormalizerUtil
 {
     /**
+     * Transforms a given class name to a human-readable representation.
+     * e.g. "Symfony\Component\Form\Exception\InvalidArgumentException" will be transformed
+     * to "invalid argument exception";
+     * "\InvalidArgumentException" will be transformed to "invalid argument exception" as well.
+     *
+     * @param string      $className
+     * @param string|null $classSuffix
+     *
+     * @return string
+     */
+    public static function humanizeClassName($className, $classSuffix = null)
+    {
+        $delimiter = strrpos($className, '\\');
+        if (false !== $delimiter) {
+            $className = substr($className, $delimiter + 1);
+        }
+        // remove $classSuffix if $className already has it
+        if ($classSuffix && substr($className, -strlen($classSuffix)) === $classSuffix) {
+            $classSuffix = null;
+        }
+
+        $result = strtolower(preg_replace('/(?<=\\w)([A-Z\\\\])/', ' $1', $className));
+        if ($classSuffix) {
+            $result .= ' ' . strtolower($classSuffix);
+        }
+
+        return $result;
+    }
+
+    /**
      * Converts the entity class name to the entity type corresponding to the given request type.
      *
      * @param ValueNormalizer $valueNormalizer

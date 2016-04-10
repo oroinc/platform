@@ -1,8 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi\JsonApiDocument;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\DocumentBuilder;
 
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocument\ArrayAccessor;
+use Oro\Bundle\ApiBundle\Request\DocumentBuilder\ArrayAccessor;
 
 class ArrayAccessorTest extends \PHPUnit_Framework_TestCase
 {

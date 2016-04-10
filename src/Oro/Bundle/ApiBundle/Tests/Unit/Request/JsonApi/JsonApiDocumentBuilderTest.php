@@ -450,6 +450,7 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $error = new Error();
         $error->setStatusCode(500);
+        $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -459,7 +460,8 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
             [
                 'errors' => [
                     [
-                        'code'   => '500',
+                        'status' => '500',
+                        'code'   => 'errCode',
                         'title'  => 'some error',
                         'detail' => 'some error details'
                     ]
@@ -473,6 +475,7 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
     {
         $error = new Error();
         $error->setStatusCode(500);
+        $error->setCode('errCode');
         $error->setTitle('some error');
         $error->setDetail('some error details');
         $metadata = $this->getEntityMetadata('Test\Entity', ['id']);
@@ -482,7 +485,8 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
             [
                 'errors' => [
                     [
-                        'code'   => '500',
+                        'status' => '500',
+                        'code'   => 'errCode',
                         'title'  => 'some error',
                         'detail' => 'some error details'
                     ]

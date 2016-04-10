@@ -1,39 +1,33 @@
 <?php
 
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared;
 
 use Oro\Bundle\ApiBundle\Config\Config;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\BuildJsonApiDocument;
+use Oro\Bundle\ApiBundle\Processor\Shared\BuildListResultDocument;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
-class BuildJsonApiDocumentTest extends GetListProcessorTestCase
+class BuildListResultDocumentTest extends GetListProcessorTestCase
 {
-    /** @var BuildJsonApiDocument */
+    /** @var BuildListResultDocument */
     protected $processor;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $documentBuilder;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $documentBuilderFactory;
+    protected $errorCompleter;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->documentBuilder        = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->documentBuilderFactory = $this
-            ->getMockBuilder('Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilderFactory')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->documentBuilder = $this->getMock('Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface');
+        $this->errorCompleter = $this->getMock('Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface');
 
-        $this->processor = new BuildJsonApiDocument($this->documentBuilderFactory);
+        $this->processor = new BuildListResultDocument($this->documentBuilder, $this->errorCompleter);
     }
 
     public function testProcessContextWithoutErrorsOnEmptyResult()
@@ -43,9 +37,6 @@ class BuildJsonApiDocumentTest extends GetListProcessorTestCase
             ->with(null);
         $this->documentBuilder->expects($this->once())
             ->method('getDocument');
-        $this->documentBuilderFactory->expects($this->once())
-            ->method('createDocumentBuilder')
-            ->willReturn($this->documentBuilder);
 
         $this->context->setResult(null);
         $this->processor->process($this->context);
@@ -61,9 +52,6 @@ class BuildJsonApiDocumentTest extends GetListProcessorTestCase
             ->with($result, $metadata);
         $this->documentBuilder->expects($this->once())
             ->method('getDocument');
-        $this->documentBuilderFactory->expects($this->once())
-            ->method('createDocumentBuilder')
-            ->willReturn($this->documentBuilder);
 
         $this->context->setResult($result);
         $this->context->setMetadata($metadata);
@@ -81,9 +69,7 @@ class BuildJsonApiDocumentTest extends GetListProcessorTestCase
         $this->documentBuilder->expects($this->once())
             ->method('setErrorCollection')
             ->with([$error]);
-        $this->documentBuilderFactory->expects($this->once())
-            ->method('createDocumentBuilder')
-            ->willReturn($this->documentBuilder);
+
         $config = new Config();
         $this->configProvider->expects($this->once())
             ->method('getConfig')
@@ -107,15 +93,10 @@ class BuildJsonApiDocumentTest extends GetListProcessorTestCase
             ->method('getDocument');
         $this->documentBuilder->expects($this->once())
             ->method('setErrorObject');
-        $this->documentBuilderFactory->expects($this->exactly(2))
-            ->method('createDocumentBuilder')
-            ->willReturn($this->documentBuilder);
-        $config = new Config();
-        $this->configProvider->expects($this->once())
-            ->method('getConfig')
-            ->willReturn($config);
 
-        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
+        $this->errorCompleter->expects($this->once())
+            ->method('complete');
+
         $this->context->setResult(null);
         $this->processor->process($this->context);
 

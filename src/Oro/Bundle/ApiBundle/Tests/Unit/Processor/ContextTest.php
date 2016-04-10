@@ -282,6 +282,61 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($config, $this->context->getConfig());
     }
 
+    public function testLoadConfigByGetConfigWhenExceptionOccurs()
+    {
+        $version      = '1.1';
+        $requestType  = 'rest';
+        $entityClass  = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2'),
+            new TestConfigExtra('extra1')
+        ];
+        $exception = new \RuntimeException('some error');
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $configExtras
+            )
+            ->willThrowException($exception);
+
+        // test that a config is not loaded yet
+        $this->assertFalse($this->context->hasConfig());
+        $this->assertFalse($this->context->hasConfigOf('section1'));
+        $this->assertFalse($this->context->hasConfigOf('section2'));
+
+        try {
+            $this->context->getConfig(); // load config
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+
+        $this->assertTrue($this->context->hasConfigOf('section1'));
+        $this->assertNull($this->context->getConfigOf('section1'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+
+        $this->assertTrue($this->context->hasConfigOf('section2'));
+        $this->assertNull($this->context->getConfigOf('section2'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+
+        // test that a config is loaded only once
+        $this->assertNull($this->context->getConfig());
+    }
+
     public function testLoadConfigByGetConfigOf()
     {
         $version      = '1.1';
@@ -340,6 +395,60 @@ class ContextTest extends \PHPUnit_Framework_TestCase
 
         // test that a config is loaded only once
         $this->assertEquals($config, $this->context->getConfig());
+    }
+
+    public function testLoadConfigByGetConfigOfWhenExceptionOccurs()
+    {
+        $version      = '1.1';
+        $requestType  = 'rest';
+        $entityClass  = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2')
+        ];
+        $exception = new \RuntimeException('some error');
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $configExtras
+            )
+            ->willThrowException($exception);
+
+        // test that a config is not loaded yet
+        $this->assertFalse($this->context->hasConfig());
+        $this->assertFalse($this->context->hasConfigOf('section1'));
+        $this->assertFalse($this->context->hasConfigOf('section2'));
+
+        try {
+            $this->context->getConfigOf('section1'); // load config
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
+        $this->assertTrue($this->context->hasConfigOf('section1'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section1'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section1'));
+
+        $this->assertTrue($this->context->hasConfig());
+        $this->assertNull($this->context->getConfig());
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . ConfigUtil::DEFINITION));
+
+        $this->assertTrue($this->context->hasConfigOf('section2'));
+        $this->assertNull($this->context->getConfigOf('section2'));
+        $this->assertTrue($this->context->has(Context::CONFIG_PREFIX . 'section2'));
+        $this->assertNull($this->context->get(Context::CONFIG_PREFIX . 'section2'));
+
+        // test that a config is loaded only once
+        $this->assertNull($this->context->getConfig());
     }
 
     /**
@@ -671,6 +780,64 @@ class ContextTest extends \PHPUnit_Framework_TestCase
     public function testLoadMetadataNoClassName()
     {
         $this->context->getMetadata();
+    }
+
+    public function testLoadMetadataWhenExceptionOccurs()
+    {
+        $version      = '1.1';
+        $requestType  = 'rest';
+        $entityClass  = 'Test\Class';
+        $configExtras = [
+            new TestConfigSection('section1'),
+            new TestConfigSection('section2')
+        ];
+        $exception = new \RuntimeException('some error');
+
+        $config         = new EntityDefinitionConfig();
+        $metadataExtras = [new TestMetadataExtra('extra1')];
+
+        $this->context->setVersion($version);
+        $this->context->getRequestType()->add($requestType);
+        $this->context->setConfigExtras($configExtras);
+        $this->context->setMetadataExtras($metadataExtras);
+        $this->context->setClassName($entityClass);
+
+        $this->configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $configExtras
+            )
+            ->willReturn($this->getConfig([ConfigUtil::DEFINITION => $config]));
+        $this->metadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(
+                $entityClass,
+                $version,
+                new RequestType([$requestType]),
+                $metadataExtras,
+                $config
+            )
+            ->willThrowException($exception);
+
+        // test that metadata are not loaded yet
+        $this->assertFalse($this->context->hasMetadata());
+
+        try {
+            $this->context->getMetadata(); // load metadata
+        } catch (\RuntimeException $e) {
+            $this->assertSame($exception, $e);
+        }
+        $this->assertTrue($this->context->hasMetadata());
+        $this->assertTrue($this->context->has(Context::METADATA));
+        $this->assertNull($this->context->get(Context::METADATA));
+
+        $this->assertEquals($config, $this->context->getConfig());
+
+        // test that metadata are loaded only once
+        $this->assertNull($this->context->getMetadata());
     }
 
     public function testMetadataWhenItIsSetExplicitly()

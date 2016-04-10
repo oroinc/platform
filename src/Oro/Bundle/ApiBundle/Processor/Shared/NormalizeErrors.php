@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 
 /**
  * Checks if there are any errors in the Context,
- * and if so, localizes all attributes that are represented by the Label object.
+ * and if so, localizes all properties that are represented by the Label object.
  */
 class NormalizeErrors implements ProcessorInterface
 {
@@ -38,10 +38,8 @@ class NormalizeErrors implements ProcessorInterface
         }
 
         $errors = $context->getErrors();
-        $context->resetErrors();
         foreach ($errors as $error) {
             $error->trans($this->translator);
-            $context->addError($error);
         }
     }
 }

@@ -1,28 +1,34 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
+namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-
 use Oro\Bundle\ApiBundle\Processor\Context;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder;
+use Oro\Bundle\ApiBundle\Request\DocumentBuilderInterface;
+use Oro\Bundle\ApiBundle\Request\ErrorCompleterInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilderFactory;
 
-abstract class BuildJsonApiDocument implements ProcessorInterface
+abstract class BuildResultDocument implements ProcessorInterface
 {
-    /** @var JsonApiDocumentBuilderFactory */
-    protected $documentBuilderFactory;
+    /** @var DocumentBuilderInterface */
+    protected $documentBuilder;
+
+    /** @var ErrorCompleterInterface */
+    protected $errorCompleter;
 
     /**
-     * @param JsonApiDocumentBuilderFactory $documentBuilderFactory
+     * @param DocumentBuilderInterface $documentBuilder
+     * @param ErrorCompleterInterface  $errorCompleter
      */
-    public function __construct(JsonApiDocumentBuilderFactory $documentBuilderFactory)
-    {
-        $this->documentBuilderFactory = $documentBuilderFactory;
+    public function __construct(
+        DocumentBuilderInterface $documentBuilder,
+        ErrorCompleterInterface $errorCompleter
+    ) {
+        $this->documentBuilder = $documentBuilder;
+        $this->errorCompleter = $errorCompleter;
     }
 
     /**
@@ -32,11 +38,9 @@ abstract class BuildJsonApiDocument implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
-
         if ($context->hasErrors()) {
             try {
-                $documentBuilder->setErrorCollection($context->getErrors(), $context->getMetadata());
+                $this->documentBuilder->setErrorCollection($context->getErrors(), $context->getMetadata());
                 // remove errors from the Context to avoid processing them by other processors
                 $context->resetErrors();
             } catch (\Exception $e) {
@@ -45,13 +49,13 @@ abstract class BuildJsonApiDocument implements ProcessorInterface
             }
         } elseif ($context->hasResult()) {
             try {
-                $this->processResult($context, $documentBuilder);
+                $this->processResult($context);
             } catch (\Exception $e) {
                 $this->processException($context, $e);
             }
         }
 
-        $context->setResult($documentBuilder->getDocument());
+        $context->setResult($this->documentBuilder->getDocument());
     }
 
     /**
@@ -63,13 +67,13 @@ abstract class BuildJsonApiDocument implements ProcessorInterface
         $context->setResponseStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
         $error = new Error();
         $error->setInnerException($e);
-        $documentBuilder = $this->documentBuilderFactory->createDocumentBuilder();
-        $documentBuilder->setErrorObject($error, $context->getMetadata());
+        $this->errorCompleter->complete($error);
+        $this->documentBuilder->clear();
+        $this->documentBuilder->setErrorObject($error);
     }
 
     /**
-     * @param Context                $context
-     * @param JsonApiDocumentBuilder $documentBuilder
+     * @param Context $context
      */
-    abstract protected function processResult(Context $context, JsonApiDocumentBuilder $documentBuilder);
+    abstract protected function processResult(Context $context);
 }
