@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Create\JsonApi;
 
+use Oro\Component\ChainProcessor\ContextInterface;
+
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateRequestData as ParentValidateRequestData;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Component\ChainProcessor\ContextInterface;
 
 class ValidateRequestData extends ParentValidateRequestData
 {
