@@ -38,10 +38,7 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
         $context        = [];
         $expectedResult = true;
 
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with($options[0], null)
-            ->will($this->returnValue($expectedResult));
+        $this->setupSecurityFacade($options[0], null, $expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -53,10 +50,7 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
         $context        = [];
         $expectedResult = true;
 
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with($options[0], $options[1])
-            ->will($this->returnValue($expectedResult));
+        $this->setupSecurityFacade($options[0], $options[1], $expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -73,10 +67,7 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue(null));
 
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with($options[0], $this->identicalTo($options[1]))
-            ->will($this->returnValue($expectedResult));
+        $this->setupSecurityFacade($options[0], $this->identicalTo($options[1]), $expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -111,10 +102,7 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($em));
 
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with($options[0], $this->identicalTo($options[1]))
-            ->will($this->returnValue($expectedResult));
+        $this->setupSecurityFacade($options[0], $this->identicalTo($options[1]), $expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -147,10 +135,7 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($em));
 
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with($options[0], 'entity:' . ClassUtils::getRealClass($options[1]))
-            ->will($this->returnValue($expectedResult));
+        $this->setupSecurityFacade($options[0], 'entity:' . ClassUtils::getRealClass($options[1]), $expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
@@ -185,13 +170,45 @@ class AclGrantedTest extends \PHPUnit_Framework_TestCase
             ->with(ClassUtils::getRealClass($options[1]))
             ->will($this->returnValue($em));
 
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with($options[0], 'entity:' . ClassUtils::getRealClass($options[1]))
-            ->will($this->returnValue($expectedResult));
+        $this->setupSecurityFacade($options[0], 'entity:' . ClassUtils::getRealClass($options[1]), $expectedResult);
 
         $this->assertSame($this->condition, $this->condition->initialize($options));
         $this->assertEquals($expectedResult, $this->condition->evaluate($context));
+    }
+
+    public function testEvaluateHasNoUser()
+    {
+        $options        = ['acme_product_view'];
+        $context        = [];
+
+        $this->securityFacade->expects($this->once())
+            ->method('hasLoggedUser')
+            ->with()
+            ->will($this->returnValue(false));
+
+        $this->securityFacade->expects($this->never())
+            ->method('isGranted');
+
+        $this->assertSame($this->condition, $this->condition->initialize($options));
+        $this->assertFalse($this->condition->evaluate($context));
+    }
+
+    /**
+     * @param string|string[] $attributes
+     * @param mixed $object
+     * @param bool $expectedResult
+     */
+    protected function setupSecurityFacade($attributes, $object, $expectedResult)
+    {
+        $this->securityFacade->expects($this->once())
+            ->method('hasLoggedUser')
+            ->with()
+            ->will($this->returnValue(true));
+
+        $this->securityFacade->expects($this->once())
+            ->method('isGranted')
+            ->with($attributes, $object)
+            ->will($this->returnValue($expectedResult));
     }
 
     /**
