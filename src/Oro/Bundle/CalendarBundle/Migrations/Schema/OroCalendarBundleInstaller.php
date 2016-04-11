@@ -25,9 +25,9 @@ class OroCalendarBundleInstaller implements Installation
         /** Tables generation **/
         $this->createOroCalendarTable($schema);
         $this->createOroSystemCalendarTable($schema);
+        $this->createOroRecurrenceTable($schema);
         $this->createOroCalendarEventTable($schema);
         $this->createOroCalendarPropertyTable($schema);
-        $this->createOroRecurrenceTable($schema);
 
         /** Foreign keys generation **/
         $this->addOroCalendarForeignKeys($schema);
@@ -168,6 +168,12 @@ class OroCalendarBundleInstaller implements Installation
             ['id'],
             ['onDelete' => 'CASCADE']
         );
+        $table->addForeignKeyConstraint(
+            $table,
+            ['recurrence_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
     }
 
     /**
@@ -217,13 +223,13 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('recurrence_type', 'string', ['notnull' => true, 'length' => 16]);
         $table->addColumn('interval', 'integer', []);
-        $table->addColumn('instance', 'integer', []);
-        $table->addColumn('day_of_week', 'array', ['comment' => '(DC2Type:array)']);
-        $table->addColumn('day_of_month', 'integer', []);
-        $table->addColumn('month_of_year', 'integer', []);
+        $table->addColumn('instance', 'integer', ['notnull' => false]);
+        $table->addColumn('day_of_week', 'array', ['notnull' => false,'comment' => '(DC2Type:array)']);
+        $table->addColumn('day_of_month', 'integer', ['notnull' => false]);
+        $table->addColumn('month_of_year', 'integer', ['notnull' => false]);
         $table->addColumn('start_time', 'datetime', []);
-        $table->addColumn('end_time', 'datetime', []);
-        $table->addColumn('occurrences', 'integer', []);
+        $table->addColumn('end_time', 'datetime', ['notnull' => false]);
+        $table->addColumn('occurrences', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['start_time'], 'IDX_B6CD65EF502DF587', []);
         $table->addIndex(['end_time'], 'IDX_B6CD65EF41561401', []);

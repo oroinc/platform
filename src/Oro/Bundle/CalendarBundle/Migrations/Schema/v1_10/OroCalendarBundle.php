@@ -27,13 +27,13 @@ class OroCalendarBundle implements Migration
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('recurrence_type', 'string', ['notnull' => true, 'length' => 16]);
         $table->addColumn('interval', 'integer', []);
-        $table->addColumn('instance', 'integer', []);
-        $table->addColumn('day_of_week', 'array', ['comment' => '(DC2Type:array)']);
-        $table->addColumn('day_of_month', 'integer', []);
-        $table->addColumn('month_of_year', 'integer', []);
+        $table->addColumn('instance', 'integer', ['notnull' => false]);
+        $table->addColumn('day_of_week', 'array', ['notnull' => false, 'comment' => '(DC2Type:array)']);
+        $table->addColumn('day_of_month', 'integer', ['notnull' => false]);
+        $table->addColumn('month_of_year', 'integer', ['notnull' => false]);
         $table->addColumn('start_time', 'datetime', []);
-        $table->addColumn('end_time', 'datetime', []);
-        $table->addColumn('occurrences', 'integer', []);
+        $table->addColumn('end_time', 'datetime', ['notnull' => false]);
+        $table->addColumn('occurrences', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['start_time'], 'IDX_B6CD65EF502DF587', []);
         $table->addIndex(['end_time'], 'IDX_B6CD65EF41561401', []);
@@ -47,5 +47,11 @@ class OroCalendarBundle implements Migration
         $table = $schema->getTable('oro_calendar_event');
         $table->addColumn('recurrence_id', 'integer', ['notnull' => false]);
         $table->addUniqueIndex(['recurrence_id'], 'UNIQ_2DDC40DD2C414CE8');
+        $table->addForeignKeyConstraint(
+            $table,
+            ['recurrence_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
     }
 }

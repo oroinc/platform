@@ -7,7 +7,13 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Recurrence Entity
  *
- * @ORM\Table(name="oro_recurrence")
+ * @ORM\Table(
+ *     name="oro_recurrence",
+ *      indexes={
+ *          @ORM\Index(name="IDX_B6CD65EF502DF587", columns={"start_time"}),
+ *          @ORM\Index(name="IDX_B6CD65EF41561401", columns={"end_time"})
+ *      }
+ * )
  * @ORM\Entity
  */
 class Recurrence
@@ -43,28 +49,28 @@ class Recurrence
     /**
      * @var int
      *
-     * @ORM\Column(name="instance", type="integer")
+     * @ORM\Column(name="instance", type="integer", nullable=true)
      */
     protected $instance;
 
     /**
      * @var []
      *
-     * @ORM\Column(name="day_of_week", type="array")
+     * @ORM\Column(name="day_of_week", type="array", nullable=true)
      */
     protected $dayOfWeek;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="day_of_month", type="integer")
+     * @ORM\Column(name="day_of_month", type="integer", nullable=true)
      */
     protected $dayOfMonth;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="month_of_year", type="integer")
+     * @ORM\Column(name="month_of_year", type="integer", nullable=true)
      */
     protected $monthOfYear;
 
@@ -78,19 +84,19 @@ class Recurrence
     /**
      * @var \DateTime
      *
-     * @ORM\Column(name="end_time", type="datetime")
+     * @ORM\Column(name="end_time", type="datetime", nullable=true)
      */
     protected $endTime;
 
     /**
      * @var int
      *
-     * @ORM\Column(name="occurrences", type="integer")
+     * @ORM\Column(name="occurrences", type="integer", nullable=true)
      */
     protected $occurrences;
 
     /**
-     * Get id
+     * Gets id
      *
      * @return integer
      */
@@ -100,11 +106,11 @@ class Recurrence
     }
 
     /**
-     * Set recurrenceType
+     * Sets recurrenceType
      *
      * @param string $recurrenceType
      *
-     * @return Recurrence
+     * @return self
      */
     public function setRecurrenceType($recurrenceType)
     {
@@ -114,7 +120,7 @@ class Recurrence
     }
 
     /**
-     * Get recurrenceType
+     * Gets recurrenceType
      *
      * @return string
      */
@@ -124,11 +130,11 @@ class Recurrence
     }
 
     /**
-     * Set interval
+     * Sets interval
      *
      * @param integer $interval
      *
-     * @return Recurrence
+     * @return self
      */
     public function setInterval($interval)
     {
@@ -138,7 +144,7 @@ class Recurrence
     }
 
     /**
-     * Get interval
+     * Gets interval
      *
      * @return integer
      */
@@ -148,11 +154,11 @@ class Recurrence
     }
 
     /**
-     * Set instance
+     * Sets instance
      *
-     * @param integer $instance
+     * @param integer|null $instance
      *
-     * @return Recurrence
+     * @return self
      */
     public function setInstance($instance)
     {
@@ -162,9 +168,9 @@ class Recurrence
     }
 
     /**
-     * Get instance
+     * Gets instance
      *
-     * @return integer
+     * @return integer|null
      */
     public function getInstance()
     {
@@ -172,11 +178,11 @@ class Recurrence
     }
 
     /**
-     * Set dayOfWeek
+     * Sets dayOfWeek
      *
-     * @param array $dayOfWeek
+     * @param array|null $dayOfWeek
      *
-     * @return Recurrence
+     * @return self
      */
     public function setDayOfWeek($dayOfWeek)
     {
@@ -186,9 +192,9 @@ class Recurrence
     }
 
     /**
-     * Get dayOfWeek
+     * Gets dayOfWeek
      *
-     * @return array
+     * @return array|null
      */
     public function getDayOfWeek()
     {
@@ -196,11 +202,11 @@ class Recurrence
     }
 
     /**
-     * Set dayOfMonth
+     * Sets dayOfMonth
      *
-     * @param integer $dayOfMonth
+     * @param integer|null $dayOfMonth
      *
-     * @return Recurrence
+     * @return self
      */
     public function setDayOfMonth($dayOfMonth)
     {
@@ -210,9 +216,9 @@ class Recurrence
     }
 
     /**
-     * Get dayOfMonth
+     * Gets dayOfMonth
      *
-     * @return integer
+     * @return integer|null
      */
     public function getDayOfMonth()
     {
@@ -220,11 +226,11 @@ class Recurrence
     }
 
     /**
-     * Set monthOfYear
+     * Sets monthOfYear
      *
-     * @param integer $monthOfYear
+     * @param integer|null $monthOfYear
      *
-     * @return Recurrence
+     * @return self
      */
     public function setMonthOfYear($monthOfYear)
     {
@@ -234,9 +240,9 @@ class Recurrence
     }
 
     /**
-     * Get monthOfYear
+     * Gets monthOfYear
      *
-     * @return integer
+     * @return integer|null
      */
     public function getMonthOfYear()
     {
@@ -244,11 +250,11 @@ class Recurrence
     }
 
     /**
-     * Set startTime
+     * Sets startTime
      *
      * @param \DateTime $startTime
      *
-     * @return Recurrence
+     * @return self
      */
     public function setStartTime($startTime)
     {
@@ -258,7 +264,7 @@ class Recurrence
     }
 
     /**
-     * Get startTime
+     * Gets startTime
      *
      * @return \DateTime
      */
@@ -268,11 +274,11 @@ class Recurrence
     }
 
     /**
-     * Set endTime
+     * Sets endTime
      *
-     * @param \DateTime $endTime
+     * @param \DateTime|null $endTime
      *
-     * @return Recurrence
+     * @return self
      */
     public function setEndTime($endTime)
     {
@@ -282,9 +288,9 @@ class Recurrence
     }
 
     /**
-     * Get endTime
+     * Gets endTime
      *
-     * @return \DateTime
+     * @return \DateTime|null
      */
     public function getEndTime()
     {
@@ -292,11 +298,11 @@ class Recurrence
     }
 
     /**
-     * Set occurrences
+     * Sets occurrences
      *
-     * @param integer $occurrences
+     * @param integer|null $occurrences
      *
-     * @return Recurrence
+     * @return self
      */
     public function setOccurrences($occurrences)
     {
@@ -306,9 +312,9 @@ class Recurrence
     }
 
     /**
-     * Get occurrences
+     * Gets occurrences
      *
-     * @return integer
+     * @return integer|null
      */
     public function getOccurrences()
     {
