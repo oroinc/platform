@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\SoapBundle\Controller\Api\Soap;
 
+use Doctrine\Instantiator\Instantiator;
 use Symfony\Component\DependencyInjection\ContainerAware;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
@@ -53,11 +54,12 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
     protected function transformToSoapEntity($entity)
     {
         $soapEntityClass = $this->getSoapEntityClass($entity);
+        $instantiator = new Instantiator();
         if (class_exists($soapEntityClass) &&
             in_array('Oro\Bundle\SoapBundle\Entity\SoapEntityInterface', class_implements($soapEntityClass))
         ) {
             /** @var SoapEntityInterface $soapEntity */
-            $soapEntity = unserialize(sprintf('C:%u:"%s":0:{}', strlen($soapEntityClass), $soapEntityClass));
+            $soapEntity = $instantiator->instantiate($soapEntityClass);
 
             $soapEntity->soapInit($entity);
             return $soapEntity;
