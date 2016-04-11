@@ -22,7 +22,7 @@ class IntegrationControllerTest extends WebTestCase
 
     protected function setUp()
     {
-        $this->initClient([], array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1)));
+        $this->initClient([], array_merge($this->generateBasicAuthHeader(), ['HTTP_X-CSRF-Header' => 1]));
 
         $this->entityManager = $this->client->getContainer()->get('doctrine')
             ->getManagerForClass('OroIntegrationBundle:Channel');
@@ -105,7 +105,7 @@ class IntegrationControllerTest extends WebTestCase
     {
         $response = $this->client->requestGrid(
             'oro-integration-grid',
-            array('channels[_filter][name][value]' => $data['name'])
+            ['channels[_filter][name][value]' => $data['name']]
         );
 
         $result = $this->getJsonResponseContent($response, 200);
@@ -114,7 +114,7 @@ class IntegrationControllerTest extends WebTestCase
         $integration = $result;
         $crawler     = $this->client->request(
             'GET',
-            $this->getUrl('oro_integration_update', array('id' => $result['id']))
+            $this->getUrl('oro_integration_update', ['id' => $result['id']])
         );
 
         /** @var Form $form */
@@ -152,7 +152,7 @@ class IntegrationControllerTest extends WebTestCase
         $this->entityManager->persist($channel);
         $this->entityManager->flush();
 
-        $this->client->request('GET', $this->getUrl('oro_integration_schedule', array('id' => $channel->getId())));
+        $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
@@ -169,7 +169,7 @@ class IntegrationControllerTest extends WebTestCase
         $this->entityManager->persist($channel);
         $this->entityManager->flush();
 
-        $this->client->request('GET', $this->getUrl('oro_integration_schedule', array('id' => $channel->getId())));
+        $this->client->request('GET', $this->getUrl('oro_integration_schedule', ['id' => $channel->getId()]));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 400);
 
@@ -188,7 +188,7 @@ class IntegrationControllerTest extends WebTestCase
     {
         $this->client->request(
             'DELETE',
-            $this->getUrl('oro_api_delete_integration', array('id' => $integration['id']))
+            $this->getUrl('oro_api_delete_integration', ['id' => $integration['id']])
         );
 
         $response = $this->client->getResponse();
@@ -196,7 +196,7 @@ class IntegrationControllerTest extends WebTestCase
 
         $response = $this->client->requestGrid(
             'oro-integration-grid',
-            array('channels[_filter][name][value]' => $integration['name'])
+            ['channels[_filter][name][value]' => $integration['name']]
         );
 
         $result = $this->getJsonResponseContent($response, 200);

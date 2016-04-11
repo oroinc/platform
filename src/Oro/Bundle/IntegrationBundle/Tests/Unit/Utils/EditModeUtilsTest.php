@@ -16,24 +16,24 @@ class EditModeUtilsTest extends \PHPUnit_Framework_TestCase
 {
     public function provideDataForIsEditAllowedTest()
     {
-        return array(
-            array(Channel::EDIT_MODE_ALLOW, true),
-            array(Channel::EDIT_MODE_FORCED_ALLOW, true),
-            array(Channel::EDIT_MODE_RESTRICTED, true),
-            array(Channel::EDIT_MODE_DISALLOW, false),
-            array(Channel::EDIT_MODE_FORCED_DISALLOW, false),
-        );
+        return [
+            [Channel::EDIT_MODE_ALLOW, true],
+            [Channel::EDIT_MODE_FORCED_ALLOW, true],
+            [Channel::EDIT_MODE_RESTRICTED, true],
+            [Channel::EDIT_MODE_DISALLOW, false],
+            [Channel::EDIT_MODE_FORCED_DISALLOW, false],
+        ];
     }
 
     public function provideDataForAttemptChangeEditModeTest()
     {
-        return array(
-            array(Channel::EDIT_MODE_ALLOW, 'aNewStatus'),
-            array(Channel::EDIT_MODE_FORCED_ALLOW, Channel::EDIT_MODE_FORCED_ALLOW),
-            array(Channel::EDIT_MODE_RESTRICTED, 'aNewStatus'),
-            array(Channel::EDIT_MODE_DISALLOW, 'aNewStatus'),
-            array(Channel::EDIT_MODE_FORCED_DISALLOW, Channel::EDIT_MODE_FORCED_DISALLOW),
-        );
+        return [
+            [Channel::EDIT_MODE_ALLOW, 'aNewStatus'],
+            [Channel::EDIT_MODE_FORCED_ALLOW, Channel::EDIT_MODE_FORCED_ALLOW],
+            [Channel::EDIT_MODE_RESTRICTED, 'aNewStatus'],
+            [Channel::EDIT_MODE_DISALLOW, 'aNewStatus'],
+            [Channel::EDIT_MODE_FORCED_DISALLOW, Channel::EDIT_MODE_FORCED_DISALLOW],
+        ];
     }
 
     /**
