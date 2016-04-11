@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\DataGridBundle\Extension\Sorter;
 
-use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Doctrine\ORM\Query\Expr\From;
 use Doctrine\ORM\QueryBuilder;
 
@@ -18,19 +16,19 @@ class PostgresqlGridModifier extends AbstractExtension
 {
     const PRIORITY = -251;
 
-    /** @var ContainerInterface */
-    protected $container;
+    /** @var string */
+    protected $databaseDriver;
 
     /** @var EntityClassResolver */
     protected $entityClassResolver;
 
     /**
-     * @param ContainerInterface $container
+     * @param string $databaseDriver
      * @param EntityClassResolver $entityClassResolver
      */
-    public function __construct(ContainerInterface $container, EntityClassResolver $entityClassResolver)
+    public function __construct($databaseDriver, EntityClassResolver $entityClassResolver)
     {
-        $this->container = $container;
+        $this->databaseDriver = $databaseDriver;
         $this->entityClassResolver = $entityClassResolver;
     }
 
@@ -39,8 +37,7 @@ class PostgresqlGridModifier extends AbstractExtension
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $dbDriver = $this->container->getParameter('database_driver');
-        return $dbDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL;
+        return $this->databaseDriver === DatabaseDriverInterface::DRIVER_POSTGRESQL;
     }
 
     /**
