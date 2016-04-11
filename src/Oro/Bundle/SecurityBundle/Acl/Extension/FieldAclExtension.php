@@ -81,11 +81,14 @@ class FieldAclExtension extends EntityAclExtension
 
         $this->doctrineHelper = $doctrineHelper;
 
-        // override permission map for fields
         $this->permissionToMaskBuilderIdentity = [
             'VIEW'   => self::IDENTITY,
             'CREATE' => self::IDENTITY,
             'EDIT'   => self::IDENTITY,
+        ];
+
+        $this->maskBuilderIdentityToPermissions = [
+            array_keys($this->permissionToMaskBuilderIdentity)
         ];
 
         $this->map = [
@@ -215,6 +218,16 @@ class FieldAclExtension extends EntityAclExtension
     protected function getPermissionsToIdentityMap($byCurrentGroup = false)
     {
         return $this->permissionToMaskBuilderIdentity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getIdentityForPermission($permission)
+    {
+        $identities = $this->getPermissionsToIdentityMap();
+
+        return empty($identities[$permission]) ? self::IDENTITY : $identities[$permission];
     }
 
     /**

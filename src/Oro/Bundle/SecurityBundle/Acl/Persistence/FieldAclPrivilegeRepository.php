@@ -13,6 +13,8 @@ use Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilege;
 use Oro\Bundle\SecurityBundle\Model\AclPrivilegeIdentity;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadata;
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
+use Oro\Bundle\SecurityBundle\Model\AclPermission;
 use Oro\Bundle\EntityBundle\Provider\EntityFieldProvider;
 
 class FieldAclPrivilegeRepository extends AclPrivilegeRepository
@@ -177,5 +179,23 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
         }
 
         $this->manager->flush();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getPermissionMasks($permissions, AclExtensionInterface $extension, array $maskBuilders)
+    {
+        // check if there are no full field permissions
+        // and add missing to calculate correct masks
+        $permissionNames = array_keys($maskBuilders);
+        foreach ($permissionNames as $permissionName) {
+            /** @var ArrayCollection $permissions */
+            if (!$permissions->containsKey($permissionName)) {
+                $permissions->add(new AclPermission($permissionName, AccessLevel::SYSTEM_LEVEL));
+            }
+        }
+
+        return parent::getPermissionMasks($permissions, $extension, $maskBuilders);
     }
 }

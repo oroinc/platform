@@ -124,7 +124,8 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         }
 
         // fallback to object aces in order to grant access to (not restricted by mask) fields
-        if ($result === null) {
+        // only in case when no aces were found on previous steps
+        if ($result === null && empty($aces)) {
             $aces = $acl->getObjectAces();
             $aces = empty($aces) ? $acl->getClassAces() : $aces;
             if (!empty($aces)) {
