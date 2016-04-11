@@ -18,7 +18,7 @@ services:
     oro_importexport.serializer.datetime_normalizer:
         class: %oro_importexport.serializer.datetime_normalizer.class%
         calls:
-            - [setFormatter,  ['@oro_importexport.formatter.excel_datetime']]
+            - [setFormatter, ['@oro_importexport.formatter.excel_datetime']]
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }
 
@@ -32,6 +32,6 @@ services:
         arguments:
             - '@oro_importexport.field.field_helper'
         calls:
-            - [setDispatcher,  ['@event_dispatcher']]
+            - [setDispatcher, ['@event_dispatcher']]
         tags:
             - { name: oro_importexport.normalizer, priority: -10 }

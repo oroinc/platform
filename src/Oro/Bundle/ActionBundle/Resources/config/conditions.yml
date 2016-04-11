@@ -20,14 +20,14 @@ services:
         arguments:
             - '@oro_action.expression.context_accessor'
         calls:
-            - [addExtension,  ['@oro_action.expression.extension']]
+            - [addExtension, ['@oro_action.expression.extension']]
 
     oro_action.expression.assembler:
         class: %oro_action.expression.assembler.class%
         arguments:
             - '@oro_action.expression.factory'
         calls:
-            - [addConfigurationPass,  ['@oro_action.configuration_pass.replace_property_path']]
+            - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
 
     oro_action.condition.configurable:
         class: %oro_action.condition.configurable.class%

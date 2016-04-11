@@ -175,19 +175,19 @@ services:
         parent: oro_importexport.processor.import_abstract
         abstract: true
         calls:
-            - [setContextRegistry,  ['@oro_importexport.context_registry']]
+            - [setContextRegistry, ['@oro_importexport.context_registry']]
 
     oro_integration.importexport.processor.export:
         class: %oro_integration.importexport.processor.export.class%
         parent: oro_importexport.processor.export_abstract
         abstract: true
         calls:
-            - [setContextRegistry,  ['@oro_importexport.context_registry']]
+            - [setContextRegistry, ['@oro_importexport.context_registry']]
 
     oro_integration.processor_registry:
         class: %oro_integration.processor_registry.class%
         calls:
-            - [setDefaultProcessor,  ['@oro_integration.sync.processor']]
+            - [setDefaultProcessor, ['@oro_integration.sync.processor']]
 
     oro_integration.provider.connector_context_mediator:
         class: %oro_integration.provider.connector_context_mediator.class%
@@ -268,7 +268,7 @@ services:
         arguments:
             - '@oro_action.context_accessor'
         calls:
-            - [setFieldsChangesManager,  ['@oro_integration.manager.fields_changes']]
+            - [setFieldsChangesManager, ['@oro_integration.manager.fields_changes']]
 
     oro_integration.action.save_fields_changes:
         class: %oro_integration.action.save_fields_changes.class%

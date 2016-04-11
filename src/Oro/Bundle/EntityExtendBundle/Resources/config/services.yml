@@ -343,7 +343,7 @@ services:
                     - integer
                     -
                         - Regex:
-                            pattern: "/^[\d+]*$/"
+                            pattern: '/^[\d+]*$/'
                             message: "This value should contain only numbers."
 
     oro_entity_extend.listener.extend_field_value_render:

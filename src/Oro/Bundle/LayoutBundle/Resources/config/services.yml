@@ -19,8 +19,8 @@ services:
         public: false
         class: %oro_layout.layout_factory_builder.class%
         calls:
-            - [addExtension,  ['@oro_layout.extension']]
-            - [addExtension,  ['@oro_layout.theme_extension']]
+            - [addExtension, ['@oro_layout.extension']]
+            - [addExtension, ['@oro_layout.theme_extension']]
             - [setDefaultRenderer, [%oro_layout.templating.default%]]
 
     oro_layout.layout_manager:
@@ -53,14 +53,14 @@ services:
         arguments:
             - '@oro_layout.expression.context_accessor'
         calls:
-            - [addExtension,  ['@oro_layout.expression.extension']]
+            - [addExtension, ['@oro_layout.expression.extension']]
 
     oro_layout.expression.assembler:
         class: Oro\Component\ConfigExpression\ExpressionAssembler
         arguments:
             - '@oro_layout.expression.factory'
         calls:
-            - [addConfigurationPass,  ['@oro_layout.expression.pass.property_path']]
+            - [addConfigurationPass, ['@oro_layout.expression.pass.property_path']]
 
     oro_layout.text.helper:
         class: Oro\Component\Layout\Templating\TextHelper

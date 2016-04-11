@@ -18,8 +18,8 @@ services:
     oro_workflow.serializer.data.serializer:
         class: %oro_workflow.serializer.data.serializer.class%
         arguments:
-          -  ['@oro_workflow.serializer.data.normalizer']
-          -  ['@serializer.encoder.json']
+          - ['@oro_workflow.serializer.data.normalizer']
+          - ['@serializer.encoder.json']
         calls:
           - [setWorkflowRegistry,  ['@oro_workflow.registry']]
 
@@ -70,7 +70,7 @@ services:
               - '@oro_workflow.serializer.process.normalizer.traversable'
               - '@oro_workflow.serializer.process.normalizer.scalar'
 
-          -  ['@serializer.encoder.json']
+          - ['@serializer.encoder.json']
 
     oro_workflow.serializer.process.normalizer.process_data:
         class: %oro_workflow.serializer.process.normalizer.process_data.class%
