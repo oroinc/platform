@@ -73,7 +73,7 @@ class ExpressionResult
 
                 $this->value = $dateValue;
 
-                $this->variableType  = $value->getValue();
+                $this->variableType  = (int)$value->getValue();
                 $this->variableLabel = (string)$value;
                 $this->sourceType    = self::TYPE_DATE;
             } elseif ($value->is(Token::TYPE_TIME)) {

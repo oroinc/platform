@@ -30,7 +30,7 @@ class ConfigProvider extends AbstractConfigProvider
      * @param string                 $className   The FQCN of an entity
      * @param string                 $version     The version of a config
      * @param RequestType            $requestType The request type, for example "rest", "soap", etc.
-     * @param ConfigExtraInterface[] $extras      Requests for additional configuration data
+     * @param ConfigExtraInterface[] $extras      Requests for configuration data
      *
      * @return Config
      */

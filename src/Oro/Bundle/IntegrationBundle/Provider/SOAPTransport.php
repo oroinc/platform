@@ -26,7 +26,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
     /** @var ParameterBag */
     protected $settings;
 
-    /** @var \SoapClient */
+    /** @var SoapClient */
     protected $client;
 
     /** @var int */
@@ -135,7 +135,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
      * @param string $wsdlUrl
      *
      * @param array $options
-     * @return \SoapClient
+     * @return SoapClient
      */
     protected function getSoapClient($wsdlUrl, array $options = [])
     {
@@ -149,7 +149,7 @@ abstract class SOAPTransport implements TransportInterface, LoggerAwareInterface
         }
         $wsdlUrl = Url::buildUrl($urlParts);
 
-        return new \SoapClient($wsdlUrl, $options);
+        return new SoapClient($wsdlUrl, $options);
     }
 
     /**

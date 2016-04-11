@@ -1,0 +1,54 @@
+layout:
+    actions:
+        - @setBlockTheme:
+            themes: 'OroUIBundle:layouts:base/page/layout.html.twig'
+        - @addTree:
+            items:
+                head:
+                    blockType: head
+                title:
+                    blockType: title
+                meta_charset:
+                    blockType: meta
+                    options:
+                        charset: 'UTF-8'
+                meta_viewport:
+                    blockType: meta
+                    options:
+                        name: viewport
+                        content: 'width=device-width, initial-scale=1'
+                theme_icon:
+                    blockType: external_resource
+                    options:
+                        visible: { @not_empty: $data.theme.icon }
+                        href: { @asset: $data.theme.icon }
+                        rel: shortcut icon
+                styles:
+                    blockType: style
+                    options:
+                        src: { @asset: $data.theme.data.assets.styles.output }
+                body:
+                    blockType: body
+                scripts_before:
+                    blockType: container
+                require_js:
+                    blockType: container
+                require_modules:
+                    blockType: container
+                app_script:
+                    blockType: script
+                    options:
+                        content: 'require(["oroui/js/app"]); require(["oroui/js/init-layout"]);'
+            tree:
+                root:
+                    head:
+                        title: ~
+                        meta_charset: ~
+                        meta_viewport: ~
+                        theme_icon: ~
+                        styles: ~
+                        scripts_before: ~
+                        require_js: ~
+                        require_modules:
+                            app_script: ~
+                    body: ~

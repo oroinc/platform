@@ -24,10 +24,13 @@ class DumpConfigCommand extends AbstractDebugCommand
      * @var array
      */
     protected $knownExtras = [
+        'actions'        => 'Oro\Bundle\ApiBundle\Config\ActionsConfigExtra',
+        'definition'     => 'Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra',
         'filters'        => 'Oro\Bundle\ApiBundle\Config\FiltersConfigExtra',
         'sorters'        => 'Oro\Bundle\ApiBundle\Config\SortersConfigExtra',
         'virtual_fields' => 'Oro\Bundle\ApiBundle\Config\VirtualFieldsConfigExtra',
-        'descriptions'   => 'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra'
+        'descriptions'   => 'Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra',
+        'status_codes'   => 'Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra',
     ];
 
     /**
@@ -61,14 +64,20 @@ class DumpConfigCommand extends AbstractDebugCommand
                 'extra',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
-                'Whether any extra configuration data should be displayed. ' .
+                'The kind of configuration data that should be displayed. ' .
                 sprintf(
-                    'Can be %s or FQCN of a class implements "%s" or "%s"',
+                    'Can be %s or the full name of a class implements "%s"',
                     '"' . implode('", "', array_keys($this->knownExtras)) . '"',
-                    'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface',
                     'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'
                 ),
-                []
+                ['definition', 'filters', 'sorters']
+            )
+            ->addOption(
+                'action',
+                null,
+                InputOption::VALUE_REQUIRED,
+                'The name of action for which the configuration should be displayed.' .
+                'Can be "get", "get_list", "delete", etc.'
             );
         parent::configure();
     }
@@ -86,43 +95,7 @@ class DumpConfigCommand extends AbstractDebugCommand
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
-
-        $extras = [];
-
-        $extraOptions = $input->getOption('extra');
-        foreach ($extraOptions as $extraName) {
-            if (array_key_exists($extraName, $this->knownExtras)) {
-                $extras[] = new $this->knownExtras[$extraName];
-                continue;
-            }
-
-            if (false === strpos($extraName, '\\')) {
-                throw new \InvalidArgumentException(
-                    sprintf('Unknown value "%s" for option `--extra`.', $extraName)
-                );
-            }
-
-            if (!class_exists($extraName)) {
-                throw new \InvalidArgumentException(
-                    sprintf('Class "%s" passed as value for option `--extra` not found.', $extraName)
-                );
-            }
-
-            if (!is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface', true)
-                && !is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface', true)
-            ) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'Class "%s" passed as value for option `--extra` do not implements ' .
-                        '`Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface` or '.
-                        '`Oro\Bundle\ApiBundle\Config\ConfigExtraInterface`.',
-                        $extraName
-                    )
-                );
-            }
-
-            $extras[] = new $extraName;
-        }
+        $extras = $this->getConfigExtras($input);
 
         /** @var ProcessorBag $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
@@ -150,6 +123,54 @@ class DumpConfigCommand extends AbstractDebugCommand
             }
         );
         $output->write(Yaml::dump($config, 100, 4, true, true));
+    }
+
+    /**
+     * @param InputInterface $input
+     *
+     * @return array
+     */
+    protected function getConfigExtras(InputInterface $input)
+    {
+        $result = [];
+
+        $extraNames = $input->getOption('extra');
+        foreach ($extraNames as $extraName) {
+            $extraClassName = null;
+            if (array_key_exists($extraName, $this->knownExtras)) {
+                $extraClassName = $this->knownExtras[$extraName];
+            } else {
+                if (false === strpos($extraName, '\\')) {
+                    throw new \InvalidArgumentException(
+                        sprintf('Unknown value "%s" for the "--extra" option.', $extraName)
+                    );
+                }
+                if (!class_exists($extraName)) {
+                    throw new \InvalidArgumentException(
+                        sprintf('The class "%s" passed as value for the "--extra" option not found.', $extraName)
+                    );
+                }
+                if (!is_a($extraName, 'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface', true)) {
+                    throw new \InvalidArgumentException(
+                        sprintf(
+                            'The class "%s" passed as value for the "--extra" option must implement "%s".',
+                            $extraName,
+                            'Oro\Bundle\ApiBundle\Config\ConfigExtraInterface'
+                        )
+                    );
+                }
+                $extraClassName = $extraName;
+            }
+
+            if ('Oro\Bundle\ApiBundle\Config\EntityDefinitionConfigExtra' === $extraClassName) {
+                $action = $input->getOption('action');
+                $result[] = new $extraClassName($action);
+            } else {
+                $result[] = new $extraClassName();
+            }
+        }
+
+        return $result;
     }
 
     /**

@@ -353,7 +353,6 @@ services:
         arguments:
             - @mailer
             - @service_container
-            - @oro_imap.imap_email_google_oauth2_manager
 
     # Email template API
     oro_email.manager.emailtemplate.api:
@@ -547,7 +546,7 @@ services:
             - [setLogger, [@logger]]
         tags:
             - { name: oro_workflow.action, alias: send_email_template }
-            - { name: oro_action.function, alias: send_email_template }
+            - { name: oro_action.action, alias: send_email_template }
 
     oro_email.helper.datagrid.emails:
         class: %oro_email.helper.datagrid.emails.class%
