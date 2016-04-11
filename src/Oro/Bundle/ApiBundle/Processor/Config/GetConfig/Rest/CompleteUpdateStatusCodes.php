@@ -24,7 +24,7 @@ class CompleteUpdateStatusCodes extends CompleteStatusCodes
         }
         if (!$statusCodes->hasCode(Response::HTTP_BAD_REQUEST)) {
             $statusCodes->addCode(
-                Response::HTTP_FORBIDDEN,
+                Response::HTTP_BAD_REQUEST,
                 $this->createStatusCode('Returned when the request data is not valid')
             );
         }
