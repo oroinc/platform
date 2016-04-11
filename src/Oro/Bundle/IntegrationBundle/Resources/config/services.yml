@@ -214,7 +214,7 @@ services:
     oro_integration.genuine_sync_scheduler:
         class: %oro_integration.genuine_sync_scheduler.class%
         arguments:
-            - @doctrine
+            - '@doctrine'
 
     oro_integration.reverse_sync.processor:
         class: %oro_integration.reverse_sync.processor.class%
