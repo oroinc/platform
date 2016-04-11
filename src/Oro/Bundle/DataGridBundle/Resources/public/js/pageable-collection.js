@@ -1074,7 +1074,8 @@ define([
                 var r = right.get(sortKey);
                 var t;
 
-                if (order === 1) {
+                // order might be int or string
+                if (order == 1) {
                     t = l;
                     l = r;
                     r = t;

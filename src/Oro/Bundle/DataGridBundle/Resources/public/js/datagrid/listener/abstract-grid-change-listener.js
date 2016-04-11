@@ -131,7 +131,8 @@ define([
                     this.confirmed[type] = true;
                     this._clearState();
                     this._synchronizeState();
-                    action.run();
+                    actionOptions.doExecute = true;
+                    action.run(actionOptions);
                 });
             }
             this.confirmed[type] = false;
