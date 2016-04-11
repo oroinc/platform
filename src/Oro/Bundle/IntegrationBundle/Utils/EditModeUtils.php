@@ -13,11 +13,9 @@ class EditModeUtils
      */
     public static function isEditAllowed($editMode)
     {
-        return in_array($editMode, [
-            Channel::EDIT_MODE_ALLOW,
-            Channel::EDIT_MODE_FORCED_ALLOW,
-            Channel::EDIT_MODE_RESTRICTED
-        ], true);
+        $allowedModes = [Channel::EDIT_MODE_ALLOW, Channel::EDIT_MODE_FORCED_ALLOW, Channel::EDIT_MODE_RESTRICTED];
+
+        return in_array($editMode, $allowedModes, true);
     }
 
     /**
@@ -26,10 +24,9 @@ class EditModeUtils
      */
     public static function attemptChangeEditMode(Channel $channel, $newEditMode)
     {
-        if (false == in_array($channel->getEditMode(), [
-            Channel::EDIT_MODE_FORCED_ALLOW,
-            Channel::EDIT_MODE_FORCED_DISALLOW,
-        ], true)) {
+        $forcedModes = [Channel::EDIT_MODE_FORCED_ALLOW, Channel::EDIT_MODE_FORCED_DISALLOW];
+
+        if (false == in_array($channel->getEditMode(), $forcedModes, true)) {
             $channel->setEditMode($newEditMode);
         }
     }
