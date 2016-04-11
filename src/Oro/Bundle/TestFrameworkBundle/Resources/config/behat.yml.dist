@@ -1,0 +1,17 @@
+# behat.yml
+default: &default
+    extensions:
+        Behat\MinkExtension:
+            base_url: 'http://orohrm.local/'
+            default_session: 'selenium2'
+            selenium2: ~
+        Behat\Symfony2Extension:
+            context:
+                path_suffix: 'Tests/Behat/Features'
+                class_suffix: 'Tests\Behat\Context\FeatureContext'
+        SensioLabs\Behat\PageObjectExtension: ~
+        Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension:
+            shared_contexts: ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext']
+    autoload:
+            - %paths.base%/../vendor/autoload.php
+    suites: []
