@@ -237,7 +237,7 @@ define([
                 model: this.model ? this.model.attributes : {},
                 themeOptions: this.themeOptions ? this.themeOptions : {}
             }));
-            $checkbox = this.$('[data-select-row]:checkbox');
+            $checkbox = this.$('[data-role=select-row]:checkbox');
             if ($checkbox.length) {
                 this.listenTo(this.model, 'backgrid:select', function(model, checked) {
                     $checkbox.prop('checked', checked);
