@@ -98,6 +98,13 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
         $configMock->expects($this->once())
             ->method('getOptions')
             ->will($this->returnValue(array()));
+        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $type->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('oro_region'));
+        $configMock->expects($this->any())
+            ->method('getType')
+            ->will($this->returnValue($type));
 
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()
@@ -209,15 +216,22 @@ class AddressCountryAndRegionSubscriberTest extends \PHPUnit_Framework_TestCase
         $configMock = $this->getMock('Symfony\Component\Form\FormConfigInterface');
         $configMock->expects($this->once())->method('getOptions')
             ->will($this->returnValue(array()));
+        $type = $this->getMock('Symfony\Component\Form\ResolvedFormTypeInterface');
+        $type->expects($this->any())
+            ->method('getName')
+            ->will($this->returnValue('oro_region'));
+        $configMock->expects($this->any())
+            ->method('getType')
+            ->will($this->returnValue($type));
 
         $fieldMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()->getMock();
-        $fieldMock->expects($this->once())->method('getConfig')
+        $fieldMock->expects($this->atLeastOnce())->method('getConfig')
             ->will($this->returnValue($configMock));
 
         $formMock = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
             ->disableOriginalConstructor()->getMock();
-        $formMock->expects($this->once())->method('get')->with($this->equalTo('region'))
+        $formMock->expects($this->atLeastOnce())->method('get')->with($this->equalTo('region'))
             ->will($this->returnValue($fieldMock));
         $formMock->expects($this->once())->method('add');
 

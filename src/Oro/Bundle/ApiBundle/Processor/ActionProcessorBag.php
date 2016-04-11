@@ -14,7 +14,7 @@ class ActionProcessorBag implements ActionProcessorBagInterface
      */
     public function addProcessor(ActionProcessorInterface $processor)
     {
-        $this->processors[] = $processor;
+        $this->processors[$processor->getAction()] = $processor;
     }
 
     /**
@@ -22,12 +22,10 @@ class ActionProcessorBag implements ActionProcessorBagInterface
      */
     public function getProcessor($action)
     {
-        foreach ($this->processors as $processor) {
-            if ($processor->getAction() === $action) {
-                return $processor;
-            }
+        if (!isset($this->processors[$action])) {
+            throw new \InvalidArgumentException(sprintf('A processor for "%s" action was not found.', $action));
         }
 
-        throw new \InvalidArgumentException(sprintf('A processor for "%s" action was not found.', $action));
+        return $this->processors[$action];
     }
 }

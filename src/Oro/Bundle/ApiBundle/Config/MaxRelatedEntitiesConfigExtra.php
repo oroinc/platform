@@ -52,7 +52,7 @@ class MaxRelatedEntitiesConfigExtra implements ConfigExtraInterface
     /**
      * {@inheritdoc}
      */
-    public function isInheritable()
+    public function isPropagable()
     {
         return true;
     }

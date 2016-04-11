@@ -4,8 +4,10 @@ layout:
             items:
                 head:
                     blockType:   head
+                title:
+                    blockType:   title
                     options:
-                        title:   Form
+                        value:   Form
                 meta_charset:
                     blockType:   meta
                     options:
@@ -31,6 +33,7 @@ layout:
             tree:
                 root:
                     head:
+                        title: ~
                         meta_charset: ~
                         meta_x_ua_compatible: ~
                         meta_viewport: ~

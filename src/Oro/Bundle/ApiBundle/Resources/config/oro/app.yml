@@ -1,6 +1,7 @@
 nelmio_api_doc:
     motd:
         template: OroApiBundle::ApiDoc/motd.html.twig
+    default_sections_opened: false
 
 security:
     firewalls:
@@ -13,6 +14,24 @@ security:
             context: main
 
 oro_api:
+    filters:
+        string: ~
+        boolean: ~
+        integer:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        bigint:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        unsignedInteger:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        decimal:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        float:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        datetime:
+            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+        entityAlias: ~
+        entityPluralAlias: ~
+
     actions:
         get_list:
             processing_groups:
@@ -50,3 +69,35 @@ oro_api:
                     priority: -70
                 normalize_result:
                     priority: -80
+        delete:
+            processing_groups:
+                initialize:
+                    priority: -10
+                security_check:
+                    priority: -20
+                normalize_input:
+                    priority: -30
+                build_query:
+                    priority: -40
+                load_data:
+                    priority: -50
+                delete_data:
+                    priority: -60
+                normalize_result:
+                    priority: -70
+        delete_list:
+            processing_groups:
+                initialize:
+                    priority: -10
+                security_check:
+                    priority: -20
+                normalize_input:
+                    priority: -30
+                build_query:
+                    priority: -40
+                load_data:
+                    priority: -50
+                delete_data:
+                    priority: -60
+                normalize_result:
+                    priority: -70

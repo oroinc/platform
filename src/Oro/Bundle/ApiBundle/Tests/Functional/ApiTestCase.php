@@ -45,7 +45,7 @@ abstract class ApiTestCase extends WebTestCase
     abstract protected function getRequestType();
 
     /**
-     * @return array
+     * @return array [entity class => [entity class, [excluded action, ...]], ...]
      */
     public function getEntities()
     {
@@ -57,7 +57,7 @@ abstract class ApiTestCase extends WebTestCase
         foreach ($resources as $resource) {
             $entityClass = $resource->getEntityClass();
 
-            $entities[$entityClass] = [$entityClass];
+            $entities[$entityClass] = [$entityClass, $resource->getExcludedActions()];
         }
 
         return $entities;

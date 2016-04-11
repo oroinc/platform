@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\ImportExportBundle\Tests\Unit\Strategy\Stub;
 
-class ImportEntity
+class ImportEntity extends BaseImportEntity
 {
     /**
      * @var int

@@ -117,7 +117,7 @@ define(function(require) {
      */
     (function() {
         function makeFloating($dropdownMenu) {
-            var css = _.extend(_.pick($dropdownMenu[0].getBoundingClientRect(), ['top', 'left']), {
+            var css = _.extend(_.pick($dropdownMenu.offset(), ['top', 'left']), {
                 display: 'block',
                 width: $dropdownMenu.outerWidth(),
                 height: $dropdownMenu.outerHeight()
@@ -128,7 +128,10 @@ define(function(require) {
                 .after($placeholder)
                 .appendTo('body')
                 .addClass('dropdown-menu__floating')
-                .css(css);
+                .css(css)
+                .one('mouseleave', function(e) {
+                    $placeholder.trigger(e.type);
+                });
 
             function toClose() {
                 $placeholder.parent().trigger('tohide.bs.dropdown');
