@@ -43,6 +43,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param bool   $isPersistNew
      * @param mixed|array|null $itemData
      * @param array $searchContext
+     * @param bool $entityIsRelation
+     *
      * @return null|object
      */
     protected function processEntity(
@@ -50,7 +52,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $isFullData = false,
         $isPersistNew = false,
         $itemData = null,
-        array $searchContext = array()
+        array $searchContext = array(),
+        $entityIsRelation = false
     ) {
         $oid = spl_object_hash($entity);
         if (isset($this->cachedEntities[$oid])) {
@@ -68,6 +71,10 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         } else {
             // if can't find entity and new entity can't be persisted
             if (!$isPersistNew) {
+                if ($entityIsRelation){
+                    $this->strategyHelper->addValidationErrors(['Do not find entity '. ClassUtils::getClass($entity)] , $this->context);
+                }
+
                 return null;
             }
             $this->databaseHelper->resetIdentifier($entity);
@@ -170,7 +177,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                             $isFullRelation,
                             $isPersistRelation,
                             $relationItemData,
-                            $searchContext
+                            $searchContext,
+                            true
                         );
                     }
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);
