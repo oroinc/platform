@@ -212,6 +212,14 @@ class FieldAclExtension extends EntityAclExtension
     /**
      * {@inheritdoc}
      */
+    protected function getPermissionsToIdentityMap($byCurrentGroup = false)
+    {
+        return $this->permissionToMaskBuilderIdentity;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getExtensionKey()
     {
         return self::NAME;
