@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Controller\Api\Rest;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
+use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Symfony\Component\HttpFoundation\Response;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -162,10 +162,10 @@ class IntegrationController extends FOSRestController
     }
 
     /**
-     * @return SyncScheduler
+     * @return GenuineSyncScheduler
      */
     protected function getSyncScheduler()
     {
-        return $this->get('oro_integration.generic_sync_scheduler');
+        return $this->get('oro_integration.genuine_sync_scheduler');
     }
 }

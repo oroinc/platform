@@ -29,7 +29,7 @@ parameters:
 
     oro_integration.delete_manager.class:                                 Oro\Bundle\IntegrationBundle\Manager\DeleteManager
     oro_integration.reverse_sync_scheduler.class:                         Oro\Bundle\IntegrationBundle\Manager\ReverseSyncScheduler
-    oro_integration.generic_sync_scheduler.class:                         Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
+    oro_integration.genuine_sync_scheduler.class:                         Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler
 
     oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
     oro_integration.provider.settings_provider.class:                     Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
@@ -211,11 +211,8 @@ services:
             - '@doctrine'
             - '@oro_integration.manager.types_registry'
 
-    # generic added to the name to avoid problems.
-    # The name oro_integration.sync_scheduler was used by
-    # a service which called right now oro_integration.reverse_sync_scheduler
-    oro_integration.generic_sync_scheduler:
-        class: %oro_integration.generic_sync_scheduler.class%
+    oro_integration.genuine_sync_scheduler:
+        class: %oro_integration.genuine_sync_scheduler.class%
         arguments:
             - @doctrine
 

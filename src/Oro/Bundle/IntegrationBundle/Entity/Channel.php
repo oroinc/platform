@@ -52,7 +52,7 @@ class Channel
     const EDIT_MODE_DISALLOW = 1;
     
     /**
-     * This modes could be used to programatically force the edit mode status.
+     * This modes could be used to programmatically force the edit mode status.
      * It must not be changed on any user actions.
      */
     const EDIT_MODE_FORCED_ALLOW = 4;

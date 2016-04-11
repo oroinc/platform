@@ -17,7 +17,7 @@ class EditModeUtils
             Channel::EDIT_MODE_ALLOW,
             Channel::EDIT_MODE_FORCED_ALLOW,
             Channel::EDIT_MODE_RESTRICTED
-        ));
+        ), true);
     }
 
     /**
@@ -29,7 +29,7 @@ class EditModeUtils
         if (false == in_array($channel->getEditMode(), array(
             Channel::EDIT_MODE_FORCED_ALLOW,
             Channel::EDIT_MODE_FORCED_DISALLOW,
-        ))) {
+        ), true)) {
             $channel->setEditMode($newEditMode);
         }
     }

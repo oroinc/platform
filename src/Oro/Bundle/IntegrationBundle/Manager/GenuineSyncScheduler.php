@@ -11,7 +11,7 @@ use Oro\Bundle\IntegrationBundle\Exception\LogicException;
 /**
  * This class is responsible for job scheduling.
  */
-class SyncScheduler
+class GenuineSyncScheduler
 {
     /** @var ManagerRegistry */
     protected $registry;
@@ -34,7 +34,7 @@ class SyncScheduler
      */
     public function schedule(Integration $integration, $force = false)
     {
-        if (false == $integration->isEnabled()) {
+        if (false === $integration->isEnabled()) {
             throw new LogicException(sprintf('The integration is not active. Id: %s', $integration->getId()));
         }
 

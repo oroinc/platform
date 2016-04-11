@@ -7,13 +7,13 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManagerInterface;
 use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
+use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 
-class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
+class GenuineSyncSchedulerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRegistryAsFirstArgument()
     {
-        new SyncScheduler($this->createRegistryStub());
+        new GenuineSyncScheduler($this->createRegistryStub());
     }
 
     /**
@@ -25,7 +25,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
         $channel = new Channel();
         $channel->setEnabled(false);
 
-        $scheduler = new SyncScheduler($this->createRegistryStub());
+        $scheduler = new GenuineSyncScheduler($this->createRegistryStub());
 
         $scheduler->schedule($channel);
     }
@@ -46,7 +46,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
             ->method('flush')
         ;
 
-        $scheduler = new SyncScheduler($this->createRegistryStub($managerMock));
+        $scheduler = new GenuineSyncScheduler($this->createRegistryStub($managerMock));
 
         $scheduler->schedule($channel);
     }
@@ -60,7 +60,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
 
         $managerMock = $this->createEntityManagerMock();
 
-        $scheduler = new SyncScheduler($this->createRegistryStub($managerMock));
+        $scheduler = new GenuineSyncScheduler($this->createRegistryStub($managerMock));
 
         $job = $scheduler->schedule($channel);
 
@@ -78,7 +78,7 @@ class SyncSchedulerTest extends \PHPUnit_Framework_TestCase
 
         $managerMock = $this->createEntityManagerMock();
 
-        $scheduler = new SyncScheduler($this->createRegistryStub($managerMock));
+        $scheduler = new GenuineSyncScheduler($this->createRegistryStub($managerMock));
 
         $job = $scheduler->schedule($channel, true);
 

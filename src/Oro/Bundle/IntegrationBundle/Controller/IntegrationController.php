@@ -3,7 +3,7 @@
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
-use Oro\Bundle\IntegrationBundle\Manager\SyncScheduler;
+use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
 use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -81,7 +81,7 @@ class IntegrationController extends Controller
      */
     public function scheduleAction(Integration $integration, Request $request)
     {
-        if (false == $integration->isEnabled()) {
+        if (false === $integration->isEnabled()) {
             return new JsonResponse([
                 'successful' => false,
                 'message'    => $this->get('translator')->trans('oro.integration.sync_error_integration_deactivated'),
@@ -181,10 +181,10 @@ class IntegrationController extends Controller
     }
 
     /**
-     * @return SyncScheduler
+     * @return GenuineSyncScheduler
      */
     protected function getSyncScheduler()
     {
-        return $this->get('oro_integration.generic_sync_scheduler');
+        return $this->get('oro_integration.genuine_sync_scheduler');
     }
 }
