@@ -22,6 +22,12 @@ class CompleteUpdateStatusCodes extends CompleteStatusCodes
                 $this->createStatusCode('Returned when entity was successfully updated')
             );
         }
+        if (!$statusCodes->hasCode(Response::HTTP_BAD_REQUEST)) {
+            $statusCodes->addCode(
+                Response::HTTP_FORBIDDEN,
+                $this->createStatusCode('Returned when the request data is not valid')
+            );
+        }
         if (!$statusCodes->hasCode(Response::HTTP_FORBIDDEN)) {
             $statusCodes->addCode(
                 Response::HTTP_FORBIDDEN,

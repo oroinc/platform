@@ -90,7 +90,14 @@ services:
     oro_api.update.validate_request_data_exist:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestDataExist
         tags:
-            - { name: oro.api.processor, action: update, group: normalize_input, priority: 100 }
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: !json_api, priority: 100 }
+
+    oro_api.update.json_api.validate_request_data:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\ValidateRequestData
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -40 }
 
     oro_api.update.json_api.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData

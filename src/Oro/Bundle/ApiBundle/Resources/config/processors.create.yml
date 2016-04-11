@@ -58,7 +58,14 @@ services:
     oro_api.create.validate_request_data_exist:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ValidateRequestDataExist
         tags:
-            - { name: oro.api.processor, action: create, group: normalize_input, priority: 100 }
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: !json_api, priority: 100 }
+
+    oro_api.create.json_api.validate_request_data:
+        class: Oro\Bundle\ApiBundle\Processor\Create\JsonApi\ValidateRequestData
+        arguments:
+            - @oro_api.value_normalizer
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -40 }
 
     oro_api.create.json_api.extract_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Create\JsonApi\ExtractEntityId
