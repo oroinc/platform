@@ -57,9 +57,20 @@ class WidgetController extends Controller
             $currentStep = $workflowItem->getCurrentStep();
         }
 
+        $steps = $steps->map(function ($step) {
+            return array(
+                'name' => $step->getName(),
+                'label' => $step->getLabel()
+            );
+        });
+
+        $steps = $steps->toArray();
+
         return array(
             'steps' => $steps,
-            'currentStep' => $currentStep,
+            'currentStep' => array(
+                'name' => $currentStep->getName()
+            )
         );
     }
 

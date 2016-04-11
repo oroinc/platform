@@ -1,8 +1,15 @@
 define([
     'oroui/js/app/controllers/base/controller',
-    'oroui/js/app/views/page-view'
-], function(BaseController, PageView) {
+    'oroui/js/app/views/page-view',
+    'underscore',
+    'module'
+], function(BaseController, PageView, _, module) {
     'use strict';
+
+    var config = module.config();
+    config = _.extend({
+        showLoadingMaskOnStartup: true
+    }, config);
 
     /**
      * Init PageView
@@ -85,7 +92,9 @@ define([
                 mediator.setHandler('hideLoading', this.view.hide, this.view);
                 mediator.on('page:beforeChange', this.view.show, this.view);
                 mediator.on('page:afterChange', this.view.hide, this.view);
-                this.view.show();
+                if (config.showLoadingMaskOnStartup) {
+                    this.view.show();
+                }
             }
         });
     });

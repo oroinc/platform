@@ -632,9 +632,9 @@ define(function(require) {
          * @private
          */
         _listenToContentEvents: function() {
-            this.listenTo(this.body, 'rowClicked', function(row) {
+            this.listenTo(this.body, 'rowClicked', function(row, options) {
                 this.trigger('rowClicked', this, row);
-                this._runRowClickAction(row);
+                this._runRowClickAction(row, options);
             });
             this.listenTo(this.columns, 'change:renderable', function() {
                 this.trigger('content:update');
@@ -652,9 +652,10 @@ define(function(require) {
          * Create row click action
          *
          * @param {orodatagrid.datagrid.Row} row
+         * @param {Object} options
          * @private
          */
-        _runRowClickAction: function(row) {
+        _runRowClickAction: function(row, options) {
             var config;
             if (!this.rowClickAction) {
                 return;
@@ -669,7 +670,7 @@ define(function(require) {
             }
             config = row.model.get('action_configuration');
             if (!config || config[action.name] !== false) {
-                action.run();
+                action.run(options);
             }
         },
 

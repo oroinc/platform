@@ -1,0 +1,42 @@
+<?php
+
+namespace Oro\Bundle\ConfigBundle\Tests\Unit\Event;
+
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
+
+class ConfigGetEventTest extends \PHPUnit_Framework_TestCase
+{
+    /** @var ConfigManager|\PHPUnit_Framework_MockObject_MockObject*/
+    protected $configManager;
+
+    protected function setUp()
+    {
+        $this->configManager = $this->getMockBuilder('Oro\Bundle\ConfigBundle\Config\ConfigManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+    }
+
+    protected function tearDown()
+    {
+        unset($this->configManager);
+    }
+
+    public function testEvent()
+    {
+        $key = 'key';
+        $value = 'value';
+        $full = true;
+
+        $event = new ConfigGetEvent($this->configManager, $key, $value, $full);
+
+        $this->assertSame($this->configManager, $event->getConfigManager());
+        $this->assertEquals($key, $event->getKey());
+        $this->assertEquals($value, $event->getValue());
+        $this->assertEquals($full, $event->isFull());
+
+        $newValue = 'new_value';
+        $event->setValue($newValue);
+        $this->assertEquals($newValue, $event->getValue());
+    }
+}

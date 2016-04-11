@@ -74,6 +74,7 @@ define(function(require) {
             $.when.apply($, promises).always(function() {
                 self.subComponents = _.compact(arguments);
                 self._resolveDeferredInit();
+                self.$componentEl.find('.view-loading').remove();
                 self.$el.show();
                 self.grid.trigger('shown');
             });
@@ -103,7 +104,8 @@ define(function(require) {
          */
         initDataGrid: function(options) {
             this.$el = $('<div>');
-            $(options.el).append(this.$el);
+            this.$componentEl = options.$el;
+            this.$componentEl.append(this.$el);
             this.gridName = options.gridName;
             this.inputName = options.inputName;
             this.data = options.data;
