@@ -7,7 +7,6 @@ use Symfony\Bundle\FrameworkBundle\Routing\Router as SymfonyRouter;
 use Symfony\Component\HttpFoundation\RedirectResponse;
 
 
-use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
@@ -41,13 +40,11 @@ class Router
      * @param Request        $request
      * @param SymfonyRouter  $router
      * @param SecurityFacade $securityFacade
-     * @param ConfigManager  $configManager
      */
     public function __construct(
         Request $request,
         SymfonyRouter $router,
-        SecurityFacade $securityFacade,
-        ConfigManager $configManager
+        SecurityFacade $securityFacade
     ) {
         $this->request = $request;
         $this->router = $router;
@@ -76,12 +73,24 @@ class Router
     {
         switch ($this->request->get(self::ACTION_PARAMETER)) {
             case self::ACTION_SAVE_AND_STAY:
-                $routeData = $saveAndStayRoute;
+                /**
+                 * If user has no permission to edit Save and close callback should be used
+                 */
+                if (is_null($entity) || $this->securityFacade->isGranted('EDIT', $entity)) {
+                    $routeData = $saveAndStayRoute;
+                } else {
+                    $routeData = $saveAndCloseRoute;
+                }
+
                 break;
             case self::ACTION_SAVE_CLOSE:
                 $routeData = $saveAndCloseRoute;
+
                 break;
             default:
+                /**
+                 * Avoids of BC break
+                 */
                 return $this->redirectToAfterSaveAction($entity);
         }
 
@@ -107,7 +116,7 @@ class Router
     {
         $route = $this->request->get(self::ACTION_PARAMETER);
         if (empty($route)) {
-            throw new \InvalidArgumentException('Input action required');
+            throw new \InvalidArgumentException('The "input_action" parameter required');
         }
 
         $route = json_decode($route, true);

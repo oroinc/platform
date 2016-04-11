@@ -16,6 +16,9 @@ use Oro\Bundle\FormBundle\Event\FormHandler\AfterFormProcessEvent;
 use Oro\Bundle\FormBundle\Event\FormHandler\Events;
 use Oro\Bundle\FormBundle\Event\FormHandler\FormProcessEvent;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -90,7 +93,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $entity = $this->getObject();
-        $expected = $this->assertSaveData($form, $entity);
+        $expected = $this->getExpectedSaveData($form, $entity);
 
         $result = $this->handler->handleUpdate(
             $entity,
@@ -126,7 +129,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher->expects($this->exactly(2))
             ->method('dispatch');
 
-        $expected = $this->assertSaveData($form, $entity);
+        $expected = $this->getExpectedSaveData($form, $entity);
 
         $result = $this->handler->handleUpdate(
             $entity,
@@ -184,7 +187,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->eventDispatcher->expects($this->exactly(4))
             ->method('dispatch');
 
-        $expected = $this->assertSaveData($form, $entity);
+        $expected = $this->getExpectedSaveData($form, $entity);
         $expected['savedId'] = 1;
 
         $result = $this->handler->handleUpdate(
@@ -271,7 +274,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $expected = $this->assertSaveData($form, $entity);
+        $expected = $this->getExpectedSaveData($form, $entity);
 
         $result = $this->handler->handleUpdate(
             $entity,
@@ -306,7 +309,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
                 }
             );
 
-        $expected = $this->assertSaveData($form, $entity);
+        $expected = $this->getExpectedSaveData($form, $entity);
 
         $result = $this->handler->handleUpdate(
             $entity,
@@ -326,18 +329,13 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $entity = $this->getObject();
 
-        $handler = $this->getMockBuilder('Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\HandlerStub')
-            ->getMock();
-        $handler->expects($this->once())
-            ->method('process')
-            ->with($entity)
-            ->will($this->returnValue(true));
+        $handler = $this->getHandlerStub($entity);
         $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($entity)
             ->will($this->returnValue(1));
 
-        $expected = $this->assertSaveData($form, $entity);
+        $expected = $this->getExpectedSaveData($form, $entity);
         $expected['savedId'] = 1;
 
         $result = $this->handler->handleUpdate(
@@ -359,18 +357,13 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $entity = $this->getObject();
 
-        $handler = $this->getMockBuilder('Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\HandlerStub')
-            ->getMock();
-        $handler->expects($this->once())
-            ->method('process')
-            ->with($entity)
-            ->will($this->returnValue(true));
+        $handler = $this->getHandlerStub($entity);
         $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($entity)
             ->will($this->returnValue(1));
 
-        $expected = $this->assertSaveData($form, $entity);
+        $expected = $this->getExpectedSaveData($form, $entity);
         $expected['savedId'] = 1;
 
         $result = $this->handler->handleUpdate(
@@ -393,12 +386,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
 
         $entity = $this->getObject();
 
-        $handler = $this->getMockBuilder('Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\HandlerStub')
-            ->getMock();
-        $handler->expects($this->once())
-            ->method('process')
-            ->with($entity)
-            ->will($this->returnValue(true));
+        $handler = $this->getHandlerStub($entity);
         $this->doctrineHelper->expects($this->once())
             ->method('getSingleEntityIdentifier')
             ->with($entity)
@@ -421,7 +409,7 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             return ['form' => $expectedForm, 'test' => 1];
         };
 
-        $expected = $this->assertSaveData($form, $entity);
+        $expected = $this->getExpectedSaveData($form, $entity);
         $expected['savedId'] = 1;
         $expected['test'] = 1;
         $expected['form'] = $expectedForm;
@@ -451,18 +439,9 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $entity = $this->getObject();
-        $handler = $this->getMockBuilder('Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\HandlerStub')
-            ->getMock();
-        $handler->expects($this->once())
-            ->method('process')
-            ->with($entity)
-            ->will($this->returnValue(true));
+        $handler = $this->getHandlerStub($entity);
 
-        $flashBag = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface')
-            ->getMock();
-        $flashBag->expects($this->once())
-            ->method('add')
-            ->with('success', $message);
+        $flashBag = $this->getFlashBagMock($message);
         $this->session->expects($this->once())
             ->method('getFlashBag')
             ->will($this->returnValue($flashBag));
@@ -490,13 +469,99 @@ class UpdateHandlerTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expected, $result);
     }
 
+    public function testHandleEntityUpdateRequestNoWid()
+    {
+        $this->request->query = new ParameterBag(['qwe' => 'rty']);
+
+        $message = 'Saved';
+
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Form $form */
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entity = $this->getObject();
+        $handler = $this->getHandlerStub($entity);
+
+        $this->session->expects($this->once())
+            ->method('getFlashBag')
+            ->willReturn($this->getFlashBagMock($message));
+
+        $redirectResponse = new \stdClass();
+        $this->router->expects($this->once())
+            ->method('redirectToAfterSaveAction')
+            ->with($entity)
+            ->willReturn($redirectResponse);
+
+        $actual = $this->handler->handleEntityUpdateRequest($entity, $form, $message, $handler);
+        $this->assertEquals($redirectResponse, $actual);
+    }
+
+    public function testHandleEntityUpdateRequest()
+    {
+        /** @var \PHPUnit_Framework_MockObject_MockObject|Form $form */
+        $form = $this->getMockBuilder('Symfony\Component\Form\Form')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $entity = $this->getObject();
+
+        $handler = $this->getHandlerStub($entity);
+        $this->doctrineHelper->expects($this->once())
+            ->method('getSingleEntityIdentifier')
+            ->with($entity)
+            ->will($this->returnValue(1));
+
+        $expected = $this->getExpectedSaveData($form, $entity);
+        $expected['savedId'] = 1;
+
+        $result = $this->handler->handleEntityUpdateRequest(
+            $entity,
+            $form,
+            'Saved',
+            $handler
+        );
+        $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @param string $message
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getFlashBagMock($message)
+    {
+        $flashBag = $this->getMockBuilder('Symfony\Component\HttpFoundation\Session\Flash\FlashBagInterface')
+            ->getMock();
+        $flashBag->expects($this->once())
+            ->method('add')
+            ->with('success', $message);
+
+        return $flashBag;
+    }
+
+    /**
+     * @param object $entity
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getHandlerStub($entity)
+    {
+        $handler = $this->getMockBuilder('Oro\Bundle\FormBundle\Tests\Unit\Form\Stub\HandlerStub')
+            ->getMock();
+        $handler->expects($this->once())
+            ->method('process')
+            ->with($entity)
+            ->willReturn(true);
+
+        return $handler;
+    }
+
     /**
      * @param \PHPUnit_Framework_MockObject_MockObject|Form $form
      * @param object $entity
      * @param string $wid
      * @return array
      */
-    protected function assertSaveData($form, $entity, $wid = 'WID')
+    protected function getExpectedSaveData($form, $entity, $wid = 'WID')
     {
         $this->request->expects($this->atLeastOnce())
             ->method('get')

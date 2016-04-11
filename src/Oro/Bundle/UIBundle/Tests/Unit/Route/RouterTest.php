@@ -141,7 +141,7 @@ class RouterTest extends \PHPUnit_Framework_TestCase
 
         $this->request->expects($this->once())
             ->method('get')
-            ->will($this->returnValue('test'));
+            ->will($this->returnValue(Router::ACTION_SAVE_CLOSE));
 
         $this->route->expects($this->once())
             ->method('generate')
@@ -168,5 +168,129 @@ class RouterTest extends \PHPUnit_Framework_TestCase
             array(),
             array()
         );
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "input_action" parameter required
+     */
+    public function testRedirectToAfterSaveActionRaiseAnExceptionWhenInputActionIsEmpty()
+    {
+        $this->router->redirectToAfterSaveAction([]);
+    }
+
+    /**
+     * @expectedException \InvalidArgumentException
+     * @expectedExceptionMessage The "route" attribute required
+     */
+    public function testRedirectToAfterSaveActionRaiseAnExceptionWhenInputActionRouteIsEmpty()
+    {
+        $this->request->expects($this->any())
+            ->method('get')
+            ->with(Router::ACTION_PARAMETER)
+            ->willReturn(json_encode(['route' => '']));
+
+        $this->router->redirectToAfterSaveAction([]);
+    }
+
+    /**
+     * @dataProvider redirectToAfterSaveActionDataProvider
+     */
+    public function testRedirectToAfterSaveAction($expected, $data)
+    {
+        $this->request->expects($this->any())
+            ->method('get')
+            ->with(Router::ACTION_PARAMETER)
+            ->willReturn(json_encode($data['actionParameters']));
+
+        $expectedUrl = 'http://expected.com';
+        $this->route->expects($this->once())
+            ->method('generate')
+            ->with($expected['route'], $expected['parameters'])
+            ->willReturn($expectedUrl);
+
+        $response = $this->router->redirectToAfterSaveAction($data['context']);
+        $this->assertEquals($expectedUrl, $response->getTargetUrl());
+    }
+
+    /**
+     * @return array
+     */
+    public function redirectToAfterSaveActionDataProvider()
+    {
+        $expectedRoute = 'test_route';
+        $expectedStaticParameterValue = 'OroCRM\Bundle\CallBundle\Entity\Call';
+        $expectedStaticParameter = 'testStaticParameter';
+        $expectedEntityIdParameter = 'id';
+        $expectedId = 42;
+        $entity = $this->getEntityStub($expectedId);
+        $entityAsContextTestCase = [
+            'expected' => [
+                'route' => $expectedRoute,
+                'parameters' => [
+                    $expectedStaticParameter => $expectedStaticParameterValue,
+                    $expectedEntityIdParameter => $expectedId
+                ]
+            ],
+            'data' => [
+                'actionParameters' => [
+                    'route' => $expectedRoute,
+                    'params' => [
+                        $expectedStaticParameter => $expectedStaticParameterValue,
+                        $expectedEntityIdParameter => '$.id'
+                    ]
+                ],
+                'context' => $entity
+            ]
+        ];
+
+        $expectedSecondEntityIdParameter = 'secondId';
+        $expectedSecondEntityId = 21;
+        $firstEntityContextKey = 'firstEntity';
+        $secondEntityContextKey = 'secondEntity';
+        $arrayAsContextTestCase = [
+            'expected' => [
+                'route' => $expectedRoute,
+                'parameters' => [
+                    $expectedStaticParameter => $expectedStaticParameterValue,
+                    $expectedEntityIdParameter => $expectedId,
+                    $expectedSecondEntityIdParameter => $expectedSecondEntityId
+                ]
+            ],
+            'data' => [
+                'actionParameters' => [
+                    'route' => $expectedRoute,
+                    'params' => [
+                        $expectedStaticParameter => $expectedStaticParameterValue,
+                        $expectedEntityIdParameter => '$.'.$firstEntityContextKey.'.id',
+                        $expectedSecondEntityIdParameter => '$.'.$secondEntityContextKey.'.id'
+                    ]
+                ],
+                'context' => [
+                    $firstEntityContextKey => $entity,
+                    $secondEntityContextKey => $this->getEntityStub($expectedSecondEntityId)
+                ]
+            ]
+        ];
+
+        return [
+            'with entity as context' => $entityAsContextTestCase,
+            'with array as context' => $arrayAsContextTestCase,
+        ];
+    }
+
+    /**
+     * @param int $id
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getEntityStub($id)
+    {
+        $entity = $this->getMock('StdClass', ['getId']);
+        $entity->expects($this->any())
+            ->method('getId')
+            ->willReturn($id);
+
+        return $entity;
     }
 }
