@@ -60,7 +60,7 @@ class UniqueExtendEntityMethodNameValidator extends ConstraintValidator
             $methods = array_merge($methods, $relationMethods);
         }
         if (!empty($methods)) {
-            $this->addViolation($constraint->message, implode(', ', $methods), '');
+            $this->addViolation($constraint->message, $fieldName, '');
         }
     }
 
