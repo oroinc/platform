@@ -156,7 +156,6 @@ define([
         },
 
         onClick: function(e) {
-            e.preventDefault();
             var _this = this;
             var options = {};
             var clickFunction = function() {
@@ -176,6 +175,7 @@ define([
             if (!this.clickPermit) {
                 return;
             }
+            e.preventDefault();
             if (tools.isTargetBlankEvent(e)) {
                 options.target = '_blank';
                 clickFunction();
