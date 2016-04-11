@@ -123,7 +123,7 @@ services:
     oro_workflow.action.get_class_name:
         class: %oro_workflow.action.get_class_name.class%
         arguments:
-            - @oro_action.context_accessor
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_workflow.action, alias: get_class_name }
 

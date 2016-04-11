@@ -135,7 +135,7 @@ services:
     oro_datagrid.extension.postgresql_grid_modifier:
         class: %oro_datagrid.extension.postgresql_grid_modifier.class%
         arguments:
-            - @service_container
-            - @oro_entity.orm.entity_class_resolver
+            - '@service_container'
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro_datagrid.extension }

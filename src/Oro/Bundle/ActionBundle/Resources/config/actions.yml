@@ -132,7 +132,7 @@ services:
     oro_action.action.get_class_name:
         class: %oro_action.action.get_class_name.class%
         arguments:
-            - @oro_action.context_accessor
+            - '@oro_action.context_accessor'
         tags:
             - { name: oro_action.action, alias: get_class_name }
 
