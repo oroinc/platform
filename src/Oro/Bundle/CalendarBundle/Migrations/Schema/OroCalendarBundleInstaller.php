@@ -169,7 +169,7 @@ class OroCalendarBundleInstaller implements Installation
             ['onDelete' => 'CASCADE']
         );
         $table->addForeignKeyConstraint(
-            $table,
+            $schema->getTable('oro_recurrence'),
             ['recurrence_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]

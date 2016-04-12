@@ -259,7 +259,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      * @var Recurrence
      *
      * @ORM\OneToOne(targetEntity="Recurrence")
-     * @ORM\JoinColumn(name="recurrence_id", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\JoinColumn(name="recurrence_id", nullable=true, referencedColumnName="id", onDelete="SET NULL")
      */
     protected $recurrence;
 
@@ -684,7 +684,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     /**
      * Set recurrence
      *
-     * @param Recurrence $recurrence
+     * @param Recurrence|null $recurrence
      *
      * @return self
      */
@@ -698,7 +698,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     /**
      * Get recurrence
      *
-     * @return Recurrence
+     * @return Recurrence|null
      */
     public function getRecurrence()
     {
