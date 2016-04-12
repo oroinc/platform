@@ -18,11 +18,11 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
     /**
      * {@inheritdoc}
      */
-    public function guess($filePath)
+    public function guess($path)
     {
         $file = ArrayUtil::find(
-            function (array $file) use ($filePath) {
-                return $file['tmp_name']['file'] === $filePath;
+            function (array $file) use ($path) {
+                return $file['tmp_name']['file'] === $path;
             },
             $_FILES
         );
@@ -31,15 +31,9 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
             return null;
         }
 
-        $fileName = $file['name']['file'];
-        $pos = strrpos($fileName, '.');
-        if (!$pos) {
-            return null;
-        }
+        $extension = pathinfo($file['name']['file'], PATHINFO_EXTENSION);
 
-        $extension = substr($fileName, $pos + 1);
-
-        $handle = fopen($filePath, 'r');
+        $handle = fopen($path, 'r');
         $bytes = bin2hex(fread($handle, 8));
         fclose($handle);
 
