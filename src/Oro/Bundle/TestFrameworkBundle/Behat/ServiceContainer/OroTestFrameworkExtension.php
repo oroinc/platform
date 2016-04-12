@@ -9,9 +9,15 @@ use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
+    const PAGE_DIRECTORY = '/Tests/Behat/Page';
+    const PAGE_NAMESPACE = '\Tests\Behat\Page';
+    const ELEMENT_DIRECTORY = '/Tests/Behat/Page/Element';
+    const ELEMENT_NAMESPACE = '\Tests\Behat\Page\Element';
+
     /**
      * {@inheritdoc}
      */
@@ -19,6 +25,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
+        $this->processPageObjectsAutoload($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -92,6 +99,7 @@ class OroTestFrameworkExtension implements TestworkExtension
 
         $configuredBundles = $this->getConfiguredBundles($suiteConfigurations);
 
+        /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
             if (in_array($bundle->getName(), $configuredBundles)) {
                 continue;
@@ -116,6 +124,38 @@ class OroTestFrameworkExtension implements TestworkExtension
     }
 
     /**
+     * @param ContainerBuilder $container
+     */
+    private function processPageObjectsAutoload(ContainerBuilder $container)
+    {
+        $kernel = $container->get(Symfony2Extension::KERNEL_ID);
+        $pages = $container->getParameter('sensio_labs.page_object_extension.namespaces.page');
+        $elements = $container->getParameter('sensio_labs.page_object_extension.namespaces.element');
+
+        /** @var BundleInterface $bundle */
+        foreach ($kernel->getBundles() as $bundle) {
+            if ($this->hasPageDirectory($bundle)) {
+                $pageNamespace = $bundle->getNamespace() . self::PAGE_NAMESPACE;
+
+                if (!in_array($pageNamespace, $pages)) {
+                    $pages[] = $pageNamespace;
+                }
+            }
+
+            if ($this->hasElementDirectory($bundle)) {
+                $pageNamespace = $bundle->getNamespace() . self::ELEMENT_NAMESPACE;
+
+                if (!in_array($pageNamespace, $elements)) {
+                    $elements[] = $pageNamespace;
+                }
+            }
+        }
+
+        $container->setParameter('sensio_labs.page_object_extension.namespaces.page', $pages);
+        $container->setParameter('sensio_labs.page_object_extension.namespaces.element', $elements);
+    }
+
+    /**
      * @param SymfonyBundleSuite $bundleSuite
      * @param Context[] $commonContexts
      * @return array
@@ -135,5 +175,23 @@ class OroTestFrameworkExtension implements TestworkExtension
     protected function hasValidPaths(SymfonyBundleSuite $bundleSuite)
     {
         return 0 < count(array_filter($bundleSuite->getSetting('paths'), "is_dir"));
+    }
+
+    /**
+     * @param BundleInterface $bundle
+     * @return bool
+     */
+    protected function hasPageDirectory(BundleInterface $bundle)
+    {
+        return is_dir($bundle->getPath() . self::PAGE_DIRECTORY);
+    }
+
+    /**
+     * @param BundleInterface $bundle
+     * @return bool
+     */
+    protected function hasElementDirectory(BundleInterface $bundle)
+    {
+        return is_dir($bundle->getPath() . self::ELEMENT_DIRECTORY);
     }
 }

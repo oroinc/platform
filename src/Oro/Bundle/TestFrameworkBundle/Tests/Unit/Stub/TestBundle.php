@@ -17,6 +17,26 @@ class TestBundle implements BundleInterface
     }
 
     /**
+     * Returns the bundle name (the class short name).
+     *
+     * @return string The Bundle name
+     */
+    public function getName()
+    {
+        return $this->name;
+    }
+
+    /**
+     * Gets the Bundle namespace.
+     *
+     * @return string The Bundle namespace
+     */
+    public function getNamespace()
+    {
+        return $this->name;
+    }
+
+    /**
      * Boots the Bundle.
      */
     public function boot()
@@ -60,25 +80,6 @@ class TestBundle implements BundleInterface
      * @return string The Bundle name it overrides or null if no parent
      */
     public function getParent()
-    {
-    }
-
-    /**
-     * Returns the bundle name (the class short name).
-     *
-     * @return string The Bundle name
-     */
-    public function getName()
-    {
-        return $this->name;
-    }
-
-    /**
-     * Gets the Bundle namespace.
-     *
-     * @return string The Bundle namespace
-     */
-    public function getNamespace()
     {
     }
 
