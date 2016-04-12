@@ -46,8 +46,8 @@ services:
     oro_locale.settings:
         class: %oro_locale.settings.class%
         arguments:
-            - @oro_config.user
-            - @oro_locale.calendar_factory
+            - '@oro_config.user'
+            - '@oro_locale.calendar_factory'
         calls:
             - [addNameFormats, [%oro_locale.format.name%]]
             - [addAddressFormats, [%oro_locale.format.address%]]
@@ -62,13 +62,13 @@ services:
     oro_locale.calendar_factory:
         class: %oro_locale.calendar_factory.class%
         arguments:
-            - @service_container
+            - '@service_container'
 
     # Form types
     oro_locale.form.type.name_format:
         class: %oro_locale.form.type.name_format.class%
         arguments:
-            - @oro_locale.formatter.name
+            - '@oro_locale.formatter.name'
         tags:
             - { name: form.type, alias: "oro_name_format" }
 
@@ -90,14 +90,14 @@ services:
     oro_locale.form.type.language:
         class: %oro_locale.form.type.language.class%
         arguments:
-            - @oro_config.global
+            - '@oro_config.global'
         tags:
             - { name: form.type, alias: "oro_language" }
 
     oro_locale.form.type.timezone:
         class: %oro_locale.form.type.timezone.class%
         arguments:
-            - @oro_locale.cache
+            - '@oro_locale.cache'
         tags:
             - { name: form.type, alias: "oro_locale_timezone" }
 
@@ -113,24 +113,24 @@ services:
     oro_locale.format_converter.date_time.intl:
         class: %oro_locale.format_converter.date_time.intl.class%
         arguments:
-            - @oro_locale.formatter.date_time
-            - @translator
+            - '@oro_locale.formatter.date_time'
+            - '@translator'
         tags:
             - { name: oro_locale.format_converter.date_time, alias: intl }
 
     oro_locale.format_converter.date_time.moment:
         class: %oro_locale.format_converter.date_time.moment.class%
         arguments:
-            - @oro_locale.formatter.date_time
-            - @translator
+            - '@oro_locale.formatter.date_time'
+            - '@translator'
         tags:
             - { name: oro_locale.format_converter.date_time, alias: moment }
 
     oro_locale.format_converter.date_time.php:
         class: %oro_locale.format_converter.date_time.php.class%
         arguments:
-            - @oro_locale.formatter.date_time
-            - @translator
+            - '@oro_locale.formatter.date_time'
+            - '@translator'
         tags:
             - { name: oro_locale.format_converter.date_time, alias: php }
 
@@ -138,7 +138,7 @@ services:
     oro_locale.locale_listener:
         class: %oro_locale.locale_listener.class%
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: kernel.event_subscriber }
 
@@ -146,7 +146,7 @@ services:
     oro_locale.formatter.name:
         class: %oro_locale.formatter.name.class%
         arguments:
-            - @oro_locale.settings
+            - '@oro_locale.settings'
 
     oro_locale.formatter.name.link:
         tags:
@@ -155,25 +155,25 @@ services:
     oro_locale.formatter.address:
         class: %oro_locale.formatter.address.class%
         arguments:
-            - @oro_locale.settings
-            - @oro_locale.formatter.name
+            - '@oro_locale.settings'
+            - '@oro_locale.formatter.name'
 
     oro_locale.formatter.date_time:
         class: %oro_locale.formatter.date_time.class%
         arguments:
-            - @oro_locale.settings
-            - @translator
+            - '@oro_locale.settings'
+            - '@translator'
 
     oro_locale.formatter.number:
         class: %oro_locale.formatter.number.class%
         arguments:
-            - @oro_locale.settings
+            - '@oro_locale.settings'
 
     # DQL formatter
     oro_locale.dql.formatter.name:
         class: %oro_locale.dql.formatter.name.class%
         arguments:
-            - @oro_locale.formatter.name
+            - '@oro_locale.formatter.name'
 
     oro_locale.dql.formatter.name.link:
         tags:
@@ -183,62 +183,62 @@ services:
     oro_locale.twig.date_format:
         class: %oro_locale.twig.date_format.class%
         arguments:
-            - @oro_locale.format_converter.date_time.registry
+            - '@oro_locale.format_converter.date_time.registry'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.locale:
         class: %oro_locale.twig.locale.class%
         arguments:
-            - @oro_locale.settings
+            - '@oro_locale.settings'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.calendar:
         class: %oro_locale.twig.calendar.class%
         arguments:
-            - @oro_locale.settings
+            - '@oro_locale.settings'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.date_time:
         class: %oro_locale.twig.date_time.class%
         arguments:
-            - @oro_locale.formatter.date_time
+            - '@oro_locale.formatter.date_time'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.name:
         class: %oro_locale.twig.name.class%
         arguments:
-            - @oro_entity.twig.extension.entity
+            - '@oro_entity.twig.extension.entity'
 
     oro_locale.twig.address:
         class: %oro_locale.twig.address.class%
         arguments:
-            - @oro_locale.formatter.address
+            - '@oro_locale.formatter.address'
         tags:
             - { name: twig.extension }
 
     oro_locale.twig.number:
         class: %oro_locale.twig.number.class%
         arguments:
-            - @oro_locale.formatter.number
+            - '@oro_locale.formatter.number'
         tags:
             - { name: twig.extension }
 
     oro_locale.format.datetime:
         class: %oro_locale.formatter.datetime.class%
         arguments:
-            - @oro_locale.formatter.date_time
-            - @translator
+            - '@oro_locale.formatter.date_time'
+            - '@translator'
         tags:
             - { name: oro_formatter, formatter: datetime }
 
     oro_locale.format.currency:
         class: Oro\Bundle\LocaleBundle\Formatter\CurrencyFormatter
         arguments:
-            - @oro_locale.twig.number
+            - '@oro_locale.twig.number'
         tags:
             - { name: oro_formatter, formatter: currency }
 
@@ -246,7 +246,7 @@ services:
         class: %oro_locale.entity_name_provider.class%
         public: false
         arguments:
-            - @oro_locale.formatter.name.link
-            - @oro_locale.dql.formatter.name.link
+            - '@oro_locale.formatter.name.link'
+            - '@oro_locale.dql.formatter.name.link'
         tags:
             - { name: oro_entity.name_provider, priority: -90 }

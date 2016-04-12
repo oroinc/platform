@@ -21,7 +21,7 @@ services:
     oro_wamp.ping.pdo:
         class: Oro\Bundle\SyncBundle\Wamp\DbPing
         arguments:
-            - @?doctrine.dbal.session_connection.wrapped
+            - "@?doctrine.dbal.session_connection.wrapped"
 
     oro_wamp.twig.sync_extension:
         class:                            %oro_wamp.twig.class%

@@ -3,7 +3,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\MetadataProcessor
         public: false
         arguments:
-            - @oro_api.processor_bag
+            - '@oro_api.processor_bag'
             - get_metadata
 
     #
@@ -13,15 +13,15 @@ services:
     oro_api.get_metadata.load_entity_metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadEntityMetadata
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_api.entity_metadata_factory
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_metadata_factory'
         tags:
             - { name: oro.api.processor, action: get_metadata, priority: -20 }
 
     oro_api.get_metadata.load_related_entity_metadata:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\LoadRelatedEntityMetadata
         arguments:
-            - @oro_api.metadata_provider
+            - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.processor, action: get_metadata, priority: -30 }
 
@@ -33,7 +33,7 @@ services:
     oro_api.get_metadata.normalize_linked_properties:
         class: Oro\Bundle\ApiBundle\Processor\GetMetadata\NormalizeLinkedProperties
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_api.entity_metadata_factory
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_metadata_factory'
         tags:
             - { name: oro.api.processor, action: get_metadata, priority: -110 }

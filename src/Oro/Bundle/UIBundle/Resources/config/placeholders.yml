@@ -51,9 +51,9 @@ items:
         template: OroUIBundle:Default/navbar:sided.html.twig
     view_buttons:
         template: OroUIBundle::buttons.html.twig
-        applicable: @oro_ui.widget_provider.view_actions->supports($entity$)
-        data: @oro_ui.widget_provider.view_actions->getWidgets($entity$)
+        applicable: "@oro_ui.widget_provider.view_actions->supports($entity$)"
+        data: "@oro_ui.widget_provider.view_actions->getWidgets($entity$)"
     update_buttons:
         template: OroUIBundle::buttons.html.twig
-        applicable: @oro_ui.widget_provider.update_actions->supports($entity$)
-        data: @oro_ui.widget_provider.update_actions->getWidgets($entity$)
+        applicable: "@oro_ui.widget_provider.update_actions->supports($entity$)"
+        data: "@oro_ui.widget_provider.update_actions->getWidgets($entity$)"

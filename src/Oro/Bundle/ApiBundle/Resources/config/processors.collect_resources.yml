@@ -3,7 +3,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor
         public: false
         arguments:
-            - @oro_api.processor_bag
+            - '@oro_api.processor_bag'
             - collect_resources
 
     #
@@ -13,41 +13,41 @@ services:
     oro_api.collect_resources.load_dictionaries:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\LoadDictionaries
         arguments:
-            - @oro_entity.dictionary_value_list_provider
+            - '@oro_entity.dictionary_value_list_provider'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -10 }
 
     oro_api.collect_resources.load_custom_entities:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\LoadCustomEntities
         arguments:
-            - @oro_entity_config.config_manager
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -10 }
 
     oro_api.collect_resources.load_from_config_bag:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\LoadFromConfigBag
         arguments:
-            - @oro_api.config_bag
+            - '@oro_api.config_bag'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -50 }
 
     oro_api.collect_resources.remove_excluded_entities:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\RemoveExcludedEntities
         arguments:
-            - @oro_api.entity_exclusion_provider
+            - '@oro_api.entity_exclusion_provider'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -100 }
 
     oro_api.collect_resources.add_excluded_actions:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActions
         arguments:
-            - @oro_api.config_provider
+            - '@oro_api.config_provider'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -110 }
 
     oro_api.collect_resources.add_excluded_actions_for_dictionaries:
         class: Oro\Bundle\ApiBundle\Processor\CollectResources\AddExcludedActionsForDictionaries
         arguments:
-            - @oro_entity.dictionary_value_list_provider
+            - '@oro_entity.dictionary_value_list_provider'
         tags:
             - { name: oro.api.processor, action: collect_resources, priority: -120 }

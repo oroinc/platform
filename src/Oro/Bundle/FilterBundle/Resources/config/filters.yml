@@ -26,147 +26,147 @@ services:
     oro_filter.string_filter:
         class: %oro_filter.string_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: string }
 
     oro_filter.select_row_filter:
         class: %oro_filter.select_row_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: selectrow }
 
     oro_filter.number_filter:
         class: %oro_filter.number_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: number }
 
     oro_filter.number_range_filter:
         class: %oro_filter.number_range_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: number-range }
 
     oro_filter.percent_filter:
         class: %oro_filter.percent_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: percent }
 
     oro_filter.currency_filter:
         class: %oro_filter.currency_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: currency }
 
     oro_filter.choice_filter:
         class: %oro_filter.choice_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: choice }
 
     oro_filter.single_choice_filter:
         class: %oro_filter.single_choice_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: single_choice }
 
     oro_filter.entity_filter:
         class: %oro_filter.entity_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: entity }
 
     oro_filter.boolean_filter:
         class: %oro_filter.boolean_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         calls:
-            - [setTranslator, [@translator]]
+            - [setTranslator, ['@translator']]
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: boolean }
 
     oro_filter.date_filter_utility:
         class: %oro_filter.date_filter_utility.class%
         arguments:
-            - @oro_locale.settings
-            - @oro_filter.expression.date.compiler
+            - '@oro_locale.settings'
+            - '@oro_filter.expression.date.compiler'
 
     oro_filter.date_range_filter:
         class: %oro_filter.date_range_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
-            - @oro_filter.date_filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_filter.date_filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: date }
 
     oro_filter.datetime_range_filter:
         class: %oro_filter.datetime_range_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
-            - @oro_filter.date_filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_filter.date_filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: datetime }
 
     oro_filter.many_to_many_filter:
         class: %oro_filter.many_to_many_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: many-to-many }
 
     oro_filter.choice_tree_filter:
         class: %oro_filter.choice_tree_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
-            - @doctrine
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@doctrine'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: choice-tree }
 
     oro_filter.dictionary_filter:
         class: %oro_filter.dictionary_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: dictionary }
 
     oro_filter.enum_filter:
         class: %oro_filter.enum_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: enum }
 
     oro_filter.multi_enum_filter:
         class: %oro_filter.multi_enum_filter.class%
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
-            - @oro_filter.builder.many_relation
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_filter.builder.many_relation'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: multi_enum }
