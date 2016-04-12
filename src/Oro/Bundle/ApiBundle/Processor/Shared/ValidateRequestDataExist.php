@@ -2,8 +2,11 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Symfony\Component\HttpFoundation\Response;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 
 /**
@@ -20,7 +23,11 @@ class ValidateRequestDataExist implements ProcessorInterface
 
         $requestData = $context->getRequestData();
         if (empty($requestData)) {
-            throw new \RuntimeException('Request must have data.');
+            $error = new Error();
+            $error->setStatusCode(Response::HTTP_BAD_REQUEST);
+            $error->setTitle('request data constraint');
+            $error->setDetail('The request data should not be empty.');
+            $context->addError($error);
         }
     }
 }

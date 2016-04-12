@@ -6,18 +6,22 @@ use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
-use Oro\Bundle\ApiBundle\Processor\FormContext;
-use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 
-class ValidateRequestData implements ProcessorInterface
+abstract class ValidateRequestData implements ProcessorInterface
 {
     /** @var ValueNormalizer */
     protected $valueNormalizer;
+
+    /** @var SingleItemContext */
+    protected $context;
 
     /**
      * @param ValueNormalizer $valueNormalizer
@@ -32,215 +36,39 @@ class ValidateRequestData implements ProcessorInterface
      */
     public function process(ContextInterface $context)
     {
-        /** @var FormContext $context */
+        /** @var FormContext|SingleItemContext $context */
 
+        $this->context = $context;
+
+        $pointer = $this->buildPointer('', JsonApiDoc::DATA);
         $requestData = $context->getRequestData();
-        $pointer = [JsonApiDoc::DATA];
-        if (!$this->validateDataObject($requestData, $pointer, $context)) {
-            // we have no data in main object
-            return;
+        if ($this->validateRequestData($requestData, $pointer)) {
+            $data = $requestData[JsonApiDoc::DATA];
+            $this->validatePrimaryDataObject($data, $pointer);
+            $this->validateAttributesAndRelationships($data, $pointer);
         }
 
-        $data = $requestData[JsonApiDoc::DATA];
-
-        if ($this->validateResourceObject($data, $pointer, $context)) {
-            if ($context->getId() !== $data[JsonApiDoc::ID]) {
-                $this->addError(
-                    $context,
-                    array_merge($pointer, [JsonApiDoc::ID]),
-                    sprintf(
-                        'The \'%s\' parameters in request data and query sting should match each other',
-                        JsonApiDoc::ID
-                    )
-                );
-            }
-
-            $dataClassName = ValueNormalizerUtil::convertToEntityClass(
-                $this->valueNormalizer,
-                $data[JsonApiDoc::TYPE],
-                $context->getRequestType(),
-                false
-            );
-            if ($dataClassName !== $context->getClassName()) {
-                $this->addError(
-                    $context,
-                    array_merge($pointer, [JsonApiDoc::TYPE]),
-                    sprintf(
-                        'The \'%s\' parameters in request data and query sting should match each other',
-                        JsonApiDoc::TYPE
-                    )
-                );
-
-            }
-        }
-
-        if (!array_key_exists(JsonApiDoc::ATTRIBUTES, $data) && !array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)) {
-            $this->addError(
-                $context,
-                $pointer,
-                sprintf(
-                    'The primary data object should contain \'%s\' or \'%s\' block',
-                    JsonApiDoc::ATTRIBUTES,
-                    JsonApiDoc::RELATIONSHIPS
-                )
-            );
-        }
-
-        if (array_key_exists(JsonApiDoc::ATTRIBUTES, $data)) {
-            $this->validateAttributes(
-                $data[JsonApiDoc::ATTRIBUTES],
-                array_merge($pointer, [JsonApiDoc::ATTRIBUTES]),
-                $context
-            );
-        }
-
-        if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)) {
-            $this->validateRelations(
-                $data[JsonApiDoc::RELATIONSHIPS],
-                array_merge($pointer, [JsonApiDoc::RELATIONSHIPS]),
-                $context
-            );
-        }
+        $this->context = null;
     }
 
     /**
-     * Validates relations block
-     *
-     * @param array            $data
-     * @param array            $pointer
-     * @param ContextInterface $context
+     * @param array  $data
+     * @param string $pointer
      *
      * @return bool
      */
-    protected function validateRelations($data, array $pointer, ContextInterface $context)
+    protected function validateRequestData(array $data, $pointer)
     {
-        if (!is_array($data)) {
-            $this->addError(
-                $context,
-                $pointer,
-                sprintf('The \'%s\' parameter should be an array', JsonApiDoc::RELATIONSHIPS)
-            );
-
-            return false;
-        }
-
-        if (count($data) === 0) {
-            $this->addError(
-                $context,
-                $pointer,
-                sprintf('The \'%s\' parameter should not be empty', JsonApiDoc::RELATIONSHIPS)
-            );
-
-            return false;
-        }
-
-        $isValid = true;
-        foreach ($data as $relationName => $relation) {
-            $relationPointer = $pointer;
-            $relationPointer[] = $relationName;
-            if (!$this->validateDataObject($relation, array_merge($relationPointer, [JsonApiDoc::DATA]), $context)) {
-                // we have no data in object
-                $isValid = false;
-                continue;
-            }
-
-            $relation = $relation[JsonApiDoc::DATA];
-            $relationPointer[] = JsonApiDoc::DATA;
-            if ($this->isArrayAssociative($relation)) {
-                $isValid = $this->validateResourceObject($relation, $relationPointer, $context) ? $isValid : false;
-            } else {
-                foreach ($relation as $id => $relationObject) {
-                    $this->validateResourceObject(
-                        $relationObject,
-                        array_merge($relationPointer, [$id]),
-                        $context
-                    );
-                    $isValid = false;
-                }
-            }
-        }
-
-        return $isValid;
-    }
-
-    /**
-     * Validates attributes block
-     *
-     * @param array            $data
-     * @param array            $pointer
-     * @param ContextInterface $context
-     *
-     * @return bool
-     */
-    protected function validateAttributes($data, array $pointer, ContextInterface $context)
-    {
-        if (!is_array($data)) {
-            $this->addError(
-                $context,
-                $pointer,
-                sprintf('The \'%s\' parameter should be an array', JsonApiDoc::ATTRIBUTES)
-            );
-
-            return false;
-        }
-
-        if (count($data) === 0) {
-            $this->addError(
-                $context,
-                $pointer,
-                sprintf('The \'%s\' parameter should not be empty', JsonApiDoc::ATTRIBUTES)
-            );
-
-            return false;
-        }
-
-        if (!$this->isArrayAssociative($data)) {
-            $this->addError(
-                $context,
-                $pointer,
-                sprintf('The \'%s\' parameter should be an associative array', JsonApiDoc::ATTRIBUTES)
-            );
-
-            return false;
-        }
-
-        return true;
-    }
-
-    /**
-     * Validates JSON API data object. Checks if object have data.
-     *
-     * @param array            $data
-     * @param array            $pointer
-     * @param ContextInterface $context
-     *
-     * @return bool
-     */
-    protected function validateDataObject($data, array $pointer, ContextInterface $context)
-    {
-        if (!is_array($data)) {
-            $this->addError(
-                $context,
-                $pointer,
-                'Data object have no data'
-            );
-
-            return false;
-        }
-
         if (!array_key_exists(JsonApiDoc::DATA, $data)) {
             $this->addError(
-                $context,
                 $pointer,
                 'The primary data object should exist'
             );
 
             return false;
         }
-
-        if (count($data[JsonApiDoc::DATA]) === 0) {
+        if (empty($data[JsonApiDoc::DATA])) {
             $this->addError(
-                $context,
                 $pointer,
                 'The primary data object should not be empty'
             );
@@ -252,31 +80,32 @@ class ValidateRequestData implements ProcessorInterface
     }
 
     /**
-     * Validates JSON API resource object
-     *
-     * @param array            $data
-     * @param array            $pointer
-     * @param ContextInterface $context
+     * @param array  $data
+     * @param string $pointer
+     */
+    abstract protected function validatePrimaryDataObject(array $data, $pointer);
+
+    /**
+     * @param array  $data
+     * @param string $pointer
      *
      * @return bool
      */
-    protected function validateResourceObject(array $data, array $pointer, ContextInterface $context)
+    protected function validatePrimaryDataObjectType(array $data, $pointer)
     {
-        if (!array_key_exists(JsonApiDoc::ID, $data)) {
+        $dataClassName = ValueNormalizerUtil::convertToEntityClass(
+            $this->valueNormalizer,
+            $data[JsonApiDoc::TYPE],
+            $this->context->getRequestType(),
+            false
+        );
+        if ($dataClassName !== $this->context->getClassName()) {
             $this->addError(
-                $context,
-                array_merge($pointer, [JsonApiDoc::ID]),
-                sprintf('The \'%s\' parameter is required', JsonApiDoc::ID)
-            );
-
-            return false;
-        }
-
-        if (!array_key_exists(JsonApiDoc::TYPE, $data)) {
-            $this->addError(
-                $context,
-                array_merge($pointer, [JsonApiDoc::TYPE]),
-                sprintf('The \'%s\' parameter is required', JsonApiDoc::TYPE)
+                $this->buildPointer($pointer, JsonApiDoc::TYPE),
+                sprintf(
+                    'The \'%s\' property of the primary data object should match the requested resource',
+                    JsonApiDoc::TYPE
+                )
             );
 
             return false;
@@ -286,43 +115,185 @@ class ValidateRequestData implements ProcessorInterface
     }
 
     /**
-     * Adds validation error to context
-     *
-     * @param ContextInterface $context
-     * @param                  $pointerPathParts
-     * @param                  $errorMessage
+     * @param array  $data
+     * @param string $pointer
      */
-    protected function addError(ContextInterface $context, $pointerPathParts, $errorMessage)
+    protected function validateAttributesAndRelationships(array $data, $pointer)
     {
-        $error = new Error();
-        $error->setStatusCode(Response::HTTP_BAD_REQUEST);
-        $error->setDetail($errorMessage);
-        $errorSource = new ErrorSource();
-        $errorSource->setPointer($this->getPointer($pointerPathParts));
-        $error->setSource($errorSource);
-
-        $context->addError($error);
+        $hasAttributes = false;
+        $hasRelationships = false;
+        if (array_key_exists(JsonApiDoc::ATTRIBUTES, $data)) {
+            $hasAttributes = true;
+            $this->validateArray($data, JsonApiDoc::ATTRIBUTES, $pointer, true, true);
+        }
+        if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)) {
+            $hasRelationships = true;
+            if ($this->validateArray($data, JsonApiDoc::RELATIONSHIPS, $pointer, true, true)) {
+                $this->validateRelationships(
+                    $data[JsonApiDoc::RELATIONSHIPS],
+                    $this->buildPointer($pointer, JsonApiDoc::RELATIONSHIPS)
+                );
+            }
+        }
+        if (!$hasAttributes && !$hasRelationships) {
+            $this->addError(
+                $pointer,
+                sprintf(
+                    'The primary data object should contain \'%s\' or \'%s\' block',
+                    JsonApiDoc::ATTRIBUTES,
+                    JsonApiDoc::RELATIONSHIPS
+                )
+            );
+        }
     }
 
     /**
-     * Returns true if array is associative
-     *
-     * @param $array
+     * @param array  $data
+     * @param string $pointer
      *
      * @return bool
      */
-    protected function isArrayAssociative($array)
+    protected function validateRelationships(array $data, $pointer)
     {
-        return array_keys($array) !== range(0, count($array) - 1);
+        $isValid = true;
+        foreach ($data as $relationName => $relation) {
+            $relationPointer = $this->buildPointer($pointer, $relationName);
+            if (!is_array($relation) || !array_key_exists(JsonApiDoc::DATA, $relation)) {
+                $this->addError(
+                    $relationPointer,
+                    sprintf('The relationship should have \'%s\' property', JsonApiDoc::DATA)
+                );
+                $isValid = false;
+                continue;
+            }
+            if (!$this->validateArray($relation, JsonApiDoc::DATA, $relationPointer, true)) {
+                $isValid = false;
+                continue;
+            }
+
+            $relationData = $relation[JsonApiDoc::DATA];
+            $relationDataPointer = $this->buildPointer($relationPointer, JsonApiDoc::DATA);
+            if (ArrayUtil::isAssoc($relationData)) {
+                if (!$this->validateResourceObject($relationData, $relationDataPointer)) {
+                    $isValid = false;
+                }
+            } else {
+                foreach ($relationData as $key => $value) {
+                    if ($this->validateResourceObject($value, $this->buildPointer($relationDataPointer, $key))) {
+                        $isValid = false;
+                    }
+                }
+            }
+        }
+
+        return $isValid;
     }
 
     /**
-     * @param array $pointerParts
+     * @param array  $data
+     * @param string $pointer
+     *
+     * @return bool
+     */
+    protected function validateResourceObject(array $data, $pointer)
+    {
+        if (!$this->validateRequired($data, JsonApiDoc::ID, $pointer)) {
+            return false;
+        }
+        if (!$this->validateRequired($data, JsonApiDoc::TYPE, $pointer)) {
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param array  $data
+     * @param string $property
+     * @param string $pointer
+     *
+     * @return bool
+     */
+    protected function validateRequired(array $data, $property, $pointer)
+    {
+        if (!array_key_exists($property, $data)) {
+            $this->addError(
+                $this->buildPointer($pointer, $property),
+                sprintf('The \'%s\' property is required', $property)
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param mixed  $data
+     * @param string $property
+     * @param string $pointer
+     * @param bool   $notEmpty
+     * @param bool   $associative
+     *
+     * @return bool
+     */
+    protected function validateArray($data, $property, $pointer, $notEmpty = false, $associative = false)
+    {
+        $value = $data[$property];
+
+        if (!is_array($value)) {
+            $this->addError(
+                $this->buildPointer($pointer, $property),
+                sprintf('The \'%s\' property should be an array', $property)
+            );
+
+            return false;
+        }
+        if ($notEmpty && empty($value)) {
+            $this->addError(
+                $this->buildPointer($pointer, $property),
+                sprintf('The \'%s\' property should not be empty', $property)
+            );
+
+            return false;
+        }
+        if ($associative && !ArrayUtil::isAssoc($value)) {
+            $this->addError(
+                $this->buildPointer($pointer, $property),
+                sprintf('The \'%s\' property should be an associative array', $property)
+            );
+
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * @param string $property
+     * @param string $parentPath
      *
      * @return string
      */
-    protected function getPointer(array $pointerParts)
+    protected function buildPointer($parentPath, $property)
     {
-        return sprintf('/%s', implode('/', $pointerParts));
+        return $parentPath . '/' . $property;
+    }
+
+    /**
+     * @param string $pointer
+     * @param string $message
+     */
+    protected function addError($pointer, $message)
+    {
+        $error = new Error();
+        $error->setStatusCode(Response::HTTP_BAD_REQUEST);
+        $error->setTitle('request data constraint');
+        $error->setDetail($message);
+        $errorSource = new ErrorSource();
+        $errorSource->setPointer($pointer);
+        $error->setSource($errorSource);
+
+        $this->context->addError($error);
     }
 }
