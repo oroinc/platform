@@ -65,7 +65,7 @@ services:
         arguments:
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api&!rest, priority: 90 }
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: 90 }
 
     oro_api.create.json_api.extract_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Create\JsonApi\ExtractEntityId
