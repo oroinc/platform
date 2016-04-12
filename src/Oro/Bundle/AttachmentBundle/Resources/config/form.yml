@@ -34,11 +34,11 @@ services:
 
     oro_attachment.form.file_subscriber:
         class: %oro_attachment.form.file_subscriber.class%
-        arguments:  ['@oro_attachment.validator.file_config_validator']
+        arguments: ['@oro_attachment.validator.file_config_validator']
 
     oro_attachment.validator.file_config_validator:
         class: %oro_attachment.validator.file_config_validator.class%
-        arguments:  ['@validator', '@oro_entity_config.config_manager', '@oro_config.global']
+        arguments: ['@validator', '@oro_entity_config.config_manager', '@oro_config.global']
 
     oro_attachment.form.handler.attachment:
         class: %oro_attachment.form.handler.attachment.class%

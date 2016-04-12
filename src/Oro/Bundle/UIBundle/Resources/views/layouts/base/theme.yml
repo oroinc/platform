@@ -14,3 +14,4 @@ data:
                 - 'bundles/oroui/css/less/uniform.less'
                 - 'bundles/oroui/css/less/font-awesome.less'
                 - 'bundles/oroui/css/less/base.less'
+                - 'bundles/oroui/css/less/desktop/form.less'

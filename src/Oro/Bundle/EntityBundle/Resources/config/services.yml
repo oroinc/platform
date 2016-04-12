@@ -142,10 +142,10 @@ services:
             - '@translator'
             - %oro_entity.hidden_fields%
         calls:
-            - [setEntityProvider,  ['@oro_entity.entity_provider']]
-            - [setVirtualFieldProvider,  ['@oro_entity.virtual_field_provider']]
-            - [setVirtualRelationProvider,  ['@oro_entity.virtual_relation_provider.chain']]
-            - [setExclusionProvider,  ['@oro_entity.exclusion_provider']]
+            - [setEntityProvider, ['@oro_entity.entity_provider']]
+            - [setVirtualFieldProvider, ['@oro_entity.virtual_field_provider']]
+            - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
+            - [setExclusionProvider, ['@oro_entity.exclusion_provider']]
 
     oro_entity.exclusion_provider:
         class: %oro_entity.exclusion_provider.chain.class%

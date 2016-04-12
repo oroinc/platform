@@ -12,6 +12,7 @@ parameters:
     oro_workflow.action.flush_entity.class: Oro\Component\Action\Action\FlushEntity
     oro_workflow.action.create_related_entity.class: Oro\Bundle\WorkflowBundle\Model\Action\CreateRelatedEntity
     oro_workflow.action.request_entity.class: Oro\Component\Action\Action\RequestEntity
+    oro_workflow.action.get_class_name.class: Oro\Component\Action\Action\GetClassName
     oro_workflow.action.call_method.class: Oro\Component\Action\Action\CallMethod
     oro_workflow.action.start_workflow.class: Oro\Bundle\WorkflowBundle\Model\Action\StartWorkflow
     oro_workflow.action.redirect.class: Oro\Component\Action\Action\Redirect
@@ -118,6 +119,13 @@ services:
             - '@doctrine'
         tags:
             - { name: oro_workflow.action, alias: request_entity|find_entity }
+
+    oro_workflow.action.get_class_name:
+        class: %oro_workflow.action.get_class_name.class%
+        arguments:
+            - '@oro_action.context_accessor'
+        tags:
+            - { name: oro_workflow.action, alias: get_class_name }
 
     oro_workflow.action.call_method:
         class: %oro_workflow.action.call_method.class%

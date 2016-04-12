@@ -99,7 +99,7 @@ services:
         class:  Oro\Component\Layout\Loader\Generator\ConfigLayoutUpdateGenerator
         public: false
         calls:
-            - [addExtension,  ['@oro_layout.layout_update_generator.extension.config_conditions']]
+            - [addExtension, ['@oro_layout.layout_update_generator.extension.config_conditions']]
 
     oro_layout.layout_update_generator.extension.config_conditions:
         class:  Oro\Bundle\LayoutBundle\Layout\Extension\Generator\ConfigExpressionGeneratorExtension

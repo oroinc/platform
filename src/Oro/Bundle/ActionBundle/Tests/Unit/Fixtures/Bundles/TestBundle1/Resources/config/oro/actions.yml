@@ -12,7 +12,7 @@ action_groups:
                 required: true
 
         conditions:
-            '@gt' : [$updatedAt, $.date]
+            '@gt': [$updatedAt, $.date]
 
         actions:
-            - '@assign_value' : [$expired, true]
+            - '@assign_value': [$expired, true]

@@ -22,7 +22,7 @@ services:
         class: %oro_importexport.processor.import_abstract.class%
         abstract: true
         calls:
-            - [setSerializer,  ['@oro_importexport.serializer']]
+            - [setSerializer, ['@oro_importexport.serializer']]
 
     # Export delegate processor, abstract import processor
     oro_importexport.processor.export_delegate:
@@ -43,7 +43,7 @@ services:
         class: %oro_importexport.processor.export_abstract.class%
         abstract: true
         calls:
-            - [setSerializer,  ['@oro_importexport.serializer']]
+            - [setSerializer, ['@oro_importexport.serializer']]
 
     # Import validate processor
     oro_importexport.processor.import_validation_delegate:

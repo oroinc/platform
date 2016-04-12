@@ -13,6 +13,7 @@ parameters:
     oro_datagrid.extension.totals.class:           Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension
     oro_datagrid.extension.columns.class:          Oro\Bundle\DataGridBundle\Extension\Columns\ColumnsExtension
     oro_datagrid.extension.mode.class:             Oro\Bundle\DataGridBundle\Extension\Mode\ModeExtension
+    oro_datagrid.extension.postgresql_grid_modifier.class: Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier
 
 services:
     oro_datagrid.extension.formatter:
@@ -128,5 +129,13 @@ services:
 
     oro_datagrid.extension.mode:
         class: %oro_datagrid.extension.mode.class%
+        tags:
+            - { name: oro_datagrid.extension }
+
+    oro_datagrid.extension.postgresql_grid_modifier:
+        class: %oro_datagrid.extension.postgresql_grid_modifier.class%
+        arguments:
+            - %database_driver%
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro_datagrid.extension }

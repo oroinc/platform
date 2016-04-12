@@ -140,7 +140,13 @@ class RendererTest extends LayoutTestCase
 
         $layout = $layoutManager->getLayoutBuilder()
             ->add('root', null, 'root')
-            ->add('head', 'root', 'head', ['title' => 'Test'])
+            ->add('head', 'root', 'head')
+            ->add(
+                'title',
+                'head',
+                'title',
+                ['value' => ['First', 'Second'], 'separator' => ' - ', 'reverse' => true]
+            )
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }', 'scoped' => true])
             ->add(
@@ -345,7 +351,7 @@ class RendererTest extends LayoutTestCase
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Test</title>
+        <title>Second - First</title>
         <meta charset="UTF-8"/>
         <style type="text/css" scoped="scoped">
             body { color: red; }

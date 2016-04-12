@@ -6,24 +6,30 @@ use Symfony\Component\Form\FormFactoryInterface;
 
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Bundle\FilterBundle\Datasource\ManyRelationBuilder;
+use Oro\Bundle\FilterBundle\Form\Type\Filter\DictionaryFilterType;
 
 class MultiEnumFilter extends BaseMultiChoiceFilter
 {
+    /** @var ManyRelationBuilder */
+    protected $manyRelationBuilder;
+
     /**
-     * Constructor
-     *
      * @param FormFactoryInterface $factory
      * @param FilterUtility        $util
+     * @param ManyRelationBuilder  $manyRelationBuilder
      */
     public function __construct(
         FormFactoryInterface $factory,
-        FilterUtility $util
+        FilterUtility $util,
+        ManyRelationBuilder $manyRelationBuilder
     ) {
         parent::__construct($factory, $util);
+        $this->manyRelationBuilder = $manyRelationBuilder;
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
@@ -53,7 +59,7 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
     }
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function init($name, array $params)
     {
@@ -68,6 +74,24 @@ class MultiEnumFilter extends BaseMultiChoiceFilter
         }
 
         parent::init($name, $params);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function buildComparisonExpr(
+        FilterDatasourceAdapterInterface $ds,
+        $comparisonType,
+        $fieldName,
+        $parameterName
+    ) {
+        return $this->manyRelationBuilder->buildComparisonExpr(
+            $ds,
+            $fieldName,
+            $parameterName,
+            $this->getName(),
+            in_array($comparisonType, [DictionaryFilterType::NOT_EQUAL, DictionaryFilterType::TYPE_NOT_IN], true)
+        );
     }
 
     /**

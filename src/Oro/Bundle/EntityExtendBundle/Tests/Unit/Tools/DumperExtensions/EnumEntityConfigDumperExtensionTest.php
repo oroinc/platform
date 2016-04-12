@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -387,8 +388,8 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                     ],
                     'importexport' => [
-                        'identity' => true
-                    ]
+                        'identity' => false,
+                    ],
                 ]
             );
         $this->relationBuilder->expects($this->at($relationBuilderAt++))
@@ -402,8 +403,11 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
                     ],
                     'datagrid' => [
-                        'is_visible' => false
-                    ]
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                    ],
+                    'importexport' => [
+                        'identity' => true,
+                    ],
                 ]
             );
         $this->relationBuilder->expects($this->at($relationBuilderAt++))
@@ -417,7 +421,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
                     ],
                     'datagrid' => [
-                        'is_visible' => false
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                     ]
                 ]
             );
@@ -432,7 +436,7 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
                     ],
                     'datagrid' => [
-                        'is_visible' => false
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                     ]
                 ]
             );

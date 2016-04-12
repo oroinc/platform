@@ -14,7 +14,7 @@ parameters:
 services:
     oro_workflow.form.event_listener.default_values:
         class: %oro_workflow.form.event_listener.default_values.class%
-        arguments:  ['@oro_action.context_accessor']
+        arguments: ['@oro_action.context_accessor']
 
     oro_workflow.form.event_listener.init_actions:
         class: %oro_workflow.form.event_listener.init_actions.class%

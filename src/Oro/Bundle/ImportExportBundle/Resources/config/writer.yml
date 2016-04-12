@@ -13,7 +13,7 @@ services:
         arguments:
             - '@oro_importexport.context_registry'
         calls:
-            - [setClearWriter,  ['@oro_importexport.writer.doctrine_clear']]
+            - [setClearWriter, ['@oro_importexport.writer.doctrine_clear']]
 
     oro_importexport.writer.entity:
         class: %oro_importexport.writer.entity.class%

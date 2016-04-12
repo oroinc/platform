@@ -16,7 +16,7 @@ services:
             - '@doctrine'
             - '@oro_security.owner.ownership_metadata_provider'
         calls:
-            - [setDispatcher,  ['@event_dispatcher']]
+            - [setDispatcher, ['@event_dispatcher']]
 
     oro_importexport.reader.template_fixture:
         class: %oro_importexport.reader.template_fixture.class%

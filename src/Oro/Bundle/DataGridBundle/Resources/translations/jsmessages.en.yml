@@ -114,7 +114,7 @@ oro:
         grid_views:
             shared_by.label: Shared by {{ name }}
         sorters:
-            not_selected: 'No sorting'
+            not_selected: 'Relevance'
             undefined:
                 ascending: Low to High
                 descending: High to Low

@@ -19,6 +19,11 @@ services:
         tags:
              - { name: layout.block_type, alias: head }
 
+    oro_layout.block_type.title:
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\TitleType
+        tags:
+             - { name: layout.block_type, alias: title }
+
     oro_layout.block_type.meta:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\MetaType
         tags:
