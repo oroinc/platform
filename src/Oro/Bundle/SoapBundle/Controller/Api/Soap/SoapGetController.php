@@ -54,10 +54,10 @@ abstract class SoapGetController extends ContainerAware implements EntityManager
     protected function transformToSoapEntity($entity)
     {
         $soapEntityClass = $this->getSoapEntityClass($entity);
-        $instantiator = new Instantiator();
         if (class_exists($soapEntityClass) &&
             in_array('Oro\Bundle\SoapBundle\Entity\SoapEntityInterface', class_implements($soapEntityClass))
         ) {
+            $instantiator = new Instantiator();
             /** @var SoapEntityInterface $soapEntity */
             $soapEntity = $instantiator->instantiate($soapEntityClass);
 
