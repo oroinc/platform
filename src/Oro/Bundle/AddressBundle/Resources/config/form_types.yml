@@ -21,14 +21,14 @@ services:
     oro_address.form.listener.address:
         class: %oro_address.form.listener.address.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @form.factory
+            - '@doctrine.orm.entity_manager'
+            - '@form.factory'
 
     # Addresses form types
     oro_address.form.type.address:
         class: %oro_address.form.type.address.class%
         arguments:
-            - @oro_address.form.listener.address
+            - '@oro_address.form.listener.address'
         tags:
              - { name: form.type, alias: oro_address }
 
@@ -91,6 +91,6 @@ services:
         class: %oro_address.form.handler.address.class%
         scope: request
         arguments:
-            - @oro_address.form.address
-            - @request
-            - @doctrine.orm.entity_manager
+            - '@oro_address.form.address'
+            - '@request'
+            - '@doctrine.orm.entity_manager'

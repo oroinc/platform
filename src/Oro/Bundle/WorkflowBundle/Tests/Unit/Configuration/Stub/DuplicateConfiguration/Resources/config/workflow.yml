@@ -26,6 +26,6 @@ workflows:
         transition_definitions:
             first_transition_definition:
                 conditions:
-                    @true: ~
+                    '@true': ~
                 post_actions:
-                    - @custom_post_action: ~
+                    - '@custom_post_action': ~

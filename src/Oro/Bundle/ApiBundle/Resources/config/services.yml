@@ -14,15 +14,15 @@ services:
         class: Oro\Component\ChainProcessor\ProcessorBag
         public: false
         arguments:
-            - @oro_api.processor_factory
+            - '@oro_api.processor_factory'
             - %kernel.debug%
 
     oro_api.processor_factory:
         class: Oro\Component\ChainProcessor\ChainProcessorFactory
         public: false
         calls:
-            - [addFactory, [@oro_api.simple_processor_factory, 10]]
-            - [addFactory, [@oro_api.di_processor_factory]]
+            - [addFactory,  ['@oro_api.simple_processor_factory', 10]]
+            - [addFactory,  ['@oro_api.di_processor_factory']]
 
     oro_api.simple_processor_factory:
         class: Oro\Component\ChainProcessor\SimpleProcessorFactory
@@ -32,13 +32,13 @@ services:
         class: Oro\Component\ChainProcessor\DependencyInjection\ProcessorFactory
         public: false
         arguments:
-            - @service_container
+            - '@service_container'
 
     oro_api.doctrine_helper:
         class: Oro\Bundle\ApiBundle\Util\DoctrineHelper
         public: false
         arguments:
-            - @doctrine
+            - '@doctrine'
 
     oro_api.entity_accessor:
         class: Oro\Component\EntitySerializer\EntityDataAccessor
@@ -48,23 +48,23 @@ services:
         class: Oro\Bundle\ApiBundle\Metadata\EntityMetadataFactory
         public: false
         arguments:
-            - @oro_api.doctrine_helper
+            - '@oro_api.doctrine_helper'
 
     oro_api.value_normalizer:
         class: Oro\Bundle\ApiBundle\Request\ValueNormalizer
         public: false
         arguments:
-            - @oro_api.normalize_value.processor
+            - '@oro_api.normalize_value.processor'
 
     oro_api.object_normalizer:
         class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer
         public: false
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_api.entity_accessor
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.entity_accessor'
         calls:
-            - [addNormalizer, [@oro_api.search_item_normalizer, 50]]
-            - [addNormalizer, [@oro_api.datetime_normalizer]]
+            - [addNormalizer,  ['@oro_api.search_item_normalizer', 50]]
+            - [addNormalizer,  ['@oro_api.datetime_normalizer']]
 
     oro_api.datetime_normalizer:
         class: Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer
@@ -78,13 +78,13 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\CustomizeLoadedDataProcessor
         public: false
         arguments:
-            - @oro_api.processor_bag
+            - '@oro_api.processor_bag'
             - customize_loaded_data
 
     oro_api.resources_loader:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesLoader
         arguments:
-            - @oro_api.collect_resources.processor
+            - '@oro_api.collect_resources.processor'
 
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry
@@ -119,22 +119,22 @@ services:
         class: Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory
         public: false
         arguments:
-            - @oro_api.config_extension_registry
+            - '@oro_api.config_extension_registry'
 
     oro_api.config_provider:
         class: Oro\Bundle\ApiBundle\Provider\ConfigProvider
         arguments:
-            - @oro_api.get_config.processor
+            - '@oro_api.get_config.processor'
 
     oro_api.metadata_provider:
         class: Oro\Bundle\ApiBundle\Provider\MetadataProvider
         arguments:
-            - @oro_api.get_metadata.processor
+            - '@oro_api.get_metadata.processor'
 
     oro_api.relation_config_provider:
         class: Oro\Bundle\ApiBundle\Provider\RelationConfigProvider
         arguments:
-            - @oro_api.get_relation_config.processor
+            - '@oro_api.get_relation_config.processor'
 
     oro_api.entity_exclusion_provider:
         class: Oro\Bundle\EntityBundle\Provider\ChainExclusionProvider
@@ -144,7 +144,7 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider
         public: false
         arguments:
-            - @oro_entity.entity_hierarchy_provider
+            - '@oro_entity.entity_hierarchy_provider'
             - [] # exclusion rules; it is set by Oro\Bundle\ApiBundle\DependencyInjection\OroApiExtension
         tags:
             - { name: oro_entity.exclusion_provider.api, priority: 60 }
@@ -156,33 +156,33 @@ services:
         class: Oro\Component\EntitySerializer\EntitySerializer
         public: false
         arguments:
-            - @oro_api.entity_serializer.doctrine_helper
-            - @oro_api.entity_accessor
-            - @oro_api.entity_serializer.data_transformer
-            - @oro_api.entity_serializer.query_factory
-            - @oro_api.entity_serializer.field_accessor
-            - @oro_api.entity_serializer.config_normalizer
-            - @oro_api.entity_serializer.data_normalizer
+            - '@oro_api.entity_serializer.doctrine_helper'
+            - '@oro_api.entity_accessor'
+            - '@oro_api.entity_serializer.data_transformer'
+            - '@oro_api.entity_serializer.query_factory'
+            - '@oro_api.entity_serializer.field_accessor'
+            - '@oro_api.entity_serializer.config_normalizer'
+            - '@oro_api.entity_serializer.data_normalizer'
 
     oro_api.entity_serializer.doctrine_helper:
         class: Oro\Component\EntitySerializer\DoctrineHelper
         public: false
         arguments:
-            - @doctrine
+            - '@doctrine'
 
     oro_api.entity_serializer.query_factory:
         class: Oro\Component\EntitySerializer\QueryFactory
         public: false
         arguments:
-            - @oro_api.entity_serializer.doctrine_helper
-            - @oro_entity.query_hint_resolver
+            - '@oro_api.entity_serializer.doctrine_helper'
+            - '@oro_entity.query_hint_resolver'
 
     oro_api.entity_serializer.field_accessor:
         class: Oro\Component\EntitySerializer\FieldAccessor
         public: false
         arguments:
-            - @oro_api.entity_serializer.doctrine_helper
-            - @oro_api.entity_accessor
+            - '@oro_api.entity_serializer.doctrine_helper'
+            - '@oro_api.entity_accessor'
 
     oro_api.entity_serializer.config_normalizer:
         class: Oro\Component\EntitySerializer\ConfigNormalizer
@@ -196,30 +196,30 @@ services:
         class: Oro\Component\EntitySerializer\EntityDataTransformer
         public: false
         arguments:
-            - @service_container
+            - '@service_container'
 
     oro_api.rest.entity_id_transformer:
         class: Oro\Bundle\ApiBundle\Request\Rest\EntityIdTransformer
         public: false
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_api.value_normalizer
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.value_normalizer'
 
     oro_api.json_api.document_builder_factory:
         class: Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilderFactory
         public: false
         arguments:
-            - @oro_api.value_normalizer
-            - @oro_api.rest.entity_id_transformer
+            - '@oro_api.value_normalizer'
+            - '@oro_api.rest.entity_id_transformer'
 
     oro_api.rest.routing_options_resolver:
         class: Oro\Bundle\ApiBundle\Routing\RestRouteOptionsResolver
         public: false
         arguments:
             - %installed%
-            - @oro_api.resources_loader
-            - @oro_api.doctrine_helper
-            - @oro_api.value_normalizer
+            - '@oro_api.resources_loader'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.value_normalizer'
             - %oro_api.rest.formats%
             - %oro_api.rest.default_format%
         tags:
@@ -229,11 +229,11 @@ services:
         class: Oro\Bundle\ApiBundle\Routing\RestDocHandler
         public: false
         arguments:
-            - @oro_api.rest.doc_view_detector
-            - @oro_api.action_processor_bag
-            - @oro_entity.entity_class_name_provider
-            - @oro_api.doctrine_helper
-            - @oro_api.value_normalizer
+            - '@oro_api.rest.doc_view_detector'
+            - '@oro_api.action_processor_bag'
+            - '@oro_entity.entity_class_name_provider'
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.value_normalizer'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
 
@@ -241,7 +241,7 @@ services:
         class: Oro\Bundle\ApiBundle\Routing\RestDocViewDetector
         public: false
         arguments:
-            - @request_stack
+            - '@request_stack'
 
     oro_api.filter_factory:
         class: Oro\Bundle\ApiBundle\Filter\ChainFilterFactory
@@ -251,6 +251,6 @@ services:
         class: Oro\Bundle\ApiBundle\Filter\SimpleFilterFactory
         public: false
         arguments:
-            - @property_accessor
+            - '@property_accessor'
         tags:
             - { name: oro.api.filter_factory, priority: -10 }

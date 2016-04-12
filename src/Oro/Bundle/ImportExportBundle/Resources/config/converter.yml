@@ -12,28 +12,28 @@ services:
         class: %oro_importexport.data_converter.configurable.class%
         abstract: true
         arguments:
-            - @oro_importexport.field.field_helper
-            - @oro_importexport.data_converter.relation_calculator
+            - '@oro_importexport.field.field_helper'
+            - '@oro_importexport.data_converter.relation_calculator'
         calls:
-            - [setDispatcher, [@event_dispatcher]]
+            - [setDispatcher,  ['@event_dispatcher']]
 
     oro_importexport.data_converter.template_fixture.configurable:
         class: %oro_importexport.data_converter.configurable.class%
         abstract: true
         arguments:
-            - @oro_importexport.field.field_helper
-            - @oro_importexport.data_converter.template_fixture.relation_calculator
+            - '@oro_importexport.field.field_helper'
+            - '@oro_importexport.data_converter.template_fixture.relation_calculator'
         calls:
-            - [setDispatcher, [@event_dispatcher]]
+            - [setDispatcher,  ['@event_dispatcher']]
 
     oro_importexport.data_converter.relation_calculator:
         class: %oro_importexport.data_converter.relation_calculator.class%
         arguments:
-            - @doctrine
-            - @oro_importexport.field.field_helper
+            - '@doctrine'
+            - '@oro_importexport.field.field_helper'
 
     oro_importexport.data_converter.template_fixture.relation_calculator:
         class: %oro_importexport.data_converter.template_fixture.relation_calculator.class%
         arguments:
-            - @oro_importexport.template_fixture.manager
-            - @oro_importexport.field.field_helper
+            - '@oro_importexport.template_fixture.manager'
+            - '@oro_importexport.field.field_helper'
