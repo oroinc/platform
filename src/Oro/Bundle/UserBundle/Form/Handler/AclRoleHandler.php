@@ -199,7 +199,9 @@ class AclRoleHandler
     public function process(AbstractRole $role)
     {
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
-            $this->form->submit($this->request);
+            $data = $this->request->request->get($this->form->getName(), array());
+            $privileges = json_decode($data['privileges'], true);
+            $this->form->submit(array_merge($data, $privileges));
 
             if ($this->form->isValid()) {
                 $appendUsers = $this->form->get('appendUsers')->getData();
@@ -306,7 +308,7 @@ class AclRoleHandler
      */
     protected function processPrivileges(AbstractRole $role)
     {
-        $decodedPrivileges = json_decode($this->form->get('privileges')->getData(), true);
+        $decodedPrivileges = $this->form->get('privileges')->getData();
         $formPrivileges = [];
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $privilegesArray = $decodedPrivileges[$fieldName];
