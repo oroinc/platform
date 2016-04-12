@@ -45,13 +45,13 @@ define(function(require) {
          */
         open: function(cb) {
             Modal.prototype.open.apply(this, arguments);
-            var WidgetPickerCollection = new BaseCollection(
+            var widgetPickerCollection = new BaseCollection(
                 this.options.dashboard.getAvailableWidgets(),
                 {model: WidgetPickerModel}
             );
             this.component = new WidgetPickerComponent({
-                el: this.$content,
-                collection: WidgetPickerCollection,
+                _sourceElement: this.$content,
+                collection: widgetPickerCollection,
                 loadWidget: _.bind(this.loadWidget, this)
             });
         },

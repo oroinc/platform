@@ -14,7 +14,6 @@ config:
         'orosidebar/js/widget-container/view': 'bundles/orosidebar/js/widget-container/view.js'
         'orosidebar/js/widget-container/icon-view': 'bundles/orosidebar/js/widget-container/icon-view.js'
         'orosidebar/js/widget-container/widget-picker-modal': 'orosidebar/js/widget-container/widget-picker-modal.js'
-        'orosidebar/js/widget-container/widget-picker-model': 'orosidebar/js/widget-container/widget-picker-model.js'
         'orosidebar/js/widget-container/widget-setup-view': 'bundles/orosidebar/js/widget-container/widget-setup-view.js'
         'orosidebar/widget/sticky-note': 'bundles/orosidebar/sidebar_widgets/sticky_note/js/widget.js'
 

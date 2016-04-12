@@ -7,7 +7,7 @@ define(function(require) {
     var WidgetContainerModel = require('./model');
 
     var BaseCollection = require('oroui/js/app/models/base/collection');
-    var WidgetPickerModel = require('orosidebar/js/widget-container/widget-picker-model');
+    var WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');
     var WidgetPickerComponent = require('oroui/js/app/components/widget-picker-component');
 
     var Modal = require('oroui/js/modal');
@@ -45,13 +45,13 @@ define(function(require) {
          */
         open: function(cb) {
             Modal.prototype.open.apply(this, arguments);
-            var WidgetPickerCollection = new BaseCollection(
+            var widgetPickerCollection = new BaseCollection(
                 this.options.sidebar.getAvailableWidgets(),
                 {model: WidgetPickerModel}
             );
             this.component = new WidgetPickerComponent({
-                el: this.$content,
-                collection: WidgetPickerCollection,
+                _sourceElement: this.$content,
+                collection: widgetPickerCollection,
                 loadWidget: _.bind(this.loadWidget, this)
             });
         },

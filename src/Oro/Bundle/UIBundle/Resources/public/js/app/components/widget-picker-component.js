@@ -29,15 +29,16 @@ define(function(require) {
          * @protected
          */
         _createViews: function(options) {
+            var $el = options._sourceElement;
             var widgetPickerFilterModel = new WidgetPickerFilterModel();
             this.widgetPickerCollectionView = new WidgetPickerCollectionView(
                 _.defaults(options, {
-                    el: options.el.find('.widget-picker-containers'),
+                    el: $el.find('.widget-picker-containers'),
                     filterModel: widgetPickerFilterModel
                 })
             );
             this.widgetPickerFilterView = new WidgetPickerFilterView({
-                el: options.el.find('.widget-picker-search'),
+                el: $el.find('.widget-picker-search'),
                 model: widgetPickerFilterModel
             });
         }

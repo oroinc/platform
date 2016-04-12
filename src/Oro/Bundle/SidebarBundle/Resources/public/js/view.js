@@ -51,6 +51,8 @@ define(function(require) {
             var model = view.model;
             var widgets = this.getWidgets();
 
+            this.translateAvailableWidgetsDescription();
+
             view.iconViews = {};
             view.hoverViews = {};
             view.widgetViews = {};
@@ -71,16 +73,26 @@ define(function(require) {
             view.listenTo(Backbone, 'setupWidget', view.onSetupWidget);
         },
 
+        translateAvailableWidgetsDescription: function() {
+            _.each(this.options.availableWidgets, function(widgetObject) {
+                widgetObject.description = __(widgetObject.description);
+            });
+        },
+
         getAvailableWidgets: function() {
-            var Widgets = this.getWidgets();
+            var widgets = this.getWidgets();
             return _.map(this.options.availableWidgets, function(widgetObject, widgetName) {
                 return _.extend(widgetObject, {
                     widgetName: widgetName,
-                    added: Widgets.filter(function(widget) {
+                    added: widgets.filter(function(widget) {
                         return widget.get('widgetName') === widgetName;
                     }).length
                 });
             });
+        },
+
+        setWidgets: function(widgets) {
+            this.options.widgets = widgets;
         },
 
         getWidgets: function() {

@@ -99,10 +99,10 @@ define(function(require) {
          * @return {Array}
          */
         getAvailableWidgets: function() {
-            var Widgets = this.widgets;
-            return _.map(this.options.availableWidgets, function(widgetObject){
+            var widgets = this.widgets;
+            return _.map(this.options.availableWidgets, function(widgetObject) {
                 return _.extend(widgetObject, {
-                    added: _.filter(Widgets, function(widget){
+                    added: _.filter(widgets, function(widget) {
                         return widget.options.widgetName === widgetObject.widgetName;
                     }).length
                 });
@@ -113,7 +113,7 @@ define(function(require) {
          *
          * @param {Event} e
          */
-        _onClickAddWidget: function (e) {
+        _onClickAddWidget: function(e) {
             e.preventDefault();
             var columnIndex = $(event.target).closest(this.options.columnsSelector).index();
             var targetColumn = (columnIndex === -1) ? 0 : columnIndex;

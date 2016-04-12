@@ -7,7 +7,6 @@ define(function(require) {
 
     var WidgetPickerCollectionView = BaseCollectionView.extend({
         itemView: WidgetPickerItemView,
-        listSelector: '.widget-picker-containers',
         isWidgetLoadingInProgress: false,
 
         /**
