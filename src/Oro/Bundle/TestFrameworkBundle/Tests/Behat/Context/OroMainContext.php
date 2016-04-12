@@ -78,7 +78,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
      */
     public function iWaitForAjaxToFinish() {
         $time = 15000; // time should be in milliseconds
-        $this->getSession()->wait($time, '(typeof($) != "undefined" && document.title !=="Loading..." && $ !== null && false === $( "div.loader-mask" ).hasClass("shown"))');
+        $this->getSession()->wait($time, "'complete' == document['readyState']");
     }
 
     /**
