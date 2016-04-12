@@ -114,22 +114,16 @@ class DateFilterUtility
         $field = $this->modifyFieldToDayWithMonth($data['field'], $data, $type);
 
         if (isset($this->partToDateFunction[$data['part']])) {
-            $field = $this->getEnforcedTimezoneFunction($this->partToDateFunction[$data['part']], $fieldName, $type);
-        } else {
-            switch ($data['part']) {
-                case DateModifierInterface::PART_QUARTER:
-                    $field = $this->getEnforcedTimezoneQuarter($field, $type);
-                    break;
-                case DateModifierInterface::PART_VALUE:
-                    if (strpos($field, 'MONTH') === false && $this->containsMonthVariable($data)) {
-                        $field = $this->getEnforcedTimezoneFunction('MONTH', $field);
-                        $data['date_start'] = $this->formatDate($data['date_start'], 'm');
-                        $data['date_end'] = $this->formatDate($data['date_end'], 'm');
-                    }
-                    break;
-                 default:
-                    break;
-            }
+            $field = $this->getEnforcedTimezoneFunction($this->partToDateFunction[$data['part']], $field, $type);
+        } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
+            $field = $this->getEnforcedTimezoneQuarter($field, $type);
+        } elseif ($data['part'] === DateModifierInterface::PART_VALUE &&
+            strpos($field, 'MONTH') === false &&
+            $this->containsMonthVariable($data)
+        ) {
+            $field = $this->getEnforcedTimezoneFunction('MONTH', $field, $type);
+            $data['date_start'] = $this->formatDate($data['date_start'], 'm');
+            $data['date_end'] = $this->formatDate($data['date_end'], 'm');
         }
 
         return array_merge($data, ['field' => $field]);
