@@ -3,10 +3,10 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\DeleteListProcessor
         public: false
         arguments:
-            - @oro_api.processor_bag
+            - '@oro_api.processor_bag'
             - delete_list
-            - @oro_api.config_provider
-            - @oro_api.metadata_provider
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.action_processor }
     
@@ -37,7 +37,7 @@ services:
     oro_api.delete_list.initialize_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
         arguments:
-            - @oro_entity.orm.entity_class_resolver
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 200 }
 
@@ -49,7 +49,7 @@ services:
     oro_api.delete_list.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
-            - @oro_api.value_normalizer
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 20 }
 
@@ -61,15 +61,15 @@ services:
     oro_api.delete_list.register_filters:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RegisterFilters
         arguments:
-            - @oro_api.filter_factory
+            - '@oro_api.filter_factory'
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: -50 }
 
     oro_api.delete_list.json_api.normalize_filter_keys:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFilterKeys
         arguments:
-            - @oro_api.doctrine_helper
-            - @translator
+            - '@oro_api.doctrine_helper'
+            - '@translator'
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: -50 }
 
@@ -80,8 +80,8 @@ services:
     oro_api.delete_list.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_security.security_facade
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete_list, group: security_check, priority: 10 }
@@ -98,7 +98,7 @@ services:
     oro_api.delete_list.normalize_filter_values:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeFilterValues
         arguments:
-            - @oro_api.value_normalizer
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_input, priority: -10 }
 
@@ -114,7 +114,7 @@ services:
     oro_api.delete_list.complete_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
         arguments:
-            - @oro_api.doctrine_helper
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -50 }
 
@@ -136,9 +136,9 @@ services:
     oro_api.delete_list.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_security.acl_helper
-            - @oro_security.acl.annotation_provider
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl_helper'
+            - '@oro_security.acl.annotation_provider'
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -90 }
@@ -146,7 +146,7 @@ services:
     oro_api.delete_list.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildQuery
         arguments:
-            - @oro_api.doctrine_helper
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: delete_list, group: build_query, priority: -100 }
 
@@ -166,7 +166,7 @@ services:
     oro_api.delete_list.set_total_count_header:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SetTotalCountHeader
         arguments:
-            - @oro_batch.orm.query_builder.count_query_optimizer
+            - '@oro_batch.orm.query_builder.count_query_optimizer'
         tags:
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -10 }
 
@@ -178,8 +178,8 @@ services:
     oro_api.delete_list.delete_data_by_handler:
         class: Oro\Bundle\ApiBundle\Processor\DeleteList\DeleteListDataByDeleteHandler
         arguments:
-            - @oro_api.doctrine_helper
-            - @service_container
+            - '@oro_api.doctrine_helper'
+            - '@service_container'
         tags:
             - { name: oro.api.processor, action: delete_list, group: delete_data, priority: -20 }
 
@@ -205,21 +205,21 @@ services:
     oro_api.delete_list.rest.complete_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors
         arguments:
-            - @oro_api.rest.error_completer
+            - '@oro_api.rest.error_completer'
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest&!json_api, priority: -10 }
 
     oro_api.delete_list.json_api.complete_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors
         arguments:
-            - @oro_api.json_api.error_completer
+            - '@oro_api.json_api.error_completer'
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: json_api, priority: -11 }
 
     oro_api.delete_list.normalize_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors
         arguments:
-            - @translator
+            - '@translator'
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, priority: -20 }
 
@@ -233,16 +233,16 @@ services:
     oro_api.delete_list.rest.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
         arguments:
-            - @oro_api.rest.document_builder
-            - @oro_api.rest.error_completer
+            - '@oro_api.rest.document_builder'
+            - '@oro_api.rest.error_completer'
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: rest&!json_api, priority: -50 }
 
     oro_api.delete_list.json_api.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
         arguments:
-            - @oro_api.json_api.document_builder
-            - @oro_api.json_api.error_completer
+            - '@oro_api.json_api.document_builder'
+            - '@oro_api.json_api.error_completer'
         tags:
             - { name: oro.api.processor, action: delete_list, group: normalize_result, requestType: json_api, priority: -51 }
 

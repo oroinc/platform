@@ -12,7 +12,7 @@ items:
 
     oro_assign_calendar_event_button:
         template: OroCalendarBundle:CalendarEvent:assignCalendarEventButton.html.twig
-        applicable: @oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)
+        applicable: "@oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)"
         acl: oro_calendar_event_create
 
     oro_add_calendar_event_link:
@@ -21,5 +21,5 @@ items:
 
     oro_assign_calendar_event_link:
         template: OroCalendarBundle:CalendarEvent:assignCalendarEventLink.html.twig
-        applicable: @oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)
+        applicable: "@oro_ui.placeholder.filter->isInstanceOf($entity$, %oro_user.entity.class%)"
         acl: oro_calendar_event_create

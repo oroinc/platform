@@ -62,8 +62,8 @@ services:
     oro_form.type.money:
         class: %oro_form.type.money.class%
         arguments:
-            - @oro_locale.settings
-            - @oro_locale.formatter.number
+            - '@oro_locale.settings'
+            - '@oro_locale.formatter.number'
         tags:
             - { name: form.type, alias: oro_money }
 
@@ -75,7 +75,7 @@ services:
     oro_form.type.icon:
         class: %oro_form.type.icon.class%
         arguments:
-            - @kernel
+            - '@kernel'
         tags:
             - { name: form.type, alias: oro_icon_select }
 
@@ -88,17 +88,17 @@ services:
     oro_form.type.jqueryselect2_hidden:
         class: %oro_form.type.jqueryselect2_hidden.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_form.autocomplete.search_registry
-            - @oro_entity_config.provider.form
+            - '@doctrine.orm.entity_manager'
+            - '@oro_form.autocomplete.search_registry'
+            - '@oro_entity_config.provider.form'
         tags:
             - { name: form.type, alias: oro_jqueryselect2_hidden }
 
     oro_form.type.multiple_entity:
         class: %oro_form.type.multiple_entity.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_security.security_facade
+            - '@oro_entity.doctrine_helper'
+            - '@oro_security.security_facade'
         tags:
             - { name: form.type, alias: oro_multiple_entity }
 
@@ -110,29 +110,29 @@ services:
     oro_form.type.entity_create_or_select:
         class: %oro_form.type.entity_create_or_select.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: oro_entity_create_or_select }
 
     oro_form.type.entity_create_or_select_choice:
         class: %oro_form.type.entity_create_or_select_choice.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: oro_entity_create_or_select_choice }
 
     oro_form.type.simple_color_picker:
         class: %oro_form.type.simple_color_picker.class%
         arguments:
-            - @oro_config.user
-            - @translator
+            - '@oro_config.user'
+            - '@translator'
         tags:
             - { name: form.type, alias: oro_simple_color_picker }
 
     oro_form.type.simple_color_choice:
         class: %oro_form.type.simple_color_choice.class%
         arguments:
-            - @oro_config.user
+            - '@oro_config.user'
         tags:
             - { name: form.type, alias: oro_simple_color_choice }
 
@@ -144,11 +144,11 @@ services:
     oro_form.type.rich_text:
         class: %oro_form.type.rich_text.class%
         arguments:
-            - @oro_config.user
-            - @oro_form.provider.html_tag_provider
+            - '@oro_config.user'
+            - '@oro_form.provider.html_tag_provider'
             - %kernel.cache_dir%
         calls:
-            - [setAssetHelper, [@assets.packages]]
+            - [setAssetHelper, ['@assets.packages']]
         tags:
             - { name: form.type, alias: oro_rich_text }
 
@@ -160,14 +160,14 @@ services:
     oro_form.type.data_changeset:
         class: %oro_form.type.data_changeset.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: oro_data_changeset }
 
     oro_form.type.entity_changeset:
         class: %oro_form.type.entity_changeset.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type, alias: oro_entity_changeset }
 
@@ -185,28 +185,28 @@ services:
     oro_help.form.tooltip_extension:
         class: %oro_form.extension.tooltip.class%
         arguments:
-            - @oro_entity_config.provider.entity
-            - @translator.default
+            - '@oro_entity_config.provider.entity'
+            - '@translator.default'
         tags:
             - { name: form.type_extension, alias: form }
 
     oro_form.extension.constraint_as_option:
         class: %oro_form.extension.constraint_as_option.class%
         arguments:
-            - @oro_form.validator.constraint_factory
+            - '@oro_form.validator.constraint_factory'
         tags:
             - { name: form.type_extension, alias: form }
 
     oro_form.extension.js_validation:
         class: %oro_form.extension.js_validation.class%
-        arguments: [@oro_form.extension.js_validation.constraints_provider]
+        arguments: ['@oro_form.extension.js_validation.constraints_provider']
         tags:
             - { name: form.type_extension, alias: form }
 
     oro_form.extension.js_validation.constraints_provider:
         class: %oro_form.extension.js_validation.constraints_provider.class%
         arguments:
-            - @validator.mapping.class_metadata_factory
+            - '@validator.mapping.class_metadata_factory'
 
 
     oro_form.extension.js_validation.repeated:
@@ -222,7 +222,7 @@ services:
     oro_form.extension.data_transformer:
         class: %oro_form.extension.data_transformer.class%
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: form.type_extension, alias: form }
 
@@ -234,7 +234,7 @@ services:
     oro_form.type.encoded_password:
         class: %oro_form.type.encoded_password.class%
         arguments:
-            - @oro_security.encoder.mcrypt
+            - '@oro_security.encoder.mcrypt'
         tags:
             - { name: form.type, alias: oro_encoded_password }
 
@@ -246,15 +246,15 @@ services:
     oro_form.type.oro_entity_create_or_select_inline:
         class: %oro_form.type.oro_entity_create_or_select_inline.class%
         arguments:
-            - @oro_security.security_facade
-            - @oro_entity_config.config_manager
+            - '@oro_security.security_facade'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: form.type, alias: oro_entity_create_or_select_inline }
 
     oro_form.type.oro_autocomplete:
         class: %oro_form.type.oro_autocomplete.class%
         arguments:
-            - @oro_form.autocomplete.search_registry
+            - '@oro_form.autocomplete.search_registry'
         tags:
             - { name: form.type, alias: oro_autocomplete }
 
@@ -266,7 +266,7 @@ services:
     oro_form.type.download_links:
         class: %oro_form.type.download_links.class%
         arguments:
-            - @assets.packages
+            - '@assets.packages'
         scope: request
         tags:
             - { name: form.type, alias: oro_download_links_type }
@@ -281,22 +281,22 @@ services:
         class: %oro_form.form_handler.api.class%
         scope: request
         arguments:
-            - @request
-            - @doctrine.orm.entity_manager
+            - '@request'
+            - '@doctrine.orm.entity_manager'
 
     oro_form.validator.entity_class:
         class: %oro_form.validator.entity_class.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity.entity_class_name_helper
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: validator.constraint_validator, alias: oro_form.entity_class_validator }
 
     oro_form.validator.related_entity:
         class: %oro_form.validator.related_entity.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity.entity_class_name_helper
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: validator.constraint_validator, alias: oro_form.related_entity_validator }
 
@@ -304,14 +304,14 @@ services:
         class: Oro\Bundle\FormBundle\Form\DataTransformer\RelatedEntityTransformer
         public: false
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity.entity_class_name_helper
-            - @oro_security.security_facade
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.entity_class_name_helper'
+            - '@oro_security.security_facade'
 
     oro_form.related_entity.form.type.api:
         class: Oro\Bundle\FormBundle\Form\Type\RelatedEntityApiType
         arguments:
-            - @oro_form.related_entity.form.transformer.api
+            - '@oro_form.related_entity.form.transformer.api'
         tags:
             - { name: form.type, alias: oro_related_entity_api }
 
@@ -324,6 +324,6 @@ services:
         parent: oro_form.type.api
         arguments:
             - oro_related_entity_standalone_collection_api
-            - @oro_form.related_entity_collection.form.type.api
+            - '@oro_form.related_entity_collection.form.type.api'
         tags:
             - { name: form.type, alias: oro_related_entity_standalone_collection_api }

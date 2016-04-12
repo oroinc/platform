@@ -12,7 +12,7 @@ services:
     oro_reminder.form.extension.reminder:
         class: %oro_reminder.form.extension.reminder.class%
         arguments:
-            - @oro_reminder.entity.manager
+            - '@oro_reminder.entity.manager'
         tags:
             - { name: form.type_extension, alias: form }
 
@@ -30,7 +30,7 @@ services:
     oro_reminder.form.type.method:
         class: %oro_reminder.form.type.method.class%
         arguments:
-            - @oro_reminder.send_processor_registry
+            - '@oro_reminder.send_processor_registry'
         tags:
             - { name: form.type, alias: oro_reminder_method }
 

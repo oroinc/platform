@@ -3,10 +3,10 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\CreateProcessor
         public: false
         arguments:
-            - @oro_api.processor_bag
+            - '@oro_api.processor_bag'
             - create
-            - @oro_api.config_provider
-            - @oro_api.metadata_provider
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.action_processor }
 
@@ -42,7 +42,7 @@ services:
     oro_api.create.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
-            - @oro_api.value_normalizer
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: create, group: initialize, priority: 20 }
 
@@ -63,7 +63,7 @@ services:
     oro_api.create.json_api.validate_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Create\JsonApi\ValidateRequestData
         arguments:
-            - @oro_api.value_normalizer
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api&!rest, priority: 90 }
 
@@ -75,14 +75,14 @@ services:
     oro_api.create.json_api.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData
         arguments:
-            - @oro_api.value_normalizer
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -50 }
 
     oro_api.create.rest.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
         arguments:
-            - @oro_api.rest.entity_id_transformer
+            - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: rest, priority: -110 }
 
@@ -93,8 +93,8 @@ services:
     oro_api.create.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_security.security_facade
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
             - CREATE
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 10 }
@@ -106,8 +106,8 @@ services:
     oro_api.create.entity_type_security_check.view:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_security.security_facade
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
             - VIEW
         tags:
             - { name: oro.api.processor, action: create, group: security_check, priority: 5 }
@@ -119,14 +119,14 @@ services:
     oro_api.create.create_entity:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CreateEntity
         arguments:
-            - @oro_api.entity_instantiator
+            - '@oro_api.entity_instantiator'
         tags:
             - { name: oro.api.processor, action: create, group: load_data, priority: -10 }
 
     oro_api.create.set_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Create\SetEntityId
         arguments:
-            - @oro_api.doctrine_helper
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: create, group: load_data, priority: -20 }
 
@@ -137,15 +137,15 @@ services:
     oro_api.create.initialize_api_form_extension:
         class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeApiFormExtension
         arguments:
-            - @form.registry
-            - @oro_api.form.guesser.metadata
+            - '@form.registry'
+            - '@oro_api.form.guesser.metadata'
         tags:
             - { name: oro.api.processor, action: create, group: build_form, priority: 250 }
 
     oro_api.create.build_form_builder:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
         arguments:
-            - @form.factory
+            - '@form.factory'
         tags:
             - { name: oro.api.processor, action: create, group: build_form, priority: 100 }
 
@@ -182,7 +182,7 @@ services:
     oro_api.create.save_orm_entity:
         class: Oro\Bundle\ApiBundle\Processor\Create\SaveOrmEntity
         arguments:
-            - @oro_api.doctrine_helper
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: create, group: save_data, priority: -10 }
 
@@ -193,7 +193,7 @@ services:
     oro_api.create.load_normalized_entity:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadNormalizedEntity
         arguments:
-            - @oro_api.action_processor_bag
+            - '@oro_api.action_processor_bag'
             - true # prevent loading of the entity by the "get" action and use the entity from the current context
         tags:
             - { name: oro.api.processor, action: create, group: normalize_data, priority: -10 }
@@ -205,9 +205,9 @@ services:
     oro_api.create.rest.set_location_header:
         class: Oro\Bundle\ApiBundle\Processor\Create\Rest\SetLocationHeader
         arguments:
-            - @router
-            - @oro_api.value_normalizer
-            - @oro_api.rest.entity_id_transformer
+            - '@router'
+            - '@oro_api.value_normalizer'
+            - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: create, group: finalize, requestType: rest, priority: -10 }
 
@@ -218,8 +218,8 @@ services:
     oro_api.create.restore_default_form_extension:
         class: Oro\Bundle\ApiBundle\Processor\Shared\RestoreDefaultFormExtension
         arguments:
-            - @form.registry
-            - @oro_api.form.guesser.metadata
+            - '@form.registry'
+            - '@oro_api.form.guesser.metadata'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, priority: 250 }
 
@@ -231,21 +231,21 @@ services:
     oro_api.create.rest.complete_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors
         arguments:
-            - @oro_api.rest.error_completer
+            - '@oro_api.rest.error_completer'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest&!json_api, priority: -10 }
 
     oro_api.create.json_api.complete_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteErrors
         arguments:
-            - @oro_api.json_api.error_completer
+            - '@oro_api.json_api.error_completer'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: json_api, priority: -11 }
 
     oro_api.create.normalize_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors
         arguments:
-            - @translator
+            - '@translator'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, priority: -20 }
 
@@ -259,16 +259,16 @@ services:
     oro_api.create.rest.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
         arguments:
-            - @oro_api.rest.document_builder
-            - @oro_api.rest.error_completer
+            - '@oro_api.rest.document_builder'
+            - '@oro_api.rest.error_completer'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: rest&!json_api, priority: -50 }
 
     oro_api.create.json_api.build_result_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemResultDocument
         arguments:
-            - @oro_api.json_api.document_builder
-            - @oro_api.json_api.error_completer
+            - '@oro_api.json_api.document_builder'
+            - '@oro_api.json_api.error_completer'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_result, requestType: json_api, priority: -51 }
 

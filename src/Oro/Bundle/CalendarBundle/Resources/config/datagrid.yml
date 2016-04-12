@@ -151,7 +151,7 @@ datagrid:
                 label:         Delete
                 icon:          trash
                 link:          delete_link
-        action_configuration: [@oro_calendar.datagrid.action_permission_provider, "getInvitationPermissions"]
+        action_configuration: ['@oro_calendar.datagrid.action_permission_provider', "getInvitationPermissions"]
         options:
             entityHint: calendar_events
             entity_pagination: true
@@ -381,7 +381,7 @@ datagrid:
                 where:
                     and:
                         - calendar.public = false
-        action_configuration: @oro_calendar.system_calendar_event.datagrid_helper->getSystemActionConfigurationClosure
+        action_configuration: "@oro_calendar.system_calendar_event.datagrid_helper->getSystemActionConfigurationClosure"
 
     public-system-calendar-event-grid:
         extends: base-system-calendar-event-grid
@@ -390,7 +390,7 @@ datagrid:
                 where:
                     and:
                         - calendar.public = true
-        action_configuration: @oro_calendar.system_calendar_event.datagrid_helper->getPublicActionConfigurationClosure
+        action_configuration: "@oro_calendar.system_calendar_event.datagrid_helper->getPublicActionConfigurationClosure"
 
     system-calendar-grid:
         source:
@@ -464,7 +464,7 @@ datagrid:
                 label:         Delete
                 icon:          trash
                 link:          delete_link
-        action_configuration: @oro_calendar.listener.datagrid.system_calendar->getActionConfigurationClosure
+        action_configuration: "@oro_calendar.listener.datagrid.system_calendar->getActionConfigurationClosure"
 
 
     calendar-event-for-context-grid:
