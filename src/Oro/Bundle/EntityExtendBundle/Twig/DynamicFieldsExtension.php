@@ -102,7 +102,7 @@ class DynamicFieldsExtension extends \Twig_Extension
 
             $fieldConfig = $this->entityProvider->getConfigById($fieldConfigId);
             $dynamicRow[$fieldName] = [
-                'type'     => $fieldType,
+                'type'     => $this->viewProvider->getConfigById($fieldConfigId)->get('type', false, $fieldType),
                 'label'    => $fieldConfig->get('label') ?: $fieldName,
                 'value'    => $event->getFieldViewValue(),
                 'priority' => $this->viewProvider->getConfigById($fieldConfigId)->get('priority', false, 0)
