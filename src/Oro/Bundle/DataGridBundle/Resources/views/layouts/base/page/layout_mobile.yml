@@ -1,25 +1,25 @@
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'OroDataGridBundle:layouts:base/page/layout_mobile.html.twig'
-        - @remove:
+        - '@remove':
             id: datagrid_toolbar_extra_actions
-        - @remove:
+        - '@remove':
             id: datagrid_toolbar_tools_container
-        - @move:
+        - '@move':
             id: datagrid_toolbar_actions
             parentId: datagrid_toolbar
             prepend: true
-        - @add:
+        - '@add':
             id: datagrid_toolbar_pagination_container
             parentId: datagrid_toolbar
             blockType: container
-        - @move:
+        - '@move':
             id: datagrid_toolbar_pagination
             parentId: datagrid_toolbar_pagination_container
-        - @move:
+        - '@move':
             id: datagrid_toolbar_page_size
             parentId: datagrid_toolbar_pagination_container
             siblingId: datagrid_toolbar_pagination
     conditions:
-        @eq: [ $context.user_agent.mobile, true ]
+        '@eq': [ $context.user_agent.mobile, true ]

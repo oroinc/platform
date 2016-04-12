@@ -25,7 +25,7 @@ class OrmFilterExtension extends AbstractExtension
     /**
      * Query param
      */
-    const FILTER_ROOT_PARAM = '_filter';
+    const FILTER_ROOT_PARAM     = '_filter';
     const MINIFIED_FILTER_PARAM = 'f';
 
     /** @var FilterInterface[] */
@@ -125,8 +125,8 @@ class OrmFilterExtension extends AbstractExtension
         $values        = $this->getValuesToApply($config);
         $initialValues = $this->getValuesToApply($config, false);
         $lazy          = $data->offsetGetOr(MetadataObject::LAZY_KEY, true);
-
-        $rawConfig = $this->configurationProvider->isApplicable($config->getName())
+        $filtersParams = $this->getParameters()->get(self::FILTER_ROOT_PARAM, []);
+        $rawConfig     = $this->configurationProvider->isApplicable($config->getName())
             ? $this->configurationProvider->getRawConfiguration($config->getName())
             : [];
 
@@ -134,9 +134,10 @@ class OrmFilterExtension extends AbstractExtension
             if (!$lazy) {
                 $filter->resolveOptions();
             }
-            $value        = $this->getFilterValue($values, $filter->getName());
-            $initialValue = $this->getFilterValue($initialValues, $filter->getName());
-
+            $name             = $filter->getName();
+            $value            = $this->getFilterValue($values, $name);
+            $initialValue     = $this->getFilterValue($initialValues, $name);
+            $filtersState        = $this->updateFilterStateEnabled($name, $filtersParams, $filtersState);
             $filtersState        = $this->updateFiltersState($filter, $value, $filtersState);
             $initialFiltersState = $this->updateFiltersState($filter, $initialValue, $initialFiltersState);
 
@@ -334,5 +335,24 @@ class OrmFilterExtension extends AbstractExtension
     protected function getFilterValue(array $values, $key, $default = false)
     {
         return isset($values[$key]) ? $values[$key] : $default;
+    }
+
+    /**
+     * Set state of filters(enable or disable) from parameters by special key - "__{$filterName}"
+     *
+     * @param string $name
+     * @param array  $filtersParams
+     * @param array  $state
+     *
+     * @return array
+     */
+    protected function updateFilterStateEnabled($name, array $filtersParams, array $state)
+    {
+        $filterEnabledKey = sprintf('__%s', $name);
+        if (isset($filtersParams[$filterEnabledKey])) {
+            $state[$filterEnabledKey] = $filtersParams[$filterEnabledKey];
+        }
+
+        return $state;
     }
 }

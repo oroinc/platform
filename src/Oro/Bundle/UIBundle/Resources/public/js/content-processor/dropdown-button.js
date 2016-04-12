@@ -47,10 +47,10 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         },
 
         _proccedButtons: function($elems) {
-            this.buttons = $elems.clone(true);
             if ($elems.length <= 1) {
                 return;
             }
+            this.buttons = $elems.clone(true).get();
 
             if (this.group) {
                 this.group.remove();
@@ -86,7 +86,9 @@ define(['jquery', 'underscore', 'oroui/js/mediator', 'jquery-ui'], function($, _
         _addButton: function(data) {
             var $button = this._collectButtons($(this.options.buttonTemplate(data)));
             if ($button.length > 0) {
-                this._proccedButtons($button.add(this.buttons));
+                var buttons = this.buttons ? this.buttons : this._collectButtons().get();
+                buttons.unshift($button.get(0));
+                this._proccedButtons($(buttons));
             }
         },
 

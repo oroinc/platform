@@ -141,14 +141,16 @@ define([
 
         /**
          * Run action
+         *
+         * @param {Object} options
          */
-        run: function() {
-            var options = {
+        run: function(options) {
+            options = _.defaults(options, {
                 doExecute: true
-            };
+            });
             this.trigger('preExecute', this, options);
             if (options.doExecute) {
-                this.execute();
+                this.execute(options);
                 this.trigger('postExecute', this, options);
             }
         },

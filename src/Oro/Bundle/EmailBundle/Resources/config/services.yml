@@ -144,11 +144,11 @@ services:
     oro_email.entity.cache.warmer:
         class: %oro_email.entity.cache.warmer.class%
         arguments:
-            - @oro_email.email.owner.provider.storage
+            - '@oro_email.email.owner.provider.storage'
             - %oro_email.entity.cache_dir%
             - %oro_email.entity.cache_namespace%
             - %oro_email.entity.proxy_name_template%
-            - @kernel
+            - '@kernel'
         tags:
             - { name: kernel.cache_warmer, priority: 30 }
 
@@ -163,14 +163,14 @@ services:
     oro_email.email.cache.manager:
         class: %oro_email.email.cache.manager.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @event_dispatcher
-            - @oro_email.email_body_synchronizer
+            - '@doctrine.orm.entity_manager'
+            - '@event_dispatcher'
+            - '@oro_email.email_body_synchronizer'
 
     oro_email.email_holder_helper:
         class: %oro_email.email_holder_helper.class%
         arguments:
-            - @oro_entity_config.provider.extend
+            - '@oro_entity_config.provider.extend'
 
     oro_email.email.address.helper:
         class: %oro_email.email.address.helper.class%
@@ -186,7 +186,7 @@ services:
     oro_email.email_address.entity_manager:
         public: false
         class: Doctrine\ORM\EntityManager
-        factory: [@doctrine, getManagerForClass]
+        factory: ['@doctrine', getManagerForClass]
         arguments:
             - 'OroEmailBundle:EmailAddress'
 
@@ -200,7 +200,7 @@ services:
             - %oro_email.entity.cache_namespace%
             - %oro_email.entity.proxy_name_template%
         calls:
-            - [setEntityManagerLink, [@oro_email.link.email_address.entity_manager]]
+            - [setEntityManagerLink, ['@oro_email.link.email_address.entity_manager']]
 
     oro_email.email.owner.provider.storage:
         public: false
@@ -210,57 +210,57 @@ services:
         public: false
         class: %oro_email.email.owner.provider.class%
         arguments:
-            - @oro_email.email.owner.provider.storage
+            - '@oro_email.email.owner.provider.storage'
 
     oro_email.email.owner.manager:
         public: false
         class: %oro_email.email.owner.manager.class%
         arguments:
-            - @oro_email.email.owner.provider.storage
-            - @oro_email.email.address.manager
+            - '@oro_email.email.owner.provider.storage'
+            - '@oro_email.email.address.manager'
 
     oro_email.email.model.builder.helper:
         class: %oro_email.email.model.builder.helper.class%
         arguments:
-            - @oro_entity.routing_helper
-            - @oro_email.email.address.helper
-            - @oro_entity.entity_name_resolver
-            - @oro_security.security_facade
-            - @oro_email.email.address.manager
-            - @doctrine.orm.entity_manager
-            - @oro_email.email.cache.manager
-            - @templating
-            - @oro_email.mailbox.manager
+            - '@oro_entity.routing_helper'
+            - '@oro_email.email.address.helper'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_security.security_facade'
+            - '@oro_email.email.address.manager'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_email.email.cache.manager'
+            - '@templating'
+            - '@oro_email.mailbox.manager'
 
     oro_email.email.entity.builder:
         class: %oro_email.email.entity.builder.class%
         scope: prototype
         arguments:
-            - @oro_email.email.entity.batch_processor
-            - @oro_email.email.address.manager
-            - @oro_email.email.address.helper
+            - '@oro_email.email.entity.batch_processor'
+            - '@oro_email.email.address.manager'
+            - '@oro_email.email.address.helper'
 
     oro_email.email.model.builder:
         class: %oro_email.email.model.builder.class%
         arguments:
-            - @oro_email.email.model.builder.helper
-            - @doctrine.orm.entity_manager
-            - @oro_config.user
-            - @oro_email.activity_list.provider
-            - @oro_email.provider.email_attachment_provider
-            - @oro_email.form.factory
+            - '@oro_email.email.model.builder.helper'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_config.user'
+            - '@oro_email.activity_list.provider'
+            - '@oro_email.provider.email_attachment_provider'
+            - '@oro_email.form.factory'
         calls:
-            - [setRequest, [@?request=]]
+            - [setRequest, ["@?request="]]
 
     oro_email.email_websocket.processor:
         class: %oro_email.email_websocket.processor.class%
         arguments:
-            - @oro_wamp.publisher
+            - '@oro_wamp.publisher'
 
     oro_email.event_listener.email_user_listener:
         class: %oro_email.event_listener.email_user_listener.class%
         arguments:
-            - @oro_email.email_websocket.processor
+            - '@oro_email.email_websocket.processor'
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: 1 }
             - { name: doctrine.event_listener, event: postFlush, priority: 1 }
@@ -270,9 +270,9 @@ services:
         public: false
         scope: prototype
         arguments:
-            - @oro_email.email.address.manager
-            - @oro_email.email.owner.provider
-            - @event_dispatcher
+            - '@oro_email.email.address.manager'
+            - '@oro_email.email.owner.provider'
+            - '@event_dispatcher'
 
     oro_email.link.email.activity.manager:
         tags:
@@ -285,10 +285,10 @@ services:
     oro_email.listener.entity_listener:
         class: %oro_email.listener.entity_listener.class%
         arguments:
-            - @oro_email.email.owner.manager
-            - @oro_email.link.email.activity.manager
-            - @oro_email.link.email.thread.manager
-            - @oro_email.model.email_activity_updates
+            - '@oro_email.email.owner.manager'
+            - '@oro_email.link.email.activity.manager'
+            - '@oro_email.link.email.thread.manager'
+            - '@oro_email.model.email_activity_updates'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -301,14 +301,14 @@ services:
     oro_email.listener.role_subscriber:
         class: %oro_email.listener.role_subscriber.class%
         arguments:
-            - @oro_email.acl.manager.link
+            - '@oro_email.acl.manager.link'
         tags:
             - { name: doctrine.event_subscriber }
 
     oro_email.listener.auto_response_listener:
         class: %oro_email.listener.auto_response_listener.class%
         arguments:
-            - @oro_email.link.autoresponserule_manager
+            - '@oro_email.link.autoresponserule_manager'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -318,16 +318,16 @@ services:
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.autoresponserule.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_email.autoresponserule_manager:
         class: %oro_email.autoresponserule_manager.class%
         arguments:
-            - @doctrine
-            - @oro_email.email.model.builder
-            - @oro_email.mailer.processor
-            - @oro_email.email_renderer
-            - @logger
+            - '@doctrine'
+            - '@oro_email.email.model.builder'
+            - '@oro_email.mailer.processor'
+            - '@oro_email.email_renderer'
+            - '@logger'
             - %locale%
 
     oro_email.link.autoresponserule_manager:
@@ -339,20 +339,20 @@ services:
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.email.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_email.manager.email_origin.api:
         class: %oro_email.manager.email_origin.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.email_origin.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_email.direct_mailer:
         class: %oro_email.direct_mailer.class%
         arguments:
-            - @mailer
-            - @service_container
+            - '@mailer'
+            - '@service_container'
 
     # Email template API
     oro_email.manager.emailtemplate.api:
@@ -360,7 +360,7 @@ services:
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.emailtemplate.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_email.cache:
           parent: oro.cache.abstract
@@ -371,7 +371,7 @@ services:
     oro_email.listener.config_listener:
         class: Oro\Bundle\EmailBundle\EventListener\EntityConfigListener
         arguments:
-            - @oro_email.cache
+            - '@oro_email.cache'
             - %oro_email.cache.available_in_template_key%
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush }
@@ -383,14 +383,14 @@ services:
     oro_email.email_renderer:
         class: %oro_email.email_renderer.class%
         arguments:
-            - @oro_email.twig.string_loader
+            - '@oro_email.twig.string_loader'
             -  # twig environment options
               strict_variables: true
-            - @oro_email.emailtemplate.variable_provider
-            - @oro_email.cache
+            - '@oro_email.emailtemplate.variable_provider'
+            - '@oro_email.cache'
             - %oro_email.cache.available_in_template_key%
-            - @oro_email.twig.email_sandbox
-            - @translator
+            - '@oro_email.twig.email_sandbox'
+            - '@translator'
         lazy: true
 
     oro_email.twig.email_security_policy:
@@ -410,7 +410,7 @@ services:
     oro_email.twig.email_sandbox:
         class: Twig_Extension_Sandbox
         arguments:
-            - @oro_email.twig.email_security_policy
+            - '@oro_email.twig.email_security_policy'
             - true # use sandbox globally in instance
 
     oro_email.emailtemplate.variable_provider:
@@ -419,10 +419,10 @@ services:
     oro_email.emailtemplate.variable_provider.entity:
         class: %oro_email.emailtemplate.variable_provider.entity.class%
         arguments:
-            - @translator
-            - @oro_entity_config.config_manager
-            - @doctrine
-            - @oro_ui.formatter
+            - '@translator'
+            - '@oro_entity_config.config_manager'
+            - '@doctrine'
+            - '@oro_ui.formatter'
         lazy: true
         public: false
         tags:
@@ -432,9 +432,9 @@ services:
         class: %oro_email.emailtemplate.variable_provider.system.class%
         lazy: true
         arguments:
-            - @translator
-            - @oro_config.user
-            - @oro_locale.formatter.date_time
+            - '@translator'
+            - '@oro_config.user'
+            - '@oro_locale.formatter.date_time'
         lazy: true
         public: false
         tags:
@@ -444,10 +444,10 @@ services:
         class: %oro_email.emailtemplate.variable_provider.user.class%
         lazy: true
         arguments:
-            - @translator
-            - @oro_security.security_facade
-            - @oro_entity.entity_name_resolver
-            - @oro_config.user
+            - '@translator'
+            - '@oro_security.security_facade'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_config.user'
         lazy: true
         public: false
         tags:
@@ -456,17 +456,17 @@ services:
     oro_email.validator.email_template_syntax:
         class: %oro_email.validator.email_template_syntax_validator.class%
         arguments:
-            - @oro_email.email_renderer
-            - @oro_locale.settings
-            - @oro_entity_config.provider.entity
-            - @translator
+            - '@oro_email.email_renderer'
+            - '@oro_locale.settings'
+            - '@oro_entity_config.provider.entity'
+            - '@translator'
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_template_syntax_validator }
 
     oro_email.validator.email_address_validator:
         class: %oro_email.validator.email_address_validator.class%
         arguments:
-            - @oro_email.email.address.helper
+            - '@oro_email.email.address.helper'
         tags:
             - { name: validator.constraint_validator, alias: oro_email.email_address_validator }
 
@@ -478,72 +478,72 @@ services:
     oro_email.datagrid_query_factory:
         class: %oro_email.datagrid_query_factory.class%
         arguments:
-            - @oro_email.email.owner.provider.storage
-            - @oro_entity.entity_name_resolver
-            - @oro_email.mailbox.manager
-            - @oro_security.security_facade
+            - '@oro_email.email.owner.provider.storage'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_email.mailbox.manager'
+            - '@oro_security.security_facade'
 
     oro_email.emailtemplate.datagrid_view_list:
         class: %oro_email.emailtemplate.datagrid_view_list.class%
         arguments:
-            - @translator
+            - '@translator'
 
     oro_email.emailfolder.datagrid_view_list:
         class: %oro_email.emailfolder.datagrid_view_list.class%
         arguments:
-            - @translator
-            - @oro_email.mailbox_choice_list
+            - '@translator'
+            - '@oro_email.mailbox_choice_list'
 
     oro_email.emailseen.datagrid_view_list:
         class: %oro_email.emailseen.datagrid_view_list.class%
         arguments:
-            - @translator
-            - @oro_email.mailbox_choice_list
+            - '@translator'
+            - '@oro_email.mailbox_choice_list'
 
     oro_email.emailtemplate.datagrid_helper:
         class: %oro_email.emailtemplate.datagrid_helper.class%
         arguments:
-            - @oro_entity.entity_provider
-            - @translator
+            - '@oro_entity.entity_provider'
+            - '@translator'
 
     oro_email.mailer.processor:
         class: %oro_email.mailer.processor.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_email.direct_mailer
-            - @oro_email.email.address.helper
-            - @oro_email.email.entity.builder=
-            - @oro_email.email.owner.provider
-            - @oro_email.email.activity.manager
-            - @oro_security.security_facade.link
-            - @event_dispatcher
-            - @oro_security.encoder.mcrypt
-            - @oro_email.mailer.email_origin_helper
+            - '@oro_entity.doctrine_helper'
+            - '@oro_email.direct_mailer'
+            - '@oro_email.email.address.helper'
+            - '@oro_email.email.entity.builder='
+            - '@oro_email.email.owner.provider'
+            - '@oro_email.email.activity.manager'
+            - '@oro_security.security_facade.link'
+            - '@event_dispatcher'
+            - '@oro_security.encoder.mcrypt'
+            - '@oro_email.mailer.email_origin_helper'
 
     oro_email.workflow.action.send_email:
         class: %oro_email.workflow.action.send_email.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_email.mailer.processor
-            - @oro_email.email.address.helper
-            - @oro_entity.entity_name_resolver
+            - '@oro_action.context_accessor'
+            - '@oro_email.mailer.processor'
+            - '@oro_email.email.address.helper'
+            - '@oro_entity.entity_name_resolver'
         calls:
-            - [setLogger, [@logger]]
+            - [setLogger, ['@logger']]
         tags:
             - { name: oro_workflow.action, alias: send_email }
 
     oro_email.workflow.action.send_email_template:
         class: %oro_email.workflow.action.send_email_template.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_email.mailer.processor
-            - @oro_email.email.address.helper
-            - @oro_entity.entity_name_resolver
-            - @oro_email.email_renderer
-            - @doctrine.orm.entity_manager
-            - @validator
+            - '@oro_action.context_accessor'
+            - '@oro_email.mailer.processor'
+            - '@oro_email.email.address.helper'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_email.email_renderer'
+            - '@doctrine.orm.entity_manager'
+            - '@validator'
         calls:
-            - [setLogger, [@logger]]
+            - [setLogger, ['@logger']]
         tags:
             - { name: oro_workflow.action, alias: send_email_template }
             - { name: oro_action.action, alias: send_email_template }
@@ -551,75 +551,75 @@ services:
     oro_email.helper.datagrid.emails:
         class: %oro_email.helper.datagrid.emails.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_email.email_synchronization_manager
-            - @oro_activity.manager
+            - '@oro_entity.doctrine_helper'
+            - '@oro_email.email_synchronization_manager'
+            - '@oro_activity.manager'
             - %oro_user.entity.class%
 
     oro_email.listener.datagrid.email:
         class: %oro_email.listener.datagrid.email.class%
         arguments:
-            - @oro_email.datagrid_query_factory
+            - '@oro_email.datagrid_query_factory'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-email-grid, method: onBuildAfter }
 
     oro_email.listener.datagrid.activity:
         class: %oro_email.listener.datagrid.activity.class%
         arguments:
-            - @oro_email.helper.datagrid.emails
-            - @oro_entity.routing_helper
+            - '@oro_email.helper.datagrid.emails'
+            - '@oro_entity.routing_helper'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.activity-email-grid, method: onBuildAfter }
 
     oro_email.listener.datagrid.recent_emails.inbox:
         class: %oro_email.listener.datagrid.user_emails.recent.class%
         arguments:
-            - @oro_email.helper.datagrid.emails
-            - @oro_email.datagrid_query_factory
+            - '@oro_email.helper.datagrid.emails'
+            - '@oro_email.datagrid_query_factory'
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-inbox-grid, method: onBuildAfter }
 
     oro_email.listener.datagrid.recent_emails.sent:
         class: %oro_email.listener.datagrid.user_emails.recent.class%
         arguments:
-            - @oro_email.helper.datagrid.emails
-            - @oro_email.datagrid_query_factory
+            - '@oro_email.helper.datagrid.emails'
+            - '@oro_email.datagrid_query_factory'
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-sent-grid, method: onBuildAfter }
 
     oro_email.listener.datagrid.recent_emails.new:
         class: %oro_email.listener.datagrid.user_emails.recent.class%
         arguments:
-            - @oro_email.helper.datagrid.emails
-            - @oro_email.datagrid_query_factory
+            - '@oro_email.helper.datagrid.emails'
+            - '@oro_email.datagrid_query_factory'
         tags:
           - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.dashboard-recent-emails-new-grid, method: onBuildAfter }
 
     oro_email.email_synchronization_manager:
         class: %oro_email.email_synchronization_manager.class%
         arguments:
-            - @service_container
+            - '@service_container'
 
     oro_email.known_email_address_checker_factory:
         class: %oro_email.known_email_address_checker_factory.class%
         public: false
         scope: prototype
         arguments:
-            - @doctrine
-            - @oro_email.email.address.manager
-            - @oro_email.email.address.helper
-            - @oro_email.email.owner.provider.storage
+            - '@doctrine'
+            - '@oro_email.email.address.manager'
+            - '@oro_email.email.address.helper'
+            - '@oro_email.email.owner.provider.storage'
             - %oro_email.email_sync_exclusions%
 
     oro_email.email.activity.manager:
         class: %oro_email.email.activity.manager.class%
         arguments:
-            - @oro_activity.manager
-            - @oro_email.activity_list.provider
-            - @oro_email.email.thread.provider
-            - @security.token_storage
-            - @oro_security.owner.entity_owner_accessor.link
-            - @=service('doctrine').getManagerForClass('OroEmailBundle:Email')
+            - '@oro_activity.manager'
+            - '@oro_email.activity_list.provider'
+            - '@oro_email.email.thread.provider'
+            - '@security.token_storage'
+            - '@oro_security.owner.entity_owner_accessor.link'
+            - "@=service('doctrine').getManagerForClass('OroEmailBundle:Email')"
 
     oro_email.email.thread.provider:
         class: %oro_email.email.thread.provider.class%
@@ -627,27 +627,27 @@ services:
     oro_email.email.thread.manager:
         class: %oro_email.email.thread.manager.class%
         arguments:
-            - @oro_email.email.thread.provider
-            - @=service('doctrine').getManagerForClass('OroEmailBundle:EmailThread')
+            - '@oro_email.email.thread.provider'
+            - "@=service('doctrine').getManagerForClass('OroEmailBundle:EmailThread')"
 
     oro_email.email.manager:
         class: %oro_email.email.manager.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_email.email.thread.manager
-            - @oro_email.email.thread.provider
-            - @oro_security.security_facade
+            - '@doctrine.orm.entity_manager'
+            - '@oro_email.email.thread.manager'
+            - '@oro_email.email.thread.provider'
+            - '@oro_security.security_facade'
 
     oro_email.twig.extension.email:
         class: %oro_email.twig.extension.email.class%
         arguments:
-            - @oro_email.email_holder_helper
-            - @oro_email.email.address.helper
-            - @oro_email.manager.email_attachment_manager
-            - @doctrine.orm.entity_manager
-            - @oro_email.mailbox.process_storage
-            - @oro_security.security_facade
-            - @oro_email.related_emails.provider
+            - '@oro_email.email_holder_helper'
+            - '@oro_email.email.address.helper'
+            - '@oro_email.manager.email_attachment_manager'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_email.mailbox.process_storage'
+            - '@oro_security.security_facade'
+            - '@oro_email.related_emails.provider'
         tags:
             - { name: twig.extension }
 
@@ -667,75 +667,75 @@ services:
     oro_email.activity_list.provider:
         class: %oro_email.activity_list.provider.class%
         arguments:
-           - @oro_entity.doctrine_helper
-           - @oro_email.link.entity_manager
-           - @oro_entity.entity_name_resolver
-           - @router
-           - @oro_entity_config.config_manager
-           - @oro_email.email.thread.provider
-           - @oro_ui.html_tag_helper
-           - @oro_security.security_facade.link
-           - @oro_email.mailbox.process_storage.link
-           - @oro_activity.association_helper
-           - @oro_comment.association_helper
+           - '@oro_entity.doctrine_helper'
+           - '@oro_email.link.entity_manager'
+           - '@oro_entity.entity_name_resolver'
+           - '@router'
+           - '@oro_entity_config.config_manager'
+           - '@oro_email.email.thread.provider'
+           - '@oro_ui.html_tag_helper'
+           - '@oro_security.security_facade.link'
+           - '@oro_email.mailbox.process_storage.link'
+           - '@oro_activity.association_helper'
+           - '@oro_comment.association_helper'
         calls:
-           - [ setSecurityContextLink, [@security.context.link] ]
+           - [ setSecurityContextLink, ['@security.context.link'] ]
         tags:
            - {name: oro_activity_list.provider, priority: 30}
 
     oro_email.related_emails.provider:
         class: %oro_email.related_emails.provider.class%
         arguments:
-            - @doctrine
-            - @oro_entity_config.config_manager
-            - @oro_security.security_facade
-            - @oro_locale.formatter.name
-            - @oro_email.email.address.helper
-            - @oro_email.provider.email_recipients.helper
+            - '@doctrine'
+            - '@oro_entity_config.config_manager'
+            - '@oro_security.security_facade'
+            - '@oro_locale.formatter.name'
+            - '@oro_email.email.address.helper'
+            - '@oro_email.provider.email_recipients.helper'
 
     oro_email.email_recipients.provider:
         class: %oro_email.email_recipients.provider.class%
         arguments:
-            - @translator
-            - @oro_email.provider.email_recipients.helper
+            - '@translator'
+            - '@oro_email.provider.email_recipients.helper'
 
     oro_email.recent_email_recipients.provider:
         class: %oro_email.recent_email_recipients.provider.class%
         arguments:
-            - @oro_security.security_facade
-            - @oro_email.related_emails.provider
-            - @oro_security.acl_helper
-            - @doctrine
-            - @oro_email.email.owner.provider
-            - @oro_email.provider.email_recipients.helper
+            - '@oro_security.security_facade'
+            - '@oro_email.related_emails.provider'
+            - '@oro_security.acl_helper'
+            - '@doctrine'
+            - '@oro_email.email.owner.provider'
+            - '@oro_email.provider.email_recipients.helper'
         tags:
             - { name: oro_email.recipients_provider }
 
     oro_email.context_email_recipients.provider:
         class: %oro_email.context_email_recipients.provider.class%
         arguments:
-            - @oro_email.related_emails.provider
+            - '@oro_email.related_emails.provider'
         tags:
             - { name: oro_email.recipients_provider, priority: 10 }
 
     oro_email.provider.emailowners.provider:
         class: %oro_email.provider.emailowners.provider.class%
         arguments:
-            - @oro_activity_list.provider.chain
-            - @oro_email.email.owner.provider.storage
-            - @doctrine
+            - '@oro_activity_list.provider.chain'
+            - '@oro_email.email.owner.provider.storage'
+            - '@doctrine'
 
     oro_email.provider.email_recipients.helper:
         class: %oro_email.provider.email_recipients.helper.class%
         arguments:
-            - @oro_security.acl_helper
-            - @oro_locale.dql.formatter.name
-            - @oro_locale.formatter.name
-            - @oro_entity_config.config_manager
-            - @translator
-            - @oro_email.email.owner.provider
-            - @doctrine
-            - @oro_email.email.address.helper
+            - '@oro_security.acl_helper'
+            - '@oro_locale.dql.formatter.name'
+            - '@oro_locale.formatter.name'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+            - '@oro_email.email.owner.provider'
+            - '@doctrine'
+            - '@oro_email.email.address.helper'
 
     oro_email.link.formatter.name:
         tags:
@@ -744,22 +744,22 @@ services:
     oro_email.manager.email_attachment_manager:
         class: %oro_email.manager.email_attachment_manager.class%
         arguments:
-            - @knp_gaufrette.filesystem_map
-            - @doctrine.orm.entity_manager
-            - @kernel
-            - @oro_security.security_facade.link
-            - @oro_attachment.validator.file_config_validator
-            - @oro_attachment.association_helper
+            - '@knp_gaufrette.filesystem_map'
+            - '@doctrine.orm.entity_manager'
+            - '@kernel'
+            - '@oro_security.security_facade.link'
+            - '@oro_attachment.validator.file_config_validator'
+            - '@oro_attachment.association_helper'
 
     oro_email.listener.email_body_add_listener:
         class: %oro_email.listener.email_body_add_listener.class%
         arguments:
-            - @oro_email.manager.email_attachment_manager
-            - @oro_entity_config.provider.attachment
-            - @oro_email.activity_list.provider
-            - @oro_security.security_facade.link
-            - @oro_activity_list.provider.chain
-            - @doctrine.orm.entity_manager
+            - '@oro_email.manager.email_attachment_manager'
+            - '@oro_entity_config.provider.attachment'
+            - '@oro_email.activity_list.provider'
+            - '@oro_security.security_facade.link'
+            - '@oro_activity_list.provider.chain'
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: kernel.event_listener, event: oro_email.email_body_added, method: linkToScope, priority: 10 }
             - { name: kernel.event_listener, event: oro_email.email_body_added, method: updateActivityDescription, priority: 20 }
@@ -772,16 +772,16 @@ services:
     oro_email.provider.email_attachment_provider:
         class: %oro_email.provider.email_attachment_provider.class%
         arguments:
-            - @oro_email.email.thread.provider
-            - @doctrine.orm.entity_manager
-            - @oro_attachment.provider.attachment
-            - @oro_email.email_attachment_transformer
+            - '@oro_email.email.thread.provider'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_attachment.provider.attachment'
+            - '@oro_email.email_attachment_transformer'
 
     oro_email.email_attachment_transformer:
         class: %oro_email.email_attachment_transformer.class%
         arguments:
-            - @knp_gaufrette.filesystem_map
-            - @oro_email.form.factory
+            - '@knp_gaufrette.filesystem_map'
+            - '@oro_email.form.factory'
 
     oro_email.email_importance_transformer:
         class: Oro\Bundle\EmailBundle\Form\DataTransformer\EmailImportanceApiTransformer
@@ -792,7 +792,7 @@ services:
     oro_email.acl.voter.email_voter:
         class: %oro_email.acl.voter.email_voter.class%
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: security.voter }
 
@@ -800,7 +800,7 @@ services:
         class: Oro\Bundle\EmailBundle\Provider\EmailEntityAliasProvider
         public: false
         arguments:
-            - @oro_email.email.address.manager
+            - '@oro_email.email.address.manager'
         tags:
             - { name: oro_entity.alias_provider }
 
@@ -809,61 +809,61 @@ services:
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.email.entity.class%
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
-            - @security.token_storage
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
+            - '@security.token_storage'
 
     oro_email.manager.email_activity_entity.api:
         class: %oro_email.manager.email_activity_entity.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.email.entity.class%
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
-            - @security.token_storage
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
+            - '@security.token_storage'
 
     oro_email.manager.email_activity_search.api:
         class: %oro_email.manager.email_activity_search.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.email.entity.class%
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
-            - @oro_search.index
-            - @oro_entity.entity_name_resolver
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
+            - '@oro_search.index'
+            - '@oro_entity.entity_name_resolver'
 
     oro_email.manager.email_activity_suggestion.api:
         class: %oro_email.manager.email_activity_suggestion.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.email.entity.class%
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
-            - @oro_search.index
-            - @oro_entity.entity_name_resolver
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
+            - '@oro_search.index'
+            - '@oro_entity.entity_name_resolver'
 
     oro_email.email.flag.manager:
         class: %oro_email.email.flag.manager.class%
         arguments:
-            - @oro_email.email_flag_manager_loader_selector
-            - @doctrine.orm.entity_manager
+            - '@oro_email.email_flag_manager_loader_selector'
+            - '@doctrine.orm.entity_manager'
         calls:
-            - [setLogger, [@logger]]
+            - [setLogger, ['@logger']]
 
     oro_email.manager.notification:
         class: %oro_email.manager.notification.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_ui.html_tag_helper
-            - @router
-            - @oro_email.email.cache.manager
-            - @oro_entity_config.config_manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_ui.html_tag_helper'
+            - '@router'
+            - '@oro_email.email.cache.manager'
+            - '@oro_entity_config.config_manager'
 
     oro_email.datagrid.origin_folder.provider:
         class: %oro_email.datagrid.origin_folder.provider.class%
         arguments:
-            - @doctrine
-            - @oro_security.security_facade
+            - '@doctrine'
+            - '@oro_security.security_facade'
 
     oro_email.mailbox.process_storage:
         class: %oro_email.mailbox.process_storage.class%
@@ -876,21 +876,21 @@ services:
     oro_email.mailbox_choice_list:
         class: %oro_email.mailbox_choice_list.class%
         arguments:
-            - @doctrine
-            - @oro_security.security_facade
-            - @oro_email.mailbox.manager
+            - '@doctrine'
+            - '@oro_security.security_facade'
+            - '@oro_email.mailbox.manager'
 
     oro_email.mailbox.manager.api:
         class: %oro_email.mailbox.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_email.mailbox.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_email.mailbox.entity_name_provider:
         class: %oro_email.mailbox.entity_name_provider.class%
         arguments:
-            - @translator.default
+            - '@translator.default'
         tags:
             - { name: oro_entity.name_provider, priority: 0}
 
@@ -901,9 +901,9 @@ services:
     oro_email.listener.mailbox_process_trigger_listener:
         class: %oro_email.listener.mailbox_process_trigger_listener.class%
         arguments:
-            - @oro_workflow.process.process_handler
-            - @oro_email.link.mailbox_process_storage
-            - @doctrine
+            - '@oro_workflow.process.process_handler'
+            - '@oro_email.link.mailbox_process_storage'
+            - '@doctrine'
         tags:
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
@@ -912,21 +912,21 @@ services:
         class: %oro_email.autocomplete.mailbox_user_search_handler.class%
         parent: oro_user.autocomplete.user.search_handler
         calls:
-           - [setSecurityFacade, [@oro_security.security_facade]]
+           - [setSecurityFacade, ['@oro_security.security_facade']]
 
     oro_email.listener.mailbox.authorization:
         class: %oro_email.listener.mailbox.authorization.class%
         arguments:
-            - @doctrine
-            - @oro_security.security_facade
+            - '@doctrine'
+            - '@oro_security.security_facade'
         tags:
             - { name: kernel.event_listener, event: kernel.controller, method: onKernelController }
 
     oro_email.listener.datagrid.mailbox_grid:
         class: %oro_email.listener.datagrid.mailbox_grid.class%
         arguments:
-            - @doctrine
-            - @oro_security.acl_helper
+            - '@doctrine'
+            - '@oro_security.acl_helper'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre.base-mailboxes-grid, method: onPreBuild }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.base-mailboxes-grid, method: onBuildAfter }
@@ -934,7 +934,7 @@ services:
     oro_email.mailbox.manager:
         class: %oro_email.mailbox.manager.class%
         arguments:
-            - @doctrine
+            - '@doctrine'
 
     oro_email.workflow.condition.instanceof:
         class: %oro_email.workflow.condition.instanceof.class%
@@ -949,55 +949,55 @@ services:
     oro_email.workflow.action.parse_first_name:
         class: %oro_email.workflow.action.parse_first_name.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_email.email.address.helper
+            - '@oro_action.context_accessor'
+            - '@oro_email.email.address.helper'
         tags:
             - { name: oro_workflow.action, alias: parse_first_name_from_email_address }
 
     oro_email.workflow.action.parse_last_name:
         class: %oro_email.workflow.action.parse_last_name.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_email.email.address.helper
+            - '@oro_action.context_accessor'
+            - '@oro_email.email.address.helper'
         tags:
             - { name: oro_workflow.action, alias: parse_last_name_from_email_address }
 
     oro_email.workflow.action.request_mailboxes:
         class: %oro_email.workflow.action.request_mailboxes.class%
         arguments:
-            - @oro_action.context_accessor
-            - @doctrine
-            - @oro_email.mailbox.process_storage
+            - '@oro_action.context_accessor'
+            - '@doctrine'
+            - '@oro_email.mailbox.process_storage'
         tags:
             - { name: oro_workflow.action, alias: request_mailboxes|find_mailboxes }
 
     oro_email.workflow.action.strip_html_tags:
         class: %oro_email.workflow.action.strip_html_tags.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_ui.html_tag_helper
+            - '@oro_action.context_accessor'
+            - '@oro_ui.html_tag_helper'
         tags:
             - { name: oro_workflow.action, alias: strip_html_tags }
 
     oro_email.workflow.action.add_activity_target:
         class: %oro_email.workflow.action.add_activity_target.class%
         arguments:
-            - @oro_action.context_accessor
-            - @oro_email.email.activity.manager
-            - @oro_activity_list.provider.chain
-            - @doctrine.orm.entity_manager
+            - '@oro_action.context_accessor'
+            - '@oro_email.email.activity.manager'
+            - '@oro_activity_list.provider.chain'
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: oro_workflow.action, alias: add_email_activity_target }
 
     oro_email.placeholder.send_email.filter:
         class: %oro_email.placeholder.send_email.filter.class%
         arguments:
-            - @oro_activity.manager
+            - '@oro_activity.manager'
 
     oro_email.mailer.email_origin_helper:
         class: %oro_email.mailer.email_origin_helper.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
 
     oro_email.listener.search_aliases_listener:
         class: %oro_email.listener.search_aliases_listener.class%
@@ -1007,35 +1007,35 @@ services:
     oro_email.listener.prepare_result_item_listener:
         class: %oro_email.listener.prepare_result_item_listener.class%
         arguments:
-            - @router
+            - '@router'
         tags:
             - { name: kernel.event_listener, event: oro_search.prepare_result_item, method: prepareEmailItemDataEvent }
 
     oro_email.listener.prepare_context_title_listener:
         class: %oro_email.listener.prepare_context_title_listener.class%
         arguments:
-            - @router
-            - @oro_entity.doctrine_helper
+            - '@router'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: oro_activity.context_title, method: prepareEmailContextTitleEvent }
 
     oro_email.listener.activity_list_pre_query_build_listener:
         class: %oro_email.listener.activity_list_pre_query_build_listener.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: kernel.event_listener, event: oro_activity_list.activity_list_pre_query_build, method: prepareIdsForEmailThreadEvent }
 
     oro_email.email_body_synchronizer:
         class: Oro\Bundle\EmailBundle\Sync\EmailBodySynchronizer
         arguments:
-            - @oro_email.email_body_loader_selector
-            - @doctrine
-            - @event_dispatcher
+            - '@oro_email.email_body_loader_selector'
+            - '@doctrine'
+            - '@event_dispatcher'
         calls:
-            - [setLogger, [@logger]]
+            - [setLogger, ['@logger']]
 
     oro_email.model.email_activity_updates:
         class: %oro_email.model.email_activity_updates.class%
         arguments:
-            - @oro_email.provider.emailowners.provider
+            - '@oro_email.provider.emailowners.provider'
