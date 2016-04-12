@@ -25,7 +25,7 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension = $this
             ->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension')
-            ->setMethods(['hasValidPaths', 'hasPageDirectory', 'hasElementDirectory'])
+            ->setMethods(['hasValidPaths', 'hasDirectory'])
             ->getMock();
         $extension->expects($this->any())->method('hasValidPaths')->willReturn(true);
         $extension->process($containerBuilder);
@@ -57,10 +57,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension = $this
             ->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension')
-            ->setMethods(['hasValidPaths', 'hasPageDirectory', 'hasElementDirectory'])
+            ->setMethods(['hasValidPaths', 'hasDirectory'])
             ->getMock();
-        $extension->expects($this->exactly(count($bundles)))->method('hasPageDirectory')->willReturn(true);
-        $extension->expects($this->exactly(count($bundles)))->method('hasElementDirectory')->willReturn(true);
+        $extension->expects($this->exactly(count($bundles)*2))->method('hasDirectory')->willReturn(true);
         $extension->process($containerBuilder);
 
         $this->assertEquals(
@@ -77,11 +76,19 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilder = new ContainerBuilder();
         $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
+        $pagesNamespaceSuffix = '\Tests\Behat\Page';
+        $elementsNamespaceSuffix = '\Tests\Behat\Page\Element';
 
         $extension = new OroTestFrameworkExtension();
-        $extension->load($containerBuilder, ['shared_contexts' => $sharedContexts]);
+        $extension->load($containerBuilder, [
+            'shared_contexts' => $sharedContexts,
+            'pages_namespace_suffix' => $pagesNamespaceSuffix,
+            'elements_namespace_suffix' => $elementsNamespaceSuffix,
+        ]);
 
         $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
+        $this->assertEquals($pagesNamespaceSuffix, $containerBuilder->getParameter('oro_test.pages_namespace_suffix'));
+        $this->assertEquals($elementsNamespaceSuffix, $containerBuilder->getParameter('oro_test.elements_namespace_suffix'));
     }
 
     public function testGetConfigKey()
@@ -240,6 +247,8 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $containerBuilder->setParameter('sensio_labs.page_object_extension.namespaces.page', []);
         $containerBuilder->setParameter('sensio_labs.page_object_extension.namespaces.element', []);
         $containerBuilder->setParameter('oro_test.shared_contexts', $this->sharedContexts);
+        $containerBuilder->setParameter('oro_test.pages_namespace_suffix', '\Tests\Behat\Page');
+        $containerBuilder->setParameter('oro_test.elements_namespace_suffix', '\Tests\Behat\Page\Element');
         $containerBuilder->set('symfony2_extension.kernel', $kernel);
         $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));
 

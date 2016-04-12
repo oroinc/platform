@@ -13,11 +13,6 @@ use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
-    const PAGE_DIRECTORY = '/Tests/Behat/Page';
-    const PAGE_NAMESPACE = '\Tests\Behat\Page';
-    const ELEMENT_DIRECTORY = '/Tests/Behat/Page/Element';
-    const ELEMENT_NAMESPACE = '\Tests\Behat\Page\Element';
-
     /**
      * {@inheritdoc}
      */
@@ -51,11 +46,17 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $builder
             ->children()
-            ->arrayNode('shared_contexts')
-                ->prototype('scalar')->end()
-                ->info('Contexts that added to all autoload bundles suites')
-            ->end()
-        ->end();
+                ->arrayNode('shared_contexts')
+                    ->prototype('scalar')->end()
+                    ->info('Contexts that added to all autoload bundles suites')
+                ->end()
+                ->scalarNode('pages_namespace_suffix')
+                    ->defaultValue('\Tests\Behat\Page')
+                ->end()
+                ->scalarNode('elements_namespace_suffix')
+                    ->defaultValue('\Tests\Behat\Page\Element')
+                ->end()
+            ->end();
     }
 
     /**
@@ -64,6 +65,8 @@ class OroTestFrameworkExtension implements TestworkExtension
     public function load(ContainerBuilder $container, array $config)
     {
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
+        $container->setParameter('oro_test.pages_namespace_suffix', $config['pages_namespace_suffix']);
+        $container->setParameter('oro_test.elements_namespace_suffix', $config['elements_namespace_suffix']);
     }
 
     /**
@@ -131,19 +134,21 @@ class OroTestFrameworkExtension implements TestworkExtension
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
         $pages = $container->getParameter('sensio_labs.page_object_extension.namespaces.page');
         $elements = $container->getParameter('sensio_labs.page_object_extension.namespaces.element');
+        $pagesNamespaceSuffix = $container->getParameter('oro_test.pages_namespace_suffix');
+        $elementsNamespaceSuffix = $container->getParameter('oro_test.elements_namespace_suffix');
 
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
-            if ($this->hasPageDirectory($bundle)) {
-                $pageNamespace = $bundle->getNamespace() . self::PAGE_NAMESPACE;
+            if ($this->hasDirectory($bundle, $pagesNamespaceSuffix)) {
+                $pageNamespace = $bundle->getNamespace().$pagesNamespaceSuffix;
 
                 if (!in_array($pageNamespace, $pages)) {
                     $pages[] = $pageNamespace;
                 }
             }
 
-            if ($this->hasElementDirectory($bundle)) {
-                $pageNamespace = $bundle->getNamespace() . self::ELEMENT_NAMESPACE;
+            if ($this->hasDirectory($bundle, $elementsNamespaceSuffix)) {
+                $pageNamespace = $bundle->getNamespace().$elementsNamespaceSuffix;
 
                 if (!in_array($pageNamespace, $elements)) {
                     $elements[] = $pageNamespace;
@@ -181,17 +186,10 @@ class OroTestFrameworkExtension implements TestworkExtension
      * @param BundleInterface $bundle
      * @return bool
      */
-    protected function hasPageDirectory(BundleInterface $bundle)
+    protected function hasDirectory(BundleInterface $bundle, $namespace)
     {
-        return is_dir($bundle->getPath() . self::PAGE_DIRECTORY);
-    }
+        $path = $bundle->getPath().str_replace('\\', DIRECTORY_SEPARATOR, $namespace);
 
-    /**
-     * @param BundleInterface $bundle
-     * @return bool
-     */
-    protected function hasElementDirectory(BundleInterface $bundle)
-    {
-        return is_dir($bundle->getPath() . self::ELEMENT_DIRECTORY);
+        return is_dir($path);
     }
 }
