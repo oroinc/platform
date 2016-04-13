@@ -5,13 +5,14 @@ namespace Oro\Bundle\EntityPaginationBundle\Storage;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
-use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
-use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
+use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
+use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
+use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class StorageDataCollector
 {
@@ -102,7 +103,15 @@ class StorageDataCollector
             $dataSource = $dataGrid->getDatasource();
             $dataGrid->getAcceptor()->acceptDatasource($dataSource);
 
-            $entityName = $this->getEntityName($dataSource);
+            $config = $dataGrid->getConfig();
+            $alias = null;
+
+            if ($config) {
+                $alias = $config->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_TARGET_PATH);
+            }
+
+            $entityName = ($alias !== null ) ? $alias : $this->getEntityName($dataSource);
+
             $stateHash = $this->generateStateHash($dataGrid);
 
             // if entities are not in storage
