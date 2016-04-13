@@ -59,12 +59,12 @@ define(function(require) {
             this.createFrontField(opts);
 
             this.$el.wrap('<span style="display:none"></span>');
-            if (this.$el.val() && this.$el.val().length) {
-                this.updateFront();
-            }
-
             if (!this.nativeMode) {
                 this.initPickerWidget(opts);
+            }
+
+            if (this.$el.val() && this.$el.val().length) {
+                this.updateFront();
             }
 
             DatePickerView.__super__.initialize.apply(this, arguments);
@@ -168,9 +168,10 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         updateOrigin: function(e) {
-            if (this.$el.val() !== this.getBackendFormattedValue()) {
+            var backendFormattedValue = this.getBackendFormattedValue();
+            if (this.$el.val() !== backendFormattedValue) {
                 this._preventFrontendUpdate = true;
-                this.$el.val(this.getBackendFormattedValue()).trigger('change');
+                this.$el.val(backendFormattedValue).trigger('change');
                 this._preventFrontendUpdate = false;
             }
         },

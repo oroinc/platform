@@ -115,7 +115,7 @@ define(function(require) {
             });
 
             this.viewDirty = !this._isCurrentStateSynchronized();
-            this.prevState = this._getCurrentState();
+            this.prevState = this._getCurrentViewModelState();
 
             this._bindEventListeners();
             this._updateTitle();
@@ -475,13 +475,7 @@ define(function(require) {
          * @private
          */
         _checkCurrentState: function() {
-            var newState = this._getCurrentState();
-            if (_.isEqual(newState, this.prevState)) {
-                return;
-            }
-
             this.viewDirty = !this._isCurrentStateSynchronized();
-            this.prevState = newState;
         },
 
         /**
