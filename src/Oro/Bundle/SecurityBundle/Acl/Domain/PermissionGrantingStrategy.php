@@ -58,7 +58,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
      * @return PermissionGrantingStrategyContextInterface
      * @throws \RuntimeException
      */
-    protected function getContext()
+    public function getContext()
     {
         if ($this->contextLink === null) {
             throw new \RuntimeException('The context link is not set.');

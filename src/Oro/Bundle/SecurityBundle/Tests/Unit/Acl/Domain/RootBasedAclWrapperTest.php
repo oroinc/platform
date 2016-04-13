@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\SecurityBundle\Tests\Unit\Acl\Domain;
 
-use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper;
+use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 use Symfony\Component\Security\Acl\Domain\RoleSecurityIdentity;
+use Symfony\Component\Security\Acl\Model\EntryInterface;
+
+use Oro\Bundle\SecurityBundle\Acl\Domain\RootBasedAclWrapper;
 
 class RootBasedAclWrapperTest extends \PHPUnit_Framework_TestCase
 {
@@ -26,68 +29,152 @@ class RootBasedAclWrapperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetClassAces()
     {
+        $context = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface');
+        $aclExtension = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
+        $permissionGrantingStrategy = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $permissionGrantingStrategy->expects($this->any())
+            ->method('getContext')
+            ->willReturn($context);
+        $context->expects($this->any())
+            ->method('getAclExtension')
+            ->willReturn($aclExtension);
+
+        $acl = new Acl(
+            1,
+            new ObjectIdentity('Test\Entity1', 'entity'),
+            $permissionGrantingStrategy,
+            [],
+            false
+        );
+        $rootAcl = new Acl(
+            10,
+            new ObjectIdentity('entity', '(root)'),
+            $permissionGrantingStrategy,
+            [],
+            false
+        );
+
         $sid1 = new RoleSecurityIdentity('sid1');
         $sid2 = new RoleSecurityIdentity('sid2');
+        $sid3 = new RoleSecurityIdentity('sid3');
+        $sid4 = new RoleSecurityIdentity('sid4');
 
-        $ace = $this->getMock('Symfony\Component\Security\Acl\Model\EntryInterface');
-        $rootAce1 = $this->getMock('Symfony\Component\Security\Acl\Model\EntryInterface');
-        $rootAce2 = $this->getMock('Symfony\Component\Security\Acl\Model\EntryInterface');
+        $obj = new RootBasedAclWrapper($acl, $rootAcl);
+        $acl->insertClassAce($sid1, 1, 0); // new ACE
+        $acl->insertClassAce($sid1, 256 + 1, 1); // new ACE, with service bits
+        $acl->insertClassAce($sid2, 2, 2); // override root ACE
+        $acl->insertClassAce($sid2, 256 + 2, 3); // override root ACE, with service bits
+        $acl->insertClassAce($sid3, 4, 4); // new ACE, root ACL does not have ACE for this SID
+        $rootAcl->insertObjectAce($sid2, 1, 0);
+        $rootAcl->insertObjectAce($sid2, 256 + 1, 1);
+        $rootAcl->insertObjectAce($sid2, 256*2 + 1, 2); // ACE existing only in root ACL
+        $rootAcl->insertObjectAce($sid4, 8, 3); // ACL does not have ACE for this SID
 
-        $ace->expects($this->any())
-            ->method('getSecurityIdentity')
-            ->will($this->returnValue($sid1));
-        $rootAce1->expects($this->any())
-            ->method('getSecurityIdentity')
-            ->will($this->returnValue($sid1));
-        $rootAce2->expects($this->any())
-            ->method('getSecurityIdentity')
-            ->will($this->returnValue($sid2));
+        $aclExtension->expects($this->any())
+            ->method('getServiceBits')
+            ->willReturnCallback(
+                function ($mask) {
+                    return $mask & (~255);
+                }
+            );
 
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
-        $this->acl->expects($this->once())
-            ->method('getClassAces')
-            ->will($this->returnValue(array($ace)));
-        $this->rootAcl->expects($this->once())
-            ->method('getObjectAces')
-            ->will($this->returnValue(array($rootAce1, $rootAce2)));
-
-        $result = $obj->getClassAces();
-
-        $this->assertEquals(array($ace, $rootAce2), $result);
+        /** @var EntryInterface[] $resultAces */
+        $resultAces = $obj->getClassAces();
+        $resultMasks = [];
+        foreach ($resultAces as $ace) {
+            $resultMasks[] = $ace->getMask();
+        }
+        $this->assertEquals(
+            [
+                1,
+                256 + 1,
+                2,
+                256 + 2,
+                4,
+                256*2 + 1,
+                8
+            ],
+            $resultMasks
+        );
     }
 
     public function testGetClassFieldAces()
     {
+        $fieldName = 'testField';
+
+        $context = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategyContextInterface');
+        $aclExtension = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface');
+        $permissionGrantingStrategy = $this
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Domain\PermissionGrantingStrategy')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $permissionGrantingStrategy->expects($this->any())
+            ->method('getContext')
+            ->willReturn($context);
+        $context->expects($this->any())
+            ->method('getAclExtension')
+            ->willReturn($aclExtension);
+
+        $acl = new Acl(
+            1,
+            new ObjectIdentity('Test\Entity1', 'entity'),
+            $permissionGrantingStrategy,
+            [],
+            false
+        );
+        $rootAcl = new Acl(
+            10,
+            new ObjectIdentity('entity', '(root)'),
+            $permissionGrantingStrategy,
+            [],
+            false
+        );
+
         $sid1 = new RoleSecurityIdentity('sid1');
         $sid2 = new RoleSecurityIdentity('sid2');
+        $sid3 = new RoleSecurityIdentity('sid3');
+        $sid4 = new RoleSecurityIdentity('sid4');
 
-        $ace = $this->getMock('Symfony\Component\Security\Acl\Model\EntryInterface');
-        $rootAce1 = $this->getMock('Symfony\Component\Security\Acl\Model\EntryInterface');
-        $rootAce2 = $this->getMock('Symfony\Component\Security\Acl\Model\EntryInterface');
+        $obj = new RootBasedAclWrapper($acl, $rootAcl);
+        $acl->insertClassFieldAce($fieldName, $sid1, 1, 0); // new ACE
+        $acl->insertClassFieldAce($fieldName, $sid1, 256 + 1, 1); // new ACE, with service bits
+        $acl->insertClassFieldAce($fieldName, $sid2, 2, 2); // override root ACE
+        $acl->insertClassFieldAce($fieldName, $sid2, 256 + 2, 3); // override root ACE, with service bits
+        $acl->insertClassFieldAce($fieldName, $sid3, 4, 4); // new ACE, root ACL does not have ACE for this SID
+        $rootAcl->insertObjectFieldAce($fieldName, $sid2, 1, 0);
+        $rootAcl->insertObjectFieldAce($fieldName, $sid2, 256 + 1, 1);
+        $rootAcl->insertObjectFieldAce($fieldName, $sid2, 256*2 + 1, 2); // ACE existing only in root ACL
+        $rootAcl->insertObjectFieldAce($fieldName, $sid4, 8, 3); // ACL does not have ACE for this SID
 
-        $ace->expects($this->any())
-            ->method('getSecurityIdentity')
-            ->will($this->returnValue($sid1));
-        $rootAce1->expects($this->any())
-            ->method('getSecurityIdentity')
-            ->will($this->returnValue($sid1));
-        $rootAce2->expects($this->any())
-            ->method('getSecurityIdentity')
-            ->will($this->returnValue($sid2));
+        $aclExtension->expects($this->any())
+            ->method('getServiceBits')
+            ->willReturnCallback(
+                function ($mask) {
+                    return $mask & (~255);
+                }
+            );
 
-        $obj = new RootBasedAclWrapper($this->acl, $this->rootAcl);
-        $this->acl->expects($this->once())
-            ->method('getClassFieldAces')
-            ->with($this->equalTo('SomeField'))
-            ->will($this->returnValue(array($ace)));
-        $this->rootAcl->expects($this->once())
-            ->method('getObjectFieldAces')
-            ->with($this->equalTo('SomeField'))
-            ->will($this->returnValue(array($rootAce1, $rootAce2)));
-
-        $result = $obj->getClassFieldAces('SomeField');
-
-        $this->assertEquals(array($ace, $rootAce2), $result);
+        /** @var EntryInterface[] $resultAces */
+        $resultAces = $obj->getClassFieldAces($fieldName);
+        $resultMasks = [];
+        foreach ($resultAces as $ace) {
+            $resultMasks[] = $ace->getMask();
+        }
+        $this->assertEquals(
+            [
+                1,
+                256 + 1,
+                2,
+                256 + 2,
+                4,
+                256*2 + 1,
+                8
+            ],
+            $resultMasks
+        );
     }
 
     public function testGetObjectAces()
