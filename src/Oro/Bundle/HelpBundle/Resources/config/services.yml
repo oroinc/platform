@@ -12,21 +12,21 @@ services:
     oro_help.model.help_link_provider:
         class: %oro_help.model.help_link_provider.class%
         calls:
-            - [ setCache, [ @oro_help.help_link.cache ] ]
+            - [ setCache, [ '@oro_help.help_link.cache' ] ]
         arguments:
-            - @controller_name_converter
-            - @oro_platform.composer.version_helper
+            - '@controller_name_converter'
+            - '@oro_platform.composer.version_helper'
 
     oro_help.twig.extension:
         class: %oro_help.twig.extension.class%
         arguments:
-            - @oro_help.model.help_link_provider
+            - '@oro_help.model.help_link_provider'
         tags:
             - { name: twig.extension }
 
     oro_help.listener.help_link:
         class: %oro_help.listener.help_link.class%
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: kernel.event_listener, priority: -200, event: kernel.controller, method: onKernelController }

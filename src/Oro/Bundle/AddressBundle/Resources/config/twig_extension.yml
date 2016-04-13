@@ -5,6 +5,6 @@ services:
     oro_address.twig.extension.phone:
         class: %oro_address.twig.extension.phone.class%
         arguments:
-            - @oro_address.provider.phone
+            - '@oro_address.provider.phone'
         tags:
             - { name: twig.extension }

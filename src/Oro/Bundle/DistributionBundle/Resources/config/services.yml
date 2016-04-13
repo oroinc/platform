@@ -29,22 +29,22 @@ services:
     oro_distribution.routing_loader:
         class: %oro_distribution.routing_loader.class%
         arguments:
-            - @kernel
-            - @oro_distribution.routing_options_resolver
+            - '@kernel'
+            - '@oro_distribution.routing_options_resolver'
         calls:
-            - [setResolver, [@routing.resolver]]
-            - [setEventDispatcher, [@event_dispatcher]]
+            - [setResolver, ['@routing.resolver']]
+            - [setEventDispatcher, ['@event_dispatcher']]
         tags:
             - { name: routing.loader }
 
     oro_distribution.expose_routing_loader:
         class: %oro_distribution.expose_routing_loader.class%
         arguments:
-            - @kernel
-            - @oro_distribution.routing_options_resolver
+            - '@kernel'
+            - '@oro_distribution.routing_options_resolver'
         calls:
-            - [setResolver, [@routing.resolver]]
-            - [setEventDispatcher, [@event_dispatcher]]
+            - [setResolver, ['@routing.resolver']]
+            - [setEventDispatcher, ['@event_dispatcher']]
         tags:
             - { name: routing.loader, priority: 255 }
 
@@ -55,12 +55,12 @@ services:
     oro_distribution.package_manager:
         class: %oro_distribution.package_manager.class%
         arguments:
-          - @oro_distribution.composer
-          - @oro_distribution.composer.installer
-          - @oro_distribution.composer.io
-          - @oro_distribution.script_runner
-          - @oro_platform.maintenance
-          - @logger
+          - '@oro_distribution.composer'
+          - '@oro_distribution.composer.installer'
+          - '@oro_distribution.composer.io'
+          - '@oro_distribution.script_runner'
+          - '@oro_platform.maintenance'
+          - '@logger'
           - %oro_distribution.composer_json%
         tags:
             - { name: monolog.logger, channel: oro_distribution }
@@ -70,8 +70,8 @@ services:
         class: %oro_distribution.script_runner.class%
         public: false
         arguments:
-            - @oro_distribution.composer.installation_manager
-            - @logger
+            - '@oro_distribution.composer.installation_manager'
+            - '@logger'
             - %kernel.root_dir%
             - %kernel.environment%
         tags:
@@ -86,13 +86,13 @@ services:
         public: false
         factory_class: Composer\Installer
         factory_method: create
-        arguments: [@oro_distribution.composer.io, @oro_distribution.composer]
+        arguments: ['@oro_distribution.composer.io', '@oro_distribution.composer']
 
     oro_distribution.composer:
         class: %oro_distribution.composer.class%
         factory_class: Composer\Factory
         factory_method: create
-        arguments: [@oro_distribution.composer.io, %oro_distribution.composer_json%]
+        arguments: ['@oro_distribution.composer.io', %oro_distribution.composer_json%]
 
     oro_distribution.composer.installation_manager:
         class: %oro_distribution.composer.installation_manager.class%
@@ -109,7 +109,7 @@ services:
     oro_distribution.listener.navigation_listener:
         class: %oro_distribution.listener.navigation_listener.class%
         arguments:
-            - @security.context
+            - '@security.context'
             - %oro_distribution.entry_point%
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }

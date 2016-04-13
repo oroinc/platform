@@ -1,14 +1,14 @@
 layout:
     actions:
-        - @add:
+        - '@add':
             id:        form
             parentId:  content
             blockType: embed_form_legacy_form
             options:
-                form:        { @value: $context.embedded_form.view }
-                form_layout: { @value: $context.embedded_form_custom_layout }
+                form:        { '@value': $context.embedded_form.view }
+                form_layout: { '@value': $context.embedded_form_custom_layout }
 
     conditions:
-        @neq:
+        '@neq':
             - ''
             - $context.embedded_form_custom_layout

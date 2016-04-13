@@ -11,7 +11,7 @@ services:
         class: Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper
         public: false
         arguments:
-            - @oro_entity_config.config_manager
+            - '@oro_entity_config.config_manager'
 
     oro_comment.migration.extension.comment:
         class: %oro_comment.migration.extension.comment.class%
@@ -38,26 +38,26 @@ services:
     oro_comment.comment.api_manager:
         class: %oro_comment.comment.api_manager.class%
         arguments:
-            - @doctrine
-            - @oro_security.security_facade
-            - @oro_entity.entity_name_resolver
-            - @oro_datagrid.extension.pager.orm.pager
-            - @event_dispatcher
-            - @oro_attachment.manager
-            - @oro_security.acl_helper
-            - @oro_entity_config.config_manager
+            - '@doctrine'
+            - '@oro_security.security_facade'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_datagrid.extension.pager.orm.pager'
+            - '@event_dispatcher'
+            - '@oro_attachment.manager'
+            - '@oro_security.acl_helper'
+            - '@oro_entity_config.config_manager'
 
     oro_comment.comment_lifecycle_listener:
         class: %oro_comment.comment_lifecycle_listener.class%
         arguments:
-            - @oro_security.security_facade.link
+            - '@oro_security.security_facade.link'
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
     
     oro_comment.placeholder.filter:
         class: %oro_comment.placeholder.filter.class%
         arguments:
-            - @oro_comment.association_helper
-            - @oro_entity.doctrine_helper
-            - @oro_security.security_facade
+            - '@oro_comment.association_helper'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_security.security_facade'
 

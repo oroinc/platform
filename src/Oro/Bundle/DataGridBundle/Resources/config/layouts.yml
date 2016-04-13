@@ -2,7 +2,7 @@ services:
     oro_datagrid.block_type.datagrid:
         class: Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType
         arguments:
-            - @oro_datagrid.datagrid.name_strategy
+            - '@oro_datagrid.datagrid.name_strategy'
         tags:
              - { name: layout.block_type, alias: datagrid }
 

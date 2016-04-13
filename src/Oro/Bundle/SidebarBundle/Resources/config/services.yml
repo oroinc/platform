@@ -15,14 +15,14 @@ services:
     oro_sidebar.twig.extension:
         class: %oro_sidebar.twig.extension.class%
         arguments:
-            - @oro_sidebar.widget_definition.registry
-            - @translator
+            - '@oro_sidebar.widget_definition.registry'
+            - '@translator'
         tags:
             - { name: twig.extension }
 
     oro_sidebar.request.handler:
         class: %oro_sidebar.request.handler.class%
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: kernel.event_listener, event: kernel.request, method: onKernelRequest }
