@@ -1,32 +1,33 @@
 define(function(require) {
     'use strict';
 
-    var WidgetPickerModal;
-    var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
-    var routing = require('routing');
-    var mediator = require('oroui/js/mediator');
-    var Modal = require('oroui/js/modal');
+
     var widgetPickerModalTemplate = require('text!oroui/templates/widget-picker/widget-picker-modal-template.html');
+    var WidgetContainerModel = require('./model');
 
     var BaseCollection = require('oroui/js/app/models/base/collection');
     var WidgetPickerModel = require('oroui/js/app/models/widget-picker/widget-picker-model');
     var WidgetPickerComponent = require('oroui/js/app/components/widget-picker-component');
 
-    WidgetPickerModal = Modal.extend({
+    var Modal = require('oroui/js/modal');
+    var constants = require('../constants');
+
+    var __ = require('orotranslation/js/translator');
+
+    /**
+     * @export  orosidebar/js/widget-container/widget-picker-modal
+     * @class   orosidebar.widgetContainer.WidgetPickerModal
+     * @extends oro.Modal
+     */
+    return Modal.extend({
+        /** @property {String} */
         className: 'modal oro-modal-normal widget-picker-modal',
 
         options: {
-            /**
-             * @property {DashboardContainer}
-             */
-            dashboard: null
+            sidebar: null
         },
 
-        /**
-         * @property {WidgetPickerComponent}
-         */
         component: null,
 
         /**
@@ -35,8 +36,7 @@ define(function(require) {
         initialize: function(options) {
             this.options = _.defaults(options || {}, this.options);
             options.content = _.template(widgetPickerModalTemplate)({});
-            options.title = __('oro.dashboard.add_dashboard_widgets.title');
-            options.cancelText = __('Close');
+            options.title = __('oro.sidebar.widget.add.dialog.title');
             Modal.prototype.initialize.apply(this, arguments);
         },
 
@@ -46,7 +46,7 @@ define(function(require) {
         open: function(cb) {
             Modal.prototype.open.apply(this, arguments);
             var widgetPickerCollection = new BaseCollection(
-                this.options.dashboard.getAvailableWidgets(),
+                this.options.sidebar.getAvailableWidgets(),
                 {model: WidgetPickerModel}
             );
             this.component = new WidgetPickerComponent({
@@ -58,26 +58,30 @@ define(function(require) {
 
         /**
          *
-         * @param {WidgetPickerModel} widgetModel
+         * @param {WidgetPickerModel} widgetPickerModel
          * @param {Function} afterLoadFunc
          */
-        loadWidget: function(widgetModel, afterLoadFunc) {
-            $.post(
-                routing.generate('oro_api_post_dashboard_widget_add_widget'),
-                {
-                    widgetName: widgetModel.getName(),
-                    dashboardId: this.options.dashboardId,
-                    targetColumn: this.options.targetColumn
-                },
-                function(response) {
-                    mediator.trigger('dashboard:widget:add', response);
+        loadWidget: function(widgetPickerModel, afterLoadFunc) {
+            var position = this.options.sidebar.getPosition();
+            var widgets = this.options.sidebar.getWidgets();
+            var widgetData = widgetPickerModel.getData();
+            var placement = null;
+            if (position === constants.SIDEBAR_LEFT) {
+                placement = 'left';
+            } else if (position === constants.SIDEBAR_RIGHT) {
+                placement = 'right';
+            }
+            var widget = new WidgetContainerModel(_.extend({}, widgetData, {
+                position: widgets.length,
+                placement: placement
+            }));
+            widgets.push(widget);
+            widget
+                .save()
+                .then(function() {
                     afterLoadFunc();
-                    widgetModel.increaseAddedCounter();
-                },
-                'json'
-            );
+                    widgetPickerModel.increaseAddedCounter();
+                });
         }
     });
-
-    return WidgetPickerModal;
 });
