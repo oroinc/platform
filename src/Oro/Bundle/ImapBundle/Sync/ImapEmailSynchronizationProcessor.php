@@ -700,6 +700,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * First system mailbox sync from sync start date
      *
      * @param EmailFolder $folder
+     *
      * @return ImapEmailIterator
      */
     protected function initialMailboxSync(EmailFolder $folder)
