@@ -211,7 +211,6 @@ class PdoMysql extends BaseDriver
     ) {
         $joinAlias  = $this->getJoinAlias($searchCondition['fieldType'], $index);
         $fieldName  = $searchCondition['fieldName'];
-        $fieldValue = $searchCondition['fieldValue'];
 
         $result = $qb->expr()->orX();
         foreach (array_values($words) as $key => $value) {
