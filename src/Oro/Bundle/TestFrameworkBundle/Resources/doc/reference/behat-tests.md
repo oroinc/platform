@@ -34,7 +34,7 @@ Read more about Page Object Extension in official documentation ([Page Object Ex
 ### BDD and Behat
 
 Sopose you have user story that user with some role can execute.
-You can describe this behavior by simple convention in .feature file (see [Behat documentation](http://docs.behat.org/en/v3.0/))
+You can describe this behavior by simple convention in .feature file (see [Behat documentation](http://docs.behat.org/en/v3.0/guides/1.gherkin.html#writing-features))
 
 
 ### Configuration
