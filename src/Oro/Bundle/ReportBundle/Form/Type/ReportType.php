@@ -43,7 +43,7 @@ class ReportType extends AbstractQueryDesignerType
                 'oro_report_chart',
                 array('required' => true)
             )
-            ->add('description', 'textarea', array('required' => false));
+            ->add('description', 'oro_resizeable_rich_text', array('required' => false));
 
         parent::buildForm($builder, $options);
     }
