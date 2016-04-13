@@ -606,10 +606,13 @@ class EntitySerializer
             $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
             $fields         = array_filter(
                 array_merge($entityMetadata->getFieldNames(), $entityMetadata->getAssociationNames()),
-                function ($field) use ($entityClass, $config, $allowExtendedFields) {
+                function ($field) use ($entityClass, $config, $allowExtendedFields, $entityMetadata) {
+                    // @todo: ignore not configured relations to avoid infinite loop
+                    // it is a temporary fix until the identifier field will not be used by default for them
                     return
                         $this->hasFieldConfig($config, $field)
-                        || $this->isApplicableField($entityClass, $field, $allowExtendedFields);
+                        || ($this->isApplicableField($entityClass, $field, $allowExtendedFields)
+                            && !$entityMetadata->isAssociation($field));
                 }
             );
             $fields         = array_merge(
