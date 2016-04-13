@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Tools\DumperExtensions;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -223,7 +224,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $datagridFieldConfig = new Config(
             new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1', 'string')
         );
-        $datagridFieldConfig->set('is_visible', true);
+        $datagridFieldConfig->set('is_visible', DatagridScope::IS_VISIBLE_TRUE);
 
         $extendConfigProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
@@ -405,7 +406,7 @@ class IndexEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
         $datagridFieldConfig1= new Config(
             new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field1', 'string')
         );
-        $datagridFieldConfig1->set('is_visible', true);
+        $datagridFieldConfig1->set('is_visible', DatagridScope::IS_VISIBLE_TRUE);
         $datagridFieldConfig2= new Config(
             new FieldConfigId('datagrid', $config->getId()->getClassName(), 'field2', 'string')
         );

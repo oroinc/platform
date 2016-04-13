@@ -1,5 +1,26 @@
 .container-fluid.page-title {
   padding-right: 0;
+  .navbar-extra > .row {
+    > .pull-right {
+      max-width: calc(~'100% - 180px');
+      > .title-buttons-container {
+        text-align: right;
+        > .pull-left, > .btn-group {
+          text-align: left;
+          display: inline-block;
+          float: none;
+          margin-bottom: 4px;
+          vertical-align: top;
+        }
+      }
+      .separator-btn {
+        margin-top: 2px;
+      }
+    }
+    > .pull-left + .pull-right {
+      max-width: none;
+    }
+  }
 }
 .customer-info {
   h1 {

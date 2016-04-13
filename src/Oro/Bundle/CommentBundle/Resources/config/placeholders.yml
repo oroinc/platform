@@ -5,5 +5,5 @@ placeholders:
 
 items:
     oro_comment_list:
-        applicable: @oro_comment.placeholder.filter->isApplicable($entity$)
+        applicable: "@oro_comment.placeholder.filter->isApplicable($entity$)"
         template: OroCommentBundle:Comment:comments.html.twig

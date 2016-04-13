@@ -1,0 +1,10 @@
+parameters:
+    oro_address.twig.extension.phone.class: Oro\Bundle\AddressBundle\Twig\PhoneExtension
+
+services:
+    oro_address.twig.extension.phone:
+        class: %oro_address.twig.extension.phone.class%
+        arguments:
+            - '@oro_address.provider.phone'
+        tags:
+            - { name: twig.extension }

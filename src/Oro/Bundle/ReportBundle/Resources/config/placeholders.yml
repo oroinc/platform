@@ -7,4 +7,4 @@ placeholders:
 items:
     aggregated_field_condition:
         template: OroReportBundle:Segment:aggregated_field_condition.html.twig
-        applicable: @oro_ui.placeholder.filter->isSame($params.id$, oro_report-condition-builder)
+        applicable: "@oro_ui.placeholder.filter->isSame($params.id$, oro_report-condition-builder)"

@@ -58,15 +58,23 @@ class EntityConfiguration extends AbstractConfigurationSection
      * @param array       $configureCallbacks
      * @param array       $preProcessCallbacks
      * @param array       $postProcessCallbacks
+     * @param string      $currentSectionName
      */
     public function configure(
         NodeBuilder $node,
         array $configureCallbacks,
         array $preProcessCallbacks,
-        array $postProcessCallbacks
+        array $postProcessCallbacks,
+        $currentSectionName = ''
     ) {
         $node->booleanNode(ConfigUtil::INHERIT)->end();
-        $this->configureEntity($node, $configureCallbacks, $preProcessCallbacks, $postProcessCallbacks);
+        $this->configureEntity(
+            $node,
+            $configureCallbacks,
+            $preProcessCallbacks,
+            $postProcessCallbacks,
+            $currentSectionName
+        );
     }
 
     /**
@@ -76,12 +84,14 @@ class EntityConfiguration extends AbstractConfigurationSection
      * @param array       $configureCallbacks
      * @param array       $preProcessCallbacks
      * @param array       $postProcessCallbacks
+     * @param string      $currentSectionName
      */
     protected function configureEntity(
         NodeBuilder $node,
         array $configureCallbacks,
         array $preProcessCallbacks,
-        array $postProcessCallbacks
+        array $postProcessCallbacks,
+        $currentSectionName = ''
     ) {
         $this->definitionSection->configure(
             $node,
@@ -89,7 +99,13 @@ class EntityConfiguration extends AbstractConfigurationSection
             $preProcessCallbacks,
             $postProcessCallbacks
         );
+        $definitionSectionName = $this->definitionSection->getSectionName();
         foreach ($this->extraSections as $name => $configuration) {
+            // check if configuration can be added to the section
+            $sectionName = $currentSectionName ?:  $this->sectionName . '.' . $definitionSectionName;
+            if (!$configuration->isApplicable($sectionName)) {
+                continue;
+            }
             $configuration->configure(
                 $node->arrayNode($name)->children(),
                 $configureCallbacks,
@@ -102,12 +118,8 @@ class EntityConfiguration extends AbstractConfigurationSection
         $parentSectionNode
             ->validate()
             ->always(
-                function ($value) use ($postProcessCallbacks) {
-                    return $this->callProcessConfigCallbacks(
-                        $this->postProcessConfig($value),
-                        $postProcessCallbacks,
-                        $this->sectionName
-                    );
+                function ($value) {
+                    return $this->postProcessConfig($value);
                 }
             );
     }
@@ -126,7 +138,7 @@ class EntityConfiguration extends AbstractConfigurationSection
     ) {
         $definitionConfigureCallbacks = $configureCallbacks;
         if ($this->maxNestingLevel > 0) {
-            $fieldSectionName        = $this->sectionName . '.entity.fields';
+            $fieldSectionName        = $this->sectionName . '.entity.field';
             $fieldConfigureCallbacks = isset($definitionConfigureCallbacks[$fieldSectionName])
                 ? $definitionConfigureCallbacks[$fieldSectionName]
                 : [];
@@ -142,13 +154,15 @@ class EntityConfiguration extends AbstractConfigurationSection
                 $targetEntityConfiguration,
                 $configureCallbacks,
                 $preProcessCallbacks,
-                $postProcessCallbacks
+                $postProcessCallbacks,
+                $fieldSectionName
             ) {
                 $targetEntityConfiguration->configureEntity(
                     $fieldNode,
                     $configureCallbacks,
                     $preProcessCallbacks,
-                    $postProcessCallbacks
+                    $postProcessCallbacks,
+                    $fieldSectionName
                 );
             };
 

@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
 
-use Oro\Bundle\ActionBundle\Configuration\ActionConfigurationProvider;
+use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
 use Oro\Bundle\CacheBundle\Provider\FilesystemCache;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
@@ -14,6 +15,8 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
  */
 class WidgetControllerTest extends WebTestCase
 {
+    const ROOT_NODE_NAME = 'operations';
+
     /** @var int */
     private $entityId;
 
@@ -27,30 +30,33 @@ class WidgetControllerTest extends WebTestCase
     {
         $this->initClient([], $this->generateBasicAuthHeader());
 
-        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider');
+        $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
         $this->loadFixtures([
             'Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData',
+            'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems',
         ]);
         $this->entityId = $this->getReference(LoadTestEntityData::TEST_ENTITY_1)->getId();
     }
 
     protected function tearDown()
     {
-        $this->cacheProvider->delete(ActionConfigurationProvider::ROOT_NODE_NAME);
+        $this->cacheProvider->delete(self::ROOT_NODE_NAME);
+
+        parent::tearDown();
     }
 
     /**
-     * @dataProvider buttonsActionDataProvider
+     * @dataProvider buttonsOperationDataProvider
      *
      * @param array $config
      * @param string $route
      * @param bool $entityId
      * @param string $entityClass
-     * @param bool|string $expected
+     * @param array $expected
      */
-    public function testButtonsAction(array $config, $route, $entityId, $entityClass, $expected)
+    public function testButtonsOperation(array $config, $route, $entityId, $entityClass, array $expected)
     {
-        $this->cacheProvider->save(ActionConfigurationProvider::ROOT_NODE_NAME, $config);
+        $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
 
         if ($entityId) {
             $entityId = $this->entityId;
@@ -74,40 +80,47 @@ class WidgetControllerTest extends WebTestCase
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
 
         if ($expected) {
-            $this->assertContains($expected, $crawler->html());
+            foreach ($expected as $item) {
+                $this->assertContains($item, $crawler->html());
+            }
         } else {
             $this->assertEmpty($crawler);
         }
     }
 
     /**
-     * @dataProvider formActionDataProvider
+     * @dataProvider formOperationDataProvider
      *
+     * @param string $entity
      * @param array $inputData
      * @param array $submittedData
      * @param array $expectedFormData
      * @param array $expectedData
      * @param string $expectedMessage
      */
-    public function testFormAction(
+    public function testFormOperation(
+        $entity,
         array $inputData,
         array $submittedData,
         array $expectedFormData,
         array $expectedData,
         $expectedMessage
     ) {
-        $this->cacheProvider->save(ActionConfigurationProvider::ROOT_NODE_NAME, $this->getConfigurationForFormAction());
+        $this->cacheProvider->save(self::ROOT_NODE_NAME, $this->getConfigurationForFormOperation());
 
-        $this->assertEntityFields($inputData);
+        $entity = $this->getReference($entity);
+
+        $this->assertEntityFields($entity, $inputData);
 
         $crawler = $this->client->request(
             'GET',
             $this->getUrl(
                 'oro_action_widget_form',
                 [
+                    '_wid' => 'test-uuid',
                     '_widgetContainer' => 'dialog',
-                    'actionName' => 'oro_action_test_action',
-                    'entityId' => $this->entityId,
+                    'operationName' => 'oro_action_test_operation',
+                    'entityId' => $entity->getId(),
                     'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
                 ]
             )
@@ -124,64 +137,103 @@ class WidgetControllerTest extends WebTestCase
         $crawler = $this->client->submit($form);
 
         $this->assertContains($expectedMessage, $crawler->html());
-        $this->assertEntityFields($expectedData);
+        $this->assertEntityFields($entity, $expectedData);
+    }
+
+    /**
+     * @param string $groupName
+     * @param array $actions
+     *
+     * @dataProvider buttonsOperationAndGroupsProvider
+     */
+    public function testButtonsOperationAndGroups($groupName, array $actions)
+    {
+        $item = $this->getReference(LoadItems::ITEM1);
+
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl(
+                'oro_action_widget_buttons',
+                [
+                    '_widgetContainer' => 'dialog',
+                    'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\Item',
+                    'entityId' => $item->getId(),
+                    'group' => $groupName
+                ]
+            )
+        );
+
+        $result = $this->client->getResponse();
+
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+
+        if ($actions) {
+            foreach ($actions as $action) {
+                $this->assertNotEmpty($crawler->selectLink($action));
+            }
+        } else {
+            $this->assertEmpty($crawler);
+        }
     }
 
     /**
      * @return array
      */
-    public function formActionDataProvider()
+    public function formOperationDataProvider()
     {
         return [
-            'valid action' => [
+            'valid operation' => [
+                'entity' => LoadTestEntityData::TEST_ENTITY_1,
                 'inputData' => [
                     'message' => 'test message',
                     'description' => null
                 ],
                 'submittedData' => [
-                    'oro_action[message_attr]' => 'new message',
+                    'oro_action_operation[message_attr]' => 'new message',
                 ],
                 'expectedFormData' => [
-                    'oro_action[message_attr]' => 'test message',
-                    'oro_action[descr_attr]' => 'Test Description'
+                    'oro_action_operation[message_attr]' => 'test message',
+                    'oro_action_operation[descr_attr]' => 'Test Description'
                 ],
                 'expectedData' => [
                     'message' => 'new message',
                     'description' => 'Test Description'
                 ],
-                'expectedMessage' => 'widget.trigger(\'formSave\', []);'
+                'expectedMessage' => 'widget.trigger(\'formSave\', {"success":true});'
             ],
-            'action not allowed' => [
+            'operation not allowed' => [
+                'entity' => LoadTestEntityData::TEST_ENTITY_2,
                 'inputData' => [
                     'message' => 'new message',
                     'description' => 'Test Description'
                 ],
                 'submittedData' => [
-                    'oro_action[message_attr]' => 'new message',
-                    'oro_action[descr_attr]' => 'new description text'
+                    'oro_action_operation[message_attr]' => 'new message',
+                    'oro_action_operation[descr_attr]' => 'new description text'
                 ],
                 'expectedFormData' => [
-                    'oro_action[message_attr]' => 'new message',
-                    'oro_action[descr_attr]' => ''
+                    'oro_action_operation[message_attr]' => 'new message',
+                    'oro_action_operation[descr_attr]' => ''
                 ],
                 'expectedData' => [
                     'message' => 'new message',
                     'description' => 'Test Description'
                 ],
-                'expectedMessage' => 'Action "oro_action_test_action" is not allowed.'
+                'expectedMessage' => 'Operation "oro_action_test_operation" is not allowed.'
             ],
-            'action not allowed (constraint message)' => [
+            'operation not allowed (constraint message)' => [
+                'entity' => LoadTestEntityData::TEST_ENTITY_2,
                 'inputData' => [
                     'message' => 'new message',
                     'description' => 'Test Description'
                 ],
                 'submittedData' => [
-                    'oro_action[message_attr]' => 'new message text',
-                    'oro_action[descr_attr]' => 'Test Description'
+                    'oro_action_operation[message_attr]' => 'new message text',
+                    'oro_action_operation[descr_attr]' => 'Test Description'
                 ],
                 'expectedFormData' => [
-                    'oro_action[message_attr]' => 'new message',
-                    'oro_action[descr_attr]' => ''
+                    'oro_action_operation[message_attr]' => 'new message',
+                    'oro_action_operation[descr_attr]' => ''
                 ],
                 'expectedData' => [
                     'message' => 'new message',
@@ -189,18 +241,19 @@ class WidgetControllerTest extends WebTestCase
                 ],
                 'expectedMessage' => 'Please, write other description.'
             ],
-            'action with form error' => [
+            'operation with form error' => [
+                'entity' => LoadTestEntityData::TEST_ENTITY_2,
                 'inputData' => [
                     'message' => 'new message',
                     'description' => 'Test Description'
                 ],
                 'submittedData' => [
-                    'oro_action[message_attr]' => '',
-                    'oro_action[descr_attr]' => 'new description text'
+                    'oro_action_operation[message_attr]' => '',
+                    'oro_action_operation[descr_attr]' => 'new description text'
                 ],
                 'expectedFormData' => [
-                    'oro_action[message_attr]' => 'new message',
-                    'oro_action[descr_attr]' => ''
+                    'oro_action_operation[message_attr]' => 'new message',
+                    'oro_action_operation[descr_attr]' => ''
                 ],
                 'expectedData' => [
                     'message' => 'new message',
@@ -212,11 +265,12 @@ class WidgetControllerTest extends WebTestCase
     }
 
     /**
+     * @param object $entity
      * @param array $fields
      */
-    protected function assertEntityFields(array $fields)
+    protected function assertEntityFields($entity, array $fields)
     {
-        $entity = $this->getEntity($this->entityId);
+        $entity = $this->getEntity($entity->getId());
 
         foreach ($fields as $name => $value) {
             $this->assertEquals($value, $this->getPropertyAccessor()->getValue($entity, $name));
@@ -252,12 +306,12 @@ class WidgetControllerTest extends WebTestCase
      *
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function buttonsActionDataProvider()
+    public function buttonsOperationDataProvider()
     {
         $label = 'oro.action.test.label';
 
         $config = [
-            'oro_action_test_action' => [
+            'oro_action_test_operation' => [
                 'label' => $label,
                 'enabled' => true,
                 'order' => 10,
@@ -273,47 +327,47 @@ class WidgetControllerTest extends WebTestCase
                 'config' => array_merge_recursive(
                     $config,
                     [
-                        'oro_action_test_action' => [
+                        'oro_action_test_operation' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            'preconditions' => ['@equal' => ['$message', 'test message']],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message']],
                         ],
                     ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => $label
+                'expected' => [$label]
             ],
             'existing entity wrong conditions' => [
                 'config' => array_merge_recursive(
                     $config,
                     [
-                        'oro_action_test_action' => [
+                        'oro_action_test_operation' => [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
-                            'preconditions' => ['@equal' => ['$message', 'test message wrong']],
+                            OperationDefinition::PRECONDITIONS => ['@equal' => ['$message', 'test message wrong']],
                         ],
                     ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => false
+                'expected' => []
             ],
             'existing entity short syntax' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_action' => ['entities' => ['OroTestFrameworkBundle:TestActivity']]]
+                    ['oro_action_test_operation' => ['entities' => ['OroTestFrameworkBundle:TestActivity']]]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => $label
+                'expected' => [$label]
             ],
             'existing entity with root namespace' => [
                 'config' => array_merge_recursive(
                     $config,
                     [
-                        'oro_action_test_action' => [
+                        'oro_action_test_operation' => [
                             'entities' => ['\Oro\Bundle\TestFrameworkBundle\Entity\TestActivity']
                         ]
                     ]
@@ -321,59 +375,63 @@ class WidgetControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => $label
+                'expected' => [$label]
             ],
             'unknown entity' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_action' => ['entities' => ['Oro\Bundle\TestFrameworkBundle\Enti\UnknownEntity']]]
+                    [
+                        'oro_action_test_operation' => [
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Enti\UnknownEntity']
+                        ]
+                    ]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => false
+                'expected' => []
             ],
             'unknown entity short syntax' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_action' => ['entities' => ['OroTestFrameworkBundle:UnknownEntity']]]
+                    ['oro_action_test_operation' => ['entities' => ['OroTestFrameworkBundle:UnknownEntity']]]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => false
+                'expected' => []
             ],
             'existing route' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_action' => ['routes' => ['oro_action_test_route']]]
+                    ['oro_action_test_operation' => ['routes' => ['oro_action_test_route']]]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => $label
+                'expected' => [$label]
             ],
             'unknown route' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_action' => ['routes' => ['oro_action_unknown_route']]]
+                    ['oro_action_test_operation' => ['routes' => ['oro_action_unknown_route']]]
                 ),
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => false
+                'expected' => []
             ],
             'empty context' => [
                 'config' => $config,
                 'route' => 'oro_action_test_route',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => false
+                'expected' => []
             ],
             'existing route and entity' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_action' =>
+                    ['oro_action_test_operation' =>
                         [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
                             'routes' => ['oro_action_test_route']
@@ -383,12 +441,12 @@ class WidgetControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'entityId' => null,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => $label
+                'expected' => [$label]
             ],
-            'non modal action' => [
+            'modal action' => [
                 'config' => array_merge_recursive(
                     $config,
-                    ['oro_action_test_action' =>
+                    ['oro_action_test_operation' =>
                         [
                             'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
                             'routes' => ['oro_action_test_route'],
@@ -399,7 +457,36 @@ class WidgetControllerTest extends WebTestCase
                 'route' => 'oro_action_test_route',
                 'entityId' => null,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'expected' => 'data-dialog-show=""'
+                'expected' => ['"showDialog":false', '"hasDialog":false'],
+            ],
+            'non modal action' => [
+                'config' => array_merge_recursive(
+                    $config,
+                    ['oro_action_test_operation' =>
+                        [
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            'routes' => ['oro_action_test_route'],
+                            'frontend_options' => ['show_dialog' => true],
+                            'form_options' => [
+                                'attribute_fields' => [
+                                    'attribute1' => 'value1',
+                                ],
+                            ],
+                        ]
+                    ]
+                ),
+                'route' => 'oro_action_test_route',
+                'entityId' => null,
+                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'expected' => [
+                    'data-options',
+                    '"showDialog":true',
+                    '"hasDialog":true',
+                    '"dialogOptions"',
+                    '"executionUrl"',
+                    '"dialogUrl"',
+                    '"title":"' . $label . '"'
+                ],
             ]
         ];
     }
@@ -407,10 +494,10 @@ class WidgetControllerTest extends WebTestCase
     /**
      * @return array
      */
-    protected function getConfigurationForFormAction()
+    protected function getConfigurationForFormOperation()
     {
         return [
-            'oro_action_test_action' => [
+            'oro_action_test_operation' => [
                 'label' => 'oro.action.test.label',
                 'enabled' => true,
                 'order' => 10,
@@ -433,15 +520,15 @@ class WidgetControllerTest extends WebTestCase
                     ],
                     'attribute_default_values' => ['message_attr' => '$message']
                 ],
-                'prefunctions' => [],
-                'preconditions' => [],
-                'form_init' => [
+                OperationDefinition::PREACTIONS => [],
+                OperationDefinition::PRECONDITIONS => [],
+                OperationDefinition::FORM_INIT => [
                     ['@assign_value' => [
-                        'conditions' => ['@empty' => '$description'],
+                        OperationDefinition::CONDITIONS => ['@empty' => '$description'],
                         'parameters' => ['$.descr_attr', 'Test Description'],
                     ]]
                 ],
-                'conditions' => [
+                OperationDefinition::CONDITIONS => [
                     '@and' => [
                         [
                             '@not' => [['@equal' => ['$message', '$.message_attr']]]
@@ -454,11 +541,36 @@ class WidgetControllerTest extends WebTestCase
                         ]
                     ]
                 ],
-                'functions' => [
+                OperationDefinition::ACTIONS => [
                     ['@assign_value' => ['$message', '$.message_attr']],
                     ['@assign_value' => ['$description', '$.descr_attr']]
                 ]
             ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function buttonsOperationAndGroupsProvider()
+    {
+        return [
+            'default group' => [
+                'group' => '',
+                OperationDefinition::ACTIONS => [],
+            ],
+            'view_navButtons' => [
+                'group' => 'view_navButtons',
+                OperationDefinition::ACTIONS => ['Edit', 'Delete'],
+            ],
+            'update_navButtons' => [
+                'group' => 'update_navButtons',
+                OperationDefinition::ACTIONS => ['Delete'],
+            ],
+            'datagridRowAction' => [
+                'group' => 'datagridRowAction',
+                OperationDefinition::ACTIONS => ['Edit', 'Delete'],
+            ],
         ];
     }
 }

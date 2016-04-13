@@ -110,7 +110,6 @@ As you have seen in the previous section we have added `setBlockTheme` action th
 ```twig
 {% block head_widget %}
     <head{{ block('block_attributes') }}>
-        <title>{{ title }}</title>
         <meta http-equiv="cache-control" content="max-age=0" />
         <meta http-equiv="cache-control" content="no-cache" />
         <meta http-equiv="expires" content="0" />

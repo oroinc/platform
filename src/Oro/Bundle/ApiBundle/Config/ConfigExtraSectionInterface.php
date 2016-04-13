@@ -3,21 +3,17 @@
 namespace Oro\Bundle\ApiBundle\Config;
 
 /**
+ * Provides an interface for different kind requests for additional configuration sections.
  * This interface can be used to tell the Context that an additional data should be available
- * as additional type of configuration. So, "hasConfigOf", "getConfigOf" and "setConfigOf" methods
+ * as additional configuration section. So, "hasConfigOf", "getConfigOf" and "setConfigOf" methods
  * of the Context can be used to access these data.
  */
-interface ConfigExtraSectionInterface
+interface ConfigExtraSectionInterface extends ConfigExtraInterface
 {
     /**
-     * Gets a string that uniquely identifies an additional configuration section.
-     *
-     * @return string
-     */
-    public function getName();
-
-    /**
-     * Gets the configuration type that can be loaded into this section.
+     * Returns the configuration type that should be loaded into this section.
+     * This string is used by ConfigLoaderFactory to find the appropriate loader.
+     * @see Oro\Bundle\ApiBundle\Config\ConfigLoaderFactory
      *
      * @return string
      */

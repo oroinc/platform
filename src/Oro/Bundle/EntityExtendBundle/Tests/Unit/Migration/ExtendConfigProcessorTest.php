@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -397,7 +398,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                                 'owner' => ExtendScope::OWNER_CUSTOM
                             ],
                             'datagrid' => [
-                                'is_visible' => false
+                                'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                             ]
                         ]
                     ],
@@ -471,7 +472,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
             $extendConfigField->all()
         );
         $this->assertEquals(
-            ['is_visible' => false],
+            ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
             $datagridConfigField->all()
         );
     }
@@ -489,7 +490,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                                 'owner' => ExtendScope::OWNER_CUSTOM
                             ],
                             'datagrid' => [
-                                'is_visible' => false
+                                'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                             ]
                         ]
                     ],
@@ -570,7 +571,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
             $extendConfigField->all()
         );
         $this->assertEquals(
-            ['is_visible' => false],
+            ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
             $datagridConfigField->all()
         );
     }

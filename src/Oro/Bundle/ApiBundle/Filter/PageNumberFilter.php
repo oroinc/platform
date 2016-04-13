@@ -26,12 +26,4 @@ class PageNumberFilter extends StandaloneFilter
             }
         }
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function createExpression(FilterValue $value = null)
-    {
-        return null;
-    }
 }

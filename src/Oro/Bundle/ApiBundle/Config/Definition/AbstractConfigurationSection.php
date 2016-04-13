@@ -7,6 +7,14 @@ use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 abstract class AbstractConfigurationSection
 {
     /**
+     * {@inheritdoc}
+     */
+    public function isApplicable($section)
+    {
+        return true;
+    }
+
+    /**
      * @param NodeBuilder $node
      * @param array       $callbacks
      * @param string      $section

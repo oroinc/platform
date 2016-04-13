@@ -6,11 +6,11 @@ definitions:
         order: 20
         exclude_definitions: [another_definition]
         pre_conditions:
-            @or:
-                - @true
-                - @false
+            '@or':
+                - '@true'
+                - '@false'
         actions_configuration:
-            - @assign_value: [$entity.field, 'value']
+            - '@assign_value': [$entity.field, 'value']
 
     another_definition:
         label: 'Another definition'
