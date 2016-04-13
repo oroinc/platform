@@ -88,7 +88,10 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
         $this->assertEquals($pagesNamespaceSuffix, $containerBuilder->getParameter('oro_test.pages_namespace_suffix'));
-        $this->assertEquals($elementsNamespaceSuffix, $containerBuilder->getParameter('oro_test.elements_namespace_suffix'));
+        $this->assertEquals(
+            $elementsNamespaceSuffix,
+            $containerBuilder->getParameter('oro_test.elements_namespace_suffix')
+        );
     }
 
     public function testGetConfigKey()
