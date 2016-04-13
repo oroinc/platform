@@ -17,10 +17,18 @@ Every bundle has its own test suite and can be run separately:
  bin/behat -s OroUserBundle
  ```
 
-During initialization Extension will create test suite with bundle name if any ```Tests/Behat/Feature``` directory exits.
+During initialization, Extension will create test suite with bundle name if any ```Tests/Behat/Feature``` directory exits.
+Thus, if bundle has no Feature directory - no test suite would be crated for it.
 
 If you need some specific feature steps for your bundle you should create ```Tests/Behat/Context/FeatureContext``` class.
 Instead of ```OroMainContext``` FeatureContext will be used for bundle test suite.
+Perhaps FeatureContext may be extends from OroMainContext for redefine some feature steps.
+
+Page Object Extension provide ```PageObjectAware``` interface for injecting PageObjectFactory that know about all pages and elements in application.
+Read more about Page Object Extension in official documentation ([Page Object Extension documentation](http://behat-page-object-extension.readthedocs.org/en/latest/guide/introduction.html))
+
+
+![Test suite](../images/test-suite.png)
 
 
 ### BDD and Behat
