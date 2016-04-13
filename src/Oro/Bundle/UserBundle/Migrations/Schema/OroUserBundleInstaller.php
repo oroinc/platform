@@ -8,6 +8,7 @@ use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtension;
 use Oro\Bundle\AttachmentBundle\Migration\Extension\AttachmentExtensionAwareInterface;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtension;
 use Oro\Bundle\ActivityBundle\Migration\Extension\ActivityExtensionAwareInterface;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
@@ -49,7 +50,7 @@ class OroUserBundleInstaller implements
      */
     public function getMigrationVersion()
     {
-        return 'v1_20';
+        return 'v1_21';
     }
 
     /**
@@ -221,6 +222,20 @@ class OroUserBundleInstaller implements
         $table = $schema->createTable('oro_user_access_role');
         $table->addColumn('user_id', 'integer', []);
         $table->addColumn('role_id', 'integer', []);
+        $table->addColumn(
+            'extend_description',
+            'text',
+            [
+                'oro_options' => [
+                    'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+                    'datagrid'  => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                    'merge'     => ['display' => true],
+                    'dataaudit' => ['auditable' => true],
+                    'form'      => ['type' => 'oro_resizeable_rich_text'],
+                    'view'      => ['type' => 'html'],
+                ]
+            ]
+        );
         $table->addIndex(['user_id'], 'IDX_290571BEA76ED395', []);
         $table->addIndex(['role_id'], 'IDX_290571BED60322AC', []);
         $table->setPrimaryKey(['user_id', 'role_id']);
