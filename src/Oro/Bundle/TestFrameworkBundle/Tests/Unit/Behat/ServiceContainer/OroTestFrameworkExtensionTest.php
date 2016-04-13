@@ -7,9 +7,13 @@ use Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtens
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\KernelStub;
 use Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub\TestBundle;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var array
+     */
     protected $sharedContexts = ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext'];
 
     /**
@@ -223,6 +227,10 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    /**
+     * @param array $names
+     * @return BundleInterface[]
+     */
     protected function getBundlesFromNames(array $names)
     {
         $bundles = [];

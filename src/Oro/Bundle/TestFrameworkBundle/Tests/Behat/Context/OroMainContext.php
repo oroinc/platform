@@ -24,6 +24,9 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     /** @var  \SensioLabs\Behat\PageObjectExtension\PageObject\Page */
     protected $currentPage;
 
+    /**
+     * {@inheritdoc}
+     */
     public function setPageObjectFactory(PageObjectFactory $pageObjectFactory)
     {
         $this->pageObjectFactory = $pageObjectFactory;
@@ -55,7 +58,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function pressButton($button)
     {
@@ -76,7 +79,8 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
      *
      * @Given /^I wait for AJAX to finish$/
      */
-    public function iWaitForAjaxToFinish() {
+    public function iWaitForAjaxToFinish()
+    {
         $time = 15000; // time should be in milliseconds
         $this->getSession()->wait($time, "'complete' == document['readyState']");
     }
@@ -117,7 +121,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     /*********************************************/
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function visit($page)
     {
@@ -126,7 +130,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     public function clickLink($link)
     {
