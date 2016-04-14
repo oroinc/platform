@@ -288,8 +288,8 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                     ActionExtension::ACTION_CONFIGURATION_KEY => function () {
                         return [
                             'view' => ['key2' => 'value2'],
-                             'update' => true,
-                         ];
+                            'update' => true,
+                        ];
                     },
                 ]),
                 'record' => new ResultRecord(['id' => 4]),
