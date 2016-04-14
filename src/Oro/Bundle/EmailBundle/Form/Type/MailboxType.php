@@ -234,15 +234,15 @@ class MailboxType extends AbstractType
         $data = $event->getData();
 
         $this->setOriginOrganizationAndOwner($data);
-        $this->setOriginSyncDate($data);
+        $this->setFolderStartSync($data);
     }
 
     /**
-     * Set origin and folder sync date to prevent sync old emails
+     * Set folder start sync date to prevent sync old emails
      *
      * @param Mailbox $data
      */
-    public function setOriginSyncDate(Mailbox $data = null)
+    protected function setFolderStartSync(Mailbox $data = null)
     {
         /* @var $origin UserEmailOrigin */
         if (!$data || !$origin = $data->getOrigin()) {
@@ -250,10 +250,9 @@ class MailboxType extends AbstractType
         }
 
         $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $origin->setSynchronizedAt($currentDate);
         foreach ($origin->getFolders() as $folder) {
             if ($folder->isSyncEnabled()) {
-                $folder->setSynchronizedAt($currentDate);
+                $folder->setSyncStartDate($currentDate);
             }
         }
     }
