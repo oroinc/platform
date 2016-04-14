@@ -14,7 +14,7 @@ class OroCalendarBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_9';
+        return 'v1_10';
     }
 
     /**
@@ -25,6 +25,7 @@ class OroCalendarBundleInstaller implements Installation
         /** Tables generation **/
         $this->createOroCalendarTable($schema);
         $this->createOroSystemCalendarTable($schema);
+        $this->createOroRecurrenceTable($schema);
         $this->createOroCalendarEventTable($schema);
         $this->createOroCalendarPropertyTable($schema);
 
@@ -93,11 +94,13 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('invitation_status', 'string', ['default' => null, 'notnull' => false, 'length' => 32]);
         $table->addColumn('parent_id', 'integer', ['default' => null, 'notnull' => false]);
+        $table->addColumn('recurrence_id', 'integer', ['notnull' => false]);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
         $table->addIndex(['system_calendar_id', 'start_at', 'end_at'], 'oro_sys_calendar_event_idx', []);
         $table->addIndex(['system_calendar_id'], 'IDX_2DDC40DD55F0F9D0', []);
         $table->addIndex(['updated_at'], 'oro_calendar_event_up_idx', []);
+        $table->addUniqueIndex(['recurrence_id'], 'UNIQ_2DDC40DD2C414CE8');
         $table->setPrimaryKey(['id']);
     }
 
@@ -165,6 +168,12 @@ class OroCalendarBundleInstaller implements Installation
             ['id'],
             ['onDelete' => 'CASCADE']
         );
+        $table->addForeignKeyConstraint(
+            $schema->getTable('oro_recurrence'),
+            ['recurrence_id'],
+            ['id'],
+            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
     }
 
     /**
@@ -201,5 +210,28 @@ class OroCalendarBundleInstaller implements Installation
             ['id'],
             ['onUpdate' => null, 'onDelete' => 'CASCADE']
         );
+    }
+
+    /**
+     * Create oro_recurrence table
+     *
+     * @param Schema $schema
+     */
+    protected function createOroRecurrenceTable(Schema $schema)
+    {
+        $table = $schema->createTable('oro_recurrence');
+        $table->addColumn('id', 'integer', ['autoincrement' => true]);
+        $table->addColumn('recurrence_type', 'string', ['notnull' => true, 'length' => 16]);
+        $table->addColumn('interval', 'integer', []);
+        $table->addColumn('instance', 'integer', ['notnull' => false]);
+        $table->addColumn('day_of_week', 'array', ['notnull' => false,'comment' => '(DC2Type:array)']);
+        $table->addColumn('day_of_month', 'integer', ['notnull' => false]);
+        $table->addColumn('month_of_year', 'integer', ['notnull' => false]);
+        $table->addColumn('start_time', 'datetime', []);
+        $table->addColumn('end_time', 'datetime', ['notnull' => false]);
+        $table->addColumn('occurrences', 'integer', ['notnull' => false]);
+        $table->setPrimaryKey(['id']);
+        $table->addIndex(['start_time'], 'IDX_B6CD65EF502DF587', []);
+        $table->addIndex(['end_time'], 'IDX_B6CD65EF41561401', []);
     }
 }

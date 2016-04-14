@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Entity;
 
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
@@ -48,7 +49,8 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
             array('backgroundColor', '#FF0000'),
             array('createdAt', new \DateTime()),
             array('updatedAt', new \DateTime()),
-            array('invitationStatus', CalendarEvent::NOT_RESPONDED)
+            array('invitationStatus', CalendarEvent::NOT_RESPONDED),
+            array('recurrence', new Recurrence()),
         );
     }
 
