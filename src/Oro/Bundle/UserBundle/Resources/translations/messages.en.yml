@@ -170,7 +170,9 @@ oro:
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
         action:
-            password_management: Manage users' passwords
+            password_management:
+                label: Manage passwords
+                description: Reset or change passwords of other users
 
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email
