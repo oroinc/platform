@@ -263,12 +263,39 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      */
     protected $recurrence;
 
+    /**
+     * @var ArrayCollection
+     *
+     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="exceptionParent", orphanRemoval=true, cascade={"all"})
+     */
+    protected $exceptions;
+
+    /**
+     * This attribute facilitates to determine whether an event is an exception and which event is it's parent one.
+     *
+     * @var CalendarEvent
+     *
+     * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="exceptions")
+     * @ORM\JoinColumn(name="exception_parent_id", referencedColumnName="id", onDelete="CASCADE")
+     */
+    protected $exceptionParent;
+
+    /**
+     * This attribute determines when an exception breaks recurrence sequence.
+     *
+     * @var \DateTime
+     *
+     * @ORM\Column(name="original_date", type="datetime", nullable=true)
+     */
+    protected $originalDate;
+
     public function __construct()
     {
         parent::__construct();
 
         $this->reminders   = new ArrayCollection();
         $this->childEvents = new ArrayCollection();
+        $this->exceptions  = new ArrayCollection();
     }
 
     /**
@@ -664,6 +691,116 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
         }
     }
 
+    /**
+     * Gets calendar event exceptions.
+     *
+     * @return Collection|CalendarEvent[]
+     */
+    public function getExceptions()
+    {
+        return $this->exceptions;
+    }
+
+    /**
+     * Resets calendar event exceptions.
+     *
+     * @param Collection|CalendarEvent[] $calendarEvents
+     *
+     * @return self
+     */
+    public function resetExceptions($calendarEvents)
+    {
+        $this->exceptions->clear();
+
+        foreach ($calendarEvents as $calendarEvent) {
+            $this->addException($calendarEvent);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Adds calendar event exception.
+     *
+     * @param CalendarEvent $calendarEvent
+     *
+     * @return self
+     */
+    public function addException(CalendarEvent $calendarEvent)
+    {
+        if (!$this->exceptions->contains($calendarEvent)) {
+            $this->exceptions->add($calendarEvent);
+            $calendarEvent->setExceptionParent($this);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Removes calendar event exception.
+     *
+     * @param CalendarEvent $calendarEvent
+     *
+     * @return self
+     */
+    public function removeException(CalendarEvent $calendarEvent)
+    {
+        if ($this->exceptions->contains($calendarEvent)) {
+            $this->exceptions->removeElement($calendarEvent);
+            $calendarEvent->setExceptionParent(null);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Sets parent for calendar event exception.
+     *
+     * @param CalendarEvent|null $exceptionParent
+     *
+     * @return self
+     */
+    public function setExceptionParent(CalendarEvent $exceptionParent = null)
+    {
+        $this->exceptionParent = $exceptionParent;
+
+        return $this;
+    }
+
+    /**
+     * Gets parent for calendar event exception.
+     *
+     * @return CalendarEvent|null
+     */
+    public function getExceptionParent()
+    {
+        return $this->exceptionParent;
+    }
+
+    /**
+     * Gets originalDate of calendar event exception or null if calendar event is not an exception.
+     *
+     * @return \DateTime|null
+     */
+    public function getOriginalDate()
+    {
+        return $this->originalDate;
+    }
+
+    /**
+     * Sets originalDate of calendar event exception.
+     *
+     * @param \DateTime|null $originalDate
+     *
+     * @return self
+     */
+    public function setOriginalDate(\DateTime $originalDate = null)
+    {
+        $this->originalDate = $originalDate;
+
+        return $this;
+    }
+    
     /**
      * @param string|null $invitationStatus
      * @return bool

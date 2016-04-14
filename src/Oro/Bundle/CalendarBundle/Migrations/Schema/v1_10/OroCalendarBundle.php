@@ -45,6 +45,8 @@ class OroCalendarBundle implements Migration
     protected function updateCalendarEventsTable(Schema $schema)
     {
         $table = $schema->getTable('oro_calendar_event');
+        $table->addColumn('original_date', 'datetime', ['notnull' => false]);
+        $table->addColumn('exception_parent_id', 'integer', ['notnull' => false]);
         $table->addColumn('recurrence_id', 'integer', ['notnull' => false]);
         $table->addUniqueIndex(['recurrence_id'], 'UNIQ_2DDC40DD2C414CE8');
         $table->addForeignKeyConstraint(
@@ -52,6 +54,12 @@ class OroCalendarBundle implements Migration
             ['recurrence_id'],
             ['id'],
             ['onDelete' => 'SET NULL', 'onUpdate' => null]
+        );
+        $table->addForeignKeyConstraint(
+            $table,
+            ['exception_parent_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
         );
     }
 }
