@@ -24,12 +24,13 @@ define(function(require) {
             valueAttribute: 'data-value'
         },
 
-        dataCache: {},
+        dataCache: null,
 
         options: {},
 
         initialize: function(options) {
             var self = this;
+            this.dataCache = {};
             this.options = _.extend({}, this.defaultOptions, options);
             this.element = options._sourceElement;
             this.element.find(this.options.accessLevelFieldSelector).each(function() {
@@ -83,7 +84,7 @@ define(function(require) {
 
             if (this.element) {
                 this.element.find(this.options.accessLevelFieldSelector).each(function() {
-                    $(this).find('input').off('chenge.' + this.cid).select2('destroy');
+                    $(this).find('input').off('change.' + this.cid).select2('destroy');
                 });
             }
 
