@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
 class CalendarEventRepository extends EntityRepository
 {
@@ -42,6 +43,7 @@ class CalendarEventRepository extends EntityRepository
             ->addSelect('e.invitationStatus, IDENTITY(e.parent) AS parentEventId, c.id as calendar')
             ->innerJoin('e.calendar', 'c');
 
+        $this->addRecurrenceData($qb);
         $this->addFilters($qb, $filters);
 
         return $qb;
@@ -179,5 +181,27 @@ class CalendarEventRepository extends EntityRepository
                 $qb->addCriteria($filters);
             }
         }
+    }
+
+    /**
+     * Adds recurrence rules data
+     *
+     * @param QueryBuilder $queryBuilder
+     *
+     * @return self
+     */
+    protected function addRecurrenceData(QueryBuilder $queryBuilder)
+    {
+        $key = Recurrence::STRING_KEY;
+        $queryBuilder->leftJoin('e.recurrence', 'r')
+            ->addSelect(
+                "r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
+                . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
+                . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
+                . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
+                . "r.instance as {$key}Instance"
+            );
+
+        return $this;
     }
 }

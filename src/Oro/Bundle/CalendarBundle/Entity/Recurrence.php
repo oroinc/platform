@@ -25,6 +25,8 @@ class Recurrence
     const TYPE_YEARLY = 'yearly';
     const TYPE_YEAR_N_TH = 'yearnth';
 
+    const STRING_KEY = 'recurrence';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")
