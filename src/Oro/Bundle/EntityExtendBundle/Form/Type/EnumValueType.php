@@ -4,13 +4,29 @@ namespace Oro\Bundle\EntityExtendBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints as ExtendAssert;
+use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
 
 class EnumValueType extends AbstractType
 {
+    /** @var EnumTypeHelper */
+    protected $typeHelper;
+
+    /**
+     * @param EnumTypeHelper $typeHelper
+     */
+    public function __construct(EnumTypeHelper $typeHelper)
+    {
+        $this->typeHelper = $typeHelper;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -27,6 +43,53 @@ class EnumValueType extends AbstractType
             ])
             ->add('is_default', 'checkbox', ['required' => false])
             ->add('priority', 'hidden', ['empty_data' => 9999]);
+    }
+
+    public function buildView(FormView $view, FormInterface $form, array $options)
+    {
+        $view->vars['allow_delete'] = $this->isDeletedAllowed($form);
+    }
+
+    /**
+     * Delete is allowed by default unless there is immutable option id in the config
+     *
+     * @param FormInterface $form
+     * @return boolean
+     */
+    protected function isDeletedAllowed(FormInterface $form)
+    {
+        $data = $form->getData();
+
+        if (!$data) {
+            return true;
+        }
+
+        /** @var ConfigIdInterface $configId */
+        $configId = $form->getParent()->getConfig()->getOption('config_id');
+        $className = $configId->getClassName();
+
+        if (empty($className)) {
+            return true;
+        }
+
+        $fieldName = $this->typeHelper->getFieldName($configId);
+        if (empty($fieldName)) {
+            return true;
+        }
+
+        $enumCode = $this->typeHelper->getEnumCode($className, $fieldName);
+        if (empty($enumCode)) {
+            return true;
+        }
+
+        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
+        $immutable = $this->typeHelper->getImmutable('enum_codes', $enumValueClassName);
+
+        if (is_array($immutable) && in_array($data['id'], $immutable)) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
