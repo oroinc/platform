@@ -375,6 +375,7 @@ services:
         class: Oro\Bundle\EntityExtendBundle\EventListener\SearchEntityConfigListener
         arguments:
             - "@doctrine"
+            - "@oro_search.provider.search_mapping"
         tags:
             - { name: kernel.event_listener, event: oro.entity_config.pre_flush, method: preFlush, priority: -255 }
 

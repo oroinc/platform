@@ -249,8 +249,9 @@ define(function(require) {
         exitEditMode: function(withDispose) {
             if (this.view) {
                 this.errorHolderView.adoptErrorMessage();
-                this.options.cell.$el.removeClass('edit-mode');
-                this.options.cell.$el.addClass('view-mode');
+                if (!this.options.cell.disposed) {
+                    this.options.cell.$el.removeClass('edit-mode').addClass('view-mode');
+                }
                 this.view.dispose();
                 this.stopListening(this.view);
                 delete this.view;
