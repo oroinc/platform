@@ -72,6 +72,7 @@ class ActionMetadata implements AclClassInfo, \Serializable
      * @param string $name
      * @param string $group
      * @param string $label
+     * @param string $description
      */
     public function __construct($name = '', $group = '', $label = '', $description = '')
     {
