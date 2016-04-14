@@ -1,8 +1,8 @@
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'OroUIBundle:layouts:base/dialog/dialog.html.twig'
-        - @addTree:
+        - '@addTree':
             items:
                 widget_content:
                     blockType: container

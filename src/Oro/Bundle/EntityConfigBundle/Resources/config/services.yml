@@ -28,16 +28,16 @@ services:
         public: false
         class: Oro\Bundle\EntityConfigBundle\Config\EntityManagerBag
         arguments:
-            - @doctrine
+            - '@doctrine'
 
     oro_entity_config.config_manager:
         class: %oro_entity_config.config_manager.class%
         arguments:
-            - @event_dispatcher
-            - @oro_entity_config.metadata.annotation_metadata_factory
-            - @oro_entity_config.config_model_manager
-            - @oro_entity_config.audit_manager
-            - @oro_entity_config.cache
+            - '@event_dispatcher'
+            - '@oro_entity_config.metadata.annotation_metadata_factory'
+            - '@oro_entity_config.config_model_manager'
+            - '@oro_entity_config.audit_manager'
+            - '@oro_entity_config.cache'
 
     oro_entity_config.config_model_lock_object:
         public: false
@@ -47,41 +47,41 @@ services:
         public: false
         class: %oro_entity_config.config_model_manager.class%
         arguments:
-            - @oro_entity_config.link.entity_manager
-            - @oro_entity_config.config_model_lock_object
+            - '@oro_entity_config.link.entity_manager'
+            - '@oro_entity_config.config_model_lock_object'
 
     oro_entity_config.helper.entity_config:
         class: %oro_entity_config.helper.entity_config.class%
         arguments:
-            - @oro_entity_config.provider.entity
-            - @oro_security.acl.group_provider.chain
+            - '@oro_entity_config.provider.entity'
+            - '@oro_security.acl.group_provider.chain'
 
     oro_entity_config.audit_manager:
         public: false
         class: Oro\Bundle\EntityConfigBundle\Audit\AuditManager
         arguments:
-            - @security.token_storage
-            - @doctrine
+            - '@security.token_storage'
+            - '@doctrine'
 
     oro_entity_config.tools.command_executor:
         class: %oro_entity_config.tools.command_executor.class%
         arguments:
             - %kernel.root_dir%/console
             - %kernel.environment%
-            - @oro_cache.oro_data_cache_manager
+            - '@oro_cache.oro_data_cache_manager'
 
     oro_entity_config.config_loader:
         class: %oro_entity_config.config_loader.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity_config.entity_manager_bag
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_config.entity_manager_bag'
 
     oro_entity_config.cache:
         public: false
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigCache
         arguments:
-            - @oro_entity_config.config_cache_impl
-            - @oro_entity_config.model_cache_impl
+            - '@oro_entity_config.config_cache_impl'
+            - '@oro_entity_config.model_cache_impl'
             - %kernel.debug%
 
     oro_entity_config.config_cache_impl:
@@ -99,34 +99,34 @@ services:
     oro_entity_config.config_cache_warmer:
         class: Oro\Bundle\EntityConfigBundle\Config\ConfigCacheWarmer
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity_config.cache
-            - @oro_entity_config.config_model_lock_object
-            - @oro_entity_config.entity_manager_bag
-            - @oro_entity.virtual_field_provider.chain
-            - @oro_entity.virtual_relation_provider.chain
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_config.cache'
+            - '@oro_entity_config.config_model_lock_object'
+            - '@oro_entity_config.entity_manager_bag'
+            - '@oro_entity.virtual_field_provider.chain'
+            - '@oro_entity.virtual_relation_provider.chain'
 
     oro_entity_config.cache.warmer:
         public: false
         class: Oro\Bundle\EntityConfigBundle\Cache\CacheWarmer
         arguments:
-            - @oro_entity_config.config_cache_warmer
+            - '@oro_entity_config.config_cache_warmer'
         tags:
             - { name: kernel.cache_warmer, priority: 28 }
 
     oro_entity_config.event_listener.entityconfig_grid_listener:
         class: %oro_entity_config.event_listener.entityconfig_grid_listener.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_datagrid.provider.resolver
+            - '@oro_entity_config.config_manager'
+            - '@oro_datagrid.provider.resolver'
         tags:
             - { name: kernel.event_subscriber }
 
     oro_entity_config.event_listener.entityfields_grid_listener:
         class: %oro_entity_config.event_listener.entityfields_grid_listener.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_datagrid.provider.resolver
+            - '@oro_entity_config.config_manager'
+            - '@oro_datagrid.provider.resolver'
         tags:
             - { name: kernel.event_subscriber }
 
@@ -142,16 +142,16 @@ services:
     oro_entity_config.twig.extension.config:
         class: %oro_entity_config.twig.extension.config.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @router
-            - @oro_entity.entity_class_name_helper
+            - '@oro_entity_config.config_manager'
+            - '@router'
+            - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: twig.extension }
 
     oro_entity_config.migration.post_up.listener:
         class: %oro_entity_config.migration.post_up.listener.class%
         arguments:
-            - @oro_entity_config.tools.command_executor
+            - '@oro_entity_config.tools.command_executor'
         tags:
             - { name: kernel.event_listener, event: oro_migration.post_up, method: updateConfigs, priority: -90 }
             - { name: kernel.event_listener, event: oro_migration.post_up, method: warmUpCache, priority: -255 }
@@ -159,6 +159,6 @@ services:
     oro_entity_config.translation.helper:
         class: %oro_entity_config.translation.helper.class%
         arguments:
-            - @doctrine
-            - @translator.default
-            - @oro_translation.database_translation.metadata.cache
+            - '@doctrine'
+            - '@translator.default'
+            - '@oro_translation.database_translation.metadata.cache'

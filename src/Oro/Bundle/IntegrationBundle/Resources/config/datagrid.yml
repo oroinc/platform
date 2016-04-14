@@ -21,8 +21,8 @@ datagrid:
                 template:       OroIntegrationBundle:Integration:Datagrid/type.html.twig
                 frontend_type:  html
                 context:
-                    choices:  @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList()
-                    registry: @oro_integration.manager.types_registry
+                    choices:  "@oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList()"
+                    registry: "@oro_integration.manager.types_registry"
             enabled:
                 label:          oro.integration.integration.enabled.label
                 frontend_type:  select
@@ -58,7 +58,7 @@ datagrid:
                     type: choice
                     options:
                         field_options:
-                            choices: @oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList
+                            choices: "@oro_integration.manager.types_registry->getAvailableChannelTypesChoiceList"
                 enabled:
                     data_name: c.enabled
                     type:      choice
@@ -125,7 +125,7 @@ datagrid:
             connector:
                 type:     callback
                 label:    oro.integration.integration_status.connector.label
-                callable: @oro_integration.datagrid.status_grid_helper->connectorCodeProperty()
+                callable: "@oro_integration.datagrid.status_grid_helper->connectorCodeProperty()"
             message:
                 label:          oro.integration.integration_status.message.label
                 type:           twig

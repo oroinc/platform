@@ -3,10 +3,10 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\DeleteProcessor
         public: false
         arguments:
-            - @oro_api.processor_bag
+            - '@oro_api.processor_bag'
             - delete
-            - @oro_api.config_provider
-            - @oro_api.metadata_provider
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.action_processor }
 
@@ -37,14 +37,14 @@ services:
     oro_api.delete.initialize_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
         arguments:
-            - @oro_entity.orm.entity_class_resolver
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
 
     oro_api.delete.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
-            - @oro_api.value_normalizer
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 20 }
 
@@ -55,8 +55,8 @@ services:
     oro_api.delete.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_security.security_facade
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete, group: security_check, priority: 10 }
@@ -73,7 +73,7 @@ services:
     oro_api.delete.rest.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
         arguments:
-            - @oro_api.rest.entity_id_transformer
+            - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_input, requestType: rest, priority: -110 }
 
@@ -84,9 +84,9 @@ services:
     oro_api.delete.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_security.acl_helper
-            - @oro_security.acl.annotation_provider
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl_helper'
+            - '@oro_security.acl.annotation_provider'
             - DELETE
         tags:
             - { name: oro.api.processor, action: delete, group: build_query, priority: -90 }
@@ -94,7 +94,7 @@ services:
     oro_api.delete.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
-            - @oro_api.doctrine_helper
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: delete, group: build_query, priority: -100 }
 
@@ -119,8 +119,8 @@ services:
     oro_api.delete.delete_data_by_handler:
         class: Oro\Bundle\ApiBundle\Processor\Delete\DeleteDataByDeleteHandler
         arguments:
-            - @oro_api.doctrine_helper
-            - @service_container
+            - '@oro_api.doctrine_helper'
+            - '@service_container'
         tags:
             - { name: oro.api.processor, action: delete, group: delete_data, priority: -10 }
 
@@ -143,14 +143,14 @@ services:
     oro_api.delete.normalize_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors
         arguments:
-            - @translator
+            - '@translator'
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_result, priority: -10 }
 
     oro_api.delete.json_api.build_json_api_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\BuildSingleItemJsonApiDocument
         arguments:
-            - @oro_api.json_api.document_builder_factory
+            - '@oro_api.json_api.document_builder_factory'
         tags:
             - { name: oro.api.processor, action: delete, group: normalize_result, requestType: json_api, priority: -20 }
 

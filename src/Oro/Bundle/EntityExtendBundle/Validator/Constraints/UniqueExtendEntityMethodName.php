@@ -8,7 +8,7 @@ class UniqueExtendEntityMethodName extends Constraint
 {
     /** @var string */
     public $message = <<<EOF
-This field name cannot be used because it conflicts with {{ value }} method(s) of this entity. Please use another name.
+The "{{ value }}" word is reserved for system purposes. Please use another name.
 EOF;
 
     /**
