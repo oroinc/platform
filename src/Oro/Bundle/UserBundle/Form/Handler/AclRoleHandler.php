@@ -308,7 +308,7 @@ class AclRoleHandler
      */
     protected function processPrivileges(AbstractRole $role)
     {
-        $decodedPrivileges = $this->form->get('privileges')->getData();
+        $decodedPrivileges = json_decode($this->form->get('privileges')->getData(), true);
         $formPrivileges = [];
         foreach ($this->privilegeConfig as $fieldName => $config) {
             $privilegesArray = $decodedPrivileges[$fieldName];
