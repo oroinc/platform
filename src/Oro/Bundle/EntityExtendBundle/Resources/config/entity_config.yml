@@ -448,6 +448,14 @@ oro_entity_config:
                             label:          oro.entity_extend.enum_options
                             tooltip:        oro.entity_extend.enum_options.tooltip
 
+    enum_codes:
+        entity:
+             items:
+                 # array of un-deletable option identifiers
+                 immutable: # array
+                     options:
+                         auditable: false
+
     search:
         entity:
             items:
