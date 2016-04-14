@@ -134,9 +134,14 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
         if ($groups) {
             $this->extension->setGroups($groups);
         }
-        $this->extension->isApplicable($datagridConfig);
 
-        $this->assertEquals($expectedActions, $this->extension->getRowConfiguration($record, []));
+        if ($this->extension->isApplicable($datagridConfig)) {
+            $actionConfigurationCallback = $datagridConfig->offsetGet(ActionExtension::ACTION_CONFIGURATION_KEY);
+
+            $this->assertInstanceOf('Closure', $actionConfigurationCallback);
+
+            $this->assertEquals($expectedActions, call_user_func($actionConfigurationCallback, $record, []));
+        }
     }
 
     /**
@@ -260,13 +265,15 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                 'context' => ['entityClass' => null, 'datagrid' => null, 'group' => null],
             ],
             '1 allowed action and array parent config' => [
-                'config' => DatagridConfiguration::create([
-                    'name' => 'datagrid_name',
-                    ActionExtension::ACTION_CONFIGURATION_KEY => [
-                        'view' => ['key1' => 'value1'],
-                        'update' => false,
-                    ],
-                ]),
+                'config' => DatagridConfiguration::create(
+                    [
+                        'name' => 'datagrid_name',
+                        ActionExtension::ACTION_CONFIGURATION_KEY => [
+                            'view' => ['key1' => 'value1'],
+                            'update' => false,
+                        ],
+                    ]
+                ),
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
                 'expectedActions' => [
@@ -278,15 +285,17 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                 'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
             '1 allowed action and callable parent config' => [
-                'config' => DatagridConfiguration::create([
-                    'name' => 'datagrid_name',
-                    ActionExtension::ACTION_CONFIGURATION_KEY => function () {
-                        return [
-                            'view' => ['key2' => 'value2'],
-                            'update' => true,
-                        ];
-                    },
-                ]),
+                'config' => DatagridConfiguration::create(
+                    [
+                        'name' => 'datagrid_name',
+                        ActionExtension::ACTION_CONFIGURATION_KEY => function () {
+                            return [
+                                'view' => ['key2' => 'value2'],
+                                'update' => true,
+                            ];
+                        },
+                    ]
+                ),
                 'record' => new ResultRecord(['id' => 4]),
                 'actions' => ['action1' => $operationAllowed1, 'action3' => $operationNotAllowed],
                 'expectedActions' => [
