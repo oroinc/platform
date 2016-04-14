@@ -13,8 +13,8 @@ items:
     change_history_link:
         template: OroDataAuditBundle::change_history_link.html.twig
         applicable:
-            - @oro_dataaudit.placeholder.filter->isEntityAuditable($entity$, $audit_show_change_history$)
-            - @oro_user.placeholder.filter->isUserApplicable()
+            - "@oro_dataaudit.placeholder.filter->isEntityAuditable($entity$, $audit_show_change_history$)"
+            - "@oro_user.placeholder.filter->isUserApplicable()"
         acl: oro_dataaudit_history
     template_audit_condition_type_select:
         template: OroDataAuditBundle:js:audit-condition-type-select.html.twig

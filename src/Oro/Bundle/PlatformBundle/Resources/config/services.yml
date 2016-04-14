@@ -29,7 +29,7 @@ services:
     oro_platform.composer.local_repo_factory:
         class: %oro_platform.composer.local_repo_factory.class%
         arguments:
-            - @filesystem
+            - '@filesystem'
             - %oro_platform.composer.installed_json%
 
     oro_platform.version.cache:
@@ -40,14 +40,14 @@ services:
     oro_platform.composer.version_helper:
         class: %oro_platform.composer.version_helper.class%
         calls:
-            - [ setCache, [ @oro_platform.version.cache ] ]
+            - [ setCache, [ '@oro_platform.version.cache' ] ]
         arguments:
-            - @oro_platform.composer.local_repo_factory
+            - '@oro_platform.composer.local_repo_factory'
 
     oro_platform.twig.platform_extension:
         class: %oro_platform.twig.platform_extension.class%
         arguments:
-            - @oro_platform.composer.version_helper
+            - '@oro_platform.composer.version_helper'
         tags:
             - { name: twig.extension }
 
@@ -55,7 +55,7 @@ services:
         class: %oro_platform.optional_listeners.manager.class%
         arguments:
            - []
-           - @service_container
+           - '@service_container'
 
     oro_platform.event_listener.optional_listeners:
         class: %oro_platform.event_listener.optional_listeners.class%

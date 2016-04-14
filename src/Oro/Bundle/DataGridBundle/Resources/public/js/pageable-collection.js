@@ -1055,7 +1055,7 @@ define([
          * Compare strings to perform sorting
          *
          * @param {String} sortKey
-         * @param {Integer} order
+         * @param {String|Integer} order
          * @return {Function}
          * @protected
          */
@@ -1075,7 +1075,7 @@ define([
                 var t;
 
                 // order might be int or string
-                if (order == 1) {
+                if (order === '1' || order === 1) {
                     t = l;
                     l = r;
                     r = t;

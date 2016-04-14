@@ -12,21 +12,27 @@ use Oro\Bundle\EntityConfigBundle\Event\PreFlushConfigEvent;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\SearchBundle\Command\ReindexCommand;
 use Oro\Bundle\SearchBundle\Entity\UpdateEntity;
+use Oro\Bundle\SearchBundle\Provider\SearchMappingProvider;
 
 class SearchEntityConfigListener
 {
-    /**  @var ManagerRegistry*/
+    /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var ConfigManager*/
+    /** @var SearchMappingProvider */
+    protected $searchMappingProvider;
+
+    /** @var ConfigManager */
     protected $configManager;
 
     /**
-     * @param ManagerRegistry $registry
+     * @param ManagerRegistry       $registry
+     * @param SearchMappingProvider $searchMappingProvider
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(ManagerRegistry $registry, SearchMappingProvider $searchMappingProvider)
     {
-        $this->registry = $registry;
+        $this->registry              = $registry;
+        $this->searchMappingProvider = $searchMappingProvider;
     }
 
     /**
@@ -44,6 +50,11 @@ class SearchEntityConfigListener
         if (!isset($changeSet['searchable'])) {
             return;
         }
+
+        /**
+         * On any configuration changes related to search the search mapping cache should be cleaned.
+         */
+        $this->searchMappingProvider->clearMappingCache();
 
         $className    = $config->getId()->getClassName();
         $extendConfig = $configManager->getProvider('extend')->getConfig($className);

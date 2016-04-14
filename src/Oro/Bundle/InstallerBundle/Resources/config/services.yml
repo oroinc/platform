@@ -28,4 +28,4 @@ services:
     oro_installer.script_manager:
         class: %oro_installer.script_manager.class%
         arguments:
-            - @kernel
+            - '@kernel'

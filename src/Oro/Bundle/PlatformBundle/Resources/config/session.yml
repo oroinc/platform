@@ -8,5 +8,5 @@ services:
     session.handler.pdo:
         class: Symfony\Component\HttpFoundation\Session\Storage\Handler\PdoSessionHandler
         arguments:
-            - @doctrine.dbal.session_connection.wrapped
+            - '@doctrine.dbal.session_connection.wrapped'
             - { db_table: oro_session, db_id_col: id }

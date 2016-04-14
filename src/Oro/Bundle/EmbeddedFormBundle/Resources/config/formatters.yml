@@ -4,7 +4,7 @@ services:
     oro_embedded_form.grid.formatter.embedded_form_type_property:
         class: %oro_embedded_form.grid.formatter.embedded_form_type_property.class%
         arguments:
-            - @oro_embedded_form.manager
-            - @translator
+            - '@oro_embedded_form.manager'
+            - '@translator'
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: embedded_form_type }

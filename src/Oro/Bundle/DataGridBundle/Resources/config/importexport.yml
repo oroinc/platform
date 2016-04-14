@@ -7,25 +7,25 @@ services:
     oro_datagrid.importexport.processor.export:
         parent: oro_importexport.processor.export_abstract
         calls:
-             - [setDataConverter, [@oro_datagrid.importexport.data_converter]]
+             - [setDataConverter, ['@oro_datagrid.importexport.data_converter']]
         tags:
             - { name: oro_importexport.processor, type: export, entity: datagrid, alias: oro_datagrid }
 
     oro_datagrid.importexport.data_converter:
         class: %oro_datagrid.importexport.data_converter.class%
         arguments:
-            - @oro_datagrid.datagrid.manager.link
-            - @translator
-            - @oro_datagrid.columns.helper
-            - @oro_importexport.formatter.formatter_provider
+            - '@oro_datagrid.datagrid.manager.link'
+            - '@translator'
+            - '@oro_datagrid.columns.helper'
+            - '@oro_importexport.formatter.formatter_provider'
 
     oro_datagrid.importexport.export_reader:
         class: %oro_datagrid.importexport.export_reader.class%
         arguments:
-            - @oro_importexport.context_registry
-            - @oro_datagrid.importexport.export_connector
+            - '@oro_importexport.context_registry'
+            - '@oro_datagrid.importexport.export_connector'
 
     oro_datagrid.importexport.export_connector:
         class: %oro_datagrid.importexport.export_connector.class%
         arguments:
-            - @oro_datagrid.datagrid.manager.link
+            - '@oro_datagrid.datagrid.manager.link'

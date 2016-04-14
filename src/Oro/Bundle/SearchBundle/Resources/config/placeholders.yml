@@ -7,4 +7,4 @@ placeholders:
 items:
    search:
         action: OroSearchBundle:Search:searchBar
-        applicable: @oro_user.placeholder.filter->isUserApplicable()
+        applicable: "@oro_user.placeholder.filter->isUserApplicable()"
