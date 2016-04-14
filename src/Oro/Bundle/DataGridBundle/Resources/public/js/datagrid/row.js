@@ -232,13 +232,36 @@ define([
 
         render: function() {
             if (this.template) {
-                this.$el.html(this.template({
-                    model: this.model ? this.model.attributes : {},
-                    themeOptions: this.themeOptions ? this.themeOptions : {}
-                }));
-                return this;
+                this.renderCustomTemplate();
+            } else {
+                Row.__super__.render.apply(this, arguments);
             }
-            return Row.__super__.render.apply(this, arguments);
+            var state = {selected: false};
+            this.model.trigger('backgrid:isSelected', this.model, state);
+            this.$el.toggleClass('row-selected', state.selected);
+            return this;
+        },
+
+        renderCustomTemplate: function() {
+            var $checkbox;
+            this.$el.html(this.template({
+                model: this.model ? this.model.attributes : {},
+                themeOptions: this.themeOptions ? this.themeOptions : {}
+            }));
+            $checkbox = this.$('[data-role=select-row]:checkbox');
+            if ($checkbox.length) {
+                this.listenTo(this.model, 'backgrid:select', function(model, checked) {
+                    $checkbox.prop('checked', checked);
+                });
+                $checkbox.on('change' + this.eventNamespace(), _.bind(function(e) {
+                    this.model.trigger('backgrid:selected', this.model, $checkbox.prop('checked'));
+                }, this));
+                $checkbox.on('click' + this.eventNamespace(), function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            return this;
         }
     });
 
