@@ -143,6 +143,10 @@ class OperationTest extends \PHPUnit_Framework_TestCase
         $this->definition->expects($this->any())->method('getFunctions')->will($this->returnValueMap($config));
         $this->definition->expects($this->any())->method('getConditions')->will($this->returnValueMap($config));
 
+        $this->definition->expects($this->any())
+            ->method('getActions')
+            ->willReturnMap($config);
+
         $this->actionFactory->expects($this->any())
             ->method('create')
             ->willReturnCallback(function ($type, $config) use ($actions) {
