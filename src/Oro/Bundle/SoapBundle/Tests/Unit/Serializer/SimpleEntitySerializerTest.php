@@ -418,10 +418,10 @@ class SimpleEntitySerializerTest extends EntitySerializerTestCase
 
         $this->setQueryExpectation(
             $this->getDriverConnectionMock($this->em),
-            'SELECT p0_.id AS id_0, p0_.name AS name_1,'
-            . ' p0_.category_name AS category_name_2, p0_.owner_id AS owner_id_3'
-            . ' FROM product_table p0_'
-            . ' WHERE p0_.id = ?',
+            'SELECT o0_.id AS id_0, o0_.name AS name_1,'
+            . ' o0_.category_name AS category_name_2, o0_.owner_id AS owner_id_3'
+            . ' FROM oro_test_serializer_product o0_'
+            . ' WHERE o0_.id = ?',
             [
                 [
                     'id_0'            => 1,
