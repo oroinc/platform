@@ -321,11 +321,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $count = $processed = $invalid = $totalInvalid = 0;
         $emails->setIterationOrder(true);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
-        $emails->setBatchCallback(
-            function ($batch) {
-                $this->registerEmailsInKnownEmailAddressChecker($batch);
-            }
-        );
         $emails->setConvertErrorCallback(
             function (\Exception $e) use (&$invalid) {
                 $invalid++;
