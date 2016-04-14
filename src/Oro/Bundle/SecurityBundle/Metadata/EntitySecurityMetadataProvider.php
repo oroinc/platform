@@ -198,6 +198,10 @@ class EntitySecurityMetadataProvider
                 $description = $securityConfig->get('description');
                 $permissions = $securityConfig->get('permissions');
 
+                if (!$description) {
+                    $description = '';
+                }
+
                 if (!$permissions || $permissions == 'All') {
                     $permissions = array();
                 } else {
