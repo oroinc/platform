@@ -138,3 +138,8 @@ services:
         class: Oro\Component\ConfigExpression\Condition\Type
         tags:
             - { name: oro_action.condition, alias: type }
+
+    oro_action.expression.has_elements:
+        class: Oro\Component\ConfigExpression\Condition\HasElements
+        tags:
+            - { name: oro_action.condition, alias: has_elements }

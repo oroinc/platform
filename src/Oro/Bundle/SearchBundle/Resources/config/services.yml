@@ -202,10 +202,3 @@ services:
             - '@oro_search.provider.search_mapping'
         tags:
             - { name: kernel.cache_warmer }
-
-    oro_search.event_listener.search_mapping_change_listener:
-        class: %oro_search.event_listener.search_mapping_change_listener.class%
-        arguments:
-            - '@oro_search.provider.search_mapping'
-        tags:
-            - { name: doctrine.event_listener, event: onFlush }
