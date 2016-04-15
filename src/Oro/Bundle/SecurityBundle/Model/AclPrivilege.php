@@ -26,6 +26,11 @@ class AclPrivilege
      */
     private $permissions;
 
+    /**
+     * @var string
+     */
+    private $description;
+
     public function __construct()
     {
         $this->permissions = new ArrayCollection();
@@ -141,5 +146,24 @@ class AclPrivilege
     public function getPermissionCount()
     {
         return $this->permissions->count();
+    }
+
+    /**
+     * @param string $description
+     * @return AclPrivilege
+     */
+    public function setDescription($description)
+    {
+        $this->description = $description;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
     }
 }
