@@ -21,6 +21,12 @@ class UpdateConfigCommand extends ContainerAwareCommand
             ->setName('oro:entity-extend:update-config')
             ->setDescription('Prepare entity config')
             ->addOption(
+                'update-custom',
+                null,
+                InputOption::VALUE_NONE,
+                'New fields will be activated if specified'
+            )
+            ->addOption(
                 'skip-origin',
                 null,
                 InputOption::VALUE_OPTIONAL | InputOption::VALUE_IS_ARRAY,
@@ -42,7 +48,7 @@ class UpdateConfigCommand extends ContainerAwareCommand
         $output->writeln($this->getDescription());
 
         $dumper = $this->getContainer()->get('oro_entity_extend.tools.dumper');
-        $dumper->updateConfig($this->getFilter($input));
+        $dumper->updateConfig($this->getFilter($input), $input->getOption('update-custom'));
     }
 
     /**

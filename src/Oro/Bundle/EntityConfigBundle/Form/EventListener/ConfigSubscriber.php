@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 use Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository;
 use Oro\Bundle\TranslationBundle\Translation\Translator;
@@ -80,6 +81,17 @@ class ConfigSubscriber implements EventSubscriberInterface
         $configModel = $event->getForm()->getConfig()->getOption('config_model');
         $data        = $event->getData();
 
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $extendConfigId = $this->configManager->getConfigIdByModel($configModel, 'extend');
+        $extendConfig = $extendConfigProvider->getConfigById($extendConfigId);
+        $pendingChanges = $extendConfig->get('pending_changes', false, []);
+        foreach ($pendingChanges as $scope => $values) {
+            foreach ($values as $code => $value) {
+                $currentVal = isset($data[$scope][$code]) ? $data[$scope][$code] : null;
+                $data[$scope][$code] = ExtendHelper::updatedPendingValue($currentVal, $value);
+            }
+        }
+
         $dataChanges = false;
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
@@ -116,6 +128,11 @@ class ConfigSubscriber implements EventSubscriberInterface
         $configModel = $form->getConfig()->getOption('config_model');
         $data        = $event->getData();
 
+        $extendConfigProvider = $this->configManager->getProvider('extend');
+        $extendConfigId = $this->configManager->getConfigIdByModel($configModel, 'extend');
+        $extendConfig = $extendConfigProvider->getConfigById($extendConfigId);
+        $pendingChanges = $extendConfig->get('pending_changes', false, []);
+
         $labelsToBeUpdated = [];
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
@@ -136,12 +153,20 @@ class ConfigSubscriber implements EventSubscriberInterface
                         // replace label text with label name in $value variable
                         $value = $config->get($code);
                     }
-                    $config->set($code, $value);
+
+                    if (isset($pendingChanges[$scope][$code])) {
+                        $pendingChanges[$scope][$code][1] = $value;
+                    } else {
+                        $config->set($code, $value);
+                    }
                 }
 
                 $this->configManager->persist($config);
             }
         }
+
+        $extendConfig->set('pending_changes', $pendingChanges);
+        $this->configManager->persist($extendConfig);
 
         if ($form->isValid()) {
             // update changed labels if any
