@@ -397,6 +397,10 @@ class ArrayUtil
     }
 
     /**
+     * Returns the value in a nested associative array,
+     * where $path is an array of keys. Returns $defaultValue if the key
+     * is not present, or the not-found value if supplied.
+     *
      * @param array $array
      * @param array $path
      * @param mixed $defaultValue
