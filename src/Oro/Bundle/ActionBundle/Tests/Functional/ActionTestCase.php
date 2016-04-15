@@ -14,7 +14,7 @@ abstract class ActionTestCase extends WebTestCase
      */
     protected function getOperationExecutionRoute()
     {
-        return 'oro_action_operation_execute';
+        return 'oro_api_action_execute_operations';
     }
 
     /**

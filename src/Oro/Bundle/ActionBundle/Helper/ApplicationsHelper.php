@@ -69,6 +69,6 @@ class ApplicationsHelper
      */
     public function getExecutionRoute()
     {
-        return 'oro_action_operation_execute';
+        return 'oro_api_action_execute_operations';
     }
 }
