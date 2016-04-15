@@ -175,7 +175,7 @@ from `routeCommerceUpdate` and `routeCommerceDelete` options.
 
 ### Questions and Answers
 
-**How I can disable CRUD default operation for my Bundle?**
+####How I can disable CRUD default operation for my Bundle?
 
   Suppose you need to disable default `DELETE` operation for your new entity `MyEntity`.
 Here the case which describe the way. You can do this in `actions.yml` under your bundle config resources directory:
@@ -188,7 +188,21 @@ operations:
   This will merge addition special condition to default operation during config compilation. 
 So that default operation `DELETE` will not be matched for your entity and will not be displayed as well.
 
-**How I can modify CRUD default operation for my Bundle?**
+####Can I disable default operation for my datagrid?
+
+  Yes. You can disable operation by updating datagrid configuration in its section `action_configuration` you should define 
+a key that corresponds to operation name with value `false`.
+`datagrid.yml`:
+```
+datagrid:
+    your_datagrid_name:
+        #... datagrid config sections
+        action_configuration:
+            some_default_common_operation: false
+```
+`some_default_common_operation` will not be displayed at `your_datagrid_name` grid anymore.
+
+####How I can modify CRUD default operation for my Bundle?
   If you need to customize somehow a default (or any other) operation. Suppose to change basically its `label`, you can
 do thing like that:
  
