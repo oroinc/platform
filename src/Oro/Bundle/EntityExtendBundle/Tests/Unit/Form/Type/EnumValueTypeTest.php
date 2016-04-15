@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraint;
@@ -19,6 +20,7 @@ use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class EnumValueTypeTest extends TypeTestCase
 {
@@ -34,7 +36,11 @@ class EnumValueTypeTest extends TypeTestCase
     {
         parent::setUp();
 
-        $this->type = new EnumValueType();
+        $helper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->type = new EnumValueType($helper);
     }
 
     protected function getExtensions()
@@ -140,6 +146,78 @@ class EnumValueTypeTest extends TypeTestCase
             'oro_entity_extend_enum_value',
             $this->type->getName()
         );
+    }
+
+    /**
+     * @param array $inputData
+     * @param array $expectedData
+     *
+     * @dataProvider allowDeleteProvider
+     */
+    public function testAllowDelete(array $inputData, array $expectedData)
+    {
+        $helper = $this->getEnumTypeHelper('status', 'task_status', $inputData['immutable']);
+        $type = new EnumValueType($helper);
+        $form = $this->factory->create($type);
+        $form->setParent($this->getConfiguredForm());
+
+        $form->submit($inputData['form']);
+        $view = new FormView();
+        $type->buildView($view, $form, []);
+
+        $this->assertArrayHasKey('allow_delete', $view->vars);
+        $this->assertSame($expectedData['allow_delete'], $view->vars['allow_delete']);
+    }
+
+    /**
+     * @return array
+     */
+    public function allowDeleteProvider()
+    {
+        return [
+            'immutable open' => [
+                'input' => [
+                    'form' => [
+                        'id' => 'open',
+                        'label' => 'Label',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                    'immutable' => ['open', 'close']
+                ],
+                'expected' => [
+                    'allow_delete' => false,
+                ],
+            ],
+            'immutable close' => [
+                'input' => [
+                    'form' => [
+                        'id' => 'close',
+                        'label' => 'Label',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                    'immutable' => ['open', 'close']
+                ],
+                'expected' => [
+                    'allow_delete' => false,
+                ],
+            ],
+            'allow delete' => [
+                'input' => [
+                    'form' => [
+                        'id' => 'deletable',
+                        'label' => 'Label',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                    'immutable' => ['open', 'close']
+                ],
+                'expected' => [
+                    'allow_delete' => true,
+                ],
+            ],
+        ];
     }
 
     /**
@@ -325,5 +403,54 @@ class EnumValueTypeTest extends TypeTestCase
         }
 
         return $path;
+    }
+
+    /**
+     * @param string $fieldName
+     * @param string $enumCode
+     * @param array $immutableCodes
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getEnumTypeHelper($fieldName, $enumCode, array $immutableCodes = array())
+    {
+        $helper = $this->getMockBuilder('Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $helper->expects($this->once())
+            ->method('getFieldName')
+            ->will($this->returnValue($fieldName));
+        $helper->expects($this->once())
+            ->method('getEnumCode')
+            ->will($this->returnValue($enumCode));
+        $helper->expects($this->once())
+            ->method('getImmutable')
+            ->will($this->returnValue($immutableCodes));
+
+        return $helper;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getConfiguredForm()
+    {
+        $configId = new FieldConfigId('enum', 'Test\Entity', 'status', 'enum');
+        $formConfig = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $formConfig->expects($this->once())
+            ->method('getOption')
+            ->will($this->returnValue($configId));
+
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $form->expects($this->once())
+            ->method('getConfig')
+            ->will($this->returnValue($formConfig));
+
+        return $form;
     }
 }
