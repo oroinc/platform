@@ -2,11 +2,15 @@
 
 namespace Oro\Bundle\ConfigBundle\Tests\Unit\Config;
 
+use Symfony\Component\EventDispatcher\EventDispatcher;
+
 use Oro\Bundle\ConfigBundle\Config\ConfigDefinitionImmutableBag;
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ConfigBundle\Config\ConfigValueBag;
+use Oro\Bundle\ConfigBundle\Config\GlobalScopeManager;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
+use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 
 class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 {
@@ -16,13 +20,13 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
     /** @var ConfigDefinitionImmutableBag */
     protected $bag;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var EventDispatcher|\PHPUnit_Framework_MockObject_MockObject */
     protected $dispatcher;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $globalScopeManager;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    /** @var GlobalScopeManager|\PHPUnit_Framework_MockObject_MockObject */
     protected $userScopeManager;
 
     /**
@@ -102,8 +106,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     public function testFlush()
     {
+        $greetingKey = 'oro_user.greeting';
         $changes = [
-            'oro_user.greeting' => [
+            $greetingKey => [
                 'value'                  => 'updated value',
                 'use_parent_scope_value' => false
             ]
@@ -111,15 +116,17 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
         $this->userScopeManager->expects($this->once())
             ->method('getSettingValue')
-            ->with('oro_user.greeting', false)
+            ->with($greetingKey, false)
             ->willReturn('old value');
 
         $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $changes);
         $afterEvent  = new ConfigUpdateEvent(
             [
-                'oro_user.greeting' => ['old' => 'old value', 'new' => 'updated value']
+                $greetingKey => ['old' => 'old value', 'new' => 'updated value']
             ]
         );
+
+        $loadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false);
 
         $this->userScopeManager->expects($this->once())
             ->method('getChanges')
@@ -130,25 +137,29 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->with($changes)
             ->willReturn(
                 [
-                    ['oro_user.greeting' => 'updated value'],
+                    [$greetingKey => 'updated value'],
                     []
                 ]
             );
 
-        $this->dispatcher->expects($this->exactly(2))
-            ->method('dispatch');
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(4))
             ->method('dispatch')
-            ->with(ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent);
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(ConfigUpdateEvent::EVENT_NAME, $afterEvent);
+            ->withConsecutive(
+                [ConfigGetEvent::NAME, $loadEvent],
+                [ConfigGetEvent::NAME . '.' . $greetingKey, $loadEvent],
+                [ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent],
+                [ConfigUpdateEvent::EVENT_NAME, $afterEvent]
+            );
 
         $this->manager->flush();
     }
 
     public function testSave()
     {
+
+        $greetingKey = 'oro_user.greeting';
+        $levelKey = 'oro_user.level';
+
         $data           = [
             'oro_user___greeting' => [
                 'value'                  => 'updated value',
@@ -163,11 +174,11 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ]
         ];
         $normalizedData = [
-            'oro_user.greeting' => [
+            $greetingKey => [
                 'value'                  => 'updated value',
                 'use_parent_scope_value' => false
             ],
-            'oro_user.level'    => [
+            $levelKey    => [
                 'use_parent_scope_value' => true
             ]
         ];
@@ -176,37 +187,45 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
             ->method('getSettingValue')
             ->willReturnMap(
                 [
-                    ['oro_user.greeting', false, 'old value'],
-                    ['oro_user.level', false, 2000]
+                    [$greetingKey, false, 'old value'],
+                    [$levelKey, false, 2000]
                 ]
             );
 
         $beforeEvent = new ConfigSettingsUpdateEvent($this->manager, $normalizedData);
         $afterEvent  = new ConfigUpdateEvent(
             [
-                'oro_user.greeting' => ['old' => 'old value', 'new' => 'updated value'],
-                'oro_user.level'    => ['old' => 2000, 'new' => 20]
+                $greetingKey => ['old' => 'old value', 'new' => 'updated value'],
+                $levelKey    => ['old' => 2000, 'new' => 20]
             ]
         );
+
+        $greetingOldValueLoadEvent = new ConfigGetEvent($this->manager, $greetingKey, 'old value', false);
+        $levelOldValueLoadEvent = new ConfigGetEvent($this->manager, $levelKey, '2000', false);
+        $levelNullValueLoadEvent = new ConfigGetEvent($this->manager, $levelKey, null, false);
 
         $this->userScopeManager->expects($this->once())
             ->method('save')
             ->with($normalizedData)
             ->willReturn(
                 [
-                    ['oro_user.greeting' => 'updated value'],
-                    ['oro_user.level']
+                    [$greetingKey => 'updated value'],
+                    [$levelKey]
                 ]
             );
 
-        $this->dispatcher->expects($this->exactly(2))
-            ->method('dispatch');
-        $this->dispatcher->expects($this->at(0))
+        $this->dispatcher->expects($this->exactly(8))
             ->method('dispatch')
-            ->with(ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent);
-        $this->dispatcher->expects($this->at(1))
-            ->method('dispatch')
-            ->with(ConfigUpdateEvent::EVENT_NAME, $afterEvent);
+            ->withConsecutive(
+                [ConfigGetEvent::NAME, $greetingOldValueLoadEvent],
+                [ConfigGetEvent::NAME . '.' . $greetingKey, $greetingOldValueLoadEvent],
+                [ConfigGetEvent::NAME, $levelOldValueLoadEvent],
+                [ConfigGetEvent::NAME . '.' . $levelKey, $levelOldValueLoadEvent],
+                [ConfigSettingsUpdateEvent::BEFORE_SAVE, $beforeEvent],
+                [ConfigGetEvent::NAME, $levelNullValueLoadEvent],
+                [ConfigGetEvent::NAME  . '.' . $levelKey, $levelNullValueLoadEvent],
+                [ConfigUpdateEvent::EVENT_NAME, $afterEvent]
+            );
 
         $this->manager->save($data);
     }
@@ -231,6 +250,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @dataProvider getFromParentParamProvider
+     * @param string $parameterName
+     * @param bool $full
+     * @param mixed $expectedResult
      */
     public function testGetFromParentScope($parameterName, $full, $expectedResult)
     {
@@ -268,6 +290,9 @@ class ConfigManagerTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    /**
+     * @return array
+     */
     public function getFromParentParamProvider()
     {
         return [

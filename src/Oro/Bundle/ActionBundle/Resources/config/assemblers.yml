@@ -9,19 +9,19 @@ services:
     oro_action.assembler.operation:
         class: %oro_action.assembler.operation.class%
         arguments:
-            - @oro_action.action_factory
-            - @oro_action.expression.factory
-            - @oro_action.assembler.attribute
-            - @oro_action.assembler.form_options
-            - @oro_entity.doctrine_helper
+            - '@oro_action.action_factory'
+            - '@oro_action.expression.factory'
+            - '@oro_action.assembler.attribute'
+            - '@oro_action.assembler.form_options'
+            - '@oro_entity.doctrine_helper'
 
     oro_action.assembler.action_group:
         class: %oro_action.assembler.action_group.class%
         arguments:
-            - @oro_action.action_factory
-            - @oro_action.expression.factory
-            - @oro_action.assembler.parameter
-            - @oro_action.parameters_resolver
+            - '@oro_action.action_factory'
+            - '@oro_action.expression.factory'
+            - '@oro_action.assembler.parameter'
+            - '@oro_action.parameters_resolver'
 
     oro_action.assembler.parameter:
         class: %oro_action.assembler.parameter.class%
@@ -32,9 +32,9 @@ services:
     oro_action.assembler.attribute:
         class: %oro_action.assembler.attribute.class%
         arguments:
-            - @oro_action.attribute_guesser
+            - '@oro_action.attribute_guesser'
 
     oro_action.assembler.form_options:
         class: %oro_action.assembler.form_options.class%
         calls:
-            - [addConfigurationPass, [@oro_action.configuration_pass.replace_property_path]]
+            - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]

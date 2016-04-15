@@ -6,10 +6,10 @@ services:
     oro_datagrid.datasource.orm:
         class: %oro_datagrid.datasource.orm.class%
         arguments:
-            - @doctrine
-            - @oro_datagrid.event.dispatcher
-            - @oro_datagrid.datasource.orm.parameter_binder
-            - @oro_entity.query_hint_resolver
+            - '@doctrine'
+            - '@oro_datagrid.event.dispatcher'
+            - '@oro_datagrid.datasource.orm.parameter_binder'
+            - '@oro_entity.query_hint_resolver'
         tags:
             - { name: oro_datagrid.datasource, type: orm }
 

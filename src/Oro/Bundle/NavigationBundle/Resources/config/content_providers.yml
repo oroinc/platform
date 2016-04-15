@@ -9,7 +9,7 @@ services:
     oro_navigation.content_provider.menu.history_menu:
         class: %oro_navigation.content_provider.menu.class%
         arguments:
-            - @oro_menu.twig.extension
+            - '@oro_menu.twig.extension'
             - "history"
             - "history"
         tags:
@@ -18,7 +18,7 @@ services:
     oro_navigation.content_provider.menu.mostviewed_menu:
         class: %oro_navigation.content_provider.menu.class%
         arguments:
-            - @oro_menu.twig.extension
+            - '@oro_menu.twig.extension'
             - "mostviewed"
             - "mostviewed"
         tags:
@@ -27,7 +27,7 @@ services:
     oro_navigation.content_provider.menu.application_menu:
         class: %oro_navigation.content_provider.menu.class%
         arguments:
-            - @oro_menu.twig.extension
+            - '@oro_menu.twig.extension'
             - "application_menu"
             - "mainMenu"
         tags:
@@ -36,21 +36,21 @@ services:
     oro_navigation.content_provider.title:
         class: %oro_navigation.content_provider.title.class%
         arguments:
-            - @oro_navigation.title_service
+            - '@oro_navigation.title_service'
         tags:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.title_short:
         class: %oro_navigation.content_provider.title_short.class%
         arguments:
-            - @oro_navigation.title_service
+            - '@oro_navigation.title_service'
         tags:
             - { name: oro_ui.content_provider }
 
     oro_navigation.content_provider.title_serialized:
         class: %oro_navigation.content_provider.title_serialized.class%
         arguments:
-            - @oro_navigation.title_service
+            - '@oro_navigation.title_service'
         tags:
             - { name: oro_ui.content_provider }
 

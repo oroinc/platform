@@ -46,16 +46,16 @@ workflows:
         transition_definitions:
             first_transition_definition:
                 pre_conditions:
-                    @true: ~
+                    '@true': ~
                 conditions:
-                    @and:
-                        @true: ~
-                        @or:
+                    '@and':
+                        '@true': ~
+                        '@or':
                             parameters:
-                                @true: ~
-                                @equals:
+                                '@true': ~
+                                '@equals':
                                     parameters: [1, 1]
                                     message: "Not equals"
                         message: "Fail upper level"
                 post_actions:
-                    - @custom_post_action: ~
+                    - '@custom_post_action': ~

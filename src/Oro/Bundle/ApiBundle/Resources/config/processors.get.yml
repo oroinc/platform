@@ -3,10 +3,10 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\GetProcessor
         public: false
         arguments:
-            - @oro_api.processor_bag
+            - '@oro_api.processor_bag'
             - get
-            - @oro_api.config_provider
-            - @oro_api.metadata_provider
+            - '@oro_api.config_provider'
+            - '@oro_api.metadata_provider'
         tags:
             - { name: oro.api.action_processor }
 
@@ -37,7 +37,7 @@ services:
     oro_api.get.initialize_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
         arguments:
-            - @oro_entity.orm.entity_class_resolver
+            - '@oro_entity.orm.entity_class_resolver'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 200 }
 
@@ -49,21 +49,21 @@ services:
     oro_api.get.json_api.normalize_include_parameter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeIncludeParameter
         arguments:
-            - @oro_api.value_normalizer
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: 50 }
 
     oro_api.get.json_api.normalize_fields_parameter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFieldsParameter
         arguments:
-            - @oro_api.value_normalizer
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: 50 }
 
     oro_api.get.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
-            - @oro_api.value_normalizer
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 20 }
 
@@ -80,15 +80,15 @@ services:
     oro_api.get.json_api.set_include_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetIncludeFilter
         arguments:
-            - @oro_api.doctrine_helper
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -10 }
 
     oro_api.get.json_api.set_fields_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\SetFieldsFilter
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_api.value_normalizer
+            - '@oro_api.doctrine_helper'
+            - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -10 }
 
@@ -99,8 +99,8 @@ services:
     oro_api.get.entity_type_security_check:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_security.security_facade
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.security_facade'
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: security_check, priority: 10 }
@@ -117,7 +117,7 @@ services:
     oro_api.get.rest.normalize_entity_id:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityId
         arguments:
-            - @oro_api.rest.entity_id_transformer
+            - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_input, requestType: rest, priority: -110 }
 
@@ -128,16 +128,16 @@ services:
     oro_api.get.complete_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
         arguments:
-            - @oro_api.doctrine_helper
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -50 }
 
     oro_api.get.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl
         arguments:
-            - @oro_api.doctrine_helper
-            - @oro_security.acl_helper
-            - @oro_security.acl.annotation_provider
+            - '@oro_api.doctrine_helper'
+            - '@oro_security.acl_helper'
+            - '@oro_security.acl.annotation_provider'
             - VIEW
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -90 }
@@ -145,7 +145,7 @@ services:
     oro_api.get.build_query:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildSingleItemQuery
         arguments:
-            - @oro_api.doctrine_helper
+            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get, group: build_query, priority: -100 }
 
@@ -156,7 +156,7 @@ services:
     oro_api.get.load_data_by_entity_serializer:
         class: Oro\Bundle\ApiBundle\Processor\Shared\LoadEntityByEntitySerializer
         arguments:
-            - @oro_api.entity_serializer
+            - '@oro_api.entity_serializer'
         tags:
             - { name: oro.api.processor, action: get, group: load_data, priority: -10 }
 
@@ -177,7 +177,7 @@ services:
     oro_api.get.normalize_data:
         class: Oro\Bundle\ApiBundle\Processor\Get\NormalizeData
         arguments:
-            - @oro_api.object_normalizer
+            - '@oro_api.object_normalizer'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_data, priority: -10 }
 
@@ -202,14 +202,14 @@ services:
     oro_api.get.normalize_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors
         arguments:
-            - @translator
+            - '@translator'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, priority: -10 }
 
     oro_api.get.json_api.build_json_api_document:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\BuildSingleItemJsonApiDocument
         arguments:
-            - @oro_api.json_api.document_builder_factory
+            - '@oro_api.json_api.document_builder_factory'
         tags:
             - { name: oro.api.processor, action: get, group: normalize_result, requestType: json_api, priority: -20 }
 

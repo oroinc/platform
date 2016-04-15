@@ -408,21 +408,27 @@ class CountQueryBuilderOptimizer
     protected function getFieldsToSelect(array $originalQueryParts)
     {
         $fieldsToSelect = [];
-        foreach ($originalQueryParts['from'] as $from) {
-            /** @var Expr\From $from */
-            $fieldNames = $this->context->getClassMetadata($from->getFrom())->getIdentifierFieldNames();
-            foreach ($fieldNames as $fieldName) {
-                $selectField = $from->getAlias() . '.' . $fieldName;
-                /** @var Expr\Select $originalSelect */
-                foreach ($originalQueryParts['select'] as $originalSelect) {
-                    foreach ($originalSelect->getParts() as $part) {
-                        if (strtolower((string)$part) === 'distinct ' . $selectField) {
-                            $selectField = 'DISTINCT ' . $selectField;
-                            break;
-                        }
-                    }
+        $distinctField = null;
+        /** @var Expr\Select $originalSelect */
+        foreach ($originalQueryParts['select'] as $originalSelect) {
+            foreach ($originalSelect->getParts() as $part) {
+                $selectField = (string)$part;
+                if (stripos($selectField, 'distinct') === 0) {
+                    $distinctField = strtolower($selectField);
+                    $fieldsToSelect[] = $selectField;
+                    break 2;
                 }
-                $fieldsToSelect[] = $selectField;
+            }
+        }
+
+        /** @var Expr\From $from */
+        foreach ($originalQueryParts['from'] as $from) {
+            $alias = $from->getAlias();
+            foreach ($this->context->getClassMetadata($from->getFrom())->getIdentifierFieldNames() as $item) {
+                $fieldName = $alias . '.' . $item;
+                if (stripos($distinctField, $fieldName) === false) {
+                    $fieldsToSelect[] = $fieldName;
+                }
             }
         }
 
