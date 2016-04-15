@@ -15,7 +15,7 @@ class UpdateTest extends WebTestCase
      */
     protected function setUp()
     {
-        $this->initClient([], $this->generateBasicAuthHeader());
+        $this->initClient([], $this->generateWsseAuthHeader());
 
         $this->loadFixtures([
             'Oro\Bundle\TestFrameworkBundle\Tests\Functional\DataFixtures\LoadItems',
@@ -29,16 +29,13 @@ class UpdateTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_action_operation_execute',
+                'oro_api_action_execute_operations',
                 [
                     'operationName' => 'UPDATE',
                     'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\Item',
                     'entityId' => $item->getId(),
                 ]
-            ),
-            [],
-            [],
-            ['HTTP_X-Requested-With' => 'XMLHttpRequest']
+            )
         );
 
         $result = $this->client->getResponse();
