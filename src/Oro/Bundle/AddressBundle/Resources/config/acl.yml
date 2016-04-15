@@ -1,5 +1,6 @@
 oro_address_dictionaries_read:
-    label: oro.address.action.read_dictionaries
+    label: oro.address.action.read_dictionaries.label
+    description: oro.address.action.read_dictionaries.description
     type: action
     group_name: ""
     bindings: ~
