@@ -145,7 +145,7 @@ class OperationExtension extends AbstractExtension
      */
     protected function retrieveConfiguration($actionConfiguration, ResultRecordInterface $record, array $config)
     {
-        if (empty($this->actionConfiguration)) {
+        if (empty($actionConfiguration)) {
             return [];
         }
 

@@ -57,7 +57,7 @@ operations:
                     - '@call_service_method':
                         service: oro_entity_config.helper.entity_config
                         method: getRoutes
-                        method_parameters: [$.data, ['name', 'delete']]
+                        method_parameters: [$.data, ['name']]
                         attribute: $.routes
                     - '@call_service_method':
                         service: oro_entity_config.helper.entity_config
@@ -70,7 +70,6 @@ operations:
         preconditions:
             '@and':
                 - '@not_blank': $.routes[name]
-                - '@not_blank': $.routes[delete]
         label: oro.action.delete
         frontend_options:
             title: oro.action.delete_entity
