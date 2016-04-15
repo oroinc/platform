@@ -52,15 +52,16 @@ services:
     oro_notification.form.type.email_notification:
         class: %oro_notification.form.type.email_notification.class%
         arguments:
-            - @oro_email.form.subscriber.emailtemplate
-            - @oro_entity_config.provider.ownership
+            - '@oro_email.form.subscriber.emailtemplate'
+            - '@oro_entity_config.provider.ownership'
+            - '@router'
         tags:
             - { name: form.type, alias: emailnotification }
 
     oro_notification.form.type.recipient_list:
         class: %oro_notification.form.type.recipient_list.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: form.type, alias: oro_notification_recipient_list }
 
@@ -68,14 +69,14 @@ services:
         class: %oro_notification.form.handler.email_notification.class%
         scope: request
         arguments:
-            - @oro_notification.form.email_notification
-            - @request
-            - @doctrine.orm.entity_manager
+            - '@oro_notification.form.email_notification'
+            - '@request'
+            - '@doctrine.orm.entity_manager'
 
     oro_notification.form.type.email_notification_entity_choice:
         class: %oro_notification.form.type.email_notification_entity_choice.class%
         arguments:
-            - @oro_notification.email_notification_entity_provider
+            - '@oro_notification.email_notification_entity_provider'
         tags:
             - { name: form.type, alias: oro_email_notification_entity_choice }
 
@@ -85,13 +86,13 @@ services:
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_notification.emailnotification.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_notification.form.type.email_notification.api:
         class: %oro_notification.form.type.email_notification.api.class%
         arguments:
-            - @oro_email.form.subscriber.emailtemplate
-            - @oro_entity_config.provider.ownership
+            - '@oro_email.form.subscriber.emailtemplate'
+            - '@oro_entity_config.provider.ownership'
         tags:
             - { name: form.type, alias: emailnotification_api }
 
@@ -105,16 +106,16 @@ services:
         class: %oro_notification.form.handler.email_notification.api.class%
         scope: request
         arguments:
-            - @oro_notification.form.email_notification.api
-            - @request
-            - @doctrine.orm.entity_manager
+            - '@oro_notification.form.email_notification.api'
+            - '@request'
+            - '@doctrine.orm.entity_manager'
 
     # Event listeners
     oro_notification.doctrine.event.listener:
         class: %oro_notification.doctrine_listener.class%
         arguments:
-            - @oro_notification.entity_spool
-            - @event_dispatcher
+            - '@oro_notification.entity_spool'
+            - '@event_dispatcher'
         tags:
             - { name: doctrine.event_listener, event: postPersist }
             - { name: doctrine.event_listener, event: postUpdate }
@@ -125,19 +126,19 @@ services:
     oro_notification.manager:
         class: %oro_notification.manager.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
             - %oro_notification.emailnotification.entity.class%
         lazy: true
 
     oro_notification.email_processor:
         class: %oro_notification.email_processor.class%
         arguments:
-            - @logger
-            - @doctrine.orm.entity_manager
-            - @oro_notification.entity_spool
-            - @oro_email.email_renderer
-            - @swiftmailer.mailer.db_spool_mailer
-            - @oro_config.user
+            - '@logger'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_notification.entity_spool'
+            - '@oro_email.email_renderer'
+            - '@swiftmailer.mailer.db_spool_mailer'
+            - '@oro_config.user'
         calls:
             - [ setEnv, [%kernel.environment%] ]
             - [ setMessageLimit, [100] ]
@@ -145,9 +146,9 @@ services:
     oro_notification.email_handler:
         class: %oro_notification.email_handler.class%
         arguments:
-            - @oro_notification.email_processor
-            - @doctrine.orm.entity_manager
-            - @oro_entity_config.provider.ownership
+            - '@oro_notification.email_processor'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_entity_config.provider.ownership'
         tags:
             - { name: notification.handler, alias: email_notification_handler }
 
@@ -155,8 +156,8 @@ services:
     oro_notification.mailer.spool_db:
         class: %oro_notification.mailer.transport.spool_db.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_notification.entity_spool
+            - '@doctrine.orm.entity_manager'
+            - '@oro_notification.entity_spool'
             - %oro_notification.mailer.transport.spool_entity.class%
 
     oro_notification.mailer.transport.eventdispatcher:
@@ -165,14 +166,14 @@ services:
     oro_notification.mailer.transport:
         parent: swiftmailer.transport.spool.abstract
         arguments:
-            - @oro_notification.mailer.transport.eventdispatcher
-            - @oro_notification.mailer.spool_db
+            - '@oro_notification.mailer.transport.eventdispatcher'
+            - '@oro_notification.mailer.spool_db'
 
     # notification mailer instance
     swiftmailer.mailer.db_spool_mailer:
         class: %swiftmailer.class%
         arguments:
-            - @oro_notification.mailer.transport
+            - '@oro_notification.mailer.transport'
 
     swiftmailer.mailer.db_spool_mailer.transport.real:
         alias: swiftmailer.transport.real
@@ -180,12 +181,12 @@ services:
     oro_notification.event_listener.email_notification_service:
         class: %oro_notification.event_listener.email_notification_service.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
         lazy: true
 
     oro_notification.email_notification_entity_provider:
         class: %oro_notification.email_notification_entity_provider.class%
         parent: oro_entity.entity_provider.abstract
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
         lazy: true

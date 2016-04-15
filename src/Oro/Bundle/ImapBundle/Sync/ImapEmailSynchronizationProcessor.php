@@ -321,11 +321,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $count = $processed = $invalid = $totalInvalid = 0;
         $emails->setIterationOrder(true);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
-        $emails->setBatchCallback(
-            function ($batch) {
-                $this->registerEmailsInKnownEmailAddressChecker($batch);
-            }
-        );
         $emails->setConvertErrorCallback(
             function (\Exception $e) use (&$invalid) {
                 $invalid++;
@@ -492,10 +487,10 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
          */
         $dateForCheck = max($email->getReceivedAt(), $email->getSentAt());
 
-        if ($mailbox && $folder->getSynchronizedAt() > $dateForCheck) {
+        if ($mailbox && $folder->getSyncStartDate() > $dateForCheck) {
             $this->logger->info(
                 sprintf(
-                    'Skip "%s" (UID: %d) email, because it was sent earlier than the last synchronization was done',
+                    'Skip "%s" (UID: %d) email, because it was sent earlier than the start synchronization is set',
                     $email->getSubject(),
                     $email->getId()->getUid()
                 )
@@ -671,25 +666,11 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         ImapEmailFolder $imapFolder,
         EmailFolder $folder
     ) {
-        if ($origin->getMailbox()) {
-            // build search query for emails sync
-            $sqb = $this->manager->getSearchQueryBuilder();
-            if ($origin->getSynchronizedAt() && $folder->getSynchronizedAt()) {
-                if ($folder->getType() === FolderType::SENT) {
-                    $sqb->sent($folder->getSynchronizedAt());
-                } else {
-                    $sqb->received($folder->getSynchronizedAt());
-                }
-            }
-            $searchQuery = $sqb->get();
-            $this->logger->info(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
-            $this->logger->info(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
-            $emails = $this->manager->getEmails($searchQuery);
+        $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
+        if (!$lastUid && $origin->getMailbox() && $folder->getSyncStartDate()) {
+            $emails = $this->initialMailboxSync($folder);
         } else {
-            $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
-
             $this->logger->info(sprintf('Previous max email UID "%s"', $lastUid));
-
             $emails = $this->manager->getEmailsUidBased($lastUid);
         }
 
@@ -708,5 +689,29 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         return !$isMultiFolder
             && $existingImapEmail
             && $email->getId()->getUid() === $existingImapEmail->getUid();
+    }
+
+    /**
+     * First system mailbox sync from sync start date
+     *
+     * @param EmailFolder $folder
+     *
+     * @return ImapEmailIterator
+     */
+    protected function initialMailboxSync(EmailFolder $folder)
+    {
+        // build search query for emails sync
+        $sqb = $this->manager->getSearchQueryBuilder();
+        if ($folder->getType() === FolderType::SENT) {
+            $sqb->sent($folder->getSyncStartDate());
+        } else {
+            $sqb->received($folder->getSyncStartDate());
+        }
+        $searchQuery = $sqb->get();
+        $this->logger->info(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
+        $this->logger->info(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
+        $emails = $this->manager->getEmails($searchQuery);
+
+        return $emails;
     }
 }

@@ -9,24 +9,24 @@ services:
     oro_windows.twig.extension:
         class: %oro_windows.twig.extension.class%
         arguments:
-            - @oro_windows.manager.windows_state_registry
-            - @oro_windows.manager.windows_state_request
+            - '@oro_windows.manager.windows_state_registry'
+            - '@oro_windows.manager.windows_state_request'
         tags:
             - { name: twig.extension }
 
     oro_windows.manager.windows_state_registry:
         class: %oro_windows.manager.windows_state_registry.class%
         arguments:
-            - @oro_windows.manager.windows_state
+            - '@oro_windows.manager.windows_state'
 
     oro_windows.manager.windows_state.abstract:
         class: %oro_windows.manager.windows_state.class%
         abstract: true
         private: true
         arguments:
-            - @security.token_storage
-            - @oro_entity.doctrine_helper
-            - @oro_windows.manager.windows_state_request
+            - '@security.token_storage'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_windows.manager.windows_state_request'
 
     oro_windows.manager.windows_state:
         parent: oro_windows.manager.windows_state.abstract
@@ -37,4 +37,4 @@ services:
     oro_windows.manager.windows_state_request:
         class: %oro_windows.manager.windows_state_request.class%
         arguments:
-            - @request_stack
+            - '@request_stack'

@@ -13,4 +13,4 @@ services:
         class: %oro_integration.transport.rest.abstract_transport.class%
         abstract: true
         calls:
-            - [setRestClientFactory, [@oro_integration.transport.rest.client_factory]]
+            - [setRestClientFactory, ['@oro_integration.transport.rest.client_factory']]

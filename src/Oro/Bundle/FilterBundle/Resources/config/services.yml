@@ -12,7 +12,7 @@ services:
     oro_filter.extension.orm_filter:
         class: %oro_filter.extension.orm_filter.class%
         arguments:
-            - @translator
+            - '@translator'
         tags:
             - { name: oro_datagrid.extension }
 
@@ -26,27 +26,27 @@ services:
 
     oro_filter.expression.date.parser:
         arguments:
-            - @oro_locale.settings
+            - '@oro_locale.settings'
         class: %oro_filter.expression.date.parser.class%
 
     oro_filter.expression.date.lexer:
         class: %oro_filter.expression.date.lexer.class%
         arguments:
-            - @translator
-            - @oro_filter.provider.datemodifierprovider
+            - '@translator'
+            - '@oro_filter.provider.datemodifierprovider'
 
     oro_filter.expression.date.compiler:
         class: %oro_filter.expression.date.compiler.class%
         arguments:
-            - @oro_filter.expression.date.lexer
-            - @oro_filter.expression.date.parser
+            - '@oro_filter.expression.date.lexer'
+            - '@oro_filter.expression.date.parser'
 
     oro_filter.builder.many_relation:
         class: %oro_filter.builder.many_relation.class%
         calls:
-            - [addBuilder, [@oro_filter.builder.many_relation.orm]]
+            - [addBuilder, ['@oro_filter.builder.many_relation.orm']]
 
     oro_filter.builder.many_relation.orm:
         class: %oro_filter.builder.many_relation.orm.class%
         arguments:
-            - @doctrine
+            - '@doctrine'

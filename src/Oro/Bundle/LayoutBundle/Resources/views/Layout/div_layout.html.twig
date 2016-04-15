@@ -70,10 +70,23 @@
 
 {% block head_widget %}
     <head{{ block('block_attributes') }}>
-        <title>{{ title|block_text(translation_domain) }}</title>
         {{ block_widget(block) }}
     </head>
 {% endblock %}
+
+{% block title_widget -%}
+    {% if reverse %}
+        {% set value = value|reverse %}
+    {% endif %}
+    <title>
+        {%- for element in value -%}
+            {{ element|block_text(translation_domain) }}
+            {%- if not loop.last -%}
+                {{ separator }}
+            {%- endif -%}
+        {%- endfor -%}
+    </title>
+{%- endblock %}
 
 {% block meta_widget %}
     <meta{{ block('block_attributes') }}/>
@@ -125,7 +138,7 @@
 {% endblock %}
 
 {% block form_end_widget %}
-    {{ form_end(form) }}
+    {{ form_end(form,  {'render_rest': render_rest}) }}
 {% endblock %}
 
 {% block form_field_widget %}

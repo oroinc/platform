@@ -412,10 +412,10 @@ define(function(require) {
          */
         _formatDisplayValue: function(value) {
             if (value.value && value.value.start) {
-                value.value.start = this._toDisplayValue(value.value.start);
+                value.value.start = this._toDisplayValue(value.value.start, value.part);
             }
             if (value.value && value.value.end) {
-                value.value.end = this._toDisplayValue(value.value.end);
+                value.value.end = this._toDisplayValue(value.value.end, value.part);
             }
             return value;
         },
@@ -425,10 +425,10 @@ define(function(require) {
          */
         _formatRawValue: function(value) {
             if (value.value && value.value.start) {
-                value.value.start = this._toRawValue(value.value.start);
+                value.value.start = this._toRawValue(value.value.start, value.part);
             }
             if (value.value && value.value.end) {
-                value.value.end = this._toRawValue(value.value.end);
+                value.value.end = this._toRawValue(value.value.end, value.part);
             }
             return value;
         },
@@ -437,13 +437,14 @@ define(function(require) {
          * Converts the date value from Raw to Display
          *
          * @param {string} value
+         * @param {string{ part
          * @returns {string}
          * @protected
          */
-        _toDisplayValue: function(value) {
+        _toDisplayValue: function(value, part) {
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
-            } else if (this.dateValueHelper.isValid(value)) {
+            } else if (part === 'value' && this.dateValueHelper.isValid(value)) {
                 value = this.dateValueHelper.formatDisplayValue(value);
             } else if (datetimeFormatter.isBackendDateValid(value)) {
                 value = datetimeFormatter.formatDate(value);
@@ -454,13 +455,14 @@ define(function(require) {
         /**
          * Converts the date value from Display to Raw         *
          * @param {string} value
+         * @param {string} part
          * @returns {string}
          * @protected
          */
-        _toRawValue: function(value) {
+        _toRawValue: function(value, part) {
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
-            } else if (this.dateValueHelper.isValid(value)) {
+            } else if (part === 'value' && this.dateValueHelper.isValid(value)) {
                 value = this.dateValueHelper.formatRawValue(value);
             } else if (datetimeFormatter.isDateValid(value)) {
                 value = datetimeFormatter.convertDateToBackendFormat(value);

@@ -258,10 +258,15 @@ define([
          * @private
          */
         _processRedirect: function(pathDesc, params, options) {
-            var url;
             var parser;
             var pathname;
             var query;
+            var getUrl = function(pathname, query) {
+                query = utils.queryParams.parse(query);
+                query._rand = Math.random();
+                query = utils.queryParams.stringify(query);
+                return pathname + (query && ('?' + query));
+            };
             options = options || {};
             if (typeof pathDesc === 'object' && pathDesc.url !== null && pathDesc.url !== void 0) {
                 options = params || {};
@@ -276,19 +281,21 @@ define([
             options = _.defaults(options, {
                 fullRedirect: this.fullRedirect
             });
+            if (options.target === '_blank') {
+                window.open(getUrl(pathname, query), '_blank');
+                return;
+            }
             if (options.fullRedirect) {
-                query = utils.queryParams.parse(query);
-                query._rand = Math.random();
-                query = utils.queryParams.stringify(query);
-                url = pathname + (query && ('?' + query));
-                location[options.replace ? 'replace' : 'assign'](url);
-            } else if (options.redirect) {
+                location[options.replace ? 'replace' : 'assign'](getUrl(pathname, query));
+                return;
+            }
+            if (options.redirect) {
                 this.publishEvent('page:redirect');
                 _.extend(options, {forceStartup: true, force: true, redirection: true});
                 utils.redirectTo(pathDesc, options);
-            } else {
-                utils.redirectTo.apply(utils, arguments);
+                return;
             }
+            utils.redirectTo.apply(utils, arguments);
         },
 
         /**

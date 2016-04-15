@@ -23,8 +23,8 @@ services:
     oro_filter.form.event_subscriber.date:
         class: %oro_filter.form.event_subscriber.date.class%
         arguments:
-            - @oro_filter.expression.date.compiler
-            - @oro_locale.settings
+            - '@oro_filter.expression.date.compiler'
+            - '@oro_locale.settings'
 
     oro_filter.form.type.date_range:
         class: %oro_filter.form.type.date_range.class%
@@ -70,18 +70,18 @@ services:
     oro_filter.form.type.filter.date_range:
         class: %oro_filter.form.type.filter.date_range.class%
         arguments:
-            - @translator
-            - @oro_filter.provider.datemodifierprovider
-            - @oro_filter.form.event_subscriber.date
+            - '@translator'
+            - '@oro_filter.provider.datemodifierprovider'
+            - '@oro_filter.form.event_subscriber.date'
         tags:
             - { name: form.type, alias: oro_type_date_range_filter }
 
     oro_filter.form.type.filter.datetime_range:
         class: %oro_filter.form.type.filter.datetime_range.class%
         arguments:
-            - @translator
-            - @oro_filter.provider.datemodifierprovider
-            - @oro_filter.form.event_subscriber.date
+            - '@translator'
+            - '@oro_filter.provider.datemodifierprovider'
+            - '@oro_filter.form.event_subscriber.date'
         tags:
             - { name: form.type, alias: oro_type_datetime_range_filter }
 
@@ -118,15 +118,15 @@ services:
     oro_filter.type.enum_filter:
         class: %oro_filter.type.enum_filter.class%
         arguments:
-            - @translator
-            - @oro_entity_extend.enum_value_provider
+            - '@translator'
+            - '@oro_entity_extend.enum_value_provider'
         tags:
             - { name: form.type, alias: oro_enum_filter }
 
     oro_filter.type.dictionary_filter:
         class: %oro_filter.type.dictionary_filter.class%
         arguments:
-            - @translator
-            - @oro_entity_extend.enum_value_provider
+            - '@translator'
+            - '@oro_entity_extend.enum_value_provider'
         tags:
             - { name: form.type, alias: oro_type_dictionary_filter }

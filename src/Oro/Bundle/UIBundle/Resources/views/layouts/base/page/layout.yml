@@ -1,13 +1,13 @@
 layout:
     actions:
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'OroUIBundle:layouts:base/page/layout.html.twig'
-        - @addTree:
+        - '@addTree':
             items:
                 head:
                     blockType: head
-                    options:
-                        title: OroPlatform
+                title:
+                    blockType: title
                 meta_charset:
                     blockType: meta
                     options:
@@ -17,10 +17,16 @@ layout:
                     options:
                         name: viewport
                         content: 'width=device-width, initial-scale=1'
+                theme_icon:
+                    blockType: external_resource
+                    options:
+                        visible: { '@not_empty': $data.theme.icon }
+                        href: { '@asset': $data.theme.icon }
+                        rel: shortcut icon
                 styles:
                     blockType: style
                     options:
-                        src: { @asset: $data.theme.data.assets.styles.output }
+                        src: { '@asset': $data.theme.data.assets.styles.output }
                 body:
                     blockType: body
                 scripts_before:
@@ -36,8 +42,10 @@ layout:
             tree:
                 root:
                     head:
+                        title: ~
                         meta_charset: ~
                         meta_viewport: ~
+                        theme_icon: ~
                         styles: ~
                         scripts_before: ~
                         require_js: ~

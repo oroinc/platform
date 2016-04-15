@@ -105,15 +105,38 @@ class OroLayoutExtension extends Extension
              *    ]
              * ]
              */
-            $foundThemeLayoutUpdates = array_merge_recursive(
-                $foundThemeLayoutUpdates,
-                $this->filterThemeLayoutUpdates($existThemePaths, $resource->data)
-            );
+            $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($existThemePaths, $resource->data);
+            $resourceThemeLayoutUpdates = $this->sortThemeLayoutUpdates($resourceThemeLayoutUpdates);
+            $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resourceThemeLayoutUpdates);
         }
 
         $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
 
         $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
+    }
+
+    /**
+     * @param array $updates
+     * @return array
+     */
+    protected function sortThemeLayoutUpdates(array $updates)
+    {
+        $directories = [];
+        $files = [];
+        foreach ($updates as $key => $update) {
+            if (is_array($update)) {
+                $update = $this->sortThemeLayoutUpdates($update);
+                $directories[$key] = $update;
+            } else {
+                $files[] = $update;
+            }
+        }
+
+        sort($files);
+        ksort($directories);
+        $updates = array_merge($files, $directories);
+
+        return $updates;
     }
 
     /**

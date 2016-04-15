@@ -5,42 +5,42 @@ definitions:
         order:   50
         entity:  Oro\Bundle\EmailBundle\Entity\EmailUser
         pre_conditions:
-            @and:
-                - @not_empty: [$origin]
-                - @equal: [$origin.active, true]
+            '@and':
+                - '@not_empty': [$origin]
+                - '@equal': [$origin.active, true]
         actions_configuration:
-            - @tree:
+            - '@tree':
                 conditions:
-                    @equal: [$seen, false]
+                    '@equal': [$seen, false]
                 actions:
-                    - @call_method:
+                    - '@call_method':
                         object: $.data
                         method: incrementUnsyncedFlagCount
-                    - @format_string:
+                    - '@format_string':
                         attribute: $.arguments
                         string: '--ids=%id%'
                         arguments:
                             id: $id
-                    - @create_entity:
+                    - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
                         flush: true
                         arguments:
                             - 'oro:email:flag-sync'
                             - ['--seen=false', $.arguments]
-            - @tree:
+            - '@tree':
                 conditions:
-                    @equal: [$seen, true]
+                    '@equal': [$seen, true]
                 actions:
-                    - @call_method:
+                    - '@call_method':
                         object: $.data
                         method: incrementUnsyncedFlagCount
-                    - @format_string:
+                    - '@format_string':
                         attribute: $.arguments
                         string: '--ids=%id%'
                         arguments:
                             id: $id
-                    - @create_entity:
+                    - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
                         flush: true

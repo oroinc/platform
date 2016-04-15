@@ -33,7 +33,7 @@ services:
     oro_imap.connector.factory:
         class: %oro_imap.connector.factory.class%
         arguments:
-            - @oro_imap.services.factory
+            - '@oro_imap.services.factory'
             - %oro_imap.connector.class%
 
     oro_imap.services.factory:
@@ -48,10 +48,10 @@ services:
         public: false
         class: %oro_imap.email_body_loader.class%
         arguments:
-            - @oro_imap.connector.factory
-            - @oro_security.encoder.mcrypt
-            - @oro_imap.imap_email_google_oauth2_manager
-            - @oro_config.global
+            - '@oro_imap.connector.factory'
+            - '@oro_security.encoder.mcrypt'
+            - '@oro_imap.imap_email_google_oauth2_manager'
+            - '@oro_config.global'
         tags:
             - { name: oro_email.email_body_loader }
 
@@ -59,9 +59,9 @@ services:
         public: false
         class: %oro_imap.email_flag_manager_loader.class%
         arguments:
-            - @oro_imap.connector.factory
-            - @oro_security.encoder.mcrypt
-            - @oro_imap.imap_email_google_oauth2_manager
+            - '@oro_imap.connector.factory'
+            - '@oro_security.encoder.mcrypt'
+            - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: oro_email.email_flag_manager_loader }
 
@@ -69,12 +69,12 @@ services:
         scope: prototype
         class: %oro_imap.email_synchronizer.class%
         arguments:
-            - @doctrine
-            - @oro_email.known_email_address_checker_factory
-            - @oro_imap.email_sync_processor_factory
-            - @oro_imap.connector.factory
-            - @oro_security.encoder.mcrypt
-            - @oro_imap.imap_email_google_oauth2_manager
+            - '@doctrine'
+            - '@oro_email.known_email_address_checker_factory'
+            - '@oro_imap.email_sync_processor_factory'
+            - '@oro_imap.connector.factory'
+            - '@oro_security.encoder.mcrypt'
+            - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: oro_email.email_synchronizer }
 
@@ -83,16 +83,16 @@ services:
         public: false
         scope: prototype
         arguments:
-            - @doctrine
-            - @oro_email.email.entity.builder
-            - @oro_email.email.address.helper
+            - '@doctrine'
+            - '@oro_email.email.entity.builder'
+            - '@oro_email.email.address.helper'
 
     oro_imap.form.type.configuration:
         class: %oro_imap.form.type.configuration.class%
         arguments:
-            - @oro_security.encoder.mcrypt
-            - @oro_security.security_facade
-            - @translator
+            - '@oro_security.encoder.mcrypt'
+            - '@oro_security.security_facade'
+            - '@translator'
         tags:
              - { name: form.type, alias: oro_imap_configuration }
 
@@ -104,71 +104,71 @@ services:
     oro_imap.form.type.choice_account:
         class: %oro_imap.form.type.choice_account.class%
         arguments:
-             - @translator
+             - '@translator'
         tags:
              - { name: form.type, alias: oro_imap_choice_account_type }
 
     oro_imap.form.configuration_gmail_type:
         class: %oro_imap.form.configuration_gmail_type.class%
         arguments:
-             - @translator
-             - @oro_config.user
-             - @oro_security.security_facade
+             - '@translator'
+             - '@oro_config.user'
+             - '@oro_security.security_facade'
         tags:
              - { name: form.type, alias: oro_imap_configuration_gmail }
 
     oro_imap.listener.user_email_origin:
         class: %oro_imap.listener.user_email_origin.class%
         arguments:
-            - @oro_security.encoder.mcrypt
-            - @oro_imap.connector.factory
-            - @doctrine
-            - @oro_imap.imap_email_google_oauth2_manager
+            - '@oro_security.encoder.mcrypt'
+            - '@oro_imap.connector.factory'
+            - '@doctrine'
+            - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: doctrine.event_listener, event: prePersist }
 
     oro_imap.manager.clear:
         class: %oro_imap.imap_clear_manager.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_entity.event_listener.entity_modify_created_updated_properties_listener
+            - '@doctrine.orm.entity_manager'
+            - '@oro_entity.event_listener.entity_modify_created_updated_properties_listener'
         calls:
-            - [setLogger, [@logger]]
+            - [setLogger, ['@logger']]
 
     oro_imap.workflow.action.dependency_job:
         class: %oro_imap.workflow.action.dependency_job.class%
         arguments:
-            - @oro_action.context_accessor
-            - @doctrine
+            - '@oro_action.context_accessor'
+            - '@doctrine'
         tags:
             - { name: oro_workflow.action, alias: job_add_dependency }
 
     oro_imap.form.type.google_sync_checkbox:
         class: %oro_imap.form.type.google_sync_checkbox.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_imap.imap_email_google_oauth2_manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: form.type, alias: oro_config_google_imap_sync_checkbox }
 
     oro_imap.imap_email_google_oauth2_manager:
         class: %oro_imap.imap_email_google_oauth2_manager.class%
         arguments:
-            - @hwi_oauth.http_client
-            - @hwi_oauth.resource_ownermap.main
-            - @oro_config.global
-            - @doctrine
+            - '@hwi_oauth.http_client'
+            - '@hwi_oauth.resource_ownermap.main'
+            - '@oro_config.global'
+            - '@doctrine'
 
     oro_imap.manager.controller.connection:
         class: %oro_imap.manager.connection_controller_manager.class%
         scope: request
         arguments:
-            - @oro_user.form.user
-            - @form.factory
-            - @oro_security.encoder.mcrypt
-            - @doctrine
-            - @oro_imap.connector.factory
-            - @oro_imap.imap_email_google_oauth2_manager
+            - '@oro_user.form.user'
+            - '@form.factory'
+            - '@oro_security.encoder.mcrypt'
+            - '@doctrine'
+            - '@oro_imap.connector.factory'
+            - '@oro_imap.imap_email_google_oauth2_manager'
             - %oro_imap.user_form_name%
             - %oro_imap.email_mailbox_form_name%
             - %oro_imap.email_mailbox_form_type%
@@ -176,7 +176,7 @@ services:
     oro_imap.listener.send_email_transport_listener:
         class: %oro_imap.listener.send_email_transport_listener.class%
         arguments:
-            - @oro_security.encoder.mcrypt
-            - @oro_imap.imap_email_google_oauth2_manager
+            - '@oro_security.encoder.mcrypt'
+            - '@oro_imap.imap_email_google_oauth2_manager'
         tags:
             - { name: kernel.event_listener, event: oro_email.send_email_transport, method: setSmtpTransport }

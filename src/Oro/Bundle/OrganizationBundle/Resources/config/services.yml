@@ -44,19 +44,19 @@ services:
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_organization.business_unit.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_organization.business_unit_manager:
         class: %oro_organization.business_unit.manager.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_security.security_facade
-            - @oro_security.acl_helper
+            - '@doctrine.orm.entity_manager'
+            - '@oro_security.security_facade'
+            - '@oro_security.acl_helper'
 
     oro_organization.organization_manager:
         class: %oro_organization.organization.manager.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     #
     # Organization API
@@ -66,7 +66,7 @@ services:
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_organization.organization.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
     #
     # Ownership
     #
@@ -82,11 +82,11 @@ services:
     oro_organization.owner_deletion_manager:
         class: %oro_organization.owner_deletion_manager.class%
         arguments:
-            - @oro_organization.owner_assignment_checker.default
-            - @oro_entity_config.provider.ownership
-            - @oro_security.owner.ownership_metadata_provider
-            - @doctrine.orm.entity_manager
-            - @oro_security.acl.object_id_accessor
+            - '@oro_organization.owner_assignment_checker.default'
+            - '@oro_entity_config.provider.ownership'
+            - '@oro_security.owner.ownership_metadata_provider'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_security.acl.object_id_accessor'
         lazy: true
     #
     # Twig
@@ -94,15 +94,15 @@ services:
     oro_organization.twig.get_owner:
         class: %oro_organization.twig.get_owner.class%
         arguments:
-            - @oro_entity_config.provider.ownership
-            - @oro_security.owner.entity_owner_accessor
+            - '@oro_entity_config.provider.ownership'
+            - '@oro_security.owner.entity_owner_accessor'
         tags:
             - { name: twig.extension }
 
     oro_organization.twig.business_units:
         class: %oro_organization.twig.business_units.class%
         arguments:
-            - @oro_organization.business_unit_manager
+            - '@oro_organization.business_unit_manager'
         tags:
             - { name: twig.extension }
 
@@ -127,9 +127,9 @@ services:
     oro_organization.import_strategy.listener:
         class: %oro_organization.import_strategy.listener.class%
         arguments:
-            - @doctrine
-            - @oro_security.security_facade.link
-            - @oro_security.owner.ownership_metadata_provider.link
+            - '@doctrine'
+            - '@oro_security.security_facade.link'
+            - '@oro_security.owner.ownership_metadata_provider.link'
         tags:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
             - { name: doctrine.event_listener, event: onClear }
@@ -140,25 +140,25 @@ services:
     oro_organization.provider.business_units_grid:
         class: %oro_organization.provider.business_units.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
     #
     # Entity config dumper extension
     #
     oro_organization.entity_config_dumper.extension:
         class: %oro_organization.entity_config_dumper.extension.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity_extend.relation_builder
-            - @oro_security.owner.ownership_metadata_provider
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.relation_builder'
+            - '@oro_security.owner.ownership_metadata_provider'
         tags:
             - { name: oro_entity_extend.entity_config_dumper_extension }
 
     oro_organization.event.business_unit_grid_listener:
         class: %oro_organization.event.business_unit_grid_listener.class%
         arguments:
-            - @oro_entity_config.link.security_context
-            - @oro_security.ownership_tree_provider
-            - @?security.acl.voter.basic_permissions
+            - '@oro_entity_config.link.security_context'
+            - '@oro_security.ownership_tree_provider'
+            - "@?security.acl.voter.basic_permissions"
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.business-unit-grid, method: onBuildBefore }
 
@@ -169,8 +169,8 @@ services:
             - %oro_organization.organization.entity.class%
             - ["id", "name"]
             - ["name"]
-            - @doctrine
-            - @oro_entity_config.link.security_context
+            - '@doctrine'
+            - '@oro_entity_config.link.security_context'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: user_organizations }
         lazy: true
@@ -183,19 +183,19 @@ services:
     oro_organization.orm.validator.organization_unique:
         class: %oro_organization.orm.validator.oranization_unique.class%
         arguments:
-            - @doctrine
-            - @oro_security.owner.ownership_metadata_provider
-            - @oro_entity.doctrine_helper
+            - '@doctrine'
+            - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_entity.doctrine_helper'
         tags:
               - { name: validator.constraint_validator, alias: organization_unique }
 
     oro_organization.provider.filter.busines_unit_choice_tree:
         class: %oro_organization.provider.filter.busines_unit_choice_tree.class%
         arguments:
-            - @doctrine
-            - @oro_security.security_facade
-            - @oro_security.acl_helper
-            - @oro_security.ownership_tree_provider.chain
+            - '@doctrine'
+            - '@oro_security.security_facade'
+            - '@oro_security.acl_helper'
+            - '@oro_security.ownership_tree_provider.chain'
 
     oro_organization.autocomplete.business_unit.search_handler:
         class: %oro_organization.autocomplete.business_unit.search_handler.class%
