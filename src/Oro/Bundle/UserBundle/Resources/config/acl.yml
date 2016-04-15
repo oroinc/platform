@@ -1,4 +1,5 @@
 password_management:
-    label: oro.user.action.password_management
+    label: oro.user.action.password_management.label
+    description: oro.user.action.password_management.description
     type: action
     group_name: ""
