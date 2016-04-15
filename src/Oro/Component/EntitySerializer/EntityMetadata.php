@@ -2,7 +2,7 @@
 
 namespace Oro\Component\EntitySerializer;
 
-use Doctrine\ORM\Mapping\ClassMetadata as ClassMetadata;
+use Doctrine\ORM\Mapping\ClassMetadata;
 
 class EntityMetadata
 {
@@ -71,6 +71,18 @@ class EntityMetadata
         $map = array_flip($this->metadata->discriminatorMap);
 
         return $map[$entityClass];
+    }
+
+    /**
+     * Gets the type of a field
+     *
+     * @param string $fieldName
+     *
+     * @return string|null
+     */
+    public function getFieldType($fieldName)
+    {
+        return $this->metadata->getTypeOfField($fieldName);
     }
 
     /**
