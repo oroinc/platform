@@ -201,8 +201,6 @@ datagrid:
             some_default_common_operation: false
 ```
 `some_default_common_operation` will not be displayed at `your_datagrid_name` grid anymore.
-            
-
 
 ####How I can modify CRUD default operation for my Bundle?
   If you need to customize somehow a default (or any other) operation. Suppose to change basically its `label`, you can
