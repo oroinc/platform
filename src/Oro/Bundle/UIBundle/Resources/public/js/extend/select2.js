@@ -209,6 +209,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
             original.apply(this, _.rest(arguments));
             if (this.opts.dontSelectFirstOptionOnOpen) {
                 this.results.find('.select2-highlighted').removeClass('select2-highlighted');
+                delete this.opts.dontSelectFirstOptionOnOpen;
+            }
+        });
+
+        prototype.moveHighlight = _.wrap(prototype.moveHighlight, function(original) {
+            if (this.highlight() === -1) {
+                this.highlight(0);
+            } else {
+                original.apply(this, _.rest(arguments));
             }
         });
     }(Select2['class'].single.prototype));
@@ -349,6 +358,15 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
             original.apply(this, _.rest(arguments));
             if (this.opts.dontSelectFirstOptionOnOpen) {
                 this.results.find('.select2-highlighted').removeClass('select2-highlighted');
+                delete this.opts.dontSelectFirstOptionOnOpen;
+            }
+        });
+
+        prototype.moveHighlight = _.wrap(prototype.moveHighlight, function(original) {
+            if (this.highlight() === -1) {
+                this.highlight(0);
+            } else {
+                original.apply(this, _.rest(arguments));
             }
         });
     }(Select2['class'].multi.prototype));
