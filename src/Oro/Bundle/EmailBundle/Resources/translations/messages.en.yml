@@ -173,7 +173,8 @@ oro:
             mark:
                 success_message: "{0} No entities were marked|{1} One entity was marked|]1,Inf[ %count% entities were marked"
             mailbox:
-                view: Mailbox: %mailbox%
+                view:
+                    Mailbox: '%mailbox%'
 
         handler:
             attempt_save_system_template: "Overriding of system's templates is prohibited, clone it instead."
