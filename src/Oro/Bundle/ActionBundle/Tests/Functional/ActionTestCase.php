@@ -38,7 +38,7 @@ abstract class ActionTestCase extends WebTestCase
         $entityId,
         $entityClass,
         array $data = [],
-        array $server = []
+        array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']
     ) {
         $url = $this->getUrl(
             $this->getOperationExecutionRoute(),
