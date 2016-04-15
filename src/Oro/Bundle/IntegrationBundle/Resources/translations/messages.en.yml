@@ -72,6 +72,7 @@ oro:
             default_user_owner.label:       Default owner
             default_business_unit_owner.label: Default Business Unit Owner
             edit_mode.label:                Edit mode
+            previously_enabled.label:       Previously Enabled
         integration_status:
             competed.label:  Completed
             failed.label:    Failed
