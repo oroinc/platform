@@ -14,7 +14,7 @@ abstract class ActionTestCase extends WebTestCase
      */
     protected function getOperationExecutionRoute()
     {
-        return 'oro_api_action_execute_operations';
+        return 'oro_action_operation_execute';
     }
 
     /**
@@ -38,7 +38,7 @@ abstract class ActionTestCase extends WebTestCase
         $entityId,
         $entityClass,
         array $data = [],
-        array $server = []
+        array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']
     ) {
         $url = $this->getUrl(
             $this->getOperationExecutionRoute(),

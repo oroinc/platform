@@ -39,10 +39,10 @@ services:
     oro_datagrid.datagrid.manager:
         class: %oro_datagrid.datagrid.manager.class%
         arguments:
-            - @oro_datagrid.configuration.provider.chain
-            - @oro_datagrid.datagrid.builder
-            - @oro_datagrid.datagrid.request_parameters_factory
-            - @oro_datagrid.datagrid.name_strategy
+            - '@oro_datagrid.configuration.provider.chain'
+            - '@oro_datagrid.datagrid.builder'
+            - '@oro_datagrid.datagrid.request_parameters_factory'
+            - '@oro_datagrid.datagrid.name_strategy'
 
     oro_datagrid.datagrid.name_strategy:
         class: %oro_datagrid.datagrid.name_strategy.class%
@@ -53,14 +53,14 @@ services:
 
     oro_datagrid.event.dispatcher:
         class: %oro_datagrid.event.dispatcher.class%
-        arguments: [@event_dispatcher]
+        arguments: ['@event_dispatcher']
 
     oro_datagrid.datagrid.builder:
         class: %oro_datagrid.datagrid.builder.class%
         arguments:
             - %oro_datagrid.datagrid.base.class%
             - %oro_datagrid.extension.acceptor.class%
-            - @oro_datagrid.event.dispatcher
+            - '@oro_datagrid.event.dispatcher'
         lazy: true
 
     oro_datagrid.datagrid.request_parameters_factory:
@@ -68,12 +68,12 @@ services:
         arguments:
             - %oro_datagrid.datagrid.parameters.class%
         calls:
-            - [setRequest, [@?request=]]
+            - [setRequest, ["@?request="]]
 
     oro_datagrid.datagrid.guesser:
         class: %oro_datagrid.datagrid.guesser.class%
         arguments:
-            - @service_container
+            - '@service_container'
             - [] # a list of service ids of column options guessers
 
     oro_datagrid.datagrid.column_options_guesser:
@@ -84,13 +84,13 @@ services:
     oro_datagrid.provider.resolver:
         class: %oro_datagrid.provider.resolver.class%
         arguments:
-            - @service_container
+            - '@service_container'
 
     oro_datagrid.configuration.provider:
         class: %oro_datagrid.configuration.provider.class%
         arguments:
             - []
-            - @oro_datagrid.provider.resolver
+            - '@oro_datagrid.provider.resolver'
         tags:
             - { name: oro_datagrid.configuration.provider, priority: -10 }
 
@@ -100,10 +100,10 @@ services:
     oro_datagrid.twig.datagrid:
         class: %oro_datagrid.twig.datagrid.class%
         arguments:
-            - @oro_datagrid.datagrid.manager
-            - @oro_datagrid.datagrid.name_strategy
-            - @router
-            - @oro_security.security_facade
+            - '@oro_datagrid.datagrid.manager'
+            - '@oro_datagrid.datagrid.name_strategy'
+            - '@router'
+            - '@oro_security.security_facade'
         tags:
             - { name: twig.extension }
 
@@ -115,7 +115,7 @@ services:
     oro_datagrid.event_listener.ormdatasource_acl:
         class: %oro_datagrid.event_listener.ormdatasource_acl.class%
         arguments:
-            - @oro_security.acl_helper
+            - '@oro_security.acl_helper'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.orm_datasource.result.before, method: onResultBefore }
 
@@ -132,17 +132,17 @@ services:
     oro_datagrid.event_listener.mixin:
         class: Oro\Bundle\DataGridBundle\EventListener\MixinListener
         arguments:
-            - @oro_datagrid.mixin_configuration.helper
+            - '@oro_datagrid.mixin_configuration.helper'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.pre, method: onPreBuild, priority: 255 }
 
     oro_datagrid.event_listener.grid_views_load:
         class: %oro_datagrid.event_listener.grid_views_load.class%
         arguments:
-            - @doctrine
-            - @oro_security.security_facade
-            - @oro_security.acl_helper
-            - @translator
+            - '@doctrine'
+            - '@oro_security.security_facade'
+            - '@oro_security.acl_helper'
+            - '@translator'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.grid_views_load, method: onViewsLoad }
 
@@ -159,16 +159,16 @@ services:
     oro_datagrid.grid_view.manager:
         class: Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager
         arguments:
-            - @oro_security.acl_helper
-            - @doctrine
+            - '@oro_security.acl_helper'
+            - '@doctrine'
 
     oro_datagrid.grid_view.manager.api:
         class: %oro_datagrid.grid_view.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_datagrid.grid_view.entity.class%
-            - @doctrine.orm.entity_manager
-            - @oro_datagrid.grid_view.manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_datagrid.grid_view.manager'
 
     oro_datagrid.form.grid_view.api:
         class:                        Symfony\Component\Form\Form
@@ -181,38 +181,38 @@ services:
     oro_datagrid.grid_view.form.handler.api:
         class: %oro_datagrid.grid_view.form.handler.api.class%
         arguments:
-            - @oro_datagrid.form.grid_view.api
-            - @request
-            - @doctrine
-            - @oro_datagrid.grid_view.manager
-            - @security.token_storage
+            - '@oro_datagrid.form.grid_view.api'
+            - '@request'
+            - '@doctrine'
+            - '@oro_datagrid.grid_view.manager'
+            - '@security.token_storage'
         scope: request
 
     oro_datagrid.datagrid.inline_edit_column_options_guesser:
         class: %oro_datagrid.datagrid.inline_edit_column_options_guesser.class%
         arguments:
-            - @validator
+            - '@validator'
 
     oro_datagrid.datagrid.inline_edit_column_options.text_guesser:
         class: %oro_datagrid.datagrid.inline_edit_column_options.text_guesser.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 100 }
 
     oro_datagrid.datagrid.inline_edit_column_options.choices_guesser:
         class: %oro_datagrid.datagrid.inline_edit_column_options.choices_guesser.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_security.acl_helper
+            - '@oro_entity.doctrine_helper'
+            - '@oro_security.acl_helper'
         tags:
             - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 90 }
 
     oro_datagrid.datagrid.inline_edit_column_options.multi_select_guesser:
         class: %oro_datagrid.datagrid.inline_edit_column_options.multi_select_guesser.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_security.acl_helper
+            - '@oro_entity.doctrine_helper'
+            - '@oro_security.acl_helper'
         tags:
             - { name: oro_datagrid.inline_edit_column_options_guesser, priority: 92 }
 
@@ -229,7 +229,7 @@ services:
     oro_datagrid.handler.export:
         class: Oro\Bundle\DataGridBundle\Handler\ExportHandler
         arguments:
-            - @oro_importexport.file.mime_type_guesser
+            - '@oro_importexport.file.mime_type_guesser'
 
     oro_datagrid.columns.helper:
         class: %oro_datagrid.columns.helper.class%
@@ -237,9 +237,9 @@ services:
     oro_datagrid.grid_configuration.helper:
         class: Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper
         arguments:
-            - @oro_entity.orm.entity_class_resolver
+            - '@oro_entity.orm.entity_class_resolver'
 
     oro_datagrid.mixin_configuration.helper:
         class: Oro\Bundle\DataGridBundle\Tools\MixinConfigurationHelper
         arguments:
-             - @oro_datagrid.configuration.provider
+             - '@oro_datagrid.configuration.provider'

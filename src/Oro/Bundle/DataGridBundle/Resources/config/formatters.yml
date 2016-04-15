@@ -11,36 +11,36 @@ services:
     oro_datagrid.extension.formatter.field_property:
         class: %oro_datagrid.extension.formatter.property.field_property.class%
         arguments:
-            - @translator
+            - '@translator'
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: field }
 
     oro_datagrid.extension.formatter.property.url_property:
         class: %oro_datagrid.extension.formatter.property.url_property.class%
         arguments:
-            - @router
+            - '@router'
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: url }
 
     oro_datagrid.extension.formatter.property.link_property:
         class: %oro_datagrid.extension.formatter.property.link_property.class%
         arguments:
-            - @router
-            - @twig
+            - '@router'
+            - '@twig'
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: link }
 
     oro_datagrid.extension.formatter.property.twig_property:
         class: %oro_datagrid.extension.formatter.property.twig_property.class%
         arguments:
-            - @twig
+            - '@twig'
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: twig }
 
     oro_datagrid.extension.formatter.property.translatable_property:
         class: %oro_datagrid.extension.formatter.property.translatable_property.class%
         arguments:
-            - @translator
+            - '@translator'
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: translatable }
 
@@ -53,7 +53,7 @@ services:
     oro_datagrid.extension.formatter.property.localized_number_property:
         class : %oro_datagrid.extension.formatter.property.localized_number_property.class%
         arguments:
-            - @translator
-            - @oro_locale.formatter.number
+            - '@translator'
+            - '@oro_locale.formatter.number'
         tags:
             - { name:  oro_datagrid.extension.formatter.property, type: localized_number }

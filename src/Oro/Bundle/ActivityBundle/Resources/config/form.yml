@@ -5,31 +5,31 @@ services:
     oro_activity.form.type.contexts_select:
         class: Oro\Bundle\ActivityBundle\Form\Type\ContextsSelectType
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_entity_config.config_manager
-            - @translator
-            - @oro_search.mapper
-            - @security.token_storage
-            - @event_dispatcher
+            - '@doctrine.orm.entity_manager'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
+            - '@oro_search.mapper'
+            - '@security.token_storage'
+            - '@event_dispatcher'
         tags:
             - { name: form.type, alias: oro_activity_contexts_select }
 
     oro_activity.form.extension.contexts:
         class: Oro\Bundle\ActivityBundle\Form\Extension\ContextsExtension
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_activity.manager
-            - @oro_entity.entity_alias_resolver
-            - @oro_entity.routing_helper
+            - '@oro_entity.doctrine_helper'
+            - '@oro_activity.manager'
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_entity.routing_helper'
         calls:
-            - [setRequest, [@?request=]]
+            - [setRequest, ["@?request="]]
         tags:
             - { name: form.type_extension, alias: form }
 
     oro_activity.type.multiple_association_choice:
         class: %oro_activity.type.multiple_association_choice.class%
         arguments:
-            - @oro_entity_extend.association_type_helper
-            - @oro_entity_config.config_manager
+            - '@oro_entity_extend.association_type_helper'
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: form.type, alias: oro_activity_multiple_association_choice }

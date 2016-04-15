@@ -19,18 +19,18 @@ services:
     oro_action.configuration.validator.operation:
         class: %oro_action.configuration.validator.operation.class%
         arguments:
-            - @router
-            - @twig.loader
-            - @oro_entity.doctrine_helper
-            - @logger
+            - '@router'
+            - '@twig.loader'
+            - '@oro_entity.doctrine_helper'
+            - '@logger'
             - %kernel.debug%
 
     oro_action.configuration.provider.operations:
         class: %oro_action.configuration.provider.class%
         arguments:
-            - @oro_action.configuration.config.operation_list
-            - @oro_action.configuration.validator.operation
-            - @oro_action.cache.provider.operations
+            - '@oro_action.configuration.config.operation_list'
+            - '@oro_action.configuration.validator.operation'
+            - '@oro_action.cache.provider.operations'
             - []
             - %kernel.bundles%
             - 'operations'
@@ -38,9 +38,9 @@ services:
     oro_action.configuration.provider.action_groups:
         class: %oro_action.configuration.provider.class%
         arguments:
-            - @oro_action.configuration.config.action_group_list
-            - @oro_action.configuration.validator.action_group
-            - @oro_action.cache.provider.action_groups
+            - '@oro_action.configuration.config.action_group_list'
+            - '@oro_action.configuration.validator.action_group'
+            - '@oro_action.cache.provider.action_groups'
             - []
             - %kernel.bundles%
             - 'action_groups'

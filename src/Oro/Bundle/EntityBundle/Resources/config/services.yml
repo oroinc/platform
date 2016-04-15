@@ -61,24 +61,24 @@ services:
         public: false
         class: Oro\Bundle\EntityBundle\ORM\ManagerBag
         arguments:
-            - @doctrine
+            - '@doctrine'
 
     oro_entity.listener.navigation_listener:
         class: %oro_entity.listener.navigation_listener.class%
         arguments:
-            - @oro_security.security_facade
-            - @oro_entity_config.config_manager
-            - @translator
+            - '@oro_security.security_facade'
+            - '@oro_entity_config.config_manager'
+            - '@translator'
         tags:
             - { name: kernel.event_listener, event: oro_menu.configure.application_menu, method: onNavigationConfigure }
 
     oro_entity.extension.unique_entity_extension:
         class: %oro_entity.extension.unique_entity_extension.class%
         arguments:
-            - @validator
-            - @translator
-            - @oro_entity_config.provider.entity
-            - @oro_entity.doctrine_helper
+            - '@validator'
+            - '@translator'
+            - '@oro_entity_config.provider.entity'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: form.type_extension, alias: form }
 
@@ -90,29 +90,29 @@ services:
     oro_entity.datagrid_helper:
         class: %oro_entity.datagrid_helper.class%
         arguments:
-            - @oro_entity.entity_provider
+            - '@oro_entity.entity_provider'
 
     oro_entity.event_listener.custom_entity_grid_listener:
         class: %oro_entity.event_listener.custom_entity_grid_listener.class%
         arguments:
-            - @router
+            - '@router'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.custom-entity-grid, method: onBuildBefore }
 
     oro_entity.event_listener.entity_modify_created_updated_properties_listener:
         class:  %oro_entity.event_listener.entity_modify_created_updated_properties_listener.class%
         arguments:
-            - @security.token_storage
+            - '@security.token_storage'
         tags:
             - { name: doctrine.event_listener, event: onFlush, priority: 100 }
 
     oro_entity.event_listener.entity_relation_grid_listener:
         class: %oro_entity.event_listener.entity_relation_grid_listener.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity.doctrine_helper
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity.doctrine_helper'
         calls:
-            - [setRequest, [@?request=]]
+            - [setRequest, ["@?request="]]
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.before.entity-relation-grid, method: onBuildBefore }
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after.entity-relation-grid, method: onBuildAfter }
@@ -120,12 +120,12 @@ services:
     oro_entity.entity_provider.abstract:
         abstract: true
         arguments:
-            - @oro_entity_config.provider.entity
-            - @oro_entity_config.provider.extend
-            - @oro_entity.orm.entity_class_resolver
-            - @translator
+            - '@oro_entity_config.provider.entity'
+            - '@oro_entity_config.provider.extend'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@translator'
         calls:
-            - [setExclusionProvider, [@oro_entity.exclusion_provider]]
+            - [setExclusionProvider,  ['@oro_entity.exclusion_provider']]
 
     oro_entity.entity_provider:
         class: %oro_entity.entity_provider.class%
@@ -134,18 +134,18 @@ services:
     oro_entity.entity_field_provider.abstract:
         abstract: true
         arguments:
-            - @oro_entity_config.provider.entity
-            - @oro_entity_config.provider.extend
-            - @oro_entity.orm.entity_class_resolver
-            - @oro_entity_extend.extend.field_type_helper
-            - @doctrine
-            - @translator
+            - '@oro_entity_config.provider.entity'
+            - '@oro_entity_config.provider.extend'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_entity_extend.extend.field_type_helper'
+            - '@doctrine'
+            - '@translator'
             - %oro_entity.hidden_fields%
         calls:
-            - [setEntityProvider, [@oro_entity.entity_provider]]
-            - [setVirtualFieldProvider, [@oro_entity.virtual_field_provider]]
-            - [setVirtualRelationProvider, [@oro_entity.virtual_relation_provider.chain]]
-            - [setExclusionProvider, [@oro_entity.exclusion_provider]]
+            - [setEntityProvider, ['@oro_entity.entity_provider']]
+            - [setVirtualFieldProvider, ['@oro_entity.virtual_field_provider']]
+            - [setVirtualRelationProvider, ['@oro_entity.virtual_relation_provider.chain']]
+            - [setExclusionProvider, ['@oro_entity.exclusion_provider']]
 
     oro_entity.exclusion_provider:
         class: %oro_entity.exclusion_provider.chain.class%
@@ -153,7 +153,7 @@ services:
     oro_entity.exclusion_provider.config:
         class: %oro_entity.exclusion_provider.config.class%
         arguments:
-            - @oro_entity.entity_hierarchy_provider
+            - '@oro_entity.entity_hierarchy_provider'
             - %oro_entity.exclusions%
         tags:
             - { name: oro_entity.exclusion_provider.default }
@@ -162,7 +162,7 @@ services:
     oro_entity.exclusion_provider.dictionary:
         class: %oro_entity.exclusion_provider.dictionary.class%
         arguments:
-            - @oro_entity_config.provider.grouping
+            - '@oro_entity_config.provider.grouping'
 
     oro_entity.virtual_field_provider.chain:
         class: %oro_entity.virtual_field_provider.chain.class%
@@ -170,7 +170,7 @@ services:
     oro_entity.virtual_field_provider:
         class: %oro_entity.virtual_field_provider.class%
         arguments:
-            - @oro_entity.entity_hierarchy_provider
+            - '@oro_entity.entity_hierarchy_provider'
             - %oro_entity.virtual_fields%
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 0 }
@@ -179,17 +179,17 @@ services:
     oro_entity.virtual_field_provider.dictionary:
         class: %oro_entity.virtual_field_provider.dictionary.class%
         arguments:
-            - @oro_entity_config.provider.grouping
-            - @oro_entity_config.provider.dictionary
-            - @doctrine
+            - '@oro_entity_config.provider.grouping'
+            - '@oro_entity_config.provider.dictionary'
+            - '@doctrine'
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 100 }
 
     oro_entity.virtual_field_provider.enum:
         class: %oro_entity.virtual_field_provider.enum.class%
         arguments:
-            - @oro_entity_config.provider.extend
-            - @doctrine
+            - '@oro_entity_config.provider.extend'
+            - '@doctrine'
         tags:
             - { name: oro_entity.virtual_field_provider, priority: 100 }
 
@@ -199,7 +199,7 @@ services:
     oro_entity.virtual_relation_provider.config:
         class: %oro_entity.virtual_relation_provider.config.class%
         arguments:
-            - @oro_entity.entity_hierarchy_provider
+            - '@oro_entity.entity_hierarchy_provider'
             - %oro_entity.virtual_relations%
         tags:
             - { name: oro_entity.virtual_relation_provider, priority: 0 }
@@ -208,16 +208,16 @@ services:
         class: Oro\Bundle\EntityBundle\Provider\EntityHierarchyProvider
         public: false
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity_config.provider.extend
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.provider.extend'
 
     oro_entity.entity_hierarchy_provider.all:
         class: Oro\Bundle\EntityBundle\Provider\AllEntityHierarchyProvider
         public: false
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity_config.provider.extend
-            - @oro_entity.entity_manager_bag
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.provider.extend'
+            - '@oro_entity.entity_manager_bag'
 
     oro_entity.entity_field_provider:
         class: %oro_entity.entity_field_provider.class%
@@ -226,33 +226,33 @@ services:
     oro_entity.entity_field_list_provider:
         class: %oro_entity.entity_field_list_provider.class%
         arguments:
-            - @oro_entity.entity_field_provider
-            - @oro_entity.entity_provider
+            - '@oro_entity.entity_field_provider'
+            - '@oro_entity.entity_provider'
 
     oro_entity.exclusion_provider.by_alias:
         class: Oro\Bundle\EntityBundle\Provider\AliasedEntityExclusionProvider
         public: false
         arguments:
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: oro_entity.exclusion_provider.api, priority: 40 }
 
     oro_entity.twig.extension.entity:
         class: %oro_entity.twig.extension.entity.class%
         arguments:
-            - @oro_entity.entity_identifier_accessor
-            - @oro_entity.routing_helper
-            - @oro_entity.entity_name_resolver
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity.entity_identifier_accessor'
+            - '@oro_entity.routing_helper'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: twig.extension }
 
     oro_entity.routing_helper:
         class: %oro_entity.routing_helper.class%
         arguments:
-            - @oro_entity.entity_class_name_helper
-            - @oro_entity.doctrine_helper
-            - @router
+            - '@oro_entity.entity_class_name_helper'
+            - '@oro_entity.doctrine_helper'
+            - '@router'
 
     oro_entity.listener.orm.generated_value_strategy_listener:
         class: %oro_entity.listener.orm.generated_value_strategy_listener.class%
@@ -269,22 +269,22 @@ services:
     oro_entity.entity_alias.cache.warmer:
         class: Oro\Bundle\EntityBundle\Cache\EntityAliasCacheWarmer
         arguments:
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: kernel.cache_warmer }
 
     oro_entity.additional_metadata.cache.warmer:
         class: Oro\Bundle\EntityBundle\Cache\AdditionalMetadataCacheWarmer
         arguments:
-            - @oro_entity.orm.mapping.additional_metadata_provider
+            - '@oro_entity.orm.mapping.additional_metadata_provider'
         tags:
             - { name: kernel.cache_warmer }
 
     oro_entity.entity_alias_resolver:
         class: %oro_entity.entity_alias_resolver.class%
         arguments:
-            - @oro_entity.entity_alias_loader
-            - @oro_entity.entity_alias_cache
+            - '@oro_entity.entity_alias_loader'
+            - '@oro_entity.entity_alias_cache'
             - %kernel.debug%
         lazy: true
 
@@ -303,8 +303,8 @@ services:
         class: Oro\Bundle\EntityBundle\ORM\OrmEntityClassProvider
         public: false
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity.entity_manager_bag
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.entity_manager_bag'
         tags:
             - { name: oro_entity.class_provider }
 
@@ -319,14 +319,14 @@ services:
         class: %oro_entity.entity_alias_provider.class%
         public: false
         arguments:
-            - @oro_entity.entity_alias_config_bag
+            - '@oro_entity.entity_alias_config_bag'
         tags:
             - { name: oro_entity.alias_provider, priority: -100 }
 
     oro_entity.entity_class_name_helper:
         class: %oro_entity.entity_class_name_helper.class%
         arguments:
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity.entity_alias_resolver'
 
     oro_entity.entity_name_resolver:
         class: %oro_entity.entity_name_resolver.class%
@@ -338,7 +338,7 @@ services:
         class: %oro_entity.entity_name_provider.default.class%
         public: false
         arguments:
-            - @doctrine
+            - '@doctrine'
         tags:
             - { name: oro_entity.name_provider, priority: -100 }
 
@@ -350,8 +350,8 @@ services:
         class: %oro_entity.entity_class_name_provider.default.class%
         public: false
         arguments:
-            - @oro_entity_config.config_manager
-            - @translator
+            - '@oro_entity_config.config_manager'
+            - '@translator'
         tags:
             - { name: oro_entity.class_name_provider, priority: -100 }
 
@@ -359,16 +359,16 @@ services:
         class: %oro_entity.dictionary_value_list_provider.default.class%
         public: false
         arguments:
-            - @oro_entity_config.config_manager
-            - @doctrine
+            - '@oro_entity_config.config_manager'
+            - '@doctrine'
         tags:
             - { name: oro_entity.dictionary_value_list_provider, priority: -100 }
 
     oro_entity.orm.mapping.additional_metadata_provider:
         class: %oro_entity.orm.mapping.additional_metadata_provider.class%
         arguments:
-            - @doctrine
-            - @doctrine.orm.default_metadata_cache
+            - '@doctrine'
+            - '@doctrine.orm.default_metadata_cache'
 
     oro_entity.dictionary_value_list_provider:
         class: %oro_entity.dictionary_value_list_provider.class%
@@ -378,9 +378,9 @@ services:
         class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityRouteOptionsResolver
         public: false
         arguments:
-            - @oro_entity.dictionary_value_list_provider
-            - @oro_entity.entity_alias_resolver
-            - @oro_entity.entity_class_name_helper
+            - '@oro_entity.dictionary_value_list_provider'
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: routing.options_resolver }
 
@@ -388,8 +388,8 @@ services:
         class: Oro\Bundle\EntityBundle\Routing\DictionaryEntityApiDocHandler
         public: false
         arguments:
-            - @oro_entity.entity_alias_resolver
-            - @oro_entity.entity_class_name_provider
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_entity.entity_class_name_provider'
         tags:
             - { name: nelmio_api_doc.extractor.handler }
 
@@ -397,11 +397,11 @@ services:
         class: %oro_entity.manager.dictionary.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_entity.dictionary_value_list_provider
-            - @oro_entity.helper.dictionary
-            - @oro_entity_config.config_manager
-            - @property_accessor
+            - '@doctrine.orm.entity_manager'
+            - '@oro_entity.dictionary_value_list_provider'
+            - '@oro_entity.helper.dictionary'
+            - '@oro_entity_config.config_manager'
+            - '@property_accessor'
 
     oro_entity.helper.dictionary:
         class: %oro_entity.helper.dictionary.class%
@@ -410,25 +410,25 @@ services:
         class: %oro_entity.manager.entity_field_manager.class%
         scope: request
         arguments:
-            - @doctrine
-            - @oro_entity.form.entity_field.form_builder
-            - @oro_entity.form.entity_field.handler.base_handler
-            - @oro_entity.routing_helper
-            - @oro_security.owner.ownership_metadata_provider
-            - @oro_entity.manager.entity_field_validator
+            - '@doctrine'
+            - '@oro_entity.form.entity_field.form_builder'
+            - '@oro_entity.form.entity_field.handler.base_handler'
+            - '@oro_entity.routing_helper'
+            - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_entity.manager.entity_field_validator'
 
     oro_entity.form.entity_field.form_builder:
             class: %oro_entity.form.entity_field.form_builder.class%
             arguments:
-                - @form.factory
-                - @doctrine
+                - '@form.factory'
+                - '@doctrine'
 
     oro_entity.form.entity_field.handler.base_handler:
         class: %oro_entity.form.entity_field.handler.base_handler.class%
         scope: request
         arguments:
-            - @doctrine
-            - @oro_entity.form.entity_field.handler.processor.handler_processor
+            - '@doctrine'
+            - '@oro_entity.form.entity_field.handler.processor.handler_processor'
 
     oro_entity.form.entity_field.handler.processor.handler_processor:
         class: %oro_entity.form.entity_field.handler.processor.handler_processor.class%
@@ -437,12 +437,12 @@ services:
         class: %oro_entity.manager.api.entity_data_api_manager.class%
         scope: request
         arguments:
-            - @oro_entity.manager.entity_field_manager
-            - @security.authorization_checker
-            - @oro_entity.routing_helper
+            - '@oro_entity.manager.entity_field_manager'
+            - '@security.authorization_checker'
+            - '@oro_entity.routing_helper'
 
     oro_entity.manager.entity_field_validator:
         class: %oro_entity.manager.entity_field_validator.class%
         arguments:
-            - @doctrine
-            - @translator
+            - '@doctrine'
+            - '@translator'
