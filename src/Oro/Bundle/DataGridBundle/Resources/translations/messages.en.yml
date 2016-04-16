@@ -44,8 +44,12 @@ oro:
             update: Edit
             delete: Delete
             clone: Clone
-            gridview_create_public: Share grid view
-            gridview_edit_public: Unshare grid view
+            gridview_create_public:
+                label: Share grid view
+                description: Share custom grid views with other users
+            gridview_edit_public:
+                label: Unshare grid view
+                description: Unshare custom grid views
 
         system_configuration:
             groups:

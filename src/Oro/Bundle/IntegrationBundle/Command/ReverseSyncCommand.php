@@ -90,6 +90,12 @@ class ReverseSyncCommand extends ContainerAwareCommand
                 throw new \InvalidArgumentException('Integration with given ID not found');
             }
 
+            if (false == $integration->isEnabled()) {
+                $logger->info(sprintf('Skip sync for "%s" integration. It is not active', $integration->getName()));
+
+                return self::STATUS_SUCCESS;
+            }
+            
             $logger->info(
                 sprintf(
                     'Run sync for "%s" integration and "%s" connector.',
