@@ -425,7 +425,7 @@ class EnumValueTypeTest extends TypeTestCase
             ->method('getEnumCode')
             ->will($this->returnValue($enumCode));
         $helper->expects($this->once())
-            ->method('getImmutable')
+            ->method('getImmutableCodes')
             ->will($this->returnValue($immutableCodes));
 
         return $helper;

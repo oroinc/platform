@@ -99,4 +99,25 @@ class ConfigTypeHelper
 
         return null;
     }
+
+    /**
+     * Returns a value of 'immutable_codes' attribute for the given entity/field
+     *
+     * @param string      $scope
+     * @param string      $className
+     * @param string|null $fieldName
+     *
+     * @return mixed The returned value depends on a scope, for example in some scopes it can be only boolean,
+     *               but other scopes can allow to use either boolean or array. More details can be found
+     *               in corresponding entity_config.yml
+     */
+    public function getImmutableCodes($scope, $className, $fieldName = null)
+    {
+        $configProvider = $this->configManager->getProvider($scope);
+        if ($configProvider->hasConfig($className, $fieldName)) {
+            return $configProvider->getConfig($className, $fieldName)->get('immutable_codes');
+        }
+
+        return null;
+    }
 }

@@ -197,6 +197,78 @@ class ConfigTypeHelperTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
+    public function testGetImmutableCodesNoConfig()
+    {
+        $scope     = 'test_scope';
+        $className = 'Test\Entity';
+
+        $configProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with($scope)
+            ->will($this->returnValue($configProvider));
+        $configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($className, null)
+            ->will($this->returnValue(false));
+        $configProvider->expects($this->never())
+            ->method('getConfig');
+
+        $this->assertNull(
+            $this->typeHelper->getImmutableCodes($scope, $className)
+        );
+    }
+
+    /**
+     * @dataProvider getImmutableCodesProvider
+     */
+    public function testGetImmutableCodes($values, $fieldName = null)
+    {
+        $scope     = 'test_scope';
+        $className = 'Test\Entity';
+
+        $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $config->expects($this->once())
+            ->method('get')
+            ->with('immutable_codes')
+            ->will($this->returnValue($values));
+
+        $configProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with($scope)
+            ->will($this->returnValue($configProvider));
+        $configProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($className, $fieldName)
+            ->will($this->returnValue(true));
+        $configProvider->expects($this->once())
+            ->method('getConfig')
+            ->with($className, $fieldName)
+            ->will($this->returnValue($config));
+
+        $this->assertSame(
+            $values,
+            $this->typeHelper->getImmutableCodes($scope, $className, $fieldName)
+        );
+    }
+
+    public function getImmutableCodesProvider()
+    {
+        return [
+            [true, null],
+            [false, null],
+            [null, null],
+            [['val1', 'val2'], null],
+            [true, 'testField'],
+            [false, 'testField'],
+            [null, 'testField'],
+            [['val1', 'val2'], 'testField'],
+        ];
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject
      */

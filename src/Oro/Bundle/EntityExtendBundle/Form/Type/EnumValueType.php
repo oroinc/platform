@@ -83,7 +83,7 @@ class EnumValueType extends AbstractType
         }
 
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-        $immutable = $this->typeHelper->getImmutable('enum_codes', $enumValueClassName);
+        $immutable = $this->typeHelper->getImmutableCodes('enum', $enumValueClassName);
 
         if (is_array($immutable) && in_array($data['id'], $immutable)) {
             return false;
