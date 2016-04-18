@@ -9,6 +9,7 @@ define(function(require) {
     var ChoiceFilter = require('oro/filter/choice-filter');
     var messenger = require('oroui/js/messenger');
     require('jquery.select2');
+    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
 
     /**
      * Multiple select filter: filter values as multiple select options
@@ -95,6 +96,21 @@ define(function(require) {
         /**
          * @inheritDoc
          */
+        setValue: function(value) {
+            DictionaryFilter.__super__.setValue.apply(this, arguments);
+
+            if (!this._criteriaRenderd && value) {
+                this.subview('loading', new LoadingMaskView({
+                    container: this.$el
+                }));
+                this.subview('loading').show();
+                this._renderCriteria();
+            }
+        },
+
+        /**
+         * @inheritDoc
+         */
         _renderCriteria: function() {
             var self = this;
             self.renderTemplate();
@@ -114,6 +130,10 @@ define(function(require) {
                     self._writeDOMValue(self.value);
                     self.applySelect2();
                     self.renderDeferred.resolve();
+                    self._updateCriteriaHint();
+                    if (self.subview('loading')) {
+                        self.subview('loading').hide();
+                    }
                 },
                 error: function(jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
@@ -236,7 +256,7 @@ define(function(require) {
         isEmptyValue: function() {
             var value = this.getValue();
 
-            return value.value && value.value.length === 0;
+            return !value.value || value.value.length === 0;
         },
 
         /**
@@ -335,7 +355,25 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var hintValue = this.wrapHintValue ? ('"' + value.value + '"') : value.value;
+            if (!this._criteriaRenderd) {
+                return '';
+            }
+
+            var data = this.$(this.elementSelector).select2('data');
+            var hintRawValue = _.isObject(_.first(value.value)) ?
+                _.map(value.value, _.property('text')) :
+                _.chain(value.value)
+                    .map(function(id) {
+                        var item =  _.find(data, function(item) {
+                            return item.id === id;
+                        });
+
+                        return item ? item.text : item;
+                    })
+                    .filter(_.negate(_.isUndefined))
+                    .value();
+
+            var hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
 
             return (option ? option.label + ' ' : '') + hintValue;
         }
