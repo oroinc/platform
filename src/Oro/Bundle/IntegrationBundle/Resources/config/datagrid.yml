@@ -43,6 +43,14 @@ datagrid:
                 type:    url
                 route:   oro_integration_schedule
                 params:  [ id ]
+            activate_link:
+                type:       url
+                route:      oro_api_activate_integration
+                params:     [ id ]
+            deactivate_link:
+                type:       url
+                route:      oro_api_deactivate_integration
+                params:     [ id ]
         sorters:
             columns:
                 name:    { data_name: c.name }
@@ -81,6 +89,18 @@ datagrid:
                 acl_resource: oro_integration_update
                 icon:         refresh
                 label:        oro.integration.datagrid.action.schedule_sync
+            activate:
+                type:         ajax
+                acl_resource: oro_integration_update
+                label:        oro.integration.datagrid.action.activate
+                icon:         ok
+                link:         activate_link
+            deactivate:
+                type:         ajax
+                acl_resource: oro_integration_update
+                label:        oro.integration.datagrid.action.deactivate
+                icon:         remove
+                link:         deactivate_link
             delete:
                 type:         delete
                 link:         delete_link
