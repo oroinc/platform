@@ -682,7 +682,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
-     * Set recurrence
+     * Sets recurrence.
      *
      * @param Recurrence|null $recurrence
      *
@@ -696,7 +696,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
-     * Get recurrence
+     * Gets recurrence.
      *
      * @return Recurrence|null
      */

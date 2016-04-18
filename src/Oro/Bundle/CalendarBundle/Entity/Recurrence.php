@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Entity;
 use Doctrine\ORM\Mapping as ORM;
 
 /**
- * Recurrence Entity
+ * Recurrence Entity.
  *
  * @ORM\Table(
  *     name="oro_recurrence",
@@ -108,7 +108,7 @@ class Recurrence
     }
 
     /**
-     * Sets recurrenceType
+     * Sets recurrenceType.
      *
      * @param string $recurrenceType
      *
@@ -122,7 +122,7 @@ class Recurrence
     }
 
     /**
-     * Gets recurrenceType
+     * Gets recurrenceType.
      *
      * @return string
      */
@@ -132,7 +132,7 @@ class Recurrence
     }
 
     /**
-     * Sets interval
+     * Sets interval.
      *
      * @param integer $interval
      *
@@ -146,7 +146,7 @@ class Recurrence
     }
 
     /**
-     * Gets interval
+     * Gets interval.
      *
      * @return integer
      */
@@ -156,7 +156,7 @@ class Recurrence
     }
 
     /**
-     * Sets instance
+     * Sets instance.
      *
      * @param integer|null $instance
      *
@@ -170,7 +170,7 @@ class Recurrence
     }
 
     /**
-     * Gets instance
+     * Gets instance.
      *
      * @return integer|null
      */
@@ -180,7 +180,7 @@ class Recurrence
     }
 
     /**
-     * Sets dayOfWeek
+     * Sets dayOfWeek.
      *
      * @param array|null $dayOfWeek
      *
@@ -194,7 +194,7 @@ class Recurrence
     }
 
     /**
-     * Gets dayOfWeek
+     * Gets dayOfWeek.
      *
      * @return array|null
      */
@@ -204,7 +204,7 @@ class Recurrence
     }
 
     /**
-     * Sets dayOfMonth
+     * Sets dayOfMonth.
      *
      * @param integer|null $dayOfMonth
      *
@@ -218,7 +218,7 @@ class Recurrence
     }
 
     /**
-     * Gets dayOfMonth
+     * Gets dayOfMonth.
      *
      * @return integer|null
      */
@@ -228,7 +228,7 @@ class Recurrence
     }
 
     /**
-     * Sets monthOfYear
+     * Sets monthOfYear.
      *
      * @param integer|null $monthOfYear
      *
@@ -242,7 +242,7 @@ class Recurrence
     }
 
     /**
-     * Gets monthOfYear
+     * Gets monthOfYear.
      *
      * @return integer|null
      */
@@ -252,7 +252,7 @@ class Recurrence
     }
 
     /**
-     * Sets startTime
+     * Sets startTime.
      *
      * @param \DateTime $startTime
      *
@@ -266,7 +266,7 @@ class Recurrence
     }
 
     /**
-     * Gets startTime
+     * Gets startTime.
      *
      * @return \DateTime
      */
@@ -276,7 +276,7 @@ class Recurrence
     }
 
     /**
-     * Sets endTime
+     * Sets endTime.
      *
      * @param \DateTime|null $endTime
      *
@@ -290,7 +290,7 @@ class Recurrence
     }
 
     /**
-     * Gets endTime
+     * Gets endTime.
      *
      * @return \DateTime|null
      */
@@ -300,7 +300,7 @@ class Recurrence
     }
 
     /**
-     * Sets occurrences
+     * Sets occurrences.
      *
      * @param integer|null $occurrences
      *
@@ -314,7 +314,7 @@ class Recurrence
     }
 
     /**
-     * Gets occurrences
+     * Gets occurrences.
      *
      * @return integer|null
      */

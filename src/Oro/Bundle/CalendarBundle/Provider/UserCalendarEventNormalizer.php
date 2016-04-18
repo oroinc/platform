@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -75,6 +76,24 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 
         foreach ($extraFields as $field) {
             $extraValues[$field] = $propertyAccessor->getValue($event, $field);
+        }
+
+        if ($recurrence = $event->getRecurrence()) {
+            $key = Recurrence::STRING_KEY;
+            $recurrenceValues = [
+                'recurrenceType' => $recurrence->getRecurrenceType(),
+                'interval' => $recurrence->getInterval(),
+                'instance' => $recurrence->getInstance(),
+                'dayOfWeek' => $recurrence->getDayOfWeek(),
+                'dayOfMonth' => $recurrence->getDayOfMonth(),
+                'monthOfYear' => $recurrence->getMonthOfYear(),
+                'startTime' => $recurrence->getStartTime(),
+                'endTime' => $recurrence->getStartTime(),
+                'occurences' => $recurrence->getOccurrences()
+            ];
+            $extraValues[$key] = array_filter($recurrenceValues, function($item) {
+                return !is_null($item);
+            });
         }
 
         return array_merge(

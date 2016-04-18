@@ -36,7 +36,7 @@ abstract class AbstractCalendarEventNormalizer
         $rawData = $query->getArrayResult();
         foreach ($rawData as $rawDataItem) {
             $item = $this->transformEntity($rawDataItem);
-            $this->applyRecurrenceData($item);
+            $this->transformRecurrenceData($item);
             $result[] = $item;
         }
         $this->applyAdditionalData($result, $calendarId);
@@ -78,15 +78,19 @@ abstract class AbstractCalendarEventNormalizer
             $value = (string)$value;
         } elseif ($value instanceof \DateTime) {
             $value = $value->format('c');
+        } elseif(is_array($value)) {
+            $value = $this->transformEntity($value);
         }
     }
 
     /**
+     * Transforms recurrence data into separate field.
+     *
      * @param $entity
      *
      * @return self
      */
-    protected function applyRecurrenceData(&$entity)
+    protected function transformRecurrenceData(&$entity)
     {
         $result = [];
         $key = Recurrence::STRING_KEY;
