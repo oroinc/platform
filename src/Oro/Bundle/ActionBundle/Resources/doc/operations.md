@@ -59,8 +59,7 @@ operations:
         datagrids:                                                  # (optional) list of datagrids
             - acme-demo-grid                                        # datagrid name
         for_all_datagrids: false                                    # (optional, default = false) is operation available in all datagrids if any   
-        exclude_datagrids:
-            - datagrid-demo-old                                     # (optional) list of datagrids that should never be matched by this operation in any context (usefull with "for_all_datagrids" option)
+        exclude_datagrids: ['datagrid-demo']                        # (optional) list of datagrids that should never be matched by this operation in any context (usefull with "for_all_datagrids" option)
         groups: ['operations_on_acme_entities']                     # (optional) list of groups that can be assigned to operation (tagging mechanism) to be available or filtered among in usual code or templates
         order: 10                                                   # (optional, default = 0) display order of operation button
         acl_resource: acme_demo_myentity_view                       # (optional) ACL resource name that will be checked while checking that operation execution is allowed
