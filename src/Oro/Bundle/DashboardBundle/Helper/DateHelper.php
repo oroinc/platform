@@ -97,21 +97,18 @@ class DateHelper
         // If count of current items > count of previous items
         // null value is adding to the previous items
         // and first item of the previous items is dropping otherwise
-
         $countCurrentItems = count($currentItems);
         $countItems = count($previousItems);
         if ($countCurrentItems != $countItems) {
             $items = [];
             $itemsKeys = array_keys($previousItems);
-            $i = 0;
-            foreach ($currentItems as $currentItem) {
+            for ($i = 0; $i < $countCurrentItems; $i++) {
                 if (isset($itemsKeys[$i])) {
-                    $key = $itemsKeys[$i];
+                    $key         = $itemsKeys[$i];
                     $items[$key] = $previousItems[$key];
                 } else {
                     $items[] = null;
                 }
-                $i++;
             }
         } else {
             $items = $previousItems;
