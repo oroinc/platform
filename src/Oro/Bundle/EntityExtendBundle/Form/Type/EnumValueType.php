@@ -12,7 +12,7 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints as ExtendAssert;
 use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class EnumValueType extends AbstractType
 {
@@ -64,10 +64,13 @@ class EnumValueType extends AbstractType
             return true;
         }
 
-        /** @var ConfigIdInterface $configId */
+        /** @var FieldConfigId $configId */
         $configId = $form->getParent()->getConfig()->getOption('config_id');
-        $className = $configId->getClassName();
+        if (!$configId instanceof FieldConfigId) {
+            return true;
+        }
 
+        $className = $configId->getClassName();
         if (empty($className)) {
             return true;
         }
