@@ -120,6 +120,13 @@ class EmailFolder
     /**
      * @var DateTime
      *
+     * @ORM\Column(name="sync_start_date", type="datetime", nullable=true)
+     */
+    protected $syncStartDate;
+
+    /**
+     * @var DateTime
+     *
      * @ORM\Column(name="outdated_at", type="datetime", nullable=true)
      */
     protected $outdatedAt;
@@ -394,6 +401,30 @@ class EmailFolder
     public function setSynchronizedAt($synchronizedAt)
     {
         $this->synchronizedAt = $synchronizedAt;
+
+        return $this;
+    }
+
+    /**
+     * Get date/time from which should start sync folder
+     *
+     * @return DateTime
+     */
+    public function getSyncStartDate()
+    {
+        return $this->syncStartDate;
+    }
+
+    /**
+     * Set date/time from which should start sync folder
+     *
+     * @param DateTime $syncStartDate
+     *
+     * @return EmailOrigin
+     */
+    public function setSyncStartDate($syncStartDate)
+    {
+        $this->syncStartDate = $syncStartDate;
 
         return $this;
     }

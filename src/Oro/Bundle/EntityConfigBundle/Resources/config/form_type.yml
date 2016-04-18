@@ -12,10 +12,10 @@ services:
     oro_entity_config.type.config:
         class: %oro_entity_config.type.config.class%
         arguments:
-            - @doctrine
-            - @oro_entity_config.config_manager
-            - @translator.default
-            - @oro_translation.database_translation.metadata.cache
+            - '@doctrine'
+            - '@oro_entity_config.config_manager'
+            - '@translator.default'
+            - '@oro_translation.database_translation.metadata.cache'
         tags:
             - { name: form.type, alias: oro_entity_config_type }
 
@@ -28,32 +28,32 @@ services:
         class: %oro_entity_config.config_type_helper.class%
         public: false
         arguments:
-            - @oro_entity_config.config_manager
+            - '@oro_entity_config.config_manager'
 
     oro_entity_config.type.integer:
         class: %oro_entity_config.type.integer.class%
         arguments:
-            - @oro_entity_config.config_type_helper
+            - '@oro_entity_config.config_type_helper'
         tags:
             - { name: form.type, alias: oro_entity_config_integer }
 
     oro_entity_config.type.text:
         class: %oro_entity_config.type.text.class%
         arguments:
-            - @oro_entity_config.config_type_helper
+            - '@oro_entity_config.config_type_helper'
         tags:
             - { name: form.type, alias: oro_entity_config_text }
 
     oro_entity_config.type.textarea:
         class: %oro_entity_config.type.textarea.class%
         arguments:
-            - @oro_entity_config.config_type_helper
+            - '@oro_entity_config.config_type_helper'
         tags:
             - { name: form.type, alias: oro_entity_config_textarea }
 
     oro_entity_config.type.choice:
         class: %oro_entity_config.type.choice.class%
         arguments:
-            - @oro_entity_config.config_type_helper
+            - '@oro_entity_config.config_type_helper'
         tags:
             - { name: form.type, alias: oro_entity_config_choice }

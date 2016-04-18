@@ -1,8 +1,9 @@
 define([
     'jquery',
     'underscore',
-    'backgrid'
-], function($, _, Backgrid) {
+    'backgrid',
+    'oroui/js/tools'
+], function($, _, Backgrid, tools) {
     'use strict';
 
     var Row;
@@ -129,9 +130,10 @@ define([
             // remember selection and target
             var $target = this.$(e.target);
             var exclude;
+            var allowed;
             if (this.themeOptions.actionSelector) {
-                exclude = this.themeOptions.actionSelector;
-                if (!$target.is(exclude) && !$target.parents(exclude).length) {
+                allowed = this.themeOptions.actionSelector;
+                if (!$target.is(allowed) && !$target.parents(allowed).length) {
                     return;
                 }
             } else {
@@ -155,22 +157,31 @@ define([
 
         onClick: function(e) {
             var _this = this;
-            if (this.clickPermit) {
-                this.clickTimeout = setTimeout(function() {
-                    if (_this.disposed) {
-                        return;
+            var options = {};
+            var clickFunction = function() {
+                if (_this.disposed) {
+                    return;
+                }
+                _this.trigger('clicked', _this, options);
+                for (var i = 0; i < _this.cells.length; i++) {
+                    var cell = _this.cells[i];
+                    if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
+                        cell.onRowClicked(_this, e);
                     }
-                    _this.trigger('clicked', _this, e);
-                    for (var i = 0; i < _this.cells.length; i++) {
-                        var cell = _this.cells[i];
-                        if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
-                            cell.onRowClicked(_this, e);
-                        }
-                    }
-                    _this.$el.removeClass('mouse-down');
-                    delete _this.clickTimeout;
-                }, this.DOUBLE_CLICK_WAIT_TIMEOUT);
+                }
+                _this.$el.removeClass('mouse-down');
+                delete _this.clickTimeout;
+            };
+            if (!this.clickPermit) {
+                return;
             }
+            e.preventDefault();
+            if (tools.isTargetBlankEvent(e)) {
+                options.target = '_blank';
+                clickFunction();
+                return;
+            }
+            this.clickTimeout = setTimeout(clickFunction, this.DOUBLE_CLICK_WAIT_TIMEOUT);
         },
 
         /**
@@ -221,13 +232,36 @@ define([
 
         render: function() {
             if (this.template) {
-                this.$el.html(this.template({
-                    model: this.model ? this.model.attributes : {},
-                    themeOptions: this.themeOptions ? this.themeOptions : {}
-                }));
-                return this;
+                this.renderCustomTemplate();
+            } else {
+                Row.__super__.render.apply(this, arguments);
             }
-            return Row.__super__.render.apply(this, arguments);
+            var state = {selected: false};
+            this.model.trigger('backgrid:isSelected', this.model, state);
+            this.$el.toggleClass('row-selected', state.selected);
+            return this;
+        },
+
+        renderCustomTemplate: function() {
+            var $checkbox;
+            this.$el.html(this.template({
+                model: this.model ? this.model.attributes : {},
+                themeOptions: this.themeOptions ? this.themeOptions : {}
+            }));
+            $checkbox = this.$('[data-role=select-row]:checkbox');
+            if ($checkbox.length) {
+                this.listenTo(this.model, 'backgrid:select', function(model, checked) {
+                    $checkbox.prop('checked', checked);
+                });
+                $checkbox.on('change' + this.eventNamespace(), _.bind(function(e) {
+                    this.model.trigger('backgrid:selected', this.model, $checkbox.prop('checked'));
+                }, this));
+                $checkbox.on('click' + this.eventNamespace(), function(e) {
+                    e.stopPropagation();
+                });
+            }
+
+            return this;
         }
     });
 

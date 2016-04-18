@@ -25,7 +25,7 @@ oro_entity_config:
                         filter_options:
                             field_options:
                                 multiple: true
-                                choices: @oro_entity_config.event_listener.entityconfig_grid_listener->getModuleChoices
+                                choices: "@oro_entity_config.event_listener.entityconfig_grid_listener->getModuleChoices"
                         required:           true
                         sortable:           true
                         filterable:         true

@@ -388,8 +388,8 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                     ],
                     'importexport' => [
-                        'identity' => true
-                    ]
+                        'identity' => false,
+                    ],
                 ]
             );
         $this->relationBuilder->expects($this->at($relationBuilderAt++))
@@ -404,7 +404,10 @@ class EnumEntityConfigDumperExtensionTest extends \PHPUnit_Framework_TestCase
                     ],
                     'datagrid' => [
                         'is_visible' => DatagridScope::IS_VISIBLE_FALSE
-                    ]
+                    ],
+                    'importexport' => [
+                        'identity' => true,
+                    ],
                 ]
             );
         $this->relationBuilder->expects($this->at($relationBuilderAt++))

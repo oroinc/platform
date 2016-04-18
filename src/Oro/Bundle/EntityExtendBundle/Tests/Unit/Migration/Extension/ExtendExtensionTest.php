@@ -355,7 +355,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.id.label',
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ],
-                                'importexport' => ['identity' => true]
+                                'importexport' => ['identity' => true],
                             ],
                             'type'    => 'string'
                         ],
@@ -365,7 +365,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.name.label',
                                     'description' => 'oro.entityextend.enumvalue.name.description',
                                 ],
-                                'datagrid'     => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
+                                'datagrid'     => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
                             ],
                             'type'    => 'string'
                         ],
@@ -469,8 +469,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ],
                                 'importexport' => [
-                                    'identity' => true
-                                ]
+                                    'identity' => true,
+                                ],
                             ],
                             'type'    => 'string',
                         ],
@@ -482,7 +482,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                 ],
                                 'datagrid'     => [
                                     'is_visible' => DatagridScope::IS_VISIBLE_FALSE
-                                ]
+                                ],
                             ],
                             'type'    => 'string',
                         ],

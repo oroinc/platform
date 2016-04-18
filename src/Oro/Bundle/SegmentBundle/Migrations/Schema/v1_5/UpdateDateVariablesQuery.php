@@ -137,10 +137,10 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
         }
 
         $value = $filter['criterion']['data']['value'];
-        if ($newStart = $this->updateMonthValue($value['start'])) {
+        if ($newStart = $this->updateMonthValue($value, 'start')) {
             $filter['criterion']['data']['value']['start'] = $newStart;
         }
-        if ($newEnd = $this->updateMonthValue($value['end'])) {
+        if ($newEnd = $this->updateMonthValue($value, 'end')) {
             $filter['criterion']['data']['value']['end'] = $newEnd;
         }
 
@@ -151,13 +151,18 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
      * Replaces old month variables ({{17}} - {{28}}) by month numbers (1 - 12)
      *
      * @param string $value
+     * @param string $offset
      *
      * @return string|false Replaced value or false if nothing was replaced
      */
-    private function updateMonthValue($value)
+    private function updateMonthValue(array $value, $offset)
     {
+        if (!isset($value[$offset])) {
+            return false;
+        }
+
         $matches = [];
-        if (preg_match('/\{\{(1[7-9]|2[0-8])\}\}/', $value, $matches)) {
+        if (preg_match('/\{\{(1[7-9]|2[0-8])\}\}/', $value[$offset], $matches)) {
             return (string) ($matches[1] - 16);
         }
 
