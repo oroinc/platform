@@ -47,16 +47,16 @@ class EnumValueType extends AbstractType
 
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        $view->vars['allow_delete'] = $this->isDeletedAllowed($form);
+        $view->vars['allow_delete'] = $this->isDeletable($form);
     }
 
     /**
-     * Delete is allowed by default unless there is immutable option id in the config
+     * Checks that the option can be removed
      *
      * @param FormInterface $form
      * @return boolean
      */
-    protected function isDeletedAllowed(FormInterface $form)
+    protected function isDeletable(FormInterface $form)
     {
         $data = $form->getData();
 
