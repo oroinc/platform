@@ -48,6 +48,7 @@ services:
         arguments:
             - @oro_entity_config.link.entity_manager
             - @oro_entity_config.config_model_lock_object
+            - %installed%
 
     oro_entity_config.audit_manager:
         public: false
