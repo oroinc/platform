@@ -41,6 +41,9 @@ class OperationDefinition
     private $forAllDatagrids = false;
 
     /** @var array */
+    private $excludeDatagrids = [];
+
+    /** @var array */
     private $datagrids = [];
 
     /** @var array */
@@ -265,6 +268,25 @@ class OperationDefinition
     public function setDatagrids(array $datagrids)
     {
         $this->datagrids = $datagrids;
+
+        return $this;
+    }
+
+    /**
+     * @return array
+     */
+    public function getExcludeDatagrids()
+    {
+        return $this->excludeDatagrids;
+    }
+
+    /**
+     * @param array $excludedDatagrids
+     * @return $this
+     */
+    public function setExcludeDatagrids(array $excludedDatagrids)
+    {
+        $this->excludeDatagrids = $excludedDatagrids;
 
         return $this;
     }
@@ -524,6 +546,7 @@ class OperationDefinition
     public function setGroups(array $groups)
     {
         $this->groups = $groups;
+
         return $this;
     }
 }
