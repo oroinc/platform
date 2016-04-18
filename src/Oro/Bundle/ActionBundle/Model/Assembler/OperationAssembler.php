@@ -170,5 +170,4 @@ class OperationAssembler extends AbstractAssembler
 
         return $this->entityNames[$entityName];
     }
-
 }
