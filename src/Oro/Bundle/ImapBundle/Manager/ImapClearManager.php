@@ -199,7 +199,6 @@ class ImapClearManager implements LoggerAwareInterface
             'Oro\Bundle\EmailBundle\Entity\EmailThread',
             'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger',
             'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition',
-            'Oro\Bundle\UserBundle\Entity\User',
             'Oro\Bundle\OrganizationBundle\Entity\Organization',
             'OroEntityProxy\OroEmailBundle\EmailAddressProxy',
         ];
