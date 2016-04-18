@@ -12,6 +12,8 @@ oro:
                 update: Update
                 delete: Delete
                 schedule_sync: Schedule Sync
+                activate: Activate
+                deactivate: Deactivate
 
         controller:
             integration:
@@ -70,6 +72,7 @@ oro:
             default_user_owner.label:       Default owner
             default_business_unit_owner.label: Default Business Unit Owner
             edit_mode.label:                Edit mode
+            previously_enabled.label:       Previously Enabled
         integration_status:
             competed.label:  Completed
             failed.label:    Failed
@@ -79,6 +82,7 @@ oro:
 
         sync: A sync job has been added to the queue. {{ job_view_link }}
         sync_error: 'Failed to add sync job to the queue. Error: %s.'
+        sync_error_integration_deactivated: 'Failed to add sync job to the queue. Integration is not active.'
         progress: Check progress.
         activate: Activate
         deactivate: Deactivate
@@ -96,3 +100,8 @@ oro:
         system_configuration:
             groups:
                 integrations.title: Integrations
+
+        notification:
+            channel:
+                activated: Integration has been activated successfully
+                deactivated: Integration has been deactivated successfully
