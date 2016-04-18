@@ -168,6 +168,11 @@ class PermissionGrantingStrategyTest extends \PHPUnit_Framework_TestCase
         $this->map = new PermissionMap($this->selector);
     }
 
+    public function testGetContext()
+    {
+        $this->assertSame($this->context, $this->strategy->getContext());
+    }
+
     /**
      * @expectedException \Symfony\Component\Security\Acl\Exception\NoAceFoundException
      */
