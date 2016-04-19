@@ -7,6 +7,7 @@ use Symfony\Component\DomCrawler\Field\ChoiceFormField;
 
 /**
  * @dbIsolation
+ * @configIsolation
  */
 class ControllersTest extends WebTestCase
 {
