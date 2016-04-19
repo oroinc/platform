@@ -94,7 +94,9 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('updated_at', 'datetime', []);
         $table->addColumn('invitation_status', 'string', ['default' => null, 'notnull' => false, 'length' => 32]);
         $table->addColumn('parent_id', 'integer', ['default' => null, 'notnull' => false]);
+        $table->addColumn('exception_parent_id', 'integer', ['notnull' => false]);
         $table->addColumn('recurrence_id', 'integer', ['notnull' => false]);
+        $table->addColumn('original_date', 'datetime', ['notnull' => false]);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
         $table->addIndex(['system_calendar_id', 'start_at', 'end_at'], 'oro_sys_calendar_event_idx', []);
@@ -165,6 +167,12 @@ class OroCalendarBundleInstaller implements Installation
         $table->addForeignKeyConstraint(
             $table,
             ['parent_id'],
+            ['id'],
+            ['onDelete' => 'CASCADE']
+        );
+        $table->addForeignKeyConstraint(
+            $table,
+            ['exception_parent_id'],
             ['id'],
             ['onDelete' => 'CASCADE']
         );

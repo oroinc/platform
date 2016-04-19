@@ -112,7 +112,8 @@ class CalendarEventRepository extends EntityRepository
             ->select(
                 'e.id, e.title, e.description, e.start, e.end, e.allDay,'
                 . ' e.backgroundColor, e.createdAt, e.updatedAt'
-            );
+            )
+            ->where('e.exceptionParent is NULL');
         if ($extraFields) {
             foreach ($extraFields as $field) {
                 $qb->addSelect('e.' . $field);

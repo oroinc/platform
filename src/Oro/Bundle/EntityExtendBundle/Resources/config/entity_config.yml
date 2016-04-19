@@ -378,6 +378,12 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                # an array of un-deletable enum options
+                # those options still can be edited, but cannot be deleted
+                immutable_codes: # string[]
+                    options:
+                        auditable: false
+
         field:
             items:
                 # the unique identifier of an enum linked to a field

@@ -21,6 +21,9 @@ oro:
                 platform.title: "System configuration"
                 general_setup.title: "General setup"
             use_default: "Use default"
+        acl:
+            action:
+                general.label: Access System Configuration
 
     dashboard:
         widgets:

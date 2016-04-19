@@ -195,6 +195,7 @@ class EntitySecurityMetadataProvider
                         ->get('label');
                 }
 
+                $description = $securityConfig->get('description', false, '');
                 $permissions = $securityConfig->get('permissions');
 
                 if (!$permissions || $permissions == 'All') {
@@ -208,7 +209,8 @@ class EntitySecurityMetadataProvider
                     $className,
                     $securityConfig->get('group_name'),
                     $label,
-                    $permissions
+                    $permissions,
+                    $description
                 );
             }
         }
