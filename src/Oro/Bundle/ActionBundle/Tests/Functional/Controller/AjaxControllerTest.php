@@ -1,6 +1,8 @@
 <?php
 
-namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller\Api\Rest;
+namespace Oro\Bundle\ActionBundle\Tests\Functional\Controller;
+
+use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\ActionBundle\Model\OperationDefinition;
 use Oro\Bundle\ActionBundle\Tests\Functional\DataFixtures\LoadTestEntityData;
@@ -11,7 +13,7 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 /**
  * @dbIsolation
  */
-class OperationControllerTest extends WebTestCase
+class AjaxControllerTest extends WebTestCase
 {
     const ROOT_NODE_NAME = 'operations';
 
@@ -29,7 +31,7 @@ class OperationControllerTest extends WebTestCase
      */
     protected function setUp()
     {
-        $this->initClient([], $this->generateWsseAuthHeader());
+        $this->initClient([], $this->generateBasicAuthHeader());
 
         $this->cacheProvider = $this->getContainer()->get('oro_action.cache.provider.operations');
         $this->loadFixtures([
@@ -60,6 +62,7 @@ class OperationControllerTest extends WebTestCase
      * @param string $entityClass
      * @param int $statusCode
      * @param string $message
+     * @param array $headers
      */
     public function testExecuteAction(
         array $config,
@@ -68,7 +71,8 @@ class OperationControllerTest extends WebTestCase
         $entityId,
         $entityClass,
         $statusCode,
-        $message
+        $message,
+        $headers = ['HTTP_X-Requested-With' => 'XMLHttpRequest']
     ) {
         $this->cacheProvider->save(self::ROOT_NODE_NAME, $config);
 
@@ -77,7 +81,7 @@ class OperationControllerTest extends WebTestCase
         $this->client->request(
             'GET',
             $this->getUrl(
-                'oro_api_action_execute_operations',
+                'oro_action_operation_execute',
                 [
                     'operationName' => 'oro_action_test_action',
                     'route' => $route,
@@ -85,13 +89,23 @@ class OperationControllerTest extends WebTestCase
                     'entityId' => $entityId ? $this->entity->getId() : null,
                     'entityClass' => $entityClass,
                 ]
-            )
+            ),
+            [],
+            [],
+            $headers
         );
 
         $result = $this->client->getResponse();
 
         $this->assertEquals($message, $this->entity->getMessage());
         $this->assertResponseStatusCodeEquals($result, $statusCode);
+
+        if ($statusCode === Response::HTTP_FOUND) {
+            $this->assertContains(
+                $this->getContainer()->get('router')->generate('oro_action_widget_buttons'),
+                $result->getContent()
+            );
+        }
     }
 
     /**
@@ -132,7 +146,7 @@ class OperationControllerTest extends WebTestCase
                 'datagrid' => '',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'statusCode' => 200,
+                'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_NEW,
             ],
             'wrong conditions' => [
@@ -149,7 +163,7 @@ class OperationControllerTest extends WebTestCase
                 'datagrid' => '',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'statusCode' => 404,
+                'statusCode' => Response::HTTP_NOT_FOUND,
                 'message' => self::MESSAGE_DEFAULT,
             ],
             'unknown entity' => [
@@ -161,7 +175,7 @@ class OperationControllerTest extends WebTestCase
                 'datagrid' => '',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'statusCode' => 200,
+                'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
             'unknown route' => [
@@ -173,7 +187,7 @@ class OperationControllerTest extends WebTestCase
                 'datagrid' => '',
                 'entityId' => false,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'statusCode' => 200,
+                'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
             'empty context' => [
@@ -182,7 +196,7 @@ class OperationControllerTest extends WebTestCase
                 'datagrid' => '',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'statusCode' => 200,
+                'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
             'datagrid' => [
@@ -194,7 +208,54 @@ class OperationControllerTest extends WebTestCase
                 'datagrid' => 'test_datagrid',
                 'entityId' => true,
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
-                'statusCode' => 200,
+                'statusCode' => Response::HTTP_OK,
+                'message' => self::MESSAGE_DEFAULT,
+            ],
+            'redirect' => [
+                'config' => array_merge_recursive(
+                    $config,
+                    [
+                        'oro_action_test_action' => [
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            OperationDefinition::ACTIONS => [
+                                [
+                                    '@redirect' => [
+                                        'route' => 'oro_action_widget_buttons'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ),
+                'route' => null,
+                'datagrid' => null,
+                'entityId' => true,
+                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'statusCode' => Response::HTTP_FOUND,
+                'message' => self::MESSAGE_DEFAULT,
+                'headers' => []
+            ],
+            'redirect ajax' => [
+                'config' => array_merge_recursive(
+                    $config,
+                    [
+                        'oro_action_test_action' => [
+                            'entities' => ['Oro\Bundle\TestFrameworkBundle\Entity\TestActivity'],
+                            OperationDefinition::ACTIONS => [
+                                [
+                                    '@redirect' => [
+                                        'route' => 'oro_action_widget_buttons'
+                                    ]
+                                ]
+                            ]
+                        ]
+                    ]
+                ),
+                'route' => null,
+                'datagrid' => null,
+                'entityId' => true,
+                'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
+                'statusCode' => Response::HTTP_OK,
                 'message' => self::MESSAGE_DEFAULT,
             ],
         ];

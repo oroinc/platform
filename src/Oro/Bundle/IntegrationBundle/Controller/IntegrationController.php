@@ -2,6 +2,9 @@
 
 namespace Oro\Bundle\IntegrationBundle\Controller;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
+use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
+use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
@@ -18,6 +21,7 @@ use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 use Oro\Bundle\IntegrationBundle\Command\SyncCommand;
 use Oro\Bundle\IntegrationBundle\Form\Handler\ChannelHandler;
+use Symfony\Component\HttpFoundation\Request;
 
 /**
  * @Route("/integration")
@@ -75,18 +79,15 @@ class IntegrationController extends Controller
      * @Route("/schedule/{id}", requirements={"id"="\d+"}, name="oro_integration_schedule")
      * @AclAncestor("oro_integration_update")
      */
-    public function scheduleAction(Integration $integration)
+    public function scheduleAction(Integration $integration, Request $request)
     {
-        $force = (bool)$this->getRequest()->get('force', false);
-        $jobParameters = [
-            '--integration-id=' . $integration->getId(),
-            '-v'
-        ];
-        if ($force) {
-            $jobParameters[] = '--force';
+        if (false === $integration->isEnabled()) {
+            return new JsonResponse([
+                'successful' => false,
+                'message'    => $this->get('translator')->trans('oro.integration.sync_error_integration_deactivated'),
+            ], Codes::HTTP_BAD_REQUEST);
         }
-        $job = new Job(SyncCommand::COMMAND_NAME, $jobParameters);
-
+        
         $status  = Codes::HTTP_OK;
         $response = [
             'successful' => true,
@@ -94,10 +95,8 @@ class IntegrationController extends Controller
         ];
 
         try {
-            $em = $this->get('doctrine.orm.entity_manager');
-            $em->persist($job);
-            $em->flush($job);
-
+            $job = $this->getSyncScheduler()->schedule($integration, (bool) $request->get('force', false));
+            
             $jobViewLink = sprintf(
                 '<a href="%s" class="job-view-link">%s</a>',
                 $this->get('router')->generate('oro_cron_job_view', ['id' => $job->getId()]),
@@ -121,50 +120,6 @@ class IntegrationController extends Controller
         }
 
         return new JsonResponse($response, $status);
-    }
-
-    /**
-     * @param Integration $integration
-     *
-     * @return \Symfony\Component\HttpFoundation\RedirectResponse
-     * @Route("/toggle/{id}", requirements={"id"="\d+"}, name="oro_integration_toggle")
-     * @Acl(
-     *      id="oro_integration_toggle",
-     *      type="entity",
-     *      permission="EDIT",
-     *      class="OroIntegrationBundle:Channel"
-     * )
-     */
-    public function toggleAction(Integration $integration)
-    {
-        if ($integration->isEnabled()) {
-            $integration->setEnabled(false);
-            $this->get('session')->getFlashBag()->add(
-                'success',
-                $this->get('translator')->trans('oro.integration.controller.integration.message.deactivated')
-            );
-
-        } else {
-            $integration->setEnabled(true);
-            $this->get('session')->getFlashBag()->add(
-                'success',
-                $this->get('translator')->trans('oro.integration.controller.integration.message.activated')
-            );
-        }
-
-        $em = $this->get('doctrine.orm.entity_manager');
-        $em->persist($integration);
-        $em->flush($integration);
-
-        return $this->redirect(
-            $this->generateUrl(
-                'oro_integration_update',
-                [
-                    'id'=>$integration->getid(),
-                    '_enableContentProviders' => 'mainMenu'
-                ]
-            )
-        );
     }
 
     /**
@@ -198,10 +153,11 @@ class IntegrationController extends Controller
             );
         }
         $form = $this->getForm();
-
+        
         return [
             'entity'   => $integration,
             'form'     => $form->createView(),
+            'edit_allowed' => EditModeUtils::isEditAllowed($integration->getEditMode()),
         ];
     }
 
@@ -222,5 +178,13 @@ class IntegrationController extends Controller
         }
 
         return $form;
+    }
+
+    /**
+     * @return GenuineSyncScheduler
+     */
+    protected function getSyncScheduler()
+    {
+        return $this->get('oro_integration.genuine_sync_scheduler');
     }
 }

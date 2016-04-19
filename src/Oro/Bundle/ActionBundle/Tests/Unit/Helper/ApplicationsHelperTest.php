@@ -44,7 +44,7 @@ class ApplicationsHelperTest extends \PHPUnit_Framework_TestCase
 
     public function testGetExecutionRoute()
     {
-        $this->assertEquals('oro_api_action_execute_operations', $this->helper->getExecutionRoute());
+        $this->assertEquals('oro_action_operation_execute', $this->helper->getExecutionRoute());
     }
 
     /**
