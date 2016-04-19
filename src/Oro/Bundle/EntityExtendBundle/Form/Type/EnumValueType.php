@@ -10,21 +10,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Validator\Constraints as Assert;
 
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints as ExtendAssert;
-use Oro\Bundle\EntityExtendBundle\Form\Util\EnumTypeHelper;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
 
 class EnumValueType extends AbstractType
 {
-    /** @var EnumTypeHelper */
-    protected $typeHelper;
+    /** @var ConfigProviderInterface */
+    protected $configProvider;
 
     /**
-     * @param EnumTypeHelper $typeHelper
+     * @param ConfigProviderInterface $configProvider
      */
-    public function __construct(EnumTypeHelper $typeHelper)
+    public function __construct(ConfigProviderInterface $configProvider)
     {
-        $this->typeHelper = $typeHelper;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -75,18 +75,22 @@ class EnumValueType extends AbstractType
             return true;
         }
 
-        $fieldName = $this->typeHelper->getFieldName($configId);
+        $fieldName = $configId->getFieldName();
         if (empty($fieldName)) {
             return true;
         }
 
-        $enumCode = $this->typeHelper->getEnumCode($className, $fieldName);
+        if (!$this->configProvider->hasConfig($className, $fieldName)) {
+            return true;
+        }
+
+        $enumCode = $this->configProvider->getConfig($className, $fieldName)->get('enum_code');
         if (empty($enumCode)) {
             return true;
         }
 
         $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-        $immutable = $this->typeHelper->getImmutableCodes('enum', $enumValueClassName);
+        $immutable = $this->configProvider->getConfig($enumValueClassName)->get('immutable_codes');
 
         if (is_array($immutable) && in_array($data['id'], $immutable)) {
             return false;
