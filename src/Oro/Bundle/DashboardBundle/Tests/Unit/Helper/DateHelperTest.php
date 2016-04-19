@@ -351,8 +351,8 @@ class DateHelperTest extends OrmTestCase
                 [
                     ['date' => '2015-08-01'],
                     ['date' => '2015-09-01'],
-                    ['date' => '2015-10-01'],
-                    ['date' => '2015-11-01', 'count' => 5],
+                    ['date' => '2015-10-01', 'count' => 5],
+                    ['date' => '2015-11-01'],
                     ['date' => '2015-12-01'],
                 ]
             ],
@@ -371,8 +371,8 @@ class DateHelperTest extends OrmTestCase
                     ['date' => '2015-08-01'],
                     ['date' => '2015-09-01'],
                     ['date' => '2015-10-01'],
-                    ['date' => '2015-11-01', 'count' => 5],
-                    ['date' => '2015-12-01'],
+                    ['date' => '2015-11-01'],
+                    ['date' => '2015-12-01', 'count' => 5],
                 ]
             ]
         ];
