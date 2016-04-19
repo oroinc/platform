@@ -248,42 +248,91 @@ class FieldProviderTest extends EntityFieldProviderTest
      */
     public function getFieldsWithVirtualRelationsAndEnumsDataProvider()
     {
-        return [
+        $expectedResult =  [
+        [
             [
                 [
-                    [
-                        'name' => 'rel1',
-                        'type' => 'ref-one',
-                        'label' => 'Enum Field',
-                    ],
-                    [
-                        'name' => 'rel1',
-                        'type' => 'enum',
-                        'label' => 'Enum Field',
-                        'related_entity_name' => 'Acme\EnumValue1'
-                    ],
-                    [
-                        'name' => 'field1',
-                        'type' => 'integer',
-                        'label' => 'Field 1',
-                        'identifier' => true
-                    ],
-                    [
-                        'name' => 'rel2',
-                        'type' => 'multiEnum',
-                        'label' => 'Multi Enum Field',
-                        'related_entity_name' => 'Acme\EnumValue2'
-                    ],
-                    [
-                        'name' => 'virtual_relation',
-                        'type' => 'oneToMany',
-                        'label' => 'acme.entity.test.virtual_relation.label',
-                        'relation_type' => 'oneToMany',
-                        'related_entity_name' => 'OtherEntity'
-                    ]
+                    'name' => 'rel1',
+                    'type' => 'ref-one',
+                    'label' => 'Enum Field',
+                ],
+                [
+                    'name' => 'rel1',
+                    'type' => 'enum',
+                    'label' => 'Enum Field',
+                    'related_entity_name' => 'Acme\EnumValue1'
+                ],
+                [
+                    'name' => 'field1',
+                    'type' => 'integer',
+                    'label' => 'Field 1',
+                    'identifier' => true
+                ],
+                [
+                    'name' => 'rel2',
+                    'type' => 'multiEnum',
+                    'label' => 'Multi Enum Field',
+                    'related_entity_name' => 'Acme\EnumValue2'
+                ],
+                [
+                    'name' => 'virtual_relation',
+                    'type' => 'oneToMany',
+                    'label' => 'acme.entity.test.virtual_relation.label',
+                    'relation_type' => 'oneToMany',
+                    'related_entity_name' => 'OtherEntity'
                 ]
             ]
-        ];
+        ]
+    ];
+
+
+        /**
+         * Changed expected result according to changes
+         * in user defined sorting algorithm in php7
+         * https://bugs.php.net/bug.php?id=69158
+         */
+
+        if(version_compare(PHP_VERSION, '7.0.0') >= 0 ) {
+            $expectedResult =  [
+                [
+                    [
+                        [
+                            'name' => 'rel1',
+                            'type' => 'enum',
+                            'label' => 'Enum Field',
+                            'related_entity_name' => 'Acme\EnumValue1'
+                        ],
+                        [
+                            'name' => 'rel1',
+                            'type' => 'ref-one',
+                            'label' => 'Enum Field',
+                        ],
+                        [
+                            'name' => 'field1',
+                            'type' => 'integer',
+                            'label' => 'Field 1',
+                            'identifier' => true
+                        ],
+                        [
+                            'name' => 'rel2',
+                            'type' => 'multiEnum',
+                            'label' => 'Multi Enum Field',
+                            'related_entity_name' => 'Acme\EnumValue2'
+                        ],
+                        [
+                            'name' => 'virtual_relation',
+                            'type' => 'oneToMany',
+                            'label' => 'acme.entity.test.virtual_relation.label',
+                            'relation_type' => 'oneToMany',
+                            'related_entity_name' => 'OtherEntity'
+                        ]
+                    ]
+                ]
+            ];
+        }
+
+        return $expectedResult;
+
     }
 
     /**
