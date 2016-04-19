@@ -12,6 +12,7 @@ use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 
 class StorageDataCollector
 {
@@ -189,7 +190,11 @@ class StorageDataCollector
      */
     protected function generateStateHash(DatagridInterface $dataGrid)
     {
-        return md5(json_encode($dataGrid->getParameters()->all()));
+        $parameters = $dataGrid->getParameters()->all();
+        if (isset($parameters[PagerInterface::PAGER_ROOT_PARAM])) {
+            unset($parameters[PagerInterface::PAGER_ROOT_PARAM]);
+        }
+        return md5(json_encode($parameters));
     }
 
     /**
