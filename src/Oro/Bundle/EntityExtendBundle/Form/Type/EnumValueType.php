@@ -12,17 +12,17 @@ use Symfony\Component\Validator\Constraints as Assert;
 use Oro\Bundle\EntityExtendBundle\Validator\Constraints as ExtendAssert;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProviderInterface;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class EnumValueType extends AbstractType
 {
-    /** @var ConfigProviderInterface */
+    /** @var ConfigProvider */
     protected $configProvider;
 
     /**
-     * @param ConfigProviderInterface $configProvider
+     * @param ConfigProvider $configProvider
      */
-    public function __construct(ConfigProviderInterface $configProvider)
+    public function __construct(ConfigProvider $configProvider)
     {
         $this->configProvider = $configProvider;
     }
@@ -70,33 +70,19 @@ class EnumValueType extends AbstractType
             return true;
         }
 
-        $className = $configId->getClassName();
-        if (empty($className)) {
+        if (!$this->configProvider->hasConfigById($configId)) {
             return true;
         }
 
-        $fieldName = $configId->getFieldName();
-        if (empty($fieldName)) {
-            return true;
-        }
-
-        if (!$this->configProvider->hasConfig($className, $fieldName)) {
-            return true;
-        }
-
-        $enumCode = $this->configProvider->getConfig($className, $fieldName)->get('enum_code');
+        $enumCode = $this->configProvider->getConfigById($configId)->get('enum_code');
         if (empty($enumCode)) {
             return true;
         }
 
-        $enumValueClassName = ExtendHelper::buildEnumValueClassName($enumCode);
-        $immutable = $this->configProvider->getConfig($enumValueClassName)->get('immutable_codes');
+        $className = ExtendHelper::buildEnumValueClassName($enumCode);
+        $config    = $this->configProvider->getConfig($className);
 
-        if (is_array($immutable) && in_array($data['id'], $immutable)) {
-            return false;
-        }
-
-        return true;
+        return !in_array($data['id'], $config->get('immutable_codes', false, []));
     }
 
     /**
