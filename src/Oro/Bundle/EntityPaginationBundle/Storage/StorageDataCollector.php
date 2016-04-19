@@ -11,7 +11,8 @@ use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
+use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 
 class StorageDataCollector
 {
@@ -189,13 +190,11 @@ class StorageDataCollector
      */
     protected function generateStateHash(DatagridInterface $dataGrid)
     {
-        $state = $dataGrid->getMetadata()->offsetGetByPath('[state]');
-        $data = [
-            'filters' => !empty($state['filters']) ? $state['filters'] : [],
-            'sorters' => !empty($state['sorters']) ? $state['sorters'] : [],
-        ];
-
-        return md5(json_encode($data));
+        $parameters = $dataGrid->getParameters()->all();
+        if (isset($parameters[PagerInterface::PAGER_ROOT_PARAM])) {
+            unset($parameters[PagerInterface::PAGER_ROOT_PARAM]);
+        }
+        return md5(json_encode($parameters));
     }
 
     /**
