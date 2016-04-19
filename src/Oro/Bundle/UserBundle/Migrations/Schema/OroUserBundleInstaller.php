@@ -222,20 +222,6 @@ class OroUserBundleInstaller implements
         $table = $schema->createTable('oro_user_access_role');
         $table->addColumn('user_id', 'integer', []);
         $table->addColumn('role_id', 'integer', []);
-        $table->addColumn(
-            'extend_description',
-            'text',
-            [
-                'oro_options' => [
-                    'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
-                    'datagrid'  => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
-                    'merge'     => ['display' => true],
-                    'dataaudit' => ['auditable' => true],
-                    'form'      => ['type' => 'oro_resizeable_rich_text'],
-                    'view'      => ['type' => 'html'],
-                ]
-            ]
-        );
         $table->addIndex(['user_id'], 'IDX_290571BEA76ED395', []);
         $table->addIndex(['role_id'], 'IDX_290571BED60322AC', []);
         $table->setPrimaryKey(['user_id', 'role_id']);
@@ -311,6 +297,20 @@ class OroUserBundleInstaller implements
         $table->addColumn('id', 'integer', ['precision' => 0, 'autoincrement' => true]);
         $table->addColumn('role', 'string', ['length' => 30, 'precision' => 0]);
         $table->addColumn('label', 'string', ['length' => 30, 'precision' => 0]);
+        $table->addColumn(
+            'extend_description',
+            'text',
+            [
+                'oro_options' => [
+                    'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+                    'datagrid'  => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                    'merge'     => ['display' => true],
+                    'dataaudit' => ['auditable' => true],
+                    'form'      => ['type' => 'oro_resizeable_rich_text'],
+                    'view'      => ['type' => 'html'],
+                ]
+            ]
+        );
         $table->addUniqueIndex(['role'], 'UNIQ_673F65E757698A6A');
         $table->setPrimaryKey(['id']);
     }
