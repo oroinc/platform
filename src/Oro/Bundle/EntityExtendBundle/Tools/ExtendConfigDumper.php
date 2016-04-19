@@ -117,7 +117,7 @@ class ExtendConfigDumper
      * @param callable|null $filter function (ConfigInterface $config) : bool
      * @param bool $updateCustom
      */
-    public function updateConfig($filter = null, $updateCustom = true)
+    public function updateConfig($filter = null, $updateCustom = false)
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);

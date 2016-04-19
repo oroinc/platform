@@ -149,14 +149,9 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getProviders')
             ->will($this->returnValue($providers));
 
-        if (null === $expectedData) {
-            $event->expects($this->never())
-                ->method('setData');
-        } else {
-            $event->expects($this->once())
-                ->method('setData')
-                ->with($expectedData);
-        }
+        $event->expects($this->once())
+            ->method('setData')
+            ->with($expectedData ?: $data);
 
         $this->subscriber->preSetData($event);
     }
@@ -242,8 +237,8 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->configManager->expects($this->exactly(2))
                 ->method('persist')
                 ->withConsecutive(
-                    [$expectedConfig],
-                    [new Config(new EntityConfigId('extend'), ['pending_changes' => []])]
+                    [new Config(new EntityConfigId('extend'), ['pending_changes' => []])],
+                    [$expectedConfig]
                 );
         }
 
