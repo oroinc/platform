@@ -105,14 +105,12 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
             // if can't find entity and new entity can't be persisted
             if (!$isPersistNew) {
                 if ($entityIsRelation) {
-                    if (is_object($entity)) {
-                        $class = $this->chainEntityClassNameProvider->getEntityClassName(ClassUtils::getClass($entity));
-                        $errorMessages = [$this->translator->trans(
-                            'oro.importexport.import.errors.not_found_entity',
-                            ['%entity_name%' => $class]
-                        )];
-                        $this->strategyHelper->addValidationErrors($errorMessages, $this->context);
-                    }
+                    $class = $this->chainEntityClassNameProvider->getEntityClassName(ClassUtils::getClass($entity));
+                    $errorMessages = [$this->translator->trans(
+                        'oro.importexport.import.errors.not_found_entity',
+                        ['%entity_name%' => $class]
+                    )];
+                    $this->strategyHelper->addValidationErrors($errorMessages, $this->context);
                 }
 
                 return null;
