@@ -138,7 +138,7 @@ class ImportStrategyHelper
         $violations = $this->validator->validate($entity, $groups);
         if (count($violations)) {
             $errors = array();
-``
+
             if (is_object($entity)) {
                 $entityClassName = ClassUtils::getClass($entity);
             }
