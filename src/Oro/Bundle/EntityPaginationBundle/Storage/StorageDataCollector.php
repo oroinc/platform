@@ -9,7 +9,6 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
@@ -32,11 +31,6 @@ class StorageDataCollector
     protected $aclHelper;
 
     /**
-     * @var Pager
-     */
-    protected $pager;
-
-    /**
      * @var EntityPaginationStorage
      */
     protected $storage;
@@ -50,7 +44,6 @@ class StorageDataCollector
      * @param DataGridManager $dataGridManager
      * @param DoctrineHelper $doctrineHelper
      * @param AclHelper $aclHelper
-     * @param Pager $pager
      * @param EntityPaginationStorage $storage
      * @param EntityPaginationManager $paginationManager
      */
@@ -58,14 +51,12 @@ class StorageDataCollector
         DataGridManager $dataGridManager,
         DoctrineHelper $doctrineHelper,
         AclHelper $aclHelper,
-        Pager $pager,
         EntityPaginationStorage $storage,
         EntityPaginationManager $paginationManager
     ) {
         $this->datagridManager   = $dataGridManager;
         $this->doctrineHelper    = $doctrineHelper;
         $this->aclHelper         = $aclHelper;
-        $this->pager             = $pager;
         $this->storage           = $storage;
         $this->paginationManager = $paginationManager;
     }
@@ -105,7 +96,6 @@ class StorageDataCollector
 
             /** @var OrmDatasource $dataSource */
             $dataSource = $dataGrid->getDatasource();
-            $dataGrid->getAcceptor()->acceptDatasource($dataSource);
 
             $entityName = $this->getEntityName($dataSource);
             $stateHash = $this->generateStateHash($dataGrid);
@@ -165,6 +155,10 @@ class StorageDataCollector
      */
     protected function getTotalCount(DatagridInterface $dataGrid)
     {
+        /** @var OrmDatasource $dataSource */
+        $dataSource = $dataGrid->getDatasource();
+        $dataGrid->getAcceptor()->acceptDatasource($dataSource);
+
         /**
          * Total is already calculated by OrmPagerExtension::visitDatasource when acceptDatasource() was called.
          * Call acceptResult() on fake data to get the value of total.
