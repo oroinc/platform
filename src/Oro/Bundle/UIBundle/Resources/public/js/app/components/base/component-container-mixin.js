@@ -67,8 +67,8 @@ define(function(require) {
         /**
          * Initializes all linked page components
          */
-        initPageComponents: function() {
-            return this._getComponentManager().init();
+        initPageComponents: function(options) {
+            return this._getComponentManager().init(options);
         },
 
         /**

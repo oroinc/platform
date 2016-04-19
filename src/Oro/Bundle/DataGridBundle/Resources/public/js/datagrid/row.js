@@ -37,7 +37,8 @@ define([
             view: '',
             optionPrefix: 'row',
             className: 'grid-row',
-            actionSelector: ''
+            actionSelector: '',
+            transferModel: false
         },
 
         /**
@@ -239,6 +240,11 @@ define([
             var state = {selected: false};
             this.model.trigger('backgrid:isSelected', this.model, state);
             this.$el.toggleClass('row-selected', state.selected);
+
+            if (this.themeOptions.transferModel) {
+                this.initLayout({gridModel: this.model});
+            }
+
             return this;
         },
 
@@ -260,7 +266,6 @@ define([
                     e.stopPropagation();
                 });
             }
-
             return this;
         }
     });

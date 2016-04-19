@@ -18,18 +18,20 @@ define([
     ComponentManager.prototype = {
         eventNamespace: '.component-manager',
 
-        init: function() {
+        init: function(options) {
             var promises;
+            var self = this;
             var elements = [];
             var modules = [];
 
             this._analyseDom(elements, modules);
 
-            promises = _.map(elements, this._initComponent, this);
+            promises = _.each(elements, function(element) {
+                self._initComponent(element, options);
+            });
 
             // optimize load time - preload components in separate layouts
             require(modules, _.noop);
-
             return $.when.apply($, _.compact(promises)).then(function() {
                 return _.compact(arguments);
             });
@@ -135,7 +137,7 @@ define([
          * @returns {Promise}
          * @protected
          */
-        _initComponent: function($elem) {
+        _initComponent: function($elem, options) {
             var data = this._readData($elem);
             this._cleanupData($elem);
 
@@ -143,10 +145,9 @@ define([
             $elem.attr('data-bound-component', data.module);
 
             var initDeferred = $.Deferred();
-
             require(
                 [data.module],
-                _.bind(this._onComponentLoaded, this, initDeferred, data.options),
+                _.bind(this._onComponentLoaded, this, initDeferred, _.extend(options || {}, data.options)),
                 _.bind(this._onRequireJsError, this, initDeferred)
             );
 
