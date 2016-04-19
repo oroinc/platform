@@ -92,9 +92,6 @@ class StorageDataCollector
                 continue;
             }
 
-            // Depending on scope entity pagination should apply different permission to datasource, e.g. VIEW or EDIT
-            $dataGrid->getConfig()->setDatasourceAclApplyPermission(EntityPaginationManager::getPermission($scope));
-
             /** @var OrmDatasource $dataSource */
             $dataSource = $dataGrid->getDatasource();
 
@@ -104,7 +101,7 @@ class StorageDataCollector
             // if entities are not in storage
             if (!$this->storage->hasData($entityName, $stateHash, $scope)) {
                 $entitiesLimit = $this->getEntitiesLimit();
-                $totalCount = $this->getTotalCount($dataGrid);
+                $totalCount = $this->getTotalCount($dataGrid, $scope);
 
                 // if grid contains allowed number of entities
                 if ($totalCount <= $entitiesLimit) {
@@ -152,10 +149,14 @@ class StorageDataCollector
 
     /**
      * @param DatagridInterface $dataGrid
+     * @param string $scope
      * @return int
      */
-    protected function getTotalCount(DatagridInterface $dataGrid)
+    protected function getTotalCount(DatagridInterface $dataGrid, $scope)
     {
+        // Depending on scope entity pagination should apply different permission to datasource, e.g. VIEW or EDIT
+        $dataGrid->getConfig()->setDatasourceAclApplyPermission(EntityPaginationManager::getPermission($scope));
+
         /** @var OrmDatasource $dataSource */
         $dataSource = $dataGrid->getDatasource();
         $dataGrid->getAcceptor()->acceptDatasource($dataSource);
