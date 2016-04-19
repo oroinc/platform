@@ -6,10 +6,10 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
-use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager as DatagridManager;
@@ -100,6 +100,10 @@ class StorageDataCollector
                 continue;
             }
 
+            // Depending on scope entity pagination should apply different permission to datasource, e.g. VIEW or EDIT
+            $dataGrid->getConfig()->setDatasourceAclApplyPermission(EntityPaginationManager::getPermission($scope));
+
+            /** @var OrmDatasource $dataSource */
             $dataSource = $dataGrid->getDatasource();
             $dataGrid->getAcceptor()->acceptDatasource($dataSource);
 
@@ -109,12 +113,12 @@ class StorageDataCollector
             // if entities are not in storage
             if (!$this->storage->hasData($entityName, $stateHash, $scope)) {
                 $entitiesLimit = $this->getEntitiesLimit();
-                $totalCount = $this->getTotalCount($dataSource, $scope);
+                $totalCount = $this->getTotalCount($dataGrid);
 
                 // if grid contains allowed number of entities
                 if ($totalCount <= $entitiesLimit) {
                     // collect and set entity IDs
-                    $entityIds = $this->getAllEntityIds($dataSource, $scope, $entitiesLimit);
+                    $entityIds = $this->getAllEntityIds($dataSource, $scope);
                     $this->storage->setData($entityName, $stateHash, $entityIds, $scope);
                 } else {
                     // set empty array as a sign that data is collected, but pagination itself must be disabled
@@ -156,19 +160,21 @@ class StorageDataCollector
     }
 
     /**
-     * @param OrmDatasource $dataSource
-     * @param string $scope
+     * @param DatagridInterface $dataGrid
      * @return int
      */
-    protected function getTotalCount(OrmDatasource $dataSource, $scope)
+    protected function getTotalCount(DatagridInterface $dataGrid)
     {
-        $permission = EntityPaginationManager::getPermission($scope);
+        /**
+         * Total is already calculated by OrmPagerExtension::visitDatasource when acceptDatasource() was called.
+         * Call acceptResult() on fake data to get the value of total.
+         *
+         * @see \Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension::visitResult
+         */
+        $result = ResultsObject::create(['data' => []]);
+        $dataGrid->getAcceptor()->acceptResult($result);
 
-        $pager = clone $this->pager;
-        $pager->setQueryBuilder($dataSource->getQueryBuilder());
-        $pager->setAclPermission($permission);
-
-        return $pager->computeNbResult();
+        return $result->getTotalRecords();
     }
 
     /**
