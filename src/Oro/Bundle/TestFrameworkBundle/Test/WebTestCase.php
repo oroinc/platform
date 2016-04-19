@@ -29,6 +29,7 @@ abstract class WebTestCase extends BaseWebTestCase
     /** Annotation names */
     const DB_ISOLATION_ANNOTATION = 'dbIsolation';
     const DB_REINDEX_ANNOTATION   = 'dbReindex';
+    const CONFIG_ISOLATION_ANNOTATION = 'configIsolation';
 
     /** Default WSSE credentials */
     const USER_NAME     = 'admin';
@@ -48,6 +49,11 @@ abstract class WebTestCase extends BaseWebTestCase
      * @var bool[]
      */
     private static $dbReindex;
+
+    /**
+     * @var bool[]
+     */
+    private static $configIsolation;
 
     /**
      * @var Client
@@ -96,6 +102,11 @@ abstract class WebTestCase extends BaseWebTestCase
             if (self::getDbIsolationSetting()) {
                 self::$clientInstance->rollbackTransaction();
             }
+
+            if (self::getConfigIsolationSetting()) {
+                self::getContainer()->get('oro_entity_config.cache')->deleteAllConfigs();
+            }
+
             self::$clientInstance = null;
             self::$soapClientInstance = null;
             self::$loadedFixtures = [];
@@ -209,6 +220,24 @@ abstract class WebTestCase extends BaseWebTestCase
         }
 
         return self::$dbReindex[$calledClass];
+    }
+
+    /**
+     * Get value of configIsolation option from annotation of called class
+     *
+     * @return bool
+     */
+    private static function getConfigIsolationSetting()
+    {
+        $calledClass = get_called_class();
+        if (!isset(self::$configIsolation[$calledClass])) {
+            self::$configIsolation[$calledClass] = self::isClassHasAnnotation(
+                $calledClass,
+                self::CONFIG_ISOLATION_ANNOTATION
+            );
+        }
+
+        return self::$configIsolation[$calledClass];
     }
 
     /**
