@@ -138,6 +138,9 @@ Single operation configuration has next properties:
 * **for_all_datagrids**
     *boolean*
     Flag that determines that current operation should be matched for all datagrids if any present.
+* **exclude_datagrids**
+    *array*
+    Define a list of datagrid names witch should be excluded from matching with current operation.
 * **order**
     *integer*
     Parameter that specifies the display order of operations buttons.
@@ -213,8 +216,8 @@ Matching
 Matching properties are:
 - `for_all_entities` and `for_all_datagrids` as wildcards boolean indicators.
 - And elements comparisons: `entities`, `routes`, `datagrids`
-- also here is present `exclude_entities` - as exclusion matcher useful with wildcard `for_all_entities` defined to
-`true`.
+- also here is present `exclude_entities` and `exclude_datagrids` - as exclusion matchers useful with wildcard 
+`for_all_entities` and `for_all_datagrids` defined to `true`.
 
 How it works? **Filters** discards all non matched operations and applied first before matchers.
 Then, **matchers**, in turn, collect all operations, among filtered, where any of comparison met though `OR` statement.
