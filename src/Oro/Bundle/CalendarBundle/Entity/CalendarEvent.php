@@ -258,7 +258,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     /**
      * @var Recurrence
      *
-     * @ORM\OneToOne(targetEntity="Recurrence")
+     * @ORM\OneToOne(targetEntity="Recurrence", cascade={"persist"})
      * @ORM\JoinColumn(name="recurrence_id", nullable=true, referencedColumnName="id", onDelete="SET NULL")
      */
     protected $recurrence;

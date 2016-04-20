@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -47,7 +48,22 @@ class RestCalendarEventTest extends WebTestCase
             'start'           => date(DATE_RFC3339),
             'end'             => date(DATE_RFC3339),
             'allDay'          => true,
-            'backgroundColor' => '#FF0000'
+            'backgroundColor' => '#FF0000',
+            'recurrence'      => [
+                'recurrenceType' => Recurrence::TYPE_DAILY,
+                'interval' => 1,
+                'startTime' => date(DATE_RFC3339),
+                'exceptions' => [
+                    [
+                        'originalDate' => date(DATE_RFC3339),
+                        'title' =>  'Test Exception Title',
+                        'description' =>  'Test Description of Exception',
+                        'start' => date(DATE_RFC3339),
+                        'end' => date(DATE_RFC3339),
+                        'allDay' => false,
+                    ]
+                ],
+            ],
         );
         $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
 
@@ -75,7 +91,22 @@ class RestCalendarEventTest extends WebTestCase
             'start'           => date(DATE_RFC3339),
             'end'             => date(DATE_RFC3339),
             'allDay'          => true,
-            'backgroundColor' => '#FF0000'
+            'backgroundColor' => '#FF0000',
+            'recurrence'      => [
+                'recurrenceType' => Recurrence::TYPE_DAILY,
+                'interval' => 1,
+                'startTime' => date(DATE_RFC3339),
+                'exceptions' => [
+                    [
+                        'originalDate' => date(DATE_RFC3339),
+                        'title' =>  'Test Exception Title',
+                        'description' =>  'Test Description of Exception',
+                        'start' => date(DATE_RFC3339),
+                        'end' => date(DATE_RFC3339),
+                        'allDay' => false,
+                    ]
+                ],
+            ],
         );
         $this->client->request(
             'PUT',

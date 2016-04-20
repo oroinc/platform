@@ -115,6 +115,9 @@ oro:
             system_calendar.label:   System Calendar
             invitation.label:        Guests
             invitation_status.label: Invitation status
+            recurrence.label:      Recurrence
+            exceptions.label:      Exceptions
+            parentException.label: Parent of exception
 
             no_color:             Use calendar color
             updated_by:           added by {{ user }}, updated by {{ editor }}
@@ -148,3 +151,43 @@ oro:
             visible.label:          Visible
             color.label:            Color
             background_color.label: Background
+
+        #
+        # Oro/Bundle/CalendarBundle/Entity/Recurrence
+        #
+        recurrence:
+            entity_label:           Recurrence
+            entity_plural_label:    Recurrences
+            type.label:             Recurrence type
+            interval.label:         Interval
+            instance.label:         Instance
+            day_of_week.label:      Day of week
+            day_of_month.label:     Day of month
+            month_of_year.label:    Month of year
+            start_time.label:       Start time
+            end_time.label:         End time
+            occurrences.label:      Occurrences
+
+            types:
+                daily:              Daily
+                weekly:             Weekly
+                monthly:            Monthly
+                monthnth:           Monthnth
+                yearly:             Yearly
+                yearnth:            Yearnth
+
+            instances:
+                first:              First
+                second:             Second
+                third:              Third
+                fourth:             Fourth
+                last:               Last
+
+            days:
+                sunday:             Sunday
+                monday:             Monday
+                tuesday:            Tuesday
+                wednesday:          Wednesday
+                thursday:           Thursday
+                friday:             Friday
+                saturday:           Saturday

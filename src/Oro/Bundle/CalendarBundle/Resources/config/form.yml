@@ -13,6 +13,8 @@ parameters:
     oro_calendar.system_calendar.form.type.class:                  Oro\Bundle\CalendarBundle\Form\Type\SystemCalendarType
     oro_calendar.system_calendar_event.form.handler.class:         Oro\Bundle\CalendarBundle\Form\Handler\SystemCalendarEventHandler
     oro_calendar.extension.acl_label.class:                        Oro\Bundle\CalendarBundle\Form\Extension\AclObjectLabelTypeExtension
+    oro_calendar.recurrence.form.type.class:                       Oro\Bundle\CalendarBundle\Form\Type\RecurrenceFormType
+    oro_calendar.exception.form.type.class:                       Oro\Bundle\CalendarBundle\Form\Type\ExceptionFormType
 
 services:
     oro_calendar.calendar_event.form.type:
@@ -175,3 +177,13 @@ services:
         class: %oro_calendar.extension.acl_label.class%
         tags:
             - { name: form.type_extension, alias: oro_acl_label }
+
+    oro_calendar.recurrence.form.type:
+        class: '%oro_calendar.recurrence.form.type.class%'
+        tags:
+            - { name: form.type, alias: oro_calendar_recurrence }
+
+    oro_calendar.exception.form.type:
+        class: '%oro_calendar.exception.form.type.class%'
+        tags:
+            - { name: form.type, alias: oro_calendar_exception }

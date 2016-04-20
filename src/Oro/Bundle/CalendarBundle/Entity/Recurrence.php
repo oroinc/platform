@@ -25,6 +25,20 @@ class Recurrence
     const TYPE_YEARLY = 'yearly';
     const TYPE_YEAR_N_TH = 'yearnth';
 
+    const INSTANCE_FIRST = 1;
+    const INSTANCE_SECOND = 2;
+    const INSTANCE_THIRD = 3;
+    const INSTANCE_FOURTH = 4;
+    const INSTANCE_LAST = 5;
+    
+    const DAY_SUNDAY = 'sunday';
+    const DAY_MONDAY = 'monday';
+    const DAY_TUESDAY = 'tuesday';
+    const DAY_WEDNESDAY = 'wednesday';
+    const DAY_THURSDAY = 'thursday';
+    const DAY_FRIDAY = 'friday';
+    const DAY_SATURDAY = 'saturday';
+
     /**
      * @ORM\Id
      * @ORM\Column(type="integer")

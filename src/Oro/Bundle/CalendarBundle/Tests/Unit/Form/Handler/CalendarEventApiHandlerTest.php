@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Handler;
 
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\HttpFoundation\ParameterBag;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -35,6 +36,7 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->request = new Request();
+        $this->request->request = new ParameterBag($data = []);
         $this->om = $this->getMockBuilder('Doctrine\Common\Persistence\ObjectManager')
             ->disableOriginalConstructor()
             ->getMock();
@@ -52,7 +54,7 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($this->obj));
         $this->form->expects($this->once())
             ->method('submit')
-            ->with($this->identicalTo($this->request));
+            ->with($this->identicalTo($data));
         $this->form->expects($this->once())
             ->method('isValid')
             ->will($this->returnValue(true));
