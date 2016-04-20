@@ -178,10 +178,16 @@ class DashboardModel implements EntityModelInterface
             function ($first, $second) {
                 /** @var WidgetModel $first */
                 /** @var WidgetModel $second */
-                $firstPosition  = $first->getLayoutPosition();
-                $secondPosition = $second->getLayoutPosition();
-
-                return $firstPosition[1] - $secondPosition[1];
+                /**
+                 * In php 7 was changed sorting algorithm to make
+                 * order of elements the same as on php 5.*,
+                 * we should return '-1' instead of '1' as result
+                 * on compare elements with equals priority
+                 */
+                if (version_compare(PHP_VERSION, '7.0.0', '>=')) {
+                    return $first->getLayoutPosition() > $second->getLayoutPosition() ? 1 : -1;
+                }
+                return $first->getLayoutPosition() < $second->getLayoutPosition() ? -1 : 1;
             }
         );
 
