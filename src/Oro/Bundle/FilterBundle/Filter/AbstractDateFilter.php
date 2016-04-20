@@ -29,7 +29,7 @@ abstract class AbstractDateFilter extends AbstractFilter
      */
     public function apply(FilterDatasourceAdapterInterface $ds, $data)
     {
-        $data = $this->dateFilterUtility->parseData($this->get(FilterUtility::DATA_NAME_KEY), $data);
+        $data = $this->dateFilterUtility->parseData($this->get(FilterUtility::DATA_NAME_KEY), $data, $this->name);
         if (!$data) {
             return false;
         }
