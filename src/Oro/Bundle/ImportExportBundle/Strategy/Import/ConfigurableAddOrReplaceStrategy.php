@@ -108,7 +108,7 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                     $class = $this->chainEntityClassNameProvider->getEntityClassName(ClassUtils::getClass($entity));
                     $errorMessages = [$this->translator->trans(
                         'oro.importexport.import.errors.not_found_entity',
-                        ['%entity_name%'=>$class]
+                        ['%entity_name%' => $class]
                     )];
                     $this->strategyHelper->addValidationErrors($errorMessages, $this->context);
                 }
