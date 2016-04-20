@@ -60,6 +60,41 @@ abstract class ActionTestCase extends WebTestCase
     }
 
     /**
+     * @param mixed $entityId
+     * @param string $entityClass
+     * @param string $redirectUrl
+     * @param bool $isSuccess
+     * @param array $server
+     * @param int $expectedCode
+     */
+    protected function assertDeleteOperation(
+        $entityId,
+        $entityClass,
+        $redirectUrl,
+        $isSuccess = true,
+        array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'],
+        $expectedCode = Response::HTTP_OK
+    ) {
+        $container = $this->getContainer();
+
+        if ($container->hasParameter($entityClass)) {
+            $entityClass = $container->getParameter($entityClass);
+        }
+
+        $this->assertExecuteOperation('DELETE', $entityId, $entityClass, [], $server, $expectedCode);
+
+        $this->assertEquals(
+            [
+                'success' => $isSuccess,
+                'message' => '',
+                'messages' => [],
+                'redirectUrl' => $this->getUrl($redirectUrl)
+            ],
+            json_decode($this->client->getResponse()->getContent(), true)
+        );
+    }
+
+    /**
      * @param string $operationName
      * @param mixed $entityId
      * @param string $entityClass
