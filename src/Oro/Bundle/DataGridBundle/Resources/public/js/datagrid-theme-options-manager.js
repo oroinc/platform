@@ -61,16 +61,11 @@ define(function(require) {
                 options[key] = view.prototype[key];
             }
 
-            if (!options[key]) {
-                options[key] = value;
-            } else if (_.isFunction(options[key])) {
+            if (_.isFunction(options[key])) {
                 var oldValueFunction = options[key];
                 options[key] = function() {
                     var oldValue = oldValueFunction.call(this);
-                    if (oldValue) {
-                        return mergeCallback(oldValue, value);
-                    }
-                    return value;
+                    return mergeCallback(oldValue, value);
                 };
             } else {
                 options[key] = mergeCallback(options[key], value);
@@ -85,13 +80,13 @@ define(function(require) {
 
         attributesOption: function(view, options, attributes) {
             this.mergeOption(view, options, 'attributes', attributes, function(option, themeOption) {
-                return $.extend(true, option, themeOption);
+                return $.extend(true, {}, option || {}, themeOption);
             });
         },
 
         classNameOption: function(view, options, className) {
             this.mergeOption(view, options, 'className', className, function(option, themeOption) {
-                return option + ' ' + themeOption;
+                return (option ? option + ' ' : '') + themeOption;
             });
         },
 

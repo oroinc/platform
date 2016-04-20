@@ -145,9 +145,10 @@ define([
             $elem.attr('data-bound-component', data.module);
 
             var initDeferred = $.Deferred();
+            var componentOptions = $.extend(true, {}, options || {}, data.options);
             require(
                 [data.module],
-                _.bind(this._onComponentLoaded, this, initDeferred, $.extend(true, options || {}, data.options)),
+                _.bind(this._onComponentLoaded, this, initDeferred, componentOptions),
                 _.bind(this._onRequireJsError, this, initDeferred)
             );
 
