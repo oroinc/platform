@@ -20,15 +20,14 @@ define([
 
         init: function(options) {
             var promises;
-            var self = this;
             var elements = [];
             var modules = [];
 
             this._analyseDom(elements, modules);
 
-            promises = _.each(elements, function(element) {
-                self._initComponent(element, options);
-            });
+            promises = _.each(elements, _.bind(function(element) {
+                this._initComponent(element, options);
+            }, this));
 
             // optimize load time - preload components in separate layouts
             require(modules, _.noop);
@@ -134,6 +133,7 @@ define([
          * Initializes component for the element
          *
          * @param {jQuery} $elem
+         * @param {Object|null} options
          * @returns {Promise}
          * @protected
          */
@@ -147,7 +147,7 @@ define([
             var initDeferred = $.Deferred();
             require(
                 [data.module],
-                _.bind(this._onComponentLoaded, this, initDeferred, _.extend(options || {}, data.options)),
+                _.bind(this._onComponentLoaded, this, initDeferred, $.extend(true, options || {}, data.options)),
                 _.bind(this._onRequireJsError, this, initDeferred)
             );
 

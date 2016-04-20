@@ -37,8 +37,7 @@ define([
             view: '',
             optionPrefix: 'row',
             className: 'grid-row',
-            actionSelector: '',
-            transferModel: false
+            actionSelector: ''
         },
 
         /**
@@ -241,8 +240,8 @@ define([
             this.model.trigger('backgrid:isSelected', this.model, state);
             this.$el.toggleClass('row-selected', state.selected);
 
-            if (this.themeOptions.transferModel) {
-                this.initLayout({gridModel: this.model});
+            if (this.$el.data('layout') === 'separate') {
+                this.initLayout({model: this.model});
             }
 
             return this;

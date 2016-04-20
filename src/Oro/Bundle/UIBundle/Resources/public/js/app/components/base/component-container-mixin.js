@@ -66,6 +66,7 @@ define(function(require) {
 
         /**
          * Initializes all linked page components
+         * @param {Object|null} options
          */
         initPageComponents: function(options) {
             return this._getComponentManager().init(options);
