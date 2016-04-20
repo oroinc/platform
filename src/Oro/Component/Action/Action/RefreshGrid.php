@@ -25,11 +25,7 @@ class RefreshGrid extends AbstractAction
         $gridNames = $this->contextAccessor->getValue($context, $property);
         $gridNames = array_map(
             function ($gridName) use ($context) {
-                if ($gridName instanceof PropertyPathInterface) {
-                    return $this->contextAccessor->getValue($context, $gridName);
-                } else {
-                    return $gridName;
-                }
+                return $this->contextAccessor->getValue($context, $gridName);
             },
             array_merge((array)$gridNames, $this->gridNames)
         );
