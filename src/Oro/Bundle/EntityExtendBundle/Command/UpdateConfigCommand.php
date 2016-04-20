@@ -24,7 +24,7 @@ class UpdateConfigCommand extends ContainerAwareCommand
                 'update-custom',
                 null,
                 InputOption::VALUE_NONE,
-                'New fields will be activated if specified'
+                'Applies user changes that require schema update if specified'
             )
             ->addOption(
                 'skip-origin',

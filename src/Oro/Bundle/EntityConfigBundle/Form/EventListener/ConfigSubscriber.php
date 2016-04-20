@@ -20,6 +20,8 @@ use Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache;
 
 class ConfigSubscriber implements EventSubscriberInterface
 {
+    const NEW_PENDING_VALUE_KEY = 1;
+
     /**
      * @var ManagerRegistry
      */
@@ -77,7 +79,7 @@ class ConfigSubscriber implements EventSubscriberInterface
         $configModel = $event->getForm()->getConfig()->getOption('config_model');
 
         $event->setData(
-            $this->updateTranslatables(
+            $this->updateTranslatableValues(
                 $configModel,
                 $this->updateDataWithPendingChanges($configModel, $event->getData())
             )
@@ -165,7 +167,7 @@ class ConfigSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param ConfigMode $configModel
+     * @param ConfigModel $configModel
      * @param array $data
      *
      * @return array
@@ -185,7 +187,7 @@ class ConfigSubscriber implements EventSubscriberInterface
 
             $values = array_intersect_key($data[$scope], $pendingChanges[$scope]);
             foreach ($values as $code => $value) {
-                $pendingChanges[$scope][$code][1] = $value;
+                $pendingChanges[$scope][$code][static::NEW_PENDING_VALUE_KEY] = $value;
                 unset($data[$scope][$code]);
             }
         }
@@ -229,9 +231,8 @@ class ConfigSubscriber implements EventSubscriberInterface
      *
      * @return array
      */
-    protected function updateTranslatables(ConfigModel $configModel, array $data)
+    protected function updateTranslatableValues(ConfigModel $configModel, array $data)
     {
-        $dataChanges = false;
         foreach ($this->configManager->getProviders() as $provider) {
             $scope = $provider->getScope();
             if (isset($data[$scope])) {
@@ -247,7 +248,6 @@ class ConfigSubscriber implements EventSubscriberInterface
                         } else {
                             $data[$scope][$code] = '';
                         }
-                        $dataChanges = true;
                     }
                 }
             }
