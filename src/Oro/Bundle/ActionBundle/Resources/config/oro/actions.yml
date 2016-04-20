@@ -94,7 +94,9 @@ operations:
                         attribute: $.routes
         preconditions:
             '@and':
-                - '@not_blank': $.routes[name]
+                - '@or':
+                    - '@not_blank': $.routes[name]
+                    - '@not_blank': $.gridName
         label: oro.action.delete
         frontend_options:
             title: oro.action.delete_entity
@@ -117,12 +119,16 @@ operations:
                     entityLabel: $.entityLabel
             - '@redirect':
                 conditions:
-                    '@empty': $.gridName
+                    '@and':
+                        - '@empty': $.gridName
+                        - '@not_empty': $.routes[name]
                 parameters:
                     route: $.routes[name]
             - '@refresh_grid':
                 conditions:
-                    '@not_empty': $.gridName
+                    '@and':
+                        - '@empty': $.routes[name]
+                        - '@not_empty': $.gridName
                 parameters: [$.gridName]
 
 action_groups:
