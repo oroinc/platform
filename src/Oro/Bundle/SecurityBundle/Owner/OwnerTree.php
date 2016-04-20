@@ -379,33 +379,29 @@ class OwnerTree implements OwnerTreeInterface
     public function buildTree()
     {
         $subordinateBusinessUnitIds = $this->subordinateBusinessUnitIds;
-        foreach ($subordinateBusinessUnitIds as &$deepLevelEntityIds) {
+        
+        foreach ($subordinateBusinessUnitIds as $key => $deepLevelEntityIds) {
             if (!empty($deepLevelEntityIds)) {
                 /**
                  * We have to add some element to the end of array and remove it after processing,
                  * otherwise the last element of the original array will not be processed.
                  */
-                $deepLevelEntityIds[] = 'EndOfArray';
-                foreach ($deepLevelEntityIds as $position => $deepLevelEntityId) {
-                    if ($deepLevelEntityId === 'EndOfArray') {
-                        $deepLevelEntityIds = array_slice($deepLevelEntityIds, 0, -1);
-                        break;
-                    }
+                $copy = $deepLevelEntityIds;
+                foreach ($copy as $position => &$deepLevelEntityId) {
                     if (!empty($subordinateBusinessUnitIds[$deepLevelEntityId])) {
                         $diff = array_diff(
                             $subordinateBusinessUnitIds[$deepLevelEntityId],
-                            $deepLevelEntityIds
+                            $copy
                         );
                         if ($diff) {
-                            array_splice(
-                                $deepLevelEntityIds,
-                                $position,
-                                1,
-                                array_merge([$deepLevelEntityId], $diff)
-                            );
+                            foreach ( $diff as $val ) {
+                                array_push($copy, $val);
+                            }
                         }
                     }
                 }
+
+                $subordinateBusinessUnitIds[$key] = $copy;
             }
         }
 
