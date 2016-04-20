@@ -106,7 +106,7 @@ class ContextHelper
     {
         $context = $this->getContext($context);
 
-        $hash = $this->generateHash($context, [self::ENTITY_CLASS_PARAM, self::ENTITY_ID_PARAM]);
+        $hash = $this->generateHash($context, [self::ENTITY_CLASS_PARAM, self::ENTITY_ID_PARAM, self::DATAGRID_PARAM]);
 
         if (!array_key_exists($hash, $this->actionDatas)) {
             $entity = null;
@@ -118,7 +118,13 @@ class ContextHelper
                 );
             }
 
-            $this->actionDatas[$hash] = new ActionData(['data' => $entity]);
+            $data = ['data' => $entity];
+
+            if ($context[self::DATAGRID_PARAM]) {
+                $data['gridName'] = $context[self::DATAGRID_PARAM];
+            }
+
+            $this->actionDatas[$hash] = new ActionData($data);
         }
 
         return $this->actionDatas[$hash];

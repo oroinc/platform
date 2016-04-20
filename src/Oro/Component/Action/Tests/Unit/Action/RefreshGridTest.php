@@ -3,6 +3,7 @@
 namespace Oro\Component\Action\Tests\Unit\Action;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Component\Action\Action\RefreshGrid;
 use Oro\Component\Action\Model\ContextAccessor;
@@ -86,6 +87,21 @@ class RefreshGridTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => ['param2' => 'value2', 'refreshGrid' => ['grid1', 'grid2']],
             ],
+            'with property path' => [
+                'input' => [
+                    'context' => [
+                        'param2' => 'value2',
+                        'refreshGrid' => ['grid1'],
+                        'testPropertyPath' => 'propertyPathData'
+                    ],
+                    'options' => ['grid2', new PropertyPath('testPropertyPath')]
+                ],
+                'expected' => [
+                    'param2' => 'value2',
+                    'refreshGrid' => ['grid1', 'grid2', 'propertyPathData'],
+                    'testPropertyPath' => 'propertyPathData'
+                ]
+            ]
         ];
     }
 }

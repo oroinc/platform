@@ -6,6 +6,19 @@ operations:
         preconditions:
             '@and':
                 - '@not_blank': $.data
+        preactions:
+            - '@tree':
+                conditions:
+                    '@not_blank': $.data
+                actions:
+                    - '@call_service_method':
+                        service: oro_entity_config.helper.entity_config
+                        method: getConfigValue
+                        method_parameters: [$.data, 'label']
+                        attribute: $.entityLabel
+                    - '@trans':
+                        id: $.entityLabel
+                        attribute: $.entityLabel
 
     UPDATE:
         extends: CRUD_ACTION
@@ -59,14 +72,6 @@ operations:
                         method: getRoutes
                         method_parameters: [$.data, ['name']]
                         attribute: $.routes
-                    - '@call_service_method':
-                        service: oro_entity_config.helper.entity_config
-                        method: getConfigValue
-                        method_parameters: [$.data, 'label']
-                        attribute: $.entityLabel
-                    - '@trans':
-                        id: $.entityLabel
-                        attribute: $.entityLabel
         preconditions:
             '@and':
                 - '@not_blank': $.routes[name]
@@ -87,11 +92,18 @@ operations:
                     data: $.data
             - '@flash_message':
                 message: oro.action.delete_message
-                type: 'info'
+                type: 'success'
                 message_parameters:
                     entityLabel: $.entityLabel
             - '@redirect':
-                route: $.routes[name]
+                conditions:
+                    '@empty': $.gridName
+                parameters:
+                    route: $.routes[name]
+            - '@refresh_grid':
+                conditions:
+                    '@not_empty': $.gridName
+                parameters: [$.gridName]
 
 action_groups:
     DELETE:
