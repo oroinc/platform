@@ -56,9 +56,10 @@ operations:
         exclude_entities: ['AcmeDemoBundle:MyEntity3']              # (optional) list of entities that must be ignored for this operation (usefull with "for_all_entities" option)
         routes:                                                     # (optional) list of routes
             - acme_demo_myentity_view                               # route name
-        datagrids                                                   # (optional) list of datagrids
+        datagrids:                                                  # (optional) list of datagrids
             - acme-demo-grid                                        # datagrid name
         for_all_datagrids: false                                    # (optional, default = false) is operation available in all datagrids if any   
+        exclude_datagrids: ['datagrid-demo']                        # (optional) list of datagrids that should never be matched by this operation in any context (usefull with "for_all_datagrids" option)
         groups: ['operations_on_acme_entities']                     # (optional) list of groups that can be assigned to operation (tagging mechanism) to be available or filtered among in usual code or templates
         order: 10                                                   # (optional, default = 0) display order of operation button
         acl_resource: acme_demo_myentity_view                       # (optional) ACL resource name that will be checked while checking that operation execution is allowed
@@ -190,9 +191,11 @@ So that default operation `DELETE` will not be matched for your entity and will 
 
 ####Can I disable default operation for my datagrid?
 
-  Yes. You can disable operation by updating datagrid configuration in its section `action_configuration` you should define 
-a key that corresponds to operation name with value `false`.
+  Yes. There are two ways to do that. **The first**: you can disable operation by updating datagrid configuration in its
+section `action_configuration` you should define a key that corresponds to operation name with value `false`.
+
 `datagrid.yml`:
+
 ```
 datagrid:
     your_datagrid_name:
@@ -200,7 +203,27 @@ datagrid:
         action_configuration:
             some_default_common_operation: false
 ```
-`some_default_common_operation` will not be displayed at `your_datagrid_name` grid anymore.
+
+`some_default_common_operation` will not be displayed at `your_datagrid_name` grid anymore. 
+However, action_configuration can accept callable as value, so that sometimes the options is occupied by service callback.
+If is that, we can use another approach.
+
+ The **second way** to disable operation for custom datagrid is to use `exclude_datagrids` option in operation definition.
+So you can specialize name of datagrid that should be excluded from matching by *operation*. 
+If your operation is defined by other bundle you can use *merge* behavior of operation configuration and just add an
+additional property value under your bundle config. For example, your operation that should not be displayed for 
+datagrid `product_view` is default operation `DELETE` from `OroActionBundle`. You can exclude your grid from matching with
+next addition to `<YourBundle>/Resources/config/oro/action.yml`
+
+```
+operations:
+    DELETE:
+        exclude_datagrids:
+            - product_view
+```
+This is it.
+You can always use more different ways to define, reuse or customize operation definition. With basic merge there also
+`replace`, `extend` and `substitute_operation` options to help with different cases.
 
 ####How I can modify CRUD default operation for my Bundle?
   If you need to customize somehow a default (or any other) operation. Suppose to change basically its `label`, you can
