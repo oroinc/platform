@@ -40,6 +40,8 @@ class ProcessTriggerCache
 
     /**
      * Write to cache entity classes and appropriate events
+     *
+     * @return array
      */
     public function build()
     {
@@ -70,6 +72,8 @@ class ProcessTriggerCache
         $this->provider->deleteAll();
         $this->provider->save(self::DATA, $data);
         $this->provider->save(self::BUILT, true);
+
+        return $data;
     }
 
     /**
@@ -82,10 +86,10 @@ class ProcessTriggerCache
         $this->assertProvider();
 
         if (!$this->isBuilt()) {
-            $this->build();
+            $data = $this->build();
+        } else {
+            $data = $this->provider->fetch(self::DATA);
         }
-
-        $data = $this->provider->fetch(self::DATA);
 
         return !empty($data[$entityClass]) && in_array($event, $data[$entityClass]);
     }
