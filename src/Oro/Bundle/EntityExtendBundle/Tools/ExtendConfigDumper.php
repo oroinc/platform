@@ -7,6 +7,7 @@ use Doctrine\Common\Cache\ClearableCache;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -30,6 +31,9 @@ class ExtendConfigDumper
     /** @var string */
     protected $cacheDir;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var ConfigProvider */
     protected $configProvider;
 
@@ -49,6 +53,7 @@ class ExtendConfigDumper
     protected $sortedExtensions;
 
     /**
+     * @param ConfigManager                   $configManager
      * @param ConfigProvider                  $configProvider
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      * @param FieldTypeHelper                 $fieldTypeHelper
@@ -56,12 +61,14 @@ class ExtendConfigDumper
      * @param string                          $cacheDir
      */
     public function __construct(
+        ConfigManager $configManager,
         ConfigProvider $configProvider,
         ExtendDbIdentifierNameGenerator $nameGenerator,
         FieldTypeHelper $fieldTypeHelper,
         EntityGenerator $entityGenerator,
         $cacheDir
     ) {
+        $this->configManager   = $configManager;
         $this->configProvider  = $configProvider;
         $this->nameGenerator   = $nameGenerator;
         $this->fieldTypeHelper = $fieldTypeHelper;
