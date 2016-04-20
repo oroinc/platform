@@ -458,7 +458,7 @@ class EnumValueTypeTest extends TypeTestCase
             ->getMock();
 
         $configProvider->expects($this->any())
-            ->method('hasConfig')
+            ->method('hasConfigById')
             ->will($this->returnValue($hasConfig));
 
         if ($hasConfig) {
@@ -470,8 +470,12 @@ class EnumValueTypeTest extends TypeTestCase
                 ->method('get')
                 ->will($this->returnValueMap([
                    ['enum_code', false, null, $enumCode],
-                   ['immutable_codes', false, null, $immutableCodes],
+                   ['immutable_codes', false, [], $immutableCodes],
                 ]));
+
+            $configProvider->expects($this->any())
+                ->method('getConfigById')
+                ->will($this->returnValue($config));
 
             $configProvider->expects($this->any())
                 ->method('getConfig')
