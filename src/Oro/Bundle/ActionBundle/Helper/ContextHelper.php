@@ -170,7 +170,7 @@ class ContextHelper
     {
         $entity = null;
 
-        if ($this->doctrineHelper->isManageableEntity($entityClass)) {
+        if ($this->isClassExists($entityClass) && $this->doctrineHelper->isManageableEntity($entityClass)) {
             if ($entityId) {
                 $entity = $this->doctrineHelper->getEntityReference($entityClass, $entityId);
             } else {
@@ -198,5 +198,20 @@ class ContextHelper
         ksort($array);
 
         return md5(json_encode($array, JSON_NUMERIC_CHECK));
+    }
+
+    /**
+     * @param string $className
+     * @return bool
+     */
+    protected function isClassExists($className)
+    {
+        if (class_exists($className)) {
+            $reflection = new \ReflectionClass($className);
+
+            return !$reflection->isAbstract();
+        }
+
+        return false;
     }
 }
