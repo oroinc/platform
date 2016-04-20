@@ -169,7 +169,7 @@ services:
         arguments:
             - %database_driver%
         tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, connection: default }
+            - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
     oro_search.provider.search_mapping:
         class: %oro_search.provider.search_mapping.class%
