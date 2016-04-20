@@ -394,7 +394,7 @@ class OwnerTree implements OwnerTreeInterface
                             $copy
                         );
                         if ($diff) {
-                            foreach ( $diff as $val ) {
+                            foreach ($diff as $val) {
                                 array_push($copy, $val);
                             }
                         }
