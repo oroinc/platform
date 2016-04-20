@@ -194,18 +194,19 @@ class ActivityContextApiEntityManager extends ApiEntityManager
     protected function prepareItemTitle($item, $targetClass, $target, $targetId)
     {
         if (!array_key_exists('title', $item) || !$item['title']) {
+            $text = [];
             if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
-                $text = [];
                 foreach ($fields as $field) {
                     $text[] = $this->mapper->getFieldValue($target, $field);
                 }
-                $item['title'] = implode(' ', $text);
-                return $item;
-            } else {
-                $item['title'] = $this->translator->trans('oro.entity.item', ['%id%' => $targetId]);
-                return $item;
             }
+            $item['title'] = array_filter($text)
+                ? implode(' ', $text)
+                : $this->translator->trans('oro.entity.item', ['%id%' => $targetId]);
+
+            return $item;
         }
+
         return $item;
     }
 }
