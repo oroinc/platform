@@ -44,12 +44,13 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
                 return;
             }
 
+            this.group = $(this.options.groupContainer);
+
             this.main = this._mainButtons($elems);
             if (this.options.useMainButtonsClone) {
                 this.main = this._prepareMainButton(this.main);
             }
 
-            this.group = $(this.options.groupContainer);
             this.group.append(this.main);
 
             // pushes rest buttons to dropdown
