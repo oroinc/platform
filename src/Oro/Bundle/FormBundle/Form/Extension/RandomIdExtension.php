@@ -33,6 +33,7 @@ class RandomIdExtension extends AbstractTypeExtension
         if (!empty($options['random_id']) && isset($view->vars['id'])) {
             $view->vars['attr'] = isset($view->vars['attr']) ? $view->vars['attr'] : [];
             $view->vars['attr']['data-ftid'] = $view->vars['id'];
+            $view->vars['attr']['data-role'] = ($view->parent ? 'field-' : 'form-') . $view->vars['name'];
             $view->vars['id'] .= uniqid('-uid-');
         }
     }
