@@ -4,7 +4,6 @@ namespace Oro\Bundle\TestFrameworkBundle\Test;
 
 use Doctrine\DBAL\Connection;
 use Doctrine\DBAL\Driver\PDOConnection;
-use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\KernelInterface;
@@ -149,26 +148,12 @@ class Client extends BaseClient
         $reflection->setAccessible(true);
         $reflection->setValue($newConnection, $oldConnection->getTransactionNestingLevel() + 1);
 
-        $this->updateEntityManagerConnection(
-            $this->getContainer()->get('doctrine.orm.entity_manager'),
-            $newConnection
-        );
-        $this->updateEntityManagerConnection(
-            $this->getContainer()->get('doctrine.orm.search_entity_manager'),
-            $newConnection
-        );
-    }
-
-    /**
-     * @param EntityManager $em
-     * @param Connection $newConnection
-     */
-    protected function updateEntityManagerConnection(EntityManager $em, Connection $newConnection)
-    {
-        if ($em->getConnection() !== $newConnection) {
+        //update connection of entity manager
+        $entityManager = $this->getContainer()->get('doctrine.orm.entity_manager');
+        if ($entityManager->getConnection() !== $newConnection) {
             $reflection = new \ReflectionProperty('Doctrine\ORM\EntityManager', 'conn');
             $reflection->setAccessible(true);
-            $reflection->setValue($em, $newConnection);
+            $reflection->setValue($entityManager, $newConnection);
         }
     }
 
