@@ -84,9 +84,8 @@ class ContextsToViewTransformer implements DataTransformerInterface
                         $text[] = $this->mapper->getFieldValue($target, $field);
                     }
                 }
-
-
-                $text = array_filter($text)
+                $text = array_filter($text);
+                $text = $text
                     ? implode(' ', $text)
                     : $this->translator->trans('oro.entity.item', ['%id%' => $target->getId()]);
 
