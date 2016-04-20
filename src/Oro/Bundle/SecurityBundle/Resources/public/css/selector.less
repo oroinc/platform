@@ -66,9 +66,27 @@
 
 table.acl-table {
   tr.default-field table tr.default-field td {
-    background-color: #C3C3C3;
+    background-color: #f5f5f5;
   }
   tr table tr:first-child td {
     border-top: 0;
+  }
+  tr table tr td {
+    vertical-align: middle;
+  }
+  .access_level_value {
+    min-height: 30px;
+  }
+  .select2-container {
+    width: 120px;
+  }
+}
+.security-row {
+  > .span8 {
+    max-width: calc(~'100% - 116px');
+    margin-right: 0;
+  }
+  .select2-container {
+    width: 100px;
   }
 }
