@@ -127,7 +127,7 @@ class AttachmentManager
 
             if ($file instanceof UploadedFile) {
                 $entity->setOriginalFilename($file->getClientOriginalName());
-                $entity->setMimeType($file->getClientMimeType());
+                $entity->setMimeType($file->getMimeType());
                 $entity->setFileSize($file->getClientSize());
             } else {
                 $entity->setOriginalFilename($file->getFileName());

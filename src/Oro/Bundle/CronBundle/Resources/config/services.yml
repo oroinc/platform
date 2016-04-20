@@ -21,15 +21,15 @@ services:
     oro_cron.schedule_manager:
         class: %oro_cron.schedule_manager.class%
         arguments:
-            - @doctrine
+            - '@doctrine'
             - %oro_cron.entity.schedule.class%
 
     oro_cron.command_args_tokenizer:
         class: Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer
         public: false
         calls:
-            - [ addNormalizer, [ @oro_cron.command_args_normalizer.default ] ]
-            - [ addNormalizer, [ @oro_cron.command_args_normalizer.pgsql92 ] ]
+            - [ addNormalizer, [ '@oro_cron.command_args_normalizer.default' ] ]
+            - [ addNormalizer, [ '@oro_cron.command_args_normalizer.pgsql92' ] ]
 
     oro_cron.command_args_normalizer.default:
         class: Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer
@@ -42,9 +42,9 @@ services:
     oro_cron.command_with_args_string_filter:
         class: Oro\Bundle\CronBundle\Filter\CommandWithArgsFilter
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
-            - @oro_cron.command_args_tokenizer
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_cron.command_args_tokenizer'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: command_with_args }
 

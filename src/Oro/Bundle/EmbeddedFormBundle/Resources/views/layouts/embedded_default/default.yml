@@ -1,6 +1,6 @@
 layout:
     actions:
-        - @addTree:
+        - '@addTree':
             items:
                 head:
                     blockType:   head
@@ -27,7 +27,7 @@ layout:
                 form_css:
                     blockType:   style
                     options:
-                        content: { @value: $data.embedded_form_entity.css }
+                        content: { '@value': $data.embedded_form_entity.css }
                 content:
                     blockType: body
             tree:
@@ -40,5 +40,5 @@ layout:
                         base_css: ~
                         form_css: ~
                     content: ~
-        - @setBlockTheme:
+        - '@setBlockTheme':
             themes: 'OroEmbeddedFormBundle:layouts:embedded_default/form.html.twig'

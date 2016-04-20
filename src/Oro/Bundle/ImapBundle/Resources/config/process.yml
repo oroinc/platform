@@ -5,36 +5,36 @@ definitions:
         order: 150
         entity: Oro\Bundle\ImapBundle\Entity\UserEmailOrigin
         actions_configuration:
-            - @assign_constant_value:
+            - '@assign_constant_value':
                 attribute: $.command
                 value: Oro\Bundle\ImapBundle\Command\ClearInactiveMailboxCommand::COMMAND_NAME
-            - @assign_constant_value:
+            - '@assign_constant_value':
                 attribute: $.statePending
                 value: JMS\JobQueueBundle\Entity\Job::STATE_PENDING
-            - @assign_constant_value:
+            - '@assign_constant_value':
                 attribute: $.stateRunning
                 value: JMS\JobQueueBundle\Entity\Job::STATE_RUNNING
-            - @find_entity:
+            - '@find_entity':
                 parameters:
                     class: JMS\JobQueueBundle\Entity\Job
                     attribute: $.pendingJob
                     where:
                         command: $.command
                         state: $.statePending
-            - @find_entity:
+            - '@find_entity':
                 parameters:
                     class: JMS\JobQueueBundle\Entity\Job
                     attribute: $.runningJob
                     where:
                         command: $.command
                         state: $.stateRunning
-            - @tree:
+            - '@tree':
                 conditions:
-                    @and:
-                        - @empty: $.pendingJob
-                        - @empty: $.runningJob
+                    '@and':
+                        - '@empty': $.pendingJob
+                        - '@empty': $.runningJob
                 actions:
-                    - @create_entity:
+                    - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
                         flush: true
@@ -46,50 +46,50 @@ definitions:
         order: 150
         entity: Oro\Bundle\EmailBundle\Entity\EmailFolder
         pre_conditions:
-            @equal: [$syncEnabled, false]
+            '@equal': [$syncEnabled, false]
         actions_configuration:
-            - @assign_constant_value:
+            - '@assign_constant_value':
                 attribute: $.command
                 value: Oro\Bundle\ImapBundle\Command\ClearInactiveMailboxCommand::COMMAND_NAME
-            - @assign_constant_value:
+            - '@assign_constant_value':
                 attribute: $.statePending
                 value: JMS\JobQueueBundle\Entity\Job::STATE_PENDING
-            - @assign_constant_value:
+            - '@assign_constant_value':
                 attribute: $.stateRunning
                 value: JMS\JobQueueBundle\Entity\Job::STATE_RUNNING
-            - @find_entity:
+            - '@find_entity':
                 parameters:
                     class: JMS\JobQueueBundle\Entity\Job
                     attribute: $.pendingJob
                     where:
                         command: $.command
                         state: $.statePending
-            - @find_entity:
+            - '@find_entity':
                 parameters:
                     class: JMS\JobQueueBundle\Entity\Job
                     attribute: $.runningJob
                     where:
                         command: $.command
                         state: $.stateRunning
-            - @tree:
+            - '@tree':
                 conditions:
-                    @and:
-                        - @empty: [$.pendingJob]
-                        - @empty: [$.runningJob]
+                    '@and':
+                        - '@empty': [$.pendingJob]
+                        - '@empty': [$.runningJob]
                 actions:
-                    - @create_entity:
+                    - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
                         flush: true
                         arguments:
                             - $.command
-            - @tree:
+            - '@tree':
                 conditions:
-                    @and:
-                        - @empty: [$.pendingJob]
-                        - @not_empty: [$.runningJob]
+                    '@and':
+                        - '@empty': [$.pendingJob]
+                        - '@not_empty': [$.runningJob]
                 actions:
-                    - @create_entity:
+                    - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
                         flush: true
@@ -97,7 +97,7 @@ definitions:
                             - $.command
                             - []
                             - false
-                    - @job_add_dependency:
+                    - '@job_add_dependency':
                         job: $.syncJob
                         dependency: $.runningJob
 

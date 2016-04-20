@@ -77,10 +77,10 @@ services:
         scope: request
         class:                        %oro_user.form.type.user.class%
         arguments:
-            - @security.context
-            - @oro_security.security_facade
-            - @request
-            - @oro_config.user
+            - '@security.context'
+            - '@oro_security.security_facade'
+            - '@request'
+            - '@oro_config.user'
         tags:
             - { name: form.type, alias: oro_user_user }
 
@@ -88,10 +88,10 @@ services:
         scope: request
         class:                        %oro_user.form.type.user.api.class%
         arguments:
-            - @security.context
-            - @oro_security.security_facade
-            - @request
-            - @oro_config.user
+            - '@security.context'
+            - '@oro_security.security_facade'
+            - '@request'
+            - '@oro_config.user'
         tags:
             - { name: form.type, alias: user }
 
@@ -163,28 +163,28 @@ services:
     oro_user.form.type.user_multiselect:
         class: %oro_user.form.type.user_multiselect.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: form.type, alias: oro_user_multiselect }
 
     oro_user.form.type.role_multiselect:
         class: %oro_user.form.type.role_multiselect.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: form.type, alias: oro_role_multiselect }
 
     oro_user.form.type.organization_user_multiselect:
         class: %oro_user.form.type.organization_user_multiselect.class%
         arguments:
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
         tags:
             - { name: form.type, alias: oro_user_organization_acl_multiselect }
 
     oro_user.form.type.gender:
         class: %oro_user.form.type.gender.class%
         arguments:
-            - @oro_user.gender_provider
+            - '@oro_user.gender_provider'
         tags:
             - { name: form.type, alias: oro_gender }
 
@@ -192,16 +192,16 @@ services:
         class: %oro_user.form.handler.user.class%
         scope: request
         arguments:
-            - @oro_user.form.user
-            - @request
-            - @oro_user.manager
-            - @oro_config.user
-            - @templating
-            - @oro_email.direct_mailer
-            - @session.flash_bag
-            - @translator
-            - @logger
-            - @oro_security.security_facade
+            - '@oro_user.form.user'
+            - '@request'
+            - '@oro_user.manager'
+            - '@oro_config.user'
+            - '@templating'
+            - '@oro_email.direct_mailer'
+            - '@session.flash_bag'
+            - '@translator'
+            - '@logger'
+            - '@oro_security.security_facade'
         calls:
             - [setBusinessUnitManager, ["@oro_organization.business_unit_manager"]]
 
@@ -209,9 +209,9 @@ services:
         class: %oro_user.form.handler.user.class%
         scope: request
         arguments:
-            - @oro_user.form.user.api
-            - @request
-            - @oro_user.manager
+            - '@oro_user.form.user.api'
+            - '@request'
+            - '@oro_user.manager'
 
     oro_user.form.handler.role.api:
         class:                        %oro_user.form.handler.role.class%
@@ -241,7 +241,7 @@ services:
     oro_user.form.handler.abstract.acl_role:
         class:                        %oro_user.form.handler.acl_role.class%
         scope:                        prototype
-        arguments:                    ["@form.factory", @security.acl.cache.doctrine, %oro_user.privileges%]
+        arguments:                    ["@form.factory", "@security.acl.cache.doctrine", %oro_user.privileges%]
         calls:
             - [setAclManager, ["@oro_security.acl.manager"]]
             - [setAclPrivilegeRepository, ["@oro_security.acl.privilege_repository"]]
@@ -258,9 +258,9 @@ services:
         class: %oro_user.form.handler.set_password.class%
         scope: request
         arguments:
-            - @logger
-            - @request
-            - @translator
-            - @oro_user.form.type.set_password.form
-            - @oro_user.mailer.processor
-            - @oro_user.manager
+            - '@logger'
+            - '@request'
+            - '@translator'
+            - '@oro_user.form.type.set_password.form'
+            - '@oro_user.mailer.processor'
+            - '@oro_user.manager'
