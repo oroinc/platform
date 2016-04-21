@@ -102,6 +102,25 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
         });
         populate(results, container, 0, []);
     }
+    var overrideMethods = {
+        processResult: function(original, data) {
+            original.apply(this, _.rest(arguments));
+            var results = _.result(data, 'results') || [];
+            if (results.length > 0 && this.opts.dontSelectFirstOptionOnOpen) {
+                this.results.find('.select2-highlighted').removeClass('select2-highlighted');
+                this.dropdown.add(this.search).one('keydown', _.bind(function() {
+                    delete this.opts.dontSelectFirstOptionOnOpen;
+                }, this));
+            }
+        },
+        moveHighlight: function(original) {
+            if (this.highlight() === -1) {
+                this.highlight(0);
+            } else {
+                original.apply(this, _.rest(arguments));
+            }
+        }
+    };
 
     // Override methods of AbstractSelect2 class
     (function(prototype) {
@@ -205,21 +224,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
             clear.apply(this, arguments);
         };
 
-        prototype.postprocessResults = _.wrap(prototype.postprocessResults, function(original) {
-            original.apply(this, _.rest(arguments));
-            if (this.opts.dontSelectFirstOptionOnOpen) {
-                this.results.find('.select2-highlighted').removeClass('select2-highlighted');
-                delete this.opts.dontSelectFirstOptionOnOpen;
-            }
-        });
+        prototype.postprocessResults = _.wrap(prototype.postprocessResults, overrideMethods.processResult);
 
-        prototype.moveHighlight = _.wrap(prototype.moveHighlight, function(original) {
-            if (this.highlight() === -1) {
-                this.highlight(0);
-            } else {
-                original.apply(this, _.rest(arguments));
-            }
-        });
+        prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
+
     }(Select2['class'].single.prototype));
 
     // Override methods of MultiSelect2 class
@@ -354,21 +362,10 @@ define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'
             val.push(id);
         };
 
-        prototype.postprocessResults = _.wrap(prototype.postprocessResults, function(original) {
-            original.apply(this, _.rest(arguments));
-            if (this.opts.dontSelectFirstOptionOnOpen) {
-                this.results.find('.select2-highlighted').removeClass('select2-highlighted');
-                delete this.opts.dontSelectFirstOptionOnOpen;
-            }
-        });
+        prototype.postprocessResults = _.wrap(prototype.postprocessResults, overrideMethods.processResult);
 
-        prototype.moveHighlight = _.wrap(prototype.moveHighlight, function(original) {
-            if (this.highlight() === -1) {
-                this.highlight(0);
-            } else {
-                original.apply(this, _.rest(arguments));
-            }
-        });
+        prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
+
     }(Select2['class'].multi.prototype));
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {
