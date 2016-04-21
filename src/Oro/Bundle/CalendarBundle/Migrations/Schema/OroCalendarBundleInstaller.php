@@ -221,7 +221,7 @@ class OroCalendarBundleInstaller implements Installation
     }
 
     /**
-     * Create oro_recurrence table
+     * Creates oro_recurrence table.
      *
      * @param Schema $schema
      */

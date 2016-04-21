@@ -6,6 +6,7 @@ use Doctrine\Common\Annotations\AnnotationReader;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
 
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 
@@ -58,13 +59,20 @@ class CalendarEventRepositoryTest extends OrmTestCase
 
         $qb = $repo->getUserEventListByTimeIntervalQueryBuilder(new \DateTime(), new \DateTime());
 
+        $key = Recurrence::STRING_KEY;
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
             . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
-            . ' c.id as calendar'
+            . ' c.id as calendar,'
+            . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
+            . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
+            . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
+            . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
+            . "r.instance as {$key}Instance"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
+            . ' LEFT JOIN e.recurrence r'
             . ' WHERE '
             . 'e.exceptionParent is NULL AND '
             . '((e.start < :start AND e.end >= :start) OR '
@@ -86,13 +94,20 @@ class CalendarEventRepositoryTest extends OrmTestCase
             new Criteria(Criteria::expr()->eq('allDay', true))
         );
 
+        $key = Recurrence::STRING_KEY;
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
             . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
-            . ' c.id as calendar'
+            . ' c.id as calendar,'
+            . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
+            . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
+            . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
+            . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
+            . "r.instance as {$key}Instance"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
+            . ' LEFT JOIN e.recurrence r'
             . ' WHERE '
             . 'e.exceptionParent is NULL AND '
             . 'e.allDay = :allDay'
@@ -118,13 +133,20 @@ class CalendarEventRepositoryTest extends OrmTestCase
             ['allDay' => true]
         );
 
+        $key = Recurrence::STRING_KEY;
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
             . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
-            . ' c.id as calendar'
+            . ' c.id as calendar,'
+            . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
+            . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
+            . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
+            . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
+            . "r.instance as {$key}Instance"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
+            . ' LEFT JOIN e.recurrence r'
             . ' WHERE '
             . 'e.exceptionParent is NULL AND '
             . 'e.allDay = :allDay'
@@ -151,13 +173,20 @@ class CalendarEventRepositoryTest extends OrmTestCase
             ['status']
         );
 
+        $key = Recurrence::STRING_KEY;
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt, e.status,'
             . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
-            . ' c.id as calendar'
+            . ' c.id as calendar,'
+            . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
+            . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
+            . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
+            . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
+            . "r.instance as {$key}Instance"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
+            . ' LEFT JOIN e.recurrence r'
             . ' WHERE '
             . 'e.exceptionParent is NULL AND '
             . '((e.start < :start AND e.end >= :start) OR '
