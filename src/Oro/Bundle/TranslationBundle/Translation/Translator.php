@@ -8,8 +8,9 @@ use Doctrine\Common\Cache\ClearableCache;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
-use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
+use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
 class Translator extends BaseTranslator
 {
@@ -38,6 +39,12 @@ class Translator extends BaseTranslator
 
     /** @var bool */
     protected $installed;
+
+    /** @var TranslationStrategyProvider */
+    protected $strategyProvider;
+
+    /** @var string|null */
+    protected $strategyName;
 
     /**
      * Collector of translations
@@ -136,6 +143,19 @@ class Translator extends BaseTranslator
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getCatalogue($locale = null)
+    {
+        // if new strategy was selected
+        if ($this->strategyProvider && $this->strategyProvider->getStrategy()->getName() !== $this->strategyName) {
+            $this->applyStrategy($this->strategyProvider->getStrategy());
+        }
+
+        return parent::getCatalogue($locale);
+    }
+
+    /**
      * Sets a cache of dynamic translation metadata
      *
      * @param DynamicTranslationMetadataCache $cache
@@ -153,6 +173,44 @@ class Translator extends BaseTranslator
     public function setResourceCache(Cache $cache)
     {
         $this->resourceCache = $cache;
+    }
+
+    /**
+     * @param TranslationStrategyProvider $strategyProvider
+     */
+    public function setStrategyProvider(TranslationStrategyProvider $strategyProvider)
+    {
+        $this->strategyProvider = $strategyProvider;
+    }
+
+    /**
+     * @param TranslationStrategyInterface $strategy
+     */
+    protected function applyStrategy(TranslationStrategyInterface $strategy)
+    {
+        // store current strategy name to skip all following requests to it
+        $this->strategyName = $strategy->getName();
+
+        // use current set of fallback locales to build translation cache
+        $fallbackLocales = $this->strategyProvider->getAllFallbackLocales($strategy);
+        $this->setFallbackLocales($fallbackLocales);
+
+        // clear catalogs to generate new ones for new strategy
+        $this->catalogues = [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function computeFallbackLocales($locale)
+    {
+        if (!$this->strategyProvider) {
+            return parent::computeFallbackLocales($locale);
+        }
+
+        $strategy = $this->strategyProvider->getStrategy();
+
+        return $this->strategyProvider->getFallbackLocales($strategy, $locale);
     }
 
     /**

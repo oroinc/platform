@@ -21,5 +21,9 @@ class TranslatorDependencyPass implements CompilerPassInterface
             'setResourceCache',
             [$container->getDefinition('oro_translation.resource.cache')]
         );
+        $translatorDef->addMethodCall(
+            'setStrategyProvider',
+            [$container->getDefinition('oro_translation.strategy.provider')]
+        );
     }
 }
