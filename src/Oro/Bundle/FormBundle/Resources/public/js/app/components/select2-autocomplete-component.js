@@ -18,6 +18,7 @@ define(function(require) {
                     if (results.length === 0) {
                         var item = {id: null};
                         item[propName] = value;
+
                         return item;
                     }
                 };

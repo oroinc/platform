@@ -77,7 +77,7 @@ define([
          */
         initFocus: function() {
             var activeElement = document.activeElement;
-            if ($(activeElement).hasAttribute('autofocus')) {
+            if ($(activeElement)[0].hasAttribute('autofocus')) {
                 return;
             }
 
