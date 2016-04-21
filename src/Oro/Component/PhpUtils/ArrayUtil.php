@@ -372,4 +372,58 @@ class ArrayUtil
 
         return $result;
     }
+
+    /**
+     * @param array $array
+     * @param array $path
+     *
+     * @return array
+     */
+    public static function unsetPath(array $array, array $path)
+    {
+        $key = array_shift($path);
+
+        if (!$path) {
+            unset($array[$key]);
+
+            return $array;
+        }
+
+        if (array_key_exists($key, $array) && is_array($array[$key])) {
+            $array[$key] = static::unsetPath($array[$key], $path);
+        }
+
+        return $array;
+    }
+
+    /**
+     * Returns the value in a nested associative array,
+     * where $path is an array of keys. Returns $defaultValue if the key
+     * is not present, or the not-found value if supplied.
+     *
+     * @param array $array
+     * @param array $path
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
+    public static function getIn(array $array, array $path, $defaultValue = null)
+    {
+        $propertyPath = implode(
+            '',
+            array_map(
+                function ($part) {
+                    return sprintf('[%s]', $part);
+                },
+                $path
+            )
+        );
+
+        $propertyAccessor = new PropertyAccessor();
+        if (!$propertyAccessor->isReadable($array, $propertyPath)) {
+            return $defaultValue;
+        }
+
+        return $propertyAccessor->getValue($array, $propertyPath);
+    }
 }

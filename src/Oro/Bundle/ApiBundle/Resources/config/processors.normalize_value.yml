@@ -3,7 +3,7 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValueProcessor
         public: false
         arguments:
-            - @oro_api.processor_bag
+            - '@oro_api.processor_bag'
             - normalize_value
 
     #
@@ -20,47 +20,62 @@ services:
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: integer, priority: -10 }
 
+    oro_api.normalize_value.bigint:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeBigint
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: bigint, priority: -10 }
+
     oro_api.normalize_value.unsigned_integer:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeUnsignedInteger
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: unsignedInteger, priority: -10 }
 
+    oro_api.normalize_value.boolean:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeBoolean
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: boolean, priority: -10 }
+
+    oro_api.normalize_value.decimal:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: decimal, priority: -10 }
+
+    oro_api.normalize_value.float:
+        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeNumber
+        tags:
+            - { name: oro.api.processor, action: normalize_value, dataType: float, priority: -10 }
+
     oro_api.normalize_value.entity_class:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityClass
         arguments:
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: entityClass, priority: -10 }
 
     oro_api.normalize_value.entity_type:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityType
         arguments:
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: entityType, priority: -10 }
 
     oro_api.normalize_value.entity_alias:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityAlias
         arguments:
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: entityAlias, priority: -10 }
 
     oro_api.normalize_value.entity_plural_alias:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\NormalizeEntityPluralAlias
         arguments:
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: oro.api.processor, action: normalize_value, dataType: entityPluralAlias, priority: -10 }
 
     #
     # REST API processors
     #
-
-    oro_api.normalize_value.rest.boolean:
-        class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeBoolean
-        tags:
-            - { name: oro.api.processor, action: normalize_value, requestType: rest, dataType: boolean, priority: -10 }
 
     oro_api.normalize_value.rest.datetime:
         class: Oro\Bundle\ApiBundle\Processor\NormalizeValue\Rest\NormalizeDateTime

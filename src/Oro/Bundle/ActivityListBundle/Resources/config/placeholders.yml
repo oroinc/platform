@@ -11,10 +11,10 @@ placeholders:
 
 items:
     view_oro_activity_list:
-        applicable: @oro_activity_list.placeholder.filter->isApplicable($entity$, Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE)
+        applicable: "@oro_activity_list.placeholder.filter->isApplicable($entity$, Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::VIEW_PAGE)"
         template: OroActivityListBundle:ActivityList:activities.html.twig
     update_oro_activity_list:
-        applicable: @oro_activity_list.placeholder.filter->isApplicable($entity$, Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE)
+        applicable: "@oro_activity_list.placeholder.filter->isApplicable($entity$, Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope::UPDATE_PAGE)"
         template: OroActivityListBundle:ActivityList:activities.html.twig
     activity_condition:
         action: OroActivityListBundle:Segment:activityCondition

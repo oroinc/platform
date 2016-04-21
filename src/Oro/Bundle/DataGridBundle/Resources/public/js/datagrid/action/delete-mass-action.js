@@ -2,8 +2,9 @@ define([
     'oroui/js/delete-confirmation',
     'orotranslation/js/translator',
     'underscore',
-    './mass-action'
-], function(DeleteConfirmation, __, _, MassAction) {
+    './mass-action',
+    'oroui/js/mediator'
+], function(DeleteConfirmation, __, _, MassAction, mediator) {
     'use strict';
 
     var DeleteMassAction;
@@ -95,7 +96,9 @@ define([
                 this.confirmation = true;
                 return DeleteMassAction.__super__.execute.call(this);
             } else {
-                MassAction.__super__._onAjaxSuccess.apply(this, arguments);
+                DeleteMassAction.__super__._onAjaxSuccess.apply(this, arguments);
+
+                mediator.trigger('datagrid:afterMassRemoveRow:' + this.datagrid.name);
             }
         },
 

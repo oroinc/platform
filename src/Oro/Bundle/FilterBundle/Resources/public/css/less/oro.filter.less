@@ -56,7 +56,8 @@
     background-color: #ffffff;
     padding: 8px 8px 2px 8px;
     border: 1px solid #d3d3d3;
-    display: none;
+    display: block;
+    visibility: hidden;
     z-index: @oroZindexDropdown;
     margin-top: 7px;
     top: auto;
@@ -307,7 +308,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
       position: relative;
       vertical-align: top;
       width: auto;
-      overflow: hidden;
+
       input[type=text] {
         max-width: 100%;
         width: 280px;
@@ -425,4 +426,11 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 }
 .select-field-date-popover .popover{
   min-width: 350px;
+}
+.field-condition-date-popover {
+  display: inline-block;
+
+  i {
+    cursor: pointer;
+  }
 }

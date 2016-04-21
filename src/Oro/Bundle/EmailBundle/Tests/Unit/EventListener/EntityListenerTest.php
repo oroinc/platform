@@ -226,8 +226,8 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($createdEmailsArray));
         $this->emailActivityUpdates
                 ->expects($this->once())
-                ->method('processCreatedEntities')
-                ->with($uow->getScheduledEntityInsertions());
+                ->method('processUpdatedEmailAddresses')
+                ->with([]);
         $this->emailActivityUpdates->expects($this->once())
             ->method('createJobs')
             ->will($this->returnValue([new Job('command')]));

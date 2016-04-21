@@ -12,6 +12,9 @@ use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 
 class GridViewRepository extends EntityRepository
 {
+    /** @var array */
+    protected $cache = [];
+
     /**
      * @param AclHelper     $aclHelper
      * @param UserInterface $user
@@ -21,25 +24,30 @@ class GridViewRepository extends EntityRepository
      */
     public function findGridViews(AclHelper $aclHelper, UserInterface $user, $gridName)
     {
-        $qb = $this->createQueryBuilder('gv');
-        $qb
-            ->andWhere('gv.gridName = :gridName')
-            ->andWhere(
-                $qb->expr()->orX(
-                    'gv.owner = :owner',
-                    'gv.type = :public'
+        $cacheKey = sprintf('%s.%s', $user->getUsername(), $gridName);
+        if (!isset($this->cache[$cacheKey])) {
+            $qb = $this->createQueryBuilder('gv');
+            $qb
+                ->andWhere('gv.gridName = :gridName')
+                ->andWhere(
+                    $qb->expr()->orX(
+                        'gv.owner = :owner',
+                        'gv.type = :public'
+                    )
                 )
-            )
-            ->setParameters(
-                [
-                    'gridName' => $gridName,
-                    'owner'    => $user,
-                    'public'   => GridView::TYPE_PUBLIC,
-                ]
-            )
-            ->orderBy('gv.gridName');
+                ->setParameters(
+                    [
+                        'gridName' => $gridName,
+                        'owner'    => $user,
+                        'public'   => GridView::TYPE_PUBLIC,
+                    ]
+                )
+                ->orderBy('gv.gridName');
 
-        return $aclHelper->apply($qb)->getResult();
+            $this->cache[$cacheKey] = $aclHelper->apply($qb)->getResult();
+        }
+
+        return $this->cache[$cacheKey];
     }
 
     /**

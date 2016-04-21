@@ -47,6 +47,19 @@ class Config implements \IteratorAggregate
     }
 
     /**
+     * Make a deep copy of object.
+     */
+    public function __clone()
+    {
+        $this->items = array_map(
+            function ($value) {
+                return is_object($value) ? clone $value : $value;
+            },
+            $this->items
+        );
+    }
+
+    /**
      * Checks whether the configuration of an entity exists.
      *
      * @return bool
@@ -134,5 +147,35 @@ class Config implements \IteratorAggregate
     public function setSorters(SortersConfig $sorters = null)
     {
         $this->set(ConfigUtil::SORTERS, $sorters);
+    }
+
+    /**
+     * Checks whether the configuration of actions.
+     *
+     * @return bool
+     */
+    public function hasActions()
+    {
+        return $this->has(ConfigUtil::ACTIONS);
+    }
+
+    /**
+     * Gets the configuration of actions.
+     *
+     * @return ActionsConfig|null
+     */
+    public function getActions()
+    {
+        return $this->get(ConfigUtil::ACTIONS);
+    }
+
+    /**
+     * Sets the configuration of actions.
+     *
+     * @param ActionsConfig|null $actions
+     */
+    public function setActions(ActionsConfig $actions = null)
+    {
+        $this->set(ConfigUtil::ACTIONS, $actions);
     }
 }

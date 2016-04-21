@@ -759,6 +759,120 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider unsetPathDataProvider
+     */
+    public function testUnsetPath(array $array, array $path, array $expectedValue)
+    {
+        $this->assertEquals($expectedValue, ArrayUtil::unsetPath($array, $path));
+    }
+
+    public function unsetPathDataProvider()
+    {
+        return [
+            'unset with empty path' => [
+                ['a' => 'aval'],
+                [],
+                ['a' => 'aval'],
+            ],
+            'unset with path having 1 element' => [
+                ['a' => 'aval'],
+                ['a'],
+                [],
+            ],
+            'unset with invalid path having 1 element' => [
+                ['a' => 'aval'],
+                ['b'],
+                ['a' => 'aval'],
+            ],
+            'unset with path having more elements' => [
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'c' => 'cval',
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+                ['b', 'c'],
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+            ],
+            'unset with invalid path having more elements' => [
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'c' => 'cval',
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+                ['a', 'b', 'c'],
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'c' => 'cval',
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getInDataProvider
+     */
+    public function testGetIn(array $array, array $path, $defaultValue, $expectedValue)
+    {
+        $this->assertEquals($expectedValue, ArrayUtil::getIn($array, $path, $defaultValue));
+    }
+
+    public function getInDataProvider()
+    {
+        return [
+            'reading non existing key from empty array' => [
+                [],
+                ['k2', 'k2.2', 'nonExistent'],
+                null,
+                null,
+            ],
+            'reading non existing key from array' => [
+                ['k1' => 'v1', 'k2' => ['k2.1' => 'v2.1', 'k2.2' => 'v2.2']],
+                ['k2', 'k2.2', 'nonExistent'],
+                null,
+                null,
+            ],
+            'reading non existing key from array with overwritten default value' => [
+                ['k1' => 'v1', 'k2' => ['k2.1' => 'v2.1', 'k2.2' => 'v2.2']],
+                ['k2', 'k2.2', 'nonExistent'],
+                'default',
+                'default',
+            ],
+            'reading simple key from array' => [
+                ['k1' => 'v1', 'k2' => ['k2.1' => 'v2.1', 'k2.2' => 'v2.2']],
+                ['k1'],
+                null,
+                'v1',
+            ],
+            'reading multivalue key from array' => [
+                ['k1' => 'v1', 'k2' => ['k2.1' => 'v2.1', 'k2.2' => 'v2.2']],
+                ['k2', 'k2.2'],
+                null,
+                'v2.2',
+            ],
+        ];
+    }
+
+    /**
      * @dataProvider mergeDataProvider
      *
      * @param array $expected

@@ -34,7 +34,7 @@ datagrid:
                     data_name: embedded_form.formType
                     options:
                         field_options:
-                            choices: @oro_embedded_form.manager->getAll
+                            choices: "@oro_embedded_form.manager->getAll"
 
         properties:
             id: ~

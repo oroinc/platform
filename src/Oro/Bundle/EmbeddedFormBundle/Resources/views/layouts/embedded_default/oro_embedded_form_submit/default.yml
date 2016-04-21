@@ -1,6 +1,6 @@
 layout:
     actions:
-        - @add:
+        - '@add':
             id:        embedded_form
             parentId:  content
             blockType: form
@@ -9,6 +9,6 @@ layout:
                 split_to_fields: true
 
     conditions:
-        @eq:
+        '@eq':
             - ''
             - $context.embedded_form_custom_layout

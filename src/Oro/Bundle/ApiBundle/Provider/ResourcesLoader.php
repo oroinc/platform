@@ -2,20 +2,20 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\CollectResources\CollectResourcesContext;
-use Oro\Bundle\ApiBundle\Processor\CollectResourcesProcessor;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class ResourcesLoader
 {
-    /** @var CollectResourcesProcessor */
+    /** @var ActionProcessorInterface */
     protected $processor;
 
     /**
-     * @param CollectResourcesProcessor $processor
+     * @param ActionProcessorInterface $processor
      */
-    public function __construct(CollectResourcesProcessor $processor)
+    public function __construct(ActionProcessorInterface $processor)
     {
         $this->processor = $processor;
     }

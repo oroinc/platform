@@ -24,7 +24,7 @@ class EntityAliasCacheWarmer implements CacheWarmerInterface
      */
     public function warmUp($cacheDir)
     {
-        $this->entityAliasResolver->warmUp($cacheDir);
+        $this->entityAliasResolver->warmUpCache();
     }
 
     /**
