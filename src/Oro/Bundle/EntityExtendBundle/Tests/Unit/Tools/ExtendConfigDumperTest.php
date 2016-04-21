@@ -41,10 +41,8 @@ class ExtendConfigDumperTest extends \PHPUnit_Framework_TestCase
         $this->cacheDir = __DIR__ . DIRECTORY_SEPARATOR . 'Fixtures' . DIRECTORY_SEPARATOR
             . 'Dumper' . DIRECTORY_SEPARATOR . 'cache';
 
-        $cm = $this->getMock('Oro\Bundle\EntityExtendBundle\Tools\ConfigManager');
-
         $this->dumper = new ExtendConfigDumper(
-            $cm,
+            $this->configManager,
             $this->configProvider,
             new ExtendDbIdentifierNameGenerator(),
             new FieldTypeHelper([]),
