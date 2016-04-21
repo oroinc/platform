@@ -2,10 +2,12 @@
 default: &default
     extensions:
         Behat\MinkExtension:
-            base_url: 'http://platform.local/'
+            base_url: 'http://localhost.com/'
             default_session: 'selenium2'
             selenium2: ~
         Behat\Symfony2Extension:
+            kernel:
+                env: 'prod'
             context:
                 path_suffix: 'Tests/Behat/Features'
                 class_suffix: 'Tests\Behat\Context\FeatureContext'
