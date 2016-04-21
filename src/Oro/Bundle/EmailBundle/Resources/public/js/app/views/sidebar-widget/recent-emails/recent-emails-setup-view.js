@@ -33,7 +33,7 @@ define(function(require) {
                 var folders;
                 if (mailbox.active) {
                     folders =
-                        _.where(mailbox.folder, { syncEnabled: true })
+                        _.where(mailbox.folder, {syncEnabled: true})
                         .map(function(folder) {
                             return {
                                 id: Number(folder.id),
