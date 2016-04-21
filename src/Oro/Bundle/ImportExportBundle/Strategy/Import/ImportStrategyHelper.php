@@ -137,15 +137,14 @@ class ImportStrategyHelper
     {
         $violations = $this->validator->validate($entity, $groups);
         if (count($violations)) {
-            $errors = array();
-            $entityClassName = ClassUtils::getClass($entity);
+            $errors = [];
 
             /** @var ConstraintViolationInterface $violation */
             foreach ($violations as $violation) {
                 $propertyPath = $violation->getPropertyPath();
-                if ($propertyPath) {
+                if ($propertyPath && is_object($entity)) {
                     $fieldHeader = $this->configurableDataConverter->getFieldHeaderWithRelation(
-                        $entityClassName,
+                        ClassUtils::getClass($entity),
                         $propertyPath
                     );
                     $propertyPath = ($fieldHeader ?: $propertyPath) . ': ';

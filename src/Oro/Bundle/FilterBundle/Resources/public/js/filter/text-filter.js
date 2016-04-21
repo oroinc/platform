@@ -197,7 +197,7 @@ define([
          * @protected
          */
         _showCriteria: function() {
-            this.$(this.criteriaSelector).show();
+            this.$(this.criteriaSelector).css('visibility', 'visible');
             this._alignCriteria();
             this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
@@ -235,7 +235,7 @@ define([
          * @protected
          */
         _hideCriteria: function() {
-            this.$(this.criteriaSelector).hide();
+            this.$(this.criteriaSelector).css('visibility', 'hidden');
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             setTimeout(_.bind(function() {
                 if (!this.disposed) {
