@@ -2,7 +2,7 @@
 default: &default
     extensions:
         Behat\MinkExtension:
-            base_url: 'http://orohrm.local/'
+            base_url: 'http://platform.local/'
             default_session: 'selenium2'
             selenium2: ~
         Behat\Symfony2Extension:
