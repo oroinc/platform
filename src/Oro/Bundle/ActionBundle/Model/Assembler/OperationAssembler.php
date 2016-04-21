@@ -93,6 +93,7 @@ class OperationAssembler extends AbstractAssembler
             ->setExcludeEntities($this->filterEntities($this->getOption($options, 'exclude_entities', [])))
             ->setForAllDatagrids($this->getOption($options, 'for_all_datagrids', false))
             ->setDatagrids($this->getOption($options, 'datagrids', []))
+            ->setExcludeDatagrids($this->getOption($options, 'exclude_datagrids', []))
             ->setRoutes($this->getOption($options, 'routes', []))
             ->setGroups($this->getOption($options, 'groups', []))
             ->setApplications($this->getOption($options, 'applications', []))
