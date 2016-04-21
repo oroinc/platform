@@ -139,7 +139,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'two sorted fields' => [
                 [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                ['field1', 10, 'field2', 15],
+                ['type1', 'field1', 10, 'type2', 'field2', 15],
                 [
                     'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
                     'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
@@ -147,7 +147,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'two sorted one without priority' => [
                 [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                ['field1', null, 'field2', 5],
+                ['type1', 'field1', null, 'type2', 'field2', 5],
                 [
                     'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
                     'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
@@ -155,7 +155,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'two sorted another without priority' => [
                 [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                ['field1', 5, 'field2', null],
+                ['type1', 'field1', 5, 'type2', 'field2', null],
                 [
                     'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
                     'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
@@ -163,7 +163,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ],
             'two sorted with less than zero' => [
                 [$this->getFieldMock('field1', 'type1'), $this->getFieldMock('field2', 'type2')],
-                ['field1', null, 'field2', -10],
+                ['type1', 'field1', null, 'type2', 'field2', -10],
                 [
                     'field1' => ['type' => 'type1', 'label' => 'field1', 'value' => 'field1'],
                     'field2' => ['type' => 'type2', 'label' => 'field2', 'value' => 'field2'],
@@ -177,7 +177,10 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                     $this->getFieldMock('field4', 'type4'),
                     $this->getFieldMock('field5', 'type5'),
                 ],
-                ['field1', -10, 'field2', -5, 'field3', null, 'field4', 0, 'field5', 10],
+                [
+                    'type1', 'field1', -10, 'type2', 'field2', -5,
+                    'type3', 'field3', null, 'type4', 'field4', 0, 'type5', 'field5', 10
+                ],
                 [
                     'field5' => ['type' => 'type5', 'label' => 'field5', 'value' => 'field5'],
                     'field3' => ['type' => 'type3', 'label' => 'field3', 'value' => 'field3'],
