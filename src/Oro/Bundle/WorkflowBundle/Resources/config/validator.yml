@@ -5,6 +5,6 @@ services:
     oro_workflow.validator.transition_is_allowed:
         class: %oro_workflow.validator.transition_is_allowed.class%
         arguments:
-            - @oro_workflow.registry
+            - '@oro_workflow.registry'
         tags:
             - { name: validator.constraint_validator, alias: oro_workflow_transition_is_allowed }

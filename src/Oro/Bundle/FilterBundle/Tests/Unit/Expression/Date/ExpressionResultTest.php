@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Tests\Unit\Expression\Date;
 use Oro\Bundle\FilterBundle\Expression\Date\ExpressionResult;
 use Oro\Bundle\FilterBundle\Expression\Date\Token;
 use Oro\Bundle\FilterBundle\Provider\DateModifierInterface;
+use Oro\Bundle\FilterBundle\Provider\DateModifierProvider;
 
 class ExpressionResultTest extends \PHPUnit_Framework_TestCase
 {

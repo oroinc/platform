@@ -8,12 +8,12 @@ use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 
 class RestRouteOptionsResolver implements RouteOptionsResolverInterface
 {
@@ -30,9 +30,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var ResourcesLoader */
     protected $resourcesLoader;
 
-    /** @var EntityAliasResolver */
-    protected $entityAliasResolver;
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -45,22 +42,23 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var string[] */
     protected $defaultFormat;
 
+    /** @var RequestType */
+    protected $requestType;
+
     /** @var array */
     private $supportedEntities;
 
     /**
-     * @param bool|string|null    $isApplicationInstalled
-     * @param ResourcesLoader     $resourcesLoader
-     * @param EntityAliasResolver $entityAliasResolver
-     * @param DoctrineHelper      $doctrineHelper
-     * @param ValueNormalizer     $valueNormalizer
-     * @param string              $formats
-     * @param string              $defaultFormat
+     * @param bool|string|null $isApplicationInstalled
+     * @param ResourcesLoader  $resourcesLoader
+     * @param DoctrineHelper   $doctrineHelper
+     * @param ValueNormalizer  $valueNormalizer
+     * @param string           $formats
+     * @param string           $defaultFormat
      */
     public function __construct(
         $isApplicationInstalled,
         ResourcesLoader $resourcesLoader,
-        EntityAliasResolver $entityAliasResolver,
         DoctrineHelper $doctrineHelper,
         ValueNormalizer $valueNormalizer,
         $formats,
@@ -68,11 +66,11 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     ) {
         $this->isApplicationInstalled = !empty($isApplicationInstalled);
         $this->resourcesLoader        = $resourcesLoader;
-        $this->entityAliasResolver    = $entityAliasResolver;
         $this->doctrineHelper         = $doctrineHelper;
         $this->valueNormalizer        = $valueNormalizer;
         $this->formats                = $formats;
         $this->defaultFormat          = $defaultFormat;
+        $this->requestType            = new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -98,24 +96,26 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     }
 
     /**
-     * @return array [[entity class, entity plural alias], ...]
+     * @return array [[entity class, entity type, [excluded action, ...]], ...]
      */
     protected function getSupportedEntities()
     {
         if (null === $this->supportedEntities) {
-            $resources = $this->resourcesLoader->getResources(
-                Version::LATEST,
-                [RequestType::REST, RequestType::JSON_API]
-            );
+            $resources = $this->resourcesLoader->getResources(Version::LATEST, $this->requestType);
 
             $this->supportedEntities = [];
             foreach ($resources as $resource) {
-                $className   = $resource->getEntityClass();
-                $pluralAlias = $this->entityAliasResolver->getPluralAlias($className);
-                if (!empty($pluralAlias)) {
+                $className = $resource->getEntityClass();
+                $entityType = $this->valueNormalizer->normalizeValue(
+                    $className,
+                    DataType::ENTITY_TYPE,
+                    $this->requestType
+                );
+                if (!empty($entityType)) {
                     $this->supportedEntities[] = [
                         $className,
-                        $pluralAlias
+                        $entityType,
+                        $resource->getExcludedActions()
                     ];
                 }
             }
@@ -127,17 +127,23 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /**
      * @param Route                   $route
      * @param RouteCollectionAccessor $routes
-     * @param array                   $entities [[entity class, entity plural alias], ...]
+     * @param array                   $entities [[entity class, entity type, [excluded action, ...]], ...]
      */
     protected function adjustRoutes(Route $route, RouteCollectionAccessor $routes, $entities)
     {
         $routeName = $routes->getName($route);
 
+        $action = $route->getDefault('_action');
         foreach ($entities as $entity) {
-            list($className, $pluralAlias) = $entity;
+            list($className, $entityType, $excludedActions) = $entity;
+
+            // check if given action is excluded for the entity
+            if (in_array($action, $excludedActions, true)) {
+                continue;
+            }
 
             $existingRoute = $routes->getByPath(
-                str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $route->getPath()),
+                str_replace(self::ENTITY_PLACEHOLDER, $entityType, $route->getPath()),
                 $route->getMethods()
             );
             if ($existingRoute) {
@@ -148,8 +154,8 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             } else {
                 // add an additional strict route based on the base route and current entity
                 $strictRoute = $routes->cloneRoute($route);
-                $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $pluralAlias, $strictRoute->getPath()));
-                $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $pluralAlias);
+                $strictRoute->setPath(str_replace(self::ENTITY_PLACEHOLDER, $entityType, $strictRoute->getPath()));
+                $strictRoute->setDefault(self::ENTITY_ATTRIBUTE, $entityType);
                 $requirements = $strictRoute->getRequirements();
                 unset($requirements[self::ENTITY_ATTRIBUTE]);
                 $strictRoute->setRequirements($requirements);
@@ -210,10 +216,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     protected function getIdFieldRequirement($fieldType)
     {
-        $result = $this->valueNormalizer->getRequirement(
-            $fieldType,
-            [RequestType::REST, RequestType::JSON_API]
-        );
+        $result = $this->valueNormalizer->getRequirement($fieldType, $this->requestType);
 
         if (ValueNormalizer::DEFAULT_REQUIREMENT === $result) {
             $result = '[^\.]+';

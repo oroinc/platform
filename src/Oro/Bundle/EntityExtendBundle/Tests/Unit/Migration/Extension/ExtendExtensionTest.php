@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration\Extension;
 use Doctrine\DBAL\Platforms\MySqlPlatform;
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -354,7 +355,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.id.label',
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ],
-                                'importexport' => ['identity' => true]
+                                'importexport' => ['identity' => true],
                             ],
                             'type'    => 'string'
                         ],
@@ -364,7 +365,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.name.label',
                                     'description' => 'oro.entityextend.enumvalue.name.description',
                                 ],
-                                'datagrid'     => ['is_visible' => false]
+                                'datagrid'     => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
                             ],
                             'type'    => 'string'
                         ],
@@ -374,7 +375,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.priority.label',
                                     'description' => 'oro.entityextend.enumvalue.priority.description',
                                 ],
-                                'datagrid' => ['is_visible' => false]
+                                'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
                             ],
                             'type'    => 'integer',
                         ],
@@ -384,7 +385,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'label'       => 'oro.entityextend.enumvalue.default.label',
                                     'description' => 'oro.entityextend.enumvalue.default.description',
                                 ],
-                                'datagrid' => ['is_visible' => false]
+                                'datagrid' => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE]
                             ],
                             'type'    => 'boolean',
                         ],
@@ -468,8 +469,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'description' => 'oro.entityextend.enumvalue.id.description',
                                 ],
                                 'importexport' => [
-                                    'identity' => true
-                                ]
+                                    'identity' => true,
+                                ],
                             ],
                             'type'    => 'string',
                         ],
@@ -480,8 +481,8 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'description' => 'oro.entityextend.enumvalue.name.description',
                                 ],
                                 'datagrid'     => [
-                                    'is_visible' => false
-                                ]
+                                    'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                                ],
                             ],
                             'type'    => 'string',
                         ],
@@ -492,7 +493,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'description' => 'oro.entityextend.enumvalue.priority.description',
                                 ],
                                 'datagrid' => [
-                                    'is_visible' => false
+                                    'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                                 ]
                             ],
                             'type'    => 'integer',
@@ -504,7 +505,7 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                                     'description' => 'oro.entityextend.enumvalue.default.description',
                                 ],
                                 'datagrid' => [
-                                    'is_visible' => false
+                                    'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                                 ]
                             ],
                             'type'    => 'boolean',
@@ -1059,33 +1060,6 @@ class ExtendExtensionTest extends \PHPUnit_Framework_TestCase
                     ]
                 ],
             ]
-        );
-    }
-
-    /**
-     * @expectedException \Doctrine\DBAL\Schema\SchemaException
-     * @expectedExceptionMessage The target column name must be "id". Relation column: "table1::rel_id". Target column
-     * name: "name".
-     */
-    public function testInvalidRelationColumnName()
-    {
-        $schema    = $this->getExtendSchema();
-        $extension = $this->getExtendExtension();
-
-        $selfTable = $schema->createTable('table1');
-        $selfTable->addColumn('id', 'integer');
-        $selfTable->setPrimaryKey(['id']);
-
-        $targetTable = $schema->createTable('table2');
-        $targetTable->addColumn('name', 'integer');
-        $targetTable->setPrimaryKey(['name']);
-
-        $extension->addManyToOneRelation(
-            $schema,
-            $selfTable,
-            'rel',
-            $targetTable,
-            'name'
         );
     }
 

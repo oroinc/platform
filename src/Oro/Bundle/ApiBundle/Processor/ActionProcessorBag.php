@@ -2,38 +2,30 @@
 
 namespace Oro\Bundle\ApiBundle\Processor;
 
-use Oro\Component\ChainProcessor\ActionProcessor;
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 
-class ActionProcessorBag
+class ActionProcessorBag implements ActionProcessorBagInterface
 {
-    /** @var ActionProcessor[] */
+    /** @var ActionProcessorInterface[] */
     protected $processors = [];
 
     /**
-     * Registers a processor in the bag.
-     *
-     * @param ActionProcessor $processor
+     * {@inheritdoc}
      */
-    public function addProcessor(ActionProcessor $processor)
+    public function addProcessor(ActionProcessorInterface $processor)
     {
-        $this->processors[] = $processor;
+        $this->processors[$processor->getAction()] = $processor;
     }
 
     /**
-     * Gets a processor responsible to handle the given action.
-     *
-     * @param string $action
-     *
-     * @return ActionProcessor
+     * {@inheritdoc}
      */
     public function getProcessor($action)
     {
-        foreach ($this->processors as $processor) {
-            if ($processor->getAction() === $action) {
-                return $processor;
-            }
+        if (!isset($this->processors[$action])) {
+            throw new \InvalidArgumentException(sprintf('A processor for "%s" action was not found.', $action));
         }
 
-        throw new \InvalidArgumentException(sprintf('A processor for "%s" action was not found.', $action));
+        return $this->processors[$action];
     }
 }

@@ -14,7 +14,9 @@ use Oro\Bundle\AttachmentBundle\Model\ExtendFile;
 /**
  * File
  *
- * @ORM\Table(name="oro_attachment_file")
+ * @ORM\Table(name="oro_attachment_file", indexes = {
+ *      @ORM\Index("att_file_orig_filename_idx", columns = {"original_filename"})
+ * })
  * @ORM\Entity()
  * @ORM\HasLifecycleCallbacks()
  * @Config(

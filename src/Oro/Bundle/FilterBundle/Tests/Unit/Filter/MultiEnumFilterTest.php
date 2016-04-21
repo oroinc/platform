@@ -68,7 +68,8 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->filter->init('test', $params);
         $this->assertAttributeEquals(
             [
-                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary'
+                FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
+                'options'                        => []
             ],
             'params',
             $this->filter
@@ -84,7 +85,8 @@ class MultiEnumFilterTest extends OrmTestCase
         $this->assertAttributeEquals(
             [
                 FilterUtility::FRONTEND_TYPE_KEY => 'dictionary',
-                'null_value'                     => ':empty:'
+                'null_value'                     => ':empty:',
+                'options'                        => []
             ],
             'params',
             $this->filter
@@ -176,7 +178,12 @@ class MultiEnumFilterTest extends OrmTestCase
 
         $result = $qb->getQuery()->getDQL();
         $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o WHERE o.values IN(:param1)',
+            'SELECT o.id FROM Stub:TestEntity o'
+            . ' WHERE o IN('
+            . 'SELECT filter_test'
+            . ' FROM Stub:TestEntity filter_test'
+            . ' INNER JOIN filter_test.values filter_test_rel'
+            . ' WHERE filter_test_rel IN(:param1))',
             $result
         );
         $this->assertEquals($values, $qb->getParameter('param1')->getValue());
@@ -217,7 +224,12 @@ class MultiEnumFilterTest extends OrmTestCase
 
         $result = $qb->getQuery()->getDQL();
         $this->assertEquals(
-            'SELECT o.id FROM Stub:TestEntity o WHERE o.values NOT IN(:param1)',
+            'SELECT o.id FROM Stub:TestEntity o'
+            . ' WHERE o NOT IN('
+            . 'SELECT filter_test'
+            . ' FROM Stub:TestEntity filter_test'
+            . ' INNER JOIN filter_test.values filter_test_rel'
+            . ' WHERE filter_test_rel IN(:param1))',
             $result
         );
         $this->assertEquals(

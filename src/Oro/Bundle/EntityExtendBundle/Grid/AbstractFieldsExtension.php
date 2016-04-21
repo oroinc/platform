@@ -177,7 +177,7 @@ abstract class AbstractFieldsExtension extends AbstractExtension
         // if field is "visible as mandatory" it is required in grid settings and rendered
         // if field is just "visible" it's rendered by default and manageable in grid settings
         // otherwise - not required and hidden by default.
-        $gridVisibilityValue = $this->getFieldConfig('datagrid', $field)->get('is_visible');
+        $gridVisibilityValue = (int)$this->getFieldConfig('datagrid', $field)->get('is_visible');
 
         $isRequired   = $gridVisibilityValue === DatagridScope::IS_VISIBLE_MANDATORY;
         $isRenderable = $isRequired ? : $gridVisibilityValue === DatagridScope::IS_VISIBLE_TRUE;

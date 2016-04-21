@@ -105,6 +105,17 @@ class Datagrid implements DatagridInterface
     /**
      * {@inheritDoc}
      */
+    public function getResolvedMetadata()
+    {
+        $data = MetadataObject::createNamed($this->getName(), [MetadataObject::LAZY_KEY => false]);
+        $this->acceptor->acceptMetadata($data);
+
+        return $data;
+    }
+
+    /**
+     * {@inheritDoc}
+     */
     public function setDatasource(DatasourceInterface $source)
     {
         $this->datasource = $source;

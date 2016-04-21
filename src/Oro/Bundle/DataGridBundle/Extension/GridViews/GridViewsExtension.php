@@ -98,8 +98,11 @@ class GridViewsExtension extends AbstractExtension
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
         $currentViewId = $this->getCurrentViewId($config->getName());
-        $this->setDefaultParams($config->getName());
-        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID]);
+        // need to set [initialState][filters] from [state][filters]
+        // before [state][filters] will be set from default grid view
+        $filtersState        = $data->offsetGetByPath('[state][filters]', []);
+        $data->offsetAddToArray('initialState', ['gridView' => self::DEFAULT_VIEW_ID, 'filters' => $filtersState]);
+        $this->setDefaultParams($config->getName(), $data);
         $data->offsetAddToArray('state', ['gridView' => $currentViewId]);
 
         $systemGridView = new View(self::DEFAULT_VIEW_ID);
@@ -110,7 +113,7 @@ class GridViewsExtension extends AbstractExtension
 
         $gridViews = [$systemGridView->getMetadata()];
         /** @var AbstractViewsList $list */
-        $list           = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
+        $list = $config->offsetGetOr(self::VIEWS_LIST_KEY, false);
         if ($list !== false) {
             $gridViews = array_merge($gridViews, $list->getMetadata());
         }
@@ -124,8 +127,8 @@ class GridViewsExtension extends AbstractExtension
         $data->offsetAddToArray(
             'gridViews',
             [
-                'views' => $gridViews,
-                'gridName' => $config->getName(),
+                'views'       => $gridViews,
+                'gridName'    => $config->getName(),
                 'permissions' => $this->getPermissions()
             ]
         );
@@ -191,9 +194,10 @@ class GridViewsExtension extends AbstractExtension
      * Sets default parameters.
      * Added filters and sorters for defined as default grid view for current logged user.
      *
-     * @param string $gridName
+     * @param string         $gridName
+     * @param MetadataObject $data
      */
-    protected function setDefaultParams($gridName)
+    protected function setDefaultParams($gridName, MetadataObject $data)
     {
         $params = $this->getParameters()->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
         if (!isset($params[self::VIEWS_PARAM_KEY])) {
@@ -204,6 +208,11 @@ class GridViewsExtension extends AbstractExtension
             if ($defaultGridView) {
                 $this->getParameters()->mergeKey('_filter', $defaultGridView->getFiltersData());
                 $this->getParameters()->mergeKey('_sort_by', $defaultGridView->getSortersData());
+                $filtersState = array_merge(
+                    $defaultGridView->getFiltersData(),
+                    $data->offsetGetByPath('[state][filters]', [])
+                );
+                $data->offsetSetByPath('[state][filters]', $filtersState);
             }
         }
         $this->getParameters()->set(ParameterBag::ADDITIONAL_PARAMETERS, $params);
@@ -215,11 +224,11 @@ class GridViewsExtension extends AbstractExtension
     private function getPermissions()
     {
         return [
-            'VIEW' => $this->securityFacade->isGranted('oro_datagrid_gridview_view'),
-            'CREATE' => $this->securityFacade->isGranted('oro_datagrid_gridview_create'),
-            'EDIT' => $this->securityFacade->isGranted('oro_datagrid_gridview_update'),
-            'DELETE' => $this->securityFacade->isGranted('oro_datagrid_gridview_delete'),
-            'SHARE' => $this->securityFacade->isGranted('oro_datagrid_gridview_publish'),
+            'VIEW'        => $this->securityFacade->isGranted('oro_datagrid_gridview_view'),
+            'CREATE'      => $this->securityFacade->isGranted('oro_datagrid_gridview_create'),
+            'EDIT'        => $this->securityFacade->isGranted('oro_datagrid_gridview_update'),
+            'DELETE'      => $this->securityFacade->isGranted('oro_datagrid_gridview_delete'),
+            'SHARE'       => $this->securityFacade->isGranted('oro_datagrid_gridview_publish'),
             'EDIT_SHARED' => $this->securityFacade->isGranted('oro_datagrid_gridview_update_public'),
         ];
     }
@@ -231,7 +240,7 @@ class GridViewsExtension extends AbstractExtension
     {
         if ($parameters->has(ParameterBag::MINIFIED_PARAMETERS)) {
             $minifiedParameters = $parameters->get(ParameterBag::MINIFIED_PARAMETERS);
-            $additional = $parameters->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
+            $additional         = $parameters->get(ParameterBag::ADDITIONAL_PARAMETERS, []);
 
             if (array_key_exists(self::MINIFIED_VIEWS_PARAM_KEY, $minifiedParameters)) {
                 $additional[self::VIEWS_PARAM_KEY] = $minifiedParameters[self::MINIFIED_VIEWS_PARAM_KEY];

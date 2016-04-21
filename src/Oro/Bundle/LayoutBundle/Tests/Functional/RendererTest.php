@@ -140,7 +140,13 @@ class RendererTest extends LayoutTestCase
 
         $layout = $layoutManager->getLayoutBuilder()
             ->add('root', null, 'root')
-            ->add('head', 'root', 'head', ['title' => 'Test'])
+            ->add('head', 'root', 'head')
+            ->add(
+                'title',
+                'head',
+                'title',
+                ['value' => ['First', 'Second'], 'separator' => ' - ', 'reverse' => true]
+            )
             ->add('meta', 'head', 'meta', ['charset' => 'UTF-8'])
             ->add('style', 'head', 'style', ['content' => 'body { color: red; }', 'scoped' => true])
             ->add(
@@ -311,7 +317,12 @@ class RendererTest extends LayoutTestCase
         /** @var FormFactoryInterface $formFactory */
         $formFactory = $this->getContainer()->get('form.factory');
 
-        $form = $formFactory->createNamedBuilder('form_for_layout_renderer_test')
+        $form = $formFactory->createNamedBuilder(
+            'form_for_layout_renderer_test',
+            'form',
+            null,
+            ['csrf_protection' => false]
+        )
             ->add('user', new UserNameType())
             ->add('jobTitle', 'text', ['label' => 'Job Title', 'required' => false])
             ->add(
@@ -340,7 +351,7 @@ class RendererTest extends LayoutTestCase
 <!DOCTYPE html>
 <html>
     <head>
-        <title>Test</title>
+        <title>Second - First</title>
         <meta charset="UTF-8"/>
         <style type="text/css" scoped="scoped">
             body { color: red; }
@@ -378,8 +389,28 @@ HTML;
     protected function getTwigFormLayoutResult()
     {
         $expected = <<<HTML
-<fieldset>
-    <legend>Additional Info</legend>
+<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test">
+    <div>
+        <label class="required">User</label>
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+            <div>
+                <label for="form_for_layout_renderer_test_user_firstName" class="required">First Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_firstName"
+                    name="form_for_layout_renderer_test[user][firstName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+            </div>
+            <div>
+                <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_lastName"
+                    name="form_for_layout_renderer_test[user][lastName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+            </div>
+        </div>
+    </div>
     <div>
         <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
         <input type="text"
@@ -410,26 +441,7 @@ HTML;
             <label for="form_for_layout_renderer_test_gender_1">Female</label>
         </div>
     </div>
-</fieldset>
-<fieldset>
-    <legend>General Info</legend>
-    <div>
-        <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_lastName"
-            name="form_for_layout_renderer_test[user][lastName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_lastName"/>
-    </div>
-    <div>
-        <label for="form_for_layout_renderer_test_user_firstName" class="required">First Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_firstName"
-            name="form_for_layout_renderer_test[user][firstName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_firstName"/>
-    </div>
-</fieldset>
+</div>
 HTML;
 
         return $expected;
@@ -441,8 +453,28 @@ HTML;
     protected function getPhpFormLayoutResult()
     {
         $expected = <<<HTML
-<fieldset>
-    <legend>Additional Info</legend>
+<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test">
+    <div>
+        <label class="required">User</label>
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+            <div>
+                <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_firstName"
+                    name="form_for_layout_renderer_test[user][firstName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+            </div>
+            <div>
+                <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
+                <input type="text"
+                    id="form_for_layout_renderer_test_user_lastName"
+                    name="form_for_layout_renderer_test[user][lastName]"
+                    required="required"
+                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+            </div>
+        </div>
+    </div>
     <div>
         <label for="form_for_layout_renderer_test_jobTitle">Job Title</label>
         <input type="text"
@@ -473,26 +505,7 @@ HTML;
             <label for="form_for_layout_renderer_test_gender_1">Female</label>
         </div>
     </div>
-</fieldset>
-<fieldset>
-    <legend>General Info</legend>
-    <div>
-        <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_lastName"
-            name="form_for_layout_renderer_test[user][lastName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_lastName"/>
-    </div>
-    <div>
-        <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
-        <input type="text"
-            id="form_for_layout_renderer_test_user_firstName"
-            name="form_for_layout_renderer_test[user][firstName]"
-            required="required"
-            data-ftid="form_for_layout_renderer_test_user_firstName"/>
-    </div>
-</fieldset>
+</div>
 HTML;
 
         return $expected;

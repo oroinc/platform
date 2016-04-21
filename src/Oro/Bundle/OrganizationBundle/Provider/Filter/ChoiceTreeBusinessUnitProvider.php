@@ -5,6 +5,7 @@ namespace Oro\Bundle\OrganizationBundle\Provider\Filter;
 use Doctrine\Bundle\DoctrineBundle\Registry;
 use Doctrine\ORM\QueryBuilder;
 
+use Oro\Component\DoctrineUtils\ORM\QueryUtils;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\SecurityBundle\Owner\ChainOwnerTreeProvider;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
@@ -56,15 +57,20 @@ class ChoiceTreeBusinessUnitProvider
         $qb
             ->select('businessUnit.id')
             ->addSelect('o.id AS owner_id')
-            ->andWhere(
-                $qb->expr()->in('businessUnit.id', ':ids')
-            )
             ->leftJoin('businessUnit.owner', 'o')
-            ->orderBy('businessUnit.id', 'ASC')
-            ->setParameter('ids', $this->getBusinessUnitIds());
+            ->orderBy('businessUnit.id', 'ASC');
         $this->addBusinessUnitName($qb);
+        QueryUtils::applyOptimizedIn($qb, 'businessUnit.id', $this->getBusinessUnitIds());
 
         return $this->aclHelper->apply($qb)->getArrayResult();
+    }
+
+    /**
+     * @return bool
+     */
+    public function shouldBeLazy()
+    {
+        return count($this->getBusinessUnitIds()) >= 500;
     }
 
     /**

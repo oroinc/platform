@@ -36,6 +36,11 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
      */
     protected $helper;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $configurableDataConverter;
+
     protected function setUp()
     {
         $this->managerRegistry = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
@@ -56,11 +61,17 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->configurableDataConverter = $this
+            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->helper = new ImportStrategyHelper(
             $this->managerRegistry,
             $this->validator,
             $this->translator,
-            $this->fieldHelper
+            $this->fieldHelper,
+            $this->configurableDataConverter
         );
 
         $this->helper->setConfigProvider($this->extendConfigProvider);
@@ -103,25 +114,30 @@ class ImportStrategyHelperTest extends \PHPUnit_Framework_TestCase
         $importedEntity->fieldOne = 'one';
         $importedEntity->fieldTwo = 'two';
         $importedEntity->excludedField = 'excluded';
-        $excludedProperties = array('excludedField');
+        $excludedProperties = ['excludedField'];
 
         $metadata = $this->getMockBuilder('\Doctrine\ORM\Mapping\ClassMetadata')
             ->disableOriginalConstructor()
             ->getMock();
         $metadata->expects($this->once())
             ->method('getFieldNames')
-            ->will($this->returnValue(array('fieldOne', 'excludedField')));
+            ->will($this->returnValue(['fieldOne', 'excludedField']));
         $metadata->expects($this->once())
             ->method('getAssociationNames')
-            ->will($this->returnValue(array('fieldTwo')));
+            ->will($this->returnValue(['fieldTwo', 'fieldThree']));
 
-        $this->fieldHelper->expects($this->atLeastOnce())
+        $this->fieldHelper->expects($this->any())
             ->method('getObjectValue')
-            ->with($importedEntity)
-            ->will($this->returnValue('testValue'));
-        $this->fieldHelper->expects($this->atLeastOnce())
+            ->will($this->returnValueMap([
+                [$importedEntity, 'fieldOne', $importedEntity->fieldOne],
+                [$importedEntity, 'fieldTwo', $importedEntity->fieldTwo],
+            ]));
+        $this->fieldHelper->expects($this->exactly(3))
             ->method('setObjectValue')
-            ->with($basicEntity, $this->isType('string'), 'testValue');
+            ->withConsecutive(
+                [$basicEntity, 'fieldOne', $importedEntity->fieldOne],
+                [$basicEntity, 'fieldTwo', $importedEntity->fieldTwo]
+            );
 
         $entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()

@@ -35,7 +35,7 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->contextAccessor = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ContextAccessor')
+        $this->contextAccessor = $this->getMockBuilder('Oro\Component\Action\Model\ContextAccessor')
             ->disableOriginalConstructor()
             ->getMock();
         $this->emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
@@ -78,7 +78,7 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
         return array(
             'no from' => array(
                 'options' => array('to' => 'test@test.com', 'subject' => 'test', 'body' => 'test'),
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'From parameter is required'
             ),
             'no from email' => array(
@@ -86,12 +86,12 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
                     'to' => 'test@test.com', 'subject' => 'test', 'body' => 'test',
                     'from' => array('name' => 'Test')
                 ),
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
             ),
             'no to' => array(
                 'options' => array('from' => 'test@test.com', 'subject' => 'test', 'body' => 'test'),
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'To parameter is required'
             ),
             'no to email' => array(
@@ -99,7 +99,7 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
                     'from' => 'test@test.com', 'subject' => 'test', 'body' => 'test',
                     'to' => array('name' => 'Test')
                 ),
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
             ),
             'no to email in one of addresses' => array(
@@ -107,17 +107,17 @@ class SendEmailTest extends \PHPUnit_Framework_TestCase
                     'from' => 'test@test.com', 'subject' => 'test', 'body' => 'test',
                     'to' => array('test@test.com', array('name' => 'Test'))
                 ),
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Email parameter is required'
             ),
             'no subject' => array(
                 'options' => array('from' => 'test@test.com', 'to' => 'test@test.com', 'body' => 'test'),
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Subject parameter is required'
             ),
             'no body' => array(
                 'options' => array('from' => 'test@test.com', 'to' => 'test@test.com', 'subject' => 'test'),
-                'exceptionName' => '\Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'exceptionName' => '\Oro\Component\Action\Exception\InvalidParameterException',
                 'exceptionMessage' => 'Body parameter is required'
             ),
         );

@@ -6,8 +6,9 @@ use Symfony\Component\PropertyAccess\PropertyPath;
 
 use Oro\Bundle\IntegrationBundle\Manager\FieldsChangesManager;
 use Oro\Bundle\IntegrationBundle\Model\Action\SaveFieldsChangesAction;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
 use Oro\Bundle\WorkflowBundle\Model\ProcessData;
+
+use Oro\Component\Action\Model\ContextAccessor;
 
 class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
 {
@@ -36,7 +37,7 @@ class SaveFieldsChangesActionTest extends \PHPUnit_Framework_TestCase
     {
         if ($message) {
             $this->setExpectedException(
-                'Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException',
+                'Oro\Component\Action\Exception\InvalidParameterException',
                 $message
             );
         }

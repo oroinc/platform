@@ -1,0 +1,151 @@
+@import "oroui/css/less/mixins";
+.dot-menu {
+  .oro-dropdown-toggle {
+    background-color: transparent !important;
+    .icon-bars {
+      display: inline-block !important;
+      height: 20px;
+      overflow: hidden;
+    }
+  }
+  .dropdown-menu {
+    border-radius: 3px;
+    right: -1px !important;
+    margin: 1px 0 0 !important;
+    padding: 0;
+    width: 415px !important;
+    outline: none;
+    .tabs-left {
+      > .nav-tabs {
+        border:0;
+        margin:0;
+        width: 120px;
+        li {
+          width: auto;
+          height: auto;
+          float: none;
+          > a {
+            border:none;
+            border-bottom:1px solid darken(#dbe2ea,2%);
+            .border-radius(0);
+            padding: 7px 8px !important;
+            line-height: 14px;
+            margin-right: 0;
+            margin-bottom:0;
+            color:#2f2f2f !important;
+            font-weight: normal !important;
+            text-shadow:0 1px 0 #f7fafc;
+            &:hover {
+              border-bottom:1px solid darken(#dbe2ea,2%);
+              color:#2f2f2f !important;
+              cursor:pointer;
+            }
+            [class^='icon-'] { color:#8ba1b6; }
+          }
+          &:hover,
+          &:active,
+          &:focus {
+            background-color: darken(#ecf1f9,2%);
+          }
+          &.active {
+            position:relative;
+            background-color: darken(#ecf1f9,5%);
+            > a{
+              font-weight:bold !important;
+            }
+            &:before {
+              width: 0px;
+              height: 0px;
+              border-style: solid;
+              border-width: 7.5px 8px 7.5px 0;
+              border-color: transparent darken(#ecf1f9,8%) transparent transparent;
+              content: "";
+              display: inline-block;
+              position: absolute;
+              right: 0;
+              top:7px;
+              bottom:0;
+            }
+            &:after {
+              width: 0px;
+              height: 0px;
+              border-style: solid;
+              border-width: 7.5px 8px 7.5px 0;
+              border-color: transparent #fff transparent transparent;
+              content: "";
+              display: inline-block;
+              position: absolute;
+              right: -1px;
+              top:7px;
+              bottom:0;
+            }
+          }
+          &.active a,
+          a:hover,
+          a:active,
+          a:focus {
+            background:none;
+            text-shadow:0 1px 0 #e6eff8;
+          }
+          &:last-child > a { border-bottom:none; }
+        }
+      }
+      &.tabbable {
+        background-color: #ecf1f9;
+        background-color: transparent;
+        border-radius: 3px;
+        overflow: hidden;
+      }
+      > .tab-content {
+        clear: none;
+        border-left: 1px solid darken(#ecf1f9,8%);
+        background-color: #fff;
+        min-height: @dotMenuDropdownMinHeight;
+        max-height: @dotMenuDropdownMaxHeight;
+        overflow: auto;
+        z-index:99;
+        .tab-pane {
+          .extra-list {
+            li {
+              a {
+                padding-right:0 !important;
+                padding-left:0 !important;
+                line-height: 16px;
+                display: inline-block;
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+  .extra-list {
+    padding: 6px 0;
+    li {
+      border-bottom:1px solid #f2f2f2;
+      padding: 3px 27px 3px 15px;
+      font-size: 12px;
+      &:last-child {
+        border-bottom:none;
+      }
+      a {
+        &:hover {
+          text-decoration: none;
+        }
+      }
+      .close {
+        position: absolute;
+        right: 13px;
+      }
+    }
+    > li:hover {
+      background-color: #f4f4f4;
+    }
+  }
+  .dot-menu-empty-message {
+    padding: @dotMenuDropdownMinHeight/2-10px 15px 15px;
+    text-align: center;
+    color:lighten(@bodyColor,30%);
+    font-style:italic;
+  }
+}

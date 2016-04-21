@@ -16,30 +16,30 @@ services:
     oro_note.manager:
         class: %oro_note.manager.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_security.security_facade
-            - @oro_security.acl_helper
-            - @oro_entity.entity_name_resolver
-            - @oro_attachment.manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_security.security_facade'
+            - '@oro_security.acl_helper'
+            - '@oro_entity.entity_name_resolver'
+            - '@oro_attachment.manager'
 
     oro_note.association_helper:
         class: Oro\Bundle\NoteBundle\Tools\NoteAssociationHelper
         public: false
         arguments:
-            - @oro_entity_config.config_manager
+            - '@oro_entity_config.config_manager'
 
     oro_note.manager.api:
         class: %oro_note.manager.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
             - %oro_note.entity.class%
-            - @doctrine.orm.entity_manager
+            - '@doctrine.orm.entity_manager'
 
     oro_note.placeholder.filter:
         class: %oro_note.placeholder.filter.class%
         arguments:
-            - @oro_note.association_helper
-            - @oro_entity.doctrine_helper
+            - '@oro_note.association_helper'
+            - '@oro_entity.doctrine_helper'
 
     oro_note.entity_config_dumper.extension:
         class: %oro_note.entity_config_dumper.extension.class%
@@ -69,10 +69,10 @@ services:
     oro_note.activity_list.provider:
         class: %oro_note.activity_list.provider.class%
         arguments:
-           - @oro_entity.doctrine_helper
-           - @oro_security.owner.entity_owner_accessor.link
-           - @oro_note.association_helper
-           - @oro_comment.association_helper
+           - '@oro_entity.doctrine_helper'
+           - '@oro_security.owner.entity_owner_accessor.link'
+           - '@oro_note.association_helper'
+           - '@oro_comment.association_helper'
         tags:
            - {name: oro_activity_list.provider, priority: 40}
 
@@ -80,9 +80,9 @@ services:
     oro_note.listener.merge_listener:
         class: %oro_note.listener.merge_listener.class%
         arguments:
-          - @translator
-          - @oro_entity_config.provider.entity
-          - @oro_activity_list.provider.chain
+          - '@translator'
+          - '@oro_entity_config.provider.entity'
+          - '@oro_activity_list.provider.chain'
         tags:
           - { name: kernel.event_listener, event: oro.entity_merge.build_metadata, method: onBuildMetadata, priority: -10 }
 
@@ -90,16 +90,16 @@ services:
     oro_note.strategy.replace:
         class: %oro_note.strategy.replace.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_activity_list.manager
+            - '@oro_entity.doctrine_helper'
+            - '@oro_activity_list.manager'
         tags:
             - { name: oro_entity_merge.strategy }
 
     oro_note.strategy.unite:
         class: %oro_note.strategy.unite.class%
         arguments:
-            - @oro_activity_list.manager
-            - @oro_entity.doctrine_helper
+            - '@oro_activity_list.manager'
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: oro_entity_merge.strategy }
 

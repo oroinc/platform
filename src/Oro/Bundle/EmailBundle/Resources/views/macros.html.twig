@@ -488,14 +488,14 @@
 {% macro date_smart_format(date) -%}
     {% if date(date)|oro_format_date == date()|oro_format_date -%}
         {# same day -- show only time #}
-        {{ date|oro_format_time }}
+        {{ date|oro_format_time({'timeZone': oro_timezone()}) }}
     {%- elseif date(date)|oro_format_date == date('-1days')|oro_format_date -%}
         {{ 'yesterday'|trans|capitalize }}
     {%- elseif date(date).format('Y') == date().format('Y') -%}
         {# same year -- month and daty #}
-        {{ date|oro_format_day }}
+        {{ date|oro_format_day({'timeZone': oro_timezone()}) }}
     {%- else -%}
-        {{ date|oro_format_date }}
+        {{ date|oro_format_date({'timeZone': oro_timezone()}) }}
     {%- endif %}
 {%- endmacro %}
 

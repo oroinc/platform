@@ -1,0 +1,6 @@
+oro:
+    action:
+        confirm_title: Action Confirmation
+        confirm_content: Are you sure you want to perform this action?
+        delete_entity:  Delete {{ entityLabel }}
+        delete_confirm: Are you sure you want to delete this {{ entityLabel }}?

@@ -266,7 +266,7 @@ after:
 
 ####SecurityBundle
 - `Oro\Bundle\SecurityBundle\Owner\OwnerTreeInterface` is changed. New method `buildTree` added (due to performance issues). It should be called once after all `addDeepEntity` calls. See [OwnerTreeProvider](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTreeProvider.php) method `fillTree`. Implementation example [OwnerTree](./src/Oro/Bundle/SecurityBundle/Owner/OwnerTree.php).
-- Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy) 
+- Bundle now contains part of Symfony security configuration (ACL configuration and access decision manager strategy)
 - `Oro\Bundle\SecurityBundle\Http\Firewall\ContextListener` added to the class cache and constructor have container as performance improvement
 - `Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactoryInterface` and its implementation `Oro\Bundle\SecurityBundle\Authentication\Token\UsernamePasswordOrganizationTokenFactory` were introduced to encapsulate creation of `UsernamePasswordOrganizationToken` in `Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider` and `Oro\Bundle\SecurityBundle\Http\Firewall\OrganizationBasicAuthenticationListener`
 - `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactoryInterface` and its implementation `Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationRememberMeTokenFactory` were introduced to encapsulate creation of `OrganizationRememberMeToken` in `Oro\Bundle\SecurityBundle\Authentication\Provider\UsernamePasswordOrganizationAuthenticationProvider`
@@ -278,7 +278,7 @@ after:
 - `Oro\Bundle\SSOBundle\Security\OAuthTokenFactoryInterface` and its implementation `Oro\Bundle\SSOBundle\Security\OAuthTokenFactory` were introduced to encapsulate creation of `OAuthToken` in `Oro\Bundle\SSOBundle\Security\OAuthProvider`
 
 ####SoapBundle
-- Bundle now contains configuration of security firewall `wsse_secured` 
+- Bundle now contains configuration of security firewall `wsse_secured`
 - `Oro\Bundle\SoapBundle\EventListener\LocaleListener` added to the class cache and constructor have container as performance improvement
 
 ####TagBundle
@@ -303,6 +303,7 @@ after:
 - Services with tag `oro_ui.content_provider` was marked as private
 - Services with tag `oro_formatter` was marked as private
 - Class `Oro\Bundle\UIBundle\Tools\ArrayUtils` marked as deprecated. Use `Oro\Component\PhpUtils\ArrayUtil` instead.
+- Added [InputWidgetManager](./src/Oro/Bundle/UIBundle/Resources/doc/reference/input-widgets.md).
 
 ####UserBundle
 - Bundle now contains configuration of security providers (`chain_provider`, `oro_user`, `in_memory`), encoders and security firewalls (`login`, `reset_password`, `main`)
@@ -314,8 +315,8 @@ after:
 - Constructor of `Oro\Bundle\WorkflowBundle\Model\ProcessFactory` changed. New argument: `ConditionFactory $conditionFactory`
 - Added new process definition option `pre_conditions`
 - Class `Oro\Bundle\WorkflowBundle\Model\WorkflowManager` now has method `massTransit` to perform several transitions in one transaction, can be used to improve workflow performance
-- Services with tag `oro_workflow.condition` was marked as private 
-- Services with tag `oro_workflow.action` was marked as private 
+- Services with tag `oro_workflow.condition` was marked as private
+- Services with tag `oro_workflow.action` was marked as private
 - Route `oro_workflow_api_rest_process_activate` marked as deprecated. Use the route `oro_api_process_activate` instead.
 - Route `oro_workflow_api_rest_process_deactivate` marked as deprecated. Use the route `oro_api_process_deactivate` instead.
 - Route `oro_workflow_api_rest_workflowdefinition_get` marked as deprecated. Use the route `oro_api_workflow_definition_get` instead.
@@ -334,7 +335,7 @@ after:
 
 ####OroIntegrationBundle
 - `Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::addStatus` marked as deprecated since 1.9.0. Will be removed in 1.11.0. Use `Oro\Bundle\IntegrationBundle\Entity\Repository\ChannelRepository::addStatusAndFlush` instead.
-- Added possibility to skip connectors during synchronization using implemenation of `Oro\Bundle\IntegrationBundle\Provider\AllowedConnectorInterface`. 
+- Added possibility to skip connectors during synchronization using implemenation of `Oro\Bundle\IntegrationBundle\Provider\AllowedConnectorInterface`.
 - Added possibility to sort connectors execution order using implementation of `Oro\Bundle\IntegrationBundle\Provider\OrderedConnectorInterface`.
 
 ####OroCronBundle

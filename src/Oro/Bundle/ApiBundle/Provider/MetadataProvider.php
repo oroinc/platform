@@ -2,21 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Provider;
 
+use Oro\Component\ChainProcessor\ActionProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataExtraInterface;
 use Oro\Bundle\ApiBundle\Processor\GetMetadata\MetadataContext;
-use Oro\Bundle\ApiBundle\Processor\MetadataProcessor;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
 class MetadataProvider
 {
-    /** @var MetadataProcessor */
+    /** @var ActionProcessorInterface */
     protected $processor;
 
     /**
-     * @param MetadataProcessor $processor
+     * @param ActionProcessorInterface $processor
      */
-    public function __construct(MetadataProcessor $processor)
+    public function __construct(ActionProcessorInterface $processor)
     {
         $this->processor = $processor;
     }
@@ -26,8 +27,8 @@ class MetadataProvider
      *
      * @param string                      $className   The FQCN of an entity
      * @param string                      $version     The version of a config
-     * @param string[]                    $requestType The request type, for example "rest", "soap", etc.
-     * @param MetadataExtraInterface[]    $extras      Additional metadata information
+     * @param RequestType                 $requestType The request type, for example "rest", "soap", etc.
+     * @param MetadataExtraInterface[]    $extras      Requests for additional metadata information
      * @param EntityDefinitionConfig|null $config      The configuration of an entity
      *
      * @return EntityMetadata|null
@@ -35,7 +36,7 @@ class MetadataProvider
     public function getMetadata(
         $className,
         $version,
-        array $requestType = [],
+        RequestType $requestType,
         array $extras = [],
         EntityDefinitionConfig $config = null
     ) {
@@ -47,9 +48,7 @@ class MetadataProvider
         $context = $this->processor->createContext();
         $context->setClassName($className);
         $context->setVersion($version);
-        if (!empty($requestType)) {
-            $context->setRequestType($requestType);
-        }
+        $context->getRequestType()->set($requestType->toArray());
         if (!empty($extras)) {
             $context->setExtras($extras);
         }

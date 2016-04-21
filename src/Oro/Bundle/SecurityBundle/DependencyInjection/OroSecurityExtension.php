@@ -33,6 +33,7 @@ class OroSecurityExtension extends Extension implements PrependExtensionInterfac
         $this->processConfiguration($configuration, $configs);
 
         $loader = new Loader\YamlFileLoader($container, new FileLocator(__DIR__ . '/../Resources/config'));
+        $loader->load('layouts.yml');
         $loader->load('ownership.yml');
         $loader->load('services.yml');
 

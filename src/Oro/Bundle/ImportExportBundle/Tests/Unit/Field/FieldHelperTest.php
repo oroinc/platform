@@ -407,6 +407,12 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
                 'value'     => 'should_be_set',
                 'exception' => []
             ],
+            'private of the parent' => [
+                'object'    => $object,
+                'fieldName' => 'basePrivate',
+                'value'     => 'val',
+                'exception' => [],
+            ]
         ];
     }
 

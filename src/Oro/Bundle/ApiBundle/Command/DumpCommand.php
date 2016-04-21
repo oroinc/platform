@@ -2,21 +2,22 @@
 
 namespace Oro\Bundle\ApiBundle\Command;
 
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
 use Oro\Bundle\ApiBundle\Request\ApiResource;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
-use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
 use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
+use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 
-class DumpCommand extends ContainerAwareCommand
+class DumpCommand extends AbstractDebugCommand
 {
     /**
      * {@inheritdoc}
@@ -26,20 +27,19 @@ class DumpCommand extends ContainerAwareCommand
         $this
             ->setName('oro:api:dump')
             ->setDescription('Dumps all resources available through Data API.')
-            // @todo: API version is not supported for now
+            ->addArgument(
+                'entity',
+                InputArgument::OPTIONAL,
+                'The entity class name or alias'
+            );
+           // @todo: API version is not supported for now
             //->addArgument(
             //    'version',
             //    InputArgument::OPTIONAL,
             //    'API version',
             //    Version::LATEST
-            //)
-            ->addOption(
-                'request-type',
-                null,
-                InputOption::VALUE_REQUIRED | InputOption::VALUE_IS_ARRAY,
-                'The request type',
-                [RequestType::REST, RequestType::JSON_API]
-            );
+            //);
+        parent::configure();
     }
 
     /**
@@ -47,7 +47,13 @@ class DumpCommand extends ContainerAwareCommand
      */
     public function execute(InputInterface $input, OutputInterface $output)
     {
-        $requestType = $input->getOption('request-type');
+        $entityClass = $input->getArgument('entity');
+        if ($entityClass) {
+            /** @var EntityClassNameHelper $entityClassNameHelper */
+            $entityClassNameHelper = $this->getContainer()->get('oro_entity.entity_class_name_helper');
+            $entityClass = $entityClassNameHelper->resolveEntityClass($entityClass, true);
+        }
+        $requestType = $this->getRequestType($input);
         // @todo: API version is not supported for now
         //$version     = $input->getArgument('version');
         $version = Version::LATEST;
@@ -61,13 +67,16 @@ class DumpCommand extends ContainerAwareCommand
 
         $i = 0;
         foreach ($resources as $resource) {
+            if ($entityClass && $resource->getEntityClass() !== $entityClass) {
+                continue;
+            }
             if ($i > 0) {
                 $table->addRow(new TableSeparator());
             }
             $table->addRow(
                 [
                     $resource->getEntityClass(),
-                    $this->convertResourceAttributesToString($this->getResourceAttributes($resource))
+                    $this->convertResourceAttributesToString($this->getResourceAttributes($resource, $requestType))
                 ]
             );
             $i++;
@@ -78,23 +87,33 @@ class DumpCommand extends ContainerAwareCommand
 
     /**
      * @param ApiResource $resource
+     * @param RequestType $requestType
      *
      * @return array
      */
-    protected function getResourceAttributes(ApiResource $resource)
+    protected function getResourceAttributes(ApiResource $resource, RequestType $requestType)
     {
         $result = [];
 
         $entityClass = $resource->getEntityClass();
 
-        /** @var EntityAliasResolver $entityAliasResolver */
-        $entityAliasResolver = $this->getContainer()->get('oro_entity.entity_alias_resolver');
-        $result['Alias']     = $entityAliasResolver->getPluralAlias($entityClass);
+        /** @var ValueNormalizer $valueNormalizer */
+        $valueNormalizer      = $this->getContainer()->get('oro_api.value_normalizer');
+        $result['Entity Type'] = $valueNormalizer->normalizeValue(
+            $entityClass,
+            DataType::ENTITY_TYPE,
+            $requestType
+        );
 
         /** @var EntityClassNameProviderInterface $entityClassNameProvider */
         $entityClassNameProvider = $this->getContainer()->get('oro_entity.entity_class_name_provider');
         $result['Name']          = $entityClassNameProvider->getEntityClassName($entityClass);
         $result['Plural Name']   = $entityClassNameProvider->getEntityClassPluralName($entityClass);
+
+        $excludedActions = $resource->getExcludedActions();
+        if (!empty($excludedActions)) {
+            $result['Excluded Actions'] = implode(', ', $excludedActions);
+        }
 
         return $result;
     }

@@ -5,19 +5,19 @@ definitions:
         entity:  Oro\Bundle\IntegrationBundle\Entity\Channel
         order:   10
         pre_conditions:
-            @equal: [$enabled, true]
+            '@equal': [$enabled, true]
         actions_configuration:
-            - @assign_constant_value:
+            - '@assign_constant_value':
                 attribute: $.commandName
                 value: Oro\Bundle\IntegrationBundle\Command\SyncCommand::COMMAND_NAME
-            - @tree:
+            - '@tree':
                 actions:
-                    - @format_string:
+                    - '@format_string':
                         attribute: $.channelArguments
                         string: '--integration-id=%integration_id%'
                         arguments:
                             integration_id: $id
-                    - @create_entity:
+                    - '@create_entity':
                         class: JMS\JobQueueBundle\Entity\Job
                         attribute: $.syncJob
                         arguments:
