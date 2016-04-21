@@ -134,9 +134,14 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
         if ($groups) {
             $this->extension->setGroups($groups);
         }
-        $this->extension->isApplicable($datagridConfig);
 
-        $this->assertEquals($expectedActions, $this->extension->getRowConfiguration($record, []));
+        if ($this->extension->isApplicable($datagridConfig)) {
+            $actionConfigurationCallback = $datagridConfig->offsetGet(ActionExtension::ACTION_CONFIGURATION_KEY);
+
+            $this->assertInstanceOf('Closure', $actionConfigurationCallback);
+
+            $this->assertEquals($expectedActions, call_user_func($actionConfigurationCallback, $record, []));
+        }
     }
 
     /**

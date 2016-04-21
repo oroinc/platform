@@ -143,16 +143,12 @@ class OperationRegistry
      */
     protected function isEntityClassMatched($className, OperationDefinition $definition)
     {
-        if (!$className) {
-            return false;
-        }
-
-        $forAllEntities = $definition->isForAllEntities();
-
-        $inEntities = in_array($className, $definition->getEntities(), true);
-        $inExcludedEntities = in_array($className, $definition->getExcludeEntities(), true);
-
-        return ($forAllEntities && !$inExcludedEntities) || (!$forAllEntities && $inEntities);
+        return $this->match(
+            $className,
+            $definition->getEntities(),
+            $definition->getExcludeEntities(),
+            $definition->isForAllEntities()
+        );
     }
 
     /**
@@ -162,13 +158,28 @@ class OperationRegistry
      */
     protected function isDatagridMatched($datagrid, OperationDefinition $definition)
     {
-        if (!$datagrid) {
+        return $this->match(
+            $datagrid,
+            $definition->getDatagrids(),
+            $definition->getExcludeDatagrids(),
+            $definition->isForAllDatagrids()
+        );
+    }
+
+    /**
+     * @param string $value
+     * @param array $inclusion
+     * @param array $exclusion
+     * @param bool $forAll
+     * @return bool
+     */
+    protected function match($value, array $inclusion, array $exclusion, $forAll)
+    {
+        if (!$value) {
             return false;
         }
 
-        $forAllDatagrids = $definition->isForAllDatagrids();
-
-        return $forAllDatagrids || $datagrid && in_array($datagrid, $definition->getDatagrids(), true);
+        return ($forAll && !in_array($value, $exclusion, true)) || (!$forAll && in_array($value, $inclusion, true));
     }
 
     /**

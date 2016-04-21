@@ -193,6 +193,13 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'group' => 'group1',
                 'expected' => ['operation9']
             ],
+            'datagrid exclusion' => [
+                'entityClass' => null,
+                'route' => null,
+                'datagrid' => 'datagrid2',
+                'group' => null,
+                'expected' => ['operation9_0']
+            ],
             'route1 & entity1' => [
                 'entityClass' => 'Oro\Bundle\ActionBundle\Tests\Unit\Stub\TestEntity1',
                 'route' => 'route1',
@@ -359,6 +366,11 @@ class OperationRegistryTest extends \PHPUnit_Framework_TestCase
                 'label' => 'Label9',
                 'groups' => ['group1'],
                 'datagrids' => ['datagrid1'],
+            ],
+            'operation9_0' => [
+                'label' => 'Label datagrids 1',
+                'for_all_datagrids' => true,
+                'exclude_datagrids' => ['datagrid1']
             ],
             'operation10' => [
                 'label' => 'Label10',
