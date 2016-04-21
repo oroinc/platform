@@ -2196,10 +2196,11 @@ div.uploader {
   line-height: 28px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
+  white-space: nowrap;
 }
 
 div.uploader span.action {
-  float: left;
+  display: inline-block;
   height: 28px;
   border-left: 1px solid #ccc;
   padding: 0 10px;
@@ -2212,8 +2213,7 @@ div.uploader.active  span.action {
 }
 div.uploader span.filename {
   padding: 0px 10px;
-  float: left;
-  display: block;
+  display: inline-block;
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -2224,6 +2224,7 @@ div.uploader span.filename {
 div.uploader input {
   float: right;
   height: 25px;
+  font-size: 40px; /* to expand real file input through whole ui substrate */
 }
 /* Select */
 
