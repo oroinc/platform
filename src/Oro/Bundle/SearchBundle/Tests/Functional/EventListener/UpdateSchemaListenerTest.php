@@ -38,7 +38,7 @@ class UpdateSchemaListenerTest extends WebTestCase
     /**
      * @dataProvider commandPostgreSQLProvider
      */
-    public function testCommandWithPostgreeSql($commandName, array $params, $expectedContent)
+    public function testCommandWithPostgreSql($commandName, array $params, $expectedContent)
     {
         /** @var Connection $connection */
         $connection = $this->getContainer()->get('doctrine')->getConnection();
