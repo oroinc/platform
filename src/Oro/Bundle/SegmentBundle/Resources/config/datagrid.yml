@@ -38,11 +38,11 @@ datagrid:
                 template:       OroEntityBundle:Datagrid:Property/entity.html.twig
                 frontend_type:  html
                 context:
-                    entity_provider: @oro_segment.entity_provider
+                    entity_provider: "@oro_segment.entity_provider"
             segmentType:
                 label:          oro.segment.type.label
                 type:           translatable
-                choices:        @oro_segment.segment_manager->getSegmentTypeChoices
+                choices:        "@oro_segment.segment_manager->getSegmentTypeChoices"
             lastRun:
                 label:          oro.segment.last_run.label
                 frontend_type:  datetime
@@ -63,14 +63,14 @@ datagrid:
                     options:
                         field_options:
                             multiple:          true
-                            choices:           @oro_entity.datagrid_helper->getEntityNames
+                            choices:           "@oro_entity.datagrid_helper->getEntityNames"
                             translatable_options: false
                 segmentType:
                     type:               choice
                     data_name:          s.type
                     options:
                         field_options:
-                            choices:    @oro_segment.segment_manager->getSegmentTypeChoices
+                            choices:    "@oro_segment.segment_manager->getSegmentTypeChoices"
                 lastRun:
                     type:       datetime
                     data_name:  s.lastRun

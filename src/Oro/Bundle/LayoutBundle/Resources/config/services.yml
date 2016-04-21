@@ -8,7 +8,7 @@ services:
         public: false
         class: Oro\Component\Layout\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
-            - @service_container
+            - '@service_container'
             - {} # types
             - {} # type extensions
             - {} # layout updates
@@ -19,14 +19,14 @@ services:
         public: false
         class: %oro_layout.layout_factory_builder.class%
         calls:
-            - [addExtension, [@oro_layout.extension]]
-            - [addExtension, [@oro_layout.theme_extension]]
+            - [addExtension, ['@oro_layout.extension']]
+            - [addExtension, ['@oro_layout.theme_extension']]
             - [setDefaultRenderer, [%oro_layout.templating.default%]]
 
     oro_layout.layout_manager:
         class: %oro_layout.layout_manager.class%
         arguments:
-            - @oro_layout.layout_factory_builder
+            - '@oro_layout.layout_factory_builder'
 
     oro_layout.form_layout_builder:
         class: %oro_layout.form_layout_builder.class%
@@ -37,7 +37,7 @@ services:
         public: false
         class: Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension
         arguments:
-            - @service_container
+            - '@service_container'
             - {}
 
     oro_layout.expression.context_accessor:
@@ -51,26 +51,26 @@ services:
     oro_layout.expression.factory:
         class: Oro\Component\ConfigExpression\ExpressionFactory
         arguments:
-            - @oro_layout.expression.context_accessor
+            - '@oro_layout.expression.context_accessor'
         calls:
-            - [addExtension, [@oro_layout.expression.extension]]
+            - [addExtension, ['@oro_layout.expression.extension']]
 
     oro_layout.expression.assembler:
         class: Oro\Component\ConfigExpression\ExpressionAssembler
         arguments:
-            - @oro_layout.expression.factory
+            - '@oro_layout.expression.factory'
         calls:
-            - [addConfigurationPass, [@oro_layout.expression.pass.property_path]]
+            - [addConfigurationPass, ['@oro_layout.expression.pass.property_path']]
 
     oro_layout.text.helper:
         class: Oro\Component\Layout\Templating\TextHelper
         arguments:
-            - @translator
+            - '@translator'
 
     oro_layout.layout_context_configurator.application:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\ApplicationContextConfigurator
         arguments:
-            - @kernel
+            - '@kernel'
         tags:
             - { name: layout.context_configurator }
 
@@ -87,14 +87,14 @@ services:
     oro_layout.layout_context_configurator.form:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\FormContextConfigurator
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
     oro_layout.layout_context_configurator.route:
         class: Oro\Bundle\LayoutBundle\Layout\Extension\RouteContextConfigurator
         calls:
-            - [setRequest, [@?request=]]
+            - [setRequest, ["@?request="]]
         tags:
             - { name: layout.context_configurator, priority: -100 }
 
@@ -111,14 +111,14 @@ services:
     oro_layout.block_type_extension.config_expression:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ConfigExpressionExtension
         arguments:
-            - @oro_layout.processor.config_expression
+            - '@oro_layout.processor.config_expression'
         tags:
             - { name: layout.block_type_extension, alias: block, priority: 255 }
 
     oro_layout.block_type_extension.class_attribute:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Extension\ClassAttributeExtension
         arguments:
-            - @oro_layout.expression.encoder_registry
+            - '@oro_layout.expression.encoder_registry'
         tags:
             - { name: layout.block_type_extension, alias: block, priority: 260 }
 
@@ -130,7 +130,7 @@ services:
     oro_layout.expression.encoder_registry:
         class: Oro\Bundle\LayoutBundle\Layout\Encoder\ConfigExpressionEncoderRegistry
         arguments:
-            - @service_container
+            - '@service_container'
             - {}
 
     oro_layout.expression.json_encoder:
@@ -148,24 +148,24 @@ services:
         public: false
         class: Oro\Bundle\LayoutBundle\Assetic\LayoutResource
         arguments:
-            - @oro_layout.theme_manager
+            - '@oro_layout.theme_manager'
         tags:
             - { name: assetic.formula_resource, loader: layout }
 
     oro_layout.processor.config_expression:
         class: Oro\Bundle\LayoutBundle\Layout\Processor\ConfigExpressionProcessor
         arguments:
-            - @oro_layout.expression.assembler
-            - @oro_layout.expression.encoder_registry
+            - '@oro_layout.expression.assembler'
+            - '@oro_layout.expression.encoder_registry'
 
     oro_layout.config_expression.asset:
         class: Oro\Bundle\LayoutBundle\ConfigExpression\Asset
         arguments:
-            - @assets.packages
+            - '@assets.packages'
         tags:
             - { name: oro_layout.expression, alias: asset }
 
     oro_layout.helper:
         class: Oro\Bundle\LayoutBundle\Request\LayoutHelper
         arguments:
-            - @request_stack
+            - '@request_stack'

@@ -21,15 +21,15 @@ services:
         class: %oro_soap.loader.class%
         public: false
         arguments:
-            - @file_locator
-            - @besimple.soap.definition.loader.annot_class
+            - '@file_locator'
+            - '@besimple.soap.definition.loader.annot_class'
         tags:
             - { name: besimple.soap.definition.loader }
 
     oro_soap.handler.delete.abstract:
         abstract: true
         calls:
-            - [setOwnerDeletionManager, [@oro_organization.owner_deletion_manager]]
+            - [setOwnerDeletionManager, ['@oro_organization.owner_deletion_manager']]
 
     oro_soap.handler.delete:
         class: %oro_soap.handler.delete.class%
@@ -38,15 +38,15 @@ services:
     oro_soap.manager.entity_manager.abstract:
         abstract: true
         calls:
-            - [setEventDispatcher, [@event_dispatcher]]
-            - [setDoctrineHelper, [@oro_entity.doctrine_helper]]
-            - [setEntityClassNameHelper, [@oro_entity.entity_class_name_helper]]
-            - [setEntitySerializer, [@oro_soap.entity_serializer]]
+            - [setEventDispatcher, ['@event_dispatcher']]
+            - [setDoctrineHelper, ['@oro_entity.doctrine_helper']]
+            - [setEntityClassNameHelper, ['@oro_entity.entity_class_name_helper']]
+            - [setEntitySerializer, ['@oro_soap.entity_serializer']]
 
     oro_soap.handler.include_delegate:
         class: %oro_soap.handler.include_delegate.class%
         arguments:
-            - @service_container
+            - '@service_container'
 
     oro_soap.handler.include:
         alias: oro_soap.handler.include_delegate
@@ -54,7 +54,7 @@ services:
     oro_soap.handler.include_total_header:
         class: %oro_soap.handler.include_total_header.class%
         arguments:
-            - @oro_batch.orm.query_builder.count_query_optimizer
+            - '@oro_batch.orm.query_builder.count_query_optimizer'
         tags:
             - { name: oro_soap.include_handler, alias: totalCount }
 
@@ -64,8 +64,8 @@ services:
     oro_soap.provider.metadata.entity:
         class: %oro_soap.provider.metadata.entity.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @translator
+            - '@oro_entity_config.config_manager'
+            - '@translator'
         tags:
             - { name: oro_soap.metadata_provider }
 
@@ -75,14 +75,14 @@ services:
     oro_soap.entity_serializer:
         class: %oro_soap.entity_serializer.class%
         arguments:
-            - @doctrine
-            - @oro_entity_config.config_manager
-            - @oro_soap.entity_accessor
-            - @oro_soap.entity_data_transformer
-            - @oro_entity.query_hint_resolver
+            - '@doctrine'
+            - '@oro_entity_config.config_manager'
+            - '@oro_soap.entity_accessor'
+            - '@oro_soap.entity_data_transformer'
+            - '@oro_entity.query_hint_resolver'
         calls:
-            # TODO: replace to compiler pass injection
-            - ["setFieldsFilter", [@oro_security.serializer.filter_chain]]
+            # TODO: replace to compiler pass injection?
+            - ["setFieldsFilter", ['@oro_security.serializer.filter_chain']]
 
     oro_soap.entity_accessor:
         class: %oro_soap.entity_accessor.class%
@@ -90,13 +90,13 @@ services:
     oro_soap.entity_data_transformer:
         class: %oro_soap.entity_data_transformer.class%
         arguments:
-            - @service_container
+            - '@service_container'
 
     # event listeners
     oro_soap.locale_listener:
         class: %oro_soap.locale_listener.class%
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: kernel.event_subscriber }
 

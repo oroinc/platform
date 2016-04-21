@@ -52,7 +52,7 @@ class ProcessTriggerCacheTest extends \PHPUnit_Framework_TestCase
 
         $this->prepareRegistryForBuild($this->testTriggerData);
         $this->cache->setProvider($this->prepareProvider($expectedProviderCalls));
-        $this->cache->build();
+        $this->assertEquals($this->testTriggerData, $this->cache->build());
     }
 
     /**
@@ -72,7 +72,6 @@ class ProcessTriggerCacheTest extends \PHPUnit_Framework_TestCase
             array('deleteAll'),
             array('save', array(ProcessTriggerCache::DATA, $this->testTriggerData)),
             array('save', array(ProcessTriggerCache::BUILT, true)),
-            array('fetch', array(ProcessTriggerCache::DATA), $this->testTriggerData),
             // second call
             array('contains', array(ProcessTriggerCache::BUILT), true),
             array('fetch', array(ProcessTriggerCache::BUILT), true),

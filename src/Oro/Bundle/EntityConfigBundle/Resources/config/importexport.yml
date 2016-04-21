@@ -14,22 +14,22 @@ services:
     oro_entity_config.importexport.template_data_converter.entity_field:
         class: %oro_entity_config.importexport.template_data_converter.entity_field.class%
         arguments:
-            - @oro_entity_extend.field_type_provider
+            - '@oro_entity_extend.field_type_provider'
 
     # Strategy
     oro_entity_config.importexport.strategy.entity_field.add_or_replace:
         class: %oro_entity_config.importexport.strategy.entity_field.add_or_replace.class%
         parent: oro_importexport.strategy.configurable_add_or_replace
         calls:
-            - [setTranslator, [@translator]]
-            - [setConstraintFactory, [@oro_form.validator.constraint_factory]]
-            - [setFieldTypeProvider, [@oro_entity_extend.field_type_provider]]
+            - [setTranslator, ['@translator']]
+            - [setConstraintFactory, ['@oro_form.validator.constraint_factory']]
+            - [setFieldTypeProvider, ['@oro_entity_extend.field_type_provider']]
 
     # Template Fixture
     oro_entity_config.importexport.template_fixture.entity_field:
         class: %oro_entity_config.importexport.template_fixture.entity_field.class%
         arguments:
-            - @oro_entity_extend.field_type_provider
+            - '@oro_entity_extend.field_type_provider'
         tags:
             - { name: oro_importexport.template_fixture }
 
@@ -37,8 +37,8 @@ services:
     oro_entity_config.importexport.processor.import.entity_field:
         parent: oro_importexport.processor.import_abstract
         calls:
-             - [setDataConverter, [@oro_entity_config.importexport.data_converter.entity_field]]
-             - [setStrategy, [@oro_entity_config.importexport.strategy.entity_field.add_or_replace]]
+             - [setDataConverter, ['@oro_entity_config.importexport.data_converter.entity_field']]
+             - [setStrategy, ['@oro_entity_config.importexport.strategy.entity_field.add_or_replace']]
         tags:
             - { name: oro_importexport.processor, type: import, entity: %oro_entity_config.entity.entity_field.class%, alias: oro_entity_config_entity_field.add_or_replace }
             - { name: oro_importexport.processor, type: import_validation, entity: %oro_entity_config.entity.entity_field.class%, alias: oro_entity_config_entity_field.add_or_replace }
@@ -47,22 +47,22 @@ services:
     oro_entity_config.importexport.processor.export_template.entity_field:
         parent: oro_importexport.processor.export_abstract
         calls:
-            - [setDataConverter, [@oro_entity_config.importexport.template_data_converter.entity_field]]
+            - [setDataConverter, ['@oro_entity_config.importexport.template_data_converter.entity_field']]
         tags:
             - { name: oro_importexport.processor, type: export_template, entity: %oro_entity_config.entity.entity_field.class%, alias: oro_entity_config_entity_field.export_template }
 
     oro_entity_config.importexport.normalizer.entityfield:
         class: %oro_entity_config.importexport.normalizer.entity_field.class%
         arguments:
-            - @doctrine
-            - @oro_entity_config.config_manager
-            - @oro_entity_extend.field_type_provider
+            - '@doctrine'
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_extend.field_type_provider'
         tags:
             - { name: oro_importexport.normalizer, priority: 20 }
 
     oro_entity_config.importexport.writer.entity_field:
         class: %oro_entity_config.importexport.writer.entity_field.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @oro_entity_config.translation.helper
-            - @oro_entity_extend.enum_synchronizer
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity_config.translation.helper'
+            - '@oro_entity_extend.enum_synchronizer'

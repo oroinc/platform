@@ -169,7 +169,7 @@ datagrid:
                 template: OroEntityConfigBundle:Audit:data.html.twig
                 frontend_type: html
                 context:
-                    config_manager: @oro_entity_config.config_manager
+                    config_manager: '@oro_entity_config.config_manager'
             loggedAt:
                 label: oro.entity_config.config_log.logged_at.label
                 type: field

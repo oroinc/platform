@@ -23,9 +23,9 @@ services:
         class: %oro_tag.tag.form.handler.tag.class%
         scope: request
         arguments:
-            - @oro_tag.form.tag
-            - @request
-            - @doctrine.orm.entity_manager
+            - '@oro_tag.form.tag'
+            - '@request'
+            - '@doctrine.orm.entity_manager'
 
     oro_tag.form.type.tag:
         class: %oro_tag.tag.form.type.tag.class%
@@ -35,27 +35,27 @@ services:
     oro_tag.form.type.tag_select:
         class: %oro_tag.form.type.tag_select.class%
         arguments:
-            - @oro_security.security_facade
-            - @oro_tag.form.transformer.tag_select
-            - @oro_tag.form.subscriber.tag_select
+            - '@oro_security.security_facade'
+            - '@oro_tag.form.transformer.tag_select'
+            - '@oro_tag.form.subscriber.tag_select'
         tags:
             - { name: form.type, alias: oro_tag_select }
 
     oro_tag.form.subscriber.tag_select:
         class: %oro_tag.form.subscriber.tag_select.class%
         arguments:
-            - @oro_tag.tag.manager
-            - @oro_tag.helper.taggable_helper
+            - '@oro_tag.tag.manager'
+            - '@oro_tag.helper.taggable_helper'
 
     oro_tag.form.transformer.tag_select:
         class: %oro_tag.form.transformer.tag_select.class%
-        arguments: [@oro_tag.tag.manager]
+        arguments:  ['@oro_tag.tag.manager']
 
     oro_tag.form.type.entity_tags_selector:
         class: %oro_tag.form.type.entity_tags_selector.class%
         arguments:
-            - @oro_security.acl_helper
-            - @doctrine
+            - '@oro_security.acl_helper'
+            - '@doctrine'
         tags:
             - { name: form.type, alias: oro_tag_entity_tags_selector }
 
@@ -69,7 +69,7 @@ services:
     oro_tag.form.type.tag_config_choice:
         class: Oro\Bundle\TagBundle\Form\Type\TagConfigChoiceType
         arguments:
-            - @oro_entity_extend.association_type_helper
+            - '@oro_entity_extend.association_type_helper'
         tags:
             - { name: form.type, alias: oro_tag_config_choice }
 
@@ -81,7 +81,7 @@ services:
         arguments:
             - %oro_tag.tag.entity.class%
             - ["name"]
-            - @oro_security.security_facade
+            - '@oro_security.security_facade'
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: tags, acl_resource: oro_tag_assign_unassign }
 
@@ -101,19 +101,19 @@ services:
         class: %oro_tag.tag.form.handler.tag.class%
         scope: request
         arguments:
-            - @oro_tag.form.type.tag.api
-            - @request
-            - @doctrine.orm.entity_manager
+            - '@oro_tag.form.type.tag.api'
+            - '@request'
+            - '@doctrine.orm.entity_manager'
 
     oro_tag.form.handler.taggable.api:
         class: Oro\Bundle\TagBundle\Form\Handler\TagEntityApiHandler
         scope: request
         arguments:
-            - @oro_tag.form.taggable.api
-            - @request
-            - @doctrine.orm.entity_manager
-            - @oro_tag.tag.manager
-            - @oro_tag.helper.taggable_helper
+            - '@oro_tag.form.taggable.api'
+            - '@request'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_tag.tag.manager'
+            - '@oro_tag.helper.taggable_helper'
 
     oro_tag.form.type.taggable.api:
         class: Oro\Bundle\TagBundle\Form\Type\TagEntityApiType
@@ -129,7 +129,7 @@ services:
         parent: oro_form.type.api
         arguments:
             - oro_tag_standalone_collection_api
-            - @oro_tag.form.tag_collection.api
+            - '@oro_tag.form.tag_collection.api'
         tags:
             - { name: form.type, alias: oro_tag_standalone_collection_api }
 

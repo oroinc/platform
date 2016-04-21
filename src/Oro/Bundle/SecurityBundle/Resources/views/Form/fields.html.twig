@@ -3,24 +3,17 @@
     {% if form.parent.parent.vars.privileges_config.view_type is defined and form.parent.parent.vars.privileges_config.view_type != 'grid' %}
         {% set additionalClass = 'span2' %}
     {% endif %}
+    {% set label = level_label is not defined or level_label is empty ?
+        translation_prefix ~ 'NONE' :
+        translation_prefix ~ level_label
+    %}
     <div class="access_level_value {{ additionalClass }}"
          data-identity="{{ identity }}"
          data-selector-id="{{ id }}"
          data-selector-name="{{ full_name }}"
          data-value="{{ value }}"
     >
-        <div class="access_level_value_link">
-            <a href="javascript:void(0);">
-                {% set label = level_label is not defined or level_label is empty ?
-                    translation_prefix ~ 'NONE' :
-                    translation_prefix ~ level_label
-                %}
-                {{ label|trans({}, translation_domain) }}
-            </a>
-            {% set type = type|default('hidden') %}
-            {{ block('form_widget_simple') }}
-        </div>
-        <div class="access_level_value_choice" style="display: none"></div>
+        <input type="hidden" data-value-text="{{ label|trans({}, translation_domain) }}" name="{{ full_name }}" value="{{ value }}">
     </div>
 {% endblock %}
 

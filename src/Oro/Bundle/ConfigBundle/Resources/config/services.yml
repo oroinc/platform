@@ -23,7 +23,7 @@ services:
         class: %oro_config.config_bag.class%
         arguments:
             - []
-            - @service_container
+            - '@service_container'
 
     oro_config.config_definition_bag:
         class: %oro_config.config_definition_bag.class%
@@ -39,15 +39,15 @@ services:
     oro_config.scope_manager.abstract:
         abstract: true
         arguments:
-            - @doctrine
-            - @oro_config.cache
+            - '@doctrine'
+            - '@oro_config.cache'
 
     oro_config.scope.user:
         class: %oro_config.user.class%
         public: false
         parent: oro_config.scope_manager.abstract
         calls:
-            - [setSecurityContext, [ @security.token_storage ]]
+            - [setSecurityContext, [ '@security.token_storage' ]]
         tags:
             - { name: oro_config.scope, scope: user, priority: 255 }
 
@@ -68,23 +68,23 @@ services:
         class: %oro_config.manager.class%
         arguments:
             - ~ # scope; it is set by Oro\Bundle\ConfigBundle\DependencyInjection\Compiler\SystemConfigurationPass
-            - @oro_config.config_definition_bag
-            - @event_dispatcher
-            - @oro_config.manager_value_bag
+            - '@oro_config.config_definition_bag'
+            - '@event_dispatcher'
+            - '@oro_config.manager_value_bag'
 
     oro_config.twig.config_extension:
         class: %oro_config.twig_extension.class%
         arguments:
-           - @oro_config.user
+           - '@oro_config.user'
         tags:
             - { name: twig.extension }
 
     oro_config.provider.system_configuration.form_provider:
         class:                        %oro_config.provider.system_configuration.form_provider.class%
         arguments:
-            - @oro_config.config_bag
-            - @form.factory
-            - @oro_security.security_facade
+            - '@oro_config.config_bag'
+            - '@form.factory'
+            - '@oro_security.security_facade'
         tags:
             - { name: oro_config.configuration_provider }
         lazy: true
@@ -92,12 +92,12 @@ services:
     oro_config.form.config_subscriber:
         class: %oro_config.form.config_subscriber.class%
         arguments:
-          - @oro_config.user
+          - '@oro_config.user'
 
     oro_config.type.form:
         class:                        %oro_config.type.form.class%
         arguments:
-            - @oro_config.form.config_subscriber
+            - '@oro_config.form.config_subscriber'
         tags:
             - { name: form.type, alias: oro_config_form_type }
 
@@ -119,9 +119,9 @@ services:
     oro_config.form.handler.config:
         class: %oro_config.form.handler.config.class%
         arguments:
-            - @oro_config.global
+            - '@oro_config.global'
 
     oro_config.manager.api:
         class: %oro_config.manager.api.class%
         arguments:
-            - @oro_config.provider.system_configuration.form_provider
+            - '@oro_config.provider.system_configuration.form_provider'

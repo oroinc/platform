@@ -22,13 +22,13 @@ services:
         class: %oro_segment.form.handler.segment.class%
         scope: request
         arguments:
-            - @oro_segment.form.segment
-            - @request
-            - @doctrine.orm.entity_manager
+            - '@oro_segment.form.segment'
+            - '@request'
+            - '@doctrine.orm.entity_manager'
 
     oro_segment.form.type.entity_choice:
         class: %oro_segment.form.type.entity_choice.class%
         arguments:
-            - @oro_segment.entity_provider
+            - '@oro_segment.entity_provider'
         tags:
             - { name: form.type, alias: oro_segment_entity_choice }

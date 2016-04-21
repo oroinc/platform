@@ -41,30 +41,8 @@ class RootBasedAclWrapper implements AclInterface
      */
     public function getClassAces()
     {
-        /** @var EntryInterface[] $aces */
         $aces = $this->acl->getClassAces();
-
-        $groupedRootAces = $this->getGroupedRootAces();
-
-        foreach ($groupedRootAces as $rootAces) {
-            /** @var EntryInterface $rootAce */
-            $rootAce = current($rootAces);
-
-            $exists = false;
-            $rootSid = $rootAce->getSecurityIdentity();
-            foreach ($aces as $ace) {
-                if ($rootSid->equals($ace->getSecurityIdentity())) {
-                    $exists = true;
-                    break;
-                }
-            }
-
-            if (!$exists) {
-                foreach ($rootAces as $rootAce) {
-                    $aces[] = $rootAce;
-                }
-            }
-        }
+        $this->addRootAces($aces);
 
         return $aces;
     }
@@ -74,28 +52,8 @@ class RootBasedAclWrapper implements AclInterface
      */
     public function getClassFieldAces($field)
     {
-        /** @var EntryInterface[] $aces */
         $aces = $this->acl->getClassFieldAces($field);
-
-        $groupedRootAces = $this->getGroupedRootAces($field);
-        foreach ($groupedRootAces as $rootAces) {
-            /** @var EntryInterface $rootAce */
-            $rootAce = current($rootAces);
-
-            $exists = false;
-            $rootSid = $rootAce->getSecurityIdentity();
-            foreach ($aces as $ace) {
-                if ($rootSid->equals($ace->getSecurityIdentity())) {
-                    $exists = true;
-                    break;
-                }
-            }
-            if (!$exists) {
-                foreach ($rootAces as $rootAce) {
-                    $aces[] = $rootAce;
-                }
-            }
-        }
+        $this->addRootAces($aces, $field);
 
         return $aces;
     }
@@ -211,33 +169,44 @@ class RootBasedAclWrapper implements AclInterface
     }
 
     /**
-     * Returns all class, object-based or class, object-field-based ACEs
-     * (depends on parameter $field) associated with this ACL.
-     * This ACEs grouped in arrays by security identity.
-     *
-     * @param string|null $field
-     *
-     * @return array
+     * @param EntryInterface[] $aces
+     * @param string|null      $field
      */
-    protected function getGroupedRootAces($field = null)
+    protected function addRootAces(array &$aces, $field = null)
     {
-        $groupedAces = [];
+        /** @var PermissionGrantingStrategy $permissionGrantingStrategy */
+        $permissionGrantingStrategy = $this->getPermissionGrantingStrategy();
+        $ext = $permissionGrantingStrategy->getContext()->getAclExtension();
 
-        /** @var EntryInterface[] $aces */
-        $aces = $field
+        $groupedAces = [];
+        foreach ($aces as $ace) {
+            $groupedAces[(string)$ace->getSecurityIdentity()][] = $ace;
+        }
+
+        /** @var EntryInterface[] $rootAces */
+        $rootAces = $field
             ? $this->rootAcl->getObjectFieldAces($field)
             : $this->rootAcl->getObjectAces();
 
-        $aces = $field && empty($aces)
+        $rootAces = $field && empty($rootAces)
             ? $this->rootAcl->getClassFieldAces($field)
             : $aces;
 
-        foreach ($aces as $ace) {
-            $rootSid = (string) $ace->getSecurityIdentity();
-
-            $groupedAces[$rootSid][] = $ace;
+        foreach ($rootAces as $rootAce) {
+            $exists = false;
+            $rootSid = (string)$rootAce->getSecurityIdentity();
+            if (isset($groupedAces[$rootSid])) {
+                /** @var EntryInterface $ace */
+                foreach ($groupedAces[$rootSid] as $ace) {
+                    if ($ext->getServiceBits($rootAce->getMask()) === $ext->getServiceBits($ace->getMask())) {
+                        $exists = true;
+                        break;
+                    }
+                }
+            }
+            if (!$exists) {
+                $aces[] = $rootAce;
+            }
         }
-
-        return $groupedAces;
     }
 }

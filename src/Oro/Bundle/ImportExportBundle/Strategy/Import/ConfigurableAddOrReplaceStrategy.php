@@ -6,12 +6,45 @@ use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Collections\ArrayCollection;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+use Symfony\Component\Translation\TranslatorInterface;
+
+use Oro\Bundle\EntityBundle\Provider\ChainEntityClassNameProvider;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
+use Oro\Bundle\ImportExportBundle\Field\DatabaseHelper;
+
 class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
 {
-    /**
-     * @var array
-     */
+    /** @var ChainEntityClassNameProvider */
+    protected $chainEntityClassNameProvider;
+
+    /** @var TranslatorInterface */
+    protected $translator;
+
+    /** @var array */
     protected $cachedEntities = array();
+
+    /**
+     * @param EventDispatcherInterface $eventDispatcher
+     * @param ImportStrategyHelper $strategyHelper
+     * @param FieldHelper $fieldHelper
+     * @param DatabaseHelper $databaseHelper
+     * @param ChainEntityClassNameProvider $chainEntityClassNameProvider
+     * @param TranslatorInterface $translator
+     */
+    public function __construct(
+        EventDispatcherInterface $eventDispatcher,
+        ImportStrategyHelper $strategyHelper,
+        FieldHelper $fieldHelper,
+        DatabaseHelper $databaseHelper,
+        ChainEntityClassNameProvider $chainEntityClassNameProvider,
+        TranslatorInterface $translator
+    ) {
+        parent::__construct($eventDispatcher, $strategyHelper, $fieldHelper, $databaseHelper);
+        $this->chainEntityClassNameProvider = $chainEntityClassNameProvider;
+        $this->translator = $translator;
+    }
+
 
     /**
      * {@inheritdoc}
@@ -43,6 +76,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
      * @param bool   $isPersistNew
      * @param mixed|array|null $itemData
      * @param array $searchContext
+     * @param bool $entityIsRelation
+     *
      * @return null|object
      */
     protected function processEntity(
@@ -50,7 +85,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         $isFullData = false,
         $isPersistNew = false,
         $itemData = null,
-        array $searchContext = array()
+        array $searchContext = array(),
+        $entityIsRelation = false
     ) {
         $oid = spl_object_hash($entity);
         if (isset($this->cachedEntities[$oid])) {
@@ -68,8 +104,18 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
         } else {
             // if can't find entity and new entity can't be persisted
             if (!$isPersistNew) {
+                if ($entityIsRelation) {
+                    $class = $this->chainEntityClassNameProvider->getEntityClassName(ClassUtils::getClass($entity));
+                    $errorMessages = [$this->translator->trans(
+                        'oro.importexport.import.errors.not_found_entity',
+                        ['%entity_name%' => $class]
+                    )];
+                    $this->strategyHelper->addValidationErrors($errorMessages, $this->context);
+                }
+
                 return null;
             }
+
             $this->databaseHelper->resetIdentifier($entity);
             $this->cachedEntities[$oid] = $entity;
         }
@@ -170,7 +216,8 @@ class ConfigurableAddOrReplaceStrategy extends AbstractImportStrategy
                             $isFullRelation,
                             $isPersistRelation,
                             $relationItemData,
-                            $searchContext
+                            $searchContext,
+                            true
                         );
                     }
                     $this->fieldHelper->setObjectValue($entity, $fieldName, $relationEntity);

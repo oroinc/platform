@@ -106,14 +106,15 @@ define(function(require) {
          * Converts the date value from Raw to Display
          *
          * @param {string} value
+         * @param {string} part
          * @returns {string}
          * @protected
          */
-        _toDisplayValue: function(value) {
+        _toDisplayValue: function(value, part) {
             var momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatDisplayValue(value);
-            } else if (this.dateValueHelper.isValid(value)) {
+            } else if (part === 'value' && this.dateValueHelper.isValid(value)) {
                 value = this.dateValueHelper.formatDisplayValue(value);
             } else if (datetimeFormatter.isValueValid(value, this.backendFormat)) {
                 momentInstance = moment(value, this.backendFormat, true);
@@ -126,14 +127,15 @@ define(function(require) {
          * Converts the date value from Display to Raw
          *
          * @param {string} value
+         * @param {string} part
          * @returns {string}
          * @protected
          */
-        _toRawValue: function(value) {
+        _toRawValue: function(value, part) {
             var momentInstance;
             if (this.dateVariableHelper.isDateVariable(value)) {
                 value = this.dateVariableHelper.formatRawValue(value);
-            } else if (this.dateValueHelper.isValid(value)) {
+            } else if (part === 'value' && this.dateValueHelper.isValid(value)) {
                 value = this.dateValueHelper.formatRawValue(value);
             } else if (datetimeFormatter.isDateTimeValid(value)) {
                 momentInstance = moment(value, datetimeFormatter.getDateTimeFormat(), true);

@@ -43,7 +43,7 @@ define([
             }
 
             this.listenTo(this.model, 'backgrid:select', function(model, checked) {
-                this.$checkbox.prop('checked', checked).change();
+                this.$(':checkbox').prop('checked', checked).change();
             });
         },
 
@@ -92,7 +92,6 @@ define([
             if (state.selected) {
                 this.$checkbox.prop('checked', 'checked');
             }
-            this.model.trigger('backgrid:selected', this.model, state.selected);
             return this;
         }
     });
