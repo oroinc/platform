@@ -18,25 +18,25 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testSetStrategy()
     {
-        $defaultLocale = 'en';
-        $customLocale = 'en_US';
+        $defaultName = 'default';
+        $customName = 'custom';
 
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $defaultStrategy */
         $defaultStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
         $defaultStrategy->expects($this->any())
-            ->method('getCurrentLocale')
-            ->willReturn($defaultLocale);
+            ->method('getName')
+            ->willReturn($defaultName);
         /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $customStrategy */
         $customStrategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
         $customStrategy->expects($this->any())
-            ->method('getCurrentLocale')
-            ->willReturn($customLocale);
+            ->method('getName')
+            ->willReturn($customName);
 
         $provider = new TranslationStrategyProvider($defaultStrategy);
         $this->assertEquals($defaultStrategy, $provider->getStrategy());
-        $this->assertEquals($defaultLocale, $provider->getStrategy()->getCurrentLocale());
+        $this->assertEquals($defaultName, $provider->getStrategy()->getName());
         $provider->setStrategy($customStrategy);
         $this->assertEquals($customStrategy, $provider->getStrategy());
-        $this->assertEquals($customLocale, $provider->getStrategy()->getCurrentLocale());
+        $this->assertEquals($customName, $provider->getStrategy()->getName());
     }
 }

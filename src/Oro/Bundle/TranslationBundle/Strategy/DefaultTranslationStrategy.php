@@ -6,6 +6,8 @@ use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
 
 class DefaultTranslationStrategy implements TranslationStrategyInterface
 {
+    const NAME = 'default';
+
     /**
      * @var LocaleSettings
      */
@@ -22,17 +24,17 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getLocaleFallbacks()
+    public function getName()
     {
-        // default strategy has only one locale and no fallbacks
-        return [$this->getCurrentLocale() => []];
+        return self::NAME;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function getCurrentLocale()
+    public function getLocaleFallbacks()
     {
-        return $this->localeSettings->getLocale();
+        // default strategy has only one locale and no fallbacks
+        return [$this->localeSettings->getLocale() => []];
     }
 }

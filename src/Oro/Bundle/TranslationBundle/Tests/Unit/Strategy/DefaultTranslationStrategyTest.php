@@ -26,15 +26,9 @@ class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
         $this->strategy = new DefaultTranslationStrategy($this->localeSettings);
     }
 
-    public function testGetCurrentLocale()
+    public function testGetName()
     {
-        $currentLocale = 'en';
-
-        $this->localeSettings->expects($this->once())
-            ->method('getLocale')
-            ->willReturn($currentLocale);
-
-        $this->assertEquals($currentLocale, $this->strategy->getCurrentLocale());
+        $this->assertEquals(DefaultTranslationStrategy::NAME, $this->strategy->getName());
     }
 
     public function testGetLocaleFallbacks()

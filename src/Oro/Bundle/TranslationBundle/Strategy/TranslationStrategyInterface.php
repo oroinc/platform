@@ -5,6 +5,13 @@ namespace Oro\Bundle\TranslationBundle\Strategy;
 interface TranslationStrategyInterface
 {
     /**
+     * Unique text identifier of the strategy
+     *
+     * @return string
+     */
+    public function getName();
+
+    /**
      * Get tree of locale fallbacks
      * Example of result:
      * [
@@ -20,11 +27,4 @@ interface TranslationStrategyInterface
      * @return array
      */
     public function getLocaleFallbacks();
-
-    /**
-     * Get string representation of current locale
-     *
-     * @return string
-     */
-    public function getCurrentLocale();
 }
