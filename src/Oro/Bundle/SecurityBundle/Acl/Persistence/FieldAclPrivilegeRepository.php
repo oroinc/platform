@@ -66,7 +66,7 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
             function ($fieldArray) {
                 return $fieldArray['name'];
             },
-            $this->fieldProvider->getFields($className, true)
+            $this->fieldProvider->getFields($className, true, false, false, false, false)
         );
 
         return $fieldList;
