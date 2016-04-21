@@ -8,6 +8,8 @@ use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\DashboardBundle\Entity\Dashboard;
 
+use Oro\Component\PhpUtils\ArrayUtil;
+
 class DashboardModel implements EntityModelInterface
 {
     const DEFAULT_TEMPLATE = 'OroDashboardBundle:Index:default.html.twig';
@@ -172,24 +174,11 @@ class DashboardModel implements EntityModelInterface
         );
 
         $result = $elements->getValues();
-
-        usort(
-            $result,
-            function ($first, $second) {
-                /** @var WidgetModel $first */
-                /** @var WidgetModel $second */
-                /**
-                 * In php 7 was changed sorting algorithm to make
-                 * order of elements the same as on php 5.*,
-                 * we should return '-1' instead of '1' as result
-                 * on compare elements with equals priority
-                 */
-                if (version_compare(PHP_VERSION, '7.0.0', '>=')) {
-                    return $first->getLayoutPosition() > $second->getLayoutPosition() ? 1 : -1;
-                }
-                return $first->getLayoutPosition() < $second->getLayoutPosition() ? -1 : 1;
-            }
-        );
+        /**
+         * We had to use stable sort to make UI consistent
+         * independent of php version
+         */
+        ArrayUtil::sortBy($result, false, 'layout_position');
 
         return $result;
     }
