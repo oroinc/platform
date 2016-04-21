@@ -19,6 +19,9 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $calendarEventNormalizer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $recurrenceStrategy;
+
     /** @var UserCalendarProvider */
     protected $provider;
 
@@ -34,11 +37,16 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer')
                 ->disableOriginalConstructor()
                 ->getMock();
+        $this->recurrenceStrategy =
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy')
+                ->disableOriginalConstructor()
+                ->getMock();
 
         $this->provider = new UserCalendarProvider(
             $this->doctrineHelper,
             $this->entityNameResolver,
-            $this->calendarEventNormalizer
+            $this->calendarEventNormalizer,
+            $this->recurrenceStrategy
         );
     }
 
@@ -164,13 +172,15 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
             ->method('andWhere')
             ->with('c.id IN (:visibleIds)')
             ->will($this->returnSelf());
-        $qb->expects($this->once())
+        $qb->expects($this->any())
             ->method('setParameter')
-            ->with('visibleIds', [10])
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
+        $qb->expects($this->once())
+            ->method('expr')
+            ->willReturn(new Expr());
 
         $this->calendarEventNormalizer->expects($this->once())
             ->method('getCalendarEvents')
@@ -215,6 +225,9 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
         $qb->expects($this->once())
             ->method('getQuery')
             ->will($this->returnValue($query));
+        $qb->expects($this->once())
+            ->method('expr')
+            ->willReturn(new Expr());
 
         $this->calendarEventNormalizer->expects($this->once())
             ->method('getCalendarEvents')

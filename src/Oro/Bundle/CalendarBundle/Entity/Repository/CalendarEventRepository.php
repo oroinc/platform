@@ -112,8 +112,7 @@ class CalendarEventRepository extends EntityRepository
             ->select(
                 'e.id, e.title, e.description, e.start, e.end, e.allDay,'
                 . ' e.backgroundColor, e.createdAt, e.updatedAt'
-            )
-            ->where('e.exceptionParent is NULL');
+            );
         if ($extraFields) {
             foreach ($extraFields as $field) {
                 $qb->addSelect('e.' . $field);
@@ -157,6 +156,23 @@ class CalendarEventRepository extends EntityRepository
             ->innerJoin('c.owner', 'u')
             ->where('e.parent IN (:parentEventIds)')
             ->setParameter('parentEventIds', $parentEventIds);
+    }
+
+    /**
+     * Returns recurrence exceptions according to its parent ID.
+     *
+     * @param int[] $parentIds
+     *
+     * @return QueryBuilder
+     */
+    public function getRecurrenceExceptionsByParentIds($parentIds)
+    {
+        $queryBuilder = $this->createQueryBuilder('e')
+            ->select('IDENTITY(e.exceptionParent) AS parentExceptionId,'
+                . ' e.allDay, e.end, e.start, e.description, e.title, e.originalDate');
+        $queryBuilder->where($queryBuilder->expr()->in('e.exceptionParent', $parentIds));
+
+        return $queryBuilder;
     }
 
     /**

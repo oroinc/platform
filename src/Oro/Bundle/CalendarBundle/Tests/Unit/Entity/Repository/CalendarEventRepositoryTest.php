@@ -46,8 +46,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
         $this->assertEquals(
             'SELECT e.id, e.title, e.description, e.start, e.end, e.allDay,'
             . ' e.backgroundColor, e.createdAt, e.updatedAt'
-            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
-            . ' WHERE e.exceptionParent is NULL',
+            . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e',
             $qb->getQuery()->getDQL()
         );
     }
@@ -74,10 +73,9 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' INNER JOIN e.calendar c'
             . ' LEFT JOIN e.recurrence r'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
-            . '((e.start < :start AND e.end >= :start) OR '
+            . '(e.start < :start AND e.end >= :start) OR '
             . '(e.start <= :end AND e.end > :end) OR'
-            . '(e.start >= :start AND e.end < :end))'
+            . '(e.start >= :start AND e.end < :end)'
             . ' ORDER BY c.id, e.start ASC',
             $qb->getQuery()->getDQL()
         );
@@ -109,7 +107,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' INNER JOIN e.calendar c'
             . ' LEFT JOIN e.recurrence r'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
             . 'e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
@@ -148,7 +145,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' INNER JOIN e.calendar c'
             . ' LEFT JOIN e.recurrence r'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
             . 'e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
@@ -188,10 +184,9 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' INNER JOIN e.calendar c'
             . ' LEFT JOIN e.recurrence r'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
-            . '((e.start < :start AND e.end >= :start) OR '
+            . '(e.start < :start AND e.end >= :start) OR '
             . '(e.start <= :end AND e.end > :end) OR'
-            . '(e.start >= :start AND e.end < :end))'
+            . '(e.start >= :start AND e.end < :end)'
             . ' ORDER BY c.id, e.start ASC',
             $qb->getQuery()->getDQL()
         );
@@ -210,7 +205,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
             . 'c.public = :public'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
@@ -238,7 +232,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
             . 'c.public = :public AND e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
@@ -268,7 +261,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
             . 'c.public = :public AND e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
@@ -294,7 +286,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
             . 'c.public = :public'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
@@ -322,7 +313,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
             . 'c.public = :public AND e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '
@@ -352,7 +342,6 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.systemCalendar c'
             . ' WHERE '
-            . 'e.exceptionParent is NULL AND '
             . 'c.public = :public AND e.allDay = :allDay'
             . ' AND ('
             . '(e.start < :start AND e.end >= :start) OR '

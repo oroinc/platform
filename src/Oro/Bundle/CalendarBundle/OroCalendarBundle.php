@@ -6,6 +6,7 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 use Oro\Bundle\CalendarBundle\DependencyInjection\Compiler\CalendarProviderPass;
+use Oro\Bundle\CalendarBundle\DependencyInjection\Compiler\RecurrenceStrategyCompilerPass;
 use Oro\Bundle\CalendarBundle\DependencyInjection\Compiler\TwigSandboxConfigurationPass;
 
 class OroCalendarBundle extends Bundle
@@ -19,5 +20,6 @@ class OroCalendarBundle extends Bundle
 
         $container->addCompilerPass(new CalendarProviderPass());
         $container->addCompilerPass(new TwigSandboxConfigurationPass());
+        $container->addCompilerPass(new RecurrenceStrategyCompilerPass());
     }
 }

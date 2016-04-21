@@ -31,6 +31,11 @@ parameters:
     oro_calendar.calendar_event.handler.delete.class:            Oro\Bundle\CalendarBundle\Handler\CalendarEventDeleteHandler
     oro_calendar.system_calendar_event.datagrid_helper.class:    Oro\Bundle\CalendarBundle\Datagrid\SystemCalendarEventGridHelper
 
+    oro_calendar.strategy.delegate.class: Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy
+    oro_calendar.strategy.daily.class: Oro\Bundle\CalendarBundle\Model\Recurrence\DailyStrategy
+    oro_calendar.strategy.weekly.class: Oro\Bundle\CalendarBundle\Model\Recurrence\WeeklyStrategy
+    oro_calendar.strategy.monthly.class: Oro\Bundle\CalendarBundle\Model\Recurrence\MonthlyStrategy
+
 services:
     oro_calendar.listener.entity_listener:
         class: %oro_calendar.listener.entity_listener.class%
@@ -137,6 +142,7 @@ services:
             - '@oro_entity.doctrine_helper'
             - '@oro_entity.entity_name_resolver'
             - '@oro_calendar.calendar_event_normalizer.user'
+            - '@oro_calendar.recurrence.strategy'
         public: false
         tags:
             - { name: oro_calendar.calendar_provider, alias: user }
@@ -263,3 +269,24 @@ services:
         tags:
             - { name: oro_workflow.action, alias: create_calendar_event }
 
+    # Recurrence Strategies
+    oro_calendar.recurrence.strategy.delegate:
+        class: %oro_calendar.strategy.delegate.class%
+
+    oro_calendar.recurrence.strategy:
+        alias: oro_calendar.recurrence.strategy.delegate
+
+    oro_calendar.recurrence.strategy.daily:
+        class: %oro_calendar.strategy.daily.class%
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
+
+    oro_calendar.recurrence.strategy.weekly:
+        class: %oro_calendar.strategy.weekly.class%
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
+
+    oro_calendar.recurrence.strategy.monthly:
+        class: %oro_calendar.strategy.monthly.class%
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
