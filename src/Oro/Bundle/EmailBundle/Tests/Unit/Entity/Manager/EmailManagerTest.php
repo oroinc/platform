@@ -218,7 +218,17 @@ class EmailManagerTest extends \PHPUnit_Framework_TestCase
 
         $repository = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Repository\EmailUserRepository')
             ->setMethods(
-                ['createQueryBuilder', 'andWhere', 'setParameter', 'getQuery', 'execute', 'expr', 'eq', 'getResult', 'andX']
+                [
+                    'createQueryBuilder',
+                    'andWhere',
+                    'setParameter',
+                    'getQuery',
+                    'execute',
+                    'expr',
+                    'eq',
+                    'getResult',
+                    'andX'
+                ]
             )
             ->disableOriginalConstructor()
             ->getMock();
