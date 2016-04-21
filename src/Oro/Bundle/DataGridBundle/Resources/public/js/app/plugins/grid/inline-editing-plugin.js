@@ -105,7 +105,10 @@ define(function(require) {
         beforeGridCollectionFetch: function(collection, options) {
             if (this.hasChanges()) {
                 var deferredConfirmation = this.confirmNavigation();
+                deferredConfirmation.then(_.bind(this.removeActiveEditorComponents, this));
                 options.waitForPromises.push(deferredConfirmation.promise());
+            } else {
+                this.removeActiveEditorComponents();
             }
 
         },
@@ -371,10 +374,7 @@ define(function(require) {
 
         highlightCell: function(cell, highlight) {
             highlight = highlight !== false;
-            if (this.lastHighlightedCell === cell && highlight) {
-                return;
-            }
-            if (this.lastHighlightedCell !== cell && !highlight) {
+            if (highlight === (this.lastHighlightedCell === cell)) {
                 return;
             }
             if (this.lastHighlightedCell && highlight) {
@@ -382,10 +382,14 @@ define(function(require) {
             }
             this.toggleHeaderCellHighlight(cell, highlight);
             if (highlight) {
-                cell.$el.parent('tr:first').addClass('row-edit-mode');
+                if (!cell.disposed) {
+                    cell.$el.parent('tr:first').addClass('row-edit-mode');
+                }
                 this.lastHighlightedCell = cell;
             } else {
-                cell.$el.parent('tr:first').removeClass('row-edit-mode');
+                if (!cell.disposed) {
+                    cell.$el.parent('tr:first').removeClass('row-edit-mode');
+                }
                 this.lastHighlightedCell = null;
             }
         },

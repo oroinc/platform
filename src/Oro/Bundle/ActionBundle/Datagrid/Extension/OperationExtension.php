@@ -28,9 +28,6 @@ class OperationExtension extends AbstractExtension
     protected $optionsHelper;
 
     /** @var array */
-    protected $actionConfiguration = [];
-
-    /** @var array */
     protected $datagridContext = [];
 
     /** @var array|Operation[] */
@@ -83,18 +80,23 @@ class OperationExtension extends AbstractExtension
         $this->processActionsConfig($config);
         $this->processMassActionsConfig($config);
 
-        $this->actionConfiguration = $config->offsetGetOr(DatagridActionExtension::ACTION_CONFIGURATION_KEY, []);
-        $config->offsetSet(DatagridActionExtension::ACTION_CONFIGURATION_KEY, [$this, 'getRowConfiguration']);
+        $config->offsetSet(
+            DatagridActionExtension::ACTION_CONFIGURATION_KEY,
+            $this->getRowConfigurationClosure(
+                $config->offsetGetOr(DatagridActionExtension::ACTION_CONFIGURATION_KEY, [])
+            )
+        );
 
         return true;
     }
 
     /**
-     * @param array $operationsConfig
+     * Gets operations from registry if they not already exist in datagrid config as actions
+     * @param array $datagridActionsConfig
      * @param array $datagridContext
      * @return Operation[]
      */
-    protected function getOperations(array $operationsConfig, array $datagridContext)
+    protected function getOperations(array $datagridActionsConfig, array $datagridContext)
     {
         $result = [];
 
@@ -102,7 +104,7 @@ class OperationExtension extends AbstractExtension
 
         foreach ($operations as $operationName => $action) {
             $operationName = strtolower($operationName);
-            if (!array_key_exists($operationName, $operationsConfig)) {
+            if (!array_key_exists($operationName, $datagridActionsConfig)) {
                 $result[$operationName] = $action;
             }
         }
@@ -111,42 +113,48 @@ class OperationExtension extends AbstractExtension
     }
 
     /**
-     * @param ResultRecordInterface $record
-     * @param array $config
-     *
-     * @return array
+     * @param array|null|callable $actionConfiguration
+     * @return \Closure
      */
-    public function getRowConfiguration(ResultRecordInterface $record, array $config)
+    protected function getRowConfigurationClosure($actionConfiguration)
     {
-        $actionsNew = [];
-        foreach ($this->operations as $operationName => $operation) {
-            $actionsNew[$operationName] = $this->getRowActionsConfig($operation, $record->getValue('id'));
-        }
+        return function (ResultRecordInterface $record, array $config) use ($actionConfiguration) {
+            $actionsNew = [];
+            foreach ($this->operations as $operationName => $operation) {
+                $actionsNew[$operationName] = $this->getRowOperationConfig(
+                    $operation,
+                    $record->getValue('id')
+                );
+            }
 
-        $result = array_filter($this->getParentRowConfiguration($record, $config), function ($item) {
-            return $item === false || is_array($item);
-        });
-
-        return array_merge($result, $actionsNew);
+            return array_filter(
+                array_merge($actionsNew, $this->retrieveConfiguration($actionConfiguration, $record, $config)),
+                function ($item) {
+                    return $item === false || is_array($item);
+                }
+            );
+        };
     }
 
     /**
+     * Retrieves parent action_configuration from callbacks
+     * @param null|array|callable $actionConfiguration
      * @param ResultRecordInterface $record
      * @param array $config
      * @return array
      */
-    protected function getParentRowConfiguration(ResultRecordInterface $record, array $config)
+    protected function retrieveConfiguration($actionConfiguration, ResultRecordInterface $record, array $config)
     {
-        if (empty($this->actionConfiguration)) {
+        if (empty($actionConfiguration)) {
             return [];
         }
 
         $rowActions = [];
 
-        if (is_callable($this->actionConfiguration)) {
-            $rowActions = call_user_func($this->actionConfiguration, $record, $config);
-        } elseif (is_array($this->actionConfiguration)) {
-            $rowActions = $this->actionConfiguration;
+        if (is_callable($actionConfiguration)) {
+            $rowActions = call_user_func($actionConfiguration, $record, $config);
+        } elseif (is_array($actionConfiguration)) {
+            $rowActions = $actionConfiguration;
         }
 
         return is_array($rowActions) ? $rowActions : [];
@@ -157,7 +165,7 @@ class OperationExtension extends AbstractExtension
      * @param mixed $entityId
      * @return bool|array
      */
-    protected function getRowActionsConfig(Operation $operation, $entityId)
+    protected function getRowOperationConfig(Operation $operation, $entityId)
     {
         $context = [
             'entityId' => $entityId,

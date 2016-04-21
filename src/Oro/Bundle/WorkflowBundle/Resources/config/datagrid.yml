@@ -24,7 +24,7 @@ datagrid:
                 label:         oro.workflow.processdefinition.related_entity.label
                 data_name:     relatedEntity
                 frontend_type: select
-                choices:       @oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice
+                choices:       "@oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice"
             executionOrder:
                 label:         oro.workflow.processdefinition.execution_order.label
                 frontend_type: integer
@@ -79,7 +79,7 @@ datagrid:
                 label:        oro.workflow.action.process.deactivate
                 icon:         remove
                 link:         deactivate_link
-        action_configuration: [@oro_workflow.datagrid.action_permission_provider, "getProcessDefinitionPermissions"]
+        action_configuration: ["@oro_workflow.datagrid.action_permission_provider", "getProcessDefinitionPermissions"]
         filters:
             columns:
                 label:
@@ -91,7 +91,7 @@ datagrid:
                     options:
                         field_options:
                             multiple: true
-                            choices:  @oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice
+                            choices:  "@oro_workflow.datagrid.process_definition_entity_name_provider->getRelatedEntitiesChoice"
                 createdAt:
                     type:      datetime
                     data_name: process.createdAt
@@ -123,7 +123,7 @@ datagrid:
                 label:         oro.workflow.workflowdefinition.related_entity.label
                 data_name:     relatedEntity
                 frontend_type: select
-                choices:       @oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice
+                choices:       "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
             active:
                 label:         oro.workflow.workflowdefinition.active.label
                 type:          twig
@@ -212,7 +212,7 @@ datagrid:
                 label:         oro.grid.action.delete
                 icon:          trash
                 link:          delete_link
-        action_configuration: [@oro_workflow.datagrid.action_permission_provider, "getWorkflowDefinitionPermissions"]
+        action_configuration: ["@oro_workflow.datagrid.action_permission_provider", "getWorkflowDefinitionPermissions"]
         filters:
             columns:
                 label:
@@ -224,7 +224,7 @@ datagrid:
                     options:
                         field_options:
                             multiple: true
-                            choices: @oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice
+                            choices: "@oro_workflow.datagrid.workflow_definition_entity_name_provider->getRelatedEntitiesChoice"
                 system:
                     type: boolean
                     data_name: w.system

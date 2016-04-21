@@ -1,10 +1,10 @@
 layout:
     actions:
-        - @setOption:
+        - '@setOption':
             id: widget_content
             optionName: 'attr.data-page-component-module'
             optionValue: 'orob2bproduct/js/app/components/redirect-component'
-        - @setOption:
+        - '@setOption':
             id: widget_content
             optionName: 'attr.data-page-component-options.targetUrl'
-            optionValue: { @value: $context.targetUrl }
+            optionValue: { '@value': $context.targetUrl }

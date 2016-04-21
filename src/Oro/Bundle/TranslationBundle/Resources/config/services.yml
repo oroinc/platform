@@ -25,8 +25,8 @@ services:
     oro_translation.controller:
         class: %oro_translation.controller.class%
         arguments:
-            - @translator.default
-            - @templating
+            - '@translator.default'
+            - '@templating'
             - OroTranslationBundle:Translation:translation.js.twig
             - ""
         lazy: true
@@ -34,26 +34,26 @@ services:
     oro_translation.extractor.php_code_extractor:
         class: %oro_translation.extractor.php_code_extractor.class%
         arguments:
-            - @service_container
+            - '@service_container'
         tags:
             - { name: translation.extractor, alias: oro_translation_php_extractor }
 
     oro_translation.service_provider:
         class: %oro_translation.service_provider.class%
         arguments:
-            - @oro_translation.uploader.default_adapter
-            - @oro_translation.js_dumper
-            - @translation.loader
-            - @oro_translation.database_translation.persister
+            - '@oro_translation.uploader.default_adapter'
+            - '@oro_translation.js_dumper'
+            - '@translation.loader'
+            - '@oro_translation.database_translation.persister'
             - %kernel.cache_dir%
         lazy: true
 
     oro_translation.statistic_provider:
         class: %oro_translation.statistic_provider.class%
         arguments:
-            - @oro_translation.cache
-            - @oro_translation.oro_translation_adapter
-            - @oro_translation.packages_provider
+            - '@oro_translation.cache'
+            - '@oro_translation.oro_translation_adapter'
+            - '@oro_translation.packages_provider'
 
     # guzzle http client for crowdin
     oro_translation.guzzle_crowdin_client:
@@ -72,20 +72,20 @@ services:
     oro_translation.uploader.crowdin_adapter:
         class: %oro_translation.crowdin.adapter.class%
         arguments:
-            - @oro_translation.guzzle_crowdin_client
+            - '@oro_translation.guzzle_crowdin_client'
 
     oro_translation.oro_translation_adapter:
         class: %oro_translation.oro_translation.adapter.class%
         arguments:
-            - @oro_translation.guzzle_oro_client
+            - '@oro_translation.guzzle_oro_client'
         calls:
             - [ setApiKey, [ %oro_translation.api.oro_service.key% ] ]
-            - [ setLogger, [ @logger ] ]
+            - [ setLogger, [ '@logger' ] ]
 
     oro_translation.database_translation.metadata.cache:
         class: %oro_translation.dynamic_translation.metadata.cache.class%
         arguments:
-            - @oro_translation.database_translation.metadata.cache_impl
+            - '@oro_translation.database_translation.metadata.cache_impl'
 
     oro_translation.database_translation.metadata.cache_impl:
         public: false
@@ -96,13 +96,13 @@ services:
     oro_translation.database_translation.persister:
         class: %oro_translation.database_translation.persister.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_translation.database_translation.metadata.cache
+            - '@doctrine.orm.entity_manager'
+            - '@oro_translation.database_translation.metadata.cache'
 
     oro_translation.database_translation.loader:
         class: %oro_translation.database_translation.loader.class%
         arguments:
-            - @doctrine
+            - '@doctrine'
         tags:
             - { name: translation.loader, alias: oro_database_translation }
 
@@ -121,8 +121,8 @@ services:
     oro_translation.js_dumper:
         class: %oro_translation.js_dumper.class%
         arguments:
-            - @oro_translation.controller
-            - @router
+            - '@oro_translation.controller'
+            - '@router'
             - %oro_translation.js_translation.domains%
             - %kernel.root_dir%
             - %kernel.default_locale%
@@ -138,8 +138,8 @@ services:
     oro_translation.twig.translation_status.extension:
         class: %oro_translation.twig.translation_status.extension.class%
         arguments:
-            - @oro_config.global
-            - @oro_translation.statistic_provider
+            - '@oro_config.global'
+            - '@oro_translation.statistic_provider'
         tags:
             - { name: twig.extension }
 
@@ -150,7 +150,7 @@ services:
     oro_translation.packages_provider:
         class: %oro_translation.packages_provider.class%
         arguments:
-            - @oro_translation.distribution.package_manager.link
+            - '@oro_translation.distribution.package_manager.link'
             - %kernel.bundles%
             - %kernel.root_dir%
             - %oro_distribution.composer_cache_home%
@@ -168,6 +168,6 @@ services:
     oro_translation.event_listener.language_change:
         class: %oro_translation.event_listener.language_change.class%
         arguments:
-            - @oro_translation.database_translation.metadata.cache
+            - '@oro_translation.database_translation.metadata.cache'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }

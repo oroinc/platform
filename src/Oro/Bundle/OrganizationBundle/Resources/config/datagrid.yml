@@ -108,7 +108,7 @@ datagrid:
                     data_name: ownerName
                     options:
                         field_options:
-                            choices: @oro_organization.provider.business_units_grid->getOwnerChoices
+                            choices: "@oro_organization.provider.business_units_grid->getOwnerChoices"
                             translatable_options: false
                 createdAt:
                     type: datetime

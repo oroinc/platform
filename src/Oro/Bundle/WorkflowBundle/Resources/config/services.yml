@@ -20,10 +20,10 @@ services:
     oro_workflow.attribute_guesser:
         class: %oro_workflow.attribute_guesser.class%
         arguments:
-            - @form.registry
-            - @doctrine
-            - @oro_entity_config.provider.entity
-            - @oro_entity_config.provider.form
+            - '@form.registry'
+            - '@doctrine'
+            - '@oro_entity_config.provider.entity'
+            - '@oro_entity_config.provider.form'
         calls:
             # mapping from doctrine type to attribute parameters
             - [addDoctrineTypeMapping, ["string", "string"]]
@@ -70,23 +70,23 @@ services:
     oro_workflow.manager:
         class: %oro_workflow.manager.class%
         arguments:
-            - @doctrine
-            - @oro_workflow.registry
-            - @oro_entity.doctrine_helper
-            - @oro_entity_config.config_manager
+            - '@doctrine'
+            - '@oro_workflow.registry'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity_config.config_manager'
 
     oro_workflow.process.process_factory:
         class: %oro_workflow.process.process_factory.class%
         arguments:
-            - @oro_workflow.action_assembler
-            - @oro_workflow.expression.factory
+            - '@oro_workflow.action_assembler'
+            - '@oro_workflow.expression.factory'
 
     oro_workflow.process.process_handler:
         class: %oro_workflow.process.process_handler.class%
         arguments:
-            - @oro_workflow.process.process_factory
-            - @oro_workflow.process.logger
-            - @event_dispatcher
+            - '@oro_workflow.process.process_factory'
+            - '@oro_workflow.process.logger'
+            - '@event_dispatcher'
 
     oro_workflow.process.schedule_policy.exclude_definitions:
         class: %oro_workflow.process.schedule_policy.exclude_definitions.class%
@@ -100,15 +100,15 @@ services:
     oro_workflow.process.logger:
         class: %oro_workflow.process.logger.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @?logger
+            - '@oro_entity.doctrine_helper'
+            - "@?logger"
 
     oro_workflow.registry:
         class: %oro_workflow.registry.class%
         arguments:
-            - @doctrine
-            - @oro_workflow.workflow_assembler
-            - @oro_entity_config.provider.workflow
+            - '@doctrine'
+            - '@oro_workflow.workflow_assembler'
+            - '@oro_entity_config.provider.workflow'
 
     oro_workflow.exclusion_provider.workflow_item_step:
         class: Oro\Bundle\WorkflowBundle\Provider\WorkflowExclusionProvider
@@ -119,19 +119,19 @@ services:
     oro_workflow.handler.transition_helper:
         class: %oro_workflow.handler.transition_helper.class%
         arguments:
-            - @fos_rest.view_handler
-            - @twig
+            - '@fos_rest.view_handler'
+            - '@twig'
 
     oro_workflow.handler.transition_handler:
         class: %oro_workflow.handler.transition_handler.class%
         arguments:
-            - @oro_workflow.manager
-            - @oro_workflow.handler.transition_helper
-            - @logger
+            - '@oro_workflow.manager'
+            - '@oro_workflow.handler.transition_helper'
+            - '@logger'
 
     oro_workflow.handler.start_transition_handler:
         class: %oro_workflow.handler.start_transition_handler.class%
         arguments:
-            - @oro_workflow.manager
-            - @oro_workflow.serializer.data.serializer
-            - @oro_workflow.handler.transition_helper
+            - '@oro_workflow.manager'
+            - '@oro_workflow.serializer.data.serializer'
+            - '@oro_workflow.handler.transition_helper'

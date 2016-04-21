@@ -26,13 +26,13 @@ items:
         acl: oro_email_email_create
     dots_menu_email:
         action: OroEmailBundle:Email:placeholderLast
-        applicable: @oro_user.placeholder.filter->isUserApplicable()
+        applicable: "@oro_user.placeholder.filter->isUserApplicable()"
     email_filter_templates:
         template: OroEmailBundle:Js:default_templates.js.twig
     email_requirejs_config:
         template: OroEmailBundle::requirejs.config.js.twig
-        applicable: @oro_user.placeholder.filter->isUserApplicable()
+        applicable: "@oro_user.placeholder.filter->isUserApplicable()"
     oro_email_action_send_email_button:
-        applicable: @oro_email.placeholder.send_email.filter->isApplicable($entity$)
+        applicable: "@oro_email.placeholder.send_email.filter->isApplicable($entity$)"
         template: OroEmailBundle:Email/action:sendEmailButton.html.twig
         acl: oro_email_email_create
