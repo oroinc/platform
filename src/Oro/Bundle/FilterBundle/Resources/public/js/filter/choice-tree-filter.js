@@ -321,23 +321,11 @@ define(function(require) {
             var self = this;
             var template = '<ul>';
             $.each(items, function(key, value) {
-                var classSearchResult = '';
-                if (value.value.result) {
-                    classSearchResult = 'search-result';
-                }
-
-                var classSelected = '';
-                if (self.isSelected(value)) {
-                    classSelected = 'checked';
-                }
-
-                var id = self.name + '-' + value.value.id;
-
                 template += '<li>' +
-                    '<label for="' + id + '" class="' + classSearchResult + '">' +
-                    '<input id="' + id + '" ' +
+                    '<label class="' + (value.value.result ? 'search-result' : '') + '">' +
+                    '<input ' +
                     'value="' + value.value.id + '" ' +
-                    'type="checkbox" ' + classSelected + '>' +
+                    'type="checkbox" ' + (self.isSelected(value) ? 'checked' : '') + '>' +
                     value.value.name +
                     '</label>';
                 if (value.children.length > 0) {
