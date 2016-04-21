@@ -10,6 +10,14 @@ oro:
 
         back_link_default_text: Back
         get_code:               Get code
+        tabs:
+            iframe:
+                label:          Iframe code
+            inline:
+                label:          Inline code
+                description: |
+                    Note: The CSS styles you defined for this form will interfere with your site's styles.
+                    This may cause some unexpected results.
         no_types_available:     The embedded form cannot be created as no form types are available.
 
         success_message:

@@ -37,7 +37,7 @@
     {% endblock stats %}
 
     {% set formDetails %}
-    <div class="widget-content">
+        <div class="widget-content">
             <div class="row-fluid form-horizontal">
                 <div class="responsive-block">
                     {{ ui.renderProperty('oro.embeddedform.title.label'|trans, entity.title) }}
@@ -67,8 +67,8 @@
     </div>
     {% endset %}
 
-    {% set getCode %}
-    <textarea name="" id="" cols="60" rows="10" style="width: 800px; height: 300px;">
+    {% set getCodeIframe %}
+        <textarea id="oro_embeddedform_iframe" cols="60" rows="10" class="fill-tab" style="height: 300px">
 <div id="embedded-form-container-{{ entity.id }}"></div>
 <script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
 <script type="text/javascript">
@@ -84,6 +84,39 @@
 </script>
         </textarea>
     {% endset %}
+
+    {% set getCodeInline %}
+        <div class="alert alert-warning">{{ 'oro.embeddedform.tabs.inline.description'|trans|nl2br }}</div>
+        <textarea id="oro_embeddedform_inline" cols="60" rows="10" class="fill-tab" style="height: 300px">
+<div id="embedded-form-container-{{ entity.id }}"></div>
+<script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
+<script type="text/javascript">
+    new ORO.EmbedForm({
+        container: 'embedded-form-container-{{ entity.id }}',
+        xhr: {
+            url: "{{ url('oro_embedded_form_submit', {'id': entity.id}) }}"
+        }
+    });
+</script>
+        </textarea>
+    {% endset %}
+
+    {% set getCodeTabs = [
+        {
+            'alias': 'oro_embeddedform_iframe',
+            'widgetType': 'block',
+            'label': 'oro.embeddedform.tabs.iframe.label'|trans,
+            'url': '#oro_embeddedform_iframe',
+            'content': getCodeIframe
+        },
+        {
+            'alias': 'oro_embeddedform_inline',
+            'widgetType': 'block',
+            'label': 'oro.embeddedform.tabs.inline.label'|trans,
+            'url': '#oro_embeddedform_inline',
+            'content': getCodeInline
+        }
+    ] %}
 
     {% set informationWidget %}
         {{ oro_widget_render({
@@ -111,7 +144,7 @@
         'title': 'Get code'|trans,
         'subblocks': [{
             'title': 'Code'|trans,
-            'data': [getCode]
+            'data': [tabPanel(getCodeTabs)]
         }]
     }]
     %}
