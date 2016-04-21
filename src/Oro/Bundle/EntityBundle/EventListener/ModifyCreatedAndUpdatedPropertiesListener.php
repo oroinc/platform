@@ -155,8 +155,9 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
      */
     protected function updateUpdatedBy($entity)
     {
-        if ($entity instanceof UpdatedByAwareInterface && !$entity->isUpdatedBySet()) {
-            $entity->setUpdatedBy($this->getUser());
+        $user = $this->getUser();
+        if ($entity instanceof UpdatedByAwareInterface && !$entity->isUpdatedBySet() && $user instanceof User) {
+            $entity->setUpdatedBy($user);
 
             return true;
         }
