@@ -10,6 +10,8 @@ define([
 ], function($, _, __, routing, tools, mediator, mapFilterModuleName, FiltersManager) {
     'use strict';
 
+    var cachedFilters = {};
+
     var methods = {
         /**
          * Reads data from container, collects required modules and runs filters builder
@@ -75,7 +77,7 @@ define([
                         options.collection = collection;
                     }
                     if (options.lazy) {
-                        options.loader = methods.createFilterLoader.call(this, options.name);
+                        options.loader = methods.createFilterLoader.call(this, options);
                     }
                     var Filter = modules[options.type].extend(options);
                     filters[options.name] = new Filter();
@@ -94,6 +96,12 @@ define([
                 return;
             }
 
+            _.chain(this.filterLoaders)
+                .filter(_.property('useCache'))
+                .each(function(loader) {
+                    loader.success.call(this, cachedFilters[loader.cacheId]);
+                });
+
             var params = {
                 gridName: gridName,
                 filterNames: _.map(this.filterLoaders, _.property('name'))
@@ -106,7 +114,10 @@ define([
             $.get(url)
                 .done(function(data) {
                     _.each(self.filterLoaders, function(loader) {
-                        loader.success.call(this, data[loader.name]);
+                        cachedFilters[data[loader.name].cacheId] = data[loader.name];
+                        if (!loader.useCache) {
+                            loader.success.call(this, data[loader.name]);
+                        }
                     });
                 })
                 .fail(function() {
@@ -114,11 +125,13 @@ define([
                 });
         },
 
-        createFilterLoader: function(filterName) {
+        createFilterLoader: function(filterOptions) {
             return _.bind(function(success) {
                 this.filterLoaders.push({
-                    name: filterName,
-                    success: success
+                    name: filterOptions.name,
+                    cacheId: filterOptions.cacheId,
+                    success: success,
+                    useCache: filterOptions.cacheId && cachedFilters[filterOptions.cacheId]
                 });
             }, this);
         }

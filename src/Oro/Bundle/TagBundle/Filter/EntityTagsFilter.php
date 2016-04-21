@@ -57,6 +57,7 @@ class EntityTagsFilter extends AbstractTagsFilter
             'translatable' => true,
             'enabled'      => true,
             'choices'      => $fieldView->vars['choices'],
+            'lazy'         => $this->isLazy(),
         ];
 
         $metadata         = array_diff_key(
