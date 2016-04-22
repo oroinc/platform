@@ -109,7 +109,7 @@ class OrmTotalsExtension extends AbstractExtension
 
         $totalData = [];
         $totals    = $config->offsetGetByPath(Configuration::TOTALS_PATH);
-        if (null !== $totals && !$result->getData()) {
+        if (null !== $totals && $result->getData()) {
             foreach ($totals as $rowName => $rowConfig) {
                 if ($onlyOnePage && $rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY]) {
                     unset($totals[$rowName]);
