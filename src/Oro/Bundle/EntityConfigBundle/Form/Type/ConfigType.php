@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Form\Type;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
@@ -17,6 +19,11 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigType extends AbstractType
 {
+    /**
+     * @var ManagerRegistry $doctrine
+     */
+    protected $doctrine;
+
     /**
      * @var ConfigManager
      */
@@ -38,10 +45,12 @@ class ConfigType extends AbstractType
      * @param DynamicTranslationMetadataCache $dbTranslationMetadataCache
      */
     public function __construct(
+        ManagerRegistry $doctrine,
         ConfigManager $configManager,
         Translator $translator,
         DynamicTranslationMetadataCache $dbTranslationMetadataCache
     ) {
+        $this->doctrine                   = $doctrine;
         $this->configManager              = $configManager;
         $this->translator                 = $translator;
         $this->dbTranslationMetadataCache = $dbTranslationMetadataCache;
@@ -123,6 +132,7 @@ class ConfigType extends AbstractType
 
         $builder->addEventSubscriber(
             new ConfigSubscriber(
+                $this->doctrine,
                 $this->configManager,
                 $this->translator,
                 $this->dbTranslationMetadataCache
