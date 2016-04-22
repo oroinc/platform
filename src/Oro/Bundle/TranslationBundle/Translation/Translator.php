@@ -9,7 +9,6 @@ use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
 use Oro\Bundle\TranslationBundle\Entity\Translation;
-use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
 use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
 class Translator extends BaseTranslator
@@ -40,9 +39,6 @@ class Translator extends BaseTranslator
     /** @var bool */
     protected $installed;
 
-    /** @var TranslationStrategyProvider */
-    protected $strategyProvider;
-
     /** @var string|null */
     protected $strategyName;
 
@@ -60,6 +56,11 @@ class Translator extends BaseTranslator
      */
     public function getTranslations(array $domains = array(), $locale = null)
     {
+        // if new strategy was selected
+        if ($this->getStrategyProvider()->getStrategy()->getName() !== $this->strategyName) {
+            $this->applyCurrentStrategy();
+        }
+
         if (null === $locale) {
             $locale = $this->getLocale();
         }
@@ -148,8 +149,8 @@ class Translator extends BaseTranslator
     public function getCatalogue($locale = null)
     {
         // if new strategy was selected
-        if ($this->strategyProvider && $this->strategyProvider->getStrategy()->getName() !== $this->strategyName) {
-            $this->applyStrategy($this->strategyProvider->getStrategy());
+        if ($this->getStrategyProvider()->getStrategy()->getName() !== $this->strategyName) {
+            $this->applyCurrentStrategy();
         }
 
         return parent::getCatalogue($locale);
@@ -160,10 +161,7 @@ class Translator extends BaseTranslator
      */
     public function warmUp($cacheDir)
     {
-        if ($this->strategyProvider) {
-            // manually apply current strategy
-            $this->applyStrategy($this->strategyProvider->getStrategy());
-        }
+        $this->applyCurrentStrategy();
 
         parent::warmUp($cacheDir);
     }
@@ -188,24 +186,16 @@ class Translator extends BaseTranslator
         $this->resourceCache = $cache;
     }
 
-    /**
-     * @param TranslationStrategyProvider $strategyProvider
-     */
-    public function setStrategyProvider(TranslationStrategyProvider $strategyProvider)
+    protected function applyCurrentStrategy()
     {
-        $this->strategyProvider = $strategyProvider;
-    }
+        $strategyProvider = $this->getStrategyProvider();
+        $strategy = $strategyProvider->getStrategy();
 
-    /**
-     * @param TranslationStrategyInterface $strategy
-     */
-    protected function applyStrategy(TranslationStrategyInterface $strategy)
-    {
         // store current strategy name to skip all following requests to it
         $this->strategyName = $strategy->getName();
 
         // use current set of fallback locales to build translation cache
-        $fallbackLocales = $this->strategyProvider->getAllFallbackLocales($strategy);
+        $fallbackLocales = $strategyProvider->getAllFallbackLocales($strategy);
         $this->setFallbackLocales($fallbackLocales);
 
         // clear catalogs to generate new ones for new strategy
@@ -217,13 +207,10 @@ class Translator extends BaseTranslator
      */
     protected function computeFallbackLocales($locale)
     {
-        if (!$this->strategyProvider) {
-            return parent::computeFallbackLocales($locale);
-        }
+        $strategyProvider = $this->getStrategyProvider();
+        $strategy = $strategyProvider->getStrategy();
 
-        $strategy = $this->strategyProvider->getStrategy();
-
-        return $this->strategyProvider->getFallbackLocales($strategy, $locale);
+        return $strategyProvider->getFallbackLocales($strategy, $locale);
     }
 
     /**
@@ -349,5 +336,14 @@ class Translator extends BaseTranslator
         }
 
         return $this->installed;
+    }
+
+    /**
+     * @return TranslationStrategyProvider
+     */
+    protected function getStrategyProvider()
+    {
+        // can't inject strategy provider directly because container creates new instances for each injected service
+        return $this->container->get('oro_translation.strategy.provider');
     }
 }

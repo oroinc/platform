@@ -47,13 +47,17 @@ class TranslationStrategyProvider
             return [];
         }
 
+        // remove current locale
+        foreach ($fallback as $key => $value) {
+            if ($value === $locale) {
+                unset($fallback[$key]);
+            }
+        }
+
         // set order from most specific to most common
         $fallback = array_reverse($fallback);
 
-        // remove current locale
-        unset($fallback[0]);
-
-        return array_values($fallback);
+        return $fallback;
     }
 
     /**
