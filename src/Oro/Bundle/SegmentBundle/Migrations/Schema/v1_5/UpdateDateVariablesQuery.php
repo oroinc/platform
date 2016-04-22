@@ -129,9 +129,9 @@ class UpdateDateVariablesQuery implements MigrationQuery, ConnectionAwareInterfa
             $filter['criterion']['filter'],
             $filter['criterion']['data'],
             $filter['criterion']['data']['part']
-        ) &&
-            !in_array($filter['criterion']['filter'], ['date', 'datetime']) &&
-            !$filter['criterion']['data']['part'] === 'month'
+        ) ||
+            !in_array($filter['criterion']['filter'], ['date', 'datetime']) ||
+            $filter['criterion']['data']['part'] !== 'month'
         ) {
             return false;
         }

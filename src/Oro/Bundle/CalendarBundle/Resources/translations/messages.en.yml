@@ -90,6 +90,7 @@ oro:
             events.label:         Events
             organization.label:   Organization
             background_color.label: Color
+            extend_description.label: Description
 
             scope.system:         System
             scope.organization:   Organization
