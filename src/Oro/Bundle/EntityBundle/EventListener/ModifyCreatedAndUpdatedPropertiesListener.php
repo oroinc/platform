@@ -9,7 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface;
@@ -165,7 +165,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
     }
 
     /**
-     * @return User|null
+     * @return UserInterface|null
      */
     protected function getUser()
     {
@@ -173,17 +173,7 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
             return null;
         }
 
-        $user = $token->getUser();
-
-        /**
-         * Check cases when user is not in the entity manager
-         * (e.g. after clear or if it is in the different entity manager)
-         */
-        if ($user instanceof User && !$this->entityManager->contains($user)) {
-            $user = $this->entityManager->find('OroUserBundle:User', $user->getId());
-        }
-
-        return $user;
+        return $token->getUser();
     }
 
     /**

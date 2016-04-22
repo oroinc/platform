@@ -179,9 +179,6 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $entityManager->expects($this->any())
             ->method('getClassMetadata')
             ->willReturn($metadataStub);
-        $entityManager->expects($this->once())
-            ->method('contains')
-            ->willReturn(true);
 
         $args->expects($this->any())
             ->method('getEntityManager')
