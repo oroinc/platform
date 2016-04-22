@@ -118,8 +118,7 @@ class RecurrenceFormType extends AbstractType
                 ]
             )
             ->add(
-                // @TODO fix typo 'occurences' => 'occurrences' after it will be fixed in plugin.
-                'occurences',
+                'occurrences',
                 'integer',
                 [
                     'required' => false,

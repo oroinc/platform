@@ -149,7 +149,7 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(8))
             ->method('add')
             ->with(
-                'occurences',
+                'occurrences',
                 'integer',
                 [
                     'required' => false,

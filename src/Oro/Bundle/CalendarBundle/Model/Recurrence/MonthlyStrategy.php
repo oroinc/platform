@@ -12,6 +12,26 @@ class MonthlyStrategy implements StrategyInterface
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
         $result = [];
+        $occurrenceDate = $this->getFirstOccurrence($recurrence);
+        $interval = $recurrence->getInterval();
+        $fromStartInterval = 1;
+
+        if ($start > $occurrenceDate) {
+            $dateInterval = $start->diff($occurrenceDate);
+            $fromStartInterval = intval($dateInterval->format('%y')) * 12 + intval($dateInterval->format('m'));
+            $fromStartInterval = floor($fromStartInterval / $interval);
+            $occurrenceDate = $this->getNextOccurrence($fromStartInterval * $interval, $occurrenceDate);
+        }
+
+        $occurrences = $recurrence->getOccurrences();
+        while ($occurrenceDate <= $recurrence->getEndTime()
+            && $occurrenceDate <= $end
+            && (is_null($occurrences) || $fromStartInterval <= $occurrences)
+        ) {
+            $result[] = $occurrenceDate;
+            $fromStartInterval++;
+            $occurrenceDate = $this->getNextOccurrence($interval, $occurrenceDate);
+        }
 
         return $result;
     }
@@ -38,5 +58,38 @@ class MonthlyStrategy implements StrategyInterface
     public function getName()
     {
         return 'recurrence_monthly';
+    }
+
+    /**
+     * Returns occurrence date according to last occurrence date and recurrence interval.
+     *
+     * @param integer $interval
+     * @param \DateTime $date
+     *
+     * @return \DateTime
+     */
+    protected function getNextOccurrence($interval, \DateTime $date)
+    {
+        return new \DateTime("+{$interval} month {$date->format('c')}");
+    }
+
+    /**
+     * Returns first occurrence according to recurrence rules.
+     *
+     * @param Recurrence $recurrence
+     *
+     * @return \DateTime
+     */
+    protected function getFirstOccurrence(Recurrence $recurrence)
+    {
+        $dayOfMonth = $recurrence->getDayOfMonth();
+        $occurrenceDate = $recurrence->getStartTime();
+        $occurrenceDate->setDate($occurrenceDate->format('Y'), $occurrenceDate->format('m'), $dayOfMonth);
+
+        if ($occurrenceDate->format('d') < $recurrence->getStartTime()->format('d')) {
+            $occurrenceDate = $this->getNextOccurrence($recurrence->getInterval(), $occurrenceDate);
+        }
+
+        return $occurrenceDate;
     }
 }

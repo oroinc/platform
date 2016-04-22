@@ -36,7 +36,7 @@ class RestCalendarEventTest extends WebTestCase
                 'monthOfYear' => null,
                 'startTime' => date(DATE_RFC3339),
                 'endTime' => null,
-                'occurences' => null,
+                'occurrences' => null,
                 'exceptions' => [
                     [
                         'originalDate' => date(DATE_RFC3339),

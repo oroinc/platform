@@ -92,8 +92,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'monthOfYear' => $recurrence->getMonthOfYear(),
                 'startTime' => $recurrence->getStartTime(),
                 'endTime' => $recurrence->getEndTime(),
-                // @TODO fix typo 'occurences' => 'occurrences' after it will be fixed in plugin.
-                'occurences' => $recurrence->getOccurrences()
+                'occurrences' => $recurrence->getOccurrences()
             ];
         }
 
@@ -268,14 +267,16 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     {
         $result = [];
         $key = Recurrence::STRING_KEY;
+        $isEmpty = true;
         foreach ($entity as $field => $value) {
             if (substr($field, 0, strlen($key)) === $key) {
                 unset($entity[$field]);
                 $result[lcfirst(substr($field, strlen($key)))] = $value;
+                $isEmpty = empty($value) ? $isEmpty : false;
             }
         }
 
-        if (!empty($result)) {
+        if (!$isEmpty) {
             $entity[$key] = $result;
         }
 
