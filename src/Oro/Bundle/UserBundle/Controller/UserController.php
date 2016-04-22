@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -68,9 +67,7 @@ class UserController extends Controller
         $securityFacade = $this->get('oro_security.security_facade');
         $currentAuthenticatedUser = $this->getUser();
         if ($currentAuthenticatedUser !== $user && !$securityFacade->isGranted('EDIT', $user)) {
-            return $this->getRequest()->isXmlHttpRequest()
-                ? new JsonResponse('', Response::HTTP_FORBIDDEN)
-                : new Response('', Response::HTTP_FORBIDDEN);
+            throw $this->createAccessDeniedException();
         }
 
         $em      = $this->getDoctrine()->getManager();
