@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
-use FOS\RestBundle\Util\Codes;
+use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -18,7 +18,6 @@ use Oro\Bundle\UserBundle\Entity\UserApi;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
-use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
