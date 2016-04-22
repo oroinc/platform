@@ -387,4 +387,34 @@ class ExtendHelperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider updatedPendingValueDataProvider
+     */
+    public function testUpdatedPendingValue($currentVal, array $changeSet, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ExtendHelper::updatedPendingValue($currentVal, $changeSet));
+    }
+
+    public function updatedPendingValueDataProvider()
+    {
+        return [
+            'scalar value' => [
+                1,
+                [
+                    1,
+                    2,
+                ],
+                2,
+            ],
+            'array value' => [
+                ['v1', 'v2', 'v3'],
+                [
+                    ['v1', 'v2'],
+                    ['v1', 'v4'],
+                ],
+                ['v1', 'v3', 'v4'],
+            ],
+        ];
+    }
 }
