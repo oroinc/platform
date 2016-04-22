@@ -362,4 +362,26 @@ define([
             return this[0] && this[0].form && $.data(this[0].form, 'validator') && handler.apply(this, arguments);
         });
     });
+
+    var oldValidatorElements = $.validator.prototype.elements;
+
+    $.validator.prototype.elements = function() {
+        var $elements = oldValidatorElements.apply(this, arguments);
+        var validator = this;
+
+        console.log($elements.length);
+        $elements = $elements
+            .add('[data-role="validateDelegate"]')
+            .filter(function() {
+                console.log(123123213123123213, this.name);
+                if (!this.form) {
+                    this.form = validator.currentForm;
+                }
+                return true;
+            });
+
+        console.log($elements, $elements.length);
+
+        return $elements;
+    };
 });
