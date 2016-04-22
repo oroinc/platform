@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Controller;
 
+use FOS\RestBundle\Util\Codes;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 
@@ -17,6 +18,7 @@ use Oro\Bundle\UserBundle\Entity\UserApi;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Symfony\Component\HttpFoundation\Response;
 
 class UserController extends Controller
 {
@@ -64,6 +66,14 @@ class UserController extends Controller
      */
     public function apigenAction(User $user)
     {
+        $securityFacade = $this->get('oro_security.security_facade');
+        $currentAuthenticatedUser = $this->getUser();
+        if ($currentAuthenticatedUser !== $user && !$securityFacade->isGranted('EDIT', $user)) {
+            return $this->getRequest()->isXmlHttpRequest()
+                ? new JsonResponse('', Response::HTTP_FORBIDDEN)
+                : new Response('', Response::HTTP_FORBIDDEN);
+        }
+
         $em      = $this->getDoctrine()->getManager();
         $userApi = $this->getUserApi($user);
         $userApi->setApiKey($userApi->generateKey())
