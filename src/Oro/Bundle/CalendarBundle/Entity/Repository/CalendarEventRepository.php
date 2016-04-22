@@ -215,7 +215,8 @@ class CalendarEventRepository extends EntityRepository
                 "r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
                 . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
                 . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
-                . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
+                // @TODO fix typo 'occurences' => 'occurrences' after it will be fixed in plugin.
+                . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurences,"
                 . "r.instance as {$key}Instance"
             );
 

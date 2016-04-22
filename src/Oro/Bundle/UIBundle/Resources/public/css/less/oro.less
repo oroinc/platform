@@ -1233,7 +1233,8 @@ footer {
   color: #aaa;
   background-color: #f2f2f2;
 }
-.status-disabled {
+.status-disabled,
+.status-unknown {
   color: #aaa;
 }
 .status-enabled {
@@ -1244,7 +1245,8 @@ footer {
 }
 .status-disabled,
 .status-tentatively,
-.status-enabled {
+.status-enabled,
+.status-unknown {
   margin-left: 5px;
   margin-top:-4px;
   text-shadow:none;
@@ -1255,6 +1257,7 @@ footer {
 }
 .status-enabled [class^='icon-']:before { color:#4a9938; }
 .status-disabled [class^='icon-']:before { color:#e37878; }
+.status-unknown [class^='icon-']:before { color:#aaa; }
 
 .dib {
   display: inline-block;

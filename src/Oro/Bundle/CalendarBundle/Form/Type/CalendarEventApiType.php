@@ -95,6 +95,23 @@ class CalendarEventApiType extends CalendarEventType
                     'format'         => DateTimeType::HTML5_FORMAT,
                     'model_timezone' => 'UTC'
                 ]
+            )
+            ->add(
+                'recurrence',
+                'oro_calendar_event_recurrence',
+                [
+                    'required' => false,
+                ]
+            )
+            ->add(
+                'exceptions',
+                'collection',
+                [
+                    'required' => false,
+                    'type' => 'oro_calendar_event_exception',
+                    'allow_add' => true,
+                    'allow_delete' => true,
+                ]
             );
 
         $builder->addEventSubscriber(new PatchSubscriber());
@@ -142,6 +159,12 @@ class CalendarEventApiType extends CalendarEventType
         }
 
         $this->calendarEventManager->setCalendar($data, $calendarAlias, (int)$calendarId);
+        
+        if (!$data->getExceptions()->isEmpty()) {
+            foreach ($data->getExceptions() as $calendarEvent) {
+                $calendarEvent->setExceptionParent($data);
+            }
+        }
     }
 
     /**

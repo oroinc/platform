@@ -65,8 +65,12 @@ class CalendarEventApiHandler
             foreach ($entity->getChildEvents() as $childEvent) {
                 $originalChildren->add($childEvent);
             }
-
-            $this->form->submit($this->request);
+            $data = $this->request->request->all();
+            if (!empty($data['recurrence']['exceptions'])) {
+                $data['exceptions'] = $data['recurrence']['exceptions'];
+                unset($data['recurrence']['exceptions']);
+            }
+            $this->form->submit($data);
 
             if ($this->form->isValid()) {
                 // TODO: should be refactored after finishing BAP-8722
@@ -74,6 +78,9 @@ class CalendarEventApiHandler
                 if ($this->form->has('contexts')) {
                     $contexts = $this->form->get('contexts')->getData();
                     $this->activityManager->setActivityTargets($entity, $contexts);
+                }
+                if (!$this->request->get('recurrence')) {
+                    $entity->setRecurrence(null);
                 }
 
                 $this->onSuccess(
