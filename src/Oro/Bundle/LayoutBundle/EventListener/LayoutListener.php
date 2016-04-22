@@ -61,6 +61,8 @@ class LayoutListener
             );
         }
 
+        $rootId = $request->get('_rid');
+
         $parameters = $event->getControllerResult();
         if (is_array($parameters)) {
             $context = new LayoutContext();
@@ -68,10 +70,10 @@ class LayoutListener
                 $context->set($key, $value);
             }
             $this->configureContext($context, $layoutAnnotation);
-            $layout = $this->getLayout($context, $layoutAnnotation);
+            $layout = $this->getLayout($context, $layoutAnnotation, $rootId);
         } elseif ($parameters instanceof ContextInterface) {
             $this->configureContext($parameters, $layoutAnnotation);
-            $layout = $this->getLayout($parameters, $layoutAnnotation);
+            $layout = $this->getLayout($parameters, $layoutAnnotation, $rootId);
         } elseif ($parameters instanceof Layout) {
             if (!$layoutAnnotation->isEmpty()) {
                 throw new LogicException(
@@ -94,10 +96,11 @@ class LayoutListener
      *
      * @param ContextInterface $context
      * @param LayoutAnnotation $layoutAnnotation
+     * @param string|null $rootId
      *
      * @return Layout
      */
-    protected function getLayout(ContextInterface $context, LayoutAnnotation $layoutAnnotation)
+    protected function getLayout(ContextInterface $context, LayoutAnnotation $layoutAnnotation, $rootId = null)
     {
         $layoutBuilder = $this->layoutManager->getLayoutBuilder();
         // TODO discuss adding root automatically
@@ -108,7 +111,7 @@ class LayoutListener
             $layoutBuilder->setBlockTheme($blockThemes);
         }
 
-        return $layoutBuilder->getLayout($context);
+        return $layoutBuilder->getLayout($context, $rootId);
     }
 
     /**

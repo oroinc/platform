@@ -68,6 +68,30 @@
 </html>
 {% endblock %}
 
+{% block widget_widget %}
+    {% import 'OroUIBundle::macros.html.twig' as UI %}
+
+    {% set elementId = "layout-widget-container-" ~ wid %}
+    {% set widgetAlias = block.vars.widgetAlias|default(block.vars.id) %}
+
+    {% set widgetComponentOptions = {
+        'type' : 'layout',
+        'options' : {
+            'url': app.request.requestUri,
+            'alias': widgetAlias,
+            'wid' : wid,
+            'rid' : block.vars.id,
+            'el' : '#' ~ elementId ~ ' .widget-content:first'
+        }
+    } %}
+
+    <div id="{{ elementId }}" {{ UI.renderWidgetAttributes(widgetComponentOptions) }} data-layout="separate">
+        <div class="widget-content">
+            {{ block_widget(block) }}
+        </div>
+    </div>
+{% endblock %}
+
 {% block head_widget %}
     <head{{ block('block_attributes') }}>
         {{ block_widget(block) }}
