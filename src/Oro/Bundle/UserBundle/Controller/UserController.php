@@ -65,8 +65,7 @@ class UserController extends Controller
     public function apigenAction(User $user)
     {
         $securityFacade = $this->get('oro_security.security_facade');
-        $currentAuthenticatedUser = $this->getUser();
-        if ($currentAuthenticatedUser !== $user && !$securityFacade->isGranted('EDIT', $user)) {
+        if ($securityFacade->getLoggedUserId() !== $user->getId() && !$securityFacade->isGranted('EDIT', $user)) {
             throw $this->createAccessDeniedException();
         }
 
