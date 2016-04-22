@@ -5,7 +5,6 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 use Doctrine\ORM\Proxy\Proxy;
 use Doctrine\ORM\AbstractQuery;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
 
 abstract class AbstractCalendarEventNormalizer
@@ -35,11 +34,11 @@ abstract class AbstractCalendarEventNormalizer
 
         $rawData = $query->getArrayResult();
         foreach ($rawData as $rawDataItem) {
-            $item = $this->transformEntity($rawDataItem);
-            $this->transformRecurrenceData($item);
-            $result[] = $item;
+            $result[] = $this->transformEntity($rawDataItem);
         }
+
         $this->applyAdditionalData($result, $calendarId);
+
         foreach ($result as &$resultItem) {
             $this->applyPermissions($resultItem, $calendarId);
         }
@@ -81,31 +80,6 @@ abstract class AbstractCalendarEventNormalizer
         } elseif(is_array($value)) {
             $value = $this->transformEntity($value);
         }
-    }
-
-    /**
-     * Transforms recurrence data into separate field.
-     *
-     * @param $entity
-     *
-     * @return self
-     */
-    protected function transformRecurrenceData(&$entity)
-    {
-        $result = [];
-        $key = Recurrence::STRING_KEY;
-        foreach ($entity as $field => $value) {
-            if (substr($field, 0, strlen($key)) === $key) {
-                unset($entity[$field]);
-                $result[lcfirst(substr($field, strlen($key)))] = $value;
-            }
-        }
-
-        if (!empty($result)) {
-            $entity[$key] = $result;
-        }
-
-        return $this;
     }
 
     /**

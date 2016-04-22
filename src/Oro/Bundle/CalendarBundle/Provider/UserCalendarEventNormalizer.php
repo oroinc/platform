@@ -2,9 +2,12 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Component\PropertyAccess\PropertyAccessor;
+use Doctrine\ORM\AbstractQuery;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
+use Oro\Component\PhpUtils\ArrayUtil;
+
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -56,6 +59,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 
         $result = [$item];
         $this->applyAdditionalData($result, $calendarId);
+        $this->addRecurrenceExceptions($result);
         $this->applyPermissions($result[0], $calendarId);
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
@@ -87,24 +91,10 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'dayOfMonth' => $recurrence->getDayOfMonth(),
                 'monthOfYear' => $recurrence->getMonthOfYear(),
                 'startTime' => $recurrence->getStartTime(),
-                'endTime' => $recurrence->getEndTime(),
+                'endTime' => $recurrence->getStartTime(),
                 // @TODO fix typo 'occurences' => 'occurrences' after it will be fixed in plugin.
                 'occurences' => $recurrence->getOccurrences()
             ];
-            if ($event->getExceptions()->count()) {
-                $extraValues[Recurrence::STRING_KEY]['exceptions'] = [];
-                foreach ($event->getExceptions() as $exception) {
-                    $extraValues[Recurrence::STRING_KEY]['exceptions'][] = [
-                        'id' => $exception->getId(),
-                        'originalDate' => $exception->getOriginalDate(),
-                        'title' => $exception->getTitle(),
-                        'description' => $exception->getDescription(),
-                        'start' => $exception->getStart(),
-                        'end' => $exception->getEnd(),
-                        'allDay' => $exception->getAllDay(),
-                    ];
-                }
-            }
         }
 
         return array_merge(
@@ -132,10 +122,9 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     protected function applyAdditionalData(&$items, $calendarId)
     {
         $parentEventIds = $this->getParentEventIds($items);
-        /** @var CalendarEventRepository $repo */
-        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $ids = [];
         if ($parentEventIds) {
+            /** @var CalendarEventRepository $repo */
+            $repo     = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
             $invitees = $repo->getInvitedUsersByParentsQueryBuilder($parentEventIds)
                 ->getQuery()
                 ->getArrayResult();
@@ -146,7 +135,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             }
 
             foreach ($items as &$item) {
-                $ids[] = $item['id'];
                 $item['invitedUsers'] = [];
                 if (isset($groupedInvitees[$item['id']])) {
                     foreach ($groupedInvitees[$item['id']] as $invitee) {
@@ -156,29 +144,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             }
         } else {
             foreach ($items as &$item) {
-                $ids[] = $item['id'];
                 $item['invitedUsers'] = [];
-            }
-        }
-        if ($items) {
-            $exceptions = $repo->getExceptionsByParentIds($ids);
-            if ($exceptions) {
-                foreach ($items as &$item) {
-                    foreach ($exceptions as $exception) {
-                        $item[Recurrence::STRING_KEY]['exceptions'] = [];
-                        if ($exception['exceptionParentId'] === $item['id']) {
-                            $item[Recurrence::STRING_KEY]['exceptions'][] = [
-                                'id' => $exception['id'],
-                                'originalDate' => $exception['originalDate'],
-                                'title' => $exception['title'],
-                                'description' => $exception['description'],
-                                'start' => $exception['start'],
-                                'end' => $exception['end'],
-                                'allDay' => $exception['allDay'],
-                            ];
-                        }
-                    }
-                }
             }
         }
     }
@@ -228,5 +194,89 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         }
 
         return $this->propertyAccessor;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCalendarEvents($calendarId, AbstractQuery $query)
+    {
+        $result = [];
+
+        $rawData = $query->getArrayResult();
+        foreach ($rawData as $rawDataItem) {
+            $item = $this->transformEntity($rawDataItem);
+            $this->transformRecurrenceData($item);
+            $result[] = $item;
+        }
+        $this->applyAdditionalData($result, $calendarId);
+        $this->addRecurrenceExceptions($result);
+        foreach ($result as &$resultItem) {
+            $this->applyPermissions($resultItem, $calendarId);
+        }
+
+        $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
+
+        return $result;
+    }
+
+    /**
+     * Gets recurrence exceptions from DB and adds it to appropriate recurrence items.
+     *
+     * @param array $items
+     *
+     * @return self
+     */
+    protected function addRecurrenceExceptions(&$items)
+    {
+        $exceptionParentIds = ArrayUtil::arrayColumn($items, 'id');
+
+        /** @var CalendarEventRepository $repository */
+        $repository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $exceptions = $repository->getRecurrenceExceptionsByParentIds($exceptionParentIds)
+            ->getQuery()
+            ->getArrayResult();
+
+        $key = Recurrence::STRING_KEY;
+        foreach ($exceptions as $exception) {
+            foreach ($items as $index => $item) {
+                if ($item['id'] == $exception['parentExceptionId'] && !empty($item[$key])) {
+                    //don't need this value in result
+                    unset($exception['parentExceptionId']);
+                    if (empty($items[$index][$key]['exceptions'])) {
+                        $items[$index][$key]['exceptions'] = [];
+                    }
+                    $items[$index][$key]['exceptions'][] = $this->transformEntity($exception);
+                    break;
+                }
+            }
+        }
+
+        return $this;
+    }
+
+    /**
+     * Transforms recurrence data into separate field.
+     *
+     * @param $entity
+     *
+     * @return self
+     */
+    protected function transformRecurrenceData(&$entity)
+    {
+        $result = [];
+        $key = Recurrence::STRING_KEY;
+        foreach ($entity as $field => $value) {
+            if (substr($field, 0, strlen($key)) === $key) {
+                unset($entity[$field]);
+                $result[lcfirst(substr($field, strlen($key)))] = $value;
+            }
+        }
+
+        if (!empty($result)) {
+            $entity[$key] = $result;
+        }
+
+        return $this;
     }
 }
