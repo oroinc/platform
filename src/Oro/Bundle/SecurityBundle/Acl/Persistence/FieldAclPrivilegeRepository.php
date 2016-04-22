@@ -56,23 +56,6 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
     }
 
     /**
-     * @param string $className
-     *
-     * @return array
-     */
-    protected function getFieldList($className)
-    {
-        $fieldList = array_map(
-            function ($fieldArray) {
-                return $fieldArray['name'];
-            },
-            $this->fieldProvider->getFields($className, true, false, false, false, false)
-        );
-
-        return $fieldList;
-    }
-
-    /**
      * @param SID    $sid
      * @param string $className
      *
@@ -113,20 +96,22 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
             $rootAcl = $this->findAclByOid($acls, $entityRootOid);
         }
 
+        // with relations, without virtual and unidirectional fields, without entity details and without exclusions
+        // there could be ACL AclExclusionProvider to filter restricted fields, so for ACL UI it shouldn't be used
+        $fieldsArray = $this->fieldProvider->getFields($className, true, false, false, false, false);
         $privileges = new ArrayCollection();
-        $fields = $this->getFieldList($className);
-        foreach ($fields as $fieldName) {
+        foreach ($fieldsArray as $fieldInfo) {
             $privilege = new AclPrivilege();
             $privilege->setIdentity(
                 new AclPrivilegeIdentity(
-                    sprintf('%s+%s:%s', $objectIdentity->getIdentifier(), $fieldName, $objectIdentity->getType()),
-                    $fieldName
+                    sprintf('%s+%s:%s', $objectIdentity->getIdentifier(), $fieldInfo['name'], $objectIdentity->getType()),
+                    $fieldInfo['label']
                 )
             )
                 ->setGroup($entityClass->getGroup())
                 ->setExtensionKey($extensionKey);
 
-            $this->addPermissions($sid, $privilege, $objectIdentity, $acls, $extension, $rootAcl, $fieldName);
+            $this->addPermissions($sid, $privilege, $objectIdentity, $acls, $extension, $rootAcl, $fieldInfo['name']);
             $privileges->add($privilege);
         }
 
