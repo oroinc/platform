@@ -462,4 +462,48 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         $this->assertAttributeEquals($secondStrategyName, 'strategyName', $translator);
         $this->assertAttributeCount(1, 'catalogues', $translator);
     }
+
+    public function testWarmUpNoStrategyProvider()
+    {
+        $translator = $this->getTranslator($this->getLoader());
+        $translator->warmUp('/cache_dir');
+
+        $this->assertAttributeEmpty('strategyName', $translator);
+        $this->assertEmpty($translator->getFallbackLocales());
+    }
+
+    public function testWarmUpWithStrategyProvider()
+    {
+        $strategyName = 'default';
+        $allFallbackLocales = ['en_US', 'en'];
+
+        /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $strategy */
+        $strategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+        $strategy->expects($this->any())
+            ->method('getName')
+            ->willReturn($strategyName);
+
+        /** @var TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject $strategyProvider */
+        $strategyProvider = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $strategyProvider->expects($this->any())
+            ->method('getStrategy')
+            ->willReturn($strategy);
+        $strategyProvider->expects($this->any())
+            ->method('getAllFallbackLocales')
+            ->with($strategy)
+            ->willReturn($allFallbackLocales);
+
+        $translator = $this->getTranslator($this->getLoader());
+        $translator->setStrategyProvider($strategyProvider);
+
+        $this->assertAttributeEmpty('strategyName', $translator);
+        $this->assertEmpty($translator->getFallbackLocales());
+
+        $translator->warmUp('/cache_dir');
+
+        $this->assertAttributeEquals($strategyName, 'strategyName', $translator);
+        $this->assertEquals($allFallbackLocales, $translator->getFallbackLocales());
+    }
 }

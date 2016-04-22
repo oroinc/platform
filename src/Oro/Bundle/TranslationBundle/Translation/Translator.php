@@ -156,6 +156,19 @@ class Translator extends BaseTranslator
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function warmUp($cacheDir)
+    {
+        if ($this->strategyProvider) {
+            // manually apply current strategy
+            $this->applyStrategy($this->strategyProvider->getStrategy());
+        }
+
+        parent::warmUp($cacheDir);
+    }
+
+    /**
      * Sets a cache of dynamic translation metadata
      *
      * @param DynamicTranslationMetadataCache $cache
