@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 /**
  * @dbIsolation
@@ -12,9 +13,42 @@ class RestCalendarEventTest extends WebTestCase
 {
     const DEFAULT_USER_CALENDAR_ID = 1;
 
+    /** @var array */
+    protected $calendarEventDocument;
+
     protected function setUp()
     {
         $this->initClient(array(), $this->generateWsseAuthHeader());
+        $this->calendarEventDocument = [
+            'title' => 'Test Event',
+            'description' => 'Test Description',
+            'start' => date(DATE_RFC3339),
+            'end' => date(DATE_RFC3339),
+            'allDay' => true,
+            'backgroundColor' => '#FF0000',
+            'calendar' => self::DEFAULT_USER_CALENDAR_ID,
+            'recurrence' => [
+                'recurrenceType' => Recurrence::TYPE_DAILY,
+                'interval' => 1,
+                'instance' => null,
+                'dayOfWeek' => [],
+                'dayOfMonth' => null,
+                'monthOfYear' => null,
+                'startTime' => date(DATE_RFC3339),
+                'endTime' => null,
+                'occurences' => null,
+                'exceptions' => [
+                    [
+                        'originalDate' => date(DATE_RFC3339),
+                        'title' => 'Test Exception Title',
+                        'description' => 'Test Description of Exception',
+                        'start' => date(DATE_RFC3339),
+                        'end' => date(DATE_RFC3339),
+                        'allDay' => false,
+                    ]
+                ],
+            ],
+        ];
     }
 
     public function testGets()
@@ -40,32 +74,7 @@ class RestCalendarEventTest extends WebTestCase
      */
     public function testPost()
     {
-        $request = array(
-            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
-            'id'              => null,
-            'title'           => "Test Event",
-            'description'     => "Test Description",
-            'start'           => date(DATE_RFC3339),
-            'end'             => date(DATE_RFC3339),
-            'allDay'          => true,
-            'backgroundColor' => '#FF0000',
-            'recurrence'      => [
-                'recurrenceType' => Recurrence::TYPE_DAILY,
-                'interval' => 1,
-                'startTime' => date(DATE_RFC3339),
-                'exceptions' => [
-                    [
-                        'originalDate' => date(DATE_RFC3339),
-                        'title' =>  'Test Exception Title',
-                        'description' =>  'Test Description of Exception',
-                        'start' => date(DATE_RFC3339),
-                        'end' => date(DATE_RFC3339),
-                        'allDay' => false,
-                    ]
-                ],
-            ],
-        );
-        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $this->calendarEventDocument);
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
 
@@ -84,34 +93,10 @@ class RestCalendarEventTest extends WebTestCase
      */
     public function testPut($id)
     {
-        $request = array(
-            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
-            'title'           => 'Test Event Updated',
-            'description'     => 'Test Description Updated',
-            'start'           => date(DATE_RFC3339),
-            'end'             => date(DATE_RFC3339),
-            'allDay'          => true,
-            'backgroundColor' => '#FF0000',
-            'recurrence'      => [
-                'recurrenceType' => Recurrence::TYPE_DAILY,
-                'interval' => 1,
-                'startTime' => date(DATE_RFC3339),
-                'exceptions' => [
-                    [
-                        'originalDate' => date(DATE_RFC3339),
-                        'title' =>  'Test Exception Title',
-                        'description' =>  'Test Description of Exception',
-                        'start' => date(DATE_RFC3339),
-                        'end' => date(DATE_RFC3339),
-                        'allDay' => false,
-                    ]
-                ],
-            ],
-        );
         $this->client->request(
             'PUT',
             $this->getUrl('oro_api_put_calendarevent', array("id" => $id)),
-            $request
+            $this->calendarEventDocument
         );
 
         $this->assertEmptyResponseStatusCodeEquals($this->client->getResponse(), 204);
@@ -135,6 +120,10 @@ class RestCalendarEventTest extends WebTestCase
 
         $this->assertNotEmpty($result);
         $this->assertEquals($id, $result['id']);
+        $calendarEventDocument = $this->calendarEventDocument;
+        $this->clearAttributes($result);
+        $this->clearAttributes($calendarEventDocument);
+        $this->assertEquals($calendarEventDocument, $result);
     }
 
     /**
@@ -199,6 +188,11 @@ class RestCalendarEventTest extends WebTestCase
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
 
         $this->assertCount(1, $result);
+        $result = $result[0];
+        $calendarEventDocument = $this->calendarEventDocument;
+        $this->clearAttributes($result);
+        $this->clearAttributes($calendarEventDocument);
+        $this->assertEquals($calendarEventDocument, $result);
 
         $this->client->request(
             'GET',
@@ -208,5 +202,37 @@ class RestCalendarEventTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertEmpty($result);
+    }
+
+    /**
+     * @param array $document
+     */
+    protected function clearAttributes(&$document)
+    {
+        $propertyAccessor = new PropertyAccessor();
+        $keysToRemove = [
+            // keys that present in response, but not in put/post
+            'id',
+            'createdAt',
+            'updatedAt',
+            'invitationStatus',
+            'invitedUsers',
+            'editable',
+            'removable',
+            'notifiable',
+            'parentEventId',
+            'use_hangout',
+            // dates come with local time, but pass by UTC
+            'start',
+            'end',
+            '[recurrence][startTime]',
+            '[recurrence][exceptions][0][id]',
+            '[recurrence][exceptions][0][originalDate]',
+            '[recurrence][exceptions][0][start]',
+            '[recurrence][exceptions][0][end]',
+        ];
+        foreach ($keysToRemove as $path) {
+            $propertyAccessor->remove($document, $path);
+        }
     }
 }

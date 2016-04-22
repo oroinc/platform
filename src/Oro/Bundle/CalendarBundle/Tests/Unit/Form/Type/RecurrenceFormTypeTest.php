@@ -149,11 +149,12 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(8))
             ->method('add')
             ->with(
-                'occurrences',
+                'occurences',
                 'integer',
                 [
                     'required' => false,
                     'label' => 'oro.calendar.recurrence.occurrences.label',
+                    'property_path' => 'occurrences',
                 ]
             )
             ->will($this->returnSelf());

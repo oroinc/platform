@@ -97,9 +97,7 @@ abstract class AbstractCalendarEventNormalizer
         foreach ($entity as $field => $value) {
             if (substr($field, 0, strlen($key)) === $key) {
                 unset($entity[$field]);
-                if ($value !== null) {
-                    $result[lcfirst(substr($field, strlen($key)))] = $value;
-                }
+                $result[lcfirst(substr($field, strlen($key)))] = $value;
             }
         }
 

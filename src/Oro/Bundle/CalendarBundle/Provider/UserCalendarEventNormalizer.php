@@ -79,8 +79,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         }
 
         if ($recurrence = $event->getRecurrence()) {
-            $key = Recurrence::STRING_KEY;
-            $recurrenceValues = [
+            $extraValues[Recurrence::STRING_KEY] = [
                 'recurrenceType' => $recurrence->getRecurrenceType(),
                 'interval' => $recurrence->getInterval(),
                 'instance' => $recurrence->getInstance(),
@@ -88,12 +87,24 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'dayOfMonth' => $recurrence->getDayOfMonth(),
                 'monthOfYear' => $recurrence->getMonthOfYear(),
                 'startTime' => $recurrence->getStartTime(),
-                'endTime' => $recurrence->getStartTime(),
+                'endTime' => $recurrence->getEndTime(),
+                // @TODO fix typo 'occurences' => 'occurrences' after it will be fixed in plugin.
                 'occurences' => $recurrence->getOccurrences()
             ];
-            $extraValues[$key] = array_filter($recurrenceValues, function($item) {
-                return !is_null($item);
-            });
+            if ($event->getExceptions()->count()) {
+                $extraValues[Recurrence::STRING_KEY]['exceptions'] = [];
+                foreach ($event->getExceptions() as $exception) {
+                    $extraValues[Recurrence::STRING_KEY]['exceptions'][] = [
+                        'id' => $exception->getId(),
+                        'originalDate' => $exception->getOriginalDate(),
+                        'title' => $exception->getTitle(),
+                        'description' => $exception->getDescription(),
+                        'start' => $exception->getStart(),
+                        'end' => $exception->getEnd(),
+                        'allDay' => $exception->getAllDay(),
+                    ];
+                }
+            }
         }
 
         return array_merge(
@@ -121,9 +132,10 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     protected function applyAdditionalData(&$items, $calendarId)
     {
         $parentEventIds = $this->getParentEventIds($items);
+        /** @var CalendarEventRepository $repo */
+        $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+        $ids = [];
         if ($parentEventIds) {
-            /** @var CalendarEventRepository $repo */
-            $repo     = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
             $invitees = $repo->getInvitedUsersByParentsQueryBuilder($parentEventIds)
                 ->getQuery()
                 ->getArrayResult();
@@ -134,6 +146,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             }
 
             foreach ($items as &$item) {
+                $ids[] = $item['id'];
                 $item['invitedUsers'] = [];
                 if (isset($groupedInvitees[$item['id']])) {
                     foreach ($groupedInvitees[$item['id']] as $invitee) {
@@ -143,7 +156,29 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             }
         } else {
             foreach ($items as &$item) {
+                $ids[] = $item['id'];
                 $item['invitedUsers'] = [];
+            }
+        }
+        if ($items) {
+            $exceptions = $repo->getExceptionsByParentIds($ids);
+            if ($exceptions) {
+                foreach ($items as &$item) {
+                    foreach ($exceptions as $exception) {
+                        $item[Recurrence::STRING_KEY]['exceptions'] = [];
+                        if ($exception['exceptionParentId'] === $item['id']) {
+                            $item[Recurrence::STRING_KEY]['exceptions'][] = [
+                                'id' => $exception['id'],
+                                'originalDate' => $exception['originalDate'],
+                                'title' => $exception['title'],
+                                'description' => $exception['description'],
+                                'start' => $exception['start'],
+                                'end' => $exception['end'],
+                                'allDay' => $exception['allDay'],
+                            ];
+                        }
+                    }
+                }
             }
         }
     }

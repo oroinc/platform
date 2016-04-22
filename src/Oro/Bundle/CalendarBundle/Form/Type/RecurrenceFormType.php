@@ -16,7 +16,7 @@ class RecurrenceFormType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // @TODO implement recurrencePattern validator
+        // @TODO implement recurrencePattern validator.
         $builder
             ->add(
                 'recurrenceType',
@@ -118,11 +118,13 @@ class RecurrenceFormType extends AbstractType
                 ]
             )
             ->add(
-                'occurrences',
+                // @TODO fix typo 'occurences' => 'occurrences' after it will be fixed in plugin.
+                'occurences',
                 'integer',
                 [
                     'required' => false,
                     'label' => 'oro.calendar.recurrence.occurrences.label',
+                    'property_path' => 'occurrences',
                 ]
             );
     }
