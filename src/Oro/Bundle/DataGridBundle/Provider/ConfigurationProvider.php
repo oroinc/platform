@@ -41,16 +41,27 @@ class ConfigurationProvider implements ConfigurationProviderInterface
      */
     public function getConfiguration($gridName)
     {
-        if (!isset($this->rawConfiguration[$gridName])) {
-            throw new RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
-        }
-
+        $rawConfiguration = $this->getRawConfiguration($gridName);
         if (!isset($this->processedConfiguration[$gridName])) {
-            $config = $this->resolver->resolve($gridName, $this->rawConfiguration[$gridName]);
+            $config = $this->resolver->resolve($gridName, $rawConfiguration);
 
             $this->processedConfiguration[$gridName] = $config;
         }
 
         return DatagridConfiguration::createNamed($gridName, $this->processedConfiguration[$gridName]);
+    }
+
+    /**
+     * @param string $gridName
+     *
+     * @return array
+     */
+    public function getRawConfiguration($gridName)
+    {
+        if (!isset($this->rawConfiguration[$gridName])) {
+            throw new RuntimeException(sprintf('A configuration for "%s" datagrid was not found.', $gridName));
+        }
+
+        return $this->rawConfiguration[$gridName];
     }
 }

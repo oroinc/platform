@@ -11,6 +11,7 @@ oro:
             url.label:           Url
             owner.label:         Owner
             organization.label:  Organization
+            extend_description.label: Description
 
             saved_message: Tracking Website saved
 
