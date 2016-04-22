@@ -136,7 +136,7 @@ class RecurrenceFormType extends AbstractType
     {
         $resolver->setDefaults(
             [
-                'intention' => 'oro_calendar_recurrence',
+                'intention' => 'oro_calendar_event_recurrence',
                 'data_class' => 'Oro\Bundle\CalendarBundle\Entity\Recurrence',
             ]
         );
@@ -147,6 +147,6 @@ class RecurrenceFormType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_calendar_recurrence';
+        return 'oro_calendar_event_recurrence';
     }
 }

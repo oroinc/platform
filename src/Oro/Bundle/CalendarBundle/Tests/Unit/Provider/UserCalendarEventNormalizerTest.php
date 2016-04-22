@@ -329,33 +329,39 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setGetInvitedUsersExpectations($invitees, $expectedParentEventIds)
     {
+        $qb = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $repo->expects($this->any())
+            ->method('getRecurrenceExceptionsByParentIds')
+            ->will($this->returnValue($qb));
+        $this->doctrineHelper->expects($this->any())
+            ->method('getEntityRepository')
+            ->with('OroCalendarBundle:CalendarEvent')
+            ->will($this->returnValue($repo));
+        $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
+            ->disableOriginalConstructor()
+            ->setMethods(['getArrayResult'])
+            ->getMockForAbstractClass();
+        $qb->expects($this->any())
+            ->method('getQuery')
+            ->will($this->returnValue($query));
+        $arrayResultInc = 0;
         if (!empty($expectedParentEventIds)) {
-            $qb   = $this->getMockBuilder('Doctrine\ORM\QueryBuilder')
-                ->disableOriginalConstructor()
-                ->getMock();
-            $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository')
-                ->disableOriginalConstructor()
-                ->getMock();
             $repo->expects($this->once())
                 ->method('getInvitedUsersByParentsQueryBuilder')
                 ->with($expectedParentEventIds)
                 ->will($this->returnValue($qb));
-            $this->doctrineHelper->expects($this->once())
-                ->method('getEntityRepository')
-                ->with('OroCalendarBundle:CalendarEvent')
-                ->will($this->returnValue($repo));
-
-            $query = $this->getMockBuilder('Doctrine\ORM\AbstractQuery')
-                ->disableOriginalConstructor()
-                ->setMethods(['getArrayResult'])
-                ->getMockForAbstractClass();
-            $qb->expects($this->once())
-                ->method('getQuery')
-                ->will($this->returnValue($query));
-            $query->expects($this->once())
+            $query->expects($this->at($arrayResultInc++))
                 ->method('getArrayResult')
                 ->will($this->returnValue($invitees));
         }
+        $query->expects($this->at($arrayResultInc++))
+            ->method('getArrayResult')
+            ->will($this->returnValue([]));
     }
 
     /**

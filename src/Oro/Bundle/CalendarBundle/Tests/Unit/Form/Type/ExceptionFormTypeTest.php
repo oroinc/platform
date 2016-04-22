@@ -76,7 +76,7 @@ class ExceptionFormTypeTest extends \PHPUnit_Framework_TestCase
                 'originalDate',
                 'datetime',
                 [
-                    'required' => false,
+                    'required' => true,
                     'with_seconds' => true,
                     'widget' => 'single_text',
                     'format' => DateTimeType::HTML5_FORMAT,
@@ -115,6 +115,6 @@ class ExceptionFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_calendar_exception', $this->type->getName());
+        $this->assertEquals('oro_calendar_event_exception', $this->type->getName());
     }
 }

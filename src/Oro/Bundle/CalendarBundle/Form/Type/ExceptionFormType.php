@@ -55,7 +55,7 @@ class ExceptionFormType extends AbstractType
                 'originalDate',
                 'datetime',
                 [
-                    'required' => false,
+                    'required' => true,
                     'with_seconds' => true,
                     'widget' => 'single_text',
                     'format' => DateTimeType::HTML5_FORMAT,
@@ -89,6 +89,6 @@ class ExceptionFormType extends AbstractType
      */
     public function getName()
     {
-        return 'oro_calendar_exception';
+        return 'oro_calendar_event_exception';
     }
 }

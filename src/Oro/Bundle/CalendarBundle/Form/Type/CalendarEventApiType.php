@@ -98,7 +98,7 @@ class CalendarEventApiType extends CalendarEventType
             )
             ->add(
                 'recurrence',
-                'oro_calendar_recurrence',
+                'oro_calendar_event_recurrence',
                 [
                     'required' => false,
                 ]
@@ -108,7 +108,7 @@ class CalendarEventApiType extends CalendarEventType
                 'collection',
                 [
                     'required' => false,
-                    'type' => 'oro_calendar_exception',
+                    'type' => 'oro_calendar_event_exception',
                     'allow_add' => true,
                     'allow_delete' => true,
                 ]

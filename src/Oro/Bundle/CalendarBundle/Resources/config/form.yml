@@ -181,9 +181,9 @@ services:
     oro_calendar.recurrence.form.type:
         class: '%oro_calendar.recurrence.form.type.class%'
         tags:
-            - { name: form.type, alias: oro_calendar_recurrence }
+            - { name: form.type, alias: oro_calendar_event_recurrence }
 
     oro_calendar.exception.form.type:
         class: '%oro_calendar.exception.form.type.class%'
         tags:
-            - { name: form.type, alias: oro_calendar_exception }
+            - { name: form.type, alias: oro_calendar_event_exception }

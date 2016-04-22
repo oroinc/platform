@@ -91,7 +91,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'dayOfMonth' => $recurrence->getDayOfMonth(),
                 'monthOfYear' => $recurrence->getMonthOfYear(),
                 'startTime' => $recurrence->getStartTime(),
-                'endTime' => $recurrence->getStartTime(),
+                'endTime' => $recurrence->getEndTime(),
                 // @TODO fix typo 'occurences' => 'occurrences' after it will be fixed in plugin.
                 'occurences' => $recurrence->getOccurrences()
             ];
@@ -231,23 +231,25 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
     {
         $exceptionParentIds = ArrayUtil::arrayColumn($items, 'id');
 
-        /** @var CalendarEventRepository $repository */
-        $repository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-        $exceptions = $repository->getRecurrenceExceptionsByParentIds($exceptionParentIds)
-            ->getQuery()
-            ->getArrayResult();
+        if ($exceptionParentIds) {
+            /** @var CalendarEventRepository $repository */
+            $repository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+            $exceptions = $repository->getRecurrenceExceptionsByParentIds($exceptionParentIds)
+                ->getQuery()
+                ->getArrayResult();
 
-        $key = Recurrence::STRING_KEY;
-        foreach ($exceptions as $exception) {
-            foreach ($items as $index => $item) {
-                if ($item['id'] == $exception['parentExceptionId'] && !empty($item[$key])) {
-                    //don't need this value in result
-                    unset($exception['parentExceptionId']);
-                    if (empty($items[$index][$key]['exceptions'])) {
-                        $items[$index][$key]['exceptions'] = [];
+            $key = Recurrence::STRING_KEY;
+            foreach ($exceptions as $exception) {
+                foreach ($items as $index => $item) {
+                    if ($item['id'] == $exception['parentExceptionId'] && !empty($item[$key])) {
+                        //don't need this value in result
+                        unset($exception['parentExceptionId']);
+                        if (empty($items[$index][$key]['exceptions'])) {
+                            $items[$index][$key]['exceptions'] = [];
+                        }
+                        $items[$index][$key]['exceptions'][] = $this->transformEntity($exception);
+                        break;
                     }
-                    $items[$index][$key]['exceptions'][] = $this->transformEntity($exception);
-                    break;
                 }
             }
         }

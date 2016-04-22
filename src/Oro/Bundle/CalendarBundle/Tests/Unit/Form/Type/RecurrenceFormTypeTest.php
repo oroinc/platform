@@ -170,7 +170,7 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
         $resolver->expects($this->once())
             ->method('setDefaults')
             ->with([
-                'intention' => 'oro_calendar_recurrence',
+                'intention' => 'oro_calendar_event_recurrence',
                 'data_class' => 'Oro\Bundle\CalendarBundle\Entity\Recurrence',
             ]);
 
@@ -179,6 +179,6 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
 
     public function testGetName()
     {
-        $this->assertEquals('oro_calendar_recurrence', $this->type->getName());
+        $this->assertEquals('oro_calendar_event_recurrence', $this->type->getName());
     }
 }
