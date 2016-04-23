@@ -240,7 +240,7 @@ services:
         arguments:
             - '@oro_api.json_api.error_completer'
         tags:
-            - { name: oro.api.processor, action: create, group: normalize_result, requestType: json_api, priority: -11 }
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: json_api, priority: -15 }
 
     oro_api.create.normalize_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeErrors
@@ -270,7 +270,7 @@ services:
             - '@oro_api.json_api.document_builder'
             - '@oro_api.json_api.error_completer'
         tags:
-            - { name: oro.api.processor, action: create, group: normalize_result, requestType: json_api, priority: -51 }
+            - { name: oro.api.processor, action: create, group: normalize_result, requestType: json_api, priority: -55 }
 
     oro_api.create.process_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProcessErrors
