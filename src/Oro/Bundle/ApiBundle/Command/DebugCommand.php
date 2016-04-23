@@ -34,7 +34,7 @@ class DebugCommand extends AbstractDebugCommand
     }
 
     /**
-     * @return string[]
+     * {@inheritdoc}
      */
     protected function getDefaultRequestType()
     {
