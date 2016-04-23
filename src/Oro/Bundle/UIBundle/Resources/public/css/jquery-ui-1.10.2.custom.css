@@ -191,7 +191,3 @@
 	color: #222222;
 	font-weight: bold;
 }
-
-form.change-password-form span.icon-eye-close, form.change-password-form span.icon-eye-open {
-	padding-left: 5px;
-}

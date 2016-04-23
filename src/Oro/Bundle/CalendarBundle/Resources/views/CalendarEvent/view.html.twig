@@ -64,7 +64,7 @@
         <div class="row-fluid form-horizontal">
             <div class="responsive-block">
                 {{ UI.renderProperty('oro.calendar.calendarevent.title.label'|trans, entity.title) }}
-                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, entity.description|escape|nl2br) }}
+                {{ UI.renderHtmlProperty('oro.calendar.calendarevent.description.label'|trans, entity.description) }}
                 {{ UI.renderProperty('oro.calendar.calendarevent.start.label'|trans, entity.start|oro_format_datetime) }}
                 {{ UI.renderProperty('oro.calendar.calendarevent.end.label'|trans, entity.end|oro_format_datetime) }}
                 {{ UI.renderProperty('oro.calendar.calendarevent.all_day.label'|trans, entity.allDay ? 'Yes'|trans : 'No'|trans) }}
