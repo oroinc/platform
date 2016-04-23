@@ -118,15 +118,12 @@ services:
 
     oro_api.get_list.json_api.add_include_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter
-        arguments:
-            - '@oro_api.doctrine_helper'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -110 }
 
     oro_api.get_list.json_api.add_fields_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddFieldsFilter
         arguments:
-            - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -110 }

@@ -7,7 +7,6 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\IncludeFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
  * Adds "include" filter.
@@ -17,17 +16,6 @@ class AddIncludeFilter implements ProcessorInterface
 {
     const FILTER_KEY = 'include';
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
-    /**
-     * @param DoctrineHelper $doctrineHelper
-     */
-    public function __construct(DoctrineHelper $doctrineHelper)
-    {
-        $this->doctrineHelper = $doctrineHelper;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -35,32 +23,23 @@ class AddIncludeFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
-        }
-
-        $indexedAssociations = $this->doctrineHelper->getIndexedAssociations(
-            $this->doctrineHelper->getEntityMetadata($entityClass)
-        );
-        if (!$indexedAssociations) {
-            // no associations - no sense to add include filters
-            return;
-        }
-
         $filters = $context->getFilters();
         if ($filters->has(self::FILTER_KEY)) {
-            // filters have been already set
+            // the "include" filter is already added
             return;
         }
 
-        $includeFilter = new IncludeFilter(
+        $associations = $context->getMetadata()->getAssociations();
+        if (empty($associations)) {
+            // the "include" filter has sense only if an entity has at least one association
+            return;
+        }
+
+        $filter = new IncludeFilter(
             DataType::STRING,
             'A list of related entities to be included. Comma-separated paths, e.g. \'comments,comments.author\'.'
         );
-        $includeFilter->setArrayAllowed(true);
-
-        $filters->add(self::FILTER_KEY, $includeFilter);
+        $filter->setArrayAllowed(true);
+        $filters->add(self::FILTER_KEY, $filter);
     }
 }

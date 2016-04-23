@@ -10,7 +10,6 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
-use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
@@ -23,21 +22,14 @@ class AddFieldsFilter implements ProcessorInterface
     const FILTER_KEY          = 'fields';
     const FILTER_KEY_TEMPLATE = 'fields[%s]';
 
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
-
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
     /**
-     * @param DoctrineHelper                  $doctrineHelper
      * @param ValueNormalizer $valueNormalizer
      */
-    public function __construct(
-        DoctrineHelper $doctrineHelper,
-        ValueNormalizer $valueNormalizer
-    ) {
-        $this->doctrineHelper         = $doctrineHelper;
+    public function __construct(ValueNormalizer $valueNormalizer)
+    {
         $this->valueNormalizer = $valueNormalizer;
     }
 
@@ -48,19 +40,13 @@ class AddFieldsFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
-        $entityClass = $context->getClassName();
-        if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
-            // only manageable entities are supported
-            return;
-        }
-
         $filters = $context->getFilters();
         if ($filters->has(self::FILTER_KEY)) {
             // filters have been already set
             return;
         }
 
-        $this->addFilter($filters, $entityClass, $context->getRequestType());
+        $this->addFilter($filters, $context->getClassName(), $context->getRequestType());
 
         $associations = $context->getMetadata()->getAssociations();
         foreach ($associations as $association) {
