@@ -4,7 +4,8 @@ default: &default
         Behat\MinkExtension:
             base_url: 'http://localhost.com/'
             default_session: 'selenium2'
-            selenium2: ~
+            selenium2:
+                wd_host: "http://localhost:8643/wd/hub"
         Behat\Symfony2Extension:
             kernel:
                 env: 'prod'
@@ -17,3 +18,10 @@ default: &default
     autoload:
             - %paths.base%/../vendor/autoload.php
     suites: []
+
+selenium2:
+    <<: *default
+    extensions:
+        Behat\MinkExtension:
+            selenium2:
+                wd_host: 'http://localhost:4444/wd/hub'

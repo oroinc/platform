@@ -77,7 +77,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     /**
      * Wait for AJAX to finish.
      *
-     * @Given /^I wait for AJAX to finish$/
+     * @Given /^(?:|I )wait for AJAX to finish$/
      */
     public function iWaitForAjaxToFinish()
     {
@@ -94,7 +94,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
-     * @Given I fill :element with:
+     * @Given /^(?:|I )fill "(?P<element>(?:[^"]|\\")*)" with:$/
      */
     public function iFillWith($element, TableNode $table)
     {
@@ -102,18 +102,15 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
-     * @Given I should be on :pageName page
+     * @Given /^(?:|I )should be on "(?P<pageName>(?:[^"]|\\")*)" page?$/
      */
     public function iShouldBeOnPage($pageName)
     {
         $page = $this->pageObjectFactory->createPage($pageName);
-        $pagePath = $this->getPagePath($page);
+        $pattern = $this->getPagePattern($page);
         $actualPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
 
-        \PHPUnit_Framework_Assert::assertEquals(
-            $pagePath,
-            $actualPath
-        );
+        expect($actualPath)->toMatch($pattern);
     }
 
     /*********************************************/
@@ -150,5 +147,23 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
         $path = $pathReflection->getValue($page);
 
         return $path;
+    }
+
+    /**
+     * @param Page $page
+     * @return string
+     */
+    private function getPagePattern(Page $page)
+    {
+        $pageReflection = new \ReflectionClass($page);
+        $pathReflection = $pageReflection->getProperty('path');
+        $pathReflection->setAccessible(true);
+        $path = $pathReflection->getValue($page);
+
+        // Replace placeholders like {id} to pattern
+        $pattern = preg_replace("/\{[\d\D]*\}/", "[\d\D]*", $path);
+        $pattern = sprintf('`^%s$`', $pattern);
+
+        return $pattern;
     }
 }
