@@ -73,7 +73,7 @@ services:
     # VIEW permissions are required to update an entity because the updated entity should be returned in response
     # the "security_check" group is disabled for the "get" action is executed by
     # the "oro_api.update.load_normalized_entity" processor
-    # so, if you add own security processor there, add it here as well
+    # so, if you add own security processor for the "get" action, add it here as well
     oro_api.update.entity_type_security_check.view:
         class: Oro\Bundle\ApiBundle\Processor\Shared\EntityTypeSecurityCheck
         arguments:
