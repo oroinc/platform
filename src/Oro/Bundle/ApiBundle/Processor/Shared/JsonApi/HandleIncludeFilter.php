@@ -10,7 +10,8 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 /**
- * Handles "include" filter.
+ * Checks whether the "include" filter exists and if so,
+ * adds the corresponding configuration extra into the Context.
  * This filter is used to specify which related entities should be returned.
  */
 class HandleIncludeFilter implements ProcessorInterface
@@ -35,19 +36,25 @@ class HandleIncludeFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if (!$context->hasConfigExtra(ExpandRelatedEntitiesConfigExtra::NAME)) {
-            $filterValue = $context->getFilterValues()->get(self::FILTER_KEY);
-            if (null !== $filterValue) {
-                $includes = $this->valueNormalizer->normalizeValue(
-                    $filterValue->getValue(),
-                    DataType::STRING,
-                    $context->getRequestType(),
-                    true
-                );
-                if (!empty($includes)) {
-                    $context->addConfigExtra(new ExpandRelatedEntitiesConfigExtra((array)$includes));
-                }
-            }
+        if ($context->hasConfigExtra(ExpandRelatedEntitiesConfigExtra::NAME)) {
+            // the "include" filter is already processed
+            return;
+        }
+
+        $filterValue = $context->getFilterValues()->get(self::FILTER_KEY);
+        if (null === $filterValue) {
+            // expanding of related entities was not requested
+            return;
+        }
+
+        $includes = $this->valueNormalizer->normalizeValue(
+            $filterValue->getValue(),
+            DataType::STRING,
+            $context->getRequestType(),
+            true
+        );
+        if (!empty($includes)) {
+            $context->addConfigExtra(new ExpandRelatedEntitiesConfigExtra((array)$includes));
         }
     }
 }

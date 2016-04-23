@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 /**
- * Checks the Criteria object exists in the Context and adds it if not.
+ * Checks whether the Criteria object exists in the Context and adds it if not.
  */
 class InitializeCriteria implements ProcessorInterface
 {

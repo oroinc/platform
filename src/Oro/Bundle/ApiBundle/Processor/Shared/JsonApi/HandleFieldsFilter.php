@@ -10,7 +10,8 @@ use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
 /**
- * Handles "fields[]" filters.
+ * Checks whether the "fields" filters exist and if so,
+ * adds the corresponding configuration extra into the Context.
  * These filters are used to specify which fields of primary
  * or related entities should be returned.
  */
@@ -36,20 +37,23 @@ class HandleFieldsFilter implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if (!$context->hasConfigExtra(FilterFieldsConfigExtra::NAME)) {
-            $fields       = [];
-            $filterValues = $context->getFilterValues()->getAll(self::FILTER_KEY);
-            foreach ($filterValues as $filterValue) {
-                $fields[$filterValue->getPath()] = (array)$this->valueNormalizer->normalizeValue(
-                    $filterValue->getValue(),
-                    DataType::STRING,
-                    $context->getRequestType(),
-                    true
-                );
-            }
-            if (!empty($fields)) {
-                $context->addConfigExtra(new FilterFieldsConfigExtra($fields));
-            }
+        if ($context->hasConfigExtra(FilterFieldsConfigExtra::NAME)) {
+            // the "fields" filters are already processed
+            return;
+        }
+
+        $fields       = [];
+        $filterValues = $context->getFilterValues()->getAll(self::FILTER_KEY);
+        foreach ($filterValues as $filterValue) {
+            $fields[$filterValue->getPath()] = (array)$this->valueNormalizer->normalizeValue(
+                $filterValue->getValue(),
+                DataType::STRING,
+                $context->getRequestType(),
+                true
+            );
+        }
+        if (!empty($fields)) {
+            $context->addConfigExtra(new FilterFieldsConfigExtra($fields));
         }
     }
 }
