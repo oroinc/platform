@@ -668,13 +668,17 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame([], $this->context->getConfigExtras());
         $this->assertNull($this->context->get(Context::CONFIG_EXTRAS));
 
-        $configExtras = [new TestConfigExtra('test')];
+        $configExtra = new TestConfigExtra('test');
+
+        $configExtras = [$configExtra];
         $this->context->setConfigExtras($configExtras);
         $this->assertEquals($configExtras, $this->context->getConfigExtras());
         $this->assertEquals($configExtras, $this->context->get(Context::CONFIG_EXTRAS));
 
         $this->assertTrue($this->context->hasConfigExtra('test'));
+        $this->assertSame($configExtra, $this->context->getConfigExtra('test'));
         $this->assertFalse($this->context->hasConfigExtra('another'));
+        $this->assertNull($this->context->getConfigExtra('another'));
 
         $anotherConfigExtra = new TestConfigExtra('another');
         $configExtras[]     = $anotherConfigExtra;

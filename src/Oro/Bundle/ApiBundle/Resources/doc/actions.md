@@ -406,6 +406,7 @@ Entity configuration related methods:
 - **getConfigExtras()** - Gets a list of [requests for configuration data](../../Config/ConfigExtraInterface.php).
 - **setConfigExtras(extras)** - Sets a list of requests for configuration data.
 - **hasConfigExtra(extraName)** - Checks whether some configuration data is requested.
+- **getConfigExtra(extraName)** - Gets a request for configuration data by its name.
 - **addConfigExtra(extra)** - Adds a request for some configuration data.
 - **removeConfigExtra(extraName)** - Removes a request for some configuration data.
 - **getConfigSections()** - Gets names of all requested [configuration sections](../../Config/ConfigExtraSectionInterface.php).

@@ -204,6 +204,15 @@ interface ContextInterface extends ComponentContextInterface
     public function hasConfigExtra($extraName);
 
     /**
+     * Gets a request for configuration data by its name.
+     *
+     * @param string $extraName
+     *
+     * @return ConfigExtraInterface|null
+     */
+    public function getConfigExtra($extraName);
+
+    /**
      * Adds a request for some configuration data.
      *
      * @param ConfigExtraInterface $extra
