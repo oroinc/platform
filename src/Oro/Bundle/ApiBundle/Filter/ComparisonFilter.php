@@ -67,19 +67,8 @@ class ComparisonFilter extends StandaloneFilter
      */
     public function createExpression(FilterValue $value = null)
     {
-        if (null !== $value) {
-            $operator = $value->getOperator();
-            $val      = $value->getValue();
-        } else {
-            $operator = null;
-            $val      = $this->getDefaultValue();
-            if (null !== $val) {
-                $operator = self::EQ;
-            }
-        }
-
-        return null !== $operator
-            ? $this->buildExpression($this->field, $operator, $val)
+        return null !== $value
+            ? $this->buildExpression($this->field, $value->getOperator(), $value->getValue())
             : null;
     }
 

@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Routing;
 
+use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Symfony\Component\Routing\Route;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -322,13 +323,15 @@ class RestDocHandler implements HandlerInterface
                         $filter->isArrayAllowed()
                     )
                 ];
-                $default = $filter->getDefaultValueString();
-                if (!empty($default)) {
-                    $options['default'] = $default;
-                }
                 $operators = $filter->getSupportedOperators();
                 if (!empty($operators) && !(count($operators) === 1 && $operators[0] === StandaloneFilter::EQ)) {
                     $options['operators'] = implode(',', $operators);
+                }
+                if ($filter instanceof StandaloneFilterWithDefaultValue) {
+                    $default = $filter->getDefaultValueString();
+                    if (!empty($default)) {
+                        $options['default'] = $default;
+                    }
                 }
                 $annotation->addFilter($key, $options);
             }
