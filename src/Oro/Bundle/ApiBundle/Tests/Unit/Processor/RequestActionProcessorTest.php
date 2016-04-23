@@ -163,6 +163,76 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         );
     }
 
+    public function testProcessWhenExceptionOccursAndNormalizeResultGroupIsDisabled()
+    {
+        $context = $this->getContext();
+        $context->setLastGroup('group2');
+
+        $exception = new \Exception('test exception');
+
+        $error = new Error();
+        $error->setInnerException($exception);
+
+        $processor1 = $this->addProcessor('processor1', 'group1');
+        $processor2 = $this->addProcessor('processor2', 'group1');
+        $processor3 = $this->addProcessor('processor3', 'group2');
+        $processor10 = $this->addProcessor('processor10', RequestActionProcessor::NORMALIZE_RESULT_GROUP);
+
+        $processor1->expects($this->once())
+            ->method('process')
+            ->with($this->identicalTo($context))
+            ->willThrowException($exception);
+        $processor2->expects($this->never())
+            ->method('process');
+        $processor3->expects($this->never())
+            ->method('process');
+        $processor10->expects($this->never())
+            ->method('process');
+
+        $this->setExpectedException(
+            get_class($exception),
+            $exception->getMessage()
+        );
+
+        $this->processor->process($context);
+    }
+
+    public function testProcessWhenErrorOccursAndNormalizeResultGroupIsDisabled()
+    {
+        $context = $this->getContext();
+        $context->setLastGroup('group2');
+
+        $error = new Error();
+        $error->setTitle('some error');
+
+        $processor1 = $this->addProcessor('processor1', 'group1');
+        $processor2 = $this->addProcessor('processor2', 'group1');
+        $processor3 = $this->addProcessor('processor3', 'group2');
+        $processor10 = $this->addProcessor('processor10', RequestActionProcessor::NORMALIZE_RESULT_GROUP);
+
+        $processor1->expects($this->once())
+            ->method('process')
+            ->with($this->identicalTo($context))
+            ->willReturnCallback(
+                function (Context $context) use ($error) {
+                    $context->addError($error);
+                }
+            );
+        $processor2->expects($this->never())
+            ->method('process');
+        $processor3->expects($this->never())
+            ->method('process');
+        $processor10->expects($this->never())
+            ->method('process');
+
+        $this->setExpectedException(
+            '\RuntimeException',
+            sprintf('An unexpected error occurred: %s.', $error->getTitle())
+        );
+
+        $this->processor->process($context);
+    }
+
     public function testProcessWhenExceptionOccursInNormalizeResultGroup()
     {
         $context = $this->getContext();

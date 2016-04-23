@@ -24,6 +24,10 @@ class RequestActionProcessor extends ActionProcessor
             /** @var ProcessorInterface $processor */
             foreach ($processors as $processor) {
                 if ($context->hasErrors() && self::NORMALIZE_RESULT_GROUP !== $processors->getGroup()) {
+                    if ($context->getLastGroup()) {
+                        // stop execution in case if the "normalize_result" group is disabled
+                        throw $this->buildErrorException($context->getErrors());
+                    }
                     // go to the "normalize_result" group
                     $this->executeNormalizeResultProcessors($context);
                     break;
@@ -34,7 +38,8 @@ class RequestActionProcessor extends ActionProcessor
         } catch (\Exception $e) {
             // rethrow an exception occurred in any processor from the "normalize_result" group,
             // this is required to prevent circular handling of such exception
-            if (self::NORMALIZE_RESULT_GROUP === $processors->getGroup()) {
+            // also rethrow an exception in case if the "normalize_result" group is disabled
+            if (self::NORMALIZE_RESULT_GROUP === $processors->getGroup() || $context->getLastGroup()) {
                 throw $e;
             }
 
@@ -62,5 +67,24 @@ class RequestActionProcessor extends ActionProcessor
         foreach ($processors as $processor) {
             $processor->process($context);
         }
+    }
+
+    /**
+     * @param Error[] $errors
+     *
+     * @return \Exception
+     */
+    protected function buildErrorException(array $errors)
+    {
+        /** @var Error $firstError */
+        $firstError = reset($errors);
+        $exception = $firstError->getInnerException();
+        if (null === $exception) {
+            $exception = new \RuntimeException(
+                sprintf('An unexpected error occurred: %s.', $firstError->getTitle())
+            );
+        }
+
+        return $exception;
     }
 }
