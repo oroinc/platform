@@ -34,6 +34,14 @@ class DebugCommand extends AbstractDebugCommand
     }
 
     /**
+     * @return string[]
+     */
+    protected function getDefaultRequestType()
+    {
+        return ['any'];
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function execute(InputInterface $input, OutputInterface $output)
