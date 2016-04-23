@@ -1,5 +1,12 @@
 # Behat Tests
 
+### Official documentation
+
+[Behat documentation](http://docs.behat.org/en/v3.0/)
+[Mink documentation](http://mink.behat.org/en/latest/)
+[Page object extension documentation](http://behat-page-object-extension.readthedocs.org/en/latest/index.html)
+
+
 ### Architecture
 
 Mink provide ```MinkContext``` with basic feature steps.
