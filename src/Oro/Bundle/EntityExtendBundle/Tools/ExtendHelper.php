@@ -452,4 +452,25 @@ class ExtendHelper
 
         return true;
     }
+
+    /**
+     * @param mixed $currentVal
+     * @param array $changeSet
+     *
+     * @return mixed
+     */
+    public static function updatedPendingValue($currentVal, array $changeSet)
+    {
+        list ($oldVal, $newVal) = $changeSet;
+        if (!is_array($oldVal) || !is_array($newVal) || !is_array($currentVal)) {
+            return $newVal;
+        }
+
+        return array_values(
+            array_diff(
+                array_merge($currentVal, array_diff($newVal, $oldVal)),
+                array_diff($oldVal, $newVal)
+            )
+        );
+    }
 }
