@@ -12,7 +12,7 @@ use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
-class Object implements \ArrayAccess, \IteratorAggregate
+class ObjectCompatible implements \ArrayAccess, \IteratorAggregate
 {
     const NAME_KEY = 'name';
 

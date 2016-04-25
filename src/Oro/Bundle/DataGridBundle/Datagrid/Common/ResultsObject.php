@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
-use Oro\Bundle\DataGridBundle\Common\Object;
+use Oro\Bundle\DataGridBundle\Common\ObjectCompatible;
 
-class ResultsObject extends Object
+class ResultsObject extends ObjectCompatible
 {
 }

@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\DataGridBundle\Datagrid\Common;
 
-use Oro\Bundle\DataGridBundle\Common\Object;
+use Oro\Bundle\DataGridBundle\Common\ObjectCompatible;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 
-class MetadataObject extends Object
+class MetadataObject extends ObjectCompatible
 {
     const GRID_NAME_KEY        = 'gridName';
     const OPTIONS_KEY          = 'options';
