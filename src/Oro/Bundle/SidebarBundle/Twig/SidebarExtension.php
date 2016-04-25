@@ -63,7 +63,7 @@ class SidebarExtension extends \Twig_Extension
 
         foreach ($definitions as &$definition) {
             $definition['title'] = $this->translator->trans($definition['title']);
-            if ($definition['dialogIcon']) {
+            if (isset($definition['dialogIcon'])) {
                 $definition['dialogIcon'] = $this->assetHelper->getUrl($definition['dialogIcon']);
             }
         }
