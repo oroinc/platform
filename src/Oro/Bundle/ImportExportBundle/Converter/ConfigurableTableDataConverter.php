@@ -56,6 +56,42 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     }
 
     /**
+     * Get field header
+     *
+     * @param string $entityClassName
+     * @param string $initialFieldName
+     * @param bool $isSearchingIdentityField
+     * @return null|string
+     */
+    public function getFieldHeaderWithRelation($entityClassName, $initialFieldName, $isSearchingIdentityField = false)
+    {
+        $fields = $this->fieldHelper->getFields($entityClassName, true);
+
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            $notFoundFieldName = !$isSearchingIdentityField && $fieldName !== $initialFieldName;
+            $foundIdentifyField = $this->fieldHelper->getConfigValue($entityClassName, $fieldName, 'identity');
+            $notFoundFieldIdentify = $isSearchingIdentityField && !$foundIdentifyField;
+
+            if ($notFoundFieldName || $notFoundFieldIdentify) {
+                continue;
+            }
+
+            if ($this->fieldHelper->isRelation($field) &&
+                !$this->fieldHelper->processRelationAsScalar($entityClassName, $fieldName)) {
+                return
+                    $this->getFieldHeader($entityClassName, $field) .
+                    $this->relationDelimiter .
+                    $this->getFieldHeaderWithRelation($field['related_entity_name'], null, true);
+            }
+
+            return $this->getFieldHeader($entityClassName, $field);
+        }
+
+        return null;
+    }
+
+    /**
      * {@inheritdoc}
      */
     protected function getHeaderConversionRules()
