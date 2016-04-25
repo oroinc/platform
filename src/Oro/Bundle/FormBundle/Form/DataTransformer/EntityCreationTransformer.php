@@ -14,7 +14,7 @@ class EntityCreationTransformer extends EntityToIdTransformer
     /**
      * Property of created entity that will be set with provided value
      *
-     * var string
+     * @var string
      */
     protected $newEntityPropertyName;
 
@@ -59,7 +59,7 @@ class EntityCreationTransformer extends EntityToIdTransformer
     }
 
     /**
-     * @param boolean $allowEmptyProperty
+     * @param bool $allowEmptyProperty
      */
     public function setAllowEmptyProperty($allowEmptyProperty)
     {
