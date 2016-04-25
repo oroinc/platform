@@ -18,6 +18,5 @@ class UserForm extends BaseForm
         'password' => 'oro_user_user_form[plainPassword][first]',
         're-enter password' => 'oro_user_user_form[plainPassword][second]',
         'email' => 'oro_user_user_form[email]',
-        'roles' => '',
     ];
 }
