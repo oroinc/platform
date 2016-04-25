@@ -99,6 +99,8 @@ class RestGroupsTest extends WebTestCase
      */
     public function testDeleteGroup($group)
     {
+        $this->client->followRedirects(true);
+
         $this->client->request(
             'DELETE',
             $this->getUrl('oro_api_delete_group', array('id' => $group['id']))

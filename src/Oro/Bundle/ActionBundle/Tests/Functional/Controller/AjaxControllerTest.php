@@ -78,6 +78,7 @@ class AjaxControllerTest extends WebTestCase
 
         $this->assertEquals(self::MESSAGE_DEFAULT, $this->entity->getMessage());
 
+        $this->client->followRedirects($statusCode < 300 || $statusCode >= 400);
         $this->client->request(
             'GET',
             $this->getUrl(
@@ -233,7 +234,7 @@ class AjaxControllerTest extends WebTestCase
                 'entityClass' => 'Oro\Bundle\TestFrameworkBundle\Entity\TestActivity',
                 'statusCode' => Response::HTTP_FOUND,
                 'message' => self::MESSAGE_DEFAULT,
-                'headers' => []
+                'headers' => $this->generateNoHashNavigationHeader()
             ],
             'redirect ajax' => [
                 'config' => array_merge_recursive(
