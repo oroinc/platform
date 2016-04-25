@@ -271,7 +271,7 @@ class FieldHelper
     {
         try {
             $this->getPropertyAccessor()->setValue($object, $fieldName, $value);
-        } catch (\Exception $e) {
+        } catch (\TypeError $e) {
             $class = ClassUtils::getClass($object);
             while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
             }
