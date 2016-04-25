@@ -38,7 +38,12 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $this->listener->onFlush($args);
     }
 
-    public function testModifyCreatedAndUpdatedPropertiesForNewEntity()
+    /**
+     * @dataProvider userDataProvider
+     * @param object $user
+     * @param boolean $expectedCallSetUpdatedBy
+     */
+    public function testModifyCreatedAndUpdatedPropertiesForNewEntity($user, $expectedCallSetUpdatedBy)
     {
         $datesAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
 
@@ -66,14 +71,11 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $alreadyUpdatedDatesAwareEntity->expects($this->never())
             ->method('setUpdatedAt');
 
-        $currentUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
         $currentToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $currentToken->expects($this->once())
+        $currentToken->expects($this->any())
             ->method('getUser')
-            ->willReturn($currentUser);
-        $this->tokenStorage->expects($this->once())
+            ->willReturn($user);
+        $this->tokenStorage->expects($this->any())
             ->method('getToken')
             ->willReturn($currentToken);
 
@@ -81,10 +83,14 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $updatedByAwareEntity->expects($this->once())
             ->method('isUpdatedBySet')
             ->willReturn(false);
-        $updatedByAwareEntity->expects($this->once())
-            ->method('setUpdatedBy')
-            ->with($currentUser);
-
+        if ($expectedCallSetUpdatedBy) {
+            $updatedByAwareEntity->expects($this->once())
+                ->method('setUpdatedBy')
+                ->with($user);
+        } else {
+            $updatedByAwareEntity->expects($this->never())
+                ->method('setUpdatedBy');
+        }
         $alreadyUpdatedUpdatedByAwareEntity = $this->getMock(
             'Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface'
         );
@@ -100,11 +106,16 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             $alreadyUpdatedDatesAwareEntity,
             $alreadyUpdatedUpdatedByAwareEntity
         ];
-
-        $this->createArgsMock(2, $scheduled);
+        $countOfRecompute = $expectedCallSetUpdatedBy ? 2 : 1;
+        $this->createArgsMock($countOfRecompute, $scheduled);
     }
 
-    public function testModifyCreatedAndUpdatedPropertiesForExistingEntity()
+    /**
+     * @dataProvider userDataProvider
+     * @param object $user
+     * @param boolean $expectedCallSetUpdatedBy
+     */
+    public function testModifyCreatedAndUpdatedPropertiesForExistingEntity($user, $expectedCallSetUpdatedBy)
     {
         $datesAwareEntity = $this->getMock('Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface');
 
@@ -122,14 +133,11 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $alreadyUpdatedDatesAwareEntity->expects($this->never())
             ->method('setUpdatedAt');
 
-        $currentUser = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
-            ->disableOriginalConstructor()
-            ->getMock();
         $currentToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $currentToken->expects($this->once())
+        $currentToken->expects($this->any())
             ->method('getUser')
-            ->willReturn($currentUser);
-        $this->tokenStorage->expects($this->once())
+            ->willReturn($user);
+        $this->tokenStorage->expects($this->any())
             ->method('getToken')
             ->willReturn($currentToken);
 
@@ -137,10 +145,14 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $updatedByAwareEntity->expects($this->once())
             ->method('isUpdatedBySet')
             ->willReturn(false);
-        $updatedByAwareEntity->expects($this->once())
-            ->method('setUpdatedBy')
-            ->with($currentUser);
-
+        if ($expectedCallSetUpdatedBy) {
+            $updatedByAwareEntity->expects($this->once())
+                ->method('setUpdatedBy')
+                ->with($user);
+        } else {
+            $updatedByAwareEntity->expects($this->never())
+                ->method('setUpdatedBy');
+        }
         $alreadyUpdatedUpdatedByAwareEntity = $this->getMock(
             'Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface'
         );
@@ -156,12 +168,31 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             $alreadyUpdatedDatesAwareEntity,
             $alreadyUpdatedUpdatedByAwareEntity
         ];
-
-        $this->createArgsMock(2, [], $scheduled);
+        $countOfRecompute = $expectedCallSetUpdatedBy ? 2 : 1;
+        $this->createArgsMock($countOfRecompute, [], $scheduled);
     }
 
     /**
-     * @param int   $countOfRecompute
+     * @return array
+     */
+    public function userDataProvider()
+    {
+        return [
+            'realUser' => [
+                'user' => $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
+                    ->disableOriginalConstructor()
+                    ->getMock(),
+                'expectedCallSetUpdatedBy' => true
+            ],
+            'anotherUser' => [
+                'user' => new \stdClass(),
+                'expectedCallSetUpdatedBy' => false
+            ],
+        ];
+    }
+
+    /**
+     * @param int $countOfRecompute
      * @param array $scheduledForInsert
      * @param array $scheduledForUpdate
      */
