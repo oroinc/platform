@@ -314,9 +314,8 @@ oro_api:
         * **property_path** *string* The property path to reach the fields' value. The same way as above in `fields` configuration section.
         * **data_type** *string* The data type of the filter value. Can be `boolean`, `integer`, `string`, etc.
         * **allow_array** *boolean* A flag indicates whether the filter can contains several values. By default `false`.
-        * **default_value** - The default value for the filter.
 
-The example:
+Example:
 
 ```yaml
 oro_api:
@@ -335,7 +334,6 @@ oro_api:
                     field3:
                         data_type: boolean
                         allow_array: false
-                        default_value: true
 ```
 
 * **sorters** - This section describes fields by which the result data can be sorted. It contains two properties: `exclusion_policy` and `fields`.

@@ -24,9 +24,6 @@ class FilterFieldConfig implements FieldConfigInterface
     /** a flag indicates whether the filter value can be an array */
     const ALLOW_ARRAY = 'allow_array';
 
-    /** the default value for the filter */
-    const DEFAULT_VALUE = 'default_value';
-
     /** a human-readable description of the filter */
     const DESCRIPTION = EntityDefinitionFieldConfig::DESCRIPTION;
 
@@ -90,31 +87,5 @@ class FilterFieldConfig implements FieldConfigInterface
     public function setArrayAllowed($allowArray = true)
     {
         $this->items[self::ALLOW_ARRAY] = $allowArray;
-    }
-
-    /**
-     * Gets the default value the filter.
-     *
-     * @return mixed
-     */
-    public function getDefaultValue()
-    {
-        return array_key_exists(self::DEFAULT_VALUE, $this->items)
-            ? $this->items[self::DEFAULT_VALUE]
-            : null;
-    }
-
-    /**
-     * Sets the default value the filter.
-     *
-     * @param mixed $defaultValue
-     */
-    public function setDefaultValue($defaultValue)
-    {
-        if (null !== $defaultValue) {
-            $this->items[self::DEFAULT_VALUE] = $defaultValue;
-        } else {
-            unset($this->items[self::DEFAULT_VALUE]);
-        }
     }
 }

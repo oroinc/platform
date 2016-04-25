@@ -84,7 +84,6 @@ class FiltersConfiguration extends AbstractConfigurationSection implements Confi
             ->scalarNode(FilterFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end()
             ->scalarNode(FilterFieldConfig::DATA_TYPE)->cannotBeEmpty()->end()
             ->booleanNode(FilterFieldConfig::ALLOW_ARRAY)->end()
-            ->scalarNode(FilterFieldConfig::DEFAULT_VALUE)->cannotBeEmpty()->end()
             ->scalarNode(FilterFieldConfig::DESCRIPTION)->cannotBeEmpty()->end();
         $parentNode
             ->validate()
