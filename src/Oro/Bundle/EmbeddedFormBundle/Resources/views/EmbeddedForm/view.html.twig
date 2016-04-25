@@ -70,6 +70,7 @@
 
     {% set getCodeIframe %}
         <textarea id="oro_embeddedform_iframe" cols="60" rows="10" class="fill-tab" style="height: 300px">
+{%- autoescape %}
 <div id="embedded-form-container-{{ entity.id }}"></div>
 <script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
 <script type="text/javascript">
@@ -83,22 +84,26 @@
         }
     });
 </script>
+{% endautoescape -%}
         </textarea>
     {% endset %}
 
     {% set getCodeInline %}
-        <div class="alert alert-warning">{{ 'oro.embeddedform.tabs.inline.description'|trans|nl2br }}</div>
+        <div class="alert alert-warning">{{ 'oro.embeddedform.tabs.inline.description'|trans|raw }}</div>
         <textarea id="oro_embeddedform_inline" cols="60" rows="10" class="fill-tab" style="height: 300px">
+{%- autoescape %}
 <div id="embedded-form-container-{{ entity.id }}"></div>
 <script type="text/javascript" src="{{ app.request.getSchemeAndHttpHost() ~ asset('bundles/oroembeddedform/js/embed.form.js') }}"></script>
 <script type="text/javascript">
     new ORO.EmbedForm({
         container: 'embedded-form-container-{{ entity.id }}',
         xhr: {
-            url: "{{ url('oro_embedded_form_submit', {'id': entity.id}) }}"
+            url: "{{ url('oro_embedded_form_submit', {'id': entity.id, 'inline': true}) }}"
         }
     });
 </script>
+{% endautoescape -%}
+        </textarea>
         </textarea>
     {% endset %}
 

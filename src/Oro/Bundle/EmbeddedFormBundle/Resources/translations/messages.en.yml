@@ -15,9 +15,11 @@ oro:
                 label:          Iframe code
             inline:
                 label:          Inline code
-                description: |
-                    Note: The CSS styles you defined for this form will interfere with your site's styles.
-                    This may cause some unexpected results.
+                description: >
+                    Note: Using this method of embedding will interfere with your site's CSS.
+                    You might need to change the form CSS.<br />
+                    You should also check the Allowed Domains section and add all known domains
+                    that are hosting your form.
         no_types_available:     The embedded form cannot be created as no form types are available.
 
         success_message:

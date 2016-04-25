@@ -35,6 +35,8 @@ class EmbedFormController extends Controller
             return $response;
         }
 
+        $isInline = $request->query->getBoolean('inline');
+
         /** @var EntityManager $em */
         $em = $this->get('doctrine.orm.entity_manager');
         /** @var EmbeddedFormManager $formManager */
@@ -85,11 +87,19 @@ class EmbedFormController extends Controller
             $em->persist($entity);
             $em->flush();
 
-            return $this->redirect($this->generateUrl('oro_embedded_form_success', ['id' => $formEntity->getId()]));
+            return $this->redirect(
+                $this->generateUrl('oro_embedded_form_success', [
+                    'id' => $formEntity->getId(),
+                    'inline' => $isInline
+                ])
+            );
         }
 
         /** @var EmbedFormLayoutManager $layoutManager */
         $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+
+        $layoutManager->setInline($isInline);
+
         $response->setContent($layoutManager->getLayout($formEntity, $form)->render());
 
         return $response;
@@ -98,10 +108,12 @@ class EmbedFormController extends Controller
     /**
      * @Route("/success/{id}", name="oro_embedded_form_success", requirements={"id"="[-\d\w]+"})
      */
-    public function formSuccessAction(EmbeddedForm $formEntity)
+    public function formSuccessAction(EmbeddedForm $formEntity, Request $request)
     {
         /** @var EmbedFormLayoutManager $layoutManager */
         $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
+
+        $layoutManager->setInline($request->query->getBoolean('inline'));
 
         return new Response($layoutManager->getLayout($formEntity)->render());
     }
