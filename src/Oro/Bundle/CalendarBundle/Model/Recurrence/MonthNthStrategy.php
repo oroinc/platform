@@ -93,7 +93,14 @@ class MonthNthStrategy implements StrategyInterface
     }
 
     /**
-     * {@inheritdoc}
+     * Returns occurrence date according to last occurrence date and recurrence rules.
+     *
+     * @param integer $interval
+     * @param array $dayOfWeek
+     * @param integer $instance
+     * @param \DateTime $date
+     *
+     * @return \DateTime
      */
     protected function getNextOccurrence($interval, $dayOfWeek, $instance, \DateTime $date)
     {

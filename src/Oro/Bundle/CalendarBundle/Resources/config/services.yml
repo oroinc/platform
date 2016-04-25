@@ -308,5 +308,12 @@ services:
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
+    oro_calendar.recurrence.strategy.yearnth:
+        class: %oro_calendar.strategy.yearnth.class%
+        arguments:
+            - '@oro_calendar.tools.recurrence.nth_strategy_helper'
+        tags:
+            - { name: oro_calendar.recurrence.strategy}
+
     oro_calendar.tools.recurrence.nth_strategy_helper:
         class: %oro_calendar.tools.recurrence.nth_strategy_helper.class%
