@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\Rest;
 
 use Oro\Bundle\ApiBundle\Filter\PageNumberFilter;
 use Oro\Bundle\ApiBundle\Filter\PageSizeFilter;
-use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultPaging;
+use Oro\Bundle\ApiBundle\Processor\GetList\Rest\SetDefaultPaging;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorTestCase;
 
@@ -34,19 +34,18 @@ class SetDefaultPagingTest extends GetListProcessorTestCase
 
     public function testProcess()
     {
-        $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->processor->process($this->context);
 
         $filters = $this->context->getFilters();
         $this->assertEquals(2, $filters->count());
         /** @var PageSizeFilter $pageSizeFilter */
-        $pageSizeFilter = $filters->get('page[size]');
+        $pageSizeFilter = $filters->get('limit');
         $this->assertEquals(10, $pageSizeFilter->getDefaultValue());
         /** @var PageNumberFilter $pageNumberFilter */
-        $pageNumberFilter = $filters->get('page[number]');
+        $pageNumberFilter = $filters->get('page');
         $this->assertEquals(1, $pageNumberFilter->getDefaultValue());
 
         // check that filters are added in correct order
-        $this->assertEquals(['page[size]', 'page[number]'], array_keys($filters->all()));
+        $this->assertEquals(['limit', 'page'], array_keys($filters->all()));
     }
 }

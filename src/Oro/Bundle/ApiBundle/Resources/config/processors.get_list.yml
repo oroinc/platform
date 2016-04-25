@@ -97,12 +97,12 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest, priority: -100 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: -100 }
 
     oro_api.get_list.rest.set_default_paging:
         class: Oro\Bundle\ApiBundle\Processor\GetList\Rest\SetDefaultPaging
         tags:
-            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest, priority: -100 }
+            - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api, priority: -100 }
 
     oro_api.get_list.json_api.set_default_sorting:
         class: Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultSorting

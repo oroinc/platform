@@ -1,9 +1,9 @@
 <?php
 
-namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\JsonApi;
+namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\Rest;
 
 use Oro\Bundle\ApiBundle\Filter\SortFilter;
-use Oro\Bundle\ApiBundle\Processor\GetList\JsonApi\SetDefaultSorting;
+use Oro\Bundle\ApiBundle\Processor\GetList\Rest\SetDefaultSorting;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\GetList\GetListProcessorOrmRelatedTestCase;
 
@@ -31,7 +31,6 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessForEntityWithIdentifierNamedId()
     {
-        $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User');
         $this->processor->process($this->context);
 
@@ -45,7 +44,6 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
 
     public function testProcessForEntityWithIdentifierNotNamedId()
     {
-        $this->context->getRequestType()->add(RequestType::JSON_API);
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category');
         $this->processor->process($this->context);
 
@@ -54,7 +52,7 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
         /** @var SortFilter $sortFilter */
         $sortFilter = $filters->get('sort');
         $this->assertEquals('orderBy', $sortFilter->getDataType());
-        $this->assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        $this->assertEquals(['name' => 'ASC'], $sortFilter->getDefaultValue());
     }
 
     public function testProcessForEntityWithCompositeIdentifier()
@@ -67,6 +65,6 @@ class SetDefaultSortingTest extends GetListProcessorOrmRelatedTestCase
         /** @var SortFilter $sortFilter */
         $sortFilter = $filters->get('sort');
         $this->assertEquals('orderBy', $sortFilter->getDataType());
-        $this->assertEquals(['id' => 'ASC'], $sortFilter->getDefaultValue());
+        $this->assertEquals(['id' => 'ASC', 'title' => 'ASC'], $sortFilter->getDefaultValue());
     }
 }
