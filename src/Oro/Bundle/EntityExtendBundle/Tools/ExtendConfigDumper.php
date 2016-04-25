@@ -7,6 +7,7 @@ use Doctrine\Common\Cache\ClearableCache;
 use Symfony\Component\Filesystem\Filesystem;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
+use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -30,6 +31,9 @@ class ExtendConfigDumper
     /** @var string */
     protected $cacheDir;
 
+    /** @var ConfigManager */
+    protected $configManager;
+
     /** @var ConfigProvider */
     protected $configProvider;
 
@@ -49,6 +53,7 @@ class ExtendConfigDumper
     protected $sortedExtensions;
 
     /**
+     * @param ConfigManager                   $configManager
      * @param ConfigProvider                  $configProvider
      * @param ExtendDbIdentifierNameGenerator $nameGenerator
      * @param FieldTypeHelper                 $fieldTypeHelper
@@ -56,12 +61,14 @@ class ExtendConfigDumper
      * @param string                          $cacheDir
      */
     public function __construct(
+        ConfigManager $configManager,
         ConfigProvider $configProvider,
         ExtendDbIdentifierNameGenerator $nameGenerator,
         FieldTypeHelper $fieldTypeHelper,
         EntityGenerator $entityGenerator,
         $cacheDir
     ) {
+        $this->configManager   = $configManager;
         $this->configProvider  = $configProvider;
         $this->nameGenerator   = $nameGenerator;
         $this->fieldTypeHelper = $fieldTypeHelper;
@@ -106,11 +113,16 @@ class ExtendConfigDumper
      * Update config.
      *
      * @param callable|null $filter function (ConfigInterface $config) : bool
+     * @param bool $updateCustom
      */
-    public function updateConfig($filter = null)
+    public function updateConfig($filter = null, $updateCustom = false)
     {
         $aliases = ExtendClassLoadingUtils::getAliases($this->cacheDir);
         $this->clear(true);
+
+        if ($updateCustom) {
+            $this->updatePendingConfigs();
+        }
 
         $extensions = $this->getExtensions();
 
@@ -507,6 +519,37 @@ class ExtendConfigDumper
 
         if ($hasChanges) {
             $this->configProvider->flush();
+        }
+    }
+
+    /**
+     * Updates pending configs
+     */
+    protected function updatePendingConfigs()
+    {
+        $pendingChanges = [];
+
+        $configs = $this->configManager->getProvider('extend')->getConfigs();
+        foreach ($configs as $config) {
+            $configPendingChanges = $config->get('pending_changes');
+            if (!$configPendingChanges) {
+                continue;
+            }
+
+            $pendingChanges[$config->getId()->getClassName()] = $configPendingChanges;
+            $config->set('pending_changes', []);
+            $this->configManager->persist($config);
+        }
+
+        foreach ($pendingChanges as $className => $changes) {
+            foreach ($changes as $scope => $values) {
+                $provider = $this->configManager->getProvider($scope);
+                $config = $provider->getConfig($className);
+                foreach ($values as $code => $value) {
+                    $config->set($code, ExtendHelper::updatedPendingValue($config->get($code), $value));
+                }
+                $this->configManager->persist($config);
+            }
         }
     }
 }

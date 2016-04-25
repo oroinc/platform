@@ -8,7 +8,7 @@ use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
-use Oro\Bundle\EntityConfigBundle\Entity\AbstractConfigModel;
+use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\EntityConfigModel;
 use Oro\Bundle\EntityConfigBundle\Entity\FieldConfigModel;
 use Oro\Bundle\EntityConfigBundle\Form\EventListener\ConfigSubscriber;
@@ -29,7 +29,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
     protected $dbTranslationMetadataCache;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $em;
+    protected $doctrine;
 
     /** @var ConfigSubscriber */
     protected $subscriber;
@@ -48,13 +48,12 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->getMockBuilder('Oro\Bundle\TranslationBundle\Translation\DynamicTranslationMetadataCache')
                 ->disableOriginalConstructor()
                 ->getMock();
-        $this->em                         = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+        $this->doctrine                   = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->configManager->expects($this->any())
-            ->method('getEntityManager')
-            ->will($this->returnValue($this->em));
+
         $this->subscriber = new ConfigSubscriber(
+            $this->doctrine,
             $this->configManager,
             $this->translator,
             $this->dbTranslationMetadataCache
@@ -95,6 +94,9 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ],
             isset($data['entity'])
         );
+        $provider1->expects($this->once())
+            ->method('getConfigById')
+            ->will($this->returnValue(new Config(new EntityConfigId('extend'))));
         $provider2 = $this->getConfigProvider(
             'test',
             [
@@ -119,6 +121,10 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($provider1));
         $this->translator->expects($this->any())
             ->method('hasTrans')
             ->will(
@@ -143,14 +149,9 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->method('getProviders')
             ->will($this->returnValue($providers));
 
-        if (null === $expectedData) {
-            $event->expects($this->never())
-                ->method('setData');
-        } else {
-            $event->expects($this->once())
-                ->method('setData')
-                ->with($expectedData);
-        }
+        $event->expects($this->once())
+            ->method('setData')
+            ->with($expectedData ?: $data);
 
         $this->subscriber->preSetData($event);
     }
@@ -161,6 +162,11 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
      */
     public function testPostSubmit($data, $isValid, $model, $trans, $expectedConfigData, $expectedTrans)
     {
+        $extendProvider = $this->getConfigProvider('extend', [], false);
+        $extendProvider->expects($this->once())
+            ->method('getConfigById')
+            ->will($this->returnValue(new Config(new EntityConfigId('extend'))));
+
         $provider1 = $this->getConfigProvider(
             'entity',
             [
@@ -196,6 +202,10 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
+        $this->configManager->expects($this->once())
+            ->method('getProvider')
+            ->with('extend')
+            ->will($this->returnValue($extendProvider));
         $this->translator->expects($this->any())
             ->method('trans')
             ->will(
@@ -217,16 +227,19 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($providers));
 
         if (null === $expectedConfigData) {
-            $this->configManager->expects($this->never())
+            $this->configManager->expects($this->once())
                 ->method('persist');
         } else {
             $expectedConfig = new Config(new EntityConfigId('entity', 'Entity\Test'));
             foreach ($expectedConfigData as $code => $val) {
                 $expectedConfig->set($code, $val);
             }
-            $this->configManager->expects($this->once())
+            $this->configManager->expects($this->exactly(2))
                 ->method('persist')
-                ->with($expectedConfig);
+                ->withConsecutive(
+                    [new Config(new EntityConfigId('extend'), ['pending_changes' => []])],
+                    [$expectedConfig]
+                );
         }
 
         $form->expects($this->once())
@@ -238,6 +251,11 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             $this->dbTranslationMetadataCache->expects($this->never())
                 ->method('updateTimestamp');
         } else {
+            $translationEm = $this->getMockBuilder('Doctrine\ORM\EntityManager')
+                ->disableOriginalConstructor()
+                ->getMock();
+            $translationValue = new Translation();
+
             $this->translator->expects($this->once())
                 ->method('getLocale')
                 ->will($this->returnValue('testLocale'));
@@ -247,7 +265,11 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
             $repo = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
                 ->disableOriginalConstructor()
                 ->getMock();
-            $this->em->expects($this->once())
+            $this->doctrine->expects($this->once())
+                ->method('getManagerForClass')
+                ->with(Translation::ENTITY_NAME)
+                ->will($this->returnValue($translationEm));
+            $translationEm->expects($this->once())
                 ->method('getRepository')
                 ->with(Translation::ENTITY_NAME)
                 ->will($this->returnValue($repo));
@@ -259,7 +281,12 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                     $expectedTrans[2],
                     TranslationRepository::DEFAULT_DOMAIN,
                     Translation::SCOPE_UI
-                );
+                )
+                ->willReturn($translationValue);
+
+            $translationEm->expects($this->once())
+                ->method('flush')
+                ->with([$translationValue]);
         }
         if ($isValid) {
             $this->configManager->expects($this->once())
@@ -570,7 +597,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
                 ],
                 [
                     'label' => 'label_key',
-                    'icon'  => 'testIcon'
+                    'icon'  => 'testIcon',
                 ],
                 [
                     'label_key',
@@ -583,7 +610,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array                                    $data
-     * @param AbstractConfigModel                      $model
+     * @param ConfigModel                              $model
      * @param \PHPUnit_Framework_MockObject_MockObject $form
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
@@ -626,7 +653,7 @@ class ConfigSubscriberTest extends \PHPUnit_Framework_TestCase
         $provider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
             ->disableOriginalConstructor()
             ->getMock();
-        $provider->expects($this->once())
+        $provider->expects($this->any())
             ->method('getScope')
             ->will($this->returnValue($scope));
         if ($isGetPropertyConfigExpected) {

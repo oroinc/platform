@@ -12,6 +12,7 @@ services:
     oro_entity_config.type.config:
         class: %oro_entity_config.type.config.class%
         arguments:
+            - @doctrine
             - @oro_entity_config.config_manager
             - @translator.default
             - @oro_translation.database_translation.metadata.cache
