@@ -4,6 +4,7 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
@@ -33,6 +34,14 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
+     * @BeforeScenario
+     */
+    public function beforeScenario(BeforeScenarioScope $scope)
+    {
+        $this->getSession()->resizeWindow(1920, 1080, 'current');
+    }
+
+    /**
      * @Given Login as an existing :login user and :password password
      */
     public function loginAsAnExistingUserAndPassword($login, $password)
@@ -55,6 +64,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         $this->currentPage = $this->pageObjectFactory->createPage($pageName);
         $this->currentPage->open();
+        $this->iWaitForAjaxToFinish();
     }
 
     /**
@@ -82,7 +92,14 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     public function iWaitForAjaxToFinish()
     {
         $time = 15000; // time should be in milliseconds
-        $this->getSession()->wait($time, "'complete' == document['readyState']");
+        $this->getSession()->wait(
+            $time,
+            '"complete" == document["readyState"] '.
+            '&& (typeof($) != "undefined" '.
+            '&& document.title !=="Loading..." '.
+            '&& $ !== null '.
+            '&& false === $( "div.loader-mask" ).hasClass("shown"))'
+        );
     }
 
     /**
