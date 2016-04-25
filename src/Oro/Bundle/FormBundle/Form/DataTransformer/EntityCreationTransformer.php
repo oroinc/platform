@@ -9,7 +9,7 @@ use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
-class CreateIfNeedEntityTransformer extends EntityToIdTransformer
+class EntityCreationTransformer extends EntityToIdTransformer
 {
     /**
      * Property of created entity that will be set with provided value
@@ -101,7 +101,7 @@ class CreateIfNeedEntityTransformer extends EntityToIdTransformer
     {
         if (!$this->valuePath && !$this->allowEmptyProperty) {
             throw new InvalidConfigurationException(
-                'Property "valuePath" should be set or property "allowEmptyProperty" should be true.'
+                'Property "valuePath" should be not empty or property "allowEmptyProperty" should be true.'
             );
         }
         $newEntityPropertyValue = $this->propertyAccessor->getValue($data, sprintf('[%s]', $this->valuePath));

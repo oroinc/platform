@@ -18,7 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\FormBundle\Form\DataTransformer\EntityToIdTransformer;
 use Oro\Bundle\FormBundle\Autocomplete\SearchRegistry;
-use Oro\Bundle\FormBundle\Form\DataTransformer\CreateIfNeedEntityTransformer;
+use Oro\Bundle\FormBundle\Form\DataTransformer\EntityCreationTransformer;
 
 class OroJquerySelect2HiddenType extends AbstractType
 {
@@ -66,19 +66,19 @@ class OroJquerySelect2HiddenType extends AbstractType
         $resolver
             ->setDefaults(
                 [
-                    'empty_value'        => '',
-                    'empty_data'         => null,
-                    'data_class'         => null,
-                    'entity_class'       => null,
-                    'configs'            => $defaultConfig,
-                    'converter'          => null,
-                    'autocomplete_alias' => null,
-                    'excluded'           => null,
-                    'random_id'          => true,
-                    'error_bubbling'     => false,
-                    'new_item_property_name'  => null,
+                    'empty_value'                   => '',
+                    'empty_data'                    => null,
+                    'data_class'                    => null,
+                    'entity_class'                  => null,
+                    'configs'                       => $defaultConfig,
+                    'converter'                     => null,
+                    'autocomplete_alias'            => null,
+                    'excluded'                      => null,
+                    'random_id'                     => true,
+                    'error_bubbling'                => false,
+                    'new_item_property_name'        => null,
                     'new_item_allow_empty_property' => false,
-                    'new_item_value_path' => 'value',
+                    'new_item_value_path'           => 'value',
                 ]
             );
 
@@ -88,7 +88,7 @@ class OroJquerySelect2HiddenType extends AbstractType
         $resolver
             ->setNormalizers(
                 [
-                    'entity_class'       => function (Options $options, $entityClass) {
+                    'entity_class' => function (Options $options, $entityClass) {
                         if (!empty($entityClass)) {
                             return $entityClass;
                         }
@@ -101,9 +101,14 @@ class OroJquerySelect2HiddenType extends AbstractType
 
                         throw new InvalidConfigurationException('The option "entity_class" must be set.');
                     },
-                    'transformer'        => function (Options $options, $value) {
+                    'transformer'  => function (Options $options, $value) {
                         if (!$value && !empty($options['entity_class'])) {
-                            $value = $this->createDefaultTransformer($options);
+                            $value = $this->createDefaultTransformer(
+                                $options['entity_class'],
+                                $options['new_item_property_name'],
+                                $options['new_item_allow_empty_property'],
+                                $options['new_item_value_path']
+                            );
                         }
 
                         if (!$value instanceof DataTransformerInterface) {
@@ -162,7 +167,7 @@ class OroJquerySelect2HiddenType extends AbstractType
                     $result = array_replace_recursive($defaultConfig, $configs);
 
                     if (!empty($options['autocomplete_alias'])) {
-                        $autoCompleteAlias = $options['autocomplete_alias'];
+                        $autoCompleteAlias            = $options['autocomplete_alias'];
                         $result['autocomplete_alias'] = $autoCompleteAlias;
                         if (empty($result['properties'])) {
                             $searchHandler        = $this->searchRegistry->getSearchHandler($autoCompleteAlias);
@@ -193,20 +198,27 @@ class OroJquerySelect2HiddenType extends AbstractType
     }
 
     /**
-     * @param Options $options
+     *
+     * @param string      $entityClass
+     * @param string|null $newItemPropertyName
+     * @param bool        $newItemAllowEmptyProperty
+     * @param string|null $newItemValuePath
      *
      * @return EntityToIdTransformer
      */
-    protected function createDefaultTransformer(Options $options)
-    {
-        $class = $options['entity_class'];
-        if ($options['new_item_property_name']) {
-            $transformer = new CreateIfNeedEntityTransformer($this->entityManager, $class);
-            $transformer->setNewEntityPropertyName($options['new_item_property_name']);
-            $transformer->setAllowEmptyProperty($options['new_item_property_name']);
-            $transformer->setValuePath($options['new_item_value_path']);
+    public function createDefaultTransformer(
+        $entityClass,
+        $newItemPropertyName = null,
+        $newItemAllowEmptyProperty = false,
+        $newItemValuePath = null
+    ) {
+        if ($newItemPropertyName) {
+            $transformer = new EntityCreationTransformer($this->entityManager, $entityClass);
+            $transformer->setNewEntityPropertyName($newItemPropertyName);
+            $transformer->setAllowEmptyProperty($newItemAllowEmptyProperty);
+            $transformer->setValuePath($newItemValuePath);
         } else {
-            $transformer = new EntityToIdTransformer($this->entityManager, $class);
+            $transformer = new EntityToIdTransformer($this->entityManager, $entityClass);
         }
 
         return $transformer;
