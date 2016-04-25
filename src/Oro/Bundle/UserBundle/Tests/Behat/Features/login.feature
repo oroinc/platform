@@ -1,7 +1,8 @@
 Feature: User login
-  In order to login in application as registered user
-  As a OroCRM Admin user
+  In order to login in application
+  As an OroCRM admin
   I need to be able to authenticate
+
 Scenario: Success login
   Given I open "Login" page
   And I fill "Login Form" with:
