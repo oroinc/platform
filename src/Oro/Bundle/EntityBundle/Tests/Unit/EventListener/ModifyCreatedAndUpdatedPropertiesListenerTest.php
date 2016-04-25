@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\EventListener;
 
+use Doctrine\ORM\Event\OnFlushEventArgs;
+
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
+
 use Oro\Bundle\EntityBundle\EventListener\ModifyCreatedAndUpdatedPropertiesListener;
 
 class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_TestCase
@@ -12,17 +16,14 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
     protected $listener;
 
     /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
+     * @var \PHPUnit_Framework_MockObject_MockObject|TokenStorageInterface
      */
     protected $tokenStorage;
 
     protected function setUp()
     {
-        $this->tokenStorage = $this->getMockBuilder(
-            'Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorage'
-        )
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->tokenStorage = $this
+            ->getMock('Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface');
 
         $this->listener = new ModifyCreatedAndUpdatedPropertiesListener($this->tokenStorage);
     }
@@ -30,6 +31,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
     public function testOptionalListenerInterfaceImplementation()
     {
         $this->listener->setEnabled(false);
+        /** @var OnFlushEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
         $args = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
@@ -145,14 +147,10 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
         $updatedByAwareEntity->expects($this->once())
             ->method('isUpdatedBySet')
             ->willReturn(false);
-        if ($expectedCallSetUpdatedBy) {
-            $updatedByAwareEntity->expects($this->once())
-                ->method('setUpdatedBy')
-                ->with($user);
-        } else {
-            $updatedByAwareEntity->expects($this->never())
-                ->method('setUpdatedBy');
-        }
+        $updatedByAwareEntity->expects($this->exactly((int)$expectedCallSetUpdatedBy))
+            ->method('setUpdatedBy')
+            ->with($user);
+
         $alreadyUpdatedUpdatedByAwareEntity = $this->getMock(
             'Oro\Bundle\EntityBundle\EntityProperty\UpdatedByAwareInterface'
         );
@@ -198,6 +196,7 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
      */
     protected function createArgsMock($countOfRecompute, array $scheduledForInsert, array $scheduledForUpdate = [])
     {
+        /** @var OnFlushEventArgs|\PHPUnit_Framework_MockObject_MockObject $args */
         $args = $this->getMockBuilder('Doctrine\ORM\Event\OnFlushEventArgs')
             ->disableOriginalConstructor()
             ->getMock();
