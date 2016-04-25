@@ -4,6 +4,7 @@ namespace Oro\Bundle\ImportExportBundle\Field;
 
 use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException;
 
 use Doctrine\Common\Util\ClassUtils;
 
@@ -265,13 +266,13 @@ class FieldHelper
      * @param object $object
      * @param string $fieldName
      * @param mixed  $value
-     * @throws \Exception
+     * @throws NoSuchPropertyException
      */
     public function setObjectValue($object, $fieldName, $value)
     {
         try {
             $this->getPropertyAccessor()->setValue($object, $fieldName, $value);
-        } catch (\TypeError $e) {
+        } catch (NoSuchPropertyException $e) {
             $class = ClassUtils::getClass($object);
             while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
             }
