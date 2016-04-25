@@ -4,8 +4,6 @@ namespace Oro\Bundle\ApiBundle\Filter;
 
 use Doctrine\Common\Collections\Criteria;
 
-use Oro\Bundle\ApiBundle\Processor\Context;
-
 /**
  * A base class for filters that can be used independently from other filters.
  */

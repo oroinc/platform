@@ -141,6 +141,12 @@ class ComparisonFilterTest extends \PHPUnit_Framework_TestCase
                 null, //filter
                 new Criteria() //expectation
             ],
+            'filter with default operator' => [
+                'fieldName',
+                true,
+                new FilterValue('path', 'value'),
+                new Criteria(new Comparison('fieldName', ComparisonFilter::EQ, 'value'))
+            ],
             'EQ filter' => [
                 'fieldName',
                 true,

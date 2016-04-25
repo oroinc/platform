@@ -68,6 +68,20 @@ class RestFilterValueAccessor implements FilterValueAccessorInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function set($key, FilterValue $value = null)
+    {
+        $this->ensureRequestParsed();
+
+        if (null !== $value) {
+            $this->parameters[strtolower($key)] = $value;
+        } else {
+            unset($this->parameters[strtolower($key)]);
+        }
+    }
+
+    /**
      * Makes sure the Request parsed
      */
     protected function ensureRequestParsed()

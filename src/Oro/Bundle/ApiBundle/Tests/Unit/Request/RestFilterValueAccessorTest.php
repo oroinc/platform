@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request;
 
 use Symfony\Component\HttpFoundation\Request;
 
+use Oro\Bundle\ApiBundle\Filter\FilterValue;
 use Oro\Bundle\ApiBundle\Request\RestFilterValueAccessor;
 
 class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
@@ -129,5 +130,39 @@ class RestFilterValueAccessorTest extends \PHPUnit_Framework_TestCase
                 'isEmptyValues' => true,
             ]
         ];
+    }
+
+    public function testOverrideExistingFilterValue()
+    {
+        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
+
+        $this->assertEquals(new FilterValue('prm1', 'val1', '='), $accessor->get('prm1'));
+
+        // test override existing filter value
+        $accessor->set('prm1', new FilterValue('prm1', 'val11', '='));
+        $this->assertEquals(new FilterValue('prm1', 'val11', '='), $accessor->get('prm1'));
+    }
+
+    public function testAddNewFilterValue()
+    {
+        $accessor = new RestFilterValueAccessor(Request::create('http://test.com'));
+
+        $this->assertNull($accessor->get('prm1'));
+
+        $accessor->set('prm1', new FilterValue('prm1', 'val11', '='));
+        $this->assertEquals(new FilterValue('prm1', 'val11', '='), $accessor->get('prm1'));
+    }
+
+    public function testRemoveExistingFilterValue()
+    {
+        $accessor = new RestFilterValueAccessor(Request::create('http://test.com?prm1=val1'));
+
+        $this->assertEquals(new FilterValue('prm1', 'val1', '='), $accessor->get('prm1'));
+
+        // test override existing filter value
+        $accessor->set('prm1');
+        $this->assertNull($accessor->get('prm1'));
+
+        $this->assertCount(0, $accessor->getAll());
     }
 }

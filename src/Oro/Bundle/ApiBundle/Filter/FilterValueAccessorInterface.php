@@ -33,4 +33,12 @@ interface FilterValueAccessorInterface
      * @return FilterValue[] [filter key => FilterValue, ...]
      */
     public function getAll($group = null);
+
+    /**
+     * Sets a filter value.
+     *
+     * @param string           $key   The key of a filter value
+     * @param FilterValue|null $value The filter value
+     */
+    public function set($key, FilterValue $value = null);
 }

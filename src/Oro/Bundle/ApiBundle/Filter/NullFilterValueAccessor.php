@@ -30,4 +30,11 @@ class NullFilterValueAccessor implements FilterValueAccessorInterface
     {
         return [];
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function set($key, FilterValue $value = null)
+    {
+    }
 }

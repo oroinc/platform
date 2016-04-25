@@ -75,9 +75,9 @@ class ComparisonFilter extends StandaloneFilter
     /**
      * Creates the Expression object that can be used to filter data using the Criteria object.
      *
-     * @param string $field
-     * @param string $operator
-     * @param mixed  $value
+     * @param string      $field
+     * @param string|null $operator
+     * @param mixed       $value
      *
      * @return Expression
      *
@@ -94,6 +94,9 @@ class ComparisonFilter extends StandaloneFilter
             );
         }
 
+        if (null === $operator) {
+            $operator = self::EQ;
+        }
         if (in_array($operator, $this->operators, true)) {
             $expr = $this->doBuildExpression($field, $operator, $value);
             if (null !== $expr) {
