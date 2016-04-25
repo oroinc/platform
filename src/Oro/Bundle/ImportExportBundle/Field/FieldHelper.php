@@ -273,17 +273,34 @@ class FieldHelper
         try {
             $this->getPropertyAccessor()->setValue($object, $fieldName, $value);
         } catch (NoSuchPropertyException $e) {
-            $class = ClassUtils::getClass($object);
-            while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
-            }
+            $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
+        } catch (\TypeError $e) {
+            $this->setObjectValueWithReflection($object, $fieldName, $value, $e);
+        }
+    }
 
-            if ($class) {
-                $reflection = new \ReflectionProperty($class, $fieldName);
-                $reflection->setAccessible(true);
-                $reflection->setValue($object, $value);
-            } else {
-                throw $e;
-            }
+    /**
+     * If Property accessor have type_error
+     * try added value by ReflectionProperty
+     *
+     * @param object $object
+     * @param string $fieldName
+     * @param mixed  $value
+     * @param NoSuchPropertyException|\\TypeError $exception
+     * @throws NoSuchPropertyException|\TypeError
+     */
+    protected function setObjectValueWithReflection($object, $fieldName, $value, $exception)
+    {
+        $class = ClassUtils::getClass($object);
+        while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+        }
+
+        if ($class) {
+            $reflection = new \ReflectionProperty($class, $fieldName);
+            $reflection->setAccessible(true);
+            $reflection->setValue($object, $value);
+        } else {
+            throw $exception;
         }
     }
 
