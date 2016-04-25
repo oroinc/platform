@@ -20,6 +20,16 @@ class DateFilterUtility
     /** @var Compiler */
     protected $expressionCompiler;
 
+    /** @var array */
+    protected $partToDateFunction = [
+        DateModifierInterface::PART_MONTH => 'MONTH',
+        DateModifierInterface::PART_DOW => 'DAYOFWEEK',
+        DateModifierInterface::PART_WEEK => 'WEEK',
+        DateModifierInterface::PART_DAY => 'DAY',
+        DateModifierInterface::PART_DOY => 'DAYOFYEAR',
+        DateModifierInterface::PART_YEAR => 'YEAR',
+    ];
+
     /**
      * @param LocaleSettings $localeSettings
      * @param Compiler $compiler
@@ -35,10 +45,11 @@ class DateFilterUtility
      *
      * @param string $field
      * @param mixed  $data
+     * @param string $type
      *
      * @return array|bool
      */
-    public function parseData($field, $data)
+    public function parseData($field, $data, $type = 'datetime')
     {
         if (!$this->isValidData($data)) {
             return false;
@@ -65,7 +76,7 @@ class DateFilterUtility
             'part'                => isset($data['part']) ? $data['part'] : DateModifierInterface::PART_VALUE,
             'field'               => $field
         ];
-        $data = $this->applyDatePart($data);
+        $data = $this->applyDatePart($data, $type);
 
         return $data;
     }
@@ -94,44 +105,25 @@ class DateFilterUtility
      * Applies datepart expressions
      *
      * @param array $data
+     * @param string $type
      *
      * @return array
      */
-    protected function applyDatePart(array $data)
+    protected function applyDatePart($data, $type)
     {
-        $field = $this->modifyFieldToDayWithMonth($data['field'], $data);
+        $field = $this->modifyFieldToDayWithMonth($data['field'], $data, $type);
 
-        switch ($data['part']) {
-            case DateModifierInterface::PART_MONTH:
-                $field = $this->getEnforcedTimezoneFunction('MONTH', $field);
-                break;
-            case DateModifierInterface::PART_DOW:
-                $field = $this->getEnforcedTimezoneFunction('DAYOFWEEK', $field);
-                break;
-            case DateModifierInterface::PART_WEEK:
-                $field = $this->getEnforcedTimezoneFunction('WEEK', $field);
-                break;
-            case DateModifierInterface::PART_DAY:
-                $field = $this->getEnforcedTimezoneFunction('DAY', $field);
-                break;
-            case DateModifierInterface::PART_QUARTER:
-                $field = $this->getEnforcedTimezoneQuarter($field);
-                break;
-            case DateModifierInterface::PART_DOY:
-                $field = $this->getEnforcedTimezoneFunction('DAYOFYEAR', $field);
-                break;
-            case DateModifierInterface::PART_YEAR:
-                $field = $this->getEnforcedTimezoneFunction('YEAR', $field);
-                break;
-            case DateModifierInterface::PART_VALUE:
-                if (strpos($field, 'MONTH') === false && $this->containsMonthVariable($data)) {
-                    $field = $this->getEnforcedTimezoneFunction('MONTH', $field);
-                    $data['date_start'] = $this->formatDate($data['date_start'], 'm');
-                    $data['date_end'] = $this->formatDate($data['date_end'], 'm');
-                }
-                break;
-            default:
-                break;
+        if (isset($this->partToDateFunction[$data['part']])) {
+            $field = $this->getEnforcedTimezoneFunction($this->partToDateFunction[$data['part']], $field, $type);
+        } elseif ($data['part'] === DateModifierInterface::PART_QUARTER) {
+            $field = $this->getEnforcedTimezoneQuarter($field, $type);
+        } elseif ($data['part'] === DateModifierInterface::PART_VALUE &&
+            strpos($field, 'MONTH') === false &&
+            $this->containsMonthVariable($data)
+        ) {
+            $field = $this->getEnforcedTimezoneFunction('MONTH', $field, $type);
+            $data['date_start'] = $this->formatDate($data['date_start'], 'm');
+            $data['date_end'] = $this->formatDate($data['date_end'], 'm');
         }
 
         return array_merge($data, ['field' => $field]);
@@ -158,9 +150,11 @@ class DateFilterUtility
      *
      * @param string $sqlField
      * @param array $data
+     * @param string $type
+     *
      * @return string
      */
-    protected function modifyFieldToDayWithMonth($sqlField, array &$data)
+    protected function modifyFieldToDayWithMonth($sqlField, array &$data, $type)
     {
         $isModifyAllowed = false;
         $fields = ['date_start', 'date_end'];
@@ -173,7 +167,7 @@ class DateFilterUtility
         }
 
         if ($isModifyAllowed) {
-            $sqlField = $this->applyTimezoneConvert($sqlField);
+            $sqlField = $this->normalizeFieldTimezone($sqlField, $type);
             $sqlField = sprintf('MONTH(%1$s) * 100 + DAY(%1$s)', $sqlField);
         }
 
@@ -241,14 +235,15 @@ class DateFilterUtility
 
     /**
      * @param string $fieldName
+     * @param string $type
      *
      * @return string
      */
-    private function getEnforcedTimezoneQuarter($fieldName)
+    private function getEnforcedTimezoneQuarter($fieldName, $type)
     {
         return sprintf(
             'QUARTER(DATE_SUB(DATE_SUB(%s, %d, \'month\'), %d, \'day\'))',
-            $this->applyTimezoneConvert($fieldName),
+            $this->normalizeFieldTimezone($fieldName, $type),
             $this->localeSettings->getFirstQuarterMonth() - 1,
             $this->localeSettings->getFirstQuarterDay() - 1
         );
@@ -259,27 +254,28 @@ class DateFilterUtility
      *
      * @param string $functionName
      * @param string $fieldName
+     * @param string $type
      *
      * @return string
      */
-    private function getEnforcedTimezoneFunction($functionName, $fieldName)
+    private function getEnforcedTimezoneFunction($functionName, $fieldName, $type)
     {
-        return sprintf('%s(%s)', $functionName, $this->applyTimezoneConvert($fieldName));
+        return sprintf('%s(%s)', $functionName, $this->normalizeFieldTimezone($fieldName, $type));
     }
 
     /**
-     * Correcting time zone in case if it not equals UTC
-     *
      * @param string $fieldName
+     * @param string $fieldType
+     *
      * @return string
      */
-    protected function applyTimezoneConvert($fieldName)
+    private function normalizeFieldTimezone($fieldName, $fieldType)
     {
-        if ('UTC' !== $this->localeSettings->getTimeZone()) {
-            return sprintf("CONVERT_TZ(%s, '+00:00', '%s')", $fieldName, $this->getTimeZoneOffset());
+        if ('UTC' === $this->localeSettings->getTimeZone() || $fieldType === 'date') {
+            return $fieldName;
         }
 
-        return $fieldName;
+        return sprintf("CONVERT_TZ(%s, '+00:00', '%s')", $fieldName, $this->getTimeZoneOffset());
     }
 
     /**
