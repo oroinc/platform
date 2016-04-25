@@ -64,7 +64,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         $this->currentPage = $this->pageObjectFactory->createPage($pageName);
         $this->currentPage->open();
-        $this->iWaitForAjaxToFinish();
+        $this->iWaitingForAjaxResponce();
     }
 
     /**
@@ -74,7 +74,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         try {
             parent::pressButton($button);
-            $this->iWaitForAjaxToFinish();
+            $this->iWaitingForAjaxResponce();
         } catch (ElementNotFoundException $e) {
             if ($this->getSession()->getPage()->hasLink($button)) {
                 $this->clickLink($button);
@@ -87,11 +87,11 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     /**
      * Wait for AJAX to finish.
      *
-     * @Given /^(?:|I )wait for AJAX to finish$/
+     * @Given /^(?:|I )waiting for AJAX responce$/
+     * @param int $time Time should be in milliseconds
      */
-    public function iWaitForAjaxToFinish()
+    public function iWaitingForAjaxResponce($time = 15000)
     {
-        $time = 15000; // time should be in milliseconds
         $this->getSession()->wait(
             $time,
             '"complete" == document["readyState"] '.
@@ -100,14 +100,6 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
             '&& $ !== null '.
             '&& false === $( "div.loader-mask" ).hasClass("shown"))'
         );
-    }
-
-    /**
-     * @Then /^(?:|I )wait (?P<number>[^"]*) seconds?$/
-     */
-    public function iWaitSeconds($number)
-    {
-        sleep($number);
     }
 
     /**
@@ -125,9 +117,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         $page = $this->pageObjectFactory->createPage($pageName);
         $pattern = $this->getPagePattern($page);
-        $actualPath = parse_url($this->getSession()->getCurrentUrl(), PHP_URL_PATH);
-
-        expect($actualPath)->toMatch($pattern);
+        $this->assertSession()->addressMatches($pattern);
     }
 
     /*********************************************/
@@ -140,7 +130,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     public function visit($page)
     {
         parent::visit($page);
-        $this->iWaitForAjaxToFinish();
+        $this->iWaitingForAjaxResponce();
     }
 
     /**
@@ -149,21 +139,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     public function clickLink($link)
     {
         parent::clickLink($link);
-        $this->iWaitForAjaxToFinish();
-    }
-
-    /**
-     * @param Page $page
-     * @return string
-     */
-    private function getPagePath(Page $page)
-    {
-        $pageReflection = new \ReflectionClass($page);
-        $pathReflection = $pageReflection->getProperty('path');
-        $pathReflection->setAccessible(true);
-        $path = $pathReflection->getValue($page);
-
-        return $path;
+        $this->iWaitingForAjaxResponce();
     }
 
     /**
