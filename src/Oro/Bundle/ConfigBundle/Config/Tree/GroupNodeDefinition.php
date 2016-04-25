@@ -88,15 +88,6 @@ class GroupNodeDefinition extends AbstractNodeDefinition implements \Countable, 
         usort(
             $this->children,
             function (AbstractNodeDefinition $a, AbstractNodeDefinition $b) {
-                /**
-                 * In php 7 was changed sorting algorithm to make
-                 * order of elements the same as on php 5.*,
-                 * we should return '-1' instead of '1' as result
-                 * on compare elements with equals priority
-                 */
-                if (version_compare(PHP_VERSION, '7.0.0', '>=')) {
-                    return $a->getPriority() < $b->getPriority() ? 1 : -1;
-                }
                 return $a->getPriority() > $b->getPriority() ? -1 : 1;
             }
         );
