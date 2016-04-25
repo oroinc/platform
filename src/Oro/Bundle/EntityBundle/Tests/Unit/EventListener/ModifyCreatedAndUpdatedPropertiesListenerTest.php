@@ -72,10 +72,10 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->method('setUpdatedAt');
 
         $currentToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $currentToken->expects($this->any())
+        $currentToken->expects($this->exactly(4))
             ->method('getUser')
             ->willReturn($user);
-        $this->tokenStorage->expects($this->any())
+        $this->tokenStorage->expects($this->exactly(4))
             ->method('getToken')
             ->willReturn($currentToken);
 
@@ -134,10 +134,10 @@ class ModifyCreatedAndUpdatedPropertiesListenerTest extends \PHPUnit_Framework_T
             ->method('setUpdatedAt');
 
         $currentToken = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
-        $currentToken->expects($this->any())
+        $currentToken->expects($this->exactly(4))
             ->method('getUser')
             ->willReturn($user);
-        $this->tokenStorage->expects($this->any())
+        $this->tokenStorage->expects($this->exactly(4))
             ->method('getToken')
             ->willReturn($currentToken);
 
