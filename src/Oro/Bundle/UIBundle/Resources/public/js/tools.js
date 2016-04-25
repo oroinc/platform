@@ -281,6 +281,24 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          */
         ensureArray: function(value) {
             return _.isArray(value) ? value : [value];
+        },
+
+        /**
+         * Adds css rules to the first style sheet
+         *
+         * @param {string} selector
+         * @param {string} styles
+         */
+        addCSSRule: function(selector, styles) {
+            document.styleSheets[0].insertRule(selector + '{' + styles + '}', 0);
+        },
+
+        /**
+         * @param {Object} event
+         */
+        isTargetBlankEvent: function(event) {
+            var mouseMiddleButton = 2;
+            return this.modifierKeyPressed(event) || event.which === mouseMiddleButton;
         }
     });
 

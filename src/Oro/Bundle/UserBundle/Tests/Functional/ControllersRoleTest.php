@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\UserBundle\Tests\Functional;
 
-use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Symfony\Component\DomCrawler\Form;
 use Symfony\Component\DomCrawler\Crawler;
 
+use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
@@ -42,6 +42,9 @@ class ControllersRoleTest extends WebTestCase
         $this->assertContains("Role saved", $crawler->html());
     }
 
+    /**
+     * @depends testCreate
+     */
     public function testUpdate()
     {
         $response = $this->client->requestGrid(
@@ -132,12 +135,9 @@ class ControllersRoleTest extends WebTestCase
 
         $fields = $crawler->filter('div[id^="oro_user_role_form_field_"] strong');
 
-        $className     = str_replace('_', '\\', substr($entityLink, strrpos($entityLink, '/') + 1));
-        $classMetadata = $this->client->getContainer()->get('doctrine')->getManager()->getClassMetadata($className);
-
         $this->assertEquals(
+            16,
             count($fields),
-            count($classMetadata->getFieldNames()),
             'Failed asserting that all fields are available on UI'
         );
 
@@ -206,6 +206,9 @@ class ControllersRoleTest extends WebTestCase
         $this->assertEquals(AccessLevel::NONE_LEVEL, $fieldInput->getAttribute('value'));
     }
 
+    /**
+     * @depends testUpdate
+     */
     public function testGridData()
     {
         $response = $this->client->requestGrid(

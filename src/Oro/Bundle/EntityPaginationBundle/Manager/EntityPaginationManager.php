@@ -58,15 +58,11 @@ class EntityPaginationManager
     {
         switch ($scope) {
             case self::VIEW_SCOPE:
-                $permission = 'VIEW';
-                break;
+                return 'VIEW';
             case self::EDIT_SCOPE:
-                $permission = 'EDIT';
-                break;
-            default:
-                throw new \LogicException(sprintf('Scope "%s" is not available.', $scope));
+                return 'EDIT';
         }
 
-        return $permission;
+        throw new \LogicException(sprintf('Scope "%s" is not available.', $scope));
     }
 }

@@ -35,6 +35,7 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
             ->addType(new Type\FormFieldType())
             ->addType(new Type\FieldsetType())
             ->addType(new Type\HeadType())
+            ->addType(new Type\TitleType())
             ->addType(new Type\MetaType())
             ->addType(new Type\ScriptType())
             ->addType(new Type\StyleType())
@@ -45,6 +46,7 @@ abstract class BlockTypeTestCase extends BaseBlockTypeTestCase
             ->addType(new Type\ButtonGroupType())
             ->addType(new Type\ListType())
             ->addType(new Type\OrderedListType())
-            ->addType(new Type\ListItemType());
+            ->addType(new Type\ListItemType())
+            ->addType(new Type\InputType());
     }
 }

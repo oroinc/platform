@@ -8,6 +8,9 @@ define(['jquery', 'jquery-ui'], function($) {
             _destroyDatepicker: $.datepicker.constructor.prototype._destroyDatepicker
         };
 
+        var dropdownClassName = 'ui-datepicker-dialog-is-below';
+        var dropupClassName = 'ui-datepicker-dialog-is-above';
+
         /**
          * Combines space-separated line of events with widget's namespace
          *  for handling datepicker's position change
@@ -33,12 +36,14 @@ define(['jquery', 'jquery-ui'], function($) {
             var pos;
             var isFixed;
             var offset;
-            var dialogIsBelow;
             // jshint -W040
             var input = this;
             var $input = $(this);
 
             var inst = $.datepicker._getInst(input);
+            if (!inst) {
+                return;
+            }
 
             if (!$.datepicker._pos) { // position below input
                 pos = $.datepicker._findPos(input);
@@ -55,18 +60,19 @@ define(['jquery', 'jquery-ui'], function($) {
             offset = $.datepicker._checkOffset(inst, offset, isFixed);
             inst.dpDiv.css({left: offset.left + 'px', top: offset.top + 'px'});
 
-            dialogIsBelow = inst.dpDiv.is(':visible') && offset.top - $input.offset().top > 0;
+            var isBelow = offset.top - $input.offset().top > 0;
+            var isActualClass = $input.hasClass(dropdownClassName) === isBelow &&
+                $input.hasClass(dropupClassName) !== isBelow;
 
-            if ($input.hasClass(dateDialogClassName) !== dialogIsBelow) {
-                $input.trigger('datepicker:dialogReposition', dialogIsBelow ? 'below' : 'above');
-                $input.toggleClass(dateDialogClassName, dialogIsBelow);
+            if (!isActualClass && inst.dpDiv.is(':visible')) {
+                $input.toggleClass(dropdownClassName, isBelow);
+                $input.toggleClass(dropupClassName, !isBelow);
+                $input.trigger('datepicker:dialogReposition', isBelow ? 'below' : 'above');
             }
-
         }
 
         var _showDatepicker = $.datepicker.constructor.prototype._showDatepicker;
         var _hideDatepicker = $.datepicker.constructor.prototype._hideDatepicker;
-        var dateDialogClassName = 'ui-datepicker-dialog-is-below';
 
         /**
          * Bind update position method after datepicker is opened
@@ -79,20 +85,25 @@ define(['jquery', 'jquery-ui'], function($) {
             _showDatepicker.apply(this, arguments);
 
             var input = elem.target || elem;
-            var events = getEvents(input.id);
+            var $input = $(input);
+            var events = getEvents($input.id);
 
-            $(input).removeClass(dateDialogClassName).parents().add(window).each(function() {
-                $(this).on(events, $.proxy(updatePos, input));
-                // @TODO develop other approach than hide on scroll
-                // because on mobile devices it's impossible to open calendar without scrolling
-                /*$(this).on(events, function () {
-                    // just close datepicker
-                    $.datepicker._hideDatepicker();
-                    input.blur();
-                });*/
-            });
+            $input
+                .removeClass(dropdownClassName + ' ' + dropupClassName)
+                .parents().add(window).each(function() {
+                    $(this).on(events, $.proxy(updatePos, input));
+                    // @TODO develop other approach than hide on scroll
+                    // because on mobile devices it's impossible to open calendar without scrolling
+                    /*$(this).on(events, function () {
+                        // just close datepicker
+                        $.datepicker._hideDatepicker();
+                        input.blur();
+                    });*/
+                });
 
             updatePos.call(input);
+
+            $input.trigger('datepicker:dialogShow');
         };
 
         /**
@@ -113,11 +124,16 @@ define(['jquery', 'jquery-ui'], function($) {
             }
             var events = getEvents(input.id);
 
-            $(input).parents().add(window).each(function() {
-                $(this).off(events);
-            });
+            var $input = $(input);
+            $input
+                .removeClass(dropdownClassName + ' ' + dropupClassName)
+                .parents().add(window).each(function() {
+                    $(this).off(events);
+                });
 
             _hideDatepicker.apply(this, arguments);
+
+            $input.trigger('datepicker:dialogHide');
         };
 
         $.datepicker.constructor.prototype._destroyDatepicker = function() {
@@ -131,4 +147,21 @@ define(['jquery', 'jquery-ui'], function($) {
         };
     }());
     /* datepicker extend:end */
+
+    /* dialog extend:start*/
+    (function() {
+        var oldMoveToTop = $.ui.dialog.prototype._moveToTop;
+        $.widget('ui.dialog', $.ui.dialog, {
+            /**
+             * Replace method because some browsers return string 'auto' if property z-index not specified.
+             * */
+            _moveToTop: function() {
+                if (typeof this.uiDialog.css('z-index') === 'string') {
+                    this.uiDialog.css('z-index', 910);
+                }
+                oldMoveToTop.apply(this);
+            }
+        });
+    }());
+    /* dialog extend:end*/
 });

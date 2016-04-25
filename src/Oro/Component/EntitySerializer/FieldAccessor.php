@@ -6,6 +6,11 @@ use Doctrine\Common\Util\ClassUtils;
 
 class FieldAccessor
 {
+    const KEY_FIELDS_ALL                         = 'fields';
+    const KEY_FIELDS_TO_SELECT                   = 'select';
+    const KEY_FIELDS_TO_SELECT_WITH_ASSOCIATIONS = 'select_assoc';
+    const KEY_FIELDS_TO_SERIALIZE                = 'serialize';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -25,128 +30,133 @@ class FieldAccessor
         DataAccessorInterface $dataAccessor,
         EntityFieldFilterInterface $entityFieldFilter = null
     ) {
-        $this->doctrineHelper    = $doctrineHelper;
-        $this->dataAccessor      = $dataAccessor;
+        $this->doctrineHelper = $doctrineHelper;
+        $this->dataAccessor = $dataAccessor;
         $this->entityFieldFilter = $entityFieldFilter;
     }
 
     /**
-     * @param array $config
-     *
-     * @return string
-     */
-    public function getConfigFields($config)
-    {
-        if (empty($config[ConfigUtil::FIELDS])) {
-            return [];
-        } else {
-            return array_keys($config[ConfigUtil::FIELDS]);
-        }
-    }
-
-    /**
-     * @param string $entityClass
-     * @param array  $config
+     * @param string       $entityClass
+     * @param EntityConfig $config
      *
      * @return string[]
      */
-    public function getFields($entityClass, $config)
+    public function getFields($entityClass, EntityConfig $config)
     {
+        // try to use cached result
+        $result = $config->get(self::KEY_FIELDS_ALL);
+        if (null !== $result) {
+            return $result;
+        }
+
         $result = [];
-        if (ConfigUtil::isExcludeAll($config)) {
-            if (!empty($config[ConfigUtil::FIELDS])) {
-                foreach ($config[ConfigUtil::FIELDS] as $field => $fieldConfig) {
-                    if (null === $fieldConfig || !ConfigUtil::isExclude($fieldConfig)) {
-                        $result[] = $field;
-                    }
+        if ($config->isExcludeAll()) {
+            $fieldConfigs = $config->getFields();
+            foreach ($fieldConfigs as $field => $fieldConfig) {
+                if (!$fieldConfig->isExcluded()) {
+                    $result[] = $field;
                 }
             }
         } else {
             $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
-            $fields         = array_merge($entityMetadata->getFieldNames(), $entityMetadata->getAssociationNames());
+            $fields = array_merge($entityMetadata->getFieldNames(), $entityMetadata->getAssociationNames());
             foreach ($fields as $field) {
-                if (ConfigUtil::hasFieldConfig($config, $field)) {
-                    $fieldConfig = $config[ConfigUtil::FIELDS][$field];
-                    if (null === $fieldConfig || !ConfigUtil::isExclude($fieldConfig)) {
+                if ($config->hasField($field)) {
+                    $fieldConfig = $config->getField($field);
+                    if (!$fieldConfig->isExcluded()) {
                         $result[] = $field;
                     }
                 } elseif ($this->isApplicableField($entityClass, $field)) {
-                    $result[] = $field;
-                }
-            }
-            if (!empty($config[ConfigUtil::FIELDS])) {
-                foreach ($config[ConfigUtil::FIELDS] as $field => $fieldConfig) {
-                    if ($this->isMetadataProperty($field)) {
+                    // @todo: ignore not configured relations to avoid infinite loop
+                    // it is a temporary fix until the identifier field will not be used by default for them
+                    if (!$entityMetadata->isAssociation($field)) {
                         $result[] = $field;
                     }
                 }
             }
+            $fieldConfigs = $config->getFields();
+            foreach ($fieldConfigs as $field => $fieldConfig) {
+                if (ConfigUtil::isMetadataProperty($fieldConfig->getPropertyPath() ?: $field)) {
+                    $result[] = $field;
+                }
+            }
         }
+        // add result to cache
+        $config->set(self::KEY_FIELDS_ALL, $result);
 
         return $result;
     }
 
     /**
-     * @param string $entityClass
-     * @param array  $config
-     * @param bool   $withAssociations
+     * @param string       $entityClass
+     * @param EntityConfig $config
+     * @param bool         $withAssociations
      *
      * @return string[]
      */
-    public function getFieldsToSelect($entityClass, $config, $withAssociations = false)
+    public function getFieldsToSelect($entityClass, EntityConfig $config, $withAssociations = false)
     {
-        $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
-        $fields         = array_filter(
-            $this->getFields($entityClass, $config),
-            function ($field) use ($entityMetadata, $withAssociations) {
-                // skip virtual properties
-                if (!$entityMetadata->isField($field) && !$entityMetadata->isAssociation($field)) {
-                    return false;
-                }
-
-                return $withAssociations
-                    ? !$entityMetadata->isCollectionValuedAssociation($field)
-                    : !$entityMetadata->isAssociation($field);
-            }
-        );
-        // make sure identifier fields are added
-        foreach ($entityMetadata->getIdentifierFieldNames() as $field) {
-            if (!in_array($field, $fields, true)) {
-                $fields[] = $field;
-            }
+        // try to use cached result
+        $cacheKey = $withAssociations
+            ? self::KEY_FIELDS_TO_SELECT_WITH_ASSOCIATIONS
+            : self::KEY_FIELDS_TO_SELECT;
+        $result = $config->get($cacheKey);
+        if (null !== $result) {
+            return $result;
         }
 
-        return $fields;
+        $result = [];
+        $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
+        $fields = $this->getFields($entityClass, $config);
+        foreach ($fields as $field) {
+            if ($entityMetadata->isField($field)) {
+                $result[] = $field;
+            } elseif ($withAssociations
+                && $entityMetadata->isAssociation($field)
+                && !$entityMetadata->isCollectionValuedAssociation($field)
+            ) {
+                $result[] = $field;
+            }
+        }
+        // make sure identifier fields are added
+        $idFields = $entityMetadata->getIdentifierFieldNames();
+        foreach ($idFields as $field) {
+            if (!in_array($field, $result, true)) {
+                $result[] = $field;
+            }
+        }
+        // add result to cache
+        $config->set($cacheKey, $result);
+
+        return $result;
     }
 
     /**
-     * @param string $entityClass
-     * @param array  $config
+     * @param string       $entityClass
+     * @param EntityConfig $config
      *
      * @return string[]
      */
-    public function getFieldsToSerialize($entityClass, $config)
+    public function getFieldsToSerialize($entityClass, EntityConfig $config)
     {
+        // try to use cached result
+        $result = $config->get(self::KEY_FIELDS_TO_SERIALIZE);
+        if (null !== $result) {
+            return $result;
+        }
+
+        $result = [];
         $entityMetadata = $this->doctrineHelper->getEntityMetadata($entityClass);
-
-        return array_filter(
-            $this->getFields($entityClass, $config),
-            function ($field) use ($entityMetadata) {
-                return !$entityMetadata->isCollectionValuedAssociation($field);
+        $fields = $this->getFields($entityClass, $config);
+        foreach ($fields as $field) {
+            if (!$entityMetadata->isCollectionValuedAssociation($field)) {
+                $result[] = $field;
             }
-        );
-    }
+        }
+        // add result to cache
+        $config->set(self::KEY_FIELDS_TO_SERIALIZE, $result);
 
-    /**
-     * Checks whether a property path represents some metadata property
-     *
-     * @param string $propertyPath
-     *
-     * @return bool
-     */
-    public function isMetadataProperty($propertyPath)
-    {
-        return ConfigUtil::isMetadataProperty($propertyPath);
+        return $result;
     }
 
     /**

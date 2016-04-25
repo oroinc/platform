@@ -13,27 +13,6 @@ define(function(require) {
     var filterWrapper = require('./datafilter-wrapper');
 
     /**
-     * Defines parent element for dropdown-menu by toggle element
-     * (this method is taken from Bootstrap-Dropdown)
-     *
-     * @param {jQuery} $toggle
-     * @returns {*|jQuery|HTMLElement}
-     */
-    function getDropdownMenuParent($toggle) {
-        var $parent;
-        var selector = $toggle.attr('data-target');
-        if (!selector) {
-            selector = $toggle.attr('href');
-            selector = selector && /#/.test(selector) && selector.replace(/.*(?=#[^\s]*$)/, ''); //strip for ie7
-        }
-        $parent = selector && $(selector);
-        if (!$parent || !$parent.length) {
-            $parent = $toggle.parent();
-        }
-        return $parent;
-    }
-
-    /**
      * View that represents all grid filters
      *
      * @export  orofilter/js/filters-manager
@@ -91,6 +70,13 @@ define(function(require) {
          */
         buttonSelector: '.ui-multiselect.filter-list',
 
+        /**
+         * jQuery object that will be target for append multiselect dropdown menus
+         *
+         * @property
+         */
+        dropdownContainer: 'body',
+
         /** @property */
         events: {
             'change [data-action=add-filter-select]': '_onChangeFilterSelect',
@@ -111,6 +97,8 @@ define(function(require) {
             this.template = _.template($(this.templateSelector).html());
 
             this.filters = {};
+
+            _.extend(this, _.pick(options, ['addButtonHint']));
 
             if (options.filters) {
                 _.extend(this.filters, options.filters);
@@ -133,10 +121,6 @@ define(function(require) {
 
                 this.listenTo(filter, filterListeners);
             }, this);
-
-            if (options.addButtonHint) {
-                this.addButtonHint = options.addButtonHint;
-            }
 
             FiltersManager.__super__.initialize.apply(this, arguments);
         },
@@ -167,6 +151,7 @@ define(function(require) {
          * @protected
          */
         _onFilterUpdated: function(filter) {
+            this._resetHintContainer();
             this.trigger('updateFilter', filter);
         },
 
@@ -302,29 +287,49 @@ define(function(require) {
          * @return {*}
          */
         render: function() {
-            var $container = $(this.template({filters: this.filters}));
-            this.setElement($container);
-
-            var fragment = document.createDocumentFragment();
+            this.$el.html(
+                this.template({filters: this.filters})
+            );
+            this.dropdownContainer = this.$el.find('.filter-container');
+            var $filterItems = this.dropdownContainer.find('.filter-items');
 
             _.each(this.filters, function(filter) {
+                if (_.isFunction(filter.setDropdownContainer)) {
+                    filter.setDropdownContainer(this.dropdownContainer);
+                }
                 filter.render();
                 if (!filter.enabled) {
                     filter.hide();
                 }
-                fragment.appendChild(filter.$el.get(0));
+                $filterItems.append(filter.$el);
+                filter.rendered();
             }, this);
 
             this.trigger('rendered');
 
             if (_.isEmpty(this.filters)) {
-                $container.hide();
+                this.$el.hide();
             } else {
-                $container.find('.filter-container').append(fragment);
                 this._initializeSelectWidget();
             }
 
             return this;
+        },
+
+        _resetHintContainer: function() {
+            var $container = this.dropdownContainer.find('.filter-items-hint');
+            var show = false;
+            $container.children('span').each(function() {
+                if (this.style.display !== 'none') {
+                    show = true;
+                    return false;
+                }
+            });
+            if (show) {
+                $container.show();
+            } else {
+                $container.hide();
+            }
         },
 
         /**
@@ -333,23 +338,29 @@ define(function(require) {
          * @protected
          */
         _initializeSelectWidget: function() {
+            var $button;
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.filterSelector),
                 parameters: {
                     multiple: true,
                     selectedList: 0,
                     selectedText: this.addButtonHint,
-                    classes: 'filter-list select-filter-widget',
+                    classes: 'select-filter-widget',
+                    position: {
+                        my: 'left top+2',
+                        at: 'left bottom'
+                    },
                     open: $.proxy(function() {
                         this.selectWidget.onOpenDropdown();
                         this._setDropdownWidth();
-                        this._updateDropdownPosition();
-                    }, this)
+                    }, this),
+                    appendTo: this.dropdownContainer
                 }
             });
 
             this.selectWidget.setViewDesign(this);
-            this.$('.filter-list span:first').replaceWith(
+            $button = this.selectWidget.multiselect('instance').button;
+            $button.find('span:first').replaceWith(
                 '<a class="add-filter-button" href="javascript:void(0);">' + this.addButtonHint +
                     '<span class="caret"></span></a>'
             );
@@ -382,29 +393,6 @@ define(function(require) {
                     this.disableFilter(filter);
                 }
             }, this);
-
-            this._updateDropdownPosition();
-        },
-
-        /**
-         * Set dropdown position according to current element
-         *
-         * @protected
-         */
-        _updateDropdownPosition: function() {
-            var button = this.$(this.buttonSelector);
-            var buttonPosition = button.offset();
-            var widgetWidth = this.selectWidget.getWidget().outerWidth();
-            var windowWidth = $(window).width();
-            var widgetLeftOffset = buttonPosition.left;
-            if (buttonPosition.left + widgetWidth > windowWidth) {
-                widgetLeftOffset = buttonPosition.left + button.outerWidth() - widgetWidth;
-            }
-
-            this.selectWidget.getWidget().css({
-                top: buttonPosition.top + button.outerHeight(),
-                left: widgetLeftOffset
-            });
         },
 
         /**
@@ -424,10 +412,7 @@ define(function(require) {
             e.preventDefault();
             e.stopPropagation();
             if (!$dropdown.hasClass('oro-open')) {
-                // closes other dropdown-menus
-                $(DROPDOWN_TOGGLE_SELECTOR).each(function() {
-                    getDropdownMenuParent($(this)).removeClass('open');
-                });
+                $(DROPDOWN_TOGGLE_SELECTOR).trigger('tohide.bs.dropdown');
             }
             $dropdown.toggleClass('oro-open');
         },

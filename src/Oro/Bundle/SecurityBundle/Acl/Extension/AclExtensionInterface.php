@@ -157,21 +157,27 @@ interface AclExtensionInterface
      * Also you can use $setOnly argument to specify whether you need a list of
      * all permissions which can be encoded in the given mask or only a list of
      * permissions are set in the given mask.
+     * And if is needed to get permissions specified only for current application
+     * group name you can use $$byCurrentGroup. By default will be returned all
+     * supported permissions for ACL extension for all application groups.
      *
      * @param int|null $mask The bitmask
      * @param bool $setOnly Determines whether all permissions can be encoded in the given mask should be returned
      *                      or only permissions are set in the given mask.
+     * @param bool $byCurrentGroup If true will be returned supported permission only for current application group.
      * @return string[]
      */
-    public function getPermissions($mask = null, $setOnly = false);
+    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false);
 
     /**
      * Gets all permissions allowed for a domain object represented by te given object identity.
      *
      * @param ObjectIdentity $oid
+     * @param string|null    $fieldName
+     *
      * @return string[]
      */
-    public function getAllowedPermissions(ObjectIdentity $oid);
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null);
 
     /**
      * Gets default permission.
@@ -207,10 +213,12 @@ interface AclExtensionInterface
     /**
      * Gets list of available access levels for given object
      *
-     * @param $object
-     * @return array
-     *  key = access level code,
-     *  value = access level name
+     * @param object      $object
+     * @param string|null $permissionName
+     *
+     * @return array key = access level code,
+     *   key = access level code,
+     *   value = access level name
      */
-    public function getAccessLevelNames($object);
+    public function getAccessLevelNames($object, $permissionName = null);
 }

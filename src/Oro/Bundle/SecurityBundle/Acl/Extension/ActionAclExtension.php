@@ -33,7 +33,7 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAccessLevelNames($object)
+    public function getAccessLevelNames($object, $permissionName = null)
     {
         return array(
             AccessLevel::NONE_LEVEL => AccessLevel::NONE_LEVEL_NAME,
@@ -46,8 +46,8 @@ class ActionAclExtension extends AbstractAclExtension
      */
     public function supports($type, $id)
     {
-        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE && $id === $this->getExtensionKey()) {
-            return true;
+        if ($type === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
+            return $id === $this->getExtensionKey();
         }
 
         $delim = strpos($type, '@');
@@ -136,10 +136,10 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getPermissions($mask = null, $setOnly = false)
+    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
     {
         $result = array();
-        if ($mask === null || $setOnly || $mask !== 0) {
+        if ($mask === null || !$setOnly || $mask !== 0) {
             $result[] = 'EXECUTE';
         }
 
@@ -149,7 +149,7 @@ class ActionAclExtension extends AbstractAclExtension
     /**
      * {@inheritdoc}
      */
-    public function getAllowedPermissions(ObjectIdentity $oid)
+    public function getAllowedPermissions(ObjectIdentity $oid, $fieldName = null)
     {
         return array('EXECUTE');
     }

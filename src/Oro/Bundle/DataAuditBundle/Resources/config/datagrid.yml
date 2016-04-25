@@ -1,9 +1,9 @@
 datagrid:
     audit-grid:
+        acl_resource: oro_dataaudit_history
         options:
             entityHint: audit
         source:
-            acl_resource: oro_dataaudit_history
             type: orm
             query:
                 select:
@@ -49,7 +49,7 @@ datagrid:
             objectClass:
                 label: oro.dataaudit.datagrid.entity_type
                 frontend_type: select
-                choices: @oro_dataaudit.dataaudit_grid_service->getObjectClassOptions
+                choices: "@oro_dataaudit.dataaudit_grid_service->getObjectClassOptions"
             objectName:
                 label: oro.dataaudit.datagrid.entity_name
             objectId:
@@ -106,7 +106,7 @@ datagrid:
                     data_name: a.objectClass
                     options:
                           field_options:
-                              choices: @oro_dataaudit.dataaudit_grid_service->getObjectClassOptions
+                              choices: "@oro_dataaudit.dataaudit_grid_service->getObjectClassOptions"
                 objectName:
                     type: string
                     data_name: a.objectName
@@ -122,8 +122,8 @@ datagrid:
                     enabled: false
 
     audit-history-grid:
+        acl_resource: oro_dataaudit_history
         source:
-            acl_resource: oro_dataaudit_history
             type: orm
             query:
                 select:

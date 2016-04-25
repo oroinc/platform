@@ -12,15 +12,16 @@ use Oro\Bundle\ApiBundle\DependencyInjection\Configuration;
 
 class ConfigurationCompilerPass implements CompilerPassInterface
 {
-    const ACTION_PROCESSOR_TAG              = 'oro.api.action_processor';
-    const ACTION_PROCESSOR_BAG_SERVICE_ID   = 'oro_api.action_processor_bag';
     const PROCESSOR_BAG_SERVICE_ID          = 'oro_api.processor_bag';
+    const ACTION_PROCESSOR_BAG_SERVICE_ID   = 'oro_api.action_processor_bag';
+    const ACTION_PROCESSOR_TAG              = 'oro.api.action_processor';
+    const FILTER_FACTORY_SERVICE_ID         = 'oro_api.filter_factory';
     const FILTER_FACTORY_TAG                = 'oro.api.filter_factory';
-    const FILTER_FACTORY_SERVICE_ID         = 'oro.api.filter_factory';
-    const EXCLUSION_PROVIDER_TAG            = 'oro_entity.exclusion_provider.api';
+    const DEFAULT_FILTER_FACTORY_SERVICE_ID = 'oro_api.filter_factory.default';
     const EXCLUSION_PROVIDER_SERVICE_ID     = 'oro_api.entity_exclusion_provider';
-    const VIRTUAL_FIELD_PROVIDER_TAG        = 'oro_entity.virtual_field_provider.api';
+    const EXCLUSION_PROVIDER_TAG            = 'oro_entity.exclusion_provider.api';
     const VIRTUAL_FIELD_PROVIDER_SERVICE_ID = 'oro_api.virtual_field_provider';
+    const VIRTUAL_FIELD_PROVIDER_TAG        = 'oro_entity.virtual_field_provider.api';
 
     /**
      * {@inheritdoc}
@@ -28,8 +29,13 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $config = $this->getConfig($container);
+
         $this->registerProcessingGroups($container, $config);
+
+        $this->registerFilters($container, $config);
+
         $this->registerActionProcessors($container);
+
         $this->registerTaggedServices(
             $container,
             self::FILTER_FACTORY_SERVICE_ID,
@@ -73,6 +79,25 @@ class ConfigurationCompilerPass implements CompilerPassInterface
 
     /**
      * @param ContainerBuilder $container
+     * @param array            $config
+     */
+    protected function registerFilters(ContainerBuilder $container, array $config)
+    {
+        $filterFactoryServiceDef = $this->findDefinition($container, self::DEFAULT_FILTER_FACTORY_SERVICE_ID);
+        if (null !== $filterFactoryServiceDef) {
+            foreach ($config['filters'] as $dataType => $parameters) {
+                $filterClassName = $parameters['class'];
+                unset($parameters['class']);
+                $filterFactoryServiceDef->addMethodCall(
+                    'addFilter',
+                    [$dataType, $filterClassName, $parameters]
+                );
+            }
+        }
+    }
+
+    /**
+     * @param ContainerBuilder $container
      */
     protected function registerActionProcessors(ContainerBuilder $container)
     {
@@ -98,24 +123,24 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     {
         $chainServiceDef = $this->findDefinition($container, $chainServiceId);
         if (null !== $chainServiceDef) {
-            // find providers
-            $providers      = [];
+            // find services
+            $services = [];
             $taggedServices = $container->findTaggedServiceIds($tagName);
             foreach ($taggedServices as $id => $attributes) {
-                $priority               = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
-                $providers[$priority][] = new Reference($id);
+                $priority = isset($attributes[0]['priority']) ? $attributes[0]['priority'] : 0;
+                $services[$priority][] = new Reference($id);
             }
-            if (empty($providers)) {
+            if (empty($services)) {
                 return;
             }
 
             // sort by priority and flatten
-            krsort($providers);
-            $providers = call_user_func_array('array_merge', $providers);
+            krsort($services);
+            $services = call_user_func_array('array_merge', $services);
 
             // register
-            foreach ($providers as $provider) {
-                $chainServiceDef->addMethodCall($addMethodName, [$provider]);
+            foreach ($services as $service) {
+                $chainServiceDef->addMethodCall($addMethodName, [$service]);
             }
         }
     }
@@ -143,8 +168,9 @@ class ConfigurationCompilerPass implements CompilerPassInterface
      */
     protected function findDefinition(ContainerBuilder $container, $serviceId)
     {
-        return $container->hasDefinition($serviceId)
-            ? $container->getDefinition($serviceId)
+        return $container->hasDefinition($serviceId) || $container->hasAlias($serviceId)
+            ? $container->findDefinition($serviceId)
             : null;
+
     }
 }

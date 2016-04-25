@@ -20,7 +20,8 @@ define([
 
         /** @property */
         events: {
-            'click a': 'onChangePageSize'
+            'click [data-grid-pagesize-trigger]': 'onChangePageSize',
+            'change [data-grid-pagesize-selector]': 'onChangePageSize'
         },
 
         /** @property */
@@ -91,7 +92,7 @@ define([
          */
         onChangePageSize: function(e) {
             e.preventDefault();
-            var pageSize = parseInt($(e.target).data('size'), 10);
+            var pageSize = parseInt($(e.target).data('size') || $(e.target).val(), 10);
             if (pageSize !== this.collection.state.pageSize) {
                 this.changePageSize(pageSize);
             }

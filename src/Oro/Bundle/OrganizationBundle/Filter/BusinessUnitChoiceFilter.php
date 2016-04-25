@@ -18,7 +18,7 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
             return false;
         }
 
-        $type =  $data['type'];
+        $type = $data['type'];
         if (count($data['value']) > 1 || (isset($data['value'][0]) && $data['value'][0] != "")) {
             $parameterName = $ds->generateParameterName($this->getName());
 
@@ -26,30 +26,30 @@ class BusinessUnitChoiceFilter extends ChoiceTreeFilter
                 ->createQueryBuilder('u')
                 ->select('u.id')
                 ->leftJoin('u.businessUnits', 'bu')
-                ->where('bu.id in (:'.$parameterName.')')
+                ->where('bu.id in (:' . $parameterName . ')')
                 ->getQuery()
-              ->getDQL();
+                ->getDQL();
 
             $this->applyFilterToClause(
                 $ds,
-                $this->get(FilterUtility::DATA_NAME_KEY) . ' in ('.$qb2.')'
+                $this->get(FilterUtility::DATA_NAME_KEY) . ' in (' . $qb2 . ')'
             );
 
             if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY], true)) {
                 $ds->setParameter($parameterName, $data['value']);
             }
         }
+
         return true;
     }
 
     /**
-     * @param $data
-     *
-     * @return mixed
+     * {@inheritDoc}
      */
     public function parseData($data)
     {
         $data['value'] = explode(',', $data['value']);
+
         return $data;
     }
 }

@@ -35,21 +35,32 @@ return array(
                 'field'      => 'some_field',
                 'priority'   => 10,
                 'queued'     => true,
-                'time_shift' => 123456
+                'time_shift' => 123456,
+                'cron'       => null
             ),
             array(
                 'event'      => ProcessTrigger::EVENT_CREATE,
                 'queued'     => true,
                 'time_shift' => 86700,
                 'field'      => null,
-                'priority'   => Job::PRIORITY_DEFAULT
+                'priority'   => Job::PRIORITY_DEFAULT,
+                'cron'       => null
             ),
             array(
                 'event'      => ProcessTrigger::EVENT_DELETE,
                 'field'      => null,
                 'priority'   => Job::PRIORITY_DEFAULT,
-                'queued'     => null,
-                'time_shift' => null
+                'queued'     => false,
+                'time_shift' => null,
+                'cron'       => null
+            ),
+            array(
+                'event'      => null,
+                'field'      => null,
+                'priority'   => Job::PRIORITY_DEFAULT,
+                'queued'     => false,
+                'time_shift' => null,
+                'cron'       => '*/1 * * * *'
             )
         )
     )

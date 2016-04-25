@@ -5,11 +5,12 @@ namespace Oro\Bundle\ActivityBundle\Entity\Manager;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Translation\TranslatorInterface;
 use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
+use Oro\Bundle\ActivityBundle\Model\ActivityInterface;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityAliasResolver;
@@ -17,6 +18,7 @@ use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
+use Oro\Bundle\ActivityBundle\Event\PrepareContextTitleEvent;
 
 class ActivityContextApiEntityManager extends ApiEntityManager
 {
@@ -110,33 +112,9 @@ class ActivityContextApiEntityManager extends ApiEntityManager
 
             $item          = [];
             $config        = $entityProvider->getConfig($targetClass);
-            $metadata      = $this->configManager->getEntityMetadata($targetClass);
             $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
 
-            $link = null;
-            if ($metadata) {
-                $link = $this->router->generate($metadata->getRoute(), ['id' => $targetId]);
-            } elseif ($link === null && ExtendHelper::isCustomEntity($targetClass)) {
-                // Generate view link for the custom entity
-                $link = $this->router->generate(
-                    'oro_entity_view',
-                    [
-                        'id'         => $targetId,
-                        'entityName' => $safeClassName
-
-                    ]
-                );
-            }
-
-            if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
-                $text = [];
-                foreach ($fields as $field) {
-                    $text[] = $this->mapper->getFieldValue($target, $field);
-                }
-                $item['title'] = implode(' ', $text);
-            } else {
-                $item['title'] = $this->translator->trans('oro.entity.item', ['%id%' => $targetId]);
-            }
+            $item = $this->prepareItemTitle($item, $targetClass, $target, $targetId);
 
             $item['activityClassAlias'] = $this->entityAliasResolver->getPluralAlias($class);
             $item['entityId']           = $id;
@@ -145,11 +123,89 @@ class ActivityContextApiEntityManager extends ApiEntityManager
             $item['targetClassName'] = $safeClassName;
 
             $item['icon'] = $config->get('icon');
-            $item['link'] = $link;
+            $item['link'] = $this->getContextLink($targetClass, $targetId);
+
+            $item = $this->dispatchContextTitle($item, $targetClass);
 
             $result[] = $item;
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $targetClass The FQCN of the activity target entity
+     * @param int    $targetId    The identifier of the activity target entity
+     *
+     * @return string|null
+     */
+    protected function getContextLink($targetClass, $targetId)
+    {
+        $metadata = $this->configManager->getEntityMetadata($targetClass);
+        $link     = null;
+        if ($metadata) {
+            try {
+                $route = $metadata->getRoute('view', true);
+            } catch (\LogicException $exception) {
+                // Need for cases when entity does not have route.
+                return null;
+            }
+            $link = $this->router->generate($route, ['id' => $targetId]);
+        } elseif (ExtendHelper::isCustomEntity($targetClass)) {
+            $safeClassName = $this->entityClassNameHelper->getUrlSafeClassName($targetClass);
+            // Generate view link for the custom entity
+            $link = $this->router->generate(
+                'oro_entity_view',
+                [
+                    'id'         => $targetId,
+                    'entityName' => $safeClassName
+
+                ]
+            );
+        }
+
+        return $link;
+    }
+
+    /**
+     * @param $item
+     * @param $targetClass
+     * @return array
+     */
+    protected function dispatchContextTitle($item, $targetClass)
+    {
+        if ($this->eventDispatcher) {
+            $event = new PrepareContextTitleEvent($item, $targetClass);
+            $this->eventDispatcher->dispatch(PrepareContextTitleEvent::EVENT_NAME, $event);
+            $item = $event->getItem();
+        }
+
+        return $item;
+    }
+
+    /**
+     * @param $item
+     * @param $targetClass
+     * @param $target
+     * @param $targetId
+     *
+     * @return mixed
+     */
+    protected function prepareItemTitle($item, $targetClass, $target, $targetId)
+    {
+        if (!array_key_exists('title', $item) || !$item['title']) {
+            if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
+                $text = [];
+                foreach ($fields as $field) {
+                    $text[] = $this->mapper->getFieldValue($target, $field);
+                }
+                $item['title'] = implode(' ', $text);
+                return $item;
+            } else {
+                $item['title'] = $this->translator->trans('oro.entity.item', ['%id%' => $targetId]);
+                return $item;
+            }
+        }
+        return $item;
     }
 }

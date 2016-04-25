@@ -17,7 +17,7 @@ class OroTagBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_6';
+        return 'v1_7';
     }
 
     /**
@@ -69,6 +69,7 @@ class OroTagBundleInstaller implements Installation
         $table->addColumn('name', 'string', ['length' => 50]);
         $table->addColumn('created', 'datetime', ['comment' => '(DC2Type:datetime)']);
         $table->addColumn('updated', 'datetime', ['comment' => '(DC2Type:datetime)']);
+        $table->addIndex(['name', 'organization_id'], 'name_organization_idx', []);
         $table->addIndex(['organization_id'], 'idx_caf0db5732c8a3de', []);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['user_owner_id'], 'idx_caf0db579eb185f9', []);

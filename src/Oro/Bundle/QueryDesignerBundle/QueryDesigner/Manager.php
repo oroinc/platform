@@ -217,11 +217,16 @@ class Manager implements FunctionProviderInterface
                     $hintText    = empty($function['hint_label'])
                         ? null // if a label is empty it means that this function should inherit a label
                         : $this->translator->trans($function['hint_label']);
-                    $functions[] = [
+                    $func = [
                         'name'  => $function['name'],
                         'label' => $nameText,
                         'title' => $hintText,
                     ];
+                    if (isset($function['return_type'])) {
+                        $func['return_type'] = $function['return_type'];
+                    }
+
+                    $functions[] = $func;
                 }
                 $attr['functions'] = $functions;
                 $result[$name]     = $attr;

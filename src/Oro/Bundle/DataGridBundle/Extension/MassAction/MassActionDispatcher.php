@@ -9,7 +9,6 @@ use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\File\Exception\UnexpectedTypeException;
 use Symfony\Component\HttpFoundation\Request;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\IterableResult;
@@ -110,7 +109,7 @@ class MassActionDispatcher
         //prepare query builder
         $qb->setMaxResults(null);
 
-        if (!$datagrid->getConfig()->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false)) {
+        if (!$datagrid->getConfig()->isDatasourceSkipAclApply()) {
             $qb = $this->aclHelper->apply($qb);
         }
 

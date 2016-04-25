@@ -79,10 +79,11 @@ class EmailUserRepository extends EntityRepository
     /**
      * @param array       $ids
      * @param EmailFolder $folder
+     * @param \DateTime   $date
      *
      * @return array
      */
-    public function getInvertedIdsFromFolder(array $ids, EmailFolder $folder)
+    public function getInvertedIdsFromFolder(array $ids, EmailFolder $folder, $date = null)
     {
         $qb = $this->createQueryBuilder('email_user');
 
@@ -94,6 +95,11 @@ class EmailUserRepository extends EntityRepository
         if ($ids) {
             $qb->andWhere($qb->expr()->notIn('email_user.id', ':ids'))
                 ->setParameter('ids', $ids);
+        }
+
+        if ($date) {
+            $qb->andWhere($qb->expr()->gt('email_user.receivedAt', ':date'))
+                ->setParameter('date', $date);
         }
 
         $emailUserIds = $qb->getQuery()->getArrayResult();
@@ -118,6 +124,7 @@ class EmailUserRepository extends EntityRepository
 
         return $qb->update()->set('email_user.seen', ':seen')
             ->where($qb->expr()->in('email_user.id', ':ids'))
+            ->andWhere('email_user.unsyncedFlagCount = 0')
             ->setParameter('seen', $seen)
             ->setParameter('ids', $ids)
             ->getQuery()->execute();
@@ -172,6 +179,8 @@ class EmailUserRepository extends EntityRepository
 
         if (!$isAllSelected) {
             $this->applyIdFilter($queryBuilder, $ids);
+        } elseif ($ids) {
+            $this->applyExcludeIdFilter($queryBuilder, $ids);
         }
 
         return $queryBuilder;
@@ -312,6 +321,21 @@ class EmailUserRepository extends EntityRepository
     {
         if ($ids) {
             $queryBuilder->andWhere($queryBuilder->expr()->in('eu.id', $ids));
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param array        $ids
+     *
+     * @return $this
+     */
+    protected function applyExcludeIdFilter(QueryBuilder $queryBuilder, $ids)
+    {
+        if ($ids) {
+            $queryBuilder->andWhere($queryBuilder->expr()->notIn('eu.id', $ids));
         }
 
         return $this;

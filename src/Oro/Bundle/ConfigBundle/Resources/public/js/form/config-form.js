@@ -7,8 +7,9 @@ define([
     'oroui/js/mediator',
     'oroui/js/messenger',
     'oroconfig/js/form/default',
-    'oroui/js/modal'
-], function(_, Backbone, __, mediator, messenger, formDefault, Modal) {
+    'oroui/js/modal',
+    'jquery'
+], function(_, Backbone, __, mediator, messenger, formDefault, Modal, $) {
     'use strict';
 
     /**
@@ -51,7 +52,18 @@ define([
 
             confirm.on('ok', _.bind(function() {
                 this.$el.get(0).reset();
-                $checkboxes.trigger('change');
+                this.$el.find('.select2').each(function(key, elem) {
+                    $(elem).select2('val', null, true);
+                });
+                this.$el.find('.removeRow').each(function() {
+                    $(this).closest('*[data-content]')
+                        .trigger('content:remove')
+                        .remove();
+                });
+                $checkboxes
+                    .prop('checked', true)
+                    .attr('checked', true)
+                    .trigger('change');
             }, this));
 
             confirm.open();

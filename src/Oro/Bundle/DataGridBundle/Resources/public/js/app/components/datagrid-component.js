@@ -7,6 +7,7 @@ define(function(require) {
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
     var mediator = require('oroui/js/mediator');
+    var Backbone = require('backbone');
     var BaseComponent = require('oroui/js/app/components/base/component');
     var PageableCollection = require('orodatagrid/js/pageable-collection');
     var Grid = require('orodatagrid/js/datagrid/grid');
@@ -16,6 +17,9 @@ define(function(require) {
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
     var FullscreenPlugin = require('orodatagrid/js/app/plugins/grid/fullscreen-plugin');
     var ColumnManagerPlugin = require('orodatagrid/js/app/plugins/grid/column-manager-plugin');
+    var ToolbarMassActionPlugin = require('orodatagrid/js/app/plugins/grid/toolbar-mass-action-plugin');
+    var MetadataModel = require('orodatagrid/js/datagrid/metadata-model');
+    var DataGridThemeOptionsManager = require('orodatagrid/js/datagrid-theme-options-manager');
 
     helpers = {
         cellType: function(type) {
@@ -71,6 +75,7 @@ define(function(require) {
             $.when.apply($, promises).always(function() {
                 self.subComponents = _.compact(arguments);
                 self._resolveDeferredInit();
+                self.$componentEl.find('.view-loading').remove();
                 self.$el.show();
                 self.grid.trigger('shown');
             });
@@ -86,6 +91,8 @@ define(function(require) {
                 throw new Error('Option inputName has to be specified');
             }
 
+            options.metadata.options.toolbarOptions =
+                $.extend(true, options.metadata.options.toolbarOptions, options.toolbarOptions);
             options.$el = $(options.el);
             options.gridName = options.gridName || options.metadata.options.gridName;
             options.builders = options.builders || [];
@@ -100,7 +107,8 @@ define(function(require) {
          */
         initDataGrid: function(options) {
             this.$el = $('<div>');
-            $(options.el).append(this.$el);
+            this.$componentEl = options.$el;
+            this.$componentEl.append(this.$el);
             this.gridName = options.gridName;
             this.inputName = options.inputName;
             this.data = options.data;
@@ -112,12 +120,18 @@ define(function(require) {
                 rowActions: {},
                 massActions: {}
             });
+            this.themeOptions = options.themeOptions || {};
+            this.metadataModel = new MetadataModel(this.metadata);
             this.modules = {};
 
             this.collectModules();
 
             // load all dependencies and build grid
             tools.loadModules(this.modules, this.build, this);
+
+            this.listenTo(this.metadataModel, 'change:massActions', function(model, massActions) {
+                this.grid.massActions.reset(this.buildMassActionsOptions(massActions));
+            }, this);
         },
 
         /**
@@ -167,9 +181,6 @@ define(function(require) {
             if (!collection) {
                 // otherwise, create collection from metadata
                 collection = new PageableCollection(collectionModels, collectionOptions);
-            } else if (this.data) {
-                _.extend(collectionOptions, {parse: true});
-                collection.reset(collectionModels, collectionOptions);
             }
 
             // create grid
@@ -178,6 +189,7 @@ define(function(require) {
 
             this.$el.hide();
             options.el = this.$el[0];
+            options.themeOptionsConfigurator(Grid, options);
             grid = new Grid(_.extend({collection: collection}, options));
             this.grid = grid;
             grid.render();
@@ -231,7 +243,6 @@ define(function(require) {
         combineGridOptions: function() {
             var columns;
             var rowActions = {};
-            var massActions = {};
             var defaultOptions = {
                 sortable: false
             };
@@ -241,7 +252,7 @@ define(function(require) {
 
             // columns
             columns = _.map(metadata.columns, function(cell) {
-                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'align',
+                var cellOptionKeys = ['name', 'label', 'renderable', 'editable', 'sortable', 'sortingType', 'align',
                     'order', 'manageable', 'required'];
                 var cellOptions = _.extend({}, defaultOptions, _.pick.apply(null, [cell].concat(cellOptionKeys)));
                 var extendOptions = _.omit.apply(null, [cell].concat(cellOptionKeys.concat('type')));
@@ -259,14 +270,12 @@ define(function(require) {
             });
 
             // mass actions
-            _.each(metadata.massActions, function(options, action) {
-                massActions[action] = modules[helpers.actionType(options.frontend_type)].extend(options);
-            });
+            var massActions = this.buildMassActionsOptions(this.metadata.massActions);
 
-            if (tools.isMobile()) {
-                plugins.push(FloatingHeaderPlugin);
-            } else {
-                if (this.metadata.enableFullScreenLayout) {
+            if (!this.themeOptions.headerHide) {
+                if (tools.isMobile()) {
+                    plugins.push(FloatingHeaderPlugin);
+                } else if (this.metadata.enableFullScreenLayout) {
                     plugins.push(FullscreenPlugin);
                 }
             }
@@ -275,20 +284,44 @@ define(function(require) {
                 plugins.push(ColumnManagerPlugin);
             }
 
+            if (this.themeOptions.showMassActionOnToolbar) {
+                plugins.push(ToolbarMassActionPlugin);
+            }
+
             return {
                 name: this.gridName,
                 columns: columns,
                 rowActions: rowActions,
-                massActions: massActions,
+                massActions: new Backbone.Collection(massActions),
                 toolbarOptions: metadata.options.toolbarOptions || {},
                 multipleSorting: metadata.options.multipleSorting || false,
                 entityHint: metadata.options.entityHint,
                 exportOptions: metadata.options.export || {},
                 routerEnabled: _.isUndefined(metadata.options.routerEnabled) ? true : metadata.options.routerEnabled,
-                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || !_.isEmpty(massActions),
+                multiSelectRowEnabled: metadata.options.multiSelectRowEnabled || massActions.length,
                 metadata: this.metadata,
-                plugins: plugins
+                metadataModel: this.metadataModel,
+                plugins: plugins,
+                themeOptionsConfigurator: DataGridThemeOptionsManager.createConfigurator(this.themeOptions)
             };
+        },
+
+        /**
+         * @param {Object} actions
+         * @returns {Array}
+         */
+        buildMassActionsOptions: function(actions) {
+            var modules = this.modules;
+            var massActions = [];
+
+            _.each(actions, function(options, action) {
+                massActions.push({
+                    action: action,
+                    module: modules[helpers.actionType(options.frontend_type)].extend(options)
+                });
+            });
+
+            return massActions;
         },
 
         fixStates: function(options) {

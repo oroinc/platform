@@ -7,14 +7,15 @@ class DataNormalizer
     /**
      * Normalizes result data of the EntitySerializer
      *
-     * @param array $data
-     * @param array $config
+     * @param array        $data
+     * @param EntityConfig $config
      *
      * @return array
      */
-    public function normalizeData(array $data, array $config)
+    public function normalizeData(array $data, EntityConfig $config)
     {
-        if (!empty($config[ConfigUtil::FIELDS])) {
+        $fields = $config->getFields();
+        if (!empty($fields)) {
             $this->normalizeRows($data, $config);
         }
 
@@ -22,10 +23,10 @@ class DataNormalizer
     }
 
     /**
-     * @param array $rows
-     * @param array $config
+     * @param array        $rows
+     * @param EntityConfig $config
      */
-    protected function normalizeRows(array &$rows, array $config)
+    protected function normalizeRows(array &$rows, EntityConfig $config)
     {
         foreach ($rows as &$row) {
             if (is_array($row)) {
@@ -35,29 +36,31 @@ class DataNormalizer
     }
 
     /**
-     * @param array $row
-     * @param array $config
+     * @param array        $row
+     * @param EntityConfig $config
      */
-    protected function normalizeRow(array &$row, array $config)
+    protected function normalizeRow(array &$row, EntityConfig $config)
     {
-        foreach ($config[ConfigUtil::FIELDS] as $field => $fieldConfig) {
-            if (null !== $fieldConfig) {
-                if (isset($fieldConfig[ConfigUtil::PROPERTY_PATH])
-                    && !ConfigUtil::isExclude($fieldConfig)
+        $fields = $config->getFields();
+        foreach ($fields as $field => $fieldConfig) {
+            $targetConfig = $fieldConfig->getTargetEntity();
+            if (!$fieldConfig->isExcluded()) {
+                $propertyPath = $fieldConfig->getPropertyPath();
+                if ($propertyPath
                     && (!array_key_exists($field, $row) || null !== $row[$field])
                 ) {
-                    $propertyPath = $fieldConfig[ConfigUtil::PROPERTY_PATH];
-                    $renaming     = isset($fieldConfig[ConfigUtil::FIELDS])
-                        && is_array($fieldConfig[ConfigUtil::FIELDS])
-                        && array_key_exists($propertyPath, $fieldConfig[ConfigUtil::FIELDS]);
+                    $renaming     =
+                        null !== $targetConfig
+                        && !$fieldConfig->isCollapsed()
+                        && $targetConfig->hasField($propertyPath);
                     $this->applyPropertyPath($row, $field, $propertyPath, $renaming);
                 }
-                if (!empty($fieldConfig[ConfigUtil::FIELDS]) && !empty($row[$field]) && is_array($row[$field])) {
-                    if (array_key_exists(0, $row[$field])) {
-                        $this->normalizeRows($row[$field], $fieldConfig);
-                    } else {
-                        $this->normalizeRow($row[$field], $fieldConfig);
-                    }
+            }
+            if (null !== $targetConfig && !empty($row[$field]) && is_array($row[$field])) {
+                if (array_key_exists(0, $row[$field])) {
+                    $this->normalizeRows($row[$field], $targetConfig);
+                } else {
+                    $this->normalizeRow($row[$field], $targetConfig);
                 }
             }
         }
@@ -83,7 +86,7 @@ class DataNormalizer
             } else {
                 $row[$field] = $this->extractValueByPropertyPath($row[$field], $propertyPath);
             }
-        } elseif (!$renaming && array_key_exists($propertyPath, $row)) {
+        } elseif (!$renaming && array_key_exists($propertyPath, $row) && $field !== $propertyPath) {
             $row[$field] = $row[$propertyPath];
             unset($row[$propertyPath]);
         }

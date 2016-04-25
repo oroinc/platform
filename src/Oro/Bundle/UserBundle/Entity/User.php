@@ -16,6 +16,7 @@ use Oro\Bundle\EmailBundle\Model\EmailHolderInterface;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
 use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\Model\AccountTypeModel;
 use Oro\Bundle\LocaleBundle\Model\FullNameInterface;
 use Oro\Bundle\NotificationBundle\Entity\NotificationEmailInterface;
 use Oro\Bundle\OrganizationBundle\Entity\BusinessUnit;
@@ -29,7 +30,9 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  *
  * @ORM\Entity(repositoryClass="Oro\Bundle\UserBundle\Entity\Repository\UserRepository")
- * @ORM\Table(name="oro_user")
+ * @ORM\Table(name="oro_user", indexes = {
+ *      @ORM\Index("user_first_name_last_name_idx", columns = {"first_name", "last_name"})
+ * })
  * @ORM\HasLifecycleCallbacks()
  * @Oro\Loggable
  * @Config(
@@ -37,8 +40,7 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *      routeView="oro_user_view",
  *      defaultValues={
  *          "entity"={
- *              "icon"="icon-user",
- *              "context-grid"="users-for-context-grid"
+ *              "icon"="icon-user"
  *          },
  *          "grouping"={
  *              "groups"={"dictionary"}
@@ -64,6 +66,10 @@ use Oro\Bundle\UserBundle\Security\AdvancedApiUserInterface;
  *          "form"={
  *              "form_type"="oro_user_select",
  *              "grid_name"="users-select-grid"
+ *          },
+ *          "grid"={
+ *              "default"="users-grid",
+ *              "context"="users-for-context-grid"
  *          },
  *          "tag"={
  *              "enabled"=true
@@ -397,6 +403,11 @@ class User extends ExtendUser implements
      * )
      */
     protected $createdAt;
+
+    /**
+     * @var AccountTypeModel
+     */
+    protected $imapAccountType;
 
     /**
      * @var \DateTime $updatedAt
@@ -941,17 +952,17 @@ class User extends ExtendUser implements
      *
      * @return User
      */
-    public function setImapConfiguration(UserEmailOrigin $imapConfiguration = null)
+    public function setImapConfiguration($imapConfiguration = null)
     {
         $currentImapConfiguration = $this->getImapConfiguration();
         if ($currentImapConfiguration &&
-            (null === $imapConfiguration || $currentImapConfiguration !== $imapConfiguration)
+            (null === $imapConfiguration || $currentImapConfiguration->getId() !== $imapConfiguration->getId())
         ) {
             // deactivate current IMAP configuration and remove a reference to it
             $currentImapConfiguration->setActive(false);
             $this->removeEmailOrigin($currentImapConfiguration);
         }
-        if (null !== $imapConfiguration) {
+        if (null !== $imapConfiguration && null !== $imapConfiguration->getUser()) {
             $this->addEmailOrigin($imapConfiguration);
         }
 
@@ -968,7 +979,7 @@ class User extends ExtendUser implements
         $items = $this->emailOrigins->filter(
             function ($item) {
                 return
-                    $item instanceof UserEmailOrigin
+                    ($item instanceof UserEmailOrigin)
                     && $item->isActive()
                     && !$item->getMailbox()
                     && (!$this->currentOrganization || $item->getOrganization() === $this->currentOrganization);
@@ -978,6 +989,45 @@ class User extends ExtendUser implements
         return $items->isEmpty()
             ? null
             : $items->first();
+    }
+
+    /**
+     * @param AccountTypeModel|null $accountTypeModel
+     */
+    public function setImapAccountType(AccountTypeModel $accountTypeModel = null)
+    {
+        $this->imapAccountType = $accountTypeModel;
+        if ($accountTypeModel instanceof AccountTypeModel) {
+            $this->setImapConfiguration($accountTypeModel->getUserEmailOrigin());
+        }
+    }
+
+    /**
+     * @return AccountTypeModel
+     */
+    public function getImapAccountType()
+    {
+        if ($this->imapAccountType === null) {
+            /** @var UserEmailOrigin $userEmailOrigin */
+            $userEmailOrigin = $this->getImapConfiguration();
+            $accountTypeModel = null;
+            if ($userEmailOrigin) {
+                $accountTypeModel = new AccountTypeModel();
+                if ($userEmailOrigin->getAccessToken() && $userEmailOrigin->getAccessToken() !== '') {
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_GMAIL);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
+                } else {
+                    $accountTypeModel->setAccountType(AccountTypeModel::ACCOUNT_TYPE_OTHER);
+                    $accountTypeModel->setUserEmailOrigin($userEmailOrigin);
+                }
+            }
+
+            if ($accountTypeModel) {
+                return $accountTypeModel;
+            }
+        }
+
+        return $this->imapAccountType;
     }
 
     /**

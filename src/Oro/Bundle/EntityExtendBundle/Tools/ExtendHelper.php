@@ -41,6 +41,19 @@ class ExtendHelper
     }
 
     /**
+     * Returns a string that can be used as a field name for inverse side of to-many relation.
+     *
+     * @param string $entityClassName The FQCN of owning side entity
+     * @param string $fieldName       The name of owning side field
+     *
+     * @return string
+     */
+    public static function buildToManyRelationTargetFieldName($entityClassName, $fieldName)
+    {
+        return strtolower(self::getShortClassName($entityClassName)) . '_' . $fieldName;
+    }
+
+    /**
      * Returns a string that can be used as a field name to the relation to the given entity.
      *
      * To prevent name collisions this method adds a hash built based on the full class name
@@ -65,7 +78,7 @@ class ExtendHelper
 
         return sprintf(
             '%s_%s',
-            Inflector::tableize(ExtendHelper::getShortClassName($targetEntityClassName)),
+            Inflector::tableize(self::getShortClassName($targetEntityClassName)),
             $hash
         );
     }
@@ -81,6 +94,18 @@ class ExtendHelper
     public static function buildRelationKey($entityClassName, $fieldName, $relationType, $targetEntityClassName)
     {
         return implode('|', [$relationType, $entityClassName, $targetEntityClassName, $fieldName]);
+    }
+
+    /**
+     * @param string $relationKey
+     *
+     * @return string
+     */
+    public static function getRelationType($relationKey)
+    {
+        $parts = explode('|', $relationKey);
+
+        return reset($parts);
     }
 
     /**
@@ -239,7 +264,7 @@ class ExtendHelper
             throw new \InvalidArgumentException('$enumCode must not be empty.');
         }
 
-        return ExtendHelper::ENTITY_NAMESPACE . 'EV_' . str_replace(' ', '_', ucwords(strtr($enumCode, '_-', '  ')));
+        return self::ENTITY_NAMESPACE . 'EV_' . str_replace(' ', '_', ucwords(strtr($enumCode, '_-', '  ')));
     }
 
     /**
@@ -292,7 +317,7 @@ class ExtendHelper
      */
     public static function isCustomEntity($className)
     {
-        return strpos($className, ExtendHelper::ENTITY_NAMESPACE) === 0;
+        return strpos($className, self::ENTITY_NAMESPACE) === 0;
     }
 
     /**
@@ -304,7 +329,7 @@ class ExtendHelper
      */
     public static function isExtendEntityProxy($className)
     {
-        return strpos($className, ExtendHelper::ENTITY_NAMESPACE) === 0;
+        return strpos($className, self::ENTITY_NAMESPACE) === 0;
     }
 
     /**
@@ -350,7 +375,7 @@ class ExtendHelper
         }
         $proxyShortClassName .= $shortClassName;
 
-        return ExtendHelper::ENTITY_NAMESPACE . $proxyShortClassName;
+        return self::ENTITY_NAMESPACE . $proxyShortClassName;
     }
 
     /**

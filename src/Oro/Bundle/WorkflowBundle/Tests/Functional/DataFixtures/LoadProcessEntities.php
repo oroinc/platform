@@ -2,91 +2,109 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
-use Symfony\Component\DependencyInjection\ContainerAwareInterface;
-use Symfony\Component\DependencyInjection\ContainerInterface;
-use Symfony\Component\Yaml\Yaml;
-
 use Doctrine\Common\DataFixtures\AbstractFixture;
 use Doctrine\Common\Persistence\ObjectManager;
 
-class LoadProcessEntities extends AbstractFixture implements ContainerAwareInterface
+use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
+
+class LoadProcessEntities extends AbstractFixture
 {
     const FIRST_DEFINITION = 'first';
     const SECOND_DEFINITION = 'second';
     const DISABLED_DEFINITION = 'disabled';
     const UPDATE_TRIGGER_FIELD = 'name';
 
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    const TRIGGER_UPDATE = 'trigger_update';
+    const TRIGGER_CREATE = 'trigger_create';
+    const TRIGGER_DELETE = 'trigger_delete';
+    const TRIGGER_CRON = 'trigger_cron';
+    const TRIGGER_DISABLED = 'trigger_disabled';
 
-    /**
-     * {@inheritDoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
-    {
-        $this->container = $container;
-    }
+    /** @var array */
+    protected $definitions = [
+        self::FIRST_DEFINITION => [
+            'related_entity' => 'Test\Entity',
+            'execution_order' => 10,
+            'enabled' => true
+        ],
+        self::SECOND_DEFINITION => [
+            'related_entity' => 'Test\Entity',
+            'execution_order' => 20,
+            'enabled' => true
+        ],
+        self::DISABLED_DEFINITION => [
+            'related_entity' => 'Test\Entity',
+            'execution_order' => 30,
+            'enabled' => false
+        ]
+    ];
+
+    /** @var array */
+    protected $triggers = [
+        self::TRIGGER_UPDATE => [
+            'definition' => self::FIRST_DEFINITION,
+            'event' => ProcessTrigger::EVENT_UPDATE,
+            'field' => self::UPDATE_TRIGGER_FIELD,
+            'cron' => null
+        ],
+        self::TRIGGER_CREATE => [
+            'definition' => self::SECOND_DEFINITION,
+            'event' => ProcessTrigger::EVENT_CREATE,
+            'field' => null,
+            'cron' => null
+        ],
+        self::TRIGGER_DELETE => [
+            'definition' => self::SECOND_DEFINITION,
+            'event' => ProcessTrigger::EVENT_DELETE,
+            'field' => null,
+            'cron' => null
+        ],
+        self::TRIGGER_CRON => [
+            'definition' => self::SECOND_DEFINITION,
+            'event' => null,
+            'field' => null,
+            'cron' => '*/1 * * * *'
+        ],
+        self::TRIGGER_DISABLED => [
+            'definition' => self::DISABLED_DEFINITION,
+            'event' => ProcessTrigger::EVENT_CREATE,
+            'field' => null,
+            'cron' => null
+        ],
+    ];
 
     /**
      * {@inheritDoc}
      */
     public function load(ObjectManager $manager)
     {
-        $entityManager = $this->container->get('doctrine')->getManager();
+        foreach ($this->definitions as $name => $config) {
+            $definition = new ProcessDefinition();
+            $definition
+                ->setName($name)
+                ->setLabel($name)
+                ->setRelatedEntity($config['related_entity'])
+                ->setExecutionOrder($config['execution_order'])
+                ->setEnabled($config['enabled']);
 
-        // first definition
-        $firstDefinition = new ProcessDefinition();
-        $firstDefinition->setName(self::FIRST_DEFINITION)
-            ->setLabel(self::FIRST_DEFINITION)
-            ->setRelatedEntity('Test\Entity')
-            ->setExecutionOrder(10);
+            $this->definitions[$name] = $definition;
 
-        $updateTrigger = new ProcessTrigger();
-        $updateTrigger->setDefinition($firstDefinition)
-            ->setEvent(ProcessTrigger::EVENT_UPDATE)
-            ->setField(self::UPDATE_TRIGGER_FIELD);
+            $manager->persist($definition);
+        }
 
-        $entityManager->persist($firstDefinition);
-        $entityManager->persist($updateTrigger);
+        foreach ($this->triggers as $key => $config) {
+            $trigger = new ProcessTrigger();
+            $trigger
+                ->setDefinition($this->definitions[$config['definition']])
+                ->setEvent($config['event'])
+                ->setField($config['field'])
+                ->setCron($config['cron']);
 
-        // second definition
-        $secondDefinition  = new ProcessDefinition();
-        $secondDefinition->setName(self::SECOND_DEFINITION)
-            ->setLabel(self::SECOND_DEFINITION)
-            ->setRelatedEntity('Test\Entity')
-            ->setExecutionOrder(20);
+            $manager->persist($trigger);
+            $this->addReference($key, $trigger);
+        }
 
-        $createTrigger = new ProcessTrigger();
-        $createTrigger->setDefinition($secondDefinition)
-            ->setEvent(ProcessTrigger::EVENT_CREATE);
-
-        $deleteTrigger = new ProcessTrigger();
-        $deleteTrigger->setDefinition($secondDefinition)
-            ->setEvent(ProcessTrigger::EVENT_DELETE);
-
-        $entityManager->persist($secondDefinition);
-        $entityManager->persist($createTrigger);
-        $entityManager->persist($deleteTrigger);
-
-        // disabled definition
-        $disabledDefinition  = new ProcessDefinition();
-        $disabledDefinition->setName(self::DISABLED_DEFINITION)
-            ->setLabel(self::DISABLED_DEFINITION)
-            ->setRelatedEntity('Test\Entity')
-            ->setExecutionOrder(30)
-            ->setEnabled(false);
-
-        $createTrigger = new ProcessTrigger();
-        $createTrigger->setDefinition($disabledDefinition)
-            ->setEvent(ProcessTrigger::EVENT_CREATE);
-
-        $entityManager->persist($disabledDefinition);
-        $entityManager->persist($createTrigger);
-
-        $entityManager->flush();
+        $manager->flush();
     }
 }

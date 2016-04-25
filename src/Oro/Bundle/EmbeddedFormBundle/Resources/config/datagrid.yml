@@ -1,7 +1,7 @@
 datagrid:
     embedded-forms-grid:
+        acl_resource: oro_embedded_form_view
         source:
-            acl_resource: oro_embedded_form_view
             type: orm
             query:
                 select:
@@ -34,7 +34,7 @@ datagrid:
                     data_name: embedded_form.formType
                     options:
                         field_options:
-                            choices: @oro_embedded_form.manager->getAll
+                            choices: "@oro_embedded_form.manager->getAll"
 
         properties:
             id: ~

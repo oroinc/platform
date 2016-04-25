@@ -327,11 +327,15 @@ abstract class AbstractPageGrid extends AbstractPage
                 "td[contains(@class,'action-cell')]//a[contains(., '...')]"
             ));
             $this->test->moveto($element);
+            $this->test->byXpath("//ul[contains(@class,'dropdown-menu__action-cell')]" .
+                "[contains(@class,'dropdown-menu__floating')]//a[@title='{$actionName}']")->click();
+        } else {
+            $entity->element(
+                $this->test->using('xpath')
+                    ->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
+            )->click();
         }
 
-        $entity->element(
-            $this->test->using('xpath')->value("td[contains(@class,'action-cell')]//a[contains(., '{$actionName}')]")
-        )->click();
         if ($confirmation) {
             $this->test->byXPath("//div[div[contains(., 'Delete Confirmation')]]//a[contains(., 'Yes')]")->click();
         }
@@ -472,6 +476,42 @@ abstract class AbstractPageGrid extends AbstractPage
     }
 
     /**
+     * Method check if grid not empty and do mass delete
+     * @return $this
+     */
+    public function massDelete()
+    {
+        $gridHeader = "//thead[contains(@class, 'grid-header')][not(contains(@class, 'thead-sizing'))]";
+        if ($this->isElementPresent("{$gridHeader}//*[@title='Mass Actions']")) {
+            $massActions = $this->test->byXPath("{$gridHeader}//*[@title='Mass Actions']");
+            if ($massActions->displayed()) {
+                $this->test->byXPath(
+                    "{$gridHeader}//button[@class='btn btn-default btn-small dropdown-toggle' and not(@type)]"
+                )->click();
+                $this->waitForAjax();
+                $this->test->byXPath(
+                    "//ul[contains(@class,'dropdown-menu__select-all-header-cell')]" .
+                    "[contains(@class,'dropdown-menu__floating')]//a[text() ='All']"
+                )->click();
+                $this->waitForAjax();
+                $massActions->click();
+                $this->waitForAjax();
+                $this->test->byXPath(
+                    "//ul[contains(@class,'dropdown-menu__action-column')]" .
+                    "[contains(@class,'dropdown-menu__floating')]//a[@title ='Delete']"
+                )->click();
+                $this->waitForAjax();
+                $this->test
+                    ->byXpath("//div[div[contains(., 'Delete Confirmation')]]//a[text()='Yes, Delete']")
+                    ->click();
+                $this->waitForAjax();
+                $this->waitPageToLoad();
+            }
+        }
+        return $this;
+    }
+
+    /**
      * @param string $message Grid message to verify
      *
      * @return $this
@@ -496,8 +536,32 @@ abstract class AbstractPageGrid extends AbstractPage
             $actionMenu =  $this->test->byXPath("//td[contains(@class,'action-cell')]//a[contains(., '...')]");
             $this->test->moveto($actionMenu);
             $this->waitForAjax();
+            $this->assertElementNotPresent("//ul[contains(@class,'dropdown-menu__action-cell')]" .
+                "[contains(@class,'dropdown-menu__floating')]//a[@title= '{$actionName}']");
+        } else {
+            $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
         }
-        $this->assertElementNotPresent("//td[contains(@class,'action-cell')]//a[@title= '{$actionName}']");
+
+        return $this;
+    }
+
+    /**
+     * Method checks if "No data message" is present and displayed
+     *
+     * @param string $message Grid message to verify
+     *
+     * @return $this
+     * @throws  \PHPUnit_Framework_AssertionFailedError
+     */
+    public function assertNoDataMessageAndDisplayed($message)
+    {
+        $this->assertNoDataMessage($message);
+        $noDataMessage = $this->test->byXPath("//div[@class='no-data']/span[contains(., '{$message}')]");
+        if (!$noDataMessage->displayed()) {
+            PHPUnit_Framework_Assert::fail(
+                "//div[@class='no-data']/span[contains(., '{$message}')] is not displayed"
+            );
+        }
 
         return $this;
     }

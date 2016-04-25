@@ -19,11 +19,11 @@ define([
         template: _.template(
             '<% if (sortable) { %>' +
                 '<a href="#">' +
-                    '<%= label %> ' +
+                    '<%- label %> ' +
                     '<span class="caret"></span>' +
                 '</a>' +
             '<% } else { %>' +
-                '<span><%= label %></span>' + // wrap label into span otherwise underscore will not render it
+                '<span><%- label %></span>' + // wrap label into span otherwise underscore will not render it
             '<% } %>'
         ),
 

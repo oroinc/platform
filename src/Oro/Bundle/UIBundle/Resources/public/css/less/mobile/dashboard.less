@@ -46,8 +46,7 @@
   /*border: 1px solid #b6b6b6;*/
   .border-radius(3px);
   .title{
-    /*padding: @contentPadding @contentPadding @contentPadding 0;*/
-    padding: @contentPadding;
+    padding: @contentPadding @contentPadding @contentPadding 0;
   }
   .calendar-container {
     padding: 0;
@@ -62,15 +61,11 @@
     margin-right: 0;
   }
 }
-.contact-box{
-  width: 100%;
+.contact-box-wrapper{
+  padding: 0;
 }
-.oro-tabs{
-  .pagination-container{
-      .pagination{
-        margin-left: -58px;
-      }
-  }
+.contact-box{
+  width: calc(~"100% - 20px");
 }
 .chart-container {
   &>.clearfix {

@@ -11,12 +11,13 @@ define(function(require) {
      *
      * ```twig
      * {% import 'OroUIBundle::macros.html.twig' as UI %}
-     * <div class="tags-view-form-container" {{ UI.renderPageComponentAttributes({
+     * <div {{ UI.renderPageComponentAttributes({
      *    module: 'oroform/js/app/components/inline-editable-view-component',
      *    options: {
      *        frontend_type: 'tags',
      *        value: oro_tag_get_list(entity),
      *        fieldName: 'tags',
+     *        insertEditorMethod: 'overlay', // Possible values are 'overlay' or [any of supported by the containerMethod](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod)
      *        metadata: {
      *            inline_editing: {
      *                enable: resource_granted('oro_tag_assign_unassign'),
@@ -41,6 +42,9 @@ define(function(require) {
      *                        }
      *                    }
      *                }
+     *            },
+     *            view_options: {
+     *              tooltip: 'Tooltip text'
      *            }
      *        }
      *    }
@@ -49,12 +53,12 @@ define(function(require) {
      *
      * @class
      * @param {Object} options - Options container
-     * @param {Object} options._sourceElement - Element where to connect this view (passed automatically when
+     * @param {Object} options._sourceElement - the element to which the view should be connected (passed automatically when
      *                                          page component is [connected through DOM attributes](../../../../UIBundle/Resources/doc/reference/page-component.md))
      * @param {string} options.frontend_type - frontend type, please find [available keys here](../../public/js/tools/frontend-type-map.js)
      * @param {*} options.value - value to edit
      * @param {string} options.fieldName - field name to use when sending value to server
-     * @param {Object} options.metadata - Editor metadata
+     * @param {string} options.insertEditorMethod - 'overlay', // Possible values are 'overlay' or [any of supported by the containerMethod](https://github.com/chaplinjs/chaplin/blob/master/docs/chaplin.view.md#containerMethod)
      * @param {Object} options.metadata.inline_editing - inline-editing configuration
      *
      * @augments BaseComponent
@@ -73,52 +77,65 @@ define(function(require) {
     var tools = require('oroui/js/tools');
 
     InlineEditableViewComponent = BaseComponent.extend(/** @exports InlineEditableViewComponent.prototype */{
-        OVERLAY_TOOL_DEFAULTS: {
-            position: {
-                my: 'left top',
-                at: 'left-10 top-6',
-                collision: 'flipfit'
-            },
-            backdrop: true
-        },
-
-        METADATA_DEFAULTS: {
-            inline_editing: {
-                enable: false,
-                save_api_accessor: {
-                    'class': 'oroui/js/tools/api-accessor'
+        options: {
+            overlay: {
+                zIndex: 1,
+                position: {
+                    my: 'left top',
+                    at: 'left-7 top-7',
+                    collision: 'flipfit'
                 }
+            },
+            metadata: {
+                inline_editing: {
+                    enable: false,
+                    save_api_accessor: {
+                        'class': 'oroui/js/tools/api-accessor'
+                    }
+                }
+            },
+            insertEditorMethod: 'overlay',
+            widthIncrement: 15,
+            fieldName: 'value',
+            messages: {
+                success: __('oro.form.inlineEditing.successMessage'),
+                processingMessage: __('oro.form.inlineEditing.saving_progress'),
+                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
             }
         },
 
-        WIDTH_INCREMENT: 15,
+        ESCAPE_KEY_CODE: 27,
 
         /**
          * @constructor
          * @param {Object} options
          */
         initialize: function(options) {
-            options.metadata = $.extend(true, {}, this.METADATA_DEFAULTS, options.metadata);
+            options = $.extend(true, {}, this.options, options);
+
+            this.insertEditorMethod = options.insertEditorMethod;
+            this.overlayOptions = options.overlay;
+            this.widthIncrement = options.widthIncrement;
+            this.messages = options.messages;
             this.inlineEditingOptions = options.metadata.inline_editing;
             var waitors = [];
-            this.fieldName = options.fieldName || 'value';
+            this.fieldName = options.fieldName;
             // frontend type mapped to viewer/editor/reader
             var classes = frontendTypeMap[options.frontend_type];
             this.classes = classes;
             this.metadata = options.metadata;
             this.model = new BaseModel();
             this.model.set(this.fieldName, options.value);
+            var viewOptions = this.getViewOptions();
             if (this.inlineEditingOptions.enable) {
-                this.wrapper = new InlineEditorWrapperView({
+                var ViewerWrapper = classes.viewerWrapper || InlineEditorWrapperView;
+                this.wrapper = new ViewerWrapper({
                     el: options._sourceElement,
                     autoRender: true
                 });
-                this.view = new classes.viewer(_.extend({
-                    el: this.wrapper.getContainer(),
-                    autoRender: true,
-                    model: this.model,
-                    fieldName: this.fieldName
-                }));
+
+                viewOptions.el = this.wrapper.getContainer();
+                this.view = new classes.viewer(viewOptions);
                 if (this.classes.editor.processMetadata) {
                     waitors.push(this.classes.editor.processMetadata(this.metadata));
                 }
@@ -131,40 +148,91 @@ define(function(require) {
                     }, this)
                 ));
             } else {
-                this.view = new classes.viewer(_.extend({
-                    el: options._sourceElement,
-                    autoRender: true,
-                    model: this.model,
-                    fieldName: this.fieldName
-                }));
+                viewOptions.el = options._sourceElement;
+                this.view = new classes.viewer(viewOptions);
             }
             this.deferredInit = $.when.apply($, waitors);
         },
 
-        enterEditMode: function() {
-            var View = this.classes.editor;
-            var viewConfiguration = this.inlineEditingOptions.editor ?
-                this.inlineEditingOptions.editor.view_options :
-                {};
-            var viewInstance = new View(_.extend({}, viewConfiguration, {
-                className: 'inline-view-editor',
+        isInsertEditorModeOverlay: function() {
+            return this.insertEditorMethod === 'overlay';
+        },
+
+        getViewOptions: function() {
+            return $.extend(true, {}, _.result(this.metadata, 'view_options', {}), {
                 autoRender: true,
                 model: this.model,
-                fieldName: this.fieldName,
-                metadata: this.metadata
-            }));
+                fieldName: this.fieldName
+            });
+        },
 
-            this.editorView = viewInstance;
+        enterEditMode: function() {
+            if (!this.view.disposed && this.view.$el) {
+                this.view.$el.removeClass('save-fail');
+            }
 
-            viewInstance.$el.addClass('inline-editor-wrapper');
+            var viewInstance = this.createEditorViewInstance();
 
-            var overlayOptions = $.extend(true, {}, this.OVERLAY_TOOL_DEFAULTS, {
-                position: {
-                    of: this.wrapper.$el
+            if (this.isInsertEditorModeOverlay()) {
+                var overlayOptions = $.extend(true, {}, this.overlayOptions, {
+                    position: {
+                        of: this.wrapper.$el
+                    }
+                });
+
+                var overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+                this.listenTo(viewInstance, 'dispose', _.bind(overlay.remove, overlay));
+            } else {
+                this.view.$el.hide();
+            }
+
+            this.initializeEditorListeners(this.editorView);
+
+            return viewInstance;
+        },
+
+        createEditorViewInstance: function() {
+            var View = this.classes.editor;
+
+            this.editorView = new View(this.getEditorOptions());
+            this.resizeTo(this.editorView, this.wrapper);
+
+            return this.editorView;
+        },
+
+        getEditorOptions: function() {
+            var viewConfiguration = this.inlineEditingOptions.editor ?
+                this.inlineEditingOptions.editor.view_options :
+            {};
+
+            if (!this.isInsertEditorModeOverlay()) {
+                viewConfiguration.container = this.view.$el;
+                viewConfiguration.containerMethod = this.insertEditorMethod;
+                viewConfiguration.autoAttach = true;
+            }
+
+            return $.extend(true, {}, viewConfiguration, {
+                className: 'inline-view-editor inline-editor-wrapper',
+                autoRender: true,
+                model: this.model,
+                fieldName: this.fieldName
+            });
+        },
+
+        initializeEditorListeners: function(viewInstance) {
+            this.listenTo(viewInstance, {
+                keydown: this.onGenericEscapeKeydown,
+                focus: function() {
+                    mediator.trigger('inlineEditor:focus', viewInstance);
+                },
+                blur: function() {
+                    if (viewInstance.isChanged()) {
+                        this.saveCurrentCell();
+                    }
                 }
             });
-            this.resizeTo(viewInstance, this.wrapper);
-            this.overlay = overlayTool.createOverlay(viewInstance.$el, overlayOptions);
+
+            viewInstance.focus();
 
             this.listenTo(viewInstance, 'saveAction', this.saveCurrentCell);
             this.listenTo(viewInstance, 'saveAndExitAction', this.saveCurrentCellAndExit);
@@ -177,13 +245,23 @@ define(function(require) {
             this.listenTo(viewInstance, 'cancelAndEditNextRowAction', this.exitEditMode);
             this.listenTo(viewInstance, 'saveAndEditPrevRowAction', this.saveCurrentCellAndExit);
             this.listenTo(viewInstance, 'cancelAndEditPrevRowAction', this.exitEditMode);
+            this.listenTo(mediator, 'inlineEditor:focus', this.onInlineEditorFocus);
+        },
 
-            return viewInstance;
+        onInlineEditorFocus: function(view) {
+            if (!this.editorView || view === this.editorView) {
+                return;
+            }
+            if (!this.editorView.isChanged()) {
+                this.exitEditMode();
+            }
         },
 
         exitEditMode: function() {
-            this.overlay.remove();
             this.editorView.dispose();
+            if (!this.isInsertEditorModeOverlay()) {
+                this.view.$el.show();
+            }
             delete this.editorView;
         },
 
@@ -211,7 +289,8 @@ define(function(require) {
             var ctx = {
                 view: wrapper,
                 model: this.model,
-                oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData))
+                oldState: _.pick(this.model.toJSON(), _.keys(modelUpdateData)),
+                messages: this.messages
             };
             this.updateModel(this.model, this.editorView, modelUpdateData);
             if (this.saveApiAccessor.initialOptions.field_name) {
@@ -224,8 +303,8 @@ define(function(require) {
                 serverUpdateData = newData;
             }
             var savePromise = this.saveApiAccessor.send(this.model.toJSON(), serverUpdateData, {}, {
-                processingMessage: __('oro.form.inlineEditing.saving_progress'),
-                preventWindowUnload: __('oro.form.inlineEditing.inline_edits')
+                processingMessage: this.messages.processingMessage,
+                preventWindowUnload: this.messages.preventWindowUnload
             });
 
             if (this.classes.editor.processSavePromise) {
@@ -246,7 +325,7 @@ define(function(require) {
             // assume "undefined" as delete value request
             for (var key in updateData) {
                 if (updateData.hasOwnProperty(key)) {
-                    if (updateData[key] === editorView.UNSET_FIELD_VALUE) {
+                    if (updateData[key] === void 0) {
                         model.unset(key);
                         delete updateData[key];
                     }
@@ -260,8 +339,20 @@ define(function(require) {
          */
         resizeTo: function(view, baseView) {
             view.$el.css({
-                width: baseView.$el.outerWidth() + this.WIDTH_INCREMENT
+                width: baseView.$el.outerWidth() + this.widthIncrement
             });
+        },
+
+        /**
+         * Generic keydown handler, which handles ESCAPE
+         *
+         * @param {$.Event} e
+         */
+        onGenericEscapeKeydown: function(e) {
+            if (e.keyCode === this.ESCAPE_KEY_CODE) {
+                this.exitEditMode(true);
+                e.preventDefault();
+            }
         }
     }, {
         onSaveSuccess: function(response) {
@@ -275,13 +366,13 @@ define(function(require) {
                     }
                 }, this);
             }
-            mediator.execute('showFlashMessage', 'success', __('oro.form.inlineEditing.successMessage'));
+            mediator.execute('showFlashMessage', 'success', this.messages.success);
         },
 
         onSaveError: function(jqXHR) {
             var errorCode = 'responseJSON' in jqXHR ? jqXHR.responseJSON.code : jqXHR.status;
             if (!this.view.disposed && this.view.$el) {
-                this.view.$el.addClassTemporarily('save-fail', 2000);
+                this.view.$el.addClass('save-fail');
             }
             if (!this.model.disposed) {
                 this.model.set(this.oldState);

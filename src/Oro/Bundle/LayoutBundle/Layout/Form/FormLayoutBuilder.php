@@ -170,15 +170,15 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
             return;
         }
 
+        $id = $this->getFieldId($fieldPath);
+        $this->addField($fieldPath, $id);
+        $this->processedFields[$fieldPath] = $id;
+
         if ($this->isCompoundField($form)) {
             /** @var FormInterface $child */
             foreach ($form as $child) {
                 $this->processForm($child, $fieldPath);
             }
-        } else {
-            $id = $this->getFieldId($fieldPath);
-            $this->addField($fieldPath, $id);
-            $this->processedFields[$fieldPath] = $id;
         }
     }
 
@@ -195,7 +195,11 @@ class FormLayoutBuilder implements FormLayoutBuilderInterface
             $id,
             $parentId ?: $this->builder->getId(),
             FormFieldType::NAME,
-            ['form_name' => $this->options['form_name'], 'field_path' => $fieldPath]
+            [
+                'form' => $this->options['form'],
+                'form_name' => $this->options['form_name'],
+                'field_path' => $fieldPath,
+            ]
         );
     }
 

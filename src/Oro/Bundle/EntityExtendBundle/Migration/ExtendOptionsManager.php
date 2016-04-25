@@ -185,7 +185,7 @@ class ExtendOptionsManager
                     if (!isset($this->options[self::APPEND_SECTION][$objectKey][$scope])) {
                         $this->options[self::APPEND_SECTION][$objectKey][$scope] = [];
                     }
-                    if (!in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope])) {
+                    if (!in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope], true)) {
                         $this->options[self::APPEND_SECTION][$objectKey][$scope][] = $attrName;
                     }
                 }
@@ -203,6 +203,6 @@ class ExtendOptionsManager
     {
         return
             isset($this->options[self::APPEND_SECTION][$objectKey][$scope]) &&
-            in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope]);
+            in_array($attrName, $this->options[self::APPEND_SECTION][$objectKey][$scope], true);
     }
 }

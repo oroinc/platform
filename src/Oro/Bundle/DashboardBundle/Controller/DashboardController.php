@@ -26,6 +26,7 @@ use Oro\Bundle\DashboardBundle\Provider\WidgetConfigurationFormProvider;
 use Oro\Bundle\DataGridBundle\Datagrid\ParameterBag;
 use Oro\Bundle\DataGridBundle\Entity\GridView;
 use Oro\Bundle\DataGridBundle\Extension\GridViews\GridViewsExtension;
+use Oro\Bundle\DataGridBundle\Provider\ConfigurationProviderInterface;
 
 /**
  * @Route("/dashboard")
@@ -320,24 +321,40 @@ class DashboardController extends Controller
      * )
      * @Template("OroDashboardBundle:Dashboard:grid.html.twig")
      *
-     * @param string $gridName
+     * @param string  $widget
+     * @param string  $gridName
+     * @param Request $request
      *
      * @return array
      */
-    public function gridAction($widget, $gridName)
+    public function gridAction($widget, $gridName, Request $request)
     {
-        $params = $this->getRequest()->get('params', []);
-        $renderParams = $this->getRequest()->get('renderParams', []);
+        $params       = $request->get('params', []);
+        $renderParams = $request->get('renderParams', []);
 
         $viewId = $this->getWidgetConfigs()->getWidgetOptions()->get('gridView');
         if ($viewId && null !== $view = $this->findView($viewId)) {
-            $params = array_merge($params, [
-                ParameterBag::ADDITIONAL_PARAMETERS => [
-                    GridViewsExtension::VIEWS_PARAM_KEY => $viewId
-                ],
-                '_filter' => $view->getFiltersData(),
-                '_sort_by' => $view->getSortersData(),
-            ]);
+            $params = array_merge(
+                $params,
+                [
+                    ParameterBag::ADDITIONAL_PARAMETERS => [
+                        GridViewsExtension::VIEWS_PARAM_KEY => $viewId
+                    ],
+                    '_filter'                           => $view->getFiltersData(),
+                    '_sort_by'                          => $view->getSortersData(),
+                ]
+            );
+        }
+
+        $options = $this->getWidgetConfigs()->getWidgetOptions();
+        $gridConfig = $this->getDatagridConfigurationProvider()->getConfiguration($gridName);
+        if (isset($gridConfig['filters'], $gridConfig['filters']['columns'])) {
+            if (!isset($params['_filter'])) {
+                $params['_filter'] = [];
+            }
+
+            $filters = array_intersect_key($options->all(), $gridConfig['filters']['columns']);
+            $params['_filter'] = array_merge($params['_filter'], $filters);
         }
 
         return array_merge(
@@ -348,6 +365,14 @@ class DashboardController extends Controller
             ],
             $this->getWidgetConfigs()->getWidgetAttributesForTwig($widget)
         );
+    }
+
+    /**
+     * @return ConfigurationProviderInterface
+     */
+    protected function getDatagridConfigurationProvider()
+    {
+        return $this->get('oro_datagrid.configuration.provider.chain');
     }
 
     /**

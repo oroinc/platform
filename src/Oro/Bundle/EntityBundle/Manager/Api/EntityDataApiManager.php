@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\EntityBundle\Manager\Api;
 
-use FOS\RestBundle\Util\Codes;
-
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\Security\Core\Authorization\AuthorizationChecker;
 
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityBundle\Entity\Manager\Field\EntityFieldManager;
+use Oro\Bundle\EntityBundle\Exception\FieldUpdateAccessException;
 
 class EntityDataApiManager
 {
@@ -22,9 +21,9 @@ class EntityDataApiManager
     protected $entityRoutingHelper;
 
     /**
-     * @param EntityFieldManager $entityDataManager
+     * @param EntityFieldManager   $entityDataManager
      * @param AuthorizationChecker $securityService
-     * @param EntityRoutingHelper $entityRoutingHelper
+     * @param EntityRoutingHelper  $entityRoutingHelper
      */
     public function __construct(
         EntityFieldManager $entityDataManager,
@@ -37,41 +36,26 @@ class EntityDataApiManager
     }
 
     /**
-     * @param $className
-     * @param $id
-     * @param $data
+     * @param string $className
+     * @param int    $id
+     * @param array  $data
      *
      * @return array
-     * @throws \Exception
+     *
+     * @throws AccessDeniedException
      */
     public function patch($className, $id, $data)
     {
-        $entity = $this->getEntity($className, $id);
+        $entity = $this->entityRoutingHelper->getEntity($className, $id);
 
         if (!$this->securityService->isGranted('EDIT', $entity)) {
             throw new AccessDeniedException();
         }
 
-        $result = $this->entityDataManager->update($entity, $data);
-
-        return $result;
-    }
-
-    /**
-     * @param $className
-     * @param $id
-     *
-     * @return object
-     * @throws \Exception
-     */
-    protected function getEntity($className, $id)
-    {
         try {
-            $entity = $this->entityRoutingHelper->getEntity($className, $id);
-        } catch (\Exception $e) {
-            throw new \Exception($e->getMessage(), Codes::HTTP_NOT_FOUND);
+            return $this->entityDataManager->update($entity, $data);
+        } catch (FieldUpdateAccessException $e) {
+            throw new AccessDeniedException($e->getMessage(), $e);
         }
-
-        return $entity;
     }
 }

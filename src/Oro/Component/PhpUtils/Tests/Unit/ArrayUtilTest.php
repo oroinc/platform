@@ -456,6 +456,456 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @dataProvider someProvider
+     */
+    public function testSome(callable $callback, array $array, $expectedResult)
+    {
+        $this->assertSame($expectedResult, ArrayUtil::some($callback, $array));
+    }
+
+    public function someProvider()
+    {
+        return [
+            [
+                function ($item) {
+                    return $item === 1;
+                },
+                [0, 1, 2, 3, 4],
+                true,
+            ],
+            [
+                function ($item) {
+                    return $item === 0;
+                },
+                [0, 1, 2, 3, 4],
+                true,
+            ],
+            [
+                function ($item) {
+                    return $item === 4;
+                },
+                [0, 1, 2, 3, 4],
+                true,
+            ],
+            [
+                function ($item) {
+                    return $item === 5;
+                },
+                [0, 1, 2, 3, 4],
+                false,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider findProvider
+     */
+    public function testFind(callable $callback, array $array, $expectedResult)
+    {
+        $this->assertSame($expectedResult, ArrayUtil::find($callback, $array));
+    }
+
+    public function findProvider()
+    {
+        return [
+            [
+                function ($item) {
+                    return $item === 1;
+                },
+                [0, 1, 2, 3, 4],
+                1,
+            ],
+            [
+                function ($item) {
+                    return $item === 0;
+                },
+                [0, 1, 2, 3, 4],
+                0,
+            ],
+            [
+                function ($item) {
+                    return $item === 4;
+                },
+                [0, 1, 2, 3, 4],
+                4,
+            ],
+            [
+                function ($item) {
+                    return $item === 5;
+                },
+                [0, 1, 2, 3, 4],
+                null,
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider dropWhileProvider
+     */
+    public function testDropWhile(callable $callback, array $array, $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ArrayUtil::dropWhile($callback, $array));
+    }
+
+    public function dropWhileProvider()
+    {
+        return [
+            [
+                function ($item) {
+                    return $item !== 2;
+                },
+                [],
+                [],
+            ],
+            [
+                function ($item) {
+                    return $item !== 2;
+                },
+                [0, 1, 2, 3, 4, 5],
+                [2, 3, 4, 5],
+            ],
+            [
+                function ($item) {
+                    return $item !== 0;
+                },
+                [0, 1, 2, 3, 4, 5],
+                [0, 1, 2, 3, 4, 5],
+            ],
+            [
+                function ($item) {
+                    return $item !== 6;
+                },
+                [0, 1, 2, 3, 4, 5],
+                [],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider shiftRangeProvider
+     */
+    public function testShiftRange(array $sortedUniqueInts, $expectedResult, $expectedShiftedUniqueInts)
+    {
+        $this->assertEquals($expectedResult, ArrayUtil::shiftRange($sortedUniqueInts));
+        $this->assertEquals($expectedShiftedUniqueInts, $sortedUniqueInts);
+    }
+
+    public function shiftRangeProvider()
+    {
+        return [
+            'empty' => [
+                [],
+                false,
+                [],
+            ],
+            '1 item' => [
+                [5],
+                [5, 5],
+                [],
+            ],
+            '2 items' => [
+                [5, 6],
+                [5, 6],
+                [],
+            ],
+            'first' => [
+                [1, 3, 5],
+                [1, 1],
+                [3, 5],
+            ],
+            'first to last' => [
+                [1, 2, 3, 4, 5],
+                [1, 5],
+                [],
+            ],
+            'first to gap' => [
+                [1, 2, 3, 5, 6],
+                [1, 3],
+                [5, 6],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider intRangesProvider
+     */
+    public function testIntRanges($ints, array $expectedResult)
+    {
+        $this->assertEquals($expectedResult, ArrayUtil::intRanges($ints));
+    }
+
+    public function intRangesProvider()
+    {
+        return [
+            [
+                [],
+                [],
+            ],
+            [
+                [1],
+                [
+                    [1, 1],
+                ]
+            ],
+            [
+                [5, 5, 3, 1, 6, 4, 100],
+                [
+                    [1, 1],
+                    [3, 6],
+                    [100, 100],
+                ]
+            ]
+        ];
+    }
+
+    /**
+     * @param array $array
+     * @param mixed $columnKey
+     * @param mixed $indexKey
+     * @param array $expected
+     *
+     * @dataProvider arrayColumnProvider
+     */
+    public function testArrayColumn(array $array, $columnKey, $indexKey, array $expected)
+    {
+        $this->assertEquals(
+            $expected,
+            ArrayUtil::arrayColumn($array, $columnKey, $indexKey)
+        );
+    }
+
+    /**
+     * @return array
+     */
+    public function arrayColumnProvider()
+    {
+        return [
+            'empty'        => [[], 'value', 'value', []],
+            'no_index'     => [
+                [
+                    [
+                        'id'    => 'id1',
+                        'value' => 'value2'
+                    ]
+                ],
+                'value',
+                null,
+                ['value2']
+            ],
+            'index'        => [
+                [
+                    [
+                        'id'    => 'id1',
+                        'value' => 'value2'
+                    ]
+                ],
+                'value',
+                'id',
+                ['id1' => 'value2']
+            ],
+            'wrong_index'  => [
+                [
+                    ['value' => 'value2']
+                ],
+                'value',
+                'id',
+                []
+            ],
+            'wrong_column' => [
+                [
+                    ['value' => 'value2']
+                ],
+                'id',
+                null,
+                []
+            ],
+
+        ];
+    }
+
+    /**
+     * @param array  $array
+     * @param mixed  $columnKey
+     * @param mixed  $indexKey
+     * @param string $expectedMessage
+     *
+     * @dataProvider arrayColumnInputData
+     */
+    public function testArrayColumnInputData(array $array, $columnKey, $indexKey, $expectedMessage)
+    {
+        $this->setExpectedException(
+            '\InvalidArgumentException',
+            $expectedMessage
+        );
+
+        ArrayUtil::arrayColumn($array, $columnKey, $indexKey);
+    }
+
+    /**
+     * @return array
+     */
+    public function arrayColumnInputData()
+    {
+        return [
+            'empty_column_key' => [
+                [
+                    ['id' => 'value']
+                ],
+                null,
+                null,
+                'Column key is empty'
+            ]
+        ];
+    }
+
+    /**
+     * @dataProvider unsetPathDataProvider
+     */
+    public function testUnsetPath(array $array, array $path, array $expectedValue)
+    {
+        $this->assertEquals($expectedValue, ArrayUtil::unsetPath($array, $path));
+    }
+
+    public function unsetPathDataProvider()
+    {
+        return [
+            'unset with empty path' => [
+                ['a' => 'aval'],
+                [],
+                ['a' => 'aval'],
+            ],
+            'unset with path having 1 element' => [
+                ['a' => 'aval'],
+                ['a'],
+                [],
+            ],
+            'unset with invalid path having 1 element' => [
+                ['a' => 'aval'],
+                ['b'],
+                ['a' => 'aval'],
+            ],
+            'unset with path having more elements' => [
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'c' => 'cval',
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+                ['b', 'c'],
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+            ],
+            'unset with invalid path having more elements' => [
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'c' => 'cval',
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+                ['a', 'b', 'c'],
+                [
+                    'a' => 'aval',
+                    'b' => [
+                        'c' => 'cval',
+                        'd' => [
+                            'e' => 'eval',
+                        ],
+                    ],
+                ],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider getInDataProvider
+     */
+    public function testGetIn(array $array, array $path, $defaultValue, $expectedValue)
+    {
+        $this->assertEquals($expectedValue, ArrayUtil::getIn($array, $path, $defaultValue));
+    }
+
+    public function getInDataProvider()
+    {
+        return [
+            'reading non existing key from empty array' => [
+                [],
+                ['k2', 'k2.2', 'nonExistent'],
+                null,
+                null,
+            ],
+            'reading non existing key from array' => [
+                ['k1' => 'v1', 'k2' => ['k2.1' => 'v2.1', 'k2.2' => 'v2.2']],
+                ['k2', 'k2.2', 'nonExistent'],
+                null,
+                null,
+            ],
+            'reading non existing key from array with overwritten default value' => [
+                ['k1' => 'v1', 'k2' => ['k2.1' => 'v2.1', 'k2.2' => 'v2.2']],
+                ['k2', 'k2.2', 'nonExistent'],
+                'default',
+                'default',
+            ],
+            'reading simple key from array' => [
+                ['k1' => 'v1', 'k2' => ['k2.1' => 'v2.1', 'k2.2' => 'v2.2']],
+                ['k1'],
+                null,
+                'v1',
+            ],
+            'reading multivalue key from array' => [
+                ['k1' => 'v1', 'k2' => ['k2.1' => 'v2.1', 'k2.2' => 'v2.2']],
+                ['k2', 'k2.2'],
+                null,
+                'v2.2',
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider mergeDataProvider
+     *
+     * @param array $expected
+     * @param array $first
+     * @param array $second
+     */
+    public function testArrayMergeRecursiveDistinct(array $expected, array $first, array $second)
+    {
+        $this->assertEquals($expected, ArrayUtil::arrayMergeRecursiveDistinct($first, $second));
+    }
+
+    /**
+     * @return array
+     */
+    public function mergeDataProvider()
+    {
+        return [
+            [
+                [
+                    'a',
+                    'b',
+                    'c' => [
+                        'd' => 'd2',
+                        'e' => 'e1'
+                    ]
+                ],
+                ['a', 'c' => ['d' => 'd1', 'e' => 'e1']],
+                ['b', 'c' => ['d' => 'd2']]
+            ]
+        ];
+    }
+
+    /**
      * @param object $obj
      *
      * @return mixed

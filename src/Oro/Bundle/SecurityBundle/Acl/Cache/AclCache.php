@@ -3,15 +3,17 @@
 namespace Oro\Bundle\SecurityBundle\Acl\Cache;
 
 use Doctrine\Common\Cache\CacheProvider;
+
 use Symfony\Component\Security\Acl\Domain\Acl;
 use Symfony\Component\Security\Acl\Domain\DoctrineAclCache;
-use Symfony\Component\Security\Acl\Domain\Entry;
 use Symfony\Component\Security\Acl\Domain\FieldEntry;
 use Symfony\Component\Security\Acl\Model\AclInterface;
 use Symfony\Component\Security\Acl\Model\PermissionGrantingStrategyInterface;
 
 class AclCache extends DoctrineAclCache
 {
+    const ENTRY_CLASS = 'Symfony\Component\Security\Acl\Domain\Entry';
+
     /**
      * @var CacheProvider
      */
@@ -63,7 +65,7 @@ class AclCache extends DoctrineAclCache
         foreach ($aces as $fieldAces) {
             /** @var FieldEntry $fieldEntry */
             foreach ($fieldAces as $fieldEntry) {
-                $writeClosure = \Closure::bind($privatePropWriter, $fieldEntry, Entry::class);
+                $writeClosure = \Closure::bind($privatePropWriter, $fieldEntry, self::ENTRY_CLASS);
                 $writeClosure($fieldEntry, 'securityIdentity', clone $fieldEntry->getSecurityIdentity());
             }
         }

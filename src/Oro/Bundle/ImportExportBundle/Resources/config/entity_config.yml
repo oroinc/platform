@@ -33,18 +33,21 @@ oro_entity_config:
                 # is filed will be used to find existing entity
                 identity:
                     options:
-                        value_type:         boolean
-                        allowed_type:       [string, text, integer, smallint, bigint, boolean, date, float, decimal, money, percent, enum]
+                        value_type:         integer
+                        allowed_type:       [string, text, integer, smallint, bigint, boolean, date, float, decimal, money, percent, enum, ref-one, manyToOne]
+                        immutable_type:     [ref-one, manyToOne]
                     form:
                         type:               choice
                         options:
                             label:          oro.importexport.entity_config.identity.label
                             choices:
                                 false:      'No'
-                                true:       'Yes'
+                                -1:         oro.importexport.entity_config.identity.only_when_not_empty
+                                true:       oro.importexport.entity_config.identity.always
                             empty_value:    false
                             required:       false
                             block:          import_export
+                            tooltip:        oro.importexport.entity_config.identity.tooltip
                 # is field must be excluded from import/export
                 excluded:
                     options:

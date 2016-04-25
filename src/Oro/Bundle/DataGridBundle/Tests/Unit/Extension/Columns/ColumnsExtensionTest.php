@@ -118,6 +118,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         $dataInitialState,
         $isGridView = true
     ) {
+        $this->extension->setParameters(new ParameterBag([]));
         $user = $this->getMockBuilder('Oro\Bundle\UserBundle\Entity\User')
             ->disableOriginalConstructor()
             ->getMock();
@@ -137,7 +138,7 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('columns')
             ->will(static::returnValue($columnsConfigArray));
         $config
-            ->expects(static::once())
+            ->expects(static::any())
             ->method('getName')
             ->will(static::returnValue('test-grid'));
 
@@ -155,12 +156,12 @@ class ColumnsExtensionTest extends \PHPUnit_Framework_TestCase
         );
 
         $repository = $this->getMockBuilder('Oro\Bundle\DataGridBundle\Entity\Repository\GridViewRepository')
-            ->setMethods(['findGridViews'])
+            ->setMethods(['findGridViews', 'findDefaultGridView'])
             ->disableOriginalConstructor()
             ->getMock();
 
         $this->registry
-            ->expects(static::once())
+            ->expects(static::any())
             ->method('getRepository')
             ->with('OroDataGridBundle:GridView')
             ->will(static::returnValue($repository));

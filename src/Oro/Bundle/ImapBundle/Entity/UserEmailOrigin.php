@@ -12,6 +12,7 @@ use Oro\Bundle\EmailBundle\Entity\Mailbox;
  *
  * @ORM\Entity
  * @ORM\HasLifecycleCallbacks()
+ * @ORM\Entity(repositoryClass="Oro\Bundle\ImapBundle\Entity\Repository\UserEmailOriginRepository")
  */
 class UserEmailOrigin extends EmailOrigin
 {
@@ -85,6 +86,32 @@ class UserEmailOrigin extends EmailOrigin
     protected $mailbox;
 
     /**
+     * @var string
+     *
+     * @ORM\Column(name="access_token", type="string", length=255, nullable=true)
+     */
+    protected $accessToken;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="refresh_token", type="string", length=255, nullable=true)
+     */
+    protected $refreshToken;
+
+    /**
+     * @var \DateTime
+     *
+     * @ORM\Column(name="access_token_expires_at", type="datetime", nullable=true)
+     */
+    protected $accessTokenExpiresAt;
+
+    /**
+     * @var string
+     */
+    protected $clientId;
+
+    /**
      * Gets the host name of IMAP server
      *
      * @return string
@@ -151,7 +178,7 @@ class UserEmailOrigin extends EmailOrigin
      */
     public function setSmtpPort($smtpPort)
     {
-        $this->smtpPort = $smtpPort;
+        $this->smtpPort = (int)$smtpPort;
 
         return $this;
     }
@@ -175,7 +202,7 @@ class UserEmailOrigin extends EmailOrigin
      */
     public function setImapPort($imapPort)
     {
-        $this->imapPort = $imapPort;
+        $this->imapPort = (int)$imapPort;
 
         return $this;
     }
@@ -283,7 +310,9 @@ class UserEmailOrigin extends EmailOrigin
         $smtpPort = $this->getSmtpPort();
         $user = $this->getUser();
         $password = $this->getPassword();
-        if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && !empty($password)) {
+        $token = $this->getAccessToken();
+
+        if (!empty($smtpHost) && $smtpPort > 0 && !empty($user) && (!empty($password) || !empty($token))) {
             return true;
         }
 
@@ -315,5 +344,81 @@ class UserEmailOrigin extends EmailOrigin
         if ($this->mailboxName === null) {
             $this->mailboxName = $this->user;
         }
+    }
+
+    /**
+     * @return string
+     */
+    public function getAccessToken()
+    {
+        return $this->accessToken;
+    }
+
+    /**
+     * @param string $accessToken
+     *
+     * @return UserEmailOrigin
+     */
+    public function setAccessToken($accessToken)
+    {
+        $this->accessToken = $accessToken;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getRefreshToken()
+    {
+        return $this->refreshToken;
+    }
+
+    /**
+     * @param string $refreshToken
+     *
+     * @return UserEmailOrigin
+     */
+    public function setRefreshToken($refreshToken)
+    {
+        $this->refreshToken = $refreshToken;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime
+     */
+    public function getAccessTokenExpiresAt()
+    {
+        return $this->accessTokenExpiresAt;
+    }
+
+    /**
+     * @param \DateTime $datetime
+     *
+     * @return UserEmailOrigin
+     */
+    public function setAccessTokenExpiresAt(\DateTime $datetime = null)
+    {
+        $this->accessTokenExpiresAt = $datetime;
+
+        return $this;
+    }
+
+    /**
+     * @param string $value
+     */
+    public function setClientId($value)
+    {
+        $this->clientId = $value;
+    }
+
+    /**
+     * @return string
+     */
+    public function getClientId()
+    {
+        return $this->clientId;
     }
 }

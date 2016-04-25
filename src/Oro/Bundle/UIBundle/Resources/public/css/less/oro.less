@@ -84,6 +84,16 @@ h1, h2, h3, h4, h5, h6 {
     }
   }
 }
+.dropdown-menu__floating {
+  margin-top: 0;
+  > li > a, > li > button {
+    padding-top: 1px;
+    padding-bottom: 1px;
+    font-size: 12px;
+    color: #444;
+    text-transform: capitalize;
+  }
+}
 .dark {
   background-color: #f6f5f5;
 }
@@ -112,7 +122,7 @@ label, input, button, select, textarea { font-size:13px;}
     label.control-label {
       float:left;
       width:160px;
-      padding-top:7px;
+      padding-top: 7px;
       color: #777;
       font-weight: normal;
       font-size: 13px;
@@ -120,11 +130,12 @@ label, input, button, select, textarea { font-size:13px;}
     }
     .control-label.wrap {
       float:left;
-      padding-top:7px;
+      padding-top: 6px;
       color: #777;
       font-weight: normal;
       font-size: 13px;
-      text-align:right;
+      line-height: 20px;
+      text-align: right;
       .tooltip-icon {
         margin-right: 5px;
         cursor: pointer;
@@ -140,7 +151,7 @@ label, input, button, select, textarea { font-size:13px;}
         margin-top: 10px;
       }
       .control-label {
-        padding-top:7px;
+        padding-top: 7px;
         width: 100%;
         word-wrap: break-word;
         padding-left: 5px; // to get nice hover background
@@ -376,24 +387,10 @@ body .select2-container {
 .label-info,
 .badge-info { background:#92b2d6; }
 
-// FontAwesome
-[class^="icon-"],
-[class*=" icon-"] {
-  display:inline-block !important;
+.widget-content > .label-info:first-child {
+  margin-bottom: 10px;
 }
-[class^='icon-'].hide-text:after,
-[class^='icon-'].hide-text:before {
-  padding:0;
-  text-indent:0;
-  font-size:14px;
-  line-height:1.3em;
-  color:#666;
-  font-family: 'FontAwesome';
-}
-.icon-resize-vertical {
-  // because resize-vertical icon is too thin
-  padding: 0 3px;
-}
+
 .ui-sortable-handle {
   cursor: move;
   cursor: -moz-grab;
@@ -878,13 +875,8 @@ footer {
   }
 }
 .ui-dialog.ui-resizable:not(.ui-dialog-buttons) {
-  &:after{
-    display: block;
-    height: 15px;
-    content: " ";
-    flex: none;
-  }
   .ui-dialog-content{
+    height: calc(~"100% - 50px") !important;
     border-radius: 0 0 3px 3px;
     border-bottom: 1px solid #e5e5e5;
   }
@@ -1298,8 +1290,24 @@ footer {
   .nav-pills {
     padding:0 10px;
   }
-  .launchers-dropdown-menu{
-    min-width: 35px;
+  /* fix for IE10 in Win8, otherwise breaks actions column */
+  .dropdown:not(.open) {
+    .launchers-dropdown-menu {
+      min-width: 0;
+      display: block;
+      height: 0;
+      width: 0;
+      overflow: hidden;
+      border-width: 0;
+    }
+  }
+}
+.launchers-dropdown-menu {
+  min-width: 35px;
+}
+.launchers-list {
+  &.nav > li:first-child > a {
+    margin-left: 2px;
   }
   .launcher-item {
     [class^='icon-']:before {
@@ -1319,17 +1327,6 @@ footer {
       &:focus {
         background:#fff;
       }
-    }
-  }
-  /* fix for IE10 in Win8, otherwise breaks actions column */
-  .dropdown:not(.open) {
-    .launchers-dropdown-menu {
-      min-width: 0;
-      display: block;
-      height: 0;
-      width: 0;
-      overflow: hidden;
-      border-width: 0;
     }
   }
 }
@@ -1654,19 +1651,6 @@ footer {
     }
   }
   &.ui-dialog-normal {
-    display: flex !important;
-    flex-direction: column;
-    .ui-dialog-titlebar {
-      min-height: 34px;
-      flex: none;
-    }
-    .ui-dialog-content {
-      flex: 1;
-    }
-    .ui-dialog-buttonpane {
-      height: 49px;
-      flex: none;
-    }
     [class*='ui-dialog-titlebar-'] {
       &:hover:before {
         #gradient > .vertical(darken(#838d98,5%), darken(#46515d,5%));
@@ -2140,14 +2124,14 @@ textarea {
 }
 .horizontal .oro-clearfix input[type="checkbox"],
 .horizontal .oro-clearfix input[type="radio"] {
-  margin: -4px 10px 0 0;
+  margin: -4px 6px 0 0;
 }
 .horizontal .oro-clearfix .label {
   float: left;
 }
 .controls {
   .horizontal {
-    padding-top: 5px;
+    padding-top: 7px;
   }
   > input[type=checkbox]:only-child {
     margin-top: 10px;
@@ -2210,14 +2194,9 @@ div.uploader {
   border: 1px solid #ccc;
   background-color: #fff;
   float: left;
-  position: relative;
-  overflow: hidden;
-  cursor: default;
   line-height: 28px;
   -webkit-border-radius: 3px;
   border-radius: 3px;
-  vertical-align: middle;
-  display: inline-block;
 }
 
 div.uploader span.action {
@@ -2244,15 +2223,8 @@ div.uploader span.filename {
 }
 
 div.uploader input {
-  opacity: 0;
-  position: absolute;
-  top: 0;
-  right: 0;
-  bottom: 0;
   float: right;
   height: 25px;
-  border: none;
-  cursor: default;
 }
 /* Select */
 
@@ -2261,33 +2233,29 @@ select {
   line-height: 26px;
 }
 div.selector {
-  line-height: 28px;
+  line-height: 30px;
   height: 30px;
-  position: relative;
   width: 235px;
-  font-size: 12px;
   border: 1px solid #ddd;
   #gradient > .vertical(#ffffff, #f3f3f3);
   -webkit-border-radius: 3px;
   border-radius: 3px;
-  padding: 0;
-  margin: 0;
 }
 
 div.selector span {
-  height: 28px;
+  height: 30px;
   display: block;
-  line-height: 28px;
+  line-height: 30px;
   .box-sizing(border-box);
-  padding: 0 5px;
+  padding: 0 5px 0 8px;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
   position: relative;
   &:after {
-    margin:2px 2px 0 0;
+    margin: 3px 2px 0 0;
     display:inline-block;
-    font:15px 'FontAwesome';
+    font:16px 'FontAwesome';
     content: "\f0dd";
     position: absolute;
     right: 5px;
@@ -2295,10 +2263,7 @@ div.selector span {
 }
 
 div.selector select {
-  position: absolute;
-  top: 0px;
   left: -2px;
-  opacity: 0;
   z-index: 1;
   padding: 0 5px;
 }
@@ -2349,6 +2314,12 @@ div.selector.disabled span {
 
 .row-fluid.row-fluid-divider {
   background: url("../../img/vertical-separator.png") repeat-y 50% 0;
+}
+/* fix incorrect aligment of fluid divider line in Firefox */
+@-moz-document url-prefix() {
+  .row-fluid.row-fluid-divider {
+    background-position: calc(~"50% - 1px") 0;
+  }
 }
 h5.user-fieldset {
   font-weight:bold;
@@ -2643,7 +2614,7 @@ label.radio.error {
   float: left;
   background: none;
   margin: 0;
-  padding: 6px 15px 0 20px;
+  padding: 6px 15px 6px 20px;
 }
 .breadcrumb > li.active,
 .breadcrumb > li {
@@ -2798,7 +2769,7 @@ span.validation-failed {
   }
 }
 .default-field{
-  background: #C3C3C3;
+  background: #f5f5f5;
 }
 .tab-container{
   .nav-tabs > .active > a,
@@ -2847,7 +2818,7 @@ span.validation-failed {
     .nav-tabs > .active > a,
     .nav-tabs > .active > a:hover,
     .nav-tabs > .active > a:focus{
-      background: none;
+      background: #fff;
     }
   }
 }
@@ -2931,6 +2902,12 @@ span.validation-failed {
   font-style: normal;
 }
 .oro-tabs {
+  .nav-tabs {
+    padding-left: 1px; // compensate tabs margin-left: -1px
+    margin-bottom: -1px; // should overlay tab-content's top border
+    border-bottom: 1px solid #ddd;
+    float: left;
+  }
   .nav-tabs > li > a,
   .nav-tabs > li > a:hover,
   .nav-tabs > li > a:focus,
@@ -2940,9 +2917,11 @@ span.validation-failed {
     border-bottom: 1px solid #ddd;
     border-top: 1px solid #ddd;
     border-right: 1px solid #ddd;
-    border-left: none;
+    border-left: 1px solid #ddd;
     border-radius: 0px;
     margin-right: 0px;
+    margin-left: -1px;
+    height: 38px;
   }
 
   .nav-tabs-dropdown {
@@ -2971,41 +2950,37 @@ span.validation-failed {
     border-bottom: 1px solid #fff;
     border-right-color: #ddd;
     border-top-color: #ddd;
-    background-color: transparent;
-  }
-
-  .nav-tabs > li:first-child > a,
-  .nav-tabs > li:first-child > a:hover,
-  .nav-tabs > li:first-child > a:focus {
-    border-left: 1px solid #ddd;
-  }
-
-  .nav-tabs {
-    margin-bottom: 0px;
-    border-bottom: 1px solid #ddd;
+    background-color: #fff;
+    outline: none;
   }
 
   .tab-content {
     overflow: initial;
-    border-bottom: 1px solid #ddd;
-    border-right: 1px solid #ddd;
-    border-left: 1px solid #ddd;
+    border: 1px solid #ddd;
+    clear: both;
   }
 
   .tab-pane {
     min-height: 104px;
   }
 }
-.tab-content{
-  .oro-tabs{
-    .nav-tabs{
-      & > li{
-        & > a{
-          margin-top: -1px;
-        }
-      }
-    }
-  }
+
+.nav-tabs {
+  padding-left: 1px; // compensate tabs margin-left: -1px
+  margin-bottom: -1px; // should overlay tab-content's top border
+  border-bottom: 1px solid #ddd;
+  float: left;
+}
+.tab-content {
+  border-top: 1px solid #ddd;
+  clear: both;
+}
+.nav-tabs > li > a.widget-component-processing{
+  background: #ccc !important;
+  border-bottom: 1px solid transparent !important;
+  /* following two lines allow this tab handle overlay .tab-content while it is loading */
+  position: relative;
+  z-index: 1;
 }
 // capitalize buttons, labels, titles, breadcrumb for English language
 .lang-en {
@@ -3205,4 +3180,9 @@ label .popover-content {
     line-height: 10px;
     padding: 0 3px;
   }
+}
+
+[class^='icon-'].hide-text:after,
+[class^='icon-'].hide-text:before {
+  color:#666;
 }

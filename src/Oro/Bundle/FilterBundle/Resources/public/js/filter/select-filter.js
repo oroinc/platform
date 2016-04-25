@@ -3,8 +3,9 @@ define([
     'underscore',
     'orotranslation/js/translator',
     './abstract-filter',
-    'orofilter/js/multiselect-decorator'
-], function($, _, __, AbstractFilter, MultiselectDecorator) {
+    'orofilter/js/multiselect-decorator',
+    'oroui/js/app/views/loading-mask-view'
+], function($, _, __, AbstractFilter, MultiselectDecorator, LoadingMaskView) {
     'use strict';
 
     var SelectFilter;
@@ -84,6 +85,13 @@ define([
         },
 
         /**
+         * Selector, jQuery object or HTML element that will be target for append multiselect dropdown menu
+         *
+         * @property
+         */
+        dropdownContainer: 'body',
+
+        /**
          * Select widget menu opened flag
          *
          * @property
@@ -96,6 +104,11 @@ define([
         contextSearch: true,
 
         /**
+         * @property {Boolean}
+         */
+        loadedMetadata: true,
+
+        /**
          * Filter events
          *
          * @property
@@ -104,8 +117,7 @@ define([
             'keydown select': '_preventEnterProcessing',
             'click .filter-select': '_onClickFilterArea',
             'click .disable-filter': '_onClickDisableFilter',
-            'change select': '_onSelectChange',
-            'click .reset-filter': '_onClickResetFilter'
+            'change select': '_onSelectChange'
         },
 
         /**
@@ -114,17 +126,10 @@ define([
          * @param {Object} options
          */
         initialize: function(options) {
-            var opts = _.pick(options || {}, 'choices');
+            var opts = _.pick(options || {}, ['choices', 'dropdownContainer']);
             _.extend(this, opts);
 
-            // init filter content options if it was not initialized so far
-            if (_.isUndefined(this.choices)) {
-                this.choices = [];
-            }
-            // temp code to keep backward compatible
-            this.choices = _.map(this.choices, function(option, i) {
-                return _.isString(option) ? {value: i, label: option} : option;
-            });
+            this._setChoices(this.choices);
 
             // init empty value object if it was not initialized so far
             if (_.isUndefined(this.emptyValue)) {
@@ -134,6 +139,19 @@ define([
             }
 
             SelectFilter.__super__.initialize.apply(this, arguments);
+
+            if (this.lazy) {
+                this.loadedMetadata = false;
+                this.loader(
+                    _.bind(function(metadata) {
+                        this._setChoices(metadata.choices);
+                        this.render();
+                        if (this.subview('loading')) {
+                            this.subview('loading').hide();
+                        }
+                    }, this)
+                );
+            }
         },
 
         /**
@@ -160,22 +178,42 @@ define([
                 options.unshift({value: '', label: this.placeholder});
             }
 
-            this.setElement((
-                this.template({
-                    label: this.label,
-                    showLabel: this.showLabel,
-                    options: options,
-                    placeholder: this.placeholder,
-                    nullLink: this.nullLink,
-                    canDisable: this.canDisable,
-                    selected: _.extend({}, this.emptyValue, this.value),
-                    isEmpty: this.isEmpty()
-                })
-            ));
+            var html = this.template({
+                label: this.labelPrefix + this.label,
+                showLabel: this.showLabel,
+                options: options,
+                canDisable: this.canDisable,
+                selected: _.extend({}, this.emptyValue, this.value),
+                isEmpty: this.isEmpty()
+            });
 
-            this._initializeSelectWidget();
+            if (!this.selectWidget) {
+                this.setElement(html);
+                this._initializeSelectWidget();
+            } else {
+                var selectOptions = $(html).find('select').html();
+                this.$('select').html(selectOptions);
+                this.selectWidget.multiselect('refresh');
+            }
+
+            if (!this.loadedMetadata && !this.subview('loading')) {
+                this.subview('loading', new LoadingMaskView({
+                    container: this.$el
+                }));
+                this.subview('loading').show();
+            }
 
             return this;
+        },
+
+        /**
+         * Set dropdownContainer for dropdown element
+         *
+         * @param {(jQuery|Element|String)} container
+         * @protected
+         */
+        setDropdownContainer: function(container) {
+            this.dropdownContainer = $(container);
         },
 
         /**
@@ -184,6 +222,7 @@ define([
          * @protected
          */
         _initializeSelectWidget: function() {
+            var $dropdownContainer = this._findDropdownFitContainer(this.dropdownContainer) || this.dropdownContainer;
             this.selectWidget = new MultiselectDecorator({
                 element: this.$(this.inputSelector),
                 parameters: _.extend({
@@ -194,7 +233,9 @@ define([
                     position: {
                         my: 'left top+7',
                         at: 'left bottom',
-                        of: this.$(this.containerSelector)
+                        of: this.$(this.containerSelector),
+                        collision: 'fit none',
+                        within: $dropdownContainer
                     },
                     open: _.bind(function() {
                         this.selectWidget.onOpenDropdown();
@@ -202,19 +243,22 @@ define([
                         this._setButtonPressed(this.$(this.containerSelector), true);
                         this._clearChoicesStyle();
                         this.selectDropdownOpened = true;
+                        this.selectWidget.updateDropdownPosition();
                     }, this),
                     close: _.bind(function() {
                         this._setButtonPressed(this.$(this.containerSelector), false);
                         setTimeout(_.bind(function() {
-                            this.selectDropdownOpened = false;
+                            if (!this.disposed) {
+                                this.selectDropdownOpened = false;
+                            }
                         }, this), 100);
-                    }, this)
+                    }, this),
+                    appendTo: this.dropdownContainer
                 }, this.widgetOptions),
                 contextSearch: this.contextSearch
             });
 
             this.selectWidget.setViewDesign(this);
-            this.$(this.buttonSelector).append('<span class="caret"></span>');
             this.selectWidget.getWidget().on('keyup', _.bind(function(e) {
                 if (e.keyCode === 27) {
                     this._onClickFilterArea(e);
@@ -333,8 +377,6 @@ define([
         _onValueUpdated: function(newValue, oldValue) {
             SelectFilter.__super__._onValueUpdated.apply(this, arguments);
             this.selectWidget.multiselect('refresh');
-            this.$(this.buttonSelector)
-                .toggleClass('filter-default-value', this.isEmpty());
         },
 
         /**
@@ -352,6 +394,15 @@ define([
             return {
                 value: this._getInputValue(this.inputSelector)
             };
+        },
+
+        _setChoices: function(choices) {
+            choices = choices || [];
+
+            // temp code to keep backward compatible
+            this.choices = _.map(choices, function(option, i) {
+                return _.isString(option) ? {value: i, label: option} : option;
+            });
         }
     });
 

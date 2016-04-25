@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Entity\Manager;
 
-use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\DBAL\Types\Type;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -180,6 +179,8 @@ class AssociationManager
      *                                             function (QueryBuilder $qb, $targetEntityClass)
      *
      * @return SqlQueryBuilder
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getMultiAssociationsQueryBuilder(
         $associationOwnerClass,
@@ -198,6 +199,11 @@ class AssociationManager
         $subQueries = [];
         foreach ($associationTargets as $entityClass => $fieldName) {
             $nameExpr = $this->entityNameResolver->getNameDQL($entityClass, 'target');
+            // Need to forcibly convert expression to string when the title is different type.
+            // Example of error: "UNION types text and integer cannot be matched".
+            if ($nameExpr) {
+                $nameExpr = sprintf('CONCAT(%s,\'\')', $nameExpr);
+            }
             $subQb    = $em->getRepository($associationOwnerClass)->createQueryBuilder('e')
                 ->select(
                     sprintf(
@@ -230,7 +236,7 @@ class AssociationManager
             }
         }
 
-        $rsm = new ResultSetMapping();
+        $rsm = QueryUtils::createResultSetMapping($em->getConnection()->getDatabasePlatform());
         $rsm
             ->addScalarResult('id', 'id', Type::INTEGER)
             ->addScalarResult('entity', 'entity')
@@ -351,7 +357,7 @@ class AssociationManager
             }
         }
 
-        $rsm = new ResultSetMapping();
+        $rsm = QueryUtils::createResultSetMapping($em->getConnection()->getDatabasePlatform());
         $rsm
             ->addScalarResult('id', 'id', Type::INTEGER)
             ->addScalarResult('entity', 'entity')

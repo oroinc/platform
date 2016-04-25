@@ -27,4 +27,20 @@ class DescriptionsConfigExtra implements ConfigExtraInterface
     {
         // no any modifications of the ConfigContext is required
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isPropagable()
+    {
+        return true;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getCacheKeyPart()
+    {
+        return self::NAME;
+    }
 }

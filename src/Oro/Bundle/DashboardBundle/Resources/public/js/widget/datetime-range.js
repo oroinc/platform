@@ -1,16 +1,16 @@
 define(function(require) {
     'use strict';
 
-    var WidgetConfigDatetimeRangeFilter;
-    var DateFilter = require('oro/filter/date-filter');
+    var WidgetConfigDateTimeRangeFilter;
+    var DateTimeFilter = require('oro/filter/datetime-filter');
     var tools = require('oroui/js/tools');
 
-    WidgetConfigDatetimeRangeFilter = DateFilter.extend({
+    WidgetConfigDateTimeRangeFilter = DateTimeFilter.extend({
         /**
          * @inheritDoc
          */
         events: {
-            'change .date-visual-element': '_onClickUpdateCriteria'
+            'change .datetime-visual-element': '_onClickUpdateCriteria'
         },
 
         /**
@@ -43,5 +43,5 @@ define(function(require) {
         }
     });
 
-    return WidgetConfigDatetimeRangeFilter;
+    return WidgetConfigDateTimeRangeFilter;
 });

@@ -196,7 +196,7 @@ class AclRoleHandler
     protected function createRoleFormInstance(AbstractRole $role, array $privilegeConfig)
     {
         return $this->formFactory->create(
-            new ACLRoleType($privilegeConfig),
+            new AclRoleType($privilegeConfig),
             $role
         );
     }
@@ -316,7 +316,7 @@ class AclRoleHandler
     {
         $securityIdentity = $this->aclManager->getSid($role);
         if ($className) {
-            return $this->privilegeRepository->getClassFieldsPrivileges($securityIdentity, $className);
+            return $this->privilegeRepository->getFieldsPrivileges($securityIdentity, $className);
         }
 
         return $this->privilegeRepository->getPrivileges($securityIdentity);

@@ -6,11 +6,14 @@
 }
 
 .oro-datagrid {
-  th, td {
+  .grid-cell {
     display: none;
   }
-  th.renderable, td.renderable {
+  .grid-cell.renderable {
     display: table-cell;
+  }
+  .loader-mask {
+    z-index: @oroZindexDropdown - 1;// to show under grid's filter
   }
 }
 
@@ -158,7 +161,10 @@ table.grid {
       cursor: pointer;
   }
   tbody tr.row-selected {
-    background-color: #FDF8E4;
+    background-color: @rowHighlightBackground;
+    &:hover {
+      background-color: @rowSelectedBackground;
+    }
   }
   .string-cell,
   .uri-cell,
@@ -315,18 +321,37 @@ td > .nowrap-ellipsis {
     margin: auto;
   }
 }
-.more-bar-holder.action-row{
-  .launcher-item {
-    padding: 2px 12px;
+.more-bar-holder {
+  .dropdown {
+    &:not(.open) {
+      .dropdown-close {
+        display: none !important;
+      }
+    }
   }
-  .launcher-item a {
-    margin: 0;
-    border: none;
-    padding: 0;
+  .dropdown-close {
+    display: block !important;
+    z-index: 899;
+    position: absolute;
+    right: 0;
+    top: 0;
   }
-  .nav-pills {
-    padding: 0;
+  &.action-row {
+    .launcher-item {
+      padding: 2px 12px;
+    }
+    .launcher-item a {
+      margin: 0;
+      border: none;
+      padding: 0;
+    }
+    .nav-pills {
+      padding: 0;
+    }
   }
+}
+.select-all-header-cell {
+  width: 40px;
 }
 .action-cell .more-bar-holder .dropdown-toggle {
   margin-left: 5px;

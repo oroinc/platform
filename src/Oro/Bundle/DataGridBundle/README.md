@@ -12,6 +12,7 @@ Table of content
     - [Datasources](./Resources/doc/backend/datasources.md)
         - [ORM](./Resources/doc/backend/datasources/orm.md)
     - [Parameter binding](./Resources/doc/backend/parameter_binding.md)
+    - [Mixin](./Resources/doc/backend/mixin.md)
     - [Extensions](./Resources/doc/backend/extensions.md)
         - [Action](./Resources/doc/backend/extensions/action.md)
         - [Export](./Resources/doc/backend/extensions/export.md)
@@ -26,5 +27,6 @@ Table of content
     - [References in YAML configuration](./Resources/doc/backend/references_in_configuration.md)
 - Frontend
     - [Datagrid](./Resources/doc/frontend/datagrid.md)
+    - [Datagrid Render](./Resources/doc/frontend/datagrid_render.md)
     - [Datagrid Widget](./Resources/doc/frontend/datagrid_widget.md)
     - [Column Manager](./Resources/doc/frontend/column_manager.md)

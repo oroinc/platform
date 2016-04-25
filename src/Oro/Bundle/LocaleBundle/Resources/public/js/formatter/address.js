@@ -1,5 +1,5 @@
-define(['../locale-settings', './name'
-    ], function(localeSettings, nameFormatter) {
+define(['jquery', '../locale-settings', './name'
+    ], function($, localeSettings, nameFormatter) {
     'use strict';
 
     /**
@@ -50,8 +50,10 @@ define(['../locale-settings', './name'
             });
 
             var addressLines = formatted
-                .replace(/ *(\\n)+/g, '\\n')
                 .split('\\n');
+            addressLines = addressLines.filter(function(element) {
+                return $.trim(element) !== '';
+            });
             if (typeof newLine === 'function') {
                 for (var i = 0; i < addressLines.length; i++) {
                     addressLines[i] = newLine(addressLines[i]);

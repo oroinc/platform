@@ -1,0 +1,68 @@
+.thread-view {
+  padding-left: 0;
+  .email-info, .email-load-more {
+    margin: 0;
+  }
+  .email-info {
+    .responsive-cell {
+      padding: 0;
+    }
+    .email-participants {
+      margin-right: 100px;
+    }
+    .email-actions {
+      margin: 16px -10px 0 0;
+      .btn-group +.btn-group {
+        margin-left: 5px;
+      }
+    }
+    .email-full {
+      .email-sent-date {
+        padding: 0;
+        height: 18px;
+        font-size: 12px;
+        color: #888;
+      }
+    }
+    .email-view-toggle {
+      padding: @contentPadding;
+    }
+    .email-content {
+      padding: 0 @contentPadding @contentPadding;
+    }
+    &:only-child {
+      .email-view-toggle {
+        padding: 0 0 10px;
+      }
+      .email-content {
+        padding: 0;
+      }
+    }
+  }
+  .email-detailed-info-table {
+    .dropdown-menu {
+      padding: 0px @contentPadding;
+    }
+    .control-group:last-child {
+      margin-bottom: 0;
+      .controls {
+        margin-bottom: 0;
+      }
+    }
+  }
+}
+
+.activity-list-widget {
+  .thread-view {
+    .email-info {
+      &:last-child, &:only-child  {
+        .email-view-toggle {
+          padding: @contentPadding;
+        }
+        .email-content {
+          padding: 0 @contentPadding;
+        }
+      }
+    }
+  }
+}

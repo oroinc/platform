@@ -4,9 +4,12 @@ namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Entity;
 
 use JMS\JobQueueBundle\Entity\Job;
 
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
 {
     /**
@@ -49,7 +52,7 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertSame($defaultValue, $this->entity->$getter());
         $this->assertSame($this->entity, $this->entity->$setter($testValue));
-        $this->assertSame($testValue, $this->entity->$getter());
+        $this->assertEquals($testValue, $this->entity->$getter());
     }
 
     /**
@@ -63,6 +66,7 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
             'queued' => array('queued', true, false),
             'timeShift' => array('timeShift', time()),
             'definition' => array('definition', new ProcessDefinition()),
+            'cron' => array('cron', '* * * * *'),
             'createdAt' => array('createdAt', new \DateTime()),
             'updatedAt' => array('updatedAt', new \DateTime()),
         );
@@ -158,7 +162,8 @@ class ProcessTriggerTest extends \PHPUnit_Framework_TestCase
             ->setPriority(Job::PRIORITY_HIGH)
             ->setQueued(true)
             ->setTimeShift(123)
-            ->setDefinition($importedDefinition);
+            ->setDefinition($importedDefinition)
+            ->setCron('*/1 * * * *');
 
         $this->assertProcessTriggerEntitiesEquals($importedEntity, $this->entity, false);
         $this->entity->import($importedEntity);

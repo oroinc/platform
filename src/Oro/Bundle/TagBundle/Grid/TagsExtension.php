@@ -5,7 +5,7 @@ namespace Oro\Bundle\TagBundle\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 use Oro\Bundle\TagBundle\Helper\TaggableHelper;
@@ -28,20 +28,20 @@ class TagsExtension extends AbstractTagsExtension
     protected $securityFacade;
 
     /**
-     * @param TagManager          $tagManager
-     * @param EntityClassResolver $resolver
-     * @param TaggableHelper      $helper
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param SecurityFacade      $securityFacade
+     * @param TagManager              $tagManager
+     * @param GridConfigurationHelper $gridConfigurationHelper
+     * @param TaggableHelper          $helper
+     * @param EntityRoutingHelper     $entityRoutingHelper
+     * @param SecurityFacade          $securityFacade
      */
     public function __construct(
         TagManager $tagManager,
-        EntityClassResolver $resolver,
+        GridConfigurationHelper $gridConfigurationHelper,
         TaggableHelper $helper,
         EntityRoutingHelper $entityRoutingHelper,
         SecurityFacade $securityFacade
     ) {
-        parent::__construct($tagManager, $resolver);
+        parent::__construct($tagManager, $gridConfigurationHelper);
 
         $this->taggableHelper      = $helper;
         $this->entityRoutingHelper = $entityRoutingHelper;
@@ -88,7 +88,7 @@ class TagsExtension extends AbstractTagsExtension
      */
     protected function isGridRootEntityTaggable(DatagridConfiguration $configuration)
     {
-        $className = $this->getEntityClassName($configuration);
+        $className = $this->getEntity($configuration);
 
         return $className && $this->taggableHelper->isTaggable($className);
     }
@@ -129,7 +129,7 @@ class TagsExtension extends AbstractTagsExtension
      */
     protected function getColumnDefinition(DatagridConfiguration $config)
     {
-        $className        = $this->getEntityClassName($config);
+        $className        = $this->getEntity($config);
         $urlSafeClassName = $this->entityRoutingHelper->getUrlSafeClassName($className);
 
         $permissions = [
@@ -185,12 +185,12 @@ class TagsExtension extends AbstractTagsExtension
      */
     protected function getColumnFilterDefinition(DatagridConfiguration $config)
     {
-        $className = $this->getEntityClassName($config);
-        $from = $config->offsetGetByPath(self::GRID_FROM_PATH);
+        $className = $this->getEntity($config);
+        $alias     = $this->gridConfigurationHelper->getEntityRootAlias($config);
 
         return [
             'type'      => 'tag',
-            'data_name' => $from[0]['alias'] .'.id',
+            'data_name' => sprintf('%s.%s', $alias, 'id'),
             'label'     => 'oro.tag.entity_plural_label',
             'enabled'   => $this->taggableHelper->isEnableGridFilter($className),
             'options'   => [
@@ -209,7 +209,7 @@ class TagsExtension extends AbstractTagsExtension
         $rows    = (array)$result->offsetGetOr('data', []);
         $idField = 'id';
         $tags    = $this->getTagsForEntityClass(
-            $this->getEntityClassName($config),
+            $this->getEntity($config),
             $this->extractEntityIds($rows, $idField)
         );
 

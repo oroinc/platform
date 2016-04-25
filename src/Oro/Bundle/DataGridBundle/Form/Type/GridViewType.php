@@ -24,6 +24,10 @@ class GridViewType extends AbstractType
             ->add('label', 'text', [
                 'property_path' => 'name',
             ])
+            ->add('is_default', 'checkbox', [
+                'required' => false,
+                'mapped'   => false,
+            ])
             ->add('type', 'choice', [
                 'choices' => GridView::getTypes(),
             ])

@@ -6,9 +6,16 @@ The following examples may help to start using layouts in your application.
 Create the layout theme
 -----------------------
 
-The theme definition should be placed at `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`:
+The theme definition should be placed at theme folder and named `theme.yml`, for example `DemoBundle/Resources/views/layouts/first_theme/theme.yml`
+Deprecated method: placed  `Resources/config/oro/` and named `layout.yml`, for example `DemoBundle/Resources/config/oro/layout.yml`:
 
 ```yaml
+#DemoBundle/Resources/views/layouts/first_theme/theme.yml
+label:  Test Theme
+icon:   bundles/demo/images/favicon.ico
+groups: [ main ]
+
+#DemoBundle/Resources/config/oro/layout.yml
 oro_layout:
     themes:
         first_theme:
@@ -103,7 +110,6 @@ As you have seen in the previous section we have added `setBlockTheme` action th
 ```twig
 {% block head_widget %}
     <head{{ block('block_attributes') }}>
-        <title>{{ title }}</title>
         <meta http-equiv="cache-control" content="max-age=0" />
         <meta http-equiv="cache-control" content="no-cache" />
         <meta http-equiv="expires" content="0" />

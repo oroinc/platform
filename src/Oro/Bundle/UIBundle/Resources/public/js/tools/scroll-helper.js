@@ -4,6 +4,7 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
+    require('jquery-ui');
 
     return {
         /**
@@ -21,19 +22,7 @@ define(function(require) {
          * @return {Number}
          */
         scrollbarWidth: function() {
-            if (!this._scrollbarWidth) {
-                var $div = $(//borrowed from anti-scroll
-                    '<div style="width:50px;height:50px;overflow-y:scroll;' +
-                    'position:absolute;top:-200px;left:-200px;"><div style="height:100px;width:100%">' +
-                    '</div>'
-                );
-                $('body').append($div);
-                var w1 = $div.innerWidth();
-                var w2 = $('div', $div).innerWidth();
-                $div.remove();
-                this._scrollbarWidth =  w1 - w2;
-            }
-            return this._scrollbarWidth;
+            return $.position.scrollbarWidth();
         },
 
         /**

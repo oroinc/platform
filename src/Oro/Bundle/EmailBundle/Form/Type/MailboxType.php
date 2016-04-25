@@ -16,6 +16,7 @@ use Oro\Bundle\EmailBundle\Mailbox\MailboxProcessStorage;
 use Oro\Bundle\FormBundle\Utils\FormUtils;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
+use Oro\Bundle\ConfigBundle\Config\ConfigManager;
 
 class MailboxType extends AbstractType
 {
@@ -27,14 +28,22 @@ class MailboxType extends AbstractType
     /** @var Mcrypt */
     protected $encryptor;
 
+    /** ConfigManager */
+    protected $userConfigManager;
+
     /**
      * @param MailboxProcessStorage $storage
      * @param Mcrypt $encryptor
+     * @param ConfigManager $userConfigManager
      */
-    public function __construct(MailboxProcessStorage $storage, Mcrypt $encryptor)
-    {
+    public function __construct(
+        MailboxProcessStorage $storage,
+        Mcrypt $encryptor,
+        ConfigManager $userConfigManager
+    ) {
         $this->storage = $storage;
         $this->encryptor = $encryptor;
+        $this->userConfigManager = $userConfigManager;
     }
 
     /**
@@ -68,7 +77,13 @@ class MailboxType extends AbstractType
                 new Email(),
             ],
         ]);
-        $builder->add('origin', 'oro_imap_configuration');
+
+        if ($this->userConfigManager->get('oro_imap.enable_google_imap')) {
+            $builder->add('imapAccountType', 'oro_imap_choice_account_type');
+        } else {
+            $builder->add('origin', 'oro_imap_configuration');
+        }
+
         $builder->add('processType', 'choice', [
             'label'       => 'oro.email.mailbox.process.type.label',
             'choices'     => $this->storage->getProcessTypeChoiceList(),
@@ -219,15 +234,15 @@ class MailboxType extends AbstractType
         $data = $event->getData();
 
         $this->setOriginOrganizationAndOwner($data);
-        $this->setOriginSyncDate($data);
+        $this->setFolderStartSync($data);
     }
 
     /**
-     * Set origin and folder sync date to prevent sync old emails
+     * Set folder start sync date to prevent sync old emails
      *
      * @param Mailbox $data
      */
-    public function setOriginSyncDate(Mailbox $data = null)
+    protected function setFolderStartSync(Mailbox $data = null)
     {
         /* @var $origin UserEmailOrigin */
         if (!$data || !$origin = $data->getOrigin()) {
@@ -235,10 +250,9 @@ class MailboxType extends AbstractType
         }
 
         $currentDate = new \DateTime('now', new \DateTimeZone('UTC'));
-        $origin->setSynchronizedAt($currentDate);
         foreach ($origin->getFolders() as $folder) {
             if ($folder->isSyncEnabled()) {
-                $folder->setSynchronizedAt($currentDate);
+                $folder->setSyncStartDate($currentDate);
             }
         }
     }

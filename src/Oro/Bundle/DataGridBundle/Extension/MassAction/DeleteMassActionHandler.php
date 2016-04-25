@@ -4,29 +4,35 @@ namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\HttpFoundation\RequestStack;
 use Symfony\Component\Translation\TranslatorInterface;
 
+use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimiter;
+use Oro\Bundle\DataGridBundle\Extension\MassAction\Actions\Ajax\MassDelete\MassDeleteLimitResult;
 use Oro\Bundle\DataGridBundle\Exception\LogicException;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\DeletionIterableResult;
+
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class DeleteMassActionHandler implements MassActionHandlerInterface
 {
     const FLUSH_BATCH_SIZE = 100;
 
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     protected $entityManager;
 
-    /**
-     * @var TranslatorInterface
-     */
+    /** @var TranslatorInterface */
     protected $translator;
 
     /** @var SecurityFacade */
     protected $securityFacade;
+
+    /** @var MassDeleteLimiter */
+    protected $limiter;
+
+    /** @var RequestStack */
+    protected $requestStack;
 
     /**
      * @var string
@@ -37,15 +43,21 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      * @param EntityManager       $entityManager
      * @param TranslatorInterface $translator
      * @param SecurityFacade      $securityFacade
+     * @param MassDeleteLimiter   $limiter
+     * @param RequestStack        $requestStack
      */
     public function __construct(
         EntityManager $entityManager,
         TranslatorInterface $translator,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        MassDeleteLimiter $limiter,
+        RequestStack $requestStack
     ) {
         $this->entityManager  = $entityManager;
         $this->translator     = $translator;
         $this->securityFacade = $securityFacade;
+        $this->limiter        = $limiter;
+        $this->requestStack   = $requestStack;
     }
 
     /**
@@ -53,56 +65,18 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      */
     public function handle(MassActionHandlerArgs $args)
     {
-        $iteration             = 0;
-        $entityName            = null;
-        $entityIdentifiedField = null;
-
-        $results = new DeletionIterableResult($args->getResults()->getSource());
-        $results->setBufferSize(self::FLUSH_BATCH_SIZE);
-
-        // batch remove should be processed in transaction
-        $this->entityManager->beginTransaction();
-        try {
-            // if huge amount data must be deleted
-            set_time_limit(0);
-
-            foreach ($results as $result) {
-                /** @var $result ResultRecordInterface */
-                $entity = $result->getRootEntity();
-                if (!$entity) {
-                    // no entity in result record, it should be extracted from DB
-                    if (!$entityName) {
-                        $entityName = $this->getEntityName($args);
-                    }
-                    if (!$entityIdentifiedField) {
-                        $entityIdentifiedField = $this->getEntityIdentifierField($args);
-                    }
-                    $entity = $this->getEntity($entityName, $result->getValue($entityIdentifiedField));
-                }
-
-                if ($entity) {
-                    if ($this->securityFacade->isGranted('DELETE', $entity)) {
-                        $this->entityManager->remove($entity);
-                        $iteration++;
-                    }
-
-                    if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
-                        $this->finishBatch();
-                    }
-                }
-            }
-
-            if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
-                $this->finishBatch();
-            }
-
-            $this->entityManager->commit();
-        } catch (\Exception $e) {
-            $this->entityManager->rollback();
-            throw $e;
+        $limitResult = $this->limiter->getLimitResult($args);
+        $method      = $this->requestStack->getMasterRequest()->getMethod();
+        if ($method === 'POST') {
+            $result = $this->getPostResponse($limitResult);
+        } elseif ($method === 'DELETE') {
+            $this->limiter->limitQuery($limitResult, $args);
+            $result = $this->doDelete($args);
+        } else {
+            $result = $this->getNotSupportedResponse($method);
         }
 
-        return $this->getResponse($args, $iteration);
+        return $result;
     }
 
     /**
@@ -122,7 +96,7 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
      *
      * @return MassActionResponse
      */
-    protected function getResponse(MassActionHandlerArgs $args, $entitiesCount = 0)
+    protected function getDeleteResponse(MassActionHandlerArgs $args, $entitiesCount = 0)
     {
         $massAction      = $args->getMassAction();
         $responseMessage = $massAction->getOptions()->offsetGetByPath('[messages][success]', $this->responseMessage);
@@ -138,6 +112,37 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
                 ['%count%' => $entitiesCount]
             ),
             $options
+        );
+    }
+
+    /**
+     * @param MassDeleteLimitResult $limitResult
+     *
+     * @return MassActionResponse
+     */
+    protected function getPostResponse(MassDeleteLimitResult $limitResult)
+    {
+        return new MassActionResponse(
+            true,
+            'OK',
+            [
+                'selected'  => $limitResult->getSelected(),
+                'deletable' => $limitResult->getDeletable(),
+                'max_limit' => $limitResult->getMaxLimit()
+            ]
+        );
+    }
+
+    /**
+     * @param $method
+     *
+     * @return MassActionResponse
+     */
+    protected function getNotSupportedResponse($method)
+    {
+        return new MassActionResponse(
+            false,
+            sprintf('Method "%s" is not supported', $method)
         );
     }
 
@@ -191,5 +196,64 @@ class DeleteMassActionHandler implements MassActionHandlerInterface
     protected function getEntity($entityName, $identifierValue)
     {
         return $this->entityManager->getReference($entityName, $identifierValue);
+    }
+
+    /**
+     * @param MassActionHandlerArgs $args
+     *
+     * @return MassActionResponse
+     * @throws \Exception
+     */
+    protected function doDelete(MassActionHandlerArgs $args)
+    {
+        $iteration             = 0;
+        $entityName            = null;
+        $entityIdentifiedField = null;
+        $queryBuilder          = $args->getResults()->getSource();
+
+        $results = new DeletionIterableResult($queryBuilder);
+        $results->setBufferSize(self::FLUSH_BATCH_SIZE);
+
+        // batch remove should be processed in transaction
+        $this->entityManager->beginTransaction();
+        try {
+            // if huge amount data must be deleted
+            set_time_limit(0);
+
+            foreach ($results as $result) {
+                /** @var $result ResultRecordInterface */
+                $entity = $result->getRootEntity();
+                if (!$entity) {
+                    // no entity in result record, it should be extracted from DB
+                    if (!$entityName) {
+                        $entityName = $this->getEntityName($args);
+                    }
+                    if (!$entityIdentifiedField) {
+                        $entityIdentifiedField = $this->getEntityIdentifierField($args);
+                    }
+                    $entity = $this->getEntity($entityName, $result->getValue($entityIdentifiedField));
+                }
+
+                if ($entity) {
+                    $this->entityManager->remove($entity);
+                    $iteration++;
+
+                    if ($iteration % self::FLUSH_BATCH_SIZE == 0) {
+                        $this->finishBatch();
+                    }
+                }
+            }
+
+            if ($iteration % self::FLUSH_BATCH_SIZE > 0) {
+                $this->finishBatch();
+            }
+
+            $this->entityManager->commit();
+        } catch (\Exception $e) {
+            $this->entityManager->rollback();
+            throw $e;
+        }
+
+        return $this->getDeleteResponse($args, $iteration);
     }
 }

@@ -71,6 +71,9 @@ define([
         /** @property {Object} */
         launcherOptions: null,
 
+        /** @property {String} */
+        requestType: 'GET',
+
         /** @property {Object} */
         defaultMessages: {
             confirm_title: 'Execution Confirmation',
@@ -138,14 +141,16 @@ define([
 
         /**
          * Run action
+         *
+         * @param {Object} options
          */
-        run: function() {
-            var options = {
+        run: function(options) {
+            options = _.defaults(options, {
                 doExecute: true
-            };
+            });
             this.trigger('preExecute', this, options);
             if (options.doExecute) {
-                this.execute();
+                this.execute(options);
                 this.trigger('postExecute', this, options);
             }
         },
@@ -228,6 +233,7 @@ define([
                 data: this.getActionParameters(),
                 context: this,
                 dataType: 'json',
+                type: this.requestType,
                 error: this._onAjaxError,
                 success: this._onAjaxSuccess
             });
@@ -303,7 +309,7 @@ define([
             if (!this.confirmModal) {
                 this.confirmModal = (new this.confirmModalConstructor({
                     title: __(this.messages.confirm_title),
-                    content: __(this.messages.confirm_content),
+                    content: this.getConfirmContentMessage(),
                     okText: __(this.messages.confirm_ok),
                     cancelText: __(this.messages.confirm_cancel)
                 }));
@@ -312,7 +318,26 @@ define([
                 this.subviews.push(this.confirmModal);
             }
             return this.confirmModal;
+        },
+
+        /**
+         * Get confirm content message
+         *
+         * @return {String}
+         */
+        getConfirmContentMessage: function() {
+            return __(this.messages.confirm_content);
+        },
+
+        /**
+         * Get ajax request type
+         *
+         * @return {String}
+         */
+        getRequestType: function() {
+            return this.requestType;
         }
+
     });
 
     return AbstractAction;

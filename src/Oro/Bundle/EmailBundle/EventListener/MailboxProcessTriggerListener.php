@@ -93,6 +93,8 @@ class MailboxProcessTriggerListener extends MailboxEmailListener
          */
         foreach ($definitions as $definition) {
             $trigger = new ProcessTrigger();
+            //id must be unique otherwise in cache will be saved and runned first definition with id = null
+            $trigger->setId($definition->getName());
             $trigger->setDefinition($definition);
 
             $data = new ProcessData();

@@ -28,6 +28,13 @@
     {% set actions = [action] %}
 
     {% set action %}
+        <a href="<%= routing.generate('oro_calendar_event_view', {'id': relatedActivityId}) %>"
+           title="{{ 'oro.calendar.view'|trans|raw }}"><i
+                class="icon-eye-open hide-text">{{ 'oro.calendar.view'|trans|raw }}</i></a>
+    {% endset %}
+    {% set actions = actions|merge([action]) %}
+
+    {% set action %}
         <% if (editable) { %>
         <a href="#" class="action item-edit-button"
            title="{{ 'oro.calendar.calendarevent.update_event'|trans({'{{ entity }}': entityName})|raw }}">

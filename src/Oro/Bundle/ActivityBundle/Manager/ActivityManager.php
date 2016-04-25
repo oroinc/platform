@@ -410,17 +410,17 @@ class ActivityManager
     {
         $result = [];
 
-        $config = $this->activityConfigProvider->getConfig($entityClass);
-        $activityClassNames = $config->get('activities', false, []);
+        $activityClassNames = $this->activityConfigProvider
+            ->getConfig($entityClass)
+            ->get('activities', false, []);
         foreach ($activityClassNames as $activityClassName) {
-            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
+            $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
+            if (!$this->isActivityAssociationEnabled($activityClassName, $associationName)) {
                 continue;
             }
 
             $entityConfig   = $this->entityConfigProvider->getConfig($activityClassName);
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
-
-            $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
 
             $item = [
                 'className'       => $activityClassName,
@@ -455,17 +455,18 @@ class ActivityManager
     {
         $result = [];
 
-        $activityClassNames = $this->activityConfigProvider->getConfig($entityClass)->get('activities');
+        $activityClassNames = $this->activityConfigProvider
+            ->getConfig($entityClass)
+            ->get('activities', false, []);
         foreach ($activityClassNames as $activityClassName) {
-            if (!$this->isActivityAssociationEnabled($entityClass, $activityClassName)) {
+            $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
+            if (!$this->isActivityAssociationEnabled($activityClassName, $associationName)) {
                 continue;
             }
 
             $activityConfig = $this->activityConfigProvider->getConfig($activityClassName);
             $buttonWidget   = $activityConfig->get('action_button_widget');
             if (!empty($buttonWidget)) {
-                $associationName = ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND);
-
                 $item = [
                     'className'       => $activityClassName,
                     'associationName' => $associationName,
@@ -564,22 +565,19 @@ class ActivityManager
     }
 
     /**
-     * @param string $entityClass
      * @param string $activityClassName
+     * @param string $activityAssociationName
      *
      * @return bool
      */
-    protected function isActivityAssociationEnabled($entityClass, $activityClassName)
+    protected function isActivityAssociationEnabled($activityClassName, $activityAssociationName)
     {
-        $extendConfig = $this->extendConfigProvider->getConfig($activityClassName);
-        $relations    = $extendConfig->get('relation', false, []);
-        $relationKey  = ExtendHelper::buildRelationKey(
-            $activityClassName,
-            ExtendHelper::buildAssociationName($entityClass, ActivityScope::ASSOCIATION_KIND),
-            RelationType::MANY_TO_MANY,
-            $entityClass
-        );
+        if (!$this->extendConfigProvider->hasConfig($activityClassName, $activityAssociationName)) {
+            return false;
+        }
 
-        return isset($relations[$relationKey]);
+        return ExtendHelper::isFieldAccessible(
+            $this->extendConfigProvider->getConfig($activityClassName, $activityAssociationName)
+        );
     }
 }

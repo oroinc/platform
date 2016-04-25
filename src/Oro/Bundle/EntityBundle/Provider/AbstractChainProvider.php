@@ -36,11 +36,9 @@ abstract class AbstractChainProvider
         if (null === $this->sorted) {
             ksort($this->providers);
 
-            if (empty($this->providers)) {
-                $this->sorted = [];
-            } else {
-                $this->sorted = call_user_func_array('array_merge', $this->providers);
-            }
+            $this->sorted = $this->providers
+                ? call_user_func_array('array_merge', $this->providers)
+                : [];
         }
 
         return $this->sorted;

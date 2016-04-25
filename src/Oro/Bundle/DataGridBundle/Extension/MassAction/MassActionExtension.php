@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DataGridBundle\Extension\MassAction;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 use Oro\Bundle\DataGridBundle\Extension\Action\Actions\ActionInterface;
@@ -16,17 +17,29 @@ class MassActionExtension extends ActionExtension
     protected $actions = [];
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function isApplicable(DatagridConfiguration $config)
     {
-        $massActions = $config->offsetGetOr(static::ACTION_KEY, []);
-
-        return !empty($massActions);
+        // Applicable due to the possibility of dynamically add mass action
+        return true;
     }
 
     /**
-     * Get grid massaction by name
+     * {@inheritDoc}
+     */
+    public function visitResult(DatagridConfiguration $config, ResultsObject $result)
+    {
+        $result->offsetAddToArray(
+            'metadata',
+            [
+                static::METADATA_ACTION_KEY => $this->getActionsMetadata($config)
+            ]
+        );
+    }
+
+    /**
+     * Get grid mass action by name
      *
      * @param string           $name
      * @param DatagridInterface $datagrid

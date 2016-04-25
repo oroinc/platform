@@ -14,12 +14,12 @@ services:
     oro_reminder.entity.manager:
         class: %oro_reminder.entity.manager.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
 
     oro_reminder.sender:
         class: %oro_reminder.sender.class%
         arguments:
-            - @oro_reminder.send_processor_registry
+            - '@oro_reminder.send_processor_registry'
         lazy: true
 
     oro_reminder.send_processor_registry:
@@ -30,24 +30,24 @@ services:
     oro_reminder.model.email_notification:
         class: %oro_reminder.model.email_notification.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_entity_config.provider.reminder
-            - @oro_entity.entity_name_resolver
+            - '@doctrine.orm.entity_manager'
+            - '@oro_entity_config.provider.reminder'
+            - '@oro_entity.entity_name_resolver'
 
     oro_reminder.send_processor.email:
         class: %oro_reminder.send_processor.email.class%
         arguments:
-            - @oro_notification.email_processor
-            - @oro_reminder.model.email_notification
-            - @event_dispatcher
+            - '@oro_notification.email_processor'
+            - '@oro_reminder.model.email_notification'
+            - '@event_dispatcher'
         tags:
             - { name: oro_reminder.send_processor }
 
     oro_reminder.send_processor.web_socket:
         class: %oro_reminder.send_processor.web_socket.class%
         arguments:
-            - @oro_wamp.publisher
-            - @oro_reminder.web_socket.message_params_provider
+            - '@oro_wamp.publisher'
+            - '@oro_reminder.web_socket.message_params_provider'
         tags:
             - { name: oro_reminder.send_processor }
 
@@ -55,23 +55,23 @@ services:
     oro_reminder.web_socket.message_params_provider:
         class: %oro_reminder.web_socket.message_params_provider.class%
         arguments:
-            - @translator
-            - @oro_locale.formatter.date_time
-            - @oro_reminder.url_provider
-            - @oro_entity_config.provider.reminder
+            - '@translator'
+            - '@oro_locale.formatter.date_time'
+            - '@oro_reminder.url_provider'
+            - '@oro_entity_config.provider.reminder'
 
     oro_reminder.url_provider:
         class: %oro_reminder.url_provider.class%
         arguments:
-            - @oro_entity_config.config_manager
-            - @router
+            - '@oro_entity_config.config_manager'
+            - '@router'
 
     #twig extension
     oro_reminder.twig.extension:
         class: %oro_reminder.twig.extension.class%
         arguments:
-            - @doctrine.orm.entity_manager
-            - @security.context
-            - @oro_reminder.web_socket.message_params_provider
+            - '@doctrine.orm.entity_manager'
+            - '@security.context'
+            - '@oro_reminder.web_socket.message_params_provider'
         tags:
             - { name: twig.extension }

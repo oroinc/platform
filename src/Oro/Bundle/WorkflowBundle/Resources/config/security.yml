@@ -6,12 +6,12 @@ services:
     oro_workflow.security.acl.manager:
         class: %oro_workflow.security.acl.manager.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_workflow.registry
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.registry'
 
     oro_workflow.security.acl.voter.entity:
         class: %oro_workflow.security.acl.voter.entity.class%
         arguments:
-            - @oro_entity.doctrine_helper
+            - '@oro_entity.doctrine_helper'
         tags:
             - { name: security.voter, priority: 500 }

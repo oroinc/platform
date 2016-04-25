@@ -13,6 +13,8 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
@@ -624,32 +626,30 @@ class ActivityManagerTest extends OrmTestCase
         $activity1Class    = 'Test\Activity1';
         $activity2Class    = 'Test\Activity2';
 
-        $activity1RelationKey = ExtendHelper::buildRelationKey(
-            $activity1Class,
-            ExtendHelper::buildAssociationName($targetEntityClass, ActivityScope::ASSOCIATION_KIND),
-            'manyToMany',
-            $targetEntityClass
-        );
-        $activity2RelationKey = ExtendHelper::buildRelationKey(
-            $activity2Class,
-            ExtendHelper::buildAssociationName($targetEntityClass, ActivityScope::ASSOCIATION_KIND),
-            'manyToMany',
-            $targetEntityClass
-        );
-
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
         $targetEntityActivityConfig->set('activities', [$activity1Class, $activity2Class]);
 
-        $activity1ExtendConfig = new Config(new EntityConfigId('extend', $activity1Class));
-        $activity1ExtendConfig->set('relation', [$activity1RelationKey => []]);
+        $activityAssociationName   = ExtendHelper::buildAssociationName(
+            $targetEntityClass,
+            ActivityScope::ASSOCIATION_KIND
+        );
+        $activityAssociation1Config = new Config(
+            new FieldConfigId('extend', $activity1Class, $activityAssociationName)
+        );
+        $activityAssociation1Config->set('is_extend', true);
+        $activityAssociation1Config->set('state', ExtendScope::STATE_ACTIVE);
+        $activityAssociation2Config = new Config(
+            new FieldConfigId('extend', $activity2Class, $activityAssociationName)
+        );
+        $activityAssociation2Config->set('is_extend', true);
+        $activityAssociation2Config->set('state', ExtendScope::STATE_ACTIVE);
+
         $activity1EntityConfig = new Config(new EntityConfigId('entity', $activity1Class));
         $activity1EntityConfig->set('plural_label', 'lbl.activity1');
         $activity1ActivityConfig = new Config(new EntityConfigId('activity', $activity1Class));
         $activity1ActivityConfig->set('route', 'route1');
         $activity1ActivityConfig->set('acl', 'acl1');
 
-        $activity2ExtendConfig = new Config(new EntityConfigId('extend', $activity2Class));
-        $activity2ExtendConfig->set('relation', [$activity2RelationKey => []]);
         $activity2EntityConfig = new Config(new EntityConfigId('entity', $activity2Class));
         $activity2EntityConfig->set('plural_label', 'lbl.activity2');
         $activity2ActivityConfig = new Config(new EntityConfigId('activity', $activity2Class));
@@ -657,12 +657,22 @@ class ActivityManagerTest extends OrmTestCase
         $activity2ActivityConfig->set('priority', 100);
 
         $this->extendConfigProvider->expects($this->any())
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$activity1Class, $activityAssociationName, true],
+                        [$activity2Class, $activityAssociationName, true],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
             ->will(
                 $this->returnValueMap(
                     [
-                        [$activity1Class, null, $activity1ExtendConfig],
-                        [$activity2Class, null, $activity2ExtendConfig],
+                        [$activity1Class, $activityAssociationName, $activityAssociation1Config],
+                        [$activity2Class, $activityAssociationName, $activityAssociation2Config],
                     ]
                 )
             );
@@ -710,7 +720,7 @@ class ActivityManagerTest extends OrmTestCase
     }
 
     /**
-     * Test that activity is not returned id activity is enabled on UI but schema update is not performed yet
+     * Test that activity is not returned if an activity is enabled on UI but schema update is not performed yet
      */
     public function testGetActivityAssociationsNoSchemaUpdate()
     {
@@ -720,17 +730,28 @@ class ActivityManagerTest extends OrmTestCase
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
         $targetEntityActivityConfig->set('activities', [$activityClass]);
 
-        $activityExtendConfig = new Config(new EntityConfigId('extend', $activityClass));
-        $activityExtendConfig->set('relation', []);
+        $activityAssociationName   = ExtendHelper::buildAssociationName(
+            $targetEntityClass,
+            ActivityScope::ASSOCIATION_KIND
+        );
+        $activityAssociationConfig = new Config(
+            new FieldConfigId('extend', $activityClass, $activityAssociationName)
+        );
+        $activityAssociationConfig->set('is_extend', true);
+        $activityAssociationConfig->set('state', ExtendScope::STATE_NEW);
 
         $this->activityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($targetEntityClass, null)
             ->will($this->returnValue($targetEntityActivityConfig));
         $this->extendConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($activityClass, $activityAssociationName)
+            ->will($this->returnValue(true));
+        $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->with($activityClass, null)
-            ->will($this->returnValue($activityExtendConfig));
+            ->with($activityClass, $activityAssociationName)
+            ->will($this->returnValue($activityAssociationConfig));
         $this->entityConfigProvider->expects($this->never())
             ->method('getConfig');
 
@@ -746,32 +767,30 @@ class ActivityManagerTest extends OrmTestCase
         $activity1Class    = 'Test\Activity1';
         $activity2Class    = 'Test\Activity2';
 
-        $activity1RelationKey = ExtendHelper::buildRelationKey(
-            $activity1Class,
-            ExtendHelper::buildAssociationName($targetEntityClass, ActivityScope::ASSOCIATION_KIND),
-            'manyToMany',
-            $targetEntityClass
-        );
-        $activity2RelationKey = ExtendHelper::buildRelationKey(
-            $activity2Class,
-            ExtendHelper::buildAssociationName($targetEntityClass, ActivityScope::ASSOCIATION_KIND),
-            'manyToMany',
-            $targetEntityClass
-        );
-
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
         $targetEntityActivityConfig->set('activities', [$activity1Class, $activity2Class]);
 
-        $activity1ExtendConfig = new Config(new EntityConfigId('extend', $activity1Class));
-        $activity1ExtendConfig->set('relation', [$activity1RelationKey => []]);
+        $activityAssociationName   = ExtendHelper::buildAssociationName(
+            $targetEntityClass,
+            ActivityScope::ASSOCIATION_KIND
+        );
+        $activityAssociation1Config = new Config(
+            new FieldConfigId('extend', $activity1Class, $activityAssociationName)
+        );
+        $activityAssociation1Config->set('is_extend', true);
+        $activityAssociation1Config->set('state', ExtendScope::STATE_ACTIVE);
+        $activityAssociation2Config = new Config(
+            new FieldConfigId('extend', $activity2Class, $activityAssociationName)
+        );
+        $activityAssociation2Config->set('is_extend', true);
+        $activityAssociation2Config->set('state', ExtendScope::STATE_ACTIVE);
+
         $activity1EntityConfig = new Config(new EntityConfigId('entity', $activity1Class));
         $activity1EntityConfig->set('plural_label', 'lbl.activity1');
         $activity1ActivityConfig = new Config(new EntityConfigId('activity', $activity1Class));
         $activity1ActivityConfig->set('action_button_widget', 'button_widget1');
         $activity1ActivityConfig->set('action_link_widget', 'link_widget1');
 
-        $activity2ExtendConfig = new Config(new EntityConfigId('extend', $activity2Class));
-        $activity2ExtendConfig->set('relation', [$activity2RelationKey => []]);
         $activity2EntityConfig = new Config(new EntityConfigId('entity', $activity2Class));
         $activity2EntityConfig->set('plural_label', 'lbl.activity2');
         $activity2ActivityConfig = new Config(new EntityConfigId('activity', $activity2Class));
@@ -780,12 +799,22 @@ class ActivityManagerTest extends OrmTestCase
         $activity2ActivityConfig->set('priority', 100);
 
         $this->extendConfigProvider->expects($this->any())
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [$activity1Class, $activityAssociationName, true],
+                        [$activity2Class, $activityAssociationName, true],
+                    ]
+                )
+            );
+        $this->extendConfigProvider->expects($this->any())
             ->method('getConfig')
             ->will(
                 $this->returnValueMap(
                     [
-                        [$activity1Class, null, $activity1ExtendConfig],
-                        [$activity2Class, null, $activity2ExtendConfig],
+                        [$activity1Class, $activityAssociationName, $activityAssociation1Config],
+                        [$activity2Class, $activityAssociationName, $activityAssociation2Config],
                     ]
                 )
             );
@@ -832,7 +861,7 @@ class ActivityManagerTest extends OrmTestCase
     }
 
     /**
-     * Test that activity action is not returned id activity is enabled on UI but schema update is not performed yet
+     * Test that activity action is not returned if an activity is enabled on UI but schema update is not performed yet
      */
     public function testGetActivityActionsNoSchemaUpdate()
     {
@@ -842,17 +871,28 @@ class ActivityManagerTest extends OrmTestCase
         $targetEntityActivityConfig = new Config(new EntityConfigId('activity', $targetEntityClass));
         $targetEntityActivityConfig->set('activities', [$activityClass]);
 
-        $activityExtendConfig = new Config(new EntityConfigId('extend', $activityClass));
-        $activityExtendConfig->set('relation', []);
+        $activityAssociationName   = ExtendHelper::buildAssociationName(
+            $targetEntityClass,
+            ActivityScope::ASSOCIATION_KIND
+        );
+        $activityAssociationConfig = new Config(
+            new FieldConfigId('extend', $activityClass, $activityAssociationName)
+        );
+        $activityAssociationConfig->set('is_extend', true);
+        $activityAssociationConfig->set('state', ExtendScope::STATE_NEW);
 
         $this->activityConfigProvider->expects($this->once())
             ->method('getConfig')
             ->with($targetEntityClass, null)
             ->will($this->returnValue($targetEntityActivityConfig));
         $this->extendConfigProvider->expects($this->once())
+            ->method('hasConfig')
+            ->with($activityClass, $activityAssociationName)
+            ->will($this->returnValue(true));
+        $this->extendConfigProvider->expects($this->once())
             ->method('getConfig')
-            ->with($activityClass, null)
-            ->will($this->returnValue($activityExtendConfig));
+            ->with($activityClass, $activityAssociationName)
+            ->will($this->returnValue($activityAssociationConfig));
         $this->entityConfigProvider->expects($this->never())
             ->method('getConfig');
 

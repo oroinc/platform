@@ -2,6 +2,10 @@
 
 namespace Oro\Bundle\ImportExportBundle\Converter;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
+
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\LoadEntityRulesAndBackendHeadersEvent;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 use Oro\Bundle\ImportExportBundle\Processor\EntityNameAwareInterface;
 use Oro\Bundle\ImportExportBundle\Exception\LogicException;
@@ -12,30 +16,26 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     const DEFAULT_MULTIPLE_RELATION_LEVEL = 3;
     const DEFAULT_ORDER = 10000;
 
-    /**
-     * @var string
-     */
+    const CONVERSION_TYPE_DATA = 'data';
+    const CONVERSION_TYPE_FIXTURES = 'fixtures';
+
+    /** @var string */
     protected $entityName;
 
-    /**
-     * @var FieldHelper
-     */
+    /**  @var FieldHelper */
     protected $fieldHelper;
 
-    /**
-     * @var RelationCalculator
-     */
+    /** @var RelationCalculator */
     protected $relationCalculator;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $relationDelimiter = ' ';
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $collectionDelimiter = '(\d+)';
+
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
 
     /**
      * @param FieldHelper $fieldHelper
@@ -45,6 +45,50 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     {
         $this->fieldHelper = $fieldHelper;
         $this->relationCalculator = $relationCalculator;
+    }
+
+    /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
+     * Get field header
+     *
+     * @param string $entityClassName
+     * @param string $initialFieldName
+     * @param bool $isSearchingIdentityField
+     * @return null|string
+     */
+    public function getFieldHeaderWithRelation($entityClassName, $initialFieldName, $isSearchingIdentityField = false)
+    {
+        $fields = $this->fieldHelper->getFields($entityClassName, true);
+
+        foreach ($fields as $field) {
+            $fieldName = $field['name'];
+            $notFoundFieldName = !$isSearchingIdentityField && $fieldName !== $initialFieldName;
+            $foundIdentifyField = $this->fieldHelper->getConfigValue($entityClassName, $fieldName, 'identity');
+            $notFoundFieldIdentify = $isSearchingIdentityField && !$foundIdentifyField;
+
+            if ($notFoundFieldName || $notFoundFieldIdentify) {
+                continue;
+            }
+
+            if ($this->fieldHelper->isRelation($field) &&
+                !$this->fieldHelper->processRelationAsScalar($entityClassName, $fieldName)) {
+                return
+                    $this->getFieldHeader($entityClassName, $field) .
+                    $this->relationDelimiter .
+                    $this->getFieldHeaderWithRelation($field['related_entity_name'], null, true);
+            }
+
+            return $this->getFieldHeader($entityClassName, $field);
+        }
+
+        return null;
     }
 
     /**
@@ -134,41 +178,42 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
                 continue;
             }
 
-            // get import/export config parameters
-            $fieldHeader = $this->getFieldHeader($entityName, $field);
+            if ($fullData || $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
+                // get import/export config parameters
+                $fieldHeader = $this->getFieldHeader($entityName, $field);
 
-            $fieldOrder = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'order');
-            if ($fieldOrder === null || $fieldOrder === '') {
-                $fieldOrder = $defaultOrder;
-                $defaultOrder++;
-            }
-            $fieldOrder = (int)$fieldOrder;
+                $fieldOrder = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'order');
+                if ($fieldOrder === null || $fieldOrder === '') {
+                    $fieldOrder = $defaultOrder;
+                    $defaultOrder++;
+                }
+                $fieldOrder = (int)$fieldOrder;
 
-            // process relations
-            if ($this->fieldHelper->isRelation($field)
-                && !$this->fieldHelper->processRelationAsScalar($entityName, $fieldName)
-            ) {
-                list($relationRules, $relationBackendHeaders) = $this->getRelatedEntityRulesAndBackendHeaders(
-                    $entityName,
-                    $fullData,
-                    $singleRelationDeepLevel,
-                    $multipleRelationDeepLevel,
-                    $field,
-                    $fieldHeader,
-                    $fieldOrder
-                );
-                $rules = array_merge($rules, $relationRules);
-                $backendHeaders = array_merge($backendHeaders, $relationBackendHeaders);
-            } else {
-                // process scalars
-                if ($fullData || $this->fieldHelper->getConfigValue($entityName, $fieldName, 'identity')) {
+                // process relations
+                if ($this->fieldHelper->isRelation($field)
+                    && !$this->fieldHelper->processRelationAsScalar($entityName, $fieldName)
+                ) {
+                    list($relationRules, $relationBackendHeaders) = $this->getRelatedEntityRulesAndBackendHeaders(
+                        $entityName,
+                        $singleRelationDeepLevel,
+                        $multipleRelationDeepLevel,
+                        $field,
+                        $fieldHeader,
+                        $fieldOrder
+                    );
+                    $rules = array_merge($rules, $relationRules);
+                    $backendHeaders = array_merge($backendHeaders, $relationBackendHeaders);
+                } else {
+                    // process scalars
                     $rules[$fieldHeader] = ['value' => $fieldName, 'order' => $fieldOrder];
                     $backendHeaders[] = $rules[$fieldHeader];
                 }
             }
         }
 
-        return [$this->sortData($rules), $this->sortData($backendHeaders)];
+        $event = $this->dispatchEntityRulesEvent($entityName, $backendHeaders, $rules, $fullData);
+
+        return [$this->sortData($event->getRules()), $this->sortData($event->getHeaders())];
     }
 
     /**
@@ -315,8 +360,8 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
     }
 
     /**
-     * @param int $a
-     * @param int $b
+     * @param array $a
+     * @param array $b
      * @return int
      */
     protected function sortDataCallback($a, $b)
@@ -366,7 +411,6 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
 
     /**
      * @param string $entityName
-     * @param bool $fullData
      * @param int $singleRelationDeepLevel
      * @param int $multipleRelationDeepLevel
      * @param array $field
@@ -377,15 +421,12 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
      */
     protected function getRelatedEntityRulesAndBackendHeaders(
         $entityName,
-        $fullData,
         $singleRelationDeepLevel,
         $multipleRelationDeepLevel,
         $field,
         $fieldHeader,
-        $fieldOrder,
-        $isIdentifier = false
+        $fieldOrder
     ) {
-        $fieldName = $field['name'];
         $relationRules = [];
         $relationBackendHeaders = [];
 
@@ -393,8 +434,9 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         $isMultipleRelation = $this->fieldHelper->isMultipleRelation($field) && $multipleRelationDeepLevel > 0;
 
         // if relation must be included
-        if ($fullData && ($isSingleRelation || $isMultipleRelation)) {
+        if ($isSingleRelation || $isMultipleRelation) {
             $relatedEntityName = $field['related_entity_name'];
+            $fieldName = $field['name'];
             $fieldFullData = $this->fieldHelper->getConfigValue($entityName, $fieldName, 'full', false);
 
             // process and merge relation rules and backend header for relation
@@ -425,5 +467,40 @@ class ConfigurableTableDataConverter extends AbstractTableDataConverter implemen
         }
 
         return [$relationRules, $relationBackendHeaders];
+    }
+
+    /**
+     * @return string
+     */
+    protected function getConversionType()
+    {
+        return $this->relationCalculator instanceof RelationCalculator
+            ? static::CONVERSION_TYPE_DATA
+            : static::CONVERSION_TYPE_FIXTURES;
+    }
+
+    /**
+     * @param string $entityName
+     * @param array $backendHeaders
+     * @param array $rules
+     * @param bool $fullData
+     *
+     * @return LoadEntityRulesAndBackendHeadersEvent
+     */
+    protected function dispatchEntityRulesEvent($entityName, $backendHeaders, array $rules, $fullData)
+    {
+        $event = new LoadEntityRulesAndBackendHeadersEvent(
+            $entityName,
+            $backendHeaders,
+            $rules,
+            $this->convertDelimiter,
+            $this->getConversionType(),
+            $fullData
+        );
+        if ($this->dispatcher && $this->dispatcher->hasListeners(Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS)) {
+            $this->dispatcher->dispatch(Events::AFTER_LOAD_ENTITY_RULES_AND_BACKEND_HEADERS, $event);
+        }
+
+        return $event;
     }
 }

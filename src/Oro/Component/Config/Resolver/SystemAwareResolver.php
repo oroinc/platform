@@ -4,21 +4,27 @@ namespace Oro\Component\Config\Resolver;
 
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
 use Symfony\Component\DependencyInjection\ContainerInterface;
+use Symfony\Component\PropertyAccess\PropertyAccessorInterface;
 
+use Oro\Component\PropertyAccess\PropertyAccessor;
+
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
 {
     const PARENT_NODE = 'parent_node';
     const NODE_KEY    = 'node_key';
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $context;
+
+    /** @var PropertyAccessorInterface|null */
+    protected $propertyAccessor;
 
     /**
      * @param ContainerInterface $container
@@ -39,7 +45,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
     /**
      * {@inheritdoc}
      */
-    public function resolve(array $config, array $context = array())
+    public function resolve(array $config, array $context = [])
     {
         $this->context = $context;
         $this->doResolve($config);
@@ -75,7 +81,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
      */
     protected function resolveSystemCall($val)
     {
-        if (!is_scalar($val)) {
+        if (!is_string($val)) {
             return $val;
         }
 
@@ -83,11 +89,11 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
             $val = $this->resolveParameter($val);
         }
 
-        if (is_scalar($val) && strpos($val, '::') !== false) {
+        if (is_string($val) && strpos($val, '::') !== false) {
             $val = $this->resolveStatic($val);
         }
 
-        if (is_scalar($val) && strpos($val, '@') !== false) {
+        if (is_string($val) && strpos($val, '@') !== false) {
             $val = $this->resolveService($val);
         }
 
@@ -113,17 +119,22 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
      */
     protected function getMethodCallParameters($declaration)
     {
-        $result = array();
+        $result = [];
 
-        $items = explode(',', trim($declaration, '()'));
+        $items = array_filter(explode(',', trim($declaration, '()')));
         foreach ($items as $item) {
             $item = trim($item, ' ');
 
             if ($this->startsWith($item, '$') && $this->endsWith($item, '$')) {
                 $name = substr($item, 1, -1);
-                $item = (isset($this->context[$name]) || array_key_exists($name, $this->context))
-                    ? $this->context[$name]
-                    : null;
+                $dot = strpos($name, '.');
+                $objectName = $dot ? substr($name, 0, $dot) : $name;
+                $item = $this->getContextValue($objectName);
+
+                if ($dot) {
+                    $propertyPath = substr($name, $dot + 1);
+                    $item = $this->getPropertyAccessor()->getValue($item, $propertyPath);
+                }
             } elseif ($this->startsWith($item, '%') && $this->endsWith($item, '%')) {
                 $name = substr($item, 1, -1);
                 $item = $this->getParameter($name);
@@ -133,6 +144,16 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         }
 
         return $result;
+    }
+
+    /**
+     * @param string $name
+     *
+     * @return mixed
+     */
+    protected function getContextValue($name)
+    {
+        return isset($this->context[$name]) ? $this->context[$name] : null;
     }
 
     /**
@@ -161,10 +182,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
      */
     protected function callServiceMethod($service, $method, $params)
     {
-        return call_user_func_array(
-            array($this->getService($service), $method),
-            $params
-        );
+        return call_user_func_array([$this->getService($service), $method], $params);
     }
 
     /**
@@ -204,7 +222,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
      */
     protected function endsWith($haystack, $needle)
     {
-        return substr($haystack, -strlen($needle)) == $needle;
+        return substr($haystack, -strlen($needle)) === $needle;
     }
 
     /**
@@ -229,7 +247,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
     /**
      * Resolve static call class:method or class::const
      *
-     * @param sting $val
+     * @param string $val
      * @return mixed
      */
     protected function resolveStatic($val)
@@ -271,7 +289,7 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         if (strpos($val, '->') === false && preg_match('#@([\w\.]+)#', $val, $match)) {
             $val = $this->getService($match[1]);
         } elseif (preg_match('#@([\w\.]+)->([\w\.]+)(\([^\)]*\))?#', $val, $match)) {
-            $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : array();
+            $params = isset($match[3]) ? $this->getMethodCallParameters($match[3]) : [];
             $val    = $this->replaceValue(
                 $val,
                 $this->callServiceMethod($match[1], $match[2], $params),
@@ -280,5 +298,17 @@ class SystemAwareResolver implements ResolverInterface, ContainerAwareInterface
         }
 
         return $val;
+    }
+
+    /**
+     * @return PropertyAccessorInterface
+     */
+    protected function getPropertyAccessor()
+    {
+        if (!$this->propertyAccessor) {
+            $this->propertyAccessor = new PropertyAccessor();
+        }
+
+        return $this->propertyAccessor;
     }
 }

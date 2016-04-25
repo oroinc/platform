@@ -25,11 +25,9 @@ abstract class AbstractRole extends BaseRole
      */
     public function setRole($role, $generateUnique = true)
     {
-        if ($generateUnique) {
-            $this->role = $this->generateUniqueRole($role);
-        } else {
-            $this->role = $this->addPrefix($this->normalize($role));
-        }
+        $this->role = $generateUnique
+            ? $this->generateUniqueRole($role)
+            : $this->addPrefix($this->normalize($role));
 
         return $this;
     }

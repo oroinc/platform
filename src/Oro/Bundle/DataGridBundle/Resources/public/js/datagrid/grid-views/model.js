@@ -1,8 +1,9 @@
 define([
     'backbone',
     'underscore',
-    'routing'
-], function(Backbone, _, routing) {
+    'routing',
+    'orotranslation/js/translator'
+], function(Backbone, _, routing, __) {
     'use strict';
 
     var GridViewsModel;
@@ -10,6 +11,7 @@ define([
     GridViewsModel = Backbone.Model.extend({
         route: 'oro_datagrid_api_rest_gridview_post',
         urlRoot: null,
+        sharedByLabel: 'oro.datagrid.grid_views.shared_by.label',
 
         /** @property */
         idAttribute: 'name',
@@ -20,7 +22,9 @@ define([
             sorters: [],
             columns: {},
             deletable: false,
-            editable:  false
+            editable:  false,
+            is_default: false,
+            shared_by: null
         },
 
         /** @property */
@@ -77,7 +81,16 @@ define([
          * @returns {Array}
          */
         toJSON: function() {
-            return _.omit(this.attributes, ['editable', 'deletable']);
+            return _.omit(this.attributes, ['editable', 'deletable', 'shared_by']);
+        },
+
+        /**
+         * @returns {string}
+         */
+        getLabel: function() {
+            var label = this.get('label');
+            var sharedBy = this.get('shared_by');
+            return null === sharedBy ? label : label + '(' + __(this.sharedByLabel, {name: sharedBy}) + ')';
         }
     });
 

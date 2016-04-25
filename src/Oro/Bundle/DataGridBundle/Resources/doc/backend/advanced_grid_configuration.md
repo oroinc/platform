@@ -238,28 +238,32 @@ datagrid:
 #### Problem:
 *I'm developing grid that should not be under ACL control*
 #### Solution:
-- set option 'skip_acl_check' to TRUE
+- set option 'skip_acl_apply' to TRUE
 
 Example:
 ``` yml
 datagrid:
     acme-demo-grid:
         ... # some configuration
-        options:
-            skip_acl_check: true
+        source:
+            skip_acl_apply: true
+            ... # some configuration of source
 ```
 
 #### Problem:
-*I want to implement some custom security verification/logic without any default acl, even if some "acl_resource" have been defined *
+*I want to implement some custom security verification/logic without any default ACL, even if some "acl_resource" have been defined *
 *e.g. i'm extending some existing grid but with custom acl logic*
 #### Solution:
-- configure grid (set option 'skip_acl_check' to TRUE)
+- configure grid (set option 'skip_acl_apply' to TRUE)
+- override option 'acl_resource' and to make it false
 ``` yml
 datagrid:
     acme-demo-grid:
         ... # some configuration
-        options:
-            skip_acl_check: true
+        acl_resource: false
+        source:
+            skip_acl_apply: true
+            ... # some configuration of source
 ```
 - declare own grid listener
 ```
@@ -273,3 +277,18 @@ my_bundle.event_listener.my_grid_listener:
 - as an example see:
     - Oro/Bundle/UserBundle/Resources/config/datagrid.yml (owner-users-select-grid)
     - Oro/Bundle/UserBundle/EventListener/OwnerUserGridListener.php (service name: "oro_user.event_listener.owner_user_grid_listener")
+
+#### Problem:
+*I want to have a grid secured by ACL resource but skip applying of ACL to DQL query of the grid.*
+#### Solution:
+- configure grid with option 'skip_acl_apply' set to TRUE, it will ignore applying of ACL to source query of the grid
+- configure grid with option 'acl_resource' set to name of some ACL resource, it will check permission to this ACL resouce before datagrid data will be loaded 
+``` yml
+datagrid:
+    acme-demo-grid:
+        ... # some configuration
+        acl_resource: 'acme_demo_entity_view'
+        source:
+            skip_acl_apply: true
+            
+```

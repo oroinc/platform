@@ -14,6 +14,11 @@ define([
          */
         options: {},
 
+        events: {
+            'change input[name$="[contexts]"]': 'onContextChange',
+            'select2-data-loaded input[name$="[contexts]"]': 'onContextChange'
+        },
+
         /**
          * @constructor
          *
@@ -39,6 +44,10 @@ define([
             opts = this.options;
             datepair = new DatepairView(opts);
             this.subview('datepair', datepair);
+        },
+
+        onContextChange: function() {
+            this.$el.trigger('content:changed');
         }
     });
 

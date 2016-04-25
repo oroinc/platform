@@ -1,0 +1,8 @@
+placeholders:
+    segment_criteria_list:
+        items:
+            field_condition: ~
+
+items:
+    field_condition:
+        template: OroSegmentBundle:Segment:field_condition.html.twig

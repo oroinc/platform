@@ -17,8 +17,12 @@ define(['jquery'], function($) {
         setCursorPosition: function(index) {
             return this.each(function() {
                 var el = this;
-                if ('selectionStart' in el && el.type !== 'number') {
-                    el.selectionEnd = el.selectionStart = index === 'end' ? el.value.length : index;
+                if ('selectionStart' in el) {
+                    try {
+                        el.selectionEnd = el.selectionStart = index === 'end' ? el.value.length : index;
+                    } catch (ex) {
+                        // avoid exeption when use these actions with unsupported input types (email, number etc)
+                    }
                 }
             });
         },
@@ -97,10 +101,15 @@ define(['jquery'], function($) {
                 var el = this;
                 var value = el.value;
                 if ('selectionStart' in el) {
-                    start = el.selectionStart;
-                    end = el.selectionEnd;
-                    el.value = value.substr(0, start) + str + value.substr(end);
-                    el.selectionEnd = el.selectionStart = start + str.length;
+                    // avoid exeption when use these actions with unsupported input types (email, number etc)
+                    try {
+                        start = el.selectionStart;
+                        end = el.selectionEnd;
+                        el.value = value.substr(0, start) + str + value.substr(end);
+                        el.selectionEnd = el.selectionStart = start + str.length;
+                    } catch (ex) {
+                        el.value += str;
+                    }
                 } else {
                     el.value += str;
                 }
@@ -110,13 +119,14 @@ define(['jquery'], function($) {
         /**
          * Thanks http://stackoverflow.com/questions/290254/how-to-order-events-bound-with-jquery
          */
-        bindFirst: function(eventType, eventData, handler) {
+        bindFirst: function(eventType, selector, eventData, handler) {
             var indexOfDot = eventType.indexOf('.');
             var eventNameSpace = indexOfDot > 0 ? eventType.substring(indexOfDot) : '';
 
             eventType = indexOfDot > 0 ? eventType.substring(0, indexOfDot) : eventType;
-            handler = handler === undefined ? eventData : handler;
-            eventData = typeof eventData === 'function' ? {} : eventData;
+            handler = handler !== undefined ? handler : (eventData !== undefined ? eventData : selector);
+            eventData = typeof eventData !== 'function' ? eventData : undefined;
+            selector = typeof selector !== 'function' ? selector : undefined;
 
             return this.each(function() {
                 var $this = $(this);
@@ -130,7 +140,7 @@ define(['jquery'], function($) {
                     this['on' + eventType] = null;
                 }
 
-                $this.bind(eventType + eventNameSpace, eventData, handler);
+                $this.on(eventType + eventNameSpace, selector, eventData, handler);
 
                 var allEvents = $this.data('events') || $._data($this[0], 'events');
                 var typeEvents = allEvents[eventType];
@@ -151,6 +161,52 @@ define(['jquery'], function($) {
                     $el.removeClass(className);
                 }, delay);
             });
+        },
+
+        formFieldValues: function(data) {
+            var els = this.find(':input').get();
+
+            if (arguments.length === 0) {
+                // return all data
+                data = {};
+                $.each(els, function() {
+                    if (this.name && !this.disabled && (
+                            this.checked ||
+                            /select|textarea/i.test(this.nodeName) ||
+                            /text|hidden|password/i.test(this.type))
+                    ) {
+                        if (data[this.name] === void 0) {
+                            data[this.name] = [];
+                        }
+                        data[this.name].push($(this).val());
+                    }
+                });
+                return data;
+            } else {
+                $.each(els, function() {
+                    if (this.name && data[this.name]) {
+                        var names = data[this.name];
+                        var $this = $(this);
+                        if (Object.prototype.toString.call(names) !== '[object Array]') {
+                            names = [names]; //backwards compat to old version of this code
+                        }
+                        if (this.type === 'checkbox' || this.type === 'radio') {
+                            var val = $this.val();
+                            var found = false;
+                            for (var i = 0; i < names.length; i++) {
+                                if (names[i] === val) {
+                                    found = true;
+                                    break;
+                                }
+                            }
+                            $this.attr('checked', found);
+                        } else {
+                            $this.val(names[0]);
+                        }
+                    }
+                });
+                return this;
+            }
         }
     });
 

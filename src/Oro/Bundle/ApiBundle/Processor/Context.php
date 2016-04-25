@@ -8,7 +8,10 @@ use Oro\Bundle\ApiBundle\Collection\CaseInsensitiveParameterBag;
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraInterface;
 use Oro\Bundle\ApiBundle\Config\ConfigExtraSectionInterface;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\FiltersConfig;
 use Oro\Bundle\ApiBundle\Config\FiltersConfigExtra;
+use Oro\Bundle\ApiBundle\Config\SortersConfig;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FilterValueAccessorInterface;
@@ -32,7 +35,7 @@ class Context extends ApiContext
     /** a prefix for all configuration sections */
     const CONFIG_PREFIX = 'config_';
 
-    /** a list of requests for additional configuration data */
+    /** a list of requests for configuration data */
     const CONFIG_EXTRAS = 'configExtras';
 
     /** metadata of an entity */
@@ -47,7 +50,7 @@ class Context extends ApiContext
     /** the Criteria object is used to add additional restrictions to a query is used to get result data */
     const CRITERIA = 'criteria';
 
-    /** the status code of an API response */
+    /** the response status code */
     const RESPONSE_STATUS_CODE = 'responseStatusCode';
 
     /**
@@ -83,6 +86,7 @@ class Context extends ApiContext
      */
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
+        parent::__construct();
         $this->configProvider   = $configProvider;
         $this->metadataProvider = $metadataProvider;
     }
@@ -100,7 +104,7 @@ class Context extends ApiContext
     /**
      * Gets a configuration of filters for an entity.
      *
-     * @return array|null
+     * @return FiltersConfig|null
      */
     public function getConfigOfFilters()
     {
@@ -110,9 +114,9 @@ class Context extends ApiContext
     /**
      * Sets a configuration of filters for an entity.
      *
-     * @param array|null $config
+     * @param FiltersConfig|null $config
      */
-    public function setConfigOfFilters($config)
+    public function setConfigOfFilters(FiltersConfig $config = null)
     {
         $this->setConfigOf(FiltersConfigExtra::NAME, $config);
     }
@@ -130,7 +134,7 @@ class Context extends ApiContext
     /**
      * Gets a configuration of sorters for an entity.
      *
-     * @return array|null
+     * @return SortersConfig|null
      */
     public function getConfigOfSorters()
     {
@@ -140,9 +144,9 @@ class Context extends ApiContext
     /**
      * Sets a configuration of sorters for an entity.
      *
-     * @param array|null $config
+     * @param SortersConfig|null $config
      */
-    public function setConfigOfSorters($config)
+    public function setConfigOfSorters(SortersConfig $config = null)
     {
         $this->setConfigOf(SortersConfigExtra::NAME, $config);
     }
@@ -216,7 +220,7 @@ class Context extends ApiContext
         );
 
         // add loaded config sections to the context
-        if (!empty($config)) {
+        if (!$config->isEmpty()) {
             foreach ($config as $key => $value) {
                 $this->set(self::CONFIG_PREFIX . $key, $value);
             }
@@ -273,7 +277,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets headers an API request.
+     * Gets request headers.
      *
      * @return ParameterBagInterface
      */
@@ -287,7 +291,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets an object that will be used to accessing headers an API request.
+     * Sets an object that will be used to accessing request headers.
      *
      * @param ParameterBagInterface $parameterBag
      */
@@ -297,7 +301,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets headers an API response.
+     * Gets response headers.
      *
      * @return ParameterBagInterface
      */
@@ -311,7 +315,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets an object that will be used to accessing headers an API response.
+     * Sets an object that will be used to accessing response headers.
      *
      * @param ParameterBagInterface $parameterBag
      */
@@ -321,7 +325,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets the status code of an API response.
+     * Gets the response status code.
      *
      * @return int|null
      */
@@ -331,7 +335,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets the status code of an API response.
+     * Sets the response status code.
      *
      * @param $statusCode
      */
@@ -373,7 +377,7 @@ class Context extends ApiContext
     /**
      * Gets a configuration of an entity.
      *
-     * @return array|null
+     * @return EntityDefinitionConfig|null
      */
     public function getConfig()
     {
@@ -388,11 +392,11 @@ class Context extends ApiContext
     /**
      * Sets a configuration of an entity.
      *
-     * @param array|null $config
+     * @param EntityDefinitionConfig|null $definition
      */
-    public function setConfig($config)
+    public function setConfig(EntityDefinitionConfig $definition = null)
     {
-        $this->set($this->getConfigKey(), $config);
+        $this->set($this->getConfigKey(), $definition);
 
         // make sure that all config sections are added to the context
         $this->ensureAllConfigSectionsSet();
@@ -419,7 +423,7 @@ class Context extends ApiContext
      *
      * @param string $configSection
      *
-     * @return array|null
+     * @return mixed
      *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
@@ -442,8 +446,8 @@ class Context extends ApiContext
     /**
      * Sets a configuration for the given section.
      *
-     * @param string     $configSection
-     * @param array|null $config
+     * @param string $configSection
+     * @param mixed  $config
      *
      * @throws \InvalidArgumentException if undefined configuration section is specified
      */
@@ -462,7 +466,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a list of requests for additional configuration data.
+     * Gets a list of requests for configuration data.
      *
      * @return ConfigExtraInterface[]
      */
@@ -476,7 +480,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a list of requests for additional configuration data.
+     * Sets a list of requests for configuration data.
      *
      * @param ConfigExtraInterface[] $extras
      *
@@ -493,14 +497,14 @@ class Context extends ApiContext
         }
 
         if (empty($extras)) {
-            $this->remove(self::CONFIG_EXTRAS, $extras);
+            $this->remove(self::CONFIG_EXTRAS);
         } else {
             $this->set(self::CONFIG_EXTRAS, $extras);
         }
     }
 
     /**
-     * Checks whether some additional configuration data is requested.
+     * Checks whether some configuration data is requested.
      *
      * @param string $extraName
      *
@@ -519,7 +523,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Adds a request for some additional configuration data.
+     * Adds a request for some configuration data.
      *
      * @param ConfigExtraInterface $extra
      *
@@ -538,7 +542,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Removes a request for some additional configuration data.
+     * Removes a request for some configuration data.
      *
      * @param string $extraName
      */
@@ -581,11 +585,11 @@ class Context extends ApiContext
     /**
      * Sets metadata of an entity.
      *
-     * @param EntityMetadata|null $config
+     * @param EntityMetadata|null $metadata
      */
-    public function setMetadata($config)
+    public function setMetadata(EntityMetadata $metadata = null)
     {
-        $this->set(self::METADATA, $config);
+        $this->set(self::METADATA, $metadata);
     }
 
     /**
@@ -620,7 +624,7 @@ class Context extends ApiContext
         }
 
         if (empty($extras)) {
-            $this->remove(self::METADATA_EXTRAS, $extras);
+            $this->remove(self::METADATA_EXTRAS);
         } else {
             $this->set(self::METADATA_EXTRAS, $extras);
         }

@@ -1007,6 +1007,50 @@ class RawLayoutTest extends \PHPUnit_Framework_TestCase
         $this->rawLayout->setBlockTheme('root', 123);
     }
 
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage The theme must not be empty.
+     */
+    public function testSetFormThemeWithEmptyThemes()
+    {
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->setFormTheme([]);
+    }
+
+    /**
+     * @expectedException \Oro\Component\Layout\Exception\InvalidArgumentException
+     * @expectedExceptionMessage Invalid "themes" argument type. Expected "string or array of strings", "integer" given.
+     */
+    public function testSetFormThemeWithInvalidThemeType()
+    {
+        $this->rawLayout->add('root', null, 'root');
+        $this->rawLayout->setFormTheme(123);
+    }
+
+    public function testSetFormTheme()
+    {
+        // prepare test data
+        $this->rawLayout->add('root', null, 'root');
+
+        // do test
+        $this->rawLayout->setFormTheme(
+            ['MyBundle:Layout:theme1.html.twig', 'MyBundle:Layout:theme2.html.twig']
+        );
+        $this->rawLayout->setFormTheme(
+            'MyBundle:Layout:theme3.html.twig'
+        );
+
+        $formThemes = $this->rawLayout->getFormThemes();
+        $this->assertSame(
+            [
+                'MyBundle:Layout:theme1.html.twig',
+                'MyBundle:Layout:theme2.html.twig',
+                'MyBundle:Layout:theme3.html.twig'
+            ],
+            $formThemes
+        );
+    }
+
     public function testGetHierarchy()
     {
         // prepare test data

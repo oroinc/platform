@@ -1,8 +1,8 @@
 datagrid:
     email-auto-response-rules:
+        acl_resource: oro_email_autoresponserule_view
         source:
             type: orm
-            acl_resource: oro_email_autoresponserule_view
             query:
                 select:
                     - r.id
@@ -55,7 +55,7 @@ datagrid:
                     reload-grid-name: email-auto-response-rules
                     options:
                         dialogOptions:
-                            title:         @translator->trans(oro.email.autoresponserule.action.update.title)
+                            title:         "@translator->trans(oro.email.autoresponserule.action.update.title)"
                             allowMaximize: false
                             allowMinimize: false
                             modal:         true
@@ -68,14 +68,6 @@ datagrid:
                 label:        oro.grid.action.delete
                 icon:         trash
                 link:         delete_link
-        mass_actions:
-            delete:
-                type: delete
-                entity_name: %oro_email.autoresponserule.entity.class%
-                data_identifier: r.id
-                acl_resource: oro_email_autoresponserule_update
-                label: oro.grid.action.delete
-                icon: trash
         options:
             toolbarOptions:
                 hide: true
@@ -85,6 +77,7 @@ datagrid:
     base-email-grid:
         source:
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - partial eu.{id, email}
@@ -159,7 +152,6 @@ datagrid:
             default: { sentAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC }
         options:
             entityHint: email
-            skip_acl_check: true
 
     simplified-email-grid:
         extends: base-email-grid
@@ -201,7 +193,7 @@ datagrid:
                     options:
                         field_options:
                             multiple: true
-                            choices: @oro_email.datagrid.origin_folder.provider->getListTypeChoices
+                            choices: "@oro_email.datagrid.origin_folder.provider->getListTypeChoices"
                 is_new:
                     label: oro.email.status.label
                     type: boolean
@@ -219,8 +211,8 @@ datagrid:
                     options:
                         field_options:
                             required: false
-                            choices: @oro_email.mailbox_choice_list->getChoiceList
-        views_list : @oro_email.emailfolder.datagrid_view_list
+                            choices: "@oro_email.mailbox_choice_list->getChoiceList"
+        views_list : "@oro_email.emailfolder.datagrid_view_list"
 
     activity-email-grid:
         extends: email-grid
@@ -242,7 +234,7 @@ datagrid:
             row_class_name:
                 type: callback
                 className: 'email-row-is-readed'
-                callable: @oro_email.helper.datagrid.emails->getReadedRowClosure
+                callable: "@oro_email.helper.datagrid.emails->getReadedRowClosure"
 
         actions:
             view_thread:
@@ -267,7 +259,7 @@ datagrid:
                 defaultMessages:
                     success: oro.email.action.success_mark_unread
                     error: oro.email.action.error
-        action_configuration: @oro_email.helper.datagrid.emails->getActionConfigurationClosure
+        action_configuration: "@oro_email.helper.datagrid.emails->getActionConfigurationClosure"
         mass_actions:
             emailmarkread:
                 type: emailmarkread
@@ -310,7 +302,7 @@ datagrid:
             row_class_name:
                 type: callback
                 className: 'email-row-is-readed'
-                callable: @oro_email.helper.datagrid.emails->getReadedRowClosure
+                callable: "@oro_email.helper.datagrid.emails->getReadedRowClosure"
         options:
             entityHint: email
             toolbarOptions:
@@ -412,9 +404,9 @@ datagrid:
                 receivedAt: %oro_datagrid.extension.orm_sorter.class%::DIRECTION_DESC
 
     email-templates:
+        acl_resource: oro_email_emailtemplate_index
         source:
             type: orm
-            acl_resource: oro_email_emailtemplate_index
             query:
                 select:
                     - t.id
@@ -435,13 +427,13 @@ datagrid:
                 template:       OroEntityBundle:Datagrid:Property/entity.html.twig
                 frontend_type:  html
                 context:
-                    entity_provider: @oro_entity.entity_provider
+                    entity_provider: "@oro_entity.entity_provider"
             name:
                 label:          oro.email.emailtemplate.name.label
             type:
                 frontend_type:  select
                 label:          oro.email.emailtemplate.type.label
-                choices:        @oro_email.emailtemplate.datagrid_helper->getTypeChoices
+                choices:        "@oro_email.emailtemplate.datagrid_helper->getTypeChoices"
             isSystem:
                 frontend_type:  boolean
                 label:          oro.email.emailtemplate.is_system.label
@@ -469,7 +461,7 @@ datagrid:
                     options:
                         field_options:
                             multiple:       true
-                            choices:        @oro_email.emailtemplate.datagrid_helper->getEntityNames
+                            choices:        "@oro_email.emailtemplate.datagrid_helper->getEntityNames"
                             translatable_options: false
                 name:
                     type:      string
@@ -479,7 +471,7 @@ datagrid:
                     data_name:       t.type
                     options:
                         field_options:
-                            choices: @oro_email.emailtemplate.datagrid_helper->getTypeChoices
+                            choices: "@oro_email.emailtemplate.datagrid_helper->getTypeChoices"
 
                 isSystem:
                     type:           boolean
@@ -513,13 +505,14 @@ datagrid:
                 link:         delete_link
         options:
             entity_pagination: true
-        action_configuration: @oro_email.emailtemplate.datagrid_helper->getActionConfigurationClosure
-        views_list : @oro_email.emailtemplate.datagrid_view_list
+        action_configuration: "@oro_email.emailtemplate.datagrid_helper->getActionConfigurationClosure"
+        views_list : "@oro_email.emailtemplate.datagrid_view_list"
         options: { entityHint: email template }
 
     base-mailboxes-grid:
         source:
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - m
@@ -564,7 +557,6 @@ datagrid:
                 params:
                     id: id
         options:
-            skip_acl_check: true
             toolbarOptions:
                 hide: true
         actions:
@@ -579,3 +571,13 @@ datagrid:
                 label:        oro.grid.action.delete
                 icon:         trash
                 link:         delete_link
+
+    email-for-context-grid:
+        extends: email-grid
+        options:
+            entityHint: email
+            entity_pagination: true
+            toolbarOptions:
+                pageSize:
+                    default_per_page: 10
+            routerEnabled: false

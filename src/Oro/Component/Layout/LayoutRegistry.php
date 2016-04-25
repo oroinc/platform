@@ -124,6 +124,23 @@ class LayoutRegistry implements LayoutRegistryInterface
     /**
      * {@inheritdoc}
      */
+    public function normalizeOptions(
+        $name,
+        array &$options,
+        ContextInterface $context,
+        DataAccessorInterface $data
+    ) {
+        $extensions = isset($this->typeExtensions[$name])
+            ? $this->typeExtensions[$name]
+            : $this->loadTypeExtensions($name);
+        foreach ($extensions as $extension) {
+            $extension->normalizeOptions($options, $context, $data);
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function buildBlock($name, BlockBuilderInterface $builder, array $options)
     {
         $extensions = isset($this->typeExtensions[$name])

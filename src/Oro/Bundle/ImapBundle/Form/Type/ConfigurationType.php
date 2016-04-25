@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ImapBundle\Form\Type;
 
-use Doctrine\Common\Collections\ArrayCollection;
-
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
@@ -12,13 +10,14 @@ use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\ImapBundle\Form\EventListener\ApplySyncSubscriber;
+use Oro\Bundle\ImapBundle\Form\EventListener\DecodeFolderSubscriber;
+use Oro\Bundle\ImapBundle\Form\EventListener\OriginFolderSubscriber;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 /**
- * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  * @SuppressWarnings(PHPMD.CouplingBetweenObjects)
  */
 class ConfigurationType extends AbstractType
@@ -54,12 +53,13 @@ class ConfigurationType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
+        $builder->addEventSubscriber(new DecodeFolderSubscriber());
         $this->modifySettingsFields($builder);
         $this->addPrepopulatePasswordEventListener($builder);
         $this->addNewOriginCreateEventListener($builder);
         $this->addOwnerOrganizationEventListener($builder);
-        $this->addApplySyncListener($builder);
-        $this->addSetOriginToFoldersListener($builder);
+        $builder->addEventSubscriber(new ApplySyncSubscriber());
+        $builder->addEventSubscriber(new OriginFolderSubscriber());
         $this->addEnableSMTPImapListener($builder);
         $this->finalDataCleaner($builder);
 
@@ -68,23 +68,24 @@ class ConfigurationType extends AbstractType
                 'label'    => 'oro.imap.configuration.use_imap.label',
                 'attr'     => ['class' => 'imap-config check-connection'],
                 'required' => false,
-                'mapped'   => false
+                'mapped'   => false,
+                'tooltip'  => 'oro.imap.configuration.use_imap.tooltip'
             ])
             ->add('imapHost', 'text', [
                 'label'    => 'oro.imap.configuration.imap_host.label',
                 'required' => false,
-                'attr'     => ['class' => 'critical-field imap-config check-connection'],
+                'attr'     => ['class' => 'critical-field imap-config check-connection switchable-field'],
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('imapPort', 'number', [
                 'label'    => 'oro.imap.configuration.imap_port.label',
-                'attr'     => ['class' => 'imap-config check-connection'],
+                'attr'     => ['class' => 'imap-config check-connection switchable-field'],
                 'required' => false
             ])
             ->add('imapEncryption', 'choice', [
                 'label'       => 'oro.imap.configuration.imap_encryption.label',
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
-                'attr'        => ['class' => 'imap-config check-connection'],
+                'attr'        => ['class' => 'imap-config check-connection switchable-field'],
                 'empty_data'  => null,
                 'empty_value' => '',
                 'required'    => false
@@ -93,23 +94,24 @@ class ConfigurationType extends AbstractType
                 'label'    => 'oro.imap.configuration.use_smtp.label',
                 'attr'     => ['class' => 'smtp-config check-connection'],
                 'required' => false,
-                'mapped'   => false
+                'mapped'   => false,
+                'tooltip'  => 'oro.imap.configuration.use_smtp.tooltip'
             ])
             ->add('smtpHost', 'text', [
                 'label'    => 'oro.imap.configuration.smtp_host.label',
-                'attr'     => ['class' => 'critical-field smtp-config check-connection'],
+                'attr'     => ['class' => 'critical-field smtp-config check-connection switchable-field'],
                 'required' => false,
                 'tooltip'  => 'oro.imap.configuration.tooltip',
             ])
             ->add('smtpPort', 'number', [
                 'label'    => 'oro.imap.configuration.smtp_port.label',
-                'attr'     => ['class' => 'smtp-config check-connection'],
+                'attr'     => ['class' => 'smtp-config check-connection switchable-field'],
                 'required' => false
             ])
             ->add('smtpEncryption', 'choice', [
                 'label'       => 'oro.imap.configuration.smtp_encryption.label',
                 'choices'     => ['ssl' => 'SSL', 'tls' => 'TLS'],
-                'attr'        => ['class' => 'smtp-config check-connection'],
+                'attr'        => ['class' => 'smtp-config check-connection switchable-field'],
                 'empty_data'  => null,
                 'empty_value' => '',
                 'required'    => false
@@ -134,77 +136,6 @@ class ConfigurationType extends AbstractType
                 'attr'    => ['class' => 'folder-tree'],
                 'tooltip' => 'If a folder is uncheked, all the data saved in it will be deleted',
             ]);
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function addSetOriginToFoldersListener(FormBuilderInterface $builder)
-    {
-        $builder->addEventListener(
-            FormEvents::POST_SUBMIT,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                if ($data !== null && $data instanceof UserEmailOrigin) {
-                    foreach ($data->getFolders() as $folder) {
-                        $folder->setOrigin($data);
-                    }
-                    $event->setData($data);
-                }
-            }
-        );
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     */
-    protected function addApplySyncListener(FormBuilderInterface $builder)
-    {
-        $builder->addEventListener(
-            FormEvents::PRE_SUBMIT,
-            function (FormEvent $event) {
-                $data = $event->getData();
-                $form = $event->getForm();
-
-                if (array_key_exists('folders', $data)) {
-                    /** @var UserEmailOrigin $origin */
-                    $origin = $form->getData();
-
-                    if ($origin !== null && $origin->getId() !== null) {
-                        $this->applySyncEnabled($origin->getRootFolders(), $data['folders']);
-
-                        $form->remove('folders');
-                        unset($data['folders']);
-                    }
-                } else {
-                    $form->remove('folders');
-                }
-                $event->setData($data);
-            },
-            5
-        );
-    }
-
-    /**
-     * @param ArrayCollection $folders
-     * @param array $data
-     */
-    protected function applySyncEnabled($folders, $data)
-    {
-        /** @var EmailFolder $folder */
-        foreach ($folders as $folder) {
-            $f = array_filter($data, function ($item) use ($folder) {
-                return $folder->getFullName() === $item['fullName'];
-            });
-
-            $matched = reset($f);
-            $syncEnabled = array_key_exists('syncEnabled', $matched);
-            $folder->setSyncEnabled($syncEnabled);
-
-            if (array_key_exists('subFolders', $matched) && $folder->hasSubFolders()) {
-                $this->applySyncEnabled($folder->getSubFolders(), $matched['subFolders']);
-            }
-        }
     }
 
     /**

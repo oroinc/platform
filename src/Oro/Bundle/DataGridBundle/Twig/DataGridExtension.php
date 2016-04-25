@@ -4,7 +4,6 @@ namespace Oro\Bundle\DataGridBundle\Twig;
 
 use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
@@ -170,7 +169,12 @@ class DataGridExtension extends \Twig_Extension
     protected function generateUrl(DatagridInterface $grid, $route, $params)
     {
         $gridFullName = $this->nameStrategy->buildGridFullName($grid->getName(), $grid->getScope());
-        return $this->router->generate($route ?: self::ROUTE, ['gridName' => $gridFullName, $gridFullName => $params]);
+        $gridUniqueName = $this->nameStrategy->getGridUniqueName($gridFullName);
+
+        return $this->router->generate(
+            $route ?: self::ROUTE,
+            ['gridName' => $gridFullName, $gridUniqueName => $params]
+        );
     }
 
     /**
@@ -183,9 +187,8 @@ class DataGridExtension extends \Twig_Extension
         $gridConfig = $this->manager->getConfigurationForGrid($gridName);
 
         if ($gridConfig) {
-            $acl     = $gridConfig->offsetGetByPath(Builder::DATASOURCE_ACL_PATH);
-            $aclSKip = $gridConfig->offsetGetByPath(Builder::DATASOURCE_SKIP_ACL_CHECK, false);
-            if (!$aclSKip && $acl && !$this->securityFacade->isGranted($acl)) {
+            $aclResource = $gridConfig->getAclResource();
+            if ($aclResource && !$this->securityFacade->isGranted($aclResource)) {
                 return false;
             } else {
                 return true;

@@ -32,14 +32,43 @@
       width: 140px !important;
     }
   }
+  > input[type=checkbox]:only-child {
+    margin-top: 7px;
+  }
 }
 .form-horizontal{
   & > .span6 {
     max-width: 100%;
   }
-  .controls{
-    .control-label{
-      padding-top: 0;
+  .control-group {
+    max-width: initial;
+    margin: 0 0 7px;
+    .control-label {
+      float: none;
+      text-align: left;
+    }
+    .controls {
+      margin-left: 0px;
+      .control-label {
+        padding-top: 6px;
+      }
+    }
+  }
+  .control-group-checkbox {
+    position: relative;
+    display: inline-block;
+    padding-right: 16px;
+    .control-label {
+      width: auto;
+      margin-right: 2px;
+    }
+    label.control-label {
+      line-height: 18px;
+    }
+    .controls {
+      position: absolute;
+      top: 0;
+      right: 0;
     }
   }
   .select2-container{
@@ -68,6 +97,7 @@
 }
 .select2-container-multi .select2-choices li {
   float: none;
+  margin-right: 5px;
 }
 .oro-item-collection {
   input[type="email"],

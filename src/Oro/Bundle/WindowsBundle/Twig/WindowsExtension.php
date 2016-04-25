@@ -2,28 +2,17 @@
 
 namespace Oro\Bundle\WindowsBundle\Twig;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Bridge\Twig\Extension\HttpKernelExtension;
 use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
-use Symfony\Component\Security\Core\SecurityContextInterface;
-use Symfony\Component\Security\Core\Authentication\Token\TokenInterface;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
-use Oro\Bundle\WindowsBundle\Entity\WindowsState;
+use Oro\Bundle\WindowsBundle\Entity\AbstractWindowsState;
+use Oro\Bundle\WindowsBundle\Manager\WindowsStateManagerRegistry;
+use Oro\Bundle\WindowsBundle\Manager\WindowsStateRequestManager;
 
 class WindowsExtension extends \Twig_Extension
 {
     const EXTENSION_NAME = 'oro_windows';
-
-    /**
-     * @var SecurityContextInterface
-     */
-    protected $securityContext;
-
-    /**
-     * @var EntityManager
-     */
-    protected $em;
 
     /**
      * Protect extension from infinite loop
@@ -32,43 +21,47 @@ class WindowsExtension extends \Twig_Extension
      */
     protected $rendered = false;
 
+    /** @var WindowsStateManagerRegistry */
+    protected $windowsStateManagerRegistry;
+
+    /** @var WindowsStateRequestManager */
+    protected $windowsStateRequestManager;
+
     /**
-     * @param SecurityContextInterface $securityContext
-     * @param EntityManager $em
+     * @param WindowsStateManagerRegistry $windowsStateManagerRegistry
+     * @param WindowsStateRequestManager $windowsStateRequestManager
      */
     public function __construct(
-        SecurityContextInterface $securityContext,
-        EntityManager $em
+        WindowsStateManagerRegistry $windowsStateManagerRegistry,
+        WindowsStateRequestManager $windowsStateRequestManager
     ) {
-        $this->securityContext = $securityContext;
-        $this->em = $em;
+        $this->windowsStateManagerRegistry = $windowsStateManagerRegistry;
+        $this->windowsStateRequestManager = $windowsStateRequestManager;
     }
 
     /**
-     * Returns a list of functions to add to the existing list.
-     *
-     * @return array An array of functions
+     * {@inheritdoc}
      */
     public function getFunctions()
     {
-        return array(
+        return [
             'oro_windows_restore' => new \Twig_Function_Method(
                 $this,
                 'render',
-                array(
-                    'is_safe' => array('html'),
-                    'needs_environment' => true
-                )
+                [
+                    'is_safe' => ['html'],
+                    'needs_environment' => true,
+                ]
             ),
             'oro_window_render_fragment' => new \Twig_Function_Method(
                 $this,
                 'renderFragment',
-                array(
-                    'is_safe' => array('html'),
-                    'needs_environment' => true
-                )
-            )
-        );
+                [
+                    'is_safe' => ['html'],
+                    'needs_environment' => true,
+                ]
+            ),
+        ];
     }
 
     /**
@@ -80,32 +73,21 @@ class WindowsExtension extends \Twig_Extension
      */
     public function render(\Twig_Environment $environment)
     {
-        if (!($user = $this->getUser()) || $this->rendered) {
+        if ($this->rendered) {
             return '';
         }
+
         $this->rendered = true;
 
-        $windowStates = array();
-        $removeWindowStates = array();
-        $userWindowStates = $this->em->getRepository('OroWindowsBundle:WindowsState')->findBy(array('user' => $user));
-        /** @var WindowsState $windowState */
-        foreach ($userWindowStates as $windowState) {
-            $data = $windowState->getData();
-            if (empty($data) || !isset($data['cleanUrl'])) {
-                $this->em->remove($windowState);
-                $removeWindowStates[] = $windowState;
-            } else {
-                $windowStates[] = $windowState;
-            }
-        }
-
-        if ($removeWindowStates) {
-            $this->em->flush($removeWindowStates);
+        try {
+            $windowsStates = $this->windowsStateManagerRegistry->getManager()->getWindowsStates();
+        } catch (AccessDeniedException $e) {
+            $windowsStates = [];
         }
 
         return $environment->render(
             'OroWindowsBundle::states.html.twig',
-            array('windowStates' => $windowStates)
+            ['windowStates' => $windowsStates]
         );
     }
 
@@ -113,100 +95,47 @@ class WindowsExtension extends \Twig_Extension
      * Renders fragment by window state.
      *
      * @param \Twig_Environment $environment
-     * @param WindowsState $windowState
+     * @param AbstractWindowsState $windowState
      *
      * @return string
      */
-    public function renderFragment(\Twig_Environment $environment, WindowsState $windowState)
+    public function renderFragment(\Twig_Environment $environment, AbstractWindowsState $windowState)
     {
         $result = '';
+        $scheduleDelete = false;
         $windowState->setRenderedSuccessfully(false);
-        $data = $windowState->getData();
-
-        if (isset($data['cleanUrl'])) {
-            if (isset($data['type'])) {
-                $wid = isset($data['wid']) ? $data['wid'] : $this->getUniqueIdentifier();
-                $uri = $this->getUrlWithContainer($data['cleanUrl'], $data['type'], $wid);
-            } else {
-                $uri = $data['cleanUrl'];
-            }
-        } else {
-            return $result;
-        }
 
         try {
+            $uri = $this->windowsStateRequestManager->getUri($windowState->getData());
+
             /** @var HttpKernelExtension $httpKernelExtension */
             $httpKernelExtension = $environment->getExtension('http_kernel');
             $result = $httpKernelExtension->renderFragment($uri);
             $windowState->setRenderedSuccessfully(true);
+
             return $result;
         } catch (NotFoundHttpException $e) {
-            $this->em->remove($windowState);
-            $this->em->flush($windowState);
+            $scheduleDelete = true;
+        } catch (\InvalidArgumentException $e) {
+            $scheduleDelete = true;
+        }
+
+        if ($scheduleDelete) {
+            try {
+                $this->windowsStateManagerRegistry->getManager()->deleteWindowsState($windowState->getId());
+            } catch (AccessDeniedException $e) {
+                return $result;
+            }
         }
 
         return $result;
     }
 
     /**
-     * Get a user from the Security Context
-     *
-     * @return null|mixed
-     * @throws \LogicException If SecurityBundle is not available
-     * @see Symfony\Component\Security\Core\Authentication\Token\TokenInterface::getUser()
-     */
-    public function getUser()
-    {
-        /** @var TokenInterface $token */
-        if (null === $token = $this->securityContext->getToken()) {
-            return null;
-        }
-
-        if (!is_object($user = $token->getUser())) {
-            return null;
-        }
-
-        return $user;
-    }
-
-    /**
-     * @param string $url
-     * @param string $container
-     * @param string $wid
-     *
-     * @return string
-     */
-    protected function getUrlWithContainer($url, $container, $wid)
-    {
-        if (strpos($url, '_widgetContainer=') === false) {
-            $parts = parse_url($url);
-            $widgetPart = '_widgetContainer=' . $container. '&_wid=' . $wid;
-            if (array_key_exists('query', $parts)) {
-                $separator = $parts['query'] ? '&' : '';
-                $newQuery = $parts['query'] . $separator . $widgetPart;
-                $url = str_replace($parts['query'], $newQuery, $url);
-            } else {
-                $url .= '?' . $widgetPart;
-            }
-        }
-        return $url;
-    }
-
-    /**
-     * Returns the name of the extension.
-     *
-     * @return string The extension name
+     * {@inheritdoc}
      */
     public function getName()
     {
         return self::EXTENSION_NAME;
-    }
-
-    /**
-     * @return string
-     */
-    protected function getUniqueIdentifier()
-    {
-        return str_replace('.', '-', uniqid('', true));
     }
 }

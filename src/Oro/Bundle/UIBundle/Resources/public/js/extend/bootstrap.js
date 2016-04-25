@@ -1,50 +1,11 @@
 define([
     'jquery',
+    'underscore',
     'oroui/js/tools/scroll-helper',
-    'bootstrap'
-], function($, scrollHelper) {
+    'bootstrap',
+    './bootstrap/bootstrap-dropdown'
+], function($, _, scrollHelper) {
     'use strict';
-
-    /**
-     * Override for Dropdown constructor
-     *  - added destroy method, which removes event handlers from <html /> node
-     *
-     * @param {HTMLElement} element
-     * @constructor
-     */
-    function Dropdown(element) {
-        var $el = $(element).on('click.dropdown.data-api', this.toggle);
-        var globalHandlers = {
-            'click.dropdown.data-api': function() {
-                $el.parent().removeClass('open');
-            }
-        };
-        $el.data('globalHandlers', globalHandlers);
-        $('html').on(globalHandlers);
-    }
-
-    Dropdown.prototype = $.fn.dropdown.Constructor.prototype;
-    Dropdown.prototype.destroy = function() {
-        var globalHandlers = this.data('globalHandlers');
-        $('html').off(globalHandlers);
-        this.removeData('dropdown');
-        this.removeData('globalHandlers');
-    };
-
-    $.fn.dropdown = function(option) {
-        return this.each(function() {
-            var $this = $(this);
-            var data = $this.data('dropdown');
-            if (!data) {
-                $this.data('dropdown', (data = new Dropdown(this)));
-            }
-            if (typeof option === 'string') {
-                data[option].call($this);
-            }
-        });
-    };
-
-    $.fn.dropdown.Constructor = Dropdown;
 
     /**
      * fix endless loop
@@ -132,10 +93,58 @@ define([
     Popover.prototype.destroy = delegateAction(Popover.prototype.destroy, 'destroy');
     Tooltip.prototype.hide = delegateAction(Tooltip.prototype.hide, 'hide');
     Tooltip.prototype.destroy = delegateAction(Tooltip.prototype.destroy, 'destroy');
+    Popover.prototype.arrow = function() {
+        this.$arrow = this.$arrow || this.tip().find('.arrow');
+        return this.$arrow;
+    };
 
-    var originalApplyPlacement = Popover.prototype.applyPlacement;
-    Popover.prototype.applyPlacement = function(coords, posId) {
-        originalApplyPlacement.apply(this, arguments);
+    Popover.prototype.applyPlacement = function(offset, placement) {
+        /** Following snippet was copied from original Bootstrap method to fix bug with offset correction.
+         *  See comment in the snippet
+         */
+        /* jshint ignore:start */
+        // jscs:disable
+        var $tip = this.tip()
+            , width = $tip[0].offsetWidth
+            , height = $tip[0].offsetHeight
+            , actualWidth
+            , actualHeight
+            , delta
+            , replace
+
+        $tip
+            .offset(offset)
+            .addClass(placement)
+            .addClass('in')
+
+        actualWidth = $tip[0].offsetWidth
+        actualHeight = $tip[0].offsetHeight
+
+        if (placement == 'top' && actualHeight != height) {
+            offset.top = offset.top + height - actualHeight
+            replace = true
+        }
+
+        if (placement == 'bottom' || placement == 'top') {
+            delta = 0
+
+            if (offset.left < 0){
+                delta = offset.left * -2
+                offset.left = 0
+                // temporarily remove placement class to avoid affecting of margins to offset method
+                $tip.removeClass(placement).offset(offset).addClass(placement);
+                actualWidth = $tip[0].offsetWidth
+                actualHeight = $tip[0].offsetHeight
+            }
+
+            this.replaceArrow(delta - width + actualWidth, actualWidth, 'left')
+        } else {
+            this.replaceArrow(actualHeight - height, actualHeight, 'top')
+        }
+
+        if (replace) $tip.offset(offset)
+        // jscs:enable
+        /* jshint ignore:end */
 
         /*
          * SCROLL support
@@ -145,9 +154,10 @@ define([
         /*
          * SHIFT support
          */
-        if (posId === 'right' || posId === 'left') {
+        var visibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
+
+        if (placement === 'right' || placement === 'left') {
             var outerHeight = this.$tip.outerHeight();
-            var visibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
             var visibleHeight = visibleRect.bottom - visibleRect.top;
             if (visibleHeight < outerHeight - /* fixes floating pixel calculation */ 1) {
                 // still doesn't match, decrease height and move into visible area
@@ -170,6 +180,26 @@ define([
     };
     var originalShow = Popover.prototype.show;
     Popover.prototype.show = function() {
+        if (this.$element.attr('data-container') && this.$element.attr('data-container').length > 0) {
+            this.options.container = this.$element.closest(this.$element.attr('data-container'));
+            if (!this.options.container.length) {
+                this.options.container = false;
+            }
+        }
+
+        if (this.options.container && this.$element.length) {
+            // if container option is specified - popover will be closed when position of $element is changed
+            var _this = this;
+            var el = this.$element[0];
+            var initialPos = el.getBoundingClientRect();
+            this.trackPositionInterval = setInterval(function() {
+                var currentPos = el.getBoundingClientRect();
+                if (currentPos.left !== initialPos.left || currentPos.top !== initialPos.top) {
+                    _this.hide();
+                }
+            }, 300);
+        }
+
         // remove adjustments made by applyPlacement
         if (this.$tip) {
             this.$tip.css({
@@ -185,5 +215,11 @@ define([
         }
 
         originalShow.apply(this, arguments);
+    };
+
+    var originalHide = Popover.prototype.hide;
+    Popover.prototype.hide = function() {
+        clearInterval(this.trackPositionInterval);
+        originalHide.apply(this, arguments);
     };
 });

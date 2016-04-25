@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Migration;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
@@ -144,7 +145,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
         $configs = [
             self::CLASS_NAME                      => [
                 'configs' => [
-                    'entity'   => [
+                    'entity' => [
                         'icon' => 'icon1'
                     ],
                     'append' => [
@@ -163,15 +164,15 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
             ]
         ];
 
-        $extendConfigEntity   = $this->createConfig('extend', self::CLASS_NAME);
-        $entityConfigEntity   = $this->createConfig('entity', self::CLASS_NAME);
+        $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
+        $entityConfigEntity = $this->createConfig('entity', self::CLASS_NAME);
         $appendConfigEntity = $this->createConfig('append', self::CLASS_NAME);
         $appendConfigEntity->set('attr1', ['existingItem']);
         $appendConfigEntity->set('attr2', ['existingItem']);
 
         // config providers configuration
-        $extendConfigProvider   = $this->getConfigProviderMock();
-        $entityConfigProvider   = $this->getConfigProviderMock();
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $entityConfigProvider = $this->getConfigProviderMock();
         $appendConfigProvider = $this->getConfigProviderMock();
         $this->configManager->expects($this->any())
             ->method('getProvider')
@@ -397,7 +398,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                                 'owner' => ExtendScope::OWNER_CUSTOM
                             ],
                             'datagrid' => [
-                                'is_visible' => false
+                                'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                             ]
                         ]
                     ],
@@ -471,7 +472,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
             $extendConfigField->all()
         );
         $this->assertEquals(
-            ['is_visible' => false],
+            ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
             $datagridConfigField->all()
         );
     }
@@ -489,7 +490,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
                                 'owner' => ExtendScope::OWNER_CUSTOM
                             ],
                             'datagrid' => [
-                                'is_visible' => false
+                                'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                             ]
                         ]
                     ],
@@ -570,8 +571,112 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
             $extendConfigField->all()
         );
         $this->assertEquals(
-            ['is_visible' => false],
+            ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
             $datagridConfigField->all()
+        );
+    }
+
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
+    public function testAppendForExistingField()
+    {
+        $testFieldName = 'field1';
+        $configs       = [
+            self::CLASS_NAME                      => [
+                'fields' => [
+                    $testFieldName => [
+                        'type'    => 'integer',
+                        'configs' => [
+                            'extend' => [
+                                'owner'              => ExtendScope::OWNER_CUSTOM,
+                                'array_attr1'        => ['val1'],
+                                'array_attr2'        => ['val2'],
+                                'array_attr3.attr31' => ['val3'],
+                                'array_attr4.attr41' => 'val4'
+                            ]
+                        ]
+                    ]
+                ]
+            ],
+            ExtendConfigProcessor::APPEND_CONFIGS => [
+                self::CLASS_NAME => [
+                    'fields' => [
+                        $testFieldName => [
+                            'configs' => [
+                                'extend' => ['array_attr1', 'array_attr2', 'array_attr3.attr31']
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $extendConfigEntity = $this->createConfig('extend', self::CLASS_NAME);
+        $extendConfigEntity->set('is_extend', true);
+        $extendConfigField = $this->createConfig('extend', self::CLASS_NAME, $testFieldName, 'string');
+        $configFieldModel  = new FieldConfigModel($testFieldName, 'string');
+
+        // config providers configuration
+        $extendConfigProvider = $this->getConfigProviderMock();
+        $this->configManager->expects($this->any())
+            ->method('getProvider')
+            ->with('extend')
+            ->willReturn($extendConfigProvider);
+        // hasConfig/getConfig expectations
+        $this->configManager->expects($this->any())
+            ->method('hasConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::CLASS_NAME, null, true],
+                        [self::CLASS_NAME, $testFieldName, true],
+                    ]
+                )
+            );
+        $extendConfigProvider->expects($this->any())
+            ->method('getConfig')
+            ->will(
+                $this->returnValueMap(
+                    [
+                        [self::CLASS_NAME, null, $extendConfigEntity],
+                        [self::CLASS_NAME, $testFieldName, $extendConfigField],
+                    ]
+                )
+            );
+
+        $this->configManager->expects($this->never())
+            ->method('createConfigFieldModel');
+        $this->configManager->expects($this->once())
+            ->method('getConfigFieldModel')
+            ->with(self::CLASS_NAME, $testFieldName)
+            ->will($this->returnValue($configFieldModel));
+        $this->configManager->expects($this->once())
+            ->method('changeFieldType')
+            ->with(self::CLASS_NAME, $testFieldName, 'integer');
+        $this->configManager->expects($this->once())
+            ->method('flush');
+
+        $this->generator->processConfigs($configs);
+
+        $this->assertEquals(
+            ['is_extend' => true],
+            $extendConfigEntity->all()
+        );
+        $this->assertEquals(
+            [
+                'state'       => ExtendScope::STATE_UPDATE,
+                'owner'       => ExtendScope::OWNER_CUSTOM,
+                'array_attr1' => ['val1'],
+                'array_attr2' => ['val2'],
+                'array_attr3' => [
+                    'attr31' => ['val3']
+                ],
+                'array_attr4' => [
+                    'attr41' => 'val4'
+                ]
+            ],
+            $extendConfigField->all()
         );
     }
 
@@ -580,6 +685,7 @@ class ExtendConfigProcessorTest extends \PHPUnit_Framework_TestCase
      * @param string      $className
      * @param string|null $fieldName
      * @param string|null $fieldType
+     *
      * @return Config
      */
     protected function createConfig($scope, $className, $fieldName = null, $fieldType = null)

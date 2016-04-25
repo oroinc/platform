@@ -3,11 +3,10 @@ datagrid:
         extended_entity_name: %oro_organization.business_unit.entity.class%
         options:
             entityHint: business unit
-            skip_acl_check: true
             entity_pagination: true
         source:
-            acl_resource: oro_business_unit_view
             type: orm
+            skip_acl_apply: true
             query:
                 select:
                     - u.id
@@ -109,7 +108,7 @@ datagrid:
                     data_name: ownerName
                     options:
                         field_options:
-                            choices: @oro_organization.provider.business_units_grid->getOwnerChoices
+                            choices: "@oro_organization.provider.business_units_grid->getOwnerChoices"
                             translatable_options: false
                 createdAt:
                     type: datetime
@@ -117,8 +116,8 @@ datagrid:
 
     bu-update-users-grid:
         extends: user-relation-grid
+        acl_resource: oro_business_unit_update
         source:
-            acl_resource: oro_business_unit_update
             query:
                 select:
                     - >
@@ -198,8 +197,8 @@ datagrid:
         extends: user-relation-grid
         options:
             entityHint: user
+        acl_resource: oro_business_unit_view
         source:
-            acl_resource: oro_business_unit_view
             query:
                 where:
                     and:

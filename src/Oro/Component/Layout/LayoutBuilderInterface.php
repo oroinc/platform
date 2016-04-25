@@ -160,6 +160,15 @@ interface LayoutBuilderInterface extends LayoutManipulatorInterface
     public function setBlockTheme($themes, $id = null);
 
     /**
+     * Sets the theme(s) to be used for rendering forms
+     *
+     * @param string|string[] $themes The theme(s). For example 'MyBundle:Layout:my_theme.html.twig'
+     *
+     * @return self
+     */
+    public function setFormTheme($themes);
+
+    /**
      * Reverts the builder to the initial state
      *
      * @return self

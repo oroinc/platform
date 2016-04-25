@@ -8,22 +8,66 @@
     line-height: @baseLineHeight;
   }
   .dropdown-menu {
+    right: 0;
+    top: 100%;
+    margin-top: 7px;
+    min-width: 300px;
+    padding: 18px 12px 12px;
+    .close {
+      right: 12px;
+    }
     &:before {
-      top: 9px;
+      top: -8px;
+      right: 9px;
+      border-top: 0 none;
+      border-left: 7px solid transparent;
+      border-right: 7px solid transparent;
+      border-bottom: 7px solid rgba(0,0,0,0.2);
     }
     &:after {
-      top: 10px;
+      top: -6px;
+      right: 10px;
+      border-top: 0 none;
+      border-left: 6px solid transparent;
+      border-right: 6px solid transparent;
+      border-bottom: 6px solid #fff;
     }
+  }
+  .table-header-wrapper th:nth-child(2) {
+    text-align: center;
+  }
+  td.title-cell {
+    white-space: normal;
+  }
+  td.sort-cell {
+    width: 40px;
+    padding-left: 0px;
+    padding-right: 0px;
+    .btn {
+      height: 20px;
+      line-height: 16px;
+    }
+  }
+  td.visibility-cell {
+    width: 40px;
   }
 }
 
+/* changes position of bubble point of dropdown when it's shown above */
 .dropup .column-manager .dropdown-menu {
+  top: auto;
+  margin-top: 0;
+  margin-bottom: 40px;
   &:before {
     top: auto;
-    bottom: 9px;
+    bottom: -7px;
+    border-bottom: 0 none;
+    border-top: 7px solid rgba(0,0,0,0.1);
   }
   &:after {
     top: auto;
-    bottom: 10px;
+    bottom: -6px;
+    border-bottom: 0 none;
+    border-top: 6px solid #fff;
   }
 }

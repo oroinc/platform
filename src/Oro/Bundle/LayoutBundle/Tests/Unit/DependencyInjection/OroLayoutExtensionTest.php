@@ -205,9 +205,14 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new OroLayoutExtension();
         $extension->load([], $container);
 
-        $expectedResult = ['base', 'oro-black'];
-        $result         = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getThemeNames();
-        $this->assertSame(sort($expectedResult), sort($result));
+        $expectedThemeNames = ['base', 'oro-black'];
+
+        $themes = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getAllThemes();
+        $themeNames = $container->get(OroLayoutExtension::THEME_MANAGER_SERVICE_ID)->getThemeNames();
+
+        $this->assertSame(sort($expectedThemeNames), sort($themeNames));
+        $this->assertSame('Oro Black theme', $themes['oro-black']->getLabel());
+        $this->assertSame('Oro Black theme description', $themes['oro-black']->getDescription());
     }
 
     public function testLoadingLayoutUpdates()
@@ -249,6 +254,11 @@ class OroLayoutExtensionTest extends \PHPUnit_Framework_TestCase
                         '/',
                         DIRECTORY_SEPARATOR,
                         $bundle1Dir . '/Resources/views/layouts/base/route_name2/update1.yml'
+                    ),
+                    str_replace(
+                        '/',
+                        DIRECTORY_SEPARATOR,
+                        $bundle2Dir . '/Resources/views/layouts/base/route_name2/update.yml'
                     ),
                     str_replace(
                         '/',

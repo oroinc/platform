@@ -8,6 +8,7 @@ use Doctrine\Common\Cache\ClearableCache;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
+use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
 
 class Translator extends BaseTranslator
@@ -34,6 +35,9 @@ class Translator extends BaseTranslator
      *  ]
      */
     protected $dynamicResources = [];
+
+    /** @var bool */
+    protected $installed;
 
     /**
      * Collector of translations
@@ -231,7 +235,7 @@ class Translator extends BaseTranslator
                     }
                 }
             }
-            if (!$hasDatabaseResources) {
+            if (!$hasDatabaseResources && $this->checkDatabase()) {
                 $locales = $this->getFallbackLocales();
                 array_unshift($locales, $locale);
                 $locales = array_unique($locales);
@@ -260,5 +264,19 @@ class Translator extends BaseTranslator
     protected function isInstalled()
     {
         return $this->container->hasParameter('installed') && $this->container->getParameter('installed');
+    }
+
+    /**
+     * Checks whether the translations table exists in the database
+     *
+     * @return bool
+     */
+    protected function checkDatabase()
+    {
+        if (null === $this->installed) {
+            $this->installed = (bool)$this->container->getParameter('installed');
+        }
+
+        return $this->installed;
     }
 }

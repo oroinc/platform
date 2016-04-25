@@ -98,6 +98,7 @@ oro_entity_config:
                         label:              oro.entity.entity_config.entity.field.items.label
                         required:           true
                         template:           OroEntityConfigBundle:Config:propertyLabel.html.twig
+                        sortable:           true
                     form:
                         type:               text
                         options:
@@ -126,8 +127,8 @@ oro_entity_config:
                 is_visible:
                     options:
                         require_schema_update: true
-                        value_type:         boolean
-                        default_value:      true
+                        value_type:         integer
+                        default_value:      1
                         allowed_type:       [string, integer, smallint, bigint, boolean, datetime, date, time, float, decimal, money, percent, enum, multiEnum]
                         required_property:
                             config_id:
@@ -137,10 +138,15 @@ oro_entity_config:
                     form:
                         type:               oro_entity_extend_choice
                         options:
-                            choices:        ['No', 'Yes']
+                            choices:
+                                0: 'No'
+                                1: oro.entity.entity_config.datagrid.field.items.is_visible.shown
+                                3: oro.entity.entity_config.datagrid.field.items.is_visible.hidden
+                                2: oro.entity.entity_config.datagrid.field.items.is_visible.mandatory
                             empty_value:    false
                             block:          other
                             label:          oro.entity.entity_config.datagrid.field.items.is_visible
+                            tooltip:        oro.entity.entity_config.datagrid.field.items.is_visible.tooltip
 
                 show_filter:
                     options:
@@ -246,4 +252,12 @@ oro_entity_config:
                 # if not specified the virtual fields are created for all fields, except identifier ones
                 virtual_fields: # array of strings
                     options:
-                        auditable:          false
+                        auditable: false
+                # specify the list of fields used for searching in the reports filter
+                search_fields: # array of strings
+                    options:
+                        auditable: false
+                # specify representation field used for rendering titles for search items in the reports filter
+                representation_field: # string
+                    options:
+                        auditable: false

@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EmailBundle\Entity;
 
+use DateTime;
+
 use Doctrine\ORM\Mapping as ORM;
 use Doctrine\ORM\Mapping\Index;
 use Doctrine\Common\Collections\ArrayCollection;
@@ -9,6 +11,8 @@ use Doctrine\Common\Collections\ArrayCollection;
 use JMS\Serializer\Annotation as JMS;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
+
+use Oro\Bundle\EmailBundle\Model\FolderType;
 
 /**
  * Email Folder
@@ -24,6 +28,10 @@ class EmailFolder
     const SYNC_ENABLED_TRUE = true;
     const SYNC_ENABLED_FALSE = false;
     const SYNC_ENABLED_IGNORE = null;
+
+    const DIRECTION_INCOMING = 'incoming';
+    const DIRECTION_OUTGOING = 'outgoing';
+    const DIRECTION_BOTH = 'both';
 
     /**
      * @var integer
@@ -103,14 +111,21 @@ class EmailFolder
     protected $origin;
 
     /**
-     * @var \DateTime
+     * @var DateTime
      *
      * @ORM\Column(name="synchronized", type="datetime", nullable=true)
      */
     protected $synchronizedAt;
 
     /**
-     * @var \DateTime
+     * @var DateTime
+     *
+     * @ORM\Column(name="sync_start_date", type="datetime", nullable=true)
+     */
+    protected $syncStartDate;
+
+    /**
+     * @var DateTime
      *
      * @ORM\Column(name="outdated_at", type="datetime", nullable=true)
      */
@@ -369,7 +384,7 @@ class EmailFolder
     /**
      * Get date/time when emails in this folder were synchronized
      *
-     * @return \DateTime
+     * @return DateTime
      */
     public function getSynchronizedAt()
     {
@@ -379,7 +394,7 @@ class EmailFolder
     /**
      * Set date/time when emails in this folder were synchronized
      *
-     * @param \DateTime $synchronizedAt
+     * @param DateTime $synchronizedAt
      *
      * @return EmailOrigin
      */
@@ -391,7 +406,31 @@ class EmailFolder
     }
 
     /**
-     * @param \DateTime $outdatedAt
+     * Get date/time from which should start sync folder
+     *
+     * @return DateTime
+     */
+    public function getSyncStartDate()
+    {
+        return $this->syncStartDate;
+    }
+
+    /**
+     * Set date/time from which should start sync folder
+     *
+     * @param DateTime $syncStartDate
+     *
+     * @return EmailOrigin
+     */
+    public function setSyncStartDate($syncStartDate)
+    {
+        $this->syncStartDate = $syncStartDate;
+
+        return $this;
+    }
+
+    /**
+     * @param DateTime $outdatedAt
      *
      * @return EmailFolder
      */
@@ -403,7 +442,7 @@ class EmailFolder
     }
 
     /**
-     * @return \DateTime
+     * @return DateTime
      */
     public function getOutdatedAt()
     {
@@ -416,6 +455,22 @@ class EmailFolder
     public function isOutdated()
     {
         return $this->outdatedAt !== null;
+    }
+
+    /**
+     * @return string
+     */
+    public function getDirection()
+    {
+        if (in_array($this->type, FolderType::outcomingTypes())) {
+            return static::DIRECTION_OUTGOING;
+        }
+
+        if (in_array($this->type, FolderType::incomingTypes())) {
+            return static::DIRECTION_INCOMING;
+        }
+
+        return static::DIRECTION_BOTH;
     }
 
     /**

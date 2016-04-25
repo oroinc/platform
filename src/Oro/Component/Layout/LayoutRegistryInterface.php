@@ -60,7 +60,7 @@ interface LayoutRegistryInterface
      * Builds the block.
      *
      * This method is called after the extended type has built the block
-     * and can be used to further modify the block.
+     * and can be used to further modify the block and prepare block options.
      *
      * @see BlockTypeInterface::buildForm()
      *
@@ -117,4 +117,19 @@ interface LayoutRegistryInterface
      * @param ContextInterface $context The context
      */
     public function configureContext(ContextInterface $context);
+
+    /**
+     * Update block options after they way resolved.
+     *
+     * @param  string $name
+     * @param array $options
+     * @param ContextInterface $context
+     * @param DataAccessorInterface $data
+     */
+    public function normalizeOptions(
+        $name,
+        array &$options,
+        ContextInterface $context,
+        DataAccessorInterface $data
+    );
 }

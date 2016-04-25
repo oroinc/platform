@@ -69,7 +69,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field1',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(1))
@@ -78,7 +78,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field2',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->exactly(2))
@@ -107,27 +107,37 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
         $this->layoutManipulator->expects($this->at(0))
             ->method('add')
             ->with(
-                self::FIELD_PREFIX . 'field1:field11',
+                self::FIELD_PREFIX . 'field1',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field1.field11']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(1))
             ->method('add')
             ->with(
+                self::FIELD_PREFIX . 'field1:field11',
+                self::ROOT_ID,
+                FormFieldType::NAME,
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1.field11']
+            )
+            ->will($this->returnSelf());
+        $this->layoutManipulator->expects($this->at(2))
+            ->method('add')
+            ->with(
                 self::FIELD_PREFIX . 'field2',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->exactly(2))
+        $this->layoutManipulator->expects($this->exactly(3))
             ->method('add');
 
         $this->builder->build($formAccessor, $this->blockBuilder, $options);
         $this->assertSame(
             [
+                'field1'         => self::FIELD_PREFIX . 'field1',
                 'field1.field11' => self::FIELD_PREFIX . 'field1:field11',
                 'field2'         => self::FIELD_PREFIX . 'field2'
             ],
@@ -151,7 +161,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field1',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(1))
@@ -160,7 +170,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field2',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->exactly(2))
@@ -193,7 +203,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field2',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(1))
@@ -202,7 +212,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field1',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->exactly(2))
@@ -236,7 +246,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field2:field21',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2.field21']
             )
             ->will($this->returnSelf());
         $this->layoutManipulator->expects($this->at(1))
@@ -245,17 +255,27 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
                 self::FIELD_PREFIX . 'field1',
                 self::ROOT_ID,
                 FormFieldType::NAME,
-                ['form_name' => self::FORM_NAME, 'field_path' => 'field1']
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field1']
             )
             ->will($this->returnSelf());
-        $this->layoutManipulator->expects($this->exactly(2))
+        $this->layoutManipulator->expects($this->at(2))
+            ->method('add')
+            ->with(
+                self::FIELD_PREFIX . 'field2',
+                self::ROOT_ID,
+                FormFieldType::NAME,
+                ['form' => null, 'form_name' => self::FORM_NAME, 'field_path' => 'field2']
+            )
+            ->will($this->returnSelf());
+        $this->layoutManipulator->expects($this->exactly(3))
             ->method('add');
 
         $this->builder->build($formAccessor, $this->blockBuilder, $options);
         $this->assertSame(
             [
                 'field2.field21' => self::FIELD_PREFIX . 'field2:field21',
-                'field1'         => self::FIELD_PREFIX . 'field1'
+                'field1'         => self::FIELD_PREFIX . 'field1',
+                'field2'         => self::FIELD_PREFIX . 'field2'
             ],
             $formAccessor->getProcessedFields()
         );
@@ -296,6 +316,7 @@ class FormLayoutBuilderTest extends \PHPUnit_Framework_TestCase
     protected function getOptions()
     {
         return [
+            'form'              => null,
             'form_name'         => self::FORM_NAME,
             'preferred_fields'  => [],
             'form_field_prefix' => self::FIELD_PREFIX,

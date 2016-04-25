@@ -14,6 +14,11 @@ define([
             'page:error mediator': 'onPageUpdate'
         },
 
+        events: {
+            'click .hide-button': 'sendUpdates',
+            'click .sf-minitoolbar': 'sendUpdates'
+        },
+
         /**
          * Handles page load event
          *  - loads debug data
@@ -25,7 +30,11 @@ define([
          * @override
          */
         onPageUpdate: function(data, actionArgs, xhr) {
-            if (!xhr) {
+            if (!actionArgs.route.previous) {
+                this.sendUpdates();
+                // nothing to do, the page just loaded
+                return;
+            } else if (!xhr) {
                 this.$el.empty();
                 mediator.trigger('layout:adjustHeight');
                 return;
@@ -65,6 +74,14 @@ define([
                 .attr('data-sfurl', url);
             this.$el.html(data);
 
+            this.sendUpdates();
+        },
+
+        /**
+         * Notifies application about updates
+         */
+        sendUpdates: function() {
+            mediator.trigger('debugToolbar:afterUpdateView');
             mediator.trigger('layout:adjustHeight');
         }
     });

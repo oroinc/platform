@@ -58,3 +58,9 @@ And these permissions are supported for fields:
 - [Access levels] (./Resources/doc/access-levels.md)
 - [Custom listeners] (./Resources/doc/custom-listeners.md)
 - [Examples](./Resources/doc/examples.md)
+
+Permissions
+-----------
+
+The `OroSecurityBundle` provides possibility to use custom permissions for entities.
+See [Permissions](./Resources/doc/permissions.md) for details.

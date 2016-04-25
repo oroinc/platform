@@ -15,6 +15,8 @@ class FieldHelper
 {
     const HAS_CONFIG = 'has_config';
 
+    const IDENTITY_ONLY_WHEN_NOT_EMPTY = -1;
+
     /** @var ConfigProvider */
     protected $configProvider;
 
@@ -246,7 +248,10 @@ class FieldHelper
             return $this->getPropertyAccessor()->getValue($object, $fieldName);
         } catch (\Exception $e) {
             $class = ClassUtils::getClass($object);
-            if (property_exists($class, $fieldName)) {
+            while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+            }
+
+            if ($class) {
                 $reflection = new \ReflectionProperty($class, $fieldName);
                 $reflection->setAccessible(true);
                 return $reflection->getValue($object);
@@ -268,7 +273,10 @@ class FieldHelper
             $this->getPropertyAccessor()->setValue($object, $fieldName, $value);
         } catch (\Exception $e) {
             $class = ClassUtils::getClass($object);
-            if (property_exists($class, $fieldName)) {
+            while (!property_exists($class, $fieldName) && $class = get_parent_class($class)) {
+            }
+
+            if ($class) {
                 $reflection = new \ReflectionProperty($class, $fieldName);
                 $reflection->setAccessible(true);
                 $reflection->setValue($object, $value);
@@ -303,21 +311,31 @@ class FieldHelper
     public function getIdentityValues($entity)
     {
         $entityName = ClassUtils::getClass($entity);
-
         $identityFieldNames = $this->getIdentityFieldNames($entityName);
-        $identityValues = [];
-        foreach ($identityFieldNames as $identityFieldName) {
-            $identityValues[$identityFieldName] = $this->getObjectValue($entity, $identityFieldName);
-        }
 
-        return $identityValues;
+        return $this->getFieldsValues($entity, $identityFieldNames);
+    }
+
+    /**
+     * Checks if a field should be used as an identity even if it has empty value
+     *
+     * @param string $entityName
+     * @param string $fieldName
+     *
+     * @return bool
+     */
+    public function isRequiredIdentityField($entityName, $fieldName)
+    {
+        $value = $this->getConfigValue($entityName, $fieldName, 'identity', false);
+
+        return $value && self::IDENTITY_ONLY_WHEN_NOT_EMPTY !== $value;
     }
 
     /**
      * @param string $entityName
      * @return string[]
      */
-    protected function getIdentityFieldNames($entityName)
+    public function getIdentityFieldNames($entityName)
     {
         if (!array_key_exists($entityName, $this->identityFieldsCache)) {
             $this->identityFieldsCache[$entityName] = [];
@@ -334,6 +352,21 @@ class FieldHelper
         }
 
         return $this->identityFieldsCache[$entityName];
+    }
+
+    /**
+     * @param object $entity
+     * @param array $fieldNames
+     * @return array
+     */
+    public function getFieldsValues($entity, $fieldNames)
+    {
+        $values = [];
+        foreach ($fieldNames as $fieldName) {
+            $values[$fieldName] = $this->getObjectValue($entity, $fieldName);
+        }
+
+        return $values;
     }
 
     /**

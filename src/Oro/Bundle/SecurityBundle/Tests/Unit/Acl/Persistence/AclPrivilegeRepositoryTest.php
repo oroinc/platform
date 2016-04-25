@@ -56,10 +56,12 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
             );
         $this->extension->expects($this->any())
             ->method('getMaskBuilder')
-            ->will($this->returnValue(new EntityMaskBuilder()));
+            ->will($this->returnValue(new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT'])));
         $this->extension->expects($this->any())
             ->method('getAllMaskBuilders')
-            ->will($this->returnValue(array(new EntityMaskBuilder())));
+            ->will($this->returnValue(
+                array(new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']))
+            ));
 
         $this->extensionSelector = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionSelector')
             ->disableOriginalConstructor()
@@ -312,13 +314,8 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->translator->expects($this->at(0))
+        $this->translator->expects($this->exactly(2))
             ->method('trans')
-            ->with('Class 1')
-            ->will($this->returnArgument(0));
-        $this->translator->expects($this->at(1))
-            ->method('trans')
-            ->with('Class 2')
             ->will($this->returnArgument(0));
 
         $result = $this->repository->getPrivileges($sid);
@@ -714,7 +711,7 @@ class AclPrivilegeRepositoryTest extends \PHPUnit_Framework_TestCase
     public static function getMask(array $masks, MaskBuilder $maskBuilder = null)
     {
         if ($maskBuilder === null) {
-            $maskBuilder = new EntityMaskBuilder();
+            $maskBuilder = new EntityMaskBuilder(0, ['VIEW', 'CREATE', 'EDIT']);
         }
         $maskBuilder->reset();
         foreach ($masks as $mask) {

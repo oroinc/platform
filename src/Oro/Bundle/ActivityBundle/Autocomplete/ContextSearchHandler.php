@@ -10,7 +10,6 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
@@ -19,6 +18,7 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 use Oro\Bundle\EntityBundle\Tools\EntityClassNameHelper;
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\ActivityBundle\Event\SearchAliasesEvent;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 use Oro\Bundle\SearchBundle\Engine\Indexer;
 use Oro\Bundle\SearchBundle\Query\Result\Item;
@@ -183,16 +183,13 @@ class ContextSearchHandler implements ConverterInterface
      */
     public function convertItem($item)
     {
+        $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
+
         /** @var Item $item */
         $text      = $item->getRecordTitle();
         $className = $item->getEntityName();
 
         $entityMapParameter = $this->mapper->getEntityMapParameter($className, 'title_fields');
-
-        if ($text === null && $entityMapParameter) {
-            $this->dispatcher->dispatch(PrepareResultItemEvent::EVENT_NAME, new PrepareResultItemEvent($item));
-            $text = $item->getRecordTitle();
-        }
 
         if (strlen($text) === 0 && !$entityMapParameter) {
             $text = $this->translator->trans('oro.entity.item', ['%id%' => $item->getRecordId()]);
@@ -357,7 +354,7 @@ class ContextSearchHandler implements ConverterInterface
             }
         }
 
-        $rsm = new ResultSetMapping();
+        $rsm = QueryUtils::createResultSetMapping($objectManager->getConnection()->getDatabasePlatform());
         $rsm
             ->addScalarResult('id', 'id', Type::INTEGER)
             ->addScalarResult('entity', 'entity')
@@ -406,6 +403,10 @@ class ContextSearchHandler implements ConverterInterface
                 $aliases[] = $alias;
             }
         }
+        /** dispatch oro_activity.search_aliases event */
+        $event = new SearchAliasesEvent($aliases, $targetEntityClasses);
+        $this->dispatcher->dispatch(SearchAliasesEvent::EVENT_NAME, $event);
+        $aliases = $event->getAliases();
 
         return $aliases;
     }

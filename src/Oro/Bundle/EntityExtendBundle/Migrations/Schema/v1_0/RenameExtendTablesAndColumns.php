@@ -234,9 +234,7 @@ class RenameExtendTablesAndColumns implements
     ) {
         $oldColumnName = 'field_' . $associationName . '_id';
         if ($table->hasColumn($oldColumnName)) {
-            $newColumnName = $this->nameGenerator->generateManyToOneRelationColumnName(
-                $associationName
-            );
+            $newColumnName = $this->nameGenerator->generateRelationColumnName($associationName);
             $this->renameExtension->renameColumn(
                 $schema,
                 $queries,

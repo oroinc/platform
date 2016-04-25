@@ -6,7 +6,7 @@ oro_integration:
                 options:
                     label:    oro.integration.integration.is_two_way_sync_enabled.label
                     required: false
-                applicable: @oro_integration.utils.form_utils->hasTwoWaySyncConnectors($channelType$)
+                applicable: "@oro_integration.utils.form_utils->hasTwoWaySyncConnectors($channelType$)"
             syncPriority:
                 type:  choice
                 options:
@@ -16,4 +16,4 @@ oro_integration:
                     choices:
                         remote: oro.integration.integration.remote_wins.label
                         local:  oro.integration.integration.local_wins.label
-                applicable: @oro_integration.utils.form_utils->hasTwoWaySyncConnectors($channelType$)
+                applicable: "@oro_integration.utils.form_utils->hasTwoWaySyncConnectors($channelType$)"

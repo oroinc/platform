@@ -4,6 +4,9 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
+use Oro\Component\Layout\ContextInterface;
+use Oro\Component\Layout\DataAccessor;
+use Oro\Component\Layout\DataAccessorInterface;
 use Oro\Component\Layout\Block\Type\BaseType;
 use Oro\Component\Layout\Block\Type\ContainerType;
 use Oro\Component\Layout\BlockBuilderInterface;
@@ -241,7 +244,23 @@ class BlockFactoryTest extends LayoutTestCase
             ->will(
                 $this->returnCallback(
                     function (OptionsResolverInterface $resolver) {
-                        $resolver->setDefaults(['test_option' => '']);
+                        $resolver->setDefaults(
+                            [
+                                'test_option_1' => '',
+                                'test_option_2' => '{BG}:red'
+                            ]
+                        );
+                    }
+                )
+            );
+        $headerBlockTypeExtension->expects($this->once())
+            ->method('normalizeOptions')
+            ->will(
+                $this->returnCallback(
+                    function (array &$options, ContextInterface $context, DataAccessorInterface $data) {
+                        if ($options['test_option_2'] === '{BG}:red') {
+                            $options['test_option_2'] = ['background'=> 'red'];
+                        }
                     }
                 )
             );
@@ -250,7 +269,7 @@ class BlockFactoryTest extends LayoutTestCase
             ->will(
                 $this->returnCallback(
                     function (BlockBuilderInterface $builder, array $options) {
-                        if ($options['test_option'] === 'move_logo_to_root') {
+                        if ($options['test_option_1'] === 'move_logo_to_root') {
                             $builder->getLayoutManipulator()->move('logo', 'root');
                         }
                     }
@@ -262,9 +281,10 @@ class BlockFactoryTest extends LayoutTestCase
                 $this->returnCallback(
                     function (BlockView $view, BlockInterface $block, array $options) {
                         $view->vars['attr']['block_id'] = $block->getId();
-                        if ($options['test_option'] === 'move_logo_to_root') {
+                        if ($options['test_option_1'] === 'move_logo_to_root') {
                             $view->vars['attr']['logo_moved'] = true;
                         }
+                        $view->vars['attr']['background'] = $options['test_option_2']['background'];
                     }
                 )
             );
@@ -294,7 +314,7 @@ class BlockFactoryTest extends LayoutTestCase
 
         $this->layoutManipulator
             ->add('root', null, 'root')
-            ->add('header', 'root', 'header', ['test_option' => 'move_logo_to_root'])
+            ->add('header', 'root', 'header', ['test_option_1' => 'move_logo_to_root'])
             ->add('logo', 'header', 'logo', ['title' => 'test']);
 
         $view = $this->getLayoutView();
@@ -308,7 +328,8 @@ class BlockFactoryTest extends LayoutTestCase
                             'id'   => 'header',
                             'attr' => [
                                 'block_id'   => 'header',
-                                'logo_moved' => true
+                                'logo_moved' => true,
+                                'background' => 'red'
                             ]
                         ],
                         'children' => [

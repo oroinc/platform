@@ -1,0 +1,17 @@
+# The layout theme that is used to add the page content and common page elements
+# for all themes in "main" group
+label:  ~ # this is a "hidden" theme
+groups: [ main ]
+data:
+    assets:
+        styles:
+            inputs:
+                - 'bundles/oroui/lib/font-awesome/css/font-awesome.css'
+                - 'bundles/oroui/lib/multiselect/jquery.multiselect.css'
+                - 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.css'
+                - 'bundles/oroui/css/jquery-ui.grid.css'
+                - 'bundles/oroui/css/jquery-ui-1.10.2.custom.css'
+                - 'bundles/oroui/css/less/uniform.less'
+                - 'bundles/oroui/css/less/font-awesome.less'
+                - 'bundles/oroui/css/less/base.less'
+                - 'bundles/oroui/css/less/desktop/form.less'

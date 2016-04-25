@@ -1,16 +1,18 @@
 <?php
 
-namespace Oro\Bundle\DataGridBundle\Tests\Twig;
+namespace Oro\Bundle\DataGridBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Symfony\Component\Routing\RouterInterface;
 
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\ManagerInterface;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
 use Oro\Bundle\DataGridBundle\Twig\DataGridExtension;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyMethods)
+ */
 class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerInterface */
@@ -85,15 +87,11 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
 
         $configuration = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datagrid\\Common\\DatagridConfiguration')
             ->disableOriginalConstructor()
+            ->setMethods(['getAclResource'])
             ->getMock();
 
-        $configuration->expects($this->at(0))
-            ->method('offsetGetByPath')
-            ->with(Builder::DATASOURCE_ACL_PATH)
-            ->will($this->returnValue(null));
-        $configuration->expects($this->at(1))
-            ->method('offsetGetByPath')
-            ->with(Builder::DATASOURCE_SKIP_ACL_CHECK)
+        $configuration->expects($this->once())
+            ->method('getAclResource')
             ->will($this->returnValue(null));
 
         $this->manager->expects($this->once())
@@ -131,14 +129,9 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $configuration->expects($this->at(0))
-            ->method('offsetGetByPath')
-            ->with(Builder::DATASOURCE_ACL_PATH)
+        $configuration->expects($this->once())
+            ->method('getAclResource')
             ->will($this->returnValue($acl));
-        $configuration->expects($this->at(1))
-            ->method('offsetGetByPath')
-            ->with(Builder::DATASOURCE_SKIP_ACL_CHECK)
-            ->will($this->returnValue(false));
 
         $this->manager->expects($this->once())
             ->method('getConfigurationForGrid')
@@ -188,6 +181,11 @@ class DataGridExtensionTest extends \PHPUnit_Framework_TestCase
         $this->nameStrategy->expects($this->once())
             ->method('buildGridFullName')
             ->with($gridName, $gridScope)
+            ->will($this->returnValue($gridFullName));
+
+        $this->nameStrategy->expects($this->once())
+            ->method('getGridUniqueName')
+            ->with($gridFullName)
             ->will($this->returnValue($gridFullName));
 
         $this->router->expects($this->once())

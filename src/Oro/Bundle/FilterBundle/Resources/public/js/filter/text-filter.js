@@ -49,13 +49,6 @@ define([
         criteriaSelector: '.filter-criteria',
 
         /**
-         * Element enclosing a criteria dropdown
-         *
-         * @property {string|jQuery|HTMLElement}
-         */
-        limitCriteriaTo: '#container:visible, body',
-
-        /**
          * Selectors for filter criteria elements
          *
          * @property {Object}
@@ -78,8 +71,7 @@ define([
             'click .filter-update': '_onClickUpdateCriteria',
             'click .filter-criteria-selector': '_onClickCriteriaSelector',
             'click .filter-criteria .filter-criteria-hide': '_onClickCloseCriteria',
-            'click .disable-filter': '_onClickDisableFilter',
-            'click .reset-filter': '_onClickResetFilter'
+            'click .disable-filter': '_onClickDisableFilter'
         },
 
         /**
@@ -205,7 +197,7 @@ define([
          * @protected
          */
         _showCriteria: function() {
-            this.$(this.criteriaSelector).show();
+            this.$(this.criteriaSelector).css('visibility', 'visible');
             this._alignCriteria();
             this._focusCriteria();
             this._setButtonPressed(this.$(this.criteriaSelector), true);
@@ -220,11 +212,21 @@ define([
          * @private
          */
         _alignCriteria: function() {
-            var $container = $(this.limitCriteriaTo);
-            var $criteria = this.$(this.criteriaSelector);
-            var shift = $container.prop('clientWidth') + $container.offset().left -
-                this.$el.offset().left - $criteria.outerWidth();
-            $criteria.css('margin-left', shift < 0 ? shift : 0);
+            var $container = this._findDropdownFitContainer();
+            if ($container === null) {
+                return;
+            }
+            var $dropdown = this.$(this.criteriaSelector);
+            var rect = $dropdown.get(0).getBoundingClientRect();
+            var containerRect = $container.get(0).getBoundingClientRect();
+            var shift = rect.right - (containerRect.left + $container.prop('clientWidth'));
+            if (shift > 0) {
+                /**
+                 * reduce shift to avoid overlaping left edge of container
+                 */
+                shift -= Math.max(0, containerRect.left - (rect.left - shift));
+                $dropdown.css('margin-left', -shift);
+            }
         },
 
         /**
@@ -233,7 +235,7 @@ define([
          * @protected
          */
         _hideCriteria: function() {
-            this.$(this.criteriaSelector).hide();
+            this.$(this.criteriaSelector).css('visibility', 'hidden');
             this._setButtonPressed(this.$(this.criteriaSelector), false);
             setTimeout(_.bind(function() {
                 if (!this.disposed) {
@@ -266,28 +268,6 @@ define([
             return {
                 value: this._getInputValue(this.criteriaValueSelectors.value)
             };
-        },
-
-        /**
-         * @inheritDoc
-         */
-        _onValueUpdated: function(newValue, oldValue) {
-            TextFilter.__super__._onValueUpdated.apply(this, arguments);
-            this._updateCriteriaHint();
-        },
-
-        /**
-         * Updates criteria hint element with actual criteria hint value
-         *
-         * @protected
-         * @return {*}
-         */
-        _updateCriteriaHint: function() {
-            this.$(this.criteriaHintSelector)
-                .html(_.escape(this._getCriteriaHint()))
-                .closest('.filter-criteria-selector')
-                .toggleClass('filter-default-value', this.isEmptyValue());
-            return this;
         },
 
         /**

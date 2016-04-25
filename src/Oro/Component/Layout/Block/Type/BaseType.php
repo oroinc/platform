@@ -16,12 +16,22 @@ class BaseType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setOptional(['vars', 'attr', 'label', 'label_attr', 'translation_domain']);
+        $resolver->setOptional(
+            [
+                'vars',
+                'attr',
+                'label',
+                'label_attr',
+                'translation_domain',
+                'class_prefix'
+            ]
+        );
         $resolver->setAllowedTypes(
             [
                 'vars'       => 'array',
                 'attr'       => 'array',
-                'label_attr' => 'array'
+                'label_attr' => 'array',
+                'class_prefix' => 'string'
             ]
         );
     }
@@ -39,6 +49,13 @@ class BaseType extends AbstractType
         // add the view to itself vars to allow get it using 'block' variable in a rendered, for example TWIG
         $view->vars['block'] = $view;
 
+        $view->vars['class_prefix'] = null;
+        if (isset($options['class_prefix'])) {
+            $view->vars['class_prefix'] = $options['class_prefix'];
+        } elseif ($view->parent) {
+            $view->vars['class_prefix'] = $view->parent->vars['class_prefix'];
+        }
+
         // replace attributes if specified ('attr' variable always exists in a view because it is added by FormView)
         if (isset($options['attr'])) {
             $view->vars['attr'] = $options['attr'];
@@ -47,6 +64,7 @@ class BaseType extends AbstractType
         // add label text and attributes if specified
         if (isset($options['label'])) {
             $view->vars['label'] = $options['label'];
+            $view->vars['label_attr'] = [];
             if (isset($options['label_attr'])) {
                 $view->vars['label_attr'] = $options['label_attr'];
             }
@@ -70,6 +88,18 @@ class BaseType extends AbstractType
         $view->vars['unique_block_prefix'] = $uniqueBlockPrefix;
         $view->vars['block_prefixes']      = $blockPrefixes;
         $view->vars['cache_key']           = sprintf('_%s_%s', $id, $name);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(BlockView $view, BlockInterface $block, array $options)
+    {
+        if (isset($view->vars['attr']['id']) && !isset($view->vars['label_attr']['for'])) {
+            $view->vars['label_attr']['for'] = $view->vars['attr']['id'];
+        }
+
+        $view->vars['blocks'] = $view->blocks;
     }
 
     /**

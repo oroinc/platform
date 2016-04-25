@@ -74,6 +74,8 @@ class RoleController extends Controller
     {
         $className = str_replace('_', '\\', $className);
         $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
+        $aclRoleHandler->setAclPrivilegeRepository($this->get('oro_security.acl.field_privilege_repository'));
+
         $aclRoleHandler->createForm($entity, $className);
 
         $privilegesConfig = $this->container->getParameter('oro_user.privileges');

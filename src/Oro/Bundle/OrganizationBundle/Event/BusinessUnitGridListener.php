@@ -72,10 +72,15 @@ class BusinessUnitGridListener
                     $organization->getId()
                 );
             }
-            $where = array_merge(
-                $where,
-                ['u.id in (' . implode(', ', $resultBuIds) . ')']
-            );
+            if (count($resultBuIds)) {
+                $where = array_merge(
+                    $where,
+                    ['u.id in (' . implode(', ', $resultBuIds) . ')']
+                );
+            } else {
+                // There are no records to show, make query to return empty result
+                $where = array_merge($where, ['1 = 0']);
+            }
         }
         if (count($where)) {
             $config->offsetSetByPath('[source][query][where][and]', $where);

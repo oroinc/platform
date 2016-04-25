@@ -43,7 +43,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.placeholder - Placeholder translation key for an empty element
      * @param {string} options.placeholder_raw - Raw placeholder value. It overrides placeholder translation key
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
@@ -76,18 +75,16 @@ define(function(require) {
             return rules;
         },
 
-        getFormattedValue: function() {
-            var raw = this.getModelValue();
-            if (isNaN(raw)) {
+        formatRawValue: function(value) {
+            value = this.parseRawValue(value);
+            if (isNaN(value)) {
                 return '';
             }
-
-            return this.formatter.fromRaw(raw);
+            return this.formatter.fromRaw(value);
         },
 
-        getModelValue: function() {
-            var raw = this.model.get(this.fieldName);
-            return parseFloat(raw);
+        parseRawValue: function(value) {
+            return parseFloat(value);
         },
 
         isChanged: function() {
@@ -105,7 +102,7 @@ define(function(require) {
 
         getModelUpdateData: function() {
             var data = {};
-            data[this.fieldName] = isNaN(this.getValue()) ? this.UNSET_FIELD_VALUE : this.getValue();
+            data[this.fieldName] = isNaN(this.getValue()) ? void 0 : this.getValue();
             return data;
         }
     });

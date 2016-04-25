@@ -127,6 +127,40 @@ define([
                 }
             }
             return value;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _getCriteriaHint: function() {
+            var value = (arguments.length > 0) ? this._getDisplayValue(arguments[0]) : this._getDisplayValue();
+            var choices = this._getSelectedChoices(value, this.choices);
+
+            return choices.length > 0 ? choices.join(', ') : this.placeholder;
+        },
+
+        /**
+         * @param {Array} value
+         * @param {Array} choices
+         * @returns {Array}
+         */
+        _getSelectedChoices: function(value, choices) {
+            return _.reduce(
+                choices,
+                function(result, choice) {
+                    if (_.has(choice, 'choices')) {
+                        return result.concat(this._getSelectedChoices(value, choice.choices));
+                    }
+
+                    if (_.indexOf(value.value, choice.value) !== -1) {
+                        result.push(choice.label);
+                    }
+
+                    return result;
+                },
+                [],
+                this
+            );
         }
     });
 

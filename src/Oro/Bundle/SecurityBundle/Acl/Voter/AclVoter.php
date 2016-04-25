@@ -108,7 +108,12 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         list($this->object, $group) = $this->separateAclGroupFromObject($this->object);
 
         try {
-            $this->extension = $this->extensionSelector->select($object);
+            // select ACL extension based on object given (that could be FieldVote instance)
+            //     to be able to choose field ACL extension
+            // or based on object that could be created in separateAclGroupFromObject
+            $this->extension = $this->extensionSelector->select(
+                $object instanceof FieldVote ? $object : $this->object
+            );
         } catch (InvalidDomainObjectException $e) {
             return self::ACCESS_ABSTAIN;
         }
@@ -122,7 +127,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         }
 
         //check acl group
-        $result = $this->checkAclGroup($group);
+        $result = $this->checkAclGroup($attributes, $group);
 
         if ($result !== self::ACCESS_DENIED) {
             $result = parent::vote($token, $object, $attributes);
@@ -207,15 +212,33 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     }
 
     /**
+     * @param array $attributes
      * @param string $group
      * @return int
      */
-    protected function checkAclGroup($group)
+    protected function checkAclGroup(array $attributes, $group)
     {
         if ($group === null || !$this->groupProvider || !$this->object) {
             return self::ACCESS_ABSTAIN;
         }
 
-        return $group === $this->groupProvider->getGroup() ? self::ACCESS_ABSTAIN : self::ACCESS_DENIED;
+        $result = self::ACCESS_DENIED;
+        if ($group === $this->groupProvider->getGroup()) {
+            $result = self::ACCESS_ABSTAIN;
+
+            $permissions = $this->extension->getPermissions(null, false, true);
+            foreach ($attributes as $attribute) {
+                if (!$this->supportsAttribute($attribute)) {
+                    continue;
+                }
+
+                if (!in_array($attribute, $permissions, true)) {
+                    $result = self::ACCESS_DENIED;
+                    break;
+                }
+            }
+        }
+
+        return $result;
     }
 }

@@ -9,7 +9,7 @@
 }
 &, #page, #top-page {
   height: auto;
-  min-height: 100vh;
+  min-height: 100%;
   overflow: visible;
 }
 
@@ -50,14 +50,22 @@
     padding-right: @contentPadding;
   }
 }
+.scrollspy.container-fluid, .page-title + [data-bound-component="orodatagrid/js/app/components/datagrid-component"]  {
+  margin-top: -10px;
+  > .no-data-visible {
+    padding-top: 1px;
+  }
+}
 .layout-content .responsive-section{
   padding: 0;
   .form-horizontal {
     padding: @contentPadding 0;
   }
 }
-.container-fluid > .responsive-section .responsive-cell {
-  padding: 0 @contentPadding;
+.container-fluid > .responsive-section {
+  .responsive-cell, .responsive-cell:only-child {
+    padding: 0 @contentPadding;
+  }
 }
 .responsive-cell .box-type1{
   .filter-box {
@@ -75,6 +83,9 @@
 #magento-without-border-tabs{
   min-width: 280px;
   padding-right: 0;
+  margin-left: -10px;
+  margin-right: -10px;
+  width: calc(~"100% + 20px");
 }
 .tab-content{
   .oro-tabs{
@@ -90,6 +101,9 @@
         }
       }
     }
+  }
+  .tab-pane {
+    padding: 0 10px;
   }
 }
 .dashboard-container{
@@ -119,11 +133,12 @@
       padding-right: 0;
       margin-left: 0;
       margin-right: 0;
+      max-width: 100%;
     }
     .container-fluid,
     .grid-toolbar{
-      padding-left: 10px;
-      padding-right: 10px;
+      padding-left: 0;
+      padding-right: 0;
     }
   }
 }

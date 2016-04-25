@@ -36,7 +36,9 @@
     text-align: center;
   }
   .map-item {
-    cursor:pointer;
+    &:not(.active) {
+      cursor: pointer;
+    }
     address {
       margin-bottom:0;
       line-height:1.5em;

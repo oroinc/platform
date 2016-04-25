@@ -10,6 +10,6 @@ services:
     oro_workflow.cache.process_trigger:
         class: %oro_workflow.cache.process_trigger.class%
         arguments:
-            - @doctrine
+            - '@doctrine'
         calls:
-            - [setProvider, [@oro_workflow.cache.provider.process_trigger]]
+            - [setProvider, ['@oro_workflow.cache.provider.process_trigger']]

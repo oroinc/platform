@@ -1,12 +1,12 @@
 datagrid:
     custom-entity-grid:
+        acl_resource: ~
         options:
             base_datagrid_class: Oro\Bundle\EntityBundle\Grid\CustomEntityDatagrid
             entityHint: entity
             export: true
             entity_pagination: true
         source:
-            acl_resource: ~
             type: orm
             query:
                 select:
@@ -19,19 +19,19 @@ datagrid:
             id: ~
             update_link:
                 type: callback
-                callable: @oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty
+                callable: "@oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty"
                 route: oro_entity_update
                 params:
                     - id
             view_link:
                 type: callback
-                callable: @oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty
+                callable: "@oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty"
                 route: oro_entity_view
                 params:
                     - id
             delete_link:
                 type: callback
-                callable: @oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty
+                callable: "@oro_entity.event_listener.custom_entity_grid_listener->getLinkProperty"
                 route: oro_entity_delete
                 params:
                     - id
@@ -61,6 +61,7 @@ datagrid:
             columns: []
 
     entity-relation-grid:
+        acl_resource: ~
         options:
             entityHint: entity
             routerEnabled: false
@@ -71,7 +72,6 @@ datagrid:
                     included: '#appendRelation'
                     excluded: '#removeRelation'
         source:
-            acl_resource: ~
             type: orm
         columns:
             assigned:

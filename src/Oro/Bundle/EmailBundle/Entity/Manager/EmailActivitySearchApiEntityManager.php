@@ -5,7 +5,6 @@ namespace Oro\Bundle\EmailBundle\Entity\Manager;
 use Doctrine\DBAL\Types\Type;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\Common\Persistence\ObjectManager;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
@@ -63,11 +62,10 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
     protected function prepareSearchEmailCriteria(SearchQueryBuilder $searchQueryBuilder, $emails = [])
     {
         $searchCriteria = $searchQueryBuilder->getCriteria();
-        foreach ($emails as $email) {
-            $searchCriteria->orWhere(
-                $searchCriteria->expr()->contains('email', $email)
-            );
-        }
+        $emailString = implode(' ', $emails);
+        $searchCriteria->andWhere(
+            $searchCriteria->expr()->contains('email', $emailString)
+        );
     }
 
     /**
@@ -148,7 +146,7 @@ class EmailActivitySearchApiEntityManager extends ActivitySearchApiEntityManager
             }
         }
 
-        $rsm = new ResultSetMapping();
+        $rsm = QueryUtils::createResultSetMapping($em->getConnection()->getDatabasePlatform());
         $rsm
             ->addScalarResult('id', 'id', Type::INTEGER)
             ->addScalarResult('entity', 'entity')

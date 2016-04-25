@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\EmailBundle\Mailer;
 
-use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
@@ -17,7 +16,6 @@ use Oro\Bundle\EmailBundle\Entity\EmailFolder;
 use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin;
-use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailActivityManager;
 use Oro\Bundle\EmailBundle\Entity\Provider\EmailOwnerProvider;
 use Oro\Bundle\EmailBundle\Event\EmailBodyAdded;
@@ -25,14 +23,13 @@ use Oro\Bundle\EmailBundle\Form\Model\Email as EmailModel;
 use Oro\Bundle\EmailBundle\Form\Model\EmailAttachment as EmailAttachmentModel;
 use Oro\Bundle\EmailBundle\Model\FolderType;
 use Oro\Bundle\EmailBundle\Tools\EmailAddressHelper;
+use Oro\Bundle\EmailBundle\Tools\EmailOriginHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
 use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
-use Oro\Bundle\UserBundle\Entity\User;
 
 /**
  * Class Processor
@@ -77,7 +74,12 @@ class Processor
     /** @var Mcrypt */
     protected $encryptor;
 
+    /** @var EmailOriginHelper */
+    protected $emailOriginHelper;
+
     /**
+     * @SuppressWarnings(PHPMD.ExcessiveParameterList)
+     *
      * @param DoctrineHelper           $doctrineHelper
      * @param DirectMailer             $mailer
      * @param EmailAddressHelper       $emailAddressHelper
@@ -87,6 +89,7 @@ class Processor
      * @param ServiceLink              $serviceLink
      * @param EventDispatcherInterface $eventDispatcher
      * @param Mcrypt                   $encryptor
+     * @param EmailOriginHelper        $emailOriginHelper
      */
     public function __construct(
         DoctrineHelper $doctrineHelper,
@@ -97,17 +100,19 @@ class Processor
         EmailActivityManager $emailActivityManager,
         ServiceLink $serviceLink,
         EventDispatcherInterface $eventDispatcher,
-        Mcrypt $encryptor
+        Mcrypt $encryptor,
+        EmailOriginHelper $emailOriginHelper
     ) {
         $this->doctrineHelper       = $doctrineHelper;
         $this->mailer               = $mailer;
         $this->emailAddressHelper   = $emailAddressHelper;
         $this->emailEntityBuilder   = $emailEntityBuilder;
-        $this->emailOwnerProvider   = $emailOwnerProvider;
+        $this->emailOwnerProvider   = $emailOwnerProvider; # can be removed to EOH
         $this->emailActivityManager = $emailActivityManager;
         $this->securityFacade       = $serviceLink->getService();
         $this->eventDispatcher      = $eventDispatcher;
         $this->encryptor            = $encryptor;
+        $this->emailOriginHelper    = $emailOriginHelper;
     }
 
     /**
@@ -145,6 +150,7 @@ class Processor
         $messageId = '<' . $message->generateId() . '>';
 
         if ($origin === null) {
+            $this->emailOriginHelper->setEmailModel($model);
             $origin = $this->getEmailOrigin($model->getFrom(), $model->getOrganization());
         }
         $this->processSend($message, $origin);
@@ -311,6 +317,8 @@ class Processor
                             return sprintf('<img%ssrc="%s"', $imgConfig, $id);
                         }
                     }
+
+                    return $matches[0];
                 },
                 $body
             );
@@ -366,20 +374,20 @@ class Processor
     /**
      * Find existing email origin entity by email string or create and persist new one.
      *
-     * @param string $email
+     * @param string                $email
      * @param OrganizationInterface $organization
-     * @param string $originName
-     * @param boolean $enableUseUserEmailOrigin
+     * @param string                $originName
+     * @param boolean               $enableUseUserEmailOrigin
      *
      * @return EmailOrigin
      */
     public function getEmailOrigin(
         $email,
-        $organization = null,
+        OrganizationInterface $organization = null,
         $originName = InternalEmailOrigin::BAP,
         $enableUseUserEmailOrigin = true
     ) {
-        $originKey    = $originName . $email;
+        $originKey = $originName . $email;
         if (!$organization && $this->securityFacade !== null && $this->securityFacade->getOrganization()) {
             $organization = $this->securityFacade->getOrganization();
         }
@@ -389,53 +397,13 @@ class Processor
                 $this->emailAddressHelper->extractPureEmailAddress($email)
             );
 
-            if ($emailOwner instanceof User) {
-                $origin = $this->getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization);
-            } elseif ($emailOwner instanceof Mailbox) {
-                $origin = $emailOwner->getOrigin();
-            } else {
-                $origin = $this->getEntityManager()
-                    ->getRepository('OroEmailBundle:InternalEmailOrigin')
-                    ->findOneBy(['internalName' => $originName]);
-            }
+            $origin = $this->emailOriginHelper
+                ->findEmailOrigin($emailOwner, $organization, $originName, $enableUseUserEmailOrigin);
+
             $this->origins[$originKey] = $origin;
         }
 
         return $this->origins[$originKey];
-    }
-
-    /**
-     * @param User                  $emailOwner
-     * @param OrganizationInterface $organization
-     *
-     * @return InternalEmailOrigin
-     */
-    protected function createUserInternalOrigin(User $emailOwner, OrganizationInterface $organization = null)
-    {
-        $organization = $organization
-            ? $organization
-            : $emailOwner->getOrganization();
-        $originName   = InternalEmailOrigin::BAP . '_User_' . $emailOwner->getId();
-
-        $outboxFolder = new EmailFolder();
-        $outboxFolder
-            ->setType(FolderType::SENT)
-            ->setName(FolderType::SENT)
-            ->setFullName(FolderType::SENT);
-
-        $origin = new InternalEmailOrigin();
-        $origin
-            ->setName($originName)
-            ->addFolder($outboxFolder)
-            ->setOwner($emailOwner)
-            ->setOrganization($organization);
-
-        $emailOwner->addEmailOrigin($origin);
-
-        $this->getEntityManager()->persist($origin);
-        $this->getEntityManager()->persist($emailOwner);
-
-        return $origin;
     }
 
     /**
@@ -515,63 +483,5 @@ class Processor
         }
 
         return $this->em;
-    }
-
-    /**
-     * Get imap origin if exists.
-     *
-     * @param $enableUseUserEmailOrigin
-     * @param $emailOwner
-     * @param $organization
-     * @return mixed|null|InternalEmailOrigin
-     */
-    protected function getPreferedOrigin($enableUseUserEmailOrigin, $emailOwner, $organization)
-    {
-        $origins = new ArrayCollection();
-
-        if ($enableUseUserEmailOrigin) {
-            $origins = $emailOwner->getEmailOrigins()->filter(
-                $this->getImapEnabledFilter($organization)
-            );
-        }
-        if ($origins->isEmpty()) {
-            $origins = $emailOwner->getEmailOrigins()->filter(
-                $this->getInternalFilter($organization)
-            );
-        }
-        $origin = $origins->isEmpty() ? null : $origins->first();
-        if ($origin === null) {
-            $origin = $this->createUserInternalOrigin($emailOwner, $organization);
-
-            return $origin;
-        }
-
-        return $origin;
-    }
-
-    /**
-     * @param $organization
-     * @return \Closure
-     */
-    protected function getImapEnabledFilter($organization)
-    {
-        return function ($item) use ($organization) {
-            return
-                $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
-                && (!$organization || $item->getOrganization() === $organization);
-        };
-    }
-
-    /**
-     * @param $organization
-     * @return \Closure
-     */
-    protected function getInternalFilter($organization)
-    {
-        return function ($item) use ($organization) {
-            return
-                $item instanceof InternalEmailOrigin
-                && (!$organization || $item->getOrganization() === $organization);
-        };
     }
 }

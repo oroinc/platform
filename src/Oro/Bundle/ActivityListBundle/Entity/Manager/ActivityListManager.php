@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\ActivityListBundle\Entity\Manager;
 
-use Doctrine\Bundle\DoctrineBundle\Registry;
-use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\QueryBuilder;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
+use Oro\Bundle\ActivityListBundle\Event\ActivityListPreQueryBuildEvent;
 use Oro\Bundle\ActivityListBundle\Helper\ActivityInheritanceTargetsHelper;
 use Oro\Bundle\ActivityBundle\EntityConfig\ActivityScope;
 use Oro\Bundle\ActivityListBundle\Model\ActivityListGroupProviderInterface;
@@ -55,6 +55,9 @@ class ActivityListManager
     /** @var ActivityInheritanceTargetsHelper */
     protected $activityInheritanceTargetsHelper;
 
+    /** @var EventDispatcherInterface */
+    protected $eventDispatcher;
+
     /**
      * @param SecurityFacade                $securityFacade
      * @param EntityNameResolver            $entityNameResolver
@@ -66,6 +69,7 @@ class ActivityListManager
      * @param DoctrineHelper                $doctrineHelper
      * @param ActivityListAclCriteriaHelper $aclHelper
      * @param ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
+     * @param EventDispatcherInterface      $eventDispatcher
      *
      * @SuppressWarnings(PHPMD.ExcessiveParameterList)
      */
@@ -79,7 +83,8 @@ class ActivityListManager
         CommentApiManager $commentManager,
         DoctrineHelper $doctrineHelper,
         ActivityListAclCriteriaHelper $aclHelper,
-        ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper
+        ActivityInheritanceTargetsHelper $activityInheritanceTargetsHelper,
+        EventDispatcherInterface $eventDispatcher
     ) {
         $this->securityFacade           = $securityFacade;
         $this->entityNameResolver       = $entityNameResolver;
@@ -91,6 +96,7 @@ class ActivityListManager
         $this->doctrineHelper           = $doctrineHelper;
         $this->activityListAclHelper    = $aclHelper;
         $this->activityInheritanceTargetsHelper = $activityInheritanceTargetsHelper;
+        $this->eventDispatcher = $eventDispatcher;
     }
 
     /**
@@ -111,12 +117,26 @@ class ActivityListManager
      */
     public function getList($entityClass, $entityId, $filter, $page)
     {
+        return $this->getListData($entityClass, $entityId, $filter, $page)['data'];
+    }
+
+    /**
+     * @param string  $entityClass
+     * @param integer $entityId
+     * @param array   $filter
+     * @param integer $page
+     *
+     * @return array ('data' => [], 'count' => int)
+     */
+    public function getListData($entityClass, $entityId, $filter, $page)
+    {
         $qb = $this->prepareQB($entityClass, $entityId, $filter);
 
         $pager = $this->pager;
         $pager->setQueryBuilder($qb);
         $pager->setPage($page);
         $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
+        $pager->setSkipAclCheck(true);
         $pager->init();
 
         $targetEntityData = [
@@ -124,7 +144,10 @@ class ActivityListManager
             'id'    => $entityId,
         ];
 
-        return $this->getEntityViewModels($pager->getResults(), $targetEntityData);
+        return [
+            'count' => $pager->getNbResults(),
+            'data' => $this->getEntityViewModels($pager->getResults(), $targetEntityData),
+        ];
     }
 
     /**
@@ -260,15 +283,18 @@ class ActivityListManager
 
     /**
      * @param string $entityClass
-     * @param string $entityId
+     * @param int $entityId
      *
      * @return QueryBuilder
      */
     protected function getBaseQB($entityClass, $entityId)
     {
+        $event = new ActivityListPreQueryBuildEvent($entityClass, $entityId);
+        $this->eventDispatcher->dispatch(ActivityListPreQueryBuildEvent::EVENT_NAME, $event);
+        $entityIds = $event->getTargetIds();
         return $this->getRepository()->getBaseActivityListQueryBuilder(
             $entityClass,
-            $entityId,
+            $entityIds,
             $this->config->get('oro_activity_list.sorting_field'),
             $this->config->get('oro_activity_list.sorting_direction'),
             $this->config->get('oro_activity_list.grouping')

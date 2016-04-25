@@ -68,7 +68,7 @@ class GroupByHelper
      */
     protected function hasAggregate($select)
     {
-        preg_match('/(MIN|MAX|AVG|COUNT|SUM)\(/i', $select, $matches);
+        preg_match('/(MIN|MAX|AVG|COUNT|SUM|GROUP_CONCAT)\(/i', $select, $matches);
 
         return (bool)$matches;
     }

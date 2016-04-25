@@ -20,11 +20,23 @@ class SystemConfigurationFormProvider extends Provider
     /** @var FormFactoryInterface */
     protected $factory;
 
-    public function __construct(ConfigBag $configBag, FormFactoryInterface $factory, SecurityFacade $securityFacade)
-    {
-        parent::__construct($configBag, $securityFacade);
+    /** @var SecurityFacade */
+    protected $securityFacade;
 
-        $this->factory = $factory;
+    /**
+     * @param ConfigBag            $configBag
+     * @param FormFactoryInterface $factory
+     * @param SecurityFacade       $securityFacade
+     */
+    public function __construct(
+        ConfigBag $configBag,
+        FormFactoryInterface $factory,
+        SecurityFacade $securityFacade
+    ) {
+        parent::__construct($configBag);
+
+        $this->factory        = $factory;
+        $this->securityFacade = $securityFacade;
     }
 
     /**
@@ -98,6 +110,18 @@ class SystemConfigurationFormProvider extends Provider
         }
 
         return [$activeGroup, $activeSubGroup];
+    }
+
+    /**
+     * Checks whether an access to a given ACL resource is granted
+     *
+     * @param string $resourceName
+     *
+     * @return bool
+     */
+    protected function checkIsGranted($resourceName)
+    {
+        return $this->securityFacade->isGranted($resourceName);
     }
 
     /**

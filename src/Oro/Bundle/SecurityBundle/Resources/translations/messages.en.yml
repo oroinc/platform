@@ -16,3 +16,7 @@ oro:
             NONE: None
         organization:
             access_denied: You don't have access to organization "%organization_name%"
+        permissions: Action Permissions
+        field_acl:
+            is_enabled.label:             Field Level ACL
+            show_restricted_fields.label: Show restricted

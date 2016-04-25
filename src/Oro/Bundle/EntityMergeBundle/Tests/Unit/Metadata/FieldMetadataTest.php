@@ -180,7 +180,7 @@ class FieldMetadataTest extends \PHPUnit_Framework_TestCase
         $this->fieldMetadata->addMergeMode(MergeModes::REPLACE);
         $this->assertEquals(array(MergeModes::REPLACE), $this->fieldMetadata->getMergeModes());
         $this->fieldMetadata->addMergeMode(MergeModes::UNITE);
-        $this->assertEquals(array(MergeModes::REPLACE, MergeModes::UNITE), $this->fieldMetadata->getMergeModes());
+        $this->assertEquals([MergeModes::UNITE, MergeModes::REPLACE], $this->fieldMetadata->getMergeModes());
     }
 
     public function testIsCollectionFalseWhenNotHasDoctrineMetadata()

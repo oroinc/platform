@@ -3,3 +3,4 @@ css:
       - 'bundles/orodatagrid/lib/backgrid/backgrid.css'
       - 'bundles/orodatagrid/lib/backgrid/extensions/paginator/backgrid-paginator.css'
       - 'bundles/orodatagrid/css/less/main.less'
+      - 'bundles/orodatagrid/css/less/inline-editing-help.less'

@@ -18,24 +18,16 @@ use Oro\Bundle\TranslationBundle\Translation\Translator;
 
 class ConfigType extends AbstractType
 {
-    /**
-     * @var ManagerRegistry
-     */
+    /** @var ManagerRegistry */
     protected $doctrine;
 
-    /**
-     * @var ConfigManager
-     */
+    /** @var ConfigManager */
     protected $configManager;
 
-    /**
-     * @var Translator
-     */
+    /** @var Translator */
     protected $translator;
 
-    /**
-     * @var DynamicTranslationMetadataCache
-     */
+    /** @var DynamicTranslationMetadataCache */
     protected $dbTranslationMetadataCache;
 
     /**

@@ -60,10 +60,9 @@ class ContextGridListener
             $class       = $parameters->get('activityClass');
             $entityClass = $this->entityClassNameHelper->resolveEntityClass($class, true);
 
-            /** @var ActivityInterface $entity */
             $entity = $this->doctrineHelper->getEntity($entityClass, $id);
 
-            if ($entity) {
+            if ($entity && $entity instanceof ActivityInterface) {
                 $targetsArray = $entity->getActivityTargets($targetClass);
 
                 $targetIds = [];
@@ -72,7 +71,7 @@ class ContextGridListener
                 }
 
                 if ($targetIds) {
-                    $queryBuilder->andWhere($queryBuilder->expr()->notIn("$alias.id", $targetIds));
+                    $queryBuilder->andWhere($queryBuilder->expr()->notIn(sprintf('%s.id', $alias), $targetIds));
                 }
             }
         }

@@ -1,0 +1,27 @@
+{% import 'OroUserBundle::macros.html.twig' as U %}
+{% if bracket_parts is not defined %}
+    {% set bracket_parts = [] %}
+{% endif %}
+{% set ownerType = oro_get_owner_type(entity) %}
+{% if ownerType == 'USER' %}
+    {% set userOwner = oro_get_entity_owner(entity) %}
+    {% if userOwner %}
+        {% set businessUnitName = U.user_business_unit_name(userOwner, false) %}
+        {% if businessUnitName is not empty %}
+            {% set bracket_parts = [businessUnitName]|merge(bracket_parts) %}
+        {% endif %}
+    {% endif %}
+{% elseif ownerType == 'ORGANIZATION' %}
+    {% if organizationInfo is not defined %}
+        {% set organizationOwner = oro_get_entity_owner(entity) %}
+        {% if organizationOwner is not null %}
+            {% set organizationInfo =  'oro.ui.owner'|trans ~ ': ' ~ organizationOwner.name %}
+        {% else %}
+            {% set organizationInfo = '' %}
+        {% endif %}
+    {% endif %}
+    {{ organizationInfo|raw }}
+{% endif %}
+{% if bracket_parts is not empty %}
+    ({{ bracket_parts|join(', ')|raw }})
+{% endif %}

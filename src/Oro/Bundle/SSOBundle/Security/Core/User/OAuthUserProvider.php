@@ -84,7 +84,7 @@ class OAuthUserProvider implements OAuthAwareUserProviderInterface
      */
     protected function isEmailEnabledForOauth($email)
     {
-        $enabledDomains = $this->cm->get('oro_sso.google_sso_domains');
+        $enabledDomains = $this->cm->get('oro_sso.domains');
         if (!$enabledDomains) {
             return true;
         }

@@ -2,14 +2,16 @@
 
 namespace Oro\Bundle\NoteBundle\Model\Strategy;
 
-use Oro\Bundle\NoteBundle\Model\MergeModes;
 use Symfony\Component\Security\Core\Util\ClassUtils;
+
+use Oro\Component\PhpUtils\ArrayUtil;
+
 use Oro\Bundle\ActivityListBundle\Entity\Manager\ActivityListManager;
 use Oro\Bundle\ActivityListBundle\Entity\ActivityList;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityMergeBundle\Model\Strategy\StrategyInterface;
 use Oro\Bundle\EntityMergeBundle\Data\FieldData;
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
+use Oro\Bundle\NoteBundle\Model\MergeModes;
 
 class UniteStrategy implements StrategyInterface
 {
@@ -60,7 +62,7 @@ class UniteStrategy implements StrategyInterface
 
                 $activityListItems = $queryBuilder->getQuery()->getResult();
 
-                $activityIds = ArrayUtils::arrayColumn($activityListItems, 'id');
+                $activityIds = ArrayUtil::arrayColumn($activityListItems, 'id');
                 $this->activityListManager
                     ->replaceActivityTargetWithPlainQuery(
                         $activityIds,

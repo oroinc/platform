@@ -9,21 +9,25 @@ use Doctrine\Common\Util\ClassUtils as DoctrineClassUtils;
 
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
+use Oro\Bundle\EntityBundle\ORM\Mapping\AdditionalMetadataProvider;
 use Oro\Bundle\EntityMergeBundle\Exception\InvalidArgumentException;
 
 class DoctrineHelper
 {
-    /**
-     * @var EntityManager
-     */
+    /** @var EntityManager */
     private $entityManager;
+
+    /** @var AdditionalMetadataProvider */
+    protected $additionalMetadataProvider;
 
     /**
      * @param EntityManager $entityManager
+     * @param AdditionalMetadataProvider $additionalMetadataProvider
      */
-    public function __construct(EntityManager $entityManager)
+    public function __construct(EntityManager $entityManager, AdditionalMetadataProvider $additionalMetadataProvider)
     {
         $this->entityManager = $entityManager;
+        $this->additionalMetadataProvider = $additionalMetadataProvider;
     }
 
     /**
@@ -128,6 +132,15 @@ class DoctrineHelper
         return
             $firstClass == $secondClass &&
             $this->getEntityIdentifierValue($entity) == $this->getEntityIdentifierValue($other);
+    }
+
+    /**
+     * @param string $className
+     * @return array
+     */
+    public function getInversedUnidirectionalAssociationMappings($className)
+    {
+        return $this->additionalMetadataProvider->getInversedUnidirectionalAssociationMappings($className);
     }
 
     /**

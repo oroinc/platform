@@ -341,20 +341,6 @@ class PropertyConfigContainer
      *
      * @return array
      */
-    public function getUpdateActionFilter($type = self::TYPE_ENTITY)
-    {
-        $type = $this->getConfigType($type);
-
-        return isset($this->config[$type]['update_filter'])
-            ? $this->config[$type]['update_filter']
-            : null;
-    }
-
-    /**
-     * @param string|ConfigIdInterface $type
-     *
-     * @return array
-     */
     public function getLayoutActions($type = self::TYPE_ENTITY)
     {
         $type = $this->getConfigType($type);

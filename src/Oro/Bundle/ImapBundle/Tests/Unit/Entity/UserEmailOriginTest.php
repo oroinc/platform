@@ -70,16 +70,40 @@ class UserEmailOriginTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(123, $origin->getSmtpPort());
     }
 
-    public function testIsSmtpConfiguredSuccess()
+    /**
+     * @param string $password
+     * @param string $accessToken
+     *
+     * @dataProvider setDataProviderSmtpConfiguredSuccess
+     */
+    public function testIsSmtpConfiguredSuccess($password, $accessToken)
     {
         $origin = new UserEmailOrigin();
         $origin->setSmtpHost('host');
         $origin->setSmtpPort(25);
         $origin->setUser('test');
-        $origin->setPassword('password');
+        $origin->setPassword($password);
+        $origin->setAccessToken($accessToken);
         $origin->setSmtpEncryption('ssl');
 
         $this->assertTrue($origin->isSmtpConfigured());
+    }
+
+    /**
+     * @return array
+     */
+    public function setDataProviderSmtpConfiguredSuccess()
+    {
+        return [
+            'empty token' => [
+                'password' => 'password',
+                'accessToken' => ''
+            ],
+            'empty password' => [
+                'password' => '',
+                'accessToken' => 'token'
+            ]
+        ];
     }
 
     public function testIsSmtpConfiguredFailure()

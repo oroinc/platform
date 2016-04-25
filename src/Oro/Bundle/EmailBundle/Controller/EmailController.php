@@ -12,13 +12,11 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Routing\Generator\UrlGeneratorInterface;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\EmailBundle\Model\WebSocket\WebSocketSendProcessor;
 use Oro\Bundle\EmailBundle\Cache\EmailCacheManager;
 use Oro\Bundle\EmailBundle\Entity\Manager\EmailManager;
 use Oro\Bundle\EmailBundle\Entity\Email;
@@ -318,7 +316,7 @@ class EmailController extends Controller
      * Link attachment to entity
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})
-     * @AclAncestor("oro_email_email_edit")
+     * @AclAncestor("oro_email_email_user_edit")
      */
     public function linkAction(EmailAttachment $emailAttachment)
     {
@@ -381,11 +379,18 @@ class EmailController extends Controller
      */
     public function userEmailsSyncAction()
     {
-        $this->get('oro_email.email_synchronization_manager')->syncOrigins(
-            $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
-                $this->get('oro_security.security_facade')->getLoggedUserId()
-            )
-        );
+        try {
+            $this->get('oro_email.email_synchronization_manager')->syncOrigins(
+                $this->get('oro_email.helper.datagrid.emails')->getEmailOrigins(
+                    $this->get('oro_security.security_facade')->getLoggedUserId()
+                )
+            );
+        } catch (\Exception $e) {
+            return new JsonResponse(
+                ['error' => $this->get('translator')->trans('oro.email.action.message.error')],
+                Codes::HTTP_OK
+            );
+        }
 
         return new JsonResponse([], Codes::HTTP_OK);
     }

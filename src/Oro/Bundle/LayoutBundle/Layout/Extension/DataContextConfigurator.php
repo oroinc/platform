@@ -29,17 +29,11 @@ class DataContextConfigurator implements ContextConfiguratorInterface
                     sprintf('The data key "%s" must be a string, but "%s" given.', $key, gettype($key))
                 );
             }
-            if (!is_array($val)) {
-                throw new \InvalidArgumentException(
-                    sprintf(
-                        'The data item "%s" must be an array, but "%s" given.',
-                        $key,
-                        is_object($val) ? get_class($val) : gettype($val)
-                    )
-                );
+            if (is_array($val)) {
+                $context->data()->set($key, $this->getDataIdentifier($key, $val), $this->getData($key, $val));
+            } else {
+                $context->data()->set($key, null, $val);
             }
-
-            $context->data()->set($key, $this->getDataIdentifier($key, $val), $this->getData($key, $val));
         }
 
         $context->remove('data');

@@ -7,13 +7,13 @@ use Oro\Bundle\MigrationBundle\Tools\DbIdentifierNameGenerator;
 class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
 {
     const CUSTOM_TABLE_PREFIX              = 'oro_ext_';
+    const CUSTOM_TABLE_PRIMARY_KEY_COLUMN  = 'id';
     const ENUM_TABLE_PREFIX                = 'oro_enum_';
     const CUSTOM_MANY_TO_MANY_TABLE_PREFIX = 'oro_rel_';
     const CUSTOM_INDEX_PREFIX              = 'oro_idx_';
     const RELATION_COLUMN_SUFFIX           = '_id';
     const SNAPSHOT_COLUMN_SUFFIX           = '_ss';
     const RELATION_DEFAULT_COLUMN_PREFIX   = ExtendConfigDumper::DEFAULT_PREFIX;
-
 
     /**
      * Gets the max size of an custom entity name
@@ -60,15 +60,19 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      *
      * @param string $entityClassName
      * @param string $associationName
+     * @param string $suffix
+     *
      * @return string
      */
-    public function generateOneToManyRelationColumnName($entityClassName, $associationName)
-    {
+    public function generateOneToManyRelationColumnName(
+        $entityClassName,
+        $associationName,
+        $suffix = self::RELATION_COLUMN_SUFFIX
+    ) {
         return sprintf(
-            '%s_%s%s',
-            strtolower(ExtendHelper::getShortClassName($entityClassName)),
-            $associationName,
-            self::RELATION_COLUMN_SUFFIX
+            '%s%s',
+            ExtendHelper::buildToManyRelationTargetFieldName($entityClassName, $associationName),
+            $suffix
         );
     }
 
@@ -77,6 +81,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      *
      * @param string $entityClassName
      * @return string
+     * @deprecated since 1.9. Use generateManyToManyJoinTableColumnName instead
      */
     public function generateManyToManyRelationColumnName($entityClassName)
     {
@@ -92,6 +97,7 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
      *
      * @param string $associationName
      * @return string
+     * @deprecated since 1.9. Use generateRelationColumnName instead
      */
     public function generateManyToOneRelationColumnName($associationName)
     {
@@ -103,18 +109,33 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     }
 
     /**
+     * Builds a column name for a relation
+     *
+     * @param string $associationName
+     * @param string $suffix
+     *
+     * @return string
+     */
+    public function generateRelationColumnName($associationName, $suffix = self::RELATION_COLUMN_SUFFIX)
+    {
+        return sprintf('%s%s', $associationName, $suffix);
+    }
+
+    /**
      * Builds a column name for a default relation
      *
      * @param string $associationName
+     * @param string $suffix
+     *
      * @return string
      */
-    public function generateRelationDefaultColumnName($associationName)
+    public function generateRelationDefaultColumnName($associationName, $suffix = self::RELATION_COLUMN_SUFFIX)
     {
         return sprintf(
             '%s%s%s',
             self::RELATION_DEFAULT_COLUMN_PREFIX,
             $associationName,
-            self::RELATION_COLUMN_SUFFIX
+            $suffix
         );
     }
 
@@ -153,14 +174,26 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
     }
 
     /**
-     * Builds a table name for many-to-many relation
+     * Gets the name of a primary key column for a custom entity
+     * The custom entity is an entity which has no PHP class in any bundle. The definition of such entity is
+     * created automatically in Symfony cache
+     *
+     * @return string
+     */
+    public function getCustomEntityPrimaryKeyColumnName()
+    {
+        return self::CUSTOM_TABLE_PRIMARY_KEY_COLUMN;
+    }
+
+    /**
+     * Builds the name of a join table for many-to-many relation
      *
      * @param string $entityClassName
-     * @param string $fieldName
+     * @param string $associationName
      * @param string $targetEntityClassName
      * @return string
      */
-    public function generateManyToManyJoinTableName($entityClassName, $fieldName, $targetEntityClassName)
+    public function generateManyToManyJoinTableName($entityClassName, $associationName, $targetEntityClassName)
     {
         // remove ending underscore (_) char
         $prefix = substr(self::CUSTOM_MANY_TO_MANY_TABLE_PREFIX, 0, -1);
@@ -170,9 +203,27 @@ class ExtendDbIdentifierNameGenerator extends DbIdentifierNameGenerator
                 ExtendHelper::getShortClassName($entityClassName),
                 ExtendHelper::getShortClassName($targetEntityClassName)
             ],
-            [$fieldName],
+            [$associationName],
             $prefix,
             false
+        );
+    }
+
+    /**
+     * Builds the name of a column in a join table for a many-to-many relation
+     *
+     * @param string $entityClassName
+     * @param string $suffix
+     *
+     * @return string
+     *
+     */
+    public function generateManyToManyJoinTableColumnName($entityClassName, $suffix = self::RELATION_COLUMN_SUFFIX)
+    {
+        return sprintf(
+            '%s%s',
+            strtolower(ExtendHelper::getShortClassName($entityClassName)),
+            $suffix
         );
     }
 

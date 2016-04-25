@@ -4,10 +4,14 @@ namespace Oro\Bundle\ImportExportBundle\Serializer\Normalizer;
 
 use Doctrine\Common\Util\ClassUtils;
 
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 use Symfony\Component\Serializer\SerializerAwareInterface;
 use Symfony\Component\Serializer\SerializerInterface;
 use Symfony\Component\Serializer\Exception\InvalidArgumentException;
 
+use Oro\Bundle\ImportExportBundle\Event\Events;
+use Oro\Bundle\ImportExportBundle\Event\DenormalizeEntityEvent;
+use Oro\Bundle\ImportExportBundle\Event\NormalizeEntityEvent;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer implements SerializerAwareInterface
@@ -15,15 +19,14 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     const FULL_MODE  = 'full';
     const SHORT_MODE = 'short';
 
-    /**
-     * @var SerializerInterface|NormalizerInterface|DenormalizerInterface
-     */
+    /** @var SerializerInterface|NormalizerInterface|DenormalizerInterface */
     protected $serializer;
 
-    /**
-     * @var FieldHelper
-     */
+    /** @var FieldHelper */
     protected $fieldHelper;
+
+    /** @var EventDispatcherInterface */
+    protected $dispatcher;
 
     /**
      * @param FieldHelper $fieldHelper
@@ -36,11 +39,23 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
     }
 
     /**
+     * @param EventDispatcherInterface $dispatcher
+     */
+    public function setDispatcher(EventDispatcherInterface $dispatcher)
+    {
+        $this->dispatcher = $dispatcher;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function denormalize($data, $class, $format = null, array $context = [])
     {
-        $result = $this->createObject($class);
+        $result = $this->dispatchDenormalizeEvent(
+            $data,
+            $this->createObject($class),
+            Events::BEFORE_DENORMALIZE_ENTITY
+        );
         $fields = $this->fieldHelper->getFields($class, true);
 
         foreach ($fields as $field) {
@@ -66,7 +81,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             }
         }
 
-        return $result;
+        return $this->dispatchDenormalizeEvent($data, $result, Events::AFTER_DENORMALIZE_ENTITY);
     }
 
     /**
@@ -103,7 +118,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         $entityName = ClassUtils::getClass($object);
         $fields = $this->fieldHelper->getFields($entityName, true);
 
-        $result = [];
+        $result = $this->dispatchNormalize($object, [], $context, Events::BEFORE_NORMALIZE_ENTITY);
         foreach ($fields as $field) {
             $fieldName = $field['name'];
 
@@ -149,7 +164,7 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
             $result[$fieldName] = $fieldValue;
         }
 
-        return $result;
+        return $this->dispatchNormalize($object, $result, $context, Events::AFTER_NORMALIZE_ENTITY);
     }
 
     /**
@@ -215,5 +230,41 @@ class ConfigurableEntityNormalizer extends AbstractContextModeAwareNormalizer im
         }
 
         return false;
+    }
+
+    /**
+     * @param array $data
+     * @param object $result
+     * @param string $eventName
+     *
+     * @return object
+     */
+    protected function dispatchDenormalizeEvent($data, $result, $eventName)
+    {
+        if ($this->dispatcher && $this->dispatcher->hasListeners($eventName)) {
+            $this->dispatcher->dispatch($eventName, new DenormalizeEntityEvent($result, $data));
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param $object
+     * @param $result
+     * @param array $context
+     * @param string $eventName
+     *
+     * @return array
+     */
+    protected function dispatchNormalize($object, $result, array $context, $eventName)
+    {
+        if ($this->dispatcher && $this->dispatcher->hasListeners($eventName)) {
+            $event = new NormalizeEntityEvent($object, $result, $this->getMode($context) === static::FULL_MODE);
+            $this->dispatcher->dispatch($eventName, $event);
+
+            return $event->getResult();
+        }
+
+        return $result;
     }
 }

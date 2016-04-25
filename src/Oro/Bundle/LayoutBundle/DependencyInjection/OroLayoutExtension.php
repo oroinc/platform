@@ -7,9 +7,11 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
+use Oro\Component\Config\CumulativeResourceInfo;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
 use Oro\Component\Config\Loader\FolderContentCumulativeLoader;
+use Oro\Component\Config\Loader\FolderingCumulativeFileLoader;
 
 class OroLayoutExtension extends Extension
 {
@@ -23,11 +25,20 @@ class OroLayoutExtension extends Extension
     {
         $configLoader = new CumulativeConfigLoader(
             'oro_layout',
-            new YamlCumulativeFileLoader('Resources/config/oro/layout.yml')
+            [
+                new FolderingCumulativeFileLoader(
+                    '{folder}',
+                    '[a-zA-Z][a-zA-Z0-9_\-:]*',
+                    new YamlCumulativeFileLoader('Resources/views/layouts/{folder}/theme.yml')
+                ),
+                new YamlCumulativeFileLoader('Resources/config/oro/layout.yml')
+            ]
         );
-        $resources    = $configLoader->load($container);
-        foreach ($resources as $resource) {
-            $configs[] = $resource->data['oro_layout'];
+        $themesResources    = $configLoader->load($container);
+        $existThemePaths = [];
+        foreach ($themesResources as $resource) {
+            $existThemePaths[$resource->path] = true;
+            $configs[] = $this->getThemeConfig($resource);
         }
 
         $configuration = new Configuration();
@@ -94,11 +105,78 @@ class OroLayoutExtension extends Extension
              *    ]
              * ]
              */
-            $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resource->data);
+            $resourceThemeLayoutUpdates = $this->filterThemeLayoutUpdates($existThemePaths, $resource->data);
+            $resourceThemeLayoutUpdates = $this->sortThemeLayoutUpdates($resourceThemeLayoutUpdates);
+            $foundThemeLayoutUpdates = array_merge_recursive($foundThemeLayoutUpdates, $resourceThemeLayoutUpdates);
         }
 
         $container->setParameter('oro_layout.theme_updates_resources', $foundThemeLayoutUpdates);
 
         $this->addClassesToCompile(['Oro\Bundle\LayoutBundle\EventListener\ThemeListener']);
+    }
+
+    /**
+     * @param array $updates
+     * @return array
+     */
+    protected function sortThemeLayoutUpdates(array $updates)
+    {
+        $directories = [];
+        $files = [];
+        foreach ($updates as $key => $update) {
+            if (is_array($update)) {
+                $update = $this->sortThemeLayoutUpdates($update);
+                $directories[$key] = $update;
+            } else {
+                $files[] = $update;
+            }
+        }
+
+        sort($files);
+        ksort($directories);
+        $updates = array_merge($files, $directories);
+
+        return $updates;
+    }
+
+    /**
+     * @param array $existThemePaths
+     * @param array $themes
+     * @return array
+     */
+    protected function filterThemeLayoutUpdates(array $existThemePaths, array $themes)
+    {
+        foreach ($themes as $theme => $themePaths) {
+            foreach ($themePaths as $pathIndex => $path) {
+                if (is_string($path) && isset($existThemePaths[$path])) {
+                    unset($themePaths[$pathIndex]);
+                }
+            }
+            if (empty($themePaths)) {
+                unset($themes[$theme]);
+            } else {
+                $themes[$theme] = $themePaths;
+            }
+        }
+
+        return $themes;
+    }
+
+    /**
+     * @param CumulativeResourceInfo $resource
+     * @return array
+     */
+    protected function getThemeConfig(CumulativeResourceInfo $resource)
+    {
+        if ($resource->name === 'layout') {
+            return $resource->data['oro_layout'];
+        } else {
+            $themeName = basename(dirname($resource->path));
+            return [
+                'themes' => [
+                    $themeName => $resource->data
+                ]
+            ];
+        }
     }
 }

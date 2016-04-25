@@ -104,8 +104,8 @@ define([
      * @param {string} path
      */
     function defaultCallback(path) {
-        var page = contentManager.get(path);
-        var title = page ? '<b>' + page.titleShort + '</b>' : 'the';
+        var data = contentManager.get(path);
+        var title = data ? '<b>' + data.page.titleShort + '</b>' : 'the';
         if (notifier) {
             notifier.close();
         }
@@ -113,25 +113,6 @@ define([
             'warning',
             __('navigation.message.content.outdated', {title: title})
         );
-    }
-
-    /**
-     * Tags come from server in following structure
-     * [
-     *  { tagname: TAG, username: AUTHOR},
-     *  ...
-     *  { tagname: TAG2, username: AUTHOR},
-     *  ...
-     * ]
-     *
-     * @param {string} tags
-     * @return []
-     */
-    function prepareTags(tags) {
-        tags = _.reject(JSON.parse(tags), function(tag) {
-            return (tag.username || null) === currentUser;
-        });
-        return _.pluck(tags, 'tagname');
     }
 
     /**
@@ -145,19 +126,37 @@ define([
             _.each(callbacks, function(callback) {
                 callback(path);
             });
+            mediator.off('page:update', outdatedPageHandlers[path]);
+            delete outdatedPageHandlers[path];
         }
     }
 
     /**
      * Handler of content update message from server
+     * tags come from server in following structure
+     * [
+     *  { tagname: TAG, username: AUTHOR},
+     *  ...
+     *  { tagname: TAG2, username: AUTHOR},
+     *  ...
+     * ]
      *
-     * @param {string} tags
+     * @param {string} tagsJson
      */
-    function onUpdate(tags) {
-        var pages;
-        tags = prepareTags(tags);
+    function onUpdate(tagsJson) {
+        var tags = JSON.parse(tagsJson);
+        var userTags = _.pluck(_.filter(tags, function(tag) {
+            return (tag.username || null) === currentUser;
+        }), 'tagname');
 
-        pages = [current].concat(_.values(pagesCache));
+        var otherTags = _.pluck(_.reject(tags, function(tag) {
+            return (tag.username || null) === currentUser;
+        }), 'tagname');
+
+        var pages = _.values(pagesCache);
+        if (!_.contains(pages, current)) {
+            pages.unshift(current);
+        }
 
         _.each(pages, function(page) {
             var handler;
@@ -165,12 +164,18 @@ define([
             var items = page.tags;
             var path = page.path;
 
-            // collect callbacks for outdated contents
             _.each(items, function(options) {
-                if (_.intersection(options.tags, tags).length) {
+                // remove page from cache silently if current user made changes
+                if (_.intersection(options.tags, userTags).length) {
+                    contentManager.remove(page.path);
+                }
+
+                // collect callbacks for outdated contents
+                if (_.intersection(options.tags, otherTags).length) {
                     callbacks.push(options.callback || defaultCallback);
                 }
             });
+
             if (!callbacks.length) {
                 return false;
             }
@@ -292,9 +297,6 @@ define([
          */
         add: function() {
             var path;
-            if (current.path[0] !== '/') {
-                current.path = '/' + current.path;
-            }
             path = current.path;
             pagesCache[path] = current;
         },
@@ -327,7 +329,7 @@ define([
          * @param {string=} hash
          */
         saveState: function(key, value, hash) {
-            if (value !== null) {
+            if (value !== null && value !== void 0) {
                 current.state[key] = value;
             } else {
                 delete current.state[key];
@@ -408,7 +410,7 @@ define([
         checkState: function(key, hash) {
             var query;
             query = Chaplin.utils.queryParams.parse(current.query);
-            return query[key] === hash;
+            return query[key] === hash || query[key] === void 0 && hash === null;
         },
 
         /**

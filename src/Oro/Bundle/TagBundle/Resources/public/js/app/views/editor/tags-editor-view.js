@@ -56,7 +56,6 @@ define(function(require) {
      * @param {Object} options - Options container
      * @param {Object} options.model - Current row model
      * @param {string} options.fieldName - Field name to edit in model
-     * @param {string} options.metadata - Editor metadata
      * @param {string} options.permissions - Permissions object
      * @param {Object} options.validationRules - Validation rules. See [documentation here](https://goo.gl/j9dj4Y)
      *
@@ -124,6 +123,7 @@ define(function(require) {
                 openOnEnter: false,
                 selectOnBlur: false,
                 multiple: true,
+                dropdownCssClass: 'inline-editor__select2-drop',
                 id: 'label',
                 formatSelection: function(item) {
                     return item.label;
@@ -277,12 +277,12 @@ define(function(require) {
             return _.isString(term) && term.length > 0;
         },
 
-        getModelValue: function() {
-            return this.model.get(this.fieldName) || [];
+        parseRawValue: function(value) {
+            return value || [];
         },
 
-        getFormattedValue: function() {
-            return this.getModelValue().map(function(item) {
+        formatRawValue: function(value) {
+            return this.parseRawValue(value).map(function(item) {
                 return item.id;
             }).join(',');
         },
@@ -326,6 +326,7 @@ define(function(require) {
             return data;
         }
     }, {
+        DEFAULT_ACCESSOR_CLASS: 'oroentity/js/tools/entity-select-search-api-accessor',
         processMetadata: AbstractRelationEditorView.processMetadata,
         processSavePromise: function(promise, metadata) {
             promise.done(function() {

@@ -4,19 +4,14 @@ namespace Oro\Bundle\CommentBundle\Placeholder;
 
 use Doctrine\Common\Util\ClassUtils;
 
-use Oro\Bundle\CommentBundle\Entity\Comment;
+use Oro\Bundle\CommentBundle\Tools\CommentAssociationHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class CommentPlaceholderFilter
 {
-    /** @var ConfigProvider */
-    protected $commentConfigProvider;
-
-    /** @var ConfigProvider */
-    protected $entityConfigProvider;
+    /** @var CommentAssociationHelper */
+    protected $commentAssociationHelper;
 
     /** @var DoctrineHelper */
     protected $doctrineHelper;
@@ -25,21 +20,18 @@ class CommentPlaceholderFilter
     protected $securityFacade;
 
     /**
-     * @param ConfigProvider $commentConfigProvider
-     * @param ConfigProvider $entityConfigProvider
-     * @param DoctrineHelper $doctrineHelper
-     * @param SecurityFacade $securityFacade
+     * @param CommentAssociationHelper $commentAssociationHelper
+     * @param DoctrineHelper           $doctrineHelper
+     * @param SecurityFacade           $securityFacade
      */
     public function __construct(
-        ConfigProvider $commentConfigProvider,
-        ConfigProvider $entityConfigProvider,
+        CommentAssociationHelper $commentAssociationHelper,
         DoctrineHelper $doctrineHelper,
         SecurityFacade $securityFacade
     ) {
-        $this->commentConfigProvider = $commentConfigProvider;
-        $this->entityConfigProvider  = $entityConfigProvider;
-        $this->doctrineHelper        = $doctrineHelper;
-        $this->securityFacade        = $securityFacade;
+        $this->commentAssociationHelper = $commentAssociationHelper;
+        $this->doctrineHelper           = $doctrineHelper;
+        $this->securityFacade           = $securityFacade;
     }
 
     /**
@@ -58,14 +50,6 @@ class CommentPlaceholderFilter
             return false;
         }
 
-        $className = ClassUtils::getClass($entity);
-
-        return
-            $this->commentConfigProvider->hasConfig($className)
-            && $this->commentConfigProvider->getConfig($className)->is('enabled')
-            && $this->entityConfigProvider->hasConfig(
-                Comment::ENTITY_NAME,
-                ExtendHelper::buildAssociationName($className)
-            );
+        return $this->commentAssociationHelper->isCommentAssociationEnabled(ClassUtils::getClass($entity));
     }
 }

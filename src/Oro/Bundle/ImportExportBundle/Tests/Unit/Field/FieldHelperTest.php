@@ -407,6 +407,12 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
                 'value'     => 'should_be_set',
                 'exception' => []
             ],
+            'private of the parent' => [
+                'object'    => $object,
+                'fieldName' => 'basePrivate',
+                'value'     => 'val',
+                'exception' => [],
+            ]
         ];
     }
 
@@ -452,18 +458,21 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
         $this->config['stdClass'] = [
             'excludedField' => ['excluded' => true],
             'identityField' => ['identity' => true],
+            'onlyWhenNotEmptyIdentityField' => ['identity' => true],
             'regularField'  => [],
         ];
 
         $fields = [
             ['name' => 'excludedField'],
             ['name' => 'identityField'],
+            ['name' => 'onlyWhenNotEmptyIdentityField'],
             ['name' => 'regularField'],
         ];
 
         $entity = new \stdClass();
         $entity->excludedField = 'excludedValue';
         $entity->identityField = 'identityValue';
+        $entity->onlyWhenNotEmptyIdentityField = 'onlyWhenNotEmptyIdentityValue';
         $entity->regularField  = 'regularValue';
 
         $this->fieldProvider->expects($this->once())
@@ -472,8 +481,38 @@ class FieldHelperTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($fields));
 
         $value = $this->helper->getIdentityValues($entity);
-        $this->assertEquals(['identityField' => 'identityValue'], $value);
+        $this->assertEquals(
+            [
+                'identityField' => 'identityValue',
+                'onlyWhenNotEmptyIdentityField' => 'onlyWhenNotEmptyIdentityValue'
+            ],
+            $value
+        );
         $this->assertSame($value, $this->helper->getIdentityValues($entity));
+    }
+
+    /**
+     * @dataProvider isRequiredIdentityFieldProvider
+     */
+    public function testIsRequiredIdentityField($identityValue, $expectedResult)
+    {
+        $this->config['stdClass'] = [
+            'testField' => ['identity' => $identityValue]
+        ];
+
+        $this->assertEquals(
+            $expectedResult,
+            $this->helper->isRequiredIdentityField('stdClass', 'testField')
+        );
+    }
+
+    public function isRequiredIdentityFieldProvider()
+    {
+        return [
+            [false, false],
+            [true, true],
+            [FieldHelper::IDENTITY_ONLY_WHEN_NOT_EMPTY, false],
+        ];
     }
 
     public function testProcessAsScalar()

@@ -5,6 +5,7 @@ oro:
                 saved:              Entity saved
                 access_denied:      You does not have access to edit this field name
                 field_not_found:    Field Name is not founded in entity
+                exactly_field_not_found: is not founded in entity
         form:
             choose_entity:          Choose an entity...
             choose_entity_field:    Choose a field...
@@ -37,7 +38,11 @@ oro:
             datagrid:
                 field:
                     items:
-                        is_visible: Show on grid
+                        is_visible: Add to grid settings
+                        is_visible.shown: Yes and display
+                        is_visible.hidden: Yes and do not display
+                        is_visible.mandatory: Yes as mandatory
+                        is_visible.tooltip: Controls the availability of a field in the Grid Settings. "Yes and display" makes it available (shown by default), "Yes and do not display" the same but hidden by default and "Yes as mandatory" adds it permanently to all grid views
                         show_filter: Show grid filter
             form:
                 field:

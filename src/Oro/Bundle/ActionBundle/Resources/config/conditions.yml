@@ -1,0 +1,145 @@
+parameters:
+    oro_action.expression.extension.class: Oro\Component\ConfigExpression\Extension\DependencyInjection\DependencyInjectionExtension
+    oro_action.expression.context_accessor.class: Oro\Component\ConfigExpression\ContextAccessor
+    oro_action.expression.factory.class: Oro\Component\ConfigExpression\ExpressionFactory
+    oro_action.expression.assembler.class: Oro\Component\ConfigExpression\ExpressionAssembler
+    oro_action.condition.configurable.class: Oro\Component\Action\Condition\Configurable
+
+services:
+    oro_action.expression.extension:
+        class: %oro_action.expression.extension.class%
+        arguments:
+            - '@service_container'
+            - {}
+
+    oro_action.expression.context_accessor:
+        class: %oro_action.expression.context_accessor.class%
+
+    oro_action.expression.factory:
+        class: %oro_action.expression.factory.class%
+        arguments:
+            - '@oro_action.expression.context_accessor'
+        calls:
+            - [addExtension, ['@oro_action.expression.extension']]
+
+    oro_action.expression.assembler:
+        class: %oro_action.expression.assembler.class%
+        arguments:
+            - '@oro_action.expression.factory'
+        calls:
+            - [addConfigurationPass, ['@oro_action.configuration_pass.replace_property_path']]
+
+    oro_action.condition.configurable:
+        class: %oro_action.condition.configurable.class%
+        arguments:
+            - '@oro_action.expression.assembler'
+        tags:
+            - { name: oro_action.condition, alias: configurable }
+
+    oro_action.expression.andx:
+        class: Oro\Component\ConfigExpression\Condition\Andx
+        tags:
+            - { name: oro_action.condition, alias: and }
+
+    oro_action.expression.orx:
+        class: Oro\Component\ConfigExpression\Condition\Orx
+        tags:
+            - { name: oro_action.condition, alias: or }
+
+    oro_action.expression.not:
+        class: Oro\Component\ConfigExpression\Condition\Not
+        tags:
+            - { name: oro_action.condition, alias: not }
+
+    oro_action.expression.true:
+        class: Oro\Component\ConfigExpression\Condition\True
+        tags:
+            - { name: oro_action.condition, alias: "true" }
+
+    oro_action.expression.false:
+        class: Oro\Component\ConfigExpression\Condition\False
+        tags:
+            - { name: oro_action.condition, alias: "false" }
+
+    oro_action.expression.equal_to:
+        class: Oro\Component\ConfigExpression\Condition\EqualTo
+        tags:
+            - { name: oro_action.condition, alias: eq|equal }
+
+    oro_action.expression.not_equal_to:
+        class: Oro\Component\ConfigExpression\Condition\NotEqualTo
+        tags:
+            - { name: oro_action.condition, alias: neq|not_equal }
+
+    oro_action.expression.blank:
+        class: Oro\Component\ConfigExpression\Condition\Blank
+        tags:
+            - { name: oro_action.condition, alias: empty|blank }
+
+    oro_action.expression.not_blank:
+        class: Oro\Component\ConfigExpression\Condition\NotBlank
+        tags:
+            - { name: oro_action.condition, alias: not_empty|not_blank }
+
+    oro_action.expression.has_value:
+        class: Oro\Component\ConfigExpression\Condition\HasValue
+        tags:
+            - { name: oro_action.condition, alias: has_value }
+
+    oro_action.expression.in:
+        class: Oro\Component\ConfigExpression\Condition\In
+        tags:
+            - { name: oro_action.condition, alias: in }
+
+    oro_action.expression.not_in:
+        class: Oro\Component\ConfigExpression\Condition\NotIn
+        tags:
+            - { name: oro_action.condition, alias: not_in }
+
+    oro_action.expression.not_has_value:
+        class: Oro\Component\ConfigExpression\Condition\NotHasValue
+        tags:
+            - { name: oro_action.condition, alias: not_has_value }
+
+    oro_action.expression.greater_than:
+        class: Oro\Component\ConfigExpression\Condition\GreaterThan
+        tags:
+            - { name: oro_action.condition, alias: gt|greater }
+
+    oro_action.expression.greater_than_or_equal:
+        class: Oro\Component\ConfigExpression\Condition\GreaterThanOrEqual
+        tags:
+            - { name: oro_action.condition, alias: gte|ge|greater_or_equal }
+
+    oro_action.expression.less_than:
+        class: Oro\Component\ConfigExpression\Condition\LessThan
+        tags:
+            - { name: oro_action.condition, alias: lt|less }
+
+    oro_action.expression.less_than_or_equal:
+        class: Oro\Component\ConfigExpression\Condition\LessThanOrEqual
+        tags:
+            - { name: oro_action.condition, alias: lte|le|less_or_equal }
+
+    oro_action.expression.acl_granted:
+        class: Oro\Bundle\SecurityBundle\ConfigExpression\AclGranted
+        arguments:
+            - '@oro_security.security_facade'
+            - '@doctrine'
+        tags:
+            - { name: oro_action.condition, alias: acl|acl_granted }
+
+    oro_action.expression.collection_element_value_exists:
+        class: Oro\Bundle\ActionBundle\Condition\CollectionElementValueExists
+        tags:
+            - { name: oro_action.condition, alias: collection_element_value_exists }
+
+    oro_action.expression.type:
+        class: Oro\Component\ConfigExpression\Condition\Type
+        tags:
+            - { name: oro_action.condition, alias: type }
+
+    oro_action.expression.has_elements:
+        class: Oro\Component\ConfigExpression\Condition\HasElements
+        tags:
+            - { name: oro_action.condition, alias: has_elements }

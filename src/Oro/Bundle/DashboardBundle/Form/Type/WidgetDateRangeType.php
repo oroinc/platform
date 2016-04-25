@@ -80,6 +80,7 @@ class WidgetDateRangeType extends AbstractType
         $resolver->setDefaults(
             [
                 'required'         => false,
+                'compile_date'     => false,
                 'field_type'       => WidgetDateRangeValueType::NAME,
                 'operator_choices' => $this->getOperatorChoices(),
                 'widget_options'   => [

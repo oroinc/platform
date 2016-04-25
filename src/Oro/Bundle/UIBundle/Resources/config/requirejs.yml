@@ -19,16 +19,12 @@ config:
         'jquery.minicolors':
             deps:
                 - 'jquery'
-        'jquery.jstree':
+        'jstree/jquery.jstree.min':
             deps:
                 - 'jquery'
-                - 'jquery.cookie'
         'jquery.cookie':
             deps:
                 - 'jquery'
-        'jstree/jquery.hotkeys':
-            deps:
-                - 'jquery.jstree'
         'bootstrap':
             deps:
                 - 'jquery'
@@ -132,10 +128,7 @@ config:
         'jquery.simplecolorpicker': 'bundles/oroui/lib/simplecolorpicker/jquery.simplecolorpicker.js'
         'jquery.minicolors': 'bundles/oroui/lib/minicolors/jquery.minicolors.js'
         'jquery.cookie': 'bundles/oroui/lib/jquery/jquery.cookie.js'
-        'jquery.jstree': 'bundles/oroui/lib/jstree/jquery.jstree.js'
         'jquery.ajax.queue': 'bundles/oroui/lib/jquery/jquery.ajaxQueue.min.js'
-        'jstree/jquery.cookie': 'bundles/oroui/lib/jstree/jquery.cookie.js'
-        'jstree/jquery.hotkeys': 'bundles/oroui/lib/jstree/jquery.hotkeys.js'
         'bootstrap': 'bundles/oroui/lib/bootstrap.min.js'
 #        'bootstrap': 'bundles/oroui/js/bootstrap-dev.js'
         'underscore': 'bundles/components/underscore/underscore.js'
@@ -159,6 +152,7 @@ config:
         'oroui/js/app/modules/messenger-module': 'bundles/oroui/js/app/modules/messenger-module.js'
         'oroui/js/app/modules/views-module': 'bundles/oroui/js/app/modules/views-module.js'
         'oroui/js/app/modules/widgets-module': 'bundles/oroui/js/app/modules/widgets-module.js'
+        'oroui/js/app/modules/input-widgets': 'bundles/oroui/js/app/modules/input-widgets.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
@@ -188,6 +182,8 @@ config:
         'oroui/js/app/components/tabs-component': 'bundles/oroui/js/app/components/tabs-component.js'
         'oroui/js/app/components/view-component': 'bundles/oroui/js/app/components/view-component.js'
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
+        'oroui/js/app/components/basic-tree-component': 'bundles/oroui/js/app/components/basic-tree-component.js'
+        'oroui/js/app/components/basic-tree-manage-component': 'bundles/oroui/js/app/components/basic-tree-manage-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
         'oro/block-widget': 'bundles/oroui/js/widget/block-widget.js'
@@ -202,6 +198,11 @@ config:
         'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
 
+        'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
+        'oroui/js/app/views/input-widget/abstract': 'bundles/oroui/js/app/views/input-widget/abstract.js'
+        'oroui/js/app/views/input-widget/uniform-file': 'bundles/oroui/js/app/views/input-widget/uniform-file.js'
+        'oroui/js/app/views/input-widget/uniform-select': 'bundles/oroui/js/app/views/input-widget/uniform-select.js'
+
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
 
         'autolinker': 'bundles/oroui/lib/autolinker.min.js'
@@ -210,9 +211,11 @@ config:
         - oroui/js/app/modules/messenger-module
         - oroui/js/app/modules/views-module
         - oroui/js/app/modules/widgets-module
+        - oroui/js/app/modules/input-widgets
 
 build:
     paths:
+        'jstree/jquery.jstree.min': 'empty:'
 #       Backbone after v.1.1.1 started to support AMD. And that broke a js-build with
 #       files which does not support AMD. backbone-bootstrap-modal use AMD without dependency,
 #       therefore it's excluded

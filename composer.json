@@ -12,7 +12,7 @@
     "repositories": [
         {
             "type": "composer",
-            "url": "http://packagist.orocrm.com"
+            "url": "https://packagist.orocrm.com"
         }
     ],
     "require": {
@@ -24,7 +24,7 @@
         "symfony/symfony": "2.7.*",
         "twig/twig": "1.20.0",
         "doctrine/orm": "2.5.1",
-        "doctrine/doctrine-bundle": "1.4.0",
+        "doctrine/doctrine-bundle": "~1.6.0",
         "doctrine/dbal": "2.5.1",
         "doctrine/data-fixtures": "1.1.1",
         "doctrine/doctrine-fixtures-bundle": "2.2.0",
@@ -33,7 +33,7 @@
         "symfony/icu": "~1.1",
         "symfony/swiftmailer-bundle": "2.3.*",
         "symfony/monolog-bundle": "2.7.*",
-        "sensio/distribution-bundle": "2.3.14",
+        "sensio/distribution-bundle": "4.0.3",
         "sensio/framework-extra-bundle": "2.3.4",
         "incenteev/composer-parameter-handler": "2.1.0",
         "jms/job-queue-bundle": "1.2.*",
@@ -75,7 +75,8 @@
         "components/font-awesome": "~4.3.0",
         "piwik/device-detector": "~3.0",
         "oro/jsplumb": "~1.7",
-        "oro/moment-timezone": "0.3.*"
+        "oro/moment-timezone": "0.3.*",
+        "vakata/jstree": "^3.2"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3"

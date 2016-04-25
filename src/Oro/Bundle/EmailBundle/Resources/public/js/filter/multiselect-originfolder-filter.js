@@ -76,11 +76,10 @@ define([
 
             this.setElement((
                 this.template({
-                    label: this.label,
+                    label: this.labelPrefix + this.label,
                     showLabel: this.showLabel,
                     options: options,
                     placeholder: this.placeholder,
-                    nullLink: this.nullLink,
                     canDisable: this.canDisable,
                     selected: _.extend({}, this.emptyValue, this.value),
                     isEmpty: this.isEmpty()

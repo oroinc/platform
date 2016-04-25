@@ -8,6 +8,9 @@ use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 
+/**
+ * Makes sure that the "class" attribute of the Context represents FQCN of an entity.
+ */
 class NormalizeEntityClass implements ProcessorInterface
 {
     /** @var ValueNormalizer */
@@ -37,7 +40,7 @@ class NormalizeEntityClass implements ProcessorInterface
         $context->setClassName(
             $this->valueNormalizer->normalizeValue(
                 $entityClass,
-                DataType::ENTITY_PLURAL_ALIAS,
+                DataType::ENTITY_CLASS,
                 $context->getRequestType()
             )
         );

@@ -5,12 +5,11 @@ namespace Oro\Bundle\TagBundle\Grid;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
+use Oro\Bundle\DataGridBundle\Tools\GridConfigurationHelper;
 use Oro\Bundle\TagBundle\Entity\TagManager;
 
 abstract class AbstractTagsExtension extends AbstractExtension
 {
-    const GRID_EXTEND_ENTITY_PATH = '[extended_entity_name]';
     const GRID_FROM_PATH          = '[source][query][from]';
     const GRID_COLUMN_ALIAS_PATH  = '[source][query_config][column_aliases]';
     const GRID_FILTERS_PATH       = '[filters][columns]';
@@ -22,17 +21,22 @@ abstract class AbstractTagsExtension extends AbstractExtension
     /** @var TagManager */
     protected $tagManager;
 
-    /** @var EntityClassResolver */
-    protected $entityClassResolver;
+    /** @var GridConfigurationHelper */
+    protected $gridConfigurationHelper;
+
+    /** @var string|null */
+    protected $entityClassName;
 
     /**
-     * @param TagManager          $tagManager
-     * @param EntityClassResolver $entityClassResolver
+     * @param TagManager              $tagManager
+     * @param GridConfigurationHelper $gridConfigurationHelper
      */
-    public function __construct(TagManager $tagManager, EntityClassResolver $entityClassResolver)
-    {
-        $this->tagManager          = $tagManager;
-        $this->entityClassResolver = $entityClassResolver;
+    public function __construct(
+        TagManager $tagManager,
+        GridConfigurationHelper $gridConfigurationHelper
+    ) {
+        $this->tagManager              = $tagManager;
+        $this->gridConfigurationHelper = $gridConfigurationHelper;
     }
 
     /**
@@ -56,19 +60,13 @@ abstract class AbstractTagsExtension extends AbstractExtension
      *
      * @return string|null
      */
-    protected function getEntityClassName(DatagridConfiguration $config)
+    protected function getEntity(DatagridConfiguration $config)
     {
-        $entityClassName = $config->offsetGetByPath(self::GRID_EXTEND_ENTITY_PATH);
-        if (!$entityClassName) {
-            $from = $config->offsetGetByPath(self::GRID_FROM_PATH);
-            if (!$from) {
-                return null;
-            }
-
-            $entityClassName = $this->entityClassResolver->getEntityClass($from[0]['table']);
+        if ($this->entityClassName === null) {
+            $this->entityClassName = $this->gridConfigurationHelper->getEntity($config);
         }
 
-        return $entityClassName;
+        return $this->entityClassName;
     }
 
     protected function getTagsForEntityClass($entityClass, array $ids)

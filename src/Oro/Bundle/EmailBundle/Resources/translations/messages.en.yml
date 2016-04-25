@@ -9,6 +9,7 @@ oro:
             description: This widget allows you to see most recent additions to your inbox and outbox
 
     email:
+        imap.folder.checkAll: All
         autocomplete:
             recently_used: Recently used
             contexts: Contexts
@@ -24,6 +25,11 @@ oro:
             no_attachments:                      No available attachments
             thread_attachments:                  Thread Attachments
             record_attachments:                  Record Attachments
+
+            tooltip:
+                attachment_sync:
+                    enable: Enable load attachments on email sync.
+                    max_size: Maximum sync attacment size, Mb. Attachments with exceeding size will not be downloaded. To unlimit size set to 0.
 
         variable.not.found:                     N/A
 
@@ -65,6 +71,12 @@ oro:
 
             show_recent_emails_in_user_bar:
                 label: Show recent emails
+
+            attachment_sync:
+                enable:
+                    label: Enable attachment sync
+                max_size:
+                    label: Maximum sync attachment size, Mb
 
         emailtemplate:
             entity_label:        Template
@@ -170,6 +182,8 @@ oro:
             recipient_can_not_be_empty:   "Recipient can not be empty"
 
         folders.label:            Folders
+        folders.tooltip:          If a folder is uncheked, all the data saved in it will be deleted
+        retrieve_folders.label:   Retrieve Folders
         message_type:
             label:                Message type
         folder_type:
@@ -225,6 +239,7 @@ oro:
         unable_to_load_body:      Unfortunately the email body cannot be loaded from a server. Possible reasons: an email has been deleted, unable to connect to a server.
         body_is_unavailable:      Body is unavailable
         email_users.label:        User Emails
+        body_synced.label:        Email body synced
         status:
             label:                Status
             unread.label:         Unread
@@ -241,6 +256,7 @@ oro:
         reply:                    Reply
         reply_all:                Reply All
         forward:                  Forward
+        view:                     View email
         forwarded_message:        Forwarded message
         parent_message_header:    "On %date% %user% wrote:"
         load_more_emails:         "%quantity% older messages"
@@ -258,6 +274,7 @@ oro:
             seen.label:               Seen
             folders.label:            Folders
             origin.label:             Email Origin
+            unsynced_flag_count.label: Unsynced Flag Count
         mailbox:
             entity_label:             Mailbox
             entity_plural_label:      Mailboxes

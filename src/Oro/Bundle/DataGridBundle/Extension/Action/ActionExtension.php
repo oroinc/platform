@@ -100,6 +100,15 @@ class ActionExtension extends AbstractExtension
      */
     public function visitMetadata(DatagridConfiguration $config, MetadataObject $data)
     {
+        $data->offsetAddToArray(static::METADATA_ACTION_KEY, $this->getActionsMetadata($config));
+    }
+
+    /**
+     * @param DatagridConfiguration $config
+     * @return array
+     */
+    protected function getActionsMetadata(DatagridConfiguration $config)
+    {
         $actionsMetadata = [];
         $actions         = $config->offsetGetOr(static::ACTION_KEY, []);
 
@@ -114,7 +123,7 @@ class ActionExtension extends AbstractExtension
             }
         }
 
-        $data->offsetAddToArray(static::METADATA_ACTION_KEY, $actionsMetadata);
+        return $actionsMetadata;
     }
 
     /**

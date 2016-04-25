@@ -11,6 +11,25 @@ liip_imagine:
                 thumbnail:    { size: [16, 16], mode: outbound }
                 strip:        ~
 
-twig:
-    globals:
-        assets_version:       "%assets_version%"
+assetic:
+    assets:
+        jstree:
+            inputs:
+                - %kernel.root_dir%/../vendor/vakata/jstree/dist/jstree.min.js
+            output: bundles/jstree/jquery.jstree.min.js
+        jstree_default_theme_style:
+            inputs:
+                - %kernel.root_dir%/../vendor/vakata/jstree/dist/themes/default/style.min.css
+            output: bundles/jstree/themes/default/style.min.css
+        jstree_default_theme_32px_png:
+            inputs:
+                - %kernel.root_dir%/../vendor/vakata/jstree/dist/themes/default/32px.png
+            output: bundles/jstree/themes/default/32px.png
+        jstree_default_theme_40px_png:
+            inputs:
+                - %kernel.root_dir%/../vendor/vakata/jstree/dist/themes/default/40px.png
+            output: bundles/jstree/themes/default/40px.png
+        jstree_default_theme_throbber_gif:
+            inputs:
+                - %kernel.root_dir%/../vendor/vakata/jstree/dist/themes/default/throbber.gif
+            output: bundles/jstree/themes/default/throbber.gif

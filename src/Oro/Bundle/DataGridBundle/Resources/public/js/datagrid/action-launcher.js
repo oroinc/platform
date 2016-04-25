@@ -4,7 +4,14 @@ define(function(require) {
     var ActionLauncher;
     var $ = require('jquery');
     var _ = require('underscore');
+    var tools = require('oroui/js/tools');
     var Backbone = require('backbone');
+    var module = require('module');
+
+    var config = module.config();
+    config = _.extend({
+        iconHideText: true
+    }, config);
 
     /**
      * Action launcher implemented as simple link or a set of links. Click on a link triggers action run
@@ -37,6 +44,9 @@ define(function(require) {
 
         /** @property {String} */
         icon: undefined,
+
+        /** @property {Boolean} */
+        iconHideText: config.iconHideText,
 
         /** @property {String} */
         iconClassName: undefined,
@@ -79,6 +89,7 @@ define(function(require) {
          * @param {function(Object, ?Object=): string} [options.template]
          * @param {String} [options.label]
          * @param {String} [options.icon]
+         * @param {Boolean} [options.iconHideText]
          * @param {String} [options.link]
          * @param {Boolean} [options.runAction]
          * @param {Boolean} [options.onClickReturnValue]
@@ -106,6 +117,10 @@ define(function(require) {
 
             if (opts.icon) {
                 this.icon = opts.icon;
+            }
+
+            if (opts.iconHideText !== undefined) {
+                this.iconHideText = opts.iconHideText;
             }
 
             if (opts.link) {
@@ -154,6 +169,7 @@ define(function(require) {
             return {
                 label: label,
                 icon: this.icon,
+                iconHideText: this.iconHideText,
                 title: this.title || label,
                 className: this.className,
                 iconClassName: this.iconClassName,
@@ -187,6 +203,7 @@ define(function(require) {
         onClick: function(e) {
             var $link;
             var key;
+            var actionOptions = {};
             if (!this.enabled) {
                 return this.onClickReturnValue;
             }
@@ -200,7 +217,10 @@ define(function(require) {
                         $link.closest('.btn-group').toggleClass('open');
                     }
                 }
-                this.action.run();
+                if (tools.isTargetBlankEvent(e)) {
+                    actionOptions.target = '_blank';
+                }
+                this.action.run(actionOptions);
 
                 //  skip launcher functionality, if action was executed
                 e.preventDefault();

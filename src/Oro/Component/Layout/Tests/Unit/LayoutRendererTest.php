@@ -4,6 +4,7 @@ namespace Oro\Component\Layout\Tests\Unit;
 
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\LayoutRenderer;
+use Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface;
 
 class LayoutRendererTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,10 +14,14 @@ class LayoutRendererTest extends \PHPUnit_Framework_TestCase
     /** @var LayoutRenderer */
     protected $renderer;
 
+    /** @var FormRendererEngineInterface */
+    protected $formRenderer;
+
     protected function setUp()
     {
         $this->innerRenderer = $this->getMock('Symfony\Component\Form\FormRendererInterface');
-        $this->renderer      = new LayoutRenderer($this->innerRenderer);
+        $this->formRenderer = $this->getMock('Oro\Component\Layout\Form\RendererEngine\FormRendererEngineInterface');
+        $this->renderer      = new LayoutRenderer($this->innerRenderer, $this->formRenderer);
     }
 
     public function testRenderBlock()
@@ -45,5 +50,16 @@ class LayoutRendererTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($view), $theme);
 
         $this->renderer->setBlockTheme($view, $theme);
+    }
+
+    public function testSetFormTheme()
+    {
+        $theme = 'MyBundle::forms.html.twig';
+
+        $this->formRenderer->expects($this->once())
+            ->method('addDefaultThemes')
+            ->with($theme);
+
+        $this->renderer->setFormTheme($theme);
     }
 }

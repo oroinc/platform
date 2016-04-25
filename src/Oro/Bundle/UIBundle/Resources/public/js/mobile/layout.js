@@ -72,14 +72,26 @@ define(function(require) {
             }
         }
 
+        function moveToTop(dialog) {
+            var $dialog = dialog.widget.dialog('instance').uiDialog;
+            $dialog.removeClass('ui-dialog-on-background').siblings('.ui-dialog').addClass('ui-dialog-on-background');
+        }
+
+        function removeFromTop(dialog) {
+            var $dialog = dialog.widget.dialog('instance').uiDialog;
+            $dialog.siblings('.ui-dialog:last').removeClass('ui-dialog-on-background');
+        }
+
         mediator.on({
             // widget dialogs
             'widget_dialog:open': function(dialog) {
                 dialogs[dialog.cid] = dialog.getState() !== 'minimized';
+                moveToTop(dialog);
                 scrollUpdate();
             },
             'widget_dialog:close': function(dialog) {
                 delete dialogs[dialog.cid];
+                removeFromTop(dialog);
                 scrollUpdate();
             },
             'widget_dialog:stateChange': function(dialog) {

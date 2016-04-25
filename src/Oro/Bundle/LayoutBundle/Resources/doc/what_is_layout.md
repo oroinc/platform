@@ -43,6 +43,7 @@ The **OroLayoutBundle** introduces a set of block types that allow to easily bui
 |-----------|------------|-------------|
 | `root` | [RootType.php](../../Layout/Block/Type/RootType.php) | `<html>` |
 | `head` | [HeadType.php](../../Layout/Block/Type/HeadType.php) | `<head>` |
+| `title` | [TitleType.php](../../Layout/Block/Type/TitleType.php) | `<title>` |
 | `meta` | [MetaType.php](../../Layout/Block/Type/MetaType.php) | `<meta>` |
 | `style` | [StyleType.php](../../Layout/Block/Type/StyleType.php) | `<style>` with content or `<link>` with external resource |
 | `script` | [ScriptType.php](../../Layout/Block/Type/ScriptType.php) | `<script>` |
@@ -58,5 +59,6 @@ The **OroLayoutBundle** introduces a set of block types that allow to easily bui
 | `ordered_list` | [OrderedListType.php](../../Layout/Block/Type/OrderedListType.php) | `<ol>` |
 | `list_item` | [ListItemType.php](../../Layout/Block/Type/ListItemType.php) | `<li>`, this block type can be used if you want to control rendering of `li` tag and its attributes |
 | `text` | [TextType.php](../../Layout/Block/Type/TextType.php) | Text node |
+| `input` | [InputType.php](../../Layout/Block/Type/InputType.php) | Input node |
 | `button` | [ButtonType.php](../../Layout/Block/Type/ButtonType.php) | `<button>` or `<input type="submit/reset/button">` |
 | `button_group` | [ButtonGroupType.php](../../Layout/Block/Type/ButtonGroupType.php) | Nothing, this is just a logical grouping of buttons. You can define how to render the button group in your application |

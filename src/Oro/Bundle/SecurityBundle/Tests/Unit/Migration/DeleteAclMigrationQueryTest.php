@@ -65,7 +65,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->once())
-            ->method('notice')
+            ->method('info')
             ->with(sprintf('Remove ACL for %s.', (string)$this->oid));
         $this->aclProvider->expects($this->once())
             ->method('deleteAclClass')
@@ -85,7 +85,7 @@ class DeleteAclMigrationQueryTest extends \PHPUnit_Framework_TestCase
 
         $logger = $this->getMock('Psr\Log\LoggerInterface');
         $logger->expects($this->never())
-            ->method('notice');
+            ->method('info');
         $this->aclProvider->expects($this->never())
             ->method('deleteAclClass');
 

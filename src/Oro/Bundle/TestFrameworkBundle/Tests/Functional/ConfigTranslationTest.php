@@ -81,6 +81,15 @@ class ConfigTranslationTest extends WebTestCase
         $missingTranslationKeys = [];
         foreach ($keys as $key) {
             $transKey = $config->get($key);
+
+            /**
+             * Ignore custom entities created for test environment only (class name starts with "Test").
+             * It's done to avoid adding and accumulation of unnecessary test entity/field/relation translations.
+             */
+            if (0 === strpos($transKey, 'extend.entity.test')) {
+                continue;
+            }
+
             if (!$this->getTranslator()->hasTrans($transKey)) {
                 $configId = $config->getId();
                 if ($configId instanceof FieldConfigId) {

@@ -9,21 +9,21 @@ services:
     oro_embedded_form.form_type.available_embedded_form:
         class: %oro.embedded_form.form_type.available_form.class%
         arguments:
-            - @oro_embedded_form.manager
+            - '@oro_embedded_form.manager'
         tags:
             - { name: form.type, alias: oro_available_embedded_forms }
 
     oro_embedded_form.manager:
         class: %oro_embedded_form.manager.class%
         arguments:
-            - @service_container
-            - @form.factory
+            - '@service_container'
+            - '@form.factory'
 
     oro_embedded_form.back_link.twig.extension:
         class: %oro_embedded_form.back_link.twig.extension.class%
         arguments:
-            - @router
-            - @translator
+            - '@router'
+            - '@translator'
         tags:
             - { name: twig.extension }
 
@@ -35,8 +35,8 @@ services:
     oro_embedded_form.embed_form_layout_manager:
         class: %oro_embedded_form.embed_form_layout_manager.class%
         arguments:
-            - @oro_layout.layout_manager
-            - @oro_embedded_form.manager
+            - '@oro_layout.layout_manager'
+            - '@oro_embedded_form.manager'
 
     oro_embedded_form.layout.block_type.success_message:
         class: Oro\Bundle\EmbeddedFormBundle\Layout\Block\Type\EmbedFormSuccessType

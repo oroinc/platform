@@ -46,23 +46,18 @@ class AclHelper
      */
     public function apply(Query $query, $permission = 'VIEW')
     {
-        $queryFromEntities = $query->getFrom();
-
-        // in query, from record !== '*'
-        if ($queryFromEntities[0] === '*') {
-            $queryFromEntities = $this->mappingProvider->getEntitiesListAliases();
-        }
+        $querySearchAliases = $this->getSearchAliases($query);
 
         $allowedAliases   = [];
         $ownerExpressions = [];
         $expr             = $query->getCriteria()->expr();
-        if (!empty($queryFromEntities)) {
-            foreach ($queryFromEntities as $entityAlias) {
+        if (count($querySearchAliases) !== 0) {
+            foreach ($querySearchAliases as $entityAlias) {
                 $className = $this->mappingProvider->getEntityClass($entityAlias);
                 if ($className) {
                     $ownerField = sprintf('%s_owner', $entityAlias);
                     $condition  = $this->ownershipDataBuilder->getAclConditionData($className, $permission);
-                    if ($condition !== null) {
+                    if (count($condition) === 0 || !($condition[0] === null && $condition[3] === null)) {
                         $allowedAliases[] = $entityAlias;
 
                         // in case if we should not limit data for entity
@@ -72,25 +67,19 @@ class AclHelper
                             continue;
                         }
 
-                        $owners = [SearchListener::EMPTY_OWNER_ID];
-                        if (!empty($condition[1])) {
-                            $owners = $condition[1];
-                            if (is_array($owners) && count($owners) === 1) {
-                                $owners = $owners[0];
-                            }
-                        }
+                        $owners = !empty($condition[1])
+                            ? $condition[1]
+                            : SearchListener::EMPTY_OWNER_ID;
 
-                        if (is_array($owners)) {
-                            $ownerExpressions[] = $expr->in('integer.' . $ownerField, $owners);
-                        } else {
-                            $ownerExpressions[] = $expr->eq('integer.' . $ownerField, $owners);
-                        }
+                        $ownerExpressions[] = (!is_array($owners) ||  count($owners) === 1)
+                            ? $expr->eq('integer.' . $ownerField, $owners)
+                            : $expr->in('integer.' . $ownerField, $owners);
                     }
                 }
             }
 
         }
-        if (!empty($ownerExpressions)) {
+        if (count($ownerExpressions) !== 0) {
             $query->getCriteria()->andWhere(new CompositeExpression(CompositeExpression::TYPE_OR, $ownerExpressions));
         }
         $query->from($allowedAliases);
@@ -120,5 +109,23 @@ class AclHelper
                 $expr->in('integer.organization', [$organizationId, SearchListener::EMPTY_ORGANIZATION_ID])
             );
         }
+    }
+
+    /**
+     * Get search query 'from' aliases
+     *
+     * @param Query $query
+     *
+     * @return array Return search aliases from Query. In case if from part = *, return all search aliases
+     */
+    protected function getSearchAliases(Query $query)
+    {
+        $queryAliases = $query->getFrom();
+
+        if ($queryAliases[0] === '*') {
+            $queryAliases = $this->mappingProvider->getEntitiesListAliases();
+        }
+
+        return $queryAliases;
     }
 }

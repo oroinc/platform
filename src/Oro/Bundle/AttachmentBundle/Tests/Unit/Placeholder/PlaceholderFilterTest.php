@@ -2,16 +2,14 @@
 
 namespace Oro\Bundle\AttachmentBundle\Tests\Unit\Placeholder;
 
-use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig;
 use Oro\Bundle\AttachmentBundle\Placeholder\PlaceholderFilter;
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 
 class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|AttachmentConfig */
-    protected $attachmentConfig;
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $attachmentAssociationHelper;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
 
     /** @var PlaceholderFilter */
@@ -19,7 +17,8 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->attachmentConfig = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentConfig')
+        $this->attachmentAssociationHelper = $this
+            ->getMockBuilder('Oro\Bundle\AttachmentBundle\Tools\AttachmentAssociationHelper')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -27,17 +26,17 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->filter = new PlaceholderFilter($this->attachmentConfig, $this->doctrineHelper);
+        $this->filter = new PlaceholderFilter($this->attachmentAssociationHelper, $this->doctrineHelper);
     }
 
     protected function tearDown()
     {
-        unset($this->attachmentConfig, $this->doctrineHelper, $this->filter);
+        unset($this->attachmentAssociationHelper, $this->doctrineHelper, $this->filter);
     }
 
     /**
      * @param null|object $entity
-     * @param bool        $attachmentConfigReturn
+     * @param bool        $attachmentAssociationHelperReturn
      * @param bool        $isNewRecord
      * @param bool        $isManaged
      * @param bool        $expected
@@ -45,15 +44,16 @@ class PlaceholderFilterTest extends \PHPUnit_Framework_TestCase
      */
     public function testIsAttachmentAssociationEnabled(
         $entity,
-        $attachmentConfigReturn,
+        $attachmentAssociationHelperReturn,
         $isNewRecord,
         $isManaged,
         $expected
     ) {
-        $this->attachmentConfig->expects(is_object($entity) && !$isNewRecord ? $this->once() : $this->never())
+        $this->attachmentAssociationHelper
+            ->expects(is_object($entity) && !$isNewRecord ? $this->once() : $this->never())
             ->method('isAttachmentAssociationEnabled')
-            ->with($entity)
-            ->willReturn($attachmentConfigReturn);
+            ->with(get_class($entity))
+            ->willReturn($attachmentAssociationHelperReturn);
 
         $this->doctrineHelper->expects(is_object($entity) && $isManaged ? $this->once() : $this->never())
             ->method('isNewEntity')

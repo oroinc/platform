@@ -7,9 +7,11 @@ use Zend\Mail\Storage\Exception as BaseException;
 use Oro\Bundle\ImapBundle\Mail\Protocol\Imap as ProtocolImap;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
+use Oro\Bundle\ImapBundle\Mail\Storage\Exception\OAuth2ConnectException;
 
 /**
  * Class Imap
+ *
  * @package Oro\Bundle\ImapBundle\Mail\Storage
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
@@ -108,9 +110,15 @@ class Imap extends \Zend\Mail\Storage\Imap
 
         $this->protocol = new ProtocolImap();
         $this->protocol->connect($host, $port, $ssl);
-        if (!$this->protocol->login($params->user, $password)) {
-            throw new BaseException\RuntimeException('cannot login, user or password wrong');
+
+        if ($params->accessToken === null) {
+            if (!$this->protocol->login($params->user, $password)) {
+                throw new BaseException\RuntimeException('cannot login, user or password wrong');
+            }
+        } else {
+            $this->oauth2Authenticate($params->user, $params->accessToken);
         }
+
         $this->selectFolder(isset($params->folder) ? $params->folder : 'INBOX');
 
         $this->postInit();
@@ -285,7 +293,7 @@ class Imap extends \Zend\Mail\Storage\Imap
     }
 
     /**
-     * Searches UIDS by the given criteria
+     * Searches UIDS by the given criteria. Returns one uid usually last one.
      *
      * @param array $criteria
      *
@@ -314,6 +322,33 @@ class Imap extends \Zend\Mail\Storage\Imap
         }
 
         return $response;
+    }
+
+    /**
+     * This function returns uid array.
+     * Firstly we get unique id for all messages. Secondly we check if given id in $ids array we would use uidSearch
+     * to get last known uid.
+     *
+     * @param int  $id
+     * @param bool $isUid if true return uid else returns id
+     *
+     * @return array
+     */
+    public function getLastMessageIdsFromId($id, $isUid = true)
+    {
+        $ids    = $this->getUniqueId();
+        $search = array_flip($ids);
+        $result = [];
+
+        if (array_key_exists($id, $search)) {
+            $result = array_chunk($search, $search[$id], true);
+        }
+
+        if (empty($result[1])) {
+            return $this->uidSearch([sprintf('%s:*', ++$id)]);
+        }
+
+        return $isUid ? array_keys($result[1]) : array_values($result[1]);
     }
 
     /**
@@ -383,6 +418,9 @@ class Imap extends \Zend\Mail\Storage\Imap
         return $message;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function getRawContent($id, $part = null)
     {
         if ($part !== null) {
@@ -422,5 +460,33 @@ class Imap extends \Zend\Mail\Storage\Imap
     {
         return in_array(self::CAPABILITY_IMAP4, $this->capability(), true)
             || in_array(self::CAPABILITY_IMAP4_REV_1, $this->capability(), true);
+    }
+
+    /**
+     * @param string $email
+     * @param string $accessToken
+     *
+     * @throws OAuth2ConnectException
+     */
+    protected function oauth2Authenticate($email, $accessToken)
+    {
+        $authenticateParams = ['XOAUTH2', base64_encode("user=$email\1auth=Bearer $accessToken\1\1")];
+        $this->protocol->sendRequest('AUTHENTICATE', $authenticateParams);
+        while (true) {
+            $response = '';
+            $isExtraServerChallenge = $this->protocol->readLine($response, '+', true);
+            if ($isExtraServerChallenge) {
+                // Send empty client response.
+                $this->protocol->sendRequest('');
+            } else {
+                if (preg_match('/^NO /i', $response) || preg_match('/^BAD /i', $response)) {
+                    throw new OAuth2ConnectException(
+                        "Cannot login with XOAuth2, user or token wrong.\nResponse: " . $response
+                    );
+                } elseif (preg_match("/^OK /i", $response)) {
+                    return;
+                }
+            }
+        }
     }
 }

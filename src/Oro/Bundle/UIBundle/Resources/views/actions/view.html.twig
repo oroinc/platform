@@ -21,7 +21,7 @@
                     <div class="pull-right title-buttons-container">
                         {% block navButtonContainer %}
                             {% placeholder view_navButtons_before with {entity: entity} %}
-                            {% block navButtons %}{% endblock navButtons %}
+                            {% block navButtons %}{% placeholder view_navButtons with {entity: entity} %}{% endblock navButtons %}
                             {% placeholder view_navButtons_after with {entity: entity} %}
                         {% endblock navButtonContainer%}
                     </div>
@@ -32,11 +32,9 @@
                                     {% placeholder view_pageActions_before with {entity: entity} %}
 
                                     {% block ownerLink %}
-                                        {% if isDesktopVersion() %}
+                                        {% if isDesktopVersion() and entity is not null %}
                                             {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                            {% if ownerLink %}
-                                                <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
-                                            {% endif %}
+                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                         {% endif %}
                                     {% endblock ownerLink %}
 
@@ -110,11 +108,9 @@
                                     {% endblock stats %}
                                     {% placeholder page_header_stats_after with {entity: entity} %}
 
-                                    {% if isMobileVersion() %}
+                                    {% if isMobileVersion() and entity is not null %}
                                         {% set ownerLink = UI.entityOwnerLink(entity) %}
-                                        {% if ownerLink %}
-                                            <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
-                                        {% endif %}
+                                        <li>{{ ownerLink }}{% placeholder additional_owner_info with {entity: entity} %}</li>
                                     {% endif %}
                                 </ul>
                             </div>

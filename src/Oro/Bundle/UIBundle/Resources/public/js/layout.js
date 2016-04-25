@@ -3,14 +3,13 @@ define(function(require) {
 
     var $ = require('jquery');
     var _ = require('underscore');
-    var __ = require('orotranslation/js/translator');
     var scrollspy = require('oroui/js/scrollspy');
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
     var scrollHelper = require('oroui/js/tools/scroll-helper');
+
     require('bootstrap');
     require('jquery-ui');
-    require('jquery.uniform');
     require('oroui/js/responsive-jquery-widget');
 
     var document = window.document;
@@ -53,10 +52,24 @@ define(function(require) {
          * @returns {number} development toolbar height in dev mode, 0 in production mode
          */
         getDevToolbarHeight: function() {
-            if (!this.devToolbarHeight) {
+            if (!mediator.execute('retrieveOption', 'debug')) {
+                return 0;
+            }
+            if (!this.devToolbarHeightListenersAttached) {
+                this.devToolbarHeightListenersAttached = true;
+                $(window).on('resize', function() {
+                    delete layout.devToolbarHeight;
+                });
+                mediator.on('debugToolbar:afterUpdateView', function() {
+                    delete layout.devToolbarHeight;
+                });
+            }
+            if (this.devToolbarHeight === void 0) {
                 var devToolbarComposition = mediator.execute('composer:retrieve', 'debugToolbar', true);
-                if (devToolbarComposition && devToolbarComposition.view) {
-                    this.devToolbarHeight = devToolbarComposition.view.$el.height();
+                if (devToolbarComposition &&
+                    devToolbarComposition.view &&
+                    devToolbarComposition.view.$('.sf-toolbarreset').is(':visible')) {
+                    this.devToolbarHeight = devToolbarComposition.view.$('.sf-toolbarreset').outerHeight();
                 } else {
                     this.devToolbarHeight = 0;
                 }
@@ -66,7 +79,7 @@ define(function(require) {
 
         /**
          * Initializes
-         *  - form widgets (uniform)
+         *  - form widgets
          *  - tooltips
          *  - popovers
          *  - scrollspy
@@ -149,30 +162,7 @@ define(function(require) {
          * @param {jQuery=} $container
          */
         styleForm: function($container) {
-            var $elements;
-            if ($.isPlainObject($.uniform)) {
-                var notUniformFilter = function(i, el) {
-                    return $(el).parent('.selector, .uploader').length === 0;
-                };
-
-                // bind uniform plugin to select elements
-                $elements = $container.find('select:not(.no-uniform,.select2)').filter(notUniformFilter);
-                $elements.uniform();
-                if ($elements.is('.error:not([multiple])')) {
-                    $elements.removeClass('error').closest('.selector').addClass('error');
-                }
-
-                // bind uniform plugin to input:file elements
-                $elements = $container.find('input:file').filter(notUniformFilter);
-                $elements.uniform({
-                    fileDefaultHtml: __('Please select a file...'),
-                    fileButtonHtml: __('Choose File')
-                });
-                if ($elements.is('.error')) {
-                    $elements.removeClass('error').closest('.uploader').addClass('error');
-                }
-            }
-
+            $container.find('input:file,input:checkbox,input:radio,select:not(.select2)').inputWidget('create');
             $container.one('content:changed', _.bind(this.styleForm, this, $container));
         },
 
@@ -182,13 +172,7 @@ define(function(require) {
          * @param {jQuery=} $container
          */
         unstyleForm: function($container) {
-            var $elements;
-
-            // removes uniform plugin from elements
-            if ($.isPlainObject($.uniform)) {
-                $elements = $container.find('select:not(.no-uniform,.select2)');
-                $.uniform.restore($elements);
-            }
+            $container.find('input:file,input:checkbox,input:radio,select:not(.select2)').inputWidget('dispose');
 
             // removes select2 plugin from elements
             $container.find('.select2-container').each(function() {

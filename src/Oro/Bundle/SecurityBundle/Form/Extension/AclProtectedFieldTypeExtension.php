@@ -14,6 +14,7 @@ use Symfony\Component\Security\Acl\Voter\FieldVote;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 
 class AclProtectedFieldTypeExtension extends AbstractTypeExtension
 {
@@ -32,14 +33,25 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     /** @var array */
     protected $allowedFields = [];
 
+    /** @var ConfigProvider */
+    protected $configProvider;
+
+    /** @var bool */
+    protected $isFieldAclEnabled = false;
+
+    /** @var bool */
+    protected $showRestricted = true;
+
     public function __construct(
         SecurityFacade $securityFacade,
         EntityClassResolver $entityClassResolver,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        ConfigProvider $configProvider
     ) {
         $this->securityFacade  = $securityFacade;
         $this->entityClassResolver = $entityClassResolver;
         $this->doctrineHelper = $doctrineHelper;
+        $this->configProvider = $configProvider;
     }
 
     /**
@@ -65,7 +77,16 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             return false;
         }
 
-        return true;
+        try {
+            $securityConfig    = $this->configProvider->getConfig($className);
+            $this->isFieldAclEnabled = $securityConfig->get('field_acl_enabled');
+            $this->showRestricted    = $securityConfig->get('show_restricted_fields');
+        } catch (\Exception $e) {
+            $this->isFieldAclEnabled = false;
+            $this->showRestricted = true;
+        }
+
+        return $this->isFieldAclEnabled;
     }
 
     /**
@@ -95,12 +116,24 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
             return;
         }
 
+        $entity = $this->getEntityByForm($form);
         foreach ($form as $childName => $childForm) {
             if ($this->isFormGranted($childForm)) {
                 continue;
             }
 
-            $view->children[$childName]->setRendered();
+            $show = $this->showRestricted && $entity ?
+                $this->securityFacade->isGranted(
+                    'VIEW',
+                    new FieldVote($entity, $this->getPropertyByForm($childForm))
+                ) :
+                false;
+
+            if ($show) {
+                $view->children[$childName]->vars['read_only'] = true;
+            } else {
+                $view->children[$childName]->setRendered();
+            }
         }
     }
 
@@ -120,7 +153,13 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
                 continue;
             }
 
-            $form->remove($childForm->getName());
+            if ($this->showRestricted) {
+                // reset existing value instead of submitted
+                $data[$childForm->getName()] = $childForm->getData();
+                $event->setData($data);
+            } else {
+                $form->remove($childForm->getName());
+            }
         }
     }
 
@@ -162,12 +201,8 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
      */
     protected function isFormGranted(FormInterface $form)
     {
-        $mainForm  = $form->getParent();
-        $isMapped  = $form->getConfig()->getMapped();
-        $className = $mainForm->getConfig()->getDataClass();
-        $entity    = $mainForm->getData();
-
-        if (false === $isMapped || !$entity instanceof $className) {
+        $entity = $this->getEntityByForm($form->getParent());
+        if (!$entity) {
             $isGranted = true;
         } else {
             $isNewEntity = is_null($this->doctrineHelper->getSingleEntityIdentifier($entity));
@@ -182,6 +217,24 @@ class AclProtectedFieldTypeExtension extends AbstractTypeExtension
     }
 
     /**
+     * @param FormInterface $form
+     *
+     * @return bool|object entity or fals
+     */
+    protected function getEntityByForm(FormInterface $form)
+    {
+        $isMapped  = $form->getConfig()->getMapped();
+        $className = $form->getConfig()->getDataClass();
+        $entity    = $form->getData();
+
+        if ($isMapped && $entity instanceof $className) {
+            return $entity;
+        } else {
+            return false;
+        }
+    }
+
+        /**
      * Return class property form mapped to
      *
      * @param FormInterface $form

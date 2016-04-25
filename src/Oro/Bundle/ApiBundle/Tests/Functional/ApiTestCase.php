@@ -4,19 +4,28 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\HttpFoundation\Response;
+use Symfony\Component\Yaml\Parser;
 
-use Oro\Bundle\ApiBundle\Request\JsonApi\EntityClassTransformer;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
+use Oro\Bundle\ApiBundle\Request\RequestType;
+use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
+use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
-class ApiTestCase extends WebTestCase
+abstract class ApiTestCase extends WebTestCase
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var EntityClassTransformer */
-    protected $entityClassTransformer;
+    /** @var ValueNormalizer */
+    protected $valueNormalizer;
+
+    /**
+     * Local cache for expectations
+     *
+     * @var array
+     */
+    private $expectations = [];
 
     /**
      * {@inheritdoc}
@@ -24,62 +33,54 @@ class ApiTestCase extends WebTestCase
     protected function setUp()
     {
         /** @var ContainerInterface $container */
-        $container                    = $this->getContainer();
+        $container = $this->getContainer();
 
-        $this->entityClassTransformer = $container->get('oro_api.json_api.entity_class_transformer');
-        $this->doctrineHelper         = $container->get('oro_api.doctrine_helper');
+        $this->valueNormalizer = $container->get('oro_api.value_normalizer');
+        $this->doctrineHelper  = $container->get('oro_api.doctrine_helper');
     }
 
     /**
-     * @return array
+     * @return RequestType
+     */
+    abstract protected function getRequestType();
+
+    /**
+     * @return array [entity class => [entity class, [excluded action, ...]], ...]
      */
     public function getEntities()
     {
         $this->initClient();
-        $entities                = [];
-        $container               = $this->getContainer();
-        $entityManagers          = $container->get('oro_entity_config.entity_manager_bag')->getEntityManagers();
-        $entityExclusionProvider = $container->get('oro_api.entity_exclusion_provider');
-        foreach ($entityManagers as $em) {
-            $allMetadata = $em->getMetadataFactory()->getAllMetadata();
-            foreach ($allMetadata as $metadata) {
-                if ($metadata->isMappedSuperclass) {
-                    continue;
-                }
-                if ($entityExclusionProvider->isIgnoredEntity($metadata->name)) {
-                    continue;
-                }
-                $entities[$metadata->name] = [$metadata->name];
-            }
+        $entities        = [];
+        $container       = $this->getContainer();
+        $resourcesLoader = $container->get('oro_api.resources_loader');
+        $resources       = $resourcesLoader->getResources(Version::LATEST, $this->getRequestType());
+        foreach ($resources as $resource) {
+            $entityClass = $resource->getEntityClass();
+
+            $entities[$entityClass] = [$entityClass, $resource->getExcludedActions()];
         }
 
         return $entities;
     }
 
     /**
-     * @param string $entityClass
-     * @param array  $content
+     * @param string $filename
      *
      * @return array
      */
-    protected function getGetRequestConfig($entityClass, $content)
+    protected function loadExpectation($filename)
     {
-        $recordExist   = count($content) === 1;
-        $recordContent = $recordExist ? $content [0] : [];
-        $idFields      = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
-        $idFieldCount  = count($idFields);
-        if ($idFieldCount === 1) {
-            // single identifier
-            return [$recordExist ? $recordContent[reset($idFields)] : 1, $recordExist];
-        } elseif ($idFieldCount > 1) {
-            // combined identifier
-            $requirements = [];
-            foreach ($idFields as $field) {
-                $requirements[$field] = $recordExist ? $content[$field] : 1;
-            }
+        if (!isset($this->expectations[$filename])) {
+            $expectedContent = file_get_contents(
+                __DIR__ . DIRECTORY_SEPARATOR . 'Stub' . DIRECTORY_SEPARATOR . $filename
+            );
 
-            return [implode(RestRequest::ARRAY_DELIMITER, $requirements), $recordExist];
+            $ymlParser = new Parser();
+
+            $this->expectations[$filename] = $ymlParser->parse($expectedContent);
         }
+
+        return $this->expectations[$filename];
     }
 
     /**

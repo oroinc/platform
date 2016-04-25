@@ -6,9 +6,9 @@ use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Reference;
 
-use Oro\Bundle\UIBundle\Tools\ArrayUtils;
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 class ConfigurationPass implements CompilerPassInterface
 {
@@ -49,7 +49,7 @@ class ConfigurationPass implements CompilerPassInterface
             $resources    = $configLoader->load($container);
             foreach ($resources as $resource) {
                 if (isset($resource->data[self::ROOT_PARAMETER]) && is_array($resource->data[self::ROOT_PARAMETER])) {
-                    $config = ArrayUtils::arrayMergeRecursiveDistinct($config, $resource->data[self::ROOT_PARAMETER]);
+                    $config = ArrayUtil::arrayMergeRecursiveDistinct($config, $resource->data[self::ROOT_PARAMETER]);
                 }
             }
 

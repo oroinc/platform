@@ -2,19 +2,12 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Extension\Totals;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-use Doctrine\ORM\Mapping\Driver\AnnotationDriver;
-use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\MetadataObject;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
-use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
 use Oro\Bundle\DataGridBundle\Extension\Totals\OrmTotalsExtension;
 use Oro\Bundle\DataGridBundle\Extension\Totals\Configuration;
 
-use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\OrmTestCase;
 
 class OrmTotalsExtensionTest extends OrmTestCase
@@ -77,7 +70,7 @@ class OrmTotalsExtensionTest extends OrmTestCase
     public function testIsApplicable()
     {
         $this->assertTrue($this->extension->isApplicable($this->config));
-        $this->config->offsetSetByPath(Builder::DATASOURCE_TYPE_PATH, 'non_orm');
+        $this->config->offsetSetByPath(DatagridConfiguration::DATASOURCE_TYPE_PATH, 'non_orm');
         $this->assertFalse($this->extension->isApplicable($this->config));
     }
 

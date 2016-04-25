@@ -4,10 +4,11 @@ namespace Oro\Bundle\EmailBundle\Mailer;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\DependencyInjection\IntrospectableContainerInterface;
+use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\EmailBundle\Entity\EmailOrigin;
+use Oro\Bundle\EmailBundle\Event\SendEmailTransport;
 use Oro\Bundle\EmailBundle\Exception\NotSupportedException;
-use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
-use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
 
 /**
  * The goal of this class is to send an email directly, not using a mail spool
@@ -15,19 +16,13 @@ use Oro\Bundle\SecurityBundle\Encoder\Mcrypt;
  */
 class DirectMailer extends \Swift_Mailer
 {
-    /**
-     * @var \Swift_Mailer
-     */
+    /** @var \Swift_Mailer */
     protected $baseMailer;
 
-    /**
-     * @var \Swift_SmtpTransport
-     */
+    /** @var \Swift_SmtpTransport */
     protected $smtpTransport;
 
-    /**
-     * @var ContainerInterface
-     */
+    /** @var ContainerInterface */
     protected $container;
 
     /**
@@ -48,38 +43,29 @@ class DirectMailer extends \Swift_Mailer
                 $transport = \Swift_NullTransport::newInstance();
             }
         }
+
+        if ($transport instanceof \Swift_Transport_EsmtpTransport) {
+            $this->addXOAuth2Authenticator($transport);
+        }
+
         parent::__construct($transport);
     }
 
     /**
      * Set SmtpTransport instance or create a new if default mailer transport is not smtp
      *
-     * @param UserEmailOrigin $userEmailOrigin
+     * @param EmailOrigin $emailOrigin
      */
-    public function prepareSmtpTransport($userEmailOrigin)
+    public function prepareSmtpTransport($emailOrigin)
     {
         if (!$this->smtpTransport) {
-            $username = $userEmailOrigin->getUser();
-            /** @var Mcrypt $encoder */
-            $encoder  =  $this->container->get('oro_security.encoder.mcrypt');
-            $password = $encoder->decryptData($userEmailOrigin->getPassword());
-            $host     = $userEmailOrigin->getSmtpHost();
-            $port     = $userEmailOrigin->getSmtpPort();
-            $security = $userEmailOrigin->getSmtpEncryption();
-
-            $transport = $this->getTransport();
-            if ($transport instanceof \Swift_SmtpTransport
-                || $transport instanceof \Swift_Transport_EsmtpTransport) {
-                $transport->setHost($host);
-                $transport->setPort($port);
-                $transport->setEncryption($security);
-            } else {
-                $transport = \Swift_SmtpTransport::newInstance($host, $port, $security);
-            }
-
-            $transport->setUsername($username);
-            $transport->setPassword($password);
-            $this->smtpTransport = $transport;
+            /** @var EventDispatcherInterface $eventDispatcher */
+            $eventDispatcher = $this->container->get('event_dispatcher');
+            $event = $eventDispatcher->dispatch(
+                SendEmailTransport::NAME,
+                new SendEmailTransport($emailOrigin, $this->getTransport())
+            );
+            $this->smtpTransport = $event->getTransport();
         }
     }
 
@@ -178,5 +164,35 @@ class DirectMailer extends \Swift_Mailer
         }
 
         return $realTransport;
+    }
+
+    /**
+     * @param \Swift_Transport_EsmtpTransport $transport
+     *
+     * @return DirectMailer
+     */
+    protected function addXOAuth2Authenticator($transport)
+    {
+        $handlers = $transport->getExtensionHandlers();
+        $handlers = is_array($handlers) ? $handlers : [];
+
+        foreach ($handlers as $handler) {
+            if ($handler instanceof \Swift_Transport_Esmtp_AuthHandler) {
+                $authenticators = $handler->getAuthenticators();
+                $isOAuth2Exist = false;
+                foreach ($authenticators as $authenticator) {
+                    if ($authenticator instanceof \Swift_Transport_Esmtp_Auth_XOAuth2Authenticator) {
+                        $isOAuth2Exist = true;
+                    }
+                }
+
+                if (!$isOAuth2Exist) {
+                    $authenticators[] = new \Swift_Transport_Esmtp_Auth_XOAuth2Authenticator();
+                    $handler->setAuthenticators($authenticators);
+                }
+            }
+        }
+
+        return $this;
     }
 }

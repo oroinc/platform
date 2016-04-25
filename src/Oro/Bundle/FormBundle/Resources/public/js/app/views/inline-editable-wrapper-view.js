@@ -1,5 +1,6 @@
 define(function(require) {
     'use strict';
+    var __ = require('orotranslation/js/translator');
     var BaseView = require('oroui/js/app/views/base/view');
 
     /**
@@ -17,6 +18,7 @@ define(function(require) {
 
         setElement: function($el) {
             $el.addClass('inline-editable-wrapper');
+            $el.attr('title', __('oro.form.inlineEditing.helpMessage'));
             return InlineEditorWrapperView.__super__.setElement.apply(this, arguments);
         },
 

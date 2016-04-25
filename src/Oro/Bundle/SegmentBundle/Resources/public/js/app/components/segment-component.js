@@ -492,6 +492,11 @@ define(function(require) {
                             group_type: $el.find(':selected').data('group_type'),
                             group_name: $el.find(':selected').data('group_name')
                         };
+
+                        var returnType = $el.find(':selected').data('return_type');
+                        if (value && returnType) {
+                            value.return_type = returnType;
+                        }
                     }
                     return value;
                 }

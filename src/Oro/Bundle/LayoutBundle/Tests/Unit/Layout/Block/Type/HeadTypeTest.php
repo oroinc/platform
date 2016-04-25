@@ -9,37 +9,6 @@ use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 
 class HeadTypeTest extends BlockTypeTestCase
 {
-    public function testSetDefaultOptions()
-    {
-        $this->assertEquals(
-            [
-                'title' => ''
-            ],
-            $this->resolveOptions(HeadType::NAME, [])
-        );
-        $this->assertEquals(
-            [
-                'title' => 'test'
-            ],
-            $this->resolveOptions(
-                HeadType::NAME,
-                [
-                    'title' => 'test'
-                ]
-            )
-        );
-    }
-
-    public function testBuildView()
-    {
-        $view = $this->getBlockView(
-            HeadType::NAME,
-            ['title' => 'test']
-        );
-
-        $this->assertEquals('test', $view->vars['title']);
-    }
-
     public function testGetName()
     {
         $type = $this->getBlockType(HeadType::NAME);

@@ -16,6 +16,9 @@ oro:
             header.label:   "Column Name"
             header.tooltip: "If blank Label will be used"
             identity.label: "Use as Identity Field"
+            identity.only_when_not_empty: "Only when not empty"
+            identity.always: "Always"
+            identity.tooltip: "If set to \"Only when not empty\", the field may be omitted in the identity when it has no value."
             order.label:    "Column Position"
 
         import:
@@ -30,5 +33,7 @@ oro:
             strategy:       Strategy
             importance:     Important
             columns_notice: The file must be comma-separated only. Files containing other separators will be rejected.
+            errors:
+                not_found_entity: Not found entity "%entity_name%"
 
 "Identity only": "Identity only"

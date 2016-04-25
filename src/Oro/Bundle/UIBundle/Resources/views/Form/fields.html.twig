@@ -2,7 +2,7 @@
 
 {% block form_row %}
     {% spaceless %}
-        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}">
+        <div class="control-group{% if attr.class is defined %} {{ attr.class }}{% endif %}{% if block_prefixes is defined %} control-group-{{ block_prefixes[1] }}{% endif %}">
             {% if label is not sameas(false) %}
                 <div class="control-label wrap">
                     {{ form_label(form, '' , { label_attr: label_attr}) }}

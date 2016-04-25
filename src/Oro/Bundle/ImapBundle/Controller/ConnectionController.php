@@ -4,7 +4,6 @@ namespace Oro\Bundle\ImapBundle\Controller;
 
 use FOS\RestBundle\Util\Codes;
 
-use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -12,6 +11,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\EmailBundle\Mailer\DirectMailer;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\ImapBundle\Connector\ImapConfig;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
@@ -34,7 +34,7 @@ class ConnectionController extends Controller
         $responseCode = Codes::HTTP_BAD_REQUEST;
 
         $data = null;
-        $id   = $request->get('id', false);
+        $id = $request->get('id', false);
         if (false !== $id) {
             $data = $this->getDoctrine()->getRepository('OroImapBundle:UserEmailOrigin')->find($id);
         }
@@ -124,6 +124,34 @@ class ConnectionController extends Controller
         }
 
         return new Response('', $responseCode);
+    }
+
+    /**
+     * @Route("imap/connection/account/change", name="oro_imap_change_account_type", methods={"POST"})
+     */
+    public function getFormAction()
+    {
+        $request = $this->container->get('request_stack')->getCurrentRequest();
+        $type = $request->get('type');
+        $token = $request->get('accessToken');
+        $formParentName = $request->get('formParentName');
+
+        $connectionControllerManager = $this->container->get('oro_imap.manager.controller.connection');
+        $form = $connectionControllerManager->getImapConnectionForm($type, $token, $formParentName);
+
+        if ($token) {
+            $html = $this->renderView('OroImapBundle:Form:accountTypeGmail.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        } else {
+            $html = $this->renderView('OroImapBundle:Form:accountTypeOther.html.twig', [
+                'form' => $form->createView(),
+            ]);
+        }
+
+        $response = ['html' => $html];
+
+        return new JsonResponse($response);
     }
 
     /**

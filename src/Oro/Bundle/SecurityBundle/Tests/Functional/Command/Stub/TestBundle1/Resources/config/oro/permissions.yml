@@ -1,0 +1,12 @@
+oro_permissions:
+    PERMISSION1:
+        label: Label for Permission 1
+        group_names: frontend
+
+    PERMISSION2:
+        label: Label for Permission 2
+        description: Permission 2 description
+        apply_to_entities: ['OroTestFrameworkBundle:TestActivity', 'OroTestFrameworkBundle:Product']
+        exclude_entities: ['OroTestFrameworkBundle:Item', 'OroTestFrameworkBundle:ItemValue']
+        group_names: ['', 'frontend']
+        apply_to_all: false

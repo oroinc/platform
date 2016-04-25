@@ -68,7 +68,8 @@ define(function(require) {
             data.collapsed = this.collapsed;
             data.createdAt = dateTimeFormatter.formatSmartDateTime(data.createdAt);
             data.updatedAt = dateTimeFormatter.formatSmartDateTime(data.updatedAt);
-            data.relatedActivityClass = _.escape(data.relatedActivityClass);
+            // use special model's method to get activity class name with replaced slashes
+            data.relatedActivityClass = _.escape(this.model.getRelatedActivityClass());
             if (data.owner_id) {
                 data.owner_url = routing.generate('oro_user_view', {'id': data.owner_id});
             } else {

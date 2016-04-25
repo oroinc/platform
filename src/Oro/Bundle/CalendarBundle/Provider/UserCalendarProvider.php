@@ -57,8 +57,6 @@ class UserCalendarProvider extends AbstractCalendarProvider
             // prohibit to remove the current calendar from the list of connected calendars
             if ($calendar->getId() === $calendarId) {
                 $resultItem['removable'] = false;
-            }
-            if ($calendarId === $calendar->getId()) {
                 $resultItem['canAddEvent']    = true;
                 $resultItem['canEditEvent']   = true;
                 $resultItem['canDeleteEvent'] = true;
@@ -92,7 +90,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
                 $visibleIds[] = $id;
             }
         }
-        if (!empty($visibleIds)) {
+        if ($visibleIds) {
             $qb
                 ->andWhere('c.id IN (:visibleIds)')
                 ->setParameter('visibleIds', $visibleIds);
@@ -111,11 +109,6 @@ class UserCalendarProvider extends AbstractCalendarProvider
      */
     protected function buildCalendarName(Calendar $calendar)
     {
-        $name = $calendar->getName();
-        if (!$name) {
-            $name = $this->entityNameResolver->getName($calendar->getOwner());
-        }
-
-        return $name;
+        return $calendar->getName() ?: $this->entityNameResolver->getName($calendar->getOwner());
     }
 }

@@ -7,6 +7,8 @@ This guide is intended for those already familiar with layouts. So, please, read
 Our guide is divided into the following sections:
 * [Getting started](#getting-started)
 * [Customizing block rendering](#customizing-block-rendering)
+* [Iteration over data](#iteration-over-data)
+* [Access to any layout block by ID](#access-to-any-layout-block-by-id)
 * [Adding CSS and JS](#adding-css-and-js)
 * [Layout blocks positioning](#layout-blocks-positioning)
 * [Providing data for layout](#providing-data-for-layout)
@@ -217,6 +219,46 @@ Now we can set the `lang` attribute in our layout update file using `setOption` 
          optionName: attr.lang
          optionValue: en
  ```
+ 
+Iteration over data
+-------------------
+ 
+If you need to iterate over some array or collection it should be done in a block template in a block theme file.
+Here is how it can look like:
+
+```twig
+{% block _attributes_container_widget %}
+    <div class="attributes-container">
+        {% for attribute in attributes %}
+            {% do block|merge_context({'attribute': attribute}) %}
+            {{ block('container_widget') }}
+        {% endfor %}
+    </div>
+{% endblock %}
+```
+
+This block will iterate over all values from `attributes` collection, pass `attribute` variable with the
+appropriate value to all children blocks and render all children blocks for every existing attribute. 
+
+Access to any layout block by ID
+----------------------------------------
+
+You can access to any layout block from another block by ID
+and modify template based on the existence of another block or any of its properties.
+
+```twig
+{% block root_widget %}
+    <!DOCTYPE {{ doctype|default('html') }}>
+    <html{{ block('block_attributes') }}>
+    {{ block_widget(block) }}
+    {% if blocks.sidebar is defined and blocks.sidebar.children|length > 0 %}
+        <script type="text/javascript">
+            //do something
+        </script>
+    {% endif %}
+    </html>
+{% endblock %}
+```
 
 Adding CSS and JS
 --------------------

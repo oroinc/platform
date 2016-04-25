@@ -19,20 +19,8 @@
 .filter-item .filter-default-value .reset-filter {
     display: none;
 }
-.filter-select .select-filter-placeholder {
-    display: none;
-}
-.filter-select.filter-default-value .select-filter-placeholder {
-    display: inline-block;
-}
-.filter-select.filter-default-value .select-filter-widget {
-    display: none;
-}
 .filter-select.filter-default-value .multiselect-filter-widget {
     display: inline-block;
-}
-.multiselect-filter-placeholder, .filter-select.filter-default-value .multiselect-filter-placeholder {
-    display: none;
 }
 
 .filter-box .btn-group [class^='icon-'] {
@@ -68,8 +56,9 @@
     background-color: #ffffff;
     padding: 8px 8px 2px 8px;
     border: 1px solid #d3d3d3;
-    display: none;
-    z-index: @zindexPopover;
+    display: block;
+    visibility: hidden;
+    z-index: @oroZindexDropdown;
     margin-top: 7px;
     top: auto;
 }
@@ -115,11 +104,14 @@
     margin-bottom: 0;
 }
 .filter-select .select-filter-widget {
-    font-weight: bold;
-    color: #333333;
-    padding: 0 0 2px 0;
-    background: none;
-    border: none;
+    &, &.ui-multiselect {
+      font-weight: bold;
+      color: #333333;
+      padding: 0 0 2px 0;
+      background: none;
+      border: none;
+      margin-left: 0;
+    }
 }
 
 .filter-select .select-filter-widget .ui-icon {
@@ -200,7 +192,8 @@
     margin: 0 6px 5px 5px;
 }
 
-.ui-multiselect.filter-list {
+.ui-multiselect.filter-list, .ui-multiselect.select-filter-widget {
+
     background: none;
     border: none;
     font-size: 13px;
@@ -209,15 +202,15 @@
     line-height: 1em;
 }
 
-.ui-multiselect.filter-list:hover .add-filter-button span.caret {
+.ui-multiselect.select-filter-widget:hover .add-filter-button span.caret {
     border-top-color: #005099; /* @linkColorHover; */
 }
 
-.ui-multiselect.filter-list:hover a {
+.ui-multiselect.select-filter-widget:hover a {
     color: #005099; /* @linkColorHover; */
 }
 
-.ui-multiselect.filter-list.select-filter-widget span.caret {
+.ui-multiselect.select-filter-widget span.caret {
     margin-top: 5px;
 }
 
@@ -315,6 +308,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
       position: relative;
       vertical-align: top;
       width: auto;
+
       input[type=text] {
         max-width: 100%;
         width: 280px;
@@ -326,7 +320,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
       }
       .filter-update {
         position: absolute;
-        left: 100%;
+        right: 0;
         top: 0;
       }
     }
@@ -384,9 +378,9 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
         margin-top: 0;
         margin-left: -18px;
       }
-      label{
+      label {
         padding-left: 20px;
-        .search-result {
+        &.search-result {
           color: #000000;
           font-weight: bold;
         }
@@ -395,5 +389,48 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
   }
   input[name="value"] {
     display: none;
+  }
+}
+
+.filter-container {
+    position: relative;
+}
+.filter-items-hint {
+    padding-right: 80px;
+    position: relative;
+
+    .reset-filter-button {
+        position: absolute;
+        top: 0;
+        right: 0;
+    }
+}
+
+.filter-criteria .choice-filter .value-field-frame .dictionary-filter {
+  width: 200px;
+}
+
+.filter-criteria .choice-filter .value-field-frame .select2-search-field input[type=text] {
+  height: 25px;
+  padding: 5px;
+}
+
+.filter-criteria .choice-filter .select2-container-multi .select2-choices .select2-search-choice {
+  margin: 2px 0 2px 5px;
+  padding: 3px 20px 3px 7px;
+}
+.select-field-date-popover {
+  top: 3px;
+  right: 3px;
+  position: absolute;
+}
+.select-field-date-popover .popover{
+  min-width: 350px;
+}
+.field-condition-date-popover {
+  display: inline-block;
+
+  i {
+    cursor: pointer;
   }
 }

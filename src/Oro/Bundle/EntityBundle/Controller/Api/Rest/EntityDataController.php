@@ -24,8 +24,8 @@ class EntityDataController extends FOSRestController
     /**
      * Patch entity field/s data by new values
      *
-     * @param int $id
-     * @param int $className
+     * @param int    $id
+     * @param string $className
      *
      * @return Response
      *

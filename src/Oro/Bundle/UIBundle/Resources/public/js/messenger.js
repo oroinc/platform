@@ -53,19 +53,26 @@ define([
              *      or false - means to not close automatically
              * @param {Function} options.template template function
              * @param {boolean} options.flash flag to turn on default delay close call, it's 5s
+             * @param {boolean} options.afterReload whether the message should be shown after a page is reloaded
              *
              * @return {Object} collection of methods - actions over message element,
              *      at the moment there's only one method 'close', allows to close the message
              */
             notificationMessage:  function(type, message, options) {
-                var container = (options || {}).container ||  defaults.container;
+                var container = (options || {}).container || defaults.container;
+                var afterReload = (options || {}).afterReload || false;
+                var afterReloadQueue = [];
                 var args = Array.prototype.slice.call(arguments);
                 var actions = {close: $.noop};
-                if (container && $(container).length) {
+                if (afterReload && window.localStorage) {
+                    afterReloadQueue = JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]');
+                    afterReloadQueue.push(args);
+                    localStorage.setItem('oroAfterReloadMessages', JSON.stringify(afterReloadQueue));
+                } else if (container && $(container).length) {
                     actions = showMessage.apply(null, args);
                 } else {
                     // if container is not ready then save message for later
-                    queue.push([args, actions]);
+                    queue.push(args);
                 }
                 return actions;
             },
@@ -82,6 +89,7 @@ define([
              *      or false - means to not close automatically
              * @param {Function} options.template template function
              * @param {boolean} options.flash flag to turn on default delay close call, it's 5s
+             * @param {boolean} options.afterReload whether the message should be shown after a page is reloaded
              *
              * @return {Object} collection of methods - actions over message element,
              *      at the moment there's only one method 'close', allows to close the message
@@ -137,17 +145,18 @@ define([
             setup: function(options) {
                 _.extend(defaults, options);
 
+                if (window.localStorage) {
+                    queue = queue.concat(JSON.parse(localStorage.getItem('oroAfterReloadMessages') || '[]'));
+                    localStorage.removeItem('oroAfterReloadMessages');
+                }
+
                 while (queue.length) {
-                    var args = queue.shift();
-                    _.extend(args[1], showMessage.apply(null, args[0]));
+                    showMessage.apply(null, queue.shift());
                 }
             },
 
             addMessage: function(type, message, options) {
-                var args = [type, message, _.extend({flash: true}, options)];
-                var actions = {close: $.noop};
-
-                queue.push([args, actions]);
+                queue.push([type, message, _.extend({flash: true}, options)]);
             },
 
             showProcessingMessage: function(message, promise, type) {

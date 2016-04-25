@@ -5,6 +5,7 @@ namespace Oro\Bundle\FilterBundle\Filter;
 use Symfony\Component\Form\Form;
 use Symfony\Component\Form\FormFactoryInterface;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 abstract class AbstractFilter implements FilterInterface
 {
@@ -22,6 +23,12 @@ abstract class AbstractFilter implements FilterInterface
 
     /** @var Form */
     protected $form;
+
+    /** @var array */
+    protected $unresolvedOptions = [];
+
+    /** @var array [array, ...] */
+    protected $additionalOptions = [];
 
     /**
      * Constructor
@@ -42,6 +49,17 @@ abstract class AbstractFilter implements FilterInterface
     {
         $this->name   = $name;
         $this->params = $params;
+
+        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
+        $this->unresolvedOptions = array_filter($options, 'is_callable');
+        if (!$this->isLazy()) {
+            $this->resolveOptions();
+        } else {
+            $unresolvedKeys = array_keys($this->unresolvedOptions);
+            foreach ($unresolvedKeys as $key) {
+                unset($this->params[FilterUtility::FORM_OPTIONS_KEY][$key]);
+            }
+        }
     }
 
     /**
@@ -89,8 +107,33 @@ abstract class AbstractFilter implements FilterInterface
         );
         $metadata = $this->mapParams($metadata);
         $metadata = array_merge($defaultMetadata, $metadata);
+        $metadata['lazy'] = $this->isLazy();
 
         return $metadata;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function resolveOptions()
+    {
+        $this->params[FilterUtility::FORM_OPTIONS_KEY] = array_merge(
+            $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []),
+            array_map(
+                function ($cb) {
+                    return call_user_func($cb);
+                },
+                $this->unresolvedOptions
+            )
+        );
+        $this->unresolvedOptions = [];
+
+        $options = $this->params[FilterUtility::FORM_OPTIONS_KEY];
+        foreach ($this->additionalOptions as $path) {
+            $options = ArrayUtil::unsetPath($options, $path);
+        }
+        $this->params[FilterUtility::FORM_OPTIONS_KEY] = $options;
+        $this->additionalOptions = [];
     }
 
     /**
@@ -179,5 +222,15 @@ abstract class AbstractFilter implements FilterInterface
         }
 
         return array_combine($keys, array_values($params));
+    }
+
+    /**
+     * @return bool
+     */
+    protected function isLazy()
+    {
+        $options = $this->getOr(FilterUtility::FORM_OPTIONS_KEY, []);
+
+        return isset($options['lazy']) && $options['lazy'];
     }
 }

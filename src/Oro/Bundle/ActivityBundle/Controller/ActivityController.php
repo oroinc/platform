@@ -59,11 +59,11 @@ class ActivityController extends Controller
         $entity        = $routingHelper->getEntity($activity, $id);
         $entityClass   = $routingHelper->resolveEntityClass($activity);
 
-        if (!$this->isGranted('VIEW', $entity)) {
+        if (!$this->isGranted('EDIT', $entity)) {
             throw new AccessDeniedException();
         }
 
-        $entityTargets    = $this->get('oro_entity.entity_context_provider')->getSupportedTargets($entity);
+        $entityTargets    = $this->get('oro_activity.provider.context_grid')->getSupportedTargets($entity);
         $entityClassAlias = $this->get('oro_entity.entity_alias_resolver')->getPluralAlias($entityClass);
 
         return [
@@ -93,12 +93,14 @@ class ActivityController extends Controller
      */
     public function contextGridAction($activity, $id, $entityClass = null)
     {
-        $gridName = $this->get('oro_entity.entity_context_provider')->getContextGridByEntity($entityClass);
+        $entityClass = $this->get('oro_entity.routing_helper')->resolveEntityClass($entityClass);
+        $gridName = $this->get('oro_activity.provider.context_grid')->getContextGridByEntity($entityClass);
 
         // Need to specify parameters for Oro\Bundle\ActivityBundle\EventListener\Datagrid\ContextGridListener
         $params = [
             'activityClass' => $activity,
-            'activityId'    => $id
+            'activityId'    => $id,
+            'class_name'    => $entityClass,
         ];
 
         return [

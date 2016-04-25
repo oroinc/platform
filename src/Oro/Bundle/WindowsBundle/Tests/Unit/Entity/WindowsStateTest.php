@@ -38,40 +38,27 @@ class WindowsStateTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->windowState->isRenderedSuccessfully());
     }
 
+    /**
+     * @return array
+     */
     public function propertiesDataProvider()
     {
         $userMock = $this->getMockBuilder('Symfony\Component\Security\Core\User\UserInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        return array(
-            'user' => array('user', $userMock),
-            'data' => array('data', array('test' => true)),
-            'createdAt' => array('createdAt', '2022-02-22 22:22:22'),
-            'updatedAt' => array('updatedAt', '2022-02-22 22:22:22'),
-        );
+        return [
+            'user' => ['user', $userMock],
+            'data' => ['data', ['test' => true]],
+            'createdAt' => ['createdAt', new \DateTime('2022-02-22 22:22:22')],
+            'updatedAt' => ['updatedAt', new \DateTime('2022-02-22 22:22:22')],
+        ];
     }
 
     public function testGetJsonData()
     {
-        $data = array('test' => true);
+        $data = ['test' => true];
         $this->windowState->setData($data);
         $this->assertEquals($data, $this->windowState->getData());
         $this->assertEquals(json_encode($data), $this->windowState->getJsonData());
-    }
-
-    public function testDoPrePersist()
-    {
-        $this->windowState->doPrePersist();
-
-        $this->assertInstanceOf('DateTime', $this->windowState->getCreatedAt());
-        $this->assertInstanceOf('DateTime', $this->windowState->getUpdatedAt());
-        $this->assertEquals($this->windowState->getCreatedAt(), $this->windowState->getUpdatedAt());
-    }
-
-    public function testDoPreUpdate()
-    {
-        $this->windowState->doPreUpdate();
-
-        $this->assertInstanceOf('DateTime', $this->windowState->getUpdatedAt());
     }
 }

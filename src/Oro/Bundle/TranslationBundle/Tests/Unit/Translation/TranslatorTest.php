@@ -298,7 +298,18 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
         ];
 
         $container     = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
+        $doctrine      = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $em            = $this->getMock('Doctrine\ORM\EntityManagerInterface');
+        $connection    = $this->getMockBuilder('Doctrine\DBAL\Connection')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $schemaManager = $this->getMockBuilder('Doctrine\DBAL\Schema\AbstractSchemaManager')
+            ->disableOriginalConstructor()
+            ->setMethods(['tablesExist'])
+            ->getMockForAbstractClass();
+        $classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
+            ->disableOriginalConstructor()
+            ->getMock();
         $repository    = $this
             ->getMockBuilder('Oro\Bundle\TranslationBundle\Entity\Repository\TranslationRepository')
             ->disableOriginalConstructor()
@@ -329,14 +340,19 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
             ->expects($this->any())
             ->method('get')
             ->with('doctrine')
-            ->willReturn($em);
-        $em
+            ->willReturn($doctrine);
+        $doctrine
             ->expects($this->any())
+            ->method('getManagerForClass')
+            ->with(Translation::ENTITY_NAME)
+            ->willReturn($em);
+        $doctrine
+            ->expects($this->once())
             ->method('getRepository')
             ->with(Translation::ENTITY_NAME)
             ->willReturn($repository);
         $repository
-            ->expects($this->any())
+            ->expects($this->once())
             ->method('findAvailableDomainsForLocales')
             ->willReturn($translate);
 

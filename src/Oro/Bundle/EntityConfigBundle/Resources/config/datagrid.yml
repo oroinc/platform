@@ -6,8 +6,8 @@ datagrid:
             toolbarOptions:
                 pageSize:
                     default_per_page: 100
+        acl_resource: oro_entityconfig_manage
         source:
-            acl_resource: oro_entityconfig_manage
             type: orm
             query:
                 select:
@@ -65,13 +65,14 @@ datagrid:
     # Entity field datagrid
     entityfields-grid:
         options:
+            mode: client
             entityHint: fields
             toolbarOptions:
                 pageSize:
                     default_per_page: 50
+        # TODO: check oro_entityconfig_view acl (403) right now
+        acl_resource: oro_entityconfig_manage
         source:
-            # TODO: check oro_entityconfig_view acl (403) right now
-            acl_resource: oro_entityconfig_manage
             type: orm
             query:
                 select:
@@ -120,14 +121,18 @@ datagrid:
             columns:
                 fieldName:
                     data_name: cf.fieldName
+                type:
+                    data_name: cf.type
+            default:
+                fieldName: ASC
         filters: ~
 
     # Audit entity log grid
     entity-audit-grid:
         options:
             entityHint: history
+        acl_resource: oro_entityconfig_manage
         source:
-            acl_resource: oro_entityconfig_manage
             type: orm
             query:
                 select:
@@ -164,7 +169,7 @@ datagrid:
                 template: OroEntityConfigBundle:Audit:data.html.twig
                 frontend_type: html
                 context:
-                    config_manager: @oro_entity_config.config_manager
+                    config_manager: '@oro_entity_config.config_manager'
             loggedAt:
                 label: oro.entity_config.config_log.logged_at.label
                 type: field

@@ -4,6 +4,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Grid;
 
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Tests\Unit\Datagrid\DatagridGuesserMock;
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Config;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -136,7 +137,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $datagridFieldConfig = new Config(
             new FieldConfigId('datagrid', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType)
         );
-        $this->datagridConfigProvider->expects($this->once())
+        $this->datagridConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($datagridFieldConfig));
@@ -159,7 +160,9 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                     'columns'              => [
                         self::FIELD_NAME => [
                             'label'         => $fieldLabel,
-                            'frontend_type' => 'string'
+                            'frontend_type' => 'string',
+                            'renderable'    => false,
+                            'required'      => false
                         ]
                     ],
                     'sorters'              => [
@@ -206,7 +209,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             new FieldConfigId('datagrid', self::ENTITY_CLASS, self::FIELD_NAME, $fieldType)
         );
         $datagridFieldConfig->set('show_filter', true);
-        $this->datagridConfigProvider->expects($this->once())
+        $this->datagridConfigProvider->expects($this->any())
             ->method('getConfig')
             ->with(self::ENTITY_CLASS, self::FIELD_NAME)
             ->will($this->returnValue($datagridFieldConfig));
@@ -229,7 +232,9 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
                     'columns'              => [
                         self::FIELD_NAME => [
                             'label'         => $fieldLabel,
-                            'frontend_type' => 'string'
+                            'frontend_type' => 'string',
+                            'renderable'    => false,
+                            'required'      => false
                         ]
                     ],
                     'sorters'              => [
@@ -435,7 +440,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnSelf());
         $qb->expects($this->once())
             ->method('addSelect')
-            ->with($relAlias . '.' . $targetFieldName . ' as ' . self::FIELD_NAME)
+            ->with(sprintf('IDENTITY(%s.%s) as %s', $alias, self::FIELD_NAME, self::FIELD_NAME))
             ->will($this->returnSelf());
 
         $datasource = $this->getMockBuilder('Oro\\Bundle\\DataGridBundle\\Datasource\\Orm\\OrmDatasource')
@@ -574,7 +579,7 @@ class DynamicFieldsExtensionTest extends \PHPUnit_Framework_TestCase
         $extendConfig->set('is_deleted', false);
 
         $datagridConfig = new Config(new FieldConfigId('datagrid', $className, $fieldName, $fieldType));
-        $datagridConfig->set('is_visible', true);
+        $datagridConfig->set('is_visible', DatagridScope::IS_VISIBLE_TRUE);
 
         $this->configManager->expects($this->once())
             ->method('hasConfig')

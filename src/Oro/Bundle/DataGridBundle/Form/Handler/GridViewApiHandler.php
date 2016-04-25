@@ -6,8 +6,10 @@ use Doctrine\Bundle\DoctrineBundle\Registry;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Authentication\Token\Storage\TokenStorageInterface;
 
 use Oro\Bundle\DataGridBundle\Entity\GridView;
+use Oro\Bundle\DataGridBundle\Entity\Manager\GridViewManager;
 
 class GridViewApiHandler
 {
@@ -20,16 +22,31 @@ class GridViewApiHandler
     /** @var Registry */
     protected $registry;
 
+    /** @var GridViewManager */
+    protected $gridViewManager;
+
+    /** @var TokenStorageInterface */
+    protected $tokenStorage;
+
     /**
-     * @param FormInterface $form
-     * @param Request $request
-     * @param Registry $registry
+     * @param FormInterface         $form
+     * @param Request               $request
+     * @param Registry              $registry
+     * @param GridViewManager       $gridViewManager
+     * @param TokenStorageInterface $tokenStorage
      */
-    public function __construct(FormInterface $form, Request $request, Registry $registry)
-    {
-        $this->form = $form;
-        $this->request = $request;
-        $this->registry = $registry;
+    public function __construct(
+        FormInterface $form,
+        Request $request,
+        Registry $registry,
+        GridViewManager $gridViewManager,
+        TokenStorageInterface $tokenStorage
+    ) {
+        $this->form            = $form;
+        $this->request         = $request;
+        $this->registry        = $registry;
+        $this->gridViewManager = $gridViewManager;
+        $this->tokenStorage    = $tokenStorage;
     }
 
     /**
@@ -67,6 +84,9 @@ class GridViewApiHandler
      */
     protected function onSuccess(GridView $entity)
     {
+        $default = $this->form->get('is_default')->getData();
+        $this->setDefaultGridView($entity, $default);
+
         $this->fixFilters($entity);
         $om = $this->registry->getManagerForClass('OroDataGridBundle:GridView');
         $om->persist($entity);
@@ -74,7 +94,19 @@ class GridViewApiHandler
     }
 
     /**
-     * @todo Remove once https://github.com/symfony/symfony/issues/5906 is fixed
+     * @param GridView $gridView
+     * @param bool     $default
+     */
+    protected function setDefaultGridView(GridView $gridView, $default)
+    {
+        $user = $this->tokenStorage->getToken()->getUser();
+        $this->gridViewManager->setDefaultGridView($user, $gridView, $default);
+    }
+
+    /**
+     * @todo Remove once https://github.com/symfony/symfony/issues/5906 is fixed.
+     *       After removing this method PLEASE CHECK saving filters in grid view
+     *       look in CollectionFiltersManager._onChangeFilterSelect()
      *
      * @param GridView $gridView
      */
@@ -82,7 +114,7 @@ class GridViewApiHandler
     {
         $filters = $gridView->getFiltersData();
         foreach ($filters as $name => $filter) {
-            if (array_key_exists('type', $filter) && $filter['type'] == null) {
+            if (is_array($filter) && array_key_exists('type', $filter) && $filter['type'] == null) {
                 $filters[$name]['type'] = '';
             }
         }

@@ -83,19 +83,14 @@ define([
          * onSubmit event listener
          */
         onSubmit: function(event) {
-            var hasErrors = false;
-            _.each(
-                this.$fields,
-                function(element) {
-                    if (element.hasClass('error')) {
-                        hasErrors = true;
-                    }
-                }
-            );
-            if (hasErrors) {
+            var $form = this.$form;
+            var hasError = false;
+            _.each(this.$fields, function(field) {
+                hasError = hasError || !field.valid();
+            });
+            if (hasError) {
                 return;
             }
-            var $form = this.$form;
             if ($form.data('nohash') && !$form.data('sent')) {
                 $form.data('sent', true);
                 return;

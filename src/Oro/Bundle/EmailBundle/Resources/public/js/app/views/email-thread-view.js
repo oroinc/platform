@@ -7,6 +7,7 @@ define(function(require) {
     var __ = require('orotranslation/js/translator');
     var mediator = require('oroui/js/mediator');
     var routing = require('routing');
+    var tools = require('oroui/js/tools');
     var EmailItemView = require('./email-item-view');
     var BaseView = require('oroui/js/app/views/base/view');
 
@@ -15,7 +16,8 @@ define(function(require) {
 
         events: {
             'click .email-view-toggle-all': 'onToggleAllClick',
-            'click .email-load-more': 'onLoadMoreClick'
+            'click .email-load-more': 'onLoadMoreClick',
+            'shown.bs.dropdown .email-detailed-info-table.dropdown': 'onDetailedInfoOpen'
         },
 
         selectors: {
@@ -105,6 +107,35 @@ define(function(require) {
                 return;
             }
             this.loadEmails();
+        },
+
+        onDetailedInfoOpen: function(e) {
+            var $target = $('>.dropdown-menu', e.currentTarget);
+            var target = $target[0];
+            var parentRect = this.el.getBoundingClientRect();
+            $target.removeAttr('data-uid').removeClass('fixed-width').css({
+                'width': '',
+                'left': ''
+            });
+            var limitWidth = Math.min(target.clientWidth, parentRect.width);
+            if (target.scrollWidth > limitWidth) {
+                $target.outerWidth(limitWidth).addClass('fixed-width');
+            }
+            var rect = target.getBoundingClientRect();
+            var left = parseInt($target.css('left'));
+            var uid = 'dropdown-menu-' + Date.now();
+            var shift = rect.right - parentRect.right;
+            if (shift > 0) {
+                $target.css({
+                    'left': left - shift + 'px'
+                });
+                // move dropdown triangle to fit to open button
+                $target.attr('data-uid', uid);
+                tools.addCSSRule(
+                    '[data-uid=' + uid + ']:before, [data-uid=' + uid + ']:after',
+                    'margin-left: ' + shift + 'px'
+                );
+            }
         },
 
         /**
