@@ -29,6 +29,8 @@ class EmbedFormController extends Controller
         $response = new Response();
         $response->setPublic();
         $response->setEtag($formEntity->getId() . $formEntity->getUpdatedAt()->format(\DateTime::ISO8601));
+        $this->setCorsHeaders($formEntity, $request, $response);
+
         if ($response->isNotModified($request)) {
             return $response;
         }
@@ -102,5 +104,40 @@ class EmbedFormController extends Controller
         $layoutManager = $this->get('oro_embedded_form.embed_form_layout_manager');
 
         return new Response($layoutManager->getLayout($formEntity)->render());
+    }
+
+    /**
+     * Checks if Origin request header match any of the allowed domains
+     * and set Access-Control-Allow-Origin
+     *
+     * @param EmbeddedForm $formEntity
+     * @param Request $request
+     * @param Response $response
+     */
+    protected function setCorsHeaders(EmbeddedForm $formEntity, Request $request, Response $response)
+    {
+        // skip if not a CORS request
+        if (!$request->headers->has('Origin')
+            || $request->headers->get('Origin') == $request->getSchemeAndHttpHost()
+        ) {
+            return;
+        }
+
+        // skip if no allowed domains
+        $allowedDomains = $formEntity->getAllowedDomains();
+        if (empty($allowedDomains)) {
+            return;
+        }
+
+        $allowedDomains = explode("\n", $allowedDomains);
+        $origin = $request->headers->get('Origin');
+
+        foreach ($allowedDomains as $allowedDomain) {
+            $regexp = '#^https?:\/\/' . str_replace('\*', '.*', preg_quote($allowedDomain, '#')) . '$#i';
+            if ('*' === $allowedDomain || preg_match($regexp, $origin)) {
+                $response->headers->set('Access-Control-Allow-Origin', $origin);
+                break;
+            }
+        }
     }
 }

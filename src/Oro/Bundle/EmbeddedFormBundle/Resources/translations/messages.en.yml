@@ -25,6 +25,13 @@ oro:
             default: Form has been submitted successfully
             description: This message will appear after submitting the form.<br />Use <strong>{back_link|Back link text}</strong> placeholder to add back link to form.
 
+        allowed_domains:
+            label: Allowed Domains
+            default: '*'
+            description: >
+                Allowed cross origin domains where the form can be embedded.
+                Supports wildcard e.g. *.example.com
+
         controller:
             saved_message: Form has been saved successfully
         css:

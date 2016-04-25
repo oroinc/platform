@@ -73,9 +73,16 @@ class EmbeddedForm extends ExtendEmbeddedForm
     /**
      * @var string
      *
-     * @ORM\Column(name="success_message", type="text")
+     * @ORM\Column(name="success_message", type="text", nullable=true)
      */
     protected $successMessage;
+
+    /**
+     * @var string
+     *
+     * @ORM\Column(name="allowed_domains", type="text")
+     */
+    protected $allowedDomains;
 
     /**
      * @var \DateTime $created
@@ -183,6 +190,22 @@ class EmbeddedForm extends ExtendEmbeddedForm
     public function getSuccessMessage()
     {
         return $this->successMessage;
+    }
+
+    /**
+     * @param string $allowedDomains
+     */
+    public function setAllowedDomains($allowedDomains)
+    {
+        $this->allowedDomains = $allowedDomains;
+    }
+
+    /**
+     * @return string
+     */
+    public function getAllowedDomains()
+    {
+        return $this->allowedDomains;
     }
 
     /**
