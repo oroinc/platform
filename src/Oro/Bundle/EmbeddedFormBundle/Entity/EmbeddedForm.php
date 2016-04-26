@@ -73,14 +73,14 @@ class EmbeddedForm extends ExtendEmbeddedForm
     /**
      * @var string
      *
-     * @ORM\Column(name="success_message", type="text", nullable=true)
+     * @ORM\Column(name="success_message", type="text")
      */
     protected $successMessage;
 
     /**
      * @var string
      *
-     * @ORM\Column(name="allowed_domains", type="text")
+     * @ORM\Column(name="allowed_domains", type="text", nullable=true)
      */
     protected $allowedDomains;
 
