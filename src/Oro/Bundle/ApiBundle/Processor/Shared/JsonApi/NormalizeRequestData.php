@@ -12,7 +12,7 @@ use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
- * Converts JSON API data to plain array.
+ * Prepares JSON.API request data to be processed by Symfony Forms.
  */
 class NormalizeRequestData implements ProcessorInterface
 {

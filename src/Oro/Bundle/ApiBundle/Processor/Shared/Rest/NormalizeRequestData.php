@@ -9,7 +9,7 @@ use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 
 /**
- * Converts JSON API data to plain array.
+ * Prepares REST API request data to be processed by Symfony Forms.
  */
 class NormalizeRequestData implements ProcessorInterface
 {
