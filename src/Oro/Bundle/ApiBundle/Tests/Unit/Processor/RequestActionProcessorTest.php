@@ -99,8 +99,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $exception = new \Exception('test exception');
 
-        $error = new Error();
-        $error->setInnerException($exception);
+        $error = Error::createByException($exception);
 
         $processor1 = $this->addProcessor('processor1', 'group1');
         $processor2 = $this->addProcessor('processor2', 'group1');
@@ -131,8 +130,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->getContext();
 
-        $error = new Error();
-        $error->setTitle('some error');
+        $error = Error::create('some error');
 
         $processor1 = $this->addProcessor('processor1', 'group1');
         $processor2 = $this->addProcessor('processor2', 'group1');
@@ -170,8 +168,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $exception = new \Exception('test exception');
 
-        $error = new Error();
-        $error->setInnerException($exception);
+        $error = Error::createByException($exception);
 
         $processor1 = $this->addProcessor('processor1', 'group1');
         $processor2 = $this->addProcessor('processor2', 'group1');
@@ -202,8 +199,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
         $context = $this->getContext();
         $context->setLastGroup('group2');
 
-        $error = new Error();
-        $error->setTitle('some error');
+        $error = Error::create('some error');
 
         $processor1 = $this->addProcessor('processor1', 'group1');
         $processor2 = $this->addProcessor('processor2', 'group1');
@@ -239,9 +235,6 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
 
         $exception = new \Exception('test exception');
 
-        $error = new Error();
-        $error->setInnerException($exception);
-
         $processor1 = $this->addProcessor('processor1', 'group1');
         $processor10 = $this->addProcessor('processor10', RequestActionProcessor::NORMALIZE_RESULT_GROUP);
         $processor11 = $this->addProcessor('processor11', RequestActionProcessor::NORMALIZE_RESULT_GROUP);
@@ -265,8 +258,7 @@ class RequestActionProcessorTest extends \PHPUnit_Framework_TestCase
     {
         $context = $this->getContext();
 
-        $error = new Error();
-        $error->setTitle('some error');
+        $error = Error::create('some error');
 
         $processor1 = $this->addProcessor('processor1', 'group1');
         $processor10 = $this->addProcessor('processor10', RequestActionProcessor::NORMALIZE_RESULT_GROUP);

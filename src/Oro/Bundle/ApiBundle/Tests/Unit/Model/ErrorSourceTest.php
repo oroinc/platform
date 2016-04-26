@@ -6,6 +6,24 @@ use Oro\Bundle\ApiBundle\Model\ErrorSource;
 
 class ErrorSourceTest extends \PHPUnit_Framework_TestCase
 {
+    public function testCreateByPropertyPath()
+    {
+        $source = ErrorSource::createByPropertyPath('test');
+        $this->assertEquals('test', $source->getPropertyPath());
+    }
+
+    public function testCreateByPointer()
+    {
+        $source = ErrorSource::createByPointer('test');
+        $this->assertEquals('test', $source->getPointer());
+    }
+
+    public function testCreateByParameter()
+    {
+        $source = ErrorSource::createByParameter('test');
+        $this->assertEquals('test', $source->getParameter());
+    }
+
     public function testPropertyPath()
     {
         $source = new ErrorSource();

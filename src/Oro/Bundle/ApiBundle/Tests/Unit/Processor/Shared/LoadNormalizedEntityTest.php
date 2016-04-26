@@ -132,8 +132,7 @@ class LoadNormalizedEntityTest extends FormProcessorTestCase
 
     public function testProcessWhenGetActionHasErrors()
     {
-        $getError = new Error();
-        $getError->setTitle('test error');
+        $getError = Error::create('test error');
 
         $getContext = new GetContext($this->configProvider, $this->metadataProvider);
         $getProcessor = $this->getMock('Oro\Component\ChainProcessor\ActionProcessorInterface');

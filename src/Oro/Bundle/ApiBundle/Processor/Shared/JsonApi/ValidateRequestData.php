@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
-use Symfony\Component\HttpFoundation\Response;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Component\PhpUtils\ArrayUtil;
@@ -270,8 +268,8 @@ abstract class ValidateRequestData implements ProcessorInterface
     }
 
     /**
-     * @param string $property
      * @param string $parentPath
+     * @param string $property
      *
      * @return string
      */
@@ -286,13 +284,8 @@ abstract class ValidateRequestData implements ProcessorInterface
      */
     protected function addError($pointer, $message)
     {
-        $error = new Error();
-        $error->setStatusCode(Response::HTTP_BAD_REQUEST);
-        $error->setTitle('request data constraint');
-        $error->setDetail($message);
-        $errorSource = new ErrorSource();
-        $errorSource->setPointer($pointer);
-        $error->setSource($errorSource);
+        $error = Error::createValidationError('request data constraint', $message)
+            ->setSource(ErrorSource::createByPointer($pointer));
 
         $this->context->addError($error);
     }

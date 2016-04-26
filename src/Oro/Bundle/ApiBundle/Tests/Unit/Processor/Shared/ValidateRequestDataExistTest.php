@@ -21,7 +21,7 @@ class ValidateRequestDataExistTest extends FormProcessorTestCase
     {
         $this->processor->process($this->context);
         $this->assertEquals(
-            [$this->createErrorObject('request data constraint', 'The request data should not be empty.')],
+            [Error::createValidationError('request data constraint', 'The request data should not be empty.')],
             $this->context->getErrors()
         );
     }
@@ -31,7 +31,7 @@ class ValidateRequestDataExistTest extends FormProcessorTestCase
         $this->context->setRequestData([]);
         $this->processor->process($this->context);
         $this->assertEquals(
-            [$this->createErrorObject('request data constraint', 'The request data should not be empty.')],
+            [Error::createValidationError('request data constraint', 'The request data should not be empty.')],
             $this->context->getErrors()
         );
     }
@@ -41,21 +41,5 @@ class ValidateRequestDataExistTest extends FormProcessorTestCase
         $this->context->setRequestData(['a' => 'b']);
         $this->processor->process($this->context);
         $this->assertFalse($this->context->hasErrors());
-    }
-
-    /**
-     * @param string $title
-     * @param string $detail
-     *
-     * @return Error
-     */
-    protected function createErrorObject($title, $detail)
-    {
-        $error = new Error();
-        $error->setStatusCode(400);
-        $error->setTitle($title);
-        $error->setDetail($detail);
-
-        return $error;
     }
 }

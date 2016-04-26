@@ -39,8 +39,7 @@ class CompleteErrorsTest extends GetProcessorTestCase
     {
         $metadata = new EntityMetadata();
 
-        $error = new Error();
-        $error->setInnerException(new \Exception('some exception'));
+        $error = Error::createByException(new \Exception('some exception'));
 
         $this->errorCompleter->expects($this->once())
             ->method('complete')
@@ -55,9 +54,8 @@ class CompleteErrorsTest extends GetProcessorTestCase
         $this->context->setMetadata($metadata);
         $this->processor->process($this->context);
 
-        $expectedError = new Error();
-        $expectedError->setInnerException(new \Exception('some exception'));
-        $expectedError->setDetail('some exception');
+        $expectedError = Error::createByException(new \Exception('some exception'))
+            ->setDetail('some exception');
 
         $this->assertEquals([$expectedError], $this->context->getErrors());
     }

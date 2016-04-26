@@ -44,9 +44,7 @@ class RequestActionProcessor extends ActionProcessor
             }
 
             // add an error to the context
-            $error = new Error();
-            $error->setInnerException($e);
-            $context->addError($error);
+            $context->addError(Error::createByException($e));
 
             // go to the "normalize_result" group
             $this->executeNormalizeResultProcessors($context);

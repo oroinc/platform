@@ -34,8 +34,7 @@ class NormalizeErrorsTest extends GetProcessorTestCase
 
     public function testProcess()
     {
-        $error = new Error();
-        $error->setTitle(new Label('error title'));
+        $error = Error::create(new Label('error title'));
 
         $this->translator->expects($this->once())
             ->method('trans')
@@ -45,8 +44,7 @@ class NormalizeErrorsTest extends GetProcessorTestCase
         $this->context->addError($error);
         $this->processor->process($this->context);
 
-        $expectedError = new Error();
-        $expectedError->setTitle('translated error title');
+        $expectedError = Error::create('translated error title');
 
         $this->assertEquals([$expectedError], $this->context->getErrors());
     }

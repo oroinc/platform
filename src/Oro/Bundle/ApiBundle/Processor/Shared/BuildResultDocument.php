@@ -65,8 +65,7 @@ abstract class BuildResultDocument implements ProcessorInterface
     protected function processException(Context $context, \Exception $e)
     {
         $context->setResponseStatusCode(Response::HTTP_INTERNAL_SERVER_ERROR);
-        $error = new Error();
-        $error->setInnerException($e);
+        $error = Error::createByException($e);
         $this->errorCompleter->complete($error);
         $this->documentBuilder->clear();
         $this->documentBuilder->setErrorObject($error);

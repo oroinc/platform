@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
-use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Validator\ConstraintViolation;
 
 use Oro\Component\ChainProcessor\ContextInterface;
@@ -105,34 +104,34 @@ class CollectFormErrors implements ProcessorInterface
      */
     protected function createErrorObject(FormError $formError, $propertyPath = null)
     {
-        $error = new Error();
+        $error = Error::createValidationError($this->getFormErrorTitle($formError), $formError->getMessage());
+        if ($propertyPath) {
+            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
+        }
 
-        $error->setStatusCode(Response::HTTP_BAD_REQUEST);
+        return $error;
+    }
 
+    /**
+     * @param FormError $formError
+     *
+     * @return string
+     */
+    protected function getFormErrorTitle(FormError $formError)
+    {
         $cause = $formError->getCause();
         if ($cause instanceof ConstraintViolation) {
             if ($this->isExtraFieldsConstraint($cause)) {
                 // special case "extra fields" constraint
                 // see comments of "isExtraFieldsConstraint" method for more details
-                $error->setTitle('extra fields constraint');
-            } else {
-                $constraint = $cause->getConstraint();
-                $error->setTitle(ValueNormalizerUtil::humanizeClassName(get_class($constraint), 'Constraint'));
+                return 'extra fields constraint';
             }
-        } else {
-            // undefined constraint type
-            $error->setTitle('form constraint');
+
+            return ValueNormalizerUtil::humanizeClassName(get_class($cause->getConstraint()), 'Constraint');
         }
 
-        $error->setDetail($formError->getMessage());
-
-        if ($propertyPath) {
-            $errorSource = new ErrorSource();
-            $errorSource->setPropertyPath($propertyPath);
-            $error->setSource($errorSource);
-        }
-
-        return $error;
+        // undefined constraint type
+        return 'form constraint';
     }
 
     /**

@@ -198,14 +198,9 @@ class CollectFormErrorsTest extends FormProcessorTestCase
      */
     protected function createErrorObject($title, $detail, $propertyPath)
     {
-        $error = new Error();
-        $error->setStatusCode(400);
-        $error->setTitle($title);
-        $error->setDetail($detail);
+        $error = Error::createValidationError($title, $detail);
         if ($propertyPath) {
-            $errorSource = new ErrorSource();
-            $errorSource->setPropertyPath($propertyPath);
-            $error->setSource($errorSource);
+            $error->setSource(ErrorSource::createByPropertyPath($propertyPath));
         }
 
         return $error;

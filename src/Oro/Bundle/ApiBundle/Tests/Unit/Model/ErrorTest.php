@@ -8,12 +8,34 @@ use Oro\Bundle\ApiBundle\Model\Label;
 
 class ErrorTest extends \PHPUnit_Framework_TestCase
 {
+    public function testCreate()
+    {
+        $error = Error::create('title', 'detail');
+        $this->assertEquals('title', $error->getTitle());
+        $this->assertEquals('detail', $error->getDetail());
+    }
+
+    public function testCreateValidationError()
+    {
+        $error = Error::createValidationError('title', 'detail');
+        $this->assertEquals(400, $error->getStatusCode());
+        $this->assertEquals('title', $error->getTitle());
+        $this->assertEquals('detail', $error->getDetail());
+    }
+
+    public function testCreateByException()
+    {
+        $exception = new \Exception();
+        $error = Error::createByException($exception);
+        $this->assertSame($exception, $error->getInnerException());
+    }
+
     public function testStatusCode()
     {
         $error = new Error();
         $this->assertNull($error->getStatusCode());
 
-        $error->setStatusCode(400);
+        $this->assertSame($error, $error->setStatusCode(400));
         $this->assertEquals(400, $error->getStatusCode());
     }
 
@@ -22,7 +44,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
         $error = new Error();
         $this->assertNull($error->getCode());
 
-        $error->setCode('test');
+        $this->assertSame($error, $error->setCode('test'));
         $this->assertEquals('test', $error->getCode());
     }
 
@@ -31,7 +53,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
         $error = new Error();
         $this->assertNull($error->getTitle());
 
-        $error->setTitle('test');
+        $this->assertSame($error, $error->setTitle('test'));
         $this->assertEquals('test', $error->getTitle());
     }
 
@@ -40,7 +62,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
         $error = new Error();
         $this->assertNull($error->getDetail());
 
-        $error->setDetail('test');
+        $this->assertSame($error, $error->setDetail('test'));
         $this->assertEquals('test', $error->getDetail());
     }
 
@@ -50,7 +72,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($error->getSource());
 
         $source = new ErrorSource();
-        $error->setSource($source);
+        $this->assertSame($error, $error->setSource($source));
         $this->assertSame($source, $error->getSource());
 
         $error->setSource(null);
@@ -63,7 +85,7 @@ class ErrorTest extends \PHPUnit_Framework_TestCase
         $this->assertNull($error->getInnerException());
 
         $exception = new \Exception();
-        $error->setInnerException($exception);
+        $this->assertSame($error, $error->setInnerException($exception));
         $this->assertSame($exception, $error->getInnerException());
 
         $error->setInnerException(null);

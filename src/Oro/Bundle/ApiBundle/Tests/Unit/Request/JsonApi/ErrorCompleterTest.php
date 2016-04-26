@@ -184,10 +184,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
     public function testCompleteErrorWithPropertyPathAndDetailEndsWithPoint()
     {
         $error = new Error();
-        $errorSource = new ErrorSource();
-        $errorSource->setPropertyPath('property');
         $error->setDetail('test detail.');
-        $error->setSource($errorSource);
+        $error->setSource(ErrorSource::createByPropertyPath('property'));
 
         $expectedError = new Error();
         $expectedError->setDetail('test detail. Source: property.');
@@ -202,10 +200,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
     public function testCompleteErrorWithPropertyPathButWithoutMetadata($property, $expectedResult)
     {
         $error = new Error();
-        $errorSource = new ErrorSource();
-        $errorSource->setPropertyPath($property);
         $error->setDetail('test detail');
-        $error->setSource($errorSource);
+        $error->setSource(ErrorSource::createByPropertyPath($property));
 
         $expectedError = new Error();
         if (array_key_exists('detail', $expectedResult)) {
@@ -252,10 +248,8 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
     public function testCompleteErrorWithPropertyPath($property, $expectedResult)
     {
         $error = new Error();
-        $errorSource = new ErrorSource();
-        $errorSource->setPropertyPath($property);
         $error->setDetail('test detail');
-        $error->setSource($errorSource);
+        $error->setSource(ErrorSource::createByPropertyPath($property));
 
         $expectedError = new Error();
         if (array_key_exists('detail', $expectedResult)) {

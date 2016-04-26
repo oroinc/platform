@@ -17,6 +17,54 @@ class ErrorSource
     protected $parameter;
 
     /**
+     * Creates an instance of ErrorSource class represents
+     * the path to a property caused the error.
+     *
+     * @param string $propertyPath
+     *
+     * @return ErrorSource
+     */
+    public static function createByPropertyPath($propertyPath)
+    {
+        $source = new self();
+        $source->setPropertyPath($propertyPath);
+
+        return $source;
+    }
+
+    /**
+     * Creates an instance of ErrorSource class represents
+     * a pointer to a property in the request document caused the error.
+     *
+     * @param string $pointer
+     *
+     * @return ErrorSource
+     */
+    public static function createByPointer($pointer)
+    {
+        $source = new self();
+        $source->setPointer($pointer);
+
+        return $source;
+    }
+
+    /**
+     * Creates an instance of ErrorSource class represents
+     * URI query parameter caused the error.
+     *
+     * @param string $parameter
+     *
+     * @return ErrorSource
+     */
+    public static function createByParameter($parameter)
+    {
+        $source = new self();
+        $source->setParameter($parameter);
+
+        return $source;
+    }
+
+    /**
      * Gets the path to a property caused the error.
      * e.g. "title", or "author.name"
      *
