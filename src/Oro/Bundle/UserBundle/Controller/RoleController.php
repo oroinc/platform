@@ -72,7 +72,7 @@ class RoleController extends Controller
      */
     public function updateFieldAction(Role $entity, $className)
     {
-        $className = str_replace('_', '\\', $className);
+        $className = $this->get('oro_entity.entity_class_name_helper')->resolveEntityClass($className);
         $aclRoleHandler = $this->get('oro_user.form.handler.acl_role');
         $aclRoleHandler->setAclPrivilegeRepository($this->get('oro_security.acl.field_privilege_repository'));
 
