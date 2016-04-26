@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\FormBundle\Form\DataTransformer;
 
-use Doctrine\ORM\EntityManager;
-
 use Symfony\Component\Form\Exception\InvalidConfigurationException;
 use Symfony\Component\Form\Exception\UnexpectedTypeException;
 
@@ -21,7 +19,7 @@ class EntityCreationTransformer extends EntityToIdTransformer
     /**
      * Path where the value for new entity is stored in passed data
      *
-     * @var null|string
+     * @var string|null
      */
     protected $valuePath;
 
@@ -31,16 +29,6 @@ class EntityCreationTransformer extends EntityToIdTransformer
      * @var bool
      */
     protected $allowEmptyProperty = false;
-
-    /**
-     * {@inheritdoc}
-     */
-    public function __construct(EntityManager $em, $className, $property = null, $queryBuilderCallback = null)
-    {
-        $property = $this->getIdPropertyPathFromEntityManager($em, $className);
-        $property = sprintf('[%s]', $property);
-        parent::__construct($em, $className, $property, $queryBuilderCallback);
-    }
 
     /**
      * @param string $newEntityPropertyName
@@ -77,6 +65,9 @@ class EntityCreationTransformer extends EntityToIdTransformer
             $data = json_decode($value, true);
             if (!$data) {
                 throw new UnexpectedTypeException($value, 'json encoded string');
+            }
+            if (is_scalar($data)) {
+                $data = [$this->property => $data];
             }
             $id = $this->propertyAccessor->getValue($data, $this->propertyPath);
 
