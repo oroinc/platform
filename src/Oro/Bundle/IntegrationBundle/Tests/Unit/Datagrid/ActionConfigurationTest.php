@@ -18,9 +18,11 @@ class ActionConfigurationTest extends \PHPUnit_Framework_TestCase
             'editMode' => Channel::EDIT_MODE_ALLOW
         ]));
 
-        $this->assertEquals([
+        $expected = [
             'activate' => false,
-        ], $result);
+            'delete'   => true
+        ];
+        $this->assertEquals($expected, $result);
     }
 
     public function testShouldReturnConfigForDisabledChannel()
@@ -34,42 +36,12 @@ class ActionConfigurationTest extends \PHPUnit_Framework_TestCase
             'editMode' => Channel::EDIT_MODE_ALLOW
         ]));
 
-        $this->assertEquals([
+        $expected = [
             'deactivate' => false,
-            'schedule' => false,
-        ], $result);
-    }
-
-    public function testShouldReturnConfigForEditModeAllow()
-    {
-        $configuration = new ActionConfiguration();
-
-        $callable = $configuration->getIsSyncAvailableCondition();
-
-        $result = $callable(new ResultRecord([
-            'enabled' => 'enabled',
-            'editMode' => Channel::EDIT_MODE_ALLOW
-        ]));
-
-        $this->assertEquals([
-            'activate' => false,
-        ], $result);
-    }
-
-    public function testShouldReturnConfigForEditModeForceAllow()
-    {
-        $configuration = new ActionConfiguration();
-
-        $callable = $configuration->getIsSyncAvailableCondition();
-
-        $result = $callable(new ResultRecord([
-            'enabled' => 'enabled',
-            'editMode' => Channel::EDIT_MODE_FORCED_ALLOW
-        ]));
-
-        $this->assertEquals([
-            'activate' => false,
-        ], $result);
+            'schedule'   => false,
+            'delete'     => true
+        ];
+        $this->assertEquals($expected, $result);
     }
 
     public function testShouldReturnConfigForEditModeDisallow()

@@ -51,6 +51,9 @@ class Channel
     const EDIT_MODE_RESTRICTED = 2;
     const EDIT_MODE_DISALLOW = 1;
 
+    const ENABLED  = true;
+    const DISABLED = false;
+
     /**
      * @var integer
      *

@@ -19,6 +19,9 @@ class EditModeUtils
     }
 
     /**
+     * System use three edit mods and disallow to change edit mode
+     * if edit mode set with another mode
+     *
      * @param Integration $integration
      * @param int         $newEditMode
      *

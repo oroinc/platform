@@ -67,7 +67,7 @@ class IntegrationController extends FOSRestController
             $this->view(
                 [
                     'message'    => $this->get('translator')->trans('oro.integration.notification.channel.activated'),
-                    'successful' => true,
+                    'success' => true,
                 ],
                 Codes::HTTP_OK
             )
@@ -113,7 +113,7 @@ class IntegrationController extends FOSRestController
             $this->view(
                 [
                     'message'    => $this->get('translator')->trans('oro.integration.notification.channel.deactivated'),
-                    'successful' => true,
+                    'success' => true,
                 ],
                 Codes::HTTP_OK
             )
