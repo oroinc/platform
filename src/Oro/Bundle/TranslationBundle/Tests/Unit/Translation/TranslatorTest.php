@@ -207,7 +207,6 @@ class TranslatorTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @param array $fallbackLocales
-     * @param array $allFallbackLocales
      * @return TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject
      */
     protected function getStrategyProvider(array $fallbackLocales = [])
