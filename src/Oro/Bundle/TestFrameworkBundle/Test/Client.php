@@ -129,22 +129,7 @@ class Client extends BaseClient
      */
     public function requestGrid($gridParameters, $filter = array(), $isRealRequest = false)
     {
-        if (is_string($gridParameters)) {
-            $gridName = $gridParameters;
-            $gridParameters = ['gridName' => $gridName];
-        } else {
-            $gridName = $gridParameters['gridName'];
-        }
-
-        //transform parameters to nested array
-        $parameters = [];
-        foreach ($filter as $param => $value) {
-            $param .= '=' . $value;
-            parse_str($param, $output);
-            $parameters = array_merge_recursive($parameters, $output);
-        }
-
-        $gridParameters = array_merge_recursive($gridParameters, $parameters);
+        list($gridName, $gridParameters) = $this->parseGridParameters($gridParameters, $filter);
 
         if ($isRealRequest) {
             $this->request(
@@ -187,6 +172,31 @@ class Client extends BaseClient
                 }
             }
         }
+    }
+
+    /**
+     * @param array|string $gridParameters
+     * @param array $filter
+     * @return array ['<gridNameString>', <gridParametersArray>]
+     */
+    protected function parseGridParameters($gridParameters, $filter = array())
+    {
+        if (is_string($gridParameters)) {
+            $gridName = $gridParameters;
+            $gridParameters = ['gridName' => $gridName];
+        } else {
+            $gridName = $gridParameters['gridName'];
+        }
+
+        //transform parameters to nested array
+        $parameters = [];
+        foreach ($filter as $param => $value) {
+            $param .= '=' . $value;
+            parse_str($param, $output);
+            $parameters = array_merge_recursive($parameters, $output);
+        }
+
+        return [$gridName, array_merge_recursive($gridParameters, $parameters)];
     }
 
     /**
