@@ -270,6 +270,8 @@ services:
 
     oro_security.form.type.object_label_type:
         class: %oro_security.type.oro_acl_label.class%
+        arguments:
+            - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: form.type, alias: oro_acl_label }
 
