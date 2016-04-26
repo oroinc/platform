@@ -39,6 +39,11 @@ class Client extends BaseClient
     protected $loadedFixtures;
 
     /**
+     * @var bool
+     */
+    protected $isHashNavigation = false;
+
+    /**
      * {@inheritdoc}
      */
     public function request(
@@ -235,6 +240,14 @@ class Client extends BaseClient
     }
 
     /**
+     * @param bool $flag
+     */
+    public function useHashNavigation($flag)
+    {
+        $this->isHashNavigation = $flag;
+    }
+
+    /**
      * @param null|array $content
      * @return bool
      */
@@ -249,7 +262,7 @@ class Client extends BaseClient
      */
     protected function isContentResponse($content)
     {
-        return $content && array_key_exists('content', $content);
+        return $content && is_array($content) && array_key_exists('content', $content);
     }
 
     /**
@@ -270,7 +283,9 @@ class Client extends BaseClient
     {
         $isWidget = !empty($parameters['_widgetContainer']) || strpos($uri, '_widgetContainer=') !== false;
 
-        return !$isWidget && !array_key_exists($this->getHashNavigationHeader(), $server);
+        return $this->isHashNavigation
+            && !$isWidget
+            && !array_key_exists($this->getHashNavigationHeader(), $server);
     }
 
     /**
@@ -308,10 +323,13 @@ class Client extends BaseClient
 
         $html =
             '<html>
-                <head><title>%s</title></head>
+                <head>
+                    <title>%s</title>
+                    <script id="page-title" type="text/html">%s</script>
+                </head>
                 <body>%s%s</body>
             </html>';
 
-        return sprintf($html, $title, $flashMessages, $content['content']);
+        return sprintf($html, $title, $title, $flashMessages, $content['content']);
     }
 }
