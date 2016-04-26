@@ -2,8 +2,8 @@
 
 namespace Oro\Bundle\QueryDesignerBundle\QueryDesigner;
 
-use Oro\Bundle\DataGridBundle\Common\ObjectCompatible;
+use Oro\Bundle\DataGridBundle\Common\DataObject;
 
-class ConfigurationObject extends ObjectCompatible
+class ConfigurationObject extends DataObject
 {
 }
