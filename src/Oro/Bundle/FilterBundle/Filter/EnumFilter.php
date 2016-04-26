@@ -4,12 +4,16 @@ namespace Oro\Bundle\FilterBundle\Filter;
 
 use Symfony\Component\Form\FormFactoryInterface;
 
+use Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\FilterBundle\Form\Type\Filter\EnumFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
 class EnumFilter extends BaseMultiChoiceFilter
 {
+    /** @var DictionaryApiEntityManager */
+    protected $dictionaryApiEntityManager;
+
     /**
      * Constructor
      *
@@ -18,9 +22,11 @@ class EnumFilter extends BaseMultiChoiceFilter
      */
     public function __construct(
         FormFactoryInterface $factory,
-        FilterUtility $util
+        FilterUtility $util,
+        DictionaryApiEntityManager $dictionaryApiEntityManager
     ) {
         parent::__construct($factory, $util);
+        $this->dictionaryApiEntityManager = $dictionaryApiEntityManager;
     }
 
     /**
@@ -42,6 +48,24 @@ class EnumFilter extends BaseMultiChoiceFilter
             unset($params['enum_code']);
         }
         parent::init($name, $params);
+    }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getMetadata()
+    {
+        $metadata = parent::getMetadata();
+        if ($metadata['class']) {
+            $this->dictionaryApiEntityManager->setClass(
+                $this->dictionaryApiEntityManager->resolveEntityClass($metadata['class'], true)
+            );
+            $metadata['initialData'] = $this->dictionaryApiEntityManager->findValueByPrimaryKey(
+                $this->getForm()->get('value')->getData()
+            );
+        }
+
+        return $metadata;
     }
 
     /**

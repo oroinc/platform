@@ -9,7 +9,6 @@ define(function(require) {
     var ChoiceFilter = require('oro/filter/choice-filter');
     var messenger = require('oroui/js/messenger');
     require('jquery.select2');
-    var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
 
     /**
      * Multiple select filter: filter values as multiple select options
@@ -60,6 +59,8 @@ define(function(require) {
 
         isInitSelect2: false,
 
+        previousData: [],
+
         /**
          * @inheritDoc
          */
@@ -79,6 +80,10 @@ define(function(require) {
         reset: function() {
             DictionaryFilter.__super__.reset.apply(this, arguments);
             var select2element = this.$el.find(this.elementSelector);
+            var data = select2element.select2('data');
+            if (data.length) {
+                this.previousData = data;
+            }
             select2element.select2('data',  null);
         },
 
@@ -89,21 +94,6 @@ define(function(require) {
             this.renderDeferred = $.Deferred();
             this._wrap('');
             if (this.$el.html() === '') {
-                this._renderCriteria();
-            }
-        },
-
-        /**
-         * @inheritDoc
-         */
-        setValue: function(value) {
-            DictionaryFilter.__super__.setValue.apply(this, arguments);
-
-            if (!this._criteriaRenderd && value) {
-                this.subview('loading', new LoadingMaskView({
-                    container: this.$el
-                }));
-                this.subview('loading').show();
                 this._renderCriteria();
             }
         },
@@ -130,10 +120,6 @@ define(function(require) {
                     self._writeDOMValue(self.value);
                     self.applySelect2();
                     self.renderDeferred.resolve();
-                    self._updateCriteriaHint();
-                    if (self.subview('loading')) {
-                        self.subview('loading').hide();
-                    }
                 },
                 error: function(jqXHR) {
                     messenger.showErrorMessage(__('Sorry, unexpected error was occurred'), jqXHR.responseJSON);
@@ -355,11 +341,10 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            if (!this._criteriaRenderd) {
-                return '';
-            }
-
             var data = this.$(this.elementSelector).select2('data');
+            if (!data.length) {
+                data = this.previousData.length ? this.previousData : this.initialData;
+            }
             var hintRawValue = _.isObject(_.first(value.value)) ?
                 _.map(value.value, _.property('text')) :
                 _.chain(value.value)
@@ -376,6 +361,14 @@ define(function(require) {
             var hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
 
             return (option ? option.label + ' ' : '') + hintValue;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _hideCriteria: function() {
+            this.$el.find(this.elementSelector).select2('close');
+            DictionaryFilter.__super__._hideCriteria.apply(this, arguments);
         }
     });
 
