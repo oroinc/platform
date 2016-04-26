@@ -18,5 +18,9 @@ oro:
             access_denied: You don't have access to organization "%organization_name%"
         permissions: Action Permissions
         field_acl:
-            is_enabled.label:             Field Level ACL
-            show_restricted_fields.label: Show restricted
+            is_enabled:
+                label:   Field Level ACL
+                tooltip: Enables Field level access check for entity
+            show_restricted_fields:
+                label:   Show restricted
+                tooltip: If Field Level ACL enabled and user have no access to field, on create and edit pages this field will be shown as disabled field.
