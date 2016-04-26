@@ -45,10 +45,10 @@ class MonthNthStrategy implements StrategyInterface
 
         if ($start > $occurrenceDate) {
             $dateInterval = $start->diff($occurrenceDate);
-            $fromStartInterval = intval($dateInterval->format('%y')) * 12 + intval($dateInterval->format('m'));
+            $fromStartInterval = intval($dateInterval->format('%y')) * 12 + intval($dateInterval->format('%m'));
             $fromStartInterval = floor($fromStartInterval / $interval);
             $occurrenceDate = $this->getNextOccurrence(
-                $fromStartInterval * $interval,
+                $fromStartInterval++ * $interval,
                 $dayOfWeek,
                 $instance,
                 $occurrenceDate
@@ -60,7 +60,9 @@ class MonthNthStrategy implements StrategyInterface
             && $occurrenceDate <= $end
             && (is_null($occurrences) || $fromStartInterval <= $occurrences)
         ) {
-            $result[] = $occurrenceDate;
+            if ($occurrenceDate >= $start) {
+                $result[] = $occurrenceDate;
+            }
             $fromStartInterval++;
             $occurrenceDate = $this->getNextOccurrence($interval, $dayOfWeek, $instance, $occurrenceDate);
         }

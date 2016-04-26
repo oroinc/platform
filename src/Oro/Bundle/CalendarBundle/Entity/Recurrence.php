@@ -58,7 +58,7 @@ class Recurrence
     /**
      * @var int
      *
-     * @ORM\Column(name="interval", type="integer")
+     * @ORM\Column(name="`interval`", type="integer")
      */
     protected $interval;
 

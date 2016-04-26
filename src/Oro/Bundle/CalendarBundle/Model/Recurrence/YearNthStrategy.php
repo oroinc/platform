@@ -50,7 +50,7 @@ class YearNthStrategy implements StrategyInterface
             $fromStartInterval = intval($dateInterval->format('%y')) * 12 + intval($dateInterval->format('m'));
             $fromStartInterval = floor($fromStartInterval / $interval);
             $occurrenceDate = $this->getNextOccurrence(
-                $fromStartInterval * $interval,
+                $fromStartInterval++ * $interval,
                 $dayOfWeek,
                 $monthOfYear,
                 $instance,
@@ -63,7 +63,9 @@ class YearNthStrategy implements StrategyInterface
             && $occurrenceDate <= $end
             && (is_null($occurrences) || $fromStartInterval <= $occurrences)
         ) {
-            $result[] = $occurrenceDate;
+            if ($occurrenceDate >= $start) {
+                $result[] = $occurrenceDate;
+            }
             $fromStartInterval++;
             $occurrenceDate = $this->getNextOccurrence($interval, $dayOfWeek, $monthOfYear, $instance, $occurrenceDate);
         }

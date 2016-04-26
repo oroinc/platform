@@ -20,7 +20,7 @@ class MonthlyStrategy implements StrategyInterface
             $dateInterval = $start->diff($occurrenceDate);
             $fromStartInterval = intval($dateInterval->format('%y')) * 12 + intval($dateInterval->format('m'));
             $fromStartInterval = floor($fromStartInterval / $interval);
-            $occurrenceDate = $this->getNextOccurrence($fromStartInterval * $interval, $occurrenceDate);
+            $occurrenceDate = $this->getNextOccurrence($fromStartInterval++ * $interval, $occurrenceDate);
         }
 
         $occurrences = $recurrence->getOccurrences();
@@ -28,7 +28,9 @@ class MonthlyStrategy implements StrategyInterface
             && $occurrenceDate <= $end
             && (is_null($occurrences) || $fromStartInterval <= $occurrences)
         ) {
-            $result[] = $occurrenceDate;
+            if ($occurrenceDate >= $start) {
+                $result[] = $occurrenceDate;
+            }
             $fromStartInterval++;
             $occurrenceDate = $this->getNextOccurrence($interval, $occurrenceDate);
         }

@@ -17,8 +17,10 @@ class DailyStrategy implements StrategyInterface
         if ($start > $occurrenceDate) {
             $dateInterval = $start->diff($occurrenceDate);
             $fromStartInterval = floor($dateInterval->format('%a') / $recurrence->getInterval());
-            $fromStartInterval = $dateInterval->format('%r%h') < 0 ? $fromStartInterval + 1 : $fromStartInterval;
-            $occurrenceDate = $this->getNextOccurrence($fromStartInterval * $recurrence->getInterval(), $occurrenceDate);
+            $occurrenceDate = $this->getNextOccurrence(
+                $fromStartInterval++ * $recurrence->getInterval(),
+                $occurrenceDate
+            );
         }
 
         $occurrences = $recurrence->getOccurrences();

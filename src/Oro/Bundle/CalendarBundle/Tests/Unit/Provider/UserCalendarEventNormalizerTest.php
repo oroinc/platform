@@ -54,9 +54,8 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('getArrayResult')
             ->will($this->returnValue($events));
 
-        $this->setGetInvitedUsersExpectations($invitees, $expectedParentEventIds);
-
         if (!empty($events)) {
+            $this->setGetInvitedUsersExpectations($invitees, $expectedParentEventIds);
             $this->securityFacade->expects($this->exactly(2))
                 ->method('isGranted')
                 ->will(
