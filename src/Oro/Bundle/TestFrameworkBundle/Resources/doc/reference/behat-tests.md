@@ -31,7 +31,7 @@ It has fast and native support for various web standards: DOM handling, CSS sele
 Install behat dependencies:
 
 ```php
-require behat/behat:3.1.0 behat/mink-extension:^2.0 behat/mink-selenium2-driver:1.* sensiolabs/behat-page-object-extension:dev-master bossa/phpspec2-expect:~1.0 behat/symfony2-extension:2.1.1
+composer require behat/behat:3.1.0 behat/mink-extension:^2.0 behat/mink-selenium2-driver:1.* sensiolabs/behat-page-object-extension:dev-master bossa/phpspec2-expect:~1.0 behat/symfony2-extension:2.1.1
 ```
 
 ### Run tests
