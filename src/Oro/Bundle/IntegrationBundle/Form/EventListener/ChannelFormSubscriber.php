@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Form\EventListener;
 
 use Doctrine\Common\Util\Inflector;
 
+use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
@@ -298,12 +299,9 @@ class ChannelFormSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($integration->getEditMode() !== Integration::EDIT_MODE_ALLOW) {
+        if (!EditModeUtils::isEditAllowed($integration->getEditMode())) {
             // disable type field
             FormUtils::replaceField($form, 'type', ['disabled' => true]);
-        }
-
-        if (Integration::EDIT_MODE_DISALLOW === $integration->getEditMode()) {
             FormUtils::replaceField($form, 'connectors', ['disabled' => true, 'attr' => ['class' => 'hide']]);
         }
     }
