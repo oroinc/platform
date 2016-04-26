@@ -83,19 +83,15 @@ class EntityToIdTransformer implements DataTransformerInterface
     protected function humanizeEntityId($entityId)
     {
         if (is_array($entityId)) {
-            return sprintf(
-                'array(%s)',
-                implode(
-                    ', ',
-                    array_map(
-                        function ($key, $value) {
-                            return sprintf('%s = %s', $key, $value);
-                        },
-                        array_keys($entityId),
-                        $entityId
-                    )
-                )
+            $elements = array_map(
+                function ($key, $value) {
+                    return sprintf('%s = %s', $key, $value);
+                },
+                array_keys($entityId),
+                $entityId
             );
+
+            return sprintf('array(%s)', implode(', ', $elements));
         }
 
         return (string)$entityId;
