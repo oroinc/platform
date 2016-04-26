@@ -150,6 +150,7 @@ oro:
             has_role.label: Has role
             clone.label: 'Copy of %name%'
             clone: 'Clone'
+            extend_description.label: Description
         invite:
             label: Send an Email Invitation
         privileges:

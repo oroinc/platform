@@ -46,6 +46,8 @@
         {% set value %}
             {{ value|nl2br }}
         {% endset %}
+    {% elseif type == 'html' %}
+        {{ value|default('N/A'|trans)|raw }}
     {% elseif type == 'boolean' %}
         {% set value = value ? 'Yes'|trans : 'No'|trans %}
     {% elseif type == 'money' %}
@@ -71,7 +73,9 @@
         {% endset %}
     {% endif %}
 
-    {{ value|default('N/A'|trans) }}
+    {% if type != 'html' %}
+        {{ value|default('N/A'|trans) }}
+    {% endif %}
 {% endmacro %}
 
 {% macro renderField(value) %}
