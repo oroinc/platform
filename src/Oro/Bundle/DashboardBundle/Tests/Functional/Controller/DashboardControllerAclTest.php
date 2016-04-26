@@ -17,6 +17,7 @@ class DashboardControllerAclTest extends WebTestCase
             [],
             $this->generateBasicAuthHeader(LoadUserData::USER_NAME, LoadUserData::USER_PASSWORD)
         );
+        $this->client->useHashNavigation(true);
         $this->loadFixtures(
             array(
                 'Oro\Bundle\DashboardBundle\Tests\Functional\Controller\DataFixtures\LoadUserData'
