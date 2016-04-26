@@ -4,6 +4,7 @@ namespace Oro\Bundle\IntegrationBundle\Controller\Api\Rest;
 
 use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler;
+use Oro\Bundle\IntegrationBundle\Utils\EditModeUtils;
 use Symfony\Component\HttpFoundation\Response;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -50,6 +51,9 @@ class IntegrationController extends FOSRestController
         /** @var Channel $integration */
         $integration = $this->getManager()->find($id);
 
+        if (!EditModeUtils::isSwitchEnableAllowed($integration->getEditMode())) {
+            return $this->handleView($this->view(null, Codes::HTTP_BAD_REQUEST));
+        }
         $integration->setPreviouslyEnabled($integration->isEnabled());
         $integration->setEnabled(true);
 
@@ -95,7 +99,9 @@ class IntegrationController extends FOSRestController
     {
         /** @var Channel $integration */
         $integration = $this->getManager()->find($id);
-
+        if (!EditModeUtils::isSwitchEnableAllowed($integration->getEditMode())) {
+            return $this->handleView($this->view(null, Codes::HTTP_BAD_REQUEST));
+        }
         $integration->setPreviouslyEnabled($integration->isEnabled());
         $integration->setEnabled(false);
 
@@ -139,7 +145,7 @@ class IntegrationController extends FOSRestController
             return $this->handleView($this->view(null, Codes::HTTP_NOT_FOUND));
         }
 
-        if ($entity->getEditMode() === $entity::EDIT_MODE_DISALLOW) {
+        if (!EditModeUtils::isEditAllowed($entity->getEditMode())) {
             return $this->handleView($this->view(null, Codes::HTTP_BAD_REQUEST));
         }
 
