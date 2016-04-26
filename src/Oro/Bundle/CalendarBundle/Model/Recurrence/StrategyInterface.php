@@ -14,6 +14,8 @@ interface StrategyInterface
      * @param \DateTime $end
      *
      * @return \DateTime[]
+     *
+     * @throws \InvalidArgumentException
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end);
 
@@ -22,7 +24,7 @@ interface StrategyInterface
      *
      * @param Recurrence $recurrence
      *
-     * @return mixed
+     * @return bool
      */
     public function supports(Recurrence $recurrence);
 
@@ -38,7 +40,7 @@ interface StrategyInterface
      *
      * @param Recurrence $recurrence
      *
-     * @return mixed
+     * @return string
      */
     public function getRecurrencePattern(Recurrence $recurrence);
 }

@@ -23,7 +23,7 @@ class WeeklyStrategy implements StrategyInterface
             $date1 = new \DateTime($item1);
             $date2 = new \DateTime($item2);
 
-            if ($date1->format('w') == $date2->format('w')) {
+            if ($date1->format('w') === $date2->format('w')) {
                 return 0;
             }
 
@@ -37,11 +37,11 @@ class WeeklyStrategy implements StrategyInterface
         $fullWeeks = 0;
         if ($start > $startTime) {
             $dateInterval = $start->diff($startTime);
-            $fromStartInterval = floor((intval($dateInterval->format('%a')) + 1) / 7 / $interval) * count($weekDays);
+            $fromStartInterval = floor(((int)$dateInterval->format('%a') + 1) / 7 / $interval) * count($weekDays);
             foreach ($weekDays as $day) {
                 $currentDay = new \DateTime($day);
                 if ($currentDay->format('w') < $recurrence->getStartTime()->format('w')) {
-                    $fromStartInterval = $fromStartInterval == 0 ? $fromStartInterval : $fromStartInterval - 1;
+                    $fromStartInterval = $fromStartInterval === 0 ? $fromStartInterval : $fromStartInterval - 1;
                 }
             }
             $fullWeeks = ceil($fromStartInterval / count($weekDays)) * $interval;
@@ -52,16 +52,16 @@ class WeeklyStrategy implements StrategyInterface
         while ($afterFullWeeksDate <= $end && $afterFullWeeksDate <= $recurrence->getEndTime()) {
             foreach ($weekDays as $day) {
                 $next = $this->getNextOccurrence($day, $afterFullWeeksDate);
-                if ($next > $recurrence->getEndTime()
-                    || $next > $end
+                if ($next > $end
+                    || $next > $recurrence->getEndTime()
                     || ($recurrence->getOccurrences() && $fromStartInterval >= $recurrence->getOccurrences())
                 ) {
                     return $result;
                 }
 
-                if ($next >= $recurrence->getStartTime()
-                    && $next >= $start
+                if ($next >= $start
                     && $next <= $end
+                    && $next >= $recurrence->getStartTime()
                     && $next <= $recurrence->getEndTime()
                 ) {
                     $result[] = $next;
@@ -110,7 +110,7 @@ class WeeklyStrategy implements StrategyInterface
      */
     protected function getNextOccurrence($day, \DateTime $date)
     {
-        if (strtolower($date->format('l')) == strtolower($day)) {
+        if (strtolower($date->format('l')) === strtolower($day)) {
             return $date;
         }
 

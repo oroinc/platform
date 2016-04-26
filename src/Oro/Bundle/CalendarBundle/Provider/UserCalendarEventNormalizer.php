@@ -4,15 +4,14 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Doctrine\ORM\AbstractQuery;
 
-use Oro\Component\PropertyAccess\PropertyAccessor;
-use Oro\Component\PhpUtils\ArrayUtil;
-
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
-use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Component\PhpUtils\ArrayUtil;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 {

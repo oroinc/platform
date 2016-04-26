@@ -6,7 +6,7 @@ use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
 class DelegateStrategy implements StrategyInterface
 {
-    /** @var StrategyInterface */
+    /** @var StrategyInterface[] */
     protected $elements = [];
 
     /**

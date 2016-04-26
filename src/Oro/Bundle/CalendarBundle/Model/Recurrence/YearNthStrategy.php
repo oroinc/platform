@@ -47,7 +47,7 @@ class YearNthStrategy implements StrategyInterface
 
         if ($start > $occurrenceDate) {
             $dateInterval = $start->diff($occurrenceDate);
-            $fromStartInterval = intval($dateInterval->format('%y')) * 12 + intval($dateInterval->format('m'));
+            $fromStartInterval = (int)$dateInterval->format('%y') * 12 + (int)$dateInterval->format('m');
             $fromStartInterval = floor($fromStartInterval / $interval);
             $occurrenceDate = $this->getNextOccurrence(
                 $fromStartInterval++ * $interval,
@@ -61,7 +61,7 @@ class YearNthStrategy implements StrategyInterface
         $occurrences = $recurrence->getOccurrences();
         while ($occurrenceDate <= $recurrence->getEndTime()
             && $occurrenceDate <= $end
-            && (is_null($occurrences) || $fromStartInterval <= $occurrences)
+            && ($occurrences === null || $fromStartInterval <= $occurrences)
         ) {
             if ($occurrenceDate >= $start) {
                 $result[] = $occurrenceDate;
@@ -120,6 +120,6 @@ class YearNthStrategy implements StrategyInterface
             $nextDays[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
         }
 
-        return $instance == Recurrence::INSTANCE_LAST ? max ($nextDays) : min($nextDays);
+        return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
     }
 }

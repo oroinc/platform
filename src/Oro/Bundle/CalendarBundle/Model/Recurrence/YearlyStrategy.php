@@ -4,7 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
-class YearlyStrategy extends MonthlyStrategy implements StrategyInterface
+class YearlyStrategy extends MonthlyStrategy
 {
     /**
      * {@inheritdoc}
