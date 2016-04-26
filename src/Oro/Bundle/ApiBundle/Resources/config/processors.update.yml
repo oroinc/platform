@@ -99,10 +99,18 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: 90 }
 
+    oro_api.update.rest.normalize_request_data:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData
+        arguments:
+            - '@oro_api.rest.entity_id_transformer'
+        tags:
+            - { name: oro.api.processor, action: update, group: normalize_input, requestType: rest&!json_api, priority: -50 }
+
     oro_api.update.json_api.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData
         arguments:
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: update, group: normalize_input, requestType: json_api, priority: -50 }
 
@@ -156,7 +164,7 @@ services:
             - { name: oro.api.processor, action: update, group: load_data, priority: -10 }
 
     #
-    # build_form
+    # transform_data
     #
 
     oro_api.update.initialize_api_form_extension:
@@ -165,38 +173,29 @@ services:
             - '@form.registry'
             - '@oro_api.form.guesser.metadata'
         tags:
-            - { name: oro.api.processor, action: update, group: build_form, priority: 250 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: 250 }
 
     oro_api.update.build_form_builder:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
         arguments:
             - '@form.factory'
         tags:
-            - { name: oro.api.processor, action: update, group: build_form, priority: 100 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: 100 }
 
     oro_api.update.build_form:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildForm
         tags:
-            - { name: oro.api.processor, action: update, group: build_form, priority: -10 }
-
-    #
-    # bind_data
-    #
-
-    oro_api.update.set_form_data:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SetFormData
-        tags:
-            - { name: oro.api.processor, action: update, group: bind_data, priority: 10 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -10 }
 
     oro_api.update.submit_form:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm
         tags:
-            - { name: oro.api.processor, action: update, group: bind_data, priority: -50 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -50 }
 
     oro_api.update.collect_form_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors
         tags:
-            - { name: oro.api.processor, action: update, group: bind_data, priority: -100 }
+            - { name: oro.api.processor, action: update, group: transform_data, priority: -100 }
 
     #
     # save_data

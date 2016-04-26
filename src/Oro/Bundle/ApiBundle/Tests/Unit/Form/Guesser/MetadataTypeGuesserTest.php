@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Form\Guesser;
 
+use Symfony\Component\Form\Guess\TypeGuess;
+
 use Oro\Bundle\ApiBundle\Form\Guesser\MetadataTypeGuesser;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Metadata\MetadataAccessorInterface;
-use Oro\Bundle\ApiBundle\Processor\ContextMetadataAccessor;
-use Symfony\Component\Form\Guess\TypeGuess;
 
 class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
 {
@@ -143,7 +143,12 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $metadata->addAssociation($associationMetadata);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertNull(
+        $this->assertEquals(
+            new TypeGuess(
+                'oro_api_entity',
+                ['multiple' => false],
+                TypeGuess::HIGH_CONFIDENCE
+            ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }
@@ -160,7 +165,12 @@ class MetadataTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $metadata->addAssociation($associationMetadata);
 
         $this->typeGuesser->setMetadataAccessor($this->getMetadataAccessor($metadata));
-        $this->assertNull(
+        $this->assertEquals(
+            new TypeGuess(
+                'oro_api_entity',
+                ['multiple' => true],
+                TypeGuess::HIGH_CONFIDENCE
+            ),
             $this->typeGuesser->guessType(self::TEST_CLASS, self::TEST_PROPERTY)
         );
     }

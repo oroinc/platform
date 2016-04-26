@@ -200,18 +200,16 @@ oro_api:
                     priority: -30
                 load_data:
                     priority: -40
-                build_form:
+                transform_data:
                     priority: -50
-                bind_data:
-                    priority: -60
                 save_data:
-                    priority: -70
+                    priority: -60
                 normalize_data:
-                    priority: -80
+                    priority: -70
                 finalize:
-                    priority: -90
+                    priority: -80
                 normalize_result:
-                    priority: -100
+                    priority: -90
         update:
             processing_groups:
                 initialize:
@@ -224,15 +222,13 @@ oro_api:
                     priority: -40
                 load_data:
                     priority: -50
-                build_form:
+                transform_data:
                     priority: -60
-                bind_data:
-                    priority: -70
                 save_data:
-                    priority: -80
+                    priority: -70
                 normalize_data:
-                    priority: -90
+                    priority: -80
                 finalize:
-                    priority: -100
+                    priority: -90
                 normalize_result:
-                    priority: -110
+                    priority: -100

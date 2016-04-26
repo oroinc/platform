@@ -72,10 +72,18 @@ services:
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -40 }
 
+    oro_api.create.rest.normalize_request_data:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData
+        arguments:
+            - '@oro_api.rest.entity_id_transformer'
+        tags:
+            - { name: oro.api.processor, action: create, group: normalize_input, requestType: rest&!json_api, priority: -50 }
+
     oro_api.create.json_api.normalize_request_data:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeRequestData
         arguments:
             - '@oro_api.value_normalizer'
+            - '@oro_api.rest.entity_id_transformer'
         tags:
             - { name: oro.api.processor, action: create, group: normalize_input, requestType: json_api, priority: -50 }
 
@@ -131,7 +139,7 @@ services:
             - { name: oro.api.processor, action: create, group: load_data, priority: -20 }
 
     #
-    # build_form
+    # transform_data
     #
 
     oro_api.create.initialize_api_form_extension:
@@ -140,40 +148,31 @@ services:
             - '@form.registry'
             - '@oro_api.form.guesser.metadata'
         tags:
-            - { name: oro.api.processor, action: create, group: build_form, priority: 250 }
+            - { name: oro.api.processor, action: create, group: transform_data, priority: 250 }
 
     oro_api.create.build_form_builder:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildFormBuilder
         arguments:
             - '@form.factory'
         tags:
-            - { name: oro.api.processor, action: create, group: build_form, priority: 100 }
+            - { name: oro.api.processor, action: create, group: transform_data, priority: 100 }
 
     oro_api.create.build_form:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildForm
         tags:
-            - { name: oro.api.processor, action: create, group: build_form, priority: -10 }
-
-    #
-    # bind_data
-    #
-
-    oro_api.create.set_form_data:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\SetFormData
-        tags:
-            - { name: oro.api.processor, action: create, group: bind_data, priority: 10 }
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -10 }
 
     oro_api.create.submit_form:
         class: Oro\Bundle\ApiBundle\Processor\Shared\SubmitForm
         arguments:
             - true # set missing fields to NULL
         tags:
-            - { name: oro.api.processor, action: create, group: bind_data, priority: -50 }
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -50 }
 
     oro_api.create.collect_form_errors:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CollectFormErrors
         tags:
-            - { name: oro.api.processor, action: create, group: bind_data, priority: -100 }
+            - { name: oro.api.processor, action: create, group: transform_data, priority: -100 }
 
     #
     # save_data

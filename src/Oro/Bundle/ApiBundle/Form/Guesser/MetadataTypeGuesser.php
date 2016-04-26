@@ -50,16 +50,9 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
         $metadata = $this->getMetadataForClass($class);
         if (null !== $metadata) {
             if ($metadata->hasField($property)) {
-                $field = $metadata->getField($property);
-
-                return $this->getTypeGuessByDataType($field->getDataType());
+                return $this->getTypeGuessForField($metadata->getField($property)->getDataType());
             } elseif ($metadata->hasAssociation($property)) {
-                $association = $metadata->getAssociation($property);
-
-                return $this->getTypeGuessByEntity(
-                    $association->getTargetClassName(),
-                    $association->isCollection()
-                );
+                return $this->getTypeGuessForAssociation($metadata->getAssociation($property)->isCollection());
             }
         }
 
@@ -127,7 +120,7 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
      *
      * @return TypeGuess
      */
-    protected function getTypeGuessByDataType($dataType)
+    protected function getTypeGuessForField($dataType)
     {
         if (!isset($this->dataTypeMappings[$dataType])) {
             return $this->createDefaultTypeGuess();
@@ -139,13 +132,16 @@ class MetadataTypeGuesser implements FormTypeGuesserInterface
     }
 
     /**
-     * @param string $class
-     * @param bool   $multiple
+     * @param bool $multiple
      *
      * @return TypeGuess|null
      */
-    protected function getTypeGuessByEntity($class, $multiple)
+    protected function getTypeGuessForAssociation($multiple)
     {
-        return null;
+        return $this->createTypeGuess(
+            'oro_api_entity',
+            ['multiple' => $multiple],
+            TypeGuess::HIGH_CONFIDENCE
+        );
     }
 }

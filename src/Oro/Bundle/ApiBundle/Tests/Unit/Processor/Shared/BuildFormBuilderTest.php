@@ -83,6 +83,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
     public function testProcess()
     {
         $entityClass = 'Test\Entity';
+        $data = new \stdClass();
         $formBuilder = $this->getMock('Symfony\Component\Form\FormBuilderInterface');
 
         $config = new EntityDefinitionConfig();
@@ -124,7 +125,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
             ->with(
                 null,
                 'form',
-                null,
+                $data,
                 [
                     'data_class'           => $entityClass,
                     'validation_groups'    => ['Default', 'api'],
@@ -179,6 +180,7 @@ class BuildFormBuilderTest extends FormProcessorTestCase
         $this->context->setClassName($entityClass);
         $this->context->setConfig($config);
         $this->context->setMetadata($metadata);
+        $this->context->setResult($data);
         $this->processor->process($this->context);
         $this->assertSame($formBuilder, $this->context->getFormBuilder());
     }

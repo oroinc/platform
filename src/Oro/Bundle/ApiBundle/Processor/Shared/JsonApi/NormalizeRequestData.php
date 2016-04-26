@@ -5,6 +5,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\RequestType;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
@@ -18,12 +19,17 @@ class NormalizeRequestData implements ProcessorInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
+    /** @var EntityIdTransformerInterface */
+    protected $entityIdTransformer;
+
     /**
      * @param ValueNormalizer $valueNormalizer
+     * @param EntityIdTransformerInterface $entityIdTransformer
      */
-    public function __construct(ValueNormalizer $valueNormalizer)
+    public function __construct(ValueNormalizer $valueNormalizer, EntityIdTransformerInterface $entityIdTransformer)
     {
         $this->valueNormalizer = $valueNormalizer;
+        $this->entityIdTransformer = $entityIdTransformer;
     }
 
     /**
@@ -65,32 +71,31 @@ class NormalizeRequestData implements ProcessorInterface
             }
         }
 
-        $context->setRequestData(
-            array_merge(
-                $data[JsonApiDoc::ATTRIBUTES],
-                $relations
-            )
-        );
+        $resultData = !empty($data[JsonApiDoc::ATTRIBUTES])
+            ? array_merge($data[JsonApiDoc::ATTRIBUTES], $relations)
+            : $relations;
+        $context->setRequestData($resultData);
     }
 
     /**
-     * @param array       $collectionItem ['type' => type, 'id' => 'id_value']
+     * @param array       $data ['type' => entity type, 'id' => entity id]
      * @param RequestType $requestType
      *
-     * @return array ['class' => class name, 'id' => 'id_value']
+     * @return array ['class' => entity class, 'id' => entity id]
      */
-    protected function normalizeItemData(array $collectionItem, RequestType $requestType)
+    protected function normalizeItemData(array $data, RequestType $requestType)
     {
         $entityClass = ValueNormalizerUtil::convertToEntityClass(
             $this->valueNormalizer,
-            $collectionItem[JsonApiDoc::TYPE],
+            $data[JsonApiDoc::TYPE],
             $requestType,
             true
         );
+        $entityId = $this->entityIdTransformer->reverseTransform($entityClass, $data[JsonApiDoc::ID]);
 
         return [
             'class' => $entityClass,
-            'id'    => $collectionItem[JsonApiDoc::ID]
+            'id'    => $entityId
         ];
     }
 }

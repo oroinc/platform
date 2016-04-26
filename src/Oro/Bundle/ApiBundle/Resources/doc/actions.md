@@ -201,8 +201,7 @@ This action has the following processor groups:
 | security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to a newly created entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.create.load_normalized_entity** processor. |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | load_data | Creating an new entity object | |
-| build_form | Building a Symfony Form is used to transform and validate the request data | |
-| bind_data | Binding an entity to a Symfony Form | |
+| transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
 | normalize_data | Converting created entity into array | |
 | finalize | Adding required response headers | |
@@ -229,8 +228,7 @@ This action has the following processor groups:
 | security_check | Checking whether an access to the requested resource is granted | If you add own security processor in the **security_check** group of the [get](#get-action) action, add it in this group as well. It is required because the **VIEW** permission is checked here due to updated entity should be returned in response and the **security_check** group of the [get](#get-action) action is disabled by **oro_api.update.load_normalized_entity** processor. |
 | normalize_input | Preparing input data to be ready to use by processors from the next groups | |
 | load_data | Loading an entity object to be updated | |
-| build_form | Building a Symfony Form is used to transform and validate the request data | |
-| bind_data | Binding an entity to a Symfony Form | |
+| transform_data | Building a Symfony Form and using it to transform and validate the request data  | |
 | save_data | Validating and persisting an entity | |
 | normalize_data | Converting updated entity into array | |
 | finalize | Adding required response headers | |

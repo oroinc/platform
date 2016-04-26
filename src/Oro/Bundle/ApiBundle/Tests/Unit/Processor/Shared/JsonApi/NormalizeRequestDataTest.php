@@ -13,6 +13,9 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $valueNormalizer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $entityIdTransformer;
+
     public function setUp()
     {
         parent::setUp();
@@ -20,11 +23,12 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->entityIdTransformer = $this->getMock('Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface');
 
-        $this->processor = new NormalizeRequestData($this->valueNormalizer);
+        $this->processor = new NormalizeRequestData($this->valueNormalizer, $this->entityIdTransformer);
     }
 
-    public function testProcessOnValidatedData()
+    public function testProcessForAlreadyNormalizedData()
     {
         $data = ['foo' => 'bar'];
         $this->context->setRequestData($data);
@@ -69,6 +73,69 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ]
         ];
 
+        $requestType = $this->context->getRequestType();
+        $this->valueNormalizer->expects($this->any())
+            ->method('normalizeValue')
+            ->willReturnMap(
+                [
+                    ['users', 'entityClass', $requestType, false, 'Test\User'],
+                    ['groups', 'entityClass', $requestType, false, 'Test\Group']
+                ]
+            );
+        $this->entityIdTransformer->expects($this->any())
+            ->method('reverseTransform')
+            ->willReturnCallback(
+                function ($entityClass, $value) {
+                    return 'normalized::' . $entityClass . '::' . $value;
+                }
+            );
+
+        $this->context->setRequestData($inputData);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            'firstName'           => 'John',
+            'lastName'            => 'Doe',
+            'toOneRelation'       => [
+                'id'    => 'normalized::Test\User::89',
+                'class' => 'Test\User'
+            ],
+            'toManyRelation'      => [
+                [
+                    'id'    => 'normalized::Test\Group::1',
+                    'class' => 'Test\Group'
+                ],
+                [
+                    'id'    => 'normalized::Test\Group::2',
+                    'class' => 'Test\Group'
+                ],
+                [
+                    'id'    => 'normalized::Test\Group::3',
+                    'class' => 'Test\Group'
+                ]
+            ],
+            'emptyToOneRelation'  => [],
+            'emptyToManyRelation' => []
+        ];
+
+        $this->assertEquals($expectedData, $this->context->getRequestData());
+    }
+
+    public function testProcessNoAttributes()
+    {
+        $inputData = [
+            'data' => [
+                'relationships' => [
+                    'toOneRelation' => [
+                        'data' => [
+                            'type' => 'users',
+                            'id'   => '89'
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
         $this->context->setRequestData($inputData);
 
         $requestType = $this->context->getRequestType();
@@ -77,35 +144,23 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
             ->willReturnMap(
                 [
                     ['users', 'entityClass', $requestType, false, 'Test\User'],
-                    ['groups', 'entityClass', $requestType, false, 'Test\Groups']
                 ]
+            );
+        $this->entityIdTransformer->expects($this->any())
+            ->method('reverseTransform')
+            ->willReturnCallback(
+                function ($entityClass, $value) {
+                    return (int)$value;
+                }
             );
 
         $this->processor->process($this->context);
 
         $expectedData = [
-            'firstName'           => 'John',
-            'lastName'            => 'Doe',
-            'toOneRelation'       => [
+            'toOneRelation' => [
                 'id'    => '89',
                 'class' => 'Test\User'
-            ],
-            'toManyRelation'      => [
-                [
-                    'id'    => '1',
-                    'class' => 'Test\Groups'
-                ],
-                [
-                    'id'    => '2',
-                    'class' => 'Test\Groups'
-                ],
-                [
-                    'id'    => '3',
-                    'class' => 'Test\Groups'
-                ]
-            ],
-            'emptyToOneRelation'  => [],
-            'emptyToManyRelation' => []
+            ]
         ];
 
         $this->assertEquals($expectedData, $this->context->getRequestData());
