@@ -13,6 +13,7 @@ class ControllersResetTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
+        $this->client->useHashNavigation(true);
         $this->client->followRedirects();
         $this->loadFixtures([
             'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData',

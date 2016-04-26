@@ -295,7 +295,7 @@ class Client extends BaseClient
      */
     protected function isHashNavigationResponse($response, array $server)
     {
-        if (empty($server[$this->getHashNavigationHeader()])) {
+        if (!$this->isHashNavigation || empty($server[$this->getHashNavigationHeader()])) {
             return false;
         }
 

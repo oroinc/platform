@@ -208,7 +208,6 @@ class RestUsersTest extends WebTestCase
 
     public function testFilterUserNonExist()
     {
-        $this->client->followRedirects(true);
         $this->client->request(
             'GET',
             $this->getUrl(
@@ -233,7 +232,6 @@ class RestUsersTest extends WebTestCase
         $result = $this->client->getResponse();
         $this->assertEmptyResponseStatusCodeEquals($result, 204);
 
-        $this->client->followRedirects(true);
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_user', ['id' => $userId])
@@ -266,7 +264,6 @@ class RestUsersTest extends WebTestCase
 
     public function testGetUserRolesNotFound()
     {
-        $this->client->followRedirects(true);
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_user_roles', ['id' => 0])
@@ -289,7 +286,6 @@ class RestUsersTest extends WebTestCase
 
     public function testGetUserGroupsNotFound()
     {
-        $this->client->followRedirects(true);
         $this->client->request(
             'GET',
             $this->getUrl('oro_api_get_user_groups', ['id' => 0])

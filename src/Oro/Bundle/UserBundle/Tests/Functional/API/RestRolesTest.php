@@ -118,8 +118,6 @@ class RestRolesTest extends WebTestCase
      */
     public function testDeleteRole($roleId)
     {
-        $this->client->followRedirects(true);
-
         $this->client->request(
             'DELETE',
             $this->getUrl('oro_api_delete_role', array('id' => $roleId))
