@@ -58,7 +58,7 @@ class SegmentTypeTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'description',
-                'textarea',
+                'oro_resizeable_rich_text',
                 ['required' => false]
             )
             ->will($this->returnSelf());
