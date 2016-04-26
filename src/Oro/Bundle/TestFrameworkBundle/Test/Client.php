@@ -327,9 +327,9 @@ class Client extends BaseClient
                     <title>%s</title>
                     <script id="page-title" type="text/html">%s</script>
                 </head>
-                <body>%s%s</body>
+                <body>%s%s%s</body>
             </html>';
 
-        return sprintf($html, $title, $title, $flashMessages, $content['content']);
+        return sprintf($html, $title, $title, $flashMessages, $content['beforeContentAddition'], $content['content']);
     }
 }
