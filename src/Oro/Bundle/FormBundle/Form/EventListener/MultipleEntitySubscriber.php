@@ -74,26 +74,37 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         /** @var ClassMetadata $parentMetadata */
         $parentMetadata = $this->doctrineHelper->getEntityMetadata(ClassUtils::getClass($parentData));
 
-        /** @var Collection $collection */
+        /** @var PersistentCollection|Collection $collection */
         $collection = $form->getData();
 
+        $collectionMappedBy = null;
+        if ($collection instanceof PersistentCollection) {
+            $collectionMapping  = $collection->getMapping();
+            $collectionMappedBy = $collectionMapping['mappedBy'];
+        }
+
         foreach ($added as $relation) {
-            $this->processRelation($parentMetadata, $relation, $parentData);
+            if ($collectionMappedBy) {
+                $this->processRelation($parentMetadata, $relation, $collectionMappedBy, $parentData);
+            }
             $collection->add($relation);
         }
 
         foreach ($removed as $relation) {
-            $this->processRelation($parentMetadata, $relation, null);
+            if ($collectionMappedBy) {
+                $this->processRelation($parentMetadata, $relation, $collectionMappedBy, null);
+            }
             $collection->removeElement($relation);
         }
     }
 
     /**
      * @param ClassMetadata $metadata
-     * @param object $relation
-     * @param mixed $value
+     * @param object        $relation
+     * @param string        $mappedBy
+     * @param mixed         $value
      */
-    protected function processRelation($metadata, $relation, $value)
+    protected function processRelation($metadata, $relation, $mappedBy, $value)
     {
         foreach ($metadata->getAssociationMappings() as $mapping) {
             if (!is_array($mapping) || !isset($mapping['targetEntity'], $mapping['type'], $mapping['mappedBy'])) {
@@ -105,9 +116,14 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
             if ($mapping['type'] !== ClassMetadata::ONE_TO_MANY) {
                 continue;
             }
-            $mappedBy = $mapping['mappedBy'];
+            if ($mapping['mappedBy'] !== $mappedBy) {
+                continue;
+            }
+
             $setter = $this->getSetterName($mappedBy);
             $relation->$setter($value);
+
+            break;
         }
     }
 
