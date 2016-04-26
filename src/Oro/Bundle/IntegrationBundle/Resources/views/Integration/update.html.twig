@@ -55,7 +55,8 @@
                 'title': 'oro.integration.deactivate'|trans,
                 'dataId': entity.id,
                 'dataUrl': path('oro_api_deactivate_integration', {'id': entity.id}),
-                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'})
+                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'}),
+                'errorMessage': 'oro.integration.deactivate.fail.message'
                 }) }}
             {% else %}
                 {{ _self.ajaxButton({
@@ -65,7 +66,8 @@
                 'title': 'oro.integration.activate'|trans,
                 'dataId': entity.id,
                 'dataUrl': path('oro_api_activate_integration', {'id': entity.id}),
-                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'})
+                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'}),
+                'errorMessage': 'oro.integration.activate.fail.message'
                 }) }}
             {% endif %}
             {{ UI.buttonSeparator() }}
@@ -220,7 +222,7 @@
 
     {% set dataAttributes = {
         'page-component-module': 'orointegration/js/app/components/ajax-button',
-        'page-component-options': {'redirect': parameters.dataRedirect }|json_encode,
+        'page-component-options': {'redirect': parameters.dataRedirect, 'errorMessage': parameters.errorMessage }|json_encode,
     } %}
 
     {{ UI.clientButton(parameters|merge({'dataAttributes': dataAttributes})) }}
