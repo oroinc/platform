@@ -66,10 +66,10 @@ Read more about ([how using the page object factory](http://behat-page-object-ex
 ### Configuration
 
 Base configuration is holded by [behat.yml.dist](../../config/behat.yml.dist).
-Use it by parameter ```-p``` for example:
+Use it by parameter ```-c``` for example:
 
 ```bash
-bin/behat -s OroUserBundle -p ./src/Oro/src/Oro/Bundle/TestFrameworkBundle/Resources/config/behat.yml.dist
+bin/behat -s OroUserBundle -c ./src/Oro/src/Oro/Bundle/TestFrameworkBundle/Resources/config/behat.yml.dist
 ```
 
 You can copy it to behat.yml to the root of project and edit it for your needs.
@@ -160,5 +160,5 @@ java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriv
 Now run tests:
 
 ```bash
-vendor/bin/behat
+vendor/bin/behat -p selenium2
 ```
