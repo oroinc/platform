@@ -6,15 +6,13 @@ use Oro\Bundle\ActionBundle\Datagrid\Extension\OperationExtension;
 use Oro\Bundle\ActionBundle\Datagrid\Provider\MassActionProviderRegistry;
 use Oro\Bundle\ActionBundle\Model\Operation;
 use Oro\Bundle\ActionBundle\Model\ActionData;
-use Oro\Bundle\ActionBundle\Model\OperationDefinition;
-use Oro\Bundle\ActionBundle\Model\OperationManager;
 use Oro\Bundle\ActionBundle\Helper\ContextHelper;
 use Oro\Bundle\ActionBundle\Helper\OptionsHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\Action\ActionExtension;
 
-class OperationExtensionTest extends \PHPUnit_Framework_TestCase
+class OperationExtensionTest extends AbstractExtensionTest
 {
     const PROVIDER_ALIAS = 'test_mass_action_provider';
 
@@ -24,14 +22,9 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var OperationExtension */
     protected $extension;
 
-    /** @var \PHPUnit_Framework_MockObject_MockObject|OperationManager */
-    protected $manager;
-
     protected function setUp()
     {
-        $this->manager = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\OperationManager')
-            ->disableOriginalConstructor()
-            ->getMock();
+        parent::setUp();
 
         /** @var \PHPUnit_Framework_MockObject_MockObject|ContextHelper $contextHelper */
         $contextHelper = $this->getMockBuilder('Oro\Bundle\ActionBundle\Helper\ContextHelper')
@@ -68,13 +61,16 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
             $this->manager,
             $contextHelper,
             $this->massActionProviderRegistry,
-            $optionsHelper
+            $optionsHelper,
+            $this->gridConfigurationHelper
         );
     }
 
     protected function tearDown()
     {
-        unset($this->extension, $this->manager, $this->massActionProviderRegistry);
+        unset($this->extension, $this->massActionProviderRegistry);
+
+        parent::tearDown();
     }
 
     /**
@@ -314,6 +310,7 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                     'action1' => ['option1' => 'value1', 'option2' => 'value2'],
                     'action3' => false,
                     'view' => ['key2' => 'value2'],
+                    'update' => true
                 ],
                 'context' => ['entityClass' => null, 'datagrid' => 'datagrid_name', 'group' => null],
             ],
@@ -337,41 +334,5 @@ class OperationExtensionTest extends \PHPUnit_Framework_TestCase
                 'operationName' => $action,
             ]
         ];
-    }
-
-    /**
-     * @param string $name
-     * @param bool $isAvailable
-     * @param array $definitionParams
-     *
-     * @return Operation|\PHPUnit_Framework_MockObject_MockObject
-     */
-    protected function createOperation($name = 'test_operation', $isAvailable = true, array $definitionParams = [])
-    {
-        /** @var \PHPUnit_Framework_MockObject_MockObject|OperationDefinition $definition */
-        $definition = $this->getMock('Oro\Bundle\ActionBundle\Model\OperationDefinition');
-
-        foreach ($definitionParams as $method => $params) {
-            $definition->expects($this->any())
-                ->method($method)
-                ->willReturn($params);
-        }
-
-        /** @var \PHPUnit_Framework_MockObject_MockObject|Operation $operation */
-        $operation = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\Operation')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $operation->expects($this->any())
-            ->method('getDefinition')
-            ->willReturn($definition);
-        $operation->expects($this->any())
-            ->method('getName')
-            ->willReturn($name);
-        $operation->expects($this->any())
-            ->method('isAvailable')
-            ->withAnyParameters()
-            ->willReturn($isAvailable);
-
-        return $operation;
     }
 }
