@@ -27,9 +27,22 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
         'type' => ''
     ];
 
+    /**
+     * {@inheritdoc}
+     */
     public function setUp()
     {
         $this->guesser = new MsMimeTypeGuesser();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function tearDown()
+    {
+        foreach ($this->files as $file) {
+            unlink($file);
+        }
     }
 
     /**
@@ -45,6 +58,9 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($expectedMimeType, $this->guesser->guess($path));
     }
 
+    /**
+     * @return array
+     */
     public function guessDataProvider()
     {
         $correctFile = $this->createFile(hex2bin('d0cf11e0a1b11ae1'));
@@ -132,13 +148,6 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    public function tearDown()
-    {
-        foreach ($this->files as $file) {
-            unlink($file);
-        }
-    }
-
     /**
      * @param string $content
      * @return string
@@ -152,6 +161,10 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
         return $file;
     }
 
+    /**
+     * @param array $files
+     * @return array
+     */
     private function buildFilesArraySimple(array $files)
     {
         $result = [];
@@ -163,6 +176,11 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
         return $result;
     }
 
+    /**
+     * @param array $files
+     * @param int $level
+     * @return array
+     */
     private function buildFilesArrayComplex(array $files, $level = 1)
     {
         $level = (int) $level ? : 1;
