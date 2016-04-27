@@ -269,11 +269,10 @@ class Processor
      *
      * @param \Swift_Message  $message
      * @param EmailModel|null $model
-     * @param string|null     $type
      */
-    public function processEmbeddedImages(\Swift_Message $message, EmailModel $model = null, $type = null)
+    public function processEmbeddedImages(\Swift_Message $message, EmailModel $model = null)
     {
-        if ($type === null ? !$model || $model->getType() !== 'html' : $type !== 'text/html') {
+        if ($model ? $model->getType() !== 'html' : $message->getContentType() !== 'text/html') {
             return;
         }
 

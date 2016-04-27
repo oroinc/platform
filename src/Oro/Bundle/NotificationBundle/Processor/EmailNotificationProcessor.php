@@ -136,7 +136,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
                     ->setFrom($senderEmail, $senderName)
                     ->setTo($email)
                     ->setBody($templateRendered, $type);
-                $this->processor->processEmbeddedImages($message, null, $type);
+                $this->processor->processEmbeddedImages($message);
                 $this->mailer->send($message);
             }
 
