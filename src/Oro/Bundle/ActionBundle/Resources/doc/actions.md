@@ -80,11 +80,12 @@ Create Date
  - attribute - target path where result of action will be saved;
 
 **Configuration Example**
+
 ```
 - @create_date:
     attribute: $sales_funnel_start_date
 
-OR
+#OR
 
 - @create_date:
     conditions:

@@ -12,6 +12,7 @@ services:
     oro_filter.extension.orm_filter:
         class: %oro_filter.extension.orm_filter.class%
         arguments:
+            - '@oro_datagrid.configuration.provider'
             - '@translator'
         tags:
             - { name: oro_datagrid.extension }

@@ -18,7 +18,7 @@
         </label>
         <div class="controls">
             <div class="control-label html-content">
-                <span class="api-key">{{ userApi ? userApi.apiKey|escape : '' }}</span>
+                <span class="api-key">{{ userApi ? userApi.apiKey|escape|default('N/A') : 'N/A' }}</span>
                 {% if viewProfile or resource_granted('EDIT', user) %}
                     <a class="btn btn-mini no-hash" id="btn-apigen" href="{{ path('oro_user_apigen', { id: user.id }) }}"
                        data-title="{{ 'Generate key'|trans }}" data-message="{{ 'Generate key was successful. New key:'|trans }}">
