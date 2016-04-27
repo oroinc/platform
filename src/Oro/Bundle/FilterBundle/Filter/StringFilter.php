@@ -20,19 +20,16 @@ class StringFilter extends AbstractFilter
         }
 
         $type = $data['type'];
-
         $parameterName = $ds->generateParameterName($this->getName());
-
-        $this->applyFilterToClause(
+        $this->setCaseSensitivity($ds);
+        $comparisonExpr = $this->buildComparisonExpr(
             $ds,
-            $this->buildComparisonExpr(
-                $ds,
-                $type,
-                $this->get(FilterUtility::DATA_NAME_KEY),
-                $parameterName
-            )
+            $type,
+            $this->get(FilterUtility::DATA_NAME_KEY),
+            $parameterName
         );
-
+        $this->resetCaseSensitivity($ds);
+        $this->applyFilterToClause($ds, $comparisonExpr);
         if (!in_array($type, [FilterUtility::TYPE_EMPTY, FilterUtility::TYPE_NOT_EMPTY])) {
             $ds->setParameter($parameterName, $data['value']);
         }
@@ -84,11 +81,6 @@ class StringFilter extends AbstractFilter
         $fieldName,
         $parameterName
     ) {
-        $platform = $ds->getDatabasePlatform();
-        if ($platform instanceof PostgreSQL92Platform) {
-            $ds->expr()->setCaseInsensitive(true);
-        }
-
         switch ($comparisonType) {
             case TextFilterType::TYPE_EQUAL:
                 return $ds->expr()->eq($fieldName, $parameterName, true);
@@ -163,5 +155,24 @@ class StringFilter extends AbstractFilter
             default:
                 return $value;
         }
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     */
+    protected function setCaseSensitivity(FilterDatasourceAdapterInterface $ds)
+    {
+        $platform = $ds->getDatabasePlatform();
+        if ($platform instanceof PostgreSQL92Platform) {
+            $ds->expr()->setCaseInsensitive(true);
+        }
+    }
+
+    /**
+     * @param FilterDatasourceAdapterInterface $ds
+     */
+    protected function resetCaseSensitivity(FilterDatasourceAdapterInterface $ds)
+    {
+        $ds->expr()->setCaseInsensitive(false);
     }
 }
