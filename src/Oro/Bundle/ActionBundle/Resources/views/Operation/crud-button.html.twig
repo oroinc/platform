@@ -1,9 +1,8 @@
 {% extends 'OroActionBundle:Operation:button.html.twig' %}
 
 {% block button %}
-    {% set entityLabel = actionData.entityLabel %}
-    {% if entityLabel is defined %}
-        {% set linkTitle = params.frontendOptions.title|default(params.label)|trans({'%entityLabel%': entityLabel|trans}) %}
+    {% if actionData.entityLabel is defined %}
+        {% set linkTitle = params.frontendOptions.title|default(params.label)|trans({'%entityLabel%': actionData.entityLabel|trans}) %}
     {% endif %}
 
     {{ parent() }}
