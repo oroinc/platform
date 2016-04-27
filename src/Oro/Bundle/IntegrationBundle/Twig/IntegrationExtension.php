@@ -56,16 +56,27 @@ class IntegrationExtension extends Twig_Extension
         return $event->getThemes();
     }
 
+    /**
+     * @param int $editMode
+     *
+     * @return bool
+     */
     public function isSwitchEnabled($editMode)
     {
         return EditModeUtils::isSwitchEnableAllowed($editMode);
     }
 
-
+    /**
+     * @param int $editMode
+     *
+     * @return bool
+     */
     public function isDeleteEnabled($editMode)
     {
+        // edit mode which allows to edit integration allows to delete it.
         return EditModeUtils::isEditAllowed($editMode);
     }
+
     /**
      * {@inheritdoc}
      */
