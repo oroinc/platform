@@ -10,4 +10,4 @@ and form types for their rendering.
 - [Data Fixture](./Resources/doc/reference/data_fixtures.md)
 - [Form Types](./Resources/doc/reference/form_types.md)
 - [Console commands](./Resources/doc/reference/commands.md)
-- [Locale Fallback Mechanism](./Resources/doc/reference/fallback_locale.md)
+- [Translation Strategies](./Resources/doc/reference/translation_strategies.md)

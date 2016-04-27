@@ -86,11 +86,5 @@ UPGRADE FROM 1.9 to 1.10
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::mergeConfig` deprecated since 1.9. Will be removed after 1.11.
 
 ####TranslationBundle:
-- Class `Oro/Bundle/TranslationBundle/Translation/Translator` is changed. Add new public methods `getCatalogue` and `warmUp`. New protected methods `applyCurrentStrategy`, `computeFallbackLocales` and `getStrategyProvider` added. Add condition if new strategy was selected at `getTranslations` method.
-- Added new class `Oro/Bundle/TranslationBundle/Strategy/DefaultTranslationStrategy`.
-- Added new class `Oro/Bundle/TranslationBundle/Strategy/TranslationStrategyInterface`.
-- Added new class `Oro/Bundle/TranslationBundle/Strategy/TranslationStrategyProvider`.
-| Service ID | Class Name |
-|------------|------------|
-| oro_translation.strategy.default | Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy |
-| oro_translation.strategy.provider | Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider |
+- Added translation strategies to dynamically handle translation fallbacks
+- Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
