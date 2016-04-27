@@ -495,25 +495,24 @@ class AclManager extends AbstractAclManager
     /**
      * Gets all object-based or class-based ACEs associated with given ACL and the given security identity
      *
-     * @param SID         $sid
-     * @param OID         $oid
-     * @param null|string $fieldName
+     * @param SID $sid
+     * @param OID $oid
      *
      * @return \Symfony\Component\Security\Acl\Model\EntryInterface[]
      */
-    public function getAces(SID $sid, OID $oid, $fieldName = null)
+    public function getAces(SID $sid, OID $oid)
     {
         $this->validateAclEnabled();
 
         if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            return $this->doGetAces($sid, $oid, self::OBJECT_ACE, $fieldName);
+            return $this->doGetAces($sid, $oid, self::OBJECT_ACE, null);
         }
         $extension = $this->extensionSelector->select($oid);
         if ($oid->getIdentifier() === $extension->getExtensionKey()) {
-            return $this->doGetAces($sid, $oid, self::CLASS_ACE, $fieldName);
+            return $this->doGetAces($sid, $oid, self::CLASS_ACE, null);
         }
 
-        return $this->doGetAces($sid, $oid, self::OBJECT_ACE, $fieldName);
+        return $this->doGetAces($sid, $oid, self::OBJECT_ACE, null);
     }
 
     /**
