@@ -132,7 +132,7 @@ class ActivityListManager
     {
         $qb = $this->prepareQB($entityClass, $entityId, $filter);
 
-        $pager = $this->pager;
+        $pager = clone $this->pager;
         $pager->setQueryBuilder($qb);
         $pager->setPage($page);
         $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
