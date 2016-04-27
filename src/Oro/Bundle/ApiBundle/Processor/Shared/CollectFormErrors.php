@@ -11,6 +11,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
@@ -124,14 +125,14 @@ class CollectFormErrors implements ProcessorInterface
             if ($this->isExtraFieldsConstraint($cause)) {
                 // special case "extra fields" constraint
                 // see comments of "isExtraFieldsConstraint" method for more details
-                return 'extra fields constraint';
+                return Constraint::EXTRA_FIELDS;
             }
 
             return ValueNormalizerUtil::humanizeClassName(get_class($cause->getConstraint()), 'Constraint');
         }
 
         // undefined constraint type
-        return 'form constraint';
+        return Constraint::FORM;
     }
 
     /**
