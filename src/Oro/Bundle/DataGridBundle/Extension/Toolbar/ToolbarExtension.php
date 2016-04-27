@@ -61,7 +61,7 @@ class ToolbarExtension extends AbstractExtension
     {
         $result->offsetSetByPath('[options][hideToolbar]', false);
         $minToolbarRecords = (int)$config->offsetGetByPath(self::TURN_OFF_TOOLBAR_RECORDS_NUMBER_PATH);
-        if ($minToolbarRecords > 0 && count($result['data']) < $minToolbarRecords) {
+        if ($minToolbarRecords > 0 && count($result->getData()) < $minToolbarRecords) {
             $result->offsetSetByPath('[options][hideToolbar]', true);
         }
     }

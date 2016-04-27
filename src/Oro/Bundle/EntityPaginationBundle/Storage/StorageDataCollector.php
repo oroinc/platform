@@ -6,12 +6,13 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
+use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
-use Oro\Bundle\DataGridBundle\Extension\Pager\Orm\Pager;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
+use Oro\Bundle\DataGridBundle\Extension\Pager\PagerInterface;
 
 class StorageDataCollector
 {
@@ -31,11 +32,6 @@ class StorageDataCollector
     protected $aclHelper;
 
     /**
-     * @var Pager
-     */
-    protected $pager;
-
-    /**
      * @var EntityPaginationStorage
      */
     protected $storage;
@@ -49,7 +45,6 @@ class StorageDataCollector
      * @param DataGridManager $dataGridManager
      * @param DoctrineHelper $doctrineHelper
      * @param AclHelper $aclHelper
-     * @param Pager $pager
      * @param EntityPaginationStorage $storage
      * @param EntityPaginationManager $paginationManager
      */
@@ -57,14 +52,12 @@ class StorageDataCollector
         DataGridManager $dataGridManager,
         DoctrineHelper $doctrineHelper,
         AclHelper $aclHelper,
-        Pager $pager,
         EntityPaginationStorage $storage,
         EntityPaginationManager $paginationManager
     ) {
         $this->datagridManager   = $dataGridManager;
         $this->doctrineHelper    = $doctrineHelper;
         $this->aclHelper         = $aclHelper;
-        $this->pager             = $pager;
         $this->storage           = $storage;
         $this->paginationManager = $paginationManager;
     }
@@ -99,8 +92,8 @@ class StorageDataCollector
                 continue;
             }
 
+            /** @var OrmDatasource $dataSource */
             $dataSource = $dataGrid->getDatasource();
-            $dataGrid->getAcceptor()->acceptDatasource($dataSource);
 
             $entityName = $this->getEntityName($dataSource);
             $stateHash = $this->generateStateHash($dataGrid);
@@ -108,12 +101,12 @@ class StorageDataCollector
             // if entities are not in storage
             if (!$this->storage->hasData($entityName, $stateHash, $scope)) {
                 $entitiesLimit = $this->getEntitiesLimit();
-                $totalCount = $this->getTotalCount($dataSource, $scope);
+                $totalCount = $this->getTotalCount($dataGrid, $scope);
 
                 // if grid contains allowed number of entities
                 if ($totalCount <= $entitiesLimit) {
                     // collect and set entity IDs
-                    $entityIds = $this->getAllEntityIds($dataSource, $scope, $entitiesLimit);
+                    $entityIds = $this->getAllEntityIds($dataSource, $scope);
                     $this->storage->setData($entityName, $stateHash, $entityIds, $scope);
                 } else {
                     // set empty array as a sign that data is collected, but pagination itself must be disabled
@@ -155,19 +148,29 @@ class StorageDataCollector
     }
 
     /**
-     * @param OrmDatasource $dataSource
+     * @param DatagridInterface $dataGrid
      * @param string $scope
      * @return int
      */
-    protected function getTotalCount(OrmDatasource $dataSource, $scope)
+    protected function getTotalCount(DatagridInterface $dataGrid, $scope)
     {
-        $permission = EntityPaginationManager::getPermission($scope);
+        // Depending on scope entity pagination should apply different permission to datasource, e.g. VIEW or EDIT
+        $dataGrid->getConfig()->setDatasourceAclApplyPermission(EntityPaginationManager::getPermission($scope));
 
-        $pager = clone $this->pager;
-        $pager->setQueryBuilder($dataSource->getQueryBuilder());
-        $pager->setAclPermission($permission);
+        /** @var OrmDatasource $dataSource */
+        $dataSource = $dataGrid->getDatasource();
+        $dataGrid->getAcceptor()->acceptDatasource($dataSource);
 
-        return $pager->computeNbResult();
+        /**
+         * Total is already calculated by OrmPagerExtension::visitDatasource when acceptDatasource() was called.
+         * Call acceptResult() on fake data to get the value of total.
+         *
+         * @see \Oro\Bundle\DataGridBundle\Extension\Pager\OrmPagerExtension::visitResult
+         */
+        $result = ResultsObject::create(['data' => []]);
+        $dataGrid->getAcceptor()->acceptResult($result);
+
+        return $result->getTotalRecords();
     }
 
     /**
@@ -188,7 +191,11 @@ class StorageDataCollector
      */
     protected function generateStateHash(DatagridInterface $dataGrid)
     {
-        return md5(json_encode($dataGrid->getParameters()->all()));
+        $parameters = $dataGrid->getParameters()->all();
+        if (isset($parameters[PagerInterface::PAGER_ROOT_PARAM])) {
+            unset($parameters[PagerInterface::PAGER_ROOT_PARAM]);
+        }
+        return md5(json_encode($parameters));
     }
 
     /**
