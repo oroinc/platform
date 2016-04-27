@@ -49,7 +49,7 @@ class BuildSingleItemQuery implements ProcessorInterface
         if (count($idFields) === 1) {
             // single identifier
             if (is_array($entityId)) {
-                throw new \UnexpectedValueException(
+                throw new \RuntimeException(
                     sprintf(
                         'The entity identifier cannot be an array because the entity "%s" has single primary key.',
                         $entityClass
@@ -62,7 +62,7 @@ class BuildSingleItemQuery implements ProcessorInterface
         } else {
             // combined identifier
             if (!is_array($entityId)) {
-                throw new \UnexpectedValueException(
+                throw new \RuntimeException(
                     sprintf(
                         'The entity identifier must be an array because the entity "%s" has composite primary key.',
                         $entityClass
@@ -72,7 +72,7 @@ class BuildSingleItemQuery implements ProcessorInterface
             $counter = 1;
             foreach ($idFields as $field) {
                 if (!array_key_exists($field, $entityId)) {
-                    throw new \UnexpectedValueException(
+                    throw new \RuntimeException(
                         sprintf(
                             'The entity identifier array must have the key "%s" because '
                             . 'the entity "%s" has composite primary key.',
