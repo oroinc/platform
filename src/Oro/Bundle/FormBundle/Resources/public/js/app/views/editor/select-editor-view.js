@@ -187,6 +187,7 @@ define(function(require) {
                 selectOnBlur: false,
                 openOnEnter: false,
                 dropdownCssClass: 'inline-editor__select2-drop',
+                dontSelectFirstOptionOnOpen: true,
                 data: {results: this.availableChoices}
             };
         },
