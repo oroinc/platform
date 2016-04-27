@@ -110,6 +110,7 @@ define(function(require) {
 
         getSelect2Options: function() {
             var _this = this;
+            var options = _.omit(TagsEditorView.__super__.getSelect2Options.apply(this, arguments), 'data');
             _this.currentData = null;
             _this.firstPageData = {
                 results: [],
@@ -117,13 +118,11 @@ define(function(require) {
                 isDummy: true
             };
             this.isSelect2Initialized = true;
-            return {
+
+            return _.extend(options, {
                 placeholder: this.placeholder || ' ',
                 allowClear: true,
-                openOnEnter: false,
-                selectOnBlur: false,
                 multiple: true,
-                dropdownCssClass: 'inline-editor__select2-drop',
                 id: 'label',
                 formatSelection: function(item) {
                     return item.label;
@@ -169,7 +168,7 @@ define(function(require) {
                         _this.makeRequest(options, autoCompleteUrlParameters);
                     }
                 }
-            };
+            });
         },
 
         buildAutoCompleteUrlParameters: function() {
