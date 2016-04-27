@@ -84,3 +84,7 @@ UPGRADE FROM 1.9 to 1.10
 ####SearchBundle
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::setEntitiesConfigParameter` deprecated since 1.9. Will be removed after 1.11. Please use oro_search.provider.search_mapping service for mapping config instead.
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::mergeConfig` deprecated since 1.9. Will be removed after 1.11.
+
+####TranslationBundle:
+- Added translation strategies to dynamically handle translation fallbacks
+- Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
