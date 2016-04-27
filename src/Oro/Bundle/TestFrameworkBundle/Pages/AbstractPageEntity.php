@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Pages;
 
+use PHPUnit_Extensions_Selenium2TestCase_Keys as Keys;
+
 /**
  * Class AbstractPageEntity
  *
@@ -20,6 +22,22 @@ abstract class AbstractPageEntity extends AbstractPage
 
     /** @var  \PHPUnit_Extensions_Selenium2TestCase_Element */
     protected $tags;
+
+    /**
+     * @param string $fieldId Original field id
+     * @param string $content
+     * @return $this
+     */
+    public function setContentToTinymceElement($fieldId, $content)
+    {
+        $this->test->byXPath(
+            "//iframe[starts-with(@id,'" . $fieldId . "')]"
+        )->click();
+        $this->test->keys(KEYS::CONTROL + 'a');
+        $this->test->keys(KEYS::DELETE);
+        $this->test->keys($content);
+        return $this;
+    }
 
     /**
      * Save entity
