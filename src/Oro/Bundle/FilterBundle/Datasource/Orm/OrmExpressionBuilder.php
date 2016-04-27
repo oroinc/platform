@@ -168,7 +168,7 @@ class OrmExpressionBuilder implements ExpressionBuilderInterface
      */
     public function like($x, $y, $withParam = false)
     {
-        return $this->expr->like($x, $withParam ? ':' . $y : $y);
+        return $this->expr->like($this->expr->lower($x), $this->expr->lower($withParam ? ':' . $y : $y));
     }
 
     /**
