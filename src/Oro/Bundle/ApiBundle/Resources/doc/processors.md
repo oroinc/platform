@@ -165,33 +165,33 @@ An error is represented by [Error](../../Model/Error.php) class. Also there is [
 
 **Error** class
 
-- **create($title, $detail)** *static* - Creates an instance of **Error** class.
-- **createValidationError($title, $detail)** *static* - Creates an instance of **Error** class represents a violation of validation constraint.
-- **createByException($exception)** *static* - Creates an instance of **Error** class based on a given exception object.
+- **create(title, detail)** *static* - Creates an instance of **Error** class.
+- **createValidationError(title, detail)** *static* - Creates an instance of **Error** class represents a violation of validation constraint.
+- **createByException(exception)** *static* - Creates an instance of **Error** class based on a given exception object.
 - **getStatusCode()** - Gets the HTTP status code applicable to this problem.
 - **getCode()** - Gets an application-specific error code.
-- **setCode($code)** - Sets an application-specific error code.
+- **setCode(code)** - Sets an application-specific error code.
 - **getTitle()** - Gets a short, human-readable summary of the problem that should not change from occurrence to occurrence of the problem.
-- **setTitle($title)** - Sets a short, human-readable summary of the problem that should not change from occurrence to occurrence of the problem.
+- **setTitle(title)** - Sets a short, human-readable summary of the problem that should not change from occurrence to occurrence of the problem.
 - **getDetail()** - Gets a human-readable explanation specific to this occurrence of the problem.
-- **setDetail($detail)** - Sets a human-readable explanation specific to this occurrence of the problem.
+- **setDetail(detail)** - Sets a human-readable explanation specific to this occurrence of the problem.
 - **getSource()** - Gets instance of [ErrorSource](../../Model/ErrorSource.php) represents a source of this occurrence of the problem.
-- **setSource($source)** - Sets instance of [ErrorSource](../../Model/ErrorSource.php) represents a source of this occurrence of the problem.
+- **setSource(source)** - Sets instance of [ErrorSource](../../Model/ErrorSource.php) represents a source of this occurrence of the problem.
 - **getInnerException()** - Gets an exception object that caused this occurrence of the problem.
-- **setInnerException($exception)** - Sets an exception object that caused this occurrence of the problem.
-- **trans($translator)** - Translates all attributes that are represented by the [Label](../../Model/Label.php) object.
+- **setInnerException(exception)** - Sets an exception object that caused this occurrence of the problem.
+- **trans(translator)** - Translates all attributes that are represented by the [Label](../../Model/Label.php) object.
 
 **ErrorSource** class
 
-- **createByPropertyPath($propertyPath)** *static* - Creates an instance of **ErrorSource** class represents the path to a property caused the error.
-- **createByPointer($pointer)** *static* - Creates an instance of **ErrorSource** class represents a pointer to a property in the request document caused the error.
-- **createByParameter($parameter)** *static* - Creates an instance of **ErrorSource** class represents URI query parameter caused the error.
+- **createByPropertyPath(propertyPath)** *static* - Creates an instance of **ErrorSource** class represents the path to a property caused the error.
+- **createByPointer(pointer)** *static* - Creates an instance of **ErrorSource** class represents a pointer to a property in the request document caused the error.
+- **createByParameter(parameter)** *static* - Creates an instance of **ErrorSource** class represents URI query parameter caused the error.
 - **getPropertyPath()** - Gets the path to a property caused the error. E.g. "title", or "author.name".
-- **setPropertyPath($propertyPath)** - Sets the path to a property caused the error.
+- **setPropertyPath(propertyPath)** - Sets the path to a property caused the error.
 - **getPointer()** - Gets a pointer to a property in the request document caused the error. For JSON documents the pointer conforms [RFC 6901](https://tools.ietf.org/html/rfc6901). E.g. "/data" for a primary data object, or "/data/attributes/title" for a specific attribute.
-- **setPointer($pointer)** - Sets a pointer to a property in the request document caused the error.
+- **setPointer(pointer)** - Sets a pointer to a property in the request document caused the error.
 - **getParameter()** - Gets URI query parameter caused the error.
-- **setParameter($parameter)** - Sets URI query parameter caused the error.
+- **setParameter(parameter)** - Sets URI query parameter caused the error.
 
 Lets consider how a processor can inform that some error is occurred.
 
