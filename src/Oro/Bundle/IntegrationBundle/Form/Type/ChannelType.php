@@ -57,8 +57,8 @@ class ChannelType extends AbstractType
             'choice',
             [
                 'choices'  => [
-                    Channel::ENABLED    => 'oro.integration.integration.enabled.active.label',
-                    Channel::DISABLED   => 'oro.integration.integration.enabled.inactive.label'
+                    true    => 'oro.integration.integration.enabled.active.label',
+                    false   => 'oro.integration.integration.enabled.inactive.label'
                 ],
                 'required' => true,
                 'label'    => 'oro.integration.integration.enabled.label',

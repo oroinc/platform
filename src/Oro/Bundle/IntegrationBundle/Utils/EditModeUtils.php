@@ -7,6 +7,8 @@ use Oro\Bundle\IntegrationBundle\Entity\Channel as Integration;
 class EditModeUtils
 {
     /**
+     * Checks if edit mode allow to edit or delete integration
+     *
      * @param int $editMode
      *
      * @return bool
@@ -36,6 +38,8 @@ class EditModeUtils
     }
 
     /**
+     * Checks if edit mode allow to activate/deactivate integration
+     *
      * @param int $editMode
      *
      * @return bool
