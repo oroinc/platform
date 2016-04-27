@@ -150,7 +150,7 @@ class CommandWithArgsFilterTest extends \PHPUnit_Framework_TestCase
                 '--prm1="Test Param\1"',
                 TextFilterType::TYPE_CONTAINS,
                 'SELECT j FROM TestEntity j '
-                . 'WHERE LOWER(CONCAT(j.command, j.args)) LIKE LOWER(:param1)',
+                . 'WHERE CONCAT(j.command, j.args) LIKE :param1',
                 [
                     'param1' => '%--prm1=\\\\"Test Param\\\\\\\\1\\\\"%'
                 ]
@@ -172,8 +172,8 @@ class CommandWithArgsFilterTest extends \PHPUnit_Framework_TestCase
                 'cmd "Acme\\Class"',
                 TextFilterType::TYPE_CONTAINS,
                 'SELECT j FROM TestEntity j '
-                . 'WHERE LOWER(CONCAT(j.command, j.args)) LIKE LOWER(:param1) '
-                . 'AND LOWER(CONCAT(j.command, j.args)) LIKE LOWER(:param2)',
+                . 'WHERE CONCAT(j.command, j.args) LIKE :param1 '
+                . 'AND CONCAT(j.command, j.args) LIKE :param2',
                 [
                     'param1' => '%cmd%',
                     'param2' => '%"Acme\\\\\\\\Class"%'
