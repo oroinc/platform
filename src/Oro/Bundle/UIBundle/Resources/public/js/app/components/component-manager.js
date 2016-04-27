@@ -19,14 +19,14 @@ define([
         eventNamespace: '.component-manager',
 
         init: function(options) {
-            var promises;
+            var promises = [];
             var elements = [];
             var modules = [];
 
             this._analyseDom(elements, modules);
 
-            promises = _.each(elements, _.bind(function(element) {
-                this._initComponent(element, options);
+            _.each(elements, _.bind(function(element) {
+                promises.push(this._initComponent(element, options));
             }, this));
 
             // optimize load time - preload components in separate layouts
