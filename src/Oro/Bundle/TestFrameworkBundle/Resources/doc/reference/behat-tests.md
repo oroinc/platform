@@ -28,11 +28,14 @@ It has fast and native support for various web standards: DOM handling, CSS sele
 
 ### Installing
 
-Install behat dependencies:
+Remove ```composer.lock``` file if you install dependencies with ```--no-dev``` parameter before.
+
+Install dev dependencies:
 
 ```php
-composer require behat/behat:3.1.0 behat/mink-extension:^2.0 behat/mink-selenium2-driver:1.* sensiolabs/behat-page-object-extension:dev-master bossa/phpspec2-expect:~1.0 behat/symfony2-extension:2.1.1
+composer install
 ```
+
 
 ### Run tests
 
@@ -73,7 +76,7 @@ vendor/bin/behat -p selenium2 -c app/behat.yml
 Run tests with PhantomJs
 
 ```bash
-vendor/bin/behat -p selenium2
+vendor/bin/behat -c app/behat.yml
 ```
 
 ### Architecture
@@ -148,20 +151,20 @@ Feature: User login
   I need to be able to authenticate
 
 Scenario: Success login
-  Given I open "Login" page
+  Given I am on "/user/login"
   And I fill "Login Form" with:
       | Username | admin |
       | Password | admin |
   And I press "Log in"
-  And I should be on "Home" page
+  And I should be on "/"
 
 Scenario: Fail login
-  Given I open "Login" page
+  Given I am on "/user/login"
   And I fill "Login Form" with:
       | Username | user |
       | Password | pass |
   And I press "Log in"
-  And I should be on "Login" page
+  And I should be on "/user/login"
   And I should see "Invalid user name or password."
 ```
 
