@@ -26,7 +26,7 @@ class DailyStrategy implements StrategyInterface
         $occurrences = $recurrence->getOccurrences();
         while ($occurrenceDate <= $recurrence->getEndTime()
             && $occurrenceDate <= $end
-            && (is_null($occurrences) || $fromStartInterval <= $occurrences)
+            && ($occurrences === null || $fromStartInterval <= $occurrences)
         ) {
             $result[] = $occurrenceDate;
             $fromStartInterval++;

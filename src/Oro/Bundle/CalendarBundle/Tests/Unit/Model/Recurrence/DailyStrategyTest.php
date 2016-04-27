@@ -30,55 +30,107 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
         $this->assertFalse($this->strategy->supports($recurrence));
     }
 
-    public function testGetOccurrences()
+    /**
+     * @param array $params
+     * @param array $expected
+     *
+     * @dataProvider propertiesDataProvider
+     */
+    public function testGetOccurrences(array $params, array $expected)
     {
+        $expected = array_map(
+            function ($date) {
+                return new \DateTime($date);
+            }, $expected
+        );
         $recurrence = new Recurrence();
         $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
-            ->setInterval(5)
-            ->setStartTime(new \DateTime('2016-04-25'))
-            ->setEndTime(new \DateTime('2016-06-10'));
-
+            ->setInterval($params['interval'])
+            ->setStartTime(new \DateTime($params['startTime']))
+            ->setEndTime(new \DateTime($params['endTime']));
+        if ($params['occurrences']) {
+            $recurrence->setOccurrences($params['occurrences']);
+        }
         $result = $this->strategy->getOccurrences(
             $recurrence,
-            new \DateTime('2016-03-28'),
-            new \DateTime('2016-05-01')
+            new \DateTime($params['start']),
+            new \DateTime($params['end'])
         );
+        $this->assertEquals($expected, $result);
+    }
 
-        $expectedResult = [
-            new \DateTime('2016-04-25'),
-            new \DateTime('2016-04-30'),
+    /**
+     * @return array
+     */
+    public function propertiesDataProvider()
+    {
+        return [
+            'start < end < startTime < endTime' => [
+                'params' => [
+                    'start' => '2016-03-28',
+                    'end' => '2016-04-17',
+                    'interval' => 5,
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2016-06-10',
+                    'occurrences' => null,
+                ],
+                'expected' => [
+                ],
+            ],
+            'start < startTime < end < endTime' => [
+                'params' => [
+                    'start' => '2016-03-28',
+                    'end' => '2016-05-01',
+                    'interval' => 5,
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2016-06-10',
+                    'occurrences' => null,
+                ],
+                'expected' => [
+                    '2016-04-25',
+                    '2016-04-30',
+                ],
+            ],
+            'start < startTime < endTime < end' => [
+                'params' => [
+                    'start' => '2016-05-30',
+                    'end' => '2016-07-03',
+                    'interval' => 5,
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2016-06-10',
+                    'occurrences' => null,
+                ],
+                'expected' => [
+                    '2016-05-30',
+                    '2016-06-04',
+                    '2016-06-09',
+                ],
+            ],
+            'startTime < endTime < start < end' => [
+                'params' => [
+                    'start' => '2016-06-11',
+                    'end' => '2016-07-03',
+                    'interval' => 5,
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2016-06-10',
+                    'occurrences' => null,
+                ],
+                'expected' => [
+                ],
+            ],
+            'start < startTime < endTime < end after x occurrences' => [
+                'params' => [
+                    'start' => '2016-05-30',
+                    'end' => '2016-07-03',
+                    'interval' => 5,
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2016-06-10',
+                    'occurrences' => 8,
+                ],
+                'expected' => [
+                    '2016-05-30',
+                ],
+            ],
         ];
-
-        $this->assertEquals($expectedResult, $result);
-
-        $result = $this->strategy->getOccurrences(
-            $recurrence,
-            new \DateTime('2016-03-28'),
-            new \DateTime('2016-04-17')
-        );
-
-        $this->assertEquals([], $result);
-
-        $result = $this->strategy->getOccurrences(
-            $recurrence,
-            new \DateTime('2016-05-30'),
-            new \DateTime('2016-07-03')
-        );
-
-        $expectedResult = [
-            new \DateTime('2016-05-30'),
-            new \DateTime('2016-06-04'),
-            new \DateTime('2016-06-09'),
-        ];
-
-        $this->assertEquals($expectedResult, $result);
-
-        $recurrence->setOccurrences(8);
-        $result = $this->strategy->getOccurrences(
-            $recurrence,
-            new \DateTime('2016-05-30'),
-            new \DateTime('2016-07-03')
-        );
-        $this->assertEquals([new \DateTime('2016-05-30')], $result);
     }
 }
