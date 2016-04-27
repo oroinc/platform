@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Strategy;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 
 class DefaultTranslationStrategy implements TranslationStrategyInterface
 {
@@ -34,7 +35,11 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
      */
     public function getLocaleFallbacks()
     {
-        // default strategy has only one locale and no fallbacks
-        return [$this->localeSettings->getLocale() => []];
+        // default strategy has only one fallback to default locale
+        return [
+            Configuration::DEFAULT_LOCALE => [
+                $this->localeSettings->getLocale() => []
+            ]
+        ];
     }
 }

@@ -185,6 +185,14 @@ class TranslationStrategyProviderTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expectedFallbackLocales' => ['en', 'ru', 'en_US', 'en_GB', 'en_CA', 'en_MX', 'ru_RU', 'ru_UA'],
             ],
+            'duplicated locales' => [
+                'fallbackTree' => [
+                    'en' => [
+                        'en' => [],
+                    ],
+                ],
+                'expectedFallbackLocales' => ['en'],
+            ],
         ];
     }
 }

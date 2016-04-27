@@ -70,7 +70,7 @@ class TranslationStrategyProvider
     {
         $fallbackTree = $strategy->getLocaleFallbacks();
 
-        return $this->convertTreeToPlainArray($fallbackTree);
+        return array_unique($this->convertTreeToPlainArray($fallbackTree));
     }
 
     /**

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Strategy;
 
 use Oro\Bundle\LocaleBundle\Model\LocaleSettings;
+use Oro\Bundle\LocaleBundle\DependencyInjection\Configuration;
 use Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy;
 
 class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
@@ -33,12 +34,19 @@ class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
 
     public function testGetLocaleFallbacks()
     {
-        $currentLocale = 'en';
+        $currentLocale = 'fr';
 
         $this->localeSettings->expects($this->once())
             ->method('getLocale')
             ->willReturn($currentLocale);
 
-        $this->assertEquals([$currentLocale => []], $this->strategy->getLocaleFallbacks());
+        $this->assertEquals(
+            [
+                Configuration::DEFAULT_LOCALE => [
+                    $currentLocale => [],
+                ],
+            ],
+            $this->strategy->getLocaleFallbacks()
+        );
     }
 }
