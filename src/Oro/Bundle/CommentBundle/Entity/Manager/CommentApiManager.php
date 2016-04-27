@@ -112,7 +112,7 @@ class CommentApiManager extends ApiEntityManager
             $qb->orderBy('c.createdAt', 'DESC');
             $this->addFilters($qb, $filters);
 
-            $pager = $this->pager;
+            $pager = clone $this->pager;
             $pager->setQueryBuilder($qb);
             $pager->setPage($page);
             $pager->setMaxPerPage($limit);
