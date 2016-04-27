@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\FilterBundle\Filter;
 
+use Doctrine\DBAL\Platforms\PostgreSQL92Platform;
+
 use Oro\Bundle\FilterBundle\Form\Type\Filter\TextFilterType;
 use Oro\Bundle\FilterBundle\Datasource\FilterDatasourceAdapterInterface;
 
@@ -82,6 +84,11 @@ class StringFilter extends AbstractFilter
         $fieldName,
         $parameterName
     ) {
+        $platform = $ds->getDatabasePlatform();
+        if ($platform instanceof PostgreSQL92Platform) {
+            $ds->expr()->setCaseInsensitive(true);
+        }
+
         switch ($comparisonType) {
             case TextFilterType::TYPE_EQUAL:
                 return $ds->expr()->eq($fieldName, $parameterName, true);
