@@ -4,14 +4,13 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-
-use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
-use Oro\Component\PropertyAccess\PropertyAccessor;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
+use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class UserCalendarProvider extends AbstractCalendarProvider
 {
@@ -136,13 +135,17 @@ class UserCalendarProvider extends AbstractCalendarProvider
     }
 
     /**
-     * Transforms recurrence rules into entity items
+     * Transforms recurrence rules into entity items.
      *
      * @param array $items
      * @param \DateTime $start
      * @param \DateTime $end
      *
      * @return self
+     *
+     * @throws \InvalidArgumentException
+     * @throws \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
+     * @throws \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
     protected function transformRecurrences(array &$items, $start, $end)
     {

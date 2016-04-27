@@ -32,6 +32,7 @@ class WeeklyStrategy implements StrategyInterface
 
         $firstDay = reset($weekDays);
         $startTime = new \DateTime("previous $firstDay {$recurrence->getStartTime()->format('c')}");
+        /** @var float $fromStartInterval */
         $fromStartInterval = 0;
         $interval = $recurrence->getInterval();
         $fullWeeks = 0;
@@ -41,7 +42,7 @@ class WeeklyStrategy implements StrategyInterface
             foreach ($weekDays as $day) {
                 $currentDay = new \DateTime($day);
                 if ($currentDay->format('w') < $recurrence->getStartTime()->format('w')) {
-                    $fromStartInterval = $fromStartInterval === 0 ? $fromStartInterval : $fromStartInterval - 1;
+                    $fromStartInterval = $fromStartInterval == 0 ? $fromStartInterval : $fromStartInterval - 1;
                 }
             }
             $fullWeeks = ceil($fromStartInterval / count($weekDays)) * $interval;
