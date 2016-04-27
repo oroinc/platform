@@ -28,7 +28,53 @@ It has fast and native support for various web standards: DOM handling, CSS sele
 
 ### Installing
 
+Install behat dependencies:
 
+```php
+composer require behat/behat:3.1.0 behat/mink-extension:^2.0 behat/mink-selenium2-driver:1.* sensiolabs/behat-page-object-extension:dev-master bossa/phpspec2-expect:~1.0 behat/symfony2-extension:2.1.1
+```
+
+### Run tests
+
+For execute features you need browser emulator demon (Selenium2 or PhantomJs) runing.
+
+Install PhantomJs:
+
+```bash
+wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
+tar -xvf $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/travis-phantomjs
+ln -s $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
+```
+
+Run PhantomJs:
+
+```bash
+phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1 &
+```
+
+Install Selenium2
+
+```bash
+curl -L http://selenium-release.storage.googleapis.com/2.52/selenium-server-standalone-2.52.0.jar > $HOME/selenium-server-standalone-2.52.0/selenium.jar
+```
+
+Run Selenium2:
+
+```bash
+java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1 &
+```
+
+Run tests with Selenium and Firefox:
+
+```bash
+vendor/bin/behat -p selenium2 -c app/behat.yml
+```
+
+Run tests with PhantomJs
+
+```bash
+vendor/bin/behat -p selenium2
+```
 
 ### Architecture
 
@@ -39,13 +85,13 @@ Mink provide ```MinkContext``` with basic feature steps.
 To look the all available feature steps:
 
 ```bash
-bin/behat -dl -s OroUserBundle
+bin/behat -dl -s OroUserBundle -c app/behat.yml
 ```
 
 Every bundle has its own test suite and can be run separately:
 
  ```bash
- bin/behat -s OroUserBundle
+ bin/behat -s OroUserBundle -c app/behat.yml
  ```
 
 For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
@@ -66,10 +112,11 @@ Read more about ([how using the page object factory](http://behat-page-object-ex
 ### Configuration
 
 Base configuration is holded by [behat.yml.dist](../../config/behat.yml.dist).
-Use it by parameter ```-c``` for example:
+You can copy and edit it if you needed.
+Use it by parameter ```-c``` for use your custom config:
 
 ```bash
-bin/behat -s OroUserBundle -c ./src/Oro/src/Oro/Bundle/TestFrameworkBundle/Resources/config/behat.yml.dist
+bin/behat -s OroUserBundle -c ~/config/behat.yml.dist
 ```
 
 You can copy it to behat.yml to the root of project and edit it for your needs.
@@ -126,39 +173,3 @@ and describe the business value derived from the inclusion of the feature in you
 and contains a description of the scenario.
 4. The next 6 lines are the scenario steps, each of which is matched to a regular expression defined in Context. 
 5. ```Scenario: Fail login``` starts the next scenario, and so on.
-
-### Run tests
-
-For execute features you need browser emulator demon (Selenium2 or PhantomJs) runing.
-
-For PhantomJs:
-
-```bash
-wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
-tar -xvf $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/travis-phantomjs
-ln -s $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
-```
-
-Run PhantomJs:
-
-```bash
-phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1 &
-```
-
-For Selenium2
-
-```bash
-curl -L http://selenium-release.storage.googleapis.com/2.52/selenium-server-standalone-2.52.0.jar > $HOME/selenium-server-standalone-2.52.0/selenium.jar
-```
-
-Run Selenium2:
-
-```bash
-java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1 &
-```
-
-Now run tests:
-
-```bash
-vendor/bin/behat -p selenium2
-```

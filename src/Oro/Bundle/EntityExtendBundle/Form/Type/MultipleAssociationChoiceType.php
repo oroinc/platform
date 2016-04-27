@@ -67,7 +67,17 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
                     return $this->getChoices($options['association_class']);
                 },
                 'multiple'    => true,
-                'expanded'    => true
+                'expanded'    => true,
+                'schema_update_required' => function ($newVal, $oldVal) {
+                    if (!is_array($oldVal)) {
+                        $oldVal = (array)$oldVal;
+                    }
+
+                    sort($newVal, SORT_STRING);
+                    sort($oldVal, SORT_STRING);
+
+                    return $newVal != $oldVal;
+                },
             ]
         );
     }
@@ -119,21 +129,6 @@ class MultipleAssociationChoiceType extends AbstractAssociationType
         }
 
         return $choices;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function isSchemaUpdateRequired($newVal, $oldVal)
-    {
-        if (!is_array($oldVal)) {
-            $oldVal = (array)$oldVal;
-        }
-
-        sort($newVal, SORT_STRING);
-        sort($oldVal, SORT_STRING);
-
-        return $newVal != $oldVal;
     }
 
     /**
