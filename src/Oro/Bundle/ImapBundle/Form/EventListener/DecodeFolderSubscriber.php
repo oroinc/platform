@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ImapBundle\Form\EventListener;
 
+use Symfony\Component\Config\Definition\Exception\Exception;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -27,6 +28,10 @@ class DecodeFolderSubscriber implements EventSubscriberInterface
     {
         $data = $event->getData();
         if (!$data || !is_array($data) || !array_key_exists('folders', $data)) {
+            return;
+        }
+
+        if (!is_string($data['folders'])) {
             return;
         }
 

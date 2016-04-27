@@ -216,7 +216,7 @@ class RestUsersTest extends WebTestCase
             )
         );
         $result = $this->client->getResponse();
-        $this->assertJsonResponseStatusCodeEquals($result, 400);
+        $this->assertJsonResponseStatusCodeEquals($result, 404);
     }
 
     /**
