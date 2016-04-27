@@ -25,12 +25,11 @@ services:
     oro_entity_pagination.storage.data_collector:
         class: %oro_entity_pagination.storage.data_collector.class%
         arguments:
-            - @oro_datagrid.datagrid.manager
-            - @oro_entity.doctrine_helper
-            - @oro_security.acl_helper
-            - @oro_datagrid.extension.pager.orm.pager
-            - @oro_entity_pagination.storage
-            - @oro_entity_pagination.manager
+            - '@oro_datagrid.datagrid.manager'
+            - '@oro_entity.doctrine_helper'
+            - '@oro_security.acl_helper'
+            - '@oro_entity_pagination.storage'
+            - '@oro_entity_pagination.manager'
 
     oro_entity_pagination.manager:
         class: %oro_entity_pagination.manager.class%
