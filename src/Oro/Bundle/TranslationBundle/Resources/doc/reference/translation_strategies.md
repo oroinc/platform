@@ -2,7 +2,7 @@ Translation Strategies
 ======================
 
 Translation bundle provides mechanism of translation strategies to handle translation fallbacks.
-Each strategy provides locale fallback tree tree that describes which locales must be used as fallback locale
+Each strategy provides locale fallback tree that describes which locales must be used as fallback locale
 for each source fallback. Here is example of such tree:
 
 ```
@@ -28,7 +28,7 @@ translation fallbacks.
 ### Classes Description
 
 
-#### TranslationBundle\Strategy\TranslationStrategyInterface**
+#### TranslationBundle\Strategy\TranslationStrategyInterface
 
 Main interface for translation strategies.
 
