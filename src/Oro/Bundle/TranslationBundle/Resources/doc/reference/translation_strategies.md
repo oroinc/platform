@@ -1,19 +1,9 @@
 Translation Strategies
 ======================
 
-
-
-
-### Classes Description
-
-#### TranslationBundle\Strategy\TranslationStrategyInterface**
-
-Main interface for translation strategies.
-
-Methods:
-
-* **getName** - returns text identifier of the strategy;
-* **getLocaleFallbacks** - returns tree of locale fallbacks, see example below:
+Translation bundle provides mechanism of translation strategies to handle translation fallbacks.
+Each strategy provides locale fallback tree tree that describes which locales must be used as fallback locale
+for each source fallback. Here is example of such tree:
 
 ```
 [
@@ -30,6 +20,23 @@ Methods:
 ]
 ```
 
+Current strategy can be extracted from strategy provider - this class is used to store selected strategy and
+perform some additional manipulations with it. Translator uses strategy provider and current strategy to handle
+translation fallbacks.
+
+
+### Classes Description
+
+
+#### TranslationBundle\Strategy\TranslationStrategyInterface**
+
+Main interface for translation strategies.
+
+Methods:
+
+* **getName** - returns text identifier of the strategy;
+* **getLocaleFallbacks** - returns tree of locale fallbacks.
+
 
 #### TranslationBundle\Strategy\DefaultTranslationStrategy
 
@@ -44,3 +51,5 @@ Methods:
 
 * **getStrategy** - returns current strategy;
 * **setStrategy** - sets specified strategy as current;
+* **getFallbackLocales** - returns list of allowed fallback locales for specified strategy and source locale;
+* **getAllFallbackLocales** - returns list of all fallback locales for specified strategy.
