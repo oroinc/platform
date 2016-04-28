@@ -44,9 +44,10 @@ For execute features you need browser emulator demon (Selenium2 or PhantomJs) ru
 Install PhantomJs:
 
 ```bash
-wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
-tar -xvf $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/travis-phantomjs
-ln -s $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
+mkdir $HOME/phantomjs
+wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
+tar -xvf $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/travis-phantomjs
+ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
 ```
 
 Run PhantomJs:
@@ -58,6 +59,7 @@ phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1 &
 Install Selenium2
 
 ```bash
+mkdir $HOME/selenium-server-standalone-2.52.0
 curl -L http://selenium-release.storage.googleapis.com/2.52/selenium-server-standalone-2.52.0.jar > $HOME/selenium-server-standalone-2.52.0/selenium.jar
 ```
 
