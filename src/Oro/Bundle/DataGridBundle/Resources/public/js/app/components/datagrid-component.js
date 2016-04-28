@@ -45,6 +45,21 @@ define(function(require) {
         _.defer(_.bind(builder.init, builder), built, options);
     }
 
+    /**
+     * Processes datagrid options by builder
+     *
+     * @param {jQuery.Deferred} built
+     * @param {Object} options
+     * @param {Object} builder
+     */
+    function processDatagridOptionsByBuilder(built, options, builder) {
+        if (!_.has(builder, 'processDatagridOptions')) {
+            built.resolve();
+            return;
+        }
+        builder.processDatagridOptions(built, options);
+    }
+
     DataGridComponent = BaseComponent.extend({
         initialize: function(options) {
             if (!options.enableFilters) {
@@ -61,24 +76,37 @@ define(function(require) {
             options = options || {};
             this.fixStates(options);
             this.processOptions(options);
-            this.initDataGrid(options);
 
-            var promises = [this.built.promise()];
+            var optionsProcessedPromises = [];
 
-            // run related builders
+            // let builders process datagrid options
             _.each(options.builders, function(module) {
                 var built = $.Deferred();
-                promises.push(built.promise());
-                require([module], _.partial(runBuilder, built, options));
+                optionsProcessedPromises.push(built.promise());
+                require([module], _.partial(processDatagridOptionsByBuilder, built, options));
             });
 
-            $.when.apply($, promises).always(function() {
-                self.subComponents = _.compact(arguments);
-                self._resolveDeferredInit();
-                self.$componentEl.find('.view-loading').remove();
-                self.$el.show();
-                self.grid.trigger('shown');
-            });
+            $.when.apply($, optionsProcessedPromises).always(_.bind(function() {
+                // then init datagrid and run builders
+                this.initDataGrid(options);
+
+                var buildersReadyPromises = [this.built.promise()];
+
+                // run related builders
+                _.each(options.builders, function(module) {
+                    var built = $.Deferred();
+                    buildersReadyPromises.push(built.promise());
+                    require([module], _.partial(runBuilder, built, options));
+                });
+
+                $.when.apply($, buildersReadyPromises).always(function() {
+                    self.subComponents = _.compact(arguments);
+                    self._resolveDeferredInit();
+                    self.$componentEl.find('.view-loading').remove();
+                    self.$el.show();
+                    self.grid.trigger('shown');
+                });
+            }, this));
         },
 
         /**
