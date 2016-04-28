@@ -2,10 +2,13 @@
 
 namespace Oro\Bundle\TranslationBundle\Tests\Unit\Translation;
 
+use Symfony\Component\DependencyInjection\ContainerInterface;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Component\Translation\MessageSelector;
 use Symfony\Component\Translation\MessageCatalogue;
 
+use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface;
+use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 use Oro\Bundle\TranslationBundle\Translation\DebugTranslator;
 
 class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
@@ -43,7 +46,12 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTrans($locale, $domain, $source, $expected)
     {
         $locales = array_keys($this->messages);
-        $translator = $this->getTranslator($this->getLoader());
+        foreach ($locales as $key => $value) {
+            if ($value === $locale) {
+                unset($locales[$key]);
+            }
+        }
+        $translator = $this->getTranslator($this->getLoader(), $this->getStrategyProvider($locales));
         $_locale = !is_null($locale) ? $locale : reset($locales);
         $translator->setLocale($_locale);
         $translator->setFallbackLocales(array_slice($locales, array_search($_locale, $locales) + 1));
@@ -83,7 +91,12 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
     public function testTransChoice($locale, $domain, $source, $number, $expected)
     {
         $locales = array_keys($this->messages);
-        $translator = $this->getTranslator($this->getLoader());
+        foreach ($locales as $key => $value) {
+            if ($value === $locale) {
+                unset($locales[$key]);
+            }
+        }
+        $translator = $this->getTranslator($this->getLoader(), $this->getStrategyProvider($locales));
         $_locale = !is_null($locale) ? $locale : reset($locales);
         $translator->setLocale($_locale);
         $translator->setFallbackLocales(array_slice($locales, array_search($_locale, $locales) + 1));
@@ -157,18 +170,49 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param array $fallbackLocales
+     * @return TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getStrategyProvider(array $fallbackLocales = [])
+    {
+        /** @var TranslationStrategyInterface|\PHPUnit_Framework_MockObject_MockObject $strategy */
+        $strategy = $this->getMock('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyInterface');
+
+        /** @var TranslationStrategyProvider|\PHPUnit_Framework_MockObject_MockObject $strategyProvider */
+        $strategyProvider = $this->getMockBuilder('Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $strategyProvider->expects($this->any())
+            ->method('getStrategy')
+            ->willReturn($strategy);
+        $strategyProvider->expects($this->any())
+            ->method('getFallbackLocales')
+            ->willReturn($fallbackLocales);
+
+        return $strategyProvider;
+    }
+
+    /**
      * Creates a mock of Container
      *
      * @param LoaderInterface $loader
+     * @param TranslationStrategyProvider $strategyProvider
      * @return \PHPUnit_Framework_MockObject_MockObject
      */
-    protected function getContainer($loader)
+    protected function getContainer($loader, $strategyProvider)
     {
+        $exceptionFlag = ContainerInterface::EXCEPTION_ON_INVALID_REFERENCE;
+        $valueMap = [
+            ['loader', $exceptionFlag, $loader],
+            ['oro_translation.strategy.provider', $exceptionFlag, $strategyProvider]
+        ];
+
         $container = $this->getMock('Symfony\Component\DependencyInjection\ContainerInterface');
         $container
             ->expects($this->any())
             ->method('get')
-            ->will($this->returnValue($loader));
+            ->willReturnMap($valueMap);
+
         return $container;
     }
 
@@ -179,10 +223,10 @@ class DebugTranslatorTest extends \PHPUnit_Framework_TestCase
      * @param array $options
      * @return DebugTranslator
      */
-    public function getTranslator($loader, $options = array())
+    public function getTranslator($loader, $strategyProvider, $options = array())
     {
         $translator = new DebugTranslator(
-            $this->getContainer($loader),
+            $this->getContainer($loader, $strategyProvider),
             new MessageSelector(),
             array('loader' => array('loader')),
             $options

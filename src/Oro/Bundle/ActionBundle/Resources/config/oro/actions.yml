@@ -6,6 +6,35 @@ operations:
         preconditions:
             '@and':
                 - '@not_blank': $.data
+        preactions:
+            - '@tree':
+                conditions:
+                    '@not_blank': $.data
+                actions:
+                    - '@call_service_method':
+                        service: oro_entity_config.provider.entity
+                        method: getClassName
+                        method_parameters: [$.data]
+                        attribute: $.className
+                    - '@call_service_method':
+                        service: oro_entity_config.config_manager
+                        method: hasConfig
+                        method_parameters: [$.className]
+                        attribute: $.hasConfig
+            - '@tree':
+                conditions:
+                    '@and':
+                        - '@not_blank': $.data
+                        - '@eq': [$.hasConfig, true]
+                actions:
+                    - '@call_service_method':
+                        service: oro_entity_config.helper.entity_config
+                        method: getConfigValue
+                        method_parameters: [$.data, 'label']
+                        attribute: $.entityLabel
+                    - '@trans':
+                        id: $.entityLabel
+                        attribute: $.entityLabel
 
     UPDATE:
         extends: CRUD_ACTION
@@ -19,7 +48,9 @@ operations:
         preactions:
             - '@tree':
                 conditions:
-                    '@not_blank': $.data
+                    '@and':
+                        - '@not_blank': $.data
+                        - '@eq': [$.hasConfig, true]
                 actions:
                     - '@call_service_method':
                         service: oro_entity_config.helper.entity_config
@@ -52,25 +83,20 @@ operations:
         preactions:
             - '@tree':
                 conditions:
-                    '@not_blank': $.data
+                    '@and':
+                        - '@not_blank': $.data
+                        - '@eq': [$.hasConfig, true]
                 actions:
                     - '@call_service_method':
                         service: oro_entity_config.helper.entity_config
                         method: getRoutes
-                        method_parameters: [$.data, ['name', 'delete']]
+                        method_parameters: [$.data, ['name']]
                         attribute: $.routes
-                    - '@call_service_method':
-                        service: oro_entity_config.helper.entity_config
-                        method: getConfigValue
-                        method_parameters: [$.data, 'label']
-                        attribute: $.entityLabel
-                    - '@trans':
-                        id: $.entityLabel
-                        attribute: $.entityLabel
         preconditions:
             '@and':
-                - '@not_blank': $.routes[name]
-                - '@not_blank': $.routes[delete]
+                - '@or':
+                    - '@not_blank': $.routes[name]
+                    - '@not_blank': $.gridName
         label: oro.action.delete
         frontend_options:
             title: oro.action.delete_entity
@@ -88,11 +114,22 @@ operations:
                     data: $.data
             - '@flash_message':
                 message: oro.action.delete_message
-                type: 'info'
+                type: 'success'
                 message_parameters:
                     entityLabel: $.entityLabel
             - '@redirect':
-                route: $.routes[name]
+                conditions:
+                    '@and':
+                        - '@empty': $.gridName
+                        - '@not_empty': $.routes[name]
+                parameters:
+                    route: $.routes[name]
+            - '@refresh_grid':
+                conditions:
+                    '@and':
+                        - '@empty': $.routes[name]
+                        - '@not_empty': $.gridName
+                parameters: [$.gridName]
 
 action_groups:
     DELETE:
