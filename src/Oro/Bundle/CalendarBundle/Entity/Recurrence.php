@@ -58,6 +58,12 @@ class Recurrence
     /**
      * @var int
      *
+     * Units of this attribute depend of recurrenceType.
+     * For daily recurrence it is number of days.
+     * For weekly recurrence it is number of weeks.
+     * For monthly, monthnth recurrences it is number of months.
+     * For yearly, yearnth recurrences it is number of month, which is multiple of 12. I.e. 12, 24, 36 etc.
+     *
      * @ORM\Column(name="`interval`", type="integer")
      */
     protected $interval;

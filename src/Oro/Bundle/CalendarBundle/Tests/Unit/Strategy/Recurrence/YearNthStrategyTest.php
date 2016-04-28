@@ -92,7 +92,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'start < end < startTime < endTime' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_FIRST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',
@@ -113,7 +113,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'start < startTime < end < endTime' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_FIRST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',
@@ -135,7 +135,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'start < startTime < endTime < end' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_FIRST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',
@@ -157,7 +157,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'startTime < start < endTime < end' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_FIRST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',
@@ -180,7 +180,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'startTime < endTime < start < end' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_FIRST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',
@@ -198,7 +198,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'start < startTime < end < endTime with no result' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_FIRST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',
@@ -215,7 +215,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'startTime < start < end < endTime with X occurrences' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_LAST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',
@@ -232,7 +232,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'startTime < start < end < endTime with Y occurrences' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_LAST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',
@@ -250,7 +250,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'start < startTime < end < endTime with last instance' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_LAST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',
@@ -268,7 +268,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             'startTime < start < end < endTime' => [
                 'params' => [
                     'instance' => Recurrence::INSTANCE_FIRST,
-                    'interval' => 1,
+                    'interval' => 12, // a number of months, which is a multiple of 12
                     'monthOfYear' => 4,
                     'daysOfWeek' => [
                         'monday',

@@ -74,7 +74,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < end < startTime < endTime' => [
                 'params' => [
-                    'interval' => 1,
+                    'interval' => 12, // number of months, which is a multiple of 12
                     'dayOfMonth' => 25,
                     'monthOfYear' => 4,
                     'occurrences' => null,
@@ -92,7 +92,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < startTime < end < endTime' => [
                 'params' => [
-                    'interval' => 12,
+                    'interval' => 12, // number of months, which is a multiple of 12
                     'dayOfMonth' => 25,
                     'monthOfYear' => 4,
                     'occurrences' => null,
@@ -112,7 +112,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < startTime < endTime < end' => [
                 'params' => [
-                    'interval' => 1,
+                    'interval' => 12, // number of months, which is a multiple of 12
                     'dayOfMonth' => 25,
                     'monthOfYear' => 4,
                     'occurrences' => null,
@@ -131,7 +131,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'startTime < start < endTime < end' => [
                 'params' => [
-                    'interval' => 1,
+                    'interval' => 12, // number of months, which is a multiple of 12
                     'dayOfMonth' => 25,
                     'monthOfYear' => 4,
                     'occurrences' => null,
@@ -150,7 +150,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'startTime < endTime < start < end' => [
                 'params' => [
-                    'interval' => 12,
+                    'interval' => 12, // number of months, which is a multiple of 12
                     'dayOfMonth' => 25,
                     'monthOfYear' => 4,
                     'occurrences' => null,
@@ -165,7 +165,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
 
             'startTime < start < end < endTime with X occurrences' => [
                 'params' => [
-                    'interval' => 1,
+                    'interval' => 12, // number of months, which is a multiple of 12
                     'dayOfMonth' => 25,
                     'monthOfYear' => 4,
                     'occurrences' => 2,
@@ -180,7 +180,7 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
             ],
             'startTime < start < endTime < end without matching' => [
                 'params' => [
-                    'interval' => 12,
+                    'interval' => 12, // number of months, which is a multiple of 12
                     'dayOfMonth' => 25,
                     'monthOfYear' => 4,
                     'occurrences' => null,

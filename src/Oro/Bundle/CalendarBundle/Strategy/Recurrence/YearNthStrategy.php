@@ -5,6 +5,9 @@ namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 
+/**
+ * Recurrence with type Recurrence::TYPE_YEAR_N_TH will provide interval a number of month, which is multiple of 12.
+ */
 class YearNthStrategy implements StrategyInterface
 {
     /** @var StrategyHelper */
@@ -49,12 +52,12 @@ class YearNthStrategy implements StrategyInterface
             );
         }
 
-        $interval = $recurrence->getInterval();
+        $interval = $recurrence->getInterval(); // a number of months, which is a multiple of 12
         $fromStartInterval = 1;
 
         if ($start > $occurrenceDate) {
             $dateInterval = $start->diff($occurrenceDate);
-            $fromStartInterval = (int)$dateInterval->format('%y') + (int)$dateInterval->format('m');
+            $fromStartInterval = (int)$dateInterval->format('%y') * 12 + (int)$dateInterval->format('m');
             $fromStartInterval = floor($fromStartInterval / $interval);
             $occurrenceDate = $this->getNextOccurrence(
                 $fromStartInterval++ * $interval,
@@ -108,17 +111,17 @@ class YearNthStrategy implements StrategyInterface
     /**
      * Returns occurrence date according to last occurrence date and recurrence rules.
      *
-     * @param $interval
-     * @param $dayOfWeek
-     * @param $monthOfYear
-     * @param $instance
+     * @param integer $interval a number of months, which is a multiple of 12
+     * @param array $dayOfWeek
+     * @param integer $monthOfYear
+     * @param integer $instance
      * @param \DateTime $date
      *
      * @return \DateTime
      */
     protected function getNextOccurrence($interval, $dayOfWeek, $monthOfYear, $instance, \DateTime $date)
     {
-        $occurrenceDate = new \DateTime("+{$interval} year {$date->format('c')}");
+        $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
         $instanceRelativeValue = $this->strategyHelper->getInstanceRelativeValue($instance);
         $month = date('M', mktime(0, 0, 0, $monthOfYear));
