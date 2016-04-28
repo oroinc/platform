@@ -22,10 +22,17 @@ class MonthNthStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \RuntimeException
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
+        // @TODO handle cases when Recurrence::$startTime = Recurrence::$endTime = null.
         $result = [];
+        // @TODO extract validation into abstract class or strategy helper.
+        if (false === filter_var($recurrence->getInterval(), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
+            throw new \RuntimeException('Value should be integer with min_rage >= 1.');
+        }
         $startTime = $recurrence->getStartTime();
         $dayOfWeek = $recurrence->getDayOfWeek();
         $instance = $recurrence->getInstance();

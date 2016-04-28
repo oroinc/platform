@@ -22,10 +22,17 @@ class YearNthStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @throws \RuntimeException
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
+        // @TODO handle cases when Recurrence::$startTime = Recurrence::$endTime = null.
         $result = [];
+        // @TODO extract validation into abstract class or strategy helper.
+        if (false === filter_var($recurrence->getInterval(), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
+            throw new \RuntimeException('Value should be integer with min_rage >= 1.');
+        }
         $startTime = $recurrence->getStartTime();
         $dayOfWeek = $recurrence->getDayOfWeek();
         $monthOfYear = $recurrence->getMonthOfYear();
@@ -47,7 +54,7 @@ class YearNthStrategy implements StrategyInterface
 
         if ($start > $occurrenceDate) {
             $dateInterval = $start->diff($occurrenceDate);
-            $fromStartInterval = (int)$dateInterval->format('%y') * 12 + (int)$dateInterval->format('m');
+            $fromStartInterval = (int)$dateInterval->format('%y') + (int)$dateInterval->format('m');
             $fromStartInterval = floor($fromStartInterval / $interval);
             $occurrenceDate = $this->getNextOccurrence(
                 $fromStartInterval++ * $interval,
@@ -59,6 +66,7 @@ class YearNthStrategy implements StrategyInterface
         }
 
         $occurrences = $recurrence->getOccurrences();
+        // @TODO extract condition retrievement into abstract class or strategy helper.
         while ($occurrenceDate <= $recurrence->getEndTime()
             && $occurrenceDate <= $end
             && ($occurrences === null || $fromStartInterval <= $occurrences)
@@ -110,7 +118,7 @@ class YearNthStrategy implements StrategyInterface
      */
     protected function getNextOccurrence($interval, $dayOfWeek, $monthOfYear, $instance, \DateTime $date)
     {
-        $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
+        $occurrenceDate = new \DateTime("+{$interval} year {$date->format('c')}");
 
         $instanceRelativeValue = $this->strategyHelper->getInstanceRelativeValue($instance);
         $month = date('M', mktime(0, 0, 0, $monthOfYear));

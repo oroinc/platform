@@ -4,8 +4,49 @@ namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
-class YearlyStrategy extends MonthlyStrategy
+class YearlyStrategy implements StrategyInterface
 {
+    /**
+     * {@inheritdoc}
+     *
+     * @throws \RuntimeException
+     */
+    public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
+    {
+        // @TODO handle cases when Recurrence::$startTime = Recurrence::$endTime = null.
+        $result = [];
+        // @TODO extract validation into abstract class or strategy helper.
+        if (false === filter_var($recurrence->getInterval(), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
+            throw new \RuntimeException('Value should be integer with min_rage >= 1.');
+        }
+        $occurrenceDate = $this->getFirstOccurrence($recurrence);
+        $interval = $recurrence->getInterval();
+        $fromStartInterval = 1;
+
+        if ($start > $occurrenceDate) {
+            $dateInterval = $start->diff($occurrenceDate);
+            // @TODO refactor this class because it almost identical to MonthlyStrategy, next line differs only.
+            $fromStartInterval = (int)$dateInterval->format('%y')+ (int)$dateInterval->format('m');
+            $fromStartInterval = floor($fromStartInterval / $interval);
+            $occurrenceDate = $this->getNextOccurrence($fromStartInterval++ * $interval, $occurrenceDate);
+        }
+
+        $occurrences = $recurrence->getOccurrences();
+        // @TODO extract condition retrievement into abstract class or strategy helper.
+        while ($occurrenceDate <= $recurrence->getEndTime()
+            && $occurrenceDate <= $end
+            && ($occurrences === null || $fromStartInterval <= $occurrences)
+        ) {
+            if ($occurrenceDate >= $start) {
+                $result[] = $occurrenceDate;
+            }
+            $fromStartInterval++;
+            $occurrenceDate = $this->getNextOccurrence($interval, $occurrenceDate);
+        }
+
+        return $result;
+    }
+
     /**
      * {@inheritdoc}
      */
@@ -28,6 +69,15 @@ class YearlyStrategy extends MonthlyStrategy
     public function getName()
     {
         return 'recurrence_yearly';
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getNextOccurrence($interval, \DateTime $date)
+    {
+        // @TODO refactor this class because it almost identical to MonthlyStrategy, next line differs only.
+        return new \DateTime("+{$interval} year {$date->format('c')}");
     }
 
     /**
