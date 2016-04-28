@@ -11,7 +11,6 @@ use Oro\Bundle\DataGridBundle\Datagrid\Common\DatagridConfiguration;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface;
 use Oro\Bundle\DataGridBundle\Datasource\ResultRecord;
 use Oro\Bundle\DataGridBundle\Extension\AbstractExtension;
-use Oro\Bundle\DataGridBundle\Exception\UnexpectedTypeException;
 
 use Oro\Bundle\SearchBundle\Engine\ObjectMapper;
 use Oro\Bundle\SearchBundle\Event\PrepareResultItemEvent;
@@ -66,10 +65,7 @@ class TagSearchResultsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rows = $result->offsetGetByPath('[data]');
-        if (!is_array($rows)) {
-            throw new UnexpectedTypeException($rows, 'array');
-        }
+        $rows = $result->getData();
 
         $mappingConfig = $this->mapper->getMappingConfig();
 
@@ -106,7 +102,7 @@ class TagSearchResultsExtension extends AbstractExtension
             $resultRows[] = new ResultRecord(['entity' => $entity, 'indexer_item' => $item]);
         }
 
-        $result->offsetSet('data', $resultRows);
+        $result->setData($resultRows);
     }
 
     /**

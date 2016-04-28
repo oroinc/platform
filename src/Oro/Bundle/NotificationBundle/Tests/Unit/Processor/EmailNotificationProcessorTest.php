@@ -71,13 +71,18 @@ class EmailNotificationProcessorTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
+        $emailProcessor = $this->getMockBuilder('Oro\Bundle\EmailBundle\Mailer\Processor')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->processor = new EmailNotificationProcessor(
             $this->logger,
             $this->entityManager,
             $this->entityPool,
             $this->emailRenderer,
             $this->mailer,
-            $this->cm
+            $this->cm,
+            $emailProcessor
         );
 
         $this->processor->setEnv(self::TEST_ENV);

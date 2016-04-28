@@ -61,7 +61,7 @@ class FormatterExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rows       = (array)$result->offsetGetOr('data', []);
+        $rows       = $result->getData();
         $columns    = $config->offsetGetOr(Configuration::COLUMNS_KEY, []);
         $properties = $config->offsetGetOr(Configuration::PROPERTIES_KEY, []);
         $toProcess  = array_merge($columns, $properties);
@@ -77,7 +77,7 @@ class FormatterExtension extends AbstractExtension
             $rows[$key] = $currentRow;
         }
 
-        $result->offsetSet('data', $rows);
+        $result->setData($rows);
     }
 
     /**
