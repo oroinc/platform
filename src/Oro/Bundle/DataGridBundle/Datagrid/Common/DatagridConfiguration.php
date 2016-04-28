@@ -34,6 +34,12 @@ class DatagridConfiguration extends DataObject
     const DATASOURCE_SKIP_ACL_APPLY_PATH = '[source][skip_acl_apply]';
 
     /**
+     * This option sets what ACL permission will be applied to datasource if value is DATASOURCE_SKIP_ACL_APPLY_PATH
+     * is set to false. Default value of this setting is VIEW.
+     */
+    const DATASOURCE_ACL_APPLY_PERMISSION_PATH = '[source][acl_apply_permission]';
+
+    /**
      * @return string
      */
     public function getDatasourceType()
@@ -73,6 +79,27 @@ class DatagridConfiguration extends DataObject
         }
 
         return (bool)$result;
+    }
+
+    /**
+     * Gets ACL permission which should be applied to datasource if isDatasourceSkipAclApply() returns false.
+     *
+     * @return string
+     */
+    public function getDatasourceAclApplyPermission()
+    {
+        return $this->offsetGetByPath(self::DATASOURCE_ACL_APPLY_PERMISSION_PATH, 'VIEW');
+    }
+
+    /**
+     * Sets ACL permission which should be applied to datasource if isDatasourceSkipAclApply() returns false.
+     *
+     * @param string $value
+     * @return string
+     */
+    public function setDatasourceAclApplyPermission($value)
+    {
+        return $this->offsetSetByPath(self::DATASOURCE_ACL_APPLY_PERMISSION_PATH, $value);
     }
 
     /**

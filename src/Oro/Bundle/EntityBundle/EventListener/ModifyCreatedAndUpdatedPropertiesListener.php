@@ -9,6 +9,7 @@ use Doctrine\ORM\EntityManagerInterface;
 use Doctrine\ORM\Event\OnFlushEventArgs;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
+use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\UserBundle\Entity\UserInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\CreatedAtAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\UpdatedAtAwareInterface;
@@ -155,8 +156,9 @@ class ModifyCreatedAndUpdatedPropertiesListener implements OptionalListenerInter
      */
     protected function updateUpdatedBy($entity)
     {
-        if ($entity instanceof UpdatedByAwareInterface && !$entity->isUpdatedBySet()) {
-            $entity->setUpdatedBy($this->getUser());
+        $user = $this->getUser();
+        if ($entity instanceof UpdatedByAwareInterface && !$entity->isUpdatedBySet() && $user instanceof User) {
+            $entity->setUpdatedBy($user);
 
             return true;
         }
