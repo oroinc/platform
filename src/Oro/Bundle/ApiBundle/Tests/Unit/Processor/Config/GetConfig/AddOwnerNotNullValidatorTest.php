@@ -35,7 +35,7 @@ class AddOwnerNotNullValidatorTest extends ConfigProcessorTestCase
         $this->processor = new AddOwnerNotNullValidator($this->doctrineHelper, $this->ownershipMetadataProvider);
     }
 
-    public function testProcessOnNonManageableEntity()
+    public function testProcessForNonManageableEntity()
     {
         $className = 'stdClass';
         $this->context->setClassName($className);
