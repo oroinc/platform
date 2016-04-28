@@ -3,9 +3,21 @@
 namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 
 class MonthlyStrategy implements StrategyInterface
 {
+    /** @var StrategyHelper */
+    protected $strategyHelper;
+
+    /**
+     * @param StrategyHelper $strategyHelper
+     */
+    public function __construct(StrategyHelper $strategyHelper)
+    {
+        $this->strategyHelper = $strategyHelper;
+    }
+
     /**
      * {@inheritdoc}
      *

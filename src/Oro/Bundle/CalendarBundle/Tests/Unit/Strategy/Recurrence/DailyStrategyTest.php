@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Strategy\Recurrence\DailyStrategy;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 
 class DailyStrategyTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +13,8 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->strategy = new DailyStrategy();
+        $helper = new StrategyHelper();
+        $this->strategy = new DailyStrategy($helper);
     }
 
     public function testGetName()

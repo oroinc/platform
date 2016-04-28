@@ -275,43 +275,50 @@ services:
             - { name: oro_workflow.action, alias: create_calendar_event }
 
     # Recurrence Strategies
+    oro_calendar.recurrence.strategy.abstract:
+        abstract: true
+        arguments:
+            - '@oro_calendar.strategy.recurrence.strategy_helper'
+
     oro_calendar.recurrence.strategy.delegate:
-        class: %oro_calendar.strategy.delegate.class%
+        class: '%oro_calendar.strategy.delegate.class%'
 
     oro_calendar.recurrence.strategy:
         alias: oro_calendar.recurrence.strategy.delegate
 
     oro_calendar.recurrence.strategy.daily:
-        class: %oro_calendar.strategy.daily.class%
+        class: '%oro_calendar.strategy.daily.class%'
+        parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.weekly:
-        class: %oro_calendar.strategy.weekly.class%
+        class: '%oro_calendar.strategy.weekly.class%'
+        parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.monthly:
-        class: %oro_calendar.strategy.monthly.class%
+        class: '%oro_calendar.strategy.monthly.class%'
+        parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.yearly:
-        class: %oro_calendar.strategy.yearly.class%
+        class: '%oro_calendar.strategy.yearly.class%'
+        parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.monthnth:
-        class: %oro_calendar.strategy.monthnth.class%
-        arguments:
-            - '@oro_calendar.strategy.recurrence.strategy_helper'
+        class: '%oro_calendar.strategy.monthnth.class%'
+        parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.yearnth:
-        class: %oro_calendar.strategy.yearnth.class%
-        arguments:
-            - '@oro_calendar.strategy.recurrence.strategy_helper'
+        class: '%oro_calendar.strategy.yearnth.class%'
+        parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 

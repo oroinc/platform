@@ -14,8 +14,6 @@ class YearNthStrategy implements StrategyInterface
     protected $strategyHelper;
 
     /**
-     * YearNthStrategy constructor.
-     *
      * @param StrategyHelper $strategyHelper
      */
     public function __construct(StrategyHelper $strategyHelper)
