@@ -24,4 +24,11 @@ interface AclClassInfo
      * @return string
      */
     public function getLabel();
+
+    /**
+     * Gets the description
+     *
+     * @return string
+     */
+    public function getDescription();
 }

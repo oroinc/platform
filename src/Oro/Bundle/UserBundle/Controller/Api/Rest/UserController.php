@@ -303,6 +303,11 @@ class UserController extends RestController implements ClassResourceInterface
                 }
                 $value = $result;
                 break;
+            case 'organization':
+                if ($value) {
+                    $value = $value->getName();
+                }
+                break;
             case 'owner':
                 if ($value) {
                     $value = [
@@ -330,7 +335,9 @@ class UserController extends RestController implements ClassResourceInterface
         unset($result['imapConfiguration']);
         unset($result['currentStatus']);
         unset($result['statuses']);
-        unset($result['api']);
+        unset($result['apiKeys']);
+        unset($result['organizations']);
+        unset($result['emailOrigins']);
 
         //todo: Add user avatar to api
         /*$result['imagePath'] = null;

@@ -73,6 +73,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'groups' => [],
                         'for_all_datagrids' => false,
                         'datagrids' => [],
+                        'exclude_datagrids' => [],
                         'order' => 0,
                         'enabled' => true,
                         OperationDefinition::PREACTIONS => [],
@@ -109,6 +110,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'groups' => ['group_1', 'group_2'],
                         'for_all_datagrids' => true,
                         'datagrids' => ['datagrid_1', 'datagrid_2'],
+                        'exclude_datagrids' => ['datagrid_3'],
                         'order' => 15,
                         'enabled' => false,
                         'frontend_options' => [
@@ -185,6 +187,7 @@ class OperationListConfigurationTest extends \PHPUnit_Framework_TestCase
                         'groups' => ['group_1', 'group_2'],
                         'for_all_datagrids' => true,
                         'datagrids' => ['datagrid_1', 'datagrid_2'],
+                        'exclude_datagrids' => ['datagrid_3'],
                         'order' => 15,
                         'enabled' => false,
                         OperationDefinition::PREACTIONS => [

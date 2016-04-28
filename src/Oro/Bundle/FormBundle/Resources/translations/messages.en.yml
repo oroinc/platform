@@ -12,6 +12,7 @@ oro:
         click_here_to_select: Click here to select...
         custom_value: Custom
         tooltip.read_more: Read more
+        new: New
         collection:
             add: Add
         color:

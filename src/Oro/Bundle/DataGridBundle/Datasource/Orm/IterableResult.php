@@ -29,10 +29,11 @@ class IterableResult extends BufferedQueryResultIterator implements IterableResu
      * Constructor
      *
      * @param QueryBuilder|Query $source
+     * @param null|bool $useCountWalker
      */
-    public function __construct($source)
+    public function __construct($source, $useCountWalker = null)
     {
-        parent::__construct($source);
+        parent::__construct($source, $useCountWalker);
         $this->source = $source;
     }
 
