@@ -81,15 +81,24 @@ class EntityCreationTransformerTest extends \PHPUnit_Framework_TestCase
         return [
             'no value 1' => [null, null],
             'no value 2' => ['', null],
-            'no json data' => [
-                'bad value',
+            'no json data and not scalar' => [
+                [1],
                 null,
                 'value',
                 false,
                 'name',
-                new UnexpectedTypeException('bad value', 'json encoded string')
+                new UnexpectedTypeException([1], 'json encoded string or scalar value')
             ],
-            'load entity' => [
+            'load entity: id from json' => [
+                json_encode(['id' => 15]),
+                new TestCreationEntity(15),
+                'value',
+                false,
+                'name',
+                null,
+                true
+            ],
+            'load entity: id as scalar' => [
                 json_encode(['id' => 15]),
                 new TestCreationEntity(15),
                 'value',
