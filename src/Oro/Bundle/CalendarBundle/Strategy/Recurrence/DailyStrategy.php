@@ -20,18 +20,12 @@ class DailyStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \RuntimeException
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        // @TODO handle cases when Recurrence::$startTime = Recurrence::$endTime = null.
+        $this->strategyHelper->validateRecurrence($recurrence);
         $result = [];
         $occurrenceDate = $recurrence->getStartTime();
-        // @TODO extract validation into abstract class or strategy helper.
-        if (false === filter_var($recurrence->getInterval(), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
-            throw new \RuntimeException('Value should be integer with min_rage >= 1.');
-        }
         $fromStartInterval = 1;
         if ($start > $occurrenceDate) {
             $dateInterval = $start->diff($occurrenceDate);
@@ -43,7 +37,6 @@ class DailyStrategy implements StrategyInterface
         }
 
         $occurrences = $recurrence->getOccurrences();
-        // @TODO extract condition retrievement into abstract class or strategy helper.
         while ($occurrenceDate <= $recurrence->getEndTime()
             && $occurrenceDate <= $end
             && ($occurrences === null || $fromStartInterval <= $occurrences)
@@ -85,7 +78,7 @@ class DailyStrategy implements StrategyInterface
     /**
      * Returns occurrence date according to last occurrence date and recurrence interval.
      *
-     * @param integer $interval
+     * @param integer $interval A number of days.
      * @param \DateTime $date
      *
      * @return \DateTime

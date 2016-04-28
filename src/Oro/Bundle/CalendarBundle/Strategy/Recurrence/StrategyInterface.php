@@ -16,6 +16,7 @@ interface StrategyInterface
      * @return \DateTime[]
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end);
 

@@ -20,19 +20,16 @@ class MonthNthStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
-     *
-     * @throws \RuntimeException
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        // @TODO handle cases when Recurrence::$startTime = Recurrence::$endTime = null.
+        $this->strategyHelper->validateRecurrence($recurrence);
         $result = [];
-        // @TODO extract validation into abstract class or strategy helper.
-        if (false === filter_var($recurrence->getInterval(), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
-            throw new \RuntimeException('Value should be integer with min_rage >= 1.');
+        $dayOfWeek = $recurrence->getDayOfWeek();
+        if ($dayOfWeek === null || count($dayOfWeek) === 0) {
+            return $result;
         }
         $startTime = $recurrence->getStartTime();
-        $dayOfWeek = $recurrence->getDayOfWeek();
         $instance = $recurrence->getInstance();
         $occurrenceDate = $this->getNextOccurrence(0, $dayOfWeek, $instance, $startTime);
 
@@ -102,14 +99,14 @@ class MonthNthStrategy implements StrategyInterface
     /**
      * Returns occurrence date according to last occurrence date and recurrence rules.
      *
-     * @param integer $interval
-     * @param array $dayOfWeek
+     * @param integer $interval A number of months.
+     * @param array $daysOfWeek
      * @param integer $instance
      * @param \DateTime $date
      *
      * @return \DateTime
      */
-    protected function getNextOccurrence($interval, $dayOfWeek, $instance, \DateTime $date)
+    protected function getNextOccurrence($interval, $daysOfWeek, $instance, \DateTime $date)
     {
         $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
@@ -117,7 +114,7 @@ class MonthNthStrategy implements StrategyInterface
         $month = $occurrenceDate->format('M');
         $year = $occurrenceDate->format('Y');
         $nextDays = [];
-        foreach ($dayOfWeek as $day) {
+        foreach ($daysOfWeek as $day) {
             $nextDays[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
         }
 
