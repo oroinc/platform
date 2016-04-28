@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
-class DailyStrategy implements StrategyInterface
+class YearlyStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
@@ -15,19 +15,20 @@ class DailyStrategy implements StrategyInterface
     {
         // @TODO handle cases when Recurrence::$startTime = Recurrence::$endTime = null.
         $result = [];
-        $occurrenceDate = $recurrence->getStartTime();
         // @TODO extract validation into abstract class or strategy helper.
         if (false === filter_var($recurrence->getInterval(), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
             throw new \RuntimeException('Value should be integer with min_rage >= 1.');
         }
+        $occurrenceDate = $this->getFirstOccurrence($recurrence);
+        $interval = $recurrence->getInterval();
         $fromStartInterval = 1;
+
         if ($start > $occurrenceDate) {
             $dateInterval = $start->diff($occurrenceDate);
-            $fromStartInterval = floor($dateInterval->format('%a') / $recurrence->getInterval());
-            $occurrenceDate = $this->getNextOccurrence(
-                $fromStartInterval++ * $recurrence->getInterval(),
-                $occurrenceDate
-            );
+            // @TODO refactor this class because it almost identical to MonthlyStrategy, next line differs only.
+            $fromStartInterval = (int)$dateInterval->format('%y')+ (int)$dateInterval->format('m');
+            $fromStartInterval = floor($fromStartInterval / $interval);
+            $occurrenceDate = $this->getNextOccurrence($fromStartInterval++ * $interval, $occurrenceDate);
         }
 
         $occurrences = $recurrence->getOccurrences();
@@ -40,7 +41,7 @@ class DailyStrategy implements StrategyInterface
                 $result[] = $occurrenceDate;
             }
             $fromStartInterval++;
-            $occurrenceDate = $this->getNextOccurrence($recurrence->getInterval(), $occurrenceDate);
+            $occurrenceDate = $this->getNextOccurrence($interval, $occurrenceDate);
         }
 
         return $result;
@@ -51,7 +52,7 @@ class DailyStrategy implements StrategyInterface
      */
     public function supports(Recurrence $recurrence)
     {
-        return $recurrence->getRecurrenceType() === Recurrence::TYPE_DAILY;
+        return $recurrence->getRecurrenceType() === Recurrence::TYPE_YEARLY;
     }
 
     /**
@@ -59,7 +60,7 @@ class DailyStrategy implements StrategyInterface
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return 'daily';
+        return 'yearly';
     }
 
     /**
@@ -67,19 +68,33 @@ class DailyStrategy implements StrategyInterface
      */
     public function getName()
     {
-        return 'recurrence_daily';
+        return 'recurrence_yearly';
     }
 
     /**
-     * Returns occurrence date according to last occurrence date and recurrence interval.
-     *
-     * @param integer $interval
-     * @param \DateTime $date
-     *
-     * @return \DateTime
+     * {@inheritdoc}
      */
     protected function getNextOccurrence($interval, \DateTime $date)
     {
-        return new \DateTime("+{$interval} day {$date->format('c')}");
+        // @TODO refactor this class because it almost identical to MonthlyStrategy, next line differs only.
+        return new \DateTime("+{$interval} year {$date->format('c')}");
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getFirstOccurrence(Recurrence $recurrence)
+    {
+        $dayOfMonth = $recurrence->getDayOfMonth();
+        $monthOfYear = $recurrence->getMonthOfYear();
+        $interval = $recurrence->getInterval();
+        $occurrenceDate = $recurrence->getStartTime();
+        $occurrenceDate->setDate($occurrenceDate->format('Y'), $monthOfYear, $dayOfMonth);
+
+        if ($occurrenceDate < $recurrence->getStartTime()) {
+            $occurrenceDate = $this->getNextOccurrence($interval, $occurrenceDate);
+        }
+
+        return $occurrenceDate;
     }
 }

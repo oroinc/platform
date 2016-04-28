@@ -3,7 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Model\Recurrence\YearNthStrategy;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearNthStrategy;
 use Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper;
 
 class YearNthStrategyTest extends \PHPUnit_Framework_TestCase

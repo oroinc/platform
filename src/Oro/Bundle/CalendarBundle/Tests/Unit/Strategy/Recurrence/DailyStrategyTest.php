@@ -3,27 +3,27 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Model\Recurrence\WeeklyStrategy;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\DailyStrategy;
 
-class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
+class DailyStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var WeeklyStrategy  */
+    /** @var DailyStrategy */
     protected $strategy;
 
     protected function setUp()
     {
-        $this->strategy = new WeeklyStrategy();
+        $this->strategy = new DailyStrategy();
     }
 
     public function testGetName()
     {
-        $this->assertEquals($this->strategy->getName(), 'recurrence_weekly');
+        $this->assertEquals($this->strategy->getName(), 'recurrence_daily');
     }
 
     public function testSupports()
     {
         $recurrence = new Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_WEEKLY);
+        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY);
         $this->assertTrue($this->strategy->supports($recurrence));
 
         $recurrence->setRecurrenceType('Test');
@@ -36,10 +36,6 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
     public function testGetOccurrencesWithWrongIntervalValue()
     {
         $recurrence = new Recurrence();
-        $recurrence->setDayOfWeek([
-            'sunday',
-            'monday',
-        ]);
         $recurrence->setInterval(-1.5);
         $this->strategy->getOccurrences(
             $recurrence,
@@ -63,9 +59,8 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
             }, $expected
         );
         $recurrence = new Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_WEEKLY)
+        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
             ->setInterval($params['interval'])
-            ->setDayOfWeek($params['daysOfWeek'])
             ->setStartTime(new \DateTime($params['startTime']))
             ->setEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
@@ -91,14 +86,10 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < end < startTime < endTime' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
+                    'interval' => 5,
                     'occurrences' => null,
                     'start' => '2016-03-28',
-                    'end' => '2016-04-18',
+                    'end' => '2016-04-17',
                     'startTime' => '2016-04-25',
                     'endTime' => '2016-06-10',
                 ],
@@ -111,11 +102,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < startTime < end < endTime' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
+                    'interval' => 5,
                     'occurrences' => null,
                     'start' => '2016-03-28',
                     'end' => '2016-05-01',
@@ -124,6 +111,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                 ],
                 'expected' => [
                     '2016-04-25',
+                    '2016-04-30',
                 ],
             ],
             /**
@@ -132,48 +120,36 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < startTime < endTime < end' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
+                    'interval' => 5,
                     'occurrences' => null,
-                    'start' => '2016-03-28',
-                    'end' => '2016-07-20',
+                    'start' => '2016-05-30',
+                    'end' => '2016-07-03',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-13',
+                    'endTime' => '2016-06-10',
                 ],
                 'expected' => [
-                    '2016-04-25',
-                    '2016-05-08',
-                    '2016-05-09',
-                    '2016-05-22',
-                    '2016-05-23',
-                    '2016-06-05',
-                    '2016-06-06',
+                    '2016-05-30',
+                    '2016-06-04',
+                    '2016-06-09',
                 ],
             ],
             /**
              *     |-----|
              * |-----|
              */
-            'startTime < start < endTime < end after x occurrences' => [
+            'startTime < start < endTime < end' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
-                    'occurrences' => 4,
-                    'start' => '2016-05-01',
-                    'end' => '2016-07-03',
+                    'interval' => 5,
+                    'occurrences' => null,
+                    'start' => '2016-04-30',
+                    'end' => '2016-05-30',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
+                    'endTime' => '2016-05-10',
                 ],
                 'expected' => [
-                    '2016-05-08',
-                    '2016-05-09',
-                    '2016-05-22',
+                    '2016-04-30',
+                    '2016-05-05',
+                    '2016-05-10',
                 ],
             ],
             /**
@@ -182,14 +158,10 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'startTime < endTime < start < end' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
+                    'interval' => 5,
                     'occurrences' => null,
-                    'start' => '2016-06-12',
-                    'end' => '2016-07-20',
+                    'start' => '2016-06-11',
+                    'end' => '2016-07-03',
                     'startTime' => '2016-04-25',
                     'endTime' => '2016-06-10',
                 ],
@@ -199,109 +171,77 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
 
             'start = end = startTime = endTime' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
+                    'interval' => 5,
                     'occurrences' => null,
-                    'start' => '2016-04-25',
-                    'end' => '2016-04-25',
-                    'startTime' => '2016-04-25',
-                    'endTime' => '2016-04-25',
-                ],
-                'expected' => [
-                    '2016-04-25',
-                ],
-            ],
-            'start = end = (startTime - 1 day) = (endTime - 1 day)' => [
-                'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
-                    'occurrences' => null,
-                    'start' => '2016-04-25',
-                    'end' => '2016-04-25',
+                    'start' => '2016-04-24',
+                    'end' => '2016-04-24',
                     'startTime' => '2016-04-24',
                     'endTime' => '2016-04-24',
                 ],
                 'expected' => [
+                    '2016-04-24',
                 ],
             ],
-            'startTime = endTime = (start + interval) = (end + interval)' => [
+            'start = end = (startTime + 1 day) = (endTime + 1 day)' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
+                    'interval' => 5,
                     'occurrences' => null,
-                    'start' => '2016-04-25',
-                    'end' => '2016-04-25',
-                    'startTime' => '2016-05-08',
-                    'endTime' => '2016-0-08',
+                    'start' => '2016-04-24',
+                    'end' => '2016-04-24',
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2016-04-25',
                 ],
                 'expected' => [
                 ],
             ],
-            'startTime < start < end < endTime' => [
+            'startTime = endTime = (start + interval days) = (end + interval days)' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
+                    'interval' => 5,
                     'occurrences' => null,
-                    'start' => '2016-05-01',
-                    'end' => '2016-05-27',
+                    'start' => '2016-04-30',
+                    'end' => '2016-04-30',
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2016-04-25',
+                ],
+                'expected' => [
+                ],
+            ],
+            'start < startTime < endTime < end after x occurrences' => [
+                'params' => [
+                    'interval' => 5,
+                    'occurrences' => 8,
+                    'start' => '2016-05-30',
+                    'end' => '2016-07-03',
                     'startTime' => '2016-04-25',
                     'endTime' => '2016-06-10',
                 ],
                 'expected' => [
-                    '2016-05-08',
-                    '2016-05-09',
-                    '2016-05-22',
-                    '2016-05-23',
+                    '2016-05-30',
                 ],
             ],
-            'startTime < start < end < endTime after x occurrences' => [
+            'start < startTime < endTime < end after y occurrences' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
-                    'occurrences' => 4,
-                    'start' => '2016-05-01',
-                    'end' => '2016-05-27',
+                    'interval' => 5,
+                    'occurrences' => 7,
+                    'start' => '2016-05-30',
+                    'end' => '2016-07-03',
                     'startTime' => '2016-04-25',
                     'endTime' => '2016-06-10',
                 ],
                 'expected' => [
-                    '2016-05-08',
-                    '2016-05-09',
-                    '2016-05-22',
                 ],
             ],
             'no endTime' => [
                 'params' => [
-                    'daysOfWeek' => [
-                        'sunday',
-                        'monday',
-                    ],
-                    'interval' => 2,
-                    'occurrences' => 4,
-                    'start' => '2016-05-01',
+                    'interval' => 5,
+                    'occurrences' => 8,
+                    'start' => '2016-05-30',
                     'end' => '2016-07-03',
                     'startTime' => '2016-04-25',
                     'endTime' => '9999-12-31',
                 ],
                 'expected' => [
-                    '2016-05-08',
-                    '2016-05-09',
-                    '2016-05-22',
+                    '2016-05-30',
                 ],
             ],
         ];

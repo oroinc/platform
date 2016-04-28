@@ -7,7 +7,7 @@ use Doctrine\ORM\QueryBuilder;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
-use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\PropertyAccess\PropertyAccessor;

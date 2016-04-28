@@ -3,27 +3,29 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Model\Recurrence\DailyStrategy;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\MonthNthStrategy;
+use Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper;
 
-class DailyStrategyTest extends \PHPUnit_Framework_TestCase
+class MonthNthStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var DailyStrategy  */
+    /** @var MonthNthStrategy  */
     protected $strategy;
 
     protected function setUp()
     {
-        $this->strategy = new DailyStrategy();
+        $helper = new NthStrategyHelper();
+        $this->strategy = new MonthNthStrategy($helper);
     }
 
     public function testGetName()
     {
-        $this->assertEquals($this->strategy->getName(), 'recurrence_daily');
+        $this->assertEquals($this->strategy->getName(), 'recurrence_monthnth');
     }
 
     public function testSupports()
     {
         $recurrence = new Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY);
+        $recurrence->setRecurrenceType(Recurrence::TYPE_MONTH_N_TH);
         $this->assertTrue($this->strategy->supports($recurrence));
 
         $recurrence->setRecurrenceType('Test');
@@ -59,8 +61,10 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             }, $expected
         );
         $recurrence = new Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
+        $recurrence->setRecurrenceType(Recurrence::TYPE_MONTH_N_TH)
             ->setInterval($params['interval'])
+            ->setDayOfWeek($params['daysOfWeek'])
+            ->setInstance($params['instance'])
             ->setStartTime(new \DateTime($params['startTime']))
             ->setEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
@@ -86,12 +90,16 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < end < startTime < endTime' => [
                 'params' => [
-                    'interval' => 5,
+                    'daysOfWeek' => [
+                        'monday',
+                    ],
+                    'instance' => Recurrence::INSTANCE_FIRST,
+                    'interval' => 2,
                     'occurrences' => null,
-                    'start' => '2016-03-28',
-                    'end' => '2016-04-17',
+                    'start' => '2016-02-01',
+                    'end' => '2016-04-01',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
+                    'endTime' => '2016-08-01',
                 ],
                 'expected' => [
                 ],
@@ -102,7 +110,11 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < startTime < end < endTime' => [
                 'params' => [
-                    'interval' => 5,
+                    'daysOfWeek' => [
+                        'monday',
+                    ],
+                    'instance' => Recurrence::INSTANCE_FIRST,
+                    'interval' => 2,
                     'occurrences' => null,
                     'start' => '2016-03-28',
                     'end' => '2016-05-01',
@@ -110,8 +122,6 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
                     'endTime' => '2016-06-10',
                 ],
                 'expected' => [
-                    '2016-04-25',
-                    '2016-04-30',
                 ],
             ],
             /**
@@ -120,17 +130,20 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < startTime < endTime < end' => [
                 'params' => [
-                    'interval' => 5,
+                    'daysOfWeek' => [
+                        'monday',
+                    ],
+                    'instance' => Recurrence::INSTANCE_FIRST,
+                    'interval' => 2,
                     'occurrences' => null,
-                    'start' => '2016-05-30',
-                    'end' => '2016-07-03',
+                    'start' => '2016-04-01',
+                    'end' => '2016-09-01',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
+                    'endTime' => '2016-08-01',
                 ],
                 'expected' => [
-                    '2016-05-30',
-                    '2016-06-04',
-                    '2016-06-09',
+                    '2016-06-06',
+                    '2016-08-01',
                 ],
             ],
             /**
@@ -139,17 +152,19 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'startTime < start < endTime < end' => [
                 'params' => [
-                    'interval' => 5,
+                    'daysOfWeek' => [
+                        'monday',
+                    ],
+                    'instance' => Recurrence::INSTANCE_FIRST,
+                    'interval' => 2,
                     'occurrences' => null,
-                    'start' => '2016-04-30',
-                    'end' => '2016-05-30',
+                    'start' => '2016-05-30',
+                    'end' => '2016-07-03',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-05-10',
+                    'endTime' => '2016-06-10',
                 ],
                 'expected' => [
-                    '2016-04-30',
-                    '2016-05-05',
-                    '2016-05-10',
+                    '2016-06-06',
                 ],
             ],
             /**
@@ -158,90 +173,52 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'startTime < endTime < start < end' => [
                 'params' => [
-                    'interval' => 5,
+                    'daysOfWeek' => [
+                        'monday',
+                    ],
+                    'instance' => Recurrence::INSTANCE_FIRST,
+                    'interval' => 2,
                     'occurrences' => null,
-                    'start' => '2016-06-11',
-                    'end' => '2016-07-03',
+                    'start' => '2016-09-01',
+                    'end' => '2016-11-01',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
+                    'endTime' => '2016-08-01',
                 ],
                 'expected' => [
                 ],
             ],
 
-            'start = end = startTime = endTime' => [
+            'start < startTime < end < endTime with X instance' => [
                 'params' => [
-                    'interval' => 5,
+                    'daysOfWeek' => [
+                        'monday',
+                    ],
+                    'instance' => Recurrence::INSTANCE_LAST,
+                    'interval' => 2,
                     'occurrences' => null,
-                    'start' => '2016-04-24',
-                    'end' => '2016-04-24',
-                    'startTime' => '2016-04-24',
-                    'endTime' => '2016-04-24',
-                ],
-                'expected' => [
-                    '2016-04-24',
-                ],
-            ],
-            'start = end = (startTime + 1 day) = (endTime + 1 day)' => [
-                'params' => [
-                    'interval' => 5,
-                    'occurrences' => null,
-                    'start' => '2016-04-24',
-                    'end' => '2016-04-24',
-                    'startTime' => '2016-04-25',
-                    'endTime' => '2016-04-25',
-                ],
-                'expected' => [
-                ],
-            ],
-            'startTime = endTime = (start + interval days) = (end + interval days)' => [
-                'params' => [
-                    'interval' => 5,
-                    'occurrences' => null,
-                    'start' => '2016-04-30',
-                    'end' => '2016-04-30',
-                    'startTime' => '2016-04-25',
-                    'endTime' => '2016-04-25',
-                ],
-                'expected' => [
-                ],
-            ],
-            'start < startTime < endTime < end after x occurrences' => [
-                'params' => [
-                    'interval' => 5,
-                    'occurrences' => 8,
-                    'start' => '2016-05-30',
-                    'end' => '2016-07-03',
+                    'start' => '2016-03-28',
+                    'end' => '2016-05-01',
                     'startTime' => '2016-04-25',
                     'endTime' => '2016-06-10',
                 ],
                 'expected' => [
-                    '2016-05-30',
+                    '2016-04-25',
                 ],
             ],
-            'start < startTime < endTime < end after y occurrences' => [
+            'start < startTime < end < endTime with X occurrence' => [
                 'params' => [
-                    'interval' => 5,
-                    'occurrences' => 7,
-                    'start' => '2016-05-30',
-                    'end' => '2016-07-03',
+                    'daysOfWeek' => [
+                        'monday',
+                    ],
+                    'instance' => Recurrence::INSTANCE_LAST,
+                    'interval' => 2,
+                    'occurrences' => 2,
+                    'start' => '2016-07-25',
+                    'end' => '2016-09-04',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
+                    'endTime' => '2016-12-31',
                 ],
                 'expected' => [
-                ],
-            ],
-            'no endTime' => [
-                'params' => [
-                    'interval' => 5,
-                    'occurrences' => 8,
-                    'start' => '2016-05-30',
-                    'end' => '2016-07-03',
-                    'startTime' => '2016-04-25',
-                    'endTime' => '9999-12-31',
-                ],
-                'expected' => [
-                    '2016-05-30',
                 ],
             ],
         ];

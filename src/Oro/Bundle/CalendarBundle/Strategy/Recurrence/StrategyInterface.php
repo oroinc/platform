@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 

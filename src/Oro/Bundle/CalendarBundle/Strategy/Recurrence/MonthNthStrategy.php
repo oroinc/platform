@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper;
 
-class YearNthStrategy implements StrategyInterface
+class MonthNthStrategy implements StrategyInterface
 {
     /** @var NthStrategyHelper */
     protected $strategyHelper;
 
     /**
-     * YearNthStrategy constructor.
+     * MonthNthStrategy constructor.
      *
      * @param NthStrategyHelper $strategyHelper
      */
@@ -35,15 +35,13 @@ class YearNthStrategy implements StrategyInterface
         }
         $startTime = $recurrence->getStartTime();
         $dayOfWeek = $recurrence->getDayOfWeek();
-        $monthOfYear = $recurrence->getMonthOfYear();
         $instance = $recurrence->getInstance();
-        $occurrenceDate = $this->getNextOccurrence(0, $dayOfWeek, $monthOfYear, $instance, $startTime);
+        $occurrenceDate = $this->getNextOccurrence(0, $dayOfWeek, $instance, $startTime);
 
         if ($occurrenceDate < $recurrence->getStartTime()) {
             $occurrenceDate = $this->getNextOccurrence(
                 $recurrence->getInterval(),
                 $dayOfWeek,
-                $monthOfYear,
                 $instance,
                 $occurrenceDate
             );
@@ -54,19 +52,17 @@ class YearNthStrategy implements StrategyInterface
 
         if ($start > $occurrenceDate) {
             $dateInterval = $start->diff($occurrenceDate);
-            $fromStartInterval = (int)$dateInterval->format('%y') + (int)$dateInterval->format('m');
+            $fromStartInterval = (int)$dateInterval->format('%y') * 12 + (int)$dateInterval->format('%m');
             $fromStartInterval = floor($fromStartInterval / $interval);
             $occurrenceDate = $this->getNextOccurrence(
                 $fromStartInterval++ * $interval,
                 $dayOfWeek,
-                $monthOfYear,
                 $instance,
                 $occurrenceDate
             );
         }
 
         $occurrences = $recurrence->getOccurrences();
-        // @TODO extract condition retrievement into abstract class or strategy helper.
         while ($occurrenceDate <= $recurrence->getEndTime()
             && $occurrenceDate <= $end
             && ($occurrences === null || $fromStartInterval <= $occurrences)
@@ -75,7 +71,7 @@ class YearNthStrategy implements StrategyInterface
                 $result[] = $occurrenceDate;
             }
             $fromStartInterval++;
-            $occurrenceDate = $this->getNextOccurrence($interval, $dayOfWeek, $monthOfYear, $instance, $occurrenceDate);
+            $occurrenceDate = $this->getNextOccurrence($interval, $dayOfWeek, $instance, $occurrenceDate);
         }
 
         return $result;
@@ -86,7 +82,7 @@ class YearNthStrategy implements StrategyInterface
      */
     public function supports(Recurrence $recurrence)
     {
-        return $recurrence->getRecurrenceType() === Recurrence::TYPE_YEAR_N_TH;
+        return $recurrence->getRecurrenceType() === Recurrence::TYPE_MONTH_N_TH;
     }
 
     /**
@@ -94,7 +90,7 @@ class YearNthStrategy implements StrategyInterface
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return 'yearnth';
+        return 'monthnth';
     }
 
     /**
@@ -102,26 +98,25 @@ class YearNthStrategy implements StrategyInterface
      */
     public function getName()
     {
-        return 'recurrence_yearnth';
+        return 'recurrence_monthnth';
     }
 
     /**
      * Returns occurrence date according to last occurrence date and recurrence rules.
      *
-     * @param $interval
-     * @param $dayOfWeek
-     * @param $monthOfYear
-     * @param $instance
+     * @param integer $interval
+     * @param array $dayOfWeek
+     * @param integer $instance
      * @param \DateTime $date
      *
      * @return \DateTime
      */
-    protected function getNextOccurrence($interval, $dayOfWeek, $monthOfYear, $instance, \DateTime $date)
+    protected function getNextOccurrence($interval, $dayOfWeek, $instance, \DateTime $date)
     {
-        $occurrenceDate = new \DateTime("+{$interval} year {$date->format('c')}");
+        $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
         $instanceRelativeValue = $this->strategyHelper->getInstanceRelativeValue($instance);
-        $month = date('M', mktime(0, 0, 0, $monthOfYear));
+        $month = $occurrenceDate->format('M');
         $year = $occurrenceDate->format('Y');
         $nextDays = [];
         foreach ($dayOfWeek as $day) {

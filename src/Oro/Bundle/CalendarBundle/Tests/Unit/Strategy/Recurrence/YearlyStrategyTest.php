@@ -3,45 +3,31 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Model\Recurrence\MonthlyStrategy;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearlyStrategy;
 
-class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
+class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var MonthlyStrategy  */
+    /** @var YearlyStrategy  */
     protected $strategy;
 
     protected function setUp()
     {
-        $this->strategy = new MonthlyStrategy();
+        $this->strategy = new YearlyStrategy();
     }
 
     public function testGetName()
     {
-        $this->assertEquals($this->strategy->getName(), 'recurrence_monthly');
+        $this->assertEquals($this->strategy->getName(), 'recurrence_yearly');
     }
 
     public function testSupports()
     {
         $recurrence = new Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_MONTHLY);
+        $recurrence->setRecurrenceType(Recurrence::TYPE_YEARLY);
         $this->assertTrue($this->strategy->supports($recurrence));
 
         $recurrence->setRecurrenceType('Test');
         $this->assertFalse($this->strategy->supports($recurrence));
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testGetOccurrencesWithWrongIntervalValue()
-    {
-        $recurrence = new Recurrence();
-        $recurrence->setInterval(-1.5);
-        $this->strategy->getOccurrences(
-            $recurrence,
-            new \DateTime(),
-            new \DateTime()
-        );
     }
 
     /**
@@ -62,6 +48,7 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
         $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
             ->setInterval($params['interval'])
             ->setDayOfMonth($params['dayOfMonth'])
+            ->setMonthOfYear($params['monthOfYear'])
             ->setStartTime(new \DateTime($params['startTime']))
             ->setEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
@@ -87,13 +74,14 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < end < startTime < endTime' => [
                 'params' => [
-                    'interval' => 2,
+                    'interval' => 1,
                     'dayOfMonth' => 25,
+                    'monthOfYear' => 4,
                     'occurrences' => null,
-                    'start' => '2016-03-28',
-                    'end' => '2016-05-01',
-                    'startTime' => '2016-05-25',
-                    'endTime' => '2016-07-30',
+                    'start' => '2015-03-01',
+                    'end' => '2015-05-01',
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2016-06-30',
                 ],
                 'expected' => [
                 ],
@@ -104,8 +92,9 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < startTime < end < endTime' => [
                 'params' => [
-                    'interval' => 2,
+                    'interval' => 12,
                     'dayOfMonth' => 25,
+                    'monthOfYear' => 4,
                     'occurrences' => null,
                     'start' => '2016-03-28',
                     'end' => '2016-05-01',
@@ -116,23 +105,24 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
                     '2016-04-25',
                 ],
             ],
+
             /**
              * |-----|
              *   |-|
              */
             'start < startTime < endTime < end' => [
                 'params' => [
-                    'interval' => 2,
+                    'interval' => 1,
                     'dayOfMonth' => 25,
+                    'monthOfYear' => 4,
                     'occurrences' => null,
-                    'start' => '2016-03-01',
-                    'end' => '2016-10-01',
+                    'start' => '2015-03-01',
+                    'end' => '2017-05-01',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-08-01',
+                    'endTime' => '2016-06-30',
                 ],
                 'expected' => [
                     '2016-04-25',
-                    '2016-06-25',
                 ],
             ],
             /**
@@ -141,16 +131,17 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'startTime < start < endTime < end' => [
                 'params' => [
-                    'interval' => 2,
+                    'interval' => 1,
                     'dayOfMonth' => 25,
+                    'monthOfYear' => 4,
                     'occurrences' => null,
-                    'start' => '2016-05-30',
-                    'end' => '2016-07-03',
+                    'start' => '2018-01-01',
+                    'end' => '2019-05-01',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-30',
+                    'endTime' => '2018-06-30',
                 ],
                 'expected' => [
-                    '2016-06-25',
+                    '2018-04-25',
                 ],
             ],
             /**
@@ -159,11 +150,12 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'startTime < endTime < start < end' => [
                 'params' => [
-                    'interval' => 5,
+                    'interval' => 12,
                     'dayOfMonth' => 25,
+                    'monthOfYear' => 4,
                     'occurrences' => null,
-                    'start' => '2016-07-25',
-                    'end' => '2016-09-04',
+                    'start' => '2021-03-28',
+                    'end' => '2021-05-01',
                     'startTime' => '2016-04-25',
                     'endTime' => '2016-06-30',
                 ],
@@ -173,27 +165,29 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
 
             'startTime < start < end < endTime with X occurrences' => [
                 'params' => [
-                    'interval' => 2,
+                    'interval' => 1,
                     'dayOfMonth' => 25,
-                    'occurrences' => 3,
-                    'start' => '2016-07-25',
-                    'end' => '2016-09-04',
+                    'monthOfYear' => 4,
+                    'occurrences' => 2,
+                    'start' => '2017-03-28',
+                    'end' => '2017-05-01',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-12-31',
+                    'endTime' => '2026-12-31',
                 ],
                 'expected' => [
-                    '2016-08-25',
+                    '2017-04-25',
                 ],
             ],
-            'startTime < start < end < endTime with no matches' => [
+            'startTime < start < endTime < end without matching' => [
                 'params' => [
-                    'interval' => 2,
+                    'interval' => 12,
                     'dayOfMonth' => 25,
-                    'occurrences' => 3,
-                    'start' => '2016-09-06',
-                    'end' => '2016-11-06',
+                    'monthOfYear' => 4,
+                    'occurrences' => null,
+                    'start' => '2016-05-30',
+                    'end' => '2016-07-03',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-12-31',
+                    'endTime' => '2016-06-30',
                 ],
                 'expected' => [
                 ],
