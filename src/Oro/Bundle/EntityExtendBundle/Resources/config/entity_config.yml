@@ -121,6 +121,12 @@ oro_entity_config:
                     options:
                         auditable:          false
 
+                # in case user changes something which requires schema update, this change is not applied
+                # to the configuration, but is stored into "pending_changes" as changeset
+                # format of changeset is same as format for doctrine fields ['field' => ['oldValue', 'newValue'], ...]
+                pending_changes:
+                    options:
+                        auditable:          false
         field:
             grid_action:
                 -

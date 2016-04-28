@@ -93,8 +93,7 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
         if ($context->getReadCount() < $this->totalCount) {
             if ($this->offset === $this->pageSize && $this->page * $this->pageSize < $this->totalCount) {
                 $this->page++;
-                $gridData         = $this->getGridData();
-                $this->sourceData = $gridData->offsetGet('data');
+                $this->sourceData = $this->getGridData()->getData();
                 $this->offset     = 0;
             }
 
@@ -156,8 +155,8 @@ class DatagridExportConnector implements ItemReaderInterface, \Countable, Contex
 
             $this->page       = 1;
             $gridData         = $this->getGridData();
-            $this->totalCount = $gridData->offsetGetByPath(PagerInterface::TOTAL_PATH_PARAM);
-            $this->sourceData = $gridData->offsetGet('data');
+            $this->totalCount = $gridData->getTotalRecords();
+            $this->sourceData = $gridData->getData();
             $this->offset     = 0;
         }
     }
