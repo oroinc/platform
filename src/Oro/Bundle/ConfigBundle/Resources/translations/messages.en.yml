@@ -20,6 +20,7 @@ oro:
             groups:
                 platform.title: "System configuration"
                 general_setup.title: "General setup"
+                integration_settings: "Please read <a href='https://developers.google.com/identity/protocols/OAuth2WebServer#creatingcred' target='_blank'>instructions</a> for obtaining credentials."
             use_default: "Use default"
         acl:
             action:
