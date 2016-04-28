@@ -173,10 +173,11 @@ define(function(require) {
      */
     (function() {
         function makeFloating($dropdownMenu) {
-            if (!$(this).data('container')) {
-                $(this).data('container', 'body');
+            var $this = $(this);
+            if (!$this.data('container')) {
+                $this.data('container', 'body');
             }
-            $(this).dropdown('detach', true);
+            $this.dropdown('detach', true);
             var $placeholder = $dropdownMenu.data('related-placeholder');
             $dropdownMenu
                 .addClass('dropdown-menu__floating')
