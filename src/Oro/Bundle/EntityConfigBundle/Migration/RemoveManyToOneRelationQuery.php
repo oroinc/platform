@@ -2,18 +2,23 @@
 
 namespace Oro\Bundle\EntityConfigBundle\Migration;
 
-use Psr\Log\LoggerInterface;
-
+use Doctrine\DBAL\DBALException;
 use Doctrine\DBAL\Types\Type;
+
+use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\MigrationBundle\Migration\ParametrizedMigrationQuery;
 
 class RemoveManyToOneRelationQuery extends ParametrizedMigrationQuery
 {
-    /** @var string  */
+    /**
+     * @var string
+     */
     protected $entityClass;
 
-    /** @var string  */
+    /**
+     * @var string
+     */
     protected $associationName;
 
     /**
@@ -69,7 +74,7 @@ class RemoveManyToOneRelationQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
-     * @param $targetClass
+     * @param string $targetClass
      * @param string $data
      */
     protected function updateEntityData(LoggerInterface $logger, $targetClass, $data)
@@ -95,9 +100,9 @@ class RemoveManyToOneRelationQuery extends ParametrizedMigrationQuery
 
     /**
      * @param LoggerInterface $logger
-     * @param $sql
+     * @param string $sql
      * @param array $parameters
-     * @throws \Doctrine\DBAL\DBALException
+     * @throws DBALException
      */
     protected function executeQuery(LoggerInterface $logger, $sql, array $parameters = [])
     {

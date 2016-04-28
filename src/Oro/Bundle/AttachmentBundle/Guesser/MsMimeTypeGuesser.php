@@ -42,7 +42,7 @@ class MsMimeTypeGuesser implements MimeTypeGuesserInterface
     }
 
     /**
-     * @param $path
+     * @param string $path
      * @return string|null
      */
     private function getExtensionByPath($path)

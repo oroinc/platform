@@ -48,13 +48,13 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider guessDataProvider
      *
-     * @param $path
-     * @param $FILES
-     * @param $expectedMimeType
+     * @param string $path
+     * @param array $files
+     * @param string|null $expectedMimeType
      */
-    public function testGuess($path, $FILES, $expectedMimeType)
+    public function testGuess($path, array $files, $expectedMimeType)
     {
-        $GLOBALS['_FILES'] = $FILES;
+        $GLOBALS['_FILES'] = $files;
         $this->assertEquals($expectedMimeType, $this->guesser->guess($path));
     }
 
@@ -69,7 +69,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
         return [
             'msg file simple form' => [
                 'path' => $correctFile,
-                'FILES' => $this->buildFilesArraySimple(
+                'files' => $this->buildFilesArraySimple(
                     [
                         ['name' => 'text.txt','tmp_name' => $textFile],
                         ['name' => 'outlook.msg', 'tmp_name' => $correctFile]
@@ -79,7 +79,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             'txt file simple form' => [
                 'path' => $textFile,
-                'FILES' => $this->buildFilesArraySimple(
+                'files' => $this->buildFilesArraySimple(
                     [
                         ['name' => 'text.txt', 'tmp_name' => $textFile]
                     ]
@@ -88,7 +88,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             'bad extension simple form' => [
                 'path' => $correctFile,
-                'FILES' => $this->buildFilesArraySimple(
+                'files' => $this->buildFilesArraySimple(
                     [
                         ['name' => 'text.txt', 'tmp_name' => $correctFile]
                     ]
@@ -97,7 +97,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             'msg file complex form (level 1)' => [
                 'path' => $correctFile,
-                'FILES' => $this->buildFilesArrayComplex(
+                'files' => $this->buildFilesArrayComplex(
                     [
                         ['name' => 'text.txt','tmp_name' => $textFile],
                         ['name' => 'outlook.msg', 'tmp_name' => $correctFile]
@@ -107,7 +107,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             'msg file complex form (level 2)' => [
                 'path' => $correctFile,
-                'FILES' => $this->buildFilesArrayComplex(
+                'files' => $this->buildFilesArrayComplex(
                     [
                         ['name' => 'text.txt','tmp_name' => $textFile],
                         ['name' => 'outlook.msg', 'tmp_name' => $correctFile]
@@ -118,7 +118,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             'msg file complex form (level 3)' => [
                 'path' => $correctFile,
-                'FILES' => $this->buildFilesArrayComplex(
+                'files' => $this->buildFilesArrayComplex(
                     [
                         ['name' => 'text.txt','tmp_name' => $textFile],
                         ['name' => 'outlook.msg', 'tmp_name' => $correctFile]
@@ -129,7 +129,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             'txt file complex form' => [
                 'path' => $textFile,
-                'FILES' => $this->buildFilesArrayComplex(
+                'files' => $this->buildFilesArrayComplex(
                     [
                         ['name' => 'text.txt','tmp_name' => $textFile],
                     ]
@@ -138,7 +138,7 @@ class MsMimeTypeGuesserTest extends \PHPUnit_Framework_TestCase
             ],
             'bad extension complex form' => [
                 'path' => $correctFile,
-                'FILES' => $this->buildFilesArrayComplex(
+                'files' => $this->buildFilesArrayComplex(
                     [
                         ['name' => 'text.txt','tmp_name' => $correctFile],
                     ]
