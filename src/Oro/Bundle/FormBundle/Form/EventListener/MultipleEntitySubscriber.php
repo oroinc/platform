@@ -106,25 +106,39 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
      */
     protected function processRelation($metadata, $relation, $mappedBy, $value)
     {
+        $relationClassName = ClassUtils::getClass($relation);
         foreach ($metadata->getAssociationMappings() as $mapping) {
-            if (!is_array($mapping) || !isset($mapping['targetEntity'], $mapping['type'], $mapping['mappedBy'])) {
-                continue;
+            if ($this->isApplicableRelation($mapping, $relationClassName, $mappedBy)) {
+                $setter = $this->getSetterName($mappedBy);
+                $relation->$setter($value);
+                break;
             }
-            if ($mapping['targetEntity'] !== ClassUtils::getClass($relation)) {
-                continue;
-            }
-            if ($mapping['type'] !== ClassMetadata::ONE_TO_MANY) {
-                continue;
-            }
-            if ($mapping['mappedBy'] !== $mappedBy) {
-                continue;
-            }
-
-            $setter = $this->getSetterName($mappedBy);
-            $relation->$setter($value);
-
-            break;
         }
+    }
+
+    /**
+     * @param array  $mapping
+     * @param string $relationClassName
+     * @param string $mappedBy
+     *
+     * @return bool
+     */
+    protected function isApplicableRelation($mapping, $relationClassName, $mappedBy)
+    {
+        if (!is_array($mapping) || !isset($mapping['targetEntity'], $mapping['type'], $mapping['mappedBy'])) {
+            return false;
+        }
+        if ($mapping['targetEntity'] !== $relationClassName) {
+            return false;
+        }
+        if ($mapping['type'] !== ClassMetadata::ONE_TO_MANY) {
+            return false;
+        }
+        if ($mapping['mappedBy'] !== $mappedBy) {
+            return false;
+        }
+
+        return true;
     }
 
     /**
