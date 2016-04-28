@@ -236,8 +236,3 @@
 .oro-multiselect-holder .float-holder span.validation-failed {
     padding-top: 4px;
 }
-
-.header-tooltips {
-    display: inline!important;
-    float: none!important;
-}

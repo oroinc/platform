@@ -4,6 +4,7 @@ oro:
                 groups:
                     google_settings.title: Google settings
                     google_integration_settings.title: Google Integration Settings
+                    integration_settings: "Please read <a href='https://developers.google.com/identity/protocols/OAuth2WebServer#creatingcred' target='_blank'>instructions</a> for obtaining credentials."
                 fields:
                     domains.label: Domains
                     domains.tooltip: Comma separated list of allowed domains
