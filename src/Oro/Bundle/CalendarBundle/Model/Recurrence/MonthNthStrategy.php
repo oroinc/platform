@@ -5,20 +5,10 @@ namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper;
 
-class MonthNthStrategy implements StrategyInterface
+class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
 {
     /** @var NthStrategyHelper */
     protected $strategyHelper;
-
-    /**
-     * MonthNthStrategy constructor.
-     *
-     * @param NthStrategyHelper $strategyHelper
-     */
-    public function __construct(NthStrategyHelper $strategyHelper)
-    {
-        $this->strategyHelper = $strategyHelper;
-    }
 
     /**
      * {@inheritdoc}
@@ -83,7 +73,18 @@ class MonthNthStrategy implements StrategyInterface
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return 'monthnth';
+        $interval = $recurrence->getInterval();
+        $instanceValue = $this->strategyHelper->getInstanceRelativeValue($recurrence->getInstance());
+        $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
+        $day = $this->strategyHelper->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
+        $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
+
+        return $this->getFullRecurrencePattern(
+            $recurrence,
+            'oro.calendar.recurrence.patterns.monthnth',
+            $interval,
+            ['%count%' => $interval, '%day%' => $day, '%instance%' => strtolower($instance)]
+        );
     }
 
     /**
@@ -117,5 +118,19 @@ class MonthNthStrategy implements StrategyInterface
         }
 
         return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
+    }
+
+    /**
+     * Sets strategy helper.
+     *
+     * @param NthStrategyHelper $helper
+     *
+     * @return self
+     */
+    public function setHelper(NthStrategyHelper $helper)
+    {
+        $this->strategyHelper = $helper;
+
+        return $this;
     }
 }

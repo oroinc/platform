@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Model\Recurrence\MonthlyStrategy;
+use Symfony\Component\Translation\TranslatorInterface;
 
 class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
 {
@@ -12,7 +13,31 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->strategy = new MonthlyStrategy();
+        /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator->expects($this->any())
+            ->method('transChoice')
+            ->will(
+                $this->returnCallback(
+                    function ($id, $count, array $parameters = []) {
+                        return $id;
+                    }
+                )
+            );
+        $translator->expects($this->any())
+            ->method('trans')
+            ->will(
+                $this->returnCallback(
+                    function ($id) {
+                        return $id;
+                    }
+                )
+            );
+        $dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->strategy = new MonthlyStrategy($translator, $dateTimeFormatter);
     }
 
     public function testGetName()
@@ -28,6 +53,25 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
 
         $recurrence->setRecurrenceType('Test');
         $this->assertFalse($this->strategy->supports($recurrence));
+    }
+
+    /**
+     * @param $recurrenceData
+     * @param $expected
+     *
+     * @dataProvider recurrencePatternsDataProvider
+     */
+    public function testGetRecurrencePattern($recurrenceData, $expected)
+    {
+        $recurrence = new Recurrence();
+        $recurrence->setRecurrenceType(Recurrence::TYPE_MONTHLY)
+            ->setInterval($recurrenceData['interval'])
+            ->setDayOfMonth($recurrenceData['dayOfMonth'])
+            ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setEndTime(new \DateTime($recurrenceData['endTime']))
+            ->setOccurrences($recurrenceData['occurrences']);
+
+        $this->assertEquals($expected, $this->strategy->getRecurrencePattern($recurrence));
     }
 
     public function testGetOccurrences()
@@ -80,5 +124,44 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
         );
 
         $this->assertEquals([], $result);
+    }
+
+    /**
+     * @return array
+     */
+    public function recurrencePatternsDataProvider()
+    {
+        return [
+            'without_occurrences_and_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 10,
+                    'startTime' => '2016-04-28',
+                    'endTime' => Recurrence::MAX_END_DATE,
+                    'occurrences' => null,
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.monthly'
+            ],
+            'with_occurrences' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 10,
+                    'startTime' => '2016-04-28',
+                    'endTime' => Recurrence::MAX_END_DATE,
+                    'occurrences' => 3,
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.monthlyoro.calendar.recurrence.patterns.occurrences'
+            ],
+            'with_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 10,
+                    'startTime' => '2016-04-28',
+                    'endTime' => '2016-06-10',
+                    'occurrences' => null,
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.monthlyoro.calendar.recurrence.patterns.end_date'
+            ]
+        ];
     }
 }

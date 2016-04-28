@@ -27,6 +27,8 @@ class Recurrence
 
     const STRING_KEY = 'recurrence';
 
+    const MAX_END_DATE = '9000-01-01T00:00:01+00:00';
+
     const INSTANCE_FIRST = 1;
     const INSTANCE_SECOND = 2;
     const INSTANCE_THIRD = 3;

@@ -5,20 +5,10 @@ namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper;
 
-class YearNthStrategy implements StrategyInterface
+class YearNthStrategy extends AbstractStrategy implements StrategyInterface
 {
     /** @var NthStrategyHelper */
     protected $strategyHelper;
-
-    /**
-     * YearNthStrategy constructor.
-     *
-     * @param NthStrategyHelper $strategyHelper
-     */
-    public function __construct(NthStrategyHelper $strategyHelper)
-    {
-        $this->strategyHelper = $strategyHelper;
-    }
 
     /**
      * {@inheritdoc}
@@ -86,7 +76,21 @@ class YearNthStrategy implements StrategyInterface
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return 'yearnth';
+        $interval = (int)($recurrence->getInterval() / 12);
+        $instanceValue = $this->strategyHelper->getInstanceRelativeValue($recurrence->getInstance());
+        $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
+        $day = $this->strategyHelper->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
+        $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
+        $currentDate = new \DateTime();
+        $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), $currentDate->format('d'));
+        $month = $this->dateTimeFormatter->format($currentDate, null, \IntlDateFormatter::NONE, null, null, 'MMM');
+
+        return $this->getFullRecurrencePattern(
+            $recurrence,
+            'oro.calendar.recurrence.patterns.yearnth',
+            $interval,
+            ['%count%' => $interval, '%day%' => $day, '%instance%' => strtolower($instance), '%month%' => $month]
+        );
     }
 
     /**
@@ -121,5 +125,19 @@ class YearNthStrategy implements StrategyInterface
         }
 
         return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
+    }
+
+    /**
+     * Sets strategy helper.
+     *
+     * @param NthStrategyHelper $helper
+     *
+     * @return self
+     */
+    public function setHelper(NthStrategyHelper $helper)
+    {
+        $this->strategyHelper = $helper;
+
+        return $this;
     }
 }

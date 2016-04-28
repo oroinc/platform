@@ -4,7 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
-class MonthlyStrategy implements StrategyInterface
+class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
@@ -51,7 +51,14 @@ class MonthlyStrategy implements StrategyInterface
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return 'monthly';
+        $interval = $recurrence->getInterval();
+
+        return $this->getFullRecurrencePattern(
+            $recurrence,
+            'oro.calendar.recurrence.patterns.monthly',
+            $interval,
+            ['%count%' => $interval, '%day%' => $recurrence->getDayOfMonth()]
+        );
     }
 
     /**
