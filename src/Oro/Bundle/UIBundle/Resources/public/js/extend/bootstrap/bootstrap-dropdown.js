@@ -172,9 +172,9 @@ define(function(require) {
      * if a menu has data attribute "data-options="{&quot;html&quot;: true}""
      */
     (function() {
-        function makeFloating($toggle, $dropdownMenu) {
-            if (!$toggle.data('container')) {
-                $toggle.data('container', 'body');
+        function makeFloating($dropdownMenu) {
+            if (!$(this).data('container')) {
+                $(this).data('container', 'body');
             }
             $(this).dropdown('detach', true);
             var $placeholder = $dropdownMenu.data('related-placeholder');
@@ -204,7 +204,7 @@ define(function(require) {
                 var $dropdownMenu = $('>.dropdown-menu', this);
                 var options = $dropdownMenu.data('options');
                 if (options && options.html) {
-                    makeFloating.call($toggle.get(0), $toggle, $dropdownMenu);
+                    makeFloating.call($toggle.get(0), $dropdownMenu);
                 }
             })
             .on('hide.bs.dropdown', '.dropdown.open', function() {
