@@ -56,7 +56,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_security.owner.ownership_metadata_provider'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -60 }
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -50 }
 
     oro_api.get_config.add_owner_validator:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerValidator
@@ -64,8 +64,8 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_security.owner.ownership_metadata_provider'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -70 }
-            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: update, priority: -70 }
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -51 }
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: update, priority: -51 }
 
     oro_api.get_config.filter_fields_by_extra:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FilterFieldsByExtra
