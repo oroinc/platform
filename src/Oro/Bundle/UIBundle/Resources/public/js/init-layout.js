@@ -428,7 +428,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     };
 
     var validateContainer = function($container) {
-        var $validationField = $container.find('[data-role="collection-validation"]:first');
+        var $validationField = $container.find('[data-name="collection-validation"]:first');
         var $form = $validationField.closest('form');
         if ($form.data('validator')) {
             $form.validate().element($validationField.get(0));
