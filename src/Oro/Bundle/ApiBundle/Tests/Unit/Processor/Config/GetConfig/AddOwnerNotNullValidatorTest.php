@@ -53,10 +53,8 @@ class AddOwnerNotNullValidatorTest extends ConfigProcessorTestCase
     {
         $className = 'stdClass';
         $fieldConfig = new EntityDefinitionFieldConfig();
-
         $definition = new EntityDefinitionConfig();
         $definition->addField('owner', $fieldConfig);
-
         $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
 
         $this->doctrineHelper->expects($this->once())
@@ -81,10 +79,8 @@ class AddOwnerNotNullValidatorTest extends ConfigProcessorTestCase
     {
         $className = 'stdClass';
         $fieldConfig = new EntityDefinitionFieldConfig();
-
         $definition = new EntityDefinitionConfig();
         $definition->addField('nonowner', $fieldConfig);
-
         $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
 
         $this->doctrineHelper->expects($this->once())
