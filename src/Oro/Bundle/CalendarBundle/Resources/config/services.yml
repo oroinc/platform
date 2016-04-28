@@ -39,7 +39,7 @@ parameters:
     oro_calendar.strategy.monthnth.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\MonthNthStrategy
     oro_calendar.strategy.yearnth.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearNthStrategy
 
-    oro_calendar.tools.recurrence.nth_strategy_helper.class: Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper
+    oro_calendar.strategy.recurrence.strategy_helper.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper
 
 services:
     oro_calendar.listener.entity_listener:
@@ -304,16 +304,16 @@ services:
     oro_calendar.recurrence.strategy.monthnth:
         class: %oro_calendar.strategy.monthnth.class%
         arguments:
-            - '@oro_calendar.tools.recurrence.nth_strategy_helper'
+            - '@oro_calendar.strategy.recurrence.strategy_helper'
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.yearnth:
         class: %oro_calendar.strategy.yearnth.class%
         arguments:
-            - '@oro_calendar.tools.recurrence.nth_strategy_helper'
+            - '@oro_calendar.strategy.recurrence.strategy_helper'
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
-    oro_calendar.tools.recurrence.nth_strategy_helper:
-        class: %oro_calendar.tools.recurrence.nth_strategy_helper.class%
+    oro_calendar.strategy.recurrence.strategy_helper:
+        class: '%oro_calendar.strategy.recurrence.strategy_helper.class%'

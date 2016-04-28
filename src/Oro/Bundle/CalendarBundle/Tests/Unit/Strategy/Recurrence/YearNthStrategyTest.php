@@ -4,7 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearNthStrategy;
-use Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 
 class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
 {
@@ -13,7 +13,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $helper = new NthStrategyHelper();
+        $helper = new StrategyHelper();
         $this->strategy = new YearNthStrategy($helper);
     }
 

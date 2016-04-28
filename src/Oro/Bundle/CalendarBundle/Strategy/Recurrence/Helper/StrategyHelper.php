@@ -1,10 +1,10 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Tools\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
-class NthStrategyHelper
+class StrategyHelper
 {
     /** @var array */
     protected $instanceRelativeValues;

@@ -3,19 +3,17 @@
 namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 
 class MonthNthStrategy implements StrategyInterface
 {
-    /** @var NthStrategyHelper */
+    /** @var StrategyHelper */
     protected $strategyHelper;
 
     /**
-     * MonthNthStrategy constructor.
-     *
-     * @param NthStrategyHelper $strategyHelper
+     * @param StrategyHelper $strategyHelper
      */
-    public function __construct(NthStrategyHelper $strategyHelper)
+    public function __construct(StrategyHelper $strategyHelper)
     {
         $this->strategyHelper = $strategyHelper;
     }
