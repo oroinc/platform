@@ -5,7 +5,7 @@ use Oro\Bundle\ConfigBundle\Config\Tree\GroupNodeDefinition;
 
 class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
 {
-    const TEST_NAME = 'testNodeName';
+    const TEST_NAME  = 'testNodeName';
     const TEST_LEVEL = 2;
 
     /**
@@ -80,7 +80,7 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('page_reload', $result);
         $this->assertArrayNotHasKey('some_another', $result);
         $this->assertArrayNotHasKey('icon', $result);
-        self::assertArrayHasKey('tooltip', $result);
+        $this->assertArrayHasKey('tooltip', $result);
     }
 
     /**
@@ -98,7 +98,7 @@ class GroupNodeDefinitionTest extends \PHPUnit_Framework_TestCase
         $this->assertArrayHasKey('icon', $result);
         $this->assertArrayNotHasKey('some_another', $result);
         $this->assertArrayNotHasKey('page_reload', $result);
-        self::assertArrayHasKey('tooltip', $result);
+        $this->assertArrayHasKey('tooltip', $result);
     }
 
     /**

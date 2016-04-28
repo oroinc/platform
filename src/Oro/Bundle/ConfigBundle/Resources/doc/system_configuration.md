@@ -22,8 +22,8 @@ oro_system_configuration:
             title: 'Platform'             # title is required
             icon:  icon-hdd
             priority: 30                  # sort order
-            description: some description # add description on next line after group header 
-            tooltip: some tooltip         # add tooltip on same line after group header 
+            description: some description # add description on the next line after group header
+            tooltip: some tooltip         # add tooltip on the same line after group header
 ```
 
 Groups definitions will be replaced recursive from configs that will parse after original definition.
