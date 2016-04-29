@@ -55,7 +55,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     ) {
         $containerBuilder = $this->getContainerBuilder($bundles);
 
-        $containerBuilder->setParameter('sensio_labs.page_object_extension.namespaces.page', $pages);
         $containerBuilder->setParameter('sensio_labs.page_object_extension.namespaces.element', $elements);
         $containerBuilder->setParameter('suite.configurations', []);
 
@@ -63,13 +62,9 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension')
             ->setMethods(['hasValidPaths', 'hasDirectory'])
             ->getMock();
-        $extension->expects($this->exactly(count($bundles)*2))->method('hasDirectory')->willReturn(true);
+        $extension->expects($this->exactly(count($bundles)))->method('hasDirectory')->willReturn(true);
         $extension->process($containerBuilder);
 
-        $this->assertEquals(
-            $expectedPages,
-            $containerBuilder->getParameter('sensio_labs.page_object_extension.namespaces.page')
-        );
         $this->assertEquals(
             $expectedElements,
             $containerBuilder->getParameter('sensio_labs.page_object_extension.namespaces.element')
@@ -86,12 +81,10 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
         $extension = new OroTestFrameworkExtension();
         $extension->load($containerBuilder, [
             'shared_contexts' => $sharedContexts,
-            'pages_namespace_suffix' => $pagesNamespaceSuffix,
             'elements_namespace_suffix' => $elementsNamespaceSuffix,
         ]);
 
         $this->assertEquals($sharedContexts, $containerBuilder->getParameter('oro_test.shared_contexts'));
-        $this->assertEquals($pagesNamespaceSuffix, $containerBuilder->getParameter('oro_test.pages_namespace_suffix'));
         $this->assertEquals(
             $elementsNamespaceSuffix,
             $containerBuilder->getParameter('oro_test.elements_namespace_suffix')
