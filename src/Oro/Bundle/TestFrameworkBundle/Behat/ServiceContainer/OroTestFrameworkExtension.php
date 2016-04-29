@@ -3,13 +3,17 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Context;
+use Behat\Behat\Context\ServiceContainer\ContextExtension;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
@@ -21,6 +25,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
         $this->processPageObjectsAutoload($container);
+        $this->processFormMappingsConfigurations($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -63,6 +68,8 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.elements_namespace_suffix', $config['elements_namespace_suffix']);
+        $this->loadFormFiller($container);
+        $this->loadFormFillerAwareInitializer($container);
     }
 
     /**
@@ -120,6 +127,50 @@ class OroTestFrameworkExtension implements TestworkExtension
         }
 
         $container->setParameter('suite.configurations', $suiteConfigurations);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function processFormMappingsConfigurations(ContainerBuilder $container)
+    {
+        $mapping = [];
+        $kernel = $container->get(Symfony2Extension::KERNEL_ID);
+
+        /** @var BundleInterface $bundle */
+        foreach ($kernel->getBundles() as $bundle) {
+            $mappingPath = str_replace('/', DIRECTORY_SEPARATOR, $bundle->getPath() . '/Resources/config/behat_form_mapping.yml');
+
+            if (!is_file($mappingPath)) {
+                continue;
+            }
+
+            $mapping = array_merge($mapping, Yaml::parse($mappingPath));
+        }
+
+        $container->getDefinition('oro_behat_form_filler')->addMethodCall('addMapping', [$mapping]);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function loadFormFiller(ContainerBuilder $container)
+    {
+        $formFillerDefinition = new Definition('Oro\Bundle\TestFrameworkBundle\Behat\FormFiller\FormFiller');
+        $container->setDefinition('oro_behat_form_filler', $formFillerDefinition);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function loadFormFillerAwareInitializer(ContainerBuilder $container)
+    {
+        $formFillerAwareInitializerDefinition = new Definition(
+            'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\FormFillerAwareInitializer',
+            [new Reference('oro_behat_form_filler')]
+        );
+        $formFillerAwareInitializerDefinition->addTag(ContextExtension::INITIALIZER_TAG, array('priority' => 0));
+        $container->setDefinition('oro_behat_form_filler_initializer', $formFillerAwareInitializerDefinition);
     }
 
     /**

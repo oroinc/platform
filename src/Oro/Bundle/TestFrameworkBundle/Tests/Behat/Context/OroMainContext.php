@@ -9,6 +9,8 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Oro\Bundle\TestFrameworkBundle\Behat\FormFiller\FormFiller;
+use Oro\Bundle\TestFrameworkBundle\Behat\FormFiller\FormFillerAware;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Factory as PageObjectFactory;
 use SensioLabs\Behat\PageObjectExtension\Context\PageObjectAware;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Page;
@@ -16,10 +18,13 @@ use SensioLabs\Behat\PageObjectExtension\PageObject\Page;
 /**
  * Defines application features from the specific context.
  */
-class OroMainContext extends MinkContext implements Context, SnippetAcceptingContext, PageObjectAware
+class OroMainContext extends MinkContext implements Context, SnippetAcceptingContext, PageObjectAware, FormFillerAware
 {
     /** @var  \SensioLabs\Behat\PageObjectExtension\PageObject\Factory */
     protected $pageObjectFactory;
+
+    /** @var  FormFiller */
+    protected $formFiller;
 
     /**
      * {@inheritdoc}
@@ -27,6 +32,11 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     public function setPageObjectFactory(PageObjectFactory $pageObjectFactory)
     {
         $this->pageObjectFactory = $pageObjectFactory;
+    }
+
+    public function setFormFiller(FormFiller $formFiller)
+    {
+        $this->formFiller = $formFiller;
     }
 
     /**
@@ -73,12 +83,13 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
-     * @Given /^(?:|I )fill "(?P<element>(?:[^"]|\\")*)" with:$/
+     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
      */
-    public function iFillWith($element, TableNode $table)
+    public function iFillFormWith($formName, TableNode $table)
     {
-        $this->pageObjectFactory->createElement($element)->fill($table);
+        $this->formFiller->fillForm($formName, $this->getSession()->getPage(), $table);
     }
+
 
     /*********************************************/
     /**** Wait for ajax finish for mink steps ****/
