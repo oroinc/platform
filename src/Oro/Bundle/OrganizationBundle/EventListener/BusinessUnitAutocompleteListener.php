@@ -18,6 +18,9 @@ class BusinessUnitAutocompleteListener
         $this->securityFacade = $securityFacade;
     }
 
+    /**
+     * @param BeforeSearchEvent $event
+     */
     public function onSearchBefore(BeforeSearchEvent $event)
     {
         $query = $event->getQuery();
