@@ -10,3 +10,4 @@ and form types for their rendering.
 - [Data Fixture](./Resources/doc/reference/data_fixtures.md)
 - [Form Types](./Resources/doc/reference/form_types.md)
 - [Console commands](./Resources/doc/reference/commands.md)
+- [Translation Strategies](./Resources/doc/reference/translation_strategies.md)
