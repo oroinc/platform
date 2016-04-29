@@ -9,16 +9,16 @@ use Doctrine\Common\DataFixtures\ReferenceRepository;
 use Doctrine\DBAL\Connection;
 
 use Symfony\Bridge\Doctrine\DataFixtures\ContainerAwareLoader as DataFixturesLoader;
-
 use Symfony\Component\Console\Output\StreamOutput;
 use Oro\Bundle\PlatformBundle\Yaml\Yaml;
 use Symfony\Component\Finder\Finder;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Console\Input\ArgvInput;
 use Symfony\Component\DependencyInjection\ContainerInterface;
-
 use Symfony\Bundle\FrameworkBundle\Console\Application;
 use Symfony\Bundle\FrameworkBundle\Test\WebTestCase as BaseWebTestCase;
+
+use Oro\Bundle\NavigationBundle\Event\ResponseHashnavListener;
 
 /**
  * Abstract class for functional and integration tests
@@ -618,6 +618,14 @@ abstract class WebTestCase extends BaseWebTestCase
             'PHP_AUTH_PW'           => $userPassword,
             'PHP_AUTH_ORGANIZATION' => $userOrganization
         ];
+    }
+
+    /**
+     * @return array
+     */
+    public static function generateNoHashNavigationHeader()
+    {
+        return ['HTTP_' . strtoupper(ResponseHashnavListener::HASH_NAVIGATION_HEADER) => 0];
     }
 
     /**
