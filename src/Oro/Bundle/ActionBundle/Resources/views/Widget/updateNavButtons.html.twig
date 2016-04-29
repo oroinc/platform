@@ -1,3 +1,9 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+
 {% set params = oro_action_widget_parameters()|merge({'group': 'update_navButtons'}) %}
 
 {% include 'OroActionBundle:Widget:_widget.html.twig' %}
+
+{% if has_operations(params) %}
+    {{ UI.buttonSeparator() }}
+{% endif %}
