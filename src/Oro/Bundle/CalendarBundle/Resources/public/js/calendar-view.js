@@ -222,6 +222,13 @@ define(function(require) {
 
         handleEventViewAdd: function(eventModel) {
             this.collection.add(eventModel);
+            //after editing recurrence event, all events should be loaded with actual data
+            if (eventModel.get('recurrence')) {
+                var oldEnableEventLoading = this.enableEventLoading;
+                this.enableEventLoading = true;
+                this.getCalendarElement().fullCalendar('refetchEvents');
+                this.enableEventLoading = oldEnableEventLoading;
+            }
         },
 
         visibleDefaultCalendar: function(eventModel) {

@@ -216,7 +216,7 @@ class CalendarEventRepository extends EntityRepository
                 . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
                 . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
                 . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
-                . "r.instance as {$key}Instance"
+                . "r.instance as {$key}Instance, r.id as {$key}Id"
             );
 
         return $this;

@@ -153,6 +153,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
     {
         $key = Recurrence::STRING_KEY;
         $propertyAccessor = $this->getPropertyAccessor();
+        $newItems = [];
         foreach ($items as $index => $item) {
             if (empty($item[$key])) {
                 continue;
@@ -163,24 +164,30 @@ class UserCalendarProvider extends AbstractCalendarProvider
             unset($item[$key]['exceptions']);
             foreach ($item[$key] as $field => $value) {
                 $value = in_array($field, ['startTime', 'endTime']) ? new \DateTime($value) : $value;
-                $propertyAccessor->setValue($recurrence, $field, $value);
+                if ($field !== 'id') {
+                    $propertyAccessor->setValue($recurrence, $field, $value);
+                }
             }
             $occurrences = $this->recurrenceStrategy->getOccurrences($recurrence, $start, $end);
             //unset recurrence values, because we don't need it for duplication
+            $recurrenceId = $item[$key]['id'];
             unset($item[$key]);
             /** @var \DateTime $occurrence */
             foreach ($occurrences as $occurrence) {
                 $newItem = $item;
+                $newItem[$key] = $recurrenceId;
+                $newItem['recurrencePattern'] = $this->recurrenceStrategy->getRecurrencePattern($recurrence);
                 $newItem['start'] = $occurrence->format('c');
                 $endDate = new \DateTime($newItem['end']);
                 $endDate->setDate($occurrence->format('Y'), $occurrence->format('m'), $occurrence->format('d'));
                 $newItem['end'] = $endDate->format('c');
                 $exception = $this->getRecurrenceException($occurrence, $exceptions);
-                $items[] = $exception ? array_merge($newItem, $exception) : $newItem;
+                $newItems[] = $exception ? array_merge($newItem, $exception) : $newItem;
             }
             //remove original item with recurrence, because it was calculated with recurrence rules
             unset($items[$index]);
         }
+        $items = array_merge($items, $newItems);
 
         return $this;
     }
@@ -240,6 +247,8 @@ class UserCalendarProvider extends AbstractCalendarProvider
 
                 return $exception;
             }
+            // @TODO $this->formatter should be used here.
+            $item['recurrencePattern'] = 'recurrencePattern';
         }
 
         return null;

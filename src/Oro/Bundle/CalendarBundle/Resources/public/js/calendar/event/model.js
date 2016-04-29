@@ -35,7 +35,9 @@ define([
             removable: false,
             calendarAlias: null,
             calendar: null, // calendarId
-            calendarUid: null // calculated automatically, equals to calendarAlias + calendarId
+            calendarUid: null, // calculated automatically, equals to calendarAlias + calendarId
+            recurrence: null,
+            recurrencePattern: null
         },
 
         initialize: function() {
@@ -72,7 +74,16 @@ define([
                 {id: this.originalId},
                 _.omit(
                     this.toJSON(),
-                    ['id', 'editable', 'removable', 'calendarUid', 'parentEventId', 'invitationStatus']
+                    [
+                        'id',
+                        'editable',
+                        'removable',
+                        'calendarUid',
+                        'parentEventId',
+                        'invitationStatus',
+                        'recurrence',
+                        'recurrencePattern'
+                    ]
                 ),
                 attrs || {}
             );
@@ -94,6 +105,11 @@ define([
             if (!this.originalId && this.id && calendarUid) {
                 this.originalId = this.id;
                 this.set('id', calendarUid + '_' + this.originalId);
+            }
+
+            if (this.get('recurrence')) {
+                var start = new Date(this.get('start'));
+                this.set('id', this.id + '_' + start.getTime());
             }
         },
 

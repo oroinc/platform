@@ -83,9 +83,6 @@ class CalendarEventApiHandler
                     $contexts = $this->form->get('contexts')->getData();
                     $this->activityManager->setActivityTargets($entity, $contexts);
                 }
-                if (!$this->request->get('recurrence')) {
-                    $entity->setRecurrence(null);
-                }
 
                 $this->onSuccess(
                     $entity,
