@@ -31,6 +31,7 @@ class ControllersTest extends WebTestCase
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
+        $this->client->useHashNavigation(true);
 
         $organization = $this->client->getContainer()
             ->get('doctrine')
