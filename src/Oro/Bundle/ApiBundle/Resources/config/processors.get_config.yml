@@ -55,8 +55,8 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -48 }
-            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: update, priority: -48 }
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -45 }
+            - { name: oro.api.processor, action: get_config, extra: definition, targetAction: update, priority: -45 }
 
     oro_api.get_config.add_owner_not_null_validator:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddOwnerNotNullValidator
