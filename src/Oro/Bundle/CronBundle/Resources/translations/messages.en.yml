@@ -19,6 +19,8 @@ oro:
             trace:        Stack trace
             view:         View
             job:          'Job "%name%"'
+            started_at:   Started At
+            closed_at:    Closed At
 
         menu:
             cron_job.description:          Cron job queue
