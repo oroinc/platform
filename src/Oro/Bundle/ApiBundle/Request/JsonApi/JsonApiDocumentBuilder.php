@@ -186,7 +186,7 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
                 $preparedValue['entityType'],
                 $this->entityIdAccessor->getEntityId($targetObject, $targetMetadata)
             );
-            $this->result[self::INCLUDED][] = $this->transformObjectToArray($targetObject, $targetMetadata);
+            $this->addRelatedObject($this->transformObjectToArray($targetObject, $targetMetadata));
         }
 
         return $resourceId;
@@ -233,6 +233,25 @@ class JsonApiDocumentBuilder extends AbstractDocumentBuilder
             'entityType' => $targetEntityType,
             'idOnly'     => $idOnly
         ];
+    }
+
+    /**
+     * @param array $object
+     */
+    protected function addRelatedObject(array $object)
+    {
+        // check whether this object was already added
+        if (!empty($this->result[self::INCLUDED])) {
+            $entityType = $object[self::TYPE];
+            $entityId = $object[self::ID];
+            foreach ($this->result[self::INCLUDED] as $existingObject) {
+                if ($existingObject[self::TYPE] === $entityType && $existingObject[self::ID] === $entityId) {
+                    return;
+                }
+            }
+        }
+
+        $this->result[self::INCLUDED][] = $object;
     }
 
     /**
