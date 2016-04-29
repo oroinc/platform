@@ -67,45 +67,57 @@ class NormalizeRequestData implements ProcessorInterface
      */
     protected function normalizeData(array $data)
     {
-        $relations = [];
-        if (array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)) {
-            $relationshipsPointer = $this->buildPointer(
-                $this->buildPointer('', JsonApiDoc::DATA),
-                JsonApiDoc::RELATIONSHIPS
-            );
-            foreach ($data[JsonApiDoc::RELATIONSHIPS] as $name => $value) {
-                $relationshipsDataItemPointer = $this->buildPointer(
-                    $this->buildPointer($relationshipsPointer, $name),
-                    JsonApiDoc::DATA
-                );
-                $relationData = $value[JsonApiDoc::DATA];
-
-                // Relation data can be null in case -to-one and an empty array in case -to-many relation.
-                // In this case we should process this relation data as empty relation
-                if (null === $relationData || empty($relationData)) {
-                    $relations[$name] = [];
-                    continue;
-                }
-
-                if (array_keys($relationData) !== range(0, count($relationData) - 1)) {
-                    $relations[$name] = $this->normalizeItemData(
-                        $relationshipsDataItemPointer,
-                        $relationData
-                    );
-                } else {
-                    foreach ($relationData as $key => $collectionItem) {
-                        $relations[$name][] = $this->normalizeItemData(
-                            $this->buildPointer($relationshipsDataItemPointer, $key),
-                            $collectionItem
-                        );
-                    }
-                }
-            }
-        }
+        $relations = array_key_exists(JsonApiDoc::RELATIONSHIPS, $data)
+            ? $this->normalizeRelations($data[JsonApiDoc::RELATIONSHIPS])
+            : [];
 
         return !empty($data[JsonApiDoc::ATTRIBUTES])
             ? array_merge($data[JsonApiDoc::ATTRIBUTES], $relations)
             : $relations;
+    }
+
+    /**
+     * @param array $relationships
+     *
+     * @return array
+     */
+    protected function normalizeRelations(array $relationships)
+    {
+        $relations = [];
+        $relationshipsPointer = $this->buildPointer(
+            $this->buildPointer('', JsonApiDoc::DATA),
+            JsonApiDoc::RELATIONSHIPS
+        );
+        foreach ($relationships as $name => $value) {
+            $relationshipsDataItemPointer = $this->buildPointer(
+                $this->buildPointer($relationshipsPointer, $name),
+                JsonApiDoc::DATA
+            );
+            $relationData = $value[JsonApiDoc::DATA];
+
+            // Relation data can be null in case -to-one and an empty array in case -to-many relation.
+            // In this case we should process this relation data as empty relation
+            if (null === $relationData || empty($relationData)) {
+                $relations[$name] = [];
+                continue;
+            }
+
+            if (array_keys($relationData) !== range(0, count($relationData) - 1)) {
+                $relations[$name] = $this->normalizeItemData(
+                    $relationshipsDataItemPointer,
+                    $relationData
+                );
+            } else {
+                foreach ($relationData as $key => $collectionItem) {
+                    $relations[$name][] = $this->normalizeItemData(
+                        $this->buildPointer($relationshipsDataItemPointer, $key),
+                        $collectionItem
+                    );
+                }
+            }
+        }
+
+        return $relations;
     }
 
     /**
