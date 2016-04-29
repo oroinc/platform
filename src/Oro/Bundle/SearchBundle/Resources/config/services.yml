@@ -29,7 +29,6 @@ parameters:
     # services used only for ORM search engine
     oro_search.fulltext_index_manager.class:                      Oro\Bundle\SearchBundle\Engine\FulltextIndexManager
     oro_search.event_listener.update_schema_listener.class:       Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener
-    oro_search.event_listener.orm.fulltext_index_listener.class:  Oro\Bundle\SearchBundle\EventListener\ORM\FulltextIndexListener
 
     oro_search.drivers:
         pdo_mysql: Oro\Bundle\SearchBundle\Engine\Orm\PdoMysql
@@ -151,7 +150,6 @@ services:
     oro_search.event_listener.update_schema_listener:
         class: %oro_search.event_listener.update_schema_listener.class%
         arguments:
-            - '@oro_search.fulltext_index_manager'
             - '@doctrine'
         tags:
             - { name: kernel.event_listener, event: console.terminate, name: onConsoleTerminate }
@@ -166,13 +164,6 @@ services:
             - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
             - { name: kernel.event_listener, event: console.terminate, method: onConsoleTerminate }
             - { name: kernel.event_listener, event: console.exception, method: onConsoleException }
-
-    oro_search.event_listener.orm.fulltext_index_listener:
-        class: %oro_search.event_listener.orm.fulltext_index_listener.class%
-        arguments:
-            - %database_driver%
-        tags:
-            - { name: doctrine.event_listener, event: loadClassMetadata, connection: search }
 
     oro_search.provider.search_mapping:
         class: %oro_search.provider.search_mapping.class%

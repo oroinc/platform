@@ -7,14 +7,15 @@ use Doctrine\ORM\Mapping as ORM;
 /**
  * Text entity for search index
  *
- * @ORM\Table(name="oro_search_index_text")
+ * @ORM\Table(
+ *     name="oro_search_index_text",
+ *     indexes={@ORM\Index(name="value", columns={"value"}, flags={"fulltext"})}
+ * )
  * @ORM\Entity
  */
 class IndexText
 {
     const HYPHEN_SUBSTITUTION = ' ';
-
-    const TABLE_NAME = 'oro_search_index_text';
 
     /**
      * @var integer
