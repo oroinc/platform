@@ -102,7 +102,7 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->formatter->expects($this->once())->method('formatDate')
-            ->with($value, $dateType, $locale, $timeZone ?: 'UTC')
+            ->with($value, $dateType, $locale, $timeZone)
             ->will($this->returnValue($expected));
 
         $this->assertEquals($expected, $this->extension->formatDate($value, $options));
@@ -139,7 +139,7 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
         $options = ['locale' => $locale];
 
         $this->formatter->expects($this->once())->method('formatDay')
-            ->with($value, $dateType, $locale, $timeZone ?: 'UTC')
+            ->with($value, $dateType, $locale, $timeZone)
             ->will($this->returnValue($expected));
 
         $this->assertEquals($expected, $this->extension->formatDay($value, $options));
@@ -182,7 +182,7 @@ class DateTimeExtensionTest extends \PHPUnit_Framework_TestCase
         ];
 
         $this->formatter->expects($this->once())->method('formatTime')
-            ->with($value, $timeType, $locale, $timeZone ?: 'UTC')
+            ->with($value, $timeType, $locale, $timeZone)
             ->will($this->returnValue($expected));
 
         $this->assertEquals($expected, $this->extension->formatTime($value, $options));
