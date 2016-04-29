@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Adds NotBlank and AccessGranted validation constraints for all associations.
+ * Adds AccessGranted validation constraint for all associations.
  */
 class AddAssociationValidators implements ProcessorInterface
 {
