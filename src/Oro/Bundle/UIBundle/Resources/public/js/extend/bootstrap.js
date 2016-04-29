@@ -162,16 +162,20 @@ define([
             if (visibleHeight < outerHeight - /* fixes floating pixel calculation */ 1) {
                 // still doesn't match, decrease height and move into visible area
                 this.$tip.css({
-                    maxHeight: visibleHeight
-                });
-                this.$tip.css({
                     height: this.$tip.outerHeight()
                 });
-                var centerChange = (outerHeight - visibleHeight) / 2;
 
                 this.$tip.css({
                     top: parseFloat(this.$tip.css('top')) + adjustmentLeft.vertical
                 });
+
+                //check visible area after move, update arrow position and height
+                var newVisibleRect = scrollHelper.getVisibleRect(this.$tip[0]);
+                var newVisibleHeight = newVisibleRect.bottom - newVisibleRect.top;
+                this.$tip.css({
+                    maxHeight: newVisibleHeight
+                });
+                var centerChange = (outerHeight - newVisibleHeight) / 2;
                 this.$arrow.css({
                     top: 'calc(50% + ' + (centerChange - adjustmentLeft.vertical) + 'px)'
                 });
