@@ -155,11 +155,11 @@ Error handling
 
 There are several types of errors that may occur during the process of a request:
 
-- Validation errors. A validation error will occur if a request has some invalid parameters, headers or data.
-- Security errors. This type of error will occur if an access is denied to a requested, updating or deleting entity.
-- Unexpected errors. These errors will occur if some unpredictable problem happens. E.g. no access to a database or a file system, requested entity does not exist, updating entity is blocked, etc.
+- **Validation errors**. A validation error will occur if a request has some invalid parameters, headers or data.
+- **Security errors**. This type of error will occur if an access is denied to a requested, updating or deleting entity.
+- **Unexpected errors**. These errors will occur if some unpredictable problem happens. E.g. no access to a database or a file system, requested entity does not exist, updating entity is blocked, etc.
 
-If an error occurs in a processor, the main execution flow is interrupted and a control is passed to a special group of processors, that is named **normalize_result**. This is true for all types of errors. But there are some exceptions for this rule, for the errors that occur in any processor of the **normalize_result** group. The execution flow is interrupted only if any of these processors raises an exception. However, these processors can safely add new errors into the [Context](./actions.md#context-class), that does not interrupted the execution of the next processors. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
+If an error occurs in a processor, the main execution flow is interrupted and the control is passed to a special group of processors, that is named **normalize_result**. This is true for all types of errors. But there are some exceptions for this rule for the errors that occur in any processor of the **normalize_result** group. The execution flow is interrupted only if any of these processors raises an exception. However, these processors can safely add new errors into the [Context](./actions.md#context-class) and the execution of the next processors will not be interrupted. For implementation details see [RequestActionProcessor](../../Processor/RequestActionProcessor.php).
 
 An error is represented by [Error](../../Model/Error.php) class. Also there is [ErrorSource](../../Model/ErrorSource.php) class that can be used to specify a source of an error, e.g. the name of URI parameter or the path to a property in request data. These classes have the following methods:
 
