@@ -306,10 +306,6 @@ class SyncProcessor extends AbstractSyncProcessor
 
         $this->addConnectorStatusAndFlush($integration, $status);
 
-        if ($integration->getEditMode() < Integration::EDIT_MODE_RESTRICTED) {
-            $integration->setEditMode(Integration::EDIT_MODE_RESTRICTED);
-        }
-
         return $status;
     }
 

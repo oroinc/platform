@@ -169,7 +169,7 @@ class OrmFilterExtension extends AbstractExtension
      */
     protected function getFilterCacheId(array $rawGridConfig, array $filterMetadata)
     {
-        if (!$filterMetadata['lazy']) {
+        if (empty($filterMetadata['lazy'])) {
             return null;
         }
 
