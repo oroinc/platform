@@ -1,13 +1,18 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
+
+use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
-use Symfony\Component\Translation\TranslatorInterface;
 
 class AbstractStrategy
 {
+    /** @var StrategyHelper */
+    protected $strategyHelper;
+
     /** @var TranslatorInterface */
     protected $translator;
 
@@ -15,13 +20,16 @@ class AbstractStrategy
     protected $dateTimeFormatter;
 
     /**
-     * AbstractStrategy constructor.
-     *
+     * @param StrategyHelper $strategyHelper
      * @param TranslatorInterface $translator
      * @param DateTimeFormatter $formatter
      */
-    public function __construct(TranslatorInterface $translator, DateTimeFormatter $formatter)
-    {
+    public function __construct(
+        StrategyHelper $strategyHelper,
+        TranslatorInterface $translator,
+        DateTimeFormatter $formatter
+    ) {
+        $this->strategyHelper = $strategyHelper;
         $this->translator = $translator;
         $this->dateTimeFormatter = $formatter;
     }
@@ -32,6 +40,8 @@ class AbstractStrategy
      * @param Recurrence $recurrence
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function getOccurrencesPattern(Recurrence $recurrence)
     {
@@ -54,6 +64,8 @@ class AbstractStrategy
      * @param Recurrence $recurrence
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getEndDatePattern(Recurrence $recurrence)
     {
@@ -78,6 +90,8 @@ class AbstractStrategy
      * @param array $translationParameters
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     protected function getFullRecurrencePattern(Recurrence $recurrence, $translationId, $count, $translationParameters)
     {

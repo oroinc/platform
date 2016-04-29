@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
@@ -16,6 +16,7 @@ interface StrategyInterface
      * @return \DateTime[]
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end);
 
@@ -41,6 +42,8 @@ interface StrategyInterface
      * @param Recurrence $recurrence
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function getRecurrencePattern(Recurrence $recurrence);
 }

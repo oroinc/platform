@@ -1,6 +1,6 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 
@@ -11,6 +11,7 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
+        $this->strategyHelper->validateRecurrence($recurrence);
         $result = [];
         $occurrenceDate = $recurrence->getStartTime();
         $fromStartInterval = 1;
@@ -72,7 +73,7 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * Returns occurrence date according to last occurrence date and recurrence interval.
      *
-     * @param integer $interval
+     * @param integer $interval A number of days.
      * @param \DateTime $date
      *
      * @return \DateTime

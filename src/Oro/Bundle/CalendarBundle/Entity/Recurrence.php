@@ -18,16 +18,15 @@ use Doctrine\ORM\Mapping as ORM;
  */
 class Recurrence
 {
+    const STRING_KEY = 'recurrence';
+    const MAX_END_DATE = '9000-01-01T00:00:01+00:00';
+
     const TYPE_DAILY = 'daily';
     const TYPE_WEEKLY = 'weekly';
     const TYPE_MONTHLY = 'monthly';
     const TYPE_MONTH_N_TH = 'monthnth';
     const TYPE_YEARLY = 'yearly';
     const TYPE_YEAR_N_TH = 'yearnth';
-
-    const STRING_KEY = 'recurrence';
-
-    const MAX_END_DATE = '9000-01-01T00:00:01+00:00';
 
     const INSTANCE_FIRST = 1;
     const INSTANCE_SECOND = 2;
@@ -59,6 +58,12 @@ class Recurrence
 
     /**
      * @var int
+     *
+     * Units of this attribute depend of recurrenceType.
+     * For daily recurrence it is number of days.
+     * For weekly recurrence it is number of weeks.
+     * For monthly, monthnth recurrences it is number of months.
+     * For yearly, yearnth recurrences it is number of month, which is multiple of 12. I.e. 12, 24, 36 etc.
      *
      * @ORM\Column(name="`interval`", type="integer")
      */

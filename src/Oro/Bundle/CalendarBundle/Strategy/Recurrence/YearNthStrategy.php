@@ -1,20 +1,20 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper;
 
+/**
+ * Recurrence with type Recurrence::TYPE_YEAR_N_TH will provide interval a number of month, which is multiple of 12.
+ */
 class YearNthStrategy extends AbstractStrategy implements StrategyInterface
 {
-    /** @var NthStrategyHelper */
-    protected $strategyHelper;
-
     /**
      * {@inheritdoc}
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
+        $this->strategyHelper->validateRecurrence($recurrence);
         $result = [];
         $startTime = $recurrence->getStartTime();
         $dayOfWeek = $recurrence->getDayOfWeek();
@@ -32,7 +32,7 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
             );
         }
 
-        $interval = $recurrence->getInterval();
+        $interval = $recurrence->getInterval(); // a number of months, which is a multiple of 12
         $fromStartInterval = 1;
 
         if ($start > $occurrenceDate) {
@@ -104,10 +104,10 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * Returns occurrence date according to last occurrence date and recurrence rules.
      *
-     * @param $interval
-     * @param $dayOfWeek
-     * @param $monthOfYear
-     * @param $instance
+     * @param integer $interval A number of months, which is a multiple of 12.
+     * @param array $dayOfWeek
+     * @param integer $monthOfYear
+     * @param integer $instance
      * @param \DateTime $date
      *
      * @return \DateTime
@@ -125,19 +125,5 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
         }
 
         return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
-    }
-
-    /**
-     * Sets strategy helper.
-     *
-     * @param NthStrategyHelper $helper
-     *
-     * @return self
-     */
-    public function setHelper(NthStrategyHelper $helper)
-    {
-        $this->strategyHelper = $helper;
-
-        return $this;
     }
 }

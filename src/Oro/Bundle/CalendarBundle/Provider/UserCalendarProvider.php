@@ -4,10 +4,11 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
+
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
-use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
 use Oro\Component\PropertyAccess\PropertyAccessor;
@@ -144,6 +145,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
      * @return self
      *
      * @throws \InvalidArgumentException
+     * @throws \RuntimeException
      * @throws \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      * @throws \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */

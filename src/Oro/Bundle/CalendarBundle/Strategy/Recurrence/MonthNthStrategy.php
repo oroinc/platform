@@ -1,23 +1,23 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper;
 
 class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
 {
-    /** @var NthStrategyHelper */
-    protected $strategyHelper;
-
     /**
      * {@inheritdoc}
      */
     public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
+        $this->strategyHelper->validateRecurrence($recurrence);
         $result = [];
-        $startTime = $recurrence->getStartTime();
         $dayOfWeek = $recurrence->getDayOfWeek();
+        if ($dayOfWeek === null || count($dayOfWeek) === 0) {
+            return $result;
+        }
+        $startTime = $recurrence->getStartTime();
         $instance = $recurrence->getInstance();
         $occurrenceDate = $this->getNextOccurrence(0, $dayOfWeek, $instance, $startTime);
 
@@ -98,14 +98,14 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * Returns occurrence date according to last occurrence date and recurrence rules.
      *
-     * @param integer $interval
-     * @param array $dayOfWeek
+     * @param integer $interval A number of months.
+     * @param array $daysOfWeek
      * @param integer $instance
      * @param \DateTime $date
      *
      * @return \DateTime
      */
-    protected function getNextOccurrence($interval, $dayOfWeek, $instance, \DateTime $date)
+    protected function getNextOccurrence($interval, $daysOfWeek, $instance, \DateTime $date)
     {
         $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
@@ -113,24 +113,10 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
         $month = $occurrenceDate->format('M');
         $year = $occurrenceDate->format('Y');
         $nextDays = [];
-        foreach ($dayOfWeek as $day) {
+        foreach ($daysOfWeek as $day) {
             $nextDays[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
         }
 
         return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
-    }
-
-    /**
-     * Sets strategy helper.
-     *
-     * @param NthStrategyHelper $helper
-     *
-     * @return self
-     */
-    public function setHelper(NthStrategyHelper $helper)
-    {
-        $this->strategyHelper = $helper;
-
-        return $this;
     }
 }

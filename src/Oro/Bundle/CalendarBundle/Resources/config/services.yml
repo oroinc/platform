@@ -31,16 +31,16 @@ parameters:
     oro_calendar.calendar_event.handler.delete.class:            Oro\Bundle\CalendarBundle\Handler\CalendarEventDeleteHandler
     oro_calendar.system_calendar_event.datagrid_helper.class:    Oro\Bundle\CalendarBundle\Datagrid\SystemCalendarEventGridHelper
 
-    oro_calendar.strategy.abstract.class: Oro\Bundle\CalendarBundle\Model\Recurrence\AbstractStrategy
-    oro_calendar.strategy.delegate.class: Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy
-    oro_calendar.strategy.daily.class: Oro\Bundle\CalendarBundle\Model\Recurrence\DailyStrategy
-    oro_calendar.strategy.weekly.class: Oro\Bundle\CalendarBundle\Model\Recurrence\WeeklyStrategy
-    oro_calendar.strategy.monthly.class: Oro\Bundle\CalendarBundle\Model\Recurrence\MonthlyStrategy
-    oro_calendar.strategy.yearly.class: Oro\Bundle\CalendarBundle\Model\Recurrence\YearlyStrategy
-    oro_calendar.strategy.monthnth.class: Oro\Bundle\CalendarBundle\Model\Recurrence\MonthNthStrategy
-    oro_calendar.strategy.yearnth.class: Oro\Bundle\CalendarBundle\Model\Recurrence\YearNthStrategy
+    oro_calendar.strategy.abstract.class:                        Oro\Bundle\CalendarBundle\Strategy\Recurrence\AbstractStrategy
+    oro_calendar.strategy.delegate.class:                        Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy
+    oro_calendar.strategy.daily.class:                           Oro\Bundle\CalendarBundle\Strategy\Recurrence\DailyStrategy
+    oro_calendar.strategy.weekly.class:                          Oro\Bundle\CalendarBundle\Strategy\Recurrence\WeeklyStrategy
+    oro_calendar.strategy.monthly.class:                         Oro\Bundle\CalendarBundle\Strategy\Recurrence\MonthlyStrategy
+    oro_calendar.strategy.yearly.class:                          Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearlyStrategy
+    oro_calendar.strategy.monthnth.class:                        Oro\Bundle\CalendarBundle\Strategy\Recurrence\MonthNthStrategy
+    oro_calendar.strategy.yearnth.class:                         Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearNthStrategy
 
-    oro_calendar.tools.recurrence.nth_strategy_helper.class: Oro\Bundle\CalendarBundle\Tools\Recurrence\NthStrategyHelper
+    oro_calendar.strategy.recurrence.strategy_helper.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper
 
 services:
     oro_calendar.listener.entity_listener:
@@ -276,58 +276,55 @@ services:
             - { name: oro_workflow.action, alias: create_calendar_event }
 
     # Recurrence Strategies
+    oro_calendar.recurrence.strategy.abstract:
+        class: '%oro_calendar.strategy.abstract.class%'
+        abstract: true
+        arguments:
+            - '@oro_calendar.strategy.recurrence.strategy_helper'
+            - '@translator'
+            - '@oro_locale.formatter.date_time'
+
     oro_calendar.recurrence.strategy.delegate:
-        class: %oro_calendar.strategy.delegate.class%
+        class: '%oro_calendar.strategy.delegate.class%'
 
     oro_calendar.recurrence.strategy:
         alias: oro_calendar.recurrence.strategy.delegate
 
-    oro_calendar.recurrence.strategy.abstract:
-        class: %oro_calendar.strategy.abstract.class%
-        abstract: true
-        arguments:
-            - "@translator"
-            - "@oro_locale.formatter.date_time"
-
     oro_calendar.recurrence.strategy.daily:
-        class: %oro_calendar.strategy.daily.class%
+        class: '%oro_calendar.strategy.daily.class%'
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.weekly:
-        class: %oro_calendar.strategy.weekly.class%
+        class: '%oro_calendar.strategy.weekly.class%'
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.monthly:
-        class: %oro_calendar.strategy.monthly.class%
+        class: '%oro_calendar.strategy.monthly.class%'
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.yearly:
-        class: %oro_calendar.strategy.yearly.class%
+        class: '%oro_calendar.strategy.yearly.class%'
         parent: oro_calendar.recurrence.strategy.abstract
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.monthnth:
-        class: %oro_calendar.strategy.monthnth.class%
+        class: '%oro_calendar.strategy.monthnth.class%'
         parent: oro_calendar.recurrence.strategy.abstract
-        calls:
-            - [ setHelper, ["@oro_calendar.tools.recurrence.nth_strategy_helper"]]
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.recurrence.strategy.yearnth:
-        class: %oro_calendar.strategy.yearnth.class%
+        class: '%oro_calendar.strategy.yearnth.class%'
         parent: oro_calendar.recurrence.strategy.abstract
-        calls:
-            - [ setHelper, ["@oro_calendar.tools.recurrence.nth_strategy_helper"]]
         tags:
             - { name: oro_calendar.recurrence.strategy}
 
-    oro_calendar.tools.recurrence.nth_strategy_helper:
-        class: %oro_calendar.tools.recurrence.nth_strategy_helper.class%
+    oro_calendar.strategy.recurrence.strategy_helper:
+        class: '%oro_calendar.strategy.recurrence.strategy_helper.class%'
