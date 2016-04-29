@@ -35,7 +35,7 @@ class Context extends ApiContext
     /** a prefix for all configuration sections */
     const CONFIG_PREFIX = 'config_';
 
-    /** a list of requests for additional configuration data */
+    /** a list of requests for configuration data */
     const CONFIG_EXTRAS = 'configExtras';
 
     /** metadata of an entity */
@@ -86,6 +86,7 @@ class Context extends ApiContext
      */
     public function __construct(ConfigProvider $configProvider, MetadataProvider $metadataProvider)
     {
+        parent::__construct();
         $this->configProvider   = $configProvider;
         $this->metadataProvider = $metadataProvider;
     }
@@ -465,7 +466,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Gets a list of requests for additional configuration data.
+     * Gets a list of requests for configuration data.
      *
      * @return ConfigExtraInterface[]
      */
@@ -479,7 +480,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Sets a list of requests for additional configuration data.
+     * Sets a list of requests for configuration data.
      *
      * @param ConfigExtraInterface[] $extras
      *
@@ -503,7 +504,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Checks whether some additional configuration data is requested.
+     * Checks whether some configuration data is requested.
      *
      * @param string $extraName
      *
@@ -522,7 +523,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Adds a request for some additional configuration data.
+     * Adds a request for some configuration data.
      *
      * @param ConfigExtraInterface $extra
      *
@@ -541,7 +542,7 @@ class Context extends ApiContext
     }
 
     /**
-     * Removes a request for some additional configuration data.
+     * Removes a request for some configuration data.
      *
      * @param string $extraName
      */

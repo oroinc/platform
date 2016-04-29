@@ -14,6 +14,6 @@ services:
     oro_ui.content_provider.flash_messages:
         class: %oro_ui.content_provider.flash_messages.class%
         arguments:
-            - @session
+            - '@session'
         tags:
             - { name: oro_ui.content_provider }

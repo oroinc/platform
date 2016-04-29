@@ -9,37 +9,7 @@ use Oro\Component\EntitySerializer\FieldConfig;
  */
 trait FieldConfigTrait
 {
-    /**
-     * Indicates whether the exclusion flag is set explicitly.
-     *
-     * @return bool
-     */
-    public function hasExcluded()
-    {
-        return array_key_exists(FieldConfig::EXCLUDE, $this->items);
-    }
-
-    /**
-     * Indicates whether the field should be excluded.
-     *
-     * @return bool
-     */
-    public function isExcluded()
-    {
-        return array_key_exists(FieldConfig::EXCLUDE, $this->items)
-            ? $this->items[FieldConfig::EXCLUDE]
-            : false;
-    }
-
-    /**
-     * Sets a flag indicates whether the field should be excluded.
-     *
-     * @param bool $exclude
-     */
-    public function setExcluded($exclude = true)
-    {
-        $this->items[FieldConfig::EXCLUDE] = $exclude;
-    }
+    use ExcludeTrait;
 
     /**
      * Indicates whether the path of the field value exists.

@@ -109,7 +109,7 @@ define(function(require) {
             'hideTimepicker .ui-timepicker-input': 'onTimepickerHide'
         },
 
-        format: datetimeFormatter.backendFormats.datetime,
+        format: datetimeFormatter.getBackendDateTimeFormat(),
 
         render: function() {
             var _this = this;
@@ -176,6 +176,7 @@ define(function(require) {
             // stop propagation to prevent default behaviour
             if (!e.shiftKey) {
                 e.stopPropagation();
+                this.onGenericTabKeydown(e);
             }
         },
 
@@ -183,6 +184,7 @@ define(function(require) {
             // stop propagation to prevent default behaviour
             if (e.shiftKey) {
                 e.stopPropagation();
+                this.onGenericTabKeydown(e);
             }
         },
 
@@ -199,6 +201,20 @@ define(function(require) {
                     // adds flag that blur event was as sequence of time selection in dropdown
                     this._isTimeSelection = true;
                 }, this));
+        },
+
+        onGenericTabKeydown: function(e) {
+            if (e.keyCode === this.TAB_KEY_CODE) {
+                if (this.$('input.hasDatepicker').is(e.currentTarget) && !e.shiftKey) {
+                    e.preventDefault();
+                    this._isTimeSelection = true;
+                    this.focus(1);
+                } else if (this.$('input.timepicker-input').is(e.currentTarget) && e.shiftKey) {
+                    e.preventDefault();
+                    this._isDateSelection = true;
+                    this.focus();
+                }
+            }
         }
     });
 

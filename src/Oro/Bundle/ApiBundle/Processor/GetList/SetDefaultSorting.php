@@ -84,7 +84,7 @@ abstract class SetDefaultSorting implements ProcessorInterface
      */
     protected function getSortFilterDescription()
     {
-        return 'Result sorting. One or several fields separated by comma, for example \'field1,-field2\'.';
+        return 'Result sorting. Comma-separated fields, e.g. \'field1,-field2\'.';
     }
 
     /**

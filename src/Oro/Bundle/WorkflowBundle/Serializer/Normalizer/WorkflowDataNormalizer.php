@@ -2,15 +2,15 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
 use Symfony\Component\Serializer\Normalizer\SerializerAwareNormalizer;
 
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\DenormalizerInterface;
 use Oro\Bundle\ImportExportBundle\Serializer\Normalizer\NormalizerInterface;
 use Oro\Bundle\WorkflowBundle\Exception\SerializerException;
-use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowData;
+use Oro\Bundle\WorkflowBundle\Serializer\WorkflowAwareSerializer;
 
 class WorkflowDataNormalizer extends SerializerAwareNormalizer implements NormalizerInterface, DenormalizerInterface
 {
@@ -88,7 +88,7 @@ class WorkflowDataNormalizer extends SerializerAwareNormalizer implements Normal
     /**
      * @param Workflow $workflow
      * @param string $attributeName
-     * @return \Oro\Bundle\WorkflowBundle\Model\Attribute
+     * @return \Oro\Bundle\ActionBundle\Model\Attribute
      * @throws SerializerException If attribute not found
      */
     protected function getAttribute(Workflow $workflow, $attributeName)

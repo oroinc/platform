@@ -5,7 +5,6 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
      * Converts buttons sequence from container to group with main buttons
      * and rest buttons in dropdown
      */
-
     $.widget('oroui.dropdownButtonProcessor', {
         options: {
             separator: '.separator-btn',
@@ -20,54 +19,60 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
             moreButtonAttrs: {}
         },
 
-        _create: function() {
-            var $more;
-            var $group = $(this.options.groupContainer);
+        group: null,
 
+        main: null,
+
+        dropdown: null,
+
+        _create: function() {
             // replaces button's separators
             this.element.find(this.options.separator).replaceWith('<li class="divider"></li>');
 
+            this._renderButtons();
+        },
+
+        _destroy: function() {
+            delete this.group;
+            delete this.main;
+            delete this.dropdown;
+        },
+
+        _renderButtons: function() {
             var $elems = this._collectButtons();
             if ($elems.length <= 1) {
                 return;
             }
 
-            var $main = this._mainButtons($elems);
+            this.group = $(this.options.groupContainer);
+
+            this.main = this._mainButtons($elems);
             if (this.options.useMainButtonsClone) {
-                $main = $main.clone(true);
-                if (this.options.truncateLength) {
-                    var self = this;
-                    // set text value string
-                    $main.contents().each(function() {
-                        if (this.nodeType === Node.TEXT_NODE) {
-                            this.nodeValue = _.trunc(this.nodeValue, self.options.truncateLength, false, '...');
-                        }
-                    });
-                }
+                this.main = this._prepareMainButton(this.main);
             }
-            $group.append($main);
+
+            this.group.append(this.main);
 
             // pushes rest buttons to dropdown
-            $elems = $elems.not($main);
+            $elems = $elems.not(this.group);
             if ($elems.length > this.options.minItemQuantity) {
-                $more = this._moreButton();
-                $group.append($more);
-
-                $elems = this._dropdownMenu($elems);
+                this.group.append(this._moreButton());
+                $elems = this.dropdown = this._dropdownMenu($elems);
             }
-            $group.append($elems);
+            this.group.append($elems);
 
-            this.element.find('.btn-group').remove().end().prepend($group);
+            this.element.find('.btn-group').remove().end().prepend(this.group);
         },
 
         /**
          * Collects all buttons of the container
          *
+         * @param {jQuery|null} $element
          * @returns {*}
          * @private
          */
-        _collectButtons: function() {
-            return this.element
+        _collectButtons: function($element) {
+            return ($element || this.element)
                 .find(this.options.includeButtons)
                 .not(this.options.excludeButtons)
                 .addClass('btn')
@@ -116,12 +121,28 @@ define(['jquery', 'underscore', 'jquery-ui'], function($, _) {
          */
         _dropdownMenu: function($buttons) {
             return $('<ul class="dropdown-menu"></ul>')
-                .append($buttons)
-                .find('.btn')
-                .wrap('<li></li>')
+                .append(this._prepareButtons($buttons));
+        },
+
+        _prepareMainButton: function($main) {
+            $main = $main.clone(true);
+            if (this.options.truncateLength) {
+                var self = this;
+                // set text value string
+                $main.contents().each(function() {
+                    if (this.nodeType === Node.TEXT_NODE) {
+                        this.nodeValue = _.trunc(this.nodeValue, self.options.truncateLength, false, '...');
+                    }
+                });
+            }
+            return $main;
+        },
+
+        _prepareButtons: function($buttons) {
+            return $buttons.filter('.btn')
                 .removeClass(function(index, css) {
                     return (css.match(/\bbtn(-\S+)?/g) || []).join(' ');
-                }).end();
+                }).wrap('<li></li>').parent();
         }
     });
 

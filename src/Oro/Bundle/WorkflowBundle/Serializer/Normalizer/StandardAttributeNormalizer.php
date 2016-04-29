@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\WorkflowBundle\Serializer\Normalizer;
 
-use Oro\Bundle\WorkflowBundle\Model\Attribute;
+use Oro\Bundle\ActionBundle\Model\Attribute;
 use Oro\Bundle\WorkflowBundle\Model\Workflow;
 
 class StandardAttributeNormalizer implements AttributeNormalizer

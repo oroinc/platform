@@ -1,0 +1,58 @@
+{% import 'OroUIBundle::macros.html.twig' as UI %}
+{% if operations|length %}
+    {% set buttons = {} %}
+    {% set groups = {} %}
+
+    {% for operation in operations %}
+        {% set params = {
+            'label': operation.definition.label|trans,
+            'buttonOptions': operation.definition.buttonOptions,
+            'frontendOptions': operation.definition.frontendOptions,
+        } %}
+        {% set template = params.buttonOptions.template|default('OroActionBundle:Operation:button.html.twig') %}
+        {% set groupName = operation.definition.buttonOptions.group|default(null) %}
+        {% if groupName %}
+            {% set link %}
+                <li>
+                    {% include template with {
+                        'params':params|merge({buttonOptions: params.buttonOptions|merge({'class': params.buttonOptions.class|default('') ~ ' action-button'})}),
+                        'context': context,
+                        'onlyLink': true,
+                        'actionData': actionData,
+                    } %}
+                </li>
+            {% endset %}
+
+            {% set groups = groups|merge({(groupName): groups[groupName]|default([])|merge([link])}) %}
+        {% else %}
+            {% set button %}
+
+                {% include template with {
+                    'params': params|merge({buttonOptions: params.buttonOptions|merge({'class': params.buttonOptions.class|default('back icons-holder-text') ~ ' btn action-button'})}),
+                    'context': context,
+                    'actionData': actionData
+                } %}
+            {% endset %}
+
+            {% set buttons = buttons|merge([button]) %}
+        {% endif %}
+    {% endfor %}
+
+    <div class="widget-content">
+        <div data-page-component-module="oroaction/js/app/components/buttons-component">
+            {% if buttons|length %}
+                {{ buttons|join()|raw }}
+            {% endif %}
+            {% if groups|length %}
+                {% for groupName, buttons in groups %}
+                    {% if buttons %}
+                        {{ UI.dropdownButton({
+                            'label': groupName|trans,
+                            'html': buttons|join()
+                        }) }}
+                    {% endif %}
+                {% endfor %}
+            {% endif %}
+        </div>
+    </div>
+{% endif %}

@@ -9,12 +9,20 @@
     display: inline-block;
     vertical-align: middle;
     white-space: nowrap;
+
+    .loader-frame {
+        padding-left: 36px;
+    }
 }
 .filter-item .reset-filter:hover [class^='icon-']:before {
     color: #666;
 }
 .filter-item .reset-filter {
     margin-left: 2px;
+    display: inline-block;
+    width: 12px;
+    line-height: 25px;
+    vertical-align: top;
 }
 .filter-item .filter-default-value .reset-filter {
     display: none;
@@ -56,7 +64,8 @@
     background-color: #ffffff;
     padding: 8px 8px 2px 8px;
     border: 1px solid #d3d3d3;
-    display: none;
+    display: block;
+    visibility: hidden;
     z-index: @oroZindexDropdown;
     margin-top: 7px;
     top: auto;
@@ -307,7 +316,7 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
       position: relative;
       vertical-align: top;
       width: auto;
-      overflow: hidden;
+
       input[type=text] {
         max-width: 100%;
         width: 280px;
@@ -417,4 +426,19 @@ button.ui-multiselect.select-filter-widget.ui-state-hover{
 .filter-criteria .choice-filter .select2-container-multi .select2-choices .select2-search-choice {
   margin: 2px 0 2px 5px;
   padding: 3px 20px 3px 7px;
+}
+.select-field-date-popover {
+  top: 3px;
+  right: 3px;
+  position: absolute;
+}
+.select-field-date-popover .popover{
+  min-width: 350px;
+}
+.field-condition-date-popover {
+  display: inline-block;
+
+  i {
+    cursor: pointer;
+  }
 }

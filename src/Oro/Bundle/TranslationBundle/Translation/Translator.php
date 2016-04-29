@@ -8,8 +8,8 @@ use Doctrine\Common\Cache\ClearableCache;
 use Symfony\Component\Translation\Loader\LoaderInterface;
 use Symfony\Bundle\FrameworkBundle\Translation\Translator as BaseTranslator;
 
-use Oro\Bundle\EntityBundle\Tools\SafeDatabaseChecker;
 use Oro\Bundle\TranslationBundle\Entity\Translation;
+use Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider;
 
 class Translator extends BaseTranslator
 {
@@ -36,8 +36,11 @@ class Translator extends BaseTranslator
      */
     protected $dynamicResources = [];
 
-    /** @var bool|null */
-    protected $dbCheck;
+    /** @var bool */
+    protected $installed;
+
+    /** @var string|null */
+    protected $strategyName;
 
     /**
      * Collector of translations
@@ -53,6 +56,11 @@ class Translator extends BaseTranslator
      */
     public function getTranslations(array $domains = array(), $locale = null)
     {
+        // if new strategy was selected
+        if ($this->getStrategyProvider()->getStrategy()->getName() !== $this->strategyName) {
+            $this->applyCurrentStrategy();
+        }
+
         if (null === $locale) {
             $locale = $this->getLocale();
         }
@@ -136,6 +144,29 @@ class Translator extends BaseTranslator
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function getCatalogue($locale = null)
+    {
+        // if new strategy was selected
+        if ($this->getStrategyProvider()->getStrategy()->getName() !== $this->strategyName) {
+            $this->applyCurrentStrategy();
+        }
+
+        return parent::getCatalogue($locale);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function warmUp($cacheDir)
+    {
+        $this->applyCurrentStrategy();
+
+        parent::warmUp($cacheDir);
+    }
+
+    /**
      * Sets a cache of dynamic translation metadata
      *
      * @param DynamicTranslationMetadataCache $cache
@@ -153,6 +184,33 @@ class Translator extends BaseTranslator
     public function setResourceCache(Cache $cache)
     {
         $this->resourceCache = $cache;
+    }
+
+    protected function applyCurrentStrategy()
+    {
+        $strategyProvider = $this->getStrategyProvider();
+        $strategy = $strategyProvider->getStrategy();
+
+        // store current strategy name to skip all following requests to it
+        $this->strategyName = $strategy->getName();
+
+        // use current set of fallback locales to build translation cache
+        $fallbackLocales = $strategyProvider->getAllFallbackLocales($strategy);
+        $this->setFallbackLocales($fallbackLocales);
+
+        // clear catalogs to generate new ones for new strategy
+        $this->catalogues = [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function computeFallbackLocales($locale)
+    {
+        $strategyProvider = $this->getStrategyProvider();
+        $strategy = $strategyProvider->getStrategy();
+
+        return $strategyProvider->getFallbackLocales($strategy, $locale);
     }
 
     /**
@@ -273,14 +331,19 @@ class Translator extends BaseTranslator
      */
     protected function checkDatabase()
     {
-        if (null === $this->dbCheck) {
-            $doctrine      = $this->container->get('doctrine');
-            $this->dbCheck = SafeDatabaseChecker::tablesExist(
-                $doctrine->getManagerForClass(Translation::ENTITY_NAME)->getConnection(),
-                SafeDatabaseChecker::getTableName($doctrine, Translation::ENTITY_NAME)
-            );
+        if (null === $this->installed) {
+            $this->installed = (bool)$this->container->getParameter('installed');
         }
 
-        return $this->dbCheck;
+        return $this->installed;
+    }
+
+    /**
+     * @return TranslationStrategyProvider
+     */
+    protected function getStrategyProvider()
+    {
+        // can't inject strategy provider directly because container creates new instances for each injected service
+        return $this->container->get('oro_translation.strategy.provider');
     }
 }

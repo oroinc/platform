@@ -5,18 +5,16 @@ oro_api:
             exclude: true
         Test\Entity3: ~
         Test\Entity4:
-            definition:
+            fields:
+                field2: ~
+                field3:
+                    exclude: true
+            filters:
                 fields:
-                    field2: ~
-                    field3:
+                    field2:
                         exclude: true
-                filters:
-                    fields:
-                        field2:
-                            exclude: true
         Test\Entity5: ~
         Test\Entity6:
-            definition:
-                fields:
-                    field1: ~
+            fields:
+                field1: ~
         Test\Entity11: ~

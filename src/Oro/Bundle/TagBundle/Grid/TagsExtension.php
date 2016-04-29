@@ -206,7 +206,7 @@ class TagsExtension extends AbstractTagsExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rows    = (array)$result->offsetGetOr('data', []);
+        $rows    = $result->getData();
         $idField = 'id';
         $tags    = $this->getTagsForEntityClass(
             $this->getEntity($config),

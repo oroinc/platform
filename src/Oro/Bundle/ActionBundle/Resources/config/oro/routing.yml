@@ -1,0 +1,9 @@
+oro_action_widget:
+    resource:     "@OroActionBundle/Controller/WidgetController.php"
+    type:         annotation
+    prefix:       /actionwidget
+
+oro_action_ajax:
+    resource:     "@OroActionBundle/Controller/AjaxController.php"
+    type:         annotation
+    prefix:       /actionajax

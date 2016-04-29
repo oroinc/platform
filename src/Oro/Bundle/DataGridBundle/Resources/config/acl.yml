@@ -5,13 +5,15 @@ oro_datagrid_gridview_view:
     group_name: ""
 
 oro_datagrid_gridview_publish:
-    label: oro.grid.action.gridview_create_public
+    label: oro.grid.action.gridview_create_public.label
+    description: oro.grid.action.gridview_create_public.description
     type: action
     group_name: ""
     bindings: ~
 
 oro_datagrid_gridview_update_public:
-    label: oro.grid.action.gridview_edit_public
+    label: oro.grid.action.gridview_edit_public.label
+    description: oro.grid.action.gridview_edit_public.description
     type: action
     group_name: ""
     bindings: ~

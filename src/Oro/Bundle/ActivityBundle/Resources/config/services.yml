@@ -18,21 +18,21 @@ services:
     oro_activity.manager:
         class: %oro_activity.manager.class%
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity.orm.entity_class_resolver
-            - @oro_entity_config.provider.activity
-            - @oro_entity_config.provider.grouping
-            - @oro_entity_config.provider.entity
-            - @oro_entity_config.provider.extend
-            - @oro_entity_extend.association_manager
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.orm.entity_class_resolver'
+            - '@oro_entity_config.provider.activity'
+            - '@oro_entity_config.provider.grouping'
+            - '@oro_entity_config.provider.entity'
+            - '@oro_entity_config.provider.extend'
+            - '@oro_entity_extend.association_manager'
         calls:
-            - [setEventDispatcher, [@event_dispatcher]]
+            - [setEventDispatcher, ['@event_dispatcher']]
 
     oro_activity.association_helper:
         class: Oro\Bundle\ActivityBundle\Tools\ActivityAssociationHelper
         public: false
         arguments:
-            - @oro_entity_config.config_manager
+            - '@oro_entity_config.config_manager'
 
     oro_activity.entity_config_dumper.extension:
         class: %oro_activity.entity_config_dumper.extension.class%
@@ -43,7 +43,7 @@ services:
     oro_activity.entity_generator.extension:
         class: %oro_activity.entity_generator.extension.class%
         arguments:
-            - @oro_entity_config.provider.grouping
+            - '@oro_entity_config.provider.grouping'
         tags:
             - { name: oro_entity_extend.entity_generator_extension }
 
@@ -58,34 +58,34 @@ services:
     oro_activity.widget_provider.activities.main:
         class: %oro_activity.widget_provider.activities.main.class%
         arguments:
-            - @oro_activity.manager
-            - @oro_security.security_facade
-            - @translator
-            - @oro_entity.entity_identifier_accessor
-            - @oro_entity.routing_helper
+            - '@oro_activity.manager'
+            - '@oro_security.security_facade'
+            - '@translator'
+            - '@oro_entity.entity_identifier_accessor'
+            - '@oro_entity.routing_helper'
         tags:
             - { name: oro_activity.activity_widget_provider }
 
     oro_activity.provider.context_grid:
         class: Oro\Bundle\ActivityBundle\Provider\ContextGridProvider
         arguments:
-            - @oro_entity.routing_helper
-            - @oro_entity.entity_provider
-            - @oro_entity_config.provider.grid
+            - '@oro_entity.routing_helper'
+            - '@oro_entity.entity_provider'
+            - '@oro_entity_config.provider.grid'
 
     oro_activity.listener.context_grid:
         class: Oro\Bundle\ActivityBundle\EventListener\Datagrid\ContextGridListener
         arguments:
-            - @oro_entity.doctrine_helper
-            - @oro_entity.entity_class_name_helper
+            - '@oro_entity.doctrine_helper'
+            - '@oro_entity.entity_class_name_helper'
         tags:
             - { name: kernel.event_listener, event: oro_datagrid.datagrid.build.after, method: onBuildAfter }
 
     oro_activity.widget_provider.actions:
         class: %oro_activity.widget_provider.actions.class%
         arguments:
-            - @oro_activity.manager
-            - @oro_ui.placeholder.provider
+            - '@oro_activity.manager'
+            - '@oro_ui.placeholder.provider'
         tags:
             - { name: oro_ui.view_action_provider, group: activity }
             - { name: oro_ui.update_action_provider, group: activity }
@@ -94,8 +94,8 @@ services:
         class: Oro\Bundle\ActivityBundle\Routing\ActivityAssociationRouteOptionsResolver
         public: false
         arguments:
-            - @oro_entity_config.provider.grouping
-            - @oro_entity.entity_alias_resolver
+            - '@oro_entity_config.provider.grouping'
+            - '@oro_entity.entity_alias_resolver'
         tags:
             - { name: routing.options_resolver }
 
@@ -103,7 +103,7 @@ services:
         class: Oro\Bundle\ActivityBundle\Provider\ActivityExclusionProvider
         public: false
         arguments:
-            - @oro_entity_config.config_manager
+            - '@oro_entity_config.config_manager'
         tags:
             - { name: oro_entity.exclusion_provider.api }
 
@@ -111,53 +111,53 @@ services:
         class: %oro_activity.manager.activity.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
 
     oro_activity.manager.activity_entity.api:
         class: %oro_activity.manager.activity_entity.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
 
     oro_activity.manager.activity_search.api:
         class: %oro_activity.manager.activity_search.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
-            - @oro_search.index
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
+            - '@oro_search.index'
 
     oro_activity.handler.delete.activity_entity:
         class: %oro_activity.handler.delete.activity_entity.class%
         parent: oro_soap.handler.delete.abstract
         calls:
-            - [setSecurityFacade, [@oro_security.security_facade]]
-            - [setActivityManager, [@oro_activity.manager]]
+            - [setSecurityFacade, ['@oro_security.security_facade']]
+            - [setActivityManager, ['@oro_activity.manager']]
 
     oro_activity.form.handler.autocomplete:
         class: Oro\Bundle\ActivityBundle\Autocomplete\ContextSearchHandler
         arguments:
-            - @security.token_storage
-            - @translator
-            - @oro_search.index
-            - @oro_activity.manager
-            - @oro_entity_config.config_manager
-            - @oro_entity.entity_class_name_helper
-            - @doctrine.orm.entity_manager
-            - @oro_search.mapper
-            - @event_dispatcher
+            - '@security.token_storage'
+            - '@translator'
+            - '@oro_search.index'
+            - '@oro_activity.manager'
+            - '@oro_entity_config.config_manager'
+            - '@oro_entity.entity_class_name_helper'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_search.mapper'
+            - '@event_dispatcher'
 
     oro_activity.form.handler.activity_entity.api:
         class: %oro_activity.form.handler.activity_entity.api.class%
         scope: request
         arguments:
-            - @oro_activity.form.activity_entity.api
-            - @request
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
-            - @oro_security.security_facade
+            - '@oro_activity.form.activity_entity.api'
+            - '@request'
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
+            - '@oro_security.security_facade'
 
     oro_activity.form.activity_entity.api:
         class: Symfony\Component\Form\Form
@@ -176,21 +176,21 @@ services:
         class: %oro_activity.manager.activity_target.api.class%
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
 
     oro_activity.manager.activity_context.api:
         class: Oro\Bundle\ActivityBundle\Entity\Manager\ActivityContextApiEntityManager
         parent: oro_soap.manager.entity_manager.abstract
         arguments:
-            - @doctrine.orm.entity_manager
-            - @oro_activity.manager
-            - @security.token_storage
-            - @oro_entity_config.config_manager
-            - @router
-            - @oro_entity.entity_alias_resolver
-            - @oro_search.mapper
-            - @translator
-            - @oro_entity.doctrine_helper
+            - '@doctrine.orm.entity_manager'
+            - '@oro_activity.manager'
+            - '@security.token_storage'
+            - '@oro_entity_config.config_manager'
+            - '@router'
+            - '@oro_entity.entity_alias_resolver'
+            - '@oro_search.mapper'
+            - '@translator'
+            - '@oro_entity.doctrine_helper'
         calls:
-            - [setEventDispatcher, [@event_dispatcher]]
+            - [setEventDispatcher, ['@event_dispatcher']]

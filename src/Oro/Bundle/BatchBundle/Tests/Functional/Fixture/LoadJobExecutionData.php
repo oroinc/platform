@@ -19,10 +19,33 @@ class LoadJobExecutionData extends AbstractFixture
      */
     public function load(ObjectManager $manager)
     {
+        $this->clearJobTables($manager);
         $this->loadJobInstances($manager);
         $this->loadJobExecutions($manager);
 
         $manager->flush();
+    }
+
+    /**
+     * @param ObjectManager $manager
+     */
+    public function clearJobTables(ObjectManager $manager)
+    {
+        $manager
+            ->createQueryBuilder()
+            ->delete('AkeneoBatchBundle:JobExecution', 'je')
+            ->where('je.id > :id')
+            ->setParameter('id', 0)
+            ->getQuery()
+            ->execute();
+
+        $manager
+            ->createQueryBuilder()
+            ->delete('AkeneoBatchBundle:JobInstance', 'ji')
+            ->where('ji.id > :id')
+            ->setParameter('id', 0)
+            ->getQuery()
+            ->execute();
     }
 
     public function loadJobInstances(ObjectManager $manager)

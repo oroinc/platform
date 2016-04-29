@@ -32,7 +32,7 @@ define(function(require) {
         /**
          * Format of date/datetime that original input accepts
          */
-        backendFormat: datetimeFormatter.backendFormats.date,
+        backendFormat: datetimeFormatter.getBackendDateFormat(),
 
         /**
          * Flag to prevent frontend field update once origin field is changed
@@ -59,12 +59,12 @@ define(function(require) {
             this.createFrontField(opts);
 
             this.$el.wrap('<span style="display:none"></span>');
-            if (this.$el.val() && this.$el.val().length) {
-                this.updateFront();
-            }
-
             if (!this.nativeMode) {
                 this.initPickerWidget(opts);
+            }
+
+            if (this.$el.val() && this.$el.val().length) {
+                this.updateFront();
             }
 
             DatePickerView.__super__.initialize.apply(this, arguments);
@@ -110,6 +110,7 @@ define(function(require) {
             this.$frontDateField = $('<input />');
             options.dateInputAttrs.type = this.nativeMode ? 'date' : 'text';
             this.$frontDateField.attr(options.dateInputAttrs);
+            this.$frontDateField.attr('data-fake-front-field', '');
             this.$frontDateField.on('keyup change', _.bind(this.updateOrigin, this));
             this.$el.after(this.$frontDateField);
             this.$el.attr('data-format', 'backend');
@@ -167,9 +168,10 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         updateOrigin: function(e) {
-            if (this.$el.val() !== this.getBackendFormattedValue()) {
+            var backendFormattedValue = this.getBackendFormattedValue();
+            if (this.$el.val() !== backendFormattedValue) {
                 this._preventFrontendUpdate = true;
-                this.$el.val(this.getBackendFormattedValue()).trigger('change');
+                this.$el.val(backendFormattedValue).trigger('change');
                 this._preventFrontendUpdate = false;
             }
         },

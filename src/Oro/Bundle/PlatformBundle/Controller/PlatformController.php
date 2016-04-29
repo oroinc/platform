@@ -26,7 +26,7 @@ class PlatformController extends Controller
      *
      * @Acl(
      *     id="oro_platform_system_info",
-     *     label="oro.platform.system_info",
+     *     label="oro.platform.acl.action.system_info.label",
      *     type="action"
      * )
      */

@@ -21,7 +21,7 @@ class ConfigurationController extends Controller
      * @Acl(
      *      id="oro_config_system",
      *      type="action",
-     *      label="oro.config.module_label",
+     *      label="oro.config.acl.action.general.label",
      *      group_name=""
      * )
      */
@@ -51,7 +51,7 @@ class ConfigurationController extends Controller
 
                 // recreate form to drop values for fields with use_parent_scope_value
                 $form = $provider->getForm($activeSubGroup);
-                $form->setData($this->get('oro_config.manager')->getSettingsByForm($form));
+                $form->setData($this->get('oro_config.global')->getSettingsByForm($form));
             }
         }
 

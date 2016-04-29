@@ -121,6 +121,11 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     protected $pageCallback;
 
     /**
+     * @var callable|null
+     */
+    protected $pageLoadedCallback;
+
+    /**
      * Constructor
      *
      * @param Query|QueryBuilder $source
@@ -165,11 +170,27 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
     /**
      * Sets callback to be called after page iteration was finished
      *
-     * @param callable $callback
+     * @param callable|null $callback
+     *
+     * @return $this
      */
     public function setPageCallback(callable $callback = null)
     {
         $this->pageCallback = $callback;
+
+        return $this;
+    }
+
+    /**
+     * Sets callback to be called after page is loaded
+     *
+     * @param callable|null $callback (array $rows): array $rows
+     *
+     * @return $this
+     */
+    public function setPageLoadedCallback(callable $callback = null)
+    {
+        $this->pageLoadedCallback = $callback;
 
         return $this;
     }
@@ -376,6 +397,10 @@ class BufferedQueryResultIterator implements \Iterator, \Countable
 
         $this->prepareQueryToExecute($query);
         $this->rows = $query->execute();
+
+        if ($this->pageLoadedCallback) {
+            $this->rows = call_user_func($this->pageLoadedCallback, $this->rows);
+        }
 
         return count($this->rows) > 0;
     }

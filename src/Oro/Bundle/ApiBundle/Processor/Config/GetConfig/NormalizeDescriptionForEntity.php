@@ -20,6 +20,10 @@ class NormalizeDescriptionForEntity extends NormalizeDescription
         /** @var ConfigContext $context */
 
         $definition = $context->getResult();
+        if (!$definition->isExcludeAll() || !$definition->hasFields()) {
+            // expected completed configs
+            return;
+        }
 
         $label = $definition->getLabel();
         if ($label instanceof Label) {

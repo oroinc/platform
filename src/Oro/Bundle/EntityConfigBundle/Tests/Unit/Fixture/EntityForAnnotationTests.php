@@ -10,6 +10,7 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\ConfigField;
  *      routeName="test_route_name",
  *      routeView="test_route_view",
  *      routeCreate="test_route_create",
+ *      routeCustom="test_route_custom",
  *      defaultValues={
  *          "ownership"={
  *              "owner_type"="USER",

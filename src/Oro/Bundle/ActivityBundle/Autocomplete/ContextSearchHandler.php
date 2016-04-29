@@ -10,7 +10,6 @@ use Doctrine\DBAL\Types\Type;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityManager;
-use Doctrine\ORM\Query\ResultSetMapping;
 use Doctrine\ORM\QueryBuilder;
 
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
@@ -190,9 +189,7 @@ class ContextSearchHandler implements ConverterInterface
         $text      = $item->getRecordTitle();
         $className = $item->getEntityName();
 
-        $entityMapParameter = $this->mapper->getEntityMapParameter($className, 'title_fields');
-
-        if (strlen($text) === 0 && !$entityMapParameter) {
+        if (strlen(trim($text)) === 0) {
             $text = $this->translator->trans('oro.entity.item', ['%id%' => $item->getRecordId()]);
         }
 
@@ -355,7 +352,7 @@ class ContextSearchHandler implements ConverterInterface
             }
         }
 
-        $rsm = new ResultSetMapping();
+        $rsm = QueryUtils::createResultSetMapping($objectManager->getConnection()->getDatabasePlatform());
         $rsm
             ->addScalarResult('id', 'id', Type::INTEGER)
             ->addScalarResult('entity', 'entity')

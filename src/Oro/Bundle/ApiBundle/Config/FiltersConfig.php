@@ -12,6 +12,9 @@ class FiltersConfig implements EntityConfigInterface
     use Traits\ConfigTrait;
     use Traits\ExclusionPolicyTrait;
 
+    /** a list of filters */
+    const FIELDS = EntityConfig::FIELDS;
+
     /** a type of the exclusion strategy that should be used for the filters */
     const EXCLUSION_POLICY = EntityConfig::EXCLUSION_POLICY;
 
@@ -39,8 +42,8 @@ class FiltersConfig implements EntityConfigInterface
 
         if (!empty($this->fields)) {
             foreach ($this->fields as $fieldName => $field) {
-                $fieldConfig                  = $field->toArray();
-                $result['fields'][$fieldName] = !empty($fieldConfig) ? $fieldConfig : null;
+                $fieldConfig                      = $field->toArray();
+                $result[self::FIELDS][$fieldName] = !empty($fieldConfig) ? $fieldConfig : null;
             }
         }
 
@@ -57,6 +60,25 @@ class FiltersConfig implements EntityConfigInterface
         return
             empty($this->items)
             && empty($this->fields);
+    }
+
+    /**
+     * Make a deep copy of object.
+     */
+    public function __clone()
+    {
+        $this->items = array_map(
+            function ($value) {
+                return is_object($value) ? clone $value : $value;
+            },
+            $this->items
+        );
+        $this->fields = array_map(
+            function ($field) {
+                return clone $field;
+            },
+            $this->fields
+        );
     }
 
     /**

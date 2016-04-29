@@ -24,22 +24,24 @@
                     </div>
                 {% endblock %}
             </div>
-            <div class="message-item message">
-                {% block activityShortMessage %}
-                    <strong><%- _.unescape(subject) %></strong>
-                    <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
-                    - <%= description %>
-                    <% } %>
-                {% endblock %}
-            </div>
-            <div class="created-at">
-                {% block activityDate %}
-                    <i class="date"><%= updatedAt %></i>
-                {% endblock %}
-            </div>
-            <div class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
-                 title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
-                <i class="icon icon-comment"></i><span class="count"><%= commentCount %></span>
+            <div class="extra-info">
+                <div class="message-item message">
+                    {% block activityShortMessage %}
+                        <strong><%- _.unescape(subject) %></strong>
+                        <% if (!_.isUndefined(description) && !_.isEmpty(description)) { %>
+                        - <%= description %>
+                        <% } %>
+                    {% endblock %}
+                </div>
+                <div class="comment-count"<% if (!commentCount) { %> style="display:none"<% } %>
+                    title="<%= _.__('oro.activitylist.comment.quantity_label') %>">
+                    <i class="icon icon-comment"></i><span class="count"><%= commentCount %></span>
+                </div>
+                <div class="created-at">
+                    {% block activityDate %}
+                        <i class="date"><%= updatedAt %></i>
+                    {% endblock %}
+                </div>
             </div>
         </div>
         <div class="accordion-body collapse<% if (!collapsed) { %> in<% } %>" id="accordion-item<%= id %>">

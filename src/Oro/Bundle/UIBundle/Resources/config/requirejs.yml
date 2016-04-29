@@ -152,6 +152,7 @@ config:
         'oroui/js/app/modules/messenger-module': 'bundles/oroui/js/app/modules/messenger-module.js'
         'oroui/js/app/modules/views-module': 'bundles/oroui/js/app/modules/views-module.js'
         'oroui/js/app/modules/widgets-module': 'bundles/oroui/js/app/modules/widgets-module.js'
+        'oroui/js/app/modules/input-widgets': 'bundles/oroui/js/app/modules/input-widgets.js'
         'oroui/js/app/application': 'bundles/oroui/js/app/application.js'
         'oroui/js/app/routes': 'bundles/oroui/js/app/routes.js'
         'oroui/js/app/models/base/collection': 'bundles/oroui/js/app/models/base/collection.js'
@@ -183,6 +184,7 @@ config:
         'oroui/js/app/components/widget-component': 'bundles/oroui/js/app/components/widget-component.js'
         'oroui/js/app/components/basic-tree-component': 'bundles/oroui/js/app/components/basic-tree-component.js'
         'oroui/js/app/components/basic-tree-manage-component': 'bundles/oroui/js/app/components/basic-tree-manage-component.js'
+        'oroui/js/app/components/widget-picker-component': 'bundles/oroui/js/app/components/widget-picker-component.js'
         'oroui/js/widget-manager': 'bundles/oroui/js/widget/widget-manager.js'
         'oroui/js/widget/abstract-widget': 'bundles/oroui/js/widget/abstract-widget.js'
         'oro/block-widget': 'bundles/oroui/js/widget/block-widget.js'
@@ -197,7 +199,18 @@ config:
         'oroui/js/items-manager/table': 'bundles/oroui/js/items-manager/table.js'
         'oroui/js/items-manager/editor': 'bundles/oroui/js/items-manager/editor.js'
 
+        'oroui/js/input-widget-manager': 'bundles/oroui/js/input-widget-manager.js'
+        'oroui/js/app/views/input-widget/abstract': 'bundles/oroui/js/app/views/input-widget/abstract.js'
+        'oroui/js/app/views/input-widget/uniform-file': 'bundles/oroui/js/app/views/input-widget/uniform-file.js'
+        'oroui/js/app/views/input-widget/uniform-select': 'bundles/oroui/js/app/views/input-widget/uniform-select.js'
+
         'oroui/js/content-processor/pinned-dropdown-button': 'oroui/js/content-processor/pinned-dropdown-button.js'
+
+        'oroui/js/app/views/widget-picker/widget-picker-collection-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-collection-view.js'
+        'oroui/js/app/views/widget-picker/widget-picker-filter-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-filter-view.js'
+        'oroui/js/app/views/widget-picker/widget-picker-item-view': 'bundles/oroui/js/app/views/widget-picker/widget-picker-item-view.js'
+        'oroui/js/app/models/widget-picker/widget-picker-filter-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-filter-model.js'
+        'oroui/js/app/models/widget-picker/widget-picker-model': 'bundles/oroui/js/app/models/widget-picker/widget-picker-model.js'
 
         'autolinker': 'bundles/oroui/lib/autolinker.min.js'
     appmodules:
@@ -205,6 +218,7 @@ config:
         - oroui/js/app/modules/messenger-module
         - oroui/js/app/modules/views-module
         - oroui/js/app/modules/widgets-module
+        - oroui/js/app/modules/input-widgets
 
 build:
     paths:

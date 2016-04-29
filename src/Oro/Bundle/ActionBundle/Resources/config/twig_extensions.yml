@@ -1,0 +1,13 @@
+parameters:
+    oro_action.twig.extension.operation.class: Oro\Bundle\ActionBundle\Twig\OperationExtension
+
+services:
+    oro_action.twig.extension.operation:
+        class: %oro_action.twig.extension.operation.class%
+        arguments:
+            - '@oro_action.operation_manager'
+            - '@oro_action.helper.applications'
+            - '@oro_action.helper.context'
+            - '@oro_action.helper.options'
+        tags:
+            - { name: twig.extension }

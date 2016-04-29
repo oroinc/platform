@@ -114,6 +114,7 @@ class AclPrivilegeRepository
                 if ($oid->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
                     $name = self::ROOT_PRIVILEGE_NAME;
                     $group = '';
+                    $description = '';
                 } else {
                     /** @var AclClassInfo $class */
                     $class = $classes[$oid->getType()];
@@ -122,6 +123,7 @@ class AclPrivilegeRepository
                         $name = substr($class->getClassName(), strpos($class->getClassName(), '\\'));
                     }
                     $group = $class->getGroup();
+                    $description = $class->getDescription();
                 }
 
                 $privilege = new AclPrivilege();
@@ -133,7 +135,8 @@ class AclPrivilegeRepository
                         )
                     )
                     ->setGroup($group)
-                    ->setExtensionKey($extensionKey);
+                    ->setExtensionKey($extensionKey)
+                    ->setDescription($description);
 
                 $this->addPermissions($sid, $privilege, $oid, $acls, $extension, $rootAcl);
 

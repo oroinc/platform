@@ -35,7 +35,7 @@ use Oro\Bundle\SecurityBundle\Owner\OwnerTree;
 /**
  * @SuppressWarnings(PHPMD.ExcessiveClassLength)
  * @SuppressWarnings(PHPMD.TooManyMethods)
- * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
  */
 class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
 {
@@ -131,19 +131,7 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         );
         $this->decisionMaker->setContainer($container);
 
-        $this->permissionManager = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->permissionManager->expects($this->any())
-            ->method('getPermissionsMap')
-            ->willReturn([
-                'VIEW'   => 1,
-                'CREATE' => 2,
-                'EDIT'   => 3,
-                'DELETE' => 4,
-                'ASSIGN' => 5,
-                'SHARE'  => 6
-            ]);
+        $this->permissionManager = $this->getPermissionManagerMock();
 
         $this->groupProvider = $this->getMock('Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface');
         $this->groupProvider->expects($this->any())
@@ -1288,5 +1276,27 @@ class EntityAclExtensionTest extends \PHPUnit_Framework_TestCase
         $permission->setName($name);
 
         return $permission;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject|PermissionManager
+     */
+    protected function getPermissionManagerMock()
+    {
+        $mock = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Acl\Permission\PermissionManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $mock->expects($this->any())
+            ->method('getPermissionsMap')
+            ->willReturn([
+                'VIEW'   => 1,
+                'CREATE' => 2,
+                'EDIT'   => 3,
+                'DELETE' => 4,
+                'ASSIGN' => 5,
+                'SHARE'  => 6
+            ]);
+
+        return $mock;
     }
 }

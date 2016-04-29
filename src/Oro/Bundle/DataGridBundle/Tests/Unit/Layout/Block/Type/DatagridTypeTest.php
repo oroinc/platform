@@ -32,7 +32,8 @@ class DatagridTypeTest extends BlockTypeTestCase
             [
                 'grid_name'       => 'test-grid',
                 'grid_scope'      => 'test-scope',
-                'grid_parameters' => ['foo' => 'bar']
+                'grid_parameters' => ['foo' => 'bar'],
+                'grid_render_parameters' => ['foo1' => 'bar1']
             ]
         );
 
@@ -40,6 +41,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals('test-grid-test-scope', $view->vars['grid_full_name']);
         $this->assertEquals('test-scope', $view->vars['grid_scope']);
         $this->assertEquals(['foo' => 'bar', 'enableFullScreenLayout' => true], $view->vars['grid_parameters']);
+        $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
     }
 
     public function testBuildViewWithoutScope()
@@ -51,7 +53,8 @@ class DatagridTypeTest extends BlockTypeTestCase
             new DatagridType($this->nameStrategy),
             [
                 'grid_name'       => 'test-grid',
-                'grid_parameters' => ['foo' => 'bar']
+                'grid_parameters' => ['foo' => 'bar'],
+                'grid_render_parameters' => ['foo1' => 'bar1'],
             ]
         );
 
@@ -59,6 +62,7 @@ class DatagridTypeTest extends BlockTypeTestCase
         $this->assertEquals('test-grid', $view->vars['grid_full_name']);
         $this->assertFalse(isset($view->vars['grid_scope']));
         $this->assertEquals(['foo' => 'bar', 'enableFullScreenLayout' => true], $view->vars['grid_parameters']);
+        $this->assertEquals(['foo1' => 'bar1'], $view->vars['grid_render_parameters']);
     }
 
     public function testBuildViewWithParamsOverwrite()
@@ -71,6 +75,7 @@ class DatagridTypeTest extends BlockTypeTestCase
             ]
         );
         $this->assertEquals(['enableFullScreenLayout' => false], $view->vars['grid_parameters']);
+        $this->assertEquals([], $view->vars['grid_render_parameters']);
     }
 
     /**
@@ -119,6 +124,7 @@ class DatagridTypeTest extends BlockTypeTestCase
                     'grid_parameters' => [
                         'enableFullScreenLayout' => true,
                     ],
+                    'grid_render_parameters' => [],
                 ]
             ],
             'custom' => [
@@ -128,6 +134,7 @@ class DatagridTypeTest extends BlockTypeTestCase
                     'grid_parameters' => [
                         'enableFullScreenLayout' => false,
                     ],
+                    'grid_render_parameters' => ['foo' => 'bar'],
                 ],
                 [
                     'grid_name' => 'test_grid',
@@ -135,6 +142,7 @@ class DatagridTypeTest extends BlockTypeTestCase
                     'grid_parameters' => [
                         'enableFullScreenLayout' => false,
                     ],
+                    'grid_render_parameters' => ['foo' => 'bar'],
                 ]
             ],
         ];

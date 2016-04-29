@@ -76,6 +76,7 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
                 'create_form_route'            => null,
                 'create_form_route_parameters' => [],
                 'grid_widget_route'            => 'oro_datagrid_widget',
+                'grid_view_widget_route'       => 'oro_datagrid_widget',
                 'grid_name'                    => null,
                 'grid_parameters'              => [],
                 'grid_render_parameters'       => []
@@ -130,5 +131,6 @@ class OroEntitySelectOrCreateInlineType extends AbstractType
         $view->vars['create_enabled']               = $options['create_enabled'];
         $view->vars['create_form_route']            = $options['create_form_route'];
         $view->vars['create_form_route_parameters'] = $options['create_form_route_parameters'];
+        $view->vars['grid_view_widget_route']       = $options['grid_view_widget_route'];
     }
 }

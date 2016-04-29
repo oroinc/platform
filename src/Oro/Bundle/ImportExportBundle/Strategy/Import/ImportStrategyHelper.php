@@ -2,19 +2,20 @@
 
 namespace Oro\Bundle\ImportExportBundle\Strategy\Import;
 
-use Symfony\Component\Translation\TranslatorInterface;
-use Symfony\Component\Validator\ValidatorInterface;
-use Symfony\Component\Validator\ConstraintViolationInterface;
-
 use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\EntityManager;
 
+use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Validator\ConstraintViolationInterface;
+use Symfony\Component\Validator\ValidatorInterface;
+
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\ImportExportBundle\Context\ContextInterface;
-use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Exception\InvalidArgumentException;
+use Oro\Bundle\ImportExportBundle\Exception\LogicException;
 use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
+use Oro\Bundle\ImportExportBundle\Converter\ConfigurableTableDataConverter;
 
 class ImportStrategyHelper
 {
@@ -42,21 +43,29 @@ class ImportStrategyHelper
     protected $extendConfigProvider;
 
     /**
+     * @var ConfigurableTableDataConverter
+     */
+    protected $configurableDataConverter;
+
+    /**
      * @param ManagerRegistry $managerRegistry
      * @param ValidatorInterface $validator
      * @param TranslatorInterface $translator
      * @param FieldHelper $fieldHelper
+     * @param ConfigurableTableDataConverter $configurableDataConverter
      */
     public function __construct(
         ManagerRegistry $managerRegistry,
         ValidatorInterface $validator,
         TranslatorInterface $translator,
-        FieldHelper $fieldHelper
+        FieldHelper $fieldHelper,
+        ConfigurableTableDataConverter $configurableDataConverter
     ) {
         $this->managerRegistry = $managerRegistry;
         $this->validator = $validator;
         $this->translator = $translator;
         $this->fieldHelper = $fieldHelper;
+        $this->configurableDataConverter = $configurableDataConverter;
     }
 
     /**
@@ -128,12 +137,17 @@ class ImportStrategyHelper
     {
         $violations = $this->validator->validate($entity, $groups);
         if (count($violations)) {
-            $errors = array();
+            $errors = [];
+
             /** @var ConstraintViolationInterface $violation */
             foreach ($violations as $violation) {
                 $propertyPath = $violation->getPropertyPath();
-                if ($propertyPath) {
-                    $propertyPath .= ': ';
+                if ($propertyPath && is_object($entity)) {
+                    $fieldHeader = $this->configurableDataConverter->getFieldHeaderWithRelation(
+                        ClassUtils::getClass($entity),
+                        $propertyPath
+                    );
+                    $propertyPath = ($fieldHeader ?: $propertyPath) . ': ';
                 }
                 $errors[] = $propertyPath . $violation->getMessage();
             }

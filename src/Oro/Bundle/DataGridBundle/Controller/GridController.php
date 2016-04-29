@@ -6,6 +6,7 @@ use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 use Akeneo\Bundle\BatchBundle\Item\ItemWriterInterface;
 
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
@@ -13,7 +14,6 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\DataGridBundle\Extension\MassAction\MassActionDispatcher;
 use Oro\Bundle\DataGridBundle\Exception\UserInputErrorExceptionInterface;
-use Oro\Bundle\DataGridBundle\Datagrid\Builder;
 use Oro\Bundle\ImportExportBundle\Formatter\FormatterProvider;
 
 class GridController extends Controller
@@ -82,6 +82,36 @@ class GridController extends Controller
         }
 
         return new JsonResponse($result->toArray());
+    }
+
+    /**
+     * @Route("/{gridName}/filter-metadata", name="oro_datagrid_filter_metadata", options={"expose"=true})
+     */
+    public function filterMetadata(Request $request, $gridName)
+    {
+        $filterNames = $request->query->get('filterNames', []);
+
+        $gridManager = $this->get('oro_datagrid.datagrid.manager');
+        $gridConfig  = $gridManager->getConfigurationForGrid($gridName);
+        $acl         = $gridConfig->getAclResource();
+
+        if ($acl && !$this->get('oro_security.security_facade')->isGranted($acl)) {
+            throw new AccessDeniedException('Access denied.');
+        }
+
+        $grid = $gridManager->getDatagridByRequestParams($gridName);
+        $meta = $grid->getResolvedMetadata();
+
+        $filterData = [];
+        foreach ($meta['filters'] as $filter) {
+            if (!in_array($filter['name'], $filterNames)) {
+                continue;
+            }
+
+            $filterData[$filter['name']] = $filter;
+        }
+
+        return new JsonResponse($filterData);
     }
 
     /**

@@ -3,6 +3,7 @@ namespace Oro\Bundle\OrganizationBundle\Form\Type;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
@@ -45,12 +46,12 @@ class BusinessUnitTreeType extends AbstractType
      */
     public function setDefaultOptions(OptionsResolverInterface $resolver)
     {
-        $resolver->setDefaults(
-            array(
-                'choices' => $this->businessUnitManager->getTreeOptions(
+        $resolver->setDefaults([
+            'choices' => function (Options $options) {
+                return $this->businessUnitManager->getTreeOptions(
                     $this->businessUnitManager->getBusinessUnitsTree()
-                )
-            )
-        );
+                );
+            }
+        ]);
     }
 }

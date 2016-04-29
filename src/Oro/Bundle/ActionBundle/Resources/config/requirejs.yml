@@ -1,0 +1,5 @@
+config:
+    paths:
+        'oroaction/js/action-manager': 'bundles/oroaction/js/action-manager.js'
+        'oroaction/js/app/components/buttons-component': 'bundles/oroaction/js/app/components/buttons-component.js'
+        'oro/datagrid/action/action-widget-action': 'bundles/oroaction/js/datagrid/action/action-widget-action.js'

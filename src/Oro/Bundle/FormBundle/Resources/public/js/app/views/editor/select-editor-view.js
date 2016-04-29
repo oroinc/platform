@@ -116,9 +116,11 @@ define(function(require) {
         },
 
         render: function() {
+            var select2options;
             var _this = this;
             SelectEditorView.__super__.render.call(this);
-            this.$('input[name=value]').select2(this.getSelect2Options());
+            select2options = this.getSelect2Options();
+            this.$('input[name=value]').select2(select2options);
             // select2 stops propagation of keydown event if key === ENTER or TAB
             // need to restore this functionality
             this.$('.select2-focusser').on('keydown' + this.eventNamespace(), function(e) {
@@ -138,6 +140,11 @@ define(function(require) {
                             e.preventDefault();
                             _this.$('input[name=value]').select2('close');
                             _this.onGenericEnterKeydown(e);
+                        } else if (!select2options.multiple) {
+                            _this.$('input[name=value]').on('select2-selecting', function(event) {
+                                _this.$('input[name=value]').val(event.val);
+                                _this.onGenericEnterKeydown(e);
+                            });
                         }
                         break;
                     case _this.TAB_KEY_CODE:
@@ -180,6 +187,7 @@ define(function(require) {
                 selectOnBlur: false,
                 openOnEnter: false,
                 dropdownCssClass: 'inline-editor__select2-drop',
+                dontSelectFirstOptionOnOpen: true,
                 data: {results: this.availableChoices}
             };
         },
@@ -197,9 +205,10 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+            this._isFocused = false;
             this.$('.select2-focusser').off(this.eventNamespace());
             this.$('input.select2-input').off(this.eventNamespace());
-            this.$('input[name=value]').select2('close').select2('destroy');
+            this.$('input[name=value]').select2('destroy');
             SelectEditorView.__super__.dispose.call(this);
         },
 
@@ -291,6 +300,12 @@ define(function(require) {
             }
             data[this.fieldName] = value;
             return data;
+        },
+
+        onGenericKeydown: function(e) {
+            this.onGenericEnterKeydown(e);
+            this.onGenericTabKeydown(e);
+            this.onGenericArrowKeydown(e);
         }
     }, {
         processMetadata: function(columnMetadata) {

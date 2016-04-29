@@ -51,6 +51,7 @@ oro:
             phone.label:         Phone
             users.label:         Users
             website.label:       Website
+            extend_description.label: Description
 
         controller:
             message:
