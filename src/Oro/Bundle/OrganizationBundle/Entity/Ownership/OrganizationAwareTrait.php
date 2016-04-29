@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\OrganizationBundle\Entity\Ownership;
 
-use Oro\Bundle\OrganizationBundle\Entity\Organization;
+use Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface;
 
 trait OrganizationAwareTrait
 {
     /**
-     * @var Organization
+     * @var OrganizationInterface
      *
      * @ORM\ManyToOne(targetEntity="Oro\Bundle\OrganizationBundle\Entity\Organization")
      * @ORM\JoinColumn(name="organization_id", referencedColumnName="id", onDelete="SET NULL")
@@ -15,7 +15,7 @@ trait OrganizationAwareTrait
     protected $organization;
 
     /**
-     * @return Organization|null
+     * @return OrganizationInterface|null
      */
     public function getOrganization()
     {
@@ -23,10 +23,10 @@ trait OrganizationAwareTrait
     }
 
     /**
-     * @param Organization|null $organization
+     * @param OrganizationInterface|null $organization
      * @return $this
      */
-    public function setOrganization(Organization $organization = null)
+    public function setOrganization(OrganizationInterface $organization)
     {
         $this->organization = $organization;
 
