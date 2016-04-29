@@ -18,6 +18,11 @@ abstract class AbstractDatagridTestCase extends WebTestCase
      */
     abstract public function gridProvider();
 
+    /**
+     * @var bool
+     */
+    protected $isRealGridRequest = true;
+
     protected function setUp()
     {
         $this->initClient(
@@ -33,9 +38,12 @@ abstract class AbstractDatagridTestCase extends WebTestCase
      */
     public function testGrid($requestData)
     {
-        $this->client->requestGrid($requestData['gridParameters'], $requestData['gridFilters']);
-        $response = $this->client->getResponse();
-        $result   = $this->getJsonResponseContent($response, 200);
+        $response = $this->client->requestGrid(
+            $requestData['gridParameters'],
+            $requestData['gridFilters'],
+            $this->isRealGridRequest
+        );
+        $result = $this->getJsonResponseContent($response, 200);
 
         foreach ($result['data'] as $row) {
             foreach ($requestData['assert'] as $fieldName => $value) {

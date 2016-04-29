@@ -45,11 +45,19 @@ define([
 
         makeCell: function(column, options) {
             var FooterCell = column.get('footerCell') || options.footerCell || this.footerCell;
-            return new FooterCell({
+            var cellOptions = {
                 column: column,
                 collection: this.collection,
-                rowName: this.options.rowName
-            });
+                rowName: this.options.rowName,
+                themeOptions: {
+                    className: 'grid-cell grid-footer-cell'
+                }
+            };
+            if (column.get('name')) {
+                cellOptions.themeOptions.className += ' grid-footer-cell-' + column.get('name');
+            }
+            this.columns.trigger('configureInitializeOptions', FooterCell, cellOptions);
+            return new FooterCell(cellOptions);
         },
 
         updateCellsOrder: Row.prototype.updateCellsOrder

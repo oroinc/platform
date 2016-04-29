@@ -15,6 +15,7 @@ class ControllersRoleTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient(array(), $this->generateBasicAuthHeader());
+        $this->client->useHashNavigation(true);
     }
 
     public function testIndex()

@@ -15,6 +15,7 @@ class PlatformControllerTest extends WebTestCase
             array(),
             $this->generateBasicAuthHeader()
         );
+        $this->client->useHashNavigation(true);
     }
 
     public function testSystemInformation()
