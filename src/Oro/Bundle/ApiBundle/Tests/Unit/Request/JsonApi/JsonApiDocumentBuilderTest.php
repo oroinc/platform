@@ -117,7 +117,7 @@ class JsonApiDocumentBuilderTest extends \PHPUnit_Framework_TestCase
                 ['id' => 789, 'name' => 'Role1'],
                 ['id' => 780, 'name' => 'Role2']
             ],
-            'otherRoles' => [ // used to test that "included" collection does not contain duplicates
+            'otherRoles' => [ // this is used to test that "included" collection does not contain duplicates
                 ['id' => 789, 'name' => 'Role1'],
                 ['id' => 780, 'name' => 'Role2']
             ],
