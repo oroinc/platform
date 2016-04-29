@@ -39,11 +39,17 @@ class ErrorCompleter extends AbstractErrorCompleter
                     $pointer[] = JsonApiDoc::ID;
                 } elseif (array_key_exists($propertyPath, $metadata->getFields())) {
                     $pointer = [JsonApiDoc::ATTRIBUTES, $propertyPath];
-                } elseif (array_key_exists($propertyPath, $metadata->getAssociations())) {
-                    $pointer = [JsonApiDoc::RELATIONSHIPS, $propertyPath];
                 } else {
-                    $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
-                    $error->setSource(null);
+                    $parts = explode('.', $propertyPath);
+                    if (array_key_exists($parts[0], $metadata->getAssociations())) {
+                        $pointer = [JsonApiDoc::RELATIONSHIPS, $parts[0], JsonApiDoc::DATA];
+                        if (count($parts) > 1) {
+                            $pointer[] = $parts[1];
+                        }
+                    } else {
+                        $error->setDetail($this->appendSourceToMessage($error->getDetail(), $propertyPath));
+                        $error->setSource(null);
+                    }
                 }
                 if (!empty($pointer)) {
                     $source->setPointer(sprintf('/%s/%s', JsonApiDoc::DATA, implode('/', $pointer)));

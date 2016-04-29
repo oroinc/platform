@@ -39,11 +39,14 @@ class ValidateRequestDataTest extends FormProcessorTestCase
         }
 
         $this->processor->process($this->context);
+
         $errors = $this->context->getErrors();
         $this->assertCount(1, $errors);
-        $expectedError = $errors[0];
-        $this->assertEquals($expectedErrorString, $expectedError->getDetail());
-        $this->assertEquals($pointer, $expectedError->getSource()->getPointer());
+        $error = $errors[0];
+        $this->assertEquals(400, $error->getStatusCode());
+        $this->assertEquals('request data constraint', $error->getTitle());
+        $this->assertEquals($expectedErrorString, $error->getDetail());
+        $this->assertEquals($pointer, $error->getSource()->getPointer());
     }
 
     /**

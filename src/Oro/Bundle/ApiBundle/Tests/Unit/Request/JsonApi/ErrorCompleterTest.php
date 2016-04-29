@@ -4,6 +4,9 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Request\JsonApi\JsonApiDocument;
 
 use Symfony\Component\HttpFoundation\Response;
 
+use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
+use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
+use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Request\JsonApi\ErrorCompleter;
@@ -29,31 +32,21 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
 
         $this->errorCompleter = new ErrorCompleter($this->exceptionTextExtractor);
 
-        $this->metadata = $this->getMockBuilder('Oro\Bundle\ApiBundle\Metadata\EntityMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $this->metadata->expects($this->any())
-            ->method('getIdentifierFieldNames')
-            ->willReturn(['id']);
-        $fieldMetadata = $this->getMockBuilder('Oro\Bundle\ApiBundle\Metadata\FieldMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $this->metadata->expects($this->any())
-            ->method('getFields')
-            ->willReturn(
-                [
-                    'id'        => $fieldMetadata,
-                    'firstName' => $fieldMetadata
-                ]
-            );
-        $this->metadata->expects($this->any())
-            ->method('getAssociations')
-            ->willReturn(
-                [
-                    'user' => $fieldMetadata
-                ]
-            );
+        $this->metadata = new EntityMetadata();
+        $this->metadata->setIdentifierFieldNames(['id']);
+        $idField = new FieldMetadata();
+        $idField->setName('id');
+        $this->metadata->addField($idField);
+        $firstNameField = new FieldMetadata();
+        $firstNameField->setName('firstName');
+        $this->metadata->addField($firstNameField);
+        $userAssociation = new AssociationMetadata();
+        $userAssociation->setName('user');
+        $this->metadata->addAssociation($userAssociation);
+        $groupsAssociation = new AssociationMetadata();
+        $groupsAssociation->setName('groups');
+        $groupsAssociation->setIsCollection(true);
+        $this->metadata->addAssociation($groupsAssociation);
     }
 
     public function testCompleteErrorWithoutInnerException()
@@ -290,7 +283,21 @@ class ErrorCompleterTest extends \PHPUnit_Framework_TestCase
                 'user',
                 [
                     'detail' => 'test detail',
-                    'source' => ['pointer' => '/data/relationships/user']
+                    'source' => ['pointer' => '/data/relationships/user/data']
+                ]
+            ],
+            [
+                'groups',
+                [
+                    'detail' => 'test detail',
+                    'source' => ['pointer' => '/data/relationships/groups/data']
+                ]
+            ],
+            [
+                'groups.2',
+                [
+                    'detail' => 'test detail',
+                    'source' => ['pointer' => '/data/relationships/groups/data/2']
                 ]
             ],
             [

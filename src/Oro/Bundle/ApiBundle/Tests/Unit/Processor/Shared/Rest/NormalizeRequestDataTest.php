@@ -5,6 +5,8 @@ namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Shared\Rest;
 use Oro\Bundle\ApiBundle\Metadata\AssociationMetadata;
 use Oro\Bundle\ApiBundle\Metadata\EntityMetadata;
 use Oro\Bundle\ApiBundle\Metadata\FieldMetadata;
+use Oro\Bundle\ApiBundle\Model\Error;
+use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\Shared\Rest\NormalizeRequestData;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
@@ -100,5 +102,65 @@ class NormalizeRequestDataTest extends FormProcessorTestCase
         ];
 
         $this->assertEquals($expectedData, $this->context->getRequestData());
+    }
+
+    public function testProcessWithInvalidIdentifiers()
+    {
+        $inputData = [
+            'toOneRelation'  => 'val1',
+            'toManyRelation' => ['val1', 'val2'],
+        ];
+
+        $metadata = new EntityMetadata();
+        $toOneRelation = new AssociationMetadata();
+        $toOneRelation->setName('toOneRelation');
+        $toOneRelation->setTargetClassName('Test\User');
+        $metadata->addAssociation($toOneRelation);
+        $toManyRelation = new AssociationMetadata();
+        $toManyRelation->setName('toManyRelation');
+        $toManyRelation->setTargetClassName('Test\Group');
+        $toManyRelation->setIsCollection(true);
+        $metadata->addAssociation($toManyRelation);
+
+        $this->entityIdTransformer->expects($this->any())
+            ->method('reverseTransform')
+            ->willThrowException(new \Exception('cannot normalize id'));
+
+        $this->context->setRequestData($inputData);
+        $this->context->setMetadata($metadata);
+        $this->processor->process($this->context);
+
+        $expectedData = [
+            'toOneRelation'  => [
+                'id'    => 'val1',
+                'class' => 'Test\User'
+            ],
+            'toManyRelation' => [
+                [
+                    'id'    => 'val1',
+                    'class' => 'Test\Group'
+                ],
+                [
+                    'id'    => 'val2',
+                    'class' => 'Test\Group'
+                ]
+            ]
+        ];
+
+        $this->assertEquals($expectedData, $this->context->getRequestData());
+        $this->assertEquals(
+            [
+                Error::createValidationError('entity identifier constraint')
+                    ->setInnerException(new \Exception('cannot normalize id'))
+                    ->setSource(ErrorSource::createByPropertyPath('toOneRelation')),
+                Error::createValidationError('entity identifier constraint')
+                    ->setInnerException(new \Exception('cannot normalize id'))
+                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation/0')),
+                Error::createValidationError('entity identifier constraint')
+                    ->setInnerException(new \Exception('cannot normalize id'))
+                    ->setSource(ErrorSource::createByPropertyPath('toManyRelation/1')),
+            ],
+            $this->context->getErrors()
+        );
     }
 }

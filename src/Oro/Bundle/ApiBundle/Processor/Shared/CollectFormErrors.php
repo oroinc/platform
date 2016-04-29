@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
+use Symfony\Component\Form\Extension\Validator\ViolationMapper\ViolationPath;
 use Symfony\Component\Form\FormError;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Validator\ConstraintViolation;
@@ -11,6 +12,7 @@ use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
 
 /**
@@ -57,7 +59,7 @@ class CollectFormErrors implements ProcessorInterface
                 foreach ($child->getErrors() as $error) {
                     $errorObject = $this->createErrorObject(
                         $error,
-                        $child->getName()
+                        $this->getFieldErrorPropertyPath($error, $child)
                     );
                     $context->addError($errorObject);
                 }
@@ -97,6 +99,28 @@ class CollectFormErrors implements ProcessorInterface
     }
 
     /**
+     * @param FormError     $error
+     * @param FormInterface $field
+     *
+     * @return string|null
+     */
+    protected function getFieldErrorPropertyPath(FormError $error, FormInterface $field)
+    {
+        $result = null;
+
+        $cause = $error->getCause();
+        if ($cause instanceof ConstraintViolation) {
+            $path = new ViolationPath($cause->getPropertyPath());
+            $result = implode('.', $path->getElements());
+        }
+        if (!$result) {
+            $result = $field->getName();
+        }
+
+        return $result;
+    }
+
+    /**
      * @param FormError   $formError
      * @param string|null $propertyPath
      *
@@ -124,14 +148,14 @@ class CollectFormErrors implements ProcessorInterface
             if ($this->isExtraFieldsConstraint($cause)) {
                 // special case "extra fields" constraint
                 // see comments of "isExtraFieldsConstraint" method for more details
-                return 'extra fields constraint';
+                return Constraint::EXTRA_FIELDS;
             }
 
             return ValueNormalizerUtil::humanizeClassName(get_class($cause->getConstraint()), 'Constraint');
         }
 
         // undefined constraint type
-        return 'form constraint';
+        return Constraint::FORM;
     }
 
     /**

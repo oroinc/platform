@@ -78,7 +78,7 @@ class SetTotalCountHeader implements ProcessorInterface
     protected function executeTotalCountCallback($callback)
     {
         if (!is_callable($callback)) {
-            throw new \InvalidArgumentException(
+            throw new \RuntimeException(
                 sprintf(
                     'Expected callable for "totalCount", "%s" given.',
                     is_object($callback) ? get_class($callback) : gettype($callback)
@@ -88,7 +88,7 @@ class SetTotalCountHeader implements ProcessorInterface
 
         $totalCount = call_user_func($callback);
         if (!is_int($totalCount)) {
-            throw new \InvalidArgumentException(
+            throw new \RuntimeException(
                 sprintf(
                     'Expected integer as result of "totalCount" callback, "%s" given.',
                     is_object($totalCount) ? get_class($totalCount) : gettype($totalCount)
@@ -125,7 +125,7 @@ class SetTotalCountHeader implements ProcessorInterface
                 ->setMaxResults(null)
                 ->setFirstResult(null);
         } else {
-            throw new \InvalidArgumentException(
+            throw new \RuntimeException(
                 sprintf(
                     'Expected instance of Doctrine\ORM\QueryBuilder, Doctrine\ORM\Query'
                     . ', Oro\Bundle\EntityBundle\ORM\SqlQueryBuilder'

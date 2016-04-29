@@ -72,7 +72,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \UnexpectedValueException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The entity identifier cannot be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User" has single primary key.
      */
     // @codingStandardsIgnoreEnd
@@ -112,7 +112,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \UnexpectedValueException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The entity identifier must be an array because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite primary key.
      */
     // @codingStandardsIgnoreEnd
@@ -125,7 +125,7 @@ class BuildSingleItemQueryTest extends GetProcessorOrmRelatedTestCase
 
     // @codingStandardsIgnoreStart
     /**
-     * @expectedException \UnexpectedValueException
+     * @expectedException \RuntimeException
      * @expectedExceptionMessage The entity identifier array must have the key "title" because the entity "Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\CompositeKeyEntity" has composite primary key.
      */
     // @codingStandardsIgnoreEnd

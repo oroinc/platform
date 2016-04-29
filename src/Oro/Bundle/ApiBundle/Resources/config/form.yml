@@ -32,3 +32,10 @@ services:
             - '@doctrine'
         tags:
             - { name: oro.api.form.type, alias: oro_api_entity }
+
+    oro_api.validator.access_granted:
+        class: Oro\Bundle\ApiBundle\Validator\Constraints\AccessGrantedValidator
+        arguments:
+            - '@oro_security.security_facade'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_api.validator.access_granted }
