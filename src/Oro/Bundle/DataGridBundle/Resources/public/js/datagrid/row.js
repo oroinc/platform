@@ -241,7 +241,11 @@ define([
             this.$el.toggleClass('row-selected', state.selected);
 
             if (this.$el.data('layout') === 'separate') {
-                this.initLayout({model: this.model});
+                var options = {};
+                if (this.$el.data('layout-model')) {
+                    options[this.$el.data('layout-model')] = this.model;
+                }
+                this.initLayout(options);
             }
 
             return this;
