@@ -8,7 +8,7 @@ namespace Oro\Bundle\ApiBundle\Request;
 final class Constraint
 {
     const FILTER       = 'filter constraint';
-    const ORDER_BY     = 'order by constraint';
+    const SORT         = 'sort constraint';
     const REQUEST_DATA = 'request data constraint';
     const REQUEST_TYPE = 'request type constraint';
     const ENTITY_TYPE  = 'entity type constraint';

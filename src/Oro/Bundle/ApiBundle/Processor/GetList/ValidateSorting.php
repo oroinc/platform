@@ -39,7 +39,7 @@ class ValidateSorting implements ProcessorInterface
                 );
                 if (!empty($unsupportedFields)) {
                     $error = Error::createValidationError(
-                        Constraint::ORDER_BY,
+                        Constraint::SORT,
                         sprintf(
                             'Sorting by "%s" field%s not supported.',
                             implode(', ', $unsupportedFields),

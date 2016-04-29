@@ -55,7 +55,7 @@ class ValidateSortingTest extends GetListProcessorTestCase
 
         $this->assertEquals(
             [
-                Error::createValidationError('order by constraint', 'Sorting by "id" field is not supported.')
+                Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -73,7 +73,7 @@ class ValidateSortingTest extends GetListProcessorTestCase
 
         $this->assertEquals(
             [
-                Error::createValidationError('order by constraint', 'Sorting by "id" field is not supported.')
+                Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -94,7 +94,7 @@ class ValidateSortingTest extends GetListProcessorTestCase
 
         $this->assertEquals(
             [
-                Error::createValidationError('order by constraint', 'Sorting by "id" field is not supported.')
+                Error::createValidationError('sort constraint', 'Sorting by "id" field is not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
@@ -115,7 +115,7 @@ class ValidateSortingTest extends GetListProcessorTestCase
 
         $this->assertEquals(
             [
-                Error::createValidationError('order by constraint', 'Sorting by "id, label" fields are not supported.')
+                Error::createValidationError('sort constraint', 'Sorting by "id, label" fields are not supported.')
                     ->setSource(ErrorSource::createByParameter('sort'))
             ],
             $this->context->getErrors()
