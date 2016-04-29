@@ -68,50 +68,36 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
             $extensionKey . ':' . $className
         );
         $entityClass = $this->getClassMetadata($className, $extension);
-
-        $oids = [];
-        $oids[] = $entityRootOid = $this->manager->getRootOid('entity');
-        $oids[] = $fieldRootOid = new OID('entity', $className);
-
         $objectIdentity = new OID($extensionKey, $className);
         $oids[] = $objectIdentity;
         $acls = $this->findAcls($sid, $oids);
 
-        // find ACL for the root object identity
-        // root identify for field level ACL is corresponding class level entity ACL, or root entity OID
-        $rootAcl = $this->findAclByOid($acls, $fieldRootOid);
-
-        // check if there are any aces to fallback to
-        $rootAces = $rootAcl ? $this->getFirstNotEmptyAce(
-            $sid,
-            $rootAcl,
-            [
-                [AclManager::OBJECT_ACE, null],
-                [AclManager::CLASS_ACE, null],
-            ]
-        ) : [];
-
-        // if no - use root entity identity (that is always exists)
-        if (empty($rootAces)) {
-            $rootAcl = $this->findAclByOid($acls, $entityRootOid);
-        }
-
-        // with relations, without virtual and unidirectional fields, without entity details and without exclusions
+        // without relations, without virtual and unidirectional fields, without entity details and without exclusions
         // there could be ACL AclExclusionProvider to filter restricted fields, so for ACL UI it shouldn't be used
-        $fieldsArray = $this->fieldProvider->getFields($className, true, false, false, false, false);
+        $fieldsArray = $this->fieldProvider->getFields($className, false, false, false, false, false);
         $privileges = new ArrayCollection();
         foreach ($fieldsArray as $fieldInfo) {
+            if (array_key_exists('identifier', $fieldInfo) && $fieldInfo['identifier']) {
+                // we should not limit access to identifier fields.
+                continue;
+            }
+
             $privilege = new AclPrivilege();
             $privilege->setIdentity(
                 new AclPrivilegeIdentity(
-                    sprintf('%s+%s:%s', $objectIdentity->getIdentifier(), $fieldInfo['name'], $objectIdentity->getType()),
+                    sprintf(
+                        '%s+%s:%s',
+                        $objectIdentity->getIdentifier(),
+                        $fieldInfo['name'],
+                        $objectIdentity->getType()
+                    ),
                     $fieldInfo['label']
                 )
-            )
-                ->setGroup($entityClass->getGroup())
+            );
+            $privilege->setGroup($entityClass->getGroup())
                 ->setExtensionKey($extensionKey);
 
-            $this->addPermissions($sid, $privilege, $objectIdentity, $acls, $extension, $rootAcl, $fieldInfo['name']);
+            $this->addFieldPermissions($sid, $privilege, $objectIdentity, $acls, $extension, $fieldInfo['name']);
             $privileges->add($privilege);
         }
 
@@ -142,7 +128,7 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
 
             $fieldName = explode('+', explode(':', $privilege->getIdentity()->getId())[0])[1];
 
-            foreach ($this->manager->getAces($sid, $oid, $fieldName) as $ace) {
+            foreach ($this->manager->getFieldAces($sid, $oid, $fieldName) as $ace) {
                 if (!$ace->isGranting()) {
                     // denying ACE is not supported
                     continue;
@@ -182,5 +168,35 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
         }
 
         return parent::getPermissionMasks($permissions, $extension, $maskBuilders);
+    }
+
+    /**
+     * Adds field permissions to the given $privilege.
+     *
+     * @param SID                   $sid
+     * @param AclPrivilege          $privilege
+     * @param OID                   $oid
+     * @param \SplObjectStorage     $acls
+     * @param AclExtensionInterface $extension
+     * @param null|string           $field
+     */
+    protected function addFieldPermissions(
+        SID $sid,
+        AclPrivilege $privilege,
+        OID $oid,
+        \SplObjectStorage $acls,
+        AclExtensionInterface $extension,
+        $field = null
+    ) {
+        $allowedPermissions = $extension->getAllowedPermissions($oid, $field);
+        $acl = $this->findAclByOid($acls, $oid);
+        $this->addAclPermissions($sid, $field, $privilege, $allowedPermissions, $extension, null, $acl);
+
+        // add default permission for not found in db privileges. By default it should be the Organization access level.
+        foreach ($allowedPermissions as $permission) {
+            if (!$privilege->hasPermission($permission)) {
+                $privilege->addPermission(new AclPermission($permission, AccessLevel::GLOBAL_LEVEL));
+            }
+        }
     }
 }

@@ -16,6 +16,7 @@ oro_entity_config:
                             block:          other
                             required:       false
                             label:          oro.security.field_acl.is_enabled.label
+                            tooltip:        oro.security.field_acl.is_enabled.tooltip
                 show_restricted_fields:
                     options:
                         default_value: false
@@ -25,3 +26,4 @@ oro_entity_config:
                             block:          other
                             required:       false
                             label:          oro.security.field_acl.show_restricted_fields.label
+                            tooltip:        oro.security.field_acl.show_restricted_fields.tooltip
