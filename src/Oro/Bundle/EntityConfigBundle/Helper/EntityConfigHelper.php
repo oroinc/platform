@@ -39,7 +39,7 @@ class EntityConfigHelper
         foreach ($routes as $route) {
             $routeName = $this->getRouteByGroup($route, $groupName);
 
-            $result[$route] = $metadata->hasRoute($routeName) ? $metadata->getRoute($routeName) : null;
+            $result[$route] = $metadata->hasRoute($routeName, true) ? $metadata->getRoute($routeName, true) : null;
         }
 
         return $result;

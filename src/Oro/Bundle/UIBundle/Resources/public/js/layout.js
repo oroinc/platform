@@ -96,7 +96,7 @@ define(function(require) {
 
             $container.find('[data-toggle="tooltip"]').tooltip();
 
-            this.initPopover($container.find('.control-label'));
+            this.initPopover($container);
         },
 
         initPopover: function(container) {

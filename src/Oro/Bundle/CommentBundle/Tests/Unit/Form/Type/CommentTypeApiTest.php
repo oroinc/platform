@@ -30,7 +30,7 @@ class CommentTypeApiTest extends \PHPUnit_Framework_TestCase
             ->method('add')
             ->with(
                 'message',
-                'textarea',
+                'oro_resizeable_rich_text',
                 [
                     'required' => true,
                     'label'    => 'oro.comment.message.label',

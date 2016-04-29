@@ -1,7 +1,7 @@
 oro:
     entity_config:
         action:
-            manage:              Manage configurable entities
+            manage:              Access Entity Management
             view_entities:       View configurable entities
             update_entity:       Update configurable entity
             view_entity:         View configurable entity

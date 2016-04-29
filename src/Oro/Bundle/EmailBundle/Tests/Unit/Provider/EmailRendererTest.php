@@ -169,7 +169,7 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $content = 'test content <a href="sdfsdf">asfsdf</a> {{ entity.field1 }} N/A';
+        $content = 'test content <a href="sdfsdf">asfsdf</a> {{ entity.field1|oro_html_sanitize }} N/A';
         $subject = 'subject';
 
         $emailTemplate = $this->getMock('Oro\Bundle\EmailBundle\Entity\EmailTemplate');
@@ -237,8 +237,9 @@ class EmailRendererTest extends \PHPUnit_Framework_TestCase
         $result = $renderer->compileMessage(new EmailTemplate('', $content), ['entity' => $entity]);
 
         $this->assertEquals(
-            'content oro.email.variable.not.found, {{ entity.field1 }}, ' .
-            '{{ entity.field2.field1 }}, oro.email.variable.not.found, {{ system.currentDate }}',
+            'content oro.email.variable.not.found, {{ entity.field1|oro_html_sanitize }}, ' .
+            '{{ entity.field2.field1|oro_html_sanitize }}, oro.email.variable.not.found, ' .
+            '{{ system.currentDate }}',
             $renderedContent = $result[1]
         );
     }

@@ -25,6 +25,9 @@
   .comments-view-footer {
     margin-bottom: 0;
   }
+  .accordion-heading > .created-at {
+    margin: 7px 0 0 0;
+  }
   .accordion-body .message .comment {
     padding-right: 0;
   }
@@ -43,14 +46,15 @@
       }
     }
     .accordion > .items {
+      .extra-info {
+        width: 100%;
+      }
       .message-item {
-        clear: left;
-        margin: 7px 0 7px 4px;
-        width: calc(~"100% - 186px");
+        margin-right: 4px;
       }
       .details {
         min-width: 0;
-        max-width: calc(~"100% - 72px");
+        max-width: calc(~"100% - 80px");
         margin-right: 0;
       }
       .actions {
@@ -64,6 +68,31 @@
       }
       .message .comment {
         padding: 0 ;
+      }
+    }
+  }
+}
+@media screen and (min-width: 400px) {
+  .activity-list-widget .filter-box {
+    width: calc(~'100% - 34px');
+    + .pull-right {
+      margin-left: -2px;
+    }
+    > .filter-container {
+      margin-bottom: 6px;
+      > .filter-item {
+        width: calc(~'50% - 16px');
+        margin: 0 12px 10px 0;
+        &:last-child {
+          margin-bottom: 10px;
+        }
+        .filter-criteria-selector {
+          height: 32px;
+          line-height: 29px;
+          .caret {
+            margin-top: 13px;
+          }
+        }
       }
     }
   }
