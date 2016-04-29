@@ -13,7 +13,8 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
 /**
- * Adds owner validators to entity.
+ * Adds NotBlank validation constraint for "owner" field.
+ * Adds Owner validation constraint for the entity.
  */
 class AddOwnerValidator implements ProcessorInterface
 {
