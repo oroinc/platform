@@ -34,6 +34,7 @@ parameters:
     oro_organization.provider.filter.busines_unit_choice_tree.class: Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider
 
     oro_organization.autocomplete.business_unit.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
+    oro_organization.business_unit.autocomplete.listener.class: Oro\Bundle\OrganizationBundle\EventListener\BusinessUnitAutocompleteListener
 
 services:
     #
@@ -133,6 +134,13 @@ services:
         tags:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
             - { name: doctrine.event_listener, event: onClear }
+
+    oro_organization.business_unit.autocomplete.listener:
+        class: %oro_organization.business_unit.autocomplete.listener.class%
+        arguments:
+            - '@oro_security.security_facade'
+        tags:
+            - { name: kernel.event_listener, event: oro_search.before_search, method: onSearchBefore }
 
     #
     # DataGrid
