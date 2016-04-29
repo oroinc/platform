@@ -37,9 +37,14 @@ class SidebarExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $this->assetHelper = $this->getMockBuilder('Symfony\Component\Asset\Packages')
+            ->disableOriginalConstructor()
+            ->getMock();
+
         $this->extension = new SidebarExtension(
             $this->widgetDefinitionsRegistry,
-            $this->translator
+            $this->translator,
+            $this->assetHelper
         );
     }
 

@@ -22,9 +22,6 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     /** @var  \SensioLabs\Behat\PageObjectExtension\PageObject\Factory */
     protected $pageObjectFactory;
 
-    /** @var  \SensioLabs\Behat\PageObjectExtension\PageObject\Page */
-    protected $currentPage;
-
     /**
      * {@inheritdoc}
      */
@@ -54,17 +51,6 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
         if ($errorBlock) {
             $errorBlock->find('named', ['content', '×'])->click();
         }
-    }
-
-    /**
-     * @Given /^(?:|I )open (?:|the )"(?P<pageName>.*?)" page$/
-     * @Given /^(?:|I )visited (?:|the )"(?P<pageName>.*?)"$/
-     */
-    public function iOpenPage($pageName)
-    {
-        $this->currentPage = $this->pageObjectFactory->createPage($pageName);
-        $this->currentPage->open();
-        $this->iWaitingForAjaxResponce();
     }
 
     /**
@@ -107,17 +93,7 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
      */
     public function iFillWith($element, TableNode $table)
     {
-        $this->currentPage->getElement($element)->fill($table);
-    }
-
-    /**
-     * @Given /^(?:|I )should be on "(?P<pageName>(?:[^"]|\\")*)" page?$/
-     */
-    public function iShouldBeOnPage($pageName)
-    {
-        $page = $this->pageObjectFactory->createPage($pageName);
-        $pattern = $this->getPagePattern($page);
-        $this->assertSession()->addressMatches($pattern);
+        $this->pageObjectFactory->createElement($element)->fill($table);
     }
 
     /*********************************************/
@@ -140,23 +116,5 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     {
         parent::clickLink($link);
         $this->iWaitingForAjaxResponce();
-    }
-
-    /**
-     * @param Page $page
-     * @return string
-     */
-    private function getPagePattern(Page $page)
-    {
-        $pageReflection = new \ReflectionClass($page);
-        $pathReflection = $pageReflection->getProperty('path');
-        $pathReflection->setAccessible(true);
-        $path = $pathReflection->getValue($page);
-
-        // Replace placeholders like {id} to pattern
-        $pattern = preg_replace("/\{[\d\D]*\}/", "[\d\D]*", $path);
-        $pattern = sprintf('`^%s$`', $pattern);
-
-        return $pattern;
     }
 }

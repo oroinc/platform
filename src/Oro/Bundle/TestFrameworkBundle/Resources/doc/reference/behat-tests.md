@@ -28,7 +28,58 @@ It has fast and native support for various web standards: DOM handling, CSS sele
 
 ### Installing
 
+Remove ```composer.lock``` file if you install dependencies with ```--no-dev``` parameter before.
 
+Install dev dependencies:
+
+```php
+composer install
+```
+
+
+### Run tests
+
+For execute features you need browser emulator demon (Selenium2 or PhantomJs) runing.
+
+Install PhantomJs:
+
+```bash
+mkdir $HOME/phantomjs
+wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
+tar -xvf $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/travis-phantomjs
+ln -s $HOME/phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
+```
+
+Run PhantomJs:
+
+```bash
+phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1 &
+```
+
+Install Selenium2
+
+```bash
+mkdir $HOME/selenium-server-standalone-2.52.0
+curl -L http://selenium-release.storage.googleapis.com/2.52/selenium-server-standalone-2.52.0.jar > $HOME/selenium-server-standalone-2.52.0/selenium.jar
+```
+
+Run Selenium2:
+
+```bash
+java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1 &
+```
+
+Run tests with Selenium and Firefox:
+
+```bash
+vendor/bin/behat -p selenium2
+```
+
+Run tests with PhantomJs
+
+```bash
+vendor/bin/behat
+```
 
 ### Architecture
 
@@ -66,15 +117,15 @@ Read more about ([how using the page object factory](http://behat-page-object-ex
 ### Configuration
 
 Base configuration is holded by [behat.yml.dist](../../config/behat.yml.dist).
-Use it by parameter ```-p``` for example:
+Use it by parameter ```-c``` for use your custom config:
 
 ```bash
-bin/behat -s OroUserBundle -p ./src/Oro/src/Oro/Bundle/TestFrameworkBundle/Resources/config/behat.yml.dist
+bin/behat -s OroUserBundle -c ~/config/behat.yml.dist
 ```
 
-You can copy it to behat.yml to the root of project and edit it for your needs.
+However you can edit behat.yml in root of project for your needs.
 Every bundle that configured symfony_bundle suite type will not be autoloaded by ```OroTestFrameworkExtension```. 
-See ***Architecture*** reference above
+See ***Architecture*** reference above.
 
 ### Write your first feature
 
@@ -101,20 +152,20 @@ Feature: User login
   I need to be able to authenticate
 
 Scenario: Success login
-  Given I open "Login" page
+  Given I am on "/user/login"
   And I fill "Login Form" with:
       | Username | admin |
       | Password | admin |
   And I press "Log in"
-  And I should be on "Home" page
+  And I should be on "/"
 
 Scenario: Fail login
-  Given I open "Login" page
+  Given I am on "/user/login"
   And I fill "Login Form" with:
       | Username | user |
       | Password | pass |
   And I press "Log in"
-  And I should be on "Login" page
+  And I should be on "/user/login"
   And I should see "Invalid user name or password."
 ```
 
@@ -126,39 +177,3 @@ and describe the business value derived from the inclusion of the feature in you
 and contains a description of the scenario.
 4. The next 6 lines are the scenario steps, each of which is matched to a regular expression defined in Context. 
 5. ```Scenario: Fail login``` starts the next scenario, and so on.
-
-### Run tests
-
-For execute features you need browser emulator demon (Selenium2 or PhantomJs) runing.
-
-For PhantomJs:
-
-```bash
-wget https://bitbucket.org/ariya/phantomjs/downloads/phantomjs-2.1.1-linux-x86_64.tar.bz2 -O $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2
-tar -xvf $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64.tar.bz2 -C $HOME/travis-phantomjs
-ln -s $HOME/travis-phantomjs/phantomjs-2.1.1-linux-x86_64/bin/phantomjs /usr/bin/phantomjs
-```
-
-Run PhantomJs:
-
-```bash
-phantomjs --webdriver=8643 > /tmp/phantomjs.log 2>&1 &
-```
-
-For Selenium2
-
-```bash
-curl -L http://selenium-release.storage.googleapis.com/2.52/selenium-server-standalone-2.52.0.jar > $HOME/selenium-server-standalone-2.52.0/selenium.jar
-```
-
-Run Selenium2:
-
-```bash
-java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriver.log > /tmp/webdriver_output.txt 2>&1 &
-```
-
-Now run tests:
-
-```bash
-vendor/bin/behat
-```
