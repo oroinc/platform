@@ -50,9 +50,6 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->prototype('scalar')->end()
                     ->info('Contexts that added to all autoload bundles suites')
                 ->end()
-                ->scalarNode('pages_namespace_suffix')
-                    ->defaultValue('\Tests\Behat\Page')
-                ->end()
                 ->scalarNode('elements_namespace_suffix')
                     ->defaultValue('\Tests\Behat\Page\Element')
                 ->end()
@@ -65,7 +62,6 @@ class OroTestFrameworkExtension implements TestworkExtension
     public function load(ContainerBuilder $container, array $config)
     {
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
-        $container->setParameter('oro_test.pages_namespace_suffix', $config['pages_namespace_suffix']);
         $container->setParameter('oro_test.elements_namespace_suffix', $config['elements_namespace_suffix']);
     }
 
@@ -132,31 +128,20 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function processPageObjectsAutoload(ContainerBuilder $container)
     {
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
-        $pages = $container->getParameter('sensio_labs.page_object_extension.namespaces.page');
         $elements = $container->getParameter('sensio_labs.page_object_extension.namespaces.element');
-        $pagesNamespaceSuffix = $container->getParameter('oro_test.pages_namespace_suffix');
         $elementsNamespaceSuffix = $container->getParameter('oro_test.elements_namespace_suffix');
 
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
-            if ($this->hasDirectory($bundle, $pagesNamespaceSuffix)) {
-                $pageNamespace = $bundle->getNamespace().$pagesNamespaceSuffix;
-
-                if (!in_array($pageNamespace, $pages)) {
-                    $pages[] = $pageNamespace;
-                }
-            }
-
             if ($this->hasDirectory($bundle, $elementsNamespaceSuffix)) {
-                $pageNamespace = $bundle->getNamespace().$elementsNamespaceSuffix;
+                $elementNamespace = $bundle->getNamespace().$elementsNamespaceSuffix;
 
-                if (!in_array($pageNamespace, $elements)) {
-                    $elements[] = $pageNamespace;
+                if (!in_array($elementNamespace, $elements)) {
+                    $elements[] = $elementNamespace;
                 }
             }
         }
 
-        $container->setParameter('sensio_labs.page_object_extension.namespaces.page', $pages);
         $container->setParameter('sensio_labs.page_object_extension.namespaces.element', $elements);
     }
 
