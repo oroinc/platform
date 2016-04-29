@@ -72,13 +72,13 @@ java -jar $HOME/selenium-server-standalone-2.52.0/selenium.jar -log /tmp/webdriv
 Run tests with Selenium and Firefox:
 
 ```bash
-vendor/bin/behat -p selenium2 -c app/behat.yml
+vendor/bin/behat -p selenium2
 ```
 
 Run tests with PhantomJs
 
 ```bash
-vendor/bin/behat -c app/behat.yml
+vendor/bin/behat
 ```
 
 ### Architecture
@@ -90,13 +90,13 @@ Mink provide ```MinkContext``` with basic feature steps.
 To look the all available feature steps:
 
 ```bash
-bin/behat -dl -s OroUserBundle -c app/behat.yml
+bin/behat -dl -s OroUserBundle
 ```
 
 Every bundle has its own test suite and can be run separately:
 
  ```bash
- bin/behat -s OroUserBundle -c app/behat.yml
+ bin/behat -s OroUserBundle
  ```
 
 For building testing suites ```Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension``` is used.
@@ -117,16 +117,15 @@ Read more about ([how using the page object factory](http://behat-page-object-ex
 ### Configuration
 
 Base configuration is holded by [behat.yml.dist](../../config/behat.yml.dist).
-You can copy and edit it if you needed.
 Use it by parameter ```-c``` for use your custom config:
 
 ```bash
 bin/behat -s OroUserBundle -c ~/config/behat.yml.dist
 ```
 
-You can copy it to behat.yml to the root of project and edit it for your needs.
+However you can edit behat.yml in root of project for your needs.
 Every bundle that configured symfony_bundle suite type will not be autoloaded by ```OroTestFrameworkExtension```. 
-See ***Architecture*** reference above
+See ***Architecture*** reference above.
 
 ### Write your first feature
 
