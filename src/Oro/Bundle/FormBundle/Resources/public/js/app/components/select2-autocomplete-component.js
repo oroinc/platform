@@ -47,7 +47,7 @@ define(function(require) {
                 labelTpl = 'highlight(' + labelTpl + ')';
             }
             return '<%= ' + labelTpl + ' %><% if (id === null) { %>' +
-                '<span class="select2__result-entry-info"> ( ' + __('oro.form.new') + ' ) </span><% } %>';
+                '<span class="select2__result-entry-info"> (' + __('oro.form.new') + ') </span><% } %>';
         }
     });
 
