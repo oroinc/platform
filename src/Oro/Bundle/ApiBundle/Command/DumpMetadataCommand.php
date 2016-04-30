@@ -43,7 +43,8 @@ class DumpMetadataCommand extends AbstractDebugCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'The name of action for which the metadata should be displayed.' .
-                'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.'
+                'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.'.
+                'get'
             );
         parent::configure();
     }

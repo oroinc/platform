@@ -79,7 +79,8 @@ class DumpConfigCommand extends AbstractDebugCommand
                 null,
                 InputOption::VALUE_REQUIRED,
                 'The name of action for which the configuration should be displayed.' .
-                'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.'
+                'Can be "get", "get_list", "create", "update", "delete", "delete_list", etc.',
+                'get'
             );
         parent::configure();
     }
