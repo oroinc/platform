@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Tests\Functional;
 
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
 
 /**
  * @dbIsolation
@@ -179,7 +178,7 @@ class GetRestPlainApiTest extends ApiTestCase
                 $requirements[$field] = $content[0][$field];
             }
 
-            return implode(RestRequest::ARRAY_DELIMITER, $requirements);
+            return implode(',', $requirements);
         }
     }
 }

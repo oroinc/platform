@@ -10,7 +10,6 @@ use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
 use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
-use Oro\Bundle\ApiBundle\Request\RestRequest;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Request\Version;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -204,7 +203,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
             }
             $route->setRequirement(
                 self::ID_ATTRIBUTE,
-                implode(RestRequest::ARRAY_DELIMITER, $requirements)
+                implode(',', $requirements)
             );
         }
     }
