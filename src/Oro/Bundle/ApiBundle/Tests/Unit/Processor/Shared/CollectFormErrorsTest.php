@@ -173,6 +173,30 @@ class CollectFormErrorsTest extends FormProcessorTestCase
         );
     }
 
+    public function testProcessWithInvalidCollectionValue()
+    {
+        $form = $this->createFormBuilder()->create('testForm', null, ['compound' => true])
+            ->add('field1', 'text', ['constraints' => [new Constraints\All(new Constraints\NotNull())]])
+            ->getForm();
+        $form->submit(
+            [
+                'field1' => [1, null],
+            ]
+        );
+
+        $this->context->setForm($form);
+        $this->processor->process($this->context);
+
+        $this->assertFalse($form->isValid());
+        $this->assertTrue($this->context->hasErrors());
+        $this->assertEquals(
+            [
+                $this->createErrorObject('not null constraint', 'This value should not be null.', 'field1.1')
+            ],
+            $this->context->getErrors()
+        );
+    }
+
     /**
      * @return FormBuilder
      */

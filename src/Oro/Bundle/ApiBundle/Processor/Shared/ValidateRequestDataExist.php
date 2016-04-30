@@ -6,6 +6,7 @@ use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 
 /**
  * Validates that the request data exist and not empty.
@@ -22,7 +23,10 @@ class ValidateRequestDataExist implements ProcessorInterface
         $requestData = $context->getRequestData();
         if (empty($requestData)) {
             $context->addError(
-                Error::createValidationError('request data constraint', 'The request data should not be empty.')
+                Error::createValidationError(
+                    Constraint::REQUEST_DATA,
+                    'The request data should not be empty.'
+                )
             );
         }
     }

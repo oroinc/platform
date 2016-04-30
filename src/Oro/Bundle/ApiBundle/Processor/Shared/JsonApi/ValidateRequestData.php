@@ -9,6 +9,7 @@ use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Model\ErrorSource;
 use Oro\Bundle\ApiBundle\Processor\FormContext;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\JsonApi\JsonApiDocumentBuilder as JsonApiDoc;
 use Oro\Bundle\ApiBundle\Request\ValueNormalizer;
 use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
@@ -37,16 +38,19 @@ abstract class ValidateRequestData implements ProcessorInterface
         /** @var FormContext|SingleItemContext $context */
 
         $this->context = $context;
-
-        $pointer = $this->buildPointer('', JsonApiDoc::DATA);
-        $requestData = $context->getRequestData();
-        if ($this->validateRequestData($requestData, $pointer)) {
-            $data = $requestData[JsonApiDoc::DATA];
-            $this->validatePrimaryDataObject($data, $pointer);
-            $this->validateAttributesAndRelationships($data, $pointer);
+        try {
+            $pointer = $this->buildPointer('', JsonApiDoc::DATA);
+            $requestData = $context->getRequestData();
+            if ($this->validateRequestData($requestData, $pointer)) {
+                $data = $requestData[JsonApiDoc::DATA];
+                $this->validatePrimaryDataObject($data, $pointer);
+                $this->validateAttributesAndRelationships($data, $pointer);
+            }
+            $this->context = null;
+        } catch (\Exception $e) {
+            $this->context = null;
+            throw $e;
         }
-
-        $this->context = null;
     }
 
     /**
@@ -284,7 +288,7 @@ abstract class ValidateRequestData implements ProcessorInterface
      */
     protected function addError($pointer, $message)
     {
-        $error = Error::createValidationError('request data constraint', $message)
+        $error = Error::createValidationError(Constraint::REQUEST_DATA, $message)
             ->setSource(ErrorSource::createByPointer($pointer));
 
         $this->context->addError($error);

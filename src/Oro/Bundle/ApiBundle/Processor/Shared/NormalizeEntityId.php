@@ -4,7 +4,9 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Model\Error;
 use Oro\Bundle\ApiBundle\Processor\SingleItemContext;
+use Oro\Bundle\ApiBundle\Request\Constraint;
 use Oro\Bundle\ApiBundle\Request\EntityIdTransformerInterface;
 
 /**
@@ -37,8 +39,14 @@ class NormalizeEntityId implements ProcessorInterface
             return;
         }
 
-        $context->setId(
-            $this->entityIdTransformer->reverseTransform($context->getClassName(), $entityId)
-        );
+        try {
+            $context->setId(
+                $this->entityIdTransformer->reverseTransform($context->getClassName(), $entityId)
+            );
+        } catch (\Exception $e) {
+            $context->addError(
+                Error::createValidationError(Constraint::ENTITY_ID)->setInnerException($e)
+            );
+        }
     }
 }
