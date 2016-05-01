@@ -31,18 +31,18 @@ oro_rest_api_delete:
     options:
         group: rest_api
 
-oro_rest_api_delete_list:
+oro_rest_api_cdelete:
     path: /api/{entity}.{_format}
     methods: [DELETE]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
     defaults:
-        _controller: OroApiBundle:RestApi:deleteList
+        _controller: OroApiBundle:RestApi:cdelete
         _action: delete_list
     options:
         group: rest_api
 
-oro_rest_post:
+oro_rest_api_post:
     path: /api/{entity}.{_format}
     methods: [POST]
     requirements:
@@ -53,7 +53,7 @@ oro_rest_post:
     options:
         group: rest_api
 
-oro_rest_patch:
+oro_rest_api_patch:
     path: /api/{entity}/{id}.{_format}
     methods: [PATCH]
     requirements:
