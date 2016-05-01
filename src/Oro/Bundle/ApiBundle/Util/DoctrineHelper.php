@@ -12,6 +12,24 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper as BaseHelper;
 
 class DoctrineHelper extends BaseHelper
 {
+    /** @var array */
+    private $manageableEntityClasses = [];
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isManageableEntityClass($entityClass)
+    {
+        if (isset($this->manageableEntityClasses[$entityClass])) {
+            return $this->manageableEntityClasses[$entityClass];
+        }
+
+        $isManageable = null !== $this->getEntityManagerForClass($entityClass, false);
+        $this->manageableEntityClasses[$entityClass] = $isManageable;
+
+        return $isManageable;
+    }
+
     /**
      * Adds criteria to the query.
      *

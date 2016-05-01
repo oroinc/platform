@@ -7,12 +7,43 @@ use Doctrine\ORM\Query\Expr\Join;
 
 use Oro\Bundle\ApiBundle\Collection\Criteria;
 use Oro\Bundle\ApiBundle\Tests\Unit\OrmRelatedTestCase;
+use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity;
 
 class DoctrineHelperTest extends OrmRelatedTestCase
 {
     const ENTITY_NAMESPACE = 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\\';
+
+    public function testIsManageableEntityClassShouldBeCached()
+    {
+        $entityClass = 'Test\Entity';
+        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn($this->em);
+
+        $doctrineHelper = new DoctrineHelper($doctrine);
+        $this->assertTrue($doctrineHelper->isManageableEntityClass($entityClass));
+        // test local cache
+        $this->assertTrue($doctrineHelper->isManageableEntityClass($entityClass));
+    }
+
+    public function testIsManageableEntityClassShouldBeCachedEvenForNotManageableEntity()
+    {
+        $entityClass = 'Test\Entity';
+        $doctrine = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
+        $doctrine->expects($this->once())
+            ->method('getManagerForClass')
+            ->with($entityClass)
+            ->willReturn(null);
+
+        $doctrineHelper = new DoctrineHelper($doctrine);
+        $this->assertFalse($doctrineHelper->isManageableEntityClass($entityClass));
+        // test local cache
+        $this->assertFalse($doctrineHelper->isManageableEntityClass($entityClass));
+    }
 
     public function testApplyCriteriaWithoutJoins()
     {

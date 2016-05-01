@@ -213,11 +213,11 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\ExcludeNotAccessibleRelations
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@router'
-            - '@oro_api.value_normalizer'
+            - '@oro_api.resources_loader'
+            - '@oro_api.resources_cache'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, requestType: rest, priority: -60 }
-            - { name: oro.api.processor, action: get_relation_config, extra: definition, requestType: rest, priority: -60 }
+            - { name: oro.api.processor, action: get_config, extra: definition, priority: -60 }
+            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -60 }
 
     oro_api.get_config.set_type_for_table_inheritance_relations:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\SetTypeForTableInheritanceRelations

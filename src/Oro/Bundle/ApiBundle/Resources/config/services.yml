@@ -92,6 +92,26 @@ services:
         class: Oro\Bundle\ApiBundle\Provider\ResourcesLoader
         arguments:
             - '@oro_api.collect_resources.processor'
+            - '@oro_api.resources_cache'
+
+    oro_api.resources_cache:
+        class: Oro\Bundle\ApiBundle\Provider\ResourcesCache
+        public: false
+        arguments:
+            - '@oro_api.resources_cache.impl'
+
+    oro_api.resources_cache.impl:
+        public: false
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_api_resources' ] ]
+
+    oro_api.listener.console_command:
+        class: Oro\Bundle\ApiBundle\EventListener\ConsoleCommandListener
+        arguments:
+            - '@oro_api.resources_cache'
+        tags:
+            - { name: kernel.event_listener, event: console.command, method: onConsoleCommand }
 
     oro_api.config_extension_registry:
         class: Oro\Bundle\ApiBundle\Config\ConfigExtensionRegistry

@@ -4,7 +4,6 @@ namespace Oro\Bundle\ApiBundle\Processor\CollectResources;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
-use Oro\Bundle\ApiBundle\Request\ApiResource;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
