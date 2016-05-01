@@ -20,7 +20,7 @@ class CompleteDefinitionOfAssociationsTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper    = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
@@ -73,16 +73,30 @@ class CompleteDefinitionOfAssociationsTest extends ConfigProcessorTestCase
                 'association4' => [
                     'exclusion_policy' => 'none'
                 ],
+                'association6' => [
+                    'exclude' => false
+                ],
+                'association7' => [
+                    'property_path' => 'realAssociation7'
+                ],
+                'association8' => [
+                    'property_path' => 'realAssociation8'
+                ],
             ]
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
-        $this->exclusionProvider->expects($this->any())
+        $this->exclusionProvider->expects($this->exactly(6))
             ->method('isIgnoredRelation')
             ->willReturnMap(
                 [
-                    [$rootEntityMetadata, 'association3', true]
+                    [$rootEntityMetadata, 'association1', false],
+                    [$rootEntityMetadata, 'association3', true],
+                    [$rootEntityMetadata, 'association4', false],
+                    [$rootEntityMetadata, 'association5', false],
+                    [$rootEntityMetadata, 'realAssociation7', false],
+                    [$rootEntityMetadata, 'realAssociation8', false],
                 ]
             );
 
@@ -90,20 +104,29 @@ class CompleteDefinitionOfAssociationsTest extends ConfigProcessorTestCase
             ->method('getAssociationMappings')
             ->willReturn(
                 [
-                    'association1' => [
+                    'association1'     => [
                         'targetEntity' => 'Test\Association1Target'
                     ],
-                    'association2' => [
+                    'association2'     => [
                         'targetEntity' => 'Test\Association2Target'
                     ],
-                    'association3' => [
+                    'association3'     => [
                         'targetEntity' => 'Test\Association3Target'
                     ],
-                    'association4' => [
+                    'association4'     => [
                         'targetEntity' => 'Test\Association4Target'
                     ],
-                    'association5' => [
+                    'association5'     => [
                         'targetEntity' => 'Test\Association5Target'
+                    ],
+                    'association6'     => [
+                        'targetEntity' => 'Test\Association6Target'
+                    ],
+                    'realAssociation7' => [
+                        'targetEntity' => 'Test\Association7Target'
+                    ],
+                    'realAssociation8' => [
+                        'targetEntity' => 'Test\Association8Target'
                     ],
                 ]
             );
@@ -153,6 +176,29 @@ class CompleteDefinitionOfAssociationsTest extends ConfigProcessorTestCase
                         'exclusion_policy' => 'all'
                     ],
                     'association5' => [
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
+                    ],
+                    'association6' => [
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
+                    ],
+                    'association7' => [
+                        'property_path'    => 'realAssociation7',
+                        'exclusion_policy' => 'all',
+                        'collapse'         => true,
+                        'fields'           => [
+                            'id' => null
+                        ]
+                    ],
+                    'association8' => [
+                        'property_path'    => 'realAssociation8',
                         'exclusion_policy' => 'all',
                         'collapse'         => true,
                         'fields'           => [

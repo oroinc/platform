@@ -37,7 +37,7 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->processor = new AddOwnerValidator($this->doctrineHelper, $this->ownershipMetadataProvider);
     }
 
-    public function testProcessForNonManageableEntity()
+    public function testProcessForNotManageableEntity()
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -54,7 +54,6 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $config = [
             'fields' => [
                 'owner' => null,
-                'org'   => null,
             ]
         ];
         $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
@@ -80,6 +79,39 @@ class AddOwnerValidatorTest extends ConfigProcessorTestCase
         $this->assertEquals(
             ['constraints' => [new NotBlank()]],
             $configObject->getField('owner')->getFormOptions()
+        );
+    }
+
+    public function testProcessForRenamedOwnerField()
+    {
+        $config = [
+            'fields' => [
+                'owner1' => ['property_path' => 'owner'],
+            ]
+        ];
+        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->ownershipMetadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($ownershipMetadata);
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            ['constraints' => [new Owner()]],
+            $configObject->getFormOptions()
+        );
+        $this->assertEquals(
+            ['constraints' => [new NotBlank()]],
+            $configObject->getField('owner1')->getFormOptions()
         );
     }
 

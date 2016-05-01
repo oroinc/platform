@@ -36,7 +36,7 @@ class AddOwnerNotNullValidatorTest extends ConfigProcessorTestCase
         $this->processor = new AddOwnerNotNullValidator($this->doctrineHelper, $this->ownershipMetadataProvider);
     }
 
-    public function testProcessForNonManageableEntity()
+    public function testProcessForNotManageableEntity()
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')
@@ -74,6 +74,35 @@ class AddOwnerNotNullValidatorTest extends ConfigProcessorTestCase
         $this->assertEquals(
             ['constraints' => [new NotNull()]],
             $configObject->getField('owner')->getFormOptions()
+        );
+    }
+
+    public function testProcessForRenamedOwnerField()
+    {
+        $config = [
+            'fields' => [
+                'owner1' => ['property_path' => 'owner'],
+            ]
+        ];
+        $ownershipMetadata = new OwnershipMetadata('USER', 'owner', 'owner', 'org', 'org');
+
+        $this->doctrineHelper->expects($this->once())
+            ->method('isManageableEntityClass')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn(true);
+        $this->ownershipMetadataProvider->expects($this->once())
+            ->method('getMetadata')
+            ->with(self::TEST_CLASS_NAME)
+            ->willReturn($ownershipMetadata);
+
+        /** @var EntityDefinitionConfig $configObject */
+        $configObject = $this->createConfigObject($config);
+        $this->context->setResult($configObject);
+        $this->processor->process($this->context);
+
+        $this->assertEquals(
+            ['constraints' => [new NotNull()]],
+            $configObject->getField('owner1')->getFormOptions()
         );
     }
 }

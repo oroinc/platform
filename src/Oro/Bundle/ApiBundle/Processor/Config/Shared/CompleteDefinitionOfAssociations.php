@@ -64,11 +64,14 @@ class CompleteDefinitionOfAssociations implements ProcessorInterface
     {
         $metadata     = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $associations = $metadata->getAssociationMappings();
-        foreach ($associations as $fieldName => $mapping) {
-            $field = $definition->getOrAddField($fieldName);
+        foreach ($associations as $propertyPath => $mapping) {
+            $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
+            $field = $fieldName
+                ? $definition->getField($fieldName)
+                : $definition->addField($propertyPath);
             if (!$field->hasExcluded()
                 && !$field->isExcluded()
-                && $this->exclusionProvider->isIgnoredRelation($metadata, $fieldName)
+                && $this->exclusionProvider->isIgnoredRelation($metadata, $propertyPath)
             ) {
                 $field->setExcluded();
             }
@@ -83,9 +86,7 @@ class CompleteDefinitionOfAssociations implements ProcessorInterface
                 $targetEntity->setExcludeAll();
                 $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($mapping['targetEntity']);
                 foreach ($idFieldNames as $idFieldName) {
-                    if (!$targetEntity->hasField($idFieldName)) {
-                        $targetEntity->addField($idFieldName);
-                    }
+                    $targetEntity->addField($idFieldName);
                 }
                 $field->setCollapsed();
             }
