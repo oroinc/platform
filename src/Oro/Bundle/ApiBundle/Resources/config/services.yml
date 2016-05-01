@@ -66,9 +66,14 @@ services:
         class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer
         public: false
         arguments:
+            - '@oro_api.object_normalizer_registry'
             - '@oro_api.doctrine_helper'
             - '@oro_api.entity_accessor'
             - '@oro_api.entity_serializer.data_transformer'
+
+    oro_api.object_normalizer_registry:
+        class: Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry
+        public: false
         calls:
             - [addNormalizer,  ['@oro_api.search_item_normalizer', 50]]
             - [addNormalizer,  ['@oro_api.datetime_normalizer']]

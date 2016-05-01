@@ -72,6 +72,7 @@ class UpdateRestJsonApiWithTableInheritanceTest extends ApiTestCase
         self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
         $result = self::jsonToArray($response->getContent());
         self::assertEquals('Department created by API', $result['data']['attributes']['title']);
+        self::assertEquals([], $result['data']['relationships']['staff']['data']);
 
         return $result['data']['id'];
     }
@@ -115,5 +116,6 @@ class UpdateRestJsonApiWithTableInheritanceTest extends ApiTestCase
         self::assertResponseContentTypeEquals($response, 'application/vnd.api+json');
         $result = self::jsonToArray($response->getContent());
         self::assertEquals('Department updated by API', $result['data']['attributes']['title']);
+        self::assertEquals([], $result['data']['relationships']['staff']['data']);
     }
 }
