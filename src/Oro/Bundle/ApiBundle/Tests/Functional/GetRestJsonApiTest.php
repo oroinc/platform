@@ -116,7 +116,7 @@ class GetRestJsonApiTest extends ApiTestCase
                 $this->client->request(
                     'DELETE',
                     $this->getUrl(
-                        'oro_rest_api_delete_list',
+                        'oro_rest_api_cdelete',
                         ['entity' => $entityAlias, 'filter[id]' => implode(',', $id)]
                     ),
                     [],
