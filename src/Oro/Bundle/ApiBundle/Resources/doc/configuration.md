@@ -57,7 +57,7 @@ Top level configuration example:
 oro_api:
     entities:
         Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
-            exclude: ~
+            exclude:
             ...
             fields:
                 ...
@@ -366,12 +366,21 @@ The `relations` configuration section describes a configuration of an entity if 
 
 The `actions` configuration section allows to specify action-specific options. The options from this section will be added to the entity configuration. If an option exists in both entity and action configurations the action option wins. The exception is the `exclude` option. This option is used to disable an action for a specific entity and it is not copied to the entity configuration. Now `get`, `get_list` and `delete` actions are supported.
 
-Each action can have next parameters:
+Each action can have next properties:
 
 * **exclude** *boolean* Indicates whether the action is disabled for entity. By default `false`.
 * **description** *string* The entity description for the action.
 * **acl_resource** *string* The name of ACL resource that should be used to protect an entity in a scope of this action. The `null` can be used to disable access checks.
 * **status_codes** *array* The possible response status codes for the action.
+* **form_type** *string* The form type that should be used for the entity. This option overrides **form_type** option defined in ["entities" configuration section](#entities-configuration-section).
+* **form_options** *array* The form options that should be used for the entity. These options override options defined in ["entities" configuration section](#entities-configuration-section).
+* **fields** - This section describes entity fields' configuration specific for a particular action. These options override options defined in ["entities" configuration section](#entities-configuration-section).
+
+Each field can have next properties:
+
+* **exclude** *boolean* Indicates whether the field should be excluded for a particular action. This property is described above in ["exclude" option](#exclude-option).
+* **form_type** *string* The form type that should be used for the field.
+* **form_options** *array* The form options that should be used for the field.
 
 By default, the following permissions are used to restrict access to an entity in a scope of the specific action:
 
@@ -475,5 +484,18 @@ oro_api:
                 delete:
                     status_codes:
                         '417':
+                            exclude: true
+```
+
+Exclude a field for `update` action:
+
+```yaml
+oro_api:
+    entities:
+        Acme\Bundle\AcmeBundle\Entity\AcmeEntity:
+            actions:
+                update:
+                    fields:
+                        field1:
                             exclude: true
 ```

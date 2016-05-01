@@ -18,8 +18,8 @@ class ApiConfiguration implements ConfigurationInterface
     const ENTITIES_SECTION   = 'entities';
     const RELATIONS_SECTION  = 'relations';
 
-    /** @var ConfigExtensionRegistry */
-    protected $extensionRegistry = [];
+    /** @var ConfigurationSettingsInterface */
+    protected $settings;
 
     /** @var int */
     protected $maxNestingLevel;
@@ -30,10 +30,10 @@ class ApiConfiguration implements ConfigurationInterface
      */
     public function __construct(ConfigExtensionRegistry $extensionRegistry, $maxNestingLevel = null)
     {
-        $this->extensionRegistry = $extensionRegistry;
-        $this->maxNestingLevel   = null !== $maxNestingLevel
+        $this->settings = $extensionRegistry->getConfigurationSettings();
+        $this->maxNestingLevel = null !== $maxNestingLevel
             ? $maxNestingLevel
-            : $this->extensionRegistry->getMaxNestingLevel();
+            : $extensionRegistry->getMaxNestingLevel();
     }
 
     /**
@@ -45,38 +45,15 @@ class ApiConfiguration implements ConfigurationInterface
         $rootNode    = $treeBuilder->root('oro_api');
         $children    = $rootNode->children();
 
-        list(
-            $extraSections,
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
-            ) = $this->extensionRegistry->getConfigurationSettings();
-
         $entityNode = $this->addEntitySection(
             $children,
-            new EntityConfiguration(
-                self::ENTITIES_SECTION,
-                new EntityDefinitionConfiguration(),
-                $extraSections,
-                $this->maxNestingLevel
-            ),
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
+            $this->createEntityConfiguration(self::ENTITIES_SECTION, new EntityDefinitionConfiguration())
         );
         $entityNode->booleanNode(ConfigUtil::EXCLUDE);
 
         $this->addEntitySection(
             $children,
-            new EntityConfiguration(
-                self::RELATIONS_SECTION,
-                new RelationDefinitionConfiguration(),
-                $extraSections,
-                $this->maxNestingLevel
-            ),
-            $configureCallbacks,
-            $preProcessCallbacks,
-            $postProcessCallbacks
+            $this->createEntityConfiguration(self::RELATIONS_SECTION, new RelationDefinitionConfiguration())
         );
 
         $rootNode
@@ -91,27 +68,37 @@ class ApiConfiguration implements ConfigurationInterface
     }
 
     /**
+     * @param string                              $sectionName
+     * @param TargetEntityDefinitionConfiguration $definitionSection
+     *
+     * @return EntityConfiguration
+     */
+    protected function createEntityConfiguration(
+        $sectionName,
+        TargetEntityDefinitionConfiguration $definitionSection
+    ) {
+        return new EntityConfiguration(
+            $sectionName,
+            $definitionSection,
+            $this->settings,
+            $this->maxNestingLevel
+        );
+    }
+
+    /**
      * @param NodeBuilder         $parentNode
-     * @param EntityConfiguration $entityConfiguration
-     * @param array               $configureCallbacks
-     * @param array               $preProcessCallbacks
-     * @param array               $postProcessCallbacks
+     * @param EntityConfiguration $configuration
      *
      * @return NodeBuilder
      */
-    protected function addEntitySection(
-        NodeBuilder $parentNode,
-        EntityConfiguration $entityConfiguration,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    protected function addEntitySection(NodeBuilder $parentNode, EntityConfiguration $configuration)
+    {
         $node = $parentNode
-            ->arrayNode($entityConfiguration->getSectionName())
+            ->arrayNode($configuration->getSectionName())
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                 ->children();
-        $entityConfiguration->configure($node, $configureCallbacks, $preProcessCallbacks, $postProcessCallbacks);
+        $configuration->configure($node);
 
         return $node;
     }

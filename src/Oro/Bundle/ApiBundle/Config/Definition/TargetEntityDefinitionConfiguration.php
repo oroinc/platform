@@ -5,8 +5,8 @@ namespace Oro\Bundle\ApiBundle\Config\Definition;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\Definition\Builder\NodeBuilder;
 
-use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
+use Oro\Bundle\ApiBundle\Config\EntityDefinitionFieldConfig;
 
 class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection implements
     ConfigurationSectionInterface
@@ -58,12 +58,8 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
     /**
      * {@inheritdoc}
      */
-    public function configure(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    public function configure(NodeBuilder $node)
+    {
         $sectionName = $this->sectionName;
         if (!empty($this->parentSectionName)) {
             $sectionName = $this->parentSectionName . '.' . $sectionName;
@@ -71,33 +67,24 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        $parentNode
-            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
-            ->beforeNormalization()
-                ->always(
-                    function ($value) use ($preProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
-                    }
-                );
-        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
+        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
+        $this->callConfigureCallbacks($node, $sectionName);
+        $this->addPreProcessCallbacks($parentNode, $sectionName);
+        $this->addPostProcessCallbacks(
+            $parentNode,
+            $sectionName,
+            function ($value) {
+                return $this->postProcessConfig($value);
+            }
+        );
+
         $this->configureEntityNode($node);
         $fieldNode = $node
             ->arrayNode(EntityDefinitionConfig::FIELDS)
                 ->useAttributeAsKey('name')
                 ->prototype('array')
                     ->children();
-        $this->configureFieldNode($fieldNode, $configureCallbacks, $preProcessCallbacks, $postProcessCallbacks);
-        $parentNode
-            ->validate()
-                ->always(
-                    function ($value) use ($postProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks(
-                            $this->postProcessConfig($value),
-                            $postProcessCallbacks,
-                            $sectionName
-                        );
-                    }
-                );
+        $this->configureFieldNode($fieldNode);
     }
 
     /**
@@ -179,16 +166,9 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
 
     /**
      * @param NodeBuilder $node
-     * @param array       $configureCallbacks
-     * @param array       $preProcessCallbacks
-     * @param array       $postProcessCallbacks
      */
-    protected function configureFieldNode(
-        NodeBuilder $node,
-        array $configureCallbacks,
-        array $preProcessCallbacks,
-        array $postProcessCallbacks
-    ) {
+    protected function configureFieldNode(NodeBuilder $node)
+    {
         $sectionName = $this->sectionName . '.field';
         if (!empty($this->parentSectionName)) {
             $sectionName = $this->parentSectionName . '.' . $sectionName;
@@ -196,15 +176,17 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
 
         /** @var ArrayNodeDefinition $parentNode */
         $parentNode = $node->end();
-        $parentNode
-            //->ignoreExtraKeys(false) @todo: uncomment after migration to Symfony 2.8+
-            ->beforeNormalization()
-                ->always(
-                    function ($value) use ($preProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks($value, $preProcessCallbacks, $sectionName);
-                    }
-                );
-        $this->callConfigureCallbacks($node, $configureCallbacks, $sectionName);
+        //$parentNode->ignoreExtraKeys(false); @todo: uncomment after migration to Symfony 2.8+
+        $this->callConfigureCallbacks($node, $sectionName);
+        $this->addPreProcessCallbacks($parentNode, $sectionName);
+        $this->addPostProcessCallbacks(
+            $parentNode,
+            $sectionName,
+            function ($value) {
+                return $this->postProcessFieldConfig($value);
+            }
+        );
+
         $node
             ->booleanNode(EntityDefinitionFieldConfig::EXCLUDE)->end()
             ->scalarNode(EntityDefinitionFieldConfig::PROPERTY_PATH)->cannotBeEmpty()->end()
@@ -220,17 +202,6 @@ class TargetEntityDefinitionConfiguration extends AbstractConfigurationSection i
                 ->prototype('variable')
                 ->end()
             ->end();
-        $parentNode
-            ->validate()
-                ->always(
-                    function ($value) use ($postProcessCallbacks, $sectionName) {
-                        return $this->callProcessConfigCallbacks(
-                            $this->postProcessFieldConfig($value),
-                            $postProcessCallbacks,
-                            $sectionName
-                        );
-                    }
-                );
     }
 
     /**
