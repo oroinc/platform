@@ -192,9 +192,7 @@ class RestApiController extends FOSRestController
      */
     protected function buildResponse(Context $context)
     {
-        $result = $context->getResult();
-
-        $view = $this->view($result);
+        $view = $this->view($context->getResult());
 
         $view->setStatusCode($context->getResponseStatusCode() ?: Response::HTTP_OK);
         foreach ($context->getResponseHeaders()->toArray() as $key => $value) {
