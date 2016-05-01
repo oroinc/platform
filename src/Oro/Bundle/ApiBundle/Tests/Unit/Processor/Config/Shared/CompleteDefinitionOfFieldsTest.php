@@ -20,7 +20,7 @@ class CompleteDefinitionOfFieldsTest extends ConfigProcessorTestCase
     {
         parent::setUp();
 
-        $this->doctrineHelper    = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
+        $this->doctrineHelper = $this->getMockBuilder('Oro\Bundle\ApiBundle\Util\DoctrineHelper')
             ->disableOriginalConstructor()
             ->getMock();
         $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
@@ -70,16 +70,29 @@ class CompleteDefinitionOfFieldsTest extends ConfigProcessorTestCase
                 'field2' => [
                     'exclude' => true
                 ],
+                'field5' => [
+                    'exclude' => false
+                ],
+                'field6' => [
+                    'property_path' => 'realField6'
+                ],
+                'field7' => [
+                    'property_path' => 'realField7'
+                ],
             ]
         ];
 
         $rootEntityMetadata = $this->getClassMetadataMock(self::TEST_CLASS_NAME);
 
-        $this->exclusionProvider->expects($this->any())
+        $this->exclusionProvider->expects($this->exactly(5))
             ->method('isIgnoredField')
             ->willReturnMap(
                 [
-                    [$rootEntityMetadata, 'field3', true]
+                    [$rootEntityMetadata, 'field1', false],
+                    [$rootEntityMetadata, 'field3', true],
+                    [$rootEntityMetadata, 'field4', false],
+                    [$rootEntityMetadata, 'realField6', false],
+                    [$rootEntityMetadata, 'realField7', true],
                 ]
             );
 
@@ -90,7 +103,10 @@ class CompleteDefinitionOfFieldsTest extends ConfigProcessorTestCase
                     'field1',
                     'field2',
                     'field3',
-                    'field4'
+                    'field4',
+                    'field5',
+                    'realField6',
+                    'realField7',
                 ]
             );
 
@@ -116,7 +132,15 @@ class CompleteDefinitionOfFieldsTest extends ConfigProcessorTestCase
                     'field3' => [
                         'exclude' => true
                     ],
-                    'field4' => null
+                    'field4' => null,
+                    'field5' => null,
+                    'field6' => [
+                        'property_path' => 'realField6'
+                    ],
+                    'field7' => [
+                        'exclude'       => true,
+                        'property_path' => 'realField7'
+                    ],
                 ]
             ],
             $this->context->getResult()

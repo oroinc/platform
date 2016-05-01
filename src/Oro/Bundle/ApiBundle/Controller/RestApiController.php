@@ -97,7 +97,7 @@ class RestApiController extends FOSRestController
      *
      * @return Response
      */
-    public function deleteListAction(Request $request)
+    public function cdeleteAction(Request $request)
     {
         $processor = $this->getProcessor($request);
         /** @var DeleteListContext $context */

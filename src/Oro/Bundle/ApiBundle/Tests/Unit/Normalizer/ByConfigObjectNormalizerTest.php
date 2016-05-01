@@ -11,6 +11,7 @@ use Oro\Bundle\ApiBundle\Config\FiltersConfigExtension;
 use Oro\Bundle\ApiBundle\Config\SortersConfigExtension;
 use Oro\Bundle\ApiBundle\Normalizer\DateTimeNormalizer;
 use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizer;
+use Oro\Bundle\ApiBundle\Normalizer\ObjectNormalizerRegistry;
 use Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity as Object;
 use Oro\Bundle\ApiBundle\Util\ConfigUtil;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
@@ -29,13 +30,15 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
             ->method('getManagerForClass')
             ->willReturn(null);
 
+        $normalizers = new ObjectNormalizerRegistry();
         $this->objectNormalizer = new ObjectNormalizer(
+            $normalizers,
             new DoctrineHelper($doctrine),
             new EntityDataAccessor(),
             new EntityDataTransformer($this->getMock('Symfony\Component\DependencyInjection\ContainerInterface'))
         );
 
-        $this->objectNormalizer->addNormalizer(
+        $normalizers->addNormalizer(
             new DateTimeNormalizer()
         );
     }
@@ -360,6 +363,258 @@ class ByConfigObjectNormalizerTest extends \PHPUnit_Framework_TestCase
                 'owner'     => [
                     'name'    => 'user_name (Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\User::name)_additional',
                     'groups1' => [11, 22]
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithCollapsedNullTableInheritanceRelations()
+    {
+        $product = new Object\Product();
+        $product->setId(123);
+        $product->setName('product_name');
+        $owner = new Object\User();
+        $owner->setId(456);
+        $owner->setName('user_name');
+        $owner->addProduct($product);
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'       => null,
+                'name'     => ['exclude' => true],
+                'category' => [
+                    'exclusion_policy' => 'all',
+                    'collapse'         => true,
+                    'fields'           => [
+                        'name'      => null,
+                        '__class__' => null
+                    ]
+                ],
+                'owner'    => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'   => null,
+                        'groups' => [
+                            'exclusion_policy' => 'all',
+                            'collapse'         => true,
+                            'fields'           => [
+                                'id'        => null,
+                                '__class__' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $product,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'       => 123,
+                'category' => null,
+                'owner'    => [
+                    'name'   => 'user_name',
+                    'groups' => []
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithCollapsedTableInheritanceRelations()
+    {
+        $product = new Object\Product();
+        $product->setId(123);
+        $product->setName('product_name');
+        $product->setCategory(new Object\Category('category_name'));
+        $owner = new Object\User();
+        $owner->setId(456);
+        $owner->setName('user_name');
+        $owner->addProduct($product);
+        $group = new Object\Group();
+        $group->setId(789);
+        $owner->addGroup($group);
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'       => null,
+                'name'     => ['exclude' => true],
+                'category' => [
+                    'exclusion_policy' => 'all',
+                    'collapse'         => true,
+                    'fields'           => [
+                        'name'      => null,
+                        '__class__' => null
+                    ]
+                ],
+                'owner'    => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'   => null,
+                        'groups' => [
+                            'exclusion_policy' => 'all',
+                            'collapse'         => true,
+                            'fields'           => [
+                                'id'        => null,
+                                '__class__' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $product,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'       => 123,
+                'category' => [
+                    'name'      => 'category_name',
+                    '__class__' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                ],
+                'owner'    => [
+                    'name'   => 'user_name',
+                    'groups' => [
+                        [
+                            'id'        => 789,
+                            '__class__' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
+                        ]
+                    ]
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithNullTableInheritanceRelations()
+    {
+        $product = new Object\Product();
+        $product->setId(123);
+        $product->setName('product_name');
+        $owner = new Object\User();
+        $owner->setId(456);
+        $owner->setName('user_name');
+        $owner->addProduct($product);
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'       => null,
+                'name'     => ['exclude' => true],
+                'category' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'      => null,
+                        '__class__' => null
+                    ]
+                ],
+                'owner'    => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'   => null,
+                        'groups' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'id'        => null,
+                                '__class__' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $product,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'       => 123,
+                'category' => null,
+                'owner'    => [
+                    'name'   => 'user_name',
+                    'groups' => []
+                ]
+            ],
+            $result
+        );
+    }
+
+    public function testNormalizeObjectWithTableInheritanceRelations()
+    {
+        $product = new Object\Product();
+        $product->setId(123);
+        $product->setName('product_name');
+        $product->setCategory(new Object\Category('category_name'));
+        $owner = new Object\User();
+        $owner->setId(456);
+        $owner->setName('user_name');
+        $owner->addProduct($product);
+        $group = new Object\Group();
+        $group->setId(789);
+        $owner->addGroup($group);
+
+        $config = [
+            'exclusion_policy' => 'all',
+            'fields'           => [
+                'id'       => null,
+                'name'     => ['exclude' => true],
+                'category' => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'      => null,
+                        '__class__' => null
+                    ]
+                ],
+                'owner'    => [
+                    'exclusion_policy' => 'all',
+                    'fields'           => [
+                        'name'   => null,
+                        'groups' => [
+                            'exclusion_policy' => 'all',
+                            'fields'           => [
+                                'id'        => null,
+                                '__class__' => null
+                            ]
+                        ]
+                    ]
+                ]
+            ]
+        ];
+
+        $result = $this->objectNormalizer->normalizeObject(
+            $product,
+            $this->createConfigObject($config)
+        );
+
+        $this->assertEquals(
+            [
+                'id'       => 123,
+                'category' => [
+                    'name'      => 'category_name',
+                    '__class__' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Category',
+                ],
+                'owner'    => [
+                    'name'   => 'user_name',
+                    'groups' => [
+                        [
+                            'id'        => 789,
+                            '__class__' => 'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Group',
+                        ]
+                    ]
                 ]
             ],
             $result

@@ -12,6 +12,7 @@ use Oro\Component\EntitySerializer\FieldConfig;
 class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterface
 {
     use Traits\ConfigTrait;
+    use Traits\FindFieldTrait;
     use Traits\LabelTrait;
     use Traits\PluralLabelTrait;
     use Traits\DescriptionTrait;
@@ -81,9 +82,33 @@ class EntityDefinitionConfig extends EntityConfig implements EntityConfigInterfa
      */
     public function hasFields()
     {
-        $fields = $this->getFields();
+        return !empty($this->fields);
+    }
 
-        return !empty($fields);
+    /**
+     * Finds the configuration of the field by its name or property path.
+     * If $findByPropertyPath equals to TRUE do the find using a given field name as a property path.
+     *
+     * @param string $fieldName
+     * @param bool   $findByPropertyPath
+     *
+     * @return EntityDefinitionFieldConfig|null
+     */
+    public function findField($fieldName, $findByPropertyPath = false)
+    {
+        return $this->doFindField($fieldName, $findByPropertyPath);
+    }
+
+    /**
+     * Finds the name of the field by its property path.
+     *
+     * @param string $propertyPath
+     *
+     * @return string|null
+     */
+    public function findFieldNameByPropertyPath($propertyPath)
+    {
+        return $this->doFindFieldNameByPropertyPath($propertyPath);
     }
 
     /**

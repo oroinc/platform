@@ -27,7 +27,7 @@ class AddAssociationValidatorsTest extends ConfigProcessorTestCase
         $this->processor = new AddAssociationValidators($this->doctrineHelper);
     }
 
-    public function testProcessForNonManageableEntity()
+    public function testProcessForNotManageableEntity()
     {
         $this->doctrineHelper->expects($this->once())
             ->method('isManageableEntityClass')

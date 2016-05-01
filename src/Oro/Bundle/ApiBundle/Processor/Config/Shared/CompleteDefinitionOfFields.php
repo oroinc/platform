@@ -63,11 +63,14 @@ class CompleteDefinitionOfFields implements ProcessorInterface
     {
         $metadata   = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
         $fieldNames = $metadata->getFieldNames();
-        foreach ($fieldNames as $fieldName) {
-            $field = $definition->getOrAddField($fieldName);
+        foreach ($fieldNames as $propertyPath) {
+            $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
+            $field = $fieldName
+                ? $definition->getField($fieldName)
+                : $definition->addField($propertyPath);
             if (!$field->hasExcluded()
                 && !$field->isExcluded()
-                && $this->exclusionProvider->isIgnoredField($metadata, $fieldName)
+                && $this->exclusionProvider->isIgnoredField($metadata, $propertyPath)
             ) {
                 $field->setExcluded();
             }
