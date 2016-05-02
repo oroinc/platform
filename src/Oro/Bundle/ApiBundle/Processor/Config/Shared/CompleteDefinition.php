@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Config\Shared;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Config\EntityDefinitionConfig;
@@ -10,9 +12,9 @@ use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
 
 /**
- * Sets "identifier only" configuration for all associations were not configured yet.
- * Marks all not accessible associations as excluded.
+ * Marks all not accessible fields and associations as excluded.
  * The entity exclusion provider is used.
+ * Sets "identifier only" configuration for all associations were not configured yet.
  */
 class CompleteDefinition implements ProcessorInterface
 {
@@ -30,7 +32,7 @@ class CompleteDefinition implements ProcessorInterface
         DoctrineHelper $doctrineHelper,
         ExclusionProviderInterface $exclusionProvider
     ) {
-        $this->doctrineHelper    = $doctrineHelper;
+        $this->doctrineHelper = $doctrineHelper;
         $this->exclusionProvider = $exclusionProvider;
     }
 
@@ -53,21 +55,64 @@ class CompleteDefinition implements ProcessorInterface
             return;
         }
 
-        $this->completeAssociations($definition, $entityClass);
+        $this->completeDefinition($definition, $entityClass);
     }
 
     /**
      * @param EntityDefinitionConfig $definition
      * @param string                 $entityClass
      */
-    protected function completeAssociations(EntityDefinitionConfig $definition, $entityClass)
+    protected function completeDefinition(EntityDefinitionConfig $definition, $entityClass)
     {
-        $metadata     = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+        $existingFields = [];
+        $fields = $definition->getFields();
+        foreach ($fields as $fieldName => $field) {
+            $propertyPath = $field->getPropertyPath() ?: $fieldName;
+            $existingFields[$propertyPath] = $fieldName;
+        }
+        $metadata = $this->doctrineHelper->getEntityMetadataForClass($entityClass);
+        $this->completeFields($definition, $metadata, $existingFields);
+        $this->completeAssociations($definition, $metadata, $existingFields);
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ClassMetadata          $metadata
+     * @param array                  $existingFields [property path => field name, ...]
+     */
+    protected function completeFields(
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata,
+        array $existingFields
+    ) {
+        $fieldNames = $metadata->getFieldNames();
+        foreach ($fieldNames as $propertyPath) {
+            $field = isset($existingFields[$propertyPath])
+                ? $definition->getField($existingFields[$propertyPath])
+                : $definition->addField($propertyPath);
+            if (!$field->hasExcluded()
+                && !$field->isExcluded()
+                && $this->exclusionProvider->isIgnoredField($metadata, $propertyPath)
+            ) {
+                $field->setExcluded();
+            }
+        }
+    }
+
+    /**
+     * @param EntityDefinitionConfig $definition
+     * @param ClassMetadata          $metadata
+     * @param array                  $existingFields [property path => field name, ...]
+     */
+    protected function completeAssociations(
+        EntityDefinitionConfig $definition,
+        ClassMetadata $metadata,
+        array $existingFields
+    ) {
         $associations = $metadata->getAssociationMappings();
         foreach ($associations as $propertyPath => $mapping) {
-            $fieldName = $definition->findFieldNameByPropertyPath($propertyPath);
-            $field = $fieldName
-                ? $definition->getField($fieldName)
+            $field = isset($existingFields[$propertyPath])
+                ? $definition->getField($existingFields[$propertyPath])
                 : $definition->addField($propertyPath);
             if (!$field->hasExcluded()
                 && !$field->isExcluded()

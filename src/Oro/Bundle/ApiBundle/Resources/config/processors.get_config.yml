@@ -185,15 +185,6 @@ services:
             - { name: oro.api.processor, action: get_config, extra: definition&expand_related_entities, priority: -5 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition&expand_related_entities, priority: -5 }
 
-    oro_api.get_config.complete_definition.fields:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfFields
-        arguments:
-            - '@oro_api.doctrine_helper'
-            - '@oro_api.entity_exclusion_provider'
-        tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, priority: -20 }
-            - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -20 }
-
     oro_api.get_config.complete_definition:
         class: Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition
         arguments:
