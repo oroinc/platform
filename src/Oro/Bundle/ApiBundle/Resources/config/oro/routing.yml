@@ -1,5 +1,5 @@
 oro_rest_api_cget:
-    path: /api/{entity}.{_format}
+    path: /api/{entity}
     methods: [GET]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
@@ -10,7 +10,7 @@ oro_rest_api_cget:
         group: rest_api
 
 oro_rest_api_get:
-    path: /api/{entity}/{id}.{_format}
+    path: /api/{entity}/{id}
     methods: [GET]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
@@ -21,7 +21,7 @@ oro_rest_api_get:
         group: rest_api
 
 oro_rest_api_delete:
-    path: /api/{entity}/{id}.{_format}
+    path: /api/{entity}/{id}
     methods: [DELETE]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
@@ -32,7 +32,7 @@ oro_rest_api_delete:
         group: rest_api
 
 oro_rest_api_cdelete:
-    path: /api/{entity}.{_format}
+    path: /api/{entity}
     methods: [DELETE]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
@@ -43,7 +43,7 @@ oro_rest_api_cdelete:
         group: rest_api
 
 oro_rest_api_post:
-    path: /api/{entity}.{_format}
+    path: /api/{entity}
     methods: [POST]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)
@@ -54,7 +54,7 @@ oro_rest_api_post:
         group: rest_api
 
 oro_rest_api_patch:
-    path: /api/{entity}/{id}.{_format}
+    path: /api/{entity}/{id}
     methods: [PATCH]
     requirements:
         entity: (?:(?!(soap|rest)$)[^/]+)

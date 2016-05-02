@@ -6,7 +6,6 @@ use Symfony\Component\Routing\Route;
 
 use Oro\Component\Routing\Resolver\RouteCollectionAccessor;
 use Oro\Component\Routing\Resolver\RouteOptionsResolverInterface;
-
 use Oro\Bundle\ApiBundle\Provider\ResourcesLoader;
 use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Request\RequestType;
@@ -22,6 +21,7 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     const ID_ATTRIBUTE       = 'id';
     const ID_PLACEHOLDER     = '{id}';
     const FORMAT_ATTRIBUTE   = '_format';
+    const FORMAT_PLACEHOLDER = '.{_format}';
 
     /** @var bool */
     protected $isApplicationInstalled;
@@ -176,6 +176,10 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     protected function setFormatAttribute(Route $route)
     {
+        $path = $route->getPath();
+        if (substr($path, -strlen(self::FORMAT_PLACEHOLDER)) !== self::FORMAT_PLACEHOLDER) {
+            $route->setPath($path . self::FORMAT_PLACEHOLDER);
+        }
         $route->setRequirement(self::FORMAT_ATTRIBUTE, $this->formats);
         $route->setDefault(self::FORMAT_ATTRIBUTE, $this->defaultFormat);
     }
