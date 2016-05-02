@@ -48,7 +48,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.relation_config_provider'
         tags:
-            - { name: oro.api.processor, action: get_config, extra: definition, requestType: !json_api, priority: -28 }
+            - { name: oro.api.processor, action: get_config, extra: definition, requestType: rest&!json_api, priority: -28 }
 
     oro_api.get_config.add_association_validators:
         class: Oro\Bundle\ApiBundle\Processor\Config\GetConfig\AddAssociationValidators

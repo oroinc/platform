@@ -116,14 +116,14 @@ Examples of processor conditions
 
 ```yaml
     tags:
-        - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api }
+        - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest }
 ```
 
 -  A processor is executed for all requests except a specified one.
 
 ```yaml
     tags:
-        - { name: oro.api.processor, action: get_list, group: initialize, requestType: !json_api }
+        - { name: oro.api.processor, action: get_list, group: initialize, requestType: !rest }
 ```
 
 -  A processor is executed only for REST requests conform [JSON.API](http://jsonapi.org/) specification.
@@ -131,6 +131,13 @@ Examples of processor conditions
 ```yaml
     tags:
         - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&json_api }
+```
+
+-  A processor is executed for all REST requests excluding requests conform [JSON.API](http://jsonapi.org/) specification.
+
+```yaml
+    tags:
+        - { name: oro.api.processor, action: get_list, group: initialize, requestType: rest&!json_api }
 ```
 
 - A processor is executed for several specified actions.
