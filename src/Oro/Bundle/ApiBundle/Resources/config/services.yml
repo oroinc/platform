@@ -1,10 +1,6 @@
 parameters:
     # the maximum number of nesting target entities that can be specified in 'Resources/config/oro/api.yml'
     oro_api.config.max_nesting_level: 3
-    # a list of supported formats of REST API requests delimited by |
-    oro_api.rest.formats: json
-    # default format of REST API requests
-    oro_api.rest.default_format: json
 
 services:
     oro_api.action_processor_bag:
@@ -286,8 +282,6 @@ services:
             - '@oro_api.resources_loader'
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
-            - %oro_api.rest.formats%
-            - %oro_api.rest.default_format%
         tags:
             - { name: routing.options_resolver, priority: -255 }
 

@@ -36,11 +36,17 @@
         );
 
         /**
-         * Disable "Form Data" body format for JSON.API sandbox
+         * Make JSON as default body format for JSON.API sandbox
          */
         if (apiType === 'rest_json_api') {
             $('#body_format').val('json');
-            $('#body_format option[value=form]').attr('disabled','disabled');
+        }
+
+        /**
+         * Disable the request format selector for JSON.API and new implementation of REST sandboxes
+         */
+        if ((apiType === 'rest_json_api' || apiType === 'rest_plain') && $('#request_format').length) {
+            $('#request_format').attr('disabled','disabled');
         }
 
         /**

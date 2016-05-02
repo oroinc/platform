@@ -20,8 +20,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     const ENTITY_PLACEHOLDER = '{entity}';
     const ID_ATTRIBUTE       = 'id';
     const ID_PLACEHOLDER     = '{id}';
-    const FORMAT_ATTRIBUTE   = '_format';
-    const FORMAT_PLACEHOLDER = '.{_format}';
 
     /** @var bool */
     protected $isApplicationInstalled;
@@ -35,12 +33,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
     /** @var ValueNormalizer */
     protected $valueNormalizer;
 
-    /** @var string[] */
-    protected $formats;
-
-    /** @var string[] */
-    protected $defaultFormat;
-
     /** @var RequestType */
     protected $requestType;
 
@@ -52,23 +44,17 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      * @param ResourcesLoader  $resourcesLoader
      * @param DoctrineHelper   $doctrineHelper
      * @param ValueNormalizer  $valueNormalizer
-     * @param string           $formats
-     * @param string           $defaultFormat
      */
     public function __construct(
         $isApplicationInstalled,
         ResourcesLoader $resourcesLoader,
         DoctrineHelper $doctrineHelper,
-        ValueNormalizer $valueNormalizer,
-        $formats,
-        $defaultFormat
+        ValueNormalizer $valueNormalizer
     ) {
         $this->isApplicationInstalled = !empty($isApplicationInstalled);
         $this->resourcesLoader        = $resourcesLoader;
         $this->doctrineHelper         = $doctrineHelper;
         $this->valueNormalizer        = $valueNormalizer;
-        $this->formats                = $formats;
-        $this->defaultFormat          = $defaultFormat;
         $this->requestType            = new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
@@ -82,8 +68,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
         }
 
         if ($this->hasAttribute($route, self::ENTITY_PLACEHOLDER)) {
-            $this->setFormatAttribute($route);
-
             $entities = $this->getSupportedEntities();
             if (!empty($entities)) {
                 $this->adjustRoutes($route, $routes, $entities);
@@ -169,19 +153,6 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
                 );
             }
         }
-    }
-
-    /**
-     * @param Route $route
-     */
-    protected function setFormatAttribute(Route $route)
-    {
-        $path = $route->getPath();
-        if (substr($path, -strlen(self::FORMAT_PLACEHOLDER)) !== self::FORMAT_PLACEHOLDER) {
-            $route->setPath($path . self::FORMAT_PLACEHOLDER);
-        }
-        $route->setRequirement(self::FORMAT_ATTRIBUTE, $this->formats);
-        $route->setDefault(self::FORMAT_ATTRIBUTE, $this->defaultFormat);
     }
 
     /**

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\ApiBundle\Routing;
 
-use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Symfony\Component\Routing\Route;
 
 use Nelmio\ApiDocBundle\Annotation\ApiDoc;
@@ -16,6 +15,7 @@ use Oro\Bundle\ApiBundle\Config\StatusCodesConfig;
 use Oro\Bundle\ApiBundle\Config\StatusCodesConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\StandaloneFilter;
+use Oro\Bundle\ApiBundle\Filter\StandaloneFilterWithDefaultValue;
 use Oro\Bundle\ApiBundle\Processor\ActionProcessorBagInterface;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Request\DataType;
@@ -28,8 +28,7 @@ class RestDocHandler implements HandlerInterface
 {
     const JSON_API_VIEW = 'rest_json_api';
 
-    const ID_DESCRIPTION     = 'The identifier of an entity';
-    const FORMAT_DESCRIPTION = 'The response format';
+    const ID_DESCRIPTION = 'The identifier of an entity';
 
     protected $templates = [
         'get'      => [
@@ -151,15 +150,6 @@ class RestDocHandler implements HandlerInterface
                 $this->addFilters($annotation, $config->getFilters());
             }
         }
-        if (self::JSON_API_VIEW === $this->docViewDetector->getView()) {
-            $this->removeFormatRequirement($annotation);
-            $this->removeFormatPlaceholder($route);
-        } else {
-            $formatRequirement = $route->getRequirement(RestRouteOptionsResolver::FORMAT_ATTRIBUTE);
-            if ($formatRequirement) {
-                $this->addFormatRequirement($annotation, $formatRequirement);
-            }
-        }
     }
 
     /**
@@ -268,52 +258,6 @@ class RestDocHandler implements HandlerInterface
             if (!$code->isExcluded()) {
                 $annotation->addStatusCode($statusCode, $code->getDescription());
             }
-        }
-    }
-
-    /**
-     * @param ApiDoc $annotation
-     * @param string $requirement
-     */
-    protected function addFormatRequirement(ApiDoc $annotation, $requirement)
-    {
-        $annotation->addRequirement(
-            RestRouteOptionsResolver::FORMAT_ATTRIBUTE,
-            [
-                'dataType'    => ApiDocDataTypeConverter::convertToApiDocDataType(DataType::STRING),
-                'requirement' => $requirement,
-                'description' => self::FORMAT_DESCRIPTION
-            ]
-        );
-    }
-
-    /**
-     * @param ApiDoc $annotation
-     */
-    protected function removeFormatRequirement(ApiDoc $annotation)
-    {
-        $requirements = $annotation->getRequirements();
-        if (array_key_exists(RestRouteOptionsResolver::FORMAT_ATTRIBUTE, $requirements)) {
-            unset($requirements[RestRouteOptionsResolver::FORMAT_ATTRIBUTE]);
-            // unfortunately ApiDoc::setRequirements method does a merge specified requirements
-            // with existing ones and there is no other way to remove existing requirement
-            // except to use the reflection
-            $r = new \ReflectionClass($annotation);
-            $p = $r->getProperty('requirements');
-            $p->setAccessible(true);
-            $p->setValue($annotation, $requirements);
-        }
-    }
-
-    /**
-     * @param Route $route
-     */
-    protected function removeFormatPlaceholder(Route $route)
-    {
-        $path = $route->getPath();
-        $startPos = strpos($path, RestRouteOptionsResolver::FORMAT_PLACEHOLDER);
-        if (false !== $startPos) {
-            $route->setPath(substr($path, 0, $startPos));
         }
     }
 
