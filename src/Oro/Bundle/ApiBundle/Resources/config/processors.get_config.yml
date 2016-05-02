@@ -203,8 +203,8 @@ services:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: -30 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -30 }
 
-    oro_api.get_config.finish_completion:
-        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FinishCompletion
+    oro_api.get_config.finish_completion_of_definition:
+        class: Oro\Bundle\ApiBundle\Processor\Config\Shared\FinishCompletionOfDefinition
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, priority: -40 }
             - { name: oro.api.processor, action: get_relation_config, extra: definition, priority: -40 }
