@@ -10,7 +10,7 @@ use Oro\Bundle\ApiBundle\Processor\Config\ConfigContext;
  * Sets "exclusion_policy = all" for the entity. It means that the configuration
  * of all fields and associations was completed.
  */
-class CompleteDefinition implements ProcessorInterface
+class FinishCompletion implements ProcessorInterface
 {
     /**
      * {@inheritdoc}

@@ -2,19 +2,19 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\FinishCompletion;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
-class CompleteDefinitionTest extends ConfigProcessorTestCase
+class FinishCompletionTest extends ConfigProcessorTestCase
 {
-    /** @var CompleteDefinition */
+    /** @var FinishCompletion */
     protected $processor;
 
     protected function setUp()
     {
         parent::setUp();
 
-        $this->processor = new CompleteDefinition();
+        $this->processor = new FinishCompletion();
     }
 
     public function testProcess()
