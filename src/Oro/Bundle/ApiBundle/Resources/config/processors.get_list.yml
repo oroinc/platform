@@ -88,7 +88,6 @@ services:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\NormalizeFilterKeys
         arguments:
             - '@oro_api.doctrine_helper'
-            - '@translator'
         tags:
             - { name: oro.api.processor, action: get_list, group: initialize, requestType: json_api, priority: -50 }
 

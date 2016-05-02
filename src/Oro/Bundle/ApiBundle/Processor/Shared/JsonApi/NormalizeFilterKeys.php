@@ -2,12 +2,9 @@
 
 namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
-use Symfony\Component\Translation\TranslatorInterface;
-
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
 use Oro\Bundle\ApiBundle\Filter\ComparisonFilter;
-use Oro\Bundle\ApiBundle\Model\Label;
 use Oro\Bundle\ApiBundle\Processor\Context;
 use Oro\Bundle\ApiBundle\Util\DoctrineHelper;
 
@@ -22,17 +19,12 @@ class NormalizeFilterKeys implements ProcessorInterface
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
-    /** @var TranslatorInterface */
-    protected $translator;
-
     /**
-     * @param DoctrineHelper      $doctrineHelper
-     * @param TranslatorInterface $translator
+     * @param DoctrineHelper $doctrineHelper
      */
-    public function __construct(DoctrineHelper $doctrineHelper, TranslatorInterface $translator)
+    public function __construct(DoctrineHelper $doctrineHelper)
     {
         $this->doctrineHelper = $doctrineHelper;
-        $this->translator     = $translator;
     }
 
     /**
@@ -91,8 +83,6 @@ class NormalizeFilterKeys implements ProcessorInterface
      */
     protected function getIdFieldDescription()
     {
-        $label = new Label('oro.entity.identifier_field');
-
-        return $label->trans($this->translator);
+        return 'Entity Identifier';
     }
 }
