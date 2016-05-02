@@ -2,10 +2,10 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\Shared;
 
-use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinitionOfAssociations;
+use Oro\Bundle\ApiBundle\Processor\Config\Shared\CompleteDefinition;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\Config\ConfigProcessorTestCase;
 
-class CompleteDefinitionOfAssociationsTest extends ConfigProcessorTestCase
+class CompleteDefinitionTest extends ConfigProcessorTestCase
 {
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $doctrineHelper;
@@ -13,7 +13,7 @@ class CompleteDefinitionOfAssociationsTest extends ConfigProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $exclusionProvider;
 
-    /** @var CompleteDefinitionOfAssociations */
+    /** @var CompleteDefinition */
     protected $processor;
 
     protected function setUp()
@@ -25,7 +25,7 @@ class CompleteDefinitionOfAssociationsTest extends ConfigProcessorTestCase
             ->getMock();
         $this->exclusionProvider = $this->getMock('Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface');
 
-        $this->processor = new CompleteDefinitionOfAssociations(
+        $this->processor = new CompleteDefinition(
             $this->doctrineHelper,
             $this->exclusionProvider
         );

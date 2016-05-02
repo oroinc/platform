@@ -14,7 +14,7 @@ use Oro\Bundle\EntityBundle\Provider\ExclusionProviderInterface;
  * Marks all not accessible associations as excluded.
  * The entity exclusion provider is used.
  */
-class CompleteDefinitionOfAssociations implements ProcessorInterface
+class CompleteDefinition implements ProcessorInterface
 {
     /** @var DoctrineHelper */
     protected $doctrineHelper;
