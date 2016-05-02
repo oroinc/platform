@@ -26,6 +26,8 @@ use Oro\Bundle\EntityBundle\Provider\EntityClassNameProviderInterface;
 
 class RestDocHandler implements HandlerInterface
 {
+    const JSON_API_VIEW = 'rest_json_api';
+
     const ID_DESCRIPTION     = 'The identifier of an entity';
     const FORMAT_DESCRIPTION = 'The response format';
 
@@ -111,7 +113,6 @@ class RestDocHandler implements HandlerInterface
         $this->entityClassNameProvider = $entityClassNameProvider;
         $this->doctrineHelper          = $doctrineHelper;
         $this->valueNormalizer         = $valueNormalizer;
-        $this->requestType             = new RequestType([RequestType::REST, RequestType::JSON_API]);
     }
 
     /**
@@ -150,9 +151,14 @@ class RestDocHandler implements HandlerInterface
                 $this->addFilters($annotation, $config->getFilters());
             }
         }
-        $formatRequirement = $route->getRequirement(RestRouteOptionsResolver::FORMAT_ATTRIBUTE);
-        if ($formatRequirement) {
-            $this->addFormatRequirement($annotation, $formatRequirement);
+        if (self::JSON_API_VIEW === $this->docViewDetector->getView()) {
+            $this->removeFormatRequirement($annotation);
+            $this->removeFormatPlaceholder($route);
+        } else {
+            $formatRequirement = $route->getRequirement(RestRouteOptionsResolver::FORMAT_ATTRIBUTE);
+            if ($formatRequirement) {
+                $this->addFormatRequirement($annotation, $formatRequirement);
+            }
         }
     }
 
@@ -176,7 +182,7 @@ class RestDocHandler implements HandlerInterface
         return $this->valueNormalizer->normalizeValue(
             $entityType,
             DataType::ENTITY_CLASS,
-            $this->requestType
+            $this->getRequestType()
         );
     }
 
@@ -194,10 +200,7 @@ class RestDocHandler implements HandlerInterface
         $context->removeConfigExtra(SortersConfigExtra::NAME);
         $context->addConfigExtra(new DescriptionsConfigExtra($action));
         $context->addConfigExtra(new StatusCodesConfigExtra($action));
-        $context->getRequestType()->add(RequestType::REST);
-        if ('rest_json_api' === $this->docViewDetector->getView()) {
-            $context->getRequestType()->add(RequestType::JSON_API);
-        }
+        $this->buildRequestType($context->getRequestType());
         $context->setLastGroup('initialize');
         $context->setClassName($entityClass);
 
@@ -286,6 +289,36 @@ class RestDocHandler implements HandlerInterface
 
     /**
      * @param ApiDoc $annotation
+     */
+    protected function removeFormatRequirement(ApiDoc $annotation)
+    {
+        $requirements = $annotation->getRequirements();
+        if (array_key_exists(RestRouteOptionsResolver::FORMAT_ATTRIBUTE, $requirements)) {
+            unset($requirements[RestRouteOptionsResolver::FORMAT_ATTRIBUTE]);
+            // unfortunately ApiDoc::setRequirements method does a merge specified requirements
+            // with existing ones and there is no other way to remove existing requirement
+            // except to use the reflection
+            $r = new \ReflectionClass($annotation);
+            $p = $r->getProperty('requirements');
+            $p->setAccessible(true);
+            $p->setValue($annotation, $requirements);
+        }
+    }
+
+    /**
+     * @param Route $route
+     */
+    protected function removeFormatPlaceholder(Route $route)
+    {
+        $path = $route->getPath();
+        $startPos = strpos($path, RestRouteOptionsResolver::FORMAT_PLACEHOLDER);
+        if (false !== $startPos) {
+            $route->setPath(substr($path, 0, $startPos));
+        }
+    }
+
+    /**
+     * @param ApiDoc $annotation
      * @param string $entityClass
      * @param string $requirement
      */
@@ -319,7 +352,7 @@ class RestDocHandler implements HandlerInterface
                     'description' => $filter->getDescription(),
                     'requirement' => $this->valueNormalizer->getRequirement(
                         $filter->getDataType(),
-                        $this->requestType,
+                        $this->getRequestType(),
                         $filter->isArrayAllowed()
                     )
                 ];
@@ -349,5 +382,29 @@ class RestDocHandler implements HandlerInterface
     protected function hasAttribute(Route $route, $placeholder)
     {
         return false !== strpos($route->getPath(), $placeholder);
+    }
+
+    /**
+     * @return RequestType
+     */
+    protected function getRequestType()
+    {
+        if (null === $this->requestType) {
+            $this->requestType = new RequestType([]);
+            $this->buildRequestType($this->requestType);
+        }
+
+        return $this->requestType;
+    }
+
+    /**
+     * @param RequestType $requestType
+     */
+    protected function buildRequestType(RequestType $requestType)
+    {
+        $requestType->add(RequestType::REST);
+        if (self::JSON_API_VIEW === $this->docViewDetector->getView()) {
+            $requestType->add(RequestType::JSON_API);
+        }
     }
 }
