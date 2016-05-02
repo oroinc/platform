@@ -34,13 +34,6 @@ services:
         tags:
             - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
 
-    oro_api.delete.initialize_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
-        arguments:
-            - '@oro_entity.orm.entity_class_resolver'
-        tags:
-            - { name: oro.api.processor, action: delete, group: initialize, priority: 200 }
-
     oro_api.delete.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
         arguments:
@@ -80,6 +73,13 @@ services:
     #
     # build_query
     #
+
+    oro_api.delete.initialize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
+        arguments:
+            - '@oro_entity.orm.entity_class_resolver'
+        tags:
+            - { name: oro.api.processor, action: delete, group: build_query, priority: 100 }
 
     oro_api.delete.protect_query_by_acl:
         class: Oro\Bundle\ApiBundle\Processor\Shared\ProtectQueryByAcl

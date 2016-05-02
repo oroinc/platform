@@ -31,11 +31,13 @@ class InitializeCriteria implements ProcessorInterface
     {
         /** @var Context $context */
 
-        if (null !== $context->getCriteria()) {
-            // the Criteria object is already initialized
+        if ($context->hasResult()) {
+            // data already exist
             return;
         }
 
-        $context->setCriteria(new Criteria($this->entityClassResolver));
+        if (null === $context->getCriteria()) {
+            $context->setCriteria(new Criteria($this->entityClassResolver));
+        }
     }
 }

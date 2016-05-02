@@ -34,31 +34,10 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 200 }
 
-    oro_api.get.initialize_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
-        arguments:
-            - '@oro_entity.orm.entity_class_resolver'
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, priority: 200 }
-
     oro_api.get.normalize_include_header:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: 50 }
-
-    oro_api.get.json_api.handle_include_filter:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
-        arguments:
-            - '@oro_api.value_normalizer'
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: 50 }
-
-    oro_api.get.json_api.handle_fields_filter:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter
-        arguments:
-            - '@oro_api.value_normalizer'
-        tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: 50 }
 
     oro_api.get.normalize_entity_class:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeEntityClass
@@ -77,17 +56,31 @@ services:
         tags:
             - { name: oro.api.processor, action: get, group: initialize, priority: -10 }
 
+    oro_api.get.json_api.handle_include_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleIncludeFilter
+        arguments:
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -20 }
+
+    oro_api.get.json_api.handle_fields_filter:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter
+        arguments:
+            - '@oro_api.value_normalizer'
+        tags:
+            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -20 }
+
     oro_api.get.json_api.add_include_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddIncludeFilter
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -10 }
+            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -200 }
 
     oro_api.get.json_api.add_fields_filter:
         class: Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\AddFieldsFilter
         arguments:
             - '@oro_api.value_normalizer'
         tags:
-            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -10 }
+            - { name: oro.api.processor, action: get, group: initialize, requestType: json_api, priority: -200 }
 
     #
     # security_check
@@ -123,6 +116,13 @@ services:
     #
     # build_query
     #
+
+    oro_api.get.initialize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
+        arguments:
+            - '@oro_entity.orm.entity_class_resolver'
+        tags:
+            - { name: oro.api.processor, action: get, group: build_query, priority: 100 }
 
     oro_api.get.complete_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria

@@ -4,6 +4,7 @@ namespace Oro\Bundle\ApiBundle\Processor\Shared\JsonApi;
 
 use Oro\Component\ChainProcessor\ContextInterface;
 use Oro\Component\ChainProcessor\ProcessorInterface;
+use Oro\Bundle\ApiBundle\Config\DescriptionsConfigExtra;
 use Oro\Bundle\ApiBundle\Filter\FilterCollection;
 use Oro\Bundle\ApiBundle\Filter\FieldsFilter;
 use Oro\Bundle\ApiBundle\Processor\Context;
@@ -43,6 +44,16 @@ class AddFieldsFilter implements ProcessorInterface
         $filters = $context->getFilters();
         if ($filters->has(self::FILTER_KEY)) {
             // filters have been already set
+            return;
+        }
+
+        if (!$context->hasConfigExtra(DescriptionsConfigExtra::NAME)) {
+            /**
+             * this filter has descriptive nature and it should be added to the list of filters
+             * only if descriptions are requested
+             * actually a filtering by this filter is performed by
+             * @see Oro\Bundle\ApiBundle\Processor\Shared\JsonApi\HandleFieldsFilter
+             */
             return;
         }
 

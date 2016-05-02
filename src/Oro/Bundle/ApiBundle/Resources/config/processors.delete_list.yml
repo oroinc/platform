@@ -34,13 +34,6 @@ services:
         tags:
             - { name: oro.api.processor, action: delete_list, group: initialize, priority: 200 }
 
-    oro_api.delete_list.initialize_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
-        arguments:
-            - '@oro_entity.orm.entity_class_resolver'
-        tags:
-            - { name: oro.api.processor, action: delete_list, group: initialize, priority: 200 }
-
     oro_api.delete_list.normalize_include_header:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
         tags:
@@ -70,7 +63,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
         tags:
-            - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: -50 }
+            - { name: oro.api.processor, action: delete_list, group: initialize, requestType: json_api, priority: -55 }
 
     #
     # security_check
@@ -104,6 +97,13 @@ services:
     #
     # build_query
     #
+
+    oro_api.delete_list.initialize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
+        arguments:
+            - '@oro_entity.orm.entity_class_resolver'
+        tags:
+            - { name: oro.api.processor, action: delete_list, group: build_query, priority: 100 }
 
     oro_api.delete_list.build_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\BuildCriteria

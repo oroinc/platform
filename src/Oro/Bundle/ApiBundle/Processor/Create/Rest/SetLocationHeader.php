@@ -17,7 +17,7 @@ use Oro\Bundle\ApiBundle\Util\ValueNormalizerUtil;
  */
 class SetLocationHeader implements ProcessorInterface
 {
-    const HEADER_NAME = 'Location';
+    const RESPONSE_HEADER_NAME = 'Location';
 
     /** @var RouterInterface */
     protected $router;
@@ -50,7 +50,7 @@ class SetLocationHeader implements ProcessorInterface
     {
         /** @var SingleItemContext $context */
 
-        if ($context->getResponseHeaders()->has(self::HEADER_NAME)) {
+        if ($context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)) {
             // the Location header is already set
             return;
         }
@@ -67,6 +67,6 @@ class SetLocationHeader implements ProcessorInterface
             UrlGeneratorInterface::ABSOLUTE_URL
         );
 
-        $context->getResponseHeaders()->set(self::HEADER_NAME, $location);
+        $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, $location);
     }
 }

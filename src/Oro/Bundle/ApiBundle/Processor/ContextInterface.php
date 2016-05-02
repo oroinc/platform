@@ -141,7 +141,7 @@ interface ContextInterface extends ComponentContextInterface
     /**
      * Gets the Criteria object is used to add additional restrictions to a query is used to get result data.
      *
-     * @return Criteria
+     * @return Criteria|null
      */
     public function getCriteria();
 

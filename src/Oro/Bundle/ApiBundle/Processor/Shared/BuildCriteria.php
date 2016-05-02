@@ -25,6 +25,11 @@ class BuildCriteria implements ProcessorInterface
         }
 
         $criteria = $context->getCriteria();
+        if (null === $criteria) {
+            // the criteria object does not exist
+            return;
+        }
+
         $filterValues = $context->getFilterValues();
         $filters = $context->getFilters();
         /** @var FilterInterface $filter */

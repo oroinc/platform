@@ -21,8 +21,8 @@ use Oro\Bundle\BatchBundle\ORM\QueryBuilder\CountQueryBuilderOptimizer;
  */
 class SetTotalCountHeader implements ProcessorInterface
 {
-    const HEADER_NAME = 'X-Include-Total-Count';
-    const HEADER_VALUE = 'totalCount';
+    const RESPONSE_HEADER_NAME = 'X-Include-Total-Count';
+    const REQUEST_HEADER_VALUE = 'totalCount';
 
     /** @var CountQueryBuilderOptimizer */
     protected $countQueryBuilderOptimizer;
@@ -42,13 +42,13 @@ class SetTotalCountHeader implements ProcessorInterface
     {
         /** @var ListContext $context */
 
-        if ($context->getResponseHeaders()->has(self::HEADER_NAME)) {
+        if ($context->getResponseHeaders()->has(self::RESPONSE_HEADER_NAME)) {
             // total count header is already set
             return;
         }
 
         $xInclude = $context->getRequestHeaders()->get(Context::INCLUDE_HEADER);
-        if (empty($xInclude) || !in_array(self::HEADER_VALUE, $xInclude, true)) {
+        if (empty($xInclude) || !in_array(self::REQUEST_HEADER_VALUE, $xInclude, true)) {
             // total count is not requested
             return;
         }
@@ -66,7 +66,7 @@ class SetTotalCountHeader implements ProcessorInterface
         }
 
         if (null !== $totalCount) {
-            $context->getResponseHeaders()->set(self::HEADER_NAME, $totalCount);
+            $context->getResponseHeaders()->set(self::RESPONSE_HEADER_NAME, $totalCount);
         }
     }
 

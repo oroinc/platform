@@ -35,6 +35,12 @@ class BuildSingleItemQuery implements ProcessorInterface
             return;
         }
 
+        $criteria = $context->getCriteria();
+        if (null === $criteria) {
+            // the criteria object does not exist
+            return;
+        }
+
         $entityClass = $context->getClassName();
         if (!$this->doctrineHelper->isManageableEntityClass($entityClass)) {
             // only manageable entities are supported
@@ -42,7 +48,7 @@ class BuildSingleItemQuery implements ProcessorInterface
         }
 
         $query = $this->doctrineHelper->getEntityRepositoryForClass($entityClass)->createQueryBuilder('e');
-        $this->doctrineHelper->applyCriteria($query, $context->getCriteria());
+        $this->doctrineHelper->applyCriteria($query, $criteria);
 
         $entityId = $context->getId();
         $idFields = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);

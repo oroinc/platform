@@ -46,14 +46,14 @@ class NormalizeFilterKeys implements ProcessorInterface
         }
 
         $filterCollection = $context->getFilters();
-        $idFieldName      = $this->getIdFieldName($context->getClassName());
+        $idFieldName = $this->getIdFieldName($context->getClassName());
 
         $filters = $filterCollection->all();
         foreach ($filters as $filterKey => $filter) {
             $filterCollection->remove($filterKey);
             if ($filter instanceof ComparisonFilter && $filter->getField() === $idFieldName) {
                 $filterKey = 'id';
-                $filter->setDescription($this->getIdFieldDescription());
+                $filter->setDescription('Entity Identifier');
             }
             $filterCollection->add(
                 sprintf(self::FILTER_KEY_TEMPLATE, $filterKey),
@@ -76,13 +76,5 @@ class NormalizeFilterKeys implements ProcessorInterface
         $idFieldNames = $this->doctrineHelper->getEntityIdentifierFieldNamesForClass($entityClass);
 
         return reset($idFieldNames);
-    }
-
-    /**
-     * @return string
-     */
-    protected function getIdFieldDescription()
-    {
-        return 'Entity Identifier';
     }
 }

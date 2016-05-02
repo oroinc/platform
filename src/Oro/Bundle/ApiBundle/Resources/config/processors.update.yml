@@ -33,13 +33,6 @@ services:
         tags:
             - { name: oro.api.processor, action: update, group: initialize, priority: 200 }
 
-    oro_api.update.initialize_criteria:
-        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
-        arguments:
-            - '@oro_entity.orm.entity_class_resolver'
-        tags:
-            - { name: oro.api.processor, action: update, group: initialize, priority: 200 }
-
     oro_api.update.normalize_include_header:
         class: Oro\Bundle\ApiBundle\Processor\Shared\NormalizeIncludeHeader
         tags:
@@ -129,6 +122,13 @@ services:
     #
     # build_query
     #
+
+    oro_api.update.initialize_criteria:
+        class: Oro\Bundle\ApiBundle\Processor\Shared\InitializeCriteria
+        arguments:
+            - '@oro_entity.orm.entity_class_resolver'
+        tags:
+            - { name: oro.api.processor, action: update, group: build_query, priority: 100 }
 
     oro_api.update.complete_criteria:
         class: Oro\Bundle\ApiBundle\Processor\Shared\CompleteCriteria
