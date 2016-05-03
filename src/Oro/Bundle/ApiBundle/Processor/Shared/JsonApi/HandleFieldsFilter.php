@@ -43,7 +43,7 @@ class HandleFieldsFilter implements ProcessorInterface
         }
 
         $fields       = [];
-        $filterValues = $context->getFilterValues()->getAll(self::FILTER_KEY);
+        $filterValues = $context->getFilterValues()->getGroup(self::FILTER_KEY);
         foreach ($filterValues as $filterValue) {
             $fields[$filterValue->getPath()] = (array)$this->valueNormalizer->normalizeValue(
                 $filterValue->getValue(),

@@ -26,13 +26,20 @@ interface FilterValueAccessorInterface
     public function get($key);
 
     /**
-     * Gets all filters or all filters from the given group.
+     * Gets all filters from the given group.
      *
      * @param string|null $group The name of a filter's group
      *
      * @return FilterValue[] [filter key => FilterValue, ...]
      */
-    public function getAll($group = null);
+    public function getGroup($group);
+
+    /**
+     * Gets all filters.
+     *
+     * @return FilterValue[] [filter key => FilterValue, ...]
+     */
+    public function getAll();
 
     /**
      * Sets a filter value.

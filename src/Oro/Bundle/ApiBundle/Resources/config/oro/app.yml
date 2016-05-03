@@ -23,17 +23,17 @@ oro_api:
         string: ~
         boolean: ~
         integer:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         bigint:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         unsignedInteger:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         decimal:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         float:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         datetime:
-            supported_operators: ['=', '<>', '<', '<=', '>', '>=']
+            supported_operators: ['=', '!=', '<', '<=', '>', '>=']
         entityAlias: ~
         entityPluralAlias: ~
 

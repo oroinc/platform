@@ -4,21 +4,23 @@ namespace Oro\Bundle\ApiBundle\DependencyInjection;
 
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Extension\PrependExtensionInterface;
 use Symfony\Component\DependencyInjection\Loader;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 use Oro\Component\Config\Loader\CumulativeConfigLoader;
 use Oro\Component\Config\Loader\YamlCumulativeFileLoader;
+use Oro\Component\DependencyInjection\ExtendedContainerBuilder;
 use Oro\Bundle\ApiBundle\Config\Definition\ApiConfiguration;
 use Oro\Bundle\ApiBundle\Util\DependencyInjectionUtil;
 
-class OroApiExtension extends Extension
+class OroApiExtension extends Extension implements PrependExtensionInterface
 {
     const CONFIG_EXTENSION_REGISTRY_SERVICE_ID = 'oro_api.config_extension_registry';
     const CONFIG_EXTENSION_TAG                 = 'oro_api.config_extension';
 
     /**
-     * {@inheritDoc}
+     * {@inheritdoc}
      */
     public function load(array $configs, ContainerBuilder $container)
     {
@@ -69,6 +71,31 @@ class OroApiExtension extends Extension
         );
 
         $this->loadApiConfiguration($container);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function prepend(ContainerBuilder $container)
+    {
+        if ($container instanceof ExtendedContainerBuilder) {
+            $configs = $container->getExtensionConfig('fos_rest');
+            foreach ($configs as $key => $config) {
+                if (isset($config['format_listener']['rules']) && is_array($config['format_listener']['rules'])) {
+                    array_unshift(
+                        $configs[$key]['format_listener']['rules'],
+                        [
+                            'path'             => '^/api/(?!(soap|rest|doc)(/|$)+)',
+                            'priorities'       => ['json'],
+                            'fallback_format'  => 'json',
+                            'prefer_extension' => false
+                        ]
+                    );
+                    break;
+                }
+            }
+            $container->setExtensionConfig('fos_rest', $configs);
+        }
     }
 
     /**

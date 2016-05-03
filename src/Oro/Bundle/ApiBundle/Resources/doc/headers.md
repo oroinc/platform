@@ -15,7 +15,7 @@ For some types of REST API requests you can get an additional information like t
 The following example shows how to get the total number of account:
 
 ```bash
-curl "http://orocrm.loc/app_dev.php/api/accounts.json?page=1&limit=2" -v --header "X-Include:totalCount" --header "X-WSSE:..."
+curl "http://orocrm.loc/app_dev.php/api/accounts?page=1&limit=2" -v --header "X-Include:totalCount" --header "X-WSSE:..."
 ```
 
 It will return

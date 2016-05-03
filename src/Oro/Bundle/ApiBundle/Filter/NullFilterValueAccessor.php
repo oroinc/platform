@@ -26,7 +26,15 @@ class NullFilterValueAccessor implements FilterValueAccessorInterface
     /**
      * {@inheritdoc}
      */
-    public function getAll($group = null)
+    public function getGroup($group)
+    {
+        return [];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAll()
     {
         return [];
     }

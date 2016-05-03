@@ -81,7 +81,7 @@ class Configuration implements ConfigurationInterface
                     [
                         'string' => [
                             'class' => 'Oro\Bundle\ApiBundle\Filter\ComparisonFilter',
-                            'supported_operators' => ['=', '<>']
+                            'supported_operators' => ['=', '!=']
                         ]
                     ]
                 )
@@ -95,7 +95,7 @@ class Configuration implements ConfigurationInterface
                         ->arrayNode('supported_operators')
                             ->prototype('scalar')->end()
                             ->cannotBeEmpty()
-                            ->defaultValue(['=', '<>'])
+                            ->defaultValue(['=', '!='])
                         ->end()
                     ->end()
                 ->end()

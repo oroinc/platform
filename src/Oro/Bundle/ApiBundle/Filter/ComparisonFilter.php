@@ -12,7 +12,7 @@ use Doctrine\Common\Collections\Expr\Expression;
  */
 class ComparisonFilter extends StandaloneFilter
 {
-    const NEQ = '<>';
+    const NEQ = '!=';
     const LT  = '<';
     const LTE = '<=';
     const GT  = '>';
