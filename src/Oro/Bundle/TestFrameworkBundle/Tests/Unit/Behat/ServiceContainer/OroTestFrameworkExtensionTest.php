@@ -24,14 +24,18 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     public function testProcessBundleAutoload(array $suiteConfig, array $bundles, array $expectedSuiteConfig)
     {
         $containerBuilder = $this->getContainerBuilder($bundles);
-
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
+        $config = [
+            'shared_contexts' => $this->sharedContexts,
+            'elements_namespace_suffix' => '\Tests\Behat\Page\Element',
+        ];
 
         $extension = $this
             ->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension')
             ->setMethods(['hasValidPaths', 'hasDirectory'])
             ->getMock();
         $extension->expects($this->any())->method('hasValidPaths')->willReturn(true);
+        $extension->load($containerBuilder, $config);
         $extension->process($containerBuilder);
 
         $this->assertEquals($expectedSuiteConfig, $containerBuilder->getParameter('suite.configurations'));
@@ -57,12 +61,17 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilder->setParameter('sensio_labs.page_object_extension.namespaces.element', $elements);
         $containerBuilder->setParameter('suite.configurations', []);
+        $config = [
+            'shared_contexts' => $this->sharedContexts,
+            'elements_namespace_suffix' => '\Tests\Behat\Page\Element',
+        ];
 
         $extension = $this
             ->getMockBuilder('Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension')
             ->setMethods(['hasValidPaths', 'hasDirectory'])
             ->getMock();
         $extension->expects($this->exactly(count($bundles)))->method('hasDirectory')->willReturn(true);
+        $extension->load($containerBuilder, $config);
         $extension->process($containerBuilder);
 
         $this->assertEquals(
@@ -250,8 +259,6 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
 
         $containerBuilder->setParameter('sensio_labs.page_object_extension.namespaces.page', []);
         $containerBuilder->setParameter('sensio_labs.page_object_extension.namespaces.element', []);
-        $containerBuilder->setParameter('oro_test.shared_contexts', $this->sharedContexts);
-        $containerBuilder->setParameter('oro_test.pages_namespace_suffix', '\Tests\Behat\Page');
         $containerBuilder->setParameter('oro_test.elements_namespace_suffix', '\Tests\Behat\Page\Element');
         $containerBuilder->set('symfony2_extension.kernel', $kernel);
         $containerBuilder->set('symfony2_extension.suite.generator', new SymfonySuiteGenerator($kernel));
