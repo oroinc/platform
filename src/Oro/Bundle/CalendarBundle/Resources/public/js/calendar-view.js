@@ -22,6 +22,7 @@ define(function(require) {
     var localeSettings = require('orolocale/js/locale-settings');
     var PluginManager = require('oroui/js/app/plugins/plugin-manager');
     var GuestsPlugin = require('orocalendar/js/app/plugins/calendar/guests-plugin');
+    var persistentStorage = require('oroui/js/persistent-storage');
     require('jquery.fullcalendar');
 
     CalendarView = BaseView.extend({
@@ -689,6 +690,9 @@ define(function(require) {
                 }
                 options.scrollTime = scrollTime.startOf('hour').format('HH:mm:ss');
             }
+            // try to retrieve the last view for this calendar
+            var lastView =  this.getStorageKey() ? persistentStorage.getItem(this.getStorageKey()) : null;
+            options.defaultView =  lastView || 'agendaWeek';
 
             var dateFormat = localeSettings.getVendorDateTimeFormat('moment', 'date', 'MMM D, YYYY');
             var timeFormat = localeSettings.getVendorDateTimeFormat('moment', 'time', 'h:mm A');
@@ -807,6 +811,11 @@ define(function(require) {
             var dayCol;
             var calendarElement = this.getCalendarElement();
             var currentView = calendarElement.fullCalendar('getView');
+            var key = this.getStorageKey();
+
+            if (key) {
+                persistentStorage.setItem(key, currentView.name)
+            }
             // shown interval in calendar timezone
             var shownInterval = {
                 start: currentView.intervalStart.clone().utc(),
@@ -918,6 +927,12 @@ define(function(require) {
             }
             $calendarEl.fullCalendar('option', 'height', height);
             $calendarEl.fullCalendar('option', 'contentHeight', contentHeight);
+        },
+
+        getStorageKey: function() {
+            var calId = this.options.calendar;
+
+            return calId ? 'calendarView' + calId : '';
         }
     });
 
