@@ -187,11 +187,9 @@ class ActivityListManager
         /** @var ActivityList $activityListItem */
         $activityListItem = $this->getRepository()->find($activityListItemId);
 
-        if ($activityListItem) {
-            return $this->getEntityViewModel($activityListItem);
-        }
-
-        return null;
+        return $activityListItem
+            ? $this->getEntityViewModel($activityListItem)
+            : null;
     }
 
     /**
@@ -364,12 +362,7 @@ class ActivityListManager
      */
     protected function getHeadStatus(ActivityList $entity, $entityProvider)
     {
-        $isHead = false;
-        if ($this->isGroupingApplicable($entityProvider)) {
-            $isHead = $entity->isHead();
-        }
-
-        return $isHead;
+        return $this->isGroupingApplicable($entityProvider) && $entity->isHead();
     }
 
     /**
