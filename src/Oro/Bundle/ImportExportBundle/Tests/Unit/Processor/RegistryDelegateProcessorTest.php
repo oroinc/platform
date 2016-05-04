@@ -147,7 +147,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit_Framework_TestCase
             ->with($this->delegateType, $processorAlias)
             ->will($this->returnValue($delegateProcessor));
 
-        $delegateProcessor->expects($this->never())->method('setImportExportContext');
+        $delegateProcessor->expects($this->once())->method('setImportExportContext')->with($context);
         $delegateProcessor->expects($this->once())->method('process')->with($item);
 
         $this->processor->setStepExecution($stepExecution);
