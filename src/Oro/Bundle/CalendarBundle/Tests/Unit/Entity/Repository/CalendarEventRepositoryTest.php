@@ -68,7 +68,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
             . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
-            . "r.instance as {$key}Instance"
+            . "r.instance as {$key}Instance, r.id as recurrenceId"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' LEFT JOIN e.recurrence r'
@@ -102,7 +102,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
             . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
-            . "r.instance as {$key}Instance"
+            . "r.instance as {$key}Instance, r.id as recurrenceId"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' LEFT JOIN e.recurrence r'
@@ -140,7 +140,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
             . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
-            . "r.instance as {$key}Instance"
+            . "r.instance as {$key}Instance, r.id as recurrenceId"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' LEFT JOIN e.recurrence r'
@@ -179,7 +179,7 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
             . "r.endTime as {$key}EndTime, r.occurrences as {$key}Occurrences,"
-            . "r.instance as {$key}Instance"
+            . "r.instance as {$key}Instance, r.id as recurrenceId"
             . ' FROM Oro\Bundle\CalendarBundle\Entity\CalendarEvent e'
             . ' INNER JOIN e.calendar c'
             . ' LEFT JOIN e.recurrence r'
