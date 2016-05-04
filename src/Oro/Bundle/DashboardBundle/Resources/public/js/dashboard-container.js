@@ -115,7 +115,7 @@ define(function(require) {
          */
         _onClickAddWidget: function(e) {
             e.preventDefault();
-            var columnIndex = $(event.target).closest(this.options.columnsSelector).index();
+            var columnIndex = $(e.target).closest(this.options.columnsSelector).index();
             var targetColumn = (columnIndex === -1) ? 0 : columnIndex;
             var dialog = new WidgetPickerModal({
                 dashboard: this,
