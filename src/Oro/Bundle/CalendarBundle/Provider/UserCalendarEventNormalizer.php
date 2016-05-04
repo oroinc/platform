@@ -162,6 +162,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         $item['notifiable'] =
             !empty($item['invitationStatus'])
             && empty($item['parentEventId'])
+            && empty($item['recurrence'])
             && !empty($item['invitedUsers']);
     }
 

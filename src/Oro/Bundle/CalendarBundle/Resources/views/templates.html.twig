@@ -19,6 +19,23 @@
     </div>
 </script>
 
+<script type="text/html" id="recurring-event-notifier-content">
+    <div class="row-fluid form-horizontal">
+        <div class="responsive-block">
+            <div class="control-group">
+                <label class="control-label">
+                    <a title="{{ 'oro.calendar.recurrence.notifier.all_events.label'|trans }}" class="btn icons-holder-text no-hash all-events" href="javascript:void(0);">
+                        {{ 'oro.calendar.recurrence.notifier.all_events'|trans }}
+                    </a>
+                </label>
+                <div class="controls">
+                    <div class="control-label recurrent-event-notifier">{{ 'oro.calendar.recurrence.notifier.all_events.label'|trans }}</div>
+                </div>
+            </div>
+        </div>
+    </div>
+</script>
+
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <div class="widget-content">
@@ -61,6 +78,7 @@
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     {% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
+    {% import 'OroCalendarBundle::recurring-event.html.twig' as recurringEvent %}
     {% set data = [
             form_row(form.title),
             form_row(form.description),
@@ -92,6 +110,11 @@
                     <% if (typeof notifiable !== 'undefined' && notifiable) { %>
                         {{ invitations.notifyGuestsComponent() }}
                     <% } %>
+
+                    <% if (recurrence != null) { %>
+                        {{ recurringEvent.notifyRecurringEventEditComponent() }}
+                    <% } %>
+
                     <div class="widget-actions form-actions" style="display: none;">
                         <% if (id != null && removable) { %>
                         {{

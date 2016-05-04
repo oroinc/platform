@@ -169,6 +169,10 @@ oro:
             end_time.label:         End time
             occurrences.label:      Occurrences
 
+            notifier:
+                all_events: All Events
+                all_events.label: All events in the series will be changed.
+
             types:
                 daily:              Daily
                 weekly:             Weekly

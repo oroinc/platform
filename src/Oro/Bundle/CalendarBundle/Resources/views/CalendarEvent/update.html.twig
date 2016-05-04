@@ -1,5 +1,6 @@
 {% extends 'OroUIBundle:actions:update.html.twig' %}
 {% import 'OroCalendarBundle::invitations.html.twig' as invitations %}
+{% import 'OroCalendarBundle::recurring-event.html.twig' as recurringEvent %}
 
 {% oro_title_set({params : {"%entity.title%": entity.title, "%entityName%": 'oro.calendar.calendarevent.entity_label'|trans } }) %}
 {% set entityId = entity.id %}
@@ -48,7 +49,8 @@
                     form_row(form.childEvents),
                     form_row(form.reminders),
                     form_row(form.notifyInvitedUsers),
-                    entity.invitationStatus and entity.parent is null and entity.childEvents is not empty ? invitations.notifyGuestsComponent() : null
+                    entity.invitationStatus and entity.parent is null and entity.childEvents is not empty and entity.recurrence is null ? invitations.notifyGuestsComponent() : null,
+                    entity.recurrence is not null ? recurringEvent.notifyRecurringEventEditComponent() : null
                 ]
             }
         ]

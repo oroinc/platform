@@ -257,3 +257,7 @@ i.invitation-status.icon-question-sign {
 .connection-menu-container > .dropdown-menu {
     display: block;
 }
+
+.form-horizontal .control-group .controls .recurrent-event-notifier {
+    padding-top: 14px;
+}
