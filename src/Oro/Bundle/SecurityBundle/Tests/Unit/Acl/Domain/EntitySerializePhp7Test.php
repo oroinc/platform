@@ -12,6 +12,8 @@ class EntitySerializePhp7Test extends \PHPUnit_Framework_TestCase
      */
     public function testCheckSerializationOnPhp7()
     {
+        $this->markTestSkipped('Bug was fixed in php 7.0.6');
+
         if (version_compare(PHP_VERSION, '7.0.0', '>=')) {
             $didErrorFired = false;
             $identity = new RoleSecurityIdentity('test-role-identity');
