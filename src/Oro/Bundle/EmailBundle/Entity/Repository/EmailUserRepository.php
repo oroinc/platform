@@ -133,23 +133,46 @@ class EmailUserRepository extends EntityRepository
     /**
      * Get all unseen user email
      *
-     * @param User         $user
+     * @param User $user
      * @param Organization $organization
-     * @param array        $ids
+     * @param array $ids
+     * @param array $mailboxIds
      *
      * @return mixed
      */
-    public function findUnseenUserEmail(User $user, Organization $organization, $ids = [])
+    public function findUnseenUserEmail(User $user, Organization $organization, $ids = [], $mailboxIds = [])
     {
         $qb = $this->createQueryBuilder('eu');
-        $qb->andWhere($qb->expr()->eq('eu.owner', ':owner'))
-            ->andWhere($qb->expr()->eq('eu.organization', ':organization'))
-            ->andWhere($qb->expr()->eq('eu.seen', ':seen'))
-            ->setParameter('owner', $user)
-            ->setParameter('organization', $organization)
-            ->setParameter('seen', false);
+        $qb->andWhere($qb->expr()->eq('eu.seen', ':seen'))
+           ->setParameter('seen', false);
 
-        if (!empty($ids)) {
+        $uoCheck = call_user_func_array(
+            [
+                $qb->expr(), 'andX'
+            ],
+            [
+                $qb->expr()->eq('eu.owner', ':owner'),
+                $qb->expr()->eq('eu.organization ', ':organization')
+            ]
+        );
+
+        if (count($mailboxIds)) {
+            $qb->andWhere(
+                $qb->expr()->orX(
+                    $uoCheck,
+                    $qb->expr()->in('eu.mailboxOwner', ':mailboxIds')
+                )
+            );
+            $qb->setParameter('mailboxIds', $mailboxIds);
+        } else {
+            $qb->andWhere($uoCheck);
+        }
+
+        $qb
+            ->setParameter('owner', $user)
+            ->setParameter('organization', $organization);
+
+        if (count($ids)) {
             $qb->andWhere($qb->expr()->in('eu.email', ':ids'))
                 ->setParameter('ids', $ids);
         }
