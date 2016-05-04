@@ -5,7 +5,7 @@
 @import "./sidebar-widget";
 
 .auto-response-rules {
-  .select-all-header-cell .all-visible {
+  .select-all-header-cell__dropdown-menu .all-visible {
     display: none;
   }
 }
@@ -472,7 +472,7 @@ span.icon.grid .icon-paperclip {
   }
   .dropdown-menu {
     padding: 8px 10px 2px 0px;
-    margin-left: -20px;
+    margin-left: -16px;
     margin-top: 3px;
     &:before {
       content: '';
@@ -494,6 +494,9 @@ span.icon.grid .icon-paperclip {
       position: absolute;
       top: -6px;
       left: 20px;
+    }
+    &.fixed-width .controls {
+      white-space: normal;
     }
     ul {
       margin: 0;
@@ -664,9 +667,7 @@ a.attachment .icon .icon-link {
   background-color: orange;
   color: white;
   border-radius: 4px;
-  -moz-border-radius: 4px;
-  -webkit-border-radius: 4px;
-  padding: 2px 2px 2px 3px;
+  padding: 2px 3px;
   font-size: 12px;
 }
 .oro-email-user-emails .email-count {
@@ -732,5 +733,15 @@ a.sync-btn span.dots {
 .container-fluid {
   .email-activity-widget {
     margin-bottom: 20px;
+  }
+}
+.grid-body-cell-subject {
+  .email-body {
+    display: inline;
+    &:before {
+      content: '-';
+      display: inline;
+      margin-right: 4px;
+    }
   }
 }

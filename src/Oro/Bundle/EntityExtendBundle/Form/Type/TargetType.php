@@ -13,6 +13,7 @@ use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\EntityExtendBundle\Extend\RelationType as RelationTypeBase;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 
 class TargetType extends AbstractType
 {
@@ -128,11 +129,6 @@ class TargetType extends AbstractType
         $choices = [];
         foreach ($entityIds as $entityId) {
             $className = $entityId->getClassName();
-            if (!$this->configManager->hasConfig($className, 'id')) {
-                // @todo: temporary ignore entities that don't have PK with name 'id'
-                // remove this in https://magecore.atlassian.net/browse/BAP-9713
-                continue;
-            }
             if ($className !== $entityClassName) {
                 $entityConfig        = $this->configManager->getProvider('entity')->getConfig($className);
                 $choices[$className] = $entityConfig->get('label');

@@ -5,9 +5,15 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\ImportExport\Serializer;
 use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
 use Oro\Bundle\EntityExtendBundle\ImportExport\Serializer\EnumNormalizer;
 use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
+use Oro\Bundle\ImportExportBundle\Field\FieldHelper;
 
 class EnumNormalizerTest extends \PHPUnit_Framework_TestCase
 {
+    /**
+     * @var FieldHelper|\PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $fieldHelper;
+
     /**
      * @var EnumNormalizer
      */
@@ -15,7 +21,11 @@ class EnumNormalizerTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->normalizer = new EnumNormalizer();
+        $this->fieldHelper = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Field\FieldHelper')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->normalizer = new EnumNormalizer($this->fieldHelper);
     }
 
     /**
@@ -76,12 +86,18 @@ class EnumNormalizerTest extends \PHPUnit_Framework_TestCase
      * @param mixed $value
      * @param bool $expected
      * @param array $context
+     * @param string $identityField
      *
      * @dataProvider normalizeDataProvider
      */
-    public function testNormalize($value, $expected, array $context = [])
+    public function testNormalize($value, $expected, array $context = [], $identityField = 'name')
     {
         $type = is_object($value) ? get_class($value) : gettype($value);
+
+        $this->fieldHelper->expects($this->any())
+            ->method('getConfigValue')
+            ->with($type, 'name', 'identity')
+            ->willReturn($identityField === 'name');
 
         $this->assertEquals($expected, $this->normalizer->normalize($value, $type, $context));
     }
@@ -111,8 +127,14 @@ class EnumNormalizerTest extends \PHPUnit_Framework_TestCase
             ],
             [
                 new TestEnumValue($id, 'name', 100, true),
-                ['id' => $id],
+                ['name' => 'name'],
                 ['mode' => 'short']
+            ],
+            [
+                new TestEnumValue($id, 'name', 100, true),
+                ['id' => $id],
+                ['mode' => 'short'],
+                'id'
             ]
         ];
     }

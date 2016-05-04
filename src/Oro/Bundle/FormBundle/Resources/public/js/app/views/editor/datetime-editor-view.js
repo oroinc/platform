@@ -109,7 +109,7 @@ define(function(require) {
             'hideTimepicker .ui-timepicker-input': 'onTimepickerHide'
         },
 
-        format: datetimeFormatter.backendFormats.datetime,
+        format: datetimeFormatter.getBackendDateTimeFormat(),
 
         render: function() {
             var _this = this;
@@ -152,8 +152,8 @@ define(function(require) {
 
         onFocusout: function(e) {
             // if blur event was as sequence of time selection in dropdown, returns focus back
-            if (this._isSelection) {
-                delete this._isSelection;
+            if (this._isTimeSelection) {
+                delete this._isTimeSelection;
                 this.focus(1);
             } else {
                 DatetimeEditorView.__super__.onFocusout.call(this, e);
@@ -176,6 +176,7 @@ define(function(require) {
             // stop propagation to prevent default behaviour
             if (!e.shiftKey) {
                 e.stopPropagation();
+                this.onGenericTabKeydown(e);
             }
         },
 
@@ -183,6 +184,7 @@ define(function(require) {
             // stop propagation to prevent default behaviour
             if (e.shiftKey) {
                 e.stopPropagation();
+                this.onGenericTabKeydown(e);
             }
         },
 
@@ -191,15 +193,28 @@ define(function(require) {
         },
 
         onTimepickerShow: function(e) {
-            var $list = $(e.currentTarget).data('timepicker-list');
+            var $list = this.view.getTimePickerWidget();
             var isBelow = !$list.hasClass('ui-timepicker-positioned-top');
             this.toggleDropdownBelowClass(isBelow);
-            $list.find('.ui-timepicker-list')
-                .off(this.eventNamespace())
-                .bindFirst('mousedown' + this.eventNamespace(), 'li', _.bind(function(e) {
+            $list.off(this.eventNamespace())
+                .on('mousedown' + this.eventNamespace(), _.bind(function(e) {
                     // adds flag that blur event was as sequence of time selection in dropdown
-                    this._isSelection = true;
+                    this._isTimeSelection = true;
                 }, this));
+        },
+
+        onGenericTabKeydown: function(e) {
+            if (e.keyCode === this.TAB_KEY_CODE) {
+                if (this.$('input.hasDatepicker').is(e.currentTarget) && !e.shiftKey) {
+                    e.preventDefault();
+                    this._isTimeSelection = true;
+                    this.focus(1);
+                } else if (this.$('input.timepicker-input').is(e.currentTarget) && e.shiftKey) {
+                    e.preventDefault();
+                    this._isDateSelection = true;
+                    this.focus();
+                }
+            }
         }
     });
 

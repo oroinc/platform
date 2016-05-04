@@ -22,7 +22,7 @@ define(function(require) {
         initialize: function(options) {},
 
         render: function() {
-            this.$el.html(this.html);
+            this.$el.html(this.html).find('.control-group.switchable-field').hide();
             this._deferredRender();
             this.initLayout().done(_.bind(this._resolveDeferredRender, this));
         },

@@ -1,6 +1,8 @@
 parameters:
+    oro_cron.entity.schedule.class:   Oro\Bundle\CronBundle\Entity\Schedule
     oro_cron.job_daemon.class:        Oro\Bundle\CronBundle\Job\Daemon
     oro_cron.job_manager.class:       Oro\Bundle\CronBundle\Entity\Manager\JobManager
+    oro_cron.schedule_manager.class:  Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager
 
 services:
     oro_cron.job_daemon:
@@ -16,12 +18,18 @@ services:
         arguments:
             - "@doctrine.orm.entity_manager"
 
+    oro_cron.schedule_manager:
+        class: %oro_cron.schedule_manager.class%
+        arguments:
+            - '@doctrine'
+            - %oro_cron.entity.schedule.class%
+
     oro_cron.command_args_tokenizer:
         class: Oro\Bundle\CronBundle\ORM\CommandArgsTokenizer
         public: false
         calls:
-            - [ addNormalizer, [ @oro_cron.command_args_normalizer.default ] ]
-            - [ addNormalizer, [ @oro_cron.command_args_normalizer.pgsql92 ] ]
+            - [ addNormalizer, [ '@oro_cron.command_args_normalizer.default' ] ]
+            - [ addNormalizer, [ '@oro_cron.command_args_normalizer.pgsql92' ] ]
 
     oro_cron.command_args_normalizer.default:
         class: Oro\Bundle\CronBundle\ORM\CommandArgsNormalizer
@@ -34,9 +42,9 @@ services:
     oro_cron.command_with_args_string_filter:
         class: Oro\Bundle\CronBundle\Filter\CommandWithArgsFilter
         arguments:
-            - @form.factory
-            - @oro_filter.filter_utility
-            - @oro_cron.command_args_tokenizer
+            - '@form.factory'
+            - '@oro_filter.filter_utility'
+            - '@oro_cron.command_args_tokenizer'
         tags:
             - { name: oro_filter.extension.orm_filter.filter, type: command_with_args }
 

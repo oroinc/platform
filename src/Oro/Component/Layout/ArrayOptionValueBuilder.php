@@ -7,8 +7,19 @@ use Oro\Component\Layout\Exception\InvalidArgumentException;
 
 class ArrayOptionValueBuilder implements OptionValueBuilderInterface
 {
+    /** @var bool */
+    protected $allowScalarValues = false;
+
     /** @var array */
     protected $values = [];
+
+    /**
+     * @param bool $allowScalarValues Allows to pass scalars as option values
+     */
+    public function __construct($allowScalarValues = false)
+    {
+        $this->allowScalarValues = $allowScalarValues;
+    }
 
     /**
      * @param $value
@@ -18,7 +29,11 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
     protected function prepareValueType($value)
     {
         if (!is_array($value)) {
-            throw new UnexpectedTypeException($value, 'array', 'value');
+            if ($this->allowScalarValues) {
+                $value = (array)$value;
+            } else {
+                throw new UnexpectedTypeException($value, 'array', 'value');
+            }
         }
 
         return array_values($value);
@@ -45,7 +60,10 @@ class ArrayOptionValueBuilder implements OptionValueBuilderInterface
             return;
         }
 
-        $this->values = array_values(array_diff($this->values, $value));
+        // array_diff can't be used because of string conversion
+        $this->values = array_values(array_filter($this->values, function ($existingValue) use ($value) {
+            return !in_array($existingValue, $value, true);
+        }));
     }
 
     /**

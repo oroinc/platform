@@ -5,7 +5,6 @@ namespace Oro\Component\EntitySerializer;
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
-use Doctrine\ORM\Query\ResultSetMapping;
 
 use Oro\Component\DoctrineUtils\ORM\QueryHintResolverInterface;
 use Oro\Component\DoctrineUtils\ORM\QueryUtils;
@@ -13,6 +12,12 @@ use Oro\Component\DoctrineUtils\ORM\SqlQueryBuilder;
 
 class QueryFactory
 {
+    /**
+     * this value is used to optimize (avoid redundant call parseQuery) UNION ALL queries
+     * for the getRelatedItemsIds() method
+     */
+    const FAKE_ID = '__fake_id__';
+
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -87,46 +92,19 @@ class QueryFactory
     }
 
     /**
-     * @param array $associationMapping
-     * @param array $entityIds
-     * @param array $config
+     * @param array        $associationMapping
+     * @param array        $entityIds
+     * @param EntityConfig $config
      *
      * @return array [['entityId' => mixed, 'relatedEntityId' => mixed], ...]
      */
-    public function getRelatedItemsIds($associationMapping, $entityIds, $config)
+    public function getRelatedItemsIds($associationMapping, $entityIds, EntityConfig $config)
     {
-        $limit = isset($config[ConfigUtil::MAX_RESULTS])
-            ? $config[ConfigUtil::MAX_RESULTS]
-            : -1;
+        $limit = $config->getMaxResults();
         if ($limit > 0 && count($entityIds) > 1) {
-            $selectStmt = null;
-            $subQueries = [];
-            foreach ($entityIds as $id) {
-                $subQuery = $this->getRelatedItemsIdsQuery($associationMapping, [$id], $config);
-                $subQuery->setMaxResults($limit);
-                // We should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
-                $subQueries[] = '(' . QueryUtils::getExecutableSql($subQuery) . ')';
-                if (null === $selectStmt) {
-                    $mapping    = QueryUtils::parseQuery($subQuery)->getResultSetMapping();
-                    $selectStmt = sprintf(
-                        'entity.%s AS entityId, entity.%s AS relatedEntityId',
-                        QueryUtils::getColumnNameByAlias($mapping, 'entityId'),
-                        QueryUtils::getColumnNameByAlias($mapping, 'relatedEntityId')
-                    );
-                }
-            }
-            $rsm = new ResultSetMapping();
-            $rsm
-                ->addScalarResult('entityId', 'entityId')
-                ->addScalarResult('relatedEntityId', 'relatedEntityId');
-            $qb = new SqlQueryBuilder(
-                $this->doctrineHelper->getEntityManager($associationMapping['targetEntity']),
-                $rsm
-            );
-            $qb
-                ->select($selectStmt)
-                ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
-            $rows = $qb->getQuery()->getScalarResult();
+            $rows = $this->getRelatedItemsUnionAllQuery($associationMapping, $entityIds, $config, $limit)
+                ->getQuery()
+                ->getScalarResult();
         } else {
             $query = $this->getRelatedItemsIdsQuery($associationMapping, $entityIds, $config);
             if ($limit >= 0) {
@@ -139,13 +117,67 @@ class QueryFactory
     }
 
     /**
-     * @param array $associationMapping
-     * @param array $entityIds
-     * @param array $config
+     * @param array        $associationMapping
+     * @param array        $entityIds
+     * @param EntityConfig $config
+     * @param int          $relatedRecordsLimit
+     *
+     * @return SqlQueryBuilder
+     * @throws Query\QueryException
+     */
+    protected function getRelatedItemsUnionAllQuery(
+        $associationMapping,
+        array $entityIds,
+        EntityConfig $config,
+        $relatedRecordsLimit
+    ) {
+        $subQueryTemplate = $this->getRelatedItemsIdsQuery($associationMapping, [self::FAKE_ID], $config);
+        $subQueryTemplate->setMaxResults($relatedRecordsLimit);
+        $parsedSubQuery = QueryUtils::parseQuery($subQueryTemplate);
+        // we should wrap all subqueries with brackets for PostgreSQL queries with UNION and LIMIT
+        $subQuerySqlTemplate = '(' . QueryUtils::getExecutableSql($subQueryTemplate, $parsedSubQuery) . ')';
+
+        // we should build subquery for each parent entity id because the limit of related records
+        // should by applied for each parent entity individually
+        $subQueries = [];
+        foreach ($entityIds as $id) {
+            $fakeId = self::FAKE_ID;
+            if (!is_string($id)) {
+                $fakeId = '\'' . $fakeId . '\'';
+            }
+            $subQueries[] = str_replace($fakeId, $id, $subQuerySqlTemplate);
+        }
+
+        $subQueryMapping = $parsedSubQuery->getResultSetMapping();
+        $selectStmt = sprintf(
+            'entity.%s AS entityId, entity.%s AS relatedEntityId',
+            QueryUtils::getColumnNameByAlias($subQueryMapping, 'entityId'),
+            QueryUtils::getColumnNameByAlias($subQueryMapping, 'relatedEntityId')
+        );
+
+        $rsm = QueryUtils::createResultSetMapping(
+            $subQueryTemplate->getEntityManager()->getConnection()->getDatabasePlatform()
+        );
+        $rsm
+            ->addScalarResult('entityId', 'entityId')
+            ->addScalarResult('relatedEntityId', 'relatedEntityId');
+
+        $qb = new SqlQueryBuilder($subQueryTemplate->getEntityManager(), $rsm);
+        $qb
+            ->select($selectStmt)
+            ->from('(' . implode(' UNION ALL ', $subQueries) . ')', 'entity');
+
+        return $qb;
+    }
+
+    /**
+     * @param array        $associationMapping
+     * @param array        $entityIds
+     * @param EntityConfig $config
      *
      * @return Query
      */
-    protected function getRelatedItemsIdsQuery($associationMapping, $entityIds, $config)
+    protected function getRelatedItemsIdsQuery($associationMapping, $entityIds, EntityConfig $config)
     {
         $qb = $this->getToManyAssociationQueryBuilder($associationMapping, $entityIds)
             ->addSelect(
@@ -160,17 +192,14 @@ class QueryFactory
 
     /**
      * @param QueryBuilder $qb
-     * @param array        $config
+     * @param EntityConfig $config
      *
      * @return Query
      */
-    public function getQuery(QueryBuilder $qb, $config)
+    public function getQuery(QueryBuilder $qb, EntityConfig $config)
     {
         $query = $qb->getQuery();
-        $this->queryHintResolver->resolveHints(
-            $query,
-            ConfigUtil::getArrayValue($config, ConfigUtil::HINTS)
-        );
+        $this->queryHintResolver->resolveHints($query, $config->getHints());
 
         return $query;
     }

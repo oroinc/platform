@@ -1,0 +1,17 @@
+parameters:
+    oro_action.form.type.operation.class: Oro\Bundle\ActionBundle\Form\Type\OperationType
+
+    oro_action.form.event_listener.required_attributes.class: Oro\Bundle\ActionBundle\Form\EventListener\RequiredAttributesListener
+
+services:
+    oro_action.form.type.operation:
+        class: %oro_action.form.type.operation.class%
+        arguments:
+            - '@oro_action.operation_manager'
+            - '@oro_action.form.event_listener.required_attributes'
+            - '@oro_action.context_accessor'
+        tags:
+            - { name: form.type, alias: oro_action_operation }
+
+    oro_action.form.event_listener.required_attributes:
+        class: %oro_action.form.event_listener.required_attributes.class%

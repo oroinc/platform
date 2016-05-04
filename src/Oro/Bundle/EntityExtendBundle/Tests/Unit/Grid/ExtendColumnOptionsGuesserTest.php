@@ -148,7 +148,12 @@ class ExtendColumnOptionsGuesserTest extends \PHPUnit_Framework_TestCase
         $guess = $this->guesser->guessFormatter($class, $property, 'enum');
         $this->assertEquals(
             [
-                'frontend_type' => 'string'
+                'frontend_type' => Property::TYPE_HTML,
+                'type'          => 'twig',
+                'template'      => 'OroEntityExtendBundle:Datagrid:Property/enum.html.twig',
+                'context'       => [
+                    'entity_class' => $config->get('target_entity')
+                ]
             ],
             $guess->getOptions()
         );

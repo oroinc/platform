@@ -8,7 +8,6 @@ use Doctrine\ORM\EntityManager;
 use Symfony\Bridge\Doctrine\ManagerRegistry;
 
 use Oro\Bundle\EntityBundle\EntityConfig\GroupingScope;
-use Oro\Bundle\EntityBundle\Exception\InvalidEntityException;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityConfigBundle\Tools\ConfigHelper;
 
@@ -95,10 +94,15 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
     protected function ensureVirtualFieldsInitialized($className)
     {
         if (!isset($this->virtualFields[$className])) {
+            $em = $this->getManagerForClass($className);
+            if (!$em) {
+                return;
+            }
+
             $this->ensureDictionariesInitialized();
             $this->virtualFields[$className] = [];
 
-            $metadata         = $this->getManagerForClass($className)->getClassMetadata($className);
+            $metadata = $em->getClassMetadata($className);
             $associationNames = $metadata->getAssociationNames();
             foreach ($associationNames as $associationName) {
                 $targetClassName = $metadata->getAssociationTargetClass($associationName);
@@ -106,7 +110,6 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                     $fields = $this->dictionaries[$targetClassName];
                     $isCombinedLabelName = count($fields) > 1;
                     $fieldNames = array_keys($fields);
-                    $target = Inflector::tableize(uniqid(sprintf('t_%s', $associationName), false));
                     foreach ($fieldNames as $fieldName) {
                         $virtualFieldName = Inflector::tableize(sprintf('%s_%s', $associationName, $fieldName));
                         $fieldName = Inflector::tableize($fieldName);
@@ -117,16 +120,16 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
                         $this->virtualFields[$className][$virtualFieldName] = [
                             'query' => [
                                 'select' => [
-                                    'expr' => sprintf('%s.%s', $target, $fieldName),
-                                    'return_type' => GroupingScope::GROUP_DICTIONARY,
-                                    'related_entity_name' => $targetClassName,
-                                    'label' => $label
+                                    'expr'                => 'target.' . $fieldName,
+                                    'label'               => $label,
+                                    'return_type'         => 'dictionary',
+                                    'related_entity_name' => $targetClassName
                                 ],
                                 'join' => [
                                     'left' => [
                                         [
-                                            'join' => sprintf('entity.%s', $associationName),
-                                            'alias' => $target
+                                            'join'  => 'entity.' . $associationName,
+                                            'alias' => 'target'
                                         ]
                                     ]
                                 ]
@@ -177,21 +180,16 @@ class DictionaryVirtualFieldProvider implements VirtualFieldProviderInterface
      * Gets doctrine entity manager for the given class
      *
      * @param string $className
-     * @return EntityManager
-     * @throws InvalidEntityException
+     * @return EntityManager|null
      */
     protected function getManagerForClass($className)
     {
-        $manager = null;
         try {
-            $manager = $this->doctrine->getManagerForClass($className);
+            return $this->doctrine->getManagerForClass($className);
         } catch (\ReflectionException $ex) {
             // ignore not found exception
         }
-        if (!$manager) {
-            throw new InvalidEntityException(sprintf('The "%s" entity was not found.', $className));
-        }
 
-        return $manager;
+        return null;
     }
 }

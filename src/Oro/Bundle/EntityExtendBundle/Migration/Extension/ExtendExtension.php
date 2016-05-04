@@ -8,6 +8,7 @@ use Doctrine\DBAL\Schema\SchemaException;
 use Doctrine\DBAL\Schema\Table;
 use Doctrine\DBAL\Types\Type;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
 use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 use Oro\Bundle\EntityConfigBundle\Entity\ConfigModel;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
@@ -201,8 +202,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'id')
                     ],
                     'importexport' => [
-                        'identity' => true
-                    ]
+                        'identity' => true,
+                    ],
                 ]
             ]
         );
@@ -217,9 +218,9 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'name')
                     ],
                     'datagrid' => [
-                        'is_visible' => false
-                    ]
-                ]
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
+                    ],
+                ],
             ]
         );
         $table->addColumn(
@@ -232,7 +233,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'priority')
                     ],
                     'datagrid' => [
-                        'is_visible' => false
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                     ]
                 ]
             ]
@@ -248,7 +249,7 @@ class ExtendExtension implements NameGeneratorAwareInterface
                         'description' => ExtendHelper::getEnumTranslationKey('description', $enumCode, 'default')
                     ],
                     'datagrid'                              => [
-                        'is_visible' => false
+                        'is_visible' => DatagridScope::IS_VISIBLE_FALSE
                     ]
                 ]
             ]
@@ -373,9 +374,11 @@ class ExtendExtension implements NameGeneratorAwareInterface
 
         $targetTableName  = $this->getTableName($targetTable);
         $targetTable      = $this->getTable($targetTable, $schema);
+        $selfPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($selfTable);
         $targetColumnName = $this->nameGenerator->generateOneToManyRelationColumnName(
             $selfClassName,
-            $associationName
+            $associationName,
+            '_' . $selfPrimaryKeyColumnName
         );
 
         $this->checkColumnsExist($targetTable, $targetTitleColumnNames);
@@ -530,7 +533,8 @@ class ExtendExtension implements NameGeneratorAwareInterface
         if (!isset($options['extend']['without_default']) || !$options['extend']['without_default']) {
             $this->addDefaultRelation($selfTable, $associationName, $targetTable);
         }
-
+        $selfIdColumn = $this->getPrimaryKeyColumnName($selfTable);
+        $targetIdColumn = $this->getPrimaryKeyColumnName($targetTable);
         $selfClassName             = $this->getEntityClassByTableName($selfTableName);
         $targetClassName           = $this->getEntityClassByTableName($targetTableName);
         $joinTableName             = $this->nameGenerator->generateManyToManyJoinTableName(
@@ -539,8 +543,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
             $targetClassName
         );
         $joinTable                 = $schema->createTable($joinTableName);
-        $selfJoinTableColumnName   = $this->nameGenerator->generateManyToManyJoinTableColumnName($selfClassName);
-        $targetJoinTableColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName($targetClassName);
+        $selfJoinTableColumnName   = $this->nameGenerator->generateManyToManyJoinTableColumnName(
+            $selfClassName,
+            '_' . $selfIdColumn
+        );
+        $targetJoinTableColumnName = $this->nameGenerator->generateManyToManyJoinTableColumnName(
+            $targetClassName,
+            '_' . $targetIdColumn
+        );
         $this->addRelation(
             $joinTable,
             $selfJoinTableColumnName,
@@ -679,12 +689,15 @@ class ExtendExtension implements NameGeneratorAwareInterface
     ) {
         $this->ensureExtendFieldSet($options);
 
-        $selfTableName  = $this->getTableName($table);
-        $selfTable      = $this->getTable($table, $schema);
-        $selfColumnName = $this->nameGenerator->generateRelationColumnName($associationName);
-
-        $targetTableName = $this->getTableName($targetTable);
-        $targetTable     = $this->getTable($targetTable, $schema);
+        $selfTableName        = $this->getTableName($table);
+        $selfTable            = $this->getTable($table, $schema);
+        $targetTableName      = $this->getTableName($targetTable);
+        $targetTable          = $this->getTable($targetTable, $schema);
+        $primaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
+        $selfColumnName       = $this->nameGenerator->generateRelationColumnName(
+            $associationName,
+            '_' . $primaryKeyColumnName
+        );
 
         $this->checkColumnsExist($targetTable, [$targetColumnName]);
 
@@ -898,16 +911,6 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     protected function addRelationColumn(Table $table, $columnName, Column $targetColumn, array $options = [])
     {
-        if ($targetColumn->getName() !== 'id') {
-            throw new SchemaException(
-                sprintf(
-                    'The target column name must be "id". Relation column: "%s::%s". Target column name: "%s".',
-                    $table->getName(),
-                    $columnName,
-                    $targetColumn->getName()
-                )
-            );
-        }
         $columnTypeName = $targetColumn->getType()->getName();
         if (!in_array($columnTypeName, [Type::INTEGER, Type::STRING, Type::SMALLINT, Type::BIGINT], true)) {
             throw new SchemaException(
@@ -960,11 +963,14 @@ class ExtendExtension implements NameGeneratorAwareInterface
      */
     protected function addDefaultRelation(Table $table, $associationName, Table $targetTable)
     {
-        $defaultRelationColumnName  = $this->nameGenerator->generateRelationDefaultColumnName($associationName);
         $targetPrimaryKeyColumnName = $this->getPrimaryKeyColumnName($targetTable);
+        $defaultRelationColumnName  = $this->nameGenerator->generateRelationDefaultColumnName(
+            $associationName,
+            '_' . $targetPrimaryKeyColumnName
+        );
         $targetPrimaryKeyColumn     = $targetTable->getColumn($targetPrimaryKeyColumnName);
         $this->addRelationColumn($table, $defaultRelationColumnName, $targetPrimaryKeyColumn, ['notnull' => false]);
-        $table->addUniqueIndex([$defaultRelationColumnName]);
+        $table->addIndex([$defaultRelationColumnName]);
         $table->addForeignKeyConstraint(
             $targetTable,
             [$defaultRelationColumnName],

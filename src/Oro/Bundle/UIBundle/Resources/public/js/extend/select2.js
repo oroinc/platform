@@ -1,4 +1,4 @@
-define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($, __, Select2) {
+define(['jquery', 'underscore', 'orotranslation/js/translator', 'jquery.select2'], function($, _, __, Select2) {
     'use strict';
 
     /**
@@ -102,6 +102,25 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
         });
         populate(results, container, 0, []);
     }
+    var overrideMethods = {
+        processResult: function(original, data) {
+            original.apply(this, _.rest(arguments));
+            var results = _.result(data, 'results') || [];
+            if (results.length > 0 && this.opts.dontSelectFirstOptionOnOpen) {
+                this.results.find('.select2-highlighted').removeClass('select2-highlighted');
+                this.dropdown.add(this.search).one('keydown', _.bind(function() {
+                    delete this.opts.dontSelectFirstOptionOnOpen;
+                }, this));
+            }
+        },
+        moveHighlight: function(original) {
+            if (this.highlight() === -1) {
+                this.highlight(0);
+            } else {
+                original.apply(this, _.rest(arguments));
+            }
+        }
+    };
 
     // Override methods of AbstractSelect2 class
     (function(prototype) {
@@ -167,6 +186,7 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
                 });
             }
         };
+
     }(Select2['class'].abstract.prototype));
 
     (function(prototype) {
@@ -203,11 +223,53 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
             this.pagePath = '';
             clear.apply(this, arguments);
         };
+
+        prototype.postprocessResults = _.wrap(prototype.postprocessResults, overrideMethods.processResult);
+
+        prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
+
     }(Select2['class'].single.prototype));
 
     // Override methods of MultiSelect2 class
     // Fix is valid for version 3.4.1
     (function(prototype) {
+        function killEvent(e) {
+            e.preventDefault();
+            e.stopPropagation();
+        }
+
+        function indexOf(value, array) {
+            var i = 0;
+            var l = array.length;
+            for (; i < l; i = i + 1) {
+                if (equal(value, array[i])) {
+                    return i;
+                }
+            }
+            return -1;
+        }
+
+        function equal(a, b) {
+            if (a === b) {
+                return true;
+            }
+            if (a === undefined || b === undefined) {
+                return false;
+            }
+            if (a === null || b === null) {
+                return false;
+            }
+            // Check whether 'a' or 'b' is a string (primitive or object).
+            // The concatenation of an empty string (+'') converts its argument to a string's primitive.
+            if (a.constructor === String) {
+                return a + '' === b + '';
+            }
+            if (b.constructor === String) {
+                return b + '' === a + '';
+            }
+            return false;
+        }
+
         var resizeSearch = prototype.resizeSearch;
 
         prototype.resizeSearch = function() {
@@ -216,6 +278,94 @@ define(['jquery', 'orotranslation/js/translator', 'jquery.select2'], function($,
             this.selection.removeClass('select2-search-resize');
             this.search.width(Math.floor($(this.search).width()) - 1);
         };
+
+        prototype.updateSelection = function(data) {
+            var ids = [];
+            var filtered = [];
+            var self = this;
+
+            // filter out duplicates
+            $(data).each(function() {
+                if (indexOf(self.id(this), ids) < 0) {
+                    ids.push(self.id(this));
+                    filtered.push(this);
+                }
+            });
+            data = filtered;
+
+            this.selection.find('.select2-search-choice').remove();
+            var val = this.getVal();
+            $(data).each(function() {
+                self.addSelectedChoiceOptimized(this, val);
+            });
+            this.setVal(val);
+            self.postprocessResults();
+        };
+
+        /**
+         * Makes it possible to render multiselect with 10 000 selected business units
+         */
+        prototype.addSelectedChoiceOptimized = function(data, val) {
+            var enableChoice = !data.locked;
+            var enabledItem = $(
+                    '<li class=\'select2-search-choice\'>' +
+                    '    <div></div>' +
+                    '    <a href=\'#\' onclick=\'return false;\' ' +
+                    'class=\'select2-search-choice-close\' tabindex=\'-1\'></a>' +
+                    '</li>');
+            var disabledItem = $(
+                    '<li class=\'select2-search-choice select2-locked\'>' +
+                    '<div></div>' +
+                    '</li>');
+            var choice = enableChoice ? enabledItem : disabledItem;
+            var id = this.id(data);
+            var formatted;
+
+            formatted = this.opts.formatSelection(data, choice.find('div'), this.opts.escapeMarkup);
+            /* jshint ignore:start */
+            if (formatted != undefined) {
+                choice.find('div').replaceWith('<div>' + formatted + '</div>');
+            }
+            var cssClass = this.opts.formatSelectionCssClass(data, choice.find('div'));
+            if (cssClass != undefined) {
+                choice.addClass(cssClass);
+            }
+            /* jshint ignore:end */
+
+            if (enableChoice) {
+                choice.find('.select2-search-choice-close')
+                    .on('mousedown', killEvent)
+                    .on('click dblclick', this.bind(function(e) {
+                    if (!this.isInterfaceEnabled()) {
+                        return;
+                    }
+
+                    $(e.target).closest('.select2-search-choice').fadeOut('fast', this.bind(function() {
+                        this.unselect($(e.target));
+                        this.selection.find('.select2-search-choice-focus').removeClass('select2-search-choice-focus');
+                        this.close();
+                        this.focusSearch();
+                    })).dequeue();
+                    killEvent(e);
+                })).on('focus', this.bind(function() {
+                    if (!this.isInterfaceEnabled()) {
+                        return;
+                    }
+                    this.container.addClass('select2-container-active');
+                    this.dropdown.addClass('select2-drop-active');
+                }));
+            }
+
+            choice.data('select2-data', data);
+            choice.insertBefore(this.searchContainer);
+
+            val.push(id);
+        };
+
+        prototype.postprocessResults = _.wrap(prototype.postprocessResults, overrideMethods.processResult);
+
+        prototype.moveHighlight = _.wrap(prototype.moveHighlight, overrideMethods.moveHighlight);
+
     }(Select2['class'].multi.prototype));
 
     $.fn.select2.defaults = $.extend($.fn.select2.defaults, {

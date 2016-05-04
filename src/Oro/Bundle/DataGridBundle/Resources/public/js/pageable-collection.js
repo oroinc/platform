@@ -1,12 +1,13 @@
-define(function(require) {
+define([
+    'jquery',
+    'underscore',
+    'backbone',
+    'backbone-pageable-collection',
+    'oroui/js/tools'
+], function($, _, Backbone, BackbonePageableCollection, tools) {
     'use strict';
 
     var PageableCollection;
-    var $ = require('jquery');
-    var _ = require('underscore');
-    var Backbone = require('backbone');
-    var BackbonePageableCollection = require('backbone-pageable-collection');
-    var tools = require('oroui/js/tools');
 
     /**
      * Object declares state keys that will be involved in URL-state saving with their shorthands
@@ -1054,7 +1055,7 @@ define(function(require) {
          * Compare strings to perform sorting
          *
          * @param {String} sortKey
-         * @param {Integer} order
+         * @param {String|Integer} order
          * @return {Function}
          * @protected
          */
@@ -1073,7 +1074,8 @@ define(function(require) {
                 var r = right.get(sortKey);
                 var t;
 
-                if (order === 1) {
+                // order might be int or string
+                if (order === '1' || order === 1) {
                     t = l;
                     l = r;
                     r = t;

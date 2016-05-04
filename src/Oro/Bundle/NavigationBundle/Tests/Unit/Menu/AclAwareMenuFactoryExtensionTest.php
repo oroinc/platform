@@ -54,6 +54,11 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
             ->method('hasLoggedUser')
             ->willReturn($this->hasLoggedUser);
 
+        $this->securityFacade
+            ->expects($this->any())
+            ->method('getToken')
+            ->willReturn($this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface'));
+
         $this->factoryExtension = new AclAwareMenuFactoryExtension($this->router, $this->securityFacade);
         $this->factory = new MenuFactory();
         $this->factory->addExtension($this->factoryExtension);
@@ -186,6 +191,19 @@ class AclAwareMenuFactoryExtensionTest extends \PHPUnit_Framework_TestCase
         $item = $this->factory->createItem('test', $options);
         $this->assertInstanceOf('Knp\Menu\MenuItem', $item);
         $this->assertEquals(AclAwareMenuFactoryExtension::DEFAULT_ACL_POLICY, $item->getExtra('isAllowed'));
+    }
+
+    public function testBuildOptionsAlreadyProcessed()
+    {
+        $options = [
+            'extras' => [
+                'isAllowed' => false,
+            ],
+        ];
+
+        $this->securityFacade->expects($this->never())
+            ->method('hasLoggedUser');
+        $this->factory->createItem('test', $options);
     }
 
     /**

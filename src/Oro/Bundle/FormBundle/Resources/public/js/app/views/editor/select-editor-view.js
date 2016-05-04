@@ -42,6 +42,7 @@ define(function(require) {
      * :---------------------------------------------------|:---------------------------------------
      * choices                                             | Key-value set of available choices
      * inline_editing.editor.view_options.placeholder      | Optional. Placeholder translation key for an empty element
+     * inline_editing.editor.view_options.key_type         | Optional. Specifies type of value that should be sent to server. Currently string/boolean/number key types are supported.
      * inline_editing.editor.view_options.placeholder_raw  | Optional. Raw placeholder value
      * inline_editing.editor.view_options.css_class_name   | Optional. Additional css class name for editor view DOM el
      * inline_editing.editor.validation_rules | Optional. Validation rules. See [documentation](https://goo.gl/j9dj4Y)
@@ -62,7 +63,6 @@ define(function(require) {
      */
     var SelectEditorView;
     var TextEditorView = require('./text-editor-view');
-    var $ = require('jquery');
     var _ = require('underscore');
     require('jquery.select2');
 
@@ -82,10 +82,22 @@ define(function(require) {
             },
             'mouseup .select2-choices': function() {
                 delete this._isSelection;
+            },
+            'focus .select2-choice': function() {
+                this.$('.select2-focusser').focus();
             }
         },
 
+        keyType: 'string',
+
         initialize: function(options) {
+            if (options.key_type) {
+                this.keyType = options.key_type;
+            } else {
+                if (_.isArray(options.choices)) {
+                    this.keyType = 'number';
+                }
+            }
             SelectEditorView.__super__.initialize.apply(this, arguments);
             this.availableChoices = this.getAvailableOptions(options);
             this.prestine = true;
@@ -94,21 +106,21 @@ define(function(require) {
         getAvailableOptions: function(options) {
             var choices = this.options.choices;
             var result = [];
-            for (var id in choices) {
-                if (choices.hasOwnProperty(id)) {
-                    result.push({
-                        id: id,
-                        text: choices[id]
-                    });
-                }
-            }
+            _.each(choices, function(text, id) {
+                result.push({
+                    id: id,
+                    text: text
+                });
+            });
             return result;
         },
 
         render: function() {
+            var select2options;
             var _this = this;
             SelectEditorView.__super__.render.call(this);
-            this.$('input[name=value]').select2(this.getSelect2Options());
+            select2options = this.getSelect2Options();
+            this.$('input[name=value]').select2(select2options);
             // select2 stops propagation of keydown event if key === ENTER or TAB
             // need to restore this functionality
             this.$('.select2-focusser').on('keydown' + this.eventNamespace(), function(e) {
@@ -128,6 +140,11 @@ define(function(require) {
                             e.preventDefault();
                             _this.$('input[name=value]').select2('close');
                             _this.onGenericEnterKeydown(e);
+                        } else if (!select2options.multiple) {
+                            _this.$('input[name=value]').on('select2-selecting', function(event) {
+                                _this.$('input[name=value]').val(event.val);
+                                _this.onGenericEnterKeydown(e);
+                            });
                         }
                         break;
                     case _this.TAB_KEY_CODE:
@@ -145,6 +162,12 @@ define(function(require) {
                 if (!_this.disposed && !_this.isChanged()) {
                     SelectEditorView.__super__.onGenericEnterKeydown.call(_this, e);
                 }
+            });
+            this.$('.select2-search-choice-close').on('mousedown', function() {
+                _this._isSelection = true;
+                _this.$('.select2-choice').one('focus', function() {
+                    delete _this._isSelection;
+                });
             });
         },
 
@@ -164,6 +187,7 @@ define(function(require) {
                 selectOnBlur: false,
                 openOnEnter: false,
                 dropdownCssClass: 'inline-editor__select2-drop',
+                dontSelectFirstOptionOnOpen: true,
                 data: {results: this.availableChoices}
             };
         },
@@ -181,9 +205,10 @@ define(function(require) {
             if (this.disposed) {
                 return;
             }
+            this._isFocused = false;
             this.$('.select2-focusser').off(this.eventNamespace());
             this.$('input.select2-input').off(this.eventNamespace());
-            this.$('input[name=value]').select2('close').select2('destroy');
+            this.$('input[name=value]').select2('destroy');
             SelectEditorView.__super__.dispose.call(this);
         },
 
@@ -208,6 +233,14 @@ define(function(require) {
             select2.dropdown.off(this.eventNamespace());
         },
 
+        parseRawValue: function(value) {
+            if (_.isBoolean(value)) {
+                return value ? '1' : '0';
+            } else {
+                return '' + value;
+            }
+        },
+
         focus: function() {
             var isFocused = this.isFocused();
             this.$('input[name=value]').select2('open');
@@ -224,9 +257,10 @@ define(function(require) {
          * @param {jQuery.Event} e
          */
         onFocusout: function(e) {
+            var select2 = this.$('input[name=value]').data('select2');
             if (this._isSelection) {
                 this.$('.select2-focused').focus();
-            } else if (!e.relatedTarget || !$('.select2-drop').has(e.relatedTarget).length) {
+            } else if (!select2 || !select2.opened()) {
                 SelectEditorView.__super__.onFocusout.call(this, e);
             }
         },
@@ -234,7 +268,7 @@ define(function(require) {
         isChanged: function() {
             // current value is always string
             // btw model value could be an number
-            return this.getValue() !== String(this.getModelValue());
+            return this.getValue() !== this.getModelValue();
         },
 
         /**
@@ -244,6 +278,34 @@ define(function(require) {
          */
         isFocused: function() {
             return this.$('.select2-container-active').length;
+        },
+
+        /**
+         * Returns data which should be sent to the server
+         *
+         * @returns {Object}
+         */
+        getServerUpdateData: function() {
+            var data = {};
+            var value = this.getValue();
+            switch (this.keyType) {
+                case 'number':
+                    value = parseFloat(value);
+                    break;
+                case 'boolean':
+                    value = (value === '1');
+                    break;
+                default:
+                    break;
+            }
+            data[this.fieldName] = value;
+            return data;
+        },
+
+        onGenericKeydown: function(e) {
+            this.onGenericEnterKeydown(e);
+            this.onGenericTabKeydown(e);
+            this.onGenericArrowKeydown(e);
         }
     }, {
         processMetadata: function(columnMetadata) {

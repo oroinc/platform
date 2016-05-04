@@ -25,6 +25,8 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @property {Object}
          */
         backendFormats: {
+            'day':      'MM-DD',
+            'month':    'MM',
             'date':     'YYYY-MM-DD',
             'time':     'HH:mm:ss',
             'datetime': 'YYYY-MM-DD[T]HH:mm:ssZZ',
@@ -76,6 +78,41 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          */
         getDateTimeFormatSeparator: function() {
             return localeSettings.getDateTimeFormatSeparator();
+        },
+
+        /**
+         * @returns {string}
+         */
+        getBackendDayFormat: function() {
+            return this.backendFormats.day;
+        },
+
+        /**
+         * @returns {string}
+         */
+        getBackendMonthFormat: function() {
+            return this.backendFormats.month;
+        },
+
+        /**
+         * @returns {string}
+         */
+        getBackendDateFormat: function() {
+            return this.backendFormats.date;
+        },
+
+        /**
+         * @returns {string}
+         */
+        getBackendTimeFormat: function() {
+            return this.backendFormats.time;
+        },
+
+        /**
+         * @returns {string}
+         */
+        getBackendDateTimeFormat: function() {
+            return this.backendFormats.datetime;
         },
 
         /**
@@ -140,7 +177,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {boolean}
          */
         isBackendDateValid: function(value, strict) {
-            return this.isValueValid(value, this.backendFormats.date, strict);
+            return this.isValueValid(value, this.getBackendDateFormat(), strict);
         },
 
         /**
@@ -151,7 +188,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {boolean}
          */
         isBackendTimeValid: function(value, strict) {
-            return this.isValueValid(value, this.backendFormats.time, strict);
+            return this.isValueValid(value, this.getBackendTimeFormat(), strict);
         },
 
         /**
@@ -162,7 +199,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {boolean}
          */
         isBackendDateTimeValid: function(value, strict) {
-            return this.isValueValid(value, this.backendFormats.datetime, strict);
+            return this.isValueValid(value, this.getBackendDateTimeFormat(), strict);
         },
 
         /**
@@ -292,7 +329,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {string}
          */
         convertDateToBackendFormat: function(value) {
-            return this.getMomentForFrontendDate(value).format(this.backendFormats.date);
+            return this.getMomentForFrontendDate(value).format(this.getBackendDateFormat());
         },
 
         /**
@@ -300,7 +337,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          * @returns {string}
          */
         convertTimeToBackendFormat: function(value) {
-            return this.getMomentForFrontendTime(value).format(this.backendFormats.time);
+            return this.getMomentForFrontendTime(value).format(this.getBackendTimeFormat());
         },
 
         /**
@@ -310,7 +347,7 @@ define(['../locale-settings', 'moment', 'orotranslation/js/translator'
          */
         convertDateTimeToBackendFormat: function(value, timezone) {
             return this.getMomentForFrontendDateTime(value, timezone).utc()
-                .format(this.backendFormats.datetime);
+                .format(this.getBackendDateTimeFormat());
         },
 
         /**

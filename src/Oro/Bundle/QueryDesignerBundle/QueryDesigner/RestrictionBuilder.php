@@ -48,6 +48,9 @@ class RestrictionBuilder implements RestrictionBuilderInterface
                 $operator = array_pop($operatorStack);
 
                 $params = [];
+                if ($operator !== null) {
+                    $params[FilterUtility::CONDITION_KEY] = $operator;
+                }
                 if (isset($item['filterData']['params'])) {
                     $params = $item['filterData']['params'];
                     unset($item['filterData']['params']);
@@ -61,7 +64,15 @@ class RestrictionBuilder implements RestrictionBuilderInterface
                 }
                 if ($form->isValid()) {
                     $ds->beginRestrictionGroup($operator);
-                    $filter->apply($ds, $form->getData());
+                    $originalValues=[];
+                    if (isset($item['filterData']['value']['start'])) {
+                        $originalValues['value']['start_original'] = $item['filterData']['value']['start'];
+                    }
+                    if (isset($item['filterData']['value']['end'])) {
+                        $originalValues['value']['end_original'] = $item['filterData']['value']['end'];
+                    }
+                    $data = array_merge_recursive($form->getData(), $originalValues);
+                    $filter->apply($ds, $data);
                     $ds->endRestrictionGroup();
                 }
             }

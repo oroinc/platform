@@ -30,6 +30,10 @@ class DecodeFolderSubscriber implements EventSubscriberInterface
             return;
         }
 
+        if (!is_string($data['folders'])) {
+            return;
+        }
+
         $data['folders'] = json_decode($data['folders'], true);
         $event->setData($data);
     }

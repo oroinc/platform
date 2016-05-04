@@ -7,12 +7,16 @@ use Doctrine\ORM\PersistentCollection;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
+use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class OrganizationsSelectType extends AbstractType
 {
@@ -72,14 +76,14 @@ class OrganizationsSelectType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $builder->add(
-            'default_organization',
-            'hidden',
-            [
-                'mapped' => false,
-                'data'   => $this->securityFacade->getOrganizationId(),
-            ]
+        $builder->addEventListener(
+            FormEvents::PRE_SUBMIT,
+            function (FormEvent $event) {
+                $data = is_string($event->getData()) ? json_decode($event->getData(), true) : $event->getData();
+                $event->setData($data);
+            }
         );
+
         $builder->add(
             'organizations',
             'entity',
@@ -87,7 +91,6 @@ class OrganizationsSelectType extends AbstractType
                 'class'    => 'OroOrganizationBundle:Organization',
                 'property' => 'name',
                 'multiple' => true,
-                'expanded' => true,
                 'choices'  => $this->getOrganizationOptions(),
             ]
         );
@@ -96,7 +99,6 @@ class OrganizationsSelectType extends AbstractType
             'oro_business_unit_tree',
             [
                 'multiple' => true,
-                'expanded' => true,
                 'required' => false,
             ]
         );
@@ -123,17 +125,41 @@ class OrganizationsSelectType extends AbstractType
             )->getValues();
         }
 
+        $view->vars['default_organization'] = $this->securityFacade->getOrganizationId();
         $view->vars['selected_organizations']  = [$this->securityFacade->getOrganizationId()];
         $view->vars['selected_business_units'] = $businessUnitData;
+        $view->vars['accordion_enabled'] = $this->buManager->getTreeNodesCount($buTree) > 1000;
+    }
+
+    /**
+     * @return int[]
+     */
+    protected function getOrganizationOptionsIds()
+    {
+        $ids = [];
+        $organizations = $this->getOrganizationOptions();
+        foreach ($organizations as $organization) {
+            $ids[] = $organization->getId();
+        }
+
+        return $ids;
     }
 
     /**
      * Prepare choice options for a select
      *
-     * @return array
+     * @return Organization[]
      */
     protected function getOrganizationOptions()
     {
-        return $this->em->getRepository('OroOrganizationBundle:Organization')->getEnabled();
+        return $this->getLoggedInUser()->getOrganizations(true);
+    }
+
+    /**
+     * @return User
+     */
+    protected function getLoggedInUser()
+    {
+        return $this->securityFacade->getLoggedUser();
     }
 }

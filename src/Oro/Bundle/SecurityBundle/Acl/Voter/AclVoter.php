@@ -122,7 +122,7 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
         }
 
         //check acl group
-        $result = $this->checkAclGroup($group);
+        $result = $this->checkAclGroup($attributes, $group);
 
         if ($result !== self::ACCESS_DENIED) {
             $result = parent::vote($token, $this->object, $attributes);
@@ -207,15 +207,33 @@ class AclVoter extends BaseAclVoter implements PermissionGrantingStrategyContext
     }
 
     /**
+     * @param array $attributes
      * @param string $group
      * @return int
      */
-    protected function checkAclGroup($group)
+    protected function checkAclGroup(array $attributes, $group)
     {
         if ($group === null || !$this->groupProvider || !$this->object) {
             return self::ACCESS_ABSTAIN;
         }
 
-        return $group === $this->groupProvider->getGroup() ? self::ACCESS_ABSTAIN : self::ACCESS_DENIED;
+        $result = self::ACCESS_DENIED;
+        if ($group === $this->groupProvider->getGroup()) {
+            $result = self::ACCESS_ABSTAIN;
+
+            $permissions = $this->extension->getPermissions(null, false, true);
+            foreach ($attributes as $attribute) {
+                if (!$this->supportsAttribute($attribute)) {
+                    continue;
+                }
+
+                if (!in_array($attribute, $permissions, true)) {
+                    $result = self::ACCESS_DENIED;
+                    break;
+                }
+            }
+        }
+
+        return $result;
     }
 }

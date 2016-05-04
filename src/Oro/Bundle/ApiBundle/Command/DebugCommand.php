@@ -7,13 +7,15 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Helper\Table;
 use Symfony\Component\Console\Helper\TableSeparator;
-use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 use Oro\Component\ChainProcessor\ChainApplicableChecker;
 use Oro\Component\ChainProcessor\Context;
+use Oro\Component\ChainProcessor\Debug\TraceableProcessor;
 use Oro\Component\ChainProcessor\ProcessorBagInterface;
+use Oro\Bundle\ApiBundle\Processor\ApiContext;
+use Oro\Bundle\ApiBundle\Request\RequestType;
 
-class DebugCommand extends ContainerAwareCommand
+class DebugCommand extends AbstractDebugCommand
 {
     /**
      * {@inheritdoc}
@@ -22,12 +24,13 @@ class DebugCommand extends ContainerAwareCommand
     {
         $this
             ->setName('oro:api:debug')
-            ->setDescription('Shows details about registered API actions and processors.')
+            ->setDescription('Shows details about registered Data API actions and processors.')
             ->addArgument(
                 'action',
                 InputArgument::OPTIONAL,
-                'Shows a list of processors for a specified action in the order they are executed'
+                'Shows a list of processors for a specified action'
             );
+        parent::configure();
     }
 
     /**
@@ -39,7 +42,7 @@ class DebugCommand extends ContainerAwareCommand
         if (empty($action)) {
             $this->dumpActions($output);
         } else {
-            $this->dumpProcessors($output, $action);
+            $this->dumpProcessors($output, $action, $this->getRequestType($input));
         }
     }
 
@@ -77,9 +80,12 @@ class DebugCommand extends ContainerAwareCommand
     /**
      * @param OutputInterface $output
      * @param string          $action
+     * @param RequestType     $requestType
      */
-    protected function dumpProcessors(OutputInterface $output, $action)
+    protected function dumpProcessors(OutputInterface $output, $action, RequestType $requestType)
     {
+        $output->writeln('The processors are displayed in the order they are executed.');
+
         /** @var ProcessorBagInterface $processorBag */
         $processorBag = $this->getContainer()->get('oro_api.processor_bag');
 
@@ -88,12 +94,21 @@ class DebugCommand extends ContainerAwareCommand
 
         $context = new Context();
         $context->setAction($action);
+        $context->set(ApiContext::REQUEST_TYPE, $requestType);
         $processors = $processorBag->getProcessors($context);
-        $processors->setApplicableChecker(new ChainApplicableChecker());
+
+        $applicableChecker = new ChainApplicableChecker();
+        $applicableChecker->addChecker(new RequestTypeApplicableChecker());
+        $processors->setApplicableChecker($applicableChecker);
+
         $i = 0;
         foreach ($processors as $processor) {
             if ($i > 0) {
                 $table->addRow(new TableSeparator());
+            }
+
+            if ($processor instanceof TraceableProcessor) {
+                $processor = $processor->getProcessor();
             }
 
             $processorColumn      = sprintf(

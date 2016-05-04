@@ -65,7 +65,7 @@ class SearchResultsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $rows = $result->offsetGetByPath('[data]');
+        $rows = $result->getData();
         $rows = is_array($rows) ? $rows : [];
 
         $rows = array_map(
@@ -112,7 +112,7 @@ class SearchResultsExtension extends AbstractExtension
         }
 
         // set results
-        $result->offsetSet('data', $resultRows);
+        $result->setData($resultRows);
     }
 
     /**

@@ -1,0 +1,20 @@
+oro_api:
+    entities:
+        Test\Entity1: ~
+        Test\Entity2:
+            exclude: true
+        Test\Entity3: ~
+        Test\Entity4:
+            fields:
+                field2: ~
+                field3:
+                    exclude: true
+            filters:
+                fields:
+                    field2:
+                        exclude: true
+        Test\Entity5: ~
+        Test\Entity6:
+            fields:
+                field1: ~
+        Test\Entity11: ~

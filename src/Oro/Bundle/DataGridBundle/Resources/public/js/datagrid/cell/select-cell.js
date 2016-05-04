@@ -36,7 +36,7 @@ define([
             this.listenTo(this.model, 'change:' + this.column.get('name'), function() {
                 this.enterEditMode();
 
-                this.$el.find('select').uniform();
+                this.$el.find('select').inputWidget('create');
             });
         },
 

@@ -6,6 +6,9 @@ use Symfony\Component\PropertyAccess\PropertyPathInterface;
 
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
+/**
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class ArrayUtil
 {
     /**
@@ -213,10 +216,12 @@ class ArrayUtil
     }
 
     /**
-     * Return first element on which callback returns truthy value, null otherwise
+     * Return first element on which callback returns true value, null otherwise
      *
      * @param callable $callback
-     * @param array $array
+     * @param array    $array
+     *
+     * @return mixed|null
      */
     public static function find(callable $callback, array $array)
     {
@@ -281,6 +286,51 @@ class ArrayUtil
     }
 
     /**
+     * Return array of ranges (inclusive)
+     * [[min1, max1], [min2, max2], ...]
+     *
+     * @param int[] $ints List of integers
+     *
+     * @return array
+     */
+    public static function intRanges(array $ints)
+    {
+        $ints = array_unique($ints);
+        sort($ints);
+
+        $result = [];
+        while (false !== ($subResult = static::shiftRange($ints))) {
+            $result[] = $subResult;
+        }
+
+        return $result;
+    }
+
+    /**
+     * @param array $sortedUniqueInts
+     *
+     * @return array|false Array 2 elements [min, max] or false when the array is empty
+     */
+    public static function shiftRange(array &$sortedUniqueInts)
+    {
+        if (!$sortedUniqueInts) {
+            return false;
+        }
+
+        $min = $max = reset($sortedUniqueInts);
+
+        $c = 1;
+        while (next($sortedUniqueInts) !== false && current($sortedUniqueInts) - $c === $min) {
+            $max = current($sortedUniqueInts);
+            array_shift($sortedUniqueInts);
+            $c++;
+        }
+        array_shift($sortedUniqueInts);
+
+        return [$min, $max];
+    }
+
+    /**
      * Return the values from a single column in the input array
      *
      * http://php.net/manual/en/function.array-column.php
@@ -321,5 +371,59 @@ class ArrayUtil
         }
 
         return $result;
+    }
+
+    /**
+     * @param array $array
+     * @param array $path
+     *
+     * @return array
+     */
+    public static function unsetPath(array $array, array $path)
+    {
+        $key = array_shift($path);
+
+        if (!$path) {
+            unset($array[$key]);
+
+            return $array;
+        }
+
+        if (array_key_exists($key, $array) && is_array($array[$key])) {
+            $array[$key] = static::unsetPath($array[$key], $path);
+        }
+
+        return $array;
+    }
+
+    /**
+     * Returns the value in a nested associative array,
+     * where $path is an array of keys. Returns $defaultValue if the key
+     * is not present, or the not-found value if supplied.
+     *
+     * @param array $array
+     * @param array $path
+     * @param mixed $defaultValue
+     *
+     * @return mixed
+     */
+    public static function getIn(array $array, array $path, $defaultValue = null)
+    {
+        $propertyPath = implode(
+            '',
+            array_map(
+                function ($part) {
+                    return sprintf('[%s]', $part);
+                },
+                $path
+            )
+        );
+
+        $propertyAccessor = new PropertyAccessor();
+        if (!$propertyAccessor->isReadable($array, $propertyPath)) {
+            return $defaultValue;
+        }
+
+        return $propertyAccessor->getValue($array, $propertyPath);
     }
 }

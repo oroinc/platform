@@ -272,7 +272,7 @@
             groupKey: parameters.groupKey is defined ? parameters.groupKey : '',
             useMainButtonsClone: true
         }) %}
-        <div class="pull-right"
+        <div class="pull-right pinned-dropdown"
              data-page-component-module="oroui/js/app/components/jquery-widget-component"
              data-page-component-options="{{ options|json_encode }}">
             {{ parameters.html|raw }}
@@ -960,3 +960,21 @@
         {% endfor -%}
     </ul>
 {% endmacro %}
+
+{%- macro entityViewLink(entity, label, route, permission) -%}
+    {% if entity %}
+        {% if route and resource_granted(permission|default('VIEW'), entity) %}
+            {{ _self.renderUrl(path(route, {'id': entity.id}), label) }}
+        {% else %}
+            {{ label|escape }}
+        {% endif %}
+    {% endif %}
+{%- endmacro -%}
+
+{%- macro entityViewLinks(entities, labelProperty, route, permission) -%}
+    {% set links = [] %}
+    {% for entity in entities %}
+        {% set links = links|merge([_self.entityViewLink(entity, attribute(entity, labelProperty), route, permission)]) %}
+    {% endfor %}
+    {{ _self.renderList(links) }}
+{%- endmacro -%}

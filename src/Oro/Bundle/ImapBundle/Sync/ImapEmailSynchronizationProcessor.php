@@ -6,7 +6,6 @@ use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\Query;
 
-
 use Oro\Bundle\BatchBundle\ORM\Query\BufferedQueryResultIterator;
 use Oro\Bundle\EmailBundle\Entity\Mailbox;
 use Oro\Bundle\EmailBundle\Model\FolderType;
@@ -24,7 +23,6 @@ use Oro\Bundle\ImapBundle\Entity\Repository\ImapEmailRepository;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnsupportException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Exception\UnselectableFolderException;
 use Oro\Bundle\ImapBundle\Mail\Storage\Folder;
-use Oro\Bundle\ImapBundle\Mail\Storage\Imap;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailIterator;
 use Oro\Bundle\ImapBundle\Manager\ImapEmailManager;
 use Oro\Bundle\ImapBundle\Manager\DTO\Email;
@@ -83,7 +81,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $folderName = $folder->getFullName();
             try {
                 $this->manager->selectFolder($folderName);
-                $this->logger->notice(sprintf('The folder "%s" is selected.', $folderName));
+                $this->logger->info(sprintf('The folder "%s" is selected.', $folderName));
 
                 // register the current folder in the entity builder
                 $this->emailEntityBuilder->setFolder($folder);
@@ -101,7 +99,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
                 $this->em->flush($folder);
             } catch (UnselectableFolderException $e) {
-                $this->logger->notice(sprintf('The folder "%s" cannot be selected and was skipped.', $folderName));
+                $this->logger->info(sprintf('The folder "%s" cannot be selected and was skipped.', $folderName));
             }
 
             $this->cleanUp(true, $imapFolder->getFolder());
@@ -123,40 +121,47 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $imapFolders = $this->getSyncEnabledImapFolders($origin);
         foreach ($imapFolders as $imapFolder) {
             $folder = $imapFolder->getFolder();
-            $this->manager->selectFolder($folder->getFullName());
+            $folderName = $folder->getFullName();
+            try {
+                $this->manager->selectFolder($folderName);
 
-            $this->em->transactional(function () use ($imapFolder, $folder) {
-                $existingUids = $this->manager->getEmailUIDs();
+                $this->em->transactional(function () use ($imapFolder, $folder) {
+                    $existingUids = $this->manager->getEmailUIDs();
 
-                $staleImapEmailsQb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
-                $staleImapEmailsQb
-                    ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
-                    ->setParameter('imap_folder', $imapFolder);
-
-                if ($existingUids) {
+                    $staleImapEmailsQb = $this->em->getRepository('OroImapBundle:ImapEmail')->createQueryBuilder('ie');
                     $staleImapEmailsQb
-                        ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
-                        ->setParameter('uids', $existingUids);
-                }
+                        ->andWhere($staleImapEmailsQb->expr()->eq('ie.imapFolder', ':imap_folder'))
+                        ->setParameter('imap_folder', $imapFolder);
 
-                $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
-                    ->setPageCallback(function () {
-                        $this->em->flush();
-                        $this->em->clear();
-                    });
+                    if ($existingUids) {
+                        $staleImapEmailsQb
+                            ->andWhere($staleImapEmailsQb->expr()->notIn('ie.uid', ':uids'))
+                            ->setParameter('uids', $existingUids);
+                    }
 
-                /* @var $staleImapEmails ImapEmail[] */
-                foreach ($staleImapEmails as $imapEmail) {
-                    $email = $imapEmail->getEmail();
-                    $email->getEmailUsers()->forAll(function ($key, EmailUser $emailUser) use ($folder) {
-                        $emailUser->removeFolder($folder);
-                        if (!$emailUser->getFolders()->count()) {
-                            $this->em->remove($emailUser);
-                        }
-                    });
-                    $this->em->remove($imapEmail);
-                }
-            });
+                    $staleImapEmails = (new BufferedQueryResultIterator($staleImapEmailsQb))
+                        ->setPageCallback(function () {
+                            $this->em->flush();
+                            $this->em->clear();
+                        });
+
+                    /* @var $staleImapEmails ImapEmail[] */
+                    foreach ($staleImapEmails as $imapEmail) {
+                        $email = $imapEmail->getEmail();
+                        $email->getEmailUsers()->forAll(function ($key, EmailUser $emailUser) use ($folder) {
+                            $emailUser->removeFolder($folder);
+                            if (!$emailUser->getFolders()->count()) {
+                                $this->em->remove($emailUser);
+                            }
+                        });
+                        $this->em->remove($imapEmail);
+                    }
+                });
+            } catch (UnselectableFolderException $e) {
+                $this->logger->info(
+                    sprintf('The folder "%s" cannot be selected for remove email and was skipped.', $folderName)
+                );
+            }
         }
     }
 
@@ -164,7 +169,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      * @param ImapEmailFolder $imapFolder
      * @param \DateTime $startDate
      */
-    protected function checkFlags(ImapEmailfolder $imapFolder, $startDate)
+    protected function checkFlags(ImapEmailFolder $imapFolder, $startDate)
     {
         try {
             $uids = $this->manager->getUnseenEmailUIDs($startDate);
@@ -178,7 +183,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $emailUserRepository->setEmailUsersSeen($ids, false);
             $emailUserRepository->setEmailUsersSeen($invertedIds, true);
         } catch (UnsupportException $e) {
-            $this->logger->notice(sprintf('Seen update unsupported - "%s"', $imapFolder->getFolder()->getOrigin()));
+            $this->logger->info(sprintf('Seen update unsupported - "%s"', $imapFolder->getFolder()->getOrigin()));
         }
     }
 
@@ -189,7 +194,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function cleanupOutdatedFolders(EmailOrigin $origin)
     {
-        $this->logger->notice('Removing empty outdated folders ...');
+        $this->logger->info('Removing empty outdated folders ...');
 
         /** @var ImapEmailFolderRepository $repo */
         $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
@@ -197,7 +202,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $folders     = new ArrayCollection();
 
         foreach ($imapFolders as $imapFolder) {
-            $this->logger->notice(sprintf('Remove "%s" folder.', $imapFolder->getFolder()->getFullName()));
+            $this->logger->info(sprintf('Remove "%s" folder.', $imapFolder->getFolder()->getFullName()));
 
             if (!$folders->contains($imapFolder->getFolder())) {
                 $folders->add($imapFolder->getFolder());
@@ -212,7 +217,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
 
         if (count($imapFolders) > 0) {
             $this->em->flush();
-            $this->logger->notice(sprintf('Removed %d folder(s).', count($imapFolders)));
+            $this->logger->info(sprintf('Removed %d folder(s).', count($imapFolders)));
         }
     }
 
@@ -226,13 +231,13 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function getExistingImapFolders(EmailOrigin $origin)
     {
-        $this->logger->notice('Loading existing folders ...');
+        $this->logger->info('Loading existing folders ...');
 
         /** @var ImapEmailFolderRepository $repo */
         $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
         $imapFolders = $repo->getFoldersByOrigin($origin);
 
-        $this->logger->notice(sprintf('Loaded %d folder(s).', count($imapFolders)));
+        $this->logger->info(sprintf('Loaded %d folder(s).', count($imapFolders)));
 
         return $imapFolders;
     }
@@ -247,13 +252,13 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function getSyncEnabledImapFolders(EmailOrigin $origin)
     {
-        $this->logger->notice('Get folders enabled for sync...');
+        $this->logger->info('Get folders enabled for sync...');
 
         /** @var ImapEmailFolderRepository $repo */
         $repo        = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
         $imapFolders = $repo->getFoldersByOrigin($origin, false, EmailFolder::SYNC_ENABLED_TRUE);
 
-        $this->logger->notice(sprintf('Got %d folder(s).', count($imapFolders)));
+        $this->logger->info(sprintf('Got %d folder(s).', count($imapFolders)));
 
         return $imapFolders;
     }
@@ -265,7 +270,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function getFolders()
     {
-        $this->logger->notice('Retrieving folders from an email server ...');
+        $this->logger->info('Retrieving folders from an email server ...');
 
         $srcFolders = $this->manager->getFolders(null, true);
 
@@ -281,7 +286,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             $folders[] = $srcFolder;
         }
 
-        $this->logger->notice(sprintf('Retrieved %d folder(s).', count($folders)));
+        $this->logger->info(sprintf('Retrieved %d folder(s).', count($folders)));
 
         return $folders;
     }
@@ -316,11 +321,6 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         $count = $processed = $invalid = $totalInvalid = 0;
         $emails->setIterationOrder(true);
         $emails->setBatchSize(self::READ_BATCH_SIZE);
-        $emails->setBatchCallback(
-            function ($batch) {
-                $this->registerEmailsInKnownEmailAddressChecker($batch);
-            }
-        );
         $emails->setConvertErrorCallback(
             function (\Exception $e) use (&$invalid) {
                 $invalid++;
@@ -331,14 +331,14 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
             }
         );
 
-        $this->logger->notice(sprintf('Found %d email(s).', $emails->count()));
+        $this->logger->info(sprintf('Found %d email(s).', $emails->count()));
 
         $batch = [];
         /** @var Email $email */
         foreach ($emails as $email) {
             $processed++;
             if ($processed % self::READ_HINT_COUNT === 0) {
-                $this->logger->notice(
+                $this->logger->info(
                     sprintf(
                         'Processed %d of %d emails.%s',
                         $processed,
@@ -481,10 +481,16 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function checkOnOldEmailForMailbox(EmailFolder $folder, Email $email, $mailbox)
     {
-        if ($mailbox && $folder->getSynchronizedAt() > $email->getSentAt()) {
+        /**
+         * @description Will select max of those dates because emails in folder `sent` could have no received date
+         *              or same date.
+         */
+        $dateForCheck = max($email->getReceivedAt(), $email->getSentAt());
+
+        if ($mailbox && $folder->getSyncStartDate() > $dateForCheck) {
             $this->logger->info(
                 sprintf(
-                    'Skip "%s" (UID: %d) email, because it was sent earlier than the last synchronization was done',
+                    'Skip "%s" (UID: %d) email, because it was sent earlier than the start synchronization is set',
                     $email->getSubject(),
                     $email->getId()->getUid()
                 )
@@ -546,7 +552,7 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
      */
     protected function removeImapEmailReference(ImapEmail $imapEmail)
     {
-        $this->logger->notice(
+        $this->logger->info(
             sprintf(
                 'Remove "%s" (UID: %d) email from "%s".',
                 $imapEmail->getEmail()->getSubject(),
@@ -660,24 +666,12 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         ImapEmailFolder $imapFolder,
         EmailFolder $folder
     ) {
-        if ($origin->getMailbox()) {
-            // build search query for emails sync
-            $sqb = $this->manager->getSearchQueryBuilder();
-            if ($origin->getSynchronizedAt() && $folder->getSynchronizedAt()) {
-                if ($folder->getType() === FolderType::SENT) {
-                    $sqb->sent($folder->getSynchronizedAt());
-                } else {
-                    $sqb->received($folder->getSynchronizedAt());
-                }
-            }
-            $searchQuery = $sqb->get();
-            $this->logger->notice(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
-            $this->logger->notice(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
-            $emails = $this->manager->getEmails($searchQuery);
+        $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
+        if (!$lastUid && $origin->getMailbox() && $folder->getSyncStartDate()) {
+            $emails = $this->initialMailboxSync($folder);
         } else {
-            $lastUid = $this->em->getRepository('OroImapBundle:ImapEmail')->findLastUidByFolder($imapFolder);
-            $this->logger->notice(sprintf('Previous max email UID "%s"', $lastUid));
-            $emails = $this->manager->getEmailsUidBased(sprintf('%s:*', ++$lastUid));
+            $this->logger->info(sprintf('Previous max email UID "%s"', $lastUid));
+            $emails = $this->manager->getEmailsUidBased($lastUid);
         }
 
         return $emails;
@@ -695,5 +689,29 @@ class ImapEmailSynchronizationProcessor extends AbstractEmailSynchronizationProc
         return !$isMultiFolder
             && $existingImapEmail
             && $email->getId()->getUid() === $existingImapEmail->getUid();
+    }
+
+    /**
+     * First system mailbox sync from sync start date
+     *
+     * @param EmailFolder $folder
+     *
+     * @return ImapEmailIterator
+     */
+    protected function initialMailboxSync(EmailFolder $folder)
+    {
+        // build search query for emails sync
+        $sqb = $this->manager->getSearchQueryBuilder();
+        if ($folder->getType() === FolderType::SENT) {
+            $sqb->sent($folder->getSyncStartDate());
+        } else {
+            $sqb->received($folder->getSyncStartDate());
+        }
+        $searchQuery = $sqb->get();
+        $this->logger->info(sprintf('Loading emails from "%s" folder ...', $folder->getFullName()));
+        $this->logger->info(sprintf('Query: "%s".', $searchQuery->convertToSearchString()));
+        $emails = $this->manager->getEmails($searchQuery);
+
+        return $emails;
     }
 }

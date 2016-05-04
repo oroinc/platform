@@ -117,12 +117,26 @@ class ActivityListManager
      */
     public function getList($entityClass, $entityId, $filter, $page)
     {
+        return $this->getListData($entityClass, $entityId, $filter, $page)['data'];
+    }
+
+    /**
+     * @param string  $entityClass
+     * @param integer $entityId
+     * @param array   $filter
+     * @param integer $page
+     *
+     * @return array ('data' => [], 'count' => int)
+     */
+    public function getListData($entityClass, $entityId, $filter, $page)
+    {
         $qb = $this->prepareQB($entityClass, $entityId, $filter);
 
-        $pager = $this->pager;
+        $pager = clone $this->pager;
         $pager->setQueryBuilder($qb);
         $pager->setPage($page);
         $pager->setMaxPerPage($this->config->get('oro_activity_list.per_page'));
+        $pager->setSkipAclCheck(true);
         $pager->init();
 
         $targetEntityData = [
@@ -130,7 +144,10 @@ class ActivityListManager
             'id'    => $entityId,
         ];
 
-        return $this->getEntityViewModels($pager->getResults(), $targetEntityData);
+        return [
+            'count' => $pager->getNbResults(),
+            'data' => $this->getEntityViewModels($pager->getResults(), $targetEntityData),
+        ];
     }
 
     /**

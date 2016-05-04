@@ -33,5 +33,7 @@ oro:
             strategy:       Strategy
             importance:     Important
             columns_notice: The file must be comma-separated only. Files containing other separators will be rejected.
+            errors:
+                not_found_entity: Not found entity "%entity_name%"
 
 "Identity only": "Identity only"

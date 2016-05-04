@@ -31,7 +31,12 @@ class ExtendColumnOptionsGuesser extends AbstractColumnOptionsGuesser
                 $extendFieldConfig = $this->getFieldConfig('extend', $class, $property);
                 if ($extendFieldConfig) {
                     $options = [
-                        'frontend_type' => Property::TYPE_STRING
+                        'frontend_type' => Property::TYPE_HTML,
+                        'type'          => 'twig',
+                        'template'      => 'OroEntityExtendBundle:Datagrid:Property/enum.html.twig',
+                        'context'       => [
+                            'entity_class' => $extendFieldConfig->get('target_entity')
+                        ]
                     ];
                 }
                 break;

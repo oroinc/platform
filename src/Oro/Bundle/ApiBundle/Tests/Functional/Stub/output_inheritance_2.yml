@@ -1,0 +1,18 @@
+data:
+  0:
+    type: "testdepartments"
+    id: auto
+    attributes:
+      name: "TestDepartment"
+    relationships:
+      staff:
+        data:
+          -
+            type: "testemployees"
+            id: auto
+included:
+  0:
+    type: "testemployees"
+    id: auto
+    attributes:
+      name: "TestEmployee"

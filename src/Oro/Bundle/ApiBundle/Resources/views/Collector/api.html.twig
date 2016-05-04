@@ -1,0 +1,141 @@
+{% extends app.request.isXmlHttpRequest ? 'WebProfilerBundle:Profiler:ajax_layout.html.twig' : 'WebProfilerBundle:Profiler:layout.html.twig' %}
+
+{% block toolbar %}
+{% endblock %}
+
+{% block menu %}
+    {% if not collector.empty %}
+    <span class="label">
+        <strong>Data API</strong>
+        <span class="count">
+            <span>{{ '%0.0f'|format(collector.totalTime * 1000) }} ms</span>
+        </span>
+    </span>
+    {% endif %}
+{% endblock %}
+
+{% block panel %}
+    {{ block('stats') }}
+    {{ block('actions') }}
+    {{ block('processors') }}
+    {{ block('graph') }}
+
+    <script type="text/javascript">//<![CDATA[
+
+        function sortTable(header, column, targetId) {
+            "use strict";
+
+            var direction = parseInt(header.getAttribute('data-sort-direction')) || 1,
+                items = [],
+                target = document.getElementById(targetId),
+                rows = target.children,
+                headers = header.parentElement.children,
+                i;
+
+            for (i = 0; i < rows.length; ++i) {
+                items.push(rows[i]);
+            }
+
+            for (i = 0; i < headers.length; ++i) {
+                headers[i].removeAttribute('data-sort-direction');
+                if (headers[i].children.length > 0) {
+                    headers[i].children[0].innerHTML = '';
+                }
+            }
+
+            header.setAttribute('data-sort-direction', (-1*direction).toString());
+            header.children[0].innerHTML = direction > 0 ? '&#9650;' : '&#9660;';
+
+            items.sort(function(a, b) {
+                return direction*(parseFloat(a.children[column].innerHTML) - parseFloat(b.children[column].innerHTML));
+            });
+
+            for (i = 0; i < items.length; ++i) {
+                Sfjs.removeClass(items[i], i % 2 ? 'even' : 'odd');
+                Sfjs.addClass(items[i], i % 2 ? 'odd' : 'even');
+                target.appendChild(items[i]);
+            }
+        }
+
+    //]]></script>
+{% endblock %}
+
+{% block stats %}
+    <h2>Data API Stats</h2>
+
+    <table>
+        <tbody>
+            <tr>
+                <th>The number of executed actions</th>
+                <td><pre>{{ collector.actionCount }}</pre></td>
+            </tr>
+            <tr>
+                <th>The number of executed processors</th>
+                <td><pre>{{ collector.processorCount }}</pre></td>
+            </tr>
+            <tr>
+                <th>Total time</th>
+                <td><pre>{{ '%0.2f'|format(collector.totalTime * 1000) }} ms</pre></td>
+            </tr>
+        </tbody>
+    </table>
+
+{% endblock stats %}
+
+{% block actions %}
+    <h2>Actions</h2>
+
+    <table class="alt" id="actionsPlaceholder">
+        <thead>
+        <tr>
+            <th onclick="javascript:sortTable(this, 0, 'actions')" style="cursor: pointer;">Time<span></span></th>
+            <th onclick="javascript:sortTable(this, 1, 'actions')" style="cursor: pointer;">Used<span></span></th>
+            <th>Name</th>
+        </tr>
+        </thead>
+        <tbody id="actions">
+        {% for i, action in collector.actions %}
+            <tr id="actionNo-{{ i }}" class="{{ cycle(['odd', 'even'], i) }}">
+                <td>{{ '%0.2f'|format(action.time * 1000) }}&nbsp;ms{% if action.time * 1000 > 5 %} ({{ '%0.1f'|format((action.time * 100) / collector.totalTime) }}%){% endif %}</td>
+                <td>{{ action.count }} times</td>
+                <td>{{ action.name }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock actions %}
+
+{% block processors %}
+    <h2>Processors</h2>
+
+    <table class="alt" id="processorsPlaceholder">
+        <thead>
+        <tr>
+            <th onclick="javascript:sortTable(this, 0, 'processors')" style="cursor: pointer;">Time<span></span></th>
+            <th onclick="javascript:sortTable(this, 1, 'processors')" style="cursor: pointer;">Used<span></span></th>
+            <th>Id</th>
+        </tr>
+        </thead>
+        <tbody id="processors">
+        {% for i, processor in collector.processors %}
+            <tr id="processorNo-{{ i }}" class="{{ cycle(['odd', 'even'], i) }}">
+                <td>{{ '%0.2f'|format(processor.time * 1000) }}&nbsp;ms{% if processor.time * 1000 > 1 %} ({{ '%0.1f'|format((processor.time * 100) / collector.totalTime) }}%){% endif %}</td>
+                <td>{{ processor.count }} times</td>
+                <td>{{ processor.id }}</td>
+            </tr>
+        {% endfor %}
+        </tbody>
+    </table>
+{% endblock processors %}
+
+{% block graph %}
+    <h2>Graph</h2>
+
+<pre>
+{% for action in collector.actionTree -%}
+<b>{{ action.name }}</b> <span  style="background-color: #ffd;{% if action.time * 1000 > 15 %}color: #d44{% endif %}">{{ '%0.2f'|format(action.time * 1000) }}ms{% if action.time * 1000 > 5 %}/{{ '%0.1f'|format((action.time * 100) / collector.totalTime) }}%{% endif %}</span>
+{% if action.processors is defined %}{% for processor in action.processors %}
+    {{ processor.id }} <span  style="background-color: #ffd;{% if processor.time * 1000 > 5 %}color: #d44{% endif %}">{{ '%0.2f'|format(processor.time * 1000) }}ms{% if processor.time * 1000 > 1 %}/{{ '%0.1f'|format((processor.time * 100) / collector.totalTime) }}%{% endif %}</span>
+{% endfor %}{% endif %}{% endfor %}
+</pre>
+{% endblock graph %}

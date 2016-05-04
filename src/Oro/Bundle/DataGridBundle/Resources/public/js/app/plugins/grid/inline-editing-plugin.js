@@ -8,27 +8,13 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var CellIterator = require('../../../datagrid/cell-iterator');
+    var gridViewsBuilder = require('../../../inline-editing/builder');
     var ApiAccessor = require('oroui/js/tools/api-accessor');
     var Modal = require('oroui/js/modal');
     require('orodatagrid/js/app/components/cell-popup-editor-component');
     require('oroform/js/app/views/editor/text-editor-view');
 
     InlineEditingPlugin = BasePlugin.extend({
-        /**
-         * This component is used by default for inline editing
-         */
-        DEFAULT_COMPONENT: 'orodatagrid/js/app/components/cell-popup-editor-component',
-
-        /**
-         * This view is used by default for editing
-         */
-        DEFAULT_VIEW: 'oroform/js/app/views/editor/text-editor-view',
-
-        /**
-         * This view is used by default for editing
-         */
-        DEFAULT_COLUMN_TYPE: 'string',
-
         /**
          * Help message for cells
          */
@@ -119,7 +105,10 @@ define(function(require) {
         beforeGridCollectionFetch: function(collection, options) {
             if (this.hasChanges()) {
                 var deferredConfirmation = this.confirmNavigation();
+                deferredConfirmation.then(_.bind(this.removeActiveEditorComponents, this));
                 options.waitForPromises.push(deferredConfirmation.promise());
+            } else {
+                this.removeActiveEditorComponents();
             }
 
         },
@@ -193,7 +182,7 @@ define(function(require) {
                 case 'enable_all':
                     if (enableConfigValue !== false) {
                         editable = (columnMetadata.inline_editing && columnMetadata.inline_editing.enable === true) ||
-                            (columnMetadata.type || this.DEFAULT_COLUMN_TYPE) in
+                            (columnMetadata.type || gridViewsBuilder.DEFAULT_COLUMN_TYPE) in
                                 this.options.metadata.inline_editing.default_editors;
                     } else {
                         editable = false;
@@ -212,39 +201,27 @@ define(function(require) {
 
         getCellEditorOptions: function(cell) {
             var columnMetadata = cell.column.get('metadata');
-            var editor = (columnMetadata && columnMetadata.inline_editing && columnMetadata.inline_editing.editor) ?
-                $.extend(true, {}, columnMetadata.inline_editing.editor) :
-                {};
+            var editor = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
+            var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
 
-            if (!editor.component) {
-                editor.component = this.options.metadata.inline_editing.cell_editor.component;
-            }
-            if (!editor.view) {
-                editor.view = this.options.metadata.inline_editing
-                    .default_editors[(columnMetadata.type || this.DEFAULT_COLUMN_TYPE)];
-            }
             if (!editor.component_options) {
                 editor.component_options = {};
             }
 
-            if (columnMetadata && columnMetadata.inline_editing && columnMetadata.inline_editing.save_api_accessor) {
-                if (!(columnMetadata.inline_editing.save_api_accessor instanceof ApiAccessor)) {
+            if (saveApiAccessor) {
+                if (!(saveApiAccessor instanceof ApiAccessor)) {
                     var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
-                        columnMetadata.inline_editing.save_api_accessor);
+                        saveApiAccessor);
                     var ConcreteApiAccessor = saveApiOptions.class;
-                    columnMetadata.inline_editing.save_api_accessor = new ConcreteApiAccessor(
-                        _.omit(saveApiOptions, 'class'));
+                    saveApiAccessor = new ConcreteApiAccessor(_.omit(saveApiOptions, 'class'));
                 }
-                editor.save_api_accessor = columnMetadata.inline_editing.save_api_accessor;
+                editor.save_api_accessor = saveApiAccessor;
             } else {
                 // use main
                 editor.save_api_accessor = this.saveApiAccessor;
             }
 
-            var validationRules = (columnMetadata.inline_editing &&
-                columnMetadata.inline_editing.validation_rules) ?
-                columnMetadata.inline_editing.validation_rules :
-                {};
+            var validationRules = _.result(columnMetadata.inline_editing, 'validation_rules') || {};
 
             _.each(validationRules, function(params, ruleName) {
                 // normalize rule's params, in case is it was defined as 'NotBlank: ~'
@@ -392,10 +369,7 @@ define(function(require) {
 
         highlightCell: function(cell, highlight) {
             highlight = highlight !== false;
-            if (this.lastHighlightedCell === cell && highlight) {
-                return;
-            }
-            if (this.lastHighlightedCell !== cell && !highlight) {
+            if (highlight === (this.lastHighlightedCell === cell)) {
                 return;
             }
             if (this.lastHighlightedCell && highlight) {
@@ -403,10 +377,14 @@ define(function(require) {
             }
             this.toggleHeaderCellHighlight(cell, highlight);
             if (highlight) {
-                cell.$el.parent('tr:first').addClass('row-edit-mode');
+                if (!cell.disposed) {
+                    cell.$el.parent('tr:first').addClass('row-edit-mode');
+                }
                 this.lastHighlightedCell = cell;
             } else {
-                cell.$el.parent('tr:first').removeClass('row-edit-mode');
+                if (!cell.disposed) {
+                    cell.$el.parent('tr:first').removeClass('row-edit-mode');
+                }
                 this.lastHighlightedCell = null;
             }
         },

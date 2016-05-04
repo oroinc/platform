@@ -3,9 +3,10 @@
 namespace Oro\Bundle\EmailBundle\Model\Action;
 
 use Oro\Bundle\UIBundle\Tools\HtmlTagHelper;
-use Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException;
-use Oro\Bundle\WorkflowBundle\Model\Action\AbstractAction;
-use Oro\Bundle\WorkflowBundle\Model\ContextAccessor;
+
+use Oro\Component\Action\Action\AbstractAction;
+use Oro\Component\Action\Exception\InvalidParameterException;
+use Oro\Component\Action\Model\ContextAccessor;
 
 /**
  * Strips html tags from string.

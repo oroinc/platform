@@ -179,6 +179,8 @@ class EmailUserRepository extends EntityRepository
 
         if (!$isAllSelected) {
             $this->applyIdFilter($queryBuilder, $ids);
+        } elseif ($ids) {
+            $this->applyExcludeIdFilter($queryBuilder, $ids);
         }
 
         return $queryBuilder;
@@ -319,6 +321,21 @@ class EmailUserRepository extends EntityRepository
     {
         if ($ids) {
             $queryBuilder->andWhere($queryBuilder->expr()->in('eu.id', $ids));
+        }
+
+        return $this;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param array        $ids
+     *
+     * @return $this
+     */
+    protected function applyExcludeIdFilter(QueryBuilder $queryBuilder, $ids)
+    {
+        if ($ids) {
+            $queryBuilder->andWhere($queryBuilder->expr()->notIn('eu.id', $ids));
         }
 
         return $this;

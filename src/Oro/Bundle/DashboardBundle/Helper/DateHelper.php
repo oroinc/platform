@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Helper;
 
 use \DateTime;
+use \DateInterval;
 
 use Doctrine\ORM\QueryBuilder;
 
@@ -65,7 +66,7 @@ class DateHelper
             $items[$key][$dataKey] = $row[$rowKey];
         }
 
-        return array_combine(range(0, count($items) - 1), array_values($items));
+        return array_values($items);
     }
 
     /**
@@ -90,24 +91,27 @@ class DateHelper
 
         $currentItems = $this->getDatePeriod($currentFrom, $currentTo);
 
-        $items = $this->getDatePeriod($from, $to);
+        $previousItems = $this->getDatePeriod($from, $to);
 
-        // Adjust time intervals to match
+        // Adjust count of items(intervals) to match
+        // If count of current items > count of previous items
+        // null value is adding to the previous items
+        // and first item of the previous items is dropping otherwise
         $countCurrentItems = count($currentItems);
-        $countItems = count($items);
-
-        if ($countCurrentItems!= $countItems) {
-            $config     = self::getFormatStrings($from, $to);
-            $interval   = new \DateInterval($config['intervalString']);
-            while ($countItems != $countCurrentItems) {
-                if ($countItems > $countCurrentItems) {
-                    $from->add($interval);
+        $countItems = count($previousItems);
+        if ($countCurrentItems != $countItems) {
+            $items = [];
+            $itemsKeys = array_keys($previousItems);
+            for ($i = 0; $i < $countCurrentItems; $i++) {
+                if (isset($itemsKeys[$i])) {
+                    $key         = $itemsKeys[$i];
+                    $items[$key] = $previousItems[$key];
                 } else {
-                    $from->sub($interval);
+                    $items[] = null;
                 }
-                $items = $this->getDatePeriod($from, $to);
-                $countItems = count($items);
             }
+        } else {
+            $items = $previousItems;
         }
 
         foreach ($data as $row) {
@@ -125,7 +129,7 @@ class DateHelper
             }
         }
 
-        return array_combine(range(0, count($currentItems) - 1), array_values($currentItems));
+        return array_values($currentItems);
     }
 
     /**
@@ -306,6 +310,58 @@ class DateHelper
             $start = new \DateTime($start, new \DateTimeZone('UTC'));
             $start = $start->setTimezone(new \DateTimeZone($this->localeSettings->getTimeZone()));
         }
+
+        return [$start, $end];
+    }
+
+    /**
+     * @return DateTime
+     */
+    public function getCurrentDateTime()
+    {
+        $now = new DateTime('now', new \DateTimeZone($this->localeSettings->getTimeZone()));
+
+        return $now;
+    }
+
+    /**
+     * Gets date interval, depends on the user timezone and $interval.
+     *
+     * @param string $interval
+     *
+     * @return array
+     */
+    public function getDateTimeInterval($interval = 'P1M')
+    {
+        $start = $this->getCurrentDateTime();
+        $start->setTime(0, 0, 0);
+
+        $end = $this->getCurrentDateTime();
+        $end->setTime(23, 59, 59);
+
+        $start = $start->sub(new DateInterval($interval));
+
+        return [$start, $end];
+    }
+
+    /**
+     * Gets previous date interval
+     *
+     * @param DateTime $from
+     * @param DateTime $to
+     *
+     * @return array
+     */
+    public function getPreviousDateTimeInterval(DateTime $from, DateTime $to)
+    {
+        $interval = $from->diff($to);
+        $start    = clone $from;
+        $start    = $start->sub($interval);
+        $start    = $start->sub(new DateInterval('PT1S'));
+
+        $end = clone $to;
+        $end = $end->sub($interval);
+        $end = $end->sub(new DateInterval('PT1S'));
 
         return [$start, $end];
     }

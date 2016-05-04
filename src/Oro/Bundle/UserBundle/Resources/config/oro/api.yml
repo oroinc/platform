@@ -1,0 +1,14 @@
+oro_api:
+    entities:
+        Oro\Bundle\UserBundle\Entity\Email: ~
+        Oro\Bundle\UserBundle\Entity\Group: ~
+        Oro\Bundle\UserBundle\Entity\Role:
+            delete_handler: oro_user.role.handler.delete
+
+        Oro\Bundle\UserBundle\Entity\User:
+            delete_handler: oro_user.handler.delete
+            actions:
+                delete:
+                    exclude: false # set manually because this entity is marked as a dictionary
+                delete_list:
+                    exclude: false # set manually because this entity is marked as a dictionary

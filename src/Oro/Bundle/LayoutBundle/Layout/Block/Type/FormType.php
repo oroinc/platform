@@ -67,7 +67,8 @@ class FormType extends AbstractFormType
                 },
                 'form_group_prefix' => function (Options $options, $value) {
                     return null === $value ? $options['form_prefix'] . ':group_' : $value;
-                }
+                },
+                'split_to_fields'   => false
             ]
         );
         $resolver
@@ -79,7 +80,8 @@ class FormType extends AbstractFormType
                 'groups'            => 'array',
                 'form_prefix'       => 'string',
                 'form_field_prefix' => 'string',
-                'form_group_prefix' => 'string'
+                'form_group_prefix' => 'string',
+                'split_to_fields'   => 'bool',
             ]
         );
     }
@@ -90,8 +92,9 @@ class FormType extends AbstractFormType
     public function buildBlock(BlockBuilderInterface $builder, array $options)
     {
         $formAccessor = $this->getFormAccessor($builder->getContext(), $options);
-
-        $this->formLayoutBuilder->build($formAccessor, $builder, $options);
+        if ($options['split_to_fields']) {
+            $this->formLayoutBuilder->build($formAccessor, $builder, $options);
+        }
     }
 
     /**
@@ -105,8 +108,14 @@ class FormType extends AbstractFormType
         if ($formAccessor instanceof ConfigurableFormAccessorInterface) {
             $formAccessor->setFormData($view->vars['form_data']);
         }
+        $formView = $formAccessor->getView();
+        if (!isset($view->vars['class_prefix'])) {
+            $view->vars['class_prefix'] = $block->getId();
+        }
+        $this->setClassPrefixToFormView($formView, $view->vars['class_prefix']);
+        $view->vars['form'] = $formView;
 
-        $view->vars['form'] = $formAccessor->getView();
+        $view->vars['split_to_fields'] = $options['split_to_fields'];
     }
 
     /**
@@ -114,6 +123,9 @@ class FormType extends AbstractFormType
      */
     public function finishView(BlockView $view, BlockInterface $block, array $options)
     {
+        if (!$options['split_to_fields']) {
+            return;
+        }
         $formAccessor = $this->getFormAccessor($block->getContext(), $options);
 
         // prevent form fields rendering by form_rest() method,
@@ -184,6 +196,27 @@ class FormType extends AbstractFormType
             if ($childView->vars['form'] !== $formFieldView) {
                 $formFieldView->setRendered();
             }
+        }
+    }
+
+    /**
+     * Sets class_prefix to FormView and it's childs recursively
+     *
+     * @param FormView $formView
+     * @param string   $classPrefix
+     */
+    protected function setClassPrefixToFormView(FormView $formView, $classPrefix)
+    {
+        $formView->vars['class_prefix'] = $classPrefix;
+
+        if (empty($formView->children) && !isset($formView->vars['prototype'])) {
+            return;
+        }
+        foreach ($formView->children as $child) {
+            $this->setClassPrefixToFormView($child, $classPrefix);
+        }
+        if (isset($formView->vars['prototype'])) {
+            $this->setClassPrefixToFormView($formView->vars['prototype'], $classPrefix);
         }
     }
 }

@@ -43,24 +43,6 @@ class ProcessHandlerTest extends \PHPUnit_Framework_TestCase
         $this->handler = new ProcessHandler($this->factory, $this->logger, $this->eventDispatcher);
     }
 
-    /**
-     * @expectedException \Oro\Bundle\WorkflowBundle\Exception\InvalidParameterException
-     * @expectedExceptionMessage Invalid process data. Entity can not be empty.
-     */
-    public function testHandleTriggerException()
-    {
-        $processTrigger = $this->getMock('Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger');
-        $processTrigger->expects($this->never())->method('getDefinition');
-
-        $process = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\Process')
-            ->disableOriginalConstructor()
-            ->getMock();
-        $process->expects($this->never())->method('execute');
-
-        $this->factory->expects($this->never())->method('create');
-        $this->handler->handleTrigger($processTrigger, new ProcessData(array('entity' => null)));
-    }
-
     public function testHandleTrigger()
     {
         $processData = new ProcessData(array(

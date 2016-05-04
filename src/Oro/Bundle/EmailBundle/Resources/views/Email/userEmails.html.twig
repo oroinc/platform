@@ -7,6 +7,47 @@
 {# grid params #}
 {% set params = {'userId': app.user.id} %}
 {% set gridName = 'user-email-grid' %}
+{% if isMobileVersion() %}
+    {% set renderParams = {
+        'themeOptions': {
+            'tagName': 'div',
+            'headerHide': true,
+            'showMassActionOnToolbar': true,
+            'bodyClassName': 'user-emails-grid',
+            'rowTemplateSelector': '#template-user-email-grid-row'
+        },
+        'toolbarOptions': {
+            'placement': {
+                'bottom': true
+            }
+        }
+    }
+    %}
+    {% block content_datagrid %}
+        {{ parent() }}
+    <script id="template-user-email-grid-row" type="text/template">
+        <div class="user-emails-row">
+            <div class="user-emails-row__top clearfix">
+                <div class="user-emails-row__select-row">
+                    <input type="checkbox" data-role="select-row">
+                </div>
+                <div class="user-emails-row__contacts">
+                    <%= model.contacts %>
+                </div>
+                <div class="user-emails-row__date">
+                    <%= model.sentAt %>
+                </div>
+                <div class="user-emails-row__attachments">
+                    <%= model.attachments %>
+                </div>
+            </div>
+            <div class="user-emails-row__subject">
+                <%= model.subject %>
+            </div>
+        </div>
+    </script>
+    {% endblock content_datagrid %}
+{% endif %}
 
 {% set pageTitle = 'oro.email.entity_plural_label'|trans %}
 

@@ -161,21 +161,18 @@
 
 {% macro renderPreviewDialog(formId, title) %}
     <script type="text/javascript">
-        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/modal'],
-        function($, _, __, Modal){
+        require(['jquery', 'underscore', 'orotranslation/js/translator', 'oro/dialog-widget'],
+        function($, _, __, DialogWidget){
             $(function () {
                 var showEmailPreviewDialog = function(el) {
                     var iframeId = 'preview-frame';
                     var iframe = $('<iframe />', {
                         name: iframeId,
                         id: iframeId,
-                        'class': "scrollable-container",
                         frameborder: 0,
-                        marginwidth: 0,
-                        marginheight: 0,
-                        allowfullscreen: true,
-                        width: '100%',
-                        height: '98%'
+                        marginwidth: 20,
+                        marginheight: 20,
+                        allowfullscreen: true
                     });
 
                     var form = $('#{{ formId }}');
@@ -185,34 +182,26 @@
                         if (!e.result) {
                             return;
                         }
-
-                        var loader;
-                        var confirmModal = new Modal({
+                        var confirmModal = new DialogWidget({
                             title: __('Preview'),
-                            content: '<div class="loading-content">' + __('Loading...') + '</div>',
-                            okText: __('OK'),
-                            className: 'modal oro-modal-normal',
-                            template: _.template('<% if (title) { %>' +
-                                '<div class="modal-header">' +
-                                    '<% if (allowCancel) { %>' +
-                                    '<a class="close">×</a>' +
-                                    '<% } %>' +
-                                    '<h3><%- title %></h3>' +
-                                '</div>' +
-                                '<% } %>' +
-                                '<div class="modal-body"><%= content %></div>'
-                            )
+                            'dialogOptions': {
+                                'modal': true,
+                                'resizable': true,
+                                'width': '85%',
+                                'height': '70%',
+                                'autoResize': true
+                            }
                         });
-                        confirmModal.open();
-                        confirmModal.$content.append(iframe);
-                        loader = confirmModal.$content.find('.loading-content');
-
-                        loader.show();
+                        confirmModal.render();
+                        confirmModal._onContentLoad('<div class="widget-content"></div>');
+                        confirmModal._showLoading();
+                        confirmModal.widget.addClass('dialog-single-iframe-container');
+                        confirmModal.$el.append(iframe);
                         form.attr('target', iframeId);
                         form.attr('action', $(el).attr('href'));
 
                         iframe.one('load', function() {
-                            loader.hide();
+                            confirmModal._hideLoading();
                             form.removeAttr('target');
                             form.attr('action', formAction);
                         });
@@ -499,14 +488,14 @@
 {% macro date_smart_format(date) -%}
     {% if date(date)|oro_format_date == date()|oro_format_date -%}
         {# same day -- show only time #}
-        {{ date|oro_format_time }}
+        {{ date|oro_format_time({'timeZone': oro_timezone()}) }}
     {%- elseif date(date)|oro_format_date == date('-1days')|oro_format_date -%}
         {{ 'yesterday'|trans|capitalize }}
     {%- elseif date(date).format('Y') == date().format('Y') -%}
         {# same year -- month and daty #}
-        {{ date|oro_format_day }}
+        {{ date|oro_format_day({'timeZone': oro_timezone()}) }}
     {%- else -%}
-        {{ date|oro_format_date }}
+        {{ date|oro_format_date({'timeZone': oro_timezone()}) }}
     {%- endif %}
 {%- endmacro %}
 

@@ -300,8 +300,7 @@ class User extends AbstractPageEntity
     {
         foreach ($businessUnits as $businessUnit) {
             $this->test->byXpath(
-                "//div[@data-ftid='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]".
-                "/preceding-sibling::input"
+                "//div[@data-ftid='oro_user_user_form_organizations']//label[contains(., '{$businessUnit}')]"
             )->click();
         }
 
@@ -402,7 +401,7 @@ class User extends AbstractPageEntity
         $this->waitPageToLoad();
         $this->test->byXPath(
             "//div[@class='control-group folder-tree "
-            . "control-group-oro_email_email_folder_tree']//input[@id='check-all']"
+            . "control-group-oro_email_email_folder_tree']//input[@class='check-all']"
         )->click();
 
         return $this;

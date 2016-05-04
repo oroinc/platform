@@ -1,0 +1,18 @@
+operations:
+    test_operation1:
+        label: Test Operation 1
+    test_operation2:
+        label: Test Operation 2
+
+action_groups:
+    group1:
+        parameters:
+            $.data:
+                type: Oro\Bundle\TestBundle\Entity\Test
+                required: true
+
+        conditions:
+            '@gt': [$updatedAt, $.date]
+
+        actions:
+            - '@assign_value': [$expired, true]

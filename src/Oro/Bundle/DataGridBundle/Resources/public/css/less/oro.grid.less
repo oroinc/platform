@@ -6,10 +6,10 @@
 }
 
 .oro-datagrid {
-  th, td {
+  .grid-cell {
     display: none;
   }
-  th.renderable, td.renderable {
+  .grid-cell.renderable {
     display: table-cell;
   }
   .loader-mask {
@@ -161,7 +161,10 @@ table.grid {
       cursor: pointer;
   }
   tbody tr.row-selected {
-    background-color: #FDF8E4;
+    background-color: @rowHighlightBackground;
+    &:hover {
+      background-color: @rowSelectedBackground;
+    }
   }
   .string-cell,
   .uri-cell,

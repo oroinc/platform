@@ -8,6 +8,7 @@ Table of content
 - [Context Calendar Menu](./Resources/doc/contextMenu.md)
 - [UI](#ui)
 - [System Calendars](./Resources/doc/systemCalendars.md)
+- [Workflow Action](./Resources/doc/workflowAction.md)
 
 ##Overview
 

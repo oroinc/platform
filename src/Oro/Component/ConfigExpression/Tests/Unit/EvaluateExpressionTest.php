@@ -35,8 +35,8 @@ class EvaluateExpressionTest extends \PHPUnit_Framework_TestCase
     public function configurationForEvaluateDataProvider()
     {
         $conditionWithFunc = <<<YAML
-@empty:
-    - @trim: \$name
+"@empty":
+    - "@trim": \$name
 YAML;
 
         return [

@@ -10,6 +10,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\EmailBundle\Entity\EmailUser;
 use Oro\Bundle\ImapBundle\Entity\ImapEmailFolder;
 use Oro\Bundle\ImapBundle\Entity\UserEmailOrigin;
+use Oro\Bundle\PlatformBundle\EventListener\OptionalListenerInterface;
 
 /**
  * Class ImapClearManager
@@ -27,14 +28,23 @@ class ImapClearManager implements LoggerAwareInterface
      */
     protected $em;
 
+    /** @var OptionalListenerInterface */
+    protected $listener;
+
     /**
      * Constructor.
      *
-     * @param EntityManager $em
+     * @param EntityManager             $em
+     * @param OptionalListenerInterface $listener
      */
-    public function __construct(EntityManager $em)
+    public function __construct(EntityManager $em, OptionalListenerInterface $listener)
     {
         $this->em = $em;
+        /**
+         * @info This listener should be disabled because it does unnecessary work during removing.
+         *       It updates date in entities which will be deleted in method clearFolder().
+         */
+        $this->listener = $listener;
     }
 
     /**
@@ -46,16 +56,16 @@ class ImapClearManager implements LoggerAwareInterface
     {
         $origins = $this->getOriginsToClear($originId);
         if (!$origins) {
-            $this->logger->notice('Nothing to clear');
+            $this->logger->info('Nothing to clear');
 
             return false;
         }
         foreach ($origins as $origin) {
-            $this->logger->notice(sprintf('Clearing origin: %s, %s', $origin->getId(), $origin));
+            $this->logger->info(sprintf('Clearing origin: %s, %s', $origin->getId(), $origin));
 
             $this->clearOrigin($origin);
 
-            $this->logger->notice('Origin processed successfully');
+            $this->logger->info('Origin processed successfully');
         }
 
         return true;
@@ -75,7 +85,7 @@ class ImapClearManager implements LoggerAwareInterface
             /** @var UserEmailOrigin $origin */
             $origin = $originRepository->find($originId);
             if ($origin === null) {
-                $this->logger->notice(sprintf('Origin with ID %s does not exist', $originId));
+                $this->logger->info(sprintf('Origin with ID %s does not exist', $originId));
 
                 return [];
             }
@@ -93,7 +103,9 @@ class ImapClearManager implements LoggerAwareInterface
      */
     protected function clearOrigin($origin)
     {
-        $folders = $origin->getFolders();
+        $this->listener->setEnabled(false);
+
+        $folders          = $origin->getFolders();
         $folderRepository = $this->em->getRepository('OroImapBundle:ImapEmailFolder');
 
         foreach ($folders as $folder) {
@@ -101,7 +113,7 @@ class ImapClearManager implements LoggerAwareInterface
             if ($imapFolder && !$origin->isActive()) {
                 $this->clearFolder($imapFolder);
                 $this->em->remove($imapFolder);
-                $this->logger->notice(sprintf('ImapFolder with ID %s removed', $imapFolder->getId()));
+                $this->logger->info(sprintf('ImapFolder with ID %s removed', $imapFolder->getId()));
             } elseif ($imapFolder && !$folder->isSyncEnabled()) {
                 $this->clearFolder($imapFolder);
                 $imapFolder->getFolder()->setSynchronizedAt(null);
@@ -110,16 +122,18 @@ class ImapClearManager implements LoggerAwareInterface
         foreach ($folders as $folder) {
             if (!$origin->isActive()) {
                 $this->em->remove($folder);
-                $this->logger->notice(sprintf('Folder with ID %s removed', $folder->getId()));
+                $this->logger->info(sprintf('Folder with ID %s removed', $folder->getId()));
             }
         }
 
         if (!$origin->isActive()) {
             $this->em->remove($origin);
-            $this->logger->notice(sprintf('Origin with ID %s removed', $origin->getId()));
+            $this->logger->info(sprintf('Origin with ID %s removed', $origin->getId()));
         }
 
         $this->em->flush();
+
+        $this->listener->setEnabled(true);
     }
 
     /**
@@ -128,12 +142,12 @@ class ImapClearManager implements LoggerAwareInterface
     protected function clearFolder($imapFolder)
     {
         $folder = $imapFolder->getFolder();
-        $limit = self::BATCH_SIZE;
+        $limit  = self::BATCH_SIZE;
         $offset = 0;
-        $i = 0;
-        while ($result =
-            $this->em->getRepository('OroEmailBundle:EmailUser')
-                ->getEmailUserByFolder($folder, $limit, $offset)->getQuery()->getResult()
+        $i      = 0;
+
+        while ($result = $this->em->getRepository('OroEmailBundle:EmailUser')
+            ->getEmailUserByFolder($folder, $limit, $offset)->getQuery()->getResult()
         ) {
             foreach ($result as $emailUser) {
                 /** @var EmailUser $emailUser */
@@ -144,7 +158,7 @@ class ImapClearManager implements LoggerAwareInterface
                 }
 
                 $imapEmails = $this->em->getRepository('OroImapBundle:ImapEmail')->findBy([
-                    'email' => $email,
+                    'email'      => $email,
                     'imapFolder' => $imapFolder
                 ]);
                 foreach ($imapEmails as $imapEmail) {
@@ -154,10 +168,9 @@ class ImapClearManager implements LoggerAwareInterface
             }
             $this->em->flush();
             $this->cleanUp();
-
         }
         if ($i > 0) {
-            $this->logger->notice(
+            $this->logger->info(
                 sprintf(
                     'ImapFolder with ID %s cleared. Removed %d emails.',
                     $imapFolder->getId(),
@@ -181,6 +194,13 @@ class ImapClearManager implements LoggerAwareInterface
             'Oro\Bundle\EmailBundle\Entity\EmailRecipient',
             'Oro\Bundle\ImapBundle\Entity\ImapEmail',
             'Oro\Bundle\EmailBundle\Entity\EmailBody',
+            'Oro\Bundle\ActivityListBundle\Entity\ActivityList',
+            'Oro\Bundle\ActivityListBundle\Entity\ActivityOwner',
+            'Oro\Bundle\EmailBundle\Entity\EmailThread',
+            'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger',
+            'Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition',
+            'Oro\Bundle\OrganizationBundle\Entity\Organization',
+            'OroEntityProxy\OroEmailBundle\EmailAddressProxy',
         ];
     }
 

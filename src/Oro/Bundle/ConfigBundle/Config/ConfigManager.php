@@ -5,6 +5,7 @@ namespace Oro\Bundle\ConfigBundle\Config;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventDispatcherInterface;
 
+use Oro\Bundle\ConfigBundle\Event\ConfigGetEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigUpdateEvent;
 use Oro\Bundle\ConfigBundle\Event\ConfigSettingsUpdateEvent;
 
@@ -283,12 +284,23 @@ class ConfigManager
     {
         $value    = null;
         $managers = $this->getScopeManagersToGetValue($default);
-        foreach ($managers as $manager) {
+        foreach ($managers as $scopeName => $manager) {
             $value = $manager->getSettingValue($name, $full);
             if (null !== $value) {
+                // in case if we get value not from current scope,
+                // we should mark value that it was get from another scope
+                if ($full && $this->scope !== $scopeName) {
+                    $value['use_parent_scope_value'] = true;
+                }
                 break;
             }
         }
+
+        $event = new ConfigGetEvent($this, $name, $value, $full);
+        $this->eventDispatcher->dispatch(ConfigGetEvent::NAME, $event);
+        $this->eventDispatcher->dispatch(sprintf('%s.%s', ConfigGetEvent::NAME, $name), $event);
+
+        $value = $event->getValue();
 
         if (null === $value) {
             list($section, $key) = explode(self::SECTION_MODEL_SEPARATOR, $name);

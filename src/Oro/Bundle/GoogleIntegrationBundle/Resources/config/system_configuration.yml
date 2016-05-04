@@ -8,15 +8,6 @@ oro_system_configuration:
             priority: 50
 
     fields:
-        oro_google_integration.domains:
-            data_type: array
-            type: oro_textlist
-            options:
-                label: oro.google_integration.system_configuration.fields.domains.label
-                tooltip: oro.google_integration.system_configuration.fields.domains.tooltip
-                required: false
-                resettable: false
-            priority: 10
         oro_google_integration.client_id:
             data_type: string
             type: text
@@ -24,6 +15,7 @@ oro_system_configuration:
                 label: oro.google_integration.system_configuration.fields.client_id.label
                 resettable: false
                 required: false
+                tooltip: oro.google_integration.system_configuration.fields.client_id.tooltip
             priority: 30
         oro_google_integration.client_secret:
             data_type: string
@@ -44,6 +36,5 @@ oro_system_configuration:
                                 children:
                                     google_integration_settings:
                                         children:
-                                            - oro_google_integration.domains
                                             - oro_google_integration.client_id
                                             - oro_google_integration.client_secret

@@ -94,7 +94,7 @@
                     <div class="pull-right">
                         <div class="pull-right title-buttons-container">
                             {% placeholder update_navButtons_before with {entity: entity} %}
-                            {% block navButtons %}{% endblock navButtons %}
+                            {% block navButtons %}{% placeholder update_navButtons with {entity: entity} %}{% endblock navButtons %}
                             {% placeholder update_navButtons_after with {entity: entity} %}
 
                             {% if form.vars.method != 'GET' %}

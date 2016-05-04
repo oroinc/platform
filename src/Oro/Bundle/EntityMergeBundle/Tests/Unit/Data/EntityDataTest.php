@@ -44,6 +44,10 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
 
         $this->fieldName = 'foo';
 
+        $this->entities[] = $this->createTestEntity(1);
+        $this->entities[] = $this->createTestEntity(2);
+        $this->entities[] = $this->createTestEntity(3);
+
         $this->fieldMetadata = $this->getMockBuilder('Oro\Bundle\EntityMergeBundle\Metadata\FieldMetadata')
             ->disableOriginalConstructor()
             ->getMock();
@@ -57,9 +61,6 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
             ->method('getFieldsMetadata')
             ->will($this->returnValue(array($this->fieldMetadata)));
 
-        $this->entities[] = $this->createTestEntity(1);
-        $this->entities[] = $this->createTestEntity(2);
-        $this->entities[] = $this->createTestEntity(3);
 
         $entityFieldsMetadata = & $this->entityFieldsMetadata;
         $this->entityMetadata->expects($this->any())
@@ -73,6 +74,8 @@ class EntityDataTest extends \PHPUnit_Framework_TestCase
             );
 
         $this->entityData = new EntityData($this->entityMetadata, $this->entities);
+        $this->entityData->setMasterEntity($this->entities[0]);
+        $this->entityData->getField($this->fieldName)->setSourceEntity($this->entities[0]);
     }
 
     public function testGetMetadata()

@@ -12,6 +12,15 @@ oro_system_configuration:
                 required: false
                 resettable: false
             priority: 10
+        oro_sso.domains:
+            data_type: array
+            type: oro_textlist
+            options:
+                label:      oro.sso.system_configuration.fields.domains.label
+                tooltip:    oro.sso.system_configuration.fields.domains.tooltip
+                required:   false
+                resettable: false
+            priority: 10
 
     tree:
         system_configuration:
@@ -24,3 +33,4 @@ oro_system_configuration:
                                     google_sso_settings:
                                         children:
                                             - oro_sso.enable_google_sso
+                                            - oro_sso.domains
