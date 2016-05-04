@@ -84,9 +84,8 @@ class FulltextIndexListenerTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             [
-                'options' => [
-                    'engine' => PdoMysql::ENGINE_MYISAM
-                ],
+                'options' => ['engine' => PdoMysql::ENGINE_MYISAM],
+                'indexes' => ['value' => ['columns' => ['value'], 'flags' => ['fulltext']]],
             ],
             $this->metadata->table
         );
