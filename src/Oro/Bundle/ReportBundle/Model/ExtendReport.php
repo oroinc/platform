@@ -4,48 +4,18 @@ namespace Oro\Bundle\ReportBundle\Model;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
-
-class ExtendReport extends AbstractQueryDesigner {
-    
-	/**
-     * Get the full name of an entity on which this report is based
-     *
-     * @return string
-     */
-    public function getEntity()
-    {
-        return $this->entity;
-    }
-
+abstract class ExtendReport extends AbstractQueryDesigner
+{
     /**
-     * Set the full name of an entity on which this report is based
+     * Constructor
      *
-     * @param string $entity
-     * @return Report
-     */
-    public function setEntity($entity)
-    {
-        $this->entity = $entity;
-
-        return $this;
-    }
-
-    /**
+     * The real implementation of this method is auto generated.
+     *
+     * IMPORTANT: If the derived class has own constructor it must call parent constructor.
+     *
      * {@inheritdoc}
      */
-    public function getDefinition()
+    public function __construct($role)
     {
-        return $this->definition;
     }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setDefinition($definition)
-    {
-        $this->definition = $definition;
-
-        return $this;
-    }
-
 }
