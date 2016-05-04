@@ -125,7 +125,15 @@ class RegistryDelegateProcessorTest extends \PHPUnit_Framework_TestCase
         $stepExecution = $this->getMockStepExecution();
         $item = $this->getMock('MockItem');
 
-        $delegateProcessor = $this->getMock('Oro\Bundle\ImportExportBundle\Processor\ContextAwareProcessor');
+        $delegateProcessor = $this
+            ->getMockBuilder('Oro\Bundle\ImportExportBundle\Processor\ProcessorInterface')
+            ->setMethods(['process', 'setImportExportContext'])
+            ->getMock()
+        ;
+
+        $this->processorRegistry->expects($this->once())->method('getProcessor')
+            ->with($this->delegateType, $processorAlias)
+            ->will($this->returnValue($delegateProcessor));
 
         $context = $this->getMock('Oro\Bundle\ImportExportBundle\Context\ContextInterface');
         $this->contextRegistry->expects($this->once())->method('getByStepExecution')
@@ -143,11 +151,7 @@ class RegistryDelegateProcessorTest extends \PHPUnit_Framework_TestCase
                 )
             );
 
-        $this->processorRegistry->expects($this->once())->method('getProcessor')
-            ->with($this->delegateType, $processorAlias)
-            ->will($this->returnValue($delegateProcessor));
-
-        $delegateProcessor->expects($this->once())->method('setImportExportContext')->with($context);
+        $delegateProcessor->expects($this->never())->method('setImportExportContext');
         $delegateProcessor->expects($this->once())->method('process')->with($item);
 
         $this->processor->setStepExecution($stepExecution);
