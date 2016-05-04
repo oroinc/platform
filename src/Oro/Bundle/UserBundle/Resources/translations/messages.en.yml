@@ -83,8 +83,8 @@ oro:
         groups.label:                Groups
         email.label:                 Primary Email
         email:
-            entity_label:            User Email
-            entity_plural_label:     User Emails
+            entity_label:            User Email Address
+            entity_plural_label:     User Email Addresses
             entity_description:      Represent user emails
             email.label:             Email
             id.label:                Id
