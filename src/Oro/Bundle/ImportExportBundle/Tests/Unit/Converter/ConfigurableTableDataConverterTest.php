@@ -590,8 +590,6 @@ class ConfigurableTableDataConverterTest extends \PHPUnit_Framework_TestCase
                     }
                 )
             );
-        $fieldHelper->expects($this->any())->method('processAsScalar')
-            ->will($this->returnValue(false));
         return $fieldHelper;
     }
 

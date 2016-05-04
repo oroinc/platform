@@ -140,7 +140,6 @@ class OperationTest extends \PHPUnit_Framework_TestCase
         $exceptionMessage = ''
     ) {
         $this->definition->expects($this->any())->method('getName')->willReturn($operationName);
-        $this->definition->expects($this->any())->method('getFunctions')->will($this->returnValueMap($config));
         $this->definition->expects($this->any())->method('getConditions')->will($this->returnValueMap($config));
 
         $this->definition->expects($this->any())

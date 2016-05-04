@@ -153,9 +153,6 @@ class PackageManagerTest extends \PHPUnit_Framework_TestCase
         $composerRepositoryWithoutProvidersMock->expects($this->atLeastOnce())
             ->method('getPackages')
             ->will($this->returnValue([$availablePackage1, $availablePackage2]));
-        $composerRepositoryWithoutProvidersMock->expects($this->any())
-            ->method('getMinimalPackages')
-            ->will($this->returnValue([]));
 
         // Ready Steady Go!
         $manager = $this->createPackageManager($composer);
