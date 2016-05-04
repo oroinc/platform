@@ -4,53 +4,18 @@ namespace Oro\Bundle\SegmentBundle\Model;
 
 use Oro\Bundle\QueryDesignerBundle\Model\AbstractQueryDesigner;
 
-
-class ExtendSegment extends AbstractQueryDesigner {
-    
-	/**
-     * Get the full name of an entity on which this segment is based
-     *
-     * @return string
-     */
-    public function getEntity()
-    {
-        return $this->entity;
-    }
-
+abstract class ExtendSegment extends AbstractQueryDesigner
+{
     /**
-     * Set the full name of an entity on which this segment is based
+     * Constructor
      *
-     * @param string $entity
-     * @return Segment
-     */
-    public function setEntity($entity)
-    {
-        $this->entity = $entity;
-
-        return $this;
-    }
-
-    /**
-     * Get this segment definition in YAML format
+     * The real implementation of this method is auto generated.
      *
-     * @return string
-     */
-    public function getDefinition()
-    {
-        return $this->definition;
-    }
-
-    /**
-     * Set this segment definition in YAML format
+     * IMPORTANT: If the derived class has own constructor it must call parent constructor.
      *
-     * @param string $definition
-     * @return Segment
+     * {@inheritdoc}
      */
-    public function setDefinition($definition)
+    public function __construct($role)
     {
-        $this->definition = $definition;
-
-        return $this;
     }
-
 }
