@@ -38,7 +38,7 @@ define(function(require) {
         messages: {
             confirm_title: 'oro.action.confirm_title',
             confirm_content: 'oro.action.confirm_content',
-            confirm_ok: 'Yes',
+            confirm_ok: 'Yes, Delete',
             confirm_cancel: 'Cancel'
         },
 

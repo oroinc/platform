@@ -152,22 +152,32 @@
       width: auto;
       z-index: 1;
     }
-    > .created-at {
-      float: right;
-      margin: 8px 0 -1px 8px;
-      color: #888;
-    }
-    > .comment-count {
-      float: right;
-      margin-top: 8px;
-    }
-    > .message-item {
-      margin: 9px 0 0 0;
-      float: left;
-      width: calc(~"100% - 510px");
-      color: #888;
-      strong {
-        color: #555;
+    > .extra-info {
+      padding-top: 9px;
+      padding-bottom: 4px;
+      width: calc(~"100% - 350px");
+      display: -webkit-flex;
+      display: flex;
+      flex-flow: row nowrap;
+      white-space: nowrap;
+      > .created-at {
+        margin-left: 8px;
+        color: #888;
+        align-self: flex-end;
+
+      }
+      > .comment-count {
+        align-self: flex-end;
+      }
+      > .message-item {
+        align-self: stretch;
+        width: 100%;
+        overflow: hidden;
+        text-overflow: ellipsis;
+        color: #888;
+        strong {
+          color: #555;
+        }
       }
     }
   }

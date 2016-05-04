@@ -52,7 +52,7 @@ class OrganizationType extends AbstractType
             )
             ->add(
                 'description',
-                'textarea',
+                'oro_resizeable_rich_text',
                 [
                     'required' => false,
                     'label'    => 'oro.organization.description.label'

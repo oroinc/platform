@@ -50,6 +50,13 @@ class Channel
     const EDIT_MODE_ALLOW = 3;
     const EDIT_MODE_RESTRICTED = 2;
     const EDIT_MODE_DISALLOW = 1;
+    
+    /**
+     * This modes could be used to programmatically force the edit mode status.
+     * It must not be changed on any user actions.
+     */
+    const EDIT_MODE_FORCED_ALLOW = 4;
+    const EDIT_MODE_FORCED_DISALLOW = 5;
 
     /**
      * @var integer
@@ -113,6 +120,17 @@ class Channel
     * @Oro\Versioned()
     */
     protected $enabled;
+
+    /**
+     * If the status is changed by a user the previous status has to be set.
+     * If the status is changed from the code, it has to be set to null.
+     * For example in the listener when a channel status is changed
+     *
+     * @var boolean
+     *
+     * @ORM\Column(name="previously_enabled", type="boolean", nullable=true)
+     */
+    protected $previouslyEnabled;
 
     /**
      * @var User
@@ -477,5 +495,21 @@ class Channel
     public function __toString()
     {
         return (string)$this->getName();
+    }
+
+    /**
+     * @return boolean|null
+     */
+    public function getPreviouslyEnabled()
+    {
+        return $this->previouslyEnabled;
+    }
+
+    /**
+     * @param boolean|null $previouslyEnabled
+     */
+    public function setPreviouslyEnabled($previouslyEnabled)
+    {
+        $this->previouslyEnabled = $previouslyEnabled;
     }
 }

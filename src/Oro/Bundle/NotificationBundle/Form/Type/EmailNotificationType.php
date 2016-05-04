@@ -5,6 +5,7 @@ namespace Oro\Bundle\NotificationBundle\Form\Type;
 use Doctrine\ORM\EntityRepository;
 
 use Symfony\Component\Form\AbstractType;
+use Symfony\Component\Routing\RouterInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
@@ -24,15 +25,21 @@ class EmailNotificationType extends AbstractType
      */
     protected $subscriber;
 
+    /** @var RouterInterface */
+    private $router;
+
     /**
      * @param BuildTemplateFormSubscriber $subscriber
-     * @param ConfigProvider              $ownershipConfigProvider
+     * @param ConfigProvider $ownershipConfigProvider
+     * @param RouterInterface $router
      */
     public function __construct(
         BuildTemplateFormSubscriber $subscriber,
-        ConfigProvider $ownershipConfigProvider
+        ConfigProvider $ownershipConfigProvider,
+        RouterInterface $router
     ) {
         $this->subscriber = $subscriber;
+        $this->router = $router;
 
         $this->ownershipEntities = [];
         foreach ($ownershipConfigProvider->getConfigs() as $config) {
@@ -55,12 +62,16 @@ class EmailNotificationType extends AbstractType
             'oro_email_notification_entity_choice',
             array(
                 'label'       => 'oro.notification.emailnotification.entity_name.label',
+                'tooltip'     => 'oro.notification.emailnotification.entity_name.tooltip',
                 'required'    => true,
                 'attr'        => array(
                     'data-ownership-entities' => json_encode($this->ownershipEntities)
                 ),
                 'configs'     => array(
                     'allowClear' => true
+                ),
+                'tooltip_parameters' => array(
+                    'url' => $this->router->generate('oro_email_emailtemplate_index')
                 ),
             )
         );

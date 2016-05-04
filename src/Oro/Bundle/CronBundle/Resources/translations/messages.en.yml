@@ -1,7 +1,7 @@
 oro:
     cron:
         action:
-            jobs_management: Jobs management
+            jobs_management: Access Job Queue
 
         header:
             command:      Command

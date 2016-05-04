@@ -9,6 +9,7 @@ use Oro\Bundle\EntityPaginationBundle\Manager\EntityPaginationManager;
 use Oro\Bundle\DataGridBundle\Datagrid\Common\ResultsObject;
 use Oro\Bundle\DataGridBundle\Datagrid\DatagridInterface;
 use Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource;
+use Oro\Bundle\EntityPaginationBundle\Datagrid\EntityPaginationExtension;
 use Oro\Bundle\SecurityBundle\ORM\Walker\AclHelper;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\DataGridBundle\Datagrid\Manager as DataGridManager;
@@ -94,8 +95,14 @@ class StorageDataCollector
 
             /** @var OrmDatasource $dataSource */
             $dataSource = $dataGrid->getDatasource();
+            $config = $dataGrid->getConfig();
+            $alias = null;
 
-            $entityName = $this->getEntityName($dataSource);
+            if ($config) {
+                $alias = $config->offsetGetByPath(EntityPaginationExtension::ENTITY_PAGINATION_TARGET_PATH);
+            }
+
+            $entityName = ($alias !== null ) ? $alias : $this->getEntityName($dataSource);
             $stateHash = $this->generateStateHash($dataGrid);
 
             // if entities are not in storage
