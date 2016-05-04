@@ -301,6 +301,17 @@ class ContextHelperTest extends \PHPUnit_Framework_TestCase
                     'entityId' => ['params' => ['id' => '42']],
                     'entityClass' => 'stdClass'
                 ]
+            ],
+            'with datagrid' => [
+                'request' => new Request(),
+                'requestStackCalls' => 0,
+                'expected' => new ActionData(['data' => $entity, 'gridName' => 'test-grid-name']),
+                'context' => [
+                    'route' => 'test_route',
+                    'entityId' => '42',
+                    'entityClass' => 'stdClass',
+                    'datagrid' => 'test-grid-name'
+                ]
             ]
         ];
     }

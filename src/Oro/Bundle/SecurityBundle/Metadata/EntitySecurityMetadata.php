@@ -32,6 +32,11 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     protected $permissions;
 
     /**
+     * @var string
+     */
+    protected $description;
+
+    /**
      * Constructor
      *
      * @param string   $securityType
@@ -39,14 +44,22 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
      * @param string   $group
      * @param string   $label
      * @param string[] $permissions
+     * @param string   $description
      */
-    public function __construct($securityType = '', $className = '', $group = '', $label = '', $permissions = array())
-    {
+    public function __construct(
+        $securityType = '',
+        $className = '',
+        $group = '',
+        $label = '',
+        $permissions = array(),
+        $description = ''
+    ) {
         $this->securityType = $securityType;
         $this->className    = $className;
         $this->group        = $group;
         $this->label        = $label;
         $this->permissions  = $permissions;
+        $this->description  = $description;
     }
 
     /**
@@ -100,6 +113,16 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
     }
 
     /**
+     * Gets an action description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -111,6 +134,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
                 $this->group,
                 $this->label,
                 $this->permissions,
+                $this->description,
             )
         );
     }
@@ -125,7 +149,8 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
             $this->className,
             $this->group,
             $this->label,
-            $this->permissions
+            $this->permissions,
+            $this->description,
             ) = unserialize($serialized);
     }
 
@@ -144,6 +169,7 @@ class EntitySecurityMetadata implements AclClassInfo, \Serializable
         $result->group        = $data['group'];
         $result->label        = $data['label'];
         $result->permissions  = $data['permissions'];
+        $result->description  = $data['description'];
 
         return $result;
     }

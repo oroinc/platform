@@ -18,7 +18,12 @@ class EnumFilterTest extends \PHPUnit_Framework_TestCase
     {
         $this->formFactory = $this->getMock('Symfony\Component\Form\FormFactoryInterface');
 
-        $this->filter = new EnumFilter($this->formFactory, new FilterUtility());
+        $dictionaryApiEntityManager =
+            $this->getMockBuilder('Oro\Bundle\EntityBundle\Entity\Manager\DictionaryApiEntityManager')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+        $this->filter = new EnumFilter($this->formFactory, new FilterUtility(), $dictionaryApiEntityManager);
     }
 
     public function testInit()

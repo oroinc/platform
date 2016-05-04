@@ -399,7 +399,7 @@ services:
             # tags
             - [ 'app', 'for', 'if', 'spaceless' ]
             # filters
-            - [ 'default', 'date', 'escape', 'format', 'length', 'lower', 'nl2br', 'number_format', 'title', 'trim', 'upper' ]
+            - [ 'default', 'date', 'escape', 'format', 'length', 'lower', 'nl2br', 'number_format', 'title', 'trim', 'upper', 'oro_html_sanitize' ]
             # methods
             - []
             # properties

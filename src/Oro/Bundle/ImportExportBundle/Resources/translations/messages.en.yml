@@ -1,9 +1,9 @@
 oro:
     importexport:
         action:
-            export:  "Export entities"
+            export:  "Export entity records"
             general: "General import/action operations"
-            import:  "Import entities"
+            import:  "Import entity records"
 
         export:
             label: Export

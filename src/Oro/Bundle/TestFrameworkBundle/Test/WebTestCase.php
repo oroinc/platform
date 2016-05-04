@@ -189,6 +189,7 @@ abstract class WebTestCase extends BaseWebTestCase
 
             $this->client = null;
             self::$clientInstance = null;
+            self::$connections = [];
         }
     }
 

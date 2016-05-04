@@ -1,5 +1,6 @@
 oro_workflow:
-    label:      oro.workflow.action.workflow.general
+    label:      oro.workflow.action.workflow.general.label
+    description: oro.workflow.action.workflow.general.description
     type:       action
     group_name: ""
     bindings:   ~

@@ -29,6 +29,7 @@ parameters:
 
     oro_integration.delete_manager.class:                                 Oro\Bundle\IntegrationBundle\Manager\DeleteManager
     oro_integration.sync_scheduler.class:                                 Oro\Bundle\IntegrationBundle\Manager\SyncScheduler
+    oro_integration.genuine_sync_scheduler.class:                         Oro\Bundle\IntegrationBundle\Manager\GenuineSyncScheduler
 
     oro_integration.reverse_sync.processor.class:                         Oro\Bundle\IntegrationBundle\Provider\ReverseSyncProcessor
     oro_integration.provider.settings_provider.class:                     Oro\Bundle\IntegrationBundle\Provider\SettingsProvider
@@ -209,6 +210,11 @@ services:
         arguments:
             - '@doctrine'
             - '@oro_integration.manager.types_registry'
+
+    oro_integration.genuine_sync_scheduler:
+        class: %oro_integration.genuine_sync_scheduler.class%
+        arguments:
+            - '@doctrine'
 
     oro_integration.reverse_sync.processor:
         class: %oro_integration.reverse_sync.processor.class%
