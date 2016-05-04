@@ -149,7 +149,7 @@ define([
         /*
          * SCROLL support
          */
-        var adjustmentLeft = scrollHelper.scrollIntoView(this.$tip[0]);
+        scrollHelper.scrollIntoView(this.$tip[0]);
 
         /*
          * SHIFT support
@@ -164,9 +164,11 @@ define([
                 this.$tip.css({
                     height: this.$tip.outerHeight()
                 });
+                //find adjustment to move tooltip
+                var adjustment = outerHeight - visibleHeight;
 
                 this.$tip.css({
-                    top: parseFloat(this.$tip.css('top')) + adjustmentLeft.vertical
+                    top: parseFloat(this.$tip.css('top')) + adjustment
                 });
 
                 //check visible area after move, update arrow position and height
@@ -177,7 +179,7 @@ define([
                 });
                 var centerChange = (outerHeight - newVisibleHeight) / 2;
                 this.$arrow.css({
-                    top: 'calc(50% + ' + (centerChange - adjustmentLeft.vertical) + 'px)'
+                    top: 'calc(50% + ' + (centerChange - adjustment) + 'px)'
                 });
             }
         }
