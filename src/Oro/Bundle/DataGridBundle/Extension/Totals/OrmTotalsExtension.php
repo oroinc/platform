@@ -105,12 +105,11 @@ class OrmTotalsExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $onlyOnePage  = !isset($result['options']['totalRecords']) ||
-            $result['options']['totalRecords'] === count($result['data']);
+        $onlyOnePage  = $result->getTotalRecords() === count($result->getData());
 
         $totalData = [];
         $totals    = $config->offsetGetByPath(Configuration::TOTALS_PATH);
-        if (null !== $totals && !empty($result['data'])) {
+        if (null !== $totals && $result->getData()) {
             foreach ($totals as $rowName => $rowConfig) {
                 if ($onlyOnePage && $rowConfig[Configuration::TOTALS_HIDE_IF_ONE_PAGE_KEY]) {
                     unset($totals[$rowName]);
@@ -332,7 +331,7 @@ class OrmTotalsExtension extends AbstractExtension
      * @param ResultsObject $pageData
      * @param bool $perPage
      */
-    protected function addPageLimits(QueryBuilder $dataQueryBuilder, $pageData, $perPage)
+    protected function addPageLimits(QueryBuilder $dataQueryBuilder, ResultsObject $pageData, $perPage)
     {
         $rootIdentifiers = $this->getRootIds($dataQueryBuilder);
 
@@ -344,7 +343,7 @@ class OrmTotalsExtension extends AbstractExtension
                 ->setMaxResults(null)
                 ->getScalarResult();
         } else {
-            $data = $pageData['data'];
+            $data = $pageData->getData();
         }
         foreach ($rootIdentifiers as $identifier) {
             $ids = ArrayUtil::arrayColumn($data, $identifier['alias']);

@@ -35,7 +35,7 @@ class HtmlTagExtensionTest extends \PHPUnit_Framework_TestCase
         $filters = $this->extension->getFilters();
 
         $this->assertTrue(is_array($filters));
-        $this->assertEquals(2, sizeof($filters));
+        $this->assertEquals(3, sizeof($filters));
 
         $filter = $filters[0];
         $this->assertInstanceOf('\Twig_SimpleFilter', $filter);

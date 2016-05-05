@@ -28,7 +28,6 @@ services:
             - '@oro_datagrid.datagrid.manager'
             - '@oro_entity.doctrine_helper'
             - '@oro_security.acl_helper'
-            - '@oro_datagrid.extension.pager.orm.pager'
             - '@oro_entity_pagination.storage'
             - '@oro_entity_pagination.manager'
 

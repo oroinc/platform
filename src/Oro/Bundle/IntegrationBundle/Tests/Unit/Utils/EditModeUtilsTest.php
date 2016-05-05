@@ -18,21 +18,27 @@ class EditModeUtilsTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [Channel::EDIT_MODE_ALLOW, true],
-            [Channel::EDIT_MODE_FORCED_ALLOW, true],
-            [Channel::EDIT_MODE_RESTRICTED, true],
+            [Channel::EDIT_MODE_RESTRICTED, false],
             [Channel::EDIT_MODE_DISALLOW, false],
-            [Channel::EDIT_MODE_FORCED_DISALLOW, false],
         ];
     }
 
     public function provideDataForAttemptChangeEditModeTest()
     {
         return [
-            [Channel::EDIT_MODE_ALLOW, 'aNewStatus'],
-            [Channel::EDIT_MODE_FORCED_ALLOW, Channel::EDIT_MODE_FORCED_ALLOW],
-            [Channel::EDIT_MODE_RESTRICTED, 'aNewStatus'],
-            [Channel::EDIT_MODE_DISALLOW, 'aNewStatus'],
-            [Channel::EDIT_MODE_FORCED_DISALLOW, Channel::EDIT_MODE_FORCED_DISALLOW],
+            [Channel::EDIT_MODE_ALLOW, Channel::EDIT_MODE_DISALLOW, Channel::EDIT_MODE_DISALLOW],
+            [Channel::EDIT_MODE_RESTRICTED, Channel::EDIT_MODE_ALLOW, Channel::EDIT_MODE_ALLOW],
+            [Channel::EDIT_MODE_DISALLOW, Channel::EDIT_MODE_ALLOW, Channel::EDIT_MODE_ALLOW],
+            [0, Channel::EDIT_MODE_ALLOW, 0],
+        ];
+    }
+
+    public function testIsSwitchEnableAllowedDataProvider()
+    {
+        return [
+            [Channel::EDIT_MODE_ALLOW, true],
+            [Channel::EDIT_MODE_RESTRICTED, true],
+            [Channel::EDIT_MODE_DISALLOW, false],
         ];
     }
 
@@ -47,13 +53,21 @@ class EditModeUtilsTest extends \PHPUnit_Framework_TestCase
     /**
      * @dataProvider provideDataForAttemptChangeEditModeTest
      */
-    public function testAttemptChangeEditModeWorksCorrectly($current, $expected)
+    public function testAttemptChangeEditModeWorksCorrectly($current, $newEditMode, $expected)
     {
         $channel = new Channel();
         $channel->setEditMode($current);
 
-        EditModeUtils::attemptChangeEditMode($channel, 'aNewStatus');
+        EditModeUtils::attemptChangeEditMode($channel, $newEditMode);
 
         $this->assertSame($expected, $channel->getEditMode());
+    }
+
+    /**
+     * @dataProvider testIsSwitchEnableAllowedDataProvider
+     */
+    public function testIsSwitchEnableAllowed($mode, $expected)
+    {
+        $this->assertEquals($expected, EditModeUtils::isSwitchEnableAllowed($mode));
     }
 }

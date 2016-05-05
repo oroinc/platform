@@ -139,6 +139,19 @@ services:
             - '@oro_action.helper.context'
             - '@oro_action.datagrid.mass_action_provider.registry'
             - '@oro_action.helper.options'
+            - '@oro_datagrid.grid_configuration.helper'
+        calls:
+            - [setGroups, [['', 'datagridRowAction']]]
+        tags:
+            - { name: oro_datagrid.extension }
+        lazy: true
+
+    oro_action.datagrid.extension.delete_mass_action:
+        class: Oro\Bundle\ActionBundle\Datagrid\Extension\DeleteMassActionExtension
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_datagrid.grid_configuration.helper'
+            - '@oro_action.operation_manager'
         calls:
             - [setGroups, [['', 'datagridRowAction']]]
         tags:

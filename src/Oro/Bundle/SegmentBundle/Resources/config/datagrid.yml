@@ -1,5 +1,6 @@
 datagrid:
     oro_segments-grid:
+        extended_entity_name: %oro_segment.segment.entity.class%
         acl_resource: oro_segment_view
         source:
             type: orm

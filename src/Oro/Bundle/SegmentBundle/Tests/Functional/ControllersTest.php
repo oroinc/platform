@@ -18,6 +18,7 @@ class ControllersTest extends WebTestCase
             array(),
             array_merge($this->generateBasicAuthHeader(), array('HTTP_X-CSRF-Header' => 1))
         );
+        $this->client->useHashNavigation(true);
     }
 
     public function testIndex()
@@ -25,7 +26,7 @@ class ControllersTest extends WebTestCase
         $crawler = $this->client->request('GET', $this->getUrl('oro_segment_index'));
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);
-        $this->assertEquals('Manage Segments - Reports &amp; Segments', $crawler->filter('#page-title')->html());
+        $this->assertEquals('Manage Segments - Reports & Segments', $crawler->filter('#page-title')->html());
     }
 
     /**
@@ -150,8 +151,6 @@ class ControllersTest extends WebTestCase
         $result = reset($result['data']);
         $id = $result['id'];
 
-
-
         $keys = array_keys($segmentExportFilter);
         $filter = array_values($segmentExportFilter);
         $keys = str_replace('$id', $id, $keys);
@@ -167,7 +166,10 @@ class ControllersTest extends WebTestCase
                     array('gridName' => Segment::GRID_PREFIX . $id, "format" => 'csv'),
                     $filter
                 )
-            )
+            ),
+            [],
+            [],
+            $this->generateNoHashNavigationHeader()
         );
 
         $content = ob_get_contents();

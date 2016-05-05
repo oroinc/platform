@@ -237,13 +237,15 @@ class EmailRenderer extends \Twig_Environment
                             && array_key_exists($propertyName, $defaultFormatter[$valueClass])
                             && !is_null($defaultFormatter[$valueClass][$propertyName])
                         ) {
-                            $result = sprintf(
+                            return sprintf(
                                 '{{ %s|oro_format(\'%s\') }}',
                                 $path,
                                 $config['default_formatter'][ClassUtils::getRealClass($value)][$propertyName]
                             );
                         }
                     }
+
+                    return sprintf('{{ %s|oro_html_sanitize }}', $path);
                 } catch (\Exception $e) {
                     $result = $that->translator->trans(self::VARIABLE_NOT_FOUND);
                 }
