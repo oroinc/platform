@@ -43,7 +43,7 @@ class ActionConfig
     protected $items = [];
 
     /** @var ActionFieldConfig[] */
-    private $fields = [];
+    protected $fields = [];
 
     /**
      * Gets a native PHP array representation of the configuration.
