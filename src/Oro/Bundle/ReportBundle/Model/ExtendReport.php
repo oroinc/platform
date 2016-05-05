@@ -15,7 +15,7 @@ abstract class ExtendReport extends AbstractQueryDesigner
      *
      * {@inheritdoc}
      */
-    public function __construct($role)
+    public function __construct()
     {
     }
 }
