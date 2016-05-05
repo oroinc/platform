@@ -13,6 +13,8 @@ use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
+use Doctrine\ORM\EntityManager;
+use Oro\Bundle\UserBundle\Entity\User;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Factory as PageObjectFactory;
 use SensioLabs\Behat\PageObjectExtension\Context\PageObjectAware;
 
@@ -69,6 +71,37 @@ class OroMainContext extends MinkContext implements
     public function iShouldSeeFlashMessage($title)
     {
         $this->assertSession()->elementTextContains('css', '.flash-messages-holder', $title);
+    }
+
+    /**
+     * @Given /^user exists with:$/
+     */
+    public function existUser(TableNode $data)
+    {
+        $this->getKernel()->boot();
+        /** @var EntityManager $em */
+        $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+
+        $user = new User();
+
+        foreach ($data as $row) {
+            switch ($row['field']) {
+                case 'roles':
+                    array_walk(explode(',', $row['value']), function ($role) use ($user, $em) {
+                        $roleEntity = $em->getRepository('OroUserBundle:Role')->findOneBy(['label' => trim($role)]);
+                        $user->addRole($roleEntity);
+                    });
+                    break;
+                case 'password':
+                    $user->setPlainPassword($row['value']);
+                    break;
+                default:
+                    $user->{'set'.ucfirst($row['field'])}($row['value']);
+            }
+        }
+
+        $this->getContainer()->get('oro_user.manager')->updateUser($user);
+        $em->flush();
     }
 
     /**

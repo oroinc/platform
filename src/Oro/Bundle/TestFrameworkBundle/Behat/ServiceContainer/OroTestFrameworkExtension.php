@@ -5,10 +5,13 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 use Behat\Behat\Context\Context;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
+use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
+use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 
 class OroTestFrameworkExtension implements TestworkExtension
@@ -63,6 +66,19 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
         $container->setParameter('oro_test.elements_namespace_suffix', $config['elements_namespace_suffix']);
+        $this->loadDbIsolationSubscriber($container);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function loadDbIsolationSubscriber(ContainerBuilder $container)
+    {
+        $definition = new Definition('Oro\Bundle\TestFrameworkBundle\Behat\Listener\DbIsolationSubscriber', [
+            new Reference(Symfony2Extension::KERNEL_ID)
+        ]);
+        $definition->addTag(EventDispatcherExtension::SUBSCRIBER_TAG, ['priority' => 10]);
+        $container->setDefinition('oro_test.listener.db_isolation_subscriber', $definition);
     }
 
     /**
