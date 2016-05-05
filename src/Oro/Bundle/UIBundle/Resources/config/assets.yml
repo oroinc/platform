@@ -18,3 +18,4 @@ css:
         # custom styles
         - 'bundles/oroui/css/less/main.less'
         - 'bundles/oroui/css/all.css'
+        - 'bundles/oroui/css/widget-picker/less/style.less'

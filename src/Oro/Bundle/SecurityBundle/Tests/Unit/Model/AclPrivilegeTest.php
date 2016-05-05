@@ -17,9 +17,11 @@ class AclPrivilegeTest extends \PHPUnit_Framework_TestCase
         $obj->setIdentity($id);
         $obj->setExtensionKey('TestKey');
         $obj->setGroup('TestGroup');
+        $obj->setDescription('TestDescription');
         $this->assertTrue($id === $obj->getIdentity());
         $this->assertEquals('TestKey', $obj->getExtensionKey());
         $this->assertEquals('TestGroup', $obj->getGroup());
+        $this->assertEquals('TestDescription', $obj->getDescription());
     }
 
     public function testPermissions()
