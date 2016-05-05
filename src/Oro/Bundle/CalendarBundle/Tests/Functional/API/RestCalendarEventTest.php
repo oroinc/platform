@@ -225,6 +225,7 @@ class RestCalendarEventTest extends WebTestCase
             // dates come with local time, but pass by UTC
             'start',
             'end',
+            '[recurrence][id]',
             '[recurrence][startTime]',
             '[recurrence][exceptions][0][id]',
             '[recurrence][exceptions][0][originalDate]',
