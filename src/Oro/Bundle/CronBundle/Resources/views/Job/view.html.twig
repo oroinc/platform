@@ -24,7 +24,7 @@
         <div class="span10">
             <table class="table table-bordered table-striped">
                 <tr>
-                    <th width="20%">{{ 'oro.cron.header.id'|trans }}</th>
+                    <th>{{ 'oro.cron.header.id'|trans }}</th>
                     <td>{{ entity.id }}</td>
                 </tr>
                 <tr>
@@ -40,11 +40,11 @@
                     <td>{{ entity.createdAt|oro_format_datetime }}</td>
                 </tr>
                 <tr>
-                    <th>{{ 'oro.cron.view.started_at'|trans }}</th>
+                    <th>{{ 'oro.cron.header.started_at'|trans }}</th>
                     <td>{{ entity.startedAt|oro_format_datetime }}</td>
                 </tr>
                 <tr>
-                    <th>{{ 'oro.cron.view.closed_at'|trans }}</th>
+                    <th>{{ 'oro.cron.header.closed_at'|trans }}</th>
                     <td>{{ entity.closedAt|oro_format_datetime }}</td>
                 </tr>
 

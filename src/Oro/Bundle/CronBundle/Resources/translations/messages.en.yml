@@ -52,9 +52,6 @@ oro:
             in_deps:      Incoming Dependencies
             original:     Original Job
             related:      Related Entities
-            related:      Related Entities
-            started_at:   Started At
-            closed_at:    Closed At
 
         job:
             status:
