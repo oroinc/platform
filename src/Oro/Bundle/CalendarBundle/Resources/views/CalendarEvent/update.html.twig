@@ -15,6 +15,7 @@
 {% endblock %}
 
 {% block pageHeader %}
+    {{ recurringEvent.generateRecurrentEventNotifierTemplate() }}
     {% if entityId %}
         {% set breadcrumbs = {
             'entity':      entity,

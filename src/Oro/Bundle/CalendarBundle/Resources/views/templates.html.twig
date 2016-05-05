@@ -19,22 +19,8 @@
     </div>
 </script>
 
-<script type="text/html" id="recurring-event-notifier-content">
-    <div class="row-fluid form-horizontal">
-        <div class="responsive-block">
-            <div class="control-group">
-                <label class="control-label">
-                    <a title="{{ 'oro.calendar.recurrence.notifier.all_events.label'|trans }}" class="btn icons-holder-text no-hash all-events" href="javascript:void(0);">
-                        {{ 'oro.calendar.recurrence.notifier.all_events'|trans }}
-                    </a>
-                </label>
-                <div class="controls">
-                    <div class="control-label recurrent-event-notifier">{{ 'oro.calendar.recurrence.notifier.all_events.label'|trans }}</div>
-                </div>
-            </div>
-        </div>
-    </div>
-</script>
+{% import 'OroCalendarBundle::recurring-event.html.twig' as recurringEvent %}
+{{ recurringEvent.generateRecurrentEventNotifierTemplate() }}
 
 <script type="text/html" id="{{ id }}">
     {% import 'OroUIBundle::macros.html.twig' as UI %}
