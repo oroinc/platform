@@ -3,21 +3,9 @@
 namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 
-class MonthNthStrategy implements StrategyInterface
+class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
 {
-    /** @var StrategyHelper */
-    protected $strategyHelper;
-
-    /**
-     * @param StrategyHelper $strategyHelper
-     */
-    public function __construct(StrategyHelper $strategyHelper)
-    {
-        $this->strategyHelper = $strategyHelper;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -85,7 +73,18 @@ class MonthNthStrategy implements StrategyInterface
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return 'monthnth';
+        $interval = $recurrence->getInterval();
+        $instanceValue = $this->strategyHelper->getInstanceRelativeValue($recurrence->getInstance());
+        $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
+        $day = $this->strategyHelper->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
+        $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
+
+        return $this->getFullRecurrencePattern(
+            $recurrence,
+            'oro.calendar.recurrence.patterns.monthnth',
+            $interval,
+            ['%count%' => $interval, '%day%' => $day, '%instance%' => strtolower($instance)]
+        );
     }
 
     /**

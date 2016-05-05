@@ -13,6 +13,7 @@ class ControllersResetTest extends WebTestCase
     protected function setUp()
     {
         $this->initClient([], $this->generateBasicAuthHeader());
+        $this->client->useHashNavigation(true);
         $this->client->followRedirects();
         $this->loadFixtures([
             'Oro\Bundle\UserBundle\Tests\Functional\DataFixtures\LoadUserData',
@@ -60,7 +61,9 @@ class ControllersResetTest extends WebTestCase
         $this->client->request(
             'POST',
             $this->getUrl('oro_user_reset_send_email'),
-            ['username' => $user->getUsername()]
+            ['username' => $user->getUsername()],
+            [],
+            $this->generateNoHashNavigationHeader()
         );
         $result = $this->client->getResponse();
         $this->assertHtmlResponseStatusCodeEquals($result, 200);

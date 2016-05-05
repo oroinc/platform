@@ -3,21 +3,9 @@
 namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 
-class WeeklyStrategy implements StrategyInterface
+class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
 {
-    /** @var StrategyHelper */
-    protected $strategyHelper;
-
-    /**
-     * @param StrategyHelper $strategyHelper
-     */
-    public function __construct(StrategyHelper $strategyHelper)
-    {
-        $this->strategyHelper = $strategyHelper;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -103,7 +91,18 @@ class WeeklyStrategy implements StrategyInterface
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return 'weekly';
+        $interval = $recurrence->getInterval();
+        $days = [];
+        foreach ($recurrence->getDayOfWeek() as $day) {
+            $days[] = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
+        }
+
+        return $this->getFullRecurrencePattern(
+            $recurrence,
+            'oro.calendar.recurrence.patterns.weekly',
+            $interval,
+            ['%count%' => $interval, '%days%' => implode(', ', $days)]
+        );
     }
 
     /**

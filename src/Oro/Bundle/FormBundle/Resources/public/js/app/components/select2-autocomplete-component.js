@@ -2,38 +2,52 @@ define(function(require) {
     'use strict';
 
     var Select2AutocompleteComponent;
+    var _ = require('underscore');
+    var __ = require('orotranslation/js/translator');
     var Select2AutocompleteView = require('oroform/js/app/views/select2-autocomplete-view');
     var Select2Component = require('oro/select2-component');
 
     Select2AutocompleteComponent = Select2Component.extend({
         ViewType: Select2AutocompleteView,
+        preConfig: function(config) {
+            config = Select2AutocompleteComponent.__super__.preConfig.apply(this, arguments);
+            if (config.allowCreateNew) {
+                var propName = config.renderedPropertyName || 'name';
+                config.result_template = config.result_template || this.makeItemTemplate(propName, false);
+                config.selection_template = config.selection_template || this.makeItemTemplate(propName, true);
+            }
+            return config;
+        },
+
         setConfig: function(config) {
             config = Select2AutocompleteComponent.__super__.setConfig.apply(this, arguments);
-            /* Next option says that select2 has to propose to select new item if value in search field wasn't found
-             * We need to have a name of property which used in option template to be able display new item correctly
+            /* 'allowCreateNew' option says to select2 to propose to select new item created with value in search field
              */
-            var propName = config.propertyNameForNewItem;
-            if (propName) {
+            if (config.allowCreateNew) {
+                /* 'renderedPropertyName' option helps to select create a new data item with proper field name
+                 *  to be rendered properly in the item template
+                 */
+                var propName = config.renderedPropertyName || 'name';
                 config.createSearchChoice = function(value, results) {
-                    if (results.length === 0) {
-                        var item = {id: null};
-                        item[propName] = value;
-                        return item;
-                    }
+                    return _.object([['id', null], [propName, value]]);
                 };
-                /* In case we can create new items we can't use plain id in input value because a new item hasn't it yet
-                 * So value is a JSON with id property and value property for a new item. For instance, {id: 123} for
-                 * existing item and {id: null, value: "My new item"} for new one
+                /* In case we create new items we can't use plain id in input value because a new item hasn't it yet
+                 * So value is a JSON with value property containing user input text, like {value: "My new item"}
                  */
                 config.id = function(e) {
-                    var val = {id: e.id};
-                    if (val.id === null) {
-                        val.value = e[propName];
-                    }
-                    return JSON.stringify(val);
+                    return e.id !== null ? e.id : JSON.stringify({value: e[propName]});
                 };
             }
             return config;
+        },
+
+        makeItemTemplate: function(propName, forSelection) {
+            var labelTpl = '_.escape(' + propName + ')';
+            if (forSelection) {
+                labelTpl = 'highlight(' + labelTpl + ')';
+            }
+            return '<%= ' + labelTpl + ' %><% if (id === null) { %>' +
+                '<span class="select2__result-entry-info"> (' + __('oro.form.new') + ') </span><% } %>';
         }
     });
 

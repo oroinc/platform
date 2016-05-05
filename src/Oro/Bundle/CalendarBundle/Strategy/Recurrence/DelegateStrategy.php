@@ -71,7 +71,15 @@ class DelegateStrategy implements StrategyInterface
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return '';
+        $delegate = $this->match($recurrence);
+
+        if (!$delegate) {
+            throw new \InvalidArgumentException(
+                sprintf('Cannot find recurrence strategy for "%s" field.', $recurrence->getRecurrenceType())
+            );
+        }
+
+        return $delegate->getRecurrencePattern($recurrence);
     }
 
     /**

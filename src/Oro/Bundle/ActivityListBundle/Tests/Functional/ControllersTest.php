@@ -24,7 +24,8 @@ class ControllersTest extends WebTestCase
                 'oro_activity_list_widget_activities',
                 [
                     'entityClass' => 'Oro_Bundle_TestFrameworkBundle_Entity_TestActivityTarget',
-                    'entityId'    => $this->getReference('test_activity_target_1')->getId()
+                    'entityId'    => $this->getReference('test_activity_target_1')->getId(),
+                    '_widgetContainer' => 'widget'
                 ]
             )
         );

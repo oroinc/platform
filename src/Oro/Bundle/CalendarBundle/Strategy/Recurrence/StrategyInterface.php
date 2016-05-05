@@ -42,6 +42,8 @@ interface StrategyInterface
      * @param Recurrence $recurrence
      *
      * @return string
+     *
+     * @throws \InvalidArgumentException
      */
     public function getRecurrencePattern(Recurrence $recurrence);
 }
