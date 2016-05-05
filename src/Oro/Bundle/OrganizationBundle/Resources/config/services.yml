@@ -34,7 +34,7 @@ parameters:
     oro_organization.provider.filter.busines_unit_choice_tree.class: Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider
 
     oro_organization.autocomplete.business_unit.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
-    oro_organization.business_unit.autocomplete.listener.class: Oro\Bundle\OrganizationBundle\EventListener\BusinessUnitAutocompleteListener
+    oro_organization.provider.busines_unit_acl.class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider
 
 services:
     #
@@ -140,13 +140,6 @@ services:
             - { name: kernel.event_listener, event: oro_importexport.strategy.process_after, method: onProcessAfter }
             - { name: doctrine.event_listener, event: onClear }
 
-    oro_organization.business_unit.autocomplete.listener:
-        class: %oro_organization.business_unit.autocomplete.listener.class%
-        arguments:
-            - '@oro_security.security_facade'
-        tags:
-            - { name: kernel.event_listener, event: oro_search.before_search, method: onSearchBefore }
-
     #
     # DataGrid
     #
@@ -218,3 +211,11 @@ services:
             - ["name"]
         tags:
             - { name: oro_form.autocomplete.search_handler, alias: business_units, acl_resource: oro_business_unit_view }
+
+    oro_organization.provider.busines_unit_acl:
+        class: %oro_organization.provider.busines_unit_acl.class%
+        arguments:
+            - @oro_organization.business_unit_manager
+            - @oro_security.security_facade
+            - @?security.acl.voter.basic_permissions
+            - @oro_security.ownership_tree_provider
