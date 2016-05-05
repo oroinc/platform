@@ -32,6 +32,13 @@
 
 {% block content_data %}
     {% set id = 'calendarevent-form' %}
+    {% set recurrencePattern = '' %}
+    {% if entity.recurrence %}
+        {% set recurrencePattern = UI.renderProperty(
+            'oro.calendar.calendarevent.recurrence.alias.repeat'|trans,
+            get_recurrence_pattern(entity.recurrence)
+        ) %}
+    {% endif %}
 
     {% set dataBlocks = [{
         'title': 'General Information'|trans,
@@ -45,6 +52,7 @@
                     form_row(form.start),
                     form_row(form.end),
                     form_row(form.allDay),
+                    recurrencePattern,
                     form_row(form.backgroundColor),
                     form.calendarUid is defined ? form_row(form.calendarUid) : null,
                     form_row(form.childEvents),

@@ -6,6 +6,8 @@ use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -16,6 +18,14 @@ class CalendarEventType extends AbstractType
      * @var CalendarEvent
      */
     protected $parentEvent;
+
+    /**
+     * @var array
+     */
+    protected $editableFieldsForRecurrence = [
+        'title',
+        'description',
+    ];
 
     /**
      * {@inheritdoc}
@@ -129,9 +139,20 @@ class CalendarEventType extends AbstractType
      */
     public function preSubmit(FormEvent $event)
     {
-        $data = $event->getForm()->getData();
+        $form = $event->getForm();
+        $data = $form->getData();
         if ($data) {
             $this->parentEvent = $data;
+        }
+        if ($form->getNormData() && $form->getNormData()->getRecurrence()) {
+            foreach ($form->all() as $child) {
+                if (in_array($child->getName(), $this->editableFieldsForRecurrence)) {
+                    continue;
+                }
+                if ($form->has($child->getName())) {
+                    $form->remove($child->getName());
+                }
+            }
         }
     }
 
@@ -200,7 +221,8 @@ class CalendarEventType extends AbstractType
                 'allow_change_calendar' => false,
                 'layout_template'       => false,
                 'data_class'            => 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
-                'intention'             => 'calendar_event'
+                'intention'             => 'calendar_event',
+                'csrf_protection'       => false,
             ]
         );
     }
@@ -246,6 +268,29 @@ class CalendarEventType extends AbstractType
                     ]
                 )
             );
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function finishView(FormView $view, FormInterface $form, array $options)
+    {
+        if ($form->getData() && $form->getData()->getRecurrence()) {
+            /** @var FormView $childView */
+            foreach ($view->children as $childView) {
+                if (in_array($childView->vars['name'], $this->editableFieldsForRecurrence)) {
+                    continue;
+                }
+                $childView->vars['disabled'] = true;
+                if (in_array($childView->vars['name'], ['start', 'end'])) {
+                    $childView->vars['attr']['data-required'] = false;
+                }
+                if ($childView->vars['name'] === 'reminders') {
+                    $childView->vars['allow_add'] = false;
+                    $childView->vars['allow_delete'] = false;
+                }
+            }
         }
     }
 

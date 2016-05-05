@@ -32,6 +32,9 @@
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.start.label'|trans, '<%= formatter.dateTime(start) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.end.label'|trans, '<%= formatter.dateTime(end) %>') }}
                 {{ UI.renderHtmlProperty('oro.calendar.calendarevent.all_day.label'|trans, '<%= formatter.bool(allDay) %>') }}
+                <% if (recurrence) { %>
+                    {{ UI.renderHtmlProperty('oro.calendar.calendarevent.recurrence.alias.repeat'|trans, '<%= formatter.string(recurrencePattern) %>') }}
+                <% } %>
                 <div class="activity-context-activity">
                 {{ UI.renderAttribute('oro.activity.contexts.label'|trans, '<div class="activity-context-activity-items"></div>') }}
                 </div>
@@ -71,6 +74,12 @@
             form_row(form.start),
             form_row(form.end),
             form_row(form.allDay),
+            '<% if (recurrence) { %>' ~
+                UI.renderHtmlProperty(
+                    'oro.calendar.calendarevent.recurrence.alias.repeat'|trans,
+                    '<%= recurrencePattern %>'
+                ) ~
+            '<% } %>',
             form_row(form.backgroundColor),
             form.calendarUid is defined ? form_row(form.calendarUid) : null,
             form_row(form.childEvents)|replace({'childEvents': 'invitedUsers'}),
