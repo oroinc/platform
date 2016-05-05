@@ -335,7 +335,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $repo->expects($this->any())
-            ->method('getRecurrenceExceptionsByParentIds')
+            ->method('getRecurringEventExceptionsByParentIds')
             ->will($this->returnValue($qb));
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')

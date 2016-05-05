@@ -51,7 +51,7 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
             array('updatedAt', new \DateTime()),
             array('invitationStatus', CalendarEvent::NOT_RESPONDED),
             array('recurrence', new Recurrence()),
-            ['originalDate', new \DateTime()],
+            ['originalStart', new \DateTime()],
         );
     }
 
@@ -322,33 +322,33 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
         $calendarEvent->setTitle('Exception parent calendar event');
 
         // reset exceptions
-        $this->assertSame($calendarEvent, $calendarEvent->resetExceptions($exceptions));
-        $actual = $calendarEvent->getExceptions();
+        $this->assertSame($calendarEvent, $calendarEvent->resetRecurringEventExceptions($exceptions));
+        $actual = $calendarEvent->getRecurringEventExceptions();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals($exceptions, $actual->toArray());
         /** @var CalendarEvent $exception */
         foreach ($exceptions as $exception) {
-            $this->assertEquals($calendarEvent->getTitle(), $exception->getExceptionParent()->getTitle());
+            $this->assertEquals($calendarEvent->getTitle(), $exception->getRecurringEvent()->getTitle());
         }
 
         // add exception calendar events
-        $this->assertSame($calendarEvent, $calendarEvent->addException($exceptionTwo));
-        $actual = $calendarEvent->getExceptions();
+        $this->assertSame($calendarEvent, $calendarEvent->addRecurringEventException($exceptionTwo));
+        $actual = $calendarEvent->getRecurringEventExceptions();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals($exceptions, $actual->toArray());
 
-        $this->assertSame($calendarEvent, $calendarEvent->addException($exceptionThree));
-        $actual = $calendarEvent->getExceptions();
+        $this->assertSame($calendarEvent, $calendarEvent->addRecurringEventException($exceptionThree));
+        $actual = $calendarEvent->getRecurringEventExceptions();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals([$exceptionOne, $exceptionTwo, $exceptionThree], $actual->toArray());
         /** @var CalendarEvent $exception */
         foreach ($exceptions as $exception) {
-            $this->assertEquals($calendarEvent->getTitle(), $exception->getExceptionParent()->getTitle());
+            $this->assertEquals($calendarEvent->getTitle(), $exception->getRecurringEvent()->getTitle());
         }
 
         // remove exception from calender event
-        $this->assertSame($calendarEvent, $calendarEvent->removeException($exceptionOne));
-        $actual = $calendarEvent->getExceptions();
+        $this->assertSame($calendarEvent, $calendarEvent->removeRecurringEventException($exceptionOne));
+        $actual = $calendarEvent->getRecurringEventExceptions();
         $this->assertInstanceOf('Doctrine\Common\Collections\ArrayCollection', $actual);
         $this->assertEquals([1 => $exceptionTwo, 2 => $exceptionThree], $actual->toArray());
     }

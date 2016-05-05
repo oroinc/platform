@@ -107,6 +107,7 @@ class CalendarEventApiType extends CalendarEventType
                 'exceptions',
                 'collection',
                 [
+                    'property_path' => 'recurringEventExceptions',
                     'required' => false,
                     'type' => 'oro_calendar_event_exception',
                     'allow_add' => true,
@@ -160,9 +161,9 @@ class CalendarEventApiType extends CalendarEventType
 
         $this->calendarEventManager->setCalendar($data, $calendarAlias, (int)$calendarId);
         
-        if (!$data->getExceptions()->isEmpty()) {
-            foreach ($data->getExceptions() as $calendarEvent) {
-                $calendarEvent->setExceptionParent($data);
+        if (!$data->getRecurringEventExceptions()->isEmpty()) {
+            foreach ($data->getRecurringEventExceptions() as $calendarEvent) {
+                $calendarEvent->setRecurringEvent($data);
             }
         }
     }

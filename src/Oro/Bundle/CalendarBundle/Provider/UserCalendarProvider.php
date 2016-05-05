@@ -233,17 +233,17 @@ class UserCalendarProvider extends AbstractCalendarProvider
      * Returns exception data for recurrence item.
      *
      * @param \DateTime $occurrence
-     * @param array $exceptions
+     * @param array $recurringEventExceptions
      *
      * @return null|array
      */
-    protected function getRecurrenceException(\DateTime $occurrence, $exceptions)
+    protected function getRecurrenceException(\DateTime $occurrence, $recurringEventExceptions)
     {
-        foreach ($exceptions as $exception) {
+        foreach ($recurringEventExceptions as $exception) {
             //if original date of exception is the same with occurrence
-            if ($occurrence->diff(new \DateTime($exception['originalDate']))->format('%a') == 0) {
+            if ($occurrence->diff(new \DateTime($exception['originalStart']))->format('%a') == 0) {
                 //don't need this value in result
-                unset($exception['originalDate']);
+                unset($exception['originalStart']);
 
                 return $exception;
             }

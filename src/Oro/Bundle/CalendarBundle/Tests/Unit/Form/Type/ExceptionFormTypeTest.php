@@ -73,7 +73,7 @@ class ExceptionFormTypeTest extends \PHPUnit_Framework_TestCase
         $builder->expects($this->at(4))
             ->method('add')
             ->with(
-                'originalDate',
+                'originalStart',
                 'datetime',
                 [
                     'required' => true,

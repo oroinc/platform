@@ -39,7 +39,7 @@ class RestCalendarEventTest extends WebTestCase
                 'occurrences' => null,
                 'exceptions' => [
                     [
-                        'originalDate' => date(DATE_RFC3339),
+                        'originalStart' => date(DATE_RFC3339),
                         'title' => 'Test Exception Title',
                         'description' => 'Test Description of Exception',
                         'start' => date(DATE_RFC3339),
@@ -228,7 +228,7 @@ class RestCalendarEventTest extends WebTestCase
             '[recurrence][id]',
             '[recurrence][startTime]',
             '[recurrence][exceptions][0][id]',
-            '[recurrence][exceptions][0][originalDate]',
+            '[recurrence][exceptions][0][originalStart]',
             '[recurrence][exceptions][0][start]',
             '[recurrence][exceptions][0][end]',
         ];

@@ -266,28 +266,28 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     /**
      * @var ArrayCollection
      *
-     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="exceptionParent", orphanRemoval=true, cascade={"all"})
+     * @ORM\OneToMany(targetEntity="CalendarEvent", mappedBy="recurringEvent", orphanRemoval=true, cascade={"all"})
      */
-    protected $exceptions;
+    protected $recurringEventExceptions;
 
     /**
      * This attribute facilitates to determine whether an event is an exception and which event is it's parent one.
      *
      * @var CalendarEvent
      *
-     * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="exceptions")
-     * @ORM\JoinColumn(name="exception_parent_id", referencedColumnName="id", onDelete="CASCADE")
+     * @ORM\ManyToOne(targetEntity="CalendarEvent", inversedBy="recurringEventExceptions")
+     * @ORM\JoinColumn(name="recurring_event_id", referencedColumnName="id", onDelete="CASCADE")
      */
-    protected $exceptionParent;
+    protected $recurringEvent;
 
     /**
      * This attribute determines when an exception breaks recurrence sequence.
      *
      * @var \DateTime
      *
-     * @ORM\Column(name="original_date", type="datetime", nullable=true)
+     * @ORM\Column(name="original_start_at", type="datetime", nullable=true)
      */
-    protected $originalDate;
+    protected $originalStart;
 
     public function __construct()
     {
@@ -295,7 +295,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
 
         $this->reminders   = new ArrayCollection();
         $this->childEvents = new ArrayCollection();
-        $this->exceptions  = new ArrayCollection();
+        $this->recurringEventExceptions  = new ArrayCollection();
     }
 
     /**
@@ -692,62 +692,62 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
-     * Gets calendar event exceptions.
+     * Gets recurring event exceptions.
      *
      * @return Collection|CalendarEvent[]
      */
-    public function getExceptions()
+    public function getRecurringEventExceptions()
     {
-        return $this->exceptions;
+        return $this->recurringEventExceptions;
     }
 
     /**
-     * Resets calendar event exceptions.
+     * Resets recurring event exceptions.
      *
      * @param Collection|CalendarEvent[] $calendarEvents
      *
      * @return self
      */
-    public function resetExceptions($calendarEvents)
+    public function resetRecurringEventExceptions($calendarEvents)
     {
-        $this->exceptions->clear();
+        $this->recurringEventExceptions->clear();
 
         foreach ($calendarEvents as $calendarEvent) {
-            $this->addException($calendarEvent);
+            $this->addRecurringEventException($calendarEvent);
         }
 
         return $this;
     }
 
     /**
-     * Adds calendar event exception.
+     * Adds recurring event exception.
      *
      * @param CalendarEvent $calendarEvent
      *
      * @return self
      */
-    public function addException(CalendarEvent $calendarEvent)
+    public function addRecurringEventException(CalendarEvent $calendarEvent)
     {
-        if (!$this->exceptions->contains($calendarEvent)) {
-            $this->exceptions->add($calendarEvent);
-            $calendarEvent->setExceptionParent($this);
+        if (!$this->recurringEventExceptions->contains($calendarEvent)) {
+            $this->recurringEventExceptions->add($calendarEvent);
+            $calendarEvent->setRecurringEvent($this);
         }
 
         return $this;
     }
 
     /**
-     * Removes calendar event exception.
+     * Removes recurring event exception.
      *
      * @param CalendarEvent $calendarEvent
      *
      * @return self
      */
-    public function removeException(CalendarEvent $calendarEvent)
+    public function removeRecurringEventException(CalendarEvent $calendarEvent)
     {
-        if ($this->exceptions->contains($calendarEvent)) {
-            $this->exceptions->removeElement($calendarEvent);
-            $calendarEvent->setExceptionParent(null);
+        if ($this->recurringEventExceptions->contains($calendarEvent)) {
+            $this->recurringEventExceptions->removeElement($calendarEvent);
+            $calendarEvent->setRecurringEvent(null);
         }
 
         return $this;
@@ -756,13 +756,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     /**
      * Sets parent for calendar event exception.
      *
-     * @param CalendarEvent|null $exceptionParent
+     * @param CalendarEvent|null $recurringEvent
      *
      * @return self
      */
-    public function setExceptionParent(CalendarEvent $exceptionParent = null)
+    public function setRecurringEvent(CalendarEvent $recurringEvent = null)
     {
-        $this->exceptionParent = $exceptionParent;
+        $this->recurringEvent = $recurringEvent;
 
         return $this;
     }
@@ -772,31 +772,31 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @return CalendarEvent|null
      */
-    public function getExceptionParent()
+    public function getRecurringEvent()
     {
-        return $this->exceptionParent;
+        return $this->recurringEvent;
     }
 
     /**
-     * Gets originalDate of calendar event exception or null if calendar event is not an exception.
+     * Gets originalStart of calendar event exception or null if calendar event is not an exception.
      *
      * @return \DateTime|null
      */
-    public function getOriginalDate()
+    public function getOriginalStart()
     {
-        return $this->originalDate;
+        return $this->originalStart;
     }
 
     /**
-     * Sets originalDate of calendar event exception.
+     * Sets originalStart of calendar event exception.
      *
-     * @param \DateTime|null $originalDate
+     * @param \DateTime|null $originalStart
      *
      * @return self
      */
-    public function setOriginalDate(\DateTime $originalDate = null)
+    public function setOriginalStart(\DateTime $originalStart = null)
     {
-        $this->originalDate = $originalDate;
+        $this->originalStart = $originalStart;
 
         return $this;
     }

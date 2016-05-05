@@ -117,8 +117,8 @@ oro:
             invitation.label:        Guests
             invitation_status.label: Invitation status
             recurrence.label:      Recurrence
-            exceptions.label:      Exceptions
-            parentException.label: Parent of exception
+            recurringEventExceptions.label: Recurring Event Exceptions
+            recurringEvent.label: Recurring Event
 
             no_color:             Use calendar color
             updated_by:           added by {{ user }}, updated by {{ editor }}

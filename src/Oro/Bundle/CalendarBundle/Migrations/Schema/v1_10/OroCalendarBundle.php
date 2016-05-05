@@ -23,7 +23,7 @@ class OroCalendarBundle implements Migration
      */
     protected function createRecurrenceTable(Schema $schema)
     {
-        $table = $schema->createTable('oro_recurrence');
+        $table = $schema->createTable('oro_calendar_recurrence');
         $table->addColumn('id', 'integer', ['autoincrement' => true]);
         $table->addColumn('recurrence_type', 'string', ['notnull' => true, 'length' => 16]);
         $table->addColumn('interval', 'integer', []);
@@ -35,8 +35,8 @@ class OroCalendarBundle implements Migration
         $table->addColumn('end_time', 'datetime', ['notnull' => false]);
         $table->addColumn('occurrences', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
-        $table->addIndex(['start_time'], 'IDX_B6CD65EF502DF587', []);
-        $table->addIndex(['end_time'], 'IDX_B6CD65EF41561401', []);
+        $table->addIndex(['start_time'], 'oro_calendar_r_start_time_idx', []);
+        $table->addIndex(['end_time'], 'oro_calendar_r_end_time_idx', []);
     }
 
     /**
@@ -45,8 +45,8 @@ class OroCalendarBundle implements Migration
     protected function updateCalendarEventsTable(Schema $schema)
     {
         $table = $schema->getTable('oro_calendar_event');
-        $table->addColumn('original_date', 'datetime', ['notnull' => false]);
-        $table->addColumn('exception_parent_id', 'integer', ['notnull' => false]);
+        $table->addColumn('original_start_at', 'datetime', ['notnull' => false]);
+        $table->addColumn('recurring_event_id', 'integer', ['notnull' => false]);
         $table->addColumn('recurrence_id', 'integer', ['notnull' => false]);
         $table->addUniqueIndex(['recurrence_id'], 'UNIQ_2DDC40DD2C414CE8');
         $table->addForeignKeyConstraint(
@@ -57,7 +57,7 @@ class OroCalendarBundle implements Migration
         );
         $table->addForeignKeyConstraint(
             $table,
-            ['exception_parent_id'],
+            ['recurring_event_id'],
             ['id'],
             ['onDelete' => 'CASCADE']
         );

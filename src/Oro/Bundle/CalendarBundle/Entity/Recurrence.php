@@ -8,10 +8,10 @@ use Doctrine\ORM\Mapping as ORM;
  * Recurrence Entity.
  *
  * @ORM\Table(
- *     name="oro_recurrence",
+ *     name="oro_calendar_recurrence",
  *      indexes={
- *          @ORM\Index(name="IDX_B6CD65EF502DF587", columns={"start_time"}),
- *          @ORM\Index(name="IDX_B6CD65EF41561401", columns={"end_time"})
+ *          @ORM\Index(name="oro_calendar_r_start_time_idx", columns={"start_time"}),
+ *          @ORM\Index(name="oro_calendar_r_end_time_idx", columns={"end_time"})
  *      }
  * )
  * @ORM\Entity
