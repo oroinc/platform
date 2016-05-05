@@ -4,12 +4,14 @@ namespace Oro\Bundle\FormBundle\Form\EventListener;
 
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
+use Doctrine\Common\Inflector\Inflector;
 use Doctrine\Common\Util\ClassUtils;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\Mapping\ClassMetadata;
 
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
+use Symfony\Component\Form\FormInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
@@ -65,94 +67,102 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
     public function postSubmit(FormEvent $event)
     {
         $form = $event->getForm();
+        $fieldName = $this->getFieldName($form);
 
-        $added   = $form->get('added')->getData();
+        $added = $form->get('added')->getData();
         $removed = $form->get('removed')->getData();
 
-        $parentData = $form->getParent()->getData();
+        $parent = $form->getParent()->getData();
+        $parentMetadata = $this->doctrineHelper->getEntityMetadata(
+            ClassUtils::getClass($parent),
+            false
+        );
 
-        /** @var ClassMetadata $parentMetadata */
-        $parentMetadata = $this->doctrineHelper->getEntityMetadata(ClassUtils::getClass($parentData));
-
-        /** @var PersistentCollection|Collection $collection */
-        $collection = $form->getData();
-
-        $collectionMappedBy = null;
-        if ($collection instanceof PersistentCollection) {
-            $collectionMapping  = $collection->getMapping();
-            $collectionMappedBy = $collectionMapping['mappedBy'];
-        }
-
-        foreach ($added as $relation) {
-            if ($collectionMappedBy) {
-                $this->processRelation($parentMetadata, $relation, $collectionMappedBy, $parentData);
+        /** @var Collection $children */
+        $children = $form->getData();
+        foreach ($added as $child) {
+            if (null !== $parentMetadata
+                && $this->isOneToManyAssociation($child, $parentMetadata, $fieldName)
+            ) {
+                $this->setOneToManyTargetEntity($child, $parentMetadata, $fieldName, $parent);
             }
-            $collection->add($relation);
+            $children->add($child);
         }
-
-        foreach ($removed as $relation) {
-            if ($collectionMappedBy) {
-                $this->processRelation($parentMetadata, $relation, $collectionMappedBy, null);
+        foreach ($removed as $child) {
+            if (null !== $parentMetadata
+                && $this->isOneToManyAssociation($child, $parentMetadata, $fieldName)
+            ) {
+                $this->setOneToManyTargetEntity($child, $parentMetadata, $fieldName, null);
             }
-            $collection->removeElement($relation);
+            $children->removeElement($child);
         }
     }
 
     /**
-     * @param ClassMetadata $metadata
-     * @param object        $relation
-     * @param string        $mappedBy
-     * @param mixed         $value
+     * @param FormInterface $form
+     *
+     * @return string
      */
-    protected function processRelation($metadata, $relation, $mappedBy, $value)
+    protected function getFieldName(FormInterface $form)
     {
-        $relationClassName = ClassUtils::getClass($relation);
-        foreach ($metadata->getAssociationMappings() as $mapping) {
-            if ($this->isApplicableRelation($mapping, $relationClassName, $mappedBy)) {
-                $setter = $this->getSetterName($mappedBy);
-                $relation->$setter($value);
-                break;
-            }
+        $form->getPropertyPath();
+        $propertyPath = $form->getConfig()->getPropertyPath();
+        if (null !== $propertyPath) {
+            return (string)$propertyPath;
         }
+
+        return $form->getName();
     }
 
     /**
-     * @param array  $mapping
-     * @param string $relationClassName
-     * @param string $mappedBy
+     * @param object        $owningEntity
+     * @param ClassMetadata $targetMetadata
+     * @param string        $targetAssociationName
      *
      * @return bool
      */
-    protected function isApplicableRelation($mapping, $relationClassName, $mappedBy)
-    {
-        if (!is_array($mapping) || !isset($mapping['targetEntity'], $mapping['type'], $mapping['mappedBy'])) {
+    protected function isOneToManyAssociation(
+        $owningEntity,
+        $targetMetadata,
+        $targetAssociationName
+    ) {
+        if (!$targetMetadata->hasAssociation($targetAssociationName)) {
             return false;
         }
-        if ($mapping['targetEntity'] !== $relationClassName) {
-            return false;
-        }
-        if ($mapping['type'] !== ClassMetadata::ONE_TO_MANY) {
-            return false;
-        }
-        if ($mapping['mappedBy'] !== $mappedBy) {
+
+        $targetAssociationMapping = $targetMetadata->getAssociationMapping($targetAssociationName);
+        if (ClassMetadata::ONE_TO_MANY !== $targetAssociationMapping['type']
+            || ClassUtils::getClass($owningEntity) !== $targetAssociationMapping['targetEntity']
+        ) {
             return false;
         }
 
         return true;
     }
+    /**
+     * @param object        $owningEntity
+     * @param ClassMetadata $targetMetadata
+     * @param string        $targetAssociationName
+     * @param object|null   $targetEntity
+     */
+    protected function setOneToManyTargetEntity(
+        $owningEntity,
+        $targetMetadata,
+        $targetAssociationName,
+        $targetEntity
+    ) {
+        $targetAssociationMapping = $targetMetadata->getAssociationMapping($targetAssociationName);
+        $setter = $this->getSetterName($targetAssociationMapping['mappedBy']);
+        $owningEntity->$setter($targetEntity);
+    }
 
     /**
      * @param string $mappedBy
+     *
      * @return string
      */
     protected function getSetterName($mappedBy)
     {
-        $parts = explode('_', $mappedBy);
-        $setter = 'set';
-        foreach ($parts as $part) {
-            $setter .= ucfirst($part);
-        }
-
-        return $setter;
+        return 'set' . Inflector::classify($mappedBy);
     }
 }
