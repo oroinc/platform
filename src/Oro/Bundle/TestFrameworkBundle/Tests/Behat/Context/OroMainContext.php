@@ -4,23 +4,56 @@ namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
 use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
+use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Behat\Symfony2Extension\Context\KernelAwareContext;
+use Behat\Symfony2Extension\Context\KernelDictionary;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Factory as PageObjectFactory;
 use SensioLabs\Behat\PageObjectExtension\Context\PageObjectAware;
-use SensioLabs\Behat\PageObjectExtension\PageObject\Page;
 
 /**
  * Defines application features from the specific context.
  */
-class OroMainContext extends MinkContext implements Context, SnippetAcceptingContext, PageObjectAware
+class OroMainContext extends MinkContext implements
+    Context,
+    SnippetAcceptingContext,
+    PageObjectAware,
+    KernelAwareContext
 {
+    use KernelDictionary;
+
     /** @var  \SensioLabs\Behat\PageObjectExtension\PageObject\Factory */
     protected $pageObjectFactory;
+
+    /**
+     * @BeforeScenario
+     */
+    public function beforeScenario(BeforeScenarioScope $scope)
+    {
+        $this->getSession()->resizeWindow(1920, 1080, 'current');
+    }
+
+    /**
+     * @AfterScenario
+     */
+    public function afterScenario(AfterScenarioScope $scope)
+    {
+        if ($scope->getTestResult()->isPassed()) {
+            return;
+        }
+
+        $screenshot = sprintf(
+            '%s/%s.png',
+            $this->getKernel()->getLogDir(),
+            $scope->getScenario()->getTitle()
+        );
+        file_put_contents($screenshot, $this->getSession()->getScreenshot());
+    }
 
     /**
      * {@inheritdoc}
@@ -31,11 +64,11 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
     }
 
     /**
-     * @BeforeScenario
+     * @Then I should see :title flash message
      */
-    public function beforeScenario(BeforeScenarioScope $scope)
+    public function iShouldSeeFlashMessage($title)
     {
-        $this->getSession()->resizeWindow(1920, 1080, 'current');
+        $this->assertSession()->elementTextContains('css', '.flash-messages-holder', $title);
     }
 
     /**
@@ -48,9 +81,6 @@ class OroMainContext extends MinkContext implements Context, SnippetAcceptingCon
         $this->fillField('_password', $password);
         $this->pressButton('_submit');
         $errorBlock = $this->getSession()->getPage()->find('css', '.alert-error');
-        if ($errorBlock) {
-            $errorBlock->find('named', ['content', '×'])->click();
-        }
     }
 
     /**

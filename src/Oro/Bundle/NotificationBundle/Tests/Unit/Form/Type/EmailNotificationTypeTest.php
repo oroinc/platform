@@ -39,8 +39,9 @@ class EmailNotificationTypeTest extends \PHPUnit_Framework_TestCase
         $this->configProvider->expects($this->once())
             ->method('getConfigs')
             ->will($this->returnValue([$config]));
+        $router = $this->getMockBuilder('Symfony\Component\Routing\RouterInterface')->getMockForAbstractClass();
 
-        $this->type = new EmailNotificationType($listener, $this->configProvider);
+        $this->type = new EmailNotificationType($listener, $this->configProvider, $router);
     }
 
     public function testSetDefaultOptions()

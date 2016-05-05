@@ -30,7 +30,6 @@
         "doctrine/doctrine-fixtures-bundle": "2.2.0",
         "twig/extensions": "1.0.1",
         "symfony/assetic-bundle": "2.3.0",
-        "symfony/icu": "~1.1",
         "symfony/swiftmailer-bundle": "2.3.*",
         "symfony/monolog-bundle": "2.7.*",
         "sensio/distribution-bundle": "4.0.3",
@@ -79,7 +78,13 @@
         "vakata/jstree": "^3.2"
     },
     "require-dev": {
-        "sensio/generator-bundle": "2.5.3"
+        "sensio/generator-bundle": "2.5.3",
+        "behat/behat": "v3.1.0",
+        "behat/mink-extension": "^2.0",
+        "behat/mink-selenium2-driver":"1.*",
+        "sensiolabs/behat-page-object-extension": "dev-master",
+        "bossa/phpspec2-expect": "~1.0",
+        "behat/symfony2-extension": "2.1.1"
     },
     "minimum-stability": "dev",
     "prefer-stable": true,

@@ -4,6 +4,8 @@ namespace Oro\Bundle\TrackingBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -20,7 +22,7 @@ class OroTrackingBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_8';
+        return 'v1_9';
     }
 
     /**
@@ -108,6 +110,20 @@ class OroTrackingBundleInstaller implements Installation
         $table->addColumn('url', 'string', ['length' => 255]);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', ['notnull' => false]);
+        $table->addColumn(
+            'extend_description',
+            'text',
+            [
+                'oro_options' => [
+                    'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+                    'datagrid'  => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                    'merge'     => ['display' => true],
+                    'dataaudit' => ['auditable' => true],
+                    'form'      => ['type' => 'oro_resizeable_rich_text'],
+                    'view'      => ['type' => 'html'],
+                ]
+            ]
+        );
         $table->addIndex(['user_owner_id'], 'idx_190388989eb185f9', []);
         $table->setPrimaryKey(['id']);
         $table->addUniqueIndex(['identifier'], 'uniq_19038898772e836a');
