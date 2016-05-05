@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub;
 
-use Oro\Component\Layout\ArrayCollection;
+use Doctrine\Common\Collections\ArrayCollection;
 
 class ParentEntity
 {
