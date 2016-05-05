@@ -3,9 +3,11 @@
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
+use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider;
 
 /**
  * Class WidgetBusinessUnitSelectConverter
@@ -19,14 +21,28 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var BusinessUnitAclProvider */
+    protected $businessUnitAclProvider;
+
+    /** @var string */
+    protected $aclEntityClass;
+
+    /** @var string */
+    protected $aclPermission;
+
     /**
      * @param EntityRepository $businessUnitRepository
      * @param SecurityFacade $securityFacade
+     * @param BusinessUnitAclProvider $businessUnitAclProvider
      */
-    public function __construct(EntityRepository $businessUnitRepository, SecurityFacade $securityFacade)
-    {
+    public function __construct(
+        EntityRepository $businessUnitRepository,
+        SecurityFacade $securityFacade,
+        BusinessUnitAclProvider $businessUnitAclProvider
+    ) {
         $this->businessUnitRepository = $businessUnitRepository;
         $this->securityFacade = $securityFacade;
+        $this->businessUnitAclProvider = $businessUnitAclProvider;
     }
 
     /**
@@ -40,6 +56,7 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
                 $queryBuilder->andWhere('bu.organization = :organizationId');
                 $queryBuilder->setParameter('organizationId', $organizationId);
             }
+            $this->applyAclByEntityPermission($queryBuilder);
             return $queryBuilder->getQuery()->getResult();
         }
 
@@ -57,6 +74,7 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
                 $queryBuilder->andWhere('bu.organization = :organizationId');
                 $queryBuilder->setParameter('organizationId', $organizationId);
             }
+            $this->applyAclByEntityPermission($queryBuilder);
             return $queryBuilder->getQuery()->getResult();
         }
 
@@ -70,5 +88,28 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
     public function getViewValue($value)
     {
         return empty($value) ? null : implode('; ', $value);
+    }
+
+    /**
+     * @param string $aclEntityClass
+     * @param string $aclPermission
+     */
+    public function addAclByEntityPermission($aclEntityClass, $aclPermission)
+    {
+        $this->aclEntityClass = $aclEntityClass;
+        $this->aclPermission = $aclPermission;
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     */
+    protected function applyAclByEntityPermission(QueryBuilder $queryBuilder)
+    {
+        if ($this->aclEntityClass && $this->aclPermission) {
+            $businessUnitIds = $this
+                ->businessUnitAclProvider
+                ->getBusinessUnitIds($this->aclEntityClass, $this->aclPermission);
+            $queryBuilder->andWhere($queryBuilder->expr()->in('bu.id', $businessUnitIds));
+        }
     }
 }
