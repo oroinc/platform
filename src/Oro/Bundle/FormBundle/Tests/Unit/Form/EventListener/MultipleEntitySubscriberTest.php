@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Bundle\FormBundle\Tests\Unit\EventListener;
+namespace Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener;
 
 use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\Common\Collections\Collection;
 use Doctrine\Common\Collections\ArrayCollection;
 
-use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ChildEntity;
-use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ParentEntity;
 use Symfony\Component\Form\FormEvent;
 
 use Oro\Bundle\FormBundle\Form\EventListener\MultipleEntitySubscriber;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ChildEntity;
+use Oro\Bundle\FormBundle\Tests\Unit\Form\EventListener\Stub\ParentEntity;
 
 class MultipleEntitySubscriberTest extends \PHPUnit_Framework_TestCase
 {
