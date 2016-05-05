@@ -1,4 +1,5 @@
 config:
     paths:
         'orointegration/js/channel-view': 'bundles/orointegration/js/channel-view.js'
+        'orointegration/js/app/components/ajax-button': 'bundles/orointegration/js/app/components/ajax-button.js'
         'oro/datagrid/action/schedule-sync-action': 'bundles/orointegration/js/datagrid/action/schedule-sync-action.js'

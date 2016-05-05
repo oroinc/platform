@@ -4,6 +4,8 @@ namespace Oro\Bundle\CalendarBundle\Migrations\Schema;
 
 use Doctrine\DBAL\Schema\Schema;
 
+use Oro\Bundle\EntityBundle\EntityConfig\DatagridScope;
+use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 use Oro\Bundle\MigrationBundle\Migration\Installation;
 use Oro\Bundle\MigrationBundle\Migration\QueryBag;
 
@@ -14,7 +16,7 @@ class OroCalendarBundleInstaller implements Installation
      */
     public function getMigrationVersion()
     {
-        return 'v1_9';
+        return 'v1_10';
     }
 
     /**
@@ -64,9 +66,23 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('organization_id', 'integer', ['notnull' => false]);
         $table->addColumn('name', 'string', ['length' => 255]);
         $table->addColumn('background_color', 'string', ['notnull' => false, 'length' => 7]);
-        $table->addcolumn('is_public', 'boolean', []);
+        $table->addColumn('is_public', 'boolean', []);
         $table->addColumn('created_at', 'datetime', []);
         $table->addColumn('updated_at', 'datetime', []);
+        $table->addColumn(
+            'extend_description',
+            'text',
+            [
+                'oro_options' => [
+                    'extend'    => ['is_extend' => true, 'owner' => ExtendScope::OWNER_CUSTOM],
+                    'datagrid'  => ['is_visible' => DatagridScope::IS_VISIBLE_FALSE],
+                    'merge'     => ['display' => true],
+                    'dataaudit' => ['auditable' => true],
+                    'form'      => ['type' => 'oro_resizeable_rich_text'],
+                    'view'      => ['type' => 'html'],
+                ]
+            ]
+        );
         $table->addIndex(['organization_id'], 'IDX_1DE3E2F032C8A3DE', []);
         $table->addIndex(['updated_at'], 'oro_system_calendar_up_idx', []);
         $table->setPrimaryKey(['id']);

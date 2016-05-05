@@ -78,16 +78,17 @@ class ContextsToViewTransformer implements DataTransformerInterface
                 ) {
                     continue;
                 }
-
+                $text = [];
                 if ($fields = $this->mapper->getEntityMapParameter($targetClass, 'title_fields')) {
-                    $text = [];
                     foreach ($fields as $field) {
                         $text[] = $this->mapper->getFieldValue($target, $field);
                     }
-                } else {
-                    $text = [$this->translator->trans('oro.entity.item', ['%id%' => $target->getId()])];
                 }
-                $text = implode(' ', $text);
+                $text = array_filter($text);
+                $text = $text
+                    ? implode(' ', $text)
+                    : $this->translator->trans('oro.entity.item', ['%id%' => $target->getId()]);
+
                 if ($label = $this->getClassLabel($targetClass)) {
                     $text .= ' (' . $label . ')';
                 }

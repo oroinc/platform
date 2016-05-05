@@ -207,7 +207,7 @@ class TagsReportExtension extends AbstractTagsExtension
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
         $identifiers = $this->getTagsColumns($config);
-        $rows = (array)$result->offsetGetOr('data', []);
+        $rows = $result->getData();
         $entitiesTags = [];
         foreach ($identifiers as $entityClass => $idAlias) {
             $entitiesTags[$entityClass] = $this->getTagsForEntityClass(

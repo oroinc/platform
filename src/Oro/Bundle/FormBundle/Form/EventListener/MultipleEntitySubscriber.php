@@ -74,41 +74,71 @@ class MultipleEntitySubscriber implements EventSubscriberInterface
         /** @var ClassMetadata $parentMetadata */
         $parentMetadata = $this->doctrineHelper->getEntityMetadata(ClassUtils::getClass($parentData));
 
-        /** @var Collection $collection */
+        /** @var PersistentCollection|Collection $collection */
         $collection = $form->getData();
 
+        $collectionMappedBy = null;
+        if ($collection instanceof PersistentCollection) {
+            $collectionMapping  = $collection->getMapping();
+            $collectionMappedBy = $collectionMapping['mappedBy'];
+        }
+
         foreach ($added as $relation) {
-            $this->processRelation($parentMetadata, $relation, $parentData);
+            if ($collectionMappedBy) {
+                $this->processRelation($parentMetadata, $relation, $collectionMappedBy, $parentData);
+            }
             $collection->add($relation);
         }
 
         foreach ($removed as $relation) {
-            $this->processRelation($parentMetadata, $relation, null);
+            if ($collectionMappedBy) {
+                $this->processRelation($parentMetadata, $relation, $collectionMappedBy, null);
+            }
             $collection->removeElement($relation);
         }
     }
 
     /**
      * @param ClassMetadata $metadata
-     * @param object $relation
-     * @param mixed $value
+     * @param object        $relation
+     * @param string        $mappedBy
+     * @param mixed         $value
      */
-    protected function processRelation($metadata, $relation, $value)
+    protected function processRelation($metadata, $relation, $mappedBy, $value)
     {
+        $relationClassName = ClassUtils::getClass($relation);
         foreach ($metadata->getAssociationMappings() as $mapping) {
-            if (!is_array($mapping) || !isset($mapping['targetEntity'], $mapping['type'], $mapping['mappedBy'])) {
-                continue;
+            if ($this->isApplicableRelation($mapping, $relationClassName, $mappedBy)) {
+                $setter = $this->getSetterName($mappedBy);
+                $relation->$setter($value);
+                break;
             }
-            if ($mapping['targetEntity'] !== ClassUtils::getClass($relation)) {
-                continue;
-            }
-            if ($mapping['type'] !== ClassMetadata::ONE_TO_MANY) {
-                continue;
-            }
-            $mappedBy = $mapping['mappedBy'];
-            $setter = $this->getSetterName($mappedBy);
-            $relation->$setter($value);
         }
+    }
+
+    /**
+     * @param array  $mapping
+     * @param string $relationClassName
+     * @param string $mappedBy
+     *
+     * @return bool
+     */
+    protected function isApplicableRelation($mapping, $relationClassName, $mappedBy)
+    {
+        if (!is_array($mapping) || !isset($mapping['targetEntity'], $mapping['type'], $mapping['mappedBy'])) {
+            return false;
+        }
+        if ($mapping['targetEntity'] !== $relationClassName) {
+            return false;
+        }
+        if ($mapping['type'] !== ClassMetadata::ONE_TO_MANY) {
+            return false;
+        }
+        if ($mapping['mappedBy'] !== $mappedBy) {
+            return false;
+        }
+
+        return true;
     }
 
     /**

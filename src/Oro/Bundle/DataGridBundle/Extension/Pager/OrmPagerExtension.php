@@ -62,6 +62,7 @@ class OrmPagerExtension extends AbstractExtension
         if ($datasource instanceof OrmDatasource) {
             $this->pager->setQueryBuilder($datasource->getQueryBuilder());
             $this->pager->setSkipAclCheck($config->isDatasourceSkipAclApply());
+            $this->pager->setAclPermission($config->getDatasourceAclApplyPermission());
             $this->pager->setSkipCountWalker(
                 $config->offsetGetByPath(DatagridConfiguration::DATASOURCE_SKIP_COUNT_WALKER_PATH)
             );
@@ -85,7 +86,7 @@ class OrmPagerExtension extends AbstractExtension
      */
     public function visitResult(DatagridConfiguration $config, ResultsObject $result)
     {
-        $result->offsetSetByPath(PagerInterface::TOTAL_PATH_PARAM, $this->pager->getNbResults());
+        $result->setTotalRecords($this->pager->getNbResults());
     }
 
     /**

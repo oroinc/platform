@@ -189,9 +189,7 @@ class ContextSearchHandler implements ConverterInterface
         $text      = $item->getRecordTitle();
         $className = $item->getEntityName();
 
-        $entityMapParameter = $this->mapper->getEntityMapParameter($className, 'title_fields');
-
-        if (strlen($text) === 0 && !$entityMapParameter) {
+        if (strlen(trim($text)) === 0) {
             $text = $this->translator->trans('oro.entity.item', ['%id%' => $item->getRecordId()]);
         }
 
