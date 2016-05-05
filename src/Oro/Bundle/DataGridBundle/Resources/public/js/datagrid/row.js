@@ -239,6 +239,11 @@ define([
             var state = {selected: false};
             this.model.trigger('backgrid:isSelected', this.model, state);
             this.$el.toggleClass('row-selected', state.selected);
+
+            if (this.$el.data('layout') === 'separate') {
+                this.initLayout({model: this.model});
+            }
+
             return this;
         },
 
@@ -260,7 +265,6 @@ define([
                     e.stopPropagation();
                 });
             }
-
             return this;
         }
     });

@@ -38,6 +38,8 @@ define(function(require) {
         /** @property {Boolean} */
         keepElement: true,
 
+        refreshOnChange: false,
+
         /**
          * @inheritDoc
          */
@@ -53,6 +55,10 @@ define(function(require) {
             if (this.isInitialized()) {
                 this.findContainer();
                 this.getContainer().addClass(this.containerClass);
+            }
+
+            if (this.refreshOnChange) {
+                this.$el.on('change', _.bind(this.refresh, this));
             }
         },
 
@@ -96,6 +102,10 @@ define(function(require) {
 
             this.$el.removeData('inputWidget');
             delete this.$container;
+
+            if (this.refreshOnChange) {
+                this.$el.off('change', _.bind(this.refresh, this));
+            }
 
             return AbstractInputWidget.__super__.dispose.apply(this, arguments);
         },
