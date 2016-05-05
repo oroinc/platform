@@ -26,21 +26,21 @@ class ObjectNormalizer
     protected $dataTransformer;
 
     /** @var ObjectNormalizerRegistry */
-    private $normalizers;
+    private $normalizerRegistry;
 
     /**
-     * @param ObjectNormalizerRegistry $normalizers
+     * @param ObjectNormalizerRegistry $normalizerRegistry
      * @param DoctrineHelper           $doctrineHelper
      * @param DataAccessorInterface    $dataAccessor
      * @param DataTransformerInterface $dataTransformer
      */
     public function __construct(
-        ObjectNormalizerRegistry $normalizers,
+        ObjectNormalizerRegistry $normalizerRegistry,
         DoctrineHelper $doctrineHelper,
         DataAccessorInterface $dataAccessor,
         DataTransformerInterface $dataTransformer
     ) {
-        $this->normalizers = $normalizers;
+        $this->normalizerRegistry = $normalizerRegistry;
         $this->doctrineHelper = $doctrineHelper;
         $this->dataAccessor = $dataAccessor;
         $this->dataTransformer = $dataTransformer;
@@ -201,7 +201,7 @@ class ObjectNormalizer
                 $val = $this->normalizeValue($val, $nextLevel, $config);
             }
         } elseif (is_object($value)) {
-            $objectNormalizer = $this->normalizers->getObjectNormalizer($value);
+            $objectNormalizer = $this->normalizerRegistry->getObjectNormalizer($value);
             if (null !== $objectNormalizer) {
                 $value = $objectNormalizer->normalize($value);
             } elseif ($value instanceof \Traversable) {
