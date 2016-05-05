@@ -31,13 +31,14 @@ parameters:
     oro_calendar.calendar_event.handler.delete.class:            Oro\Bundle\CalendarBundle\Handler\CalendarEventDeleteHandler
     oro_calendar.system_calendar_event.datagrid_helper.class:    Oro\Bundle\CalendarBundle\Datagrid\SystemCalendarEventGridHelper
 
-    oro_calendar.strategy.delegate.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy
-    oro_calendar.strategy.daily.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\DailyStrategy
-    oro_calendar.strategy.weekly.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\WeeklyStrategy
-    oro_calendar.strategy.monthly.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\MonthlyStrategy
-    oro_calendar.strategy.yearly.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearlyStrategy
-    oro_calendar.strategy.monthnth.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\MonthNthStrategy
-    oro_calendar.strategy.yearnth.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearNthStrategy
+    oro_calendar.strategy.abstract.class:                        Oro\Bundle\CalendarBundle\Strategy\Recurrence\AbstractStrategy
+    oro_calendar.strategy.delegate.class:                        Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy
+    oro_calendar.strategy.daily.class:                           Oro\Bundle\CalendarBundle\Strategy\Recurrence\DailyStrategy
+    oro_calendar.strategy.weekly.class:                          Oro\Bundle\CalendarBundle\Strategy\Recurrence\WeeklyStrategy
+    oro_calendar.strategy.monthly.class:                         Oro\Bundle\CalendarBundle\Strategy\Recurrence\MonthlyStrategy
+    oro_calendar.strategy.yearly.class:                          Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearlyStrategy
+    oro_calendar.strategy.monthnth.class:                        Oro\Bundle\CalendarBundle\Strategy\Recurrence\MonthNthStrategy
+    oro_calendar.strategy.yearnth.class:                         Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearNthStrategy
 
     oro_calendar.strategy.recurrence.strategy_helper.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper
 
@@ -276,9 +277,12 @@ services:
 
     # Recurrence Strategies
     oro_calendar.recurrence.strategy.abstract:
+        class: '%oro_calendar.strategy.abstract.class%'
         abstract: true
         arguments:
             - '@oro_calendar.strategy.recurrence.strategy_helper'
+            - '@translator'
+            - '@oro_locale.formatter.date_time'
 
     oro_calendar.recurrence.strategy.delegate:
         class: '%oro_calendar.strategy.delegate.class%'

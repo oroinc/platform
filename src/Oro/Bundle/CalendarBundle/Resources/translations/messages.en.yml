@@ -173,6 +173,16 @@ oro:
                 all_events: All Events
                 all_events.label: All events in the series will be changed.
 
+            patterns:
+                occurrences: "{1} , end after 1 occurrence|]1,Inf[ , end after %count% occurrences"
+                end_date: ", end by %date%"
+                daily: "{1} Daily every 1 day|]1,Inf[ Daily every %count% days"
+                weekly: "{1} Weekly every 1 week on %days%|]1,Inf[ Weekly every %count% weeks on %days%"
+                monthly: "{1} Monthly day %day% of every 1 month|]1,Inf[ Monthly day %day% of every %count% months"
+                monthnth: "{1} Monthly the %instance% %day% of every 1 month|]1,Inf[ Monthly the %instance% %day% of every %count% months"
+                yearly: "{1} Yearly every 1 year on %day%|]1,Inf[ Yearly every %count% years on %day%"
+                yearnth: "{1} Yearly every 1 year on the %instance% %day% of %month%|]1,Inf[ Yearly every %count% years on the %instance% %day% of %month%"
+
             types:
                 daily:              Daily
                 weekly:             Weekly
@@ -196,3 +206,6 @@ oro:
                 thursday:           Thursday
                 friday:             Friday
                 saturday:           Saturday
+                weekday:            weekday
+                weekend:            weekend
+                day:                day

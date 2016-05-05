@@ -3,24 +3,12 @@
 namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 
 /**
  * Recurrence with type Recurrence::TYPE_YEAR_N_TH will provide interval a number of month, which is multiple of 12.
  */
-class YearNthStrategy implements StrategyInterface
+class YearNthStrategy extends AbstractStrategy implements StrategyInterface
 {
-    /** @var StrategyHelper */
-    protected $strategyHelper;
-
-    /**
-     * @param StrategyHelper $strategyHelper
-     */
-    public function __construct(StrategyHelper $strategyHelper)
-    {
-        $this->strategyHelper = $strategyHelper;
-    }
-
     /**
      * {@inheritdoc}
      */
@@ -88,7 +76,21 @@ class YearNthStrategy implements StrategyInterface
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return 'yearnth';
+        $interval = (int)($recurrence->getInterval() / 12);
+        $instanceValue = $this->strategyHelper->getInstanceRelativeValue($recurrence->getInstance());
+        $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
+        $day = $this->strategyHelper->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
+        $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
+        $currentDate = new \DateTime();
+        $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), $currentDate->format('d'));
+        $month = $this->dateTimeFormatter->format($currentDate, null, \IntlDateFormatter::NONE, null, null, 'MMM');
+
+        return $this->getFullRecurrencePattern(
+            $recurrence,
+            'oro.calendar.recurrence.patterns.yearnth',
+            $interval,
+            ['%count%' => $interval, '%day%' => $day, '%instance%' => strtolower($instance), '%month%' => $month]
+        );
     }
 
     /**

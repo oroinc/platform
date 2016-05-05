@@ -22,7 +22,17 @@ class YearlyStrategy extends MonthlyStrategy
      */
     public function getRecurrencePattern(Recurrence $recurrence)
     {
-        return 'yearly';
+        $interval = (int)($recurrence->getInterval() / 12);
+        $currentDate = new \DateTime();
+        $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), $recurrence->getDayOfMonth());
+        $date = $this->dateTimeFormatter->formatDay($currentDate);
+
+        return $this->getFullRecurrencePattern(
+            $recurrence,
+            'oro.calendar.recurrence.patterns.yearly',
+            $interval,
+            ['%count%' => $interval, '%day%' => $date]
+        );
     }
 
     /**

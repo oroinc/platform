@@ -15,6 +15,21 @@ class StrategyHelper
         Recurrence::INSTANCE_LAST => 'last',
     ];
 
+    /** @var array */
+    protected static $weekdays = [
+        'monday',
+        'tuesday',
+        'wednesday',
+        'thursday',
+        'friday',
+    ];
+
+    /** @var array */
+    protected static $weekends = [
+        'saturday',
+        'sunday',
+    ];
+
     /**
      * Returns recurrence instance relative value by its key.
      *
@@ -55,5 +70,33 @@ class StrategyHelper
                 throw new \RuntimeException('Unknown instance');
             }
         }
+    }
+
+    /**
+     * Returns relative value for dayOfWeek of recurrence entity.
+     *
+     * @param array $dayOfWeek
+     *
+     * @return string
+     */
+    public function getDayOfWeekRelativeValue($dayOfWeek)
+    {
+        sort($dayOfWeek);
+        sort(self::$weekends);
+        if (self::$weekends == $dayOfWeek) {
+            return 'weekend';
+        }
+
+        sort(self::$weekdays);
+        if (self::$weekdays == $dayOfWeek) {
+            return 'weekday';
+        }
+
+        if (count($dayOfWeek) == 7) {
+            return 'day';
+        }
+
+        //returns first element
+        return reset($dayOfWeek);
     }
 }

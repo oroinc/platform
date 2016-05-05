@@ -14,7 +14,31 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
     protected function setUp()
     {
         $helper = new StrategyHelper();
-        $this->strategy = new WeeklyStrategy($helper);
+        /** @var \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\Translation\TranslatorInterface */
+        $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
+        $translator->expects($this->any())
+            ->method('transChoice')
+            ->will(
+                $this->returnCallback(
+                    function ($id, $count, array $parameters = []) {
+                        return $id;
+                    }
+                )
+            );
+        $translator->expects($this->any())
+            ->method('trans')
+            ->will(
+                $this->returnCallback(
+                    function ($id) {
+                        return $id;
+                    }
+                )
+            );
+        $dateTimeFormatter = $this->getMockBuilder('Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->strategy = new WeeklyStrategy($helper, $translator, $dateTimeFormatter);
     }
 
     public function testGetName()
@@ -79,6 +103,25 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
             new \DateTime($params['end'])
         );
         $this->assertEquals($expected, $result);
+    }
+
+    /**
+     * @param $recurrenceData
+     * @param $expected
+     *
+     * @dataProvider recurrencePatternsDataProvider
+     */
+    public function testGetRecurrencePattern($recurrenceData, $expected)
+    {
+        $recurrence = new Recurrence();
+        $recurrence->setRecurrenceType(Recurrence::TYPE_WEEKLY)
+            ->setInterval($recurrenceData['interval'])
+            ->setDayOfWeek($recurrenceData['dayOfWeek'])
+            ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setEndTime(new \DateTime($recurrenceData['endTime']))
+            ->setOccurrences($recurrenceData['occurrences']);
+
+        $this->assertEquals($expected, $this->strategy->getRecurrencePattern($recurrence));
     }
 
     /**
@@ -306,6 +349,45 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     '2016-05-22',
                 ],
             ],
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function recurrencePatternsDataProvider()
+    {
+        return [
+            'without_occurrences_and_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfWeek' => ['monday'],
+                    'startTime' => '2016-04-28',
+                    'endTime' => Recurrence::MAX_END_DATE,
+                    'occurrences' => null,
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.weekly'
+            ],
+            'with_occurrences' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfWeek' => ['monday'],
+                    'startTime' => '2016-04-28',
+                    'endTime' => Recurrence::MAX_END_DATE,
+                    'occurrences' => 3,
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.weeklyoro.calendar.recurrence.patterns.occurrences'
+            ],
+            'with_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfWeek' => ['monday'],
+                    'startTime' => '2016-04-28',
+                    'endTime' => '2016-06-10',
+                    'occurrences' => null,
+                ],
+                'expected' => 'oro.calendar.recurrence.patterns.weeklyoro.calendar.recurrence.patterns.end_date'
+            ]
         ];
     }
 }
