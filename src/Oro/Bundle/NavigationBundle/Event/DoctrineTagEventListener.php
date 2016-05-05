@@ -68,10 +68,12 @@ class DoctrineTagEventListener
                 $includeCollectionTag = $uow->isScheduledForInsert($entity)
                     || $uow->isScheduledForDelete($entity);
 
-                $this->collectedTags = array_merge(
-                    $this->collectedTags,
-                    $generator->generate($entity, $includeCollectionTag)
-                );
+                if ($this->haveRealChanges($uow->getEntityChangeSet($entity))) {
+                    $this->collectedTags = array_merge(
+                        $this->collectedTags,
+                        $generator->generate($entity, $includeCollectionTag)
+                    );
+                }
             }
         }
 
@@ -106,5 +108,21 @@ class DoctrineTagEventListener
         }
 
         $this->skipTrackingFor[$className] = true;
+    }
+
+    protected function haveRealChanges($changeSet)
+    {
+        $result = array_filter(
+            $changeSet,
+            function ($item) {
+                if ($item[0] instanceof \DateTime && $item[1] instanceof \DateTime) {
+                    return $item[0]->getTimestamp() !== $item[1]->getTimestamp();
+                } else {
+                    return $item[0] !== $item[1];
+                }
+            }
+        );
+
+        return count($result) > 0;
     }
 }
