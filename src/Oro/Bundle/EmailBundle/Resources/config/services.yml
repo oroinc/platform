@@ -637,6 +637,7 @@ services:
             - '@oro_email.email.thread.manager'
             - '@oro_email.email.thread.provider'
             - '@oro_security.security_facade'
+            - '@oro_email.mailbox.manager'
 
     oro_email.twig.extension.email:
         class: %oro_email.twig.extension.email.class%
