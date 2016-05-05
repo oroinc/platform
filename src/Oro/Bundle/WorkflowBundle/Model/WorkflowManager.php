@@ -101,7 +101,7 @@ class WorkflowManager
         $workflow,
         $transition,
         $entity,
-        array $data = array(),
+        array $data = [],
         Collection $errors = null
     ) {
         $workflow = $this->getWorkflow($workflow);
@@ -323,12 +323,12 @@ class WorkflowManager
      */
     public function getWorkflowItemByEntity($entity)
     {
-        $entityClass = $this->doctrineHelper->getEntityClass($entity);
         $entityIdentifier = $this->doctrineHelper->getSingleEntityIdentifier($entity);
-
         if (false === filter_var($entityIdentifier, FILTER_VALIDATE_INT)) {
             return null;
         }
+
+        $entityClass = $this->doctrineHelper->getEntityClass($entity);
 
         return $this->getWorkflowItemRepository()->findByEntityMetadata($entityClass, $entityIdentifier);
     }
@@ -348,9 +348,13 @@ class WorkflowManager
     {
         if (is_string($workflowIdentifier)) {
             return $this->workflowRegistry->getWorkflow($workflowIdentifier);
-        } elseif ($workflowIdentifier instanceof WorkflowItem) {
+        }
+
+        if ($workflowIdentifier instanceof WorkflowItem) {
             return $this->workflowRegistry->getWorkflow($workflowIdentifier->getWorkflowName());
-        } elseif ($workflowIdentifier instanceof Workflow) {
+        }
+
+        if ($workflowIdentifier instanceof Workflow) {
             return $workflowIdentifier;
         }
 
@@ -389,7 +393,7 @@ class WorkflowManager
     {
         $this->getWorkflowItemRepository()->resetWorkflowData(
             $workflowDefinition->getRelatedEntity(),
-            array($workflowDefinition->getName())
+            [$workflowDefinition->getName()]
         );
     }
 
@@ -412,11 +416,11 @@ class WorkflowManager
     protected function getEntityConfig($entityClass)
     {
         $workflowConfigProvider = $this->configManager->getProvider('workflow');
-        if (!$workflowConfigProvider->hasConfig($entityClass)) {
-            throw new WorkflowException(sprintf('Entity %s is not configurable', $entityClass));
+        if ($workflowConfigProvider->hasConfig($entityClass)) {
+            return $workflowConfigProvider->getConfig($entityClass);
         }
 
-        return $workflowConfigProvider->getConfig($entityClass);
+        throw new WorkflowException(sprintf('Entity %s is not configurable', $entityClass));
     }
 
     /**

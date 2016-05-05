@@ -53,6 +53,9 @@ class Configuration implements ConfigurationInterface
                             ->variableNode('settings')
                                 ->defaultNull()
                             ->end()
+                            ->booleanNode('isNew')
+                                ->defaultFalse()
+                            ->end()
                         ->end()
                         ->validate()
                             ->ifTrue(function ($value) {

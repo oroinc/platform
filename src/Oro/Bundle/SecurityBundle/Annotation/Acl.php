@@ -44,6 +44,11 @@ class Acl implements \Serializable
     private $label;
 
     /**
+     * @var string
+     */
+    private $description;
+
+    /**
      * Constructor
      *
      * @param  array $data
@@ -72,6 +77,7 @@ class Acl implements \Serializable
         $this->class          = isset($data['class']) ? $data['class'] : '';
         $this->group          = isset($data['group_name']) ? $data['group_name'] : '';
         $this->label          = isset($data['label']) ? $data['label'] : '';
+        $this->description    = isset($data['description']) ? $data['description'] : '';
     }
 
     /**
@@ -167,6 +173,16 @@ class Acl implements \Serializable
     }
 
     /**
+     * Gets ACL description
+     *
+     * @return string
+     */
+    public function getDescription()
+    {
+        return $this->description;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function serialize()
@@ -179,7 +195,8 @@ class Acl implements \Serializable
                 $this->permission,
                 $this->ignoreClassAcl,
                 $this->group,
-                $this->label
+                $this->label,
+                $this->description,
             )
         );
     }
@@ -196,7 +213,8 @@ class Acl implements \Serializable
             $this->permission,
             $this->ignoreClassAcl,
             $this->group,
-            $this->label
+            $this->label,
+            $this->description,
             ) = unserialize($serialized);
     }
 
@@ -217,6 +235,7 @@ class Acl implements \Serializable
         $result->ignoreClassAcl = $data['ignoreClassAcl'];
         $result->group          = $data['group'];
         $result->label          = $data['label'];
+        $result->description    = $data['description'];
 
         return $result;
     }
