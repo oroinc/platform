@@ -107,18 +107,18 @@ class TagManager
     {
         if ($entity instanceof Taggable) {
             return $entity->getTags();
-        } else {
-            $entityClassName = ClassUtils::getClass($entity);
-            $entityId        = TaggableHelper::getEntityId($entity);
-            if (!isset($this->storage[$entityClassName][$entityId])) {
-                $this->storage[$entityClassName][$entityId] = $this->fetchTags(
-                    $entity,
-                    null
-                );
-            }
-
-            return $this->storage[$entityClassName][$entityId];
         }
+
+        $entityClassName = ClassUtils::getClass($entity);
+        $entityId        = TaggableHelper::getEntityId($entity);
+        if (!isset($this->storage[$entityClassName][$entityId])) {
+            $this->storage[$entityClassName][$entityId] = $this->fetchTags(
+                $entity,
+                null
+            );
+        }
+
+        return $this->storage[$entityClassName][$entityId];
     }
 
     /**
@@ -267,22 +267,22 @@ class TagManager
             $entry = [
                 'name' => $tag->getName()
             ];
-            if (!$tag->getId()) {
-                $entry = array_merge(
-                    $entry,
-                    [
-                        'id'    => $tag->getName(),
-                        'url'   => false,
-                        'owner' => true
-                    ]
-                );
-            } else {
+            if ($tag->getId()) {
                 $entry = array_merge(
                     $entry,
                     [
                         'id'    => $tag->getId(),
                         'url'   => $this->router->generate('oro_tag_search', ['id' => $tag->getId()]),
                         'owner' => false
+                    ]
+                );
+            } else {
+                $entry = array_merge(
+                    $entry,
+                    [
+                        'id'    => $tag->getName(),
+                        'url'   => false,
+                        'owner' => true
                     ]
                 );
             }
@@ -552,11 +552,13 @@ class TagManager
                 $tagIds->toArray()
             );
 
-        } elseif (!is_array($tagIds)) {
-            return [];
         }
 
-        return $tagIds;
+        if (is_array($tagIds)) {
+            return $tagIds;
+        }
+
+        return [];
     }
 
     /**

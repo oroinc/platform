@@ -13,7 +13,7 @@ define(function(require) {
 
     var IconView = require('./widget-container/icon-view');
     var WidgetContainerView = require('./widget-container/view');
-    var WidgetAddView = require('./widget-container/widget-add-view');
+    var WidgetPickerModal = require('./widget-container/widget-picker-modal');
     var WidgetSetupModalView = require('./widget-container/widget-setup-view');
 
     var sidebarTemplate = require('text!./templates/template.html');
@@ -51,6 +51,8 @@ define(function(require) {
             var model = view.model;
             var widgets = this.getWidgets();
 
+            this.translateAvailableWidgetsDescription();
+
             view.iconViews = {};
             view.hoverViews = {};
             view.widgetViews = {};
@@ -71,8 +73,26 @@ define(function(require) {
             view.listenTo(Backbone, 'setupWidget', view.onSetupWidget);
         },
 
+        translateAvailableWidgetsDescription: function() {
+            _.each(this.options.availableWidgets, function(widgetObject) {
+                widgetObject.description = __(widgetObject.description);
+            });
+        },
+
         getAvailableWidgets: function() {
-            return this.options.availableWidgets;
+            var widgets = this.getWidgets();
+            return _.map(this.options.availableWidgets, function(widgetObject, widgetName) {
+                return _.extend(widgetObject, {
+                    widgetName: widgetName,
+                    added: widgets.filter(function(widget) {
+                        return widget.get('widgetName') === widgetName;
+                    }).length
+                });
+            });
+        },
+
+        setWidgets: function(widgets) {
+            this.options.widgets = widgets;
         },
 
         getWidgets: function() {
@@ -122,11 +142,11 @@ define(function(require) {
             });
 
             $content.sortable({
-                axis:        'y',
+                axis: 'y',
                 containment: 'parent',
-                delay:       WIDGET_SORT_DELAY,
-                revert:      true,
-                tolerance:   'pointer',
+                delay: WIDGET_SORT_DELAY,
+                revert: true,
+                tolerance: 'pointer',
                 start: function(event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -159,11 +179,11 @@ define(function(require) {
             });
 
             $content.sortable({
-                axis:        'y',
+                axis: 'y',
                 containment: 'parent',
-                delay:       WIDGET_SORT_DELAY,
-                revert:      true,
-                tolerance:   'pointer',
+                delay: WIDGET_SORT_DELAY,
+                revert: true,
+                tolerance: 'pointer',
                 start: function(event, ui) {
                     var cid = ui.item.data('cid');
                     view.onIconDragStart(cid);
@@ -213,7 +233,7 @@ define(function(require) {
             e.stopPropagation();
             e.preventDefault();
 
-            var widgetAddView = new WidgetAddView({
+            var widgetAddView = new WidgetPickerModal({
                 sidebar: this
             });
 

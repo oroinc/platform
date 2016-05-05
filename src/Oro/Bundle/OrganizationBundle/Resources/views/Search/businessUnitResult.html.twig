@@ -2,5 +2,6 @@
 
 {% set showImage = false %}
 
+{% set recordUrl = path('oro_business_unit_view', {id: indexer_item.recordId}) %}
 {% set title = entity.name|default('N/A') %}
 {% set entityType = oro_entity_config_value(indexer_item.entityName, 'label')|trans %}

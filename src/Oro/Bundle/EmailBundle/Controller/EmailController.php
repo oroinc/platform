@@ -230,7 +230,7 @@ class EmailController extends Controller
     }
 
     /**
-     * @Route("/create")
+     * @Route("/create", name="oro_email_email_create")
      * @AclAncestor("oro_email_email_create")
      * @Template("OroEmailBundle:Email:update.html.twig")
      */
