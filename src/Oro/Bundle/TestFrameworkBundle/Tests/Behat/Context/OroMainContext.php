@@ -81,8 +81,9 @@ class OroMainContext extends MinkContext implements
         $this->getKernel()->boot();
         /** @var EntityManager $em */
         $em = $this->getContainer()->get('doctrine.orm.entity_manager');
+        $manager = $this->getContainer()->get('oro_user.manager');
 
-        $user = new User();
+        $user = $manager->createUser();
 
         foreach ($data as $row) {
             switch ($row['field']) {
@@ -101,7 +102,20 @@ class OroMainContext extends MinkContext implements
             }
         }
 
-        $this->getContainer()->get('oro_user.manager')->updateUser($user);
+        $organization = $em
+            ->getRepository('OroOrganizationBundle:Organization')->findOneBy([]);
+        $businessUnit = $em
+            ->getRepository('OroOrganizationBundle:BusinessUnit')
+            ->findOneBy([]);
+
+        $user
+            ->setEnabled(true)
+            ->addBusinessUnit($businessUnit)
+            ->addOrganization($organization)
+            ->setOrganization($organization)
+        ;
+
+        $manager->updateUser($user);
         $em->flush();
     }
 
