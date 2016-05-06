@@ -57,9 +57,6 @@ class PhoneProvider implements PhoneProviderInterface
      */
     public function addTargetEntity($className, $priority = 0)
     {
-        if (!isset($this->targetEntities[$priority])) {
-            $this->targetEntities[$priority] = [];
-        }
         $this->targetEntities[$priority][] = $className;
         $this->sortedTargetEntities        = null;
     }
@@ -93,7 +90,7 @@ class PhoneProvider implements PhoneProviderInterface
 
         // check if an object has own phone number
         $phoneProviders = $this->getPhoneProviders($object);
-        if (!empty($phoneProviders)) {
+        if ($phoneProviders) {
             $phone = null;
             /** @var PhoneProviderInterface $provider */
             foreach ($phoneProviders as $provider) {
@@ -104,7 +101,9 @@ class PhoneProvider implements PhoneProviderInterface
             }
 
             return $phone;
-        } elseif (method_exists($object, self::GET_PHONE_METHOD)) {
+        }
+
+        if (method_exists($object, self::GET_PHONE_METHOD)) {
             $phone = $object->getPhone();
             if (!is_object($phone)) {
                 return $phone;
@@ -130,7 +129,7 @@ class PhoneProvider implements PhoneProviderInterface
 
         // check if an object has own phone number
         $phoneProviders = $this->getPhoneProviders($object);
-        if (!empty($phoneProviders)) {
+        if ($phoneProviders) {
             $phones = [];
             /** @var PhoneProviderInterface $provider */
             foreach ($phoneProviders as $provider) {
@@ -138,7 +137,9 @@ class PhoneProvider implements PhoneProviderInterface
             }
 
             return $phones;
-        } elseif (method_exists($object, self::GET_PHONE_METHOD)) {
+        }
+
+        if (method_exists($object, self::GET_PHONE_METHOD)) {
             $phone = $object->{self::GET_PHONE_METHOD}();
             if ($phone && !is_object($phone)) {
                 return [[$phone, $object]];
