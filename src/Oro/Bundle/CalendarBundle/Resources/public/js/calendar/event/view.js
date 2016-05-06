@@ -271,6 +271,11 @@ define([
                         self._hideMask();
                     });
                 }
+                if (modelData.recurrence &&
+                    name.indexOf('[title]') === -1 &&
+                    name.indexOf('[description]') === -1) {
+                    input.attr('disabled', true);
+                }
             });
 
             return form;
