@@ -1,0 +1,14 @@
+{{ get_recurrence_pattern_by_attributes(
+    record.getValue('recurrenceId'),
+    {
+        'recurrenceType': record.getValue('recurrenceType'),
+        'interval': record.getValue('recurrenceInterval'),
+        'instance': record.getValue('recurrenceInstance'),
+        'dayOfWeek': record.getValue('recurrenceDayOfWeek'),
+        'dayOfMonth': record.getValue('recurrenceDayOfMonth'),
+        'monthOfYear': record.getValue('recurrenceMonthOfYear'),
+        'startTime': record.getValue('recurrenceStartTime'),
+        'endTime': record.getValue('recurrenceEndTime'),
+        'occurrences': record.getValue('recurrenceOccurrences')
+    }
+) }}

@@ -110,6 +110,7 @@ services:
         class: '%oro_calendar.twig.recurrence.class%'
         arguments:
             - '@oro_calendar.recurrence.strategy.delegate'
+            - '@translator'
         tags:
             - { name: twig.extension }
 
