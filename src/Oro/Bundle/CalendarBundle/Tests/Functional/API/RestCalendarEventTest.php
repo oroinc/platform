@@ -121,6 +121,8 @@ class RestCalendarEventTest extends WebTestCase
         $this->assertNotEmpty($result);
         $this->assertEquals($id, $result['id']);
         $calendarEventDocument = $this->calendarEventDocument;
+        //event listener must change endTime date
+        $calendarEventDocument['recurrence']['endTime'] = '9000-01-01T00:00:01+00:00';
         $this->clearAttributes($result);
         $this->clearAttributes($calendarEventDocument);
         $this->assertEquals($calendarEventDocument, $result);
@@ -190,6 +192,8 @@ class RestCalendarEventTest extends WebTestCase
         $this->assertCount(1, $result);
         $result = $result[0];
         $calendarEventDocument = $this->calendarEventDocument;
+        //event listener must change endTime date
+        $calendarEventDocument['recurrence']['endTime'] = '9000-01-01T00:00:01+00:00';
         $this->clearAttributes($result);
         $this->clearAttributes($calendarEventDocument);
         $this->assertEquals($calendarEventDocument, $result);

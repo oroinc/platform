@@ -120,10 +120,55 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
         $month = date('M', mktime(0, 0, 0, $monthOfYear));
         $year = $occurrenceDate->format('Y');
         $nextDays = [];
-        foreach ($dayOfWeek as $day) {
-            $nextDays[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
+        if ($instance === Recurrence::INSTANCE_FIRST || $instance === Recurrence::INSTANCE_LAST) {
+            foreach ($dayOfWeek as $day) {
+                $nextDays[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
+            }
+
+            return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
         }
 
-        return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
+        $days = [];
+        $currentInstance = 1;
+        while(count($days) < $instance) {
+            $instanceRelativeValue = $this->strategyHelper->getInstanceRelativeValue($currentInstance);
+            foreach ($dayOfWeek as $day) {
+                $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
+            }
+            $currentInstance++;
+        }
+        sort($days);
+
+        return $days[$instance - 1];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLastOccurrence(Recurrence $recurrence)
+    {
+        $startTime = $recurrence->getStartTime();
+        $dayOfWeek = $recurrence->getDayOfWeek();
+        $monthOfYear = $recurrence->getMonthOfYear();
+        $instance = $recurrence->getInstance();
+        $occurrenceDate = $this->getNextOccurrence(0, $dayOfWeek, $monthOfYear, $instance, $startTime);
+
+        if ($occurrenceDate < $recurrence->getStartTime()) {
+            $occurrenceDate = $this->getNextOccurrence(
+                $recurrence->getInterval(),
+                $dayOfWeek,
+                $monthOfYear,
+                $instance,
+                $occurrenceDate
+            );
+        }
+
+        return $this->getNextOccurrence(
+            ($recurrence->getOccurrences() - 1) * $recurrence->getInterval(),
+            $dayOfWeek,
+            $monthOfYear,
+            $instance,
+            $occurrenceDate
+        );
     }
 }
