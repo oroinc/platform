@@ -68,7 +68,7 @@ class DoctrineTagEventListener
                 $includeCollectionTag = $uow->isScheduledForInsert($entity)
                     || $uow->isScheduledForDelete($entity);
 
-                if ($this->haveRealChanges($uow->getEntityChangeSet($entity))) {
+                if ($this->hasFieldChanges($uow->getEntityChangeSet($entity))) {
                     $this->collectedTags = array_merge(
                         $this->collectedTags,
                         $generator->generate($entity, $includeCollectionTag)
@@ -110,7 +110,11 @@ class DoctrineTagEventListener
         $this->skipTrackingFor[$className] = true;
     }
 
-    protected function haveRealChanges($changeSet)
+    /**
+     * @param array $changeSet
+     * @return bool
+     */
+    protected function hasFieldChanges($changeSet)
     {
         $result = array_filter(
             $changeSet,
