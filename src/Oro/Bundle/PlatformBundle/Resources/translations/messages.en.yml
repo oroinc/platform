@@ -14,7 +14,7 @@ oro:
             thirdParty: 3rd Party Packages
         acl:
             action:
-                system_info.label: Access System Information
+                system_info.label: Access system information
     distribution:
         package_manager:
             label: Package Manager
