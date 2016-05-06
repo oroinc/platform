@@ -136,6 +136,13 @@ class CalendarEventApiType extends CalendarEventType
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function preSubmit(FormEvent $event)
+    {
+    }
+
+    /**
      * POST_SUBMIT event handler
      *
      * @param FormEvent $event

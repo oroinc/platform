@@ -20,16 +20,7 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
         }
 
         //week days should be sorted in standard sequence (sun, mon, tue...)
-        usort($weekDays, function ($item1, $item2) {
-            $date1 = new \DateTime($item1);
-            $date2 = new \DateTime($item2);
-
-            if ($date1->format('w') === $date2->format('w')) {
-                return 0;
-            }
-
-            return $date1->format('w') > $date2->format('w');
-        });
+        $this->sortWeekDays($weekDays);
 
         $firstDay = reset($weekDays);
         $startTime = new \DateTime("previous $firstDay {$recurrence->getStartTime()->format('c')}");
@@ -128,5 +119,70 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
         }
 
         return new \DateTime("next {$day} {$date->format('c')}");
+    }
+
+    /**
+     * Sorts weekdays array to standard sequence(sun, mon, ...).
+     *
+     * @param $weekDays
+     *
+     * @return self
+     */
+    protected function sortWeekDays(&$weekDays)
+    {
+        usort($weekDays, function ($item1, $item2) {
+            $date1 = new \DateTime($item1);
+            $date2 = new \DateTime($item2);
+
+            if ($date1->format('w') === $date2->format('w')) {
+                return 0;
+            }
+
+            return $date1->format('w') > $date2->format('w');
+        });
+
+        return $this;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLastOccurrence(Recurrence $recurrence)
+    {
+        $weekDays = $recurrence->getDayOfWeek();
+
+        $this->sortWeekDays($weekDays);
+        $firstDay = reset($weekDays);
+        $currentDay = new \DateTime($firstDay);
+        $startTime = $recurrence->getStartTime();
+        if ($recurrence->getStartTime()->format('w') > $currentDay->format('w')) {
+            $startTime = new \DateTime("previous $firstDay {$recurrence->getStartTime()->format('c')}");
+        }
+
+        $fullWeeks = (ceil($recurrence->getOccurrences() / count($weekDays)) - 1) * $recurrence->getInterval();
+        $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}");
+        $fromStartInterval = $fullWeeks / $recurrence->getInterval() * count($weekDays);
+        foreach ($weekDays as $day) {
+            $currentDay = new \DateTime($day);
+            if ($currentDay->format('w') < $recurrence->getStartTime()->format('w')) {
+                $fromStartInterval = $fromStartInterval == 0 ? $fromStartInterval : $fromStartInterval - 1;
+            }
+        }
+
+        if ($fromStartInterval + count($weekDays) < $recurrence->getOccurrences()) {
+            $fullWeeks += $recurrence->getInterval();
+            $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}");
+            $fromStartInterval += count($weekDays);
+        }
+
+        foreach ($weekDays as $day) {
+            $next = $this->getNextOccurrence($day, $afterFullWeeksDate);
+            $fromStartInterval = $next >= $recurrence->getStartTime() ? $fromStartInterval + 1 : $fromStartInterval;
+            if ($fromStartInterval >= $recurrence->getOccurrences()) {
+                return $next;
+            }
+        }
+
+        return $recurrence->getStartTime();
     }
 }

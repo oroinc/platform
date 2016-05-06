@@ -46,4 +46,13 @@ interface StrategyInterface
      * @throws \InvalidArgumentException
      */
     public function getRecurrencePattern(Recurrence $recurrence);
+
+    /**
+     * Calculates and returns last occurrence date.
+     *
+     * @param Recurrence $recurrence
+     *
+     * @return \DateTime
+     */
+    public function getCalculatedEndTime(Recurrence $recurrence);
 }

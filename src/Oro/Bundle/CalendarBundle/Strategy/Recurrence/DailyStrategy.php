@@ -82,4 +82,15 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
     {
         return new \DateTime("+{$interval} day {$date->format('c')}");
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLastOccurrence(Recurrence $recurrence)
+    {
+        return $this->getNextOccurrence(
+            $recurrence->getInterval() * ($recurrence->getOccurrences() - 1),
+            $recurrence->getStartTime()
+        );
+    }
 }

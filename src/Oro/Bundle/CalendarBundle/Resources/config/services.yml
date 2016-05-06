@@ -11,6 +11,7 @@ parameters:
     oro_calendar.calendar_property.manager.api.class:            Oro\Bundle\CalendarBundle\Manager\CalendarPropertyApiEntityManager
     oro_calendar.system_calendar.manager.api.class:              Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager
     oro_calendar.twig.dateformat.class:                          Oro\Bundle\CalendarBundle\Twig\DateFormatExtension
+    oro_calendar.twig.recurrence.class:                          Oro\Bundle\CalendarBundle\Twig\RecurrenceExtension
     oro_calendar.provider.calendar_config.class:                 Oro\Bundle\CalendarBundle\Provider\CalendarDateTimeConfigProvider
     oro_calendar.owner_assignment_checker.calendar.class:        Oro\Bundle\CalendarBundle\Ownership\CalendarOwnerAssignmentChecker
     oro_calendar.activity_list.provider.class:                   Oro\Bundle\CalendarBundle\Provider\CalendarEventActivityListProvider
@@ -47,8 +48,10 @@ services:
         class: %oro_calendar.listener.entity_listener.class%
         arguments:
             - '@oro_organization.link.security_context'
+            - '@oro_calendar.recurrence.strategy'
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
 
@@ -100,6 +103,14 @@ services:
         class: %oro_calendar.twig.dateformat.class%
         arguments:
             - '@oro_locale.formatter.date_time'
+        tags:
+            - { name: twig.extension }
+
+    oro_calendar.twig.recurrence:
+        class: '%oro_calendar.twig.recurrence.class%'
+        arguments:
+            - '@oro_calendar.recurrence.strategy.delegate'
+            - '@translator'
         tags:
             - { name: twig.extension }
 

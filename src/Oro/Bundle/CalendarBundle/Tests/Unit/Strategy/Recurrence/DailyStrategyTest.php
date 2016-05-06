@@ -121,6 +121,27 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $recurrenceData
+     * @param $expected
+     *
+     * @dataProvider recurrenceLastOccurrenceDataProvider
+     */
+    public function testGetCalculatedEndTime($recurrenceData, $expected)
+    {
+        $recurrence = new Recurrence();
+        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
+            ->setInterval($recurrenceData['interval'])
+            ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setOccurrences($recurrenceData['occurrences']);
+
+        if (!empty($recurrenceData['endTime'])) {
+            $recurrence->setEndTime(new \DateTime($recurrenceData['endTime']));
+        }
+
+        $this->assertEquals($expected, $this->strategy->getCalculatedEndTime($recurrence));
+    }
+
+    /**
      * @return array
      */
     public function propertiesDataProvider()
@@ -325,6 +346,42 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
                     'occurrences' => null,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.dailyoro.calendar.recurrence.patterns.end_date'
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function recurrenceLastOccurrenceDataProvider()
+    {
+        return [
+            'without_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'startTime' => '2016-04-28',
+                    'endTime' => null,
+                    'occurrences' => null,
+                ],
+                'expected' => new \DateTime(Recurrence::MAX_END_DATE)
+            ],
+            'with_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'startTime' => '2016-04-28',
+                    'endTime' => '2016-05-12',
+                    'occurrences' => null,
+                ],
+                'expected' => new \DateTime('2016-05-12')
+            ],
+            'with_occurrences' => [
+                'params' => [
+                    'interval' => 2,
+                    'startTime' => '2016-04-28',
+                    'endTime' => null,
+                    'occurrences' => 5,
+                ],
+                'expected' => new \DateTime('2016-05-06')
             ]
         ];
     }

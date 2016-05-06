@@ -135,7 +135,8 @@ class CalendarEventHandler
                 $this->onSuccess(
                     $entity,
                     $originalChildren,
-                    $this->form->get('notifyInvitedUsers')->getData()
+                    $this->form->has('notifyInvitedUsers') ?
+                        $this->form->get('notifyInvitedUsers')->getData() : new ArrayCollection()
                 );
 
                 return true;

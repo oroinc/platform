@@ -117,6 +117,10 @@ oro:
             invitation.label:        Guests
             invitation_status.label: Invitation status
             recurrence.label:      Recurrence
+            recurrence.alias.repeat: Repeat
+            recurrence.alias.recurrent: Recurrent
+            recurrence.pattern: Recurrence Pattern
+            recurrence.na: N/A
             recurringEventExceptions.label: Recurring Event Exceptions
             recurringEvent.label: Recurring Event
 

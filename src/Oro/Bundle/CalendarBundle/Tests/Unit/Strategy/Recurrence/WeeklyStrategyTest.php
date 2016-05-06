@@ -125,6 +125,28 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $recurrenceData
+     * @param $expected
+     *
+     * @dataProvider recurrenceLastOccurrenceDataProvider
+     */
+    public function testGetCalculatedEndTime($recurrenceData, $expected)
+    {
+        $recurrence = new Recurrence();
+        $recurrence->setRecurrenceType(Recurrence::TYPE_WEEKLY)
+            ->setInterval($recurrenceData['interval'])
+            ->setDayOfWeek($recurrenceData['dayOfWeek'])
+            ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setOccurrences($recurrenceData['occurrences']);
+
+        if (!empty($recurrenceData['endTime'])) {
+            $recurrence->setEndTime(new \DateTime($recurrenceData['endTime']));
+        }
+
+        $this->assertEquals($expected, $this->strategy->getCalculatedEndTime($recurrence));
+    }
+
+    /**
      * @return array
      */
     public function propertiesDataProvider()
@@ -387,6 +409,75 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     'occurrences' => null,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.weeklyoro.calendar.recurrence.patterns.end_date'
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function recurrenceLastOccurrenceDataProvider()
+    {
+        return [
+            'without_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfWeek' => ['monday'],
+                    'startTime' => '2016-04-28',
+                    'endTime' => null,
+                    'occurrences' => null,
+                ],
+                'expected' => new \DateTime(Recurrence::MAX_END_DATE)
+            ],
+            'with_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfWeek' => ['monday'],
+                    'startTime' => '2016-04-28',
+                    'endTime' => '2016-05-12',
+                    'occurrences' => null,
+                ],
+                'expected' => new \DateTime('2016-05-12')
+            ],
+            'with_occurrences' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfWeek' => ['monday', 'tuesday'],
+                    'startTime' => '2016-04-25',
+                    'endTime' => null,
+                    'occurrences' => 5,
+                ],
+                'expected' => new \DateTime('2016-05-23')
+            ],
+            'with_occurrences_1' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfWeek' => ['saturday', 'sunday', 'monday'],
+                    'startTime' => '2016-04-26',
+                    'endTime' => null,
+                    'occurrences' => 5,
+                ],
+                'expected' => new \DateTime('2016-05-22')
+            ],
+            'with_occurrences_2' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfWeek' => ['wednesday', 'friday'],
+                    'startTime' => '2016-05-02',
+                    'endTime' => null,
+                    'occurrences' => 8,
+                ],
+                'expected' => new \DateTime('2016-06-17')
+            ],
+            'with_occurrences_3' => [
+                'params' => [
+                    'interval' => 3,
+                    'dayOfWeek' => ['sunday', 'saturday'],
+                    'startTime' => '2016-05-02',
+                    'endTime' => null,
+                    'occurrences' => 111,
+                ],
+                'expected' => new \DateTime('2019-07-06')
             ]
         ];
     }
