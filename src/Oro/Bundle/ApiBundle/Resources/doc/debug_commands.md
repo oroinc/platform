@@ -2,7 +2,7 @@ Debug commands
 --------------
 
 ### oro:api:dump
-This command shows all resources available through Data API.
+This command shows all resources accessible through Data API.
 
 Run this command without parameters to see all available resources:
 

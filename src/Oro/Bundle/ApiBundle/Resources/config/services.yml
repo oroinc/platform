@@ -283,7 +283,7 @@ services:
             - '@oro_api.doctrine_helper'
             - '@oro_api.value_normalizer'
         tags:
-            - { name: routing.options_resolver, priority: -255 }
+            - { name: routing.options_resolver.api_doc, priority: -255 }
 
     oro_api.routing_options_resolver.api_doc:
         class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver

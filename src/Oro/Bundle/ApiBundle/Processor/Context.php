@@ -737,9 +737,7 @@ class Context extends ApiContext implements ContextInterface
         if (empty($entityClass)) {
             $this->processLoadedMetadata(null);
 
-            throw new \RuntimeException(
-                'A class name must be set in the context before metadata are loaded.'
-            );
+            return;
         }
 
         try {

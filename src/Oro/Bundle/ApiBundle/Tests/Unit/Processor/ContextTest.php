@@ -777,13 +777,13 @@ class ContextTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($metadata, $this->context->getMetadata());
     }
 
-    /**
-     * @expectedException \RuntimeException
-     * @expectedExceptionMessage A class name must be set in the context before metadata are loaded.
-     */
     public function testLoadMetadataNoClassName()
     {
-        $this->context->getMetadata();
+        $this->metadataProvider->expects($this->never())
+            ->method('getMetadata');
+
+        $this->assertNull($this->context->getMetadata());
+        $this->assertTrue($this->context->hasMetadata());
     }
 
     public function testLoadMetadataWhenExceptionOccurs()

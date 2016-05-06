@@ -36,7 +36,7 @@ The following table shows all actions provided out of the box:
 
 | Action Name           | Description |
 | ---                   | --- |
-| [collect_resources](#collect_resources-action) | Returns a list of all resources available through Data API |
+| [collect_resources](#collect_resources-action) | Returns a list of all resources accessible through Data API |
 | [get](#get-action) | Returns an entity by its identifier |
 | [get_list](#get_list-action) | Returns a list of entities |
 | [delete](#delete-action) | Deletes an entity by its identifier |
@@ -54,7 +54,7 @@ Also you can use the [oro:api:debug](./debug_commands.md#oroapidebug) command to
 collect_resources Action
 ------------------------
 
-This action is intended to get a list of all resources available through Data API.
+This action is intended to get a list of all resources accessible through Data API.
 
 The context class: [CollectResourcesContext](../../Processor/CollectResources/CollectResourcesContext.php).
 

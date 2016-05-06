@@ -12,6 +12,12 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $valueNormalizer;
 
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $resourcesLoader;
+
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
+    protected $resourcesCache;
+
     /** @var NormalizeEntityClass */
     protected $processor;
 
@@ -22,8 +28,18 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
         $this->valueNormalizer = $this->getMockBuilder('Oro\Bundle\ApiBundle\Request\ValueNormalizer')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->resourcesLoader = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesLoader')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $this->resourcesCache = $this->getMockBuilder('Oro\Bundle\ApiBundle\Provider\ResourcesCache')
+            ->disableOriginalConstructor()
+            ->getMock();
 
-        $this->processor = new NormalizeEntityClass($this->valueNormalizer);
+        $this->processor = new NormalizeEntityClass(
+            $this->valueNormalizer,
+            $this->resourcesLoader,
+            $this->resourcesCache
+        );
     }
 
     public function testProcessWhenClassAlreadyNormalized()
@@ -44,10 +60,63 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
             ->method('normalizeValue')
             ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
             ->willReturn('Test\Class');
+        $this->resourcesCache->expects($this->once())
+            ->method('getAccessibleResources')
+            ->with($this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(['Test\Class']);
 
         $this->processor->process($this->context);
 
         $this->assertSame('Test\Class', $this->context->getClassName());
+    }
+
+    public function testProcessWhenNoResourcesCache()
+    {
+        $this->context->setClassName('test');
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn('Test\Class');
+        $this->resourcesCache->expects($this->at(0))
+            ->method('getAccessibleResources')
+            ->with($this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(null);
+        $this->resourcesLoader->expects($this->once())
+            ->method('getResources')
+            ->with($this->context->getVersion(), $this->context->getRequestType());
+        $this->resourcesCache->expects($this->at(1))
+            ->method('getAccessibleResources')
+            ->with($this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn(['Test\Class']);
+
+        $this->processor->process($this->context);
+
+        $this->assertSame('Test\Class', $this->context->getClassName());
+    }
+
+    public function testProcessForNotAccessibleEntityType()
+    {
+        $this->context->setClassName('test');
+
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with($this->context->getClassName(), DataType::ENTITY_CLASS, $this->context->getRequestType())
+            ->willReturn('Test\Class');
+        $this->resourcesCache->expects($this->once())
+            ->method('getAccessibleResources')
+            ->with($this->context->getVersion(), $this->context->getRequestType())
+            ->willReturn([]);
+
+        $this->processor->process($this->context);
+
+        $this->assertNull($this->context->getClassName());
+        $this->assertEquals(
+            [
+                Error::createValidationError('entity type constraint', 'Unknown entity type: test.')
+            ],
+            $this->context->getErrors()
+        );
     }
 
     public function testProcessForInvalidEntityType()
@@ -61,10 +130,10 @@ class NormalizeEntityClassTest extends GetListProcessorTestCase
 
         $this->processor->process($this->context);
 
-        $this->assertSame('test', $this->context->getClassName());
+        $this->assertNull($this->context->getClassName());
         $this->assertEquals(
             [
-                Error::createValidationError('entity type constraint')
+                Error::createValidationError('entity type constraint', 'Unknown entity type: test.')
             ],
             $this->context->getErrors()
         );
