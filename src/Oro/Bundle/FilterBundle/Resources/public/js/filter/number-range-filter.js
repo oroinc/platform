@@ -171,6 +171,12 @@ define([
             var formatted = NumberRangeFilter.__super__._formatRawValue.apply(this, arguments);
 
             formatted.value_end = this._toRawValue(data.value_end);
+            // change start/end values order if end value is lower than start
+            if (formatted.value_end && formatted.value_end < formatted.value) {
+                var endValue = formatted.value_end;
+                formatted.value_end = formatted.value;
+                formatted.value = endValue;
+            }
 
             return formatted;
         },
