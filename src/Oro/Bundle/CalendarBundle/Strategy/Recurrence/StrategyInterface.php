@@ -54,5 +54,5 @@ interface StrategyInterface
      *
      * @return \DateTime
      */
-    public function getLastOccurrenceDate(Recurrence $recurrence);
+    public function getCalculatedEndTime(Recurrence $recurrence);
 }

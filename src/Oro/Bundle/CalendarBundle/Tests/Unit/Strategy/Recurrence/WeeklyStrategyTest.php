@@ -130,7 +130,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider recurrenceLastOccurrenceDataProvider
      */
-    public function testGetLastOccurrenceDate($recurrenceData, $expected)
+    public function testGetCalculatedEndTime($recurrenceData, $expected)
     {
         $recurrence = new Recurrence();
         $recurrence->setRecurrenceType(Recurrence::TYPE_WEEKLY)
@@ -143,7 +143,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
             $recurrence->setEndTime(new \DateTime($recurrenceData['endTime']));
         }
 
-        $this->assertEquals($expected, $this->strategy->getLastOccurrenceDate($recurrence));
+        $this->assertEquals($expected, $this->strategy->getCalculatedEndTime($recurrence));
     }
 
     /**

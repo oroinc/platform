@@ -108,9 +108,13 @@ abstract class AbstractStrategy
     }
 
     /**
-     * {@inheritdoc}
+     * @param Recurrence $recurrence
+     *
+     * @return \DateTime|null
+     *
+     * @see Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface
      */
-    public function getLastOccurrenceDate(Recurrence $recurrence)
+    public function getCalculatedEndTime(Recurrence $recurrence)
     {
         $occurrences = $recurrence->getOccurrences();
         $currentEndTime = $recurrence->getEndTime();

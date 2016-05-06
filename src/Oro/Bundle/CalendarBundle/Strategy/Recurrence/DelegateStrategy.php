@@ -85,7 +85,7 @@ class DelegateStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getLastOccurrenceDate(Recurrence $recurrence)
+    public function getCalculatedEndTime(Recurrence $recurrence)
     {
         $delegate = $this->match($recurrence);
 
@@ -95,7 +95,7 @@ class DelegateStrategy implements StrategyInterface
             );
         }
 
-        return $delegate->getLastOccurrenceDate($recurrence);
+        return $delegate->getCalculatedEndTime($recurrence);
     }
 
     /**

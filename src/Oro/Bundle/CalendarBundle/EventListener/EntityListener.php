@@ -3,22 +3,22 @@
 namespace Oro\Bundle\CalendarBundle\EventListener;
 
 use Doctrine\Common\Util\ClassUtils;
-use Doctrine\ORM\Event\LifecycleEventArgs;
-use Doctrine\ORM\Event\PostFlushEventArgs;
-use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\EntityManager;
+use Doctrine\ORM\Event\LifecycleEventArgs;
 use Doctrine\ORM\Event\OnFlushEventArgs;
+use Doctrine\ORM\Event\PostFlushEventArgs;
 use Doctrine\ORM\Event\PreUpdateEventArgs;
+use Doctrine\ORM\Mapping\ClassMetadata;
 use Doctrine\ORM\PersistentCollection;
 use Doctrine\ORM\UnitOfWork;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface;
 use Symfony\Component\Security\Core\SecurityContextInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;
@@ -39,8 +39,6 @@ class EntityListener
     protected $recurrenceStrategy;
 
     /**
-     * EntityListener constructor.
-     *
      * @param ServiceLink $securityContextLink
      * @param StrategyInterface $recurrenceStrategy
      */
@@ -70,7 +68,7 @@ class EntityListener
         }
 
         if ($entity instanceof Recurrence) {
-            $entity->setEndTime($this->recurrenceStrategy->getLastOccurrenceDate($entity));
+            $entity->setEndTime($this->recurrenceStrategy->getCalculatedEndTime($entity));
         }
     }
 
@@ -81,7 +79,7 @@ class EntityListener
     {
         $entity = $args->getEntity();
         if ($entity instanceof Recurrence) {
-            $entity->setEndTime($this->recurrenceStrategy->getLastOccurrenceDate($entity));
+            $entity->setEndTime($this->recurrenceStrategy->getCalculatedEndTime($entity));
         }
     }
 
