@@ -118,6 +118,9 @@ oro:
             invitation_status.label: Invitation status
             recurrence.label:      Recurrence
             recurrence.alias.repeat: Repeat
+            recurrence.alias.recurrent: Recurrent
+            recurrence.pattern: Recurrence Pattern
+            recurrence.na: N/A
             exceptions.label:      Exceptions
             parentException.label: Parent of exception
 
