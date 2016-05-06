@@ -63,7 +63,14 @@ class RestRouteOptionsResolver implements RouteOptionsResolverInterface
      */
     public function resolve(Route $route, RouteCollectionAccessor $routes)
     {
-        if (!$this->isApplicationInstalled || $route->getOption('group') !== self::ROUTE_GROUP) {
+        if (!$this->isApplicationInstalled) {
+            return;
+        }
+        if ($route->getOption('group') === 'rest_api_deprecated') {
+            $routes->remove($routes->getName($route));
+            return;
+        }
+        if ($route->getOption('group') !== self::ROUTE_GROUP) {
             return;
         }
 
