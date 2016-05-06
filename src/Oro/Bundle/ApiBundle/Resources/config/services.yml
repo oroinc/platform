@@ -285,6 +285,10 @@ services:
         tags:
             - { name: routing.options_resolver, priority: -255 }
 
+    oro_api.routing_options_resolver.api_doc:
+        class: Oro\Component\Routing\Resolver\ChainRouteOptionsResolver
+        public: false
+
     oro_api.rest.doc_handler:
         class: Oro\Bundle\ApiBundle\Routing\RestDocHandler
         public: false

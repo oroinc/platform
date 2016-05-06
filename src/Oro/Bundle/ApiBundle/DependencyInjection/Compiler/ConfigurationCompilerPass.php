@@ -43,6 +43,9 @@ class ConfigurationCompilerPass implements CompilerPassInterface
     const EXCEPTION_TEXT_EXTRACTOR_SERVICE_ID = 'oro_api.exception_text_extractor';
     const EXCEPTION_TEXT_EXTRACTOR_TAG        = 'oro.api.exception_text_extractor';
 
+    const API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE  = 'oro_api.routing_options_resolver.api_doc';
+    const API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME = 'routing.options_resolver.api_doc';
+
     /**
      * {@inheritdoc}
      */
@@ -87,6 +90,13 @@ class ConfigurationCompilerPass implements CompilerPassInterface
             self::EXCEPTION_TEXT_EXTRACTOR_SERVICE_ID,
             self::EXCEPTION_TEXT_EXTRACTOR_TAG,
             'addExtractor'
+        );
+
+        DependencyInjectionUtil::registerTaggedServices(
+            $container,
+            self::API_DOC_ROUTING_OPTIONS_RESOLVER_SERVICE,
+            self::API_DOC_ROUTING_OPTIONS_RESOLVER_TAG_NAME,
+            'addResolver'
         );
     }
 
