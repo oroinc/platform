@@ -135,52 +135,33 @@
                 </div>
             </div>
         </div>
-        <script type="text/html" id="available-dashboard-widgets">
-            {% for widgetName, widget in widgets %}
-                {% if widget.acl is not defined or resource_granted(widget.acl) %}
-                    <div class="dashboard-widget-container">
-                        <table>
-                            <tr class="dashboard-widget-title">
-                                <td class="dashboard-widget-small-column">
-                                    <a href="javascript:void(0);" class="dashboard-picker-collapse">
-                                    </a>
-                                </td>
-                                <td class="dashboard-widget-small-column">
-                                    {% if widget.icon is defined %}
-                                    <img class="dashboard-widget-icon" src="{{ asset(widget.icon) }}" alt="Preview" />
-                                    {% else %}
-                                    <img class="dashboard-widget-icon" src="{{ asset("bundles/orodashboard/img/no_icon.png") }}" alt="Preview" />
-                                    {% endif %}
-                                </td>
-                                <td class="dashboard-widget-large-column">
-                                    {% if widget.label is defined %}
-                                        <strong>{{ widget.label|trans }}</strong>
-                                    {% endif %}
-                                </td>
-                                <td class="dashboard-widgets-pick-wrapper">
-                                    <a class="btn add-widget-button btn-primary" data-widget-name="{{ widgetName }}">
-                                            {{ "oro.dashboard.add_dashboard_widgets.add_to_dashboard"|trans }}
-                                        </a>
-                                </td>
-                            </tr>
-                            <tr class="dashboard-widgets-description">
-                                <td colspan="2"></td>
-                                <td class="dashboard-widget-large-column">
-                                    {% if widget.description is defined %}
-                                        {{ widget.description|trans }}
-                                    {% endif %}
-                                </td>
-                            </tr>
-                        </table>
-                    </div>
-                {% endif %}
-            {% endfor %}
-        </script>
     {% endblock widgets_content %}
 
+    {% set availableWidgets = [] %}
+    {% for widgetName, widget in widgets %}
+        {% if widget.acl is not defined or resource_granted(widget.acl) %}
+            {% set icon = asset("bundles/orodashboard/img/no_icon.png") %}
+            {% if widget.icon is defined %}
+                {% set icon = asset(widget.icon) %}
+            {% endif %}
+            {% set title = widget.label|trans %}
+            {% set description = '' %}
+            {% if widget.description is defined %}
+                {% set description = widget.description|trans %}
+            {% endif %}
+            {% set availableWidgets = availableWidgets|merge([{
+            'dialogIcon': icon,
+            'title': title,
+            'widgetName': widgetName,
+            'description': description,
+            'isNew': widget.isNew
+            }]) %}
+        {% endif %}
+    {% endfor %}
+
     <script type="text/javascript">
-        require(['orodashboard/js/dashboard-container', 'orodashboard/js/widget-picker'],
-            function(dashboardContainer, widgetPicker) {
+        require(['orodashboard/js/dashboard-container'],
+            function(dashboardContainer) {
                 {% set widgetIds = [] %}
                 {% for widget in dashboard.widgets %}
                     {% if widget.config.acl is not defined or resource_granted(widget.config.acl) %}
@@ -191,9 +172,9 @@
                     widgetIds: {{ widgetIds|json_encode|raw }},
                     dashboardId: {{ dashboard.id|json_encode|raw }},
                     columnsSelector: '.dashboard-column',
-                    allowEdit: {{ allowEdit ? 'true' : 'false' }}
+                    allowEdit: {{ allowEdit ? 'true' : 'false' }},
+                    availableWidgets: {{ availableWidgets|json_encode|raw }}
                 });
-                widgetPicker.init({{ dashboard.id }});
             }
         );
     </script>
@@ -222,6 +203,7 @@
                         },
                         'allowEdit': options.allowEdit,
                         'showConfig': options.allowEdit and widget.config.configuration|length > 0,
+                        'widgetName': widget.entity.name
                     })
                 }}
             {% endif %}

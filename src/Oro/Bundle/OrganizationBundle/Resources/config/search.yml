@@ -10,7 +10,7 @@ Oro\Bundle\OrganizationBundle\Entity\Organization:
 
 Oro\Bundle\OrganizationBundle\Entity\BusinessUnit:
     alias:                          oro_business_unit
-    search_template:                OroOrganizationBundle:Search:organizationResult.html.twig
+    search_template:                OroOrganizationBundle:Search:businessUnitResult.html.twig
     title_fields:                   [name]
     fields:
         -

@@ -57,4 +57,13 @@ class MassActionExtension extends ActionExtension
 
         return $action;
     }
+
+    /**
+     * {@inheritDoc}
+     */
+    public function getPriority()
+    {
+        // should be applied before action extension
+        return 205;
+    }
 }
