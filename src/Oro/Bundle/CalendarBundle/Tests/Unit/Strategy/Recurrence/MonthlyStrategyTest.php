@@ -121,6 +121,28 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $recurrenceData
+     * @param $expected
+     *
+     * @dataProvider recurrenceLastOccurrenceDataProvider
+     */
+    public function testGetLastOccurrenceDate($recurrenceData, $expected)
+    {
+        $recurrence = new Recurrence();
+        $recurrence->setRecurrenceType(Recurrence::TYPE_MONTHLY)
+            ->setInterval($recurrenceData['interval'])
+            ->setDayOfMonth($recurrenceData['dayOfMonth'])
+            ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setOccurrences($recurrenceData['occurrences']);
+
+        if (!empty($recurrenceData['endTime'])) {
+            $recurrence->setEndTime(new \DateTime($recurrenceData['endTime']));
+        }
+
+        $this->assertEquals($expected, $this->strategy->getLastOccurrenceDate($recurrence));
+    }
+
+    /**
      * @return array
      */
     public function propertiesDataProvider()
@@ -281,6 +303,65 @@ class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
                     'occurrences' => null,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.monthlyoro.calendar.recurrence.patterns.end_date'
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function recurrenceLastOccurrenceDataProvider()
+    {
+        return [
+            'without_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 10,
+                    'startTime' => '2016-04-28',
+                    'endTime' => null,
+                    'occurrences' => null,
+                ],
+                'expected' => new \DateTime(Recurrence::MAX_END_DATE)
+            ],
+            'with_end_date' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 10,
+                    'startTime' => '2016-04-28',
+                    'endTime' => '2016-05-12',
+                    'occurrences' => null,
+                ],
+                'expected' => new \DateTime('2016-05-12')
+            ],
+            'with_occurrences' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 18,
+                    'startTime' => '2016-04-14T00:00:00+03:00',
+                    'endTime' => null,
+                    'occurrences' => 5,
+                ],
+                'expected' => new \DateTime('2016-12-18T00:00:00+03:00')
+            ],
+            'with_occurrences_1' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 10,
+                    'startTime' => '2016-04-14T00:00:00+03:00',
+                    'endTime' => null,
+                    'occurrences' => 3,
+                ],
+                'expected' => new \DateTime('2016-10-10T00:00:00+03:00')
+            ],
+            'with_occurrences_2' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 14,
+                    'startTime' => '2016-04-14T00:00:00+03:00',
+                    'endTime' => null,
+                    'occurrences' => 3,
+                ],
+                'expected' => new \DateTime('2016-08-14T00:00:00+03:00')
             ]
         ];
     }

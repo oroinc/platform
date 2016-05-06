@@ -113,10 +113,52 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
         $month = $occurrenceDate->format('M');
         $year = $occurrenceDate->format('Y');
         $nextDays = [];
-        foreach ($daysOfWeek as $day) {
-            $nextDays[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
+        if ($instance === Recurrence::INSTANCE_FIRST || $instance === Recurrence::INSTANCE_LAST) {
+            foreach ($daysOfWeek as $day) {
+                $nextDays[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
+            }
+
+            return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
         }
 
-        return $instance === Recurrence::INSTANCE_LAST ? max($nextDays) : min($nextDays);
+        $days = [];
+        $currentInstance = 1;
+        while(count($days) < $instance) {
+            $instanceRelativeValue = $this->strategyHelper->getInstanceRelativeValue($currentInstance);
+            foreach ($daysOfWeek as $day) {
+                $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
+            }
+            $currentInstance++;
+        }
+        sort($days);
+
+        return $days[$instance - 1];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLastOccurrence(Recurrence $recurrence)
+    {
+        $dayOfWeek = $recurrence->getDayOfWeek();
+        $startTime = $recurrence->getStartTime();
+        $instance = $recurrence->getInstance();
+        $occurrenceDate = $this->getNextOccurrence(0, $dayOfWeek, $instance, $startTime);
+
+        if ($occurrenceDate < $recurrence->getStartTime()) {
+            $occurrenceDate = $this->getNextOccurrence(
+                $recurrence->getInterval(),
+                $dayOfWeek,
+                $instance,
+                $occurrenceDate
+            );
+        }
+
+        return  $this->getNextOccurrence(
+            ($recurrence->getOccurrences() - 1) * $recurrence->getInterval(),
+            $dayOfWeek,
+            $instance,
+            $occurrenceDate
+        );
     }
 }

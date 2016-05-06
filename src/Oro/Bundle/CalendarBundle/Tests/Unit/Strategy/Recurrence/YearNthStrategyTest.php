@@ -124,6 +124,30 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
+     * @param $recurrenceData
+     * @param $expected
+     *
+     * @dataProvider recurrenceLastOccurrenceDataProvider
+     */
+    public function testGetLastOccurrenceDate($recurrenceData, $expected)
+    {
+        $recurrence = new Recurrence();
+        $recurrence->setRecurrenceType(Recurrence::TYPE_YEAR_N_TH)
+            ->setInterval($recurrenceData['interval'])
+            ->setInstance($recurrenceData['instance'])
+            ->setDayOfWeek($recurrenceData['dayOfWeek'])
+            ->setMonthOfYear($recurrenceData['monthOfYear'])
+            ->setStartTime(new \DateTime($recurrenceData['startTime']))
+            ->setOccurrences($recurrenceData['occurrences']);
+
+        if (!empty($recurrenceData['endTime'])) {
+            $recurrence->setEndTime(new \DateTime($recurrenceData['endTime']));
+        }
+
+        $this->assertEquals($expected, $this->strategy->getLastOccurrenceDate($recurrence));
+    }
+
+    /**
      * @return array
      */
     public function propertiesDataProvider()
@@ -327,6 +351,26 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
                     '2017-04-03',
                 ],
             ],
+            'with_weekend_day' => [
+                'params' => [
+                    'instance' => Recurrence::INSTANCE_FOURTH,
+                    'interval' => 12, // a number of months, which is a multiple of 12
+                    'monthOfYear' => 4,
+                    'daysOfWeek' => [
+                        'sunday',
+                        'saturday'
+                    ],
+                    'occurrences' => null,
+                    'start' => '2017-03-28',
+                    'end' => '2018-05-01',
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2020-06-10',
+                ],
+                'expected' => [
+                    '2017-04-09',
+                    '2018-04-14',
+                ],
+            ],
         ];
     }
 
@@ -371,6 +415,75 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
                     'occurrences' => null,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.yearnthoro.calendar.recurrence.patterns.end_date'
+            ]
+        ];
+    }
+
+    /**
+     * @return array
+     */
+    public function recurrenceLastOccurrenceDataProvider()
+    {
+        return [
+            'without_end_date' => [
+                'params' => [
+                    'interval' => 12,
+                    'instance' => 3,
+                    'dayOfWeek' => ['saturday'],
+                    'monthOfYear' => 6,
+                    'startTime' => '2016-04-28',
+                    'endTime' => null,
+                    'occurrences' => null,
+                ],
+                'expected' => new \DateTime(Recurrence::MAX_END_DATE)
+            ],
+            'with_end_date' => [
+                'params' => [
+                    'interval' => 12,
+                    'instance' => 3,
+                    'dayOfWeek' => ['saturday'],
+                    'monthOfYear' => 6,
+                    'startTime' => '2016-04-28',
+                    'endTime' => '2016-05-12',
+                    'occurrences' => null,
+                ],
+                'expected' => new \DateTime('2016-05-12')
+            ],
+            'with_occurrences' => [
+                'params' => [
+                    'interval' => 24,
+                    'instance' => 2,
+                    'dayOfWeek' => ['monday'],
+                    'monthOfYear' => 6,
+                    'startTime' => '2016-04-28',
+                    'endTime' => null,
+                    'occurrences' => 3,
+                ],
+                'expected' => new \DateTime('2020-06-08')
+            ],
+            'with_occurrences_1' => [
+                'params' => [
+                    'interval' => 24,
+                    'instance' => 3,
+                    'dayOfWeek' => ['sunday'],
+                    'monthOfYear' => 3,
+                    'startTime' => '2016-04-28',
+                    'endTime' => null,
+                    'occurrences' => 3,
+                ],
+                'expected' => new \DateTime('2022-03-20')
+            ],
+            'with_occurrences_2' => [
+                'params' => [
+                    'interval' => 24,
+                    'instance' => 3,
+                    'dayOfWeek' => ['saturday', 'sunday'],
+                    'monthOfYear' => 6,
+                    'startTime' => '2016-04-28',
+                    'endTime' => null,
+                    'occurrences' => 3,
+                ],
+                'expected' => new \DateTime('2020-06-13')
             ]
         ];
     }

@@ -47,8 +47,10 @@ services:
         class: %oro_calendar.listener.entity_listener.class%
         arguments:
             - '@oro_organization.link.security_context'
+            - '@oro_calendar.recurrence.strategy'
         tags:
             - { name: doctrine.event_listener, event: preUpdate }
+            - { name: doctrine.event_listener, event: prePersist }
             - { name: doctrine.event_listener, event: onFlush }
             - { name: doctrine.event_listener, event: postFlush }
 

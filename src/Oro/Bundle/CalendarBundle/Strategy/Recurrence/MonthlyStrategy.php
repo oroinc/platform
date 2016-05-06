@@ -93,7 +93,7 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
     protected function getFirstOccurrence(Recurrence $recurrence)
     {
         $dayOfMonth = $recurrence->getDayOfMonth();
-        $occurrenceDate = $recurrence->getStartTime();
+        $occurrenceDate = clone $recurrence->getStartTime();
         $occurrenceDate->setDate($occurrenceDate->format('Y'), $occurrenceDate->format('m'), $dayOfMonth);
 
         if ($occurrenceDate->format('d') < $recurrence->getStartTime()->format('d')) {
@@ -101,5 +101,18 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
         }
 
         return $occurrenceDate;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getLastOccurrence(Recurrence $recurrence)
+    {
+        $occurrenceDate = $this->getFirstOccurrence($recurrence);
+
+        return $this->getNextOccurrence(
+            ($recurrence->getOccurrences() - 1) * $recurrence->getInterval(),
+            $occurrenceDate
+        );
     }
 }

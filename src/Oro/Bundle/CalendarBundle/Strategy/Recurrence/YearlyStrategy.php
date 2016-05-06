@@ -51,7 +51,7 @@ class YearlyStrategy extends MonthlyStrategy
         $dayOfMonth = $recurrence->getDayOfMonth();
         $monthOfYear = $recurrence->getMonthOfYear();
         $interval = $recurrence->getInterval(); // a number of months, which is a multiple of 12
-        $occurrenceDate = $recurrence->getStartTime();
+        $occurrenceDate = clone $recurrence->getStartTime();
         $occurrenceDate->setDate($occurrenceDate->format('Y'), $monthOfYear, $dayOfMonth);
 
         if ($occurrenceDate < $recurrence->getStartTime()) {
