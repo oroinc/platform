@@ -76,7 +76,7 @@ class OroMainContext extends MinkContext implements
     /**
      * @Given /^user exists with:$/
      */
-    public function existUser(TableNode $data)
+    public function userExists(TableNode $data)
     {
         $this->getKernel()->boot();
         /** @var EntityManager $em */
@@ -87,7 +87,8 @@ class OroMainContext extends MinkContext implements
         foreach ($data as $row) {
             switch ($row['field']) {
                 case 'roles':
-                    array_walk(explode(',', $row['value']), function ($role) use ($user, $em) {
+                    $roles = explode(',', $row['value']);
+                    array_walk($roles, function ($role) use ($user, $em) {
                         $roleEntity = $em->getRepository('OroUserBundle:Role')->findOneBy(['label' => trim($role)]);
                         $user->addRole($roleEntity);
                     });
