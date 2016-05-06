@@ -388,6 +388,7 @@ HTML;
      */
     protected function getTwigFormLayoutResult()
     {
+        // @codingStandardsIgnoreStart
         $expected = <<<HTML
 <div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test">
     <div>
@@ -443,6 +444,7 @@ HTML;
     </div>
 </div>
 HTML;
+        // @codingStandardsIgnoreEnd
 
         return $expected;
     }
@@ -452,6 +454,7 @@ HTML;
      */
     protected function getPhpFormLayoutResult()
     {
+        // @codingStandardsIgnoreStart
         $expected = <<<HTML
 <div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test">
     <div>
@@ -507,6 +510,7 @@ HTML;
     </div>
 </div>
 HTML;
+        // @codingStandardsIgnoreEnd
 
         return $expected;
     }
@@ -516,10 +520,12 @@ HTML;
      */
     protected function getFormStartTestLayoutResult()
     {
+        // @codingStandardsIgnoreStart
         $expected = <<<HTML
 <form data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test" action="test.php" method="post">
 <input type="hidden" name="_method" value="PATCH"/>
 HTML;
+        // @codingStandardsIgnoreEnd
 
         return $expected;
     }
