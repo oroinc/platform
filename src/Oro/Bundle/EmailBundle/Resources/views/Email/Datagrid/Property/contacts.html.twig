@@ -5,23 +5,23 @@
 {% set isNew = record.getValue('is_new') %}
 {% set folderType = folders is not null and folders[0] is defined ? folders[0].type : null %}
 
-{% if (folderType == 'inbox') %}
+{% if record.getValue('incoming') %}
     {% set sender = record.getValue('email.from_name') %}
 {% elseif thread is not null %}
     {% set recipients = oro_get_email_thread_recipients(thread) %}
-{% elseif (folderType == 'sent') %}
+{% elseif record.getValue('outgoing') %}
     {% set recipients = record.getValue('email.recipients') %}
 {% endif %}
 
 <span class="nowrap">
 {% if folders is not null %}
-    {% if record.getValue('outgoing') %}
+    {% if record.getValue('incoming') %}
         <span class="icon grid">
-            <i class="icon-signout"></i>
+            <i class="icon-signin"></i>
         </span>
     {% else %}
         <span class="icon grid">
-            <i class="icon-signin"></i>
+            <i class="icon-signout"></i>
         </span>
     {% endif %}
 {% endif %}
