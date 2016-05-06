@@ -6,6 +6,7 @@ use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
+use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
@@ -31,6 +32,12 @@ class OroMainContext extends MinkContext implements
 
     /** @var  \SensioLabs\Behat\PageObjectExtension\PageObject\Factory */
     protected $pageObjectFactory;
+
+    /** @BeforeStep */
+    public function beforeStep(BeforeStepScope $scope)
+    {
+        $this->iWaitingForAjaxResponce();
+    }
 
     /**
      * @BeforeScenario
@@ -172,27 +179,5 @@ class OroMainContext extends MinkContext implements
     public function iFillWith($element, TableNode $table)
     {
         $this->pageObjectFactory->createElement($element)->fill($table);
-    }
-
-    /*********************************************/
-    /**** Wait for ajax finish for mink steps ****/
-    /*********************************************/
-
-    /**
-     * {@inheritdoc}
-     */
-    public function visit($page)
-    {
-        parent::visit($page);
-        $this->iWaitingForAjaxResponce();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clickLink($link)
-    {
-        parent::clickLink($link);
-        $this->iWaitingForAjaxResponce();
     }
 }
