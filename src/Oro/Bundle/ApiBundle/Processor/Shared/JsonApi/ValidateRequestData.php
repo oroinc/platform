@@ -168,7 +168,10 @@ abstract class ValidateRequestData implements ProcessorInterface
                 $isValid = false;
                 continue;
             }
-            if (!$this->validateArray($relation, JsonApiDoc::DATA, $relationPointer, true)) {
+            if (null === $relation[JsonApiDoc::DATA]) {
+                continue;
+            }
+            if (!$this->validateArray($relation, JsonApiDoc::DATA, $relationPointer)) {
                 $isValid = false;
                 continue;
             }

@@ -3,6 +3,7 @@
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Processor\Create\JsonApi;
 
 use Oro\Bundle\ApiBundle\Processor\Create\JsonApi\ValidateRequestData;
+use Oro\Bundle\ApiBundle\Request\DataType;
 use Oro\Bundle\ApiBundle\Tests\Unit\Processor\FormProcessorTestCase;
 
 class ValidateRequestDataTest extends FormProcessorTestCase
@@ -25,18 +26,52 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     }
 
     /**
-     * @dataProvider requestDataProvider
+     * @dataProvider validRequestDataProvider
      */
-    public function testProcess($requestData, $expectedErrorString, $pointer, $normalizedValue = '')
+    public function testProcessWithValidRequestData($requestData)
+    {
+        $this->valueNormalizer->expects($this->once())
+            ->method('normalizeValue')
+            ->with('products')
+            ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+
+        $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
+        $this->context->setRequestData($requestData);
+
+        $this->processor->process($this->context);
+        $this->assertFalse($this->context->hasErrors());
+    }
+
+    public function validRequestDataProvider()
+    {
+        return [
+            [
+                ['data' => ['type' => 'products', 'attributes' => ['test' => null]]]
+            ],
+            [
+                ['data' => ['id' => '23', 'type' => 'products', 'attributes' => ['test' => null]]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => null]]]]
+            ],
+            [
+                ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => []]]]],
+            ],
+        ];
+    }
+
+    /**
+     * @dataProvider invalidRequestDataProvider
+     */
+    public function testProcessWithInvalidRequestData($requestData, $expectedErrorString, $pointer)
     {
         $this->context->setClassName('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
         $this->context->setRequestData($requestData);
 
-        if ($normalizedValue) {
-            $this->valueNormalizer->expects($this->once())
-                ->method('normalizeValue')
-                ->willReturn($normalizedValue);
-        }
+        $this->valueNormalizer->expects($this->any())
+            ->method('normalizeValue')
+            ->with('products')
+            ->willReturn('Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product');
 
         $this->processor->process($this->context);
 
@@ -52,7 +87,7 @@ class ValidateRequestDataTest extends FormProcessorTestCase
     /**
      * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
-    public function requestDataProvider()
+    public function invalidRequestDataProvider()
     {
         return [
             [[], 'The primary data object should exist', '/data'],
@@ -63,127 +98,91 @@ class ValidateRequestDataTest extends FormProcessorTestCase
                 ['data' => ['type' => 'test', 'attributes' => ['foo' => 'bar']]],
                 'The \'type\' property of the primary data object should match the requested resource',
                 '/data/type',
-                'test'
             ],
             [
-                ['data' => ['type' => 'test']],
+                ['data' => ['type' => 'products']],
                 'The primary data object should contain \'attributes\' or \'relationships\' block',
                 '/data',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test']],
+                ['data' => ['type' => 'products']],
                 'The primary data object should contain \'attributes\' or \'relationships\' block',
                 '/data',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test', 'attributes' => null]],
+                ['data' => ['type' => 'products', 'attributes' => null]],
                 'The \'attributes\' property should be an array',
                 '/data/attributes',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test', 'attributes' => []]],
+                ['data' => ['type' => 'products', 'attributes' => []]],
                 'The \'attributes\' property should not be empty',
                 '/data/attributes',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test', 'attributes' => [1, 2, 3]]],
+                ['data' => ['type' => 'products', 'attributes' => [1, 2, 3]]],
                 'The \'attributes\' property should be an associative array',
                 '/data/attributes',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test', 'relationships' => null]],
+                ['data' => ['type' => 'products', 'relationships' => null]],
                 'The \'relationships\' property should be an array',
                 '/data/relationships',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test', 'relationships' => []]],
+                ['data' => ['type' => 'products', 'relationships' => []]],
                 'The \'relationships\' property should not be empty',
                 '/data/relationships',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test', 'relationships' => [1, 2, 3]]],
+                ['data' => ['type' => 'products', 'relationships' => [1, 2, 3]]],
                 'The \'relationships\' property should be an associative array',
                 '/data/relationships',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test', 'relationships' => ['test' => null]]],
+                ['data' => ['type' => 'products', 'relationships' => ['test' => null]]],
                 'The relationship should have \'data\' property',
                 '/data/relationships/test',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test', 'relationships' => ['test' => []]]],
+                ['data' => ['type' => 'products', 'relationships' => ['test' => []]]],
                 'The relationship should have \'data\' property',
                 '/data/relationships/test',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
-                ['data' => ['type' => 'test', 'relationships' => ['test' => ['data' => null]]]],
-                'The \'data\' property should be an array',
-                '/data/relationships/test/data',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
-            ],
-            [
-                ['data' => ['type' => 'test', 'relationships' => ['test' => ['data' => []]]]],
-                'The \'data\' property should not be empty',
-                '/data/relationships/test/data',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
-            ],
-            [
-                ['data' => ['type' => 'test', 'relationships' => ['test' => ['data' => []]]]],
-                'The \'data\' property should not be empty',
-                '/data/relationships/test/data',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
-            ],
-            [
-                ['data' => ['type' => 'test', 'relationships' => ['test' => ['data' => ['id' => '2']]]]],
+                ['data' => ['type' => 'products', 'relationships' => ['test' => ['data' => ['id' => '2']]]]],
                 'The \'type\' property is required',
                 '/data/relationships/test/data/type',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
                 [
-                    'data' =>
-                        [
-                            'type'          => 'test',
-                            'relationships' => ['test' => ['data' => ['type' => 'test']]]
-                        ]
+                    'data' => [
+                        'type'          => 'products',
+                        'relationships' => ['test' => ['data' => ['type' => 'products']]]
+                    ]
                 ],
                 'The \'id\' property is required',
                 '/data/relationships/test/data/id',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
                 [
-                    'data' =>
-                        [
-                            'type'          => 'test',
-                            'relationships' => ['test' => ['data' => [['id' => '2']]]]
-                        ]
+                    'data' => [
+                        'type'          => 'products',
+                        'relationships' => ['test' => ['data' => [['id' => '2']]]]
+                    ]
                 ],
                 'The \'type\' property is required',
                 '/data/relationships/test/data/0/type',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ],
             [
                 [
-                    'data' =>
-                        [
-                            'type'          => 'test',
-                            'relationships' => ['test' => ['data' => [['type' => 'test']]]]
-                        ]
+                    'data' => [
+                        'type'          => 'products',
+                        'relationships' => ['test' => ['data' => [['type' => 'products']]]]
+                    ]
                 ],
                 'The \'id\' property is required',
                 '/data/relationships/test/data/0/id',
-                'Oro\Bundle\ApiBundle\Tests\Unit\Fixtures\Entity\Product'
             ]
         ];
     }
