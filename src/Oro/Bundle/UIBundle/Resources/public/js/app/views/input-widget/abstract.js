@@ -38,6 +38,8 @@ define(function(require) {
         /** @property {Boolean} */
         keepElement: true,
 
+        refreshOnChange: false,
+
         /**
          * @inheritDoc
          */
@@ -53,6 +55,13 @@ define(function(require) {
             if (this.isInitialized()) {
                 this.findContainer();
                 this.getContainer().addClass(this.containerClass);
+            }
+        },
+
+        delegateEvents: function() {
+            AbstractInputWidget.__super__.delegateEvents.apply(this, arguments);
+            if (this.refreshOnChange) {
+                this.$el.on('change' + this.eventNamespace(), _.bind(this.refresh, this));
             }
         },
 

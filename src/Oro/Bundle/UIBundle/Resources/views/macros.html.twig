@@ -273,8 +273,10 @@
             useMainButtonsClone: true
         }) %}
         <div class="pull-right pinned-dropdown"
-             data-page-component-module="oroui/js/app/components/jquery-widget-component"
-             data-page-component-options="{{ options|json_encode }}">
+             {{ _self.renderAttributes(parameters.dataAttributes|default({})|merge({
+                 'page-component-module': 'oroui/js/app/components/jquery-widget-component',
+                 'page-component-options': options
+             })) }}>
             {{ parameters.html|raw }}
         </div>
     {% else %}

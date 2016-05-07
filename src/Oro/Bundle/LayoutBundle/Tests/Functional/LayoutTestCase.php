@@ -46,7 +46,7 @@ class LayoutTestCase extends WebTestCase
         // remove spaces at the begin of a line
         $html = preg_replace('/^\s+/m', '', $html);
 
-        // replace uid from id attributes, see RandomIdExtension
+        // replace uid from id attributes, see AdditionalAttrExtension
         $html = preg_replace('/="(\w+)-uid-[a-z0-9]+"/', '="${1}"', $html);
 
         $html = rtrim($html);
