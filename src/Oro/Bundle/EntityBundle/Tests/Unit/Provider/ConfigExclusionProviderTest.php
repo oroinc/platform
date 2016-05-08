@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\EntityBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\EntityBundle\Provider\ConfigExclusionProvider;
 
 class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
@@ -121,26 +123,10 @@ class ConfigExclusionProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function getEntityMetadata($className, $fields = [])
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $metadata = new ClassMetadata($className);
 
-        $metadata->expects($this->any())
-            ->method('getName')
-            ->will($this->returnValue($className));
-
-        $fieldTypes = [];
         foreach ($fields as $fieldName => $fieldType) {
-            $fieldTypes[] = [$fieldName, $fieldType];
-        }
-
-        if (empty($fieldTypes)) {
-            $metadata->expects($this->never())
-                ->method('getTypeOfField');
-        } else {
-            $metadata->expects($this->any())
-                ->method('getTypeOfField')
-                ->will($this->returnValueMap($fieldTypes));
+            $metadata->mapField(['fieldName' => $fieldName, 'type' => $fieldType]);
         }
 
         return $metadata;

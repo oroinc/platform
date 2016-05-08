@@ -70,7 +70,7 @@ class ConfigExclusionProvider implements ExclusionProviderInterface
     protected function getFieldProperties(ClassMetadata $metadata, $fieldName)
     {
         return [
-            'entity' => $metadata->getName(),
+            'entity' => $metadata->name,
             'field'  => $fieldName,
             'type'   => $metadata->getTypeOfField($fieldName)
         ];

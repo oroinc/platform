@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\ApiBundle\Tests\Unit\Provider;
 
+use Doctrine\ORM\Mapping\ClassMetadata;
+
 use Oro\Bundle\ApiBundle\Provider\ChainExclusionProvider;
 
 class ChainExclusionProviderWithIncludeRulesTest extends \PHPUnit_Framework_TestCase
@@ -110,14 +112,6 @@ class ChainExclusionProviderWithIncludeRulesTest extends \PHPUnit_Framework_Test
      */
     protected function getEntityMetadata($className)
     {
-        $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $metadata->expects($this->any())
-            ->method('getName')
-            ->willReturn($className);
-
-        return $metadata;
+        return new ClassMetadata($className);
     }
 }
