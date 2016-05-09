@@ -5,7 +5,7 @@ Feature: User
   I need to be able to open Create User dialog and create new user
 Scenario: Create new user
   Given Login as an existing "admin" user and "admin" password
-  And I open "User Create" page
+  And I go to "/user/create"
   When I fill "User Form" with:
         | username          | userName       |
         | password          | 123123q        |
@@ -16,5 +16,5 @@ Scenario: Create new user
   And I select "Active" from "Status"
   And I check "Manager"
   And I press "Save and Close"
-  And I should be on "User View" page
+  And the url should match "/user/view/\d+"
   Then I should see "User saved"
