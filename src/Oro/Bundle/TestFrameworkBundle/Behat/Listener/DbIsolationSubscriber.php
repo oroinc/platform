@@ -10,6 +10,7 @@ use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Mink\Mink;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class DbIsolationSubscriber implements EventSubscriberInterface
@@ -84,10 +85,14 @@ class DbIsolationSubscriber implements EventSubscriberInterface
         // waiting for process to finish
         }
 
+        if (false === $this->dumpDbProcess->isSuccessful()) {
+            throw new ProcessFailedException($this->dumpDbProcess);
+        }
+
         $process = new Process(sprintf(
             "mysql -e 'drop database %s;' -u %s -p%s".
             " && mysql -e 'create database %s;' -u %s -p%s".
-            " && mysql -u %s -p%s %s < %s.sql",
+            " && mysql -u %s -p%s %s < %s/%s.sql",
             $this->dbName,
             $this->dbUser,
             $this->dbPass,
@@ -97,6 +102,7 @@ class DbIsolationSubscriber implements EventSubscriberInterface
             $this->dbUser,
             $this->dbPass,
             $this->dbName,
+            $this->cacheDir,
             $this->dbName
         ));
         $process->run();
