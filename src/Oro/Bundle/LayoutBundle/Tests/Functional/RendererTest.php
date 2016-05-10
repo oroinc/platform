@@ -388,18 +388,19 @@ HTML;
      */
     protected function getTwigFormLayoutResult()
     {
+        // @codingStandardsIgnoreStart
         $expected = <<<HTML
-<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test">
+<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test">
     <div>
         <label class="required">User</label>
-        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user" data-name="field__user">
             <div>
                 <label for="form_for_layout_renderer_test_user_firstName" class="required">First Name</label>
                 <input type="text"
                     id="form_for_layout_renderer_test_user_firstName"
                     name="form_for_layout_renderer_test[user][firstName]"
                     required="required"
-                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+                    data-ftid="form_for_layout_renderer_test_user_firstName" data-name="field__first-name"/>
             </div>
             <div>
                 <label for="form_for_layout_renderer_test_user_lastName" class="required">Last Name</label>
@@ -407,7 +408,7 @@ HTML;
                     id="form_for_layout_renderer_test_user_lastName"
                     name="form_for_layout_renderer_test[user][lastName]"
                     required="required"
-                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+                    data-ftid="form_for_layout_renderer_test_user_lastName" data-name="field__last-name"/>
             </div>
         </div>
     </div>
@@ -416,33 +417,34 @@ HTML;
         <input type="text"
             id="form_for_layout_renderer_test_jobTitle"
             name="form_for_layout_renderer_test[jobTitle]"
-            data-ftid="form_for_layout_renderer_test_jobTitle"/>
+            data-ftid="form_for_layout_renderer_test_jobTitle" data-name="field__job-title"/>
     </div>
     <div>
         <label>Gender</label>
-        <div id="form_for_layout_renderer_test_gender" data-ftid="form_for_layout_renderer_test_gender">
+        <div id="form_for_layout_renderer_test_gender" data-ftid="form_for_layout_renderer_test_gender" data-name="field__gender">
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_placeholder"
                 name="form_for_layout_renderer_test[gender]"
-                data-ftid="form_for_layout_renderer_test_gender_placeholder"
+                data-ftid="form_for_layout_renderer_test_gender_placeholder" data-name="field__placeholder"
                 value=""/>
             <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"
                 name="form_for_layout_renderer_test[gender]"
-                data-ftid="form_for_layout_renderer_test_gender_0"
+                data-ftid="form_for_layout_renderer_test_gender_0" data-name="field__0"
                 value="male"/>
             <label for="form_for_layout_renderer_test_gender_0">Male</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_1"
                 name="form_for_layout_renderer_test[gender]"
-                data-ftid="form_for_layout_renderer_test_gender_1"
+                data-ftid="form_for_layout_renderer_test_gender_1" data-name="field__1"
                 value="female"/>
             <label for="form_for_layout_renderer_test_gender_1">Female</label>
         </div>
     </div>
 </div>
 HTML;
+        // @codingStandardsIgnoreEnd
 
         return $expected;
     }
@@ -452,18 +454,19 @@ HTML;
      */
     protected function getPhpFormLayoutResult()
     {
+        // @codingStandardsIgnoreStart
         $expected = <<<HTML
-<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test">
+<div id="form_for_layout_renderer_test" data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test">
     <div>
         <label class="required">User</label>
-        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user">
+        <div id="form_for_layout_renderer_test_user" data-ftid="form_for_layout_renderer_test_user" data-name="field__user">
             <div>
                 <label class="required" for="form_for_layout_renderer_test_user_firstName">First Name</label>
                 <input type="text"
                     id="form_for_layout_renderer_test_user_firstName"
                     name="form_for_layout_renderer_test[user][firstName]"
                     required="required"
-                    data-ftid="form_for_layout_renderer_test_user_firstName"/>
+                    data-ftid="form_for_layout_renderer_test_user_firstName" data-name="field__first-name"/>
             </div>
             <div>
                 <label class="required" for="form_for_layout_renderer_test_user_lastName">Last Name</label>
@@ -471,7 +474,7 @@ HTML;
                     id="form_for_layout_renderer_test_user_lastName"
                     name="form_for_layout_renderer_test[user][lastName]"
                     required="required"
-                    data-ftid="form_for_layout_renderer_test_user_lastName"/>
+                    data-ftid="form_for_layout_renderer_test_user_lastName" data-name="field__last-name"/>
             </div>
         </div>
     </div>
@@ -480,33 +483,34 @@ HTML;
         <input type="text"
             id="form_for_layout_renderer_test_jobTitle"
             name="form_for_layout_renderer_test[jobTitle]"
-            data-ftid="form_for_layout_renderer_test_jobTitle"/>
+            data-ftid="form_for_layout_renderer_test_jobTitle" data-name="field__job-title"/>
     </div>
     <div>
         <label>Gender</label>
-        <div id="form_for_layout_renderer_test_gender" data-ftid="form_for_layout_renderer_test_gender">
+        <div id="form_for_layout_renderer_test_gender" data-ftid="form_for_layout_renderer_test_gender" data-name="field__gender">
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_placeholder"
                 name="form_for_layout_renderer_test[gender]"
-                data-ftid="form_for_layout_renderer_test_gender_placeholder"
+                data-ftid="form_for_layout_renderer_test_gender_placeholder" data-name="field__placeholder"
                 value=""/>
             <label for="form_for_layout_renderer_test_gender_placeholder">None</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_0"
                 name="form_for_layout_renderer_test[gender]"
-                data-ftid="form_for_layout_renderer_test_gender_0"
+                data-ftid="form_for_layout_renderer_test_gender_0" data-name="field__0"
                 value="male"/>
             <label for="form_for_layout_renderer_test_gender_0">Male</label>
             <input type="radio"
                 id="form_for_layout_renderer_test_gender_1"
                 name="form_for_layout_renderer_test[gender]"
-                data-ftid="form_for_layout_renderer_test_gender_1"
+                data-ftid="form_for_layout_renderer_test_gender_1" data-name="field__1"
                 value="female"/>
             <label for="form_for_layout_renderer_test_gender_1">Female</label>
         </div>
     </div>
 </div>
 HTML;
+        // @codingStandardsIgnoreEnd
 
         return $expected;
     }
@@ -516,10 +520,12 @@ HTML;
      */
     protected function getFormStartTestLayoutResult()
     {
+        // @codingStandardsIgnoreStart
         $expected = <<<HTML
-<form action="test.php" method="post">
+<form data-ftid="form_for_layout_renderer_test" data-name="form__form-for-layout-renderer-test" action="test.php" method="post">
 <input type="hidden" name="_method" value="PATCH"/>
 HTML;
+        // @codingStandardsIgnoreEnd
 
         return $expected;
     }
