@@ -152,7 +152,7 @@ class OrganizationsSelectType extends AbstractType
      */
     protected function getOrganizationOptions()
     {
-        return $this->getLoggedInUser()->getOrganizations(true);
+        return $this->getLoggedInUser()->getOrganizations(false);
     }
 
     /**
