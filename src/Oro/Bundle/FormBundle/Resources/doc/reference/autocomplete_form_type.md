@@ -43,7 +43,8 @@ class ProductType extends AbstractType
                     'allowClear'              => true,
                     'minimumInputLength'      => 1,
                     'route_name'              => 'oro_form_autocomplete_search',
-                    'propertyNameForNewItem'  => 'name'
+                    'allowCreateNew'          => true,
+                    'renderedPropertyName'    => 'fullName'
                 )
             )
         );
@@ -200,14 +201,17 @@ Url of this route will be used by select2 plugin to iteract with search handler.
 By default  Oro\Bundle\FormBundle\Controller\AutocompleteController::searchAction is used
 but you can implement your own action and use it by referencing it via *route_name*.
 
-**configs.propertyNameForNewItem**
+**configs.allowCreateNew**
 
-When this option is present select2 plugin gives posibility to create a new item. When user inputs in search field some
-value that isn't present in options plugin created a new one. Value of this option will be used to create new item to
-be displayed correctly with option template. Take in account that we can't use plain id in input value because a new
-item hasn't it yet. So plugin will set value as JSON with 'id' property and 'value' property for a new item.
-For instance, {id: 123} for existing item and {id: null, value: "My new item"} for new one. The backend part should
-support such format as well.
+When this option is set select2 plugin gives posibility to create a new item. When user inputs in search field some
+value the plugin created a new one. Take in account that we can't use plain id in input value in case a new
+item. So plugin will set value as JSON with 'value' property for a new item. For instance, {value: "My new item"}
+for new one. The backend part should support such format as well. For existing items a value is plain id.
+
+**configs.renderedPropertyName**
+
+Value of this option will be used to create new item to be displayed correctly with option template. If isn't set the
+plugin use 'name' property.
 
 
 #### Search Handler Service

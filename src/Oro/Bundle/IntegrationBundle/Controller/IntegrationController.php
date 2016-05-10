@@ -156,8 +156,7 @@ class IntegrationController extends Controller
         
         return [
             'entity'   => $integration,
-            'form'     => $form->createView(),
-            'edit_allowed' => EditModeUtils::isEditAllowed($integration->getEditMode()),
+            'form'     => $form->createView()
         ];
     }
 
