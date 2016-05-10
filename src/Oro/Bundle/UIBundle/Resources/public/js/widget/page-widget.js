@@ -44,7 +44,7 @@ define(['underscore', 'backbone', 'oroui/js/mediator', 'oro/block-widget'
             this.options.container = this.$replacementEl.parent();
             this.on('adoptedFormResetClick', this.remove);
 
-            BlockWidget.prototype.initialize.apply(this, options);
+            BlockWidget.prototype.initialize.apply(this, arguments);
         },
 
         remove: function() {

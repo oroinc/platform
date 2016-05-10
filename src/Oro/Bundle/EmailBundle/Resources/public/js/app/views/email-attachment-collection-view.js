@@ -18,7 +18,7 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            BaseCollectionView.__super__.initialize.apply(this, options);
+            BaseCollectionView.__super__.initialize.apply(this, arguments);
             this.itemView = this.itemView.extend({
                 inputName: options.inputName,
                 collectionView: this
