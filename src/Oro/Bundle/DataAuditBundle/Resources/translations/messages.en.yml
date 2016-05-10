@@ -65,3 +65,7 @@ oro:
         condition_builder:
             criteria:
                 data_audit: Data audit
+
+        acl:
+            action:
+                history.label: Access Data Audit

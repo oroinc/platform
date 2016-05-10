@@ -187,7 +187,7 @@ class PostgresqlGridModifier extends AbstractExtension
         }
 
         if (!$isSelected) {
-            $queryBuilder->select($field);
+            $queryBuilder->addSelect($field);
         }
     }
 }
