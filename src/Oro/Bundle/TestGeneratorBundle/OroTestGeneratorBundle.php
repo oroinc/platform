@@ -7,7 +7,9 @@ use Symfony\Component\HttpKernel\Bundle\Bundle;
 
 class OroTestGeneratorBundle extends Bundle
 {
-    /** {@inheritdoc} */
+    /**
+     * {@inheritDoc}
+     */
     public function getContainerExtension()
     {
         return new OroTestGeneratorExtension();

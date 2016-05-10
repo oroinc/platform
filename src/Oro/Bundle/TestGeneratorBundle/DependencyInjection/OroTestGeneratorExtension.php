@@ -20,7 +20,9 @@ class OroTestGeneratorExtension extends Extension
         $loader->load('services.yml');
     }
 
-    /** {@inheritdoc} */
+    /**
+     * {@inheritDoc}
+     */
     public function getAlias()
     {
         return self::ALIAS;

@@ -21,7 +21,6 @@ class CreateTestCommand extends ContainerAwareCommand
             ->setDescription('Create Test')
             ->addArgument('class', InputArgument::REQUIRED)
             ->addArgument('type', InputArgument::REQUIRED);
-
     }
 
     /**
