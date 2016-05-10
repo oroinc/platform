@@ -65,7 +65,9 @@ oro:
         enum_options: Options
         enum_name.tooltip: ""
         enum_public.tooltip: Public option sets can be reused in other entities.
-        enum_options.tooltip: Deleting an option will remove it from all records that use it.
+        enum_options.tooltip: > 
+            Some options could be defined as system and can't be deleted. 
+            Deleting an option will remove it from all records that use it.
         enum_options.priority.tooltip: Click and drag to reorder.
         enum_options.default.tooltip: If marked, this option will be selected by default for new records.
         action:

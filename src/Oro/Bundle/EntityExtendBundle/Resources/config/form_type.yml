@@ -167,6 +167,8 @@ services:
 
     oro_entity_extend.type.enum_value:
         class: %oro_entity_extend.type.enum_value.class%
+        arguments:
+            - '@oro_entity_config.provider.enum'
         tags:
             - { name: form.type, alias: oro_entity_extend_enum_value }
 

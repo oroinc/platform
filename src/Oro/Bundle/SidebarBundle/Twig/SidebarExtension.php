@@ -3,6 +3,7 @@
 namespace Oro\Bundle\SidebarBundle\Twig;
 
 use Symfony\Component\Translation\TranslatorInterface;
+use Symfony\Component\Asset\Packages as AssetHelper;
 
 use Oro\Bundle\SidebarBundle\Model\WidgetDefinitionRegistry;
 
@@ -21,15 +22,23 @@ class SidebarExtension extends \Twig_Extension
     protected $translator;
 
     /**
+     * @var AssetHelper
+     */
+    protected $assetHelper;
+
+    /**
      * @param WidgetDefinitionRegistry $widgetDefinitionsRegistry
      * @param TranslatorInterface $translator
+     * @param AssetHelper $assetHelper
      */
     public function __construct(
         WidgetDefinitionRegistry $widgetDefinitionsRegistry,
-        TranslatorInterface $translator
+        TranslatorInterface $translator,
+        AssetHelper $assetHelper
     ) {
         $this->widgetDefinitionsRegistry = $widgetDefinitionsRegistry;
         $this->translator = $translator;
+        $this->assetHelper = $assetHelper;
     }
 
     /**
@@ -56,6 +65,9 @@ class SidebarExtension extends \Twig_Extension
 
         foreach ($definitions as &$definition) {
             $definition['title'] = $this->translator->trans($definition['title']);
+            if (!empty($definition['dialogIcon'])) {
+                $definition['dialogIcon'] = $this->assetHelper->getUrl($definition['dialogIcon']);
+            }
         }
 
         return $definitions;

@@ -5,6 +5,7 @@ namespace Oro\Bundle\EntityExtendBundle\Tests\Unit\Form\Type;
 use Symfony\Component\Form\Extension\Validator\Type\FormTypeValidatorExtension;
 use Symfony\Component\Form\Extension\Validator\ValidatorExtension;
 use Symfony\Component\Form\PreloadedExtension;
+use Symfony\Component\Form\FormView;
 use Symfony\Component\Form\Test\TypeTestCase;
 use Symfony\Component\Translation\IdentityTranslator;
 use Symfony\Component\Validator\Constraint;
@@ -19,6 +20,7 @@ use Symfony\Component\Validator\Validator;
 use Symfony\Component\Validator\Mapping\Loader\LoaderInterface;
 
 use Oro\Bundle\EntityExtendBundle\Form\Type\EnumValueType;
+use Oro\Bundle\EntityConfigBundle\Config\Id\FieldConfigId;
 
 class EnumValueTypeTest extends TypeTestCase
 {
@@ -34,7 +36,7 @@ class EnumValueTypeTest extends TypeTestCase
     {
         parent::setUp();
 
-        $this->type = new EnumValueType();
+        $this->type = new EnumValueType($this->getConfigProvider());
     }
 
     protected function getExtensions()
@@ -140,6 +142,121 @@ class EnumValueTypeTest extends TypeTestCase
             'oro_entity_extend_enum_value',
             $this->type->getName()
         );
+    }
+
+    /**
+     * @param array $inputData
+     * @param array $expectedData
+     *
+     * @dataProvider allowDeleteProvider
+     */
+    public function testAllowDelete(array $inputData, array $expectedData)
+    {
+        $configProvider = $this->getConfigProvider(
+            $inputData['has_config'],
+            $inputData['enum_code'],
+            $inputData['immutable']
+        );
+
+        $type = new EnumValueType($configProvider);
+        $form = $this->factory->create($type);
+        $form->setParent($this->getConfiguredForm());
+
+        $form->submit($inputData['form']);
+        $view = new FormView();
+        $type->buildView($view, $form, []);
+
+        $this->assertArrayHasKey('allow_delete', $view->vars);
+        $this->assertSame($expectedData['allow_delete'], $view->vars['allow_delete']);
+    }
+
+    /**
+     * @return array
+     */
+    public function allowDeleteProvider()
+    {
+        return [
+            'no config' => [
+                'input' => [
+                    'form' => [
+                        'id' => 'open',
+                        'label' => 'Label',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                    'has_config' => false,
+                    'enum_code' => 'task_status',
+                    'immutable' => ['open', 'close']
+                ],
+                'expected' => [
+                    'allow_delete' => true,
+                ],
+            ],
+            'no enum code' => [
+                'input' => [
+                    'form' => [
+                        'id' => 'open',
+                        'label' => 'Label',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                    'has_config' => true,
+                    'enum_code' => '',
+                    'immutable' => ['open', 'close']
+                ],
+                'expected' => [
+                    'allow_delete' => true,
+                ],
+            ],
+            'immutable open' => [
+                'input' => [
+                    'form' => [
+                        'id' => 'open',
+                        'label' => 'Label',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                    'has_config' => true,
+                    'enum_code' => 'task_status',
+                    'immutable' => ['open', 'close']
+                ],
+                'expected' => [
+                    'allow_delete' => false,
+                ],
+            ],
+            'immutable close' => [
+                'input' => [
+                    'form' => [
+                        'id' => 'close',
+                        'label' => 'Label',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                    'has_config' => true,
+                    'enum_code' => 'task_status',
+                    'immutable' => ['open', 'close']
+                ],
+                'expected' => [
+                    'allow_delete' => false,
+                ],
+            ],
+            'allow delete' => [
+                'input' => [
+                    'form' => [
+                        'id' => 'deletable',
+                        'label' => 'Label',
+                        'is_default' => true,
+                        'priority' => 1,
+                    ],
+                    'has_config' => true,
+                    'enum_code' => 'task_status',
+                    'immutable' => ['open', 'close']
+                ],
+                'expected' => [
+                    'allow_delete' => true,
+                ],
+            ],
+        ];
     }
 
     /**
@@ -325,5 +442,69 @@ class EnumValueTypeTest extends TypeTestCase
         }
 
         return $path;
+    }
+
+    /**
+     * @param boolean $hasConfig
+     * @param string $enumCode
+     * @param string[] $immutableCodes
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getConfigProvider($hasConfig = false, $enumCode = '', array $immutableCodes = [])
+    {
+        $configProvider = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $configProvider->expects($this->any())
+            ->method('hasConfigById')
+            ->will($this->returnValue($hasConfig));
+
+        if ($hasConfig) {
+            $config = $this->getMockBuilder('Oro\Bundle\EntityConfigBundle\Config\Config')
+                ->disableOriginalConstructor()
+                ->getMock();
+
+            $config->expects($this->any())
+                ->method('get')
+                ->will($this->returnValueMap([
+                   ['enum_code', false, null, $enumCode],
+                   ['immutable_codes', false, [], $immutableCodes],
+                ]));
+
+            $configProvider->expects($this->any())
+                ->method('getConfigById')
+                ->will($this->returnValue($config));
+
+            $configProvider->expects($this->any())
+                ->method('getConfig')
+                ->will($this->returnValue($config));
+        }
+
+        return $configProvider;
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getConfiguredForm()
+    {
+        $configId = new FieldConfigId('enum', 'Test\Entity', 'status', 'enum');
+        $formConfig = $this->getMockBuilder('Symfony\Component\Form\FormConfigInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $formConfig->expects($this->once())
+            ->method('getOption')
+            ->will($this->returnValue($configId));
+
+        $form = $this->getMockBuilder('Symfony\Component\Form\Test\FormInterface')
+            ->disableOriginalConstructor()
+            ->getMock();
+        $form->expects($this->once())
+            ->method('getConfig')
+            ->will($this->returnValue($formConfig));
+
+        return $form;
     }
 }

@@ -59,6 +59,8 @@ define(function(require) {
 
         isInitSelect2: false,
 
+        previousData: [],
+
         /**
          * @inheritDoc
          */
@@ -78,6 +80,10 @@ define(function(require) {
         reset: function() {
             DictionaryFilter.__super__.reset.apply(this, arguments);
             var select2element = this.$el.find(this.elementSelector);
+            var data = select2element.select2('data');
+            if (data.length) {
+                this.previousData = data;
+            }
             select2element.select2('data',  null);
         },
 
@@ -236,7 +242,7 @@ define(function(require) {
         isEmptyValue: function() {
             var value = this.getValue();
 
-            return value.value && value.value.length === 0;
+            return !value.value || value.value.length === 0;
         },
 
         /**
@@ -335,9 +341,34 @@ define(function(require) {
                 return this.placeholder;
             }
 
-            var hintValue = this.wrapHintValue ? ('"' + value.value + '"') : value.value;
+            var data = this.$(this.elementSelector).select2('data');
+            if (!data.length) {
+                data = this.previousData.length ? this.previousData : this.initialData;
+            }
+            var hintRawValue = _.isObject(_.first(value.value)) ?
+                _.map(value.value, _.property('text')) :
+                _.chain(value.value)
+                    .map(function(id) {
+                        var item =  _.find(data, function(item) {
+                            return item.id === id;
+                        });
+
+                        return item ? item.text : item;
+                    })
+                    .filter(_.negate(_.isUndefined))
+                    .value();
+
+            var hintValue = this.wrapHintValue ? ('"' + hintRawValue + '"') : hintRawValue;
 
             return (option ? option.label + ' ' : '') + hintValue;
+        },
+
+        /**
+         * @inheritDoc
+         */
+        _hideCriteria: function() {
+            this.$el.find(this.elementSelector).select2('close');
+            DictionaryFilter.__super__._hideCriteria.apply(this, arguments);
         }
     });
 

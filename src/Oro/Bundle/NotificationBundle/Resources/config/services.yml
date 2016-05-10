@@ -54,6 +54,7 @@ services:
         arguments:
             - '@oro_email.form.subscriber.emailtemplate'
             - '@oro_entity_config.provider.ownership'
+            - '@router'
         tags:
             - { name: form.type, alias: emailnotification }
 
@@ -138,6 +139,7 @@ services:
             - '@oro_email.email_renderer'
             - '@swiftmailer.mailer.db_spool_mailer'
             - '@oro_config.user'
+            - '@oro_email.mailer.processor'
         calls:
             - [ setEnv, [%kernel.environment%] ]
             - [ setMessageLimit, [100] ]

@@ -21,7 +21,7 @@ class ConfigurationController extends Controller
      * @Acl(
      *      id="oro_config_system",
      *      type="action",
-     *      label="oro.config.module_label",
+     *      label="oro.config.acl.action.general.label",
      *      group_name=""
      * )
      */

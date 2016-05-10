@@ -4,6 +4,7 @@ namespace Oro\Bundle\ActionBundle\Tests\Functional;
 
 use Symfony\Component\DomCrawler\Crawler;
 use Symfony\Component\DomCrawler\Form;
+use Symfony\Component\HttpFoundation\Response;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
@@ -31,6 +32,7 @@ abstract class ActionTestCase extends WebTestCase
      * @param string $entityClass
      * @param array $data
      * @param array $server
+     * @param int $expectedCode
      * @return Crawler
      */
     protected function assertExecuteOperation(
@@ -38,7 +40,8 @@ abstract class ActionTestCase extends WebTestCase
         $entityId,
         $entityClass,
         array $data = [],
-        array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest']
+        array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'],
+        $expectedCode = Response::HTTP_OK
     ) {
         $url = $this->getUrl(
             $this->getOperationExecutionRoute(),
@@ -51,9 +54,44 @@ abstract class ActionTestCase extends WebTestCase
 
         $crawler = $this->client->request('GET', $url, [], [], $server);
 
-        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), 200);
+        $this->assertJsonResponseStatusCodeEquals($this->client->getResponse(), $expectedCode);
 
         return $crawler;
+    }
+
+    /**
+     * @param mixed $entityId
+     * @param string $entityClass
+     * @param string $redirectUrl
+     * @param bool $isSuccess
+     * @param array $server
+     * @param int $expectedCode
+     */
+    protected function assertDeleteOperation(
+        $entityId,
+        $entityClass,
+        $redirectUrl,
+        $isSuccess = true,
+        array $server = ['HTTP_X_REQUESTED_WITH' => 'XMLHttpRequest'],
+        $expectedCode = Response::HTTP_OK
+    ) {
+        $container = $this->getContainer();
+
+        if ($container->hasParameter($entityClass)) {
+            $entityClass = $container->getParameter($entityClass);
+        }
+
+        $this->assertExecuteOperation('DELETE', $entityId, $entityClass, [], $server, $expectedCode);
+
+        $this->assertEquals(
+            [
+                'success' => $isSuccess,
+                'message' => '',
+                'messages' => [],
+                'redirectUrl' => $this->getUrl($redirectUrl)
+            ],
+            json_decode($this->client->getResponse()->getContent(), true)
+        );
     }
 
     /**

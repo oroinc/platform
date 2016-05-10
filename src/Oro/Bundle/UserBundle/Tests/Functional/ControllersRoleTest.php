@@ -45,6 +45,39 @@ class ControllersRoleTest extends WebTestCase
     /**
      * @depends testCreate
      */
+    public function testClone()
+    {
+        $response = $this->client->requestGrid(
+            'roles-grid',
+            array('roles-grid[_filter][label][value]' => 'testRole')
+        );
+
+        $result = $this->getJsonResponseContent($response, 200);
+        $result = reset($result['data']);
+
+        /** @var Crawler $crawler */
+        $crawler = $this->client->request(
+            'GET',
+            $this->getUrl('oro_user_role_clone', array('id' => $result['id']))
+        );
+
+        /** @var Form $form */
+        $form = $crawler->selectButton('Save and Close')->form();
+        $form['oro_user_role_form[label]'] = 'clonedRole';
+
+        $this->client->followRedirects(true);
+        $crawler = $this->client->submit($form);
+
+        $result = $this->client->getResponse();
+        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertContains("Role saved", $crawler->html());
+        $this->assertContains("clonedRole", $crawler->html());
+        $this->assertContains("testRole", $crawler->html());
+    }
+
+    /**
+     * @depends testCreate
+     */
     public function testUpdate()
     {
         $response = $this->client->requestGrid(
@@ -60,6 +93,7 @@ class ControllersRoleTest extends WebTestCase
             'GET',
             $this->getUrl('oro_user_role_update', ['id' => $result['id']])
         );
+
         /** @var Form $form */
         $form = $crawler->selectButton('Save and Close')->form();
 

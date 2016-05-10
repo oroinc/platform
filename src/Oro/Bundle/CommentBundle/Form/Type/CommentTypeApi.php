@@ -35,7 +35,7 @@ class CommentTypeApi extends AbstractType
         $builder
             ->add(
                 'message',
-                'textarea',
+                'oro_resizeable_rich_text',
                 [
                     'required' => true,
                     'label'    => 'oro.comment.message.label',
