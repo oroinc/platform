@@ -17,6 +17,8 @@ use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
+    const FORM_FILLER_ID = 'oro_behat_form_filler';
+
     /**
      * {@inheritdoc}
      */
@@ -152,7 +154,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             $mapping = array_merge($mapping, Yaml::parse($mappingPath));
         }
 
-        $container->getDefinition('oro_behat_form_filler')->addMethodCall('addMapping', [$mapping]);
+        $container->getDefinition(self::FORM_FILLER_ID)->addMethodCall('addMapping', [$mapping]);
     }
 
     /**
@@ -161,7 +163,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     private function loadFormFiller(ContainerBuilder $container)
     {
         $formFillerDefinition = new Definition('Oro\Bundle\TestFrameworkBundle\Behat\FormFiller\FormFiller');
-        $container->setDefinition('oro_behat_form_filler', $formFillerDefinition);
+        $container->setDefinition(self::FORM_FILLER_ID, $formFillerDefinition);
     }
 
     /**
@@ -171,7 +173,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $formFillerAwareInitializerDefinition = new Definition(
             'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\FormFillerAwareInitializer',
-            [new Reference('oro_behat_form_filler')]
+            [new Reference(self::FORM_FILLER_ID)]
         );
         $formFillerAwareInitializerDefinition->addTag(ContextExtension::INITIALIZER_TAG, array('priority' => 0));
         $container->setDefinition('oro_behat_form_filler_initializer', $formFillerAwareInitializerDefinition);
