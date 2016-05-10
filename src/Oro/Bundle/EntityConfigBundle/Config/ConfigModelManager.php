@@ -45,6 +45,9 @@ class ConfigModelManager
     /** @var LockObject */
     protected $lockObject;
 
+    /** @var bool */
+    protected $installed = false;
+
     private $requiredTables = [
         'oro_entity_config',
         'oro_entity_config_field',
@@ -54,11 +57,13 @@ class ConfigModelManager
     /**
      * @param ServiceLink $emLink A link to the EntityManager
      * @param LockObject  $lockObject
+     * @param bool $installed
      */
-    public function __construct(ServiceLink $emLink, LockObject $lockObject)
+    public function __construct(ServiceLink $emLink, LockObject $lockObject, $installed = false)
     {
         $this->emLink     = $emLink;
         $this->lockObject = $lockObject;
+        $this->installed = (bool) $installed;
     }
 
     /**
@@ -81,7 +86,7 @@ class ConfigModelManager
             return true;
         }
 
-        $this->dbCheck = SafeDatabaseChecker::tablesExist(
+        $this->dbCheck = $this->installed || SafeDatabaseChecker::tablesExist(
             $this->getEntityManager()->getConnection(),
             $this->requiredTables
         );
