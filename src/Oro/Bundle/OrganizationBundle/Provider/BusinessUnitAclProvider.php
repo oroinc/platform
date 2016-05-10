@@ -33,6 +33,9 @@ class BusinessUnitAclProvider
     /** @var OwnerTreeProvider */
     protected $treeProvider;
 
+    /** @var OneShotIsGrantedObserver */
+    protected $observer;
+
     /**
      * @param BusinessUnitManager $businessUnitManager
      * @param SecurityFacade      $securityFacade
@@ -69,6 +72,16 @@ class BusinessUnitAclProvider
     }
 
     /**
+     * @param OneShotIsGrantedObserver $observer
+     * @return $this
+     */
+    public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer)
+    {
+        $this->observer = $observer;
+        return $this;
+    }
+
+    /**
      * Check is granting user to object in given permission
      *
      * @param string        $permission
@@ -76,10 +89,11 @@ class BusinessUnitAclProvider
      */
     protected function checkIsGranted($permission, $object)
     {
-        $observer = new OneShotIsGrantedObserver();
-        $this->aclVoter->addOneShotIsGrantedObserver($observer);
-        $this->isAssignGranted = $this->securityFacade->isGranted($permission, $object);
-        $this->accessLevel     = $observer->getAccessLevel();
+        if ($this->observer) {
+            $this->aclVoter->addOneShotIsGrantedObserver($this->observer);
+            $this->isAssignGranted = $this->securityFacade->isGranted($permission, $object);
+            $this->accessLevel = $this->observer->getAccessLevel();
+        }
     }
 
     /**
@@ -89,9 +103,9 @@ class BusinessUnitAclProvider
      */
     protected function getIds()
     {
-        if (AccessLevel::SYSTEM_LEVEL == $this->accessLevel) {
+        if (AccessLevel::SYSTEM_LEVEL === $this->accessLevel) {
             return $this->businessUnitManager->getBusinessUnitIds();
-        } elseif (AccessLevel::LOCAL_LEVEL == $this->accessLevel) {
+        } elseif (AccessLevel::LOCAL_LEVEL === $this->accessLevel) {
             return $this->treeProvider->getTree()->getUserBusinessUnitIds(
                 $this->currentUser->getId(),
                 $this->getOrganizationContextId()
@@ -115,7 +129,7 @@ class BusinessUnitAclProvider
     {
         if (null === $this->currentUser) {
             $user = $this->securityFacade->getLoggedUser();
-            if ($user && is_object($user) && $user instanceof UserInterface) {
+            if ($user instanceof UserInterface) {
                 $this->currentUser = $user;
             }
         }

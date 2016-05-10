@@ -3,11 +3,11 @@
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use Doctrine\ORM\EntityRepository;
-use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider;
+use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 
 /**
  * Class WidgetBusinessUnitSelectConverter
@@ -51,13 +51,7 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         if ($value === null) {
-            $queryBuilder = $this->businessUnitRepository->createQueryBuilder('bu');
-            if ($organizationId = $this->securityFacade->getOrganizationId()) {
-                $queryBuilder->andWhere('bu.organization = :organizationId');
-                $queryBuilder->setParameter('organizationId', $organizationId);
-            }
-            $this->applyAclByEntityPermission($queryBuilder);
-            return $queryBuilder->getQuery()->getResult();
+            return $this->getBusinessUnitList();
         }
 
         return parent::getConvertedValue($widgetConfig, $value, $config, $options);
@@ -69,13 +63,7 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
     public function getFormValue(array $converterAttributes, $value)
     {
         if ($value === null) {
-            $queryBuilder = $this->businessUnitRepository->createQueryBuilder('bu');
-            if ($organizationId = $this->securityFacade->getOrganizationId()) {
-                $queryBuilder->andWhere('bu.organization = :organizationId');
-                $queryBuilder->setParameter('organizationId', $organizationId);
-            }
-            $this->applyAclByEntityPermission($queryBuilder);
-            return $queryBuilder->getQuery()->getResult();
+            return $this->getBusinessUnitList();
         }
 
         return parent::getFormValue($converterAttributes, $value);
@@ -101,15 +89,23 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
     }
 
     /**
-     * @param QueryBuilder $queryBuilder
+     * @return array
      */
-    protected function applyAclByEntityPermission(QueryBuilder $queryBuilder)
+    protected function getBusinessUnitList()
     {
+        $queryBuilder = $this->businessUnitRepository->getQueryBuilderByOrganization(
+            $this->securityFacade->getOrganizationId()
+        );
+
         if ($this->aclEntityClass && $this->aclPermission) {
+            $observer = new OneShotIsGrantedObserver();
             $businessUnitIds = $this
                 ->businessUnitAclProvider
+                ->addOneShotIsGrantedObserver($observer)
                 ->getBusinessUnitIds($this->aclEntityClass, $this->aclPermission);
-            $queryBuilder->andWhere($queryBuilder->expr()->in('bu.id', $businessUnitIds));
+            $queryBuilder->andWhere($queryBuilder->expr()->in('businessUnit.id', $businessUnitIds));
         }
+
+        return $queryBuilder->getQuery()->getResult();
     }
 }
