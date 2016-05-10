@@ -262,7 +262,7 @@ abstract class AbstractTestGenerator
             if (!in_array($class->getName(), $this->usedClasses)) {
                 $this->usedClasses[] = $class->getName();
             }
-        } elseif ($class && !in_array($class, $this->usedClasses)) {
+        } elseif ($class && !in_array($class, $this->usedClasses) && strpos($class, '\\') !== 0) {
             $this->usedClasses[] = $class;
         }
     }

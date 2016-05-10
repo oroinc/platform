@@ -112,6 +112,9 @@ class EntityTestGenerator extends AbstractTestGenerator
         foreach ($annotations as $annotation) {
             if (strpos($annotation, 'var ') !== false) {
                 $annotation = str_replace('var ', '', $annotation);
+                if (strpos($annotation, '$') !== false) {
+                    $annotation = explode(' ', $annotation)[0];
+                }
                 break;
             }
         }
@@ -158,6 +161,10 @@ class EntityTestGenerator extends AbstractTestGenerator
      */
     protected function getFullClassName($className, $fullClassNames)
     {
+        if (strpos($className, '\\') === 0) {
+            return $className;
+        }
+
         foreach ($fullClassNames as $fullClassName) {
             $parts = explode('\\', $fullClassName);
             if ($className === end($parts)) {
@@ -166,7 +173,6 @@ class EntityTestGenerator extends AbstractTestGenerator
         }
         $parts = explode('\\', $this->className);
         array_pop($parts);
-
 
         return implode('\\', $parts) . '\\' . $className;
     }
