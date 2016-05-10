@@ -144,7 +144,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             $mappingPath = str_replace(
                 '/',
                 DIRECTORY_SEPARATOR,
-                $bundle->getPath().'/Resources/config/behat_form_mapping.yml'
+                $bundle->getPath().'/Resources/config/behat_mapping.yml'
             );
 
             if (!is_file($mappingPath)) {
