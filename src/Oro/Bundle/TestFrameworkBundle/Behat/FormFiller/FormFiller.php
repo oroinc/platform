@@ -7,6 +7,9 @@ use Behat\Mink\Element\DocumentElement;
 
 class FormFiller
 {
+    /**
+     * @var array
+     */
     protected $formMapping = [];
 
     /**

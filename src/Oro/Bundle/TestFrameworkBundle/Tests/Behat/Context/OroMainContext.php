@@ -2,12 +2,10 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
-use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeStepScope;
-use Behat\Gherkin\Node\PyStringNode;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\MinkExtension\Context\MinkContext;
@@ -75,6 +73,9 @@ class OroMainContext extends MinkContext implements
         $this->pageObjectFactory = $pageObjectFactory;
     }
 
+    /**
+     * {@inheritdoc}
+     */
     public function setFormFiller(FormFiller $formFiller)
     {
         $this->formFiller = $formFiller;
