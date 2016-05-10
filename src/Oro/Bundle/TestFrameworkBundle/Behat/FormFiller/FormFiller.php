@@ -33,12 +33,14 @@ class FormFiller
             throw new \Exception(sprintf('Can\'t find "%s" field', $name));
         }
 
-        foreach ($table as $row) {
-            if (!array_key_exists($row['label'], $this->formMapping[$name])) {
-                throw new \Exception(sprintf('Can\'t find "%s" label for "%s" form', $row['label'], $name));
+        foreach ($table->getRows() as $row) {
+            list($label, $value) = $row;
+
+            if (!array_key_exists($label, $this->formMapping[$name])) {
+                throw new \Exception(sprintf('Can\'t find "%s" label for "%s" form', $label, $name));
             }
 
-            $element->fillField($this->formMapping[$name][$row['label']], $row['value']);
+            $element->fillField($this->formMapping[$name][$label], $value);
         }
     }
 }
