@@ -57,6 +57,7 @@ class {{ className }} extends \PHPUnit_Framework_TestCase
         ${{ argument.name }} = '';
 {% endif %}
 {% endfor %}
+        //TODO: Add expectations
         $this->{{ testedClassNameVariable }}->{{methodData.name}}({% for key, argument in methodData.arguments %}${{ argument.name }}{% if methodData.arguments|length != key+1 %}, {% endif %}{% endfor %});
     }
 {% endfor %}
