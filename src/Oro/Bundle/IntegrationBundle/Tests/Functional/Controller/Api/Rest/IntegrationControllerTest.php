@@ -133,9 +133,9 @@ class IntegrationControllerTest extends WebTestCase
      */
     protected function assertResult($result)
     {
-        $this->assertArrayHasKey('successful', $result);
+        $this->assertArrayHasKey('success', $result);
         $this->assertArrayHasKey('message', $result);
-        $this->assertTrue($result['successful']);
+        $this->assertTrue($result['success']);
         $this->assertNotEmpty($result['message']);
     }
 
