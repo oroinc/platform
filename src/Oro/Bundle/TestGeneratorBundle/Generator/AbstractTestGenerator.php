@@ -72,7 +72,7 @@ abstract class AbstractTestGenerator
         $methods = [];
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
             if ($method->getDeclaringClass()->getName() == $class->getName()) {
-                $methods[] = $method['name'];
+                $methods[] = $method;
             }
         }
 

@@ -20,7 +20,7 @@ class UnitTestGenerator extends AbstractTestGenerator
         $testPath = $this->getTestPath($fullTestNameSpace);
         $class = new \ReflectionClass($className);
         $constructor = $class->getConstructor();
-        $dependencies = $this->getDependencies($constructor);
+        $dependencies = $constructor ? $this->getDependencies($constructor) : [];
         $dependenciesData = $this->getDependenciesData($dependencies);
         $methodsData = $this->getMethodsData($class);
         $this->addClassToUses($className);

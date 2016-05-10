@@ -25,7 +25,7 @@ class EntityTestGenerator extends AbstractTestGenerator
         $nameSpace = implode('\\', $parts);
         $testPath = $this->getTestPath($fullTestNameSpace);
         $constructor = $class->getConstructor();
-        $dependencies = $this->getDependencies($constructor);
+        $dependencies = $constructor ? $this->getDependencies($constructor) : [];
         $dependenciesData = $this->getDependenciesData($dependencies);
         $this->addClassToUses($className);
         $this->addClassToUses('Oro\Component\Testing\Unit\EntityTestCaseTrait');
