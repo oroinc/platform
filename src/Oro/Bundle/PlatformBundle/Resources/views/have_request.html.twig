@@ -4,7 +4,7 @@
             var options = {
                 dataType: 'script',
                 cache:     true,
-                url:       '{{ data|default(constant('Oro\\Bundle\\PlatformBundle\\Helper\\UrlHelper::URL')) }}',
+                url:       '{{ data|default(constant('Oro\\Bundle\\PlatformBundle\\Form\\UrlGenerator::URL')) }}',
                 timeout:   2000
             };
 

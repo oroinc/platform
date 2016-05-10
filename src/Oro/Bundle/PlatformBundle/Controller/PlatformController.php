@@ -7,7 +7,7 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
-use Oro\Bundle\PlatformBundle\Helper\PackageHelper;
+use Oro\Bundle\PlatformBundle\Provider\PackageProvider;
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 
 /**
@@ -16,10 +16,10 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 class PlatformController extends Controller
 {
     /** @deprecated since 1.10 */
-    const ORO_NAMESPACE = PackageHelper::ORO_NAMESPACE;
+    const ORO_NAMESPACE = PackageProvider::ORO_NAMESPACE;
 
     /** @deprecated since 1.10 */
-    const NAMESPACE_DELIMITER = PackageHelper::NAMESPACE_DELIMITER;
+    const NAMESPACE_DELIMITER = PackageProvider::NAMESPACE_DELIMITER;
 
     /**
      * @Route("/information", name="oro_platform_system_info")
@@ -33,11 +33,11 @@ class PlatformController extends Controller
      */
     public function systemInfoAction()
     {
-        $packageHelper = $this->get('oro_platform.helper.package');
+        $packageProvider = $this->get('oro_platform.provider.package');
 
         return [
-            'thirdPartyPackages' => $packageHelper->getThirdPartyPackages(),
-            'oroPackages' => $packageHelper->getOroPackages(),
+            'thirdPartyPackages' => $packageProvider->getThirdPartyPackages(),
+            'oroPackages' => $packageProvider->getOroPackages(),
         ];
     }
 }

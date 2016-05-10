@@ -1,12 +1,12 @@
 <?php
 
-namespace Oro\Bundle\PlatformBundle\Helper;
+namespace Oro\Bundle\PlatformBundle\Provider;
 
 use Composer\Package\PackageInterface;
 
 use Oro\Bundle\PlatformBundle\Composer\LocalRepositoryFactory;
 
-class PackageHelper
+class PackageProvider
 {
     const ORO_NAMESPACE = 'oro';
     const NAMESPACE_DELIMITER = '/';

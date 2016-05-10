@@ -12,9 +12,6 @@ parameters:
     oro_platform.optional_listeners.manager.class: Oro\Bundle\PlatformBundle\Manager\OptionalListenerManager
     oro_platform.event_listener.optional_listeners.class: Oro\Bundle\PlatformBundle\EventListener\Console\OptionalListenersListener
 
-    oro_platform.helper.url.class:                 Oro\Bundle\PlatformBundle\Helper\UrlHelper
-    oro_platform.helper.package.class:             Oro\Bundle\PlatformBundle\Helper\PackageHelper
-
 services:
     oro_platform.maintenance:
         class:                                %oro_platform.maintenance.class%
@@ -52,14 +49,14 @@ services:
         arguments:
             - '@oro_platform.composer.local_repo_factory'
 
-    oro_platform.helper.url:
-        class: %oro_platform.helper.url.class%
+    oro_platform.form.url_generator:
+        class: 'Oro\Bundle\PlatformBundle\Form\UrlGenerator'
         arguments:
-            - '@oro_platform.helper.package'
+            - '@oro_platform.provider.package'
             - '@oro_platform.url.cache'
 
-    oro_platform.helper.package:
-        class: %oro_platform.helper.package.class%
+    oro_platform.provider.package:
+        class: 'Oro\Bundle\PlatformBundle\Provider\PackageProvider'
         arguments:
             - '@oro_platform.composer.local_repo_factory'
 
