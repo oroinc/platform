@@ -52,35 +52,42 @@ define(function(require) {
             }, this));
         },
 
+        mergeOption: function(view, options, key, value, mergeCallback) {
+            if (!value) {
+                return;
+            }
+
+            if (options[key] === undefined) {
+                options[key] = view.prototype[key];
+            }
+
+            if (_.isFunction(options[key])) {
+                var oldValueFunction = options[key];
+                options[key] = function() {
+                    var oldValue = oldValueFunction.call(this);
+                    return mergeCallback(oldValue, value);
+                };
+            } else {
+                options[key] = mergeCallback(options[key], value);
+            }
+        },
+
         tagNameOption: function(view, options, tagName) {
             if (tagName) {
                 options.tagName = tagName;
             }
         },
 
+        attributesOption: function(view, options, attributes) {
+            this.mergeOption(view, options, 'attributes', attributes, function(option, themeOption) {
+                return $.extend(true, {}, option || {}, themeOption);
+            });
+        },
+
         classNameOption: function(view, options, className) {
-            if (!className) {
-                return ;
-            }
-
-            if (options.className === undefined) {
-                options.className = view.prototype.className;
-            }
-
-            if (!options.className) {
-                options.className = className;
-            } else if (_.isFunction(options.className)) {
-                var oldClassName = options.className;
-                options.className = function() {
-                    var oldClassNameValue = oldClassName.call(this);
-                    if (oldClassNameValue) {
-                        return oldClassNameValue + ' ' + className;
-                    }
-                    return className;
-                };
-            } else {
-                options.className += ' ' + className;
-            }
+            this.mergeOption(view, options, 'className', className, function(option, themeOption) {
+                return (option ? option + ' ' : '') + themeOption;
+            });
         },
 
         templateOption: function(view, options, template) {

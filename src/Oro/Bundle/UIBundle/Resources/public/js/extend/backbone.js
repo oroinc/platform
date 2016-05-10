@@ -53,11 +53,11 @@ define([
     Backbone.View.prototype.getLayoutElement = function() {
         return this.$el;
     };
-    Backbone.View.prototype.initLayout = function() {
+    Backbone.View.prototype.initLayout = function(options) {
         // initializes layout
         Backbone.mediator.execute('layout:init', this.getLayoutElement());
         // initializes page components
-        return this.initPageComponents();
+        return this.initPageComponents(options);
     };
     /**
      * Create flag of deferred render

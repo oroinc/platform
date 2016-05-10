@@ -7,7 +7,7 @@ use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-class RandomIdExtension extends AbstractTypeExtension
+class AdditionalAttrExtension extends AbstractTypeExtension
 {
     /**
      * {@inheritdoc}
@@ -35,5 +35,22 @@ class RandomIdExtension extends AbstractTypeExtension
             $view->vars['attr']['data-ftid'] = $view->vars['id'];
             $view->vars['id'] .= uniqid('-uid-');
         }
+        if (isset($view->vars['name'])) {
+            $fieldPrefix = $view->parent ? 'field__' : 'form__';
+            $fieldName = $this->canonizeFieldName($view->vars['name']);
+            $view->vars['attr']['data-name'] = $fieldPrefix.$fieldName;
+        }
+    }
+
+    /**
+     * @param string $name
+     * @return string
+     */
+    private function canonizeFieldName($name)
+    {
+        $name = preg_replace('/[A-Z]/', '-$0', $name);
+        $name = str_replace('_', '-', $name);
+
+        return strtolower(trim($name, '-'));
     }
 }
