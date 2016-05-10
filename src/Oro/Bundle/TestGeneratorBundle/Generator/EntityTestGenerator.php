@@ -115,10 +115,11 @@ class EntityTestGenerator extends AbstractTestGenerator
                 if (strpos($annotation, '$') !== false) {
                     $annotation = explode(' ', $annotation)[0];
                 }
+                $resultAnnotation = $annotation;
                 break;
             }
         }
-        if (!isset($annotation)) {
+        if (!isset($resultAnnotation)) {
             return false;
         }
         if (!strpos($annotation, '|')) {
