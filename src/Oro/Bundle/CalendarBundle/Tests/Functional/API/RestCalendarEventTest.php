@@ -84,8 +84,6 @@ class RestCalendarEventTest extends WebTestCase
 
         $this->assertNotEmpty($result);
         unset(
-            $result['createdAt'],
-            $result['updatedAt'],
             $result['invitedUsers'][0]['createdAt'],
             $result['invitedUsers'][0]['updatedAt'],
             $result['invitedUsers'][1]['createdAt'],
@@ -116,7 +114,7 @@ class RestCalendarEventTest extends WebTestCase
                     ],
                 ],
             ],
-            $result
+            $this->extractInterestingResponseData($result)
         );
 
         $calendarEvent = $this->getContainer()->get('doctrine')
@@ -190,8 +188,6 @@ class RestCalendarEventTest extends WebTestCase
 
         $this->assertNotEmpty($result);
         unset(
-            $result['createdAt'],
-            $result['updatedAt'],
             $result['invitedUsers'][0]['createdAt'],
             $result['invitedUsers'][0]['updatedAt'],
             $result['invitedUsers'][1]['createdAt'],
@@ -228,7 +224,7 @@ class RestCalendarEventTest extends WebTestCase
                     ]
                 ],
             ],
-            $result
+            $this->extractInterestingResponseData($result)
         );
 
         $calendarEvent = $this->getContainer()->get('doctrine')
@@ -265,10 +261,9 @@ class RestCalendarEventTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+        $this->assertCount(1, $result);
         unset(
             $result[0]['id'],
-            $result[0]['createdAt'],
-            $result[0]['updatedAt'],
             $result[0]['invitedUsers'][0]['createdAt'],
             $result[0]['invitedUsers'][0]['updatedAt'],
             $result[0]['invitedUsers'][1]['createdAt'],
@@ -308,7 +303,7 @@ class RestCalendarEventTest extends WebTestCase
                     ],
                 ],
             ],
-            $result
+            [$this->extractInterestingResponseData($result[0])]
         );
     }
 
@@ -383,5 +378,30 @@ class RestCalendarEventTest extends WebTestCase
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
         $this->assertEmpty($result);
+    }
+
+    public function extractInterestingResponseData(array $responseData)
+    {
+        return array_intersect_key(
+            $responseData,
+            [
+                'id'              => null,
+                'calendar'        => null,
+                'title'           => null,
+                'description'     => null,
+                'start'           => null,
+                'end'             => null,
+                'allDay'          => null,
+                'backgroundColor' => null,
+                'invitationStatus' => null,
+                'parentEventId'    => null,
+                'invitedUsers'     => null,
+                'editable'         => null,
+                'removable'        => null,
+                'notifiable'       => null,
+                'invitedUsers'     => null,
+                'calendarAlias'    => null,
+            ]
+        );
     }
 }
