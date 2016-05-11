@@ -476,6 +476,9 @@ class ExtendConfigDumper
             $fieldConfig->set('is_deleted', true);
             $this->configManager->persist($fieldConfig);
         } elseif (!$fieldConfig->is('state', ExtendScope::STATE_ACTIVE)) {
+            if ($fieldConfig->is('state', ExtendScope::STATE_RESTORE)) {
+                $fieldConfig->set('is_deleted', false);
+            }
             $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
             $this->configManager->persist($fieldConfig);
         }
