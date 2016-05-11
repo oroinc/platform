@@ -34,9 +34,6 @@ class ConfigModelManager
     /** @var ServiceLink */
     protected $proxyEm;
 
-    /** @var bool */
-    protected $installed = false;
-
     private $requiredTables = [
         'oro_entity_config',
         'oro_entity_config_field',
@@ -45,12 +42,10 @@ class ConfigModelManager
 
     /**
      * @param ServiceLink $proxyEm
-     * @param bool $installed
      */
-    public function __construct(ServiceLink $proxyEm, $installed = false)
+    public function __construct(ServiceLink $proxyEm)
     {
         $this->proxyEm = $proxyEm;
-        $this->installed = (bool) $installed;
     }
 
     /**
@@ -67,7 +62,7 @@ class ConfigModelManager
     public function checkDatabase()
     {
         if ($this->dbCheck === null) {
-            $this->dbCheck = $this->installed || SafeDatabaseChecker::tablesExist(
+            $this->dbCheck = SafeDatabaseChecker::tablesExist(
                 $this->getEntityManager()->getConnection(),
                 $this->requiredTables
             );

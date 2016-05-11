@@ -43,7 +43,6 @@ services:
         class: %oro_entity_config.config_model_manager.class%
         arguments:
             - @oro_entity_config.link.entity_manager
-            - %installed%
 
     oro_entity_config.config_audit_mamanger:
         public: false
