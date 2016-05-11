@@ -29,6 +29,8 @@ parameters:
     oro_action.action.run_action_group.class: Oro\Bundle\ActionBundle\Action\RunActionGroup
     oro_action.action.find_entities.class: Oro\Component\Action\Action\FindEntities
     oro_action.action.assign_url.class: Oro\Component\Action\Action\AssignUrl
+    oro_action.action.clone_object.class: Oro\Component\Action\Action\CloneObject
+    oro_action.action.clone_entity.class: Oro\Component\Action\Action\CloneEntity
 
 services:
     oro_action.context_accessor:
@@ -247,3 +249,18 @@ services:
             - '@router'
         tags:
             - { name: oro_action.action, alias: assign_url }
+
+    oro_action.action.clone_object:
+        class: '%oro_action.action.clone_object.class%'
+        arguments:
+            - '@oro_action.context_accessor'
+        tags:
+            - { name: oro_action.action, alias: clone_object }
+
+    oro_action.action.clone_entity:
+        class: '%oro_action.action.clone_entity.class%'
+        arguments:
+            - '@oro_action.context_accessor'
+            - '@doctrine'
+        tags:
+            - { name: oro_action.action, alias: clone_entity }
