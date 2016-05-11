@@ -10,29 +10,27 @@ use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Oro\Bundle\TestFrameworkBundle\Behat\FormFiller\FormFiller;
-use Oro\Bundle\TestFrameworkBundle\Behat\FormFiller\FormFillerAware;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Factory as PageObjectFactory;
-use SensioLabs\Behat\PageObjectExtension\Context\PageObjectAware;
 
 /**
  * Defines application features from the specific context.
  */
 class OroMainContext extends MinkContext implements
-    FormFillerAware,
     SnippetAcceptingContext,
-    PageObjectAware,
+    OroElementFactoryAware,
     KernelAwareContext
 {
     use KernelDictionary;
 
-    /** @var  \SensioLabs\Behat\PageObjectExtension\PageObject\Factory */
-    protected $pageObjectFactory;
-
-    /** @var  FormFiller */
-    protected $formFiller;
+    /**
+     * @var OroElementFactory
+     */
+    protected $elementFactory;
 
     /** @BeforeStep */
     public function beforeStep(BeforeStepScope $scope)
@@ -66,19 +64,13 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * {@inheritdoc}
+     * @param OroElementFactory $elementFactory
+     *
+     * @return null
      */
-    public function setPageObjectFactory(PageObjectFactory $pageObjectFactory)
+    public function setElementFactory(OroElementFactory $elementFactory)
     {
-        $this->pageObjectFactory = $pageObjectFactory;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function setFormFiller(FormFiller $formFiller)
-    {
-        $this->formFiller = $formFiller;
+        $this->elementFactory = $elementFactory;
     }
 
     /**
@@ -141,6 +133,6 @@ class OroMainContext extends MinkContext implements
      */
     public function iFillFormWith($formName, TableNode $table)
     {
-        $this->formFiller->fillForm($formName, $this->getSession()->getPage(), $table);
+        $this->elementFactory->createElement($formName)->fill($table);
     }
 }
