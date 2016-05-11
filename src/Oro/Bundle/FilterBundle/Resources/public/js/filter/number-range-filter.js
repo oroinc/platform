@@ -37,6 +37,11 @@ define([
             notBetween: 8
         },
 
+        /**
+         * Type values to use if only one value is selected
+         *
+         * @property {Object}
+         */
         fallbackTypeValues: {
             moreThan: 2,
             lessThan: 6
