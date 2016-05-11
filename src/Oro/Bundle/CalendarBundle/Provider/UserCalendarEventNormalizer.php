@@ -5,7 +5,6 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\ReminderBundle\Entity\Manager\ReminderManager;
@@ -14,9 +13,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 {
     /** @var SecurityFacade */
     protected $securityFacade;
-
-    /** @var DoctrineHelper */
-    protected $doctrineHelper;
 
     /** @var PropertyAccessor */
     protected $propertyAccessor;
@@ -31,9 +27,8 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         SecurityFacade $securityFacade,
         DoctrineHelper $doctrineHelper
     ) {
-        parent::__construct($reminderManager);
+        parent::__construct($reminderManager, $doctrineHelper);
         $this->securityFacade = $securityFacade;
-        $this->doctrineHelper = $doctrineHelper;
     }
 
     /**
@@ -54,7 +49,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         }
 
         $result = [$item];
-        $this->applyAdditionalData($result, $calendarId);
         $this->applyPermissions($result[0], $calendarId);
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
@@ -77,6 +71,19 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             $extraValues[$field] = $propertyAccessor->getValue($event, $field);
         }
 
+        $extraValues['invitedUsers'] = [];
+        foreach ($event->getAttendees() as $attendee) {
+            $extraValues['invitedUsers'][] =  $this->transformEntity([
+                'displayName' => $attendee->getDisplayName(),
+                'email' => $attendee->getEmail(),
+                'createdAt' => $attendee->getCreatedAt(),
+                'updatedAt' => $attendee->getUpdatedAt(),
+                'origin' => $attendee->getOrigin() ? $attendee->getOrigin()->getId() : null,
+                'status' => $attendee->getStatus() ? $attendee->getStatus()->getId() : null,
+                'type' => $attendee->getType() ? $attendee->getType()->getId() : null,
+            ]);
+        }
+
         return array_merge(
             [
                 'id'               => $event->getId(),
@@ -94,39 +101,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             ],
             $extraValues
         );
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    protected function applyAdditionalData(&$items, $calendarId)
-    {
-        $parentEventIds = $this->getParentEventIds($items);
-        if ($parentEventIds) {
-            /** @var CalendarEventRepository $repo */
-            $repo     = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-            $invitees = $repo->getInvitedUsersByParentsQueryBuilder($parentEventIds)
-                ->getQuery()
-                ->getArrayResult();
-
-            $groupedInvitees = [];
-            foreach ($invitees as $invitee) {
-                $groupedInvitees[$invitee['parentEventId']][] = $invitee;
-            }
-
-            foreach ($items as &$item) {
-                $item['invitedUsers'] = [];
-                if (isset($groupedInvitees[$item['id']])) {
-                    foreach ($groupedInvitees[$item['id']] as $invitee) {
-                        $item['invitedUsers'][] = $invitee['userId'];
-                    }
-                }
-            }
-        } else {
-            foreach ($items as &$item) {
-                $item['invitedUsers'] = [];
-            }
-        }
     }
 
     /**

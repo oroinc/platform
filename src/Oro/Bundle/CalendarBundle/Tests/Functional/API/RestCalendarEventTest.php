@@ -111,6 +111,7 @@ class RestCalendarEventTest extends WebTestCase
                         'email'       => 'admin@example.com',
                         'origin'      => 'client',
                         'status'      => null,
+                        'type'        => null,
                     ],
                 ],
             ],
@@ -158,6 +159,8 @@ class RestCalendarEventTest extends WebTestCase
                     'displayName' => 'Ext',
                     'email'       => 'ext@example.com',
                     'origin'      => 'external',
+                    'status'      => 'tentative',
+                    'type'        => 'organizer',
                 ]
             ],
         );
@@ -215,12 +218,14 @@ class RestCalendarEventTest extends WebTestCase
                         'email'       => 'admin@example.com',
                         'origin'      => 'client',
                         'status'      => null,
+                        'type'        => null,
                     ],
                     [
                         'displayName' => 'Ext',
                         'email'       => 'ext@example.com',
                         'origin'      => 'external',
-                        'status'      => null,
+                        'status'      => 'tentative',
+                        'type'        => 'organizer'
                     ]
                 ],
             ],
@@ -293,12 +298,14 @@ class RestCalendarEventTest extends WebTestCase
                             'email'       => 'admin@example.com',
                             'origin'      => 'client',
                             'status'      => null,
+                            'type'        => null,
                         ],
                         [
                             'displayName' => 'Ext',
                             'email'       => 'ext@example.com',
                             'origin'      => 'external',
-                            'status'      => null,
+                            'status'      => 'tentative',
+                            'type'        => 'organizer',
                         ]
                     ],
                 ],
