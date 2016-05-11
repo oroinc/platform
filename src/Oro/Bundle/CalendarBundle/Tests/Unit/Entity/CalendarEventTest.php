@@ -38,21 +38,22 @@ class CalendarEventTest extends \PHPUnit_Framework_TestCase
 
     public function propertiesDataProvider()
     {
-        return array(
-            array('calendar', new Calendar()),
-            array('systemCalendar', new SystemCalendar()),
-            array('title', 'testTitle'),
-            array('description', 'testdDescription'),
-            array('start', new \DateTime()),
-            array('end', new \DateTime()),
-            array('allDay', true),
-            array('backgroundColor', '#FF0000'),
-            array('createdAt', new \DateTime()),
-            array('updatedAt', new \DateTime()),
-            array('invitationStatus', CalendarEvent::NOT_RESPONDED),
-            array('recurrence', new Recurrence()),
+        return [
+            ['calendar', new Calendar()],
+            ['systemCalendar', new SystemCalendar()],
+            ['title', 'testTitle'],
+            ['description', 'testdDescription'],
+            ['start', new \DateTime()],
+            ['end', new \DateTime()],
+            ['allDay', true],
+            ['backgroundColor', '#FF0000'],
+            ['createdAt', new \DateTime()],
+            ['updatedAt', new \DateTime()],
+            ['invitationStatus', CalendarEvent::NOT_RESPONDED],
+            ['recurrence', new Recurrence()],
             ['originalStart', new \DateTime()],
-        );
+            ['isCancelled', true],
+        ];
     }
 
     /**

@@ -48,6 +48,7 @@ class OroCalendarBundle implements Migration
         $table->addColumn('original_start_at', 'datetime', ['notnull' => false]);
         $table->addColumn('recurring_event_id', 'integer', ['notnull' => false]);
         $table->addColumn('recurrence_id', 'integer', ['notnull' => false]);
+        $table->addColumn('is_cancelled', 'boolean', ['default' => false]);
         $table->addUniqueIndex(['recurrence_id'], 'UNIQ_2DDC40DD2C414CE8');
         $table->addForeignKeyConstraint(
             $table,

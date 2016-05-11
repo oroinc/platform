@@ -109,6 +109,9 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'invitationStatus' => $event->getInvitationStatus(),
                 'parentEventId'    => $event->getParent() ? $event->getParent()->getId() : null,
                 'calendar'         => $event->getCalendar() ? $event->getCalendar()->getId() : null,
+                'recurringEventId' => $event->getRecurringEvent() ? $event->getRecurringEvent()->getId() : null,
+                'originalStart'    => $event->getOriginalStart(),
+                'isCancelled'      => $event->getIsCancelled(),
             ],
             $extraValues
         );

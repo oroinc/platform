@@ -104,16 +104,25 @@ class CalendarEventApiType extends CalendarEventType
                 ]
             )
             ->add(
-                'exceptions',
-                'collection',
+                'recurringEventId',
+                'integer',
                 [
-                    'property_path' => 'recurringEventExceptions',
                     'required' => false,
-                    'type' => 'oro_calendar_event_exception',
-                    'allow_add' => true,
-                    'allow_delete' => true,
+                    'mapped'   => false
                 ]
-            );
+            )
+            ->add(
+                'originalStart',
+                'datetime',
+                [
+                    'required' => false,
+                    'with_seconds' => true,
+                    'widget' => 'single_text',
+                    'format' => DateTimeType::HTML5_FORMAT,
+                    'model_timezone' => 'UTC',
+                ]
+            )
+            ->add('isCancelled', 'checkbox', ['required' => false]);
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);
@@ -167,11 +176,9 @@ class CalendarEventApiType extends CalendarEventType
         }
 
         $this->calendarEventManager->setCalendar($data, $calendarAlias, (int)$calendarId);
-        
-        if (!$data->getRecurringEventExceptions()->isEmpty()) {
-            foreach ($data->getRecurringEventExceptions() as $calendarEvent) {
-                $calendarEvent->setRecurringEvent($data);
-            }
+        $recurringEventId = $form->get('recurringEventId')->getData();
+        if ($recurringEventId) {
+            $this->calendarEventManager->setRecurringEvent($data, (int)$recurringEventId);
         }
     }
 

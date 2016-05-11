@@ -27,6 +27,9 @@ class RestCalendarEventTest extends WebTestCase
             'allDay' => true,
             'backgroundColor' => '#FF0000',
             'calendar' => self::DEFAULT_USER_CALENDAR_ID,
+            'recurringEventId' => null,
+            'originalStart' => null,
+            'isCancelled' => false,
             'recurrence' => [
                 'recurrenceType' => Recurrence::TYPE_DAILY,
                 'interval' => 1,
@@ -37,16 +40,6 @@ class RestCalendarEventTest extends WebTestCase
                 'startTime' => date(DATE_RFC3339),
                 'endTime' => null,
                 'occurrences' => null,
-                'exceptions' => [
-                    [
-                        'originalStart' => date(DATE_RFC3339),
-                        'title' => 'Test Exception Title',
-                        'description' => 'Test Description of Exception',
-                        'start' => date(DATE_RFC3339),
-                        'end' => date(DATE_RFC3339),
-                        'allDay' => false,
-                    ]
-                ],
             ],
         ];
     }

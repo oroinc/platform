@@ -175,4 +175,17 @@ class CalendarEventManager
         return $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar')
             ->find($calendarId);
     }
+
+    /**
+     * @param CalendarEvent $event
+     * @param $recurringEventId
+     */
+    public function setRecurringEvent(CalendarEvent $event, $recurringEventId)
+    {
+        $recurringEvent = $event->getRecurringEvent();
+        if (!$recurringEvent || $recurringEvent->getId() !== $recurringEventId) {
+            $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+            $event->setRecurringEvent($repo->find($recurringEventId));
+        }
+    }
 }

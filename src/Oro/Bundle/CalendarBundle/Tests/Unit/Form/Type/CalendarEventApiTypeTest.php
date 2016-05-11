@@ -22,7 +22,6 @@ use Oro\Bundle\ReminderBundle\Model\SendProcessorRegistry;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventApiType;
 use Oro\Bundle\CalendarBundle\Form\DataTransformer\EventsToUsersTransformer;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventInviteesType;
-use Oro\Bundle\CalendarBundle\Form\Type\ExceptionFormType;
 use Oro\Bundle\CalendarBundle\Form\Type\RecurrenceFormType;
 use Oro\Bundle\FormBundle\Form\Type\OroJquerySelect2HiddenType;
 use Oro\Bundle\UserBundle\Form\Type\UserMultiSelectType;
@@ -261,7 +260,6 @@ class CalendarEventApiTypeTest extends TypeTestCase
             new UserMultiSelectType($this->entityManager),
             new OroJquerySelect2HiddenType($this->entityManager, $searchRegistry, $configProvider),
             new Select2Type('hidden'),
-            new ExceptionFormType(),
             new RecurrenceFormType(),
         ];
 

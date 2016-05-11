@@ -289,6 +289,15 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      */
     protected $originalStart;
 
+    /**
+     * This attribute indicates whether the occurrence was removed from user's calendar.
+     *
+     * @var bool
+     *
+     * @ORM\Column(name="is_cancelled", type="boolean")
+     */
+    protected $isCancelled = false;
+
     public function __construct()
     {
         parent::__construct();
@@ -799,6 +808,30 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
         $this->originalStart = $originalStart;
 
         return $this;
+    }
+
+    /**
+     * Sets isCancelled flag.
+     *
+     * @param bool $isCancelled
+     *
+     * @return self
+     */
+    public function setIsCancelled($isCancelled = false)
+    {
+        $this->isCancelled = $isCancelled;
+
+        return $this;
+    }
+
+    /**
+     * Gets isCancelled flag.
+     *
+     * @return bool
+     */
+    public function getIsCancelled()
+    {
+        return $this->isCancelled;
     }
     
     /**

@@ -121,8 +121,10 @@ oro:
             recurrence.alias.recurrent: Recurrent
             recurrence.pattern: Recurrence Pattern
             recurrence.na: N/A
-            recurringEventExceptions.label: Recurring Event Exceptions
-            recurringEvent.label: Recurring Event
+            recurring_event_exceptions.label: Recurring Event Exceptions
+            recurring_event.label: Recurring Event
+            original_start.label: Original Start
+            is_cancelled.label: Is Cancelled
 
             no_color:             Use calendar color
             updated_by:           added by {{ user }}, updated by {{ editor }}

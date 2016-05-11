@@ -27,6 +27,7 @@ use Oro\Bundle\SoapBundle\Controller\Api\Rest\RestController;
 use Oro\Bundle\SoapBundle\Entity\Manager\ApiEntityManager;
 use Oro\Bundle\CalendarBundle\Handler\DeleteHandler;
 use Oro\Bundle\SoapBundle\Request\Parameters\Filter\HttpDateTimeParameterFilter;
+use Oro\Bundle\SoapBundle\Request\Parameters\Filter\IdentifierToReferenceFilter;
 use Oro\Bundle\SecurityBundle\Exception\ForbiddenException;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigInterface;
@@ -121,7 +122,14 @@ class CalendarEventController extends RestController implements ClassResourceInt
         } elseif ($this->getRequest()->get('page') && $this->getRequest()->get('limit')) {
             $dateParamFilter  = new HttpDateTimeParameterFilter();
             $filterParameters = ['createdAt' => $dateParamFilter, 'updatedAt' => $dateParamFilter];
-            $filterCriteria   = $this->getFilterCriteria(['createdAt', 'updatedAt'], $filterParameters);
+            $parameters = ['createdAt', 'updatedAt'];
+            if ($this->getRequest()->get('recurringEventId')) {
+                $filterParameters['recurringEvent'] = new IdentifierToReferenceFilter(
+                    $this->getDoctrine(), 'OroCalendarBundle:CalendarEvent'
+                );
+                $parameters[] = 'recurringEvent';
+            }
+            $filterCriteria   = $this->getFilterCriteria($parameters, $filterParameters);
 
             /** @var CalendarEventRepository $repo */
             $repo  = $this->getManager()->getRepository();

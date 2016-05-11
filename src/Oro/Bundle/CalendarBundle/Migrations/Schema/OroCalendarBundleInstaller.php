@@ -113,6 +113,7 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('recurring_event_id', 'integer', ['notnull' => false]);
         $table->addColumn('recurrence_id', 'integer', ['notnull' => false]);
         $table->addColumn('original_start_at', 'datetime', ['notnull' => false]);
+        $table->addColumn('is_cancelled', 'boolean', ['default' => false]);
         $table->addIndex(['calendar_id', 'start_at', 'end_at'], 'oro_calendar_event_idx', []);
         $table->addIndex(['calendar_id'], 'idx_2ddc40dda40a2c8', []);
         $table->addIndex(['system_calendar_id', 'start_at', 'end_at'], 'oro_sys_calendar_event_idx', []);

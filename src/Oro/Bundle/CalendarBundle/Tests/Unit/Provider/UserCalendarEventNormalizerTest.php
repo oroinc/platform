@@ -226,7 +226,10 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => null
+                    'invitationStatus' => null,
+                    'recurringEventId' => null,
+                    'originalStart'    => null,
+                    'isCancelled'      => false,
                 ],
                 'calendarId'             => null,
                 'invitees'               => [],
@@ -247,7 +250,10 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'invitedUsers'     => [],
                     'editable'         => true,
                     'removable'        => true,
-                    'notifiable'       => false
+                    'notifiable'       => false,
+                    'recurringEventId' => null,
+                    'originalStart'    => null,
+                    'isCancelled'      => false,
                 ]
             ],
             'own calendar'           => [
@@ -263,7 +269,10 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => null
+                    'invitationStatus' => null,
+                    'recurringEventId' => null,
+                    'originalStart'    => null,
+                    'isCancelled'      => false,
                 ],
                 'calendarId'             => 123,
                 'invitees'               => [],
@@ -284,7 +293,10 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'invitedUsers'     => [],
                     'editable'         => true,
                     'removable'        => true,
-                    'notifiable'       => false
+                    'notifiable'       => false,
+                    'recurringEventId' => null,
+                    'originalStart'    => null,
+                    'isCancelled'      => false,
                 ]
             ],
             'another calendar'       => [
@@ -320,7 +332,10 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'invitedUsers'     => [],
                     'editable'         => false,
                     'removable'        => false,
-                    'notifiable'       => false
+                    'notifiable'       => false,
+                    'recurringEventId' => null,
+                    'originalStart'    => null,
+                    'isCancelled'      => false,
                 ]
             ],
         ];
