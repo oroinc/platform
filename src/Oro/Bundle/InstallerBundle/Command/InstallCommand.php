@@ -108,7 +108,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'cache:clear',
                 array(
                     '--no-optional-warmers' => true,
-                    '--process-isolation' => true
+                    '--process-isolation'   => true
                 )
             );
         }
@@ -154,7 +154,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     public function validate(InputInterface $input)
     {
         $requiredParams = ['user-email', 'user-firstname', 'user-lastname', 'user-password'];
-        $emptyParams = [];
+        $emptyParams    = [];
 
         foreach ($requiredParams as $param) {
             if (null === $input->getOption($param)) {
@@ -210,7 +210,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      * Drop schema, clear entity config and extend caches
      *
      * @param CommandExecutor $commandExecutor
-     * @param string $dropDatabase Can be 'none', 'app' or 'full'
+     * @param string          $dropDatabase Can be 'none', 'app' or 'full'
      *
      * @return InstallCommand
      */
@@ -218,7 +218,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     {
         if ($dropDatabase !== 'none') {
             $schemaDropOptions = [
-                '--force' => true,
+                '--force'             => true,
                 '--process-isolation' => true
             ];
             if ($dropDatabase === 'full') {
@@ -264,10 +264,10 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     protected function updateUser(CommandExecutor $commandExecutor)
     {
-        $emailValidator = $this->getNotBlankValidator('The email must be specified');
+        $emailValidator     = $this->getNotBlankValidator('The email must be specified');
         $firstNameValidator = $this->getNotBlankValidator('The first name must be specified');
-        $lastNameValidator = $this->getNotBlankValidator('The last name must be specified');
-        $passwordValidator = function ($value) {
+        $lastNameValidator  = $this->getNotBlankValidator('The last name must be specified');
+        $passwordValidator  = function ($value) {
             if (strlen(trim($value)) < 2) {
                 throw new \Exception('The password must be at least 2 characters long');
             }
@@ -276,35 +276,35 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         };
 
         $options = [
-            'user-name' => [
-                'label' => 'Username',
-                'askMethod' => 'ask',
+            'user-name'      => [
+                'label'                  => 'Username',
+                'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
-                'defaultValue' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
+                'defaultValue'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
             ],
-            'user-email' => [
-                'label' => 'Email',
-                'askMethod' => 'askAndValidate',
+            'user-email'     => [
+                'label'                  => 'Email',
+                'askMethod'              => 'askAndValidate',
                 'additionalAskArguments' => [$emailValidator],
-                'defaultValue' => null,
+                'defaultValue'           => null,
             ],
             'user-firstname' => [
-                'label' => 'First name',
-                'askMethod' => 'askAndValidate',
+                'label'                  => 'First name',
+                'askMethod'              => 'askAndValidate',
                 'additionalAskArguments' => [$firstNameValidator],
-                'defaultValue' => null,
+                'defaultValue'           => null,
             ],
-            'user-lastname' => [
-                'label' => 'Last name',
-                'askMethod' => 'askAndValidate',
+            'user-lastname'  => [
+                'label'                  => 'Last name',
+                'askMethod'              => 'askAndValidate',
                 'additionalAskArguments' => [$lastNameValidator],
-                'defaultValue' => null,
+                'defaultValue'           => null,
             ],
-            'user-password' => [
-                'label' => 'Password',
-                'askMethod' => 'askHiddenResponseAndValidate',
+            'user-password'  => [
+                'label'                  => 'Password',
+                'askMethod'              => 'askHiddenResponseAndValidate',
                 'additionalAskArguments' => [$passwordValidator],
-                'defaultValue' => null,
+                'defaultValue'           => null,
             ],
         ];
 
@@ -323,7 +323,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             'oro:user:update',
             array_merge(
                 [
-                    'user-name' => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
+                    'user-name'           => LoadAdminUserData::DEFAULT_ADMIN_USERNAME,
                     '--process-isolation' => true
                 ],
                 $commandParameters
@@ -339,8 +339,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     protected function updateOrganization(CommandExecutor $commandExecutor)
     {
         /** @var ConfigManager $configManager */
-        $configManager = $this->getContainer()->get('oro_config.global');
-        $defaultOrganizationName = $configManager->get('oro_ui.organization_name');
+        $configManager             = $this->getContainer()->get('oro_config.global');
+        $defaultOrganizationName   = $configManager->get('oro_ui.organization_name');
         $organizationNameValidator = function ($value) use (&$defaultOrganizationName) {
             $len = strlen(trim($value));
             if ($len === 0 && empty($defaultOrganizationName)) {
@@ -349,16 +349,15 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             if ($len > 15) {
                 throw new \Exception('The organization name must be not more than 15 characters long');
             }
-
             return $value;
         };
 
         $options = [
             'organization-name' => [
-                'label' => 'Organization name',
-                'askMethod' => 'askAndValidate',
+                'label'                  => 'Organization name',
+                'askMethod'              => 'askAndValidate',
                 'additionalAskArguments' => [$organizationNameValidator],
-                'defaultValue' => $defaultOrganizationName,
+                'defaultValue'           => $defaultOrganizationName,
             ]
         ];
 
@@ -392,17 +391,17 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     {
         /** @var ConfigManager $configManager */
         $configManager = $this->getContainer()->get('oro_config.global');
-        $options = [
+        $options       = [
             'application-url' => [
-                'label' => 'Application URL',
-                'config_key' => 'oro_ui.application_url',
-                'askMethod' => 'ask',
+                'label'                  => 'Application URL',
+                'config_key'             => 'oro_ui.application_url',
+                'askMethod'              => 'ask',
                 'additionalAskArguments' => [],
             ]
         ];
 
         foreach ($options as $optionName => $optionData) {
-            $configKey = $optionData['config_key'];
+            $configKey    = $optionData['config_key'];
             $defaultValue = $configManager->get($configKey);
 
             $value = $this->inputOptionProvider->get(
@@ -436,9 +435,9 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->runCommand(
                 'oro:migration:load',
                 [
-                    '--force' => true,
+                    '--force'             => true,
                     '--process-isolation' => true,
-                    '--timeout' => $commandExecutor->getDefaultOption('process-timeout')
+                    '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                 ]
             )
             ->runCommand(
@@ -463,7 +462,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 'oro:migration:data:load',
                 [
                     '--process-isolation' => true,
-                    '--no-interaction' => true,
+                    '--no-interaction'    => true,
                 ]
             );
 
@@ -486,8 +485,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             $commandExecutor->runCommand(
                 'oro:migration:data:load',
                 array(
-                    '--process-isolation' => true,
-                    '--fixtures-type' => 'demo',
+                    '--process-isolation'  => true,
+                    '--fixtures-type'      => 'demo',
                     '--disabled-listeners' =>
                         [
                             'oro_dataaudit.listener.entity_listener',
@@ -587,8 +586,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      */
     protected function updateInstalledFlag($installed)
     {
-        $dumper = $this->getContainer()->get('oro_installer.yaml_persister');
-        $params = $dumper->parse();
+        $dumper                        = $this->getContainer()->get('oro_installer.yaml_persister');
+        $params                        = $dumper->parse();
         $params['system']['installed'] = $installed;
         $dumper->dump($params);
     }
@@ -604,7 +603,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         $scriptExecutor = new ScriptExecutor($output, $this->getContainer(), $commandExecutor);
         /** @var ScriptManager $scriptManager */
         $scriptManager = $this->getContainer()->get('oro_installer.script_manager');
-        $scriptFiles = $scriptManager->getScriptFiles();
+        $scriptFiles   = $scriptManager->getScriptFiles();
         if (!empty($scriptFiles)) {
             foreach ($scriptFiles as $scriptFile) {
                 $scriptExecutor->runScript($scriptFile);
@@ -615,8 +614,8 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
     /**
      * Render requirements table
      *
-     * @param array $collection
-     * @param string $header
+     * @param array           $collection
+     * @param string          $header
      * @param OutputInterface $output
      */
     protected function renderTable(array $collection, $header, OutputInterface $output)
