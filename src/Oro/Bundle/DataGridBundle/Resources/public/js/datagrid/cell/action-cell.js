@@ -38,24 +38,20 @@ define([
         showCloseButton: config.showCloseButton,
 
         /** @property */
-        template: _.template(
+        baseMarkup:
             '<div class="more-bar-holder">' +
                 '<div class="dropdown">' +
                     '<a data-toggle="dropdown" class="dropdown-toggle" href="javascript:void(0);">...</a>' +
                     '<ul class="dropdown-menu dropdown-menu__action-cell pull-right launchers-dropdown-menu" ' +
                         'data-options="{&quot;html&quot;: true}"></ul>' +
                 '</div>' +
-            '</div>'
-        ),
+            '</div>',
 
+        /** @property */
+        simpleBaseMarkup: '<div class="more-bar-holder action-row"></div>',
         /** @property */
         closeButtonTemplate: _.template(
             '<li class="dropdown-close"><i class="icon-remove hide-text">' + _.__('Close') + '</i></li>'
-        ),
-
-        /** @property */
-        simpleTemplate: _.template(
-            '<div class="more-bar-holder action-row"></div>'
         ),
 
         /** @property */
@@ -200,12 +196,12 @@ define([
             }
 
             if (this.launchers.length < this.actionsHideCount) {
-                this.template = this.simpleTemplate;
+                this.baseMarkup = this.simpleBaseMarkup;
                 this.launchersListTemplate = this.simpleLaunchersListTemplate;
                 this.launchersContainerSelector = '.more-bar-holder';
             }
 
-            this.$el.empty().append(this.template());
+            var $markup = $(this.baseMarkup);
 
             launchers = this.getLaunchersByIcons();
             $listsContainer = this.$(this.launchersContainerSelector);
@@ -227,6 +223,8 @@ define([
                 this.renderLaunchersList(launchers.withoutIcons, {withIcons: false})
                     .appendTo($listsContainer);
             }
+
+            this.$el.empty().append($markup);
 
             return this;
         },
