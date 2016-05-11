@@ -101,7 +101,6 @@ class RestCalendarEventTest extends WebTestCase
                 'backgroundColor' => '#FF0000',
                 'invitationStatus' => null,
                 'parentEventId'    => null,
-                'invitedUsers'     => [],
                 'editable'         => true,
                 'removable'        => true,
                 'notifiable'       => false,
@@ -208,7 +207,6 @@ class RestCalendarEventTest extends WebTestCase
                 'backgroundColor' => '#FF0000',
                 'invitationStatus' => null,
                 'parentEventId'    => null,
-                'invitedUsers'     => [],
                 'editable'         => true,
                 'removable'        => true,
                 'notifiable'       => false,
@@ -239,12 +237,13 @@ class RestCalendarEventTest extends WebTestCase
         $attendees = $calendarEvent->getAttendees();
         $this->assertCount(2, $attendees);
 
-        $boundAttendees = array_filter(array_map(
+        $boundAttendees = array_values(array_filter(array_map(
             function (Attendee $attendee) {
                 return $attendee->getUser() ? $attendee : null;
             },
             $attendees->toArray()
-        ));
+        )));
+        
         $this->assertCount(1, $boundAttendees);
         $this->assertEquals('admin@example.com', $boundAttendees[0]->getEmail());
         $this->assertEquals('admin', $boundAttendees[0]->getUser()->getUsername());
@@ -287,7 +286,6 @@ class RestCalendarEventTest extends WebTestCase
                     'backgroundColor' => '#FF0000',
                     'invitationStatus' => null,
                     'parentEventId'    => null,
-                    'invitedUsers'     => [],
                     'editable'         => true,
                     'removable'        => true,
                     'notifiable'       => false,
@@ -406,7 +404,6 @@ class RestCalendarEventTest extends WebTestCase
                 'editable'         => null,
                 'removable'        => null,
                 'notifiable'       => null,
-                'invitedUsers'     => null,
                 'calendarAlias'    => null,
             ]
         );
