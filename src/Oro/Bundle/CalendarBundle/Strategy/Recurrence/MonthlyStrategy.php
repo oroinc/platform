@@ -115,4 +115,16 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
             $occurrenceDate
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationErrorMessage(Recurrence $recurrence)
+    {
+        if (empty($recurrence->getDayOfMonth())) {
+            return "dayOfMonth can't be empty for Monthly recurrence pattern";
+        }
+
+        return null;
+    }
 }

@@ -55,4 +55,13 @@ interface StrategyInterface
      * @return \DateTime
      */
     public function getCalculatedEndTime(Recurrence $recurrence);
+
+    /**
+     * Validates recurrence and returns error message if it is not valid.
+     *
+     * @param Recurrence $recurrence
+     *
+     * @return null|string
+     */
+    public function getValidationErrorMessage(Recurrence $recurrence);
 }

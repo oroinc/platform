@@ -16,6 +16,11 @@ class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
     /** @var RecurrenceExtension */
     protected $extension;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $validator;
+
     protected function setUp()
     {
         $this->delegateStrategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy')
@@ -24,7 +29,9 @@ class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->extension = new RecurrenceExtension($this->delegateStrategy, $this->translator);
+        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
+            ->getMock();
+        $this->extension = new RecurrenceExtension($this->delegateStrategy, $this->translator, $this->validator);
     }
 
     public function testGetName()

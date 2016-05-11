@@ -11,9 +11,16 @@ class YearlyStrategyTest extends \PHPUnit_Framework_TestCase
     /** @var YearlyStrategy  */
     protected $strategy;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $validator;
+
     protected function setUp()
     {
-        $helper = new StrategyHelper();
+        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
+            ->getMock();
+        $helper = new StrategyHelper($this->validator);
         /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())

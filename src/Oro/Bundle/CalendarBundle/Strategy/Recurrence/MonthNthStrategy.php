@@ -161,4 +161,20 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
             $occurrenceDate
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationErrorMessage(Recurrence $recurrence)
+    {
+        if (empty($recurrence->getInstance())) {
+            return "instance value can't be empty for MonthNth recurrence pattern";
+        }
+
+        if (empty($recurrence->getDayOfWeek())) {
+            return "dayOfWeek can't be empty for MonthNth recurrence pattern";
+        }
+
+        return null;
+    }
 }

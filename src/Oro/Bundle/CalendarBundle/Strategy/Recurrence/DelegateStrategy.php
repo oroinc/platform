@@ -101,6 +101,22 @@ class DelegateStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
+    public function getValidationErrorMessage(Recurrence $recurrence)
+    {
+        $delegate = $this->match($recurrence);
+
+        if (!$delegate) {
+            throw new \InvalidArgumentException(
+                sprintf('Cannot find recurrence strategy for "%s" field.', $recurrence->getRecurrenceType())
+            );
+        }
+
+        return $delegate->getValidationErrorMessage($recurrence);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
     public function getName()
     {
         return 'recurrence_delegate';

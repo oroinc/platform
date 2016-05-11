@@ -185,4 +185,16 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
 
         return $recurrence->getStartTime();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationErrorMessage(Recurrence $recurrence)
+    {
+        if (empty($recurrence->getDayOfWeek())) {
+            return "dayOfWeek can't be empty for Weekly recurrence pattern";
+        }
+
+        return null;
+    }
 }

@@ -11,9 +11,16 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
     /** @var YearNthStrategy  */
     protected $strategy;
 
+    /**
+     * @var \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected $validator;
+
     protected function setUp()
     {
-        $helper = new StrategyHelper();
+        $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
+            ->getMock();
+        $helper = new StrategyHelper($this->validator);
         /** @var \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\Translation\TranslatorInterface */
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
@@ -53,20 +60,6 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
 
         $recurrence->setRecurrenceType('Test');
         $this->assertFalse($this->strategy->supports($recurrence));
-    }
-
-    /**
-     * @expectedException \RuntimeException
-     */
-    public function testGetOccurrencesWithWrongIntervalValue()
-    {
-        $recurrence = new Recurrence();
-        $recurrence->setInterval(-1.5);
-        $this->strategy->getOccurrences(
-            $recurrence,
-            new \DateTime(),
-            new \DateTime()
-        );
     }
 
     /**

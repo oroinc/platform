@@ -60,4 +60,32 @@ class YearlyStrategy extends MonthlyStrategy
 
         return $occurrenceDate;
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationErrorMessage(Recurrence $recurrence)
+    {
+        if ($recurrence->getInterval() % 12 !== 0) {
+            return "interval value must be a multiple of 12 for Yearly recurrence pattern";
+        }
+
+        if (empty($recurrence->getDayOfMonth())) {
+            return "dayOfMonth can't be empty for Yearly recurrence pattern";
+        }
+
+        if (empty($recurrence->getMonthOfYear())) {
+            return "monthOfYear can't be empty for Yearly recurrence pattern";
+        }
+
+        $currentDate = new \DateTime();
+        $dateString = $currentDate->format('Y')
+            . '-' . $recurrence->getMonthOfYear()
+            . '-' . $recurrence->getDayOfMonth();
+        if (\DateTime::createFromFormat('Y-m-d', $dateString) === FALSE) {
+            return "dayOfMonth and monthOfYear values are invalid: such date doesn't exist(Yearly recurrence pattern)";
+        }
+
+        return null;
+    }
 }

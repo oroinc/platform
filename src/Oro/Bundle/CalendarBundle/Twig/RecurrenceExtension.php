@@ -7,6 +7,7 @@ use Symfony\Component\Translation\TranslatorInterface;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy;
 use Oro\Component\PropertyAccess\PropertyAccessor;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RecurrenceExtension extends \Twig_Extension
 {
@@ -19,16 +20,28 @@ class RecurrenceExtension extends \Twig_Extension
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
+
     // @TODO unit test
 
     /**
+     * RecurrenceExtension constructor.
+     *
      * @param DelegateStrategy $delegateStrategy
      * @param TranslatorInterface $translator
+     * @param ValidatorInterface $validator
      */
-    public function __construct(DelegateStrategy $delegateStrategy, TranslatorInterface $translator)
-    {
+    public function __construct(
+        DelegateStrategy $delegateStrategy,
+        TranslatorInterface $translator,
+        ValidatorInterface $validator
+    ) {
         $this->delegateStrategy = $delegateStrategy;
         $this->translator = $translator;
+        $this->validator = $validator;
     }
 
     /**
@@ -78,7 +91,17 @@ class RecurrenceExtension extends \Twig_Extension
         foreach ($attributes as $attr => $value) {
             $propertyAccessor->setValue($recurrence, $attr, $value);
         }
-        // @TODO use RecurrenceValidator
+
+        $errors = $this->validator->validate($recurrence);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
+            }
+
+            throw new \RuntimeException('Recurrence is invalid: ' . json_encode($errorMessages));
+        }
 
         return $this->getRecurrencePattern($recurrence);
     }

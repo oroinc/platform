@@ -16,7 +16,6 @@ class RecurrenceFormType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        // @TODO implement recurrencePattern validator.
         $builder
             ->add(
                 'recurrenceType',

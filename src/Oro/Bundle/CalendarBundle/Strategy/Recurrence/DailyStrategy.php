@@ -93,4 +93,13 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
             $recurrence->getStartTime()
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationErrorMessage(Recurrence $recurrence)
+    {
+        //for this strategy no additional validation needed
+        return null;
+    }
 }
