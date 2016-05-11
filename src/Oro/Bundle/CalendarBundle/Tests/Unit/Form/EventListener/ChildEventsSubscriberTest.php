@@ -196,6 +196,38 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals($attendees->first(), $event->getRelatedAttendee());
     }
 
+    public function testUpdateAttendees()
+    {
+        $user = (new User())
+            ->setFirstName('first')
+            ->setLastName('last');
+
+        $calendar = (new Calendar())
+            ->setOwner($user);
+
+        $attendees = new ArrayCollection([
+            (new Attendee())
+                ->setEmail('attendee@example.com')
+                ->setUser($user),
+            (new Attendee())
+                ->setEmail('attendee2@example.com')
+        ]);
+
+        $event = (new CalendarEvent())
+            ->setAttendees($attendees)
+            ->setCalendar($calendar);
+
+        $form = $this->getMock('Symfony\Component\Form\FormInterface');
+        $form->expects($this->any())
+            ->method('getData')
+            ->will($this->returnValue($event));
+
+        $this->childEventsSubscriber->postSubmit(new FormEvent($form, []));
+
+        $this->assertEquals('first last', $attendees->get(0)->getDisplayName());
+        $this->assertEquals('attendee2@example.com', $attendees->get(1)->getDisplayName());
+    }
+
     /**
      * @param CalendarEvent $expected
      * @param CalendarEvent $actual

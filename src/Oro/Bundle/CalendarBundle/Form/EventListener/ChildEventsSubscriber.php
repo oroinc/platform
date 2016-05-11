@@ -113,6 +113,7 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         /** @var CalendarEvent $parentEvent */
         $parentEvent = $event->getForm()->getData();
         $this->updateCalendarEvents($parentEvent);
+        $this->updateAttendeeDisplayNames($parentEvent);
         if ($parentEvent && !$parentEvent->getChildEvents()->isEmpty()) {
             $this->setDefaultEventStatus($parentEvent, CalendarEvent::STATUS_ACCEPTED);
 
@@ -190,6 +191,21 @@ class ChildEventsSubscriber implements EventSubscriberInterface
                 }
                 $parent->addChildEvent($event);
             }
+        }
+    }
+
+    /**
+     * @param CalendarEvent $parent
+     */
+    protected function updateAttendeeDisplayNames(CalendarEvent $parent)
+    {
+        foreach ($parent->getAttendees() as $attendee) {
+            if ($attendee->getDisplayName()) {
+                continue;
+            }
+
+            $displayName = $attendee->getUser() ? $attendee->getUser()->getFullName() : $attendee->getEmail();
+            $attendee->setDisplayName($displayName);
         }
     }
 
