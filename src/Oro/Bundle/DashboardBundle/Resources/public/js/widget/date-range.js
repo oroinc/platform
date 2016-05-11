@@ -12,7 +12,7 @@ define(function(require) {
         events: {
             'change .date-visual-element': '_onClickUpdateCriteria'
         },
-        
+
         /**
          * @inheritDoc
          */

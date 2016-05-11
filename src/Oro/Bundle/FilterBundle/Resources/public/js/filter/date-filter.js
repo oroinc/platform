@@ -470,6 +470,7 @@ define(function(require) {
          * Apply additional logic for "between" filters
          * - Swap start and end dates if end date is behind start date
          * - Change filter type to more than/less than, when only one date is filled
+         * 
          * @param {*} value
          * @param {boolean} updateDom
          * @protected
@@ -521,7 +522,6 @@ define(function(require) {
                     }
                 }
             }
-
         },
 
         /**
