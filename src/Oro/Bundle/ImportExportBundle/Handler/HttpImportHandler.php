@@ -191,21 +191,6 @@ class HttpImportHandler extends AbstractImportHandler
     {
         return sprintf('oro_importexport_import_%s_%s', $inputFilePrefix, $inputFormat);
     }
-    
-    /**
-     * @param integer|null $value
-     * @param integer $count
-     *
-     * @return integer
-     */
-    protected function countValue($value, $count)
-    {
-        if (isset($value)) {
-            $count += $value;
-        }
-
-        return $count;
-    }
 
     /**
      * @param $counts
@@ -215,9 +200,17 @@ class HttpImportHandler extends AbstractImportHandler
     {
         $add = 0;
         $update = 0;
-        $add = $this->countValue($counts['add'], $add);
-        $update = $this->countValue($counts['update'], $update);
-        $update = $this->countValue($counts['replace'], $update);
+
+        if (isset($counts['add'])) {
+            $add += $counts['add'];
+        }
+        if (isset($counts['update'])) {
+            $update += $counts['update'];
+        }
+        if (isset($counts['replace'])) {
+            $update += $counts['replace'];
+        }
+
         $importInfo = $this->translator->trans(
             'oro.importexport.import.alert',
             ['%added%' => $add, '%updated%' => $update]
