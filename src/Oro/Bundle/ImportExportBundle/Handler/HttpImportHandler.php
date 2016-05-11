@@ -117,15 +117,7 @@ class HttpImportHandler extends AbstractImportHandler
         if ($jobResult->isSuccessful()) {
             $this->removeImportingFile($inputFormat, $inputFilePrefix);
             $message = $this->translator->trans('oro.importexport.import.success');
-            $add = 0;
-            $update = 0;
-            $add = $this->countValue($counts['add'], $add);
-            $update = $this->countValue($counts['update'], $update);
-            $update = $this->countValue($counts['replace'], $update);
-            $importInfo = $this->translator->trans(
-                'oro.importexport.import.alert',
-                ['%added%' => $add, '%updated%' => $update]
-            );
+            $importInfo = $this->getImportInfo($counts);
         } else {
             $message = $this->translator->trans('oro.importexport.import.error');
         }
@@ -213,5 +205,24 @@ class HttpImportHandler extends AbstractImportHandler
         }
 
         return $count;
+    }
+
+    /**
+     * @param $counts
+     * @return string
+     */
+    protected function getImportInfo($counts)
+    {
+        $add = 0;
+        $update = 0;
+        $add = $this->countValue($counts['add'], $add);
+        $update = $this->countValue($counts['update'], $update);
+        $update = $this->countValue($counts['replace'], $update);
+        $importInfo = $this->translator->trans(
+            'oro.importexport.import.alert',
+            ['%added%' => $add, '%updated%' => $update]
+        );
+
+        return $importInfo;
     }
 }
