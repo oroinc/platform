@@ -1,12 +1,15 @@
 "Your config changes will be applied to schema.": "Your config changes will be applied to schema."
 "It may take few minutes...": "It may take few minutes..."
+"Field successfully deleted": "Field successfully deleted"
+
+# TODO: these labels are not used for now. Should be fixed in BAP-10441
 "System": "System"
 "Custom": "Custom"
 "New": "New"
 "Requires update": "Requires update"
 "Active": "Active"
 "Deleted": "Deleted"
-"Field successfully deleted": "Field successfully deleted"
+"Restored": "Requires update"
 
 oro:
     entity_extend:

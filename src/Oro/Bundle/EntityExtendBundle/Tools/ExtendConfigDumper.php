@@ -308,6 +308,9 @@ class ExtendConfigDumper
             $fieldConfig->set('is_deleted', true);
         } else {
             $fieldConfig->set('state', ExtendScope::STATE_ACTIVE);
+            if ($fieldConfig->is('state', ExtendScope::STATE_RESTORE)) {
+                $fieldConfig->set('is_deleted', false);
+            }
         }
         if ($fieldConfig->is('is_extend')) {
             /** @var FieldConfigId $fieldConfigId */
