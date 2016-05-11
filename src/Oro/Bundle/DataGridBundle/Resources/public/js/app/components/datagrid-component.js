@@ -46,7 +46,7 @@ define(function(require) {
     }
 
     /**
-     * Processes options by builder
+     * Processes datagrid options by builder
      *
      * @param {jQuery.Deferred} built
      * @param {Object} options
@@ -79,7 +79,7 @@ define(function(require) {
 
             var optionsProcessedPromises = [];
 
-            // run related builders
+            // let builders process datagrid options
             _.each(options.builders, function(module) {
                 var built = $.Deferred();
                 optionsProcessedPromises.push(built.promise());
@@ -87,6 +87,7 @@ define(function(require) {
             });
 
             $.when.apply($, optionsProcessedPromises).always(_.bind(function() {
+                // then init datagrid and run builders
                 this.initDataGrid(options);
 
                 var buildersReadyPromises = [this.built.promise()];

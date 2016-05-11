@@ -12,6 +12,18 @@ define(function(require) {
          */
         DEFAULT_COLUMN_TYPE: 'string',
 
+        /**
+         * Prepares and preloads all required files for inline editing plugin
+         *
+         * @param {jQuery.Deferred} deferred
+         * @param {Object} options
+         * @param {jQuery} [options.$el] container for the grid
+         * @param {string} [options.gridName] grid name
+         * @param {Object} [options.gridPromise] grid builder's promise
+         * @param {Object} [options.data] data for grid's collection
+         * @param {Object} [options.metadata] configuration for the grid
+         */
+
         processDatagridOptions: function(deferred, options) {
             if (tools.isMobile() || !options.metadata.inline_editing || !options.metadata.inline_editing.enable) {
                 deferred.resolve();
@@ -41,15 +53,7 @@ define(function(require) {
         },
 
         /**
-         * Prepares and preloads all required files for inline editing plugin
-         *
-         * @param {jQuery.Deferred} deferred
-         * @param {Object} options
-         * @param {jQuery} [options.$el] container for the grid
-         * @param {string} [options.gridName] grid name
-         * @param {Object} [options.gridPromise] grid builder's promise
-         * @param {Object} [options.data] data for grid's collection
-         * @param {Object} [options.metadata] configuration for the grid
+         * Init() function is required
          */
         init: function(deferred, options) {
             deferred.resolve();
