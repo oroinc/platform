@@ -24,7 +24,7 @@ class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new DefaultTranslationStrategy($this->localeSettings);
+        $this->strategy = new DefaultTranslationStrategy($this->localeSettings, '2016-05-10T14:57:01+00:00');
     }
 
     public function testGetName()
@@ -45,6 +45,18 @@ class DefaultTranslationStrategyTest extends \PHPUnit_Framework_TestCase
                 Configuration::DEFAULT_LOCALE => [
                     $currentLocale => [],
                 ],
+            ],
+            $this->strategy->getLocaleFallbacks()
+        );
+    }
+
+    public function testGetLocaleFallbacksNotInstalledApp()
+    {
+        $this->strategy = new DefaultTranslationStrategy($this->localeSettings, null);
+
+        $this->assertEquals(
+            [
+                Configuration::DEFAULT_LOCALE => [],
             ],
             $this->strategy->getLocaleFallbacks()
         );
