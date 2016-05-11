@@ -14,12 +14,17 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
      */
     protected $localeSettings;
 
+    /** @var bool */
+    protected $installed = false;
+
     /**
      * @param LocaleSettings $localeSettings
+     * @param bool $installed
      */
-    public function __construct(LocaleSettings $localeSettings)
+    public function __construct(LocaleSettings $localeSettings, $installed = false)
     {
         $this->localeSettings = $localeSettings;
+        $this->installed = (bool)$installed;
     }
 
     /**
@@ -36,10 +41,15 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
     public function getLocaleFallbacks()
     {
         // default strategy has only one fallback to default locale
-        return [
-            Configuration::DEFAULT_LOCALE => [
-                $this->localeSettings->getLocale() => []
-            ]
-        ];
+        $locales = [Configuration::DEFAULT_LOCALE => []];
+        if ($this->installed) {
+            $locales = [
+                Configuration::DEFAULT_LOCALE => [
+                    $this->localeSettings->getLocale() => []
+                ]
+            ];
+        }
+
+        return $locales;
     }
 }
