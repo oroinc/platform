@@ -41,13 +41,14 @@ class DefaultTranslationStrategy implements TranslationStrategyInterface
     public function getLocaleFallbacks()
     {
         // default strategy has only one fallback to default locale
-        $locales = [Configuration::DEFAULT_LOCALE => []];
         if ($this->installed) {
             $locales = [
                 Configuration::DEFAULT_LOCALE => [
                     $this->localeSettings->getLocale() => []
                 ]
             ];
+        } else {
+            $locales = [Configuration::DEFAULT_LOCALE => []];
         }
 
         return $locales;
