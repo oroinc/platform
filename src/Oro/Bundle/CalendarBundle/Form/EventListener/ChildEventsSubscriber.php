@@ -151,12 +151,13 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         $currentUserIds = array_keys($attendeesByUserId);
 
         $calendarEventOwnerIds = [];
-        if ($parent->getCalendar() && $parent->getCalendar()->getOwner()) {
-            $owner = $parent->getCalendar()->getOwner();
+        $calendar = $parent->getCalendar();
+        if ($calendar && $calendar->getOwner()) {
+            $owner = $calendar->getOwner();
             if (isset($attendeesByUserId[$owner->getId()])) {
                 $parent->setRelatedAttendee($attendeesByUserId[$owner->getId()]);
             }
-            $calendarEventOwnerIds[] = $parent->getCalendar()->getOwner()->getId();
+            $calendarEventOwnerIds[] = $calendar->getOwner()->getId();
         }
         $events = $parent->getChildEvents();
         foreach ($events as $event) {
