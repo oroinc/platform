@@ -56,8 +56,8 @@ class PlatformUpdateCommand extends AbstractCommand
                     'oro:migration:load',
                     array(
                         '--process-isolation' => true,
-                        '--force' => true,
-                        '--timeout' => $commandExecutor->getDefaultOption('process-timeout')
+                        '--force'             => true,
+                        '--timeout'           => $commandExecutor->getDefaultOption('process-timeout')
                     )
                 )
                 ->runCommand(LoadPermissionConfigurationCommand::NAME, array('--process-isolation' => true))
