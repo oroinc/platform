@@ -32,7 +32,7 @@ class Role extends AbstractPageEntity
         foreach ($aclAction as $action) {
             $action = strtoupper($action);
             $this->accessLevel = $this->test->byXpath(
-                "//div/strong[normalize-space(text()) = '{$entityName}']/ancestor::tr//input" .
+                "//div[normalize-space(strong/text()) = '{$entityName}']/ancestor::tr//input" .
                 "[contains(@name, '[$action][accessLevel')]/preceding-sibling::div/a"
             );
             $this->test->moveto($this->accessLevel);
