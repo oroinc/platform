@@ -382,7 +382,7 @@ class RestCalendarEventTest extends WebTestCase
 
     public function extractInterestingResponseData(array $responseData)
     {
-        return array_intersect_key(
+        $result = array_intersect_key(
             $responseData,
             [
                 'id'              => null,
@@ -403,5 +403,16 @@ class RestCalendarEventTest extends WebTestCase
                 'calendarAlias'    => null,
             ]
         );
+
+        $invitedUsers = $result['invitedUsers'];
+        usort(
+            $invitedUsers,
+            function ($user1, $user2) {
+                return strcmp($user1['displayName'], $user2['displayName']);
+            }
+        );
+        $result['invitedUsers'] = $invitedUsers;
+
+        return $result;
     }
 }
