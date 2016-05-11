@@ -208,6 +208,21 @@ class BusinessUnitRepository extends EntityRepository
     }
 
     /**
+     * @param int $organizationId
+     * @return QueryBuilder
+     */
+    public function getQueryBuilderByOrganization($organizationId = null)
+    {
+        $queryBuilder = $this->getQueryBuilder();
+        if ($organizationId) {
+            $queryBuilder->andWhere('businessUnit.organization = :organizationId');
+            $queryBuilder->setParameter('organizationId', $organizationId);
+        }
+
+        return $queryBuilder;
+    }
+
+    /**
      * @return QueryBuilder
      */
     public function getQueryBuilder()
