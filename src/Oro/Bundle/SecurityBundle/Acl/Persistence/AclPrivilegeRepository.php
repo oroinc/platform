@@ -542,13 +542,12 @@ class AclPrivilegeRepository
         OID $oid,
         \SplObjectStorage $acls,
         AclExtensionInterface $extension,
-        AclInterface $rootAcl = null,
-        $field = null
+        AclInterface $rootAcl = null
     ) {
-        $allowedPermissions = $extension->getAllowedPermissions($oid, $field);
+        $allowedPermissions = $extension->getAllowedPermissions($oid);
         $acl = $this->findAclByOid($acls, $oid);
         if ($rootAcl !== null) {
-            $this->addAclPermissions($sid, $field, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);
+            $this->addAclPermissions($sid, null, $privilege, $allowedPermissions, $extension, $rootAcl, $acl);
         }
 
         // add default permission for not found in db privileges
@@ -579,7 +578,7 @@ class AclPrivilegeRepository
         AclPrivilege $privilege,
         array $permissions,
         AclExtensionInterface $extension,
-        AclInterface $rootAcl,
+        AclInterface $rootAcl = null,
         AclInterface $acl = null
     ) {
         if ($acl !== null) {
@@ -600,7 +599,7 @@ class AclPrivilegeRepository
                 );
             }
             // check parent ACEs if object and class ACEs were not contains all requested privileges
-            if ($privilege->getPermissionCount() < count($permissions) && $acl->isEntriesInheriting()) {
+            if ($rootAcl && $privilege->getPermissionCount() < count($permissions) && $acl->isEntriesInheriting()) {
                 $parentAcl = $acl->getParentAcl();
                 if ($parentAcl !== null) {
                     $this->addAclPermissions($sid, $field, $privilege, $permissions, $extension, $rootAcl, $parentAcl);
@@ -608,51 +607,15 @@ class AclPrivilegeRepository
             }
         }
         // if so far not all requested privileges are found get them from the root ACL
-        if ($privilege->getPermissionCount() < count($permissions)) {
-            // get root aces
-            $rootAces = $this->getFirstNotEmptyAce(
-                $sid,
-                $rootAcl,
-                [
-                    [AclManager::OBJECT_ACE, $field],
-                    [AclManager::CLASS_ACE, $field],
-                    [AclManager::OBJECT_ACE, null],
-                    [AclManager::CLASS_ACE, null],
-                ]
-            );
-
+        if ($rootAcl && $privilege->getPermissionCount() < count($permissions)) {
             $this->addAcesPermissions(
                 $privilege,
                 $permissions,
-                $rootAces,
+                $this->getAces($sid, $rootAcl, AclManager::OBJECT_ACE, $field),
                 $extension,
                 true
             );
         }
-    }
-
-    /**
-     * @param SID          $sid
-     * @param AclInterface $rootAcl
-     * @param array        $accessParamList [[AclManager::*_ACE, 'fieldName1'], ...]
-     *
-     * @return null|EntryInterface[]
-     */
-    protected function getFirstNotEmptyAce($sid, $rootAcl, array $accessParamList)
-    {
-        $resultAces = [];
-
-        foreach ($accessParamList as $accessParams) {
-            list ($level, $field) = $accessParams;
-            $rootAces = $this->getAces($sid, $rootAcl, $level, $field);
-
-            if (!empty($rootAces)) {
-                $resultAces = $rootAces;
-                break;
-            }
-        }
-
-        return $resultAces;
     }
 
     /**
@@ -666,7 +629,7 @@ class AclPrivilegeRepository
      *                           Set to not null class-field-based or object-field-based ACE
      * @return EntryInterface[]
      */
-    protected function getAces(SID $sid, AclInterface $acl, $type, $field)
+    protected function getAces(SID $sid, AclInterface $acl, $type, $field = null)
     {
         return array_filter(
             $this->manager->getAceProvider()->getAces($acl, $type, $field),

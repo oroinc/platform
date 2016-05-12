@@ -29,6 +29,7 @@ UPGRADE FROM 1.9 to 1.10
 - Added migration `Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery` for updating ACL Entries to use custom Permissions.
 - Added `acl_permission` twig extension - allows get `Permission` by `AclPermission`.
 - Added third parameter `$byCurrentGroup` to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface::getPermissions` for getting permissions only for current application group name. Updated same method in `Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension` and `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`.
+- Added second parameter `$permissionName` to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface`.
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Exception\ActionException` marked as deprecated. Use `Oro\Component\Action\Exception\ActionException` instead.

@@ -190,7 +190,7 @@ class RootBasedAclWrapper implements AclInterface
 
         $rootAces = $field && empty($rootAces)
             ? $this->rootAcl->getClassFieldAces($field)
-            : $aces;
+            : $rootAces;
 
         foreach ($rootAces as $rootAce) {
             $exists = false;
