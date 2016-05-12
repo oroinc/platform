@@ -52,6 +52,12 @@ class OroElementFactory
     {
         $elementClass = $elementConfig['class'];
 
-        return new $elementClass($this->mink->getSession(), $this, $elementConfig['selector']);
+        $element = new $elementClass($this->mink->getSession(), $this, $elementConfig['selector']);
+
+        if (isset($elementConfig['options'])) {
+            $element->setOptions($elementConfig['options']);
+        }
+
+        return $element;
     }
 }

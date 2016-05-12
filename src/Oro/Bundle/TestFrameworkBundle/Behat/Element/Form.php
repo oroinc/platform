@@ -14,7 +14,8 @@ class Form extends Element
     public function fill(TableNode $table)
     {
         foreach ($table->getRows() as $row) {
-            $this->fillField($row[0], $row[1]);
+            $locator = isset($this->options['mapping'][$row[0]]) ? $this->options['mapping'][$row[0]] : $row[0];
+            $this->fillField($locator, $row[1]);
         }
     }
 }

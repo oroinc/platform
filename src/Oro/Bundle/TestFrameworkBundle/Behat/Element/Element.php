@@ -20,6 +20,11 @@ class Element extends NodeElement
     protected $session;
 
     /**
+     * @var array
+     */
+    protected $options;
+
+    /**
      * @param Session $session
      * @param OroElementFactory $elementFactory
      * @param array|string $selector
@@ -30,6 +35,14 @@ class Element extends NodeElement
 
         $this->elementFactory = $elementFactory;
         $this->session = $session;
+    }
+
+    /**
+     * @param array $options
+     */
+    public function setOptions(array $options)
+    {
+        $this->options = $options;
     }
 
     /**
@@ -67,8 +80,8 @@ class Element extends NodeElement
      */
     private function getSelectorAsXpath(SelectorsHandler $selectorsHandler, $selector)
     {
-        $selectorType = is_array($selector) ? key($selector) : 'css';
-        $locator = is_array($selector) ? $selector[$selectorType] : $selector;
+        $selectorType = is_array($selector) ? $selector['type'] : 'css';
+        $locator = is_array($selector) ? $selector['locator'] : $selector;
 
         return $selectorsHandler->selectorToXpath($selectorType, $locator);
     }
