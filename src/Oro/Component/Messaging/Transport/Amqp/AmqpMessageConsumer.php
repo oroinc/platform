@@ -44,7 +44,7 @@ class AmqpMessageConsumer implements MessageConsumer
 
     /**
      * {@inheritdoc}
-     * 
+     *
      * @return AmqpQueue
      */
     public function getQueue()
