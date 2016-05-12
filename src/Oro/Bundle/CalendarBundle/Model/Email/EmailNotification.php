@@ -8,31 +8,23 @@ use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 
 class EmailNotification implements EmailNotificationInterface
 {
     const TEMPLATE_ENTITY = 'Oro\Bundle\EmailBundle\Entity\EmailTemplate';
-    const ENTITY_CLASS_NAME = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    const ENTITY_CLASS_NAME = 'Oro\Bundle\CalendarBundle\Entity\Attendee';
 
-    /**
-     * @var ObjectManager
-     */
+    /** @var ObjectManager */
     protected $em;
 
-    /**
-     * @var CalendarEvent
-     */
-    protected $calendarEvent;
+    /** @var Attendee */
+    protected $attendee;
 
-    /**
-     * @var string
-     */
+    /** @var string */
     protected $templateName;
 
-    /**
-     * @var array
-     */
+    /** @var array */
     protected $emails = [];
 
     /**
@@ -45,11 +37,11 @@ class EmailNotification implements EmailNotificationInterface
     }
 
     /**
-     * @param CalendarEvent $calendarEvent
+     * @param Attendee $attendee
      */
-    public function setCalendarEvent(CalendarEvent $calendarEvent)
+    public function setAttendee(Attendee $attendee)
     {
-        $this->calendarEvent = $calendarEvent;
+        $this->attendee = $attendee;
     }
 
     /**
@@ -86,7 +78,7 @@ class EmailNotification implements EmailNotificationInterface
 
     public function getEntity()
     {
-        return $this->calendarEvent;
+        return $this->attendee;
     }
 
     /**

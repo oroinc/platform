@@ -129,29 +129,37 @@ class EmailSendProcessor
      */
     public function sendRespondNotification(CalendarEvent $calendarEvent)
     {
-        if ($calendarEvent->getParent()) {
-            switch ($calendarEvent->getInvitationStatus()) {
-                case CalendarEvent::STATUS_ACCEPTED:
-                    $templateName = self::ACCEPTED_TEMPLATE_NAME;
-                    break;
-                case CalendarEvent::STATUS_TENTATIVELY_ACCEPTED:
-                    $templateName = self::TENTATIVE_TEMPLATE_NAME;
-                    break;
-                case CalendarEvent::STATUS_DECLINED:
-                    $templateName = self::DECLINED_TEMPLATE_NAME;
-                    break;
-                default:
-                    throw new \LogicException(
-                        sprintf('Invitees try to send un-respond status %s', $calendarEvent->getInvitationStatus())
-                    );
-            }
-            $this->addEmailNotification(
-                $calendarEvent,
-                $this->getParentEmail($calendarEvent),
-                $templateName
-            );
-            $this->process();
+        if (!$calendarEvent->getParent()) {
+            return;
         }
+
+        $relatedAttendee = $calendarEvent->getRelatedAttendee();
+        if (!$relatedAttendee) {
+            return;
+        }
+
+        $statusId = $relatedAttendee->getStatus() ? $relatedAttendee->getStatus()->getId() : null;
+        switch ($statusId) {
+            case CalendarEvent::STATUS_ACCEPTED:
+                $templateName = self::ACCEPTED_TEMPLATE_NAME;
+                break;
+            case CalendarEvent::STATUS_TENTATIVELY_ACCEPTED:
+                $templateName = self::TENTATIVE_TEMPLATE_NAME;
+                break;
+            case CalendarEvent::STATUS_DECLINED:
+                $templateName = self::DECLINED_TEMPLATE_NAME;
+                break;
+            default:
+                throw new \LogicException(
+                    sprintf('Invitees try to send un-respond status %s', $statusId)
+                );
+        }
+        $this->addEmailNotification(
+            $calendarEvent,
+            $this->getParentEmail($calendarEvent),
+            $templateName
+        );
+        $this->process();
     }
 
     /**
@@ -228,15 +236,15 @@ class EmailSendProcessor
     }
 
     /**
-     * @param CalendarEvent     $calendarEvent
-     * @param array             $emails
-     * @param string            $templateName
+     * @param Attendee $attendee
+     * @param array    $emails
+     * @param string   $templateName
      */
-    protected function addEmailNotification(CalendarEvent $calendarEvent, $emails, $templateName)
+    protected function addEmailNotification(Attendee $attendee, $emails, $templateName)
     {
         $emailNotification = new EmailNotification($this->em);
         $emailNotification->setEmails($emails);
-        $emailNotification->setCalendarEvent($calendarEvent);
+        $emailNotification->setAttendee($attendee);
         $emailNotification->setTemplateName($templateName);
         $this->emailNotifications[] = $emailNotification;
     }
