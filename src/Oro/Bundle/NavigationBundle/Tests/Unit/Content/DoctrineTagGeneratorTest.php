@@ -11,7 +11,6 @@ use Doctrine\ORM\Mapping\ClassMetadata;
 use Oro\Bundle\NavigationBundle\Content\DoctrineTagGenerator;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\EntityStub;
 use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\NewEntityStub;
-use Oro\Bundle\NavigationBundle\Tests\Unit\Content\Stub\PersistentCollectionStub;
 
 class DoctrineTagGeneratorTest extends \PHPUnit_Framework_TestCase
 {
