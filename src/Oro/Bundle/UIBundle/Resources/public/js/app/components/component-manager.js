@@ -18,18 +18,19 @@ define([
     ComponentManager.prototype = {
         eventNamespace: '.component-manager',
 
-        init: function() {
-            var promises;
+        init: function(options) {
+            var promises = [];
             var elements = [];
             var modules = [];
 
             this._analyseDom(elements, modules);
 
-            promises = _.map(elements, this._initComponent, this);
+            _.each(elements, _.bind(function(element) {
+                promises.push(this._initComponent(element, options));
+            }, this));
 
             // optimize load time - preload components in separate layouts
             require(modules, _.noop);
-
             return $.when.apply($, _.compact(promises)).then(function() {
                 return _.compact(arguments);
             });
@@ -132,10 +133,11 @@ define([
          * Initializes component for the element
          *
          * @param {jQuery} $elem
+         * @param {Object|null} options
          * @returns {Promise}
          * @protected
          */
-        _initComponent: function($elem) {
+        _initComponent: function($elem, options) {
             var data = this._readData($elem);
             this._cleanupData($elem);
 
@@ -143,10 +145,10 @@ define([
             $elem.attr('data-bound-component', data.module);
 
             var initDeferred = $.Deferred();
-
+            var componentOptions = $.extend(true, {}, options || {}, data.options);
             require(
                 [data.module],
-                _.bind(this._onComponentLoaded, this, initDeferred, data.options),
+                _.bind(this._onComponentLoaded, this, initDeferred, componentOptions),
                 _.bind(this._onRequireJsError, this, initDeferred)
             );
 

@@ -92,20 +92,19 @@ class BusinessUnitRepository extends EntityRepository
      *
      * @return array
      */
-    public function getOrganizationBusinessUnitsTree($organizationId = null, $sortOrder = [])
+    public function getOrganizationBusinessUnitsTree($organizationId = null, array $sortOrder = [])
     {
         $tree          = [];
         $businessUnits = $this->getBusinessUnitsTree();
 
-        $organizations = $this->_em
-            ->getRepository('OroOrganizationBundle:Organization')
-            ->getEnabled(true, $sortOrder);
+        $organizations = $this->_em->getRepository('OroOrganizationBundle:Organization')
+            ->getOrganizationsPartialData(
+                ['id', 'name', 'enabled'],
+                $sortOrder,
+                $organizationId ? [$organizationId] : []
+            );
         foreach ($organizations as $organizationItem) {
-            $tree[$organizationItem['id']] = [
-                'id'       => $organizationItem['id'],
-                'name'     => $organizationItem['name'],
-                'children' => []
-            ];
+            $tree[$organizationItem['id']] = array_merge($organizationItem, ['children' => []]);
         }
 
         foreach ($businessUnits as $businessUnit) {

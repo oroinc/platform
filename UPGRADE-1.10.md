@@ -84,6 +84,12 @@ UPGRADE FROM 1.9 to 1.10
 ####SearchBundle
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::setEntitiesConfigParameter` deprecated since 1.9. Will be removed after 1.11. Please use oro_search.provider.search_mapping service for mapping config instead.
 - `Oro\Bundle\SearchBundle\DependencyInjection\OroSearchExtension::mergeConfig` deprecated since 1.9. Will be removed after 1.11.
+- `Oro\Bundle\SearchBundle\EventListener\UpdateSchemaDoctrineListener` is no longer requires `Oro\Bundle\SearchBundle\Engine\FulltextIndexManager` as an first argument
+
+####FormBundle:
+- 'Oro\Bundle\FormBundle\Form\Extension\RandomIdExtension' was renamed to 'Oro\Bundle\FormBundle\Form\Extension\AdditionalAttrExtension'
+- 'oro_form.extension.random_id' service was renamed to 'oro_form.extension.additional_attr'
+- Form field identifier - 'data-name' attribute generation added to 'AdditionalAttrExtension'
 
 ####TranslationBundle:
 - Added translation strategies to dynamically handle translation fallbacks
