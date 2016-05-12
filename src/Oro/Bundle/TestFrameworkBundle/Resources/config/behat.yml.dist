@@ -6,18 +6,17 @@ default: &default
             default_session: 'selenium2'
             selenium2:
                 wd_host: "http://localhost:8643/wd/hub"
-        Behat\Symfony2Extension:
-            kernel:
-                env: 'prod'
-            context:
-                path_suffix: 'Tests/Behat/Features'
-                class_suffix: 'Tests\Behat\Context\FeatureContext'
-        SensioLabs\Behat\PageObjectExtension: ~
-        Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer\OroTestFrameworkExtension:
-            shared_contexts: ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext']
+        SensioLabs\Behat\PageObjectExtension:
+            namespaces:
+                page: [Oro\Bundle\UserBundle\Tests\Behat\Page]
+                element: [Oro\Bundle\UserBundle\Tests\Behat\Page\Element]
     autoload:
             - %paths.base%/../vendor/autoload.php
-    suites: []
+    suites:
+        OroUserBundle:
+            settings:
+                paths:    [ %paths.base%/../../../UserBundle/Tests/Behat/Features ]
+                contexts: ['Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context\OroMainContext']
 
 selenium2:
     <<: *default
