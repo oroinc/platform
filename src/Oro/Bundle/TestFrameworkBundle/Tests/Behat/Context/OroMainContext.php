@@ -12,7 +12,6 @@ use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
 use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
-use Oro\Bundle\TestFrameworkBundle\Behat\FormFiller\FormFiller;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Factory as PageObjectFactory;
@@ -35,7 +34,7 @@ class OroMainContext extends MinkContext implements
     /** @BeforeStep */
     public function beforeStep(BeforeStepScope $scope)
     {
-        $this->iWaitingForAjaxResponce();
+        $this->iWaitingForAjaxResponse();
     }
 
     /**
@@ -90,7 +89,6 @@ class OroMainContext extends MinkContext implements
         $this->fillField('_username', $login);
         $this->fillField('_password', $password);
         $this->pressButton('_submit');
-        $errorBlock = $this->getSession()->getPage()->find('css', '.alert-error');
     }
 
     /**
@@ -100,7 +98,7 @@ class OroMainContext extends MinkContext implements
     {
         try {
             parent::pressButton($button);
-            $this->iWaitingForAjaxResponce();
+            $this->iWaitingForAjaxResponse();
         } catch (ElementNotFoundException $e) {
             if ($this->getSession()->getPage()->hasLink($button)) {
                 $this->clickLink($button);
@@ -113,10 +111,10 @@ class OroMainContext extends MinkContext implements
     /**
      * Wait for AJAX to finish.
      *
-     * @Given /^(?:|I )waiting for AJAX responce$/
+     * @Given /^(?:|I )waiting for AJAX response$/
      * @param int $time Time should be in milliseconds
      */
-    public function iWaitingForAjaxResponce($time = 15000)
+    public function iWaitingForAjaxResponse($time = 15000)
     {
         $this->getSession()->wait(
             $time,

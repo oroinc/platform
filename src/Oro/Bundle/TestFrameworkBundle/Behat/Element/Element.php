@@ -56,7 +56,7 @@ class Element extends NodeElement
      */
     protected function getName()
     {
-        return preg_replace('/^.*\\\(.*?)$/', '$1', get_called_class());
+        return preg_replace('/^.*\\\(.*?)$/', '$1', get_class($this));
     }
 
     /**

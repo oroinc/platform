@@ -48,7 +48,7 @@ class OroElementFactory
      *
      * @return Element
      */
-    private function instantiateElement(array $elementConfig)
+    protected function instantiateElement(array $elementConfig)
     {
         $elementClass = $elementConfig['class'];
 
