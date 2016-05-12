@@ -69,7 +69,7 @@ define(function(require) {
         setupCache: function() {
             this.$grid = this.grid.$grid;
             this.$el = this.grid.$el;
-            this.documentHeight = $(document).height();
+            this.documentHeight = scrollHelper.documentHeight();
             this.domCache = {
                 body: $(document.body),
                 gridContainer: this.$grid.parent(),

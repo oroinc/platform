@@ -2,12 +2,12 @@ define(function(require) {
     'use strict';
 
     var FullScreenPlugin;
-    var $ = require('jquery');
     var _ = require('underscore');
     var BasePlugin = require('oroui/js/app/plugins/base/plugin');
     var mediator = require('oroui/js/mediator');
     var tools = require('oroui/js/tools');
     var FloatingHeaderPlugin = require('orodatagrid/js/app/plugins/grid/floating-header-plugin');
+    var scrollHelper = require('oroui/js/tools/scroll-helper');
 
     FullScreenPlugin = BasePlugin.extend({
         enable: function() {
@@ -40,7 +40,7 @@ define(function(require) {
          * @returns {string}
          */
         getCssHeightCalcExpression: function() {
-            var documentHeight = $(document).height();
+            var documentHeight = scrollHelper.documentHeight();
             var availableHeight = mediator.execute('layout:getAvailableHeight',
                     this.main.$grid.parents('.grid-scrollable-container:first'));
             return 'calc(100vh - ' + (documentHeight - availableHeight) + 'px)';
