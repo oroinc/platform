@@ -123,16 +123,6 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
             }
         }
 
-        // fallback to object aces in order to grant access to (not restricted by mask) fields
-        // only in case when no aces were found on previous steps
-        if ($result === null && empty($aces)) {
-            $aces = $acl->getObjectAces();
-            $aces = empty($aces) ? $acl->getClassAces() : $aces;
-            if (!empty($aces)) {
-                $result = $this->hasSufficientPermissions($acl, $aces, $masks, $sids, $administrativeMode);
-            }
-        }
-
         // check parent ACEs if object and class ACEs were not found
         if ($result === null && $acl->isEntriesInheriting()) {
             $parentAcl = $acl->getParentAcl();
@@ -140,9 +130,10 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
                 $result = $parentAcl->isFieldGranted($field, $masks, $sids, $administrativeMode);
             }
         }
-        // throw NoAceFoundException if no any ACEs were found
+
+        // return true if no any ACEs were found (grant access)
         if ($result === null) {
-            throw new NoAceFoundException();
+            $result = true;
         }
 
         return $result;
@@ -270,11 +261,7 @@ class PermissionGrantingStrategy implements PermissionGrantingStrategyInterface
         $aceMask   = $ace->getMask();
 
         if ($acl->getObjectIdentity()->getType() === ObjectIdentityFactory::ROOT_IDENTITY_TYPE) {
-            $isFieldExtension = FieldAclExtension::NAME == $extension->getExtensionKey();
-            $isEntityIdentity = EntityAclExtension::NAME == $acl->getObjectIdentity()->getIdentifier();
-            $isFieldFallback = $isFieldExtension && $isEntityIdentity;
-
-            if ($acl->getObjectIdentity()->getIdentifier() !== $extension->getExtensionKey() && !$isFieldFallback) {
+            if ($acl->getObjectIdentity()->getIdentifier() !== $extension->getExtensionKey()) {
                 return false;
             }
             $aceMask = $extension->adaptRootMask($aceMask, $this->getContext()->getObject());

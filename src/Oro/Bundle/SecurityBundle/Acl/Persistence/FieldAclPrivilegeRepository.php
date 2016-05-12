@@ -72,9 +72,9 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
         $oids[] = $objectIdentity;
         $acls = $this->findAcls($sid, $oids);
 
-        // without relations, without virtual and unidirectional fields, without entity details and without exclusions
+        // with relations, without virtual and unidirectional fields, without entity details and without exclusions
         // there could be ACL AclExclusionProvider to filter restricted fields, so for ACL UI it shouldn't be used
-        $fieldsArray = $this->fieldProvider->getFields($className, false, false, false, false, false);
+        $fieldsArray = $this->fieldProvider->getFields($className, true, false, false, false, false);
         $privileges = new ArrayCollection();
         foreach ($fieldsArray as $fieldInfo) {
             if (array_key_exists('identifier', $fieldInfo) && $fieldInfo['identifier']) {
@@ -195,7 +195,7 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
         // add default permission for not found in db privileges. By default it should be the Organization access level.
         foreach ($allowedPermissions as $permission) {
             if (!$privilege->hasPermission($permission)) {
-                $privilege->addPermission(new AclPermission($permission, AccessLevel::GLOBAL_LEVEL));
+                $privilege->addPermission(new AclPermission($permission, AccessLevel::SYSTEM_LEVEL));
             }
         }
     }

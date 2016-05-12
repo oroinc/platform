@@ -20,36 +20,6 @@ class FieldAclExtension extends EntityAclExtension
 {
     const NAME = 'field';
 
-    const IDENTITY = 0;
-
-    /**
-         basic  - access to own records and objects that are shared with the user
-         local  - access to records in all business units are assigned to the user
-         deep   - access to records in all business units are assigned to the user
-                  and all business units subordinate to business units are assigned to the user.
-         global - access to all records within the organization,
-                  regardless of the business unit hierarchical level to which the domain object belongs
-                  or the user is assigned to
-         system - access to all records within the system
-     */
-    const MASK_VIEW_BASIC         = 1;
-    const MASK_VIEW_LOCAL         = 2;
-    const MASK_VIEW_DEEP          = 4;
-    const MASK_VIEW_GLOBAL        = 8;
-    const MASK_VIEW_SYSTEM        = 16;
-
-    const MASK_CREATE_BASIC       = 32;
-    const MASK_CREATE_LOCAL       = 64;
-    const MASK_CREATE_DEEP        = 128;
-    const MASK_CREATE_GLOBAL      = 256;
-    const MASK_CREATE_SYSTEM      = 512;
-
-    const MASK_EDIT_BASIC         = 1024;
-    const MASK_EDIT_LOCAL         = 2048;
-    const MASK_EDIT_DEEP          = 4096;
-    const MASK_EDIT_GLOBAL        = 8192;
-    const MASK_EDIT_SYSTEM        = 16384;
-
     /** @var DoctrineHelper */
     protected $doctrineHelper;
 
@@ -82,9 +52,9 @@ class FieldAclExtension extends EntityAclExtension
         $this->doctrineHelper = $doctrineHelper;
 
         $this->permissionToMaskBuilderIdentity = [
-            'VIEW'   => self::IDENTITY,
-            'CREATE' => self::IDENTITY,
-            'EDIT'   => self::IDENTITY,
+            'VIEW'   => FieldMaskBuilder::IDENTITY,
+            'CREATE' => FieldMaskBuilder::IDENTITY,
+            'EDIT'   => FieldMaskBuilder::IDENTITY,
         ];
 
         $this->maskBuilderIdentityToPermissions = [
@@ -93,25 +63,21 @@ class FieldAclExtension extends EntityAclExtension
 
         $this->map = [
             'VIEW'   => [
-                self::MASK_VIEW_BASIC,
-                self::MASK_VIEW_LOCAL,
-                self::MASK_VIEW_DEEP,
-                self::MASK_VIEW_GLOBAL,
-                self::MASK_VIEW_SYSTEM,
+                FieldMaskBuilder::MASK_VIEW_BASIC,
+                FieldMaskBuilder::MASK_VIEW_LOCAL,
+                FieldMaskBuilder::MASK_VIEW_DEEP,
+                FieldMaskBuilder::MASK_VIEW_GLOBAL,
+                FieldMaskBuilder::MASK_VIEW_SYSTEM,
             ],
             'CREATE' => [
-                self::MASK_CREATE_BASIC,
-                self::MASK_CREATE_LOCAL,
-                self::MASK_CREATE_DEEP,
-                self::MASK_CREATE_GLOBAL,
-                self::MASK_CREATE_SYSTEM,
+                FieldMaskBuilder::MASK_CREATE_SYSTEM,
             ],
             'EDIT'   => [
-                self::MASK_EDIT_BASIC,
-                self::MASK_EDIT_LOCAL,
-                self::MASK_EDIT_DEEP,
-                self::MASK_EDIT_GLOBAL,
-                self::MASK_EDIT_SYSTEM,
+                FieldMaskBuilder::MASK_EDIT_BASIC,
+                FieldMaskBuilder::MASK_EDIT_LOCAL,
+                FieldMaskBuilder::MASK_EDIT_DEEP,
+                FieldMaskBuilder::MASK_EDIT_GLOBAL,
+                FieldMaskBuilder::MASK_EDIT_SYSTEM,
             ],
         ];
     }
@@ -167,14 +133,28 @@ class FieldAclExtension extends EntityAclExtension
      */
     public function getAccessLevelNames($object, $permissionName = null)
     {
-        $levelNames = parent::getAccessLevelNames($object);
-
-        if ('CREATE' == $permissionName) {
+        if ('CREATE' === $permissionName) {
             // only system and none levels are applicable to new entities
-            $levelNames = AccessLevel::getAccessLevelNames(AccessLevel::SYSTEM_LEVEL);
+            return AccessLevel::getAccessLevelNames(AccessLevel::SYSTEM_LEVEL);
         }
 
-        return $levelNames;
+        $metadata = $this->getMetadata($object);
+        if (!$metadata->hasOwner()) {
+            return [
+                AccessLevel::NONE_LEVEL   => AccessLevel::NONE_LEVEL_NAME,
+                AccessLevel::SYSTEM_LEVEL => AccessLevel::getAccessLevelName(AccessLevel::SYSTEM_LEVEL)
+            ];
+        }
+
+        if ($metadata->isBasicLevelOwned()) {
+            $minLevel = AccessLevel::BASIC_LEVEL;
+        } elseif ($metadata->isLocalLevelOwned()) {
+            $minLevel = AccessLevel::LOCAL_LEVEL;
+        } else {
+            $minLevel = AccessLevel::GLOBAL_LEVEL;
+        }
+
+        return AccessLevel::getAccessLevelNames($minLevel);
     }
 
     /**
@@ -191,25 +171,61 @@ class FieldAclExtension extends EntityAclExtension
             return $result;
         }
 
-        $isIdentifier = $fieldName == $this->doctrineHelper
-                ->getSingleEntityIdentifierFieldName($className, false);
-
         $entityMetadata = empty($this->metadataCache[$className]) ?
             $this->doctrineHelper->getEntityMetadata($className) :
             $this->metadataCache[$oid->getType()];
 
-        try {
-            $isNullable = $entityMetadata->isNullable($fieldName);
-        } catch (MappingException $e) {
-            $isNullable = true;
-        }
+        if (in_array('CREATE', $result, true)) {
+            try {
+                $isNullable = $entityMetadata->isNullable($fieldName);
+            } catch (MappingException $e) {
+                $isNullable = true;
+            }
 
-        // return only 'VIEW' permission for identifier and required fields
-        if ($isIdentifier || !$isNullable) {
-            $result = ['VIEW'];
+            // remove CREATE permission manipulations because this field is not nullable
+            if (!$isNullable && in_array('CREATE', $result, true)) {
+                foreach ($result as $index => $permission) {
+                    if ($permission === 'CREATE') {
+                        unset($result[$index]);
+                        break;
+                    }
+                }
+            }
         }
 
         return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getExtensionKey()
+    {
+        return self::NAME;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMaskPattern($mask)
+    {
+        return FieldMaskBuilder::getPatternFor($mask);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getMaskBuilder($permission)
+    {
+        return new FieldMaskBuilder();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getAllMaskBuilders()
+    {
+        return [new FieldMaskBuilder()];
     }
 
     /**
@@ -227,14 +243,6 @@ class FieldAclExtension extends EntityAclExtension
     {
         $identities = $this->getPermissionsToIdentityMap();
 
-        return empty($identities[$permission]) ? self::IDENTITY : $identities[$permission];
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getExtensionKey()
-    {
-        return self::NAME;
+        return empty($identities[$permission]) ? FieldMaskBuilder::IDENTITY : $identities[$permission];
     }
 }
