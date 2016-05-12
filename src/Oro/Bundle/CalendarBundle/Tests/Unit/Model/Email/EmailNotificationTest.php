@@ -6,13 +6,14 @@ use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 use Oro\Bundle\EmailBundle\Entity\EmailTemplateTranslation;
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailNotification;
 
 class EmailNotificationTest extends \PHPUnit_Framework_TestCase
 {
     const LOCALE     = 'locale';
-    const CLASS_NAME = 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent';
+    const CLASS_NAME = 'Oro\Bundle\CalendarBundle\Entity\Attendee';
 
     /**
      * @var \PHPUnit_Framework_MockObject_MockObject
@@ -32,11 +33,11 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
         $this->notification = new EmailNotification($this->em);
     }
 
-    public function testCalendarEvent()
+    public function testAttendee()
     {
-        $calendarEvent = new CalendarEvent();
-        $this->notification->setCalendarEvent($calendarEvent);
-        $this->assertEquals($calendarEvent, $this->notification->getEntity());
+        $attendee = new Attendee();
+        $this->notification->setAttendee($attendee);
+        $this->assertEquals($attendee, $this->notification->getEntity());
     }
 
     public function testEmails()
@@ -62,7 +63,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
         $repository
             ->expects($this->any())
             ->method('find')
-            ->will($this->returnValue(new CalendarEvent()));
+            ->will($this->returnValue(new Attendee()));
 
         $repository
             ->expects($this->any())
