@@ -30,4 +30,15 @@ interface FactoryInterface
      * @return MessageProducer
      */
     public function createRouterMessageProducer();
+
+    public function createConsumerTopic();
+
+    public function createConsumerQueue($name);
+
+    public function createConsumerMessage($messageName, $processorName, $messageBody);
+
+    /**
+     * @return MessageProducer
+     */
+    public function createConsumerMessageProducer($name = null);
 }
