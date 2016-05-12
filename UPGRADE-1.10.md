@@ -6,6 +6,7 @@ UPGRADE FROM 1.9 to 1.10
 
 ####EntityConfigBundle:
 - Entity config class metadata now allows any `route*` options, that can be used for CRUD routes configuration - as well as already existing `routeName`, `routeView` and `routeCreate` options.
+- Added `Oro\Bundle\EntityConfigBundle\Migration\RemoveManyToOneRelationQuery` as an automated way to remove ManyToOne relation
 
 ####DashboardBundle:
 - Class `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateTimeRangeConverter` was renamed to `Oro\Bundle\DashboardBundle\Provider\Converters\FilterDateRangeConverter`. Service was not renamed.
@@ -94,3 +95,13 @@ UPGRADE FROM 1.9 to 1.10
 ####TranslationBundle:
 - Added translation strategies to dynamically handle translation fallbacks
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
+
+####AttachmentBundle:
+- Fixed `Oro\Bundle\AttachmentBundle\Guesser\MsMimeTypeGuesser` to avoid PHP notices on file upload in some cases
+
+####ProductBundle:
+- Added translation strategies to dynamically handle translation fallbacks
+
+####LayoutBundle
+- Defined image types configuration section for theme config
+- Added `oro_layout.provider.image_type` service to get image types available across all themes
