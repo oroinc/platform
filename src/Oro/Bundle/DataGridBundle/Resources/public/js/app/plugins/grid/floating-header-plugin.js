@@ -34,9 +34,10 @@ define(function(require) {
             }
 
             this.setupCache();
+            this.headerHeight = this.domCache.theadTr.height();
+
             this.isHeaderCellWidthFixed = false;
             this.rescrollCb = this.enableOtherScroll();
-            this.headerHeight = this.domCache.theadTr.height();
             if (!this.isHeaderCellWidthFixed) {
                 this.fixHeaderCellWidth();
             }
