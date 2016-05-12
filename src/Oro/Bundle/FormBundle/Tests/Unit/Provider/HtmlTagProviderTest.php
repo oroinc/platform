@@ -24,7 +24,7 @@ class HtmlTagProviderTest extends \PHPUnit_Framework_TestCase
         'tbody[align|valign]',
         'tr[align|valign]',
         'td[align|valign|rowspan|colspan|bgcolor|nowrap|width|height]',
-        'a[!href|target=_blank|title]',
+        'a[!href|target|title]',
         'dl',
         'dt',
         'div',
