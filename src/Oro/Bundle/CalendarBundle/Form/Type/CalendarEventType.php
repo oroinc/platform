@@ -2,20 +2,38 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Type;
 
+use Doctrine\Common\Collections\Collection;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
 use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\CalendarBundle\Form\EventListener\CalendarUidSubscriber;
+use Oro\Bundle\CalendarBundle\Form\EventListener\ChildEventsSubscriber;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class CalendarEventType extends AbstractType
 {
+    /** @var ManagerRegistry */
+    protected $registry;
+
+    /** @var SecurityFacade */
+    protected $securityFacade;
+
     /**
-     * @var CalendarEvent
+     * @param ManagerRegistry $registry
+     * @param SecurityFacade $securityFacade
      */
-    protected $parentEvent;
+    public function __construct(ManagerRegistry $registry, SecurityFacade $securityFacade)
+    {
+        $this->registry = $registry;
+        $this->securityFacade = $securityFacade;
+    }
 
     /**
      * {@inheritdoc}
@@ -86,11 +104,11 @@ class CalendarEventType extends AbstractType
                 ]
             )
             ->add(
-                'childEvents',
-                'oro_calendar_event_invitees',
+                'attendees',
+                'oro_calendar_event_attendees',
                 [
                     'required' => false,
-                    'label'    => 'oro.calendar.calendarevent.invitation.label'
+                    'label'    => 'oro.calendar.calendarevent.attendees.label'
                 ]
             )
             ->add(
@@ -101,92 +119,31 @@ class CalendarEventType extends AbstractType
                 ]
             );
 
-        $builder->addEventListener(FormEvents::PRE_SET_DATA, [$this, 'preSetData']);
-        $this->subscribeOnChildEvents($builder);
-    }
-
-    /**
-     * @param FormBuilderInterface $builder
-     * @param string               $childEventsFieldName
-     */
-    protected function subscribeOnChildEvents(FormBuilderInterface $builder, $childEventsFieldName = 'childEvents')
-    {
-        // extract master event
-        $builder->addEventListener(FormEvents::PRE_SUBMIT, [$this, 'preSubmit']);
-
-        // get existing events
-        $builder->get($childEventsFieldName)
-            ->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitChildEvents']);
-
-        // synchronize child events
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmit']);
-    }
-
-    /**
-     * PRE_SUBMIT event handler
-     *
-     * @param FormEvent $event
-     */
-    public function preSubmit(FormEvent $event)
-    {
-        $data = $event->getForm()->getData();
-        if ($data) {
-            $this->parentEvent = $data;
-        }
-    }
-
-    /**
-     * POST_SUBMIT event handler for 'childEvents' child field
-     *
-     * @param FormEvent $event
-     */
-    public function postSubmitChildEvents(FormEvent $event)
-    {
-        /** @var CalendarEvent[] $data */
-        $data = $event->getForm()->getData();
-        if ($data && $this->parentEvent) {
-            foreach ($data as $key => $calendarEvent) {
-                $existingEvent = $this->parentEvent->getChildEventByCalendar($calendarEvent->getCalendar());
-                if ($existingEvent) {
-                    $data[$key] = $existingEvent;
-                }
+        $builder->addEventSubscriber(new CalendarUidSubscriber());
+        $builder->addEventSubscriber(new ChildEventsSubscriber($builder, $this->registry, $this->securityFacade));
+        $builder->addEventListener(FormEvents::POST_SUBMIT, function (FormEvent $event) {
+            $calendarEvent = $event->getData();
+            if (!$calendarEvent) {
+                return;
             }
-        }
+
+            $this->setDefaultOrigin($calendarEvent->getAttendees());
+        }, 10);
     }
 
     /**
-     * POST_SUBMIT event handler
-     *
-     * @param FormEvent $event
+     * @param Collection|Attendee[] $attendees
      */
-    public function postSubmit(FormEvent $event)
+    protected function setDefaultOrigin(Collection $attendees)
     {
-        /** @var CalendarEvent $parentEvent */
-        $parentEvent = $event->getForm()->getData();
-        if ($parentEvent && !$parentEvent->getChildEvents()->isEmpty()) {
-            $this->setDefaultEventStatus($parentEvent, CalendarEvent::ACCEPTED);
-
-            foreach ($parentEvent->getChildEvents() as $calendarEvent) {
-                $calendarEvent
-                    ->setTitle($parentEvent->getTitle())
-                    ->setDescription($parentEvent->getDescription())
-                    ->setStart($parentEvent->getStart())
-                    ->setEnd($parentEvent->getEnd())
-                    ->setAllDay($parentEvent->getAllDay());
-
-                $this->setDefaultEventStatus($calendarEvent);
+        foreach ($attendees as $attendee) {
+            if ($attendee->getOrigin()) {
+                return;
             }
-        }
-    }
 
-    /**
-     * @param CalendarEvent $calendarEvent
-     * @param string        $status
-     */
-    protected function setDefaultEventStatus(CalendarEvent $calendarEvent, $status = CalendarEvent::NOT_RESPONDED)
-    {
-        if (!$calendarEvent->getInvitationStatus()) {
-            $calendarEvent->setInvitationStatus($status);
+            $server = $this->registry->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
+                ->find(Attendee::ORIGIN_SERVER);
+            $attendee->setOrigin($server);
         }
     }
 
@@ -203,50 +160,6 @@ class CalendarEventType extends AbstractType
                 'intention'             => 'calendar_event'
             ]
         );
-    }
-
-    /**
-     * PRE_SET_DATA event handler
-     *
-     * @param FormEvent $event
-     */
-    public function preSetData(FormEvent $event)
-    {
-        $form   = $event->getForm();
-        $config = $form->getConfig();
-
-        if (!$config->getOption('allow_change_calendar')) {
-            return;
-        }
-
-        if ($config->getOption('layout_template')) {
-            $form->add(
-                'calendarUid',
-                'oro_calendar_choice_template',
-                [
-                    'required' => false,
-                    'mapped'   => false,
-                    'label'    => 'oro.calendar.calendarevent.calendar.label'
-                ]
-            );
-        } else {
-            /** @var CalendarEvent $data */
-            $data = $event->getData();
-            $form->add(
-                $form->getConfig()->getFormFactory()->createNamed(
-                    'calendarUid',
-                    'oro_calendar_choice',
-                    $data ? $data->getCalendarUid() : null,
-                    [
-                        'required'        => false,
-                        'mapped'          => false,
-                        'auto_initialize' => false,
-                        'is_new'          => !$data || !$data->getId(),
-                        'label'           => 'oro.calendar.calendarevent.calendar.label'
-                    ]
-                )
-            );
-        }
     }
 
     /**
