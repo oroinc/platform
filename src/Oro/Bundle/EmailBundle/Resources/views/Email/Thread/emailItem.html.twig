@@ -103,7 +103,7 @@
                     {{ 'oro.email.body_is_unavailable'|trans }}
                 {% endif %}
                 {% if email.emailBody %}
-                    <ul class="email-attachments-list">
+                    <ul class="email-attachments-list thumbnails">
                         {{ EA.attachments(email.emailBody.attachments, target, hasGrantReattach) }}
                     </ul>
                 {% endif %}

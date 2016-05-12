@@ -9,6 +9,8 @@ use Doctrine\ORM\Mapping as ORM;
 use JMS\Serializer\Annotation as JMS;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\FileExtensionAwareInterface;
+use Oro\Bundle\EmailBundle\Decoder\ContentDecoder;
 
 /**
  * Email Attachment
@@ -16,7 +18,7 @@ use Oro\Bundle\AttachmentBundle\Entity\File;
  * @ORM\Table(name="oro_email_attachment")
  * @ORM\Entity(repositoryClass="Oro\Bundle\EmailBundle\Entity\Repository\EmailAttachmentRepository")
  */
-class EmailAttachment
+class EmailAttachment implements FileExtensionAwareInterface
 {
     const CLASS_NAME = 'Oro\Bundle\EmailBundle\Entity\EmailAttachment';
 
@@ -240,6 +242,39 @@ class EmailAttachment
         $this->embeddedContentId = $embeddedContentId;
 
         return $this;
+    }
+
+    /**
+     * Get size of attachment
+     *
+     * @return int
+     */
+    public function getSize()
+    {
+        if ($this->file) {
+            $size = $this->file->getFileSize();
+        } else {
+            $content = ContentDecoder::decode(
+                $this->attachmentContent->getContent(),
+                $this->attachmentContent->getContentTransferEncoding()
+            );
+            $size = strlen($content);
+        }
+
+        return $size;
+    }
+
+    /**
+     * Check if attachment is an image
+     *
+     * @return bool
+     */
+    public function isImage()
+    {
+        return in_array(
+            $this->contentType,
+            ['image/gif','image/jpeg','image/pjpeg','image/png']
+        );
     }
 
     /**

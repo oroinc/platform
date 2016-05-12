@@ -313,6 +313,44 @@ class EmailController extends Controller
     }
 
     /**
+     * @Route("media/cache/email_attachment/resize/{id}/{width}/{height}",
+     *   name="oro_resize_email_attachment",
+     *   requirements={"id"="\d+", "width"="\d+", "height"="\d+"}
+     * )
+     * @AclAncestor("oro_email_email_view")
+     *
+     * @param EmailAttachment $attachment
+     * @param $width
+     * @param $height
+     * @return mixed
+     */
+    public function getResizedAttachmentImageAction(EmailAttachment $attachment, $width, $height)
+    {
+        $path       = substr($this->getRequest()->getPathInfo(), 2);
+        $filterName = 'attachment_' . $width . '_' . $height;
+
+        $this->get('liip_imagine.filter.configuration')->set(
+            $filterName,
+            [
+                'filters' => [
+                    'thumbnail' => [
+                        'size' => [$width, $height]
+                    ]
+                ]
+            ]
+        );
+        $content = ContentDecoder::decode(
+            $attachment->getContent()->getContent(),
+            $attachment->getContent()->getContentTransferEncoding()
+        );
+        $binary         = $this->get('liip_imagine')->load($content);
+        $filteredBinary = $this->get('liip_imagine.filter.manager')->applyFilter($binary, $filterName);
+        $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getContentType()));
+
+        return $this->get('liip_imagine.cache.manager')->store($response, $path, $filterName);
+    }
+
+    /**
      * Link attachment to entity
      *
      * @Route("/attachment/{id}/link", name="oro_email_attachment_link", requirements={"id"="\d+"})

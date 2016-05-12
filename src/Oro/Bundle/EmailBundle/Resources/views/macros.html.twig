@@ -394,34 +394,44 @@
     {%- for attachment in attachments -%}
         {% if attachment.embeddedContentId is null %}
             {% set canCopyToRecord = (hasGrantReattach and target is defined and oro_can_attache(attachment, target)) ? true : false %}
-            <li class="email-attachments-list-item">
-            <div class="dropdown link-to-record">
-                <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
-                    <i class="icon icon-file-alt"></i> {{ attachment.fileName|oro_format_filename }}
-                </a>
-                <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="dropdownMenu">
-                    <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
-                        {{ 'oro.email.attachment.save'|trans }}
-                    </a>
-                    {% if (canCopyToRecord) %}
-                        {% set options = {
-                            'view': 'oroemail/js/app/views/email-attachment-link-view',
-                            'url': path('oro_email_attachment_link', {
-                                id: attachment.id,
-                                targetActivityClass: oro_class_name(target),
-                                targetActivityId: target.id
-                            })
-                        } %}
-                    <a tabindex="-1" data-page-component-module="oroui/js/app/components/view-component"
-                        class="attachment"
-                        data-page-component-options="{{ options|json_encode }}"
-                        href="{{ options.url }}">
-                        {{ 'oro.email.attachment.copy_to_record'|trans }}
-                    </a>
+            <li class="email-attachments-list-item span3">
+                <div class="email-attachments-file">
+                    {% if attachment.isImage %}
+                        <img src="{{ path('oro_resize_email_attachment', {id: attachment.id, width: 100, height: 80}) }}"
+                             class="img-rounded" width="110" height="80" alt="" />
+                    {% else %}
+                        <div class="thumbnail">
+                            <i class="fa {{ oro_attachment_icon(attachment) }} fa-3x"></i>
+                        </div>
                     {% endif %}
-                </ul>
-            </div>
-        </li>
+                </div>
+                <div class="dropdown link-to-record">
+                    <a class="no-hash dropdown-toggle" href="javascript: void(0);" data-toggle="dropdown">
+                        <i class="fa {{ oro_attachment_icon(attachment) }}"></i> {{ attachment.fileName|oro_format_filename }}
+                    </a>
+                    <ul class="dropdown-menu {{ canCopyToRecord ? '' : 'one'}}" role="menu" aria-labelledby="dropdownMenu">
+                        <a class="no-hash" tabindex="-1" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
+                            {{ 'oro.email.attachment.save'|trans }}<span>({{ file_size(attachment.size) }})</span>
+                        </a>
+                        {% if (canCopyToRecord) %}
+                            {% set options = {
+                                'view': 'oroemail/js/app/views/email-attachment-link-view',
+                                'url': path('oro_email_attachment_link', {
+                                    id: attachment.id,
+                                    targetActivityClass: oro_class_name(target),
+                                    targetActivityId: target.id
+                                })
+                            } %}
+                        <a tabindex="-1" data-page-component-module="oroui/js/app/components/view-component"
+                            class="attachment"
+                            data-page-component-options="{{ options|json_encode }}"
+                            href="{{ options.url }}">
+                            {{ 'oro.email.attachment.copy_to_record'|trans }}
+                        </a>
+                        {% endif %}
+                    </ul>
+                </div>
+            </li>
         {% endif %}
     {%- endfor -%}
 {%- endmacro %}

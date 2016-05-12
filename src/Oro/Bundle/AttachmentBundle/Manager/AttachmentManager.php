@@ -20,6 +20,7 @@ use Gaufrette\Adapter\MetadataSupporter;
 use Gaufrette\Stream\Local as LocalStream;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\FileExtensionAwareInterface;
 use Oro\Bundle\AttachmentBundle\EntityConfig\AttachmentScope;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\EntityExtendBundle\Entity\Manager\AssociationManager;
@@ -342,10 +343,10 @@ class AttachmentManager
     /**
      * Get filetype icon
      *
-     * @param File $entity
+     * @param FileExtensionAwareInterface $entity
      * @return string
      */
-    public function getAttachmentIconClass(File $entity)
+    public function getAttachmentIconClass(FileExtensionAwareInterface $entity)
     {
         return isset($this->fileIcons[$entity->getExtension()])
             ? $this->fileIcons[$entity->getExtension()]

@@ -8,6 +8,7 @@ use Symfony\Component\PropertyAccess\PropertyAccess;
 use Symfony\Component\Security\Core\Util\ClassUtils;
 
 use Oro\Bundle\AttachmentBundle\Entity\File;
+use Oro\Bundle\AttachmentBundle\Entity\FileExtensionAwareInterface;
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
@@ -126,11 +127,11 @@ class FileExtension extends \Twig_Extension
     /**
      * Get attachment icon class
      *
-     * @param File $attachment
+     * @param FileExtensionAwareInterface $attachment
      *
      * @return string
      */
-    public function getAttachmentIcon(File $attachment)
+    public function getAttachmentIcon(FileExtensionAwareInterface $attachment)
     {
         return $this->manager->getAttachmentIconClass($attachment);
     }

@@ -124,7 +124,7 @@ oro:
 
         attachment:
             copy_to_record: Copy to Record
-            save: Save
+            save: Download
             select_file: Select file
 
         menu:
