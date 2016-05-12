@@ -34,9 +34,12 @@ define(function(require) {
             }
 
             this.setupCache();
+            this.isHeaderCellWidthFixed = false;
             this.rescrollCb = this.enableOtherScroll();
             this.headerHeight = this.domCache.theadTr.height();
-            this.fixHeaderCellWidth();
+            if (!this.isHeaderCellWidthFixed) {
+                this.fixHeaderCellWidth();
+            }
             this.$grid.on('click.float-thead', 'thead:first .dropdown', _.bind(function() {
                 this.setFloatTheadMode(this.scrollVisible ? 'relative' : 'default');
             }, this));
@@ -44,7 +47,6 @@ define(function(require) {
 
             this.listenTo(mediator, 'layout:headerStateChange', this.selectMode);
             this.listenTo(this.grid, 'content:update', this.onGridContentUpdate);
-            this.listenTo(this.grid, 'layout:update', this.fixHeaderCellWidth);
             this.listenTo(this.grid, 'ensureCellIsVisible', this.ensureCellIsVisible);
             this.checkLayoutIntervalId = setInterval(this.checkLayout, 400);
             this.connected = true;
@@ -54,7 +56,6 @@ define(function(require) {
         disable: function() {
             this.connected = false;
             clearInterval(this.checkLayoutIntervalId);
-            this.checkLayout();
 
             this.setFloatTheadMode('default');
             this.disableOtherScroll();
@@ -85,6 +86,8 @@ define(function(require) {
         },
 
         fixHeaderCellWidth: function() {
+            // console.log('fixHeaderCellWidth');
+            this.isHeaderCellWidthFixed = true;
             this.setupCache();
             var headerCells = this.domCache.headerCells;
             var firstRowCells = this.domCache.firstRowCells;
@@ -355,8 +358,12 @@ define(function(require) {
                     visible: self.scrollVisible,
                     scrollHeight:  scrollContainer[0].scrollHeight,
                     clientHeight:  scrollContainer[0].clientHeight,
-                    clientWidth:   scrollContainer[0].clientWidth,
                     scrollTop:     scrollContainer[0].scrollTop
+                });
+                // update width in separate cycle
+                // it can change during visibility change
+                scrollStateModel.set({
+                    clientWidth:   scrollContainer[0].clientWidth
                 });
             }
 
