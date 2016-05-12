@@ -83,8 +83,8 @@ oro:
         groups.label:                Groups
         email.label:                 Primary Email
         email:
-            entity_label:            User Email
-            entity_plural_label:     User Emails
+            entity_label:            User Email Address
+            entity_plural_label:     User Email Addresses
             entity_description:      Represent user emails
             email.label:             Email
             id.label:                Id
@@ -148,6 +148,9 @@ oro:
             label.label:  Label
             owner.label:  Owner
             has_role.label: Has role
+            clone.label: 'Copy of %name%'
+            clone: 'Clone'
+            extend_description.label: Description
         invite:
             label: Send an Email Invitation
         privileges:
@@ -169,7 +172,9 @@ oro:
                 popup.message: User {{ user }} will receive reset password by email.
                 popup.question: Are you sure you want to proceed?
         action:
-            password_management: Manage users' passwords
+            password_management:
+                label: Manage passwords
+                description: Reset or change passwords of other users
 
         security:
             password_changed.message: Your password was updated by administrator. New password was sent to you by email

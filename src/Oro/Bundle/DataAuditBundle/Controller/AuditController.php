@@ -39,7 +39,7 @@ class AuditController extends Controller
      * @Acl(
      *      id="oro_dataaudit_history",
      *      type="action",
-     *      label="oro.dataaudit.module_label",
+     *      label="oro.dataaudit.acl.action.history.label",
      *      group_name=""
      * )
      */

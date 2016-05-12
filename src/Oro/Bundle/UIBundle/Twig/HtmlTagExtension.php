@@ -29,6 +29,7 @@ class HtmlTagExtension extends \Twig_Extension
         return [
             new \Twig_SimpleFilter('oro_tag_filter', [$this, 'tagFilter'], ['is_safe' => ['all']]),
             new \Twig_SimpleFilter('oro_html_purify', [$this, 'htmlPurify']),
+            new \Twig_SimpleFilter('oro_html_sanitize', [$this, 'htmlSanitize'], ['is_safe' => ['html']]),
         ];
     }
 
@@ -51,6 +52,16 @@ class HtmlTagExtension extends \Twig_Extension
     public function htmlPurify($string)
     {
         return $this->htmlTagHelper->purify($string);
+    }
+
+    /**
+     * @param string $string
+     *
+     * @return string
+     */
+    public function htmlSanitize($string)
+    {
+        return $this->htmlTagHelper->sanitize($string);
     }
 
     /**

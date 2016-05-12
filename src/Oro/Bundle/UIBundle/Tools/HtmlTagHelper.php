@@ -29,6 +29,21 @@ class HtmlTagHelper
 
     /**
      * @param string $string
+     *
+     * @return string
+     */
+    public function sanitize($string)
+    {
+        $transformer = new SanitizeHTMLTransformer(
+            implode(',', $this->htmlTagProvider->getAllowedElements()),
+            $this->cacheDir
+        );
+
+        return $transformer->transform($string);
+    }
+
+    /**
+     * @param string $string
      * @return string
      */
     public function purify($string)

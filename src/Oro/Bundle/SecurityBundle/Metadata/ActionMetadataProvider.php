@@ -111,7 +111,8 @@ class ActionMetadataProvider
             $data[$annotation->getId()] = new ActionMetadata(
                 $annotation->getId(),
                 $annotation->getGroup(),
-                $annotation->getLabel()
+                $annotation->getLabel(),
+                $annotation->getDescription()
             );
         }
 
