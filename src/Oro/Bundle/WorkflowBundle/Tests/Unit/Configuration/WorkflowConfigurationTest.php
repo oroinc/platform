@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
+use Symfony\Component\Yaml\Yaml;
+
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 class WorkflowConfigurationTest extends \PHPUnit_Framework_TestCase
