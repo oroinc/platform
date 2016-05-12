@@ -6,3 +6,4 @@ placeholders:
 items:
     have_request:
         template: OroPlatformBundle::have_request.html.twig
+        data: '@oro_platform.form.url_generator->getFormUrl()'
