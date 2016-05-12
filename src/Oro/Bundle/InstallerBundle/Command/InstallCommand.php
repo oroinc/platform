@@ -41,7 +41,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
             ->addOption(
-                'skip-ui-init',
+                'skip-assets',
                 null,
                 InputOption::VALUE_NONE,
                 'Skip UI related commands during installation'
@@ -75,7 +75,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         }
 
         $forceInstall = $input->getOption('force');
-        $skipUI = $input->getOption('skip-ui-init');
+        $skipAssets = $input->getOption('skip-assets');
         $commandExecutor = $this->getCommandExecutor($input, $output);
 
         // if there is application is not installed or no --force option
@@ -129,7 +129,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->checkStep($output)
             ->prepareStep($commandExecutor, $dropDatabase)
             ->loadDataStep($commandExecutor, $output)
-            ->finalStep($commandExecutor, $output, $input, $skipUI);
+            ->finalStep($commandExecutor, $output, $input, $skipAssets);
 
         $output->writeln('');
         $output->writeln(
@@ -505,14 +505,14 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      * @param CommandExecutor $commandExecutor
      * @param OutputInterface $output
      * @param InputInterface $input
-     * @param boolean $skipUI
+     * @param boolean $skipAssets
      * @return InstallCommand
      */
     protected function finalStep(
         CommandExecutor $commandExecutor,
         OutputInterface $output,
         InputInterface $input,
-        $skipUI
+        $skipAssets
     ) {
         $output->writeln('<info>Preparing application.</info>');
 
@@ -530,7 +530,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                     '--process-isolation' => true,
                 )
             );
-        if (!$skipUI) {
+        if (!$skipAssets) {
             $commandExecutor->runCommand(
                 'fos:js-routing:dump',
                 array(
