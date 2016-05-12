@@ -71,7 +71,9 @@ class NoteController extends Controller
      */
     public function infoAction(Note $entity)
     {
-        return array('entity' => $entity);
+        $manager = $this->getNoteManager();
+        $attachment = $manager->getAttachmentInfo($entity);
+        return ['entity' => $entity, 'attachment' => $attachment];
     }
 
     /**

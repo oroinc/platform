@@ -24,6 +24,9 @@
                 <fieldset class="form-horizontal control-group">
                     {{ form_widget(form.message) }}
                     {{ form_errors(form.message) }}
+                    <div class="pull-left">
+                        {{ form_widget(form.attachment) }}
+                    </div>
                 </fieldset>
                 <fieldset class="form-horizontal">
                     {{ form_rest(form) }}

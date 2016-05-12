@@ -8,6 +8,7 @@ oro:
 
         id.label:             Id
         message.label:        Message
+        attachment.label:     Attachment
         owner.label:          Created By
         organization.label:   Organization
         updated_by.label:     Updated By

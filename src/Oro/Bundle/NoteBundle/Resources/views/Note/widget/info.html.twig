@@ -3,4 +3,11 @@
     <div class="responsive-block">
         {{ UI.renderSwitchableHtmlProperty('oro.note.message.label'|trans, entity.message) }}
     </div>
+    {% if attachment.attachmentURL %}
+    <div class="note-attachments">
+        <div class="attachment-item">
+            <i class="icon-paper-clip"></i> <a href="{{ attachment.attachmentURL }}" class="no-hash" title="<{{ attachment.attachmentFileName }}">{{ attachment.attachmentFileName }}</a> ({{ attachment.attachmentSize }})
+        </div>
+    </div>
+    {% endif %}
 </div>
