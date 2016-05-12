@@ -40,8 +40,9 @@ define(function(require) {
             var searchString = this.filterModel.get('search');
             var data = ColumnManagerItemView.__super__.getTemplateData.call(this);
             data.cid = this.model.cid;
+            data.label = _.escape(data.label);
             if (searchString.length > 0) {
-                data.label = this.highlightLabel(_.escape(data.label), searchString);
+                data.label = this.highlightLabel(data.label, searchString);
             }
             return data;
         },
