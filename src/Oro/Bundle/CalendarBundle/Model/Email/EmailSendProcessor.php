@@ -5,8 +5,9 @@ namespace Oro\Bundle\CalendarBundle\Model\Email;
 use Doctrine\Common\Collections\ArrayCollection;
 use Doctrine\Common\Persistence\ObjectManager;
 
-use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\NotificationBundle\Processor\EmailNotificationProcessor;
 
 class EmailSendProcessor
 {
@@ -53,11 +54,15 @@ class EmailSendProcessor
      */
     public function sendInviteNotification(CalendarEvent $calendarEvent)
     {
-        if (!$calendarEvent->getParent() && count($calendarEvent->getChildEvents()) > 0) {
-            foreach ($calendarEvent->getChildEvents() as $childEvent) {
+        if (!$calendarEvent->getParent() && count($calendarEvent->getChildAttendees()) > 0) {
+            foreach ($calendarEvent->getChildAttendees() as $attendee) {
+                if (!$this->notifiable($attendee)) {
+                    continue;
+                }
+
                 $this->addEmailNotification(
-                    $childEvent,
-                    [$childEvent->getCalendar()->getOwner()->getEmail()],
+                    $attendee->getCalendarEvent(),
+                    [$attendee->getEmail()],
                     self::CREATE_INVITE_TEMPLATE_NAME
                 );
             }
@@ -69,18 +74,20 @@ class EmailSendProcessor
      * Send notification to invitees if event was changed
      *
      * @param CalendarEvent   $calendarEvent
-     * @param ArrayCollection $originalChildren
+     * @param ArrayCollection $originalAttendees
      * @param boolean         $notify
      *
      * @return boolean
      */
     public function sendUpdateParentEventNotification(
         CalendarEvent $calendarEvent,
-        ArrayCollection $originalChildren,
+        ArrayCollection $originalAttendees,
         $notify = false
     ) {
+        $childAttendees = $calendarEvent->getChildAttendees();
+
         // Send notification to existing invitees if event was changed
-        if (count($calendarEvent->getChildEvents()) > 0 && $notify) {
+        if (count($childAttendees) > 0 && $notify) {
             $this->addEmailNotification(
                 $calendarEvent,
                 $this->getChildEmails($calendarEvent),
@@ -89,20 +96,20 @@ class EmailSendProcessor
             $this->process();
         }
         // Send notification to new invitees
-        foreach ($calendarEvent->getChildEvents() as $childEvent) {
-            if (false === $originalChildren->contains($childEvent)) {
+        foreach ($childAttendees as $attendee) {
+            if ($this->notifiable($attendee) && false === $originalAttendees->contains($attendee)) {
                 $this->addEmailNotification(
-                    $childEvent,
-                    [$childEvent->getCalendar()->getOwner()->getEmail()],
+                    $attendee->getCalendarEvent(),
+                    [$attendee->getEmail()],
                     self::CREATE_INVITE_TEMPLATE_NAME
                 );
             }
         }
-        foreach ($originalChildren as $childEvent) {
-            if (false === $calendarEvent->getChildEvents()->contains($childEvent)) {
+        foreach ($originalAttendees as $attendee) {
+            if ($this->notifiable($attendee) && false === $childAttendees->contains($attendee)) {
                 $this->addEmailNotification(
-                    $calendarEvent,
-                    [$childEvent->getCalendar()->getOwner()->getEmail()],
+                    $attendee->getCalendarEvent(),
+                    [$attendee->getEmail()],
                     self::UN_INVITE_TEMPLATE_NAME
                 );
             }
@@ -124,13 +131,13 @@ class EmailSendProcessor
     {
         if ($calendarEvent->getParent()) {
             switch ($calendarEvent->getInvitationStatus()) {
-                case CalendarEvent::ACCEPTED:
+                case CalendarEvent::STATUS_ACCEPTED:
                     $templateName = self::ACCEPTED_TEMPLATE_NAME;
                     break;
-                case CalendarEvent::TENTATIVELY_ACCEPTED:
+                case CalendarEvent::STATUS_TENTATIVELY_ACCEPTED:
                     $templateName = self::TENTATIVE_TEMPLATE_NAME;
                     break;
-                case CalendarEvent::DECLINED:
+                case CalendarEvent::STATUS_DECLINED:
                     $templateName = self::DECLINED_TEMPLATE_NAME;
                     break;
                 default:
@@ -161,7 +168,7 @@ class EmailSendProcessor
                 self::REMOVE_CHILD_TEMPLATE_NAME
             );
             $this->process();
-        } elseif (count($calendarEvent->getChildEvents()) > 0) {
+        } elseif (count($calendarEvent->getChildAttendees()) > 0) {
             $this->addEmailNotification(
                 $calendarEvent,
                 $this->getChildEmails($calendarEvent),
@@ -189,8 +196,12 @@ class EmailSendProcessor
     {
         $emails = [];
         /** @var CalendarEvent $notifyEvent */
-        foreach ($parentEvent->getChildEvents() as $notifyEvent) {
-            $emails[] = $notifyEvent->getCalendar()->getOwner()->getEmail();
+        foreach ($parentEvent->getChildAttendees() as $attendee) {
+            if (!$this->notifiable($attendee)) {
+                continue;
+            }
+
+            $emails[] = $attendee->getEmail();
         }
 
         return $emails;
@@ -203,11 +214,17 @@ class EmailSendProcessor
      */
     protected function getParentEmail(CalendarEvent $childEvent)
     {
-        if ($childEvent->getParent()) {
-            return [$childEvent->getParent()->getCalendar()->getOwner()->getEmail()];
-        } else {
+        $parent = $childEvent->getParent();
+        if (!$parent || !$parent->getRelatedAttendee()) {
             return [];
         }
+
+        $relatedAttendee = $parent->getRelatedAttendee();
+        if (!$this->notifiable($relatedAttendee)) {
+            return [];
+        }
+
+        return [$relatedAttendee->getEmail()];
     }
 
     /**
@@ -222,5 +239,17 @@ class EmailSendProcessor
         $emailNotification->setCalendarEvent($calendarEvent);
         $emailNotification->setTemplateName($templateName);
         $this->emailNotifications[] = $emailNotification;
+    }
+
+    /**
+     * @param Attendee $attendee
+     *
+     * @return bool
+     */
+    protected function notifiable(Attendee $attendee)
+    {
+        $origin = $attendee->getOrigin();
+
+        return $origin && $origin->getId() === 'server';
     }
 }
