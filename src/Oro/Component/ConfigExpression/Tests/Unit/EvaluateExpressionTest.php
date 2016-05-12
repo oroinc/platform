@@ -2,6 +2,8 @@
 
 namespace Oro\Component\ConfigExpression\Tests\Unit;
 
+use Symfony\Component\Yaml\Yaml;
+
 use Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\ConfigExpressions;
 use Oro\Component\ConfigExpression\Func;
@@ -15,7 +17,7 @@ class EvaluateExpressionTest extends \PHPUnit_Framework_TestCase
     public function testAssembleWithEvaluateResult($yaml, $context, $expected)
     {
         $language      = new ConfigExpressions();
-        $configuration = Yaml::parse(file_get_contents($yaml));
+        $configuration = Yaml::parse($yaml);
 
         $this->assertEquals(
             $expected,
