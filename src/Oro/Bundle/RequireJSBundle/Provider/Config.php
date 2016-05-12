@@ -3,7 +3,7 @@
 namespace Oro\Bundle\RequireJSBundle\Provider;
 
 use Symfony\Component\DependencyInjection\ContainerInterface;
-use Oro\Bundle\PlatformBundle\Yaml\Yaml;
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Templating\TemplateReferenceInterface;
 use Symfony\Bundle\FrameworkBundle\Templating\EngineInterface;
 

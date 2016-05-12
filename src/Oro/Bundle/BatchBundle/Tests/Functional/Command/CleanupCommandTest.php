@@ -4,7 +4,7 @@ namespace Oro\Bundle\BatchBundle\Tests\Functional\Command;
 
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\PlatformBundle\Yaml\Yaml;
+use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 

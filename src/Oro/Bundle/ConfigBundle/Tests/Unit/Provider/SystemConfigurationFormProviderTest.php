@@ -4,7 +4,8 @@ namespace ConfigBundle\Tests\Provider;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\SectionDefinition;
 use Oro\Bundle\ConfigBundle\Config\ApiTree\VariableDefinition;
 use Oro\Bundle\ConfigBundle\Config\ConfigBag;
-use Oro\Bundle\PlatformBundle\Yaml\Yaml;
+
+use Symfony\Component\Yaml\Yaml;
 use Symfony\Component\Form\Forms;
 use Symfony\Component\Form\PreloadedExtension;
 use Symfony\Component\Config\Definition\Processor;

@@ -8,7 +8,7 @@ use Doctrine\ORM\QueryBuilder;
 
 use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
-use Oro\Bundle\PlatformBundle\Yaml\Yaml;
+use Symfony\Component\Yaml\Yaml;
 
 use Oro\Bundle\BatchBundle\ORM\QueryBuilder\QueryBuilderTools;
 use Oro\Bundle\QueryDesignerBundle\Model\GroupByHelper;
@@ -23,7 +23,7 @@ class YamlConverter implements QueryConverterInterface
     public function parse($value, ManagerRegistry $doctrine)
     {
         if (!is_array($value)) {
-            $value = Yaml::parse($value);
+            $value = Yaml::parse(file_get_contents($value));
         }
 
         $processor = new Processor();

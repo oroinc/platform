@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Configuration;
 
-use Oro\Bundle\PlatformBundle\Yaml\Yaml;
-
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfiguration;
 
 class WorkflowConfigurationTest extends \PHPUnit_Framework_TestCase
