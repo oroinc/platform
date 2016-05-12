@@ -91,7 +91,7 @@ class OrganizationsSelectType extends AbstractType
                 'class'    => 'OroOrganizationBundle:Organization',
                 'property' => 'name',
                 'multiple' => true,
-                'choices'  => $this->getOrganizationOptions(),
+                'choices'  => $this->getAvailableOrganizations(),
             ]
         );
         $builder->add(
@@ -137,7 +137,7 @@ class OrganizationsSelectType extends AbstractType
     protected function getOrganizationOptionsIds()
     {
         $ids = [];
-        $organizations = $this->getOrganizationOptions();
+        $organizations = $this->getAvailableOrganizations();
         foreach ($organizations as $organization) {
             $ids[] = $organization->getId();
         }
@@ -150,9 +150,9 @@ class OrganizationsSelectType extends AbstractType
      *
      * @return Organization[]
      */
-    protected function getOrganizationOptions()
+    protected function getAvailableOrganizations()
     {
-        return $this->getLoggedInUser()->getOrganizations(true);
+        return $this->getLoggedInUser()->getOrganizations(false);
     }
 
     /**
