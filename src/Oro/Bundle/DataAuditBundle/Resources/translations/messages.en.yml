@@ -68,4 +68,4 @@ oro:
 
         acl:
             action:
-                history.label: Access Data Audit
+                history.label: Access data audit
