@@ -43,7 +43,9 @@ class AmqpMessageConsumer implements MessageConsumer
     }
 
     /**
-     * @return Queue
+     * {@inheritdoc}
+     * 
+     * @return AmqpQueue
      */
     public function getQueue()
     {
@@ -83,14 +85,26 @@ class AmqpMessageConsumer implements MessageConsumer
                 get_class($message)
             ));
         }
-        $internalMessage = $message->getInternalMessage();
-        if (false == $internalMessage) {
-            throw new InvalidMessageException(
-                'A message does not have an internal message associated. Could not be acknowledged'
-            );
+
+        $this->session->getChannel()->basic_ack($message->getConsumerTag());
+    }
+
+    /**
+     * {@inheritdoc}
+     *
+     * @param AmqpMessage $message
+     */
+    public function reject(Message $message, $requeue = false)
+    {
+        if (false == $message instanceof AmqpMessage) {
+            throw new InvalidMessageException(sprintf(
+                'A message is invalid. Message must be an instance of %s but it is %s.',
+                'Oro\Component\Messaging\Transport\Amqp\AmqpMessage',
+                get_class($message)
+            ));
         }
 
-        $this->session->getChannel()->basic_ack($internalMessage->delivery_info['delivery_tag']);
+        $this->session->getChannel()->basic_reject($message->getConsumerTag(), $requeue);
     }
 
     protected function initialize()
@@ -109,18 +123,19 @@ class AmqpMessageConsumer implements MessageConsumer
                 $properties,
                 $internalMessage->get_properties()
             );
-            $message->setInternalMessage($internalMessage);
+            $message->setConsumerTag($internalMessage->delivery_info['consumer_tag']);
+            $message->setRedelivered($internalMessage->delivery_info['redelivered']);
 
             $this->receivedMessage = $message;
         };
 
         $this->session->getChannel()->basic_consume(
-            $this->getQueue()->getQueueName(),
-            '',
-            false,
-            false,
-            false,
-            false,
+            $this->queue->getQueueName(),
+            $this->queue->getConsumerTag(),
+            $this->queue->isNoLocal(),
+            $this->queue->isNoAck(),
+            $this->queue->isExclusive(),
+            $this->queue->isNoWait(),
             $callback
         );
 

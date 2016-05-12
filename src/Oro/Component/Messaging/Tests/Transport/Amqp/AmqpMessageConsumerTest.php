@@ -52,6 +52,29 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer->receive();
     }
 
+    public function testShouldCorrectlyPassQueueOptionsToBasicConsumeMethod()
+    {
+        $queue = new AmqpQueue('aQueueName');
+        $queue->setConsumerTag('theConsumerTag');
+        $queue->setNoLocal('theLocalBool');
+        $queue->setNoAck('theAskBool');
+        $queue->setExclusive('theExclusiveBool');
+        $queue->setNoWait('theNoWaitBool');
+
+        $channelMock = $this->createAmqpChannel();
+        $channelMock
+            ->expects($this->once())
+            ->method('basic_consume')
+            ->with($this->anything(), 'theConsumerTag', 'theLocalBool', 'theAskBool', 'theExclusiveBool', 'theNoWaitBool')
+        ;
+
+        $sessionStub = $this->createAmqpSessionStub($channelMock);
+
+        $consumer = new AmqpMessageConsumer($sessionStub, $queue);
+
+        $consumer->receive();
+    }
+
     public function testShouldRegisterCreateMessageCallbackOnFirstReceiveCall()
     {
         $channelMock = $this->createAmqpChannel();
@@ -93,10 +116,12 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer->receive($expectedTimeout);
     }
 
-    public function testShouldWaitForInternalMessageAndReturnItOnReceive()
+    public function testShouldWaitForMessageAndReturnItOnReceive()
     {
         $expectedMessage = new AmqpMessage();
         $expectedInternalMessage = new AMQPLibMessage();
+        $expectedInternalMessage->delivery_info['consumer_tag'] = 'theConsumerTag';
+        $expectedInternalMessage->delivery_info['redelivered'] = 'theRedeliveredBool';
 
         $channelStub = new AMQPChannelStub();
         $channelStub->receivedInternalMessage = $expectedInternalMessage;
@@ -113,12 +138,15 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
         $actualMessage = $consumer->receive();
         $this->assertSame($expectedMessage, $actualMessage);
-        $this->assertSame($expectedInternalMessage, $actualMessage->getInternalMessage());
+        $this->assertSame('theConsumerTag', $actualMessage->getConsumerTag());
+        $this->assertSame('theRedeliveredBool', $actualMessage->isRedelivered());
     }
 
     public function testShouldCorrectlyExtractInternalMessageBodyAndPassItMessageFactory()
     {
         $internalMessage = new AMQPLibMessage('theMessageBody');
+        $internalMessage->delivery_info['consumer_tag'] = 'aTag';
+        $internalMessage->delivery_info['redelivered'] = 'aRedeliveredBool';
 
         $channelStub = new AMQPChannelStub();
         $channelStub->receivedInternalMessage = $internalMessage;
@@ -141,6 +169,8 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
     {
         $internalMessage = new AMQPLibMessage('theMessageBody');
         $internalMessage->set('application_headers', new AMQPTable(['theProp' => 'thePropVal']));
+        $internalMessage->delivery_info['consumer_tag'] = 'aTag';
+        $internalMessage->delivery_info['redelivered'] = 'aRedeliveredBool';
 
         $channelStub = new AMQPChannelStub();
         $channelStub->receivedInternalMessage = $internalMessage;
@@ -162,6 +192,8 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
     public function testShouldCorrectlyExtractInternalMessageHeadersAndPassItMessageFactory()
     {
         $internalMessage = new AMQPLibMessage('theMessageBody', ['timestamp' => 123123123]);
+        $internalMessage->delivery_info['consumer_tag'] = 'aTag';
+        $internalMessage->delivery_info['redelivered'] = 'aRedeliveredBool';
 
         $channelStub = new AMQPChannelStub();
         $channelStub->receivedInternalMessage = $internalMessage;
@@ -231,19 +263,6 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer->acknowledge($invalidMessage);
     }
 
-    /**
-     * @expectedException \Oro\Component\Messaging\Transport\Exception\InvalidMessageException
-     * @expectedExceptionMessage A message does not have an internal message associated. Could not be acknowledged
-     */
-    public function testThrowIfGivenMessageNotHaveInternalMessageSetOnAcknowledge()
-    {
-        $consumer = new AmqpMessageConsumer($this->createAmqpSessionStub(), new AmqpQueue('aName'));
-
-        $message = new AmqpMessage();
-
-        $consumer->acknowledge($message);
-    }
-
     public function testShouldAcknowledgeMessage()
     {
         $expectedDeliveryTag = 'theDeliveryTag';
@@ -259,12 +278,65 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
         $consumer = new AmqpMessageConsumer($sessionStub, new AmqpQueue('aName'));
 
-        $internalMessage = new AMQPLibMessage();
-        $internalMessage->delivery_info['delivery_tag'] = $expectedDeliveryTag;
         $message = new AmqpMessage();
-        $message->setInternalMessage($internalMessage);
+        $message->setConsumerTag($expectedDeliveryTag);
 
         $consumer->acknowledge($message);
+    }
+
+    /**
+     * @expectedException \Oro\Component\Messaging\Transport\Exception\InvalidMessageException
+     * @expectedExceptionMessage A message is invalid. Message must be an instance of Oro\Component\Messaging\Transport\Amqp\AmqpMessage
+     */
+    public function testThrowIfGivenDestinationInvalidOnReject()
+    {
+        $consumer = new AmqpMessageConsumer($this->createAmqpSessionStub(), new AmqpQueue('aName'));
+
+        $invalidMessage = $this->createMessage();
+
+        $consumer->reject($invalidMessage);
+    }
+
+    public function testShouldRejectMessageWithoutRequeueByDefault()
+    {
+        $expectedDeliveryTag = 'theDeliveryTag';
+
+        $channelMock = $this->createAmqpChannel();
+        $channelMock
+            ->expects($this->once())
+            ->method('basic_reject')
+            ->with($expectedDeliveryTag, $requeue = false)
+        ;
+
+        $sessionStub = $this->createAmqpSessionStub($channelMock);
+
+        $consumer = new AmqpMessageConsumer($sessionStub, new AmqpQueue('aName'));
+
+        $message = new AmqpMessage();
+        $message->setConsumerTag($expectedDeliveryTag);
+
+        $consumer->reject($message);
+    }
+
+    public function testShouldRejectMessageWithRequeuePassedExplicitly()
+    {
+        $expectedDeliveryTag = 'theDeliveryTag';
+
+        $channelMock = $this->createAmqpChannel();
+        $channelMock
+            ->expects($this->once())
+            ->method('basic_reject')
+            ->with($expectedDeliveryTag, $requeue = true)
+        ;
+
+        $sessionStub = $this->createAmqpSessionStub($channelMock);
+
+        $consumer = new AmqpMessageConsumer($sessionStub, new AmqpQueue('aName'));
+
+        $message = new AmqpMessage();
+        $message->setConsumerTag($expectedDeliveryTag);
+
+        $consumer->reject($message, true);
     }
 
     /**
@@ -314,15 +386,23 @@ class AMQPChannelStub extends AMQPChannel
     {
     }
 
-    public function wait()
+    public function wait($allowed_methods = null, $non_blocking = false, $timeout = 0)
     {
         call_user_func($this->callback, $this->receivedInternalMessage);
     }
 
-    public function basic_consume()
-    {
-        // see parent's basic_consume method arguments for more details.
-        $this->callback = func_get_arg(6);
+    public function basic_consume(
+        $queue = '',
+        $consumer_tag = '',
+        $no_local = false,
+        $no_ack = false,
+        $exclusive = false,
+        $nowait = false,
+        $callback = null,
+        $ticket = null,
+        $arguments = array()
+    ) {
+        $this->callback = $callback;
     }
 }
 

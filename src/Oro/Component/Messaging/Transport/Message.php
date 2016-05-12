@@ -54,4 +54,14 @@ interface Message
      * @return string
      */
     public function getHeader($name, $default = null);
+
+    /**
+     * @param boolean $redelivered
+     */
+    public function setRedelivered($redelivered);
+
+    /**
+     * @return boolean
+     */
+    public function isRedelivered();
 }

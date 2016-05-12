@@ -106,23 +106,33 @@ class AmqpMessageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('barDefault', $message->getHeader('bar', 'barDefault'));
     }
 
-    public function testShouldAllowGetInternalMessagePreviouslySet()
+    public function testShouldSetNullConsumerKeyInConstructor()
     {
         $message = new AmqpMessage();
-        $internalMessage = new AMQPLibMessage('', []);
 
-        $message->setInternalMessage($internalMessage);
-
-        $this->assertSame($internalMessage, $message->getInternalMessage());
+        $this->assertSame(null, $message->getConsumerTag());
     }
 
-    public function testShouldAllowUnsetInternalMessage()
+    public function testShouldAllowGetPreviouslySetRoutingKey()
+    {
+        $message = new AmqpMessage();
+        $message->setConsumerTag('theConsumerKey');
+
+        $this->assertEquals('theConsumerKey', $message->getConsumerTag());
+    }
+
+    public function testShouldSetRedeliveredFalseInConstructor()
     {
         $message = new AmqpMessage();
 
-        $message->setInternalMessage(new AMQPLibMessage('', []));
-        $message->setInternalMessage(null);
+        $this->assertFalse($message->isRedelivered());
+    }
 
-        $this->assertSame(null, $message->getInternalMessage());
+    public function testShouldAllowGetPreviouslySetRedelivered()
+    {
+        $message = new AmqpMessage();
+        $message->setRedelivered(true);
+
+        $this->assertTrue($message->isRedelivered());
     }
 }

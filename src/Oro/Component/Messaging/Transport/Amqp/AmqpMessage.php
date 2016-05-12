@@ -2,7 +2,6 @@
 namespace Oro\Component\Messaging\Transport\Amqp;
 
 use Oro\Component\Messaging\Transport\Message;
-use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
 
 class AmqpMessage implements Message
 {
@@ -22,14 +21,21 @@ class AmqpMessage implements Message
     private $headers;
 
     /**
-     * @var AMQPLibMessage|null
+     * @var boolean
      */
-    private $internalMessage;
+    private $redelivered;
+
+    /**
+     * @var string
+     */
+    private $consumerTag;
 
     public function __construct()
     {
         $this->properties = [];
         $this->headers = [];
+
+        $this->redelivered = false;
     }
     
     /**
@@ -97,18 +103,34 @@ class AmqpMessage implements Message
     }
 
     /**
-     * @return AMQPLibMessage|null
+     * @return boolean
      */
-    public function getInternalMessage()
+    public function isRedelivered()
     {
-        return $this->internalMessage;
+        return $this->redelivered;
     }
 
     /**
-     * @param AMQPLibMessage|null $internalMessage
+     * @param boolean $redelivered
      */
-    public function setInternalMessage(AMQPLibMessage $internalMessage = null)
+    public function setRedelivered($redelivered)
     {
-        $this->internalMessage = $internalMessage;
+        $this->redelivered = $redelivered;
+    }
+
+    /**
+     * @return string
+     */
+    public function getConsumerTag()
+    {
+        return $this->consumerTag;
+    }
+
+    /**
+     * @param string $consumerTag
+     */
+    public function setConsumerTag($consumerTag)
+    {
+        $this->consumerTag = $consumerTag;
     }
 }
