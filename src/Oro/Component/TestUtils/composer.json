@@ -5,7 +5,7 @@
     "keywords": ["ORO", "BAP", "Test", "PhpUnit", "Utils", "Util"],
     "license": "MIT",
     "require": {
-        "php": ">=5.5.9"
+        "php": ">=5.5.0"
     },
     "require-dev": {
       "doctrine/common": "~2.3",
