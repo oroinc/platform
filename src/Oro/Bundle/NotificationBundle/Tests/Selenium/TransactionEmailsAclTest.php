@@ -193,7 +193,6 @@ class TransactionEmailsAclTest extends Selenium2TestCase
 
     public function viewListAcl($login, $roleName, $username)
     {
-
         $login->openRoles('Oro\Bundle\UserBundle')
             ->filterBy('Label', $roleName)
             ->open(array($roleName))
