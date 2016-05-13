@@ -315,7 +315,7 @@ class EmailRecipientsHelper
      *
      * @return array
      */
-    protected function recipientsFromResult(array $result, $entityClass)
+    public function recipientsFromResult(array $result, $entityClass)
     {
         $emails = [];
         foreach ($result as $row) {

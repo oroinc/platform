@@ -9,6 +9,44 @@ use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 class AttendeeRepository extends EntityRepository
 {
     /**
+     * @param string|null $query
+     * @param int|null $limit
+     *
+     * @return array
+     */
+    public function getEmailRecipients($query = null, $limit = null)
+    {
+        $subQb = $this->createQueryBuilder('sa')
+            ->select('MIN(sa.id)')
+            ->groupBy('sa.email, sa.displayName');
+
+        if ($limit) {
+            $subQb->setMaxResults($limit);
+        }
+
+        $qb = $this->createQueryBuilder('a');
+
+        if ($query) {
+            $subQb
+                ->andWhere($subQb->expr()->orX(
+                    $subQb->expr()->like('a.displayName', ':query'),
+                    $subQb->expr()->like('a.email', ':query')
+                ));
+            $qb->setParameter('query', sprintf('%%%s%%', $query));
+        }
+
+        $qb
+            ->select('a.id as entityId, a.email, a.displayName AS name, o.name AS organization')
+            ->join('a.calendarEvent', 'e')
+            ->join('e.calendar', 'c')
+            ->join('c.organization', 'o')
+            ->where($qb->expr()->in('a.id', $subQb->getDQL()));
+
+        return $qb->getQuery()
+            ->getArrayResult();
+    }
+
+    /**
      * @param CalendarEvent|int $calendarEvent
      *
      * @return array
