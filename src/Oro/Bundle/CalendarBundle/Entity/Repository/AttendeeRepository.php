@@ -12,12 +12,17 @@ class AttendeeRepository extends EntityRepository
     /**
      * @param Organization|null $organization
      * @param string|null $query
+     * @param string[] $excludedNames
      * @param int|null $limit
      *
      * @return array
      */
-    public function getEmailRecipients(Organization $organization = null, $query = null, $limit = null)
-    {
+    public function getEmailRecipients(
+        Organization $organization = null,
+        $query = null,
+        $excludedNames = [],
+        $limit = null
+    ) {
         $subQb = $this->createQueryBuilder('sa')
             ->select('MIN(sa.id)')
             ->groupBy('sa.email, sa.displayName');
@@ -37,13 +42,25 @@ class AttendeeRepository extends EntityRepository
             $qb->setParameter('query', sprintf('%%%s%%', $query));
         }
 
+        if ($organization || $excludedNames) {
+            $subQb
+                ->join('sa.calendarEvent', 'se')
+                ->join('se.calendar', 'sc')
+                ->join('sc.organization', 'so');
+        }
+
         if ($organization) {
             $subQb
-                ->join('a.calendarEvent', 'se')
-                ->join('e.calendar', 'sc')
-                ->join('c.organization', 'so')
                 ->andWhere('so.id = :organization');
             $qb->setParameter('organization', $organization);
+        }
+
+        if ($excludedNames) {
+            $subQb->andWhere($qb->expr()->notIn(
+                'TRIM(CONCAT(sa.displayName, \' <\', sa.email, \'>|\', so.name))',
+                ':excluded_names'
+            ));
+            $qb->setParameter('excluded_names', $excludedNames);
         }
 
         $qb

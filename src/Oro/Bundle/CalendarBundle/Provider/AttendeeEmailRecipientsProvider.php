@@ -36,6 +36,7 @@ class AttendeeEmailRecipientsProvider implements EmailRecipientsProviderInterfac
             $this->getAttendeeRepository()->getEmailRecipients(
                 $args->getOrganization(),
                 $args->getQuery(),
+                $args->getExcludedEmailNamesForEntity('Oro\Bundle\CalendarBundle\Entity\Attendee'),
                 $args->getLimit()
             ),
             'Oro\Bundle\CalendarBundle\Entity\Attendee'
