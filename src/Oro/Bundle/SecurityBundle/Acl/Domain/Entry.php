@@ -1,5 +1,11 @@
 <?php
 
+/*
+ * This file is a copy of {@see Symfony\Component\Security\Acl\Domain\Entry}
+ *
+ * (c) Johannes M. Schmitt <schmittjoh@gmail.com>
+ */
+
 namespace Oro\Bundle\SecurityBundle\Acl\Domain;
 
 use Symfony\Component\Security\Acl\Model\AclInterface;
@@ -7,13 +13,9 @@ use Symfony\Component\Security\Acl\Model\AuditableEntryInterface;
 use Symfony\Component\Security\Acl\Model\SecurityIdentityInterface;
 
 /**
- * Auditable ACE implementation.
- *
- * @author Johannes M. Schmitt <schmittjoh@gmail.com>
- */
-/**
- * This class was created to avoid php7 issue with unserialization of the reference object
- * https://bugs.php.net/bug.php?id=71940
+ * This class is mostly the copy of {@see Symfony\Component\Security\Acl\Domain\Entry} v2.7.3
+ * but it has the fix on issue with unserialization https://bugs.php.net/bug.php?id=71940 that
+ * present php versions from 7.0.0 to 7.0.5
  */
 class Entry implements AuditableEntryInterface
 {
