@@ -383,22 +383,20 @@ class OwnerTree implements OwnerTreeInterface
                  * We have to add some element to the end of array and remove it after processing,
                  * otherwise the last element of the original array will not be processed.
                  */
-                $copy = $deepLevelEntityIds;
+                $copy = new \ArrayIterator($deepLevelEntityIds);
                 foreach ($copy as $position => &$deepLevelEntityId) {
                     if (!empty($subordinateBusinessUnitIds[$deepLevelEntityId])) {
                         $diff = array_diff(
                             $subordinateBusinessUnitIds[$deepLevelEntityId],
-                            $copy
+                            $copy->getArrayCopy()
                         );
-                        if ($diff) {
-                            foreach ($diff as $val) {
-                                array_push($copy, $val);
-                            }
+                        foreach ($diff as $value) {
+                            $copy->append($value);
                         }
                     }
                 }
 
-                $subordinateBusinessUnitIds[$key] = $copy;
+                $subordinateBusinessUnitIds[$key] = $copy->getArrayCopy();
             }
         }
 
