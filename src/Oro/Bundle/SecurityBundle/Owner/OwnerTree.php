@@ -384,7 +384,7 @@ class OwnerTree implements OwnerTreeInterface
                  * otherwise the last element of the original array will not be processed.
                  */
                 $copy = new \ArrayIterator($deepLevelEntityIds);
-                foreach ($copy as $position => &$deepLevelEntityId) {
+                foreach ($copy as $position => $deepLevelEntityId) {
                     if (!empty($subordinateBusinessUnitIds[$deepLevelEntityId])) {
                         $diff = array_diff(
                             $subordinateBusinessUnitIds[$deepLevelEntityId],
