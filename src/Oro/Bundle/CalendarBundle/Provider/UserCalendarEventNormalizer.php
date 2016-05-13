@@ -82,6 +82,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 
         if ($recurrence = $event->getRecurrence()) {
             $extraValues[Recurrence::STRING_KEY] = [
+                'id' => $recurrence->getId(),
                 'recurrenceType' => $recurrence->getRecurrenceType(),
                 'interval' => $recurrence->getInterval(),
                 'instance' => $recurrence->getInstance(),

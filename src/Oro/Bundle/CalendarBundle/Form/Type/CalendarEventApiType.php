@@ -149,6 +149,15 @@ class CalendarEventApiType extends CalendarEventType
      */
     public function preSubmit(FormEvent $event)
     {
+        $form = $event->getForm();
+        $data = $event->getData();
+        if (empty($data['recurrence'])) {
+            $recurrence = $form->get('recurrence')->getData();
+            if ($recurrence) {
+                $this->calendarEventManager->removeRecurrence($recurrence);
+                $form->get('recurrence')->setData(null);
+            }
+        }
     }
 
     /**

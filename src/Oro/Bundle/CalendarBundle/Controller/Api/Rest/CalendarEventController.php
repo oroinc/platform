@@ -95,6 +95,11 @@ class CalendarEventController extends RestController implements ClassResourceInt
      *     nullable=true,
      *     description="Date in RFC 3339 format. For example: 2009-11-05T13:15:30Z, 2008-07-01T22:35:17+08:00"
      * )
+     * @QueryParam(
+     *     name="recurringEventId", requirements="\d+",
+     *     nullable=true,
+     *     description="Recurring Event Id."
+     * )
      * @ApiDoc(
      *      description="Get calendar events",
      *      resource=true
@@ -123,13 +128,24 @@ class CalendarEventController extends RestController implements ClassResourceInt
             $dateParamFilter  = new HttpDateTimeParameterFilter();
             $filterParameters = ['createdAt' => $dateParamFilter, 'updatedAt' => $dateParamFilter];
             $parameters = ['createdAt', 'updatedAt'];
+            $result = [];
             if ($this->getRequest()->get('recurringEventId')) {
-                $filterParameters['recurringEvent'] = new IdentifierToReferenceFilter(
-                    $this->getDoctrine(), 'OroCalendarBundle:CalendarEvent'
+                $filterParameters['recurringEventId'] = new IdentifierToReferenceFilter(
+                    $this->getDoctrine(),
+                    'OroCalendarBundle:CalendarEvent'
                 );
-                $parameters[] = 'recurringEvent';
+                $parameters[] = 'recurringEventId';
+                /** @var CalendarEvent|null $entity */
+                $entity = $this->getManager()->find($this->getRequest()->get('recurringEventId'));
+                $recurringEvent = $this->get('oro_calendar.calendar_event_normalizer.user')
+                    ->getCalendarEvent(
+                        $entity,
+                        null,
+                        $this->getExtendFieldNames('Oro\Bundle\CalendarBundle\Entity\CalendarEvent')
+                    );
+                $result[] = $recurringEvent;
             }
-            $filterCriteria   = $this->getFilterCriteria($parameters, $filterParameters);
+            $filterCriteria   = $this->getFilterCriteria($parameters, $filterParameters, ['recurringEventId' => 'recurringEvent']);
 
             /** @var CalendarEventRepository $repo */
             $repo  = $this->getManager()->getRepository();
@@ -142,10 +158,10 @@ class CalendarEventController extends RestController implements ClassResourceInt
             $qb->setMaxResults($limit)
                 ->setFirstResult($page > 0 ? ($page - 1) * $limit : 0);
 
-            $result = $this->get('oro_calendar.calendar_event_normalizer.user')->getCalendarEvents(
+            $result = array_merge($result, $this->get('oro_calendar.calendar_event_normalizer.user')->getCalendarEvents(
                 $calendarId,
                 $qb->getQuery()
-            );
+            ));
 
             return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
         } else {
