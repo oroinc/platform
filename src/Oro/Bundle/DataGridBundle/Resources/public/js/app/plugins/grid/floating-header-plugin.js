@@ -46,7 +46,8 @@ define(function(require) {
             }, this));
             this.domCache.gridContainer.parents().add(document).on('scroll', this.checkLayout);
 
-            this.listenTo(mediator, 'layout:headerStateChange', this.selectMode);
+            this.listenTo(mediator, 'layout:headerStateChange', this.checkLayout);
+            this.listenTo(mediator, 'layout:reposition', this.checkLayout);
             this.listenTo(this.grid, 'content:update', this.onGridContentUpdate);
             this.listenTo(this.grid, 'ensureCellIsVisible', this.ensureCellIsVisible);
             this.checkLayoutIntervalId = setInterval(this.checkLayout, 400);
@@ -87,7 +88,6 @@ define(function(require) {
         },
 
         fixHeaderCellWidth: function() {
-            // console.log('fixHeaderCellWidth');
             this.isHeaderCellWidthFixed = true;
             this.setupCache();
             var headerCells = this.domCache.headerCells;
@@ -421,6 +421,10 @@ define(function(require) {
                 if (this._lastScrollLeft !== scrollLeft) {
                     this.selectMode();
                     this._lastScrollLeft = scrollLeft;
+                } else {
+                    if (this._lastClientRect.bottom !== scrollContainerRect.bottom) {
+                        this.rescrollCb();
+                    }
                 }
             }
             this._lastClientRect = scrollContainerRect;

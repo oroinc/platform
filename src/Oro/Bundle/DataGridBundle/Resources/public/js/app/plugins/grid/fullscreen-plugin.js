@@ -60,7 +60,6 @@ define(function(require) {
             } else {
                 clearTimeout(this.updateLayoutTimeoutId);
             }
-            // console.log('update layout');
             if (tools.isMobile()) {
                 this.manager.enable(FloatingHeaderPlugin);
             }
@@ -70,6 +69,8 @@ define(function(require) {
 
         /**
          * Sets layout and perform all required operations
+         *
+         * @param newLayout
          */
         setLayout: function(newLayout) {
             if (newLayout === this.main.layout) {
@@ -78,7 +79,6 @@ define(function(require) {
                         maxHeight: this.getCssHeightCalcExpression()
                     });
                     this.main.trigger('layout:update');
-                    this.manager.getInstance(FloatingHeaderPlugin).fixHeaderCellWidth();
                 }
                 return;
             }
