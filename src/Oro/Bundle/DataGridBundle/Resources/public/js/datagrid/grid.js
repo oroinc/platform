@@ -861,6 +861,8 @@ define(function(require) {
                 this._resolveDeferredRender();
             }, this));
 
+            this.rendered = true;
+
             return this;
         },
 
