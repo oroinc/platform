@@ -38,12 +38,12 @@ class OroRichTextType extends AbstractType
     public static $toolbars = [
         self::TOOLBAR_SMALL  => ['undo redo | bold italic underline | bullist numlist link | bdesk_photo | fullscreen'],
         self::TOOLBAR_DEFAULT => [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo \
+            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
              | fullscreen'
         ],
         self::TOOLBAR_LARGE => [
-            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo \
-             | fullscreen'
+            'undo redo | bold italic underline | forecolor backcolor | bullist numlist | link | code | bdesk_photo 
+            | fullscreen'
         ],
     ];
 

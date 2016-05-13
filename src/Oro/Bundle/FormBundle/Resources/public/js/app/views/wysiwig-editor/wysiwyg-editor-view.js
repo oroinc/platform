@@ -5,6 +5,7 @@ define(function(require) {
     var BaseView = require('oroui/js/app/views/base/view');
     var _ = require('underscore');
     var $ = require('tinymce/jquery.tinymce.min');
+    var tools = require('oroui/js/tools');
     var txtHtmlTransformer = require('./txt-html-transformer');
     var LoadingMask = require('oroui/js/app/views/loading-mask-view');
 
@@ -38,6 +39,12 @@ define(function(require) {
             options = $.extend(true, {}, this.defaults, options);
             this.enabled = options.enabled;
             this.options = _.omit(options, ['enabled']);
+            if (tools.isIOS()) {
+                this.options.plugins = _.without(this.options.plugins, 'fullscreen');
+                this.options.toolbar = this.options.toolbar.map(function(toolbar) {
+                    return toolbar.replace(/\s*\|\s?fullscreen/, '');
+                });
+            }
             WysiwygEditorView.__super__.initialize.apply(this, arguments);
         },
 
