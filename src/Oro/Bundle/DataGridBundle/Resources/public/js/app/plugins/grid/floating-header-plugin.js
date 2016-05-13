@@ -59,13 +59,16 @@ define(function(require) {
             this.connected = false;
             clearInterval(this.checkLayoutIntervalId);
 
-            this.setFloatTheadMode('default');
-            this.disableOtherScroll();
-            this.$grid.off('click.float-thead');
             this.domCache.gridContainer.parents().add(document).off('scroll', this.checkLayout);
-            // remove css
-            this.domCache.headerCells.attr('style', '');
-            this.domCache.firstRowCells.attr('style', '');
+
+            if (!this.manager.disposing) {
+                this.setFloatTheadMode('default');
+                this.disableOtherScroll();
+                this.$grid.off('click.float-thead');
+                // remove css
+                this.domCache.headerCells.attr('style', '');
+                this.domCache.firstRowCells.attr('style', '');
+            }
             FloatingHeaderPlugin.__super__.disable.call(this);
         },
 
