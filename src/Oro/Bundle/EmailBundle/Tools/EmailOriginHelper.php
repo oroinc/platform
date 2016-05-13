@@ -126,7 +126,7 @@ class EmailOriginHelper
      */
     protected function getImapEnabledFilter(OrganizationInterface $organization = null)
     {
-        return function (EmailOrigin $item) use ($organization) {
+        return function ($item) use ($organization) {
             return $item instanceof UserEmailOrigin && $item->isActive() && $item->isSmtpConfigured()
             && (!$organization || $item->getOrganization() === $organization);
         };
@@ -139,7 +139,7 @@ class EmailOriginHelper
      */
     protected function getInternalFilter(OrganizationInterface $organization = null)
     {
-        return function (EmailOrigin $item) use ($organization) {
+        return function ($item) use ($organization) {
             return ($item->getOrganization() === $organization || !$organization) &&
             $item instanceof InternalEmailOrigin;
         };
