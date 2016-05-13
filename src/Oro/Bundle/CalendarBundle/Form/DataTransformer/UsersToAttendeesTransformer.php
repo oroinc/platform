@@ -111,6 +111,8 @@ class UsersToAttendeesTransformer implements DataTransformerInterface
 
     /**
      * @param mixed $ids
+     *
+     * @return array
      */
     protected function idsToUsers($ids)
     {
