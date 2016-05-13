@@ -3,6 +3,7 @@
 namespace Oro\Bundle\DashboardBundle\Provider\Converters;
 
 use Doctrine\ORM\EntityRepository;
+use Doctrine\ORM\QueryBuilder;
 
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -91,9 +92,23 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
                 $businessUnitIds = [0];
             }
 
-            $queryBuilder->andWhere($queryBuilder->expr()->in('businessUnit.id', $businessUnitIds));
+            $this->applyAdditionalConditions(
+                $queryBuilder,
+                $businessUnitIds,
+                $this->businessUnitAclProvider->getProcessedEntityAccessLevel()
+            );
         }
 
         return $queryBuilder->getQuery()->getResult();
+    }
+
+    /**
+     * @param QueryBuilder $queryBuilder
+     * @param array $businessUnitIds
+     * @param string $accessLevel
+     */
+    protected function applyAdditionalConditions(QueryBuilder $queryBuilder, $businessUnitIds, $accessLevel)
+    {
+        $queryBuilder->andWhere($queryBuilder->expr()->in('businessUnit.id', $businessUnitIds));
     }
 }
