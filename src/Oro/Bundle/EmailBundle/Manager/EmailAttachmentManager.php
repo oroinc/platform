@@ -11,6 +11,7 @@ use Knp\Bundle\GaufretteBundle\FilesystemMap;
 
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\HttpFoundation\File\File as ComponentFile;
+use Symfony\Bundle\FrameworkBundle\Routing\Router;
 
 use Oro\Bundle\AttachmentBundle\Entity\Attachment;
 use Oro\Bundle\AttachmentBundle\Entity\File;
@@ -24,6 +25,10 @@ use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 class EmailAttachmentManager
 {
     const ATTACHMENT_DIR = 'attachment';
+
+    const DEFAULT_IMAGE_WIDTH = 100;
+
+    const DEFAULT_IMAGE_HEIGHT = 100;
 
     /** @var Filesystem */
     protected $filesystem;
@@ -45,6 +50,7 @@ class EmailAttachmentManager
      * @param EntityManager               $em
      * @param KernelInterface             $kernel
      * @param ServiceLink                 $securityFacadeLink
+     * @param Router                      $router
      * @param ConfigFileValidator         $configFileValidator
      * @param AttachmentAssociationHelper $attachmentAssociationHelper
      */
@@ -53,6 +59,7 @@ class EmailAttachmentManager
         EntityManager $em,
         KernelInterface $kernel,
         ServiceLink $securityFacadeLink,
+        Router $router,
         ConfigFileValidator $configFileValidator,
         AttachmentAssociationHelper $attachmentAssociationHelper
     ) {
@@ -60,6 +67,7 @@ class EmailAttachmentManager
         $this->em = $em;
         $this->attachmentDir = $kernel->getRootDir() . DIRECTORY_SEPARATOR . self::ATTACHMENT_DIR;
         $this->securityFacadeLink = $securityFacadeLink;
+        $this->router = $router;
         $this->configFileValidator = $configFileValidator;
         $this->attachmentAssociationHelper = $attachmentAssociationHelper;
     }
@@ -127,6 +135,33 @@ class EmailAttachmentManager
             return null !== $attached;
         }
         return false;
+    }
+
+    /**
+     * Get resized image url
+     *
+     * @param EmailAttachment $entity
+     * @param int             $width
+     * @param int             $height
+     * @param bool|string     $referenceType
+     *
+     * @return string
+     */
+    public function getResizedImageUrl(
+        EmailAttachment $entity,
+        $width = self::DEFAULT_IMAGE_WIDTH,
+        $height = self::DEFAULT_IMAGE_HEIGHT,
+        $referenceType = Router::ABSOLUTE_PATH
+    ) {
+        return $this->router->generate(
+            'oro_resize_email_attachment',
+            [
+                'id'       => $entity->getId(),
+                'width'    => $width,
+                'height'   => $height,
+            ],
+            $referenceType
+        );
     }
 
     /**

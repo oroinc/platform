@@ -118,7 +118,17 @@
     <script type="text/template" id="email-attachment-list-row-view">
         <div class="attachment-list-row <% if (!visible) { %>hide<% } %>">
             <input type="checkbox" class="checkbox" <% if (checked) { %>checked<% } %>>
-            <span><%= fileName %> (<%= fileSize %>, <%= modified %>)</span>
+            <a href="javascript:void(0);"
+                <% if (preview) { %>
+                    data-toggle="popover"
+                    data-content="<img src='<%= preview %>' class='img-rounded' alt='' >"
+                    data-placement="bottom"
+                    data-trigger="hover"
+                <% } %>
+            >
+                <%= fileName %>
+            </a>
+            <span>(<%= fileSize %>, <%= modified %>)</span>
         </div>
     </script>
 
@@ -139,7 +149,8 @@
             'type': attachment.type,
             'fileName': attachment.fileName,
             'fileSize': attachment.fileSize,
-            'modified': attachment.modified
+            'modified': attachment.modified,
+            'preview': attachment.preview
         } %}
         {% set attachmentsAvailableArray = attachmentsAvailableArray|merge([attachmentAvailableArray]) %}
     {% endfor %}

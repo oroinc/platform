@@ -396,8 +396,8 @@
             {% set canCopyToRecord = (hasGrantReattach and target is defined and oro_can_attache(attachment, target)) ? true : false %}
             <li class="email-attachments-list-item span3">
                 <div class="email-attachments-file">
-                    {% if attachment.isImage %}
-                        <img src="{{ path('oro_resize_email_attachment', {id: attachment.id, width: 100, height: 80}) }}"
+                    {% if oro_type_is_image(attachment.contentType) %}
+                        <img src="{{ path('oro_resize_email_attachment', {id: attachment.id, width: 110, height: 80}) }}"
                              class="img-rounded" width="110" height="80" alt="" />
                     {% else %}
                         <div class="thumbnail">

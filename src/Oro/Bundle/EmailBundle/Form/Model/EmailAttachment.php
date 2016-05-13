@@ -48,6 +48,11 @@ class EmailAttachment
     protected $file;
 
     /**
+     * @var string
+     */
+    protected $preview;
+
+    /**
      * @return int
      */
     public function getId()
@@ -186,5 +191,25 @@ class EmailAttachment
         $this->file = $uploadedFile;
 
         return $this;
+    }
+
+    /**
+     * @param string $preview
+     *
+     * @return $this
+     */
+    public function setPreview($preview)
+    {
+        $this->preview = $preview;
+
+        return $this;
+    }
+
+    /**
+     * @return string
+     */
+    public function getPreview()
+    {
+        return $this->preview;
     }
 }

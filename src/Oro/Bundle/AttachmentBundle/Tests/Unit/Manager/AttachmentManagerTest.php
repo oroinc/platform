@@ -374,4 +374,10 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $resultStream->seek(0);
         $this->assertEquals('Test data', $resultStream->read(100));
     }
+
+    public function testIsImageType()
+    {
+        $this->assertTrue($this->attachmentManager->isImageType('image/png'));
+        $this->assertFalse($this->attachmentManager->isImageType('application/pdf'));
+    }
 }

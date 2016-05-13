@@ -53,6 +53,7 @@ class FileExtension extends \Twig_Extension
             new \Twig_SimpleFunction('filtered_image_url', [$this, 'getFilteredImageUrl']),
             new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
             new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
+            new \Twig_SimpleFunction('oro_type_is_image', [$this, 'getTypeIsImage']),
             new \Twig_SimpleFunction(
                 'oro_file_view',
                 [$this, 'getFileView'],
@@ -254,6 +255,15 @@ class FileExtension extends \Twig_Extension
     public function getFilteredImageUrl(File $attachment, $filterName)
     {
         return $this->manager->getFilteredImageUrl($attachment, $filterName);
+    }
+
+    /**
+     * @param  string $type
+     * @return bool
+     */
+    public function getTypeIsImage($type)
+    {
+        return $this->manager->isImageType($type);
     }
 
     /**

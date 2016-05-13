@@ -454,6 +454,20 @@ class AttachmentManager
 
         return $fileCopy;
     }
+    
+    /**
+     * Check if content type is an image
+     *
+     * @param $contentType
+     * @return bool
+     */
+    public function isImageType($contentType)
+    {
+        return in_array(
+            $contentType,
+            ['image/gif','image/jpeg','image/pjpeg','image/png']
+        );
+    }
 
     /**
      * Copy stream to storage

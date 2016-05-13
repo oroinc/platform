@@ -59,6 +59,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             'filtered_image_url',
             'oro_configured_image_url',
             'oro_attachment_icon',
+            'oro_type_is_image',
             'oro_file_view',
             'oro_image_view'
         ];
@@ -196,6 +197,15 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->with($this->attachment, 'testFilter');
 
         $this->extension->getFilteredImageUrl($this->attachment, 'testFilter');
+    }
+
+    public function testGetTypeIsImage()
+    {
+        $this->manager->expects($this->once())
+            ->method('isImageType')
+            ->with('image/jpeg');
+
+        $this->extension->getTypeIsImage('image/jpeg');
     }
 
     public function testGetConfiguredImageUrl()

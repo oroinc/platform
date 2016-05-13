@@ -70,16 +70,4 @@ class EmailAttachmentTest extends \PHPUnit_Framework_TestCase
         $entity->setContent($attachmentContent);
         $this->assertTrue($entity->getSize() === 4);
     }
-
-    public function testIsImage()
-    {
-        $entity = new EmailAttachment();
-        $entity->setContentType('image/png');
-
-        $this->assertTrue($entity->isImage());
-
-        $entity->setContentType('application/pdf');
-
-        $this->assertFalse($entity->isImage());
-    }
 }

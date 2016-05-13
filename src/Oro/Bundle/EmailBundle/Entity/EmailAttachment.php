@@ -265,19 +265,6 @@ class EmailAttachment implements FileExtensionAwareInterface
     }
 
     /**
-     * Check if attachment is an image
-     *
-     * @return bool
-     */
-    public function isImage()
-    {
-        return in_array(
-            $this->contentType,
-            ['image/gif','image/jpeg','image/pjpeg','image/png']
-        );
-    }
-
-    /**
      * Clone record as new one
      */
     public function __clone()

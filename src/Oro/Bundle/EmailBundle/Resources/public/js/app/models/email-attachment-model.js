@@ -15,6 +15,7 @@ define(function(require) {
             fileName: '',
             fileSize: '',
             modified: '',
+            preview: '',
             checked: false, // whether file is checked for attaching to an email
             visible: true
         },
