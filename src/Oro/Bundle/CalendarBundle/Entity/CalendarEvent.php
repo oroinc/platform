@@ -38,6 +38,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *          "security"={
  *              "type"="ACL",
  *              "group_name"=""
+ *              "permissions"="VIEW;CREATE;EDIT;DELETE",
  *          },
  *          "grouping"={
  *              "groups"={"activity"}
@@ -71,26 +72,49 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
 {
     use DatesAwareTrait;
 
-    const NOT_RESPONDED        = 'not_responded';
-    const TENTATIVELY_ACCEPTED = 'tentatively_accepted';
-    const ACCEPTED             = 'accepted';
-    const DECLINED             = 'declined';
+    /** @derpecated use constant with STATUS_ prefix */
+    const NOT_RESPONDED        = self::STATUS_NOT_RESPONDED;
+    /** @derpecated use constant with STATUS_ prefix */
+    const TENTATIVELY_ACCEPTED = self::STATUS_TENTATIVELY_ACCEPTED;
+    /** @derpecated use constant with STATUS_ prefix */
+    const ACCEPTED             = self::STATUS_ACCEPTED;
+    /** @derpecated use constant with STATUS_ prefix */
+    const DECLINED             = self::STATUS_DECLINED;
+
+    const STATUS_NOT_RESPONDED        = 'none';
+    const STATUS_TENTATIVELY_ACCEPTED = 'tentative';
+    const STATUS_ACCEPTED             = 'accepted';
+    const STATUS_DECLINED             = 'declined';
+
     const WITHOUT_STATUS       = null;
+    
+    const ORIGIN_ENUM_CODE     = 'oro_cal_event_origin';
+    const ORIGIN_CLIENT        = 'client';
+    const ORIGIN_SERVER        = 'server';
+    const ORIGIN_EXTERNAL      = 'external';
 
+    /**
+     * @deprecated
+     */
     protected $invitationStatuses = [
-        CalendarEvent::NOT_RESPONDED,
-        CalendarEvent::ACCEPTED,
-        CalendarEvent::TENTATIVELY_ACCEPTED,
-        CalendarEvent::DECLINED
-    ];
-
-    protected $availableStatuses = [
-        CalendarEvent::ACCEPTED,
-        CalendarEvent::TENTATIVELY_ACCEPTED,
-        CalendarEvent::DECLINED
+        CalendarEvent::STATUS_NOT_RESPONDED,
+        CalendarEvent::STATUS_ACCEPTED,
+        CalendarEvent::STATUS_TENTATIVELY_ACCEPTED,
+        CalendarEvent::STATUS_DECLINED
     ];
 
     /**
+     * @deprecated
+     */
+    protected $availableStatuses = [
+        CalendarEvent::STATUS_ACCEPTED,
+        CalendarEvent::STATUS_TENTATIVELY_ACCEPTED,
+        CalendarEvent::STATUS_DECLINED
+    ];
+
+    /**
+     * @deprecated
+     *
      * @return array
      */
     public function getAvailableInvitationStatuses()
@@ -242,18 +266,24 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $reminders;
 
     /**
-     * @var string
+     * @var Collection|Attendee[]
      *
-     * @ORM\Column(name="invitation_status", type="string", length=32, nullable=true)
-     * @ConfigField(
-     *      defaultValues={
-     *          "dataaudit"={
-     *              "auditable"=true
-     *          }
-     *      }
+     * @ORM\OneToMany(
+     *     targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee",
+     *     mappedBy="calendarEvent",
+     *     cascade={"all"},
+     *     orphanRemoval=true
      * )
      */
-    protected $invitationStatus;
+    protected $attendees;
+
+    /**
+     * @var Attendee
+     *
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee")
+     * @ORM\JoinColumn(name="related_attendee", referencedColumnName="id", onDelete="SET NULL")
+     */
+    protected $relatedAttendee;
 
     public function __construct()
     {
@@ -261,6 +291,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
 
         $this->reminders   = new ArrayCollection();
         $this->childEvents = new ArrayCollection();
+        $this->attendees   = new ArrayCollection();
     }
 
     /**
@@ -637,32 +668,113 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     }
 
     /**
+     * @deprecated
+     *
      * @return string|null
      */
     public function getInvitationStatus()
     {
-        return $this->invitationStatus;
-    }
-
-    /**
-     * @param string|null $invitationStatus
-     */
-    public function setInvitationStatus($invitationStatus)
-    {
-        if ($this->isValid($invitationStatus)) {
-            $this->invitationStatus = $invitationStatus;
-        } else {
-            throw new \LogicException(sprintf('Investigation status "%s" is not supported', $invitationStatus));
+        if (!$this->relatedAttendee || !($status = $this->relatedAttendee->getStatus())) {
+            return null;
         }
+
+        return $status->getId();
     }
 
     /**
-     * @param string|null $invitationStatus
-     * @return bool
+     * @return CalendarEvent
      */
-    protected function isValid($invitationStatus)
+    public function getRealCalendarEvent()
     {
-        return $invitationStatus === self::WITHOUT_STATUS || in_array($invitationStatus, $this->invitationStatuses);
+        return $this->getParent() ? : $this;
+    }
+
+
+    /**
+     * @return Collection|Attendee[]
+     */
+    public function getAttendees()
+    {
+        return $this->getRealCalendarEvent()->attendees;
+    }
+
+    /**
+     * @return Collection|Attendee[]
+     */
+    public function getChildAttendees()
+    {
+        if ($this->parent) {
+            return new ArrayCollection();
+        }
+
+        return $this->attendees->filter(function (Attendee $attendee) {
+            return !$this->relatedAttendee || $attendee->getEmail() !== $this->relatedAttendee->getEmail();
+        });
+    }
+
+    /**
+     * @param Collection|Attendee[] $attendees
+     *
+     * @return CalendarEvent
+     */
+    public function setAttendees(Collection $attendees)
+    {
+        $this->getRealCalendarEvent()->attendees = $attendees;
+
+        return $this;
+    }
+
+    /**
+     * @param Attendee $attendee
+     *
+     * @return CalendarEvent
+     */
+    public function addAttendee(Attendee $attendee)
+    {
+        $attendees = $this->getRealCalendarEvent()->attendees;
+        if (!$attendees->contains($attendee)) {
+            $attendee->setCalendarEvent($this);
+            $attendees->add($attendee);
+        }
+
+        return $this;
+    }
+
+    /**
+     * Remove child calendar event
+     *
+     * @param Attendee $attendee
+     *
+     * @return CalendarEvent
+     */
+    public function removeAttendee(Attendee $attendee)
+    {
+        if ($this->getRealCalendarEvent()->attendees->contains($attendee)) {
+            $this->getRealCalendarEvent()->attendees->removeElement($attendee);
+        }
+
+        return $this;
+    }
+
+    /**
+     * @return Attendee
+     */
+    public function getRelatedAttendee()
+    {
+        return $this->relatedAttendee;
+    }
+
+    /**
+     * @param Attendee $relatedAttendee
+     *
+     * @return CalendarEvent
+     */
+    public function setRelatedAttendee(Attendee $relatedAttendee)
+    {
+        $this->relatedAttendee = $relatedAttendee;
+        $this->addAttendee($relatedAttendee);
+
+        return $this;
     }
 
     /**

@@ -10,8 +10,11 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
+use Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -165,6 +168,30 @@ class CalendarEventHandler
                 $this->securityFacade->getOrganization()->getId()
             );
         $entity->setCalendar($defaultCalendar);
+        $entity->setRelatedAttendee($this->createRelatedAttendee($defaultCalendar->getOwner()));
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return Attendee
+     */
+    protected function createRelatedAttendee(User $user)
+    {
+        $transformer = new UsersToAttendeesTransformer();
+        $attendee = $transformer->reverseTransform([$user])->first();
+
+        $status = $this->manager
+            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
+            ->find(Attendee::STATUS_NONE);
+        $attendee->setStatus($status);
+
+        $origin = $this->manager
+            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
+            ->find(Attendee::ORIGIN_SERVER);
+        $attendee->setOrigin($origin);
+
+        return $attendee;
     }
 
     /**

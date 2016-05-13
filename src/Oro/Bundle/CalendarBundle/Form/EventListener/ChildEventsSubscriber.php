@@ -188,10 +188,10 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             foreach ($calendars as $calendar) {
                 $event = new CalendarEvent();
                 $event->setCalendar($calendar);
+                $parent->addChildEvent($event);
                 if ($calendar->getOwner() && isset($attendeesByUserId[$calendar->getOwner()->getId()])) {
                     $event->setRelatedAttendee($attendeesByUserId[$calendar->getOwner()->getId()]);
                 }
-                $parent->addChildEvent($event);
             }
         }
     }
