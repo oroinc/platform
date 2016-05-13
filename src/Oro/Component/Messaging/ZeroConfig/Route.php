@@ -11,17 +11,12 @@ class Route
     /**
      * @var string
      */
-    protected $processorName;
+    protected $handlerName;
 
     /**
      * @var string
      */
     protected $consumerName;
-
-    public function __construct()
-    {
-        $this->exclusive = false;
-    }
 
     /**
      * @return string
@@ -42,33 +37,17 @@ class Route
     /**
      * @return string
      */
-    public function getProcessorName()
+    public function getHandlerName()
     {
-        return $this->processorName;
+        return $this->handlerName;
     }
 
     /**
-     * @param string $processorName
+     * @param string $handlerName
      */
-    public function setProcessorName($processorName)
+    public function setHandlerName($handlerName)
     {
-        $this->processorName = $processorName;
-    }
-
-    /**
-     * @return boolean
-     */
-    public function isExclusive()
-    {
-        return $this->exclusive;
-    }
-
-    /**
-     * @param boolean $exclusive
-     */
-    public function setExclusive($exclusive)
-    {
-        $this->exclusive = (bool) $exclusive;
+        $this->handlerName = $handlerName;
     }
 
     /**

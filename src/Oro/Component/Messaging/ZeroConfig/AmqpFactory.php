@@ -2,9 +2,13 @@
 namespace Oro\Component\Messaging\ZeroConfig;
 
 use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
+use Oro\Component\Messaging\Transport\MessageProducer;
+use Oro\Component\Messaging\Transport\Queue;
 
 class AmqpFactory implements FactoryInterface
 {
+    const DELIVERY_MODE_PERSISTENT = 2;
+
     /**
      * @var AmqpSession
      */
@@ -19,6 +23,16 @@ class AmqpFactory implements FactoryInterface
      * @var string
      */
     protected $routerQueueName;
+
+    /**
+     * @var string
+     */
+    protected $consumerTopicName;
+
+    /**
+     * @var string
+     */
+    protected $defaultConsumerQueueName;
 
     /**
      * @param AmqpSession $session
@@ -37,9 +51,15 @@ class AmqpFactory implements FactoryInterface
      */
     public function createRouterMessage($messageName, $messageBody)
     {
-        return $this->session->createMessage($messageBody, [
+        $properties = [
             'messageName' => $messageName,
-        ]);
+        ];
+
+        $headers = [
+            'delivery_mode' => self::DELIVERY_MODE_PERSISTENT,
+        ];
+
+        return $this->session->createMessage($messageBody, $properties, $headers);
     }
 
     /**
@@ -79,10 +99,70 @@ class AmqpFactory implements FactoryInterface
     /**
      * {@inheritdoc}
      */
+    public function createConsumerMessage($messageName, $handlerName, $messageBody)
+    {
+        $properties = [
+            'messageName' => $messageName,
+            'handlerName' => $handlerName,
+        ];
+
+        $headers = [
+            'delivery_mode' => self::DELIVERY_MODE_PERSISTENT,
+        ];
+
+        return $this->session->createMessage($messageBody, $properties, $headers);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createConsumerTopic($consumerName)
+    {
+        $topic = $this->session->createTopic($this->consumerTopicName);
+        $topic->setType('direct');
+        $topic->setDurable(true);
+        $topic->setRoutingKey($consumerName);
+
+        return $topic;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createConsumerQueue($consumerName)
+    {
+        $queue = $this->session->createQueue($consumerName);
+        $queue->setDurable(true);
+        $queue->setAutoDelete(false);
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function createConsumerMessageProducer($consumerName)
+    {
+        $this->createConsumerSchema($consumerName);
+
+        return $this->session->createProducer($this->createConsumerTopic($consumerName));
+    }
+
     protected function createRouterSchema()
     {
         $topic = $this->createRouterTopic();
         $queue = $this->createRouterQueue();
+
+        $this->session->declareTopic($topic);
+        $this->session->declareQueue($queue);
+        $this->session->declareBind($topic, $queue);
+    }
+
+    /**
+     * @param string $consumerName
+     */
+    protected function createConsumerSchema($consumerName)
+    {
+        $topic = $this->createConsumerTopic($consumerName);
+        $queue = $this->createConsumerQueue($consumerName);
 
         $this->session->declareTopic($topic);
         $this->session->declareQueue($queue);

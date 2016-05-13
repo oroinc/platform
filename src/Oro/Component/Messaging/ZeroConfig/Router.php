@@ -1,8 +1,6 @@
 <?php
 namespace Oro\Component\Messaging\ZeroConfig;
 
-use Oro\Component\Messaging\Transport\Message;
-
 class Router
 {
     /**
@@ -11,46 +9,25 @@ class Router
     protected $routeRegistry;
 
     /**
-     * @var FactoryInterface
+     * @var ConsumerProducerInterface
      */
-    protected $factory;
+    protected $consumerProducer;
 
     /**
      * @var string
      */
-    protected $defaultConsumerName = 'default';
+    protected $defaultConsumerName;
 
     /**
-     * @param Message $message
+     * @param string $messageName
+     * @param string $messageBody
      */
-    public function route(Message $message)
+    public function route($messageName, $messageBody)
     {
-        $messageName = $message->getProperty('messageName');
-        if (false == $messageName) {
-            throw new \LogicException('Got empty message name.');
-        }
-
         foreach ($this->routeRegistry->getRoutes($messageName) as $route) {
-            $this->processRoute($route, $message);
+            $consumerName = $route->getConsumerName() ?: $this->defaultConsumerName;
+
+            $this->consumerProducer->sendMessage($consumerName, $route->getHandlerName(), $messageName, $messageBody);
         }
-    }
-
-    /**
-     * @param Route   $route
-     * @param Message $message
-     */
-    protected function processRoute(Route $route, Message $message)
-    {
-        $message = $this->factory->createConsumerMessage(
-            $route->getMessageName(),
-            $route->getProcessorName(),
-            $message->getBody()
-        );
-        $topic = $this->factory->createConsumerTopic();
-        
-        $consumerName = $route->getConsumerName() ?: $this->defaultConsumerName;
-
-        $producer = $this->factory->createConsumerMessageProducer($consumerName);
-        $producer->send($topic, $message);
     }
 }
