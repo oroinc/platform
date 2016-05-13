@@ -61,6 +61,12 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
+        $transformer = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer')
+            ->disableOriginalConstructor()
+            ->setMethods(null)
+            ->getMock();
+
         $this->entity  = new CalendarEvent();
         $this->handler = new CalendarEventHandler(
             $this->form,
@@ -69,7 +75,8 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             $this->activityManager,
             $this->entityRoutingHelper,
             $this->securityFacade,
-            $this->emailSendProcessor
+            $this->emailSendProcessor,
+            $transformer
         );
     }
 

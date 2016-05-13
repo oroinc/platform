@@ -3,7 +3,6 @@
 namespace Oro\Bundle\CalendarBundle\Form\DataTransformer;
 
 use Doctrine\Common\Collections\ArrayCollection;
-use Doctrine\Common\Collections\Collection;
 
 use Symfony\Component\Form\DataTransformerInterface;
 
@@ -70,11 +69,11 @@ class UsersToAttendeesTransformer implements DataTransformerInterface
     }
 
     /**
-     * @param Collection|Attendee[] $attendees
+     * @param \Traversable|Attendee[] $attendees
      *
      * @return ArrayCollection|User[]
      */
-    public function attendeesToUsers(Collection $attendees)
+    public function attendeesToUsers($attendees)
     {
         $users = new ArrayCollection();
         foreach ($attendees as $attendee) {
