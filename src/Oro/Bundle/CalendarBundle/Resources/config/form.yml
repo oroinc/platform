@@ -78,11 +78,26 @@ services:
         class: %oro_calendar.calendar_event.form.handler.api.class%
         scope: request
         arguments:
+<<<<<<< HEAD
             - '@oro_calendar.calendar_event.form.api'
             - '@request'
             - '@doctrine.orm.entity_manager'
             - '@oro_calendar.send_processor.email'
             - '@oro_activity.manager'
+=======
+            - @oro_calendar.calendar_event.form.api
+            - @request
+            - @doctrine.orm.entity_manager
+            - @oro_calendar.send_processor.email
+            - @oro_activity.manager
+
+    oro_calendar.oro_calendar_event_attendees.form.type:
+        class: %oro_calendar.oro_calendar_event_attendees.form.type.class%
+        arguments:
+            - @doctrine
+        tags:
+            - { name: form.type, alias: oro_calendar_event_attendees }
+>>>>>>> 33535af... AEIV-575: Manual testing
 
     oro_calendar.calendar_event_invitees.form.type:
         class: %oro_calendar.calendar_event_invitees.form.type.class%
