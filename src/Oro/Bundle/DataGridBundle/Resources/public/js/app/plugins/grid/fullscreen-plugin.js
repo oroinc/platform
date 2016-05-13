@@ -51,7 +51,7 @@ define(function(require) {
          */
         updateLayout: function() {
             var layout;
-            if (!this.main.rendered || !this.main.$grid.parents('body').length || !this.main.$el.is(':visible')) {
+            if (!this.main.shown) {
                 // not ready to apply layout
                 // try to do that at next js cycle1
                 clearTimeout(this.updateLayoutTimeoutId);
