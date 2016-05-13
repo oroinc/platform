@@ -20,7 +20,8 @@ class AttendeeEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
 
     public function setUp()
     {
-        $this->attendeeRepository = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository')
+        $this->attendeeRepository = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository')
             ->disableOriginalConstructor()
             ->getMock();
 
