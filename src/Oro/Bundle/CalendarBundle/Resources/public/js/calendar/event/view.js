@@ -260,7 +260,18 @@ define([
                             input.prop('checked', input.val() === value);
                         }
                     } else {
-                        input.val(value);
+                        if (_.first(matches) === 'invitedUsers') {
+                            value = _.map(value, function(attendee) {
+                                return {
+                                    id: null,
+                                    firstName: attendee.displayName,
+                                    email: attendee.email
+                                };
+                            });
+                            input.select2('data', value);
+                        } else {
+                            input.val(value);
+                        }
                     }
                     input.change();
                 }
@@ -412,8 +423,14 @@ define([
             }
 
             if (data.hasOwnProperty('invitedUsers')) {
-                data.invitedUsers = _.map(data.invitedUsers ? data.invitedUsers.split(',') : [], function(item) {
-                    return parseInt(item);
+                var invitedUsers = this.eventDialog.form.find('[name="oro_calendar_event_form[invitedUsers]"]')
+                    .select2('data');
+                data.invitedUsers = _.map(invitedUsers, function(user) {
+                    return {
+                        displayName: user.id ? user.fullName : user.email,
+                        email: user.email,
+                        origin: 'server'
+                    };
                 });
             }
 
