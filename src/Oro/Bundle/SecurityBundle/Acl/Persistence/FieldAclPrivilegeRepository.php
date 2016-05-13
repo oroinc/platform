@@ -153,24 +153,6 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
     }
 
     /**
-     * {@inheritdoc}
-     */
-    protected function getPermissionMasks($permissions, AclExtensionInterface $extension, array $maskBuilders)
-    {
-        // check if there are no full field permissions
-        // and add missing to calculate correct masks
-        $permissionNames = array_keys($maskBuilders);
-        foreach ($permissionNames as $permissionName) {
-            /** @var ArrayCollection $permissions */
-            if (!$permissions->containsKey($permissionName)) {
-                $permissions->add(new AclPermission($permissionName, AccessLevel::SYSTEM_LEVEL));
-            }
-        }
-
-        return parent::getPermissionMasks($permissions, $extension, $maskBuilders);
-    }
-
-    /**
      * Adds field permissions to the given $privilege.
      *
      * @param SID                   $sid
@@ -192,7 +174,7 @@ class FieldAclPrivilegeRepository extends AclPrivilegeRepository
         $acl = $this->findAclByOid($acls, $oid);
         $this->addAclPermissions($sid, $field, $privilege, $allowedPermissions, $extension, null, $acl);
 
-        // add default permission for not found in db privileges. By default it should be the Organization access level.
+        // add default permission for not found in db privileges. By default it should be the System access level.
         foreach ($allowedPermissions as $permission) {
             if (!$privilege->hasPermission($permission)) {
                 $privilege->addPermission(new AclPermission($permission, AccessLevel::SYSTEM_LEVEL));

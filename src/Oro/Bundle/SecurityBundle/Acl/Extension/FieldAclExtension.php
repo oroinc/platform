@@ -12,7 +12,6 @@ use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdAccessor;
 use Oro\Bundle\SecurityBundle\Metadata\EntitySecurityMetadataProvider;
 use Oro\Bundle\SecurityBundle\Owner\Metadata\MetadataProviderInterface;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
-use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
@@ -105,32 +104,6 @@ class FieldAclExtension extends EntityAclExtension
     /**
      * {@inheritdoc}
      */
-    protected function parseDescriptor($descriptor, &$type, &$id, &$group)
-    {
-        parent::parseDescriptor($descriptor, $type, $id, $group);
-
-        if (strpos($id, '+')) {
-            $id = explode('+', $id)[0];
-        }
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function getObjectIdentity($val)
-    {
-        $identity = parent::getObjectIdentity($val);
-
-        if (null === $identity->getIdentifier()) {
-            $identity = new ObjectIdentity('entity', $identity->getType());
-        }
-
-        return $identity;
-    }
-
-    /**
-     * {@inheritdoc}
-     */
     public function getAccessLevelNames($object, $permissionName = null)
     {
         if ('CREATE' === $permissionName) {
@@ -165,11 +138,6 @@ class FieldAclExtension extends EntityAclExtension
         $result = parent::getAllowedPermissions($oid);
 
         $className = $oid->getType();
-
-        $isRoot = $className == ObjectIdentityFactory::ROOT_IDENTITY_TYPE;
-        if ($isRoot || $oid->getIdentifier() != self::NAME) {
-            return $result;
-        }
 
         $entityMetadata = empty($this->metadataCache[$className]) ?
             $this->doctrineHelper->getEntityMetadata($className) :
@@ -231,6 +199,173 @@ class FieldAclExtension extends EntityAclExtension
     /**
      * {@inheritdoc}
      */
+    public function getAccessLevel($mask, $permission = null, $object = null)
+    {
+        if (0 === $this->removeServiceBits($mask)) {
+            return AccessLevel::NONE_LEVEL;
+        }
+
+        $identity = $this->getServiceBits($mask);
+        if ($permission !== null) {
+            $permissionMask = $this->getMaskBuilderConst($identity, 'GROUP_' . $permission);
+            $mask = $mask & $permissionMask;
+        }
+
+        $mask = $this->removeServiceBits($mask);
+
+        $result = AccessLevel::NONE_LEVEL;
+        foreach (AccessLevel::$allAccessLevelNames as $accessLevel) {
+            if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $accessLevel))) {
+                $result = AccessLevel::getConst($accessLevel . '_LEVEL');
+            }
+        }
+
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getPermissions($mask = null, $setOnly = false, $byCurrentGroup = false)
+    {
+        if ($mask === null) {
+            return array_keys($this->permissionToMaskBuilderIdentity);
+        }
+        $result = [];
+        if (!$setOnly) {
+            $identity = $this->getServiceBits($mask);
+            foreach ($this->permissionToMaskBuilderIdentity as $permission => $id) {
+                if ($id === $identity) {
+                    $result[] = $permission;
+                }
+            }
+        } elseif (0 !== $this->removeServiceBits($mask)) {
+            $identity = $this->getServiceBits($mask);
+            foreach ($this->permissionToMaskBuilderIdentity as $permission => $id) {
+                if ($id === $identity) {
+                    if (0 !== ($mask & $this->getMaskBuilderConst($identity, 'GROUP_' . $permission))) {
+                        $result[] = $permission;
+                    }
+                }
+            }
+        }
+        return $result;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getServiceBits($mask)
+    {
+        return $mask & FieldMaskBuilder::SERVICE_BITS;
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function validateMask($mask, $object, $permission = null)
+    {
+        if (0 === $this->removeServiceBits($mask)) {
+            // zero mask
+            return;
+        }
+
+        $permissions = $permission === null
+            ? $this->getPermissions($mask, true)
+            : [$permission];
+
+        foreach ($permissions as $permission) {
+            $validMasks = $this->getValidMasks($permission, $object);
+            if (($mask | $validMasks) === $validMasks) {
+                $identity = $this->permissionToMaskBuilderIdentity[$permission];
+                foreach ($this->permissionToMaskBuilderIdentity as $p => $i) {
+                    if ($identity === $i) {
+                        $this->validateMaskAccessLevel($p, $mask, $object);
+                    }
+                }
+
+                return;
+            }
+        }
+
+        throw $this->createInvalidAclMaskException($mask, $object);
+    }
+
+    /**
+     * Gets all valid bitmasks for the given object
+     *
+     * @param string $permission
+     * @param mixed  $object
+     *
+     * @return int
+     */
+    protected function getValidMasks($permission, $object)
+    {
+        $identity = $this->permissionToMaskBuilderIdentity[$permission];
+
+        $metadata = $this->getMetadata($object);
+        if (!$metadata->hasOwner()) {
+            if ($identity === $this->permissionToMaskBuilderIdentity['CREATE']) {
+                return $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM');
+            } elseif ($identity === $this->permissionToMaskBuilderIdentity['ASSIGN']) {
+                return $this->getMaskBuilderConst($identity, 'MASK_DELETE_SYSTEM');
+            }
+
+            return $identity;
+        }
+
+        if ($metadata->isGlobalLevelOwned()) {
+            return
+                $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
+                | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL');
+        } elseif ($metadata->isLocalLevelOwned()) {
+            return
+                $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
+                | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL')
+                | $this->getMaskBuilderConst($identity, 'GROUP_DEEP')
+                | $this->getMaskBuilderConst($identity, 'GROUP_LOCAL');
+        } elseif ($metadata->isBasicLevelOwned()) {
+            return
+                $this->getMaskBuilderConst($identity, 'GROUP_SYSTEM')
+                | $this->getMaskBuilderConst($identity, 'GROUP_GLOBAL')
+                | $this->getMaskBuilderConst($identity, 'GROUP_DEEP')
+                | $this->getMaskBuilderConst($identity, 'GROUP_LOCAL')
+                | $this->getMaskBuilderConst($identity, 'GROUP_BASIC');
+        }
+
+        return $this->permissionToMaskBuilderIdentity[$permission];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function parseDescriptor($descriptor, &$type, &$id, &$group)
+    {
+        parent::parseDescriptor($descriptor, $type, $id, $group);
+
+        if (strpos($id, '+')) {
+            $id = explode('+', $id)[0];
+        }
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getObjectIdentity($val)
+    {
+        $identity = parent::getObjectIdentity($val);
+
+        if (null === $identity->getIdentifier()) {
+            $identity = new ObjectIdentity('entity', $identity->getType());
+        }
+
+        return $identity;
+    }
+
+
+    /**
+     * {@inheritdoc}
+     */
     protected function getPermissionsToIdentityMap($byCurrentGroup = false)
     {
         return $this->permissionToMaskBuilderIdentity;
@@ -244,5 +379,18 @@ class FieldAclExtension extends EntityAclExtension
         $identities = $this->getPermissionsToIdentityMap();
 
         return empty($identities[$permission]) ? FieldMaskBuilder::IDENTITY : $identities[$permission];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    protected function getMaskBuilderConst($maskBuilderIdentity, $constName)
+    {
+        $maskBuilder = new FieldMaskBuilder(
+            $maskBuilderIdentity,
+            $this->getPermissionsForIdentity($maskBuilderIdentity)
+        );
+
+        return $maskBuilder->getMask($constName);
     }
 }
