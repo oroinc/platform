@@ -48,7 +48,7 @@ define(function(require) {
                 if ($dropdown.is('.open')) {
                     $dropdown.trigger('hide.bs.dropdown').removeClass('open');
                 }
-                $(this).dropdown('detach', false);
+                $el.dropdown('detach', false);
             }
         };
         $el.data('globalHandlers', globalHandlers);
