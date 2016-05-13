@@ -22,8 +22,8 @@ class OrxTest extends \PHPUnit_Framework_TestCase
             $this->condition,
             $this->condition->initialize(
                 [
-                    new Condition\TrueCompatible(),
-                    new Condition\FalseCompatible(),
+                    new Condition\TrueCondition(),
+                    new Condition\FalseCondition(),
                 ]
             )
         );
@@ -37,12 +37,12 @@ class OrxTest extends \PHPUnit_Framework_TestCase
 
         $this->condition->setMessage($currentConditionError);
 
-        $falseConditionWithError = new Condition\FalseCompatible();
+        $falseConditionWithError = new Condition\FalseCondition();
         $falseConditionWithError->setMessage($nestedConditionError);
 
         $this->condition->initialize(
             [
-                new Condition\FalseCompatible(),
+                new Condition\FalseCondition(),
                 $falseConditionWithError
             ]
         );
@@ -86,7 +86,7 @@ class OrxTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'options'  => [new Condition\TrueCompatible()],
+                'options'  => [new Condition\TrueCondition()],
                 'message'  => null,
                 'expected' => [
                     '@or' => [
@@ -97,7 +97,7 @@ class OrxTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             [
-                'options'  => [new Condition\TrueCompatible(), new Condition\FalseCompatible()],
+                'options'  => [new Condition\TrueCondition(), new Condition\FalseCondition()],
                 'message'  => 'Test',
                 'expected' => [
                     '@or' => [
@@ -129,12 +129,12 @@ class OrxTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'options'  => [new Condition\TrueCompatible()],
+                'options'  => [new Condition\TrueCondition()],
                 'message'  => null,
                 'expected' => '$factory->create(\'or\', [$factory->create(\'true\', [])])'
             ],
             [
-                'options'  => [new Condition\TrueCompatible(), new Condition\FalseCompatible()],
+                'options'  => [new Condition\TrueCondition(), new Condition\FalseCondition()],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'or\', '
                     . '[$factory->create(\'true\', []), $factory->create(\'false\', [])])'

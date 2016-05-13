@@ -93,7 +93,7 @@ class UserController extends SoapController
 
     /**
      * @Soap\Method("getUserBy")
-     * @Soap\Param("filters", phpType="Oro\Bundle\SoapBundle\Type\KeyValue\StringCompatible[]")
+     * @Soap\Param("filters", phpType="Oro\Bundle\SoapBundle\Type\KeyValue\StringType[]")
      * @Soap\Result(phpType="Oro\Bundle\UserBundle\Entity\UserSoap")
      * @AclAncestor("oro_user_user_view")
      */

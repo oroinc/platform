@@ -6,12 +6,12 @@ use Oro\Component\ConfigExpression\Condition;
 
 class TrueTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var Condition\TrueCompatible */
+    /** @var Condition\TrueCondition */
     protected $condition;
 
     protected function setUp()
     {
-        $this->condition = new Condition\TrueCompatible();
+        $this->condition = new Condition\TrueCondition();
     }
 
     public function testEvaluate()
