@@ -14,9 +14,6 @@ class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
     protected $provider;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
-    protected $businessUnitManager;
-
-    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $securityFacade;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject */
@@ -36,11 +33,6 @@ class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->businessUnitManager =$this
-            ->getMockBuilder('Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         $this->securityFacade = $this->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->getMock();
@@ -50,7 +42,13 @@ class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->treeProvider = $this->getMockBuilder('Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider')
-            ->setMethods(['getTree', 'getUserBusinessUnitIds', 'getUserSubordinateBusinessUnitIds'])
+            ->setMethods([
+                'getTree',
+                'getUserBusinessUnitIds',
+                'getUserSubordinateBusinessUnitIds',
+                'getAllBusinessUnitIds',
+                'getOrganizationBusinessUnitIds'
+            ])
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -76,42 +74,39 @@ class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
             ->method('getOrganization')
             ->will($this->returnValue($this->organization));
 
-        $this->provider = new BusinessUnitAclProvider(
-            $this->businessUnitManager,
-            $this->securityFacade,
-            $this->aclVoter,
-            $this->treeProvider
-        );
-
-        $this->provider->addOneShotIsGrantedObserver($this->observer);
+        $this->provider = $this->getMockBuilder('Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider')
+            ->setMethods(['getAccessLevel'])
+            ->setConstructorArgs([
+                $this->securityFacade,
+                $this->aclVoter,
+                $this->treeProvider
+                ])
+            ->getMock();
     }
 
     public function testSystemLevel()
     {
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
-            ->will($this->returnValue(true));
-
-        $this->observer->expects($this->once())
+        $this->provider->expects($this->once())
             ->method('getAccessLevel')
+            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
             ->will($this->returnValue(AccessLevel::SYSTEM_LEVEL));
 
-        $this->businessUnitManager->expects($this->exactly(1))
-            ->method('getBusinessUnitIds');
+        $this->treeProvider->expects($this->exactly(1))
+            ->method('getTree')
+            ->will($this->returnValue($this->treeProvider));
+
+        $this->treeProvider->expects($this->exactly(1))
+            ->method('getAllBusinessUnitIds')
+            ->will($this->returnValue($this->treeProvider));
 
         $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION);
     }
 
     public function testLocalLevel()
     {
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
-            ->will($this->returnValue(true));
-
-        $this->observer->expects($this->once())
+        $this->provider->expects($this->once())
             ->method('getAccessLevel')
+            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
             ->will($this->returnValue(AccessLevel::LOCAL_LEVEL));
 
         $this->treeProvider->expects($this->exactly(1))
@@ -127,13 +122,9 @@ class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testDeepLevel()
     {
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
-            ->will($this->returnValue(true));
-
-        $this->observer->expects($this->once())
+        $this->provider->expects($this->once())
             ->method('getAccessLevel')
+            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
             ->will($this->returnValue(AccessLevel::DEEP_LEVEL));
 
         $this->treeProvider->expects($this->exactly(1))
@@ -149,34 +140,27 @@ class BusinessUnitAclProviderTest extends \PHPUnit_Framework_TestCase
 
     public function testGlobalLevel()
     {
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
-            ->will($this->returnValue(true));
-
-        $this->observer->expects($this->once())
+        $this->provider->expects($this->once())
             ->method('getAccessLevel')
+            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
             ->will($this->returnValue(AccessLevel::GLOBAL_LEVEL));
 
-        $this->businessUnitManager->expects($this->exactly(1))
-            ->method('getBusinessUnitIds');
+        $this->treeProvider->expects($this->exactly(1))
+            ->method('getTree')
+            ->will($this->returnValue($this->treeProvider));
+
+        $this->treeProvider->expects($this->exactly(1))
+            ->method('getOrganizationBusinessUnitIds')
+            ->will($this->returnValue($this->treeProvider));
 
         $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION);
     }
 
     public function testAccessNotGranted()
     {
-        $this->securityFacade->expects($this->once())
-            ->method('isGranted')
-            ->with(self::PERMISSION, 'entity:'.self::ENTITY_NAME)
-            ->will($this->returnValue(false));
-
-        $this->businessUnitManager->expects($this->exactly(0))
-            ->method('getBusinessUnitIds');
-
         $this->treeProvider->expects($this->exactly(0))
             ->method('getTree');
 
-        $this->assertEquals([null], $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION));
+        $this->assertEquals([], $this->provider->getBusinessUnitIds(self::ENTITY_NAME, self::PERMISSION));
     }
 }

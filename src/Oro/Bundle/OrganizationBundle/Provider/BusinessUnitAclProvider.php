@@ -2,30 +2,16 @@
 
 namespace Oro\Bundle\OrganizationBundle\Provider;
 
-use Oro\Bundle\OrganizationBundle\Entity\Manager\BusinessUnitManager;
 use Oro\Bundle\SecurityBundle\Acl\AccessLevel;
 use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 use Oro\Bundle\SecurityBundle\Acl\Voter\AclVoter;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SecurityBundle\Owner\OwnerTreeProvider;
-use Oro\Bundle\UserBundle\Entity\UserInterface;
 
 class BusinessUnitAclProvider
 {
-    /** @var BusinessUnitManager */
-    protected $businessUnitManager;
-
     /** @var SecurityFacade */
     protected $securityFacade;
-
-    /** @var bool */
-    protected $isAssignGranted;
-
-    /** @var int */
-    protected $accessLevel;
-
-    /** @var UserInterface */
-    protected $currentUser;
 
     /** @var AclVoter */
     protected $aclVoter;
@@ -36,105 +22,87 @@ class BusinessUnitAclProvider
     /** @var OneShotIsGrantedObserver */
     protected $observer;
 
+    /** @var string */
+    protected $accessLevel;
+
     /**
-     * @param BusinessUnitManager $businessUnitManager
-     * @param SecurityFacade      $securityFacade
-     * @param AclVoter            $aclVoter
-     * @param OwnerTreeProvider   $treeProvider
+     * @param SecurityFacade    $securityFacade
+     * @param AclVoter          $aclVoter
+     * @param OwnerTreeProvider $treeProvider
      */
     public function __construct(
-        BusinessUnitManager $businessUnitManager,
         SecurityFacade $securityFacade,
         AclVoter $aclVoter,
         OwnerTreeProvider $treeProvider
     ) {
-        $this->businessUnitManager       = $businessUnitManager;
-        $this->securityFacade            = $securityFacade;
-        $this->aclVoter                  = $aclVoter;
-        $this->treeProvider              = $treeProvider;
+        $this->securityFacade      = $securityFacade;
+        $this->aclVoter            = $aclVoter;
+        $this->treeProvider        = $treeProvider;
+        $this->observer            = new OneShotIsGrantedObserver();
     }
 
     /**
+     * Get business units ids for current user and current entity access level
+     *
      * @param string $dataClassName
      * @param string $permission
      * @return array
      */
     public function getBusinessUnitIds($dataClassName, $permission = 'VIEW')
     {
-        $this->getCurrentUser();
-        $this->checkIsGranted($permission, 'entity:' . $dataClassName);
+        $ids = [];
 
-        if ($this->isAssignGranted) {
-            return $this->getIds();
+        $this->accessLevel = $this->getAccessLevel($permission, 'entity:' . $dataClassName);
+        $currentUser = $this->securityFacade->getLoggedUser();
+
+        if (!$currentUser || !$this->accessLevel) {
+            return $ids;
         }
 
-        return [null];
-    }
-
-    /**
-     * @param OneShotIsGrantedObserver $observer
-     * @return $this
-     */
-    public function addOneShotIsGrantedObserver(OneShotIsGrantedObserver $observer)
-    {
-        $this->observer = $observer;
-        return $this;
-    }
-
-    /**
-     * Check is granting user to object in given permission
-     *
-     * @param string        $permission
-     * @param object|string $object
-     */
-    protected function checkIsGranted($permission, $object)
-    {
-        if ($this->observer) {
-            $this->aclVoter->addOneShotIsGrantedObserver($this->observer);
-            $this->isAssignGranted = $this->securityFacade->isGranted($permission, $object);
-            $this->accessLevel = $this->observer->getAccessLevel();
-        }
-    }
-
-    /**
-     * Get business units ids for current user for current access level
-     *
-     * @return array
-     */
-    protected function getIds()
-    {
         if (AccessLevel::SYSTEM_LEVEL === $this->accessLevel) {
-            return $this->businessUnitManager->getBusinessUnitIds();
-        } elseif (AccessLevel::LOCAL_LEVEL === $this->accessLevel) {
-            return $this->treeProvider->getTree()->getUserBusinessUnitIds(
-                $this->currentUser->getId(),
+            $ids = $this->treeProvider->getTree()->getAllBusinessUnitIds();
+        } elseif (AccessLevel::GLOBAL_LEVEL === $this->accessLevel) {
+            $ids = $this->treeProvider->getTree()->getOrganizationBusinessUnitIds(
                 $this->getOrganizationContextId()
             );
         } elseif (AccessLevel::DEEP_LEVEL === $this->accessLevel) {
-            return $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
-                $this->currentUser->getId(),
+            $ids = $this->treeProvider->getTree()->getUserSubordinateBusinessUnitIds(
+                $currentUser->getId(),
                 $this->getOrganizationContextId()
             );
-        } elseif (AccessLevel::GLOBAL_LEVEL === $this->accessLevel) {
-            return $this->businessUnitManager->getBusinessUnitIds($this->getOrganizationContextId());
+        } elseif (AccessLevel::LOCAL_LEVEL === $this->accessLevel) {
+            $ids = $this->treeProvider->getTree()->getUserBusinessUnitIds(
+                $currentUser->getId(),
+                $this->getOrganizationContextId()
+            );
         }
 
-        return [null];
+        return $ids;
     }
 
     /**
-     * @return null|UserInterface
+     * @return string
      */
-    protected function getCurrentUser()
+    public function getProcessedEntityAccessLevel()
     {
-        if (null === $this->currentUser) {
-            $user = $this->securityFacade->getLoggedUser();
-            if ($user instanceof UserInterface) {
-                $this->currentUser = $user;
-            }
+        return $this->accessLevel;
+    }
+
+    /**
+     * Get object's access level
+     *
+     * @param string $permission
+     * @param string $object
+     * @return null|int
+     */
+    protected function getAccessLevel($permission, $object)
+    {
+        $this->aclVoter->addOneShotIsGrantedObserver($this->observer);
+        if ($this->securityFacade->isGranted($permission, $object)) {
+            return $this->observer->getAccessLevel();
         }
 
-        return $this->currentUser;
+        return null;
     }
 
     /**
