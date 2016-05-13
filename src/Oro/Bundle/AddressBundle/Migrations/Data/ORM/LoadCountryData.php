@@ -2,11 +2,10 @@
 
 namespace Oro\Bundle\AddressBundle\Migrations\Data\ORM;
 
-use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
-
 use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\ORM\EntityRepository;
 
+use Oro\Bundle\MigrationBundle\Fixture\VersionedFixtureInterface;
 use Oro\Bundle\TranslationBundle\DataFixtures\AbstractTranslatableEntityFixture;
 use Oro\Bundle\AddressBundle\Entity\Country;
 use Oro\Bundle\AddressBundle\Entity\Region;

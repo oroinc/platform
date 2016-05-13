@@ -85,8 +85,7 @@ class OperationExtensionTest extends AbstractExtensionTest
         DatagridConfiguration $config,
         array $operations,
         $expected,
-        array $expectedConfiguration = [],
-        $debug = false
+        array $expectedConfiguration = []
     ) {
         $this->manager->expects($this->once())
             ->method('getOperations')

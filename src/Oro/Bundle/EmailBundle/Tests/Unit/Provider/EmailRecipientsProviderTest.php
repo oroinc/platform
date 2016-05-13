@@ -146,7 +146,8 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
      * @param string    $section
      * @param array     $provided
      * @param int       $recipientExactly
-     * @return mixed
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
      */
     protected function createProvider($section, array $provided, $recipientExactly = 1)
     {
