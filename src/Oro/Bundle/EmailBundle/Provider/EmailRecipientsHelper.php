@@ -262,6 +262,33 @@ class EmailRecipientsHelper
     }
 
     /**
+     * @param array $result
+     * @param string $entityClass
+     *
+     * @return array
+     */
+    public function recipientsFromResult(array $result, $entityClass)
+    {
+        $emails = [];
+        foreach ($result as $row) {
+            $recipient = new CategorizedRecipient(
+                $row['email'],
+                sprintf('%s <%s>', $row['name'], $row['email']),
+                new RecipientEntity(
+                    $entityClass,
+                    $row['entityId'],
+                    $this->createRecipientEntityLabel($row['name'], $entityClass),
+                    $row['organization']
+                )
+            );
+
+            $emails[$recipient->getIdentifier()] = $recipient;
+        }
+
+        return $emails;
+    }
+
+    /**
      * @param QueryBuilder $qb
      * @param EmailRecipientsProviderArgs $args
      *
@@ -307,33 +334,6 @@ class EmailRecipientsHelper
         $label        = $this->configManager->getConfig($entityConfig)->get('label');
 
         return $this->translator->trans($label);
-    }
-
-    /**
-     * @param array $result
-     * @param string $entityClass
-     *
-     * @return array
-     */
-    public function recipientsFromResult(array $result, $entityClass)
-    {
-        $emails = [];
-        foreach ($result as $row) {
-            $recipient = new CategorizedRecipient(
-                $row['email'],
-                sprintf('%s <%s>', $row['name'], $row['email']),
-                new RecipientEntity(
-                    $entityClass,
-                    $row['entityId'],
-                    $this->createRecipientEntityLabel($row['name'], $entityClass),
-                    $row['organization']
-                )
-            );
-
-            $emails[$recipient->getIdentifier()] = $recipient;
-        }
-
-        return $emails;
     }
 
     /**
