@@ -262,8 +262,8 @@ oro:
         load_more_emails:         "%quantity% older messages"
 
         emailuser:
-            entity_label:             Email User
-            entity_plural_label:      Email Users
+            entity_label:             Email-User Relation
+            entity_plural_label:      Email-User Relations
             email.label:              Email
             folder.label:             Folder
             id.label:                 Id
