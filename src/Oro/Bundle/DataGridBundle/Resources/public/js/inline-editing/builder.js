@@ -4,7 +4,6 @@ define(function(require) {
     var $ = require('jquery');
     var _ = require('underscore');
     var tools = require('oroui/js/tools');
-    var InlineEditingHelpPlugin = require('../app/plugins/grid/inline-editing-help-plugin');
     var console = window.console;
 
     var gridViewsBuilder = {
@@ -24,7 +23,8 @@ define(function(require) {
          * @param {Object} [options.data] data for grid's collection
          * @param {Object} [options.metadata] configuration for the grid
          */
-        init: function(deferred, options) {
+
+        processDatagridOptions: function(deferred, options) {
             if (tools.isMobile() || !options.metadata.inline_editing || !options.metadata.inline_editing.enable) {
                 deferred.resolve();
                 return;
@@ -33,14 +33,14 @@ define(function(require) {
                 .concat(this.prepareColumns(options));
 
             $.when.apply($, promises).done(function() {
-                options.gridPromise.done(function(grid) {
-                    grid.pluginManager.create(options.metadata.inline_editing.plugin, options);
-                    grid.pluginManager.enable(options.metadata.inline_editing.plugin);
-                    if (options.metadata.inline_editing.disable_help !== false) {
-                        grid.pluginManager.enable(InlineEditingHelpPlugin);
-                    }
-                    deferred.resolve();
+                if (!options.metadata.plugins) {
+                    options.metadata.plugins = [];
+                }
+                options.metadata.plugins.push({
+                    constructor: options.metadata.inline_editing.plugin,
+                    options: options
                 });
+                deferred.resolve();
             }).fail(function(e) {
                 if (console && console.error) {
                     console.log(e);
@@ -50,6 +50,13 @@ define(function(require) {
                 }
                 deferred.resolve();
             });
+        },
+
+        /**
+         * Init() function is required
+         */
+        init: function(deferred, options) {
+            deferred.resolve();
         },
 
         getDefaultOptions: function() {

@@ -67,7 +67,7 @@ class ImportExportTest extends WebTestCase
     public function testImport()
     {
         $this->validateImportFile($this->doExportTemplate());
-        $this->doImport();
+        $this->doImport(16, 0);
 
         $this->assertCount(count($this->fields) + 16, $this->getEntityFields());
     }
@@ -78,7 +78,7 @@ class ImportExportTest extends WebTestCase
             $this->getFilePath('@OroEntityConfigBundle/Tests/Functional/ImportExport/data/string_field.csv')
         );
 
-        $this->doImport();
+        $this->doImport(1, 0);
         $this->assertCount(count($this->fields) + 1, $this->getEntityFields());
 
         $this->assertErrors(
@@ -93,7 +93,7 @@ class ImportExportTest extends WebTestCase
             $this->getFilePath('@OroEntityConfigBundle/Tests/Functional/ImportExport/data/system_fields.csv')
         );
 
-        $this->doImport();
+        $this->doImport(0, 0);
         $this->assertCount(count($this->fields), $this->getEntityFields());
     }
 
@@ -185,7 +185,11 @@ class ImportExportTest extends WebTestCase
         $this->assertEquals($errorsCount, $this->client->getCrawler()->filter('.import-errors')->count());
     }
 
-    protected function doImport()
+    /**
+     * @param int $added
+     * @param int $replaced
+     */
+    protected function doImport($added, $replaced)
     {
         $this->client->followRedirects(false);
         $this->client->request(
@@ -207,7 +211,8 @@ class ImportExportTest extends WebTestCase
             [
                 'success' => true,
                 'message' => 'File was successfully imported.',
-                'errorsUrl' => null
+                'errorsUrl' => null,
+                'importInfo' => sprintf('%s entities were added, %s entities were updated', $added, $replaced)
             ],
             $data
         );
