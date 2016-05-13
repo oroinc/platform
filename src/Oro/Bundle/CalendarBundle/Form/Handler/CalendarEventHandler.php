@@ -42,6 +42,9 @@ class CalendarEventHandler
     /** @var EmailSendProcessor */
     protected $emailSendProcessor;
 
+    /** @var UsersToAttendeesTransformer */
+    protected $usersToAttendeesTransformer;
+
     /**
      * @param FormInterface       $form
      * @param Request             $request
@@ -58,7 +61,8 @@ class CalendarEventHandler
         ActivityManager $activityManager,
         EntityRoutingHelper $entityRoutingHelper,
         SecurityFacade $securityFacade,
-        EmailSendProcessor $emailSendProcessor
+        EmailSendProcessor $emailSendProcessor,
+        UsersToAttendeesTransformer $usersToAttendeesTransformer
     ) {
         $this->form                = $form;
         $this->request             = $request;
@@ -67,6 +71,7 @@ class CalendarEventHandler
         $this->entityRoutingHelper = $entityRoutingHelper;
         $this->securityFacade      = $securityFacade;
         $this->emailSendProcessor  = $emailSendProcessor;
+        $this->usersToAttendeesTransformer = $usersToAttendeesTransformer;
     }
 
     /**
@@ -178,8 +183,7 @@ class CalendarEventHandler
      */
     protected function createRelatedAttendee(User $user)
     {
-        $transformer = new UsersToAttendeesTransformer();
-        $attendee = $transformer->reverseTransform([$user])->first();
+        $attendee = $this->usersToAttendeesTransformer->userToAttendee($user);
 
         $status = $this->manager
             ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))

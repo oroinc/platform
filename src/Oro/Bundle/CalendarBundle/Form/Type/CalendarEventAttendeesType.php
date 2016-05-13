@@ -5,7 +5,6 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Form\AbstractType;
-use Symfony\Component\Form\DataTransformerInterface;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
@@ -14,22 +13,21 @@ use Symfony\Component\OptionsResolver\OptionsResolver;
 
 use Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
-use Oro\Bundle\FormBundle\Form\DataTransformer\EntitiesToIdsTransformer;
 
 class CalendarEventAttendeesType extends AbstractType
 {
     /** @var ManagerRegistry */
     protected $registry;
 
-    /** @var DataTransformerInterface */
+    /** @var UsersToAttendeesTransformer */
     protected $usersToAttendeesTransformer;
 
     /**
-     * @param ManagerRegistry $registry
+     * @param UsersToAttendeesTransformer $usersToAttendeesTransformer
      */
-    public function __construct(ManagerRegistry $registry)
+    public function __construct(UsersToAttendeesTransformer $usersToAttendeesTransformer)
     {
-        $this->registry = $registry;
+        $this->usersToAttendeesTransformer = $usersToAttendeesTransformer;
     }
 
     /**
@@ -37,13 +35,6 @@ class CalendarEventAttendeesType extends AbstractType
      */
     public function buildForm(FormBuilderInterface $builder, array $options)
     {
-        $this->usersToAttendeesTransformer = new UsersToAttendeesTransformer(
-            new EntitiesToIdsTransformer(
-                $this->registry->getManagerForClass($options['entity_class']),
-                $options['entity_class']
-            )
-        );
-
         $builder->resetModelTransformers();
         $builder->addModelTransformer($this->usersToAttendeesTransformer);
     }
@@ -61,6 +52,7 @@ class CalendarEventAttendeesType extends AbstractType
                     [
                         'allowCreateNew' => true,
                         'renderedPropertyName' => 'email',
+                        'forceSelectedData' => true,
                     ]
                 );
             },
@@ -77,7 +69,7 @@ class CalendarEventAttendeesType extends AbstractType
 
         $formData = $form->getData();
         if ($formData) {
-            $transformedData = $this->usersToAttendeesTransformer->transform($formData);
+            $transformedData = $this->usersToAttendeesTransformer->attendeesToUsers($formData);
 
             $result = [];
             foreach ($transformedData as $item) {
