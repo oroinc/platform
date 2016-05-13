@@ -3,6 +3,7 @@
 namespace Oro\Bundle\NoteBundle\Entity\Manager;
 
 use Doctrine\ORM\EntityManager;
+
 use Symfony\Component\PropertyAccess\PropertyAccess;
 
 use Oro\Bundle\AttachmentBundle\Manager\AttachmentManager;
