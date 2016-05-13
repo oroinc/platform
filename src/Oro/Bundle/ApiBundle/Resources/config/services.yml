@@ -36,6 +36,12 @@ services:
         arguments:
             - '@doctrine'
 
+    oro_api.validation_helper:
+        class: Oro\Bundle\ApiBundle\Util\ValidationHelper
+        public: false
+        arguments:
+            - '@validator.mapping.class_metadata_factory'
+
     oro_api.entity_instantiator:
         class: Oro\Bundle\ApiBundle\Util\EntityInstantiator
         public: false

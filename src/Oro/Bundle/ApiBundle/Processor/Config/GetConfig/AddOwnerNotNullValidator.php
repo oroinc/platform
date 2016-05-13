@@ -45,14 +45,17 @@ class AddOwnerNotNullValidator implements ProcessorInterface
         }
 
         $definition = $context->getResult();
-        $field = $definition->findField(
-            $this->ownershipMetadataProvider->getMetadata($entityClass)->getOwnerFieldName(),
-            true
-        );
-        if (null !== $field) {
-            $fieldOptions = $field->getFormOptions();
-            $fieldOptions['constraints'][] = new NotNull();
-            $field->setFormOptions($fieldOptions);
+        $fieldName = $this->ownershipMetadataProvider->getMetadata($entityClass)->getOwnerFieldName();
+        if (!$fieldName) {
+            return;
         }
+        $field = $definition->findField($fieldName, true);
+        if (null === $field) {
+            return;
+        }
+
+        $fieldOptions = $field->getFormOptions();
+        $fieldOptions['constraints'][] = new NotNull();
+        $field->setFormOptions($fieldOptions);
     }
 }

@@ -71,6 +71,7 @@ services:
         arguments:
             - '@oro_api.doctrine_helper'
             - '@oro_security.owner.ownership_metadata_provider'
+            - '@oro_api.validation_helper'
         tags:
             - { name: oro.api.processor, action: get_config, extra: definition, targetAction: create, priority: -51 }
             - { name: oro.api.processor, action: get_config, extra: definition, targetAction: update, priority: -51 }
