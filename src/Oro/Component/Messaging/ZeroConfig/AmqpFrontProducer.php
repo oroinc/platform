@@ -1,20 +1,17 @@
 <?php
 namespace Oro\Component\Messaging\ZeroConfig;
 
-/**
- * Facade
- */
-class ZeroConfig
+class AmqpFrontProducer implements FrontProducerInterface
 {
     /**
-     * @var FactoryInterface
+     * @var AmqpFactory
      */
     protected $factory;
 
     /**
-     * @param FactoryInterface $factory
+     * @param AmqpFactory $factory
      */
-    public function __construct(FactoryInterface $factory)
+    public function __construct(AmqpFactory $factory)
     {
         $this->factory = $factory;
     }

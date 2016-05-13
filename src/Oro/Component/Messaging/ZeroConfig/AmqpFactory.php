@@ -5,7 +5,7 @@ use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
 use Oro\Component\Messaging\Transport\MessageProducer;
 use Oro\Component\Messaging\Transport\Queue;
 
-class AmqpFactory implements FactoryInterface
+class AmqpFactory
 {
     const DELIVERY_MODE_PERSISTENT = 2;
 
@@ -28,12 +28,7 @@ class AmqpFactory implements FactoryInterface
      * @var string
      */
     protected $consumerTopicName;
-
-    /**
-     * @var string
-     */
-    protected $defaultConsumerQueueName;
-
+    
     /**
      * @param AmqpSession $session
      * @param string      $routerTopicName
