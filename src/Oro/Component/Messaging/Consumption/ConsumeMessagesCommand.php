@@ -46,6 +46,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        // TODO add tests
         /** @var MessageProcessor $messageProcessor */
         $messageProcessor = $this->container->get($input->getArgument('processor-service'));
         if (false == $messageProcessor instanceof  MessageProcessor) {

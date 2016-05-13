@@ -33,10 +33,6 @@ class Extensions implements Extension
     {
         foreach ($this->extensions as $extension) {
             $extension->onPreReceived($context);
-            
-            if ($context->getStatus()) {
-                return;
-            }
         }
     }
 

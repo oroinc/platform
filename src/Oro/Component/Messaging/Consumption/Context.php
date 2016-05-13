@@ -149,7 +149,7 @@ class Context
      */
     public function setExecutionInterrupted($executionInterrupted)
     {
-        if ($this->executionInterrupted) {
+        if (false == $executionInterrupted && $this->executionInterrupted) {
             throw new IllegalContextModificationException('The execution once interrupted could not be roll backed');
         }
 
