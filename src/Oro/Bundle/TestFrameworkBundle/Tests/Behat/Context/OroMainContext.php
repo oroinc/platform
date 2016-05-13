@@ -2,33 +2,40 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Behat\Context;
 
-use Behat\Behat\Context\Context;
 use Behat\Behat\Context\SnippetAcceptingContext;
 use Behat\Behat\Hook\Scope\AfterScenarioScope;
 use Behat\Behat\Hook\Scope\BeforeScenarioScope;
-use Behat\Gherkin\Node\PyStringNode;
+use Behat\Behat\Hook\Scope\BeforeStepScope;
 use Behat\Gherkin\Node\TableNode;
 use Behat\Behat\Tester\Exception\PendingException;
 use Behat\MinkExtension\Context\MinkContext;
 use Behat\Mink\Exception\ElementNotFoundException;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory;
+use Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactoryAware;
 use Behat\Symfony2Extension\Context\KernelAwareContext;
 use Behat\Symfony2Extension\Context\KernelDictionary;
 use SensioLabs\Behat\PageObjectExtension\PageObject\Factory as PageObjectFactory;
-use SensioLabs\Behat\PageObjectExtension\Context\PageObjectAware;
 
 /**
  * Defines application features from the specific context.
  */
 class OroMainContext extends MinkContext implements
-    Context,
     SnippetAcceptingContext,
-    PageObjectAware,
+    OroElementFactoryAware,
     KernelAwareContext
 {
     use KernelDictionary;
 
-    /** @var  \SensioLabs\Behat\PageObjectExtension\PageObject\Factory */
-    protected $pageObjectFactory;
+    /**
+     * @var OroElementFactory
+     */
+    protected $elementFactory;
+
+    /** @BeforeStep */
+    public function beforeStep(BeforeStepScope $scope)
+    {
+        $this->iWaitingForAjaxResponse();
+    }
 
     /**
      * @BeforeScenario
@@ -56,11 +63,13 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * {@inheritdoc}
+     * @param OroElementFactory $elementFactory
+     *
+     * @return null
      */
-    public function setPageObjectFactory(PageObjectFactory $pageObjectFactory)
+    public function setElementFactory(OroElementFactory $elementFactory)
     {
-        $this->pageObjectFactory = $pageObjectFactory;
+        $this->elementFactory = $elementFactory;
     }
 
     /**
@@ -80,7 +89,6 @@ class OroMainContext extends MinkContext implements
         $this->fillField('_username', $login);
         $this->fillField('_password', $password);
         $this->pressButton('_submit');
-        $errorBlock = $this->getSession()->getPage()->find('css', '.alert-error');
     }
 
     /**
@@ -90,7 +98,7 @@ class OroMainContext extends MinkContext implements
     {
         try {
             parent::pressButton($button);
-            $this->iWaitingForAjaxResponce();
+            $this->iWaitingForAjaxResponse();
         } catch (ElementNotFoundException $e) {
             if ($this->getSession()->getPage()->hasLink($button)) {
                 $this->clickLink($button);
@@ -103,10 +111,10 @@ class OroMainContext extends MinkContext implements
     /**
      * Wait for AJAX to finish.
      *
-     * @Given /^(?:|I )waiting for AJAX responce$/
+     * @Given /^(?:|I )waiting for AJAX response$/
      * @param int $time Time should be in milliseconds
      */
-    public function iWaitingForAjaxResponce($time = 15000)
+    public function iWaitingForAjaxResponse($time = 15000)
     {
         $this->getSession()->wait(
             $time,
@@ -119,32 +127,10 @@ class OroMainContext extends MinkContext implements
     }
 
     /**
-     * @Given /^(?:|I )fill "(?P<element>(?:[^"]|\\")*)" with:$/
+     * @When /^(?:|I )fill "(?P<formName>(?:[^"]|\\")*)" form with:$/
      */
-    public function iFillWith($element, TableNode $table)
+    public function iFillFormWith($formName, TableNode $table)
     {
-        $this->pageObjectFactory->createElement($element)->fill($table);
-    }
-
-    /*********************************************/
-    /**** Wait for ajax finish for mink steps ****/
-    /*********************************************/
-
-    /**
-     * {@inheritdoc}
-     */
-    public function visit($page)
-    {
-        parent::visit($page);
-        $this->iWaitingForAjaxResponce();
-    }
-
-    /**
-     * {@inheritdoc}
-     */
-    public function clickLink($link)
-    {
-        parent::clickLink($link);
-        $this->iWaitingForAjaxResponce();
+        $this->elementFactory->createElement($formName)->fill($table);
     }
 }

@@ -262,11 +262,11 @@ abstract class AbstractPageEntity extends AbstractPage
     {
         $this->test->moveto($this->test->byXPath("//*[@class='container-fluid accordion']"));
         $this->filterByMultiselect('Activity Type', [$activityType]);
+
         $this->assertElementPresent(
-            "//*[@class='container-fluid accordion']".
-            "//*[@class='message-item message'][contains(., '{$activityName}')]".
-            "/parent::*".
-            "/*[@class='details'][contains(., '{$activityType}')]",
+            "//div[@class='container-fluid accordion']//div[contains(@class, 'accordion-heading')]" .
+            "[//div[@class='details'][contains(.,'{$activityType}')]]" .
+            "[//div[@class='message-item message'][contains(., '{$activityName}')]]",
             "{$activityType} '{$activityName}' not found"
         );
 

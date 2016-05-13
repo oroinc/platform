@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\IntegrationBundle\Form\Type;
 
+use Oro\Bundle\IntegrationBundle\Entity\Channel;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Validator\Constraints\NotBlank;
@@ -50,6 +51,19 @@ class ChannelType extends AbstractType
             ]
         );
         $builder->add('name', 'text', ['required' => true, 'label' => 'oro.integration.integration.name.label']);
+
+        $builder->add(
+            'enabled',
+            'choice',
+            [
+                'choices'  => [
+                    true    => 'oro.integration.integration.enabled.active.label',
+                    false   => 'oro.integration.integration.enabled.inactive.label'
+                ],
+                'required' => true,
+                'label'    => 'oro.integration.integration.enabled.label',
+            ]
+        );
 
         // add transport type selector
         $builder->add(
