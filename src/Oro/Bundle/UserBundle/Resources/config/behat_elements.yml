@@ -1,6 +1,7 @@
 Login:
   selector: '#login-form'
   class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
-  mapping:
-    Username: '_username'
-    Password: '_password'
+  options:
+    mapping:
+      Username: '_username'
+      Password: '_password'

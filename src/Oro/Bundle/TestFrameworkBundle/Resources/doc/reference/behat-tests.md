@@ -12,8 +12,7 @@ with shared tools and a shared process to collaborate on software development. [
 ***Mink*** is an open source browser controller/emulator for web applications, written in PHP. [Mink documentation](http://mink.behat.org/en/latest/)
 
 
-***Page Object Extension*** provides tools for implementing [page object pattern](http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern).
-Also see [Page Object Extension documentation](http://behat-page-object-extension.readthedocs.org/en/latest/index.html)
+***OroElementFactory*** create elements in contexts. See more about [page object pattern](http://www.seleniumhq.org/docs/06_test_design_considerations.jsp#page-object-design-pattern).
 
 ***Symfony2 Extension*** provides integration with Symfony2. [See Symfony2 Extension documentation](https://github.com/Behat/Symfony2Extension/blob/master/doc/index.rst)
 
@@ -85,7 +84,7 @@ vendor/bin/behat
 
 Mink provide ```MinkContext``` with basic feature steps.
 ```OroMainContext``` is extended from ```MinkContext``` and add many additional steps for features. 
-```OroMainContext``` it's a shared context that present in every test suite.
+```OroMainContext``` it's a shared context that added to every test suite that haven't it's own FeatureContext
 
 To look the all available feature steps:
 
@@ -107,12 +106,35 @@ If you need some specific feature steps for your bundle you should create ```Tes
 Instead of ```OroMainContext``` FeatureContext will be used for bundle test suite.
 Perhaps FeatureContext may be extended from OroMainContext for reload some feature steps.
 
-Page Object Extension provide ```PageObjectAware``` interface for injecting PageObjectFactory that know about all pages and elements in application.
-Read more about ([how using the page object factory](http://behat-page-object-extension.readthedocs.org/en/latest/guide/working_with_page_objects.html#using-the-page-object-factory))
+Every Bundle can have own number of elements. All elements must be discribed in ```Resources/config/behat_elements.yml``` in way:
 
+```yml
+Login:
+  selector: '#login-form'
+  class: 'Oro\Bundle\TestFrameworkBundle\Behat\Element\Form'
+  options:
+    mapping:
+      Username: '_username'
+      Password: '_password'
+```
 
-![Test suite](../images/test-suite.png)
+1. ```Login``` is an element name. It must be unique.
+ Element can be created in context by ```OroElementFactory``` by it's name:
+ 
+ ```php
+    $this->elementFactory->createElement('Login')
+ ```
 
+2. ```selector``` this is how selenium driver can found element on the page. By default it use css selector, but it also can use xpath:
+
+ ```yml
+    selector:
+        type: xpath
+        locator: //span[id='mySpan']/ancestor::form/
+ ```
+ 
+3. ```class``` namespace for element class. It must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```
+4. ```options``` it's an array of extra options that will be set in options property of Element class
 
 ### Configuration
 
@@ -123,7 +145,7 @@ Use it by parameter ```-c``` for use your custom config:
 bin/behat -s OroUserBundle -c ~/config/behat.yml.dist
 ```
 
-However you can edit behat.yml in root of project for your needs.
+However you can copy behat.yml.dist to behat.yml in root of project and edit for your needs.
 Every bundle that configured symfony_bundle suite type will not be autoloaded by ```OroTestFrameworkExtension```. 
 See ***Architecture*** reference above.
 
@@ -153,20 +175,25 @@ Feature: User login
 
 Scenario: Success login
   Given I am on "/user/login"
-  And I fill "Login Form" with:
+  And I fill "Login" form with:
       | Username | admin |
       | Password | admin |
   And I press "Log in"
   And I should be on "/"
 
-Scenario: Fail login
+Scenario Outline: Fail login
   Given I am on "/user/login"
-  And I fill "Login Form" with:
-      | Username | user |
-      | Password | pass |
+  And I fill "Login" form with:
+      | Username | <login>    |
+      | Password | <password> |
   And I press "Log in"
   And I should be on "/user/login"
   And I should see "Invalid user name or password."
+
+  Examples:
+  | login | password |
+  | user  | pass     |
+  | user2 | pass2    |
 ```
 
 1. ```Feature: User login``` starts the feature and gives it a title.
@@ -176,4 +203,6 @@ and describe the business value derived from the inclusion of the feature in you
 3. ```Scenario: Success login``` starts the scenario, 
 and contains a description of the scenario.
 4. The next 6 lines are the scenario steps, each of which is matched to a regular expression defined in Context. 
-5. ```Scenario: Fail login``` starts the next scenario, and so on.
+5. ```Scenario Outline: Fail login``` starts the next scenario. Scenario Outlines allow express examples through the use of a template with placeholders
+ The Scenario Outline steps provide a template which is never directly run. A Scenario Outline is run once for each row in the Examples section beneath it (except for the first header row).
+ Think of a placeholder like a variable. It is replaced with a real value from the Examples: table row, where the text between the placeholder angle brackets matches that of the table column header. 
