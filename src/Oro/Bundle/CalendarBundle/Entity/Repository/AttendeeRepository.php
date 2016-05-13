@@ -5,16 +5,18 @@ namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 use Doctrine\ORM\EntityRepository;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\OrganizationBundle\Entity\Organization;
 
 class AttendeeRepository extends EntityRepository
 {
     /**
+     * @param Organization|null $organization
      * @param string|null $query
      * @param int|null $limit
      *
      * @return array
      */
-    public function getEmailRecipients($query = null, $limit = null)
+    public function getEmailRecipients(Organization $organization = null, $query = null, $limit = null)
     {
         $subQb = $this->createQueryBuilder('sa')
             ->select('MIN(sa.id)')
@@ -33,6 +35,15 @@ class AttendeeRepository extends EntityRepository
                     $subQb->expr()->like('a.email', ':query')
                 ));
             $qb->setParameter('query', sprintf('%%%s%%', $query));
+        }
+
+        if ($organization) {
+            $subQb
+                ->join('a.calendarEvent', 'se')
+                ->join('e.calendar', 'sc')
+                ->join('c.organization', 'so')
+                ->andWhere('so.id = :organization');
+            $qb->setParameter('organization', $organization);
         }
 
         $qb

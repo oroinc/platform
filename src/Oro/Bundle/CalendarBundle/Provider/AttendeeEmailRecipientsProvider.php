@@ -33,7 +33,11 @@ class AttendeeEmailRecipientsProvider implements EmailRecipientsProviderInterfac
     public function getRecipients(EmailRecipientsProviderArgs $args)
     {
         return $this->emailRecipientsHelper->recipientsFromResult(
-            $this->getAttendeeRepository()->getEmailRecipients($args->getQuery(), $args->getLimit()),
+            $this->getAttendeeRepository()->getEmailRecipients(
+                $args->getOrganization(),
+                $args->getQuery(),
+                $args->getLimit()
+            ),
             'Oro\Bundle\CalendarBundle\Entity\Attendee'
         );
     }
