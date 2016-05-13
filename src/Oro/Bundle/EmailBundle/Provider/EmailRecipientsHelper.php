@@ -289,6 +289,26 @@ class EmailRecipientsHelper
     }
 
     /**
+     * @param array $result
+     *
+     * @return array
+     */
+    public function plainRecipientsFromResult(array $result)
+    {
+        $emails = [];
+        foreach ($result as $row) {
+            $recipient = new CategorizedRecipient(
+                $row['email'],
+                sprintf('%s <%s>', $row['name'], $row['email'])
+            );
+
+            $emails[$recipient->getIdentifier()] = $recipient;
+        }
+
+        return $emails;
+    }
+
+    /**
      * @param QueryBuilder $qb
      * @param EmailRecipientsProviderArgs $args
      *

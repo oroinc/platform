@@ -5,6 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Oro\Bundle\CalendarBundle\Entity\Repository\AttendeeRepository;
+use Oro\Bundle\EmailBundle\Model\CategorizedRecipient;
 use Oro\Bundle\EmailBundle\Model\EmailRecipientsProviderArgs;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsHelper;
 use Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface;
@@ -32,14 +33,12 @@ class AttendeeEmailRecipientsProvider implements EmailRecipientsProviderInterfac
      */
     public function getRecipients(EmailRecipientsProviderArgs $args)
     {
-        return $this->emailRecipientsHelper->recipientsFromResult(
+        return $this->emailRecipientsHelper->plainRecipientsFromResult(
             $this->getAttendeeRepository()->getEmailRecipients(
                 $args->getOrganization(),
                 $args->getQuery(),
-                $args->getExcludedEmailNamesForEntity('Oro\Bundle\CalendarBundle\Entity\Attendee'),
                 $args->getLimit()
-            ),
-            'Oro\Bundle\CalendarBundle\Entity\Attendee'
+            )
         );
     }
 

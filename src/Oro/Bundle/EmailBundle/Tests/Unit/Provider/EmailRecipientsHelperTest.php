@@ -202,4 +202,38 @@ class EmailRecipientsHelperTest extends \PHPUnit_Framework_TestCase
             ],
         ];
     }
+
+    /**
+     * @dataProvider plainRecipientsFromResultProvider
+     */
+    public function testRlainRecipientsFromResult(array $result, $entityClass, array $expectedRecipients)
+    {
+        $this->assertEquals(
+            $expectedRecipients,
+            $this->emailRecipientsHelper->plainRecipientsFromResult($result, $entityClass)
+        );
+    }
+
+    public function plainRecipientsFromResultProvider()
+    {
+        return [
+            [
+                [
+                    [
+                        'name'  => 'Recipient',
+                        'email' => 'recipient@example.com',
+                        'entityId'     => 1,
+                        'organization' => 'org',
+                    ],
+                ],
+                'Class',
+                [
+                    'recipient@example.com' => new CategorizedRecipient(
+                        'recipient@example.com',
+                        'Recipient <recipient@example.com>'
+                    )
+                ]
+            ],
+        ];
+    }
 }

@@ -51,12 +51,12 @@ class AttendeeEmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
 
         $this->attendeeRepository->expects($this->once())
             ->method('getEmailRecipients')
-            ->with(null, 'query', [], 100)
+            ->with(null, 'query', 100)
             ->will($this->returnValue([]));
 
         $this->emailRecipientsHelper->expects($this->once())
-            ->method('recipientsFromResult')
-            ->with([], 'Oro\Bundle\CalendarBundle\Entity\Attendee')
+            ->method('plainRecipientsFromResult')
+            ->with([])
             ->will($this->returnValue([]));
 
         $this->assertEquals([], $this->provider->getRecipients($args));

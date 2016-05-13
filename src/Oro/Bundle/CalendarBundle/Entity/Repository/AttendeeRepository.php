@@ -12,7 +12,6 @@ class AttendeeRepository extends EntityRepository
     /**
      * @param Organization|null $organization
      * @param string|null $query
-     * @param string[] $excludedNames
      * @param int|null $limit
      *
      * @return array
@@ -20,55 +19,33 @@ class AttendeeRepository extends EntityRepository
     public function getEmailRecipients(
         Organization $organization = null,
         $query = null,
-        $excludedNames = [],
         $limit = null
     ) {
-        $subQb = $this->createQueryBuilder('sa')
-            ->select('MIN(sa.id)')
-            ->groupBy('sa.email, sa.displayName');
+        $qb = $this->createQueryBuilder('a')
+            ->select('a.email, a.displayName AS name')
+            ->groupBy('a.email, a.displayName');
 
         if ($limit) {
-            $subQb->setMaxResults($limit);
+            $qb->setMaxResults($limit);
         }
-
-        $qb = $this->createQueryBuilder('a');
 
         if ($query) {
-            $subQb
-                ->andWhere($subQb->expr()->orX(
-                    $subQb->expr()->like('a.displayName', ':query'),
-                    $subQb->expr()->like('a.email', ':query')
-                ));
-            $qb->setParameter('query', sprintf('%%%s%%', $query));
-        }
-
-        if ($organization || $excludedNames) {
-            $subQb
-                ->join('sa.calendarEvent', 'se')
-                ->join('se.calendar', 'sc')
-                ->join('sc.organization', 'so');
+            $qb
+                ->andWhere($qb->expr()->orX(
+                    $qb->expr()->like('a.displayName', ':query'),
+                    $qb->expr()->like('a.email', ':query')
+                ))
+                ->setParameter('query', sprintf('%%%s%%', $query));
         }
 
         if ($organization) {
-            $subQb
-                ->andWhere('so.id = :organization');
+            $qb
+                ->join('a.calendarEvent', 'e')
+                ->join('e.calendar', 'c')
+                ->join('c.organization', 'o')
+                ->andWhere('o.id = :organization');
             $qb->setParameter('organization', $organization);
         }
-
-        if ($excludedNames) {
-            $subQb->andWhere($qb->expr()->notIn(
-                'TRIM(CONCAT(sa.displayName, \' <\', sa.email, \'>|\', so.name))',
-                ':excluded_names'
-            ));
-            $qb->setParameter('excluded_names', $excludedNames);
-        }
-
-        $qb
-            ->select('a.id as entityId, a.email, a.displayName AS name, o.name AS organization')
-            ->join('a.calendarEvent', 'e')
-            ->join('e.calendar', 'c')
-            ->join('c.organization', 'o')
-            ->where($qb->expr()->in('a.id', $subQb->getDQL()));
 
         return $qb->getQuery()
             ->getArrayResult();
