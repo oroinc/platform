@@ -102,8 +102,6 @@ define([
          * @inheritDoc
          */
         refresh: function() {
-            // fasten updates by detaching body tree from document
-            this.$el.empty();
             this._stopListeningToRowsEvents(this.rows);
             _.each(this.rows, function(row) {
                 // dispose in Chaplin's way, instead of Backbone's remove
