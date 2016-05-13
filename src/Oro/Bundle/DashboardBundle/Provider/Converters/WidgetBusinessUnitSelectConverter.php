@@ -7,7 +7,6 @@ use Doctrine\ORM\EntityRepository;
 use Oro\Bundle\DashboardBundle\Provider\ConfigValueConverterAbstract;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider;
-use Oro\Bundle\SecurityBundle\Acl\Domain\OneShotIsGrantedObserver;
 
 /**
  * Class WidgetBusinessUnitSelectConverter
@@ -23,12 +22,6 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
 
     /** @var BusinessUnitAclProvider */
     protected $businessUnitAclProvider;
-
-    /** @var string */
-    protected $aclEntityClass;
-
-    /** @var string */
-    protected $aclPermission;
 
     /**
      * @param EntityRepository $businessUnitRepository
@@ -51,7 +44,7 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
     public function getConvertedValue(array $widgetConfig, $value = null, array $config = [], array $options = [])
     {
         if ($value === null) {
-            return $this->getBusinessUnitList();
+            return $this->getBusinessUnitList($config);
         }
 
         return parent::getConvertedValue($widgetConfig, $value, $config, $options);
@@ -63,7 +56,7 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
     public function getFormValue(array $converterAttributes, $value)
     {
         if ($value === null) {
-            return $this->getBusinessUnitList();
+            return $this->getBusinessUnitList($converterAttributes);
         }
 
         return parent::getFormValue($converterAttributes, $value);
@@ -79,30 +72,25 @@ class WidgetBusinessUnitSelectConverter extends ConfigValueConverterAbstract
     }
 
     /**
-     * @param string $aclEntityClass
-     * @param string $aclPermission
-     */
-    public function addAclByEntityPermission($aclEntityClass, $aclPermission)
-    {
-        $this->aclEntityClass = $aclEntityClass;
-        $this->aclPermission = $aclPermission;
-    }
-
-    /**
+     * @param array $config
      * @return array
      */
-    protected function getBusinessUnitList()
+    public function getBusinessUnitList($config)
     {
-        $queryBuilder = $this->businessUnitRepository->getQueryBuilderByOrganization(
-            $this->securityFacade->getOrganizationId()
-        );
+        $aclClass = isset($config['aclClass']) ? $config['aclClass'] : null;
+        $aclPermission = isset($config['aclPermission']) ? $config['aclPermission'] : null;
+        $queryBuilder = $this->businessUnitRepository->createQueryBuilder('businessUnit');
 
-        if ($this->aclEntityClass && $this->aclPermission) {
-            $observer = new OneShotIsGrantedObserver();
+        if ($aclClass && $aclPermission) {
+
             $businessUnitIds = $this
                 ->businessUnitAclProvider
-                ->addOneShotIsGrantedObserver($observer)
-                ->getBusinessUnitIds($this->aclEntityClass, $this->aclPermission);
+                ->getBusinessUnitIds($aclClass, $aclPermission);
+
+            if (!is_array($businessUnitIds) || count($businessUnitIds) === 0) {
+                $businessUnitIds = [0];
+            }
+
             $queryBuilder->andWhere($queryBuilder->expr()->in('businessUnit.id', $businessUnitIds));
         }
 
