@@ -6,7 +6,7 @@ define(function(require) {
     var moment = require('moment');
     var __ = require('orotranslation/js/translator');
     var datetimeFormatter = require('orolocale/js/formatter/datetime');
-    var NativeDateTimePickerView = require('orofilter/js/app/views/datepicker/native-datetimepicker-view');
+    var DateTimePickerView = require('oroui/js/app/views/datepicker/datetimepicker-view');
     var VariableDateTimePickerView = require('orofilter/js/app/views/datepicker/variable-datetimepicker-view');
     var DateFilter = require('./date-filter');
     var tools = require('oroui/js/tools');
@@ -27,7 +27,7 @@ define(function(require) {
          *
          * @property
          */
-        picker: tools.isMobile() ? NativeDateTimePickerView : VariableDateTimePickerView,
+        picker: tools.isMobile() ? DateTimePickerView : VariableDateTimePickerView,
 
         /**
          * Selectors for filter data
