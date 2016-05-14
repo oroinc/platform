@@ -25,7 +25,7 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function process(ContainerBuilder $container)
     {
-        $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
+        $container->get(Symfony2Extension::KERNEL_ID)->boot();
         $this->processBundleAutoload($container);
         $this->processElementFactory($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
