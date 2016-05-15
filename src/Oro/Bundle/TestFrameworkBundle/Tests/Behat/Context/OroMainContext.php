@@ -56,7 +56,7 @@ class OroMainContext extends MinkContext implements
 
         $screenshot = sprintf(
             '%s/%s.png',
-            str_replace('/', DIRECTORY_SEPARATOR, __DIR__.'/../../../../../../../../../app/logs/'),
+            $this->getKernel()->getLogDir(),
             $scope->getScenario()->getTitle()
         );
         file_put_contents($screenshot, $this->getSession()->getScreenshot());
