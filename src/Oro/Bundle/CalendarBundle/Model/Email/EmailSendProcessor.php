@@ -33,7 +33,7 @@ class EmailSendProcessor
     /**
      * @var EmailNotification[]
      */
-    protected $emailNotifications;
+    protected $emailNotifications = [];
 
     /**
      * @param EmailNotificationProcessor $emailNotificationProcessor

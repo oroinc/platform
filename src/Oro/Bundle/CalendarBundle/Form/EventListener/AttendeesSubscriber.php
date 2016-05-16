@@ -31,8 +31,42 @@ class AttendeesSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
+            FormEvents::PRE_SUBMIT => ['fixSubmittedData', 100],
             FormEvents::POST_SUBMIT => ['postSubmit', -100],
         ];
+    }
+
+    /**
+     * @param FormEvent $event
+     */
+    public function fixSubmittedData(FormEvent $event)
+    {
+        $data = $event->getData();
+        $attendees = $event->getForm()->getData();
+        if (!$attendees || !$data) {
+            return;
+        }
+
+        $attendeeKeysByEmail = [];
+        foreach ($attendees as $key => $attendee) {
+            $attendeeKeysByEmail[$attendee->getEmail()] = $key;
+        }
+
+        $nextNewKey = count($attendeeKeysByEmail);
+        $fixedData = [];
+        foreach ($data as $attendee) {
+            if (!isset($attendee['email']) || !$attendee['email']) {
+                return;
+            }
+
+            $key = isset($attendeeKeysByEmail[$attendee['email']])
+                ? $attendeeKeysByEmail[$attendee['email']]
+                : $nextNewKey++;
+
+            $fixedData[$key] = $attendee;
+        }
+
+        $event->setData($fixedData);
     }
 
     /**

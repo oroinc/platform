@@ -274,6 +274,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *     cascade={"all"},
      *     orphanRemoval=true
      * )
+     * @ORM\OrderBy({"displayName"="ASC"})
      */
     protected $attendees;
 
