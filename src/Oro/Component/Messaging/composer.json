@@ -2,7 +2,7 @@
     "name": "oro/messaging",
     "type": "library",
     "description": "ORO Messaging Component",
-    "keywords": ["ORO", "Messeging", "Queue", "AMQP"],
+    "keywords": ["ORO", "Messaging", "Queue", "AMQP"],
     "license": "MIT",
     "require": {
         "php": ">=5.4.9",

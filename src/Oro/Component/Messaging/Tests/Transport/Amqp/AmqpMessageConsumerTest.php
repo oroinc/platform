@@ -120,7 +120,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
     {
         $expectedMessage = new AmqpMessage();
         $expectedInternalMessage = new AMQPLibMessage();
-        $expectedInternalMessage->delivery_info['consumer_tag'] = 'theConsumerTag';
+        $expectedInternalMessage->delivery_info['delivery_tag'] = 'theDeliveryTag';
         $expectedInternalMessage->delivery_info['redelivered'] = 'theRedeliveredBool';
 
         $channelStub = new AMQPChannelStub();
@@ -138,14 +138,14 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
 
         $actualMessage = $consumer->receive();
         $this->assertSame($expectedMessage, $actualMessage);
-        $this->assertSame('theConsumerTag', $actualMessage->getConsumerTag());
+        $this->assertSame('theDeliveryTag', $actualMessage->getDeliveryTag());
         $this->assertSame('theRedeliveredBool', $actualMessage->isRedelivered());
     }
 
     public function testShouldCorrectlyExtractInternalMessageBodyAndPassItMessageFactory()
     {
         $internalMessage = new AMQPLibMessage('theMessageBody');
-        $internalMessage->delivery_info['consumer_tag'] = 'aTag';
+        $internalMessage->delivery_info['delivery_tag'] = 'aTag';
         $internalMessage->delivery_info['redelivered'] = 'aRedeliveredBool';
 
         $channelStub = new AMQPChannelStub();
@@ -169,7 +169,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
     {
         $internalMessage = new AMQPLibMessage('theMessageBody');
         $internalMessage->set('application_headers', new AMQPTable(['theProp' => 'thePropVal']));
-        $internalMessage->delivery_info['consumer_tag'] = 'aTag';
+        $internalMessage->delivery_info['delivery_tag'] = 'aTag';
         $internalMessage->delivery_info['redelivered'] = 'aRedeliveredBool';
 
         $channelStub = new AMQPChannelStub();
@@ -192,7 +192,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
     public function testShouldCorrectlyExtractInternalMessageHeadersAndPassItMessageFactory()
     {
         $internalMessage = new AMQPLibMessage('theMessageBody', ['timestamp' => 123123123]);
-        $internalMessage->delivery_info['consumer_tag'] = 'aTag';
+        $internalMessage->delivery_info['delivery_tag'] = 'aTag';
         $internalMessage->delivery_info['redelivered'] = 'aRedeliveredBool';
 
         $channelStub = new AMQPChannelStub();
@@ -279,7 +279,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new AmqpMessageConsumer($sessionStub, new AmqpQueue('aName'));
 
         $message = new AmqpMessage();
-        $message->setConsumerTag($expectedDeliveryTag);
+        $message->setDeliveryTag($expectedDeliveryTag);
 
         $consumer->acknowledge($message);
     }
@@ -313,7 +313,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new AmqpMessageConsumer($sessionStub, new AmqpQueue('aName'));
 
         $message = new AmqpMessage();
-        $message->setConsumerTag($expectedDeliveryTag);
+        $message->setDeliveryTag($expectedDeliveryTag);
 
         $consumer->reject($message);
     }
@@ -334,7 +334,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $consumer = new AmqpMessageConsumer($sessionStub, new AmqpQueue('aName'));
 
         $message = new AmqpMessage();
-        $message->setConsumerTag($expectedDeliveryTag);
+        $message->setDeliveryTag($expectedDeliveryTag);
 
         $consumer->reject($message, true);
     }
@@ -393,7 +393,7 @@ class AMQPChannelStub extends AMQPChannel
 
     public function basic_consume(
         $queue = '',
-        $consumer_tag = '',
+        $gconsumer_tag = '',
         $no_local = false,
         $no_ack = false,
         $exclusive = false,

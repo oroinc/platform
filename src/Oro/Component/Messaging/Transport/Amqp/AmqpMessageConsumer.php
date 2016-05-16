@@ -86,7 +86,7 @@ class AmqpMessageConsumer implements MessageConsumer
             ));
         }
 
-        $this->session->getChannel()->basic_ack($message->getConsumerTag());
+        $this->session->getChannel()->basic_ack($message->getDeliveryTag());
     }
 
     /**
@@ -104,7 +104,7 @@ class AmqpMessageConsumer implements MessageConsumer
             ));
         }
 
-        $this->session->getChannel()->basic_reject($message->getConsumerTag(), $requeue);
+        $this->session->getChannel()->basic_reject($message->getDeliveryTag(), $requeue);
     }
 
     protected function initialize()
@@ -123,7 +123,7 @@ class AmqpMessageConsumer implements MessageConsumer
                 $properties,
                 $internalMessage->get_properties()
             );
-            $message->setConsumerTag($internalMessage->delivery_info['consumer_tag']);
+            $message->setDeliveryTag($internalMessage->delivery_info['delivery_tag']);
             $message->setRedelivered($internalMessage->delivery_info['redelivered']);
 
             $this->receivedMessage = $message;

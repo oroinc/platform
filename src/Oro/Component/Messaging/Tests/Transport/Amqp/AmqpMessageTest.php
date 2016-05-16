@@ -106,19 +106,19 @@ class AmqpMessageTest extends \PHPUnit_Framework_TestCase
         $this->assertSame('barDefault', $message->getHeader('bar', 'barDefault'));
     }
 
-    public function testShouldSetNullConsumerKeyInConstructor()
+    public function testShouldSetNullDeliveryKeyInConstructor()
     {
         $message = new AmqpMessage();
 
-        $this->assertSame(null, $message->getConsumerTag());
+        $this->assertSame(null, $message->getDeliveryTag());
     }
 
     public function testShouldAllowGetPreviouslySetRoutingKey()
     {
         $message = new AmqpMessage();
-        $message->setConsumerTag('theConsumerKey');
+        $message->setDeliveryTag('theDeliveryKey');
 
-        $this->assertEquals('theConsumerKey', $message->getConsumerTag());
+        $this->assertEquals('theDeliveryKey', $message->getDeliveryTag());
     }
 
     public function testShouldSetRedeliveredFalseInConstructor()

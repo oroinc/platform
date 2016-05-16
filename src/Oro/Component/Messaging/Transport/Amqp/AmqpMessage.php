@@ -28,7 +28,7 @@ class AmqpMessage implements Message
     /**
      * @var string
      */
-    private $consumerTag;
+    private $deliveryTag;
 
     public function __construct()
     {
@@ -121,16 +121,16 @@ class AmqpMessage implements Message
     /**
      * @return string
      */
-    public function getConsumerTag()
+    public function getDeliveryTag()
     {
-        return $this->consumerTag;
+        return $this->deliveryTag;
     }
 
     /**
-     * @param string $consumerTag
+     * @param string $deliveryTag
      */
-    public function setConsumerTag($consumerTag)
+    public function setDeliveryTag($deliveryTag)
     {
-        $this->consumerTag = $consumerTag;
+        $this->deliveryTag = $deliveryTag;
     }
 }
