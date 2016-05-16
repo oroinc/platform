@@ -230,7 +230,7 @@ define(function(require) {
          */
         getAvailableHeight: function($mainEl) {
             var $parents = $mainEl.parents();
-            var documentHeight = $(document).height();
+            var documentHeight = scrollHelper.documentHeight();
             var heightDiff = documentHeight - $mainEl[0].getBoundingClientRect().top;
             $parents.each(function() {
                 heightDiff += this.scrollTop;
