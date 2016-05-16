@@ -135,3 +135,18 @@ services:
             - '@oro_workflow.manager'
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
+
+    oro_workflow.process.cron_scheduler:
+        class: Oro\Bundle\WorkflowBundle\Model\ProcessCronScheduler
+        arguments:
+            - '@oro_cron.schedule_manager'
+            - '@doctrine'
+            - '%oro_cron.entity.schedule.class%'
+
+    oro_workflow.process.import:
+        class: Oro\Bundle\WorkflowBundle\Model\ProcessImport
+        public: true
+        arguments:
+            - '@oro_entity.doctrine_helper'
+            - '@oro_workflow.configuration.builder.process_configuration'
+            - '@oro_workflow.process.cron_scheduler'
