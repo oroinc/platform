@@ -35,7 +35,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected $transitionDefinitions = array(
+    protected static $transitionDefinitions = array(
         'empty_definition' => array(),
         'with_pre_condition' => array(
             'pre_conditions' => array('@true' => null)
@@ -257,7 +257,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $transitions = $this->assembler->assemble(
             array('test' => $configuration),
-            $this->transitionDefinitions,
+            self::$transitionDefinitions,
             $steps,
             $attributes
         );
@@ -349,7 +349,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     ),
                     'frontend_options' => array('class' => 'foo', 'icon' => 'bar'),
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['empty_definition'],
+                'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
             ),
             'with_condition' => array(
                 'configuration' => array(
@@ -357,7 +357,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label',
                     'step_to' => 'step',
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['with_condition'],
+                'transitionDefinition' => self::$transitionDefinitions['with_condition'],
             ),
             'with_post_actions' => array(
                 'configuration' => array(
@@ -365,7 +365,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label',
                     'step_to' => 'step',
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['with_post_actions'],
+                'transitionDefinition' => self::$transitionDefinitions['with_post_actions'],
             ),
             'full_definition' => array(
                 'configuration' => array(
@@ -375,7 +375,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label',
                     'step_to' => 'step',
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['full_definition'],
+                'transitionDefinition' => self::$transitionDefinitions['full_definition'],
             ),
             'start_transition' => array(
                 'configuration' => array(
@@ -386,7 +386,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'step_to' => 'step',
                     'is_start' => true,
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['empty_definition'],
+                'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
             ),
         );
     }

@@ -515,17 +515,26 @@ class Transition
         return $this->dialogTemplate;
     }
 
+    /**
+     * @param string $cron
+     * @return $this
+     */
     public function setScheduleCron($cron)
     {
-        $this->scheduleCron = $cron;
+        $this->scheduleCron = (string)$cron;
+
+        return $this;
     }
 
     /**
      * @param string $DQLFilter
+     * @return $this
      */
     public function setScheduleFilter($DQLFilter)
     {
-        $this->scheduleFilter = $DQLFilter;
+        $this->scheduleFilter = (string) $DQLFilter;
+
+        return $this;
     }
 
     /**

@@ -68,6 +68,6 @@ class WorkflowHandler extends AbstractHandler
             unset($workflow['entity']);
         }
 
-        return $this->filterKeys($workflow, $this->workflowKeys);
+        return $this->filterKeys($workflow, self::$workflowKeys);
     }
 }
