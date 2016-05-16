@@ -83,14 +83,14 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         if ($attendees && $this->parentEvent) {
             $existingAttendees = $this->parentEvent->getAttendees();
             foreach ($attendees as $key => $attendee) {
-                if (!$attendee->getUser()) {
-                    continue;
-                }
-
-                $userId = $attendee->getUser()->getId();
                 $existingAttendee = ArrayUtil::find(
-                    function (Attendee $attendee) use ($userId) {
-                        return $attendee->getUser() && $attendee->getUser()->getId() === $userId;
+                    function (Attendee $existingAttendee) use ($attendee) {
+                        if ($attendee->getUser()) {
+                            return $existingAttendee->getUser() &&
+                                $existingAttendee->getUser()->getId() === $attendee->getUser()->getId();
+                        }
+
+                        return !$existingAttendee->getUser() && $existingAttendee->getEmail() === $attendee->getEmail();
                     },
                     $existingAttendees->toArray()
                 );
