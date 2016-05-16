@@ -3,6 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\ServiceContainer;
 
 use Behat\Behat\Context\Context;
+use Behat\Behat\Context\ServiceContainer\ContextExtension;
+use Behat\MinkExtension\ServiceContainer\MinkExtension;
 use Behat\Symfony2Extension\ServiceContainer\Symfony2Extension;
 use Behat\Symfony2Extension\Suite\SymfonyBundleSuite;
 use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
@@ -13,9 +15,12 @@ use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
+use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
+    const ELEMENT_FACTORY_ID = 'oro_element_factory';
+
     /**
      * {@inheritdoc}
      */
@@ -23,7 +28,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
-        $this->processPageObjectsAutoload($container);
+        $this->processElementFactory($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -53,9 +58,6 @@ class OroTestFrameworkExtension implements TestworkExtension
                     ->prototype('scalar')->end()
                     ->info('Contexts that added to all autoload bundles suites')
                 ->end()
-                ->scalarNode('elements_namespace_suffix')
-                    ->defaultValue('\Tests\Behat\Page\Element')
-                ->end()
             ->end();
     }
 
@@ -65,8 +67,8 @@ class OroTestFrameworkExtension implements TestworkExtension
     public function load(ContainerBuilder $container, array $config)
     {
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
-        $container->setParameter('oro_test.elements_namespace_suffix', $config['elements_namespace_suffix']);
         $this->loadDbIsolationSubscriber($container);
+        $this->loadElementFactoryInitializer($container);
     }
 
     /**
@@ -141,24 +143,47 @@ class OroTestFrameworkExtension implements TestworkExtension
     /**
      * @param ContainerBuilder $container
      */
-    private function processPageObjectsAutoload(ContainerBuilder $container)
+    private function processElementFactory(ContainerBuilder $container)
     {
+        $elementConfiguration = [];
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
-        $elements = $container->getParameter('sensio_labs.page_object_extension.namespaces.element');
-        $elementsNamespaceSuffix = $container->getParameter('oro_test.elements_namespace_suffix');
 
         /** @var BundleInterface $bundle */
         foreach ($kernel->getBundles() as $bundle) {
-            if ($this->hasDirectory($bundle, $elementsNamespaceSuffix)) {
-                $elementNamespace = $bundle->getNamespace().$elementsNamespaceSuffix;
+            $mappingPath = str_replace(
+                '/',
+                DIRECTORY_SEPARATOR,
+                $bundle->getPath().'/Resources/config/behat_elements.yml'
+            );
 
-                if (!in_array($elementNamespace, $elements)) {
-                    $elements[] = $elementNamespace;
-                }
+            if (!is_file($mappingPath)) {
+                continue;
             }
+
+            $elementConfiguration = array_merge($elementConfiguration, Yaml::parse($mappingPath));
         }
 
-        $container->setParameter('sensio_labs.page_object_extension.namespaces.element', $elements);
+        $elementFactory = new Definition(
+            'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory',
+            [
+                new Reference(MinkExtension::MINK_ID),
+                $elementConfiguration,
+            ]
+        );
+        $container->setDefinition(self::ELEMENT_FACTORY_ID, $elementFactory);
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     */
+    private function loadElementFactoryInitializer(ContainerBuilder $container)
+    {
+        $formFillerAwareInitializerDefinition = new Definition(
+            'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ElementFactoryInitializer',
+            [new Reference(self::ELEMENT_FACTORY_ID)]
+        );
+        $formFillerAwareInitializerDefinition->addTag(ContextExtension::INITIALIZER_TAG, array('priority' => 0));
+        $container->setDefinition('oro_behat_form_filler_initializer', $formFillerAwareInitializerDefinition);
     }
 
     /**
