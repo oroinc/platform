@@ -94,3 +94,6 @@ UPGRADE FROM 1.9 to 1.10
 ####TranslationBundle:
 - Added translation strategies to dynamically handle translation fallbacks
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
+
+####PlatformBundle
+- The method `prepend()` of `Oro\Bundle\PlatformBundle\DependencyInjection\OroPlatformExtension` class was changed. The main aim is to change ordering of configuration load from `Resources\config\oro\app.yml` files. At now the bundles that are loaded later can override configuration of bundles loaded before.
