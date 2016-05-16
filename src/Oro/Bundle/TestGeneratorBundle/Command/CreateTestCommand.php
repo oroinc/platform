@@ -9,7 +9,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 
 class CreateTestCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:test:create';
+    const NAME = 'oro:generate:test';
 
     /**
      * {@inheritdoc}
@@ -19,8 +19,16 @@ class CreateTestCommand extends ContainerAwareCommand
         $this
             ->setName(self::NAME)
             ->setDescription('Create Test')
-            ->addArgument('class', InputArgument::REQUIRED)
-            ->addArgument('type', InputArgument::REQUIRED);
+            ->addArgument(
+                'class',
+                InputArgument::REQUIRED,
+                'Full qualified class name or path to php file'
+            )
+            ->addArgument(
+                'type',
+                InputArgument::REQUIRED,
+                'Test type. Supported types are: unit, entity, functional'
+            );
     }
 
     /**
@@ -28,23 +36,20 @@ class CreateTestCommand extends ContainerAwareCommand
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $container = $this->getContainer();
         $type = $input->getArgument('type');
-        if ($type === 'unit') {
-            $generator = $container->get('oro_test_generator.generator.test.unit');
-        } elseif ($type === 'entity') {
-            $generator = $container->get('oro_test_generator.generator.test.entity');
-        } elseif ($type == 'functional') {
-            $generator = $container->get('oro_test_generator.generator.test.functional');
+        if (!in_array($type, ['unit', 'entity', 'functional'], true)) {
+            throw new \InvalidArgumentException(
+                sprintf('Type "%s" is not known. Supported types are: unit, entity, functional', $type)
+            );
         }
-        if (isset($generator)) {
-            $class = $input->getArgument('class');
-            if (strpos($class, '\\') === false) {
-                $class = str_replace('.php', '', $class);
-                $class = str_replace('/', '\\', substr($class, strripos($class, '/src/') + 5));
-            }
-            $generator->generate($class);
-            $output->writeln('<info>Test was generated successful</info>');
+
+        $generator = $this->getContainer()->get('oro_test_generator.generator.test.' . $type);
+        $class = $input->getArgument('class');
+        if (strpos($class, '\\') === false) {
+            $class = str_replace('.php', '', $class);
+            $class = str_replace('/', '\\', substr($class, strripos($class, '/src/') + 5));
         }
+        $generator->generate($class);
+        $output->writeln('<info>Test was generated successful</info>');
     }
 }

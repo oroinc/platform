@@ -35,14 +35,15 @@ class {{ className }} extends \PHPUnit_Framework_TestCase
 {% endif %}
 {% endif %}
 {% endfor %}
-        $this->{{ testedClassNameVariable }} = new {{testedClassName}}({% for key, dependencyData in dependenciesData %}$this->{{ dependencyData.variable }}{% if dependenciesData|length != key+1 %}, {% endif %}{% endfor %});
+        $this->{{ testedClassNameVariable }} = new {{testedClassName}}({% for key, dependencyData in dependenciesData %}$this->{{ dependencyData.variable }}{% if not loop.last %}, {% endif %}{% endfor %});
     }
 {% for methodData in methodsData %}
 
     public function {{ methodData.testName }}()
     {
 {% for argument in methodData.arguments %}
-        /** @var {{ argument.class }}{% if argument.class|length !=0 %}|\PHPUnit_Framework_MockObject_MockObject{% endif %} ${{ argument.name }} **/
+{% if argument.class %}        /** @var {{ argument.class }}{% if argument.class|length !=0 %}|\PHPUnit_Framework_MockObject_MockObject{% endif %} ${{ argument.name }} **/
+{% endif %}
 {% if argument.has_constructor is defined %}
 {% if argument.has_constructor %}
         ${{ argument.name }} = $this->getMockBuilder('{{ argument.fullClass }}')
@@ -57,7 +58,7 @@ class {{ className }} extends \PHPUnit_Framework_TestCase
         ${{ argument.name }} = '';
 {% endif %}
 {% endfor %}
-        //TODO: Add expectations
+        //TODO: add test assertions
         $this->{{ testedClassNameVariable }}->{{methodData.name}}({% for key, argument in methodData.arguments %}${{ argument.name }}{% if methodData.arguments|length != key+1 %}, {% endif %}{% endfor %});
     }
 {% endfor %}

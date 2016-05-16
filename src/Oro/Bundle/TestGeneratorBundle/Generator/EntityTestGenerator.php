@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\TestGeneratorBundle\Generator;
 
-use Symfony\Component\HttpKernel\KernelInterface;
-
 class EntityTestGenerator extends AbstractTestGenerator
 {
-    /** @var  string */
+    /**
+     * @var string
+     */
     protected $className;
 
     /**
@@ -109,6 +109,7 @@ class EntityTestGenerator extends AbstractTestGenerator
         $doc = $property->getDocComment();
         preg_match_all('#@(.*?)\n#s', $doc, $annotations);
         $annotations = $annotations[1];
+        $resultAnnotation = null;
         foreach ($annotations as $annotation) {
             if (strpos($annotation, 'var ') !== false) {
                 $annotation = str_replace('var ', '', $annotation);
@@ -119,13 +120,13 @@ class EntityTestGenerator extends AbstractTestGenerator
                 break;
             }
         }
-        if (!isset($resultAnnotation)) {
+        if (!$resultAnnotation) {
             return false;
         }
-        if (!strpos($annotation, '|')) {
-            return $annotation;
+        if (strpos($resultAnnotation, '|') === false) {
+            return $resultAnnotation;
         } else {
-            $parts = explode('|', $annotation);
+            $parts = explode('|', $resultAnnotation);
             foreach ($parts as $part) {
                 if (strpos($part, '[]') !== false) {
                     return $part;
@@ -147,7 +148,7 @@ class EntityTestGenerator extends AbstractTestGenerator
         $i = 4;
         while (strpos($lines[$i], '/*') === false && strpos($lines[$i], 'class ') === false) {
             if ($lines[$i] !== "\n" && strpos($lines[$i], ' as ') === false) {
-                $result[] = str_replace('use ', '', str_replace(";\n", '', $lines[$i]));
+                $result[] = str_replace(['use ', ';' . PHP_EOL], '', $lines[$i]);
             }
             $i++;
         }
@@ -189,7 +190,7 @@ class EntityTestGenerator extends AbstractTestGenerator
             $temp['value'] = 42;
 
             return $temp;
-        } elseif ($type == 'float') {
+        } elseif ($type === 'float') {
             $temp['value'] = 3.1415926;
 
             return $temp;

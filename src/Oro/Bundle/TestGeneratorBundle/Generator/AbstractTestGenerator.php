@@ -2,19 +2,23 @@
 
 namespace Oro\Bundle\TestGeneratorBundle\Generator;
 
-use Doctrine\Common\Annotations\AnnotationReader;
-
 use Symfony\Component\HttpKernel\KernelInterface;
 
 abstract class AbstractTestGenerator
 {
-    /** @var  \Twig_Environment */
+    /**
+     * @var \Twig_Environment
+     */
     protected $twig;
 
-    /** @var  KernelInterface */
+    /**
+     * @var  KernelInterface
+     */
     protected $kernel;
 
-    /** @var  array */
+    /**
+     * @var array
+     */
     protected $usedClasses;
 
     /**
@@ -49,7 +53,7 @@ abstract class AbstractTestGenerator
                 $params = $method->getParameters();
                 $arguments = [];
                 foreach ($params as $param) {
-                    $arguments = $this->fillArguments($class, $param, $arguments);
+                    $arguments = $this->fillArguments($param, $arguments);
                 }
                 $data[] = [
                     'name' => $methodName,
@@ -71,7 +75,7 @@ abstract class AbstractTestGenerator
     {
         $methods = [];
         foreach ($class->getMethods(\ReflectionMethod::IS_PUBLIC) as $method) {
-            if ($method->getDeclaringClass()->getName() == $class->getName()) {
+            if ($method->getDeclaringClass()->getName() === $class->getName()) {
                 $methods[] = $method;
             }
         }
@@ -160,37 +164,38 @@ abstract class AbstractTestGenerator
     }
 
     /**
-     * @param string $nameSpace
+     * @param string $namespace
      * @return string
      */
-    protected function getTestPath($nameSpace)
+    protected function getTestPath($namespace)
     {
         $root = $this->kernel->getRootDir();
-        $parts = explode('/', $root);
-        //for non monolithic
-        if (!strpos($root, '/application/')) {
-            array_pop($parts);
-            $srcPath = implode('/', $parts) . '/src/';
-        } else {
-            array_pop($parts);
+        $parts = explode(DIRECTORY_SEPARATOR, $root);
+        array_pop($parts);
+
+        //for monolithic
+        if (strpos($root, DIRECTORY_SEPARATOR . 'application' . DIRECTORY_SEPARATOR) !== false) {
             $application = array_pop($parts);
             array_pop($parts);
-            $srcPath = implode('/', $parts) . '/package/' . $application . '/src/';
+            $parts[] = 'package';
+            $parts[] = $application;
         }
+        $parts[] = 'src';
 
-        return $srcPath . str_replace('\\', '/', $nameSpace) . '.php';
+        return implode(DIRECTORY_SEPARATOR, $parts)
+            . DIRECTORY_SEPARATOR . str_replace('\\', DIRECTORY_SEPARATOR, $namespace) . '.php';
     }
 
     /**
-     * @param $path
-     * @param $content
+     * @param string $path
+     * @param string $content
      */
     protected function createFile($path, $content)
     {
         if (!file_exists(dirname($path))) {
             mkdir(dirname($path), 0777, true);
         }
-        $fp = fopen($path, "w");
+        $fp = fopen($path, 'w');
         fwrite($fp, $content);
         fclose($fp);
     }
@@ -217,12 +222,11 @@ abstract class AbstractTestGenerator
     }
 
     /**
-     * @param \ReflectionClass $class
      * @param \ReflectionParameter $param
      * @param array $arguments
      * @return array
      */
-    protected function fillArguments(\ReflectionClass $class, \ReflectionParameter $param, $arguments)
+    protected function fillArguments(\ReflectionParameter $param, $arguments)
     {
         $temp = [];
         $class = $param->getClass();
@@ -259,10 +263,10 @@ abstract class AbstractTestGenerator
     protected function addClassToUses($class)
     {
         if ($class instanceof \ReflectionClass) {
-            if (!in_array($class->getName(), $this->usedClasses)) {
+            if (!in_array($class->getName(), $this->usedClasses, true)) {
                 $this->usedClasses[] = $class->getName();
             }
-        } elseif ($class && !in_array($class, $this->usedClasses) && strpos($class, '\\') !== 0) {
+        } elseif ($class && !in_array($class, $this->usedClasses, true) && strpos($class, '\\') !== 0) {
             $this->usedClasses[] = $class;
         }
     }

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\TestGeneratorBundle\Generator;
 
-use Symfony\Component\HttpKernel\KernelInterface;
-
 class UnitTestGenerator extends AbstractTestGenerator
 {
     /**
