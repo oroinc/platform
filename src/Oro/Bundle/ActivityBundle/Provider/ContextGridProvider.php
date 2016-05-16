@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
 
 class ContextGridProvider
 {
@@ -34,11 +35,12 @@ class ContextGridProvider
     }
 
     /**
-     * @param object $entity
+     * @param object            $entity
+     * @param SecurityFacade    $securityFacade
      *
      * @return array
      */
-    public function getSupportedTargets($entity)
+    public function getSupportedTargets($entity, $securityFacade)
     {
         $targetEntities = $this->entityProvider->getEntities();
         $entityTargets  = [];
@@ -49,6 +51,11 @@ class ContextGridProvider
 
         $count = count($targetEntities);
         for ($i = 0; $i < $count; $i++) {
+
+            if (!$securityFacade->isGranted('VIEW', 'entity:'.$targetEntities[$i]['name'])) {
+                continue;
+            }
+
             $targetEntity = $targetEntities[$i];
             $className    = $targetEntity['name'];
             $gridName     = $this->getContextGridByEntity($className);
