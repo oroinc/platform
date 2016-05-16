@@ -56,7 +56,7 @@ class Transition
     /**
      * @var array
      */
-    protected $frontendOptions = [];
+    protected $frontendOptions = array();
 
     /**
      * @var string
@@ -71,7 +71,7 @@ class Transition
     /**
      * @var array
      */
-    protected $formOptions = [];
+    protected $formOptions = array();
 
     /**
      * @var string
@@ -112,7 +112,6 @@ class Transition
     public function setLabel($label)
     {
         $this->label = $label;
-
         return $this;
     }
 
@@ -135,7 +134,6 @@ class Transition
     public function setCondition(ExpressionInterface $condition = null)
     {
         $this->condition = $condition;
-
         return $this;
     }
 
@@ -158,7 +156,6 @@ class Transition
     public function setPreCondition($condition)
     {
         $this->preCondition = $condition;
-
         return $this;
     }
 
@@ -181,7 +178,6 @@ class Transition
     public function setName($name)
     {
         $this->name = $name;
-
         return $this;
     }
 
@@ -204,7 +200,6 @@ class Transition
     public function setPostAction(ActionInterface $postAction = null)
     {
         $this->postAction = $postAction;
-
         return $this;
     }
 
@@ -227,7 +222,6 @@ class Transition
     public function setStepTo(Step $stepTo)
     {
         $this->stepTo = $stepTo;
-
         return $this;
     }
 
@@ -283,7 +277,7 @@ class Transition
     public function isAllowed(WorkflowItem $workflowItem, Collection $errors = null)
     {
         return $this->isPreConditionAllowed($workflowItem, $errors)
-        && $this->isConditionAllowed($workflowItem, $errors);
+            && $this->isConditionAllowed($workflowItem, $errors);
     }
 
     /**
@@ -333,7 +327,6 @@ class Transition
     public function setStart($start)
     {
         $this->start = $start;
-
         return $this;
     }
 
@@ -354,7 +347,6 @@ class Transition
     public function setFrontendOptions(array $frontendOptions)
     {
         $this->frontendOptions = $frontendOptions;
-
         return $this;
     }
 
@@ -383,7 +375,6 @@ class Transition
     public function setFormType($formType)
     {
         $this->formType = $formType;
-
         return $this;
     }
 
@@ -402,7 +393,6 @@ class Transition
     public function setFormOptions(array $formOptions)
     {
         $this->formOptions = $formOptions;
-
         return $this;
     }
 
@@ -429,7 +419,6 @@ class Transition
     public function setHidden($hidden)
     {
         $this->hidden = $hidden;
-
         return $this;
     }
 
@@ -448,7 +437,6 @@ class Transition
     public function setMessage($message)
     {
         $this->message = $message;
-
         return $this;
     }
 
@@ -467,7 +455,6 @@ class Transition
     public function setUnavailableHidden($unavailableHidden)
     {
         $this->unavailableHidden = $unavailableHidden;
-
         return $this;
     }
 
