@@ -89,6 +89,7 @@ class TransitionAssembler extends BaseAbstractAssembler
                 $options = [];
             }
             $definitions[$name] = [
+                'schedule' => $this->getOption($options, 'schedule', []),
                 'pre_conditions' => $this->getOption($options, 'pre_conditions', []),
                 'conditions' => $this->getOption($options, 'conditions', []),
                 'post_actions' => $this->getOption($options, 'post_actions', [])
