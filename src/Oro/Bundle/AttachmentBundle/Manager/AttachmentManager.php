@@ -470,6 +470,14 @@ class AttachmentManager
     }
 
     /**
+     * @return array
+     */
+    public function getFileIcons()
+    {
+        return $this->fileIcons;
+    }
+
+    /**
      * Copy stream to storage
      *
      * @param Stream $srcStream

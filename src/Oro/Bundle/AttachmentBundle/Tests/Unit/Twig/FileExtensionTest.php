@@ -60,6 +60,7 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             'oro_configured_image_url',
             'oro_attachment_icon',
             'oro_type_is_image',
+            'oro_file_icons_config',
             'oro_file_view',
             'oro_image_view'
         ];
@@ -206,6 +207,14 @@ class FileExtensionTest extends \PHPUnit_Framework_TestCase
             ->with('image/jpeg');
 
         $this->extension->getTypeIsImage('image/jpeg');
+    }
+
+    public function testGetFileIconsConfig()
+    {
+        $this->manager->expects($this->once())
+            ->method('getFileIcons');
+
+        $this->extension->getFileIconsConfig();
     }
 
     public function testGetConfiguredImageUrl()

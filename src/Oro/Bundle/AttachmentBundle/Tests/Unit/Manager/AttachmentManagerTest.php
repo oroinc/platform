@@ -380,4 +380,15 @@ class AttachmentManagerTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($this->attachmentManager->isImageType('image/png'));
         $this->assertFalse($this->attachmentManager->isImageType('application/pdf'));
     }
+
+    public function testGetFileIcons()
+    {
+        $this->assertEquals(
+            $this->attachmentManager->getFileIcons(),
+            [
+                'default' => 'icon_default',
+                'txt' => 'icon_txt'
+            ]
+        );
+    }
 }

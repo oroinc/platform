@@ -16,6 +16,7 @@ define(function(require) {
             fileSize: '',
             modified: '',
             preview: '',
+            icon: '',
             checked: false, // whether file is checked for attaching to an email
             visible: true
         },

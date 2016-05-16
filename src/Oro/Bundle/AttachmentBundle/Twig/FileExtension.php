@@ -54,6 +54,7 @@ class FileExtension extends \Twig_Extension
             new \Twig_SimpleFunction('oro_configured_image_url', [$this, 'getConfiguredImageUrl']),
             new \Twig_SimpleFunction('oro_attachment_icon', [$this, 'getAttachmentIcon']),
             new \Twig_SimpleFunction('oro_type_is_image', [$this, 'getTypeIsImage']),
+            new \Twig_SimpleFunction('oro_file_icons_config', [$this, 'getFileIconsConfig']),
             new \Twig_SimpleFunction(
                 'oro_file_view',
                 [$this, 'getFileView'],
@@ -262,12 +263,24 @@ class FileExtension extends \Twig_Extension
     }
 
     /**
+     * Checks if file type is an image
+     *
      * @param  string $type
      * @return bool
      */
     public function getTypeIsImage($type)
     {
         return $this->manager->isImageType($type);
+    }
+
+    /**
+     * Get array of file icons
+     *
+     * @return array
+     */
+    public function getFileIconsConfig()
+    {
+        return $this->manager->getFileIcons();
     }
 
     /**

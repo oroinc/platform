@@ -76,7 +76,7 @@
     <script type="text/template" id="email-attachment-item">
         <div class="attachment-item" style="border: none">
             <span data-id="<%= id %>" class="filename">
-                <i class="icon icon-file-alt"></i>
+                <i class="fa"></i>
                 <span class="filename-label"><%= fileName %></span>
                 <i class="icon-remove"></i>
             </span>
@@ -159,7 +159,8 @@
         containerId: id,
         inputName: full_name,
         entityAttachments: entityAttachmentsArray,
-        attachmentsAvailable: attachmentsAvailableArray
+        attachmentsAvailable: attachmentsAvailableArray,
+        fileIcons: oro_file_icons_config()
     }) %}
 
     <div data-page-component-module="oroemail/js/app/components/email-attachment-component"
