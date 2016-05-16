@@ -7,3 +7,6 @@
     border-color: #bce8f1;
     padding: 8px 20px 8px 14px;
 }
+.import-widget-content .controls > div {
+    margin-right: 16px;
+}

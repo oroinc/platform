@@ -427,6 +427,14 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             .replace(new RegExp(collectionInfo.prototypeName, 'g'), collectionInfo.nextIndex);
     };
 
+    var validateContainer = function($container) {
+        var $validationField = $container.find('[data-name="collection-validation"]:first');
+        var $form = $validationField.closest('form');
+        if ($form.data('validator')) {
+            $form.validate().element($validationField.get(0));
+        }
+    };
+
     $(document).on('click', '.add-list-item', function(e) {
         e.preventDefault();
         if ($(this).attr('disabled')) {
@@ -446,6 +454,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         $listContainer.find('input.position-input').each(function(i, el) {
             $(el).val(i);
         });
+        validateContainer($listContainer);
     });
 
     $(document).on('click', '.addAfterRow', function(e) {

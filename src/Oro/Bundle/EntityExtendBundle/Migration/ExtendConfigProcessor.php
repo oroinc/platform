@@ -50,8 +50,8 @@ class ExtendConfigProcessor
     public function processConfigs(array $configs, LoggerInterface $logger = null, $dryRun = false)
     {
         $this->logger = $logger ? : new NullLogger();
-        try {
-            if (!empty($configs)) {
+        if ($configs) {
+            try {
                 $this->appendConfigs = $this->getAndRemoveElement($configs, self::APPEND_CONFIGS, []);
 
                 $renameConfigs = $this->getAndRemoveElement($configs, self::RENAME_CONFIGS, []);
@@ -59,7 +59,7 @@ class ExtendConfigProcessor
                 $this->filterConfigs($configs);
 
                 $hasChanges = false;
-                if (!empty($configs)) {
+                if ($configs) {
                     foreach ($configs as $className => $entityConfigs) {
                         $this->processEntityConfigs($className, $entityConfigs);
                     }
@@ -77,10 +77,10 @@ class ExtendConfigProcessor
                         $this->configManager->clearCache();
                     }
                 }
+            } catch (\Exception $ex) {
+                $this->logger = null;
+                throw $ex;
             }
-        } catch (\Exception $ex) {
-            $this->logger = null;
-            throw $ex;
         }
     }
 

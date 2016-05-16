@@ -193,7 +193,7 @@ datagrid:
                     options:
                         field_options:
                             multiple: true
-                            choices: "@oro_email.datagrid.origin_folder.provider->getListTypeChoices"
+                            choices: "@oro_email.datagrid.origin_folder.provider->getListTypeChoices()"
                 is_new:
                     label: oro.email.status.label
                     type: boolean

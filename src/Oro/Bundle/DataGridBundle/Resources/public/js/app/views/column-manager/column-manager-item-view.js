@@ -3,6 +3,7 @@ define(function(require) {
 
     var ColumnManagerItemView;
     var $ = require('jquery');
+    var _ = require('underscore');
     var BaseView = require('oroui/js/app/views/base/view');
 
     ColumnManagerItemView = BaseView.extend({
@@ -39,6 +40,7 @@ define(function(require) {
             var searchString = this.filterModel.get('search');
             var data = ColumnManagerItemView.__super__.getTemplateData.call(this);
             data.cid = this.model.cid;
+            data.label = _.escape(data.label);
             if (searchString.length > 0) {
                 data.label = this.highlightLabel(data.label, searchString);
             }

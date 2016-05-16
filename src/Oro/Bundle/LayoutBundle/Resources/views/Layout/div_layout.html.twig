@@ -143,6 +143,7 @@
 {% endblock %}
 
 {% block form_start_widget %}
+    {% set attr = form.vars.attr|merge(attr) %}
     {% set action = action_path is defined ? action_path : (action_route_name is defined ? path(action_route_name, action_route_parameters) : null) -%}
     {% if method is defined and method not in ['GET', 'POST'] -%}
         {% set form_method = 'POST' %}

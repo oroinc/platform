@@ -21,6 +21,9 @@ parameters:
     oro_translation.packages_provider.class:                    Oro\Bundle\TranslationBundle\Provider\PackagesProvider
     oro_translation.event_listener.language_change.class:       Oro\Bundle\TranslationBundle\EventListener\LanguageChangeListener
 
+    oro_translation.strategy.provider.class:                    Oro\Bundle\TranslationBundle\Strategy\TranslationStrategyProvider
+    oro_translation.strategy.default.class:                     Oro\Bundle\TranslationBundle\Strategy\DefaultTranslationStrategy
+
 services:
     oro_translation.controller:
         class: %oro_translation.controller.class%
@@ -171,3 +174,15 @@ services:
             - '@oro_translation.database_translation.metadata.cache'
         tags:
             - { name: kernel.event_listener, event: oro_config.update_after, method: onConfigUpdate }
+
+    oro_translation.strategy.default:
+        class: '%oro_translation.strategy.default.class%'
+        public: false
+        arguments:
+            - '@oro_locale.settings'
+            - '%installed%'
+
+    oro_translation.strategy.provider:
+        class: '%oro_translation.strategy.provider.class%'
+        arguments:
+            - '@oro_translation.strategy.default'

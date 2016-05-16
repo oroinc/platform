@@ -9,6 +9,7 @@ use JMS\JobQueueBundle\Entity\Job;
 use Psr\Log\LoggerInterface;
 
 use Oro\Bundle\ConfigBundle\Config\ConfigManager;
+use Oro\Bundle\EmailBundle\Mailer\Processor;
 use Oro\Bundle\EmailBundle\Provider\EmailRenderer;
 use Oro\Bundle\NotificationBundle\Doctrine\EntityPool;
 
@@ -31,6 +32,9 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
     /** @var string */
     protected $env = 'prod';
 
+    /** @var Processor */
+    protected $processor;
+
     /**
      * Constructor
      *
@@ -40,6 +44,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
      * @param EmailRenderer     $emailRenderer
      * @param \Swift_Mailer     $mailer
      * @param ConfigManager     $cm
+     * @param Processor         $processor
      */
     public function __construct(
         LoggerInterface $logger,
@@ -47,12 +52,14 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
         EntityPool $entityPool,
         EmailRenderer $emailRenderer,
         \Swift_Mailer $mailer,
-        ConfigManager $cm
+        ConfigManager $cm,
+        Processor $processor
     ) {
         parent::__construct($logger, $em, $entityPool);
         $this->renderer          = $emailRenderer;
         $this->mailer            = $mailer;
         $this->cm                = $cm;
+        $this->processor         = $processor;
     }
 
     /**
@@ -129,6 +136,7 @@ class EmailNotificationProcessor extends AbstractNotificationProcessor
                     ->setFrom($senderEmail, $senderName)
                     ->setTo($email)
                     ->setBody($templateRendered, $type);
+                $this->processor->processEmbeddedImages($message);
                 $this->mailer->send($message);
             }
 
