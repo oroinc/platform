@@ -261,7 +261,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
         }
         foreach ($occurrences as $oKey => &$occurrence) {
             foreach ($exceptions as $eKey => $exception) {
-                if ($exception['recurringEventId'] === $occurrence['id'] &&
+                if ((int)$exception['recurringEventId'] === (int)$occurrence['id'] &&
                     (new \DateTime($exception['originalStart'])) == (new \DateTime($occurrence['start']))
                 ) {
                     if ($exception['isCancelled']) {
@@ -273,7 +273,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
                 }
             }
             foreach ($exceptionsNotInRange as $exception) {
-                if ($exception['recurringEventId'] === $occurrence['id'] &&
+                if ((int)$exception['recurringEventId'] === (int)$occurrence['id'] &&
                     $exception['originalStart'] == (new \DateTime($occurrence['start']))
                 ) {
                     unset($occurrences[$oKey]);

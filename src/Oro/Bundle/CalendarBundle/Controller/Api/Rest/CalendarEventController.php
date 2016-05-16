@@ -145,7 +145,11 @@ class CalendarEventController extends RestController implements ClassResourceInt
                     );
                 $result[] = $recurringEvent;
             }
-            $filterCriteria   = $this->getFilterCriteria($parameters, $filterParameters, ['recurringEventId' => 'recurringEvent']);
+            $filterCriteria   = $this->getFilterCriteria(
+                $parameters,
+                $filterParameters,
+                ['recurringEventId' => 'recurringEvent']
+            );
 
             /** @var CalendarEventRepository $repo */
             $repo  = $this->getManager()->getRepository();
@@ -158,10 +162,13 @@ class CalendarEventController extends RestController implements ClassResourceInt
             $qb->setMaxResults($limit)
                 ->setFirstResult($page > 0 ? ($page - 1) * $limit : 0);
 
-            $result = array_merge($result, $this->get('oro_calendar.calendar_event_normalizer.user')->getCalendarEvents(
-                $calendarId,
-                $qb->getQuery()
-            ));
+            $result = array_merge(
+                $result,
+                $this->get('oro_calendar.calendar_event_normalizer.user')->getCalendarEvents(
+                    $calendarId,
+                    $qb->getQuery()
+                )
+            );
 
             return $this->buildResponse($result, self::ACTION_LIST, ['result' => $result, 'query' => $qb]);
         } else {
