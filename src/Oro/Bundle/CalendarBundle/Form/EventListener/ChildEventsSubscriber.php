@@ -115,8 +115,12 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         $parentEvent = $event->getForm()->getData();
         $this->updateCalendarEvents($parentEvent);
         $this->updateAttendeeDisplayNames($parentEvent);
-        if ($parentEvent && !$parentEvent->getChildEvents()->isEmpty()) {
-            $this->setDefaultEventStatus($parentEvent, CalendarEvent::STATUS_ACCEPTED);
+        if (!$parentEvent) {
+            return;
+        }
+
+        if (!$parentEvent->getChildEvents()->isEmpty()) {
+            $this->setDefaultAttendeeStatus($parentEvent->getRelatedAttendee(), CalendarEvent::STATUS_ACCEPTED);
 
             foreach ($parentEvent->getChildEvents() as $calendarEvent) {
                 $calendarEvent
@@ -125,9 +129,11 @@ class ChildEventsSubscriber implements EventSubscriberInterface
                     ->setStart($parentEvent->getStart())
                     ->setEnd($parentEvent->getEnd())
                     ->setAllDay($parentEvent->getAllDay());
-
-                $this->setDefaultEventStatus($calendarEvent);
             }
+        }
+
+        foreach ($parentEvent->getChildAttendees() as $attendee) {
+            $this->setDefaultAttendeeStatus($attendee);
         }
     }
 
@@ -212,25 +218,20 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param CalendarEvent $calendarEvent
+     * @param Attendee|null $attendee
      * @param string        $status
      */
-    protected function setDefaultEventStatus(
-        CalendarEvent $calendarEvent,
+    protected function setDefaultAttendeeStatus(
+        Attendee $attendee = null,
         $status = CalendarEvent::STATUS_NOT_RESPONDED
     ) {
-        if ($calendarEvent->getInvitationStatus()) {
-            return;
-        }
-
-        $relatedAttendee = $calendarEvent->getRelatedAttendee();
-        if (!$relatedAttendee) {
+        if (!$attendee || $attendee->getStatus()) {
             return;
         }
 
         $statusEnum = $this->registry
             ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
             ->find($status);
-        $relatedAttendee->setStatus($statusEnum);
+        $attendee->setStatus($statusEnum);
     }
 }
