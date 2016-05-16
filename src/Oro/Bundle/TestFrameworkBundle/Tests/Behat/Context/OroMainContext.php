@@ -93,21 +93,23 @@ class OroMainContext extends MinkContext implements
         $manager = $this->getContainer()->get('oro_user.manager');
 
         $user = $manager->createUser();
+        // 'test' password
+        $user
+            ->setPassword('g3dg06kxNIX6AZrZHTjOmdu/k3buFPx6MHTo6KEn9px03wleHDIAhpwS/4TbdOyZpBWFS8qrImlwAehTjHah7g==')
+            ->setSalt('3z7ouvbt1rqc88ow8o0wk04o0goowkw')
+        ;
 
-        foreach ($data as $row) {
-            switch ($row['field']) {
+        foreach ($data->getRows() as $row) {
+            switch ($row[0]) {
                 case 'roles':
-                    $roles = explode(',', $row['value']);
+                    $roles = explode(',', $row[1]);
                     array_walk($roles, function ($role) use ($user, $em) {
                         $roleEntity = $em->getRepository('OroUserBundle:Role')->findOneBy(['label' => trim($role)]);
                         $user->addRole($roleEntity);
                     });
                     break;
-                case 'password':
-                    $user->setPlainPassword($row['value']);
-                    break;
                 default:
-                    $user->{'set'.ucfirst($row['field'])}($row['value']);
+                    $user->{'set'.ucfirst($row[0])}($row[1]);
             }
         }
 
@@ -124,14 +126,15 @@ class OroMainContext extends MinkContext implements
             ->setOrganization($organization)
         ;
 
-        $manager->updateUser($user);
+        $em->persist($user);
         $em->flush();
     }
 
     /**
      * @Given Login as an existing :login user and :password password
+     * @Given Login as :login
      */
-    public function loginAsAnExistingUserAndPassword($login, $password)
+    public function loginAsAnExistingUserAndPassword($login, $password = 'test')
     {
         $this->visit('user/login');
         $this->fillField('_username', $login);
