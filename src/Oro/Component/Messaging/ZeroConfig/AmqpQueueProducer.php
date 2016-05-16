@@ -6,7 +6,7 @@ use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
 use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
 use Oro\Component\Messaging\Transport\Message;
 
-class AmqpFrontProducer implements ProducerInterface
+class AmqpQueueProducer implements ProducerInterface
 {
     /**
      * @var AmqpSession
@@ -19,20 +19,13 @@ class AmqpFrontProducer implements ProducerInterface
     protected $topicName;
 
     /**
-     * @var string
-     */
-    protected $queueName;
-
-    /**
      * @param AmqpSession $session
      * @param string      $topicName
-     * @param string      $queueName
      */
-    public function __construct(AmqpSession $session, $topicName, $queueName)
+    public function __construct(AmqpSession $session, $topicName)
     {
         $this->session = $session;
         $this->topicName = $topicName;
-        $this->queueName = $queueName;
     }
 
     /**
@@ -40,13 +33,18 @@ class AmqpFrontProducer implements ProducerInterface
      */
     public function send(Message $message)
     {
-        $messageName = $message->getProperty('messageName');
-        if (false == $messageName) {
-            throw new \LogicException('Got message without "messageName" parameter');
+        $processorName = $message->getProperty('processorName');
+        if (false == $processorName) {
+            throw new \LogicException('Got message without "processorName" parameter');
         }
-        
-        $topic = $this->createTopic();
-        $queue = $this->createQueue();
+
+        $queueName = $message->getProperty('queueName');
+        if (false == $queueName) {
+            throw new \LogicException('Got message without "queueName" parameter');
+        }
+
+        $topic = $this->createTopic($this->generateRoutingKey($queueName));
+        $queue = $this->createQueue($this->generateQueueName($queueName));
 
         $this->createSchema($topic, $queue);
 
@@ -55,23 +53,28 @@ class AmqpFrontProducer implements ProducerInterface
     }
 
     /**
+     * @param string $routingKey
+     *
      * @return AmqpTopic
      */
-    protected function createTopic()
+    protected function createTopic($routingKey)
     {
         $topic = $this->session->createTopic($this->topicName);
-        $topic->setType('fanout');
+        $topic->setType('direct');
         $topic->setDurable(true);
+        $topic->setRoutingKey($routingKey);
 
         return $topic;
     }
 
     /**
+     * @param string $queueName
+     *
      * @return AmqpQueue
      */
-    protected function createQueue()
+    protected function createQueue($queueName)
     {
-        $queue = $this->session->createQueue($this->queueName);
+        $queue = $this->session->createQueue($queueName);
         $queue->setDurable(true);
         $queue->setAutoDelete(false);
 
@@ -87,5 +90,25 @@ class AmqpFrontProducer implements ProducerInterface
         $this->session->declareTopic($topic);
         $this->session->declareQueue($queue);
         $this->session->declareBind($topic, $queue);
+    }
+
+    /**
+     * @param string $queueName
+     *
+     * @return string
+     */
+    protected function generateRoutingKey($queueName)
+    {
+        return strtolower($queueName);
+    }
+
+    /**
+     * @param string $queueName
+     *
+     * @return string
+     */
+    protected function generateQueueName($queueName)
+    {
+        return strtolower($queueName);
     }
 }

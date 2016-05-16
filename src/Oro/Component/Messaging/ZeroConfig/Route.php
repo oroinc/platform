@@ -11,12 +11,12 @@ class Route
     /**
      * @var string
      */
-    protected $handlerName;
+    protected $processorName;
 
     /**
      * @var string
      */
-    protected $consumerName;
+    protected $queueName;
 
     /**
      * @return string
@@ -37,32 +37,32 @@ class Route
     /**
      * @return string
      */
-    public function getHandlerName()
+    public function getProcessorName()
     {
-        return $this->handlerName;
+        return $this->processorName;
     }
 
     /**
-     * @param string $handlerName
+     * @param string $processorName
      */
-    public function setHandlerName($handlerName)
+    public function setProcessorName($processorName)
     {
-        $this->handlerName = $handlerName;
+        $this->processorName = $processorName;
     }
 
     /**
      * @return string
      */
-    public function getConsumerName()
+    public function getQueueName()
     {
-        return $this->consumerName;
+        return $this->queueName;
     }
 
     /**
-     * @param string $consumerName
+     * @param string $queueName
      */
-    public function setConsumerName($consumerName)
+    public function setQueueName($queueName)
     {
-        $this->consumerName = $consumerName;
+        $this->queueName = $queueName;
     }
 }
