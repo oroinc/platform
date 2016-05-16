@@ -181,7 +181,7 @@ define([
 
             this.publishEvent('page:update', pageData, actionArgs, jqXHR, updatePromises);
 
-            // once all views are have updated, trigger page:afterChange
+            // once all views has been updated, trigger page:afterChange
             $.when.apply($, updatePromises).done(_.debounce(function() {
                 self.publishEvent('page:afterChange');
             }, 0));

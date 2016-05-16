@@ -24,7 +24,7 @@ class PlatformUpdateCommand extends AbstractCommand
                 'Forces operation to be executed.'
             )
             ->addOption(
-                'skip-ui-init',
+                'skip-assets',
                 null,
                 InputOption::VALUE_NONE,
                 'Skip UI related commands during update'
@@ -67,7 +67,7 @@ class PlatformUpdateCommand extends AbstractCommand
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
                 ->runCommand('router:cache:clear', array('--process-isolation' => true));
 
-            if (!$input->getOption('skip-ui-init')) {
+            if (!$input->getOption('skip-assets')) {
                 $commandExecutor
                     ->runCommand('oro:assets:install', $assetsOptions)
                     ->runCommand('assetic:dump')
