@@ -107,10 +107,8 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         // set default empty data
         $firstEvent = new CalendarEvent();
         $firstEvent->setTitle('1');
-        $firstEvent->setRelatedAttendee(new Attendee());
         $secondEvent = new CalendarEvent();
         $secondEvent->setTitle('2');
-        $secondEvent->setRelatedAttendee(new Attendee());
         $eventWithoutRelatedAttendee = new CalendarEvent();
         $eventWithoutRelatedAttendee->setTitle('3');
 
@@ -124,6 +122,15 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         $parentEvent->addChildEvent($firstEvent)
             ->addChildEvent($secondEvent)
             ->addChildEvent($eventWithoutRelatedAttendee);
+
+        $firstEvent->setRelatedAttendee(
+            (new Attendee())
+                ->setEmail('first@example.com')
+        );
+        $secondEvent->setRelatedAttendee(
+            (new Attendee())
+                ->setEmail('second@example.com')
+        );
 
         $form = $this->getMock('Symfony\Component\Form\FormInterface');
         $form->expects($this->any())

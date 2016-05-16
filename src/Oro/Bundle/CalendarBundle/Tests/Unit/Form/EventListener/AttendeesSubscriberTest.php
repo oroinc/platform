@@ -177,7 +177,8 @@ class AttendeesSubscriberTest extends \PHPUnit_Framework_TestCase
     {
         return [
             (new Attendee(1))
-                ->setEmail('u1@example.com'),
+                ->setEmail('u1@example.com')
+                 ->setUser($this->users['u1@example.com']),
             (new Attendee())
                 ->setEmail('u2@example.com')
                 ->setUser($this->users['u2@example.com']),
