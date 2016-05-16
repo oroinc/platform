@@ -2,15 +2,12 @@
 
 namespace Oro\Bundle\FormBundle\Tests\Unit\Form\Type;
 
-use Symfony\Component\Form\Test\FormIntegrationTestCase;
-
 use Oro\Bundle\FormBundle\Form\Type\OroTimeIntervalType;
+use Symfony\Component\Form\Test\FormIntegrationTestCase;
 
 class OroTimeIntervalTypeTest extends FormIntegrationTestCase
 {
-    /**
-     * @var OroTimeIntervalType
-     */
+    /** @var OroTimeIntervalType */
     protected $type;
 
     protected function setUp()
@@ -27,20 +24,18 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
 
     public function testGetParent()
     {
-        $this->assertEquals('time', $this->type->getParent());
+        $this->assertEquals('text', $this->type->getParent());
     }
 
     public function testSetDefaultOptions()
     {
         $expectedOptions = array(
-            'widget'         => 'single_text',
-            'with_seconds'   => true,
-            'model_timezone' => 'UTC',
-            'view_timezone'  => 'UTC',
+            'tooltip' => 'oro.form.oro_time_interval.tooltip',
+            'type' => 'text',
+            'input_property_path' => null,
         );
 
         $form = $this->factory->create($this->type);
-        $form->submit(new \DateTime());
 
         $options = $form->getConfig()->getOptions();
         foreach ($expectedOptions as $name => $expectedValue) {
@@ -49,12 +44,48 @@ class OroTimeIntervalTypeTest extends FormIntegrationTestCase
         }
     }
 
-    public function testBuildView()
+    /**
+     * @dataProvider submitDataProvider
+     *
+     * @param $value
+     * @param $expected
+     */
+    public function testSubmit($value, $expected)
     {
         $form = $this->factory->create($this->type);
-        $form->submit(new \DateTime());
-        $view = $form->createView();
+        $form->submit($value);
+        $data = $form->getData();
 
-        $this->assertEquals('text', $view->vars['type']);
+        $this->assertInstanceOf($expected, $data);
+    }
+
+    public function submitDataProvider()
+    {
+        return [
+            'default' => [
+                120,
+                'DateTime',
+            ],
+            'BC datetime should pass trough' => [
+                new \DateTime(),
+                'DateTime',
+            ],
+        ];
+    }
+
+    public function testConfigureOptions()
+    {
+        $expectedOptions = array(
+            'tooltip' => 'test',
+            'input_property_path' => 'durationString',
+        );
+
+        $form = $this->factory->create($this->type, null, $expectedOptions);
+
+        $options = $form->getConfig()->getOptions();
+        foreach ($expectedOptions as $name => $expectedValue) {
+            $this->assertArrayHasKey($name, $options);
+            $this->assertEquals($expectedValue, $options[$name]);
+        }
     }
 }

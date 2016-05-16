@@ -68,6 +68,11 @@ class DurationToStringTransformer implements DataTransformerInterface
             return null;
         }
 
+        // Do not transform if already a DateTime (for BC)
+        if ($value instanceof \DateTime) {
+            return $value;
+        }
+
         if (!is_string($value)) {
             throw new UnexpectedTypeException($value, 'string');
         }
