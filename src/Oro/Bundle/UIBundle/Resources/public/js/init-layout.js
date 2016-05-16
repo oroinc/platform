@@ -504,3 +504,52 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         }
     });
 });
+
+require(['jquery', 'lightgallery'], function($) {
+    'use strict';
+
+    /**
+     * On click on gallery element (with 'data-gallery' attribte): find all gallery elements from the same gallery group,
+     * dynamically generate array of gallery elements and show the gallery.
+     */
+    $(document).on('click.gallery', function(e) {
+        var $target = $(e.target);
+        if ($target.is('img')) { //if click was done on thumbnail image, use parent element as a target
+            $target = $target.parent();
+        }
+        if ($target.data('gallery')) {
+            var galleryId = $target.data('gallery');
+            var $items = $('[data-gallery]').filter(function() {
+                return $(this).data('gallery') == galleryId;
+            });
+            var dynamicEl = [];
+            $items.each(function() {
+                var $item = $(this);
+                var el = {};
+                el.src = $item.attr('href');
+                var img = $item.find('img');
+                if (img.length) {
+                    el.thumb = img.attr('src');
+                } else {
+                    el.thumb = el.src;
+                }
+                dynamicEl.push(el);
+            });
+
+            var currentSlide = _.indexOf($items, $target.get(0));
+
+            $(this).lightGallery({
+                dynamic: true,
+                dynamicEl: dynamicEl,
+                index: currentSlide,
+                showAfterLoad: false,
+                hash: false
+            }).on('onCloseAfter.lg', function() {
+                $(this).data('lightGallery').destroy(true); //fully destroy gallery on close
+                $(this).off('onCloseAfter.lg');
+            });
+            
+            e.preventDefault();
+        }
+    });
+})

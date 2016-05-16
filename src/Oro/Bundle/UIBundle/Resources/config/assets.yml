@@ -17,6 +17,7 @@ css:
         - 'bundles/oroui/css/jquery-ui-1.10.2.custom.css'
         - 'bundles/oroui/lib/multiselect/jquery.multiselect.css'
         - 'bundles/oroui/lib/multiselect/jquery.multiselect.filter.css'
+        - 'bundles/oroui/css/lightgallery/lightgallery.css'
         # custom styles
         - 'bundles/oroui/css/less/main.less'
         - 'bundles/oroui/css/all.css'

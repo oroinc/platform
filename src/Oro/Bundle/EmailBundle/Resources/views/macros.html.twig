@@ -391,14 +391,17 @@
         hasGrantReattach - has grants for create attachment entity
 #}
 {% macro attachments(attachments, target, hasGrantReattach) -%}
+    {% set galleryUid = random() %}
     {%- for attachment in attachments -%}
         {% if attachment.embeddedContentId is null %}
             {% set canCopyToRecord = (hasGrantReattach and target is defined and oro_can_attache(attachment, target)) ? true : false %}
             <li class="email-attachments-list-item span3">
                 <div class="email-attachments-file">
                     {% if oro_type_is_image(attachment.contentType) %}
-                        <img src="{{ path('oro_resize_email_attachment', {id: attachment.id, width: 110, height: 80}) }}"
-                             class="img-rounded" width="110" height="80" alt="" />
+                        <a data-gallery="gallery-{{ galleryUid }}" class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
+                            <img src="{{ path('oro_resize_email_attachment', {id: attachment.id, width: 110, height: 80}) }}"
+                                 class="img-rounded" width="110" height="80" alt="" />
+                        </a>
                     {% else %}
                         <div class="thumbnail">
                             <i class="fa {{ oro_attachment_icon(attachment) }} fa-3x"></i>

@@ -93,3 +93,6 @@ UPGRADE FROM 1.9 to 1.10
 ####TranslationBundle:
 - Added translation strategies to dynamically handle translation fallbacks
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
+
+####UiBundle
+- Added [lightgallery](http://sachinchoolur.github.io/lightGallery/) by Sachin N.

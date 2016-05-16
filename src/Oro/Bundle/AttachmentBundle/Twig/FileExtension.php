@@ -144,6 +144,7 @@ class FileExtension extends \Twig_Extension
      * @param object            $parentEntity
      * @param string            $fieldName
      * @param File              $attachment
+     * @param array             $additional
      *
      * @return string
      */
@@ -151,7 +152,8 @@ class FileExtension extends \Twig_Extension
         \Twig_Environment $environment,
         $parentEntity,
         $fieldName,
-        $attachment = null
+        $attachment = null,
+        $additional = null
     ) {
         /**
          * @todo: should be refactored in BAP-5637
@@ -162,9 +164,11 @@ class FileExtension extends \Twig_Extension
         if ($attachment && $attachment->getFilename()) {
             return $environment->loadTemplate(self::FILES_TEMPLATE)->render(
                 [
-                    'iconClass' => $this->manager->getAttachmentIconClass($attachment),
-                    'url'       => $this->manager->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
-                    'fileName'  => $attachment->getOriginalFilename()
+                    'iconClass'  => $this->manager->getAttachmentIconClass($attachment),
+                    'url'        => $this->manager
+                        ->getFileUrl($parentEntity, $fieldName, $attachment, 'download', true),
+                    'fileName'   => $attachment->getOriginalFilename(),
+                    'additional' => $additional
                 ]
             );
         }

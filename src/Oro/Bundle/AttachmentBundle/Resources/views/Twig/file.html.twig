@@ -1,3 +1,4 @@
 <span class="filename">
-    <i class="fa {{ iconClass }}"></i><a href="{{ url }}" class="no-hash" title="{{ fileName }}">{{ fileName|oro_format_filename }}</a>
+    <i class="fa {{ iconClass }}"></i>
+    <a href="{{ url }}" {% if additional['galleryId'] %}data-gallery="{{ additional['galleryId'] }}"{% endif %} class="no-hash" title="{{ fileName }}">{{ fileName|oro_format_filename }}</a>
 </span>
