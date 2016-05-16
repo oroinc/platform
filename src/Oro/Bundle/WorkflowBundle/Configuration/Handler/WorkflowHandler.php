@@ -9,7 +9,7 @@ class WorkflowHandler extends AbstractHandler
     /**
      * @var array
      */
-    protected $workflowKeys = array(
+    protected static $workflowKeys = array(
         'name',
         'label',
         'entity',

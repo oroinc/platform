@@ -94,6 +94,16 @@ class Transition
     protected $dialogTemplate;
 
     /**
+     * @var string
+     */
+    protected $scheduleCron;
+
+    /**
+     * @var string
+     */
+    protected $scheduleFilter;
+
+    /**
      * Set label.
      *
      * @param string $label
@@ -503,5 +513,34 @@ class Transition
     public function getDialogTemplate()
     {
         return $this->dialogTemplate;
+    }
+
+    public function setScheduleCron($cron)
+    {
+        $this->scheduleCron = $cron;
+    }
+
+    /**
+     * @param string $DQLFilter
+     */
+    public function setScheduleFilter($DQLFilter)
+    {
+        $this->scheduleFilter = $DQLFilter;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScheduleFilter()
+    {
+        return $this->scheduleFilter;
+    }
+
+    /**
+     * @return string
+     */
+    public function getScheduleCron()
+    {
+        return $this->scheduleCron;
     }
 }

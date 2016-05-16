@@ -61,7 +61,7 @@ class TransitionAssembler extends BaseAbstractAssembler
 
         $transitions = new ArrayCollection();
         foreach ($configuration as $name => $options) {
-            $this->assertOptions($options, array('transition_definition'));
+            $this->assertOptions($options, ['transition_definition']);
             $definitionName = $options['transition_definition'];
             if (!isset($definitions[$definitionName])) {
                 throw new AssemblerException(
@@ -83,16 +83,16 @@ class TransitionAssembler extends BaseAbstractAssembler
      */
     protected function parseDefinitions(array $configuration)
     {
-        $definitions = array();
+        $definitions = [];
         foreach ($configuration as $name => $options) {
             if (empty($options)) {
-                $options = array();
+                $options = [];
             }
-            $definitions[$name] = array(
-                'pre_conditions' => $this->getOption($options, 'pre_conditions', array()),
-                'conditions' => $this->getOption($options, 'conditions', array()),
-                'post_actions' => $this->getOption($options, 'post_actions', array())
-            );
+            $definitions[$name] = [
+                'pre_conditions' => $this->getOption($options, 'pre_conditions', []),
+                'conditions' => $this->getOption($options, 'conditions', []),
+                'post_actions' => $this->getOption($options, 'post_actions', [])
+            ];
         }
 
         return $definitions;
@@ -109,7 +109,7 @@ class TransitionAssembler extends BaseAbstractAssembler
      */
     protected function assembleTransition($name, array $options, array $definition, $steps, $attributes)
     {
-        $this->assertOptions($options, array('step_to', 'label'));
+        $this->assertOptions($options, ['step_to', 'label']);
         $stepToName = $options['step_to'];
         if (empty($steps[$stepToName])) {
             throw new AssemblerException(sprintf('Step "%s" not found', $stepToName));
@@ -125,7 +125,7 @@ class TransitionAssembler extends BaseAbstractAssembler
             ->setUnavailableHidden($this->getOption($options, 'is_unavailable_hidden', false))
             ->setFormType($this->getOption($options, 'form_type', WorkflowTransitionType::NAME))
             ->setFormOptions($this->assembleFormOptions($options, $attributes, $name))
-            ->setFrontendOptions($this->getOption($options, 'frontend_options', array()))
+            ->setFrontendOptions($this->getOption($options, 'frontend_options', []))
             ->setDisplayType(
                 $this->getOption($options, 'display_type', WorkflowConfiguration::DEFAULT_TRANSITION_DISPLAY_TYPE)
             )
@@ -148,6 +148,11 @@ class TransitionAssembler extends BaseAbstractAssembler
             $transition->setPostAction($postAction);
         }
 
+        if (!empty($definition['schedule'])) {
+            $transition->setScheduleCron($definition['schedule']['cron']);
+            $transition->setScheduleFilter($this->getOption($definition['schedule'], 'filter', null));
+        }
+
         return $transition;
     }
 
@@ -161,26 +166,26 @@ class TransitionAssembler extends BaseAbstractAssembler
         $aclResource = $this->getOption($options, 'acl_resource');
 
         if ($aclResource) {
-            $aclPreConditionDefinition = array('parameters' => array($aclResource));
+            $aclPreConditionDefinition = ['parameters' => [$aclResource]];
             $aclMessage = $this->getOption($options, 'acl_message');
             if ($aclMessage) {
                 $aclPreConditionDefinition['message'] = $aclMessage;
             }
-            $aclPreCondition = array('@acl_granted' => $aclPreConditionDefinition);
+            $aclPreCondition = ['@acl_granted' => $aclPreConditionDefinition];
 
             if (empty($definition['pre_conditions'])) {
                 $definition['pre_conditions'] = $aclPreCondition;
             } else {
-                $definition['pre_conditions'] = array(
-                    '@and' => array(
+                $definition['pre_conditions'] = [
+                    '@and' => [
                         $aclPreCondition,
                         $definition['pre_conditions']
-                    )
-                );
+                    ]
+                ];
             }
         }
 
-        return !empty($definition['pre_conditions']) ? $definition['pre_conditions'] : array();
+        return !empty($definition['pre_conditions']) ? $definition['pre_conditions'] : [];
     }
 
     /**
@@ -191,7 +196,8 @@ class TransitionAssembler extends BaseAbstractAssembler
      */
     protected function assembleFormOptions(array $options, $attributes, $transitionName)
     {
-        $formOptions = $this->getOption($options, 'form_options', array());
+        $formOptions = $this->getOption($options, 'form_options', []);
+
         return $this->formOptionsAssembler->assemble($formOptions, $attributes, 'transition', $transitionName);
     }
 }

@@ -12,6 +12,7 @@ use Doctrine\ORM\EntityManager;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Symfony\Component\Yaml\Yaml;
 
 class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
 {
@@ -81,6 +82,12 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                     $existingWorkflowDefinition->import($workflowDefinition);
                 } else {
                     $manager->persist($workflowDefinition);
+                }
+
+                if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+                    $output->writeln(
+                        Yaml::dump($workflowDefinition->getConfiguration(), 6, 4)
+                    );
                 }
             }
 
