@@ -66,6 +66,9 @@ config:
         'jquery.multiselect.filter':
             deps:
                 - 'jquery.multiselect'
+        'lightgallery':
+            deps:
+                - 'jquery'
     map:
         '*':
             'jquery': 'oroui/js/extend/jquery'
@@ -141,6 +144,7 @@ config:
         'cryptojs/hmac': 'bundles/oroui/lib/cryptojs/hmac-min.js'
         'cryptojs/sha256': 'bundles/oroui/lib/cryptojs/sha256-min.js'
         'cryptojs/pbkdf2': 'bundles/oroui/lib/cryptojs/pbkdf2-min.js'
+        'lightgallery': 'bundles/oroui/lib/lightgallery/js/lightgallery-all.js'
 
         'ready': 'bundles/oroui/js/requirejs/ready.js'
         'tpl': 'bundles/oroui/js/requirejs/tpl.js'
