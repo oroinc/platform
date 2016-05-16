@@ -122,7 +122,7 @@ class AttendeesSubscriber implements EventSubscriberInterface
     {
         $unboundAttendeesByEmail = [];
         foreach ($attendees as $attendee) {
-            if ($attendee->getId() || $attendee->getUser()) {
+            if ($attendee->getUser()) {
                 continue;
             }
 
