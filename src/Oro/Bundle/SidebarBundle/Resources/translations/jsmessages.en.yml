@@ -2,7 +2,7 @@ oro.sidebar:
   widget:
     add:
       dialog:
-        title: "Select widget to add"
+        title: "Sidebar Widgets"
       content:
         section_title: "Add widget"
     remove:
