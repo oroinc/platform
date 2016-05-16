@@ -4,7 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\FormView;
 
-use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Form\Type\CalendarEventAttendeesType;
 use Oro\Bundle\UserBundle\Entity\User;
 
@@ -78,7 +78,7 @@ class CalendarEventAttendeesTypeTest extends \PHPUnit_Framework_TestCase
                     ->setEmail('name@example.com')
             ]));
 
-        $this->type->buildView($view, $form, ['converter' => $converter]);
+        $this->type->buildView($view, $form, ['converter' => $converter, 'disable_user_removal' => false]);
 
         $this->assertEquals(
             json_encode([['fullName' => 'name@example.com', 'email' => 'name@example.com']]),
