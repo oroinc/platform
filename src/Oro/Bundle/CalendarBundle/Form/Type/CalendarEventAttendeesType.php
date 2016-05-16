@@ -47,6 +47,7 @@ class CalendarEventAttendeesType extends AbstractType
     {
         $resolver->setDefaults([
             'autocomplete_alias' => 'organization_users',
+            'disable_user_removal' => false,
             'configs' => function (Options $options, $value) {
                 return array_merge(
                     $value,
@@ -75,7 +76,9 @@ class CalendarEventAttendeesType extends AbstractType
             $result = [];
             foreach ($transformedData as $k => $item) {
                 $converted = $converter->convertItem($item);
-                if ($formData[$k]->getOrigin() && $formData[$k]->getOrigin()->getId() !== Attendee::ORIGIN_SERVER) {
+                if (($formData[$k]->getOrigin() && $formData[$k]->getOrigin()->getId() !== Attendee::ORIGIN_SERVER) ||
+                    ($options['disable_user_removal'] && $formData[$k]->getUser())
+                ) {
                     $converted['locked'] = true;
                 }
 

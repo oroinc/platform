@@ -108,7 +108,8 @@ class CalendarEventType extends AbstractType
                 'oro_calendar_event_attendees',
                 [
                     'required' => false,
-                    'label'    => 'oro.calendar.calendarevent.attendees.label'
+                    'label'    => 'oro.calendar.calendarevent.attendees.label',
+                    'disable_user_removal' => !$this->securityFacade->isGranted('oro_user_user_view'),
                 ]
             )
             ->add(
