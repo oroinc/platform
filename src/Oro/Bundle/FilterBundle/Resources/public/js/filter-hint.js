@@ -106,10 +106,12 @@ define([
             if (!this.inline && hint === null) {
                 if (this.visible) {
                     this.$el.hide();
+                    this.visible = false;
                 }
             } else {
                 if (!this.visible) {
                     this.$el.show();
+                    this.visible = true;
                 }
             }
             return this;
