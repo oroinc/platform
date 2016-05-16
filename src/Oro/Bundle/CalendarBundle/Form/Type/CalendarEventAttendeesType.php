@@ -11,6 +11,7 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer;
 use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
 
@@ -72,8 +73,13 @@ class CalendarEventAttendeesType extends AbstractType
             $transformedData = $this->usersToAttendeesTransformer->attendeesToUsers($formData);
 
             $result = [];
-            foreach ($transformedData as $item) {
-                $result[] = $converter->convertItem($item);
+            foreach ($transformedData as $k => $item) {
+                $converted = $converter->convertItem($item);
+                if ($formData[$k]->getOrigin() && $formData[$k]->getOrigin()->getId() !== Attendee::ORIGIN_SERVER) {
+                    $converted['locked'] = true;
+                }
+
+                $result[]  = $converted;
             }
 
             $view->vars['attr']['data-selected-data'] = json_encode($result);
