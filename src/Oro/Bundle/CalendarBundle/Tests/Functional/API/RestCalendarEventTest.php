@@ -403,6 +403,32 @@ class RestCalendarEventTest extends WebTestCase
         $this->assertEmpty($result);
     }
 
+    /**
+     * @depends testPut
+     */
+    public function testDelete($id)
+    {
+        // guard
+        $this->assertNotNull(
+            $this->getContainer()->get('doctrine')
+                ->getRepository('OroCalendarBundle:CalendarEvent')
+                ->find($id)
+        );
+
+        $this->client->request('DELETE', $this->getUrl('oro_api_get_calendarevent', ['id' => $id]));
+        $this->assertEquals(204, $this->client->getResponse()->getStatusCode());
+
+        $this->getContainer()->get('doctrine')
+                ->getManagerForClass('OroCalendarBundle:CalendarEvent')
+                ->clear();
+
+        $this->assertNull(
+            $this->getContainer()->get('doctrine')
+                ->getRepository('OroCalendarBundle:CalendarEvent')
+                ->find($id)
+        );
+    }
+
     public function extractInterestingResponseData(array $responseData)
     {
         $result = array_intersect_key(
