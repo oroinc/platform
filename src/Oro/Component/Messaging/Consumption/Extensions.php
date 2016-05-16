@@ -1,7 +1,7 @@
 <?php
 namespace Oro\Component\Messaging\Consumption;
 
-class Extensions implements Extension
+final class Extensions implements Extension
 {
     /**
      * @var array|Extension[]

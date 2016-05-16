@@ -6,7 +6,7 @@ use Oro\Component\Messaging\Transport\Message;
 use Oro\Component\Messaging\Transport\MessageConsumer;
 use Oro\Component\Messaging\Transport\Session;
 
-class Context
+final class Context
 {
     /**
      * @var Session

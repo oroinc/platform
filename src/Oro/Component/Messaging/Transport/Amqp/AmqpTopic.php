@@ -3,7 +3,7 @@ namespace Oro\Component\Messaging\Transport\Amqp;
 
 use Oro\Component\Messaging\Transport\Topic;
 
-class AmqpTopic implements Topic
+final class AmqpTopic implements Topic
 {
     /**
      * @var string

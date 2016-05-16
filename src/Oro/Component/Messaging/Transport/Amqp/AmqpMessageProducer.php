@@ -9,7 +9,7 @@ use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
 use PhpAmqpLib\Wire\AMQPTable;
 
-class AmqpMessageProducer implements MessageProducer
+final class AmqpMessageProducer implements MessageProducer
 {
     /**
      * @var AMQPChannel

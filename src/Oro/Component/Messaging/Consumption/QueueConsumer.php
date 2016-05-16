@@ -3,7 +3,7 @@ namespace Oro\Component\Messaging\Consumption;
 
 use Oro\Component\Messaging\Transport\Session;
 
-class QueueConsumer
+final class QueueConsumer
 {
     /**
      * @var Session
