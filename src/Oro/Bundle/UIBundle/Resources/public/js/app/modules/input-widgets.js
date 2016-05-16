@@ -6,7 +6,7 @@ define(function(require) {
     var UniformFileInputWidget = require('oroui/js/app/views/input-widget/uniform-file');
 
     InputWidgetManager.addWidget('uniform-select', {
-        selector: 'select:not(.no-uniform)',
+        selector: 'select:not(.no-uniform):not([multiple])',
         Widget: UniformSelectInputWidget
     });
 

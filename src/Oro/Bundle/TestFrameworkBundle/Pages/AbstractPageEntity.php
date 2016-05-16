@@ -22,6 +22,25 @@ abstract class AbstractPageEntity extends AbstractPage
     protected $tags;
 
     /**
+     * @param string $fieldId Original field id
+     * @param string $content
+     * @return $this
+     */
+    public function setContentToTinymceElement($fieldId, $content)
+    {
+        $iframeElement = $this->test->byXPath(
+            "//iframe[starts-with(@id,'" . $fieldId . "')]"
+        );
+        $this->test->frame($iframeElement);
+        $bodyElement = $this->test->byTag('body');
+        $bodyElement->clear();
+        $this->test->frame(null);
+        $iframeElement->click();
+        $this->test->keys($content);
+        return $this;
+    }
+
+    /**
      * Save entity
      * @param string $button Default name of save button
      * @return $this

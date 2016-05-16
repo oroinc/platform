@@ -23,7 +23,7 @@ oro:
             use_default: "Use default"
         acl:
             action:
-                general.label: Access System Configuration
+                general.label: Access system configuration
 
     dashboard:
         widgets:
