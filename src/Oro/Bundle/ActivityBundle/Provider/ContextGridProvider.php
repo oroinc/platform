@@ -6,7 +6,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
-use Symfony\Component\Security\Acl\Exception\InvalidDomainObjectException;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ContextGridProvider
 {
@@ -19,28 +19,33 @@ class ContextGridProvider
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /** @var SecurityFacade  */
+    protected $securityFacade;
+
     /**
      * @param EntityRoutingHelper $routingHelper
      * @param EntityProvider      $entityProvider
      * @param ConfigProvider      $entityConfigProvider
+     * @param SecurityFacade      $securityFacade
      */
     public function __construct(
         EntityRoutingHelper $routingHelper,
         EntityProvider $entityProvider,
-        ConfigProvider $entityConfigProvider
+        ConfigProvider $entityConfigProvider,
+        SecurityFacade $securityFacade
     ) {
         $this->routingHelper        = $routingHelper;
         $this->entityProvider       = $entityProvider;
         $this->entityConfigProvider = $entityConfigProvider;
+        $this->securityFacade       = $securityFacade;
     }
 
     /**
-     * @param object            $entity
-     * @param SecurityFacade    $securityFacade
+     * @param object $entity
      *
      * @return array
      */
-    public function getSupportedTargets($entity, $securityFacade)
+    public function getSupportedTargets($entity)
     {
         $targetEntities = $this->entityProvider->getEntities();
         $entityTargets  = [];
@@ -51,8 +56,7 @@ class ContextGridProvider
 
         $count = count($targetEntities);
         for ($i = 0; $i < $count; $i++) {
-
-            if (!$securityFacade->isGranted('VIEW', 'entity:'.$targetEntities[$i]['name'])) {
+            if (!$this->securityFacade->isGranted('VIEW', 'entity:'.$targetEntities[$i]['name'])) {
                 continue;
             }
 

@@ -63,11 +63,11 @@ class ActivityController extends Controller
             throw new AccessDeniedException();
         }
 
-        $securityFacade   = $this->get('oro_security.security_facade');
         $entityTargets    = $this->get('oro_activity.provider.context_grid')
-                                 ->getSupportedTargets($entity, $securityFacade);
-        
-        $entityClassAlias = $this->get('oro_entity.entity_alias_resolver')->getPluralAlias($entityClass);
+                                 ->getSupportedTargets($entity);
+
+        $entityClassAlias = $this->get('oro_entity.entity_alias_resolver')
+                                 ->getPluralAlias($entityClass);
 
         return [
             'sourceEntity'           => $entity,

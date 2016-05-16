@@ -80,9 +80,8 @@ class ContextGridProviderTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         
         $this->mockSecurityFacade = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle')
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
-            ->setMethods(['isGranted'])
             ->getMock();
         
         $this->entityProvider->expects($this->any())
@@ -114,7 +113,8 @@ class ContextGridProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new ContextGridProvider(
             $this->routingHelper,
             $this->entityProvider,
-            $this->configProvider
+            $this->configProvider,
+            $this->mockSecurityFacade
         );
     }
 
@@ -170,7 +170,7 @@ class ContextGridProviderTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($entities));
 
         $mockSecurityFacade = $this
-            ->getMockBuilder('Oro\Bundle\SecurityBundle')
+            ->getMockBuilder('Oro\Bundle\SecurityBundle\SecurityFacade')
             ->disableOriginalConstructor()
             ->setMethods(['isGranted'])
             ->getMock();
@@ -203,10 +203,11 @@ class ContextGridProviderTest extends \PHPUnit_Framework_TestCase
         $this->provider = new ContextGridProvider(
             $routingHelper,
             $entityProvider,
-            $configProvider
+            $configProvider,
+            $mockSecurityFacade
         );
 
-        $targets = $this->provider->getSupportedTargets($mockEntity, $mockSecurityFacade);
+        $targets = $this->provider->getSupportedTargets($mockEntity);
 
         $this->assertCount($expectedCount, $targets);
         $this->assertEquals($expectedArray, $targets);
