@@ -112,13 +112,16 @@ class CustomEntity extends AbstractPageEntity
     public function addMultiSelectOptions($options = array())
     {
         // $flag used for counting adding new options to Multi Select field
-        $flag = 0;
+        $flag = 1;
         foreach ($options as $option) {
             $field = $this->test
-                ->byXPath("//*[@data-ftid='oro_entity_config_type_enum_enum_options_{$flag}_label']");
+                ->byXPath(
+                    "(//input[contains(@data-ftid,'oro_entity_config_type_enum_enum_options')" .
+                    " and @type='text'])[{$flag}]"
+                );
             $field->clear();
             $field->value($option);
-            if ($flag < count($options)-1) {
+            if ($flag < count($options)) {
                 $this->test->byXPath(
                     "//div[contains(@class,'control-group-collection')]//a[normalize-space(text()) = 'Add']"
                 )->click();
