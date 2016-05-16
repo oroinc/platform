@@ -92,6 +92,8 @@ define([
                     .find(this.selectors.reset).before(this.$el);
             }
 
+            this.visible = true;
+
             this.update(this.hint);
         },
 
@@ -102,9 +104,13 @@ define([
         update: function(hint) {
             this.$el.find(this.selectors.hint).html(_.escape(hint));
             if (!this.inline && hint === null) {
-                this.$el.hide();
+                if (this.visible) {
+                    this.$el.hide();
+                }
             } else {
-                this.$el.show();
+                if (!this.visible) {
+                    this.$el.show();
+                }
             }
             return this;
         },
