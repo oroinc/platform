@@ -18,7 +18,7 @@ define(function(require) {
 
         initialize: function() {
             RecentEmailsContentView.__super__.initialize.apply(this, arguments);
-            $.getJSON(routing.generate('oro_api_get_emailorigins'),
+            $.getJSON(routing.generate('oro_email_emailorigin_list'),
                 _.bind(function(data) {
                     this.foldersData = this.parseFoldersData(data);
                     this.foldersData.unshift({id: 0, text: __('oro.email.recent_emails_widget.all_folders')});
@@ -29,14 +29,12 @@ define(function(require) {
 
         parseFoldersData: function(data) {
             var mailboxes = [];
-            _.each(data, function(mailbox) {
-                var text;
+            _.each(data, function(mailbox, text) {
                 var folders;
                 if (mailbox.active) {
-                    text = mailbox.properties.user;
-                    folders = mailbox.folders.filter(function(folder) {
-                            return Boolean(folder.syncEnabled);
-                        }).map(function(folder) {
+                    folders =
+                        _.where(mailbox.folder, {syncEnabled: true})
+                        .map(function(folder) {
                             return {
                                 id: Number(folder.id),
                                 text: folder.fullName

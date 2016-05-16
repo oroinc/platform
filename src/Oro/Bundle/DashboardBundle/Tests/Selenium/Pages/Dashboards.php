@@ -39,7 +39,9 @@ class Dashboards extends AbstractPageFilteredGrid
             "//a[contains(@class, 'dashboard-widgets-add') and normalize-space(.) = 'Add widget']"
         )->click();
         // select widget and click add
-        $this->test->byXPath("//tr[td[contains(., '{$name}')]]/td/a[contains(@class, 'add-widget-button')]")->click();
+        $this->test->byXPath(
+            "//tr[td[contains(., '{$name}')]]/td/a[contains(@class, 'widget-picker-add-btn')]"
+        )->click();
         //wait until adding
         $this->waitForAjax();
         //close widget dialog
