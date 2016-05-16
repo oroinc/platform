@@ -41,6 +41,7 @@ parameters:
 
     oro_form.validator.entity_class.class:                       Oro\Bundle\FormBundle\Validator\Constraints\EntityClassValidator
     oro_form.validator.related_entity.class:                     Oro\Bundle\FormBundle\Validator\Constraints\RelatedEntityValidator
+    oro_form.validator.duration.class:                           Oro\Bundle\FormBundle\Validator\Constraints\DurationValidator
 
 services:
     # Form types
@@ -283,6 +284,11 @@ services:
         arguments:
             - '@request'
             - '@doctrine.orm.entity_manager'
+
+    oro_form.validator.duration:
+        class: '%oro_form.validator.duration.class%'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_form.duration_validator }
 
     oro_form.validator.entity_class:
         class: %oro_form.validator.entity_class.class%
