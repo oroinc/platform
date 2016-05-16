@@ -75,7 +75,7 @@ class OrganizationRepository extends EntityRepository
         }
 
         if (count($ids) !== 0) {
-            $organizationsQueryQB->where('org.id in :ids')
+            $organizationsQueryQB->where('org.id in (:ids)')
                 ->setParameter('ids', $ids);
         }
 
