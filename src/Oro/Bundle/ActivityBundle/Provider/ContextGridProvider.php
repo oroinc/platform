@@ -66,8 +66,6 @@ class ContextGridProvider
                     'first'     => count($entityTargets) === 0,
                     'gridName'  => $gridName
                 ];
-
-                $i++;
             }
         }
 
