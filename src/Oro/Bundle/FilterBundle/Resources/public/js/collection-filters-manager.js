@@ -110,10 +110,12 @@ define([
             if (hasRecords || hasFiltersState) {
                 if (!this.isVisible) {
                     this.$el.show();
+                    this.isVisible = true;
                 }
             } else {
                 if (this.isVisible) {
                     this.$el.hide();
+                    this.isVisible = false;
                 }
             }
         },

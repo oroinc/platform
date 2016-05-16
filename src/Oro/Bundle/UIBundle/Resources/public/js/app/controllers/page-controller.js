@@ -183,7 +183,7 @@ define([
 
             // once all views are have updated, trigger page:afterChange
             $.when.apply($, updatePromises).done(_.debounce(function() {
-                self.publishEvent('page:statsAfterChange');
+                self.publishEvent('page:afterChange');
             }, 0));
         },
 
