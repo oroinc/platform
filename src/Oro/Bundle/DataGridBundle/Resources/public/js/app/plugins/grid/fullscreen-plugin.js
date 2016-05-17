@@ -51,11 +51,11 @@ define(function(require) {
          */
         updateLayout: function() {
             var layout;
-            if (!this.main.rendered || !this.main.$grid.parents('body').length || !this.main.$el.is(':visible')) {
+            if (!this.main.shown) {
                 // not ready to apply layout
                 // try to do that at next js cycle1
                 clearTimeout(this.updateLayoutTimeoutId);
-                this.updateLayoutTimeoutId = _.delay(_.bind(this.updateLayout, this), 50);
+                this.updateLayoutTimeoutId = _.delay(_.bind(this.updateLayout, this), 0);
                 return;
             } else {
                 clearTimeout(this.updateLayoutTimeoutId);
@@ -69,6 +69,8 @@ define(function(require) {
 
         /**
          * Sets layout and perform all required operations
+         *
+         * @param newLayout
          */
         setLayout: function(newLayout) {
             if (newLayout === this.main.layout) {
@@ -83,19 +85,19 @@ define(function(require) {
             this.main.layout = newLayout;
             switch (newLayout) {
                 case 'fullscreen':
-                    this.manager.enable(FloatingHeaderPlugin);
+                    mediator.execute('layout:disablePageScroll', this.main.$el);
                     this.main.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: this.getCssHeightCalcExpression()
                     });
-                    mediator.execute('layout:disablePageScroll', this.main.$el);
+                    this.manager.enable(FloatingHeaderPlugin);
                     break;
                 case 'scroll':
                 case 'default':
-                    this.manager.disable(FloatingHeaderPlugin);
+                    mediator.execute('layout:enablePageScroll');
                     this.main.$grid.parents('.grid-scrollable-container').css({
                         maxHeight: ''
                     });
-                    mediator.execute('layout:enablePageScroll');
+                    this.manager.disable(FloatingHeaderPlugin);
                     break;
                 default:
                     throw new Error('Unknown grid layout');

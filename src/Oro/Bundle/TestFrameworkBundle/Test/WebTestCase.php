@@ -516,7 +516,7 @@ abstract class WebTestCase extends BaseWebTestCase
         $parameters = [];
         $testFiles = new \RecursiveDirectoryIterator($folder, \RecursiveDirectoryIterator::SKIP_DOTS);
         foreach ($testFiles as $fileName => $object) {
-            $parameters[$fileName] = Yaml::parse($fileName);
+            $parameters[$fileName] = Yaml::parse(file_get_contents($fileName)) ?: [];
             if (is_null($parameters[$fileName]['response'])) {
                 unset($parameters[$fileName]['response']);
             }

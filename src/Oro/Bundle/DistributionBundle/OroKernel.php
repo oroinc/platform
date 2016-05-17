@@ -72,7 +72,7 @@ abstract class OroKernel extends Kernel
             }
 
             // require instead of require_once used to correctly handle sub-requests
-            $bundles = require $cache;
+            $bundles = require $cache->getPath();
         }
 
         return $bundles;
@@ -140,7 +140,7 @@ abstract class OroKernel extends Kernel
         $bundles    = array();
         $exclusions = array();
         foreach ($files as $file) {
-            $import  = Yaml::parse($file);
+            $import  = Yaml::parse(file_get_contents($file));
             if (!empty($import)) {
                 if (!empty($import['bundles'])) {
                     $bundles = array_merge($bundles, $this->getBundlesMapping($import['bundles']));
