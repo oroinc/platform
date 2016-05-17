@@ -16,15 +16,17 @@ class Configuration implements ConfigurationInterface
 
         $rootNode->children()
             ->arrayNode('transport')->children()
+                ->booleanNode('null')->defaultFalse()->end()
                 ->arrayNode('amqp')->children()
                     ->scalarNode('host')->isRequired()->cannotBeEmpty()->end()
                     ->scalarNode('port')->isRequired()->cannotBeEmpty()->end()
                     ->scalarNode('user')->isRequired()->cannotBeEmpty()->end()
                     ->scalarNode('password')->isRequired()->cannotBeEmpty()->end()
                     ->scalarNode('vhost')->isRequired()->cannotBeEmpty()->end()
+                ->end()->end()
+            ->end()->end()
         ;
 
         return $tb;
     }
 }
-

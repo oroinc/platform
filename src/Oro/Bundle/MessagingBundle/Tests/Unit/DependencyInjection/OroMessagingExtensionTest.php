@@ -4,6 +4,8 @@ namespace Oro\Bundle\MessagingBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\MessagingBundle\DependencyInjection\OroMessagingExtension;
 use Oro\Component\Messaging\Transport\Amqp\AmqpConnection;
 use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
+use Oro\Component\Messaging\Transport\Null\NullConnection;
+use Oro\Component\Messaging\Transport\Null\NullSession;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
@@ -90,6 +92,49 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals(
             new Alias('oro_messaging.transport.amqp.session'),
+            $container->getAlias('oro_messaging.transport.session')
+        );
+    }
+
+    public function testShouldConfigureNullTransport()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessagingExtension();
+
+        $extension->load([[
+            'transport' => [
+                'null' => true
+            ]
+        ]], $container);
+
+        $this->assertTrue($container->hasDefinition('oro_messaging.transport.null.connection'));
+        $connection = $container->getDefinition('oro_messaging.transport.null.connection');
+        $this->assertEquals(NullConnection::class, $connection->getClass());
+
+        $this->assertTrue($container->hasDefinition('oro_messaging.transport.null.session'));
+        $session = $container->getDefinition('oro_messaging.transport.null.session');
+        $this->assertEquals(NullSession::class, $session->getClass());
+        $this->assertEquals(
+            [new Reference('oro_messaging.transport.null.connection'), 'createSession'],
+            $session->getFactory()
+        );
+    }
+
+    public function testShouldUseNullTransportAsDefault()
+    {
+        $container = new ContainerBuilder();
+
+        $extension = new OroMessagingExtension();
+
+        $extension->load([[
+            'transport' => [
+                'null' => true
+            ]
+        ]], $container);
+
+        $this->assertEquals(
+            new Alias('oro_messaging.transport.null.session'),
             $container->getAlias('oro_messaging.transport.session')
         );
     }

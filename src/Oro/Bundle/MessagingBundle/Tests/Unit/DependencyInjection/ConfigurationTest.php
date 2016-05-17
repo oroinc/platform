@@ -55,7 +55,26 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
                     'user' => 'theUser',
                     'password' => 'thePassword',
                     'vhost' => 'theVhost'
-                ]
+                ],
+                'null' => false,
+            ]
+        ], $config);
+    }
+
+    public function testShouldAllowConfigureNullTransport()
+    {
+        $configuration = new Configuration();
+
+        $processor = new Processor();
+        $config = $processor->processConfiguration($configuration, [[
+            'transport' => [
+                'null' => true,
+            ]
+        ]]);
+
+        $this->assertEquals([
+            'transport' => [
+                'null' => true,
             ]
         ], $config);
     }
