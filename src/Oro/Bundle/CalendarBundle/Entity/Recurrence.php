@@ -343,39 +343,4 @@ class Recurrence
     {
         return $this->occurrences;
     }
-
-    /**
-     * Returns the list of possible values for recurrenceType.
-     *
-     * @return array
-     */
-    public static function getRecurrenceTypes()
-    {
-        return [
-            Recurrence::TYPE_DAILY,
-            Recurrence::TYPE_WEEKLY,
-            Recurrence::TYPE_MONTHLY,
-            Recurrence::TYPE_MONTH_N_TH,
-            Recurrence::TYPE_YEARLY,
-            Recurrence::TYPE_YEAR_N_TH,
-        ];
-    }
-
-    /**
-     * Returns the list of possible values for dayOfWeek.
-     *
-     * @return array
-     */
-    public static function getDaysOfWeek()
-    {
-        return [
-            Recurrence::DAY_SUNDAY,
-            Recurrence::DAY_MONDAY,
-            Recurrence::DAY_TUESDAY,
-            Recurrence::DAY_WEDNESDAY,
-            Recurrence::DAY_THURSDAY,
-            Recurrence::DAY_FRIDAY,
-            Recurrence::DAY_SATURDAY,
-        ];
-    }
 }

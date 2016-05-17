@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Twig;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 use Oro\Bundle\CalendarBundle\Twig\RecurrenceExtension;
 
 class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
@@ -31,7 +32,8 @@ class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
             ->getMock();
-        $this->extension = new RecurrenceExtension($this->delegateStrategy, $this->translator, $this->validator);
+        $helper = new StrategyHelper($this->validator);
+        $this->extension = new RecurrenceExtension($this->delegateStrategy, $this->translator, $helper);
     }
 
     public function testGetName()

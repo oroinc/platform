@@ -62,6 +62,8 @@ interface StrategyInterface
      * @param Recurrence $recurrence
      *
      * @return null|string
+     *
+     * @throws \InvalidArgumentException
      */
     public function getValidationErrorMessage(Recurrence $recurrence);
 }

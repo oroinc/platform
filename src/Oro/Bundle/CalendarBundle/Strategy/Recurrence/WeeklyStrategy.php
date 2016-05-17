@@ -192,7 +192,7 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
     public function getValidationErrorMessage(Recurrence $recurrence)
     {
         if (empty($recurrence->getDayOfWeek())) {
-            return "dayOfWeek can't be empty for Weekly recurrence pattern";
+            return "Parameter 'dayOfWeek' can't be empty for Weekly recurrence pattern.";
         }
 
         return null;

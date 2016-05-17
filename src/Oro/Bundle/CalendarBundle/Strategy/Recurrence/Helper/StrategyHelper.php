@@ -3,6 +3,7 @@
 namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Symfony\Component\Validator\ConstraintViolation;
 use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class StrategyHelper
@@ -73,6 +74,7 @@ class StrategyHelper
 
         if (count($errors) > 0) {
             $errorMessages = [];
+            /** @var ConstraintViolation $error */
             foreach ($errors as $error) {
                 $errorMessages[$error->getPropertyPath()] = $error->getMessage();
             }

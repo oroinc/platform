@@ -32,7 +32,7 @@ class RecurrenceValidator extends ConstraintValidator
     public function validate($value, Constraint $constraint)
     {
         if ($value->getEndTime() !== null && $value->getEndTime() < $value->getStartTime()) {
-            $this->context->addViolation("endTime date can't be earlier than startTime date");
+            $this->context->addViolation("Parameter 'endTime' date can't be earlier than startTime date.");
         }
 
         if ($errorMessage = $this->recurrenceStrategy->getValidationErrorMessage($value)) {

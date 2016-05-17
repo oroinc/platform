@@ -2,12 +2,12 @@
 
 namespace Oro\Bundle\CalendarBundle\Twig;
 
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy;
 use Oro\Component\PropertyAccess\PropertyAccessor;
-use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class RecurrenceExtension extends \Twig_Extension
 {
@@ -20,28 +20,24 @@ class RecurrenceExtension extends \Twig_Extension
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    /**
-     * @var ValidatorInterface
-     */
-    protected $validator;
-
-    // @TODO unit test
+    /** @var  StrategyHelper */
+    protected $recurrenceHelper;
 
     /**
      * RecurrenceExtension constructor.
      *
      * @param DelegateStrategy $delegateStrategy
      * @param TranslatorInterface $translator
-     * @param ValidatorInterface $validator
+     * @param StrategyHelper $strategyHelper
      */
     public function __construct(
         DelegateStrategy $delegateStrategy,
         TranslatorInterface $translator,
-        ValidatorInterface $validator
+        StrategyHelper $strategyHelper
     ) {
         $this->delegateStrategy = $delegateStrategy;
         $this->translator = $translator;
-        $this->validator = $validator;
+        $this->recurrenceHelper = $strategyHelper;
     }
 
     /**
@@ -92,16 +88,7 @@ class RecurrenceExtension extends \Twig_Extension
             $propertyAccessor->setValue($recurrence, $attr, $value);
         }
 
-        $errors = $this->validator->validate($recurrence);
-
-        if (count($errors) > 0) {
-            $errorMessages = [];
-            foreach ($errors as $error) {
-                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
-            }
-
-            throw new \RuntimeException('Recurrence is invalid: ' . json_encode($errorMessages));
-        }
+        $this->recurrenceHelper->validateRecurrence($recurrence);
 
         return $this->getRecurrencePattern($recurrence);
     }

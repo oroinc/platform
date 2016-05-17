@@ -99,7 +99,10 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
      */
     public function getValidationErrorMessage(Recurrence $recurrence)
     {
-        //for this strategy no additional validation needed
+        if ($recurrence->getInterval() > 99) {
+            return "Parameter 'interval' can't be more than 99 for Daily recurrence pattern";
+        }
+
         return null;
     }
 }

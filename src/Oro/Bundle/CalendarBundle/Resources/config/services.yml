@@ -113,7 +113,7 @@ services:
         arguments:
             - '@oro_calendar.recurrence.strategy.delegate'
             - '@translator'
-            - '@validator'
+            - '@oro_calendar.strategy.recurrence.strategy_helper'
         tags:
             - { name: twig.extension }
 
