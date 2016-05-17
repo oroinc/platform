@@ -5,6 +5,9 @@ use Oro\Component\Messaging\Transport\Message;
 
 class AmqpMessage implements Message
 {
+    const DELIVERY_MODE_NON_PERSISTENT = 1;
+    const DELIVERY_MODE_PERSISTENT = 2;
+
     /**
      * @var string
      */

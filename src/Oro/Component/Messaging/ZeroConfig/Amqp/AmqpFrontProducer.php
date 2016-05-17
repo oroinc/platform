@@ -1,15 +1,16 @@
 <?php
-namespace Oro\Component\Messaging\ZeroConfig;
+namespace Oro\Component\Messaging\ZeroConfig\Amqp;
 
 use Oro\Component\Messaging\Transport\Amqp\AmqpQueue;
-use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
+use Oro\Component\Messaging\Transport\Amqp\AmqpSession as TransportAmqpSession;
 use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
 use Oro\Component\Messaging\Transport\Message;
+use Oro\Component\Messaging\ZeroConfig\ProducerInterface;
 
 class AmqpFrontProducer implements ProducerInterface
 {
     /**
-     * @var AmqpSession
+     * @var TransportAmqpSession
      */
     protected $session;
 
@@ -24,11 +25,11 @@ class AmqpFrontProducer implements ProducerInterface
     protected $queueName;
 
     /**
-     * @param AmqpSession $session
-     * @param string      $topicName
-     * @param string      $queueName
+     * @param TransportAmqpSession $session
+     * @param string               $topicName
+     * @param string               $queueName
      */
-    public function __construct(AmqpSession $session, $topicName, $queueName)
+    public function __construct(TransportAmqpSession $session, $topicName, $queueName)
     {
         $this->session = $session;
         $this->topicName = $topicName;

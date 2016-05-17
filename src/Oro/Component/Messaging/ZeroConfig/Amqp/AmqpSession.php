@@ -1,12 +1,12 @@
 <?php
-namespace Oro\Component\Messaging\ZeroConfig;
+namespace Oro\Component\Messaging\ZeroConfig\Amqp;
 
+use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
 use \Oro\Component\Messaging\Transport\Amqp\AmqpSession as TransportAmqpSession;
+use Oro\Component\Messaging\ZeroConfig\SessionInterface;
 
 class AmqpSession implements SessionInterface
 {
-    const DELIVERY_MODE_PERSISTENT = 2;
-
     /**
      * @var TransportAmqpSession
      */
@@ -28,12 +28,26 @@ class AmqpSession implements SessionInterface
     protected $queueTopicName;
 
     /**
+     * @param TransportAmqpSession $session
+     * @param string               $routerTopicName
+     * @param string               $routerQueueName
+     * @param string               $queueTopicName
+     */
+    public function __construct(TransportAmqpSession $session, $routerTopicName, $routerQueueName, $queueTopicName)
+    {
+        $this->session = $session;
+        $this->routerTopicName = $routerTopicName;
+        $this->routerQueueName = $routerQueueName;
+        $this->queueTopicName = $queueTopicName;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function createMessage()
     {
         return $this->session->createMessage(null, [], [
-            'delivery_mode' => self::DELIVERY_MODE_PERSISTENT,
+            'delivery_mode' => AmqpMessage::DELIVERY_MODE_PERSISTENT,
         ]);
     }
 

@@ -1,12 +1,12 @@
 <?php
-namespace Oro\Component\Messaging\Tests\ZeroConfig;
+namespace Oro\Component\Messaging\Tests\ZeroConfig\Amqp;
 
 use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
 use Oro\Component\Messaging\Transport\Amqp\AmqpMessageProducer;
 use Oro\Component\Messaging\Transport\Amqp\AmqpQueue;
 use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
 use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
-use Oro\Component\Messaging\ZeroConfig\AmqpQueueProducer;
+use Oro\Component\Messaging\ZeroConfig\Amqp\AmqpQueueProducer;
 
 class AmqpQueueProducerTest extends \PHPUnit_Framework_TestCase
 {

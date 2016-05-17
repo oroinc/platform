@@ -3,27 +3,21 @@ namespace Oro\Component\Messaging\ZeroConfig;
 
 use Oro\Component\Messaging\Consumption\MessageProcessor;
 use Symfony\Component\DependencyInjection\ContainerAwareInterface;
+use Symfony\Component\DependencyInjection\ContainerAwareTrait;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
 class ContainerAwareMessageProcessorRegistry implements MessageProcessorRegistryInterface, ContainerAwareInterface
 {
-    /**
-     * @var ContainerInterface
-     */
-    protected $container;
+    use ContainerAwareTrait;
 
     /**
      * @var MessageProcessor[]
      */
     protected $processors;
 
-    /**
-     * {@inheritdoc}
-     */
-    public function setContainer(ContainerInterface $container = null)
+    public function __construct()
     {
         $this->processors = [];
-        $this->container = $container;
     }
 
     /**

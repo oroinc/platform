@@ -53,6 +53,7 @@ class RouterMessageProcessor implements MessageProcessor
 
             $queueMessage = $this->session->createMessage();
             $queueMessage->setProperties($properties);
+            $queueMessage->setHeaders($message->getHeaders());
             $queueMessage->setBody($message->getBody());
 
             $this->session->createQueueProducer($queueName)->send($queueMessage);
