@@ -6,6 +6,7 @@ Table of content
 - [Overview](#overview)
 - [Recurrence Pattern](#recurrence-pattern)
 - [Pattern Exceptions](#pattern-exceptions)
+- [Recurrence Validation](#recurrence-validation)
 
 ##Overview
 
@@ -23,3 +24,19 @@ The additional fields are as follows:
 - **recurringEventId** – the id of the parent recurring event.
 - **originalStart** – the original start date and time of this occurrence. It may differ from the actual start date for the recurrence. 
 - **isCancelled** – A boolean field indicating whether the occurrence was cancelled (removed from the user’s calendar).
+
+##Recurrence Validation
+
+To make sure that Recurrence pattern has all needed data it can be validated with recurrence strategy helper:
+```php
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
+        
+...
+
+/** @var \Symfony\Component\Validator\Validator\ValidatorInterface $validator */
+/** @var \Oro\Bundle\CalendarBundle\Entity\Recurrence $recurrence */
+$helper = new StrategyHelper($this->validator);
+$helper->validateRecurrence($recurrence);
+
+```
+
