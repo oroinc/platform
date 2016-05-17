@@ -151,12 +151,12 @@ class CalendarEventController extends Controller
             $saved = true;
         }
 
-        return array(
+        return [
             'entity'     => $entity,
             'saved'      => $saved,
             'form'       => $this->get('oro_calendar.calendar_event.form.handler')->getForm()->createView(),
             'formAction' => $formAction
-        );
+        ];
     }
 
     /**

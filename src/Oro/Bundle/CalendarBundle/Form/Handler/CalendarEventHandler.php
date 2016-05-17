@@ -7,6 +7,7 @@ use Doctrine\Common\Persistence\ObjectManager;
 
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\HttpFoundation\Request;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
@@ -46,13 +47,14 @@ class CalendarEventHandler
     protected $usersToAttendeesTransformer;
 
     /**
-     * @param FormInterface       $form
-     * @param Request             $request
-     * @param ObjectManager       $manager
-     * @param ActivityManager     $activityManager
-     * @param EntityRoutingHelper $entityRoutingHelper
-     * @param SecurityFacade      $securityFacade
-     * @param EmailSendProcessor  $emailSendProcessor
+     * @param FormInterface               $form
+     * @param Request                     $request
+     * @param ObjectManager               $manager
+     * @param ActivityManager             $activityManager
+     * @param EntityRoutingHelper         $entityRoutingHelper
+     * @param SecurityFacade              $securityFacade
+     * @param EmailSendProcessor          $emailSendProcessor
+     * @param UsersToAttendeesTransformer $usersToAttendeesTransformer
      */
     public function __construct(
         FormInterface $form,
@@ -64,13 +66,13 @@ class CalendarEventHandler
         EmailSendProcessor $emailSendProcessor,
         UsersToAttendeesTransformer $usersToAttendeesTransformer
     ) {
-        $this->form                = $form;
-        $this->request             = $request;
-        $this->manager             = $manager;
-        $this->activityManager     = $activityManager;
-        $this->entityRoutingHelper = $entityRoutingHelper;
-        $this->securityFacade      = $securityFacade;
-        $this->emailSendProcessor  = $emailSendProcessor;
+        $this->form                        = $form;
+        $this->request                     = $request;
+        $this->manager                     = $manager;
+        $this->activityManager             = $activityManager;
+        $this->entityRoutingHelper         = $entityRoutingHelper;
+        $this->securityFacade              = $securityFacade;
+        $this->emailSendProcessor          = $emailSendProcessor;
         $this->usersToAttendeesTransformer = $usersToAttendeesTransformer;
     }
 
@@ -89,12 +91,15 @@ class CalendarEventHandler
      *
      * @param  CalendarEvent $entity
      *
-     * @throws \LogicException
+     * @return bool True on successful processing, false otherwise
      *
-     * @return bool  True on successful processing, false otherwise
+     * @throw AccessDeniedException
+     * @throws \LogicException
      */
     public function process(CalendarEvent $entity)
     {
+        $this->checkPermission($entity);
+
         $this->form->setData($entity);
 
         if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
@@ -219,6 +224,18 @@ class CalendarEventHandler
                 $originalAttendees,
                 $notify
             );
+        }
+    }
+
+    /**
+     * @param CalendarEvent $entity
+     *
+     * @throws AccessDeniedException
+     */
+    protected function checkPermission(CalendarEvent $entity)
+    {
+        if ($entity->getOrigin() && $entity->getOrigin()->getId() === CalendarEvent::ORIGIN_EXTERNAL) {
+            throw new AccessDeniedException();
         }
     }
 }
