@@ -2,13 +2,12 @@
 
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Command;
 
-use Doctrine\Common\Persistence\ObjectRepository;
-
 use Symfony\Component\Console\Tester\CommandTester;
+
+use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
 /**
  * @dbIsolation
@@ -93,29 +92,6 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 
         foreach ($definitions as $definition) {
             if ($definition->getName() === $name) {
-                $found = true;
-                break;
-            }
-        }
-
-        $this->assertTrue($found);
-    }
-
-    /**
-     * @param array|ProcessTrigger[] $triggers
-     * @param string $name
-     * @param string $event
-     * @param string $cron
-     */
-    protected function assertTriggerLoaded(array $triggers, $name, $event, $cron)
-    {
-        $found = false;
-
-        foreach ($triggers as $trigger) {
-            if ($trigger->getEvent() === $event &&
-                $trigger->getCron() === $cron &&
-                $trigger->getDefinition()->getName() === $name
-            ) {
                 $found = true;
                 break;
             }
