@@ -96,4 +96,15 @@ UPGRADE FROM 1.9 to 1.10
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
 
 ####UiBundle
-- Added [lightgallery](http://sachinchoolur.github.io/lightGallery/) by Sachin N.
+- Added [lightgallery](http://sachinchoolur.github.io/lightGallery/) plugin by Sachin N.
+
+Gallery view for a group of `<a>` elements can be triggered by adding 'data-gallery' attribute with unique gallery id.
+
+```
+<a href="sample1.jpg" data-gallery="unique-id"></a>
+<a href="sample2.jpg" data-gallery="unique-id"></a>
+```
+
+####EmailBundle
+- Constructor for `Oro\Bundle\EmailBundle\Manager\EmailAttachmentManager` was changed. New arguments: `Router $router`
+- Constructor for `Oro\Bundle\EmailBundle\Tools\EmailAttachmentTransformer` was changed. New arguments: `AttachmentManager $manager, EmailAttachmentManager $emailAttachmentManager`
