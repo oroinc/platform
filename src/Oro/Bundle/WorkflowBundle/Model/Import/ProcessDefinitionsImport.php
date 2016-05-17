@@ -7,7 +7,7 @@ use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Component\DoctrineUtils\ORM\EntityManagementTrait;
 
-class ProcessDefinitionImport
+class ProcessDefinitionsImport
 {
     use EntityManagementTrait;
 
@@ -47,7 +47,7 @@ class ProcessDefinitionImport
      */
     public function import(array $definitionsConfiguration)
     {
-        $loadedDefinitions = [];
+        $importedDefinitions = [];
 
         $entityManager = $this->getObjectManager();
         $definitionRepository = $this->getRepository();
@@ -66,13 +66,13 @@ class ProcessDefinitionImport
                     $entityManager->persist($definition);
                 }
 
-                $loadedDefinitions[$definitionName] = $definition;
+                $importedDefinitions[$definitionName] = $definition;
             }
 
             $entityManager->flush();
         }
 
-        return $loadedDefinitions;
+        return $importedDefinitions;
     }
 
     /**

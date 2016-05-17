@@ -145,7 +145,7 @@ services:
             - '%oro_cron.entity.schedule.class%'
 
     oro_workflow.process.import.definitions:
-        class: Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionImport
+        class: Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport
         arguments:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@doctrine'

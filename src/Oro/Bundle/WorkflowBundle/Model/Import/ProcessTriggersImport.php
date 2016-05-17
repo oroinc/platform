@@ -64,7 +64,7 @@ class ProcessTriggersImport
      */
     public function import(array $triggersConfiguration, array $definitions)
     {
-        $loadedTriggers = [];
+        $importedTriggers = [];
 
         $triggers = $this->configurationBuilder->buildProcessTriggers(
             $triggersConfiguration,
@@ -84,7 +84,7 @@ class ProcessTriggersImport
                     $entityManager->persist($trigger);
                 }
 
-                $loadedTriggers[] = $trigger;
+                $importedTriggers[] = $trigger;
             }
 
             $entityManager->flush();
@@ -92,14 +92,14 @@ class ProcessTriggersImport
         
         $this->createdSchedules = [];
 
-        if (count($loadedTriggers) > 0) {
+        if (count($importedTriggers) > 0) {
             foreach ($triggerRepository->findAllCronTriggers() as $cronTrigger) {
                 $this->processCronScheduler->add($cronTrigger);
             }
             $this->createdSchedules = $this->processCronScheduler->flush();
         }
 
-        return $loadedTriggers;
+        return $importedTriggers;
     }
 
     /**
