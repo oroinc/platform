@@ -75,7 +75,7 @@ class RestCalendarEventTest extends WebTestCase
         return $result['id'];
     }
 
-        /**
+    /**
      * @depends testPost
      *
      * @param int $id
@@ -107,6 +107,7 @@ class RestCalendarEventTest extends WebTestCase
                 'allDay'          => true,
                 'backgroundColor' => '#FF0000',
                 'invitationStatus' => 'accepted',
+                'origin'           => 'client',
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
@@ -224,6 +225,7 @@ class RestCalendarEventTest extends WebTestCase
                 'allDay'          => true,
                 'backgroundColor' => '#FF0000',
                 'invitationStatus' => null,
+                'origin'           => 'client',
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
