@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Handler;
 use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
-use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;

@@ -123,7 +123,11 @@ class CalendarEventApiTypeTest extends TypeTestCase
         );
 
         $type = new CalendarEventApiType($this->calendarEventManager, $this->registry, $this->securityFacade);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(
+            $type,
+            null,
+            ['data_class' => 'Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\CalendarEvent']
+        );
 
         $this->calendarEventManager->expects($this->once())
             ->method('setCalendar')
@@ -169,7 +173,11 @@ class CalendarEventApiTypeTest extends TypeTestCase
         );
 
         $type = new CalendarEventApiType($this->calendarEventManager, $this->registry, $this->securityFacade);
-        $form = $this->factory->create($type);
+        $form = $this->factory->create(
+            $type,
+            null,
+            ['data_class' => 'Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\CalendarEvent']
+        );
 
         $this->calendarEventManager->expects($this->once())
             ->method('setCalendar')
