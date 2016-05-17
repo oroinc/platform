@@ -78,13 +78,11 @@ class NullSessionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf('Oro\Component\Messaging\Transport\Null\NullMessageConsumer', $consumer);
     }
 
-    public function testShouldAllowCreateProducerForGivenTopic()
+    public function testShouldAllowCreateProducer()
     {
         $session = new NullSession();
 
-        $topic = new NullTopic('aName');
-
-        $producer = $session->createProducer($topic);
+        $producer = $session->createProducer();
 
         $this->assertInstanceOf('Oro\Component\Messaging\Transport\Null\NullMessageProducer', $producer);
     }

@@ -86,18 +86,11 @@ class AmqpSession implements Session
     /**
      * {@inheritdoc}
      *
-     * @param AmqpTopic $destination
-     *
      * @return AmqpMessageProducer
      */
-    public function createProducer(Destination $destination)
+    public function createProducer()
     {
-        InvalidDestinationException::assertDestinationInstanceOf(
-            $destination,
-            'Oro\Component\Messaging\Transport\Amqp\AmqpTopic'
-        );
-
-        return new AmqpMessageProducer($this->channel, $destination);
+        return new AmqpMessageProducer($this->channel);
     }
 
     /**

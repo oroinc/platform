@@ -53,12 +53,10 @@ class NullSession implements Session
     
     /**
      * {@inheritdoc}
-     *
-     * @return NullMessageProducer
      */
-    public function createProducer(Destination $destination)
+    public function createProducer()
     {
-        return new NullMessageProducer($destination);
+        return new NullMessageProducer();
     }
 
     /**

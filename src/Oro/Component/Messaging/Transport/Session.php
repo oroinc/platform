@@ -34,11 +34,9 @@ interface Session
     public function createConsumer(Destination $destination);
 
     /**
-     * @param Destination $destination
-     *
      * @return MessageProducer
      */
-    public function createProducer(Destination $destination);
+    public function createProducer();
 
     /**
      * @param Destination $destination

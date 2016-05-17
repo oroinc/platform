@@ -92,27 +92,13 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
         $session->createConsumer($invalidDestination);
     }
 
-    public function testShouldAllowCreateProducerForGivenTopic()
+    public function testShouldAllowCreateProducer()
     {
         $session = new AmqpSession($this->createAmqpChannel());
 
-        $topic = new AmqpTopic('aName');
-
-        $producer = $session->createProducer($topic);
+        $producer = $session->createProducer();
 
         $this->assertInstanceOf('Oro\Component\Messaging\Transport\Amqp\AmqpMessageProducer', $producer);
-    }
-
-    /**
-     * @expectedException \Oro\Component\Messaging\Transport\Exception\InvalidDestinationException
-     */
-    public function testThrowIfGivenDestinationInvalidOnCreateProducer()
-    {
-        $session = new AmqpSession($this->createAmqpChannel());
-
-        $invalidDestination = $this->createDestination();
-
-        $session->createProducer($invalidDestination);
     }
 
     public function testShouldAllowDeclareQueue()
