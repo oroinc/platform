@@ -157,6 +157,7 @@ services:
             - '@oro_workflow.configuration.builder.process_configuration'
             - '@doctrine'
             - '%oro_workflow.process_trigger.entity.class%'
+            - '@oro_workflow.process.cron_scheduler'
 
     oro_workflow.process.import:
         class: Oro\Bundle\WorkflowBundle\Model\ProcessImport
@@ -164,4 +165,3 @@ services:
         arguments:
             - '@oro_workflow.process.import.definitions'
             - '@oro_workflow.process.import.triggers'
-            - '@oro_workflow.process.cron_scheduler'

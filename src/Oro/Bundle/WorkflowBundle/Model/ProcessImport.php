@@ -12,11 +12,6 @@ use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport;
 class ProcessImport
 {
     /**
-     * @var ProcessTriggerScheduler
-     */
-    private $triggerScheduler;
-
-    /**
      * @var array|ProcessDefinition[]
      */
     private $loadedDefinitions = [];
@@ -25,11 +20,6 @@ class ProcessImport
      * @var array|ProcessTrigger[]
      */
     private $loadedTriggers = [];
-
-    /**
-     * @var Schedule[]
-     */
-    private $createdSchedules = [];
 
     /**
      * @var ProcessDefinitionImport
@@ -44,16 +34,13 @@ class ProcessImport
     /**
      * @param ProcessDefinitionImport $definitionImport
      * @param ProcessTriggersImport $triggersImport
-     * @param ProcessTriggerScheduler $processCronScheduler
      */
     public function __construct(
         ProcessDefinitionImport $definitionImport,
-        ProcessTriggersImport $triggersImport,
-        ProcessTriggerScheduler $processCronScheduler
+        ProcessTriggersImport $triggersImport
     ) {
         $this->definitionImport = $definitionImport;
         $this->triggersImport = $triggersImport;
-        $this->triggerScheduler = $processCronScheduler;
     }
 
     /**
@@ -69,28 +56,18 @@ class ProcessImport
             $processConfigurations[ProcessConfigurationProvider::NODE_TRIGGERS],
             $this->definitionImport->getDefinitionsRepository()->findAll()
         );
-        
-        if (count($this->loadedTriggers) !== 0) {
-            foreach ($this->triggersImport->getTriggersRepository()->findAllCronTriggers() as $cronTrigger) {
-                $this->triggerScheduler->add($cronTrigger);
-            }
-
-            $this->createdSchedules = $this->triggerScheduler->flush();
-        } else {
-            $this->createdSchedules = [];
-        }
     }
 
     /**
-     * @return \Oro\Bundle\CronBundle\Entity\Schedule[]
+     * @return array|Schedule[]
      */
     public function getCreatedSchedules()
     {
-        return $this->createdSchedules;
+        return $this->triggersImport->getCreatedSchedules();
     }
 
     /**
-     * @return array|\Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger[]
+     * @return array|ProcessTrigger[]
      */
     public function getLoadedTriggers()
     {
@@ -98,7 +75,7 @@ class ProcessImport
     }
 
     /**
-     * @return array|\Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition[]
+     * @return array|ProcessDefinition[]
      */
     public function getLoadedDefinitions()
     {

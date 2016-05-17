@@ -3,9 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
+use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler;
 use Oro\Component\DoctrineUtils\ORM\EntityManagementTrait;
 
 class ProcessTriggersImport
@@ -28,18 +30,31 @@ class ProcessTriggersImport
     private $triggerEntityClass;
 
     /**
+     * @var ProcessTriggerScheduler
+     */
+    private $processCronScheduler;
+
+    /**
+     * @var array|Schedule[]
+     */
+    private $createdSchedules;
+
+    /**
      * @param ProcessConfigurationBuilder $configurationBuilder
      * @param ManagerRegistry $managerRegistry
      * @param string $triggerEntityClass
+     * @param ProcessTriggerScheduler $processCronScheduler
      */
     public function __construct(
         ProcessConfigurationBuilder $configurationBuilder,
         ManagerRegistry $managerRegistry,
-        $triggerEntityClass
+        $triggerEntityClass,
+        ProcessTriggerScheduler $processCronScheduler
     ) {
         $this->configurationBuilder = $configurationBuilder;
         $this->managerRegistry = $managerRegistry;
         $this->triggerEntityClass = $triggerEntityClass;
+        $this->processCronScheduler = $processCronScheduler;
     }
 
     /**
@@ -55,11 +70,13 @@ class ProcessTriggersImport
             $triggersConfiguration,
             $this->namedDefinitionsArray($definitions)
         );
+        
+        /** @var ProcessTriggerRepository $triggerRepository */
+        $triggerRepository = $this->getRepository();
 
         if ($triggers) { #because of flush
             $entityManager = $this->getObjectManager();
-            /** @var ProcessTriggerRepository $triggerRepository */
-            $triggerRepository = $this->getRepository();
+            
             foreach ($triggers as $trigger) {
                 if ($existingTrigger = $triggerRepository->findEqualTrigger($trigger)) {
                     $existingTrigger->import($trigger);
@@ -71,6 +88,15 @@ class ProcessTriggersImport
             }
 
             $entityManager->flush();
+        }
+        
+        $this->createdSchedules = [];
+
+        if (count($loadedTriggers) > 0) {
+            foreach ($triggerRepository->findAllCronTriggers() as $cronTrigger) {
+                $this->processCronScheduler->add($cronTrigger);
+            }
+            $this->createdSchedules = $this->processCronScheduler->flush();
         }
 
         return $loadedTriggers;
@@ -91,11 +117,11 @@ class ProcessTriggersImport
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository|ProcessTriggerRepository
+     * @return array|Schedule[]
      */
-    public function getTriggersRepository()
+    public function getCreatedSchedules()
     {
-        return $this->getRepository();
+        return $this->createdSchedules;
     }
 
     /**
