@@ -52,7 +52,6 @@ class CalendarEventAttendeesType extends AbstractType
                 return array_merge(
                     $value,
                     [
-                        'allowCreateNew' => true,
                         'renderedPropertyName' => 'email',
                         'forceSelectedData' => true,
                     ]
