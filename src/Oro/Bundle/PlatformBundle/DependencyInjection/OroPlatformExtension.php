@@ -27,8 +27,15 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
             new YamlCumulativeFileLoader('Resources/config/oro/app.yml')
         );
 
+        // original security config
+        $securityConfig = null;
+        if ($container->hasExtension('security')) {
+            $securityConfig = $container->getExtensionConfig('security');
+        }
+
         $securityModified = false;
         $securityConfigs = [];
+
         $extensions = $container->getExtensions();
 
         //bundles that are loaded later should be able to override configuration of bundles loaded before
@@ -55,8 +62,7 @@ class OroPlatformExtension extends Extension implements PrependExtensionInterfac
         }
 
         // original security config has highest priority
-        if ($container->hasExtension('security')) {
-            $securityConfig = $container->getExtensionConfig('security');
+        if ($securityConfig) {
             $this->mergeConfigIntoOne($container, 'security', reset($securityConfig));
         }
 
