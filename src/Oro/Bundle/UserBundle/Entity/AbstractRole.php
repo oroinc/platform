@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\UserBundle\Entity;
 
+use Symfony\Component\Security\Core\Authorization\Voter\AuthenticatedVoter;
 use Symfony\Component\Security\Core\Role\Role as BaseRole;
 
 abstract class AbstractRole extends BaseRole
@@ -82,7 +83,7 @@ abstract class AbstractRole extends BaseRole
      */
     protected function addPrefix($role)
     {
-        if (strpos($role, $this->getPrefix()) !== 0) {
+        if ($role !== AuthenticatedVoter::IS_AUTHENTICATED_ANONYMOUSLY && strpos($role, $this->getPrefix()) !== 0) {
             $role = $this->getPrefix() . $role;
         }
 
