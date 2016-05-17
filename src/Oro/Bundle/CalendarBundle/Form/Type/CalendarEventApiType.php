@@ -95,7 +95,8 @@ class CalendarEventApiType extends CalendarEventType
                     'format'         => DateTimeType::HTML5_FORMAT,
                     'model_timezone' => 'UTC'
                 ]
-            );
+            )
+            ->add('origin');
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);
