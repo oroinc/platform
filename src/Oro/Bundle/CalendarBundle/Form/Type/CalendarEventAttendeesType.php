@@ -6,6 +6,9 @@ use Doctrine\Common\Persistence\ManagerRegistry;
 
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\FormBuilderInterface;
+use Symfony\Component\Form\FormError;
+use Symfony\Component\Form\FormEvent;
+use Symfony\Component\Form\FormEvents;
 use Symfony\Component\Form\FormInterface;
 use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
@@ -39,6 +42,35 @@ class CalendarEventAttendeesType extends AbstractType
     {
         $builder->resetModelTransformers();
         $builder->addModelTransformer($this->usersToAttendeesTransformer);
+        $builder->addEventListener(FormEvents::PRE_SUBMIT, function (FormEvent $event) {
+            $form = $event->getForm();
+            $data = $event->getData();
+            if (!$data) {
+                return;
+            }
+
+            $invalidAttendees = array_diff(
+                $this->parseNewValues($data),
+                $this->parseNewValues($form->getViewData())
+            );
+
+            if (!$invalidAttendees) {
+                return;
+            }
+
+            $form->addError(new FormError(sprintf(
+                'This field has invalid attendees: "%s"',
+                implode(
+                    ', ',
+                    array_map(
+                        function ($value) {
+                            return json_decode($value)->value;
+                        },
+                        $invalidAttendees
+                    )
+                )
+            )));
+        });
     }
 
     /**
@@ -121,6 +153,21 @@ class CalendarEventAttendeesType extends AbstractType
                 $attendee->getId() !== $calendarEvent->getRelatedAttendee()->getId()
                 && $attendee->getId() !== $calendarEvent->getRealCalendarEvent()->getRelatedAttendee()->getId()
             )
+        );
+    }
+
+    /**
+     * @param string $value
+     *
+     * @return array
+     */
+    protected function parseNewValues($value)
+    {
+        return array_filter(
+            explode(',', $value),
+            function ($value) {
+                return !is_numeric($value);
+            }
         );
     }
 }
