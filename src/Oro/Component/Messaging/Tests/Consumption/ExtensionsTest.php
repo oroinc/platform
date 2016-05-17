@@ -42,6 +42,28 @@ class ExtensionsTest extends \PHPUnit_Framework_TestCase
         $extensions->onStart($context);
     }
 
+    public function testShouldProxyOnBeforeReceiveToAllInternalExtensions()
+    {
+        $context = $this->createContextMock();
+
+        $fooExtension = $this->createExtension();
+        $fooExtension
+            ->expects($this->once())
+            ->method('onBeforeReceive')
+            ->with($this->identicalTo($context))
+        ;
+        $barExtension = $this->createExtension();
+        $barExtension
+            ->expects($this->once())
+            ->method('onBeforeReceive')
+            ->with($this->identicalTo($context))
+        ;
+
+        $extensions = new Extensions([$fooExtension, $barExtension]);
+
+        $extensions->onBeforeReceive($context);
+    }
+
     public function testShouldProxyOnPreReceiveToAllInternalExtensions()
     {
         $context = $this->createContextMock();

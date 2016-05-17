@@ -7,6 +7,11 @@ interface Extension
      * @param Context $context
      */
     public function onStart(Context $context);
+    
+    /**
+     * @param Context $context
+     */
+    public function onBeforeReceive(Context $context);
 
     /**
      * @param Context $context

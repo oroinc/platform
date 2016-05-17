@@ -2,6 +2,7 @@
 namespace Oro\Component\Messaging\Consumption;
 
 use Oro\Component\Messaging\Transport\Session;
+use Psr\Log\NullLogger;
 
 class QueueConsumer
 {
@@ -42,14 +43,17 @@ class QueueConsumer
         } else {
             $extensions = $this->extensions;
         }
-        
-        $extensions->onStart(new Context($this->session, $messageConsumer, $messageProcessor));
+
+        $startContext = new Context($this->session, $messageConsumer, $messageProcessor, new NullLogger());
+        $extensions->onStart($startContext);
 
         while (true) {
-            $context = new Context($this->session, $messageConsumer, $messageProcessor);
+            $context = new Context($this->session, $messageConsumer, $messageProcessor, $startContext->getLogger());
             try {
+                $extensions->onBeforeReceive($context);
+                
 
-                if ($message = $messageConsumer->receive($timeout = 100)) {
+                if ($message = $messageConsumer->receive($timeout = 1)) {
                     $context->setMessage($message);
 
                     $extensions->onPreReceived($context);

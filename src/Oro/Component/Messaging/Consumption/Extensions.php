@@ -29,6 +29,16 @@ class Extensions implements Extension
     /**
      * @param Context $context
      */
+    public function onBeforeReceive(Context $context)
+    {
+        foreach ($this->extensions as $extension) {
+            $extension->onBeforeReceive($context);
+        }
+    }
+
+    /**
+     * @param Context $context
+     */
     public function onPreReceived(Context $context)
     {
         foreach ($this->extensions as $extension) {

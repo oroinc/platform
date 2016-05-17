@@ -5,6 +5,8 @@ use Oro\Component\Messaging\Consumption\Exception\IllegalContextModificationExce
 use Oro\Component\Messaging\Transport\Message;
 use Oro\Component\Messaging\Transport\MessageConsumer;
 use Oro\Component\Messaging\Transport\Session;
+use Psr\Log\LoggerInterface;
+use Symfony\Component\HttpKernel\Tests\Logger;
 
 class Context
 {
@@ -22,6 +24,11 @@ class Context
      * @var MessageProcessor
      */
     private $messageProcessor;
+
+    /**
+     * @var LoggerInterface
+     */
+    private $logger;
 
     /**
      * @var Message
@@ -47,12 +54,19 @@ class Context
      * @param Session $session
      * @param MessageConsumer $messageConsumer
      * @param MessageProcessor $messageProcessor
+     * @param LoggerInterface $logger
      */
-    public function __construct(Session $session, MessageConsumer $messageConsumer, MessageProcessor $messageProcessor)
-    {
+    public function __construct(
+        Session $session,
+        MessageConsumer $messageConsumer,
+        MessageProcessor $messageProcessor,
+        LoggerInterface $logger
+    ) {
         $this->session = $session;
         $this->messageConsumer = $messageConsumer;
         $this->messageProcessor = $messageProcessor;
+        $this->logger = $logger;
+        
         $this->executionInterrupted = false;
     }
 
@@ -154,5 +168,21 @@ class Context
         }
 
         $this->executionInterrupted = $executionInterrupted;
+    }
+
+    /**
+     * @return LoggerInterface
+     */
+    public function getLogger()
+    {
+        return $this->logger;
+    }
+
+    /**
+     * @param LoggerInterface $logger
+     */
+    public function setLogger(LoggerInterface $logger)
+    {
+        $this->logger = $logger;
     }
 }

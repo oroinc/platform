@@ -13,6 +13,13 @@ trait ExtensionTrait
     /**
      * @param Context $context
      */
+    public function onBeforeReceive(Context $context)
+    {
+    }
+
+    /**
+     * @param Context $context
+     */
     public function onPreReceived(Context $context)
     {
     }
