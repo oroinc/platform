@@ -1,0 +1,74 @@
+# start: '-5 day'
+# end: '+5 day'
+regularEventNotInRange:
+    title: 'Regular event not in start:end range'
+    start: '-7 day'
+    end: '-7 day + 1 hour'
+    allDay: false
+
+regularEventInRange:
+    title: 'Regular event in start:end range'
+    start: '-3 day'
+    end: '-3 day + 1 hour'
+    allDay: false
+
+recurringEventNotInRange:
+    title: 'Recurring event not in start:end range'
+    start: '-7 day'
+    end: '-7 day + 1 hour'
+    allDay: false
+    recurrence:
+        type: 'daily'
+        interval: 1
+        occurrences: 2
+        startTime: '-7 day'
+
+recurringEventInRange:
+    title: 'Recurring event in start:end range'
+    start: '-4 day'
+    end: '-4 day + 1 hour'
+    allDay: false
+    recurrence:
+        type: 'daily'
+        interval: 1
+        occurrences: 2
+        startTime: '-4 day'
+
+recurringEventNotInRangeWithExceptionInRange:
+    title: 'Recurring event not in start:end range with exception in range'
+    start: '-7 day'
+    end: '-7 day + 1 hour'
+    allDay: false,
+    recurrence:
+        type: 'daily'
+        interval: 1
+        occurrences: 2
+        startTime: '-7 day'
+    exceptions:
+        exceptionInRange:
+            title: 'Recurring event exception in range'
+            start: '-4 day'
+            end: '-4 day + 1 hour'
+            allDay: false
+#            originalStart: '-7 day' # the same as start
+            isCancelled: false
+
+recurringEventInRangeWithCancelledException:
+    reference: 'eventInRangeWithCancelledException'
+    title: 'Recurring event in start:end range with canceled exception'
+    start: '-2 day'
+    end: '-2 day + 1 hour'
+    allDay: false
+    recurrence:
+        type: 'daily'
+        interval: 1
+        occurrences: 2
+        startTime: '-2 day'
+    exceptions:
+        cancelledException:
+            title: 'Cancelled recurring event exception in range'
+            start: '-2 day'
+            end: '-2 day + 1 hour'
+            allDay: false
+#            originalStart: '-2 day' # the same as start
+            isCancelled: true
