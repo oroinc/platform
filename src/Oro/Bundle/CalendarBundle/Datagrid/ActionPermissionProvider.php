@@ -32,8 +32,10 @@ class ActionPermissionProvider
         $parentId = $record->getValue('parentId');
         $ownerId = $record->getValue('ownerId');
         $childrenCount = $record->getValue('childrenCount');
+        $origin = $record->getValue('originId');
 
-        $isEditable = !$invitationStatus || ($invitationStatus && !$parentId);
+        $isEditable = (!$invitationStatus || ($invitationStatus && !$parentId))
+            && $origin !== CalendarEvent::ORIGIN_EXTERNAL;
 
         return array(
             'accept'      => $this->isAvailableResponseButton(

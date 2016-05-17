@@ -10,7 +10,7 @@
     {% if app.user and app.user.id == entity.calendar.owner.id %}
         {% include 'OroCalendarBundle:CalendarEvent:invitationButtons.html.twig' with {'entity': entity} %}
     {% endif %}
-    {% if entity.parent is empty and resource_granted('EDIT', entity) %}
+    {% if entity.parent is empty and resource_granted('EDIT', entity) and entity.origin in not 'external' %}
         {# Button for add context on the activity list item view page #}
         {{ AC.addContextButton(entity) }}
         {{ UI.editButton({
