@@ -62,11 +62,11 @@ class ProcessDefinitionsImport
                 $existingDefinition = $definitionRepository->find($definitionName);
                 if ($existingDefinition) {
                     $existingDefinition->import($definition);
+                    $importedDefinitions[$definitionName] = $existingDefinition;
                 } else {
                     $entityManager->persist($definition);
+                    $importedDefinitions[$definitionName] = $definition;
                 }
-
-                $importedDefinitions[$definitionName] = $definition;
             }
 
             $entityManager->flush();
