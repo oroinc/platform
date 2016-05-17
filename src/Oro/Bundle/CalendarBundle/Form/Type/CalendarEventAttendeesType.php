@@ -77,11 +77,11 @@ class CalendarEventAttendeesType extends AbstractType
             foreach ($transformedData as $k => $item) {
                 $converted = $converter->convertItem($item);
 
-                if ($this->isAttendeeCouldBeRemoved($formData[$k])) {
+                if (!$this->isAttendeeRemovable($formData[$k], $options['disable_user_removal'])) {
                     $converted['locked'] = true;
                 }
 
-                $result[]  = $converted;
+                $result[] = $converted;
             }
 
             $view->vars['attr']['data-selected-data'] = json_encode($result);
@@ -106,21 +106,22 @@ class CalendarEventAttendeesType extends AbstractType
 
     /**
      * @param Attendee $attendee
+     * @param bool     $disableUserRemoval
      *
      * @return bool
      */
-    protected function isAttendeeCouldBeRemoved($attendee)
+    protected function isAttendeeRemovable(Attendee $attendee, $disableUserRemoval = false)
     {
         $user          = $attendee->getUser();
         $calendarEvent = $attendee->getCalendarEvent();
 
         return (
             $user instanceof User
+            && !$disableUserRemoval
             && (
-                $attendee->getId() === $calendarEvent->getRelatedAttendee()->getId()
-                || $attendee->getId() === $calendarEvent->getRealCalendarEvent()->getRelatedAttendee()->getId()
+                $attendee->getId() !== $calendarEvent->getRelatedAttendee()->getId()
+                && $attendee->getId() !== $calendarEvent->getRealCalendarEvent()->getRelatedAttendee()->getId()
             )
-        )
-        || (!$user instanceof User);
+        );
     }
 }
