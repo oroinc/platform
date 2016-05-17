@@ -24,6 +24,10 @@
         <div class="span10">
             <table class="table table-bordered table-striped">
                 <tr>
+                    <th>{{ 'oro.cron.header.id'|trans }}</th>
+                    <td>{{ entity.id }}</td>
+                </tr>
+                <tr>
                     <th width="20%">{{ 'oro.cron.header.command'|trans }}</th>
                     <td>{{ macros.command(entity) }}</td>
                 </tr>
@@ -34,6 +38,14 @@
                 <tr>
                     <th>{{ 'oro.ui.created_at'|trans }}</th>
                     <td>{{ entity.createdAt|oro_format_datetime }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'oro.cron.header.started_at'|trans }}</th>
+                    <td>{{ entity.startedAt|oro_format_datetime }}</td>
+                </tr>
+                <tr>
+                    <th>{{ 'oro.cron.header.closed_at'|trans }}</th>
+                    <td>{{ entity.closedAt|oro_format_datetime }}</td>
                 </tr>
 
                 {% if entity.isRetryJob() %}
