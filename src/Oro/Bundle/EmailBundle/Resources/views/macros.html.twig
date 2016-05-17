@@ -398,7 +398,10 @@
             <li class="email-attachments-list-item span3">
                 <div class="email-attachments-file">
                     {% if oro_type_is_image(attachment.contentType) %}
-                        <a data-gallery="gallery-{{ galleryUid }}" class="no-hash" href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
+                        <a data-gallery="gallery-{{ galleryUid }}"
+                           data-filename="{{ attachment.fileName }}"
+                           class="no-hash"
+                           href="{{ path('oro_email_attachment', {id: attachment.id}) }}">
                             <img src="{{ path('oro_resize_email_attachment', {id: attachment.id, width: 110, height: 80}) }}"
                                  class="img-rounded" width="110" height="80" alt="" />
                         </a>

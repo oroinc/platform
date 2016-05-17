@@ -274,7 +274,7 @@ class FileExtension extends \Twig_Extension
     }
 
     /**
-     * Get array of file icons
+     * Get config array of file icons
      *
      * @return array
      */

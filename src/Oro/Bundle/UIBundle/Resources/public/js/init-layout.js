@@ -505,11 +505,12 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
     });
 });
 
-require(['jquery', 'lightgallery'], function($) {
+require(['jquery', 'underscore', 'lightgallery', 'lightgallery.print'], function($, _) {
     'use strict';
 
     /**
-     * On click on gallery element (with 'data-gallery' attribte): find all gallery elements from the same gallery group,
+     * On click on gallery element (with 'data-gallery' attribte):
+     * find all gallery elements from the same gallery group,
      * dynamically generate array of gallery elements and show the gallery.
      */
     $(document).on('click.gallery', function(e) {
@@ -532,6 +533,9 @@ require(['jquery', 'lightgallery'], function($) {
                     el.thumb = img.attr('src');
                 } else {
                     el.thumb = el.src;
+                }
+                if ($item.data('filename')) {
+                    el.subHtml = _.escape($item.data('filename'));
                 }
                 dynamicEl.push(el);
             });

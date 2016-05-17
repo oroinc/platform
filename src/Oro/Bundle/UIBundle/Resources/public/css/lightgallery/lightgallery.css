@@ -2,7 +2,12 @@
     background: #aaaaaa;
     opacity: 0.3;
 }
-
-.lg-toolbar{
+.lg-toolbar {
     background: #000;
+}
+.lg-toolbar .lg-print {
+    font-family: FontAwesome;
+}
+.mobile-version .lg-print {
+    display: none !important;
 }
