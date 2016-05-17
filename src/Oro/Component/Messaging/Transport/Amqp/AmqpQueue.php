@@ -3,7 +3,7 @@ namespace Oro\Component\Messaging\Transport\Amqp;
 
 use Oro\Component\Messaging\Transport\Queue;
 
-final class AmqpQueue implements Queue
+class AmqpQueue implements Queue
 {
     /**
      * @var string

@@ -8,7 +8,7 @@ use Oro\Component\Messaging\Transport\MessageConsumer;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
 
-final class AmqpMessageConsumer implements MessageConsumer
+class AmqpMessageConsumer implements MessageConsumer
 {
     /**
      * @var AmqpSession

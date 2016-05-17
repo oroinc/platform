@@ -3,7 +3,7 @@ namespace Oro\Component\Messaging\Transport\Amqp;
 
 use Oro\Component\Messaging\Transport\Message;
 
-final class AmqpMessage implements Message
+class AmqpMessage implements Message
 {
     /**
      * @var string

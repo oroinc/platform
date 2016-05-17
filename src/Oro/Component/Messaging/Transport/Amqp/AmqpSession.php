@@ -6,7 +6,7 @@ use Oro\Component\Messaging\Transport\Exception\InvalidDestinationException;
 use Oro\Component\Messaging\Transport\Session;
 use PhpAmqpLib\Channel\AMQPChannel;
 
-final class AmqpSession implements Session
+class AmqpSession implements Session
 {
     /**
      * @var AMQPChannel
