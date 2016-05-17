@@ -16,9 +16,7 @@ interface SessionInterface
     public function createFrontProducer();
 
     /**
-     * @param string $queueName
-     *
      * @return ProducerInterface
      */
-    public function createQueueProducer($queueName);
+    public function createQueueProducer();
 }

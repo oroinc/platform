@@ -28,6 +28,11 @@ class AmqpSession implements SessionInterface
     protected $queueTopicName;
 
     /**
+     * @var string
+     */
+    protected $defaultQueueQueueName;
+
+    /**
      * @param TransportAmqpSession $session
      * @param string               $routerTopicName
      * @param string               $routerQueueName
@@ -62,8 +67,8 @@ class AmqpSession implements SessionInterface
     /**
      * {@inheritdoc}
      */
-    public function createQueueProducer($queueName)
+    public function createQueueProducer()
     {
-        return new AmqpQueueProducer($this->session, $this->queueTopicName);
+        return new AmqpQueueProducer($this->session, $this->queueTopicName, $this->defaultQueueQueueName);
     }
 }

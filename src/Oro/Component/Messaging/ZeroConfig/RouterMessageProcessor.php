@@ -18,20 +18,13 @@ class RouterMessageProcessor implements MessageProcessor
     protected $routeRegistry;
 
     /**
-     * @var string
-     */
-    protected $defaultQueueName;
-
-    /**
      * @param SessionInterface       $session
      * @param RouteRegistryInterface $routeRegistry
-     * @param string                 $defaultQueueName
      */
-    public function __construct(SessionInterface $session, RouteRegistryInterface $routeRegistry, $defaultQueueName)
+    public function __construct(SessionInterface $session, RouteRegistryInterface $routeRegistry)
     {
         $this->session = $session;
         $this->routeRegistry = $routeRegistry;
-        $this->defaultQueueName = $defaultQueueName;
     }
 
     /**
@@ -45,18 +38,16 @@ class RouterMessageProcessor implements MessageProcessor
         }
 
         foreach ($this->routeRegistry->getRoutes($messageName) as $route) {
-            $queueName = $route->getQueueName() ?: $this->defaultQueueName;
-
             $properties = $message->getProperties();
             $properties['processorName'] = $route->getProcessorName();
-            $properties['queueName'] = $queueName;
+            $properties['queueName'] = $route->getQueueName();
 
             $queueMessage = $this->session->createMessage();
             $queueMessage->setProperties($properties);
             $queueMessage->setHeaders($message->getHeaders());
             $queueMessage->setBody($message->getBody());
 
-            $this->session->createQueueProducer($queueName)->send($queueMessage);
+            $this->session->createQueueProducer()->send($queueMessage);
         }
     }
 }

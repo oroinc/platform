@@ -20,13 +20,20 @@ class AmqpQueueProducer implements ProducerInterface
     protected $topicName;
 
     /**
+     * @var string
+     */
+    protected $defaultQueueName;
+
+    /**
      * @param TransportAmqpSession $session
      * @param string               $topicName
+     * @param string               $defaultQueueName
      */
-    public function __construct(TransportAmqpSession $session, $topicName)
+    public function __construct(TransportAmqpSession $session, $topicName, $defaultQueueName)
     {
         $this->session = $session;
         $this->topicName = $topicName;
+        $this->defaultQueueName = $defaultQueueName;
     }
 
     /**
@@ -39,10 +46,7 @@ class AmqpQueueProducer implements ProducerInterface
             throw new \LogicException('Got message without "processorName" parameter');
         }
 
-        $queueName = $message->getProperty('queueName');
-        if (false == $queueName) {
-            throw new \LogicException('Got message without "queueName" parameter');
-        }
+        $queueName = $message->getProperty('queueName') ?: $this->defaultQueueName;
 
         $topic = $this->createTopic($this->generateRoutingKey($queueName));
         $queue = $this->createQueue($this->generateQueueName($queueName));
