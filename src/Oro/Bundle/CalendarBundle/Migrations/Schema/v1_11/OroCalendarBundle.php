@@ -139,7 +139,7 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
             $schema->getTable('oro_attendee'),
             ['related_attendee'],
             ['id'],
-            ['onDelete' => 'SET NULL', 'onUpdate' => null]
+            ['onDelete' => 'CASCADE', 'onUpdate' => null]
         );
         
         $this->extendExtension->addEnumField(

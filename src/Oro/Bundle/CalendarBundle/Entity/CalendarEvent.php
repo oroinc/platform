@@ -281,8 +281,8 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     /**
      * @var Attendee
      *
-     * @ORM\ManyToOne(targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee")
-     * @ORM\JoinColumn(name="related_attendee", referencedColumnName="id", onDelete="SET NULL")
+     * @ORM\ManyToOne(targetEntity="Oro\Bundle\CalendarBundle\Entity\Attendee", cascade={"persist", "remove"})
+     * @ORM\JoinColumn(name="related_attendee", referencedColumnName="id", onDelete="CASCADE")
      */
     protected $relatedAttendee;
 
