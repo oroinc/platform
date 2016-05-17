@@ -502,16 +502,20 @@ define(function(require) {
         },
 
         onValidationError: function(jqXHR) {
+            var responseErrors = _.result(jqXHR.responseJSON, 'errors');
             if (!this.options.cell.disposed) {
                 var fieldName = this.options.cell.column.get('name');
             }
-            if (jqXHR.responseJSON && jqXHR.responseJSON.errors) {
+            if (responseErrors) {
                 var backendErrors = {};
-                _.each(jqXHR.responseJSON.errors.children, function(item, name) {
+                _.each(responseErrors.children, function(item, name) {
                     if (fieldName === name && _.isArray(item.errors)) {
                         backendErrors.value = item.errors[0];
                     }
                 }, this);
+                if (!backendErrors.hasOwnProperty('value') && _.isArray(responseErrors.errors)) {
+                    backendErrors.value = responseErrors.errors[0];
+                }
                 this.errorHolderView.setErrorMessages(backendErrors);
             }
         }
