@@ -28,7 +28,7 @@ class YamlDriver extends AbstractDriver
      */
     protected function loadResourceGeneratorData($file)
     {
-        $data = Yaml::parse($file);
+        $data = Yaml::parse(file_get_contents($file));
         $data = isset($data['layout']) ? $data['layout'] : [];
 
         return new GeneratorData($data);

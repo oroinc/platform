@@ -154,7 +154,7 @@ class EmailAttachmentManagerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->attachment = $this->getMockBuilder('Oro\Bundle\AttachmentBundle\Entity\Attachment')
-            ->setMethods(['supportTarget'])
+            ->setMethods(['supportTarget', 'setFile'])
             ->disableOriginalConstructor()
             ->getMock();
 

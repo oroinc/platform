@@ -6,7 +6,7 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     require('jquery-ui');
 
-    return {
+    var scrollHelper = {
         /**
          * Height of header on mobile devices
          */
@@ -18,11 +18,35 @@ define(function(require) {
         MOBILE_POPUP_HEADER_HEIGHT: 44,
 
         /**
+         * Cached scrollbarWidth value
+         */
+        _scrollbarWidth: -1,
+
+        /**
          * Try to calculate the scrollbar width for your browser/os
          * @return {Number}
          */
         scrollbarWidth: function() {
-            return $.position.scrollbarWidth();
+            if (this._scrollbarWidth === -1) {
+                this._scrollbarWidth = $.position.scrollbarWidth();
+            }
+            return this._scrollbarWidth;
+        },
+
+        /**
+         * Cached documentHeight value
+         */
+        _documentHeight: -1,
+
+        /**
+         * Returns actual documentHeight
+         * @return {Number}
+         */
+        documentHeight: function() {
+            if (this._documentHeight === -1) {
+                this._documentHeight = $(document).height();
+            }
+            return this._documentHeight;
         },
 
         /**
@@ -56,7 +80,7 @@ define(function(require) {
             };
             if (
                 (resultRect.top === 0 && resultRect.bottom === 0) || // no-data block is shown
-                    (resultRect.top > $(document).height() && forceInvisible)
+                    (resultRect.top > this.documentHeight() && forceInvisible)
                 ) {
                 // no need to calculate anything
                 return resultRect;
@@ -208,4 +232,11 @@ define(function(require) {
             return scrolls;
         }
     };
+
+    // reset document height cache on resize
+    $(window).bindFirst('resize', function() {
+        scrollHelper._documentHeight = -1;
+    });
+
+    return scrollHelper;
 });

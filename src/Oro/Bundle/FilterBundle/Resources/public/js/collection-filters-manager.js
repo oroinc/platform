@@ -31,6 +31,8 @@ define([
                 'reset': this._onCollectionReset
             });
 
+            this.isVisible = true;
+
             CollectionFiltersManager.__super__.initialize.apply(this, arguments);
         },
 
@@ -106,9 +108,15 @@ define([
             var hasRecords = collection.state.totalRecords > 0;
             var hasFiltersState = !_.isEmpty(collection.state.filters);
             if (hasRecords || hasFiltersState) {
-                this.$el.show();
+                if (!this.isVisible) {
+                    this.$el.show();
+                    this.isVisible = true;
+                }
             } else {
-                this.$el.hide();
+                if (this.isVisible) {
+                    this.$el.hide();
+                    this.isVisible = false;
+                }
             }
         },
 

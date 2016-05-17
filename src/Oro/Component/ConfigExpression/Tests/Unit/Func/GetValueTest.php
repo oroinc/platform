@@ -52,7 +52,7 @@ class GetValueTest extends \PHPUnit_Framework_TestCase
                 'expectedResult' => 'baz'
             ],
             'get_with_expr'                               => [
-                'options'        => [new Condition\True()],
+                'options'        => [new Condition\TrueCondition()],
                 'context'        => [],
                 'expectedResult' => true
             ],
