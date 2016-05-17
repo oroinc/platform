@@ -41,7 +41,9 @@ parameters:
     oro_calendar.strategy.monthnth.class:                        Oro\Bundle\CalendarBundle\Strategy\Recurrence\MonthNthStrategy
     oro_calendar.strategy.yearnth.class:                         Oro\Bundle\CalendarBundle\Strategy\Recurrence\YearNthStrategy
 
-    oro_calendar.strategy.recurrence.strategy_helper.class: Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper
+    oro_calendar.strategy.recurrence.strategy_helper.class:      Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper
+
+    oro_calendar.validator.recurrence.class:                     Oro\Bundle\CalendarBundle\Validator\RecurrenceValidator
 
 services:
     oro_calendar.listener.entity_listener:
@@ -111,6 +113,7 @@ services:
         arguments:
             - '@oro_calendar.recurrence.strategy.delegate'
             - '@translator'
+            - '@oro_calendar.strategy.recurrence.strategy_helper'
         tags:
             - { name: twig.extension }
 
@@ -338,4 +341,13 @@ services:
             - { name: oro_calendar.recurrence.strategy}
 
     oro_calendar.strategy.recurrence.strategy_helper:
+        arguments:
+            - '@validator'
         class: '%oro_calendar.strategy.recurrence.strategy_helper.class%'
+
+    oro_calendar.validator.recurrence:
+        class: '%oro_calendar.validator.recurrence.class%'
+        arguments:
+            - '@oro_calendar.recurrence.strategy'
+        tags:
+            - { name: validator.constraint_validator, alias: oro_calendar.recurrence_validator }

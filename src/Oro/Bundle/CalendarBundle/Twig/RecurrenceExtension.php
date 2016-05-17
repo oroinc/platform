@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Twig;
 
+use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
@@ -19,16 +20,24 @@ class RecurrenceExtension extends \Twig_Extension
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    // @TODO unit test
+    /** @var  StrategyHelper */
+    protected $recurrenceHelper;
 
     /**
+     * RecurrenceExtension constructor.
+     *
      * @param DelegateStrategy $delegateStrategy
      * @param TranslatorInterface $translator
+     * @param StrategyHelper $strategyHelper
      */
-    public function __construct(DelegateStrategy $delegateStrategy, TranslatorInterface $translator)
-    {
+    public function __construct(
+        DelegateStrategy $delegateStrategy,
+        TranslatorInterface $translator,
+        StrategyHelper $strategyHelper
+    ) {
         $this->delegateStrategy = $delegateStrategy;
         $this->translator = $translator;
+        $this->recurrenceHelper = $strategyHelper;
     }
 
     /**
@@ -78,7 +87,8 @@ class RecurrenceExtension extends \Twig_Extension
         foreach ($attributes as $attr => $value) {
             $propertyAccessor->setValue($recurrence, $attr, $value);
         }
-        // @TODO use RecurrenceValidator
+
+        $this->recurrenceHelper->validateRecurrence($recurrence);
 
         return $this->getRecurrencePattern($recurrence);
     }

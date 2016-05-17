@@ -93,4 +93,16 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
             $recurrence->getStartTime()
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationErrorMessage(Recurrence $recurrence)
+    {
+        if ($recurrence->getInterval() > 99) {
+            return "Parameter 'interval' can't be more than 99 for Daily recurrence pattern";
+        }
+
+        return null;
+    }
 }

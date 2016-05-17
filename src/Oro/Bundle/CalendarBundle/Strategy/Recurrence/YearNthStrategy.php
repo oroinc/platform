@@ -171,4 +171,28 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
             $occurrenceDate
         );
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function getValidationErrorMessage(Recurrence $recurrence)
+    {
+        if ($recurrence->getInterval() % 12 !== 0) {
+            return "Parameter 'interval' value must be a multiple of 12 for YearNth recurrence pattern.";
+        }
+
+        if (empty($recurrence->getInstance())) {
+            return "Parameter 'instance' value can't be empty for YearNth recurrence pattern.";
+        }
+
+        if (empty($recurrence->getDayOfWeek())) {
+            return "Parameter 'dayOfWeek' can't be empty for YearNth recurrence pattern.";
+        }
+
+        if (empty($recurrence->getMonthOfYear())) {
+            return "Parameter 'monthOfYear' can't be empty for YearNth recurrence pattern.";
+        }
+
+        return null;
+    }
 }

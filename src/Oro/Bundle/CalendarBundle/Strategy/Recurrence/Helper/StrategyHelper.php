@@ -3,9 +3,26 @@
 namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper;
 
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Symfony\Component\Validator\ConstraintViolation;
+use Symfony\Component\Validator\Validator\ValidatorInterface;
 
 class StrategyHelper
 {
+    /**
+     * @var ValidatorInterface
+     */
+    protected $validator;
+
+    /**
+     * StrategyHelper constructor.
+     *
+     * @param ValidatorInterface $validator
+     */
+    public function __construct(ValidatorInterface $validator)
+    {
+        $this->validator = $validator;
+    }
+
     /** @var array */
     protected static $instanceRelativeValues = [
         Recurrence::INSTANCE_FIRST => 'first',
@@ -43,33 +60,29 @@ class StrategyHelper
     }
 
     /**
+     * Validates recurrence entity according to its validation rules.
+     *
      * @param Recurrence $recurrence
+     *
+     * @return self
      *
      * @throws \RuntimeException
      */
     public function validateRecurrence(Recurrence $recurrence)
     {
-        if (false === filter_var($recurrence->getInterval(), FILTER_VALIDATE_INT, ['options' => ['min_range' => 1]])) {
-            throw new \RuntimeException('Interval should be an integer with min_rage >= 1.');
-        }
-        if (! $recurrence->getStartTime() instanceof \DateTime) {
-            throw new \RuntimeException('StartTime should be an instance of \DateTime');
-        }
-        if (! $recurrence->getEndTime() instanceof \DateTime) {
-            throw new \RuntimeException('EndTime should be an instance of \DateTime');
-        }
-        if (in_array(
-            $recurrence->getRecurrenceType(),
-            [
-                Recurrence::TYPE_MONTH_N_TH,
-                Recurrence::TYPE_YEAR_N_TH,
-            ],
-            true
-        )) {
-            if (! array_key_exists($recurrence->getInstance(), self::$instanceRelativeValues)) {
-                throw new \RuntimeException('Unknown instance');
+        $errors = $this->validator->validate($recurrence);
+
+        if (count($errors) > 0) {
+            $errorMessages = [];
+            /** @var ConstraintViolation $error */
+            foreach ($errors as $error) {
+                $errorMessages[$error->getPropertyPath()] = $error->getMessage();
             }
+
+            throw new \RuntimeException('Recurrence is invalid: ' . json_encode($errorMessages));
         }
+
+        return $this;
     }
 
     /**
