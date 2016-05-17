@@ -9,8 +9,12 @@ use Doctrine\Common\Persistence\ObjectManager;
 use Doctrine\Common\Collections\ArrayCollection;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
+use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\UserBundle\Entity\User;
 
 class CalendarEventApiHandler
 {
@@ -29,25 +33,31 @@ class CalendarEventApiHandler
     /** @var ActivityManager */
     protected $activityManager;
 
+    /** @var UsersToAttendeesTransformer */
+    protected $usersToAttendeesTransformer;
+
     /**
      * @param FormInterface      $form
      * @param Request            $request
      * @param ObjectManager      $manager
      * @param EmailSendProcessor $emailSendProcessor
      * @param ActivityManager    $activityManager
+     * @param UsersToAttendeesTransformer $usersToAttendeesTransformer
      */
     public function __construct(
         FormInterface $form,
         Request $request,
         ObjectManager $manager,
         EmailSendProcessor $emailSendProcessor,
-        ActivityManager $activityManager
+        ActivityManager $activityManager,
+        UsersToAttendeesTransformer $usersToAttendeesTransformer
     ) {
         $this->form               = $form;
         $this->request            = $request;
         $this->manager            = $manager;
         $this->emailSendProcessor = $emailSendProcessor;
         $this->activityManager    = $activityManager;
+        $this->usersToAttendeesTransformer = $usersToAttendeesTransformer;
     }
 
     /**
@@ -67,6 +77,8 @@ class CalendarEventApiHandler
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
+                $this->ensureRelatedAttendeeSet($entity);
+
                 // TODO: should be refactored after finishing BAP-8722
                 // Contexts handling should be moved to common for activities form handler
                 if ($this->form->has('contexts')) {
@@ -84,6 +96,45 @@ class CalendarEventApiHandler
         }
 
         return false;
+    }
+
+    /**
+     * @param CalendarEvent $event
+     */
+    public function ensureRelatedAttendeeSet(CalendarEvent $event)
+    {
+        if ($event->getRelatedAttendee()) {
+            return;
+        }
+
+        $calendar = $event->getCalendar();
+        if (!$calendar) {
+            return;
+        }
+
+        $event->setRelatedAttendee($this->createRelatedAttendee($calendar->getOwner()));
+    }
+
+    /**
+     * @param User $user
+     *
+     * @return Attendee
+     */
+    protected function createRelatedAttendee(User $user)
+    {
+        $attendee = $this->usersToAttendeesTransformer->userToAttendee($user);
+
+        $status = $this->manager
+            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
+            ->find(Attendee::STATUS_NONE);
+        $attendee->setStatus($status);
+
+        $origin = $this->manager
+            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
+            ->find(Attendee::ORIGIN_CLIENT);
+        $attendee->setOrigin($origin);
+
+        return $attendee;
     }
 
     /**
