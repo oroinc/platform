@@ -103,6 +103,7 @@ define(function(require) {
                         self._resolveDeferredInit();
                         self.$componentEl.find('.view-loading').remove();
                         self.$el.show();
+                        self.grid.shown = true;
                         self.grid.trigger('shown');
                     });
                 });
