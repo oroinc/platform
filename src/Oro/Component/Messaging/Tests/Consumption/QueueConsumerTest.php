@@ -520,6 +520,41 @@ class QueueConsumerTest extends \PHPUnit_Framework_TestCase
         $queueConsumer->consume('aQueueName', $messageProcessorMock);
     }
 
+    public function testShouldCallExtensionPassedOnRuntime()
+    {
+        $expectedMessage = $this->createMessageMock();
+        $messageConsumerStub = $this->createMessageConsumerStub($expectedMessage);
+
+        $sessionStub = $this->createSessionStub($messageConsumerStub);
+
+        $messageProcessorMock = $this->createMessageProcessorMock();
+        $messageProcessorMock
+            ->expects($this->once())
+            ->method('process')
+        ;
+
+        $runtimeExtension = $this->createExtension();
+        $runtimeExtension
+            ->expects($this->once())
+            ->method('onStart')
+            ->with($this->isInstanceOf(Context::class))
+        ;
+        $runtimeExtension
+            ->expects($this->once())
+            ->method('onPreReceived')
+            ->with($this->isInstanceOf(Context::class))
+        ;
+        $runtimeExtension
+            ->expects($this->once())
+            ->method('onPostReceived')
+            ->with($this->isInstanceOf(Context::class))
+        ;
+
+        $queueConsumer = new QueueConsumer($sessionStub, new Extensions([new BreakCycleExtension(1)]));
+
+        $queueConsumer->consume('aQueueName', $messageProcessorMock, new Extensions([$runtimeExtension]));
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|MessageConsumer
      */

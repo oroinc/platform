@@ -28,17 +28,22 @@ class QueueConsumer
     /**
      * @param string $queueName
      * @param MessageProcessor $messageProcessor
+     * @param Extensions $extensions
      *
      * @throws \Exception
-     *
-     * @return void
      */
-    public function consume($queueName, MessageProcessor $messageProcessor)
+    public function consume($queueName, MessageProcessor $messageProcessor, Extensions $extensions = null)
     {
         $queue = $this->session->createQueue($queueName);
         $messageConsumer = $this->session->createConsumer($queue);
+
+        if ($extensions) {
+            $extensions = new Extensions([$this->extensions, $extensions]);
+        } else {
+            $extensions = $this->extensions;
+        }
         
-        $this->extensions->onStart(new Context($this->session, $messageConsumer, $messageProcessor));
+        $extensions->onStart(new Context($this->session, $messageConsumer, $messageProcessor));
 
         while (true) {
             $context = new Context($this->session, $messageConsumer, $messageProcessor);
@@ -47,7 +52,7 @@ class QueueConsumer
                 if ($message = $messageConsumer->receive($timeout = 100)) {
                     $context->setMessage($message);
 
-                    $this->extensions->onPreReceived($context);
+                    $extensions->onPreReceived($context);
                     if (false == $context->getStatus()) {
                         $status = $messageProcessor->process($message, $this->session);
                         $status = $status ?: MessageProcessor::ACK;
@@ -67,20 +72,20 @@ class QueueConsumer
                         ));
                     }
 
-                    $this->extensions->onPostReceived($context);
+                    $extensions->onPostReceived($context);
                 } else {
-                    $this->extensions->onIdle($context);
+                    $extensions->onIdle($context);
                 }
 
                 if ($context->isExecutionInterrupted()) {
-                    $this->extensions->onInterrupted($context);
+                    $extensions->onInterrupted($context);
 
                     return;
                 }
             } catch (\Exception $e) {
                 $context->setExecutionInterrupted(true);
                 $context->setException($e);
-                $this->extensions->onInterrupted($context);
+                $extensions->onInterrupted($context);
                 
                 throw $e;
             }
