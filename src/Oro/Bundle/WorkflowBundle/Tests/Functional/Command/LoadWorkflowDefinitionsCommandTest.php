@@ -38,7 +38,11 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
      */
     public function testExecute(array $expectedMessages, array $expectedDefinitions)
     {
-        $definitionsBefore = $this->getRepository('OroWorkflowBundle:WorkflowDefinition')->findAll();
+        $repository = $this->getContainer()->get('doctrine')
+            ->getManagerForClass('OroWorkflowBundle:WorkflowDefinition')
+            ->getRepository('OroWorkflowBundle:WorkflowDefinition');
+
+        $definitionsBefore = $repository->findAll();
 
         $result = $this->runCommand(self::NAME);
 
@@ -47,7 +51,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
             $this->assertContains($message, $result);
         }
 
-        $definitions = $this->getRepository('OroWorkflowBundle:WorkflowDefinition')->findAll();
+        $definitions = $repository->findAll();
 
         $this->assertCount(count($definitionsBefore) + 2, $definitions);
         foreach ($expectedDefinitions as $definition) {
@@ -71,15 +75,6 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
                 ],
             ]
         ];
-    }
-
-    /**
-     * @param string $className
-     * @return ObjectRepository
-     */
-    protected function getRepository($className)
-    {
-        return $this->getContainer()->get('doctrine')->getManagerForClass($className)->getRepository($className);
     }
 
     /**
