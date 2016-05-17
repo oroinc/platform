@@ -126,6 +126,7 @@ oro:
             copy_to_record: Copy to Record
             save: Download
             select_file: Select file
+            download_all: Download All
 
         menu:
             emailtemplate_list.description: List of email templates

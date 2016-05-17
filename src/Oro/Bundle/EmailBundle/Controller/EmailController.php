@@ -13,6 +13,7 @@ use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\Security\Core\Exception\AccessDeniedException;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -348,6 +349,45 @@ class EmailController extends Controller
         $response       = new Response($filteredBinary, 200, array('Content-Type' => $attachment->getContentType()));
 
         return $this->get('liip_imagine.cache.manager')->store($response, $path, $filterName);
+    }
+
+    /**
+     * Get a zip with email attachments from the given email body
+     *
+     * @Route("/attachments/{id}", name="oro_email_body_attachments", requirements={"id"="\d+"})
+     * @AclAncestor("oro_email_email_view")
+     *
+     * @param EmailBody $entity
+     * @return BinaryFileResponse
+     */
+    public function downloadAttachmentsAction(EmailBody $entity)
+    {
+        $attachments = $entity->getAttachments();
+        if (count($attachments)) {
+            $zip = new \ZipArchive();
+            $zipName = 'attachments-' . time() . '.zip';
+            $zip->open($zipName, \ZipArchive::CREATE);
+            foreach ($attachments as $attachment) {
+                $content = ContentDecoder::decode(
+                    $attachment->getContent()->getContent(),
+                    $attachment->getContent()->getContentTransferEncoding()
+                );
+                $zip->addFromString($attachment->getFileName(), $content);
+            }
+            $zip->close();
+
+            $response = new BinaryFileResponse($zipName);
+            $response->headers->set('Content-Type', 'application/zip');
+            $response->headers->set('Content-Disposition', sprintf('attachment; filename="%s"', $zipName));
+            $response->headers->set('Pragma', 'no-cache');
+            $response->headers->set('Expires', '0');
+            $response->setPrivate();
+            $response->deleteFileAfterSend(true);
+
+            return $response;
+        }
+
+        return new Response('', Codes::HTTP_NOT_FOUND);
     }
 
     /**
