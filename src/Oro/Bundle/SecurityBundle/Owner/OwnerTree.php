@@ -308,6 +308,24 @@ class OwnerTree implements OwnerTreeInterface
     }
 
     /**
+     * Get all business units in system
+     *
+     * @return array
+     */
+    public function getAllBusinessUnitIds()
+    {
+        $resultBuIds = [];
+
+        if (is_array($this->organizationBusinessUnitIds) && count($this->organizationBusinessUnitIds)) {
+            foreach ($this->organizationBusinessUnitIds as $businessUnits) {
+                $resultBuIds = array_merge($resultBuIds, $businessUnits);
+            }
+        }
+
+        return $resultBuIds;
+    }
+
+    /**
      * Add the given business unit to the tree
      *
      * @param int|string      $businessUnitId
