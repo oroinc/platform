@@ -458,7 +458,7 @@ class AttachmentManager
     /**
      * Check if content type is an image
      *
-     * @param $contentType
+     * @param string $contentType
      * @return bool
      */
     public function isImageType($contentType)
