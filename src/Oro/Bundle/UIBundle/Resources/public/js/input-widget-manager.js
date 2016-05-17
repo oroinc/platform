@@ -198,7 +198,6 @@ define(function(require) {
          * @returns {mixed}
          */
         inputWidget: function(command) {
-            $('select:first,input:last').width();
             if (command === 'create') {
                 return InputWidgetManager.create(this);
             }

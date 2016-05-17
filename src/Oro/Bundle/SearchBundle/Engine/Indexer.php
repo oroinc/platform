@@ -46,6 +46,9 @@ class Indexer
     /** @var AclHelper */
     protected $searchAclHelper;
 
+    /** @var bool */
+    protected $isAllowedApplyAcl = true;
+
     /**
      * @param ObjectManager       $em
      * @param EngineInterface     $engine
@@ -227,6 +230,14 @@ class Indexer
     }
 
     /**
+     * @param bool $value
+     */
+    public function setIsAllowedApplyAcl($value)
+    {
+        $this->isAllowedApplyAcl = (bool)$value;
+    }
+
+    /**
      * Do query manipulations such as ACL apply etc.
      *
      * @param Query $query
@@ -234,7 +245,9 @@ class Indexer
     protected function prepareQuery(Query $query)
     {
         $this->applyModesBehavior($query);
-        $this->searchAclHelper->apply($query);
+        if ($this->isAllowedApplyAcl) {
+            $this->searchAclHelper->apply($query);
+        }
     }
 
     /**

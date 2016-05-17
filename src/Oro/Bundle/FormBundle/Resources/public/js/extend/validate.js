@@ -138,6 +138,11 @@ define([
         return this;
     };
 
+    $.validator.prototype.elements = _.wrap($.validator.prototype.elements, function(func) {
+        var $additionalElements = $(this.currentForm).find(':input[data-validate-element]');
+        return func.apply(this, _.rest(arguments)).add($additionalElements);
+    });
+
     /**
      * Fetches descendant form elements which available for validation
      *
@@ -145,9 +150,11 @@ define([
      * @returns {jQuery}
      */
     $.validator.prototype.elementsOf = function(element) {
+        var $additionalElements = $(this.currentForm).find(':input[data-validate-element]');
         return $(element).find('input, select, textarea')
             .not(':submit, :reset, :image, [disabled]')
-            .not(this.settings.ignore);
+            .not(this.settings.ignore)
+            .add($additionalElements);
     };
 
     // translates default messages

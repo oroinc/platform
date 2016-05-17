@@ -30,21 +30,6 @@ define(function(require) {
         }
     };
 
-    /**
-     * Runs passed builder
-     *
-     * @param {jQuery.Deferred} built
-     * @param {Object} options
-     * @param {Object} builder
-     */
-    function runBuilder(built, options, builder) {
-        if (!_.has(builder, 'init') || !$.isFunction(builder.init)) {
-            built.resolve();
-            throw new TypeError('Builder does not have init method');
-        }
-        _.defer(_.bind(builder.init, builder), built, options);
-    }
-
     DataGridComponent = BaseComponent.extend({
         initialize: function(options) {
             if (!options.enableFilters) {
@@ -61,24 +46,68 @@ define(function(require) {
             options = options || {};
             this.fixStates(options);
             this.processOptions(options);
-            this.initDataGrid(options);
 
-            var promises = [this.built.promise()];
+            var optionsProcessedPromises = [];
+            var builderImpl = [];
 
-            // run related builders
+            /**
+             * #1. Let builders process datagrid options
+             */
             _.each(options.builders, function(module) {
                 var built = $.Deferred();
-                promises.push(built.promise());
-                require([module], _.partial(runBuilder, built, options));
+                optionsProcessedPromises.push(built.promise());
+                require([module], function(impl) {
+                    builderImpl.push(impl);
+                    if (!_.has(impl, 'processDatagridOptions')) {
+                        built.resolve();
+                        return;
+                    }
+                    impl.processDatagridOptions(built, options);
+                });
             });
 
-            $.when.apply($, promises).always(function() {
-                self.subComponents = _.compact(arguments);
-                self._resolveDeferredInit();
-                self.$componentEl.find('.view-loading').remove();
-                self.$el.show();
-                self.grid.trigger('shown');
-            });
+            $.when.apply($, optionsProcessedPromises).always(_.bind(function() {
+                /**
+                 * #2. Init datagrid
+                 */
+                this.initDataGrid(options);
+
+                this.built.then(function() {
+                    /**
+                     * #3. Run builders
+                     */
+                    var buildersReadyPromises = [];
+
+                    function throwNoInitMethodError() {
+                        throw new TypeError('Builder does not have init method');
+                    }
+                    // run related builders
+                    for (var i = 0; i < builderImpl.length; i++) {
+                        var builder = builderImpl[i];
+                        var built = $.Deferred();
+                        buildersReadyPromises.push(built.promise());
+
+                        if (!_.has(builder, 'init') || !$.isFunction(builder.init)) {
+                            built.resolve();
+                            _.defer(throwNoInitMethodError);
+                            continue;
+                        }
+                        builder.init(built, options);
+                    }
+
+                    $.when.apply($, buildersReadyPromises).always(function() {
+                        /**
+                         * #4. Done
+                         */
+                        self.subComponents = _.compact(arguments);
+                        self._resolveDeferredInit();
+                        self.$componentEl.find('.view-loading').remove();
+                        self.$el.show();
+                        self.grid.shown = true;
+                        self.grid.trigger('shown');
+                    });
+                });
+            }, this));
         },
 
         /**

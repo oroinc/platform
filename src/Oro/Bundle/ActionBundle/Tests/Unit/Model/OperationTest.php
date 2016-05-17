@@ -140,8 +140,13 @@ class OperationTest extends \PHPUnit_Framework_TestCase
         $exceptionMessage = ''
     ) {
         $this->definition->expects($this->any())->method('getName')->willReturn($operationName);
-        $this->definition->expects($this->any())->method('getFunctions')->will($this->returnValueMap($config));
         $this->definition->expects($this->any())->method('getConditions')->will($this->returnValueMap($config));
+
+        $this->definition->expects($this->any())
+            ->method('getActions')
+            ->willReturnCallback(function ($name) {
+                return [$name];
+            });
 
         $this->actionFactory->expects($this->any())
             ->method('create')
@@ -166,7 +171,7 @@ class OperationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertArrayNotHasKey('errors', $data);
 
-        $this->operation->execute($this->data, $errors);
+        $this->operation->execute($data, $errors);
 
         $this->assertEmpty($errors->toArray());
 

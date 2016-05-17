@@ -257,7 +257,7 @@ class DashboardModelTest extends \PHPUnit_Framework_TestCase
                 'appendGreater' => true,
                 'appendLesser' => true,
                 'layoutPositions' => array(array(2, 0), array(1, 0), array(0, 2), array(0, 1), array(0, 0)),
-                'expectedLayoutPositions' => array(array(2, 0), array(1, 0), array(0, 0), array(0, 1), array(0, 2)),
+                'expectedLayoutPositions' => array(array(0, 0), array(0, 1), array(0, 2), array(1, 0), array(2, 0)),
             ),
             array(
                 'column' => 1,

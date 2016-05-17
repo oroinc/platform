@@ -1,29 +1,28 @@
 .tags-container {
-  line-height: 23px;
-}
-
-.table td.tags-container {
-  line-height: 24px;
-  padding-top: 2px;
-  padding-bottom: 2px;
-}
-.tags-container__tag-entry {
-  color: @tagItemColor;
-  background-color: @tagItemBackground;
-  border-radius: 10px;
-  font-size: 12px;
-  line-height: 12px;
-  padding: 5px 8px;
-  margin: 0 0 3px 0;
-  display: inline-block;
-  vertical-align: bottom;
-  &:hover, &:focus {
-    color: @tagItemColor;
-    outline-style: none;
+  line-height: 25px;
+  .table td& {
+    line-height: 24px;
+    padding-top: 2px;
+    padding-bottom: 2px;
   }
-}
-.tags-container__tag-entry_is-my {
-  background-color: @tagItemBackground;
+  &__tag-entry {
+    color: @tagItemColor;
+    background-color: @tagItemBackground;
+    border-radius: 10px;
+    font-size: 12px;
+    line-height: 12px;
+    padding: 5px 8px;
+    margin: 1px 0 2px;
+    display: inline-block;
+    vertical-align: top;
+    &:hover, &:focus {
+      color: @tagItemColor;
+      outline-style: none;
+    }
+  }
+  &__tag-entry_is-my {
+    background-color: @tagItemBackground;
+  }
 }
 
 .tags-form-select-editor {
