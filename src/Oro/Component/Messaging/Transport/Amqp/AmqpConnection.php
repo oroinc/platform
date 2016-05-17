@@ -22,7 +22,7 @@ class AmqpConnection implements Connection
         if (true == AMQP_WITHOUT_SIGNALS) {
             throw new \LogicException('The AMQP_WITHOUT_SIGNALS must be set to false.');
         }
-        
+
         $config = array_replace([
             'host' => 'localhost',
              'port' => 5672,
