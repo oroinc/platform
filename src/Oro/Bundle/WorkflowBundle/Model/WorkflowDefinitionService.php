@@ -96,15 +96,6 @@ class WorkflowDefinitionService
     }
 
     /**
-     * @param array $configuration
-     * @return WorkflowDefinition
-     */
-    public function buildFromRawConfiguration(array $configuration)
-    {
-        return $this->definitionBuilder->buildFromRawConfiguration($configuration);
-    }
-
-    /**
      * @return EntityManager
      */
     private function getEntityManager()
