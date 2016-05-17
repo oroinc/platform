@@ -83,7 +83,7 @@ class SignalExtension implements Extension
     public function handleSignal($signal)
     {
         if ($this->logger) {
-            $this->logger->debug(sprintf('Caught signal: %s', $signal);
+            $this->logger->debug(sprintf('Caught signal: %s', $signal));
         }
         
         switch ($signal) {
