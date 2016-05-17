@@ -20,7 +20,7 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('host')->isRequired()->cannotBeEmpty()->end()
                     ->scalarNode('port')->isRequired()->cannotBeEmpty()->end()
                     ->scalarNode('user')->isRequired()->cannotBeEmpty()->end()
-                    ->scalarNode('pass')->isRequired()->cannotBeEmpty()->end()
+                    ->scalarNode('password')->isRequired()->cannotBeEmpty()->end()
                     ->scalarNode('vhost')->isRequired()->cannotBeEmpty()->end()
         ;
 

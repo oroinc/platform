@@ -2,9 +2,8 @@
 
 namespace Oro\Bundle\MessagingBundle\DependencyInjection;
 
+use Oro\Component\Messaging\Transport\Amqp\AmqpConnection;
 use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
-use PhpAmqpLib\Channel\AMQPChannel;
-use PhpAmqpLib\Connection\AMQPStreamConnection;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -27,20 +26,11 @@ class OroMessagingExtension extends Extension
         $defaultSessionId = null;
         if (isset($config['transport']['amqp'])) {
             $amqpConfig = $config['transport']['amqp'];
-            $connection = new Definition(AMQPStreamConnection::class, [
-                $amqpConfig['host'],
-                $amqpConfig['port'],
-                $amqpConfig['user'],
-                $amqpConfig['pass'],
-                $amqpConfig['vhost'],
-            ]);
+            $connection = new Definition(AmqpConnection::class, [$amqpConfig]);
             $container->setDefinition('oro_messaging.transport.amqp.connection', $connection);
             
-            $channel = new Definition(AMQPChannel::class);
-            $channel->setFactory([new Reference('oro_messaging.transport.amqp.connection'), 'channel']);
-            $container->setDefinition('oro_messaging.transport.amqp.channel', $channel);
-
-            $session = new Definition(AmqpSession::class, [new Reference('oro_messaging.transport.amqp.channel')]);
+            $session = new Definition(AmqpSession::class);
+            $session->setFactory([new Reference('oro_messaging.transport.amqp.connection'), 'createSession']);
             $container->setDefinition('oro_messaging.transport.amqp.session', $session);
             $defaultSessionId = 'oro_messaging.transport.amqp.session';
         }
