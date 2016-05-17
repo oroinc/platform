@@ -96,7 +96,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'createdAt'        => $event->getCreatedAt(),
                 'updatedAt'        => $event->getUpdatedAt(),
                 'invitationStatus' => $event->getInvitationStatus(),
-                'origin'           => $event->getOrigin() ? $event->getOrigin()->getId() : null,
                 'parentEventId'    => $event->getParent() ? $event->getParent()->getId() : null,
                 'calendar'         => $event->getCalendar() ? $event->getCalendar()->getId() : null,
                 'origin'           => $event->getRealCalendarEvent()->getOrigin()
