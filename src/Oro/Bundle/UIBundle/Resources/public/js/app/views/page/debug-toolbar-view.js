@@ -13,13 +13,15 @@ define([
     }, 0);
 
     /* globals Sfjs */
-    // must patch Sfjs to properly update layout on debug-toolbar changes
-
-    var originalRenderAjaxRequests = Sfjs.renderAjaxRequests;
-    Sfjs.renderAjaxRequests = function() {
-        originalRenderAjaxRequests.call(Sfjs, arguments);
-        sendUpdateMessages();
-    };
+    // Sfjs is global object that provides access to Symfony Debug Toolbar
+    // Sfjs is patched to update layout on Debug Toolbar changes
+    if (Sfjs !== void 0) {
+        var originalRenderAjaxRequests = Sfjs.renderAjaxRequests;
+        Sfjs.renderAjaxRequests = function() {
+            originalRenderAjaxRequests.call(Sfjs, arguments);
+            sendUpdateMessages();
+        };
+    }
 
     var DebugToolbarView;
 
@@ -87,7 +89,9 @@ define([
                 .attr('id', id)
                 .attr('data-sfurl', url);
             this.$el.html(data);
-            Sfjs.renderAjaxRequests();
+            if (Sfjs) {
+                Sfjs.renderAjaxRequests();
+            }
         }
     });
 
