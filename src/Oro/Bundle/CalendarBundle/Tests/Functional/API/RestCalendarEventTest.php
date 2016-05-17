@@ -374,7 +374,7 @@ class RestCalendarEventTest extends WebTestCase
         $this->client->request('GET', $this->getUrl('oro_api_get_calendarevents', $request));
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(5, $result);
+        $this->assertCount(6, $result);
     }
 
     public function testCgetByPagination()
@@ -392,7 +392,7 @@ class RestCalendarEventTest extends WebTestCase
         );
 
         $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
-        $this->assertCount(8, $result);
+        $this->assertCount(10, $result);
     }
 
     public function testCgetByPaginationWithRecurringEventIdFilter()

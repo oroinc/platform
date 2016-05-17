@@ -242,23 +242,6 @@ class UserCalendarProvider extends AbstractCalendarProvider
      */
     protected function getMergedOccurrencesWithExceptions(array $occurrences, array $exceptions)
     {
-        $exceptionsNotInRange = [];
-        $recurringEventIds = array_unique(ArrayUtil::arrayColumn($occurrences, 'id'));
-        if ($recurringEventIds) {
-            /** @var CalendarEventRepository $repository */
-            $repository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-            $allExceptionCollection = $repository->getRecurringEventExceptionsByParentIds($recurringEventIds)
-                ->getQuery()
-                ->getArrayResult();
-            foreach ($exceptions as $exceptionInRange) {
-                foreach ($allExceptionCollection as $key => $exception) {
-                    if ($exception['id'] === $exceptionInRange['id']) {
-                        unset($allExceptionCollection[$key]);
-                    }
-                }
-            }
-            $exceptionsNotInRange = $allExceptionCollection;
-        }
         foreach ($occurrences as $oKey => &$occurrence) {
             foreach ($exceptions as $eKey => $exception) {
                 if ((int)$exception['recurringEventId'] === (int)$occurrence['id'] &&
@@ -270,13 +253,6 @@ class UserCalendarProvider extends AbstractCalendarProvider
                         $occurrence = $exception;
                     }
                     unset($exceptions[$eKey]);
-                }
-            }
-            foreach ($exceptionsNotInRange as $exception) {
-                if ((int)$exception['recurringEventId'] === (int)$occurrence['id'] &&
-                    $exception['originalStart'] == (new \DateTime($occurrence['start']))
-                ) {
-                    unset($occurrences[$oKey]);
                 }
             }
         }
@@ -306,6 +282,13 @@ class UserCalendarProvider extends AbstractCalendarProvider
             $expr->andX(
                 $expr->lte('r.startTime', ':endDate'),
                 $expr->gte('r.endTime', ':startDate')
+            )
+        )
+        ->orWhere(
+            $expr->andX(
+                $expr->isNotNull('e.originalStart'),
+                $expr->lte('e.originalStart', ':endDate'),
+                $expr->gte('e.originalStart', ':startDate')
             )
         );
         $queryBuilder->setParameter('startDate', $startDate);

@@ -21,7 +21,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *      indexes={
  *          @ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"}),
  *          @ORM\Index(name="oro_sys_calendar_event_idx", columns={"system_calendar_id", "start_at", "end_at"}),
- *          @ORM\Index(name="oro_calendar_event_up_idx", columns={"updated_at"})
+ *          @ORM\Index(name="oro_calendar_event_up_idx", columns={"updated_at"}),
+ *          @ORM\Index(name="oro_calendar_event_osa_idx", columns={"original_start_at"})
  *      }
  * )
  * @ORM\HasLifecycleCallbacks()
@@ -294,7 +295,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      *
      * @var bool
      *
-     * @ORM\Column(name="is_cancelled", type="boolean")
+     * @ORM\Column(name="is_cancelled", type="boolean", options={"default"=false})
      */
     protected $isCancelled = false;
 

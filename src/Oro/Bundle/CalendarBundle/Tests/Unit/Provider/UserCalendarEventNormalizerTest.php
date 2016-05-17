@@ -349,9 +349,6 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
         $repo = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository')
             ->disableOriginalConstructor()
             ->getMock();
-        $repo->expects($this->any())
-            ->method('getRecurringEventExceptionsByParentIds')
-            ->will($this->returnValue($qb));
         $this->doctrineHelper->expects($this->any())
             ->method('getEntityRepository')
             ->with('OroCalendarBundle:CalendarEvent')

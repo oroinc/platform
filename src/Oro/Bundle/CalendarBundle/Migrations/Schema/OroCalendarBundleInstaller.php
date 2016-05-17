@@ -120,6 +120,7 @@ class OroCalendarBundleInstaller implements Installation
         $table->addIndex(['system_calendar_id'], 'IDX_2DDC40DD55F0F9D0', []);
         $table->addIndex(['updated_at'], 'oro_calendar_event_up_idx', []);
         $table->addUniqueIndex(['recurrence_id'], 'UNIQ_2DDC40DD2C414CE8');
+        $table->addIndex(['original_start_at'], 'oro_calendar_event_osa_idx');
         $table->setPrimaryKey(['id']);
     }
 
