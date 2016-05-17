@@ -98,6 +98,9 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'invitationStatus' => $event->getInvitationStatus(),
                 'parentEventId'    => $event->getParent() ? $event->getParent()->getId() : null,
                 'calendar'         => $event->getCalendar() ? $event->getCalendar()->getId() : null,
+                'origin'           => $event->getRealCalendarEvent()->getOrigin()
+                    ? $event->getRealCalendarEvent()->getOrigin()->getId()
+                    : null
             ],
             $extraValues
         );
@@ -111,7 +114,8 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         $item['editable']     =
             ($item['calendar'] === $calendarId)
             && empty($item['parentEventId'])
-            && $this->securityFacade->isGranted('oro_calendar_event_update');
+            && $this->securityFacade->isGranted('oro_calendar_event_update')
+            && $item['origin'] !== CalendarEvent::ORIGIN_EXTERNAL;
         $item['removable']    =
             ($item['calendar'] === $calendarId)
             && $this->securityFacade->isGranted('oro_calendar_event_delete');
