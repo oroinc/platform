@@ -61,11 +61,11 @@ class ContentDecoderTest extends \PHPUnit_Framework_TestCase
                 'expected' => 'руруbubu'
             ],
             'koi8-r quoted-printable' => [
-                'string' => 'V. &#268;kalovo g.',
+                'string' => 'T. &#268;ktesttest',
                 'contentTransferEncoding' => 'quoted-printable',
                 'fromEncode' => 'koi8-r',
                 'toEncode' => 'UTF-8',
-                'expected' => 'V. &#268;kalovo g.'
+                'expected' => 'T. &#268;ktesttest'
             ],
             'windows-1250 quoted-printable' => [
                 'string' => '<DIV><FONT face=3DArial=20
