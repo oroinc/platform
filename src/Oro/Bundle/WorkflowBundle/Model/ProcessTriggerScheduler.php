@@ -8,7 +8,7 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-class ProcessCronScheduler
+class ProcessTriggerScheduler
 {
     /**
      * @var ScheduleManager
@@ -87,6 +87,7 @@ class ProcessCronScheduler
     public function flush()
     {
         $new = $this->created;
+
         if (count($this->created) !== 0) {
             $this->objectManager->flush();
             $this->created = [];

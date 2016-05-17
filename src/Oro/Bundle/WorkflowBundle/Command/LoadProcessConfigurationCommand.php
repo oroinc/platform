@@ -59,6 +59,10 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
 
         $processImport->import($processConfiguration);
 
+        $this->printDefinitions($output, $processImport->getLoadedDefinitions());
+        $this->printTriggers($output, $processImport->getLoadedTriggers());
+        $this->printSchedules($output, $processImport->getCreatedSchedules());
+
         // update triggers cache
         $this->getContainer()->get('oro_workflow.cache.process_trigger')->build();
     }
