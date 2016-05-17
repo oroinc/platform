@@ -52,7 +52,7 @@ class DurationToStringTransformer implements DataTransformerInterface
             return $value;
         }
 
-        if (!$value instanceof \DateTimeInterface) {
+        if (!$value instanceof \DateTimeInterface && !$value instanceof \DateTime) {
             throw new TransformationFailedException('Expected a \DateTime or \DateTimeInterface.');
         }
 
