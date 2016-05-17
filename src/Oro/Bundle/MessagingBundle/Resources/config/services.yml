@@ -1,7 +1,8 @@
 services:
     oro_messaging.consumption.extensions:
         class: Oro\Component\Messaging\Consumption\Extensions
-        arguments: [{}]
+        arguments:
+            - []
 
     oro_messaging.consumption.queue_consumer:
         class: Oro\Component\Messaging\Consumption\QueueConsumer
