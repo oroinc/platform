@@ -434,9 +434,6 @@ class WorkflowTest extends \PHPUnit_Framework_TestCase
         $workflowStep = new WorkflowStep();
         $workflowStep->setName('step_name');
         $step = $this->getStepMock($workflowStep->getName());
-        $step->expects($this->any())
-            ->method('getEntity')
-            ->will($this->returnValue($workflowStep));
 
         $transition = $this->getTransitionMock($expectedTransitionName, true, $step);
         $transition->expects($this->once())

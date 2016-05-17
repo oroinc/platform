@@ -94,7 +94,7 @@ process:
         final:
             header:        Finish
             greeting:      Success!!!
-            content:       You are now ready to start using Oro.<br>For help please join our community <a href="http://www.orocrm.com/forums">forums</a>.
+            content:       'You are now ready to start using Oro.<br>For help please join our community <a href="http://www.orocrm.com/forums">forums</a>.'
     button:
         back:              Back
         next:              Next

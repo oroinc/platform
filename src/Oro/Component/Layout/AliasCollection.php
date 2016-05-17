@@ -185,7 +185,7 @@ class AliasCollection
     protected function removeDependedAliases($alias, $id)
     {
         foreach ($this->ids[$id] as $otherAlias) {
-            if ($this->aliases[$otherAlias] === $alias) {
+            if (isset($this->aliases[$otherAlias]) && $this->aliases[$otherAlias] === $alias) {
                 unset($this->aliases[$otherAlias]);
                 $aliases = &$this->ids[$id];
                 unset($aliases[array_search($otherAlias, $aliases, true)]);

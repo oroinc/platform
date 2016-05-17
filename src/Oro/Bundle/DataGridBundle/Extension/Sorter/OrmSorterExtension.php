@@ -147,7 +147,7 @@ class OrmSorterExtension extends AbstractExtension
     public function getPriority()
     {
         // should visit after all extensions
-        return -250;
+        return -260;
     }
 
     /**

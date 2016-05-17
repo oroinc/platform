@@ -104,7 +104,7 @@ define([
         refresh: function() {
             this._stopListeningToRowsEvents(this.rows);
             _.each(this.rows, function(row) {
-                // to trigger properly dispose flow for all nested views, instead of just removing rows
+                // dispose in Chaplin's way, instead of Backbone's remove
                 row.dispose();
             });
             this.rows = [];
@@ -117,10 +117,6 @@ define([
          * Create this function instead of original Body.__super__.refresh to customize options for subviews
          */
         backgridRefresh: function() {
-            for (var i = 0; i < this.rows.length; i++) {
-                this.rows[i].remove();
-            }
-
             this.createRows();
             this._unshiftEmptyRowMayBe();
 

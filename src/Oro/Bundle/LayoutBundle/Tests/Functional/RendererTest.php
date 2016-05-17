@@ -155,7 +155,7 @@ class RendererTest extends LayoutTestCase
                 'style',
                 [
                     'src' => ['@asset' => 'test.css'],
-                    'scoped' => new Condition\False()
+                    'scoped' => new Condition\FalseCondition()
                 ]
             )
             ->add(
@@ -165,7 +165,7 @@ class RendererTest extends LayoutTestCase
                 [
                     'content' => 'alert(\'test\');',
                     'async'   => true,
-                    'defer'   => new Condition\False()
+                    'defer'   => new Condition\FalseCondition()
                 ]
             )
             ->add('external_resource', 'head', 'external_resource', ['href' => 'test.css', 'rel' => 'stylesheet'])
@@ -276,7 +276,7 @@ class RendererTest extends LayoutTestCase
                 ['charset' => 'invisible_by_expr_raw']
             )
             // test 'visible' option when its value is already assembled expression
-            ->add('invisible_by_expr_container', 'root', 'head', ['visible' => new Condition\False()])
+            ->add('invisible_by_expr_container', 'root', 'head', ['visible' => new Condition\FalseCondition()])
             ->add('invisible_by_expr_child', 'invisible_by_expr_container', 'meta', ['charset' => 'invisible_by_expr'])
             // test buttons
             ->add(

@@ -5,16 +5,16 @@ namespace Oro\Component\ConfigExpression\Condition;
 use Oro\Component\ConfigExpression\Exception;
 
 /**
- * Implements logical FALSE constant.
+ * Implements logical TRUE constant.
  */
-class False extends AbstractCondition
+class TrueCondition extends AbstractCondition
 {
     /**
      * {@inheritdoc}
      */
     public function getName()
     {
-        return 'false';
+        return 'true';
     }
 
     /**
@@ -50,6 +50,6 @@ class False extends AbstractCondition
      */
     protected function isConditionAllowed($context)
     {
-        return false;
+        return true;
     }
 }

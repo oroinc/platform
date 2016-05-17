@@ -75,7 +75,8 @@
         "piwik/device-detector": "~3.0",
         "oro/jsplumb": "~1.7",
         "oro/moment-timezone": "0.3.*",
-        "vakata/jstree": "^3.2"
+        "vakata/jstree": "^3.2",
+        "symfony/polyfill-php70":"1.*"
     },
     "require-dev": {
         "sensio/generator-bundle": "2.5.3"
