@@ -14,11 +14,6 @@ services:
         tags:
              - { name: layout.block_type, alias: root }
 
-    oro_layout.block_type.widget:
-        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\WidgetType
-        tags:
-             - { name: layout.block_type, alias: widget }
-
     oro_layout.block_type.head:
         class: Oro\Bundle\LayoutBundle\Layout\Block\Type\HeadType
         tags:
