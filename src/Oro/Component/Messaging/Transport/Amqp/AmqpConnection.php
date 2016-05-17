@@ -2,19 +2,20 @@
 namespace Oro\Component\Messaging\Transport\Amqp;
 
 use Oro\Component\Messaging\Transport\Connection;
+use PhpAmqpLib\Connection\AbstractConnection;
 use PhpAmqpLib\Connection\AMQPStreamConnection;
 
 class AmqpConnection implements Connection
 {
     /**
-     * @var AMQPStreamConnection
+     * @var AbstractConnection
      */
     private $connection;
 
     /**
-     * @param array $config
+     * @param AbstractConnection $connection
      */
-    public function __construct(array $config)
+    public function __construct(AbstractConnection $connection)
     {
         if (false == defined('AMQP_WITHOUT_SIGNALS')) {
             define('AMQP_WITHOUT_SIGNALS', false);
@@ -23,22 +24,7 @@ class AmqpConnection implements Connection
             throw new \LogicException('The AMQP_WITHOUT_SIGNALS must be set to false.');
         }
 
-        $config = array_replace([
-            'host' => 'localhost',
-             'port' => 5672,
-            'user' => null,
-            'password' => null,
-            'vhost' => '/',
-        ], $config);
-
-
-        $this->connection = new AMQPStreamConnection(
-            $config['host'],
-            $config['port'],
-            $config['user'],
-            $config['password'],
-            $config['vhost']
-        );
+        $this->connection = $connection;
     }
 
     /**
@@ -49,5 +35,29 @@ class AmqpConnection implements Connection
     public function createSession()
     {
         return new AmqpSession($this->connection->channel());
+    }
+
+    /**
+     * @param array $config
+     *
+     * @return static
+     */
+    public static function createFromConfig(array $config)
+    {
+        $config = array_replace([
+            'host' => 'localhost',
+            'port' => 5672,
+            'user' => null,
+            'password' => null,
+            'vhost' => '/',
+        ], $config);
+
+        return new static(new AMQPStreamConnection(
+            $config['host'],
+            $config['port'],
+            $config['user'],
+            $config['password'],
+            $config['vhost']
+        ));
     }
 }

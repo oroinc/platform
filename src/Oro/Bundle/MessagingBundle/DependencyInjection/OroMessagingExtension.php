@@ -26,7 +26,7 @@ class OroMessagingExtension extends Extension
         $loader->load('services.yml');
 
         $defaultSessionId = null;
-        if (isset($config['transport']['null'])) {
+        if (isset($config['transport']['null']) && $config['transport']['null']) {
             $connection = new Definition(NullConnection::class);
             $container->setDefinition('oro_messaging.transport.null.connection', $connection);
 
@@ -34,9 +34,10 @@ class OroMessagingExtension extends Extension
             $session->setFactory([new Reference('oro_messaging.transport.null.connection'), 'createSession']);
             $container->setDefinition('oro_messaging.transport.null.session', $session);
             $defaultSessionId = 'oro_messaging.transport.null.session';
-        } elseif (isset($config['transport']['amqp'])) {
+        } elseif (isset($config['transport']['amqp']) && $config['transport']['amqp']) {
             $amqpConfig = $config['transport']['amqp'];
             $connection = new Definition(AmqpConnection::class, [$amqpConfig]);
+            $connection->setFactory([AmqpConnection::class, 'createFromConfig']);
             $container->setDefinition('oro_messaging.transport.amqp.connection', $connection);
 
             $session = new Definition(AmqpSession::class);

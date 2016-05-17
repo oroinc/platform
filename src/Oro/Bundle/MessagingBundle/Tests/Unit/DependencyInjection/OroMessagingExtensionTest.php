@@ -55,6 +55,7 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->hasDefinition('oro_messaging.transport.amqp.connection'));
         $connection = $container->getDefinition('oro_messaging.transport.amqp.connection');
         $this->assertEquals(AmqpConnection::class, $connection->getClass());
+        $this->assertEquals([AmqpConnection::class, 'createFromConfig'], $connection->getFactory());
         $this->assertEquals([
             'host' => 'theHost',
             'port' => 'thePort',
