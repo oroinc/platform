@@ -5,7 +5,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Provider;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Provider\UserCalendarEventNormalizer;
 use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\Origin;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 
 class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
 {
@@ -411,7 +411,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
         }
 
         if (!empty($data['origin'])) {
-            $origin = new Origin($data['origin']);
+            $origin = new TestEnumValue($data['origin'], $data['origin']);
             $event->setOrigin($origin);
         }
 

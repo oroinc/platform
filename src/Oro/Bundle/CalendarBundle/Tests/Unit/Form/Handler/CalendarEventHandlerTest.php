@@ -6,7 +6,7 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Tests\Unit\Fixtures\Entity\Origin;
+use Oro\Bundle\EntityExtendBundle\Tests\Unit\Fixtures\TestEnumValue;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventHandler;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
@@ -69,9 +69,7 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
             ->getMock();
 
         $this->entity  = new CalendarEvent();
-
-        $origin = new Origin(CalendarEvent::ORIGIN_SERVER);
-
+        $origin        = new TestEnumValue(CalendarEvent::ORIGIN_SERVER, CalendarEvent::ORIGIN_SERVER);
         $this->entity->setOrigin($origin);
         
         $this->handler = new CalendarEventHandler(
@@ -106,7 +104,7 @@ class CalendarEventHandlerTest extends \PHPUnit_Framework_TestCase
      */
     public function testProcessWithException()
     {
-        $origin = new Origin(CalendarEvent::ORIGIN_EXTERNAL);
+        $origin = new TestEnumValue(CalendarEvent::ORIGIN_EXTERNAL, CalendarEvent::ORIGIN_EXTERNAL);
         $this->entity->setOrigin($origin);
 
         $this->handler->process($this->entity);
