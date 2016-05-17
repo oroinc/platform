@@ -30,121 +30,136 @@ class AmqpQueueTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldSetPassiveFalseInConstructor()
     {
-        $topic = new AmqpQueue('aName');
+        $queue = new AmqpQueue('aName');
 
-        $this->assertFalse($topic->isPassive());
+        $this->assertFalse($queue->isPassive());
     }
 
     public function testShouldAllowGetPreviouslySetPassive()
     {
-        $topic = new AmqpQueue('aName');
-        $topic->setPassive(true);
+        $queue = new AmqpQueue('aName');
+        $queue->setPassive(true);
 
-        $this->assertTrue($topic->isPassive());
+        $this->assertTrue($queue->isPassive());
     }
 
     public function testShouldSetDurableTrueInConstructor()
     {
-        $topic = new AmqpQueue('aName');
+        $queue = new AmqpQueue('aName');
 
-        $this->assertTrue($topic->isDurable());
+        $this->assertTrue($queue->isDurable());
     }
 
     public function testShouldAllowGetPreviouslySetDurable()
     {
-        $topic = new AmqpQueue('aName');
-        $topic->setDurable(false);
+        $queue = new AmqpQueue('aName');
+        $queue->setDurable(false);
 
-        $this->assertFalse($topic->isDurable());
+        $this->assertFalse($queue->isDurable());
     }
 
     public function testShouldSetExclusiveFalseInConstructor()
     {
-        $topic = new AmqpQueue('aName');
+        $queue = new AmqpQueue('aName');
 
-        $this->assertFalse($topic->isExclusive());
+        $this->assertFalse($queue->isExclusive());
     }
 
     public function testShouldAllowGetPreviouslySetExclusive()
     {
-        $topic = new AmqpQueue('aName');
-        $topic->setExclusive(true);
+        $queue = new AmqpQueue('aName');
+        $queue->setExclusive(true);
 
-        $this->assertTrue($topic->isExclusive());
+        $this->assertTrue($queue->isExclusive());
     }
 
     public function testShouldSetAutoDeleteFalseInConstructor()
     {
-        $topic = new AmqpQueue('aName');
+        $queue = new AmqpQueue('aName');
 
-        $this->assertFalse($topic->isAutoDelete());
+        $this->assertFalse($queue->isAutoDelete());
     }
 
     public function testShouldAllowGetPreviouslySetAutoDelete()
     {
-        $topic = new AmqpQueue('aName');
-        $topic->setAutoDelete(true);
+        $queue = new AmqpQueue('aName');
+        $queue->setAutoDelete(true);
 
-        $this->assertTrue($topic->isAutoDelete());
+        $this->assertTrue($queue->isAutoDelete());
     }
 
     public function testShouldSetNoWaitFalseInConstructor()
     {
-        $topic = new AmqpQueue('aName');
+        $queue = new AmqpQueue('aName');
 
-        $this->assertFalse($topic->isNoWait());
+        $this->assertFalse($queue->isNoWait());
     }
 
     public function testShouldAllowGetPreviouslySetNoWait()
     {
-        $topic = new AmqpQueue('aName');
-        $topic->setNoWait(true);
+        $queue = new AmqpQueue('aName');
+        $queue->setNoWait(true);
 
-        $this->assertTrue($topic->isNoWait());
+        $this->assertTrue($queue->isNoWait());
     }
 
     public function testShouldSetNoLocalFalseInConstructor()
     {
-        $topic = new AmqpQueue('aName');
+        $queue = new AmqpQueue('aName');
 
-        $this->assertFalse($topic->isNoLocal());
+        $this->assertFalse($queue->isNoLocal());
     }
 
     public function testShouldAllowGetPreviouslySetNoLocal()
     {
-        $topic = new AmqpQueue('aName');
-        $topic->setNoLocal(true);
+        $queue = new AmqpQueue('aName');
+        $queue->setNoLocal(true);
 
-        $this->assertTrue($topic->isNoLocal());
+        $this->assertTrue($queue->isNoLocal());
     }
 
     public function testShouldSetNoAckFalseInConstructor()
     {
-        $topic = new AmqpQueue('aName');
+        $queue = new AmqpQueue('aName');
 
-        $this->assertFalse($topic->isNoAck());
+        $this->assertFalse($queue->isNoAck());
     }
 
     public function testShouldAllowGetPreviouslySetNoAck()
     {
-        $topic = new AmqpQueue('aName');
-        $topic->setNoAck(true);
+        $queue = new AmqpQueue('aName');
+        $queue->setNoAck(true);
 
-        $this->assertTrue($topic->isNoAck());
+        $this->assertTrue($queue->isNoAck());
     }
 
     public function testShouldSetEmptyConsumerTagInConstructor()
     {
-        $topic = new AmqpQueue('aName');
+        $queue = new AmqpQueue('aName');
 
-        $this->assertEquals('', $topic->getConsumerTag());
+        $this->assertEquals('', $queue->getConsumerTag());
     }
 
     public function testShouldAllowGetPreviouslySetConsumerTag()
     {
-        $topic = new AmqpQueue('aName');
-        $topic->setConsumerTag('theConsumerTag');
+        $queue = new AmqpQueue('aName');
+        $queue->setConsumerTag('theConsumerTag');
 
-        $this->assertEquals('theConsumerTag', $topic->getConsumerTag());
+        $this->assertEquals('theConsumerTag', $queue->getConsumerTag());
+    }
+
+    public function testShouldSetEmptyArrayTableInConstructor()
+    {
+        $queue = new AmqpQueue('aName');
+
+        $this->assertEquals([], $queue->getTable());
+    }
+
+    public function testShouldAllowGetPreviouslySetTable()
+    {
+        $queue = new AmqpQueue('aName');
+        $queue->setTable(['aFoo' => 'aFooVal']);
+
+        $this->assertEquals(['aFoo' => 'aFooVal'], $queue->getTable());
     }
 }

@@ -46,6 +46,11 @@ class AmqpTopic implements Topic
     private $immediate;
 
     /**
+     * @var string[]
+     */
+    private $table;
+
+    /**
      * @param string $name
      */
     public function __construct($name)
@@ -59,6 +64,7 @@ class AmqpTopic implements Topic
         $this->routingKey = '';
         $this->mandatory = false;
         $this->immediate = false;
+        $this->table = [];
     }
 
     /**
@@ -179,5 +185,21 @@ class AmqpTopic implements Topic
     public function setImmediate($immediate)
     {
         $this->immediate = $immediate;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @param \string[] $table
+     */
+    public function setTable(array $table)
+    {
+        $this->table = $table;
     }
 }

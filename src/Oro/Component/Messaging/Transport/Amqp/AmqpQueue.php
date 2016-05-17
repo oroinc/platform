@@ -51,6 +51,11 @@ class AmqpQueue implements Queue
     private $noAck;
 
     /**
+     * @var string[]
+     */
+    private $table;
+
+    /**
      * @param string $name
      */
     public function __construct($name)
@@ -65,6 +70,7 @@ class AmqpQueue implements Queue
         $this->consumerTag = '';
         $this->noLocal = false;
         $this->noAck = false;
+        $this->table = [];
     }
 
     /**
@@ -201,5 +207,21 @@ class AmqpQueue implements Queue
     public function setNoAck($noAck)
     {
         $this->noAck = $noAck;
+    }
+
+    /**
+     * @return \string[]
+     */
+    public function getTable()
+    {
+        return $this->table;
+    }
+
+    /**
+     * @param \string[] $table
+     */
+    public function setTable(array $table)
+    {
+        $this->table = $table;
     }
 }

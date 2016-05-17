@@ -138,6 +138,7 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
         $queue->setExclusive('theExclusiveBool');
         $queue->setAutoDelete('theAutoDeleteBool');
         $queue->setNoWait('theNoWaitBool');
+        $queue->setTable(['theKey' => 'theVal']);
 
         $channelMock = $this->createAmqpChannel();
 
@@ -149,7 +150,8 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
                 'theDurableBool',
                 'theExclusiveBool',
                 'theAutoDeleteBool',
-                'theNoWaitBool'
+                'theNoWaitBool',
+                ['theKey' => 'theVal']
             )
         ;
 
@@ -191,12 +193,22 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
         $topic->setDurable('theDurableBool');
         $topic->setPassive('thePassiveBool');
         $topic->setNoWait('theNoWaitBool');
+        $topic->setTable(['theKey' => 'theVal']);
 
         $channelMock = $this->createAmqpChannel();
 
         $channelMock->expects($this->once())
             ->method('exchange_declare')
-            ->with($this->anything(), 'theTopicType', 'thePassiveBool', 'theDurableBool', false, false, 'theNoWaitBool')
+            ->with(
+                $this->anything(),
+                'theTopicType',
+                'thePassiveBool',
+                'theDurableBool',
+                false,
+                false,
+                'theNoWaitBool',
+                ['theKey' => 'theVal']
+            )
         ;
 
         $session = new AmqpSession($channelMock);

@@ -132,4 +132,19 @@ class AmqpTopicTest extends \PHPUnit_Framework_TestCase
 
         $this->assertTrue($topic->isMandatory());
     }
+
+    public function testShouldSetEmptyArrayTableInConstructor()
+    {
+        $topic = new AmqpTopic('aName');
+
+        $this->assertEquals([], $topic->getTable());
+    }
+
+    public function testShouldAllowGetPreviouslySetTable()
+    {
+        $topic = new AmqpTopic('aName');
+        $topic->setTable(['aFoo' => 'aFooVal']);
+
+        $this->assertEquals(['aFoo' => 'aFooVal'], $topic->getTable());
+    }
 }

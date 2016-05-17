@@ -119,7 +119,8 @@ class AmqpSession implements Session
             $destination->isDurable(),
             $autoDelete = false, // rabbitmq specific
             $internal = false, // rabbitmq specific
-            $destination->isNoWait()
+            $destination->isNoWait(),
+            $destination->getTable()
         );
     }
 
@@ -141,7 +142,8 @@ class AmqpSession implements Session
             $destination->isDurable(),
             $destination->isExclusive(),
             $destination->isAutoDelete(),
-            $destination->isNoWait()
+            $destination->isNoWait(),
+            $destination->getTable()
         );
     }
 
