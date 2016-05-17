@@ -4,6 +4,7 @@ namespace Oro\Bundle\SecurityBundle\Acl\Extension;
 
 use Doctrine\ORM\Mapping\MappingException;
 
+use Oro\Bundle\SecurityBundle\Acl\Domain\ObjectIdentityFactory;
 use Symfony\Component\Security\Acl\Domain\ObjectIdentity;
 
 use Oro\Bundle\SecurityBundle\Acl\Group\AclGroupProviderInterface;
@@ -79,6 +80,14 @@ class FieldAclExtension extends EntityAclExtension
                 FieldMaskBuilder::MASK_EDIT_SYSTEM,
             ],
         ];
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function isRootSupported()
+    {
+        return false;
     }
 
     /**
@@ -361,7 +370,6 @@ class FieldAclExtension extends EntityAclExtension
 
         return $identity;
     }
-
 
     /**
      * {@inheritdoc}

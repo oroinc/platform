@@ -73,6 +73,14 @@ abstract class AbstractAclExtension implements AclExtensionInterface
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function isRootSupported()
+    {
+        return true;
+    }
+
+    /**
      * Split the given object identity descriptor
      *
      * @param string $descriptor
