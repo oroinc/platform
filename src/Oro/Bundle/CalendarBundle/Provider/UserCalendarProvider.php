@@ -11,6 +11,7 @@ use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
+use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class UserCalendarProvider extends AbstractCalendarProvider
@@ -119,8 +120,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
         $this->addRecurrencesConditions($qb, $start, $end);
 
         $items = $this->calendarEventNormalizer->getCalendarEvents($calendarId, $qb->getQuery());
-
-        $this->transformRecurrences($items, $start, $end);
+        $items = $this->getExpandedRecurrences($items, $start, $end);
 
         return $items;
     }
@@ -136,60 +136,133 @@ class UserCalendarProvider extends AbstractCalendarProvider
     }
 
     /**
-     * Transforms recurrence rules into entity items.
-     *
      * @param array $items
      * @param \DateTime $start
      * @param \DateTime $end
      *
-     * @return self
+     * @return array
+     */
+    protected function getExpandedRecurrences(array $items, \DateTime $start, \DateTime $end)
+    {
+        $regularEvents = $this->getRegularEvents($items);
+        $exceptions = $this->getExceptions($items);
+        $occurrences = $this->getOccurrences($items, $start, $end);
+
+        return array_merge($regularEvents, $this->getMergedOccurrencesWithExceptions($occurrences, $exceptions));
+    }
+
+    /**
+     * @param array $items
+     *
+     * @return array
+     */
+    protected function getRegularEvents(array $items)
+    {
+        $events = [];
+        foreach ($items as $item) {
+            if (empty($item[Recurrence::STRING_KEY]) && empty($item['recurringEventId'])) {
+                $events[] = $item;
+            }
+        }
+
+        return $events;
+    }
+
+    /**
+     * @param array $items
+     *
+     * @return array
+     */
+    protected function getExceptions(array $items)
+    {
+        $exceptions = [];
+        foreach ($items as $item) {
+            if (empty($item[Recurrence::STRING_KEY]) &&
+                !empty($item['recurringEventId']) &&
+                !empty($item['originalStart'])
+            ) {
+                $exceptions[] = $item;
+            }
+        }
+
+        return $exceptions;
+    }
+
+    /**
+     * @param array $items
+     * @param \DateTime $start
+     * @param \DateTime $end
+     *
+     * @return array
      *
      * @throws \InvalidArgumentException
      * @throws \RuntimeException
      * @throws \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      * @throws \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
-    protected function transformRecurrences(array &$items, $start, $end)
+    protected function getOccurrences(array $items, \DateTime $start, \DateTime $end)
     {
         $key = Recurrence::STRING_KEY;
         $propertyAccessor = $this->getPropertyAccessor();
-        $newItems = [];
-        foreach ($items as $index => $item) {
-            if (empty($item[$key])) {
-                continue;
-            }
-
-            $recurrence = new Recurrence();
-            $exceptions = empty($item[$key]['exceptions']) ? [] : $item[$key]['exceptions'];
-            unset($item[$key]['exceptions']);
-            foreach ($item[$key] as $field => $value) {
-                $value = in_array($field, ['startTime', 'endTime']) ? new \DateTime($value) : $value;
-                if ($field !== 'id') {
-                    $propertyAccessor->setValue($recurrence, $field, $value);
+        $occurrences = [];
+        foreach ($items as $item) {
+            if (!empty($item[$key]) && empty($item['recurringEventId'])) {
+                $recurrence = new Recurrence();
+                foreach ($item[$key] as $field => $value) {
+                    $value = in_array($field, ['startTime', 'endTime'], true) ? new \DateTime($value) : $value;
+                    if ($field !== 'id') {
+                        $propertyAccessor->setValue($recurrence, $field, $value);
+                    }
+                }
+                $occurrenceDates = $this->recurrenceStrategy->getOccurrences($recurrence, $start, $end);
+                foreach ($occurrenceDates as $occurrenceDate) {
+                    $newItem = $item;
+                    $newItem['recurrencePattern'] = $this->recurrenceStrategy->getRecurrencePattern($recurrence);
+                    $newItem['start'] = $occurrenceDate->format('c');
+                    $endDate = new \DateTime($newItem['end']);
+                    $endDate->setDate(
+                        $occurrenceDate->format('Y'),
+                        $occurrenceDate->format('m'),
+                        $occurrenceDate->format('d')
+                    );
+                    $newItem['end'] = $endDate->format('c');
+                    $occurrences[] = $newItem;
                 }
             }
-            $occurrences = $this->recurrenceStrategy->getOccurrences($recurrence, $start, $end);
-            //unset recurrence values, because we don't need it for duplication
-            $recurrenceId = $item[$key]['id'];
-            unset($item[$key]);
-            /** @var \DateTime $occurrence */
-            foreach ($occurrences as $occurrence) {
-                $newItem = $item;
-                $newItem[$key] = $recurrenceId;
-                $newItem['recurrencePattern'] = $this->recurrenceStrategy->getRecurrencePattern($recurrence);
-                $newItem['start'] = $occurrence->format('c');
-                $endDate = new \DateTime($newItem['end']);
-                $endDate->setDate($occurrence->format('Y'), $occurrence->format('m'), $occurrence->format('d'));
-                $newItem['end'] = $endDate->format('c');
-                $exception = $this->getRecurrenceException($occurrence, $exceptions);
-                $newItems[] = $exception ? array_merge($newItem, $exception) : $newItem;
-            }
-            //remove original item with recurrence, because it was calculated with recurrence rules
-            unset($items[$index]);
         }
-        $items = array_merge($items, $newItems);
 
-        return $this;
+        return $occurrences;
+    }
+
+    /**
+     * @param array $occurrences
+     * @param array $exceptions
+     *
+     * @return array
+     */
+    protected function getMergedOccurrencesWithExceptions(array $occurrences, array $exceptions)
+    {
+        foreach ($occurrences as $oKey => &$occurrence) {
+            foreach ($exceptions as $eKey => $exception) {
+                if ((int)$exception['recurringEventId'] === (int)$occurrence['id'] &&
+                    (new \DateTime($exception['originalStart'])) == (new \DateTime($occurrence['start']))
+                ) {
+                    if ($exception['isCancelled']) {
+                        unset($occurrences[$oKey]);
+                    } else {
+                        $occurrence = $exception;
+                    }
+                    unset($exceptions[$eKey]);
+                }
+            }
+        }
+        unset($occurrence);
+        $occurrences = empty($occurrences) ? [] : $occurrences;
+        if (!empty($exceptions)) {
+            $occurrences = array_merge($occurrences, $exceptions);
+        }
+
+        return $occurrences;
     }
 
     /**
@@ -210,6 +283,13 @@ class UserCalendarProvider extends AbstractCalendarProvider
                 $expr->lte('r.startTime', ':endDate'),
                 $expr->gte('r.endTime', ':startDate')
             )
+        )
+        ->orWhere(
+            $expr->andX(
+                $expr->isNotNull('e.originalStart'),
+                $expr->lte('e.originalStart', ':endDate'),
+                $expr->gte('e.originalStart', ':startDate')
+            )
         );
         $queryBuilder->setParameter('startDate', $startDate);
         $queryBuilder->setParameter('endDate', $endDate);
@@ -227,30 +307,5 @@ class UserCalendarProvider extends AbstractCalendarProvider
         }
 
         return $this->propertyAccessor;
-    }
-
-    /**
-     * Returns exception data for recurrence item.
-     *
-     * @param \DateTime $occurrence
-     * @param array $recurringEventExceptions
-     *
-     * @return null|array
-     */
-    protected function getRecurrenceException(\DateTime $occurrence, $recurringEventExceptions)
-    {
-        foreach ($recurringEventExceptions as $exception) {
-            //if original date of exception is the same with occurrence
-            if ($occurrence->diff(new \DateTime($exception['originalStart']))->format('%a') == 0) {
-                //don't need this value in result
-                unset($exception['originalStart']);
-
-                return $exception;
-            }
-            // @TODO $this->formatter should be used here.
-            $item['recurrencePattern'] = 'recurrencePattern';
-        }
-
-        return null;
     }
 }

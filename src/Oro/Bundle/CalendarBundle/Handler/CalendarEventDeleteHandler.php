@@ -105,6 +105,9 @@ class CalendarEventDeleteHandler extends DeleteHandler
      */
     public function processDelete($entity, ObjectManager $em)
     {
+        if ($entity->getRecurrence() && $entity->getRecurrence()->getId()) {
+            $em->remove($entity->getRecurrence());
+        }
         parent::processDelete($entity, $em);
         $this->emailSendProcessor->sendDeleteEventNotification($entity);
     }

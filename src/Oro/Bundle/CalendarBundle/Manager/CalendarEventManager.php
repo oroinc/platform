@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Manager;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarRepository;
 use Oro\Bundle\CalendarBundle\Entity\Repository\SystemCalendarRepository;
@@ -174,5 +175,26 @@ class CalendarEventManager
     {
         return $this->doctrineHelper->getEntityRepository('OroCalendarBundle:SystemCalendar')
             ->find($calendarId);
+    }
+
+    /**
+     * @param CalendarEvent $event
+     * @param $recurringEventId
+     */
+    public function setRecurringEvent(CalendarEvent $event, $recurringEventId)
+    {
+        $recurringEvent = $event->getRecurringEvent();
+        if (!$recurringEvent || $recurringEvent->getId() !== $recurringEventId) {
+            $repo = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
+            $event->setRecurringEvent($repo->find($recurringEventId));
+        }
+    }
+
+    /**
+     * @param Recurrence $recurrence
+     */
+    public function removeRecurrence(Recurrence $recurrence)
+    {
+        $this->doctrineHelper->getEntityManager($recurrence)->remove($recurrence);
     }
 }

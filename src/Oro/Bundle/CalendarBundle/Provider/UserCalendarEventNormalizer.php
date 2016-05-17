@@ -58,7 +58,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 
         $result = [$item];
         $this->applyAdditionalData($result, $calendarId);
-        $this->addRecurringEventExceptions($result);
         $this->applyPermissions($result[0], $calendarId);
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
@@ -83,6 +82,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
 
         if ($recurrence = $event->getRecurrence()) {
             $extraValues[Recurrence::STRING_KEY] = [
+                'id' => $recurrence->getId(),
                 'recurrenceType' => $recurrence->getRecurrenceType(),
                 'interval' => $recurrence->getInterval(),
                 'instance' => $recurrence->getInstance(),
@@ -109,6 +109,9 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'invitationStatus' => $event->getInvitationStatus(),
                 'parentEventId'    => $event->getParent() ? $event->getParent()->getId() : null,
                 'calendar'         => $event->getCalendar() ? $event->getCalendar()->getId() : null,
+                'recurringEventId' => $event->getRecurringEvent() ? $event->getRecurringEvent()->getId() : null,
+                'originalStart'    => $event->getOriginalStart(),
+                'isCancelled'      => $event->getIsCancelled(),
             ],
             $extraValues
         );
@@ -209,7 +212,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             $result[] = $item;
         }
         $this->applyAdditionalData($result, $calendarId);
-        $this->addRecurringEventExceptions($result);
         foreach ($result as &$resultItem) {
             $this->applyPermissions($resultItem, $calendarId);
         }
@@ -217,43 +219,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
         return $result;
-    }
-
-    /**
-     * Gets recurring event exceptions from DB and adds it to appropriate recurrence items.
-     *
-     * @param array $items
-     *
-     * @return self
-     */
-    protected function addRecurringEventExceptions(&$items)
-    {
-        $recurringEventIds = ArrayUtil::arrayColumn($items, 'id');
-
-        if ($recurringEventIds) {
-            /** @var CalendarEventRepository $repository */
-            $repository = $this->doctrineHelper->getEntityRepository('OroCalendarBundle:CalendarEvent');
-            $exceptions = $repository->getRecurringEventExceptionsByParentIds($recurringEventIds)
-                ->getQuery()
-                ->getArrayResult();
-
-            $key = Recurrence::STRING_KEY;
-            foreach ($exceptions as $exception) {
-                foreach ($items as $index => $item) {
-                    if ($item['id'] == $exception['recurringEventId'] && !empty($item[$key])) {
-                        //don't need this value in result
-                        unset($exception['recurringEventId']);
-                        if (empty($items[$index][$key]['exceptions'])) {
-                            $items[$index][$key]['exceptions'] = [];
-                        }
-                        $items[$index][$key]['exceptions'][] = $this->transformEntity($exception);
-                        break;
-                    }
-                }
-            }
-        }
-
-        return $this;
     }
 
     /**

@@ -37,7 +37,10 @@ define([
             calendar: null, // calendarId
             calendarUid: null, // calculated automatically, equals to calendarAlias + calendarId
             recurrence: null,
-            recurrencePattern: null
+            recurrencePattern: null,
+            recurringEventId: null,
+            originalStart: null,
+            isCancelled: null
         },
 
         initialize: function() {
@@ -82,7 +85,10 @@ define([
                         'parentEventId',
                         'invitationStatus',
                         'recurrence',
-                        'recurrencePattern'
+                        'recurrencePattern',
+                        'recurringEventId',
+                        'originalStart',
+                        'isCancelled'
                     ]
                 ),
                 attrs || {}

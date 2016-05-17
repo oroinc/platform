@@ -64,6 +64,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
             . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
+            . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
+            . ' e.originalStart, e.isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
@@ -98,6 +100,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
             . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
+            . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
+            . ' e.originalStart, e.isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
@@ -136,6 +140,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt,'
             . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
+            . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
+            . ' e.originalStart, e.isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"
@@ -175,6 +181,8 @@ class CalendarEventRepositoryTest extends OrmTestCase
             . ' e.backgroundColor, e.createdAt, e.updatedAt, e.status,'
             . ' e.invitationStatus, IDENTITY(e.parent) AS parentEventId,'
             . ' c.id as calendar,'
+            . ' IDENTITY(e.recurringEvent) AS recurringEventId,'
+            . ' e.originalStart, e.isCancelled,'
             . " r.recurrenceType as {$key}RecurrenceType, r.interval as {$key}Interval,"
             . "r.dayOfWeek as {$key}DayOfWeek, r.dayOfMonth as {$key}DayOfMonth,"
             . "r.monthOfYear as {$key}MonthOfYear, r.startTime as {$key}StartTime,"

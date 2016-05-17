@@ -21,7 +21,8 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  *      indexes={
  *          @ORM\Index(name="oro_calendar_event_idx", columns={"calendar_id", "start_at", "end_at"}),
  *          @ORM\Index(name="oro_sys_calendar_event_idx", columns={"system_calendar_id", "start_at", "end_at"}),
- *          @ORM\Index(name="oro_calendar_event_up_idx", columns={"updated_at"})
+ *          @ORM\Index(name="oro_calendar_event_up_idx", columns={"updated_at"}),
+ *          @ORM\Index(name="oro_calendar_event_osa_idx", columns={"original_start_at"})
  *      }
  * )
  * @ORM\HasLifecycleCallbacks()
@@ -288,6 +289,15 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      * @ORM\Column(name="original_start_at", type="datetime", nullable=true)
      */
     protected $originalStart;
+
+    /**
+     * This attribute indicates whether the occurrence was removed from user's calendar.
+     *
+     * @var bool
+     *
+     * @ORM\Column(name="is_cancelled", type="boolean", options={"default"=false})
+     */
+    protected $isCancelled = false;
 
     public function __construct()
     {
@@ -799,6 +809,30 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
         $this->originalStart = $originalStart;
 
         return $this;
+    }
+
+    /**
+     * Sets isCancelled flag.
+     *
+     * @param bool $isCancelled
+     *
+     * @return self
+     */
+    public function setIsCancelled($isCancelled = false)
+    {
+        $this->isCancelled = $isCancelled;
+
+        return $this;
+    }
+
+    /**
+     * Gets isCancelled flag.
+     *
+     * @return bool
+     */
+    public function getIsCancelled()
+    {
+        return $this->isCancelled;
     }
     
     /**
