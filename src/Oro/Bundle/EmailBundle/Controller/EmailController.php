@@ -12,8 +12,8 @@ use Symfony\Bundle\FrameworkBundle\Controller\Controller;
 use Symfony\Component\HttpFoundation\JsonResponse;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpFoundation\Response;
-use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 use Symfony\Component\HttpFoundation\BinaryFileResponse;
+use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
@@ -321,9 +321,9 @@ class EmailController extends Controller
      * @AclAncestor("oro_email_email_view")
      *
      * @param EmailAttachment $attachment
-     * @param $width
-     * @param $height
-     * @return mixed
+     * @param int $width
+     * @param int $height
+     * @return Response
      */
     public function getResizedAttachmentImageAction(EmailAttachment $attachment, $width, $height)
     {
