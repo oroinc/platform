@@ -3,6 +3,7 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Import;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport;
 use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler;
 
@@ -21,7 +22,7 @@ class ProcessTriggersImportTest extends \PHPUnit_Framework_TestCase
     protected $managerRegistry;
 
     /**
-     * @var |\PHPUnit_Framework_MockObject_MockObject
+     * @var string|\PHPUnit_Framework_MockObject_MockObject
      */
     protected $triggerEntityClass;
 
@@ -44,6 +45,7 @@ class ProcessTriggersImportTest extends \PHPUnit_Framework_TestCase
         $this->processCronScheduler = $this->getMockBuilder('Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler')
             ->disableOriginalConstructor()
             ->getMock();
+        $this->triggerEntityClass = 'Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger';
         $this->processTriggersImport = new ProcessTriggersImport(
             $this->configurationBuilder,
             $this->managerRegistry,
