@@ -261,14 +261,12 @@ define([
                         }
                     } else {
                         if (_.first(matches) === 'invitedUsers') {
-                            value = _.map(value, function(attendee) {
-                                return {
-                                    id: null,
-                                    firstName: attendee.displayName,
-                                    email: attendee.email
-                                };
-                            });
-                            input.select2('data', value);
+                            if (value && value.length) {
+                                input.on('select2-data-loaded', function() {
+                                    self._hideMask();
+                                });
+                                input.val(_.last(modelData.id.match(/\d+/g)));
+                            }
                         } else {
                             input.val(value);
                         }

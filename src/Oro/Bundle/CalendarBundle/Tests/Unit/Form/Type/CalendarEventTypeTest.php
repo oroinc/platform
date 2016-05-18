@@ -122,7 +122,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
                 [
                     'required' => false,
                     'label' => 'oro.calendar.calendarevent.attendees.label',
-                    'disable_user_removal' => true,
+                    'layout_template' => false,
                 ]
             )
             ->will($this->returnSelf());
@@ -141,7 +141,7 @@ class CalendarEventTypeTest extends \PHPUnit_Framework_TestCase
             ->with('attendees')
             ->will($this->returnSelf());
 
-        $this->type->buildForm($builder, []);
+        $this->type->buildForm($builder, ['layout_template' => false]);
     }
 
     public function testSetDefaultOptions()

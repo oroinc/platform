@@ -3,13 +3,14 @@
 namespace Oro\Bundle\CalendarBundle\Controller;
 
 use Symfony\Bundle\FrameworkBundle\Controller\Controller;
+use Symfony\Component\HttpFoundation\JsonResponse;
 
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Route;
 use Sensio\Bundle\FrameworkExtraBundle\Configuration\Template;
 
 use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
-
+use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 /**
@@ -79,6 +80,21 @@ class CalendarEventController extends Controller
         return array(
             'entity' => $this->get('oro_entity.routing_helper')->getEntity($entityClass, $entityId)
         );
+    }
+
+    /**
+     * @Route(
+     *      "/attendees-autocomplete-data/{id}",
+     *      name="oro_calendar_event_attendees_autocomplete_data",
+     *      options={"expose"=true}
+     * )
+     */
+    public function attendeesAutocompleteDataAction(CalendarEvent $event)
+    {
+        $data = $this->getAttendeeManager()
+            ->attendeesToAutocompleteData($event->getAttendees());
+
+        return new JsonResponse($data);
     }
 
     /**
@@ -174,5 +190,13 @@ class CalendarEventController extends Controller
         }
 
         return $entityRoutingHelper->getEntity($targetEntityClass, $targetEntityId);
+    }
+
+    /**
+     * @return AttendeeManager
+     */
+    protected function getAttendeeManager()
+    {
+        return $this->get('oro_calendar.attendee_manager');
     }
 }

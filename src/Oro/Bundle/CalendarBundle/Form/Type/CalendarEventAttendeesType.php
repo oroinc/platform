@@ -14,10 +14,8 @@ use Symfony\Component\Form\FormView;
 use Symfony\Component\OptionsResolver\Options;
 use Symfony\Component\OptionsResolver\OptionsResolver;
 
-use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer;
-use Oro\Bundle\FormBundle\Autocomplete\ConverterInterface;
-use Oro\Bundle\UserBundle\Entity\User;
+use Oro\Bundle\CalendarBundle\Manager\AttendeeManager;
 
 class CalendarEventAttendeesType extends AbstractType
 {
@@ -27,12 +25,19 @@ class CalendarEventAttendeesType extends AbstractType
     /** @var UsersToAttendeesTransformer */
     protected $usersToAttendeesTransformer;
 
+    /** @var AttendeeManager */
+    protected $attendeeManager;
+
     /**
      * @param UsersToAttendeesTransformer $usersToAttendeesTransformer
+     * @param AttendeeManager $attendeeManager
      */
-    public function __construct(UsersToAttendeesTransformer $usersToAttendeesTransformer)
-    {
+    public function __construct(
+        UsersToAttendeesTransformer $usersToAttendeesTransformer,
+        AttendeeManager $attendeeManager
+    ) {
         $this->usersToAttendeesTransformer = $usersToAttendeesTransformer;
+        $this->attendeeManager = $attendeeManager;
     }
 
     /**
@@ -80,14 +85,18 @@ class CalendarEventAttendeesType extends AbstractType
     {
         $resolver->setDefaults([
             'autocomplete_alias' => 'organization_users',
+            'layout_template' => false,
             'configs' => function (Options $options, $value) {
-                return array_merge(
-                    $value,
-                    [
-                        'renderedPropertyName' => 'email',
-                        'forceSelectedData' => true,
-                    ]
-                );
+                $newConfigs = [
+                    'renderedPropertyName' => 'email',
+                    'forceSelectedData' => true,
+                ];
+
+                if ($options['layout_template']) {
+                    $newConfigs['component'] = 'attendees';
+                }
+
+                return array_merge($value, $newConfigs);
             },
         ]);
     }
@@ -97,26 +106,14 @@ class CalendarEventAttendeesType extends AbstractType
      */
     public function buildView(FormView $view, FormInterface $form, array $options)
     {
-        /** @var ConverterInterface $converter */
-        $converter = $options['converter'];
-
         $formData = $form->getData();
-        if ($formData) {
-            $transformedData = $this->usersToAttendeesTransformer->attendeesToUsers($formData);
-
-            $result = [];
-            foreach ($transformedData as $k => $item) {
-                $converted = $converter->convertItem($item);
-
-                if (!$this->isAttendeeRemovable($formData[$k], $options['disable_user_removal'])) {
-                    $converted['locked'] = true;
-                }
-
-                $result[] = $converted;
-            }
-
-            $view->vars['attr']['data-selected-data'] = json_encode($result);
+        if (!$formData) {
+            return;
         }
+
+        $view->vars['attr']['data-selected-data'] = json_encode(
+            $this->attendeeManager->attendeesToAutocompleteData($formData)
+        );
     }
 
     /**
@@ -133,27 +130,6 @@ class CalendarEventAttendeesType extends AbstractType
     public function getName()
     {
         return 'oro_calendar_event_attendees';
-    }
-
-    /**
-     * @param Attendee $attendee
-     * @param bool     $disableUserRemoval
-     *
-     * @return bool
-     */
-    protected function isAttendeeRemovable(Attendee $attendee, $disableUserRemoval = false)
-    {
-        $user          = $attendee->getUser();
-        $calendarEvent = $attendee->getCalendarEvent();
-
-        return (
-            $user instanceof User
-            && !$disableUserRemoval
-            && (
-                $attendee->getId() !== $calendarEvent->getRelatedAttendee()->getId()
-                && $attendee->getId() !== $calendarEvent->getRealCalendarEvent()->getRelatedAttendee()->getId()
-            )
-        );
     }
 
     /**

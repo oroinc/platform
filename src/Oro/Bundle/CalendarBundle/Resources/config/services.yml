@@ -17,6 +17,7 @@ parameters:
     oro_calendar.activity_list.provider.class:                   Oro\Bundle\CalendarBundle\Provider\CalendarEventActivityListProvider
     oro_calendar.calendar_event_manager.class:                   Oro\Bundle\CalendarBundle\Manager\CalendarEventManager
     oro_calendar.calendar_manager.class:                         Oro\Bundle\CalendarBundle\Manager\CalendarManager
+    oro_calendar.attendee_manager.class:                         Oro\Bundle\CalendarBundle\Manager\AttendeeManager
     oro_calendar.calendar_property_provider.class:               Oro\Bundle\CalendarBundle\Provider\CalendarPropertyProvider
     oro_calendar.calendar_provider.user.class:                   Oro\Bundle\CalendarBundle\Provider\UserCalendarProvider
     oro_calendar.calendar_provider.system.class:                 Oro\Bundle\CalendarBundle\Provider\SystemCalendarProvider
@@ -132,6 +133,13 @@ services:
         class: %oro_calendar.calendar_manager.class%
         arguments:
             - '@oro_calendar.calendar_property_provider'
+
+    oro_calendar.attendee_manager:
+        class: %oro_calendar.attendee_manager.class%
+        arguments:
+            - @=service('oro_form.autocomplete.search_registry').getSearchHandler('users')
+            - @oro_calendar.users_to_attendees.transformer
+            - @oro_security.security_facade
 
     oro_calendar.calendar_property_provider:
         class: %oro_calendar.calendar_property_provider.class%

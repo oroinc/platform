@@ -98,6 +98,7 @@ services:
         class: %oro_calendar.oro_calendar_event_attendees.form.type.class%
         arguments:
             - '@oro_calendar.users_to_attendees.transformer'
+            - '@oro_calendar.attendee_manager'
         tags:
             - { name: form.type, alias: oro_calendar_event_attendees }
 
