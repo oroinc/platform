@@ -105,7 +105,8 @@ class TagSearchResultsGridListenerTest extends \PHPUnit_Framework_TestCase
                 $earMockBuilder->willThrowException($exception);
                 $qb
                     ->expects($this->at(1))
-                    ->method('1 = 0');
+                    ->method('andWhere')
+                    ->with('1 = 0');
             }
         }
 

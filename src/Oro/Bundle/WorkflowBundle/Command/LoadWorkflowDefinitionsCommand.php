@@ -6,6 +6,7 @@ use Symfony\Bundle\FrameworkBundle\Command\ContainerAwareCommand;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Yaml\Yaml;
 
 use Doctrine\ORM\EntityManager;
 
@@ -81,6 +82,12 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                     $existingWorkflowDefinition->import($workflowDefinition);
                 } else {
                     $manager->persist($workflowDefinition);
+                }
+
+                if ($output->getVerbosity() === OutputInterface::VERBOSITY_DEBUG) {
+                    $output->writeln(
+                        Yaml::dump($workflowDefinition->getConfiguration(), 6, 4)
+                    );
                 }
             }
 
