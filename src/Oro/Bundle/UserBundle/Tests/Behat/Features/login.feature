@@ -1,3 +1,4 @@
+@dbIsolation
 Feature: User login
   In order to login in application
   As an OroCRM admin
@@ -10,6 +11,13 @@ Scenario: Success login
       | Password | admin |
   And I press "Log in"
   And I should be on "/"
+
+Scenario: Login just created user
+  Given user exists with:
+    |username|test|
+    |email   |test@example.com|
+  When Login as "test"
+  Then I should be on the homepage
 
 Scenario Outline: Fail login
   Given I am on "/user/login"
