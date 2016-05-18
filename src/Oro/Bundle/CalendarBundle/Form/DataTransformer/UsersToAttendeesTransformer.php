@@ -54,7 +54,6 @@ class UsersToAttendeesTransformer implements DataTransformerInterface
 
         $existingUsers = [];
         $encodedEmails = [];
-
         foreach ($users as $user) {
             if ($user->getId()) {
                 $existingUsers[] = $user;
@@ -77,10 +76,8 @@ class UsersToAttendeesTransformer implements DataTransformerInterface
     public function attendeesToUsers($attendees)
     {
         $users = new ArrayCollection();
-
         foreach ($attendees as $attendee) {
             $user = $attendee->getUser();
-
             if (!$user) {
                 $user = (new User())
                     ->setEmail($attendee->getEmail())
@@ -102,7 +99,6 @@ class UsersToAttendeesTransformer implements DataTransformerInterface
     {
         $attendee = new Attendee();
         $attendee->setEmail($user->getEmail());
-
         if ($user->getId()) {
             $attendee->setDisplayName($user->getFullName());
             $attendee->setUser($user);
