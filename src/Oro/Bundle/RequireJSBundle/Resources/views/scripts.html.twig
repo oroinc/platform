@@ -20,6 +20,11 @@
     <script type="text/javascript" src="{{ asset(get_requirejs_build_path()) }}"></script>
 {% else %}
     <script type="text/javascript" src="{{ asset('bundles/ororequirejs/lib/require.js') }}"></script>
+    <script type="text/javascript" src="{{ asset('bundles/oroui/lib/set-immediate/setImmediate.js') }}"></script>
+    <script type="text/javascript">
+        require.nextTick = setImmediate;
+        require.s.contexts._.nextTick = setImmediate;
+    </script>
     <script type="text/javascript">
         {{ get_requirejs_config() }}
     </script>

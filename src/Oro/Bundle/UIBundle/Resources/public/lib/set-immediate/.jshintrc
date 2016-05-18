@@ -1,0 +1,22 @@
+{
+    "camelcase": true,
+    "curly": true,
+    "eqeqeq": true,
+    "evil": true,
+    "globalstrict": true,
+    "immed": true,
+    "indent": 4,
+    "latedef": true,
+    "newcap": true,
+    "noarg": true,
+    "node": true,
+    "quotmark": "double",
+    "trailing": true,
+    "undef": true,
+    "unused": true,
+    "white": true,
+    "globals": {
+        "MessageChannel": false,
+        "self": false
+    }
+}
