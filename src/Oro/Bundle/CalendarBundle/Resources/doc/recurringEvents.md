@@ -29,15 +29,15 @@ The additional fields are as follows:
 
 ##Recurrence Validation
 
-To make sure that Recurrence pattern has all needed data it can be validated with recurrence strategy helper:
+To make sure that Recurrence pattern has all needed data it can be validated with recurrence model:
 ```php
-use Oro\Bundle\CalendarBundle\Model\Recurrence\Helper\StrategyHelper;
+use Oro\Bundle\CalendarBundle\Model\Recurrence as RecurrenceModel;
         
 ...
 
 /** @var \Symfony\Component\Validator\Validator\ValidatorInterface $validator */
 /** @var \Oro\Bundle\CalendarBundle\Entity\Recurrence $recurrence */
-$helper = new StrategyHelper($this->validator);
+$helper = new RecurrenceModel($this->validator);
 $helper->validateRecurrence($recurrence);
 
 ```
