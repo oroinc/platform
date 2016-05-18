@@ -168,6 +168,7 @@ Cucumber does not differentiate between the keywords, but choosing the right one
 Get look at login.feature in OroUserBundle - [UserBundle/Tests/Behat/Features/login.feature](../../../../UserBundle/Tests/Behat/Features/login.feature)
 
 ```gherkin
+@dbIsolation
 Feature: User login
   In order to login in application
   As an OroCRM admin
@@ -196,13 +197,16 @@ Scenario Outline: Fail login
   | user2 | pass2    |
 ```
 
-1. ```Feature: User login``` starts the feature and gives it a title.
-2. Behat does not parse the next 3 lines of text. (In order to... As an... I need to...). 
+1. ```@dbIsolation``` is a feature tag. Each feature or even scenario can be taggad. 
+Tag must start from ```@``` symbol.
+If feature has ```@dbIsolation``` tag then database will restore from dump after all scenarios has been executed. 
+2. ```Feature: User login``` starts the feature and gives it a title.
+3. Behat does not parse the next 3 lines of text. (In order to... As an... I need to...). 
 These lines simply provide context to the people reading your feature, 
 and describe the business value derived from the inclusion of the feature in your software.
-3. ```Scenario: Success login``` starts the scenario, 
+4. ```Scenario: Success login``` starts the scenario, 
 and contains a description of the scenario.
-4. The next 6 lines are the scenario steps, each of which is matched to a regular expression defined in Context. 
-5. ```Scenario Outline: Fail login``` starts the next scenario. Scenario Outlines allow express examples through the use of a template with placeholders
+5. The next 6 lines are the scenario steps, each of which is matched to a regular expression defined in Context. 
+6. ```Scenario Outline: Fail login``` starts the next scenario. Scenario Outlines allow express examples through the use of a template with placeholders
  The Scenario Outline steps provide a template which is never directly run. A Scenario Outline is run once for each row in the Examples section beneath it (except for the first header row).
  Think of a placeholder like a variable. It is replaced with a real value from the Examples: table row, where the text between the placeholder angle brackets matches that of the table column header. 

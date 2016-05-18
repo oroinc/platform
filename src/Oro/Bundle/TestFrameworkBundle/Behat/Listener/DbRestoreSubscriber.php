@@ -8,7 +8,7 @@ use Behat\Behat\EventDispatcher\Event\FeatureTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
-class DbIsolationSubscriber implements EventSubscriberInterface
+class DbRestoreSubscriber implements EventSubscriberInterface
 {
     const ANNOTATION = 'dbIsolation';
 
@@ -29,7 +29,6 @@ class DbIsolationSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FeatureTested::BEFORE => ['dbDump', 5],
             FeatureTested::AFTER  => ['dbRestore', 5],
         ];
     }

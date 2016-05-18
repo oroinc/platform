@@ -2,9 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Dumper;
 
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
-
 class PgsqlDumper extends AbstractDbDumper
 {
     /**
@@ -12,7 +9,7 @@ class PgsqlDumper extends AbstractDbDumper
      */
     public function dumpDb()
     {
-        $dumpDbProcess = new Process(sprintf(
+        $this->runProcess(sprintf(
             'PGPASSWORD="%s" pg_dump -h %s -U %s %s > %s/%4$s.sql',
             $this->dbPass,
             $this->dbHost,
@@ -20,9 +17,6 @@ class PgsqlDumper extends AbstractDbDumper
             $this->dbName,
             $this->cacheDir
         ));
-
-        $dumpDbProcess->setTimeout(30);
-        $dumpDbProcess->run();
     }
 
     /**
@@ -30,7 +24,7 @@ class PgsqlDumper extends AbstractDbDumper
      */
     public function restoreDb()
     {
-        $restoreDbProcess = new Process(sprintf(
+        $this->runProcess(sprintf(
             'PGPASSWORD="%4$s" psql -c "drop database %s;" -h %s -U %s'.
             ' && psql -c "create database %2$s;" -h %3$s -U %4$s '.
             ' && psql -h %3$s -U %4$s %2$s < %5$s/%2$s.sql',
@@ -40,8 +34,5 @@ class PgsqlDumper extends AbstractDbDumper
             $this->dbUser,
             $this->cacheDir
         ));
-
-        $restoreDbProcess->setTimeout(30);
-        $restoreDbProcess->run();
     }
 }

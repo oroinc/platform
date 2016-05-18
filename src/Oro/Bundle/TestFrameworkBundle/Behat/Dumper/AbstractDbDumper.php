@@ -3,6 +3,8 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Dumper;
 
 use Symfony\Component\HttpKernel\KernelInterface;
+use Symfony\Component\Process\Exception\ProcessFailedException;
+use Symfony\Component\Process\Process;
 
 abstract class AbstractDbDumper implements DbDumperInterface
 {
@@ -34,5 +36,20 @@ abstract class AbstractDbDumper implements DbDumperInterface
         $this->dbName = $container->getParameter('database_name');
         $this->dbUser = $container->getParameter('database_user');
         $this->dbPass = $container->getParameter('database_password');
+    }
+
+    /**
+     * @param string $commandline The command line to run
+     */
+    protected function runProcess($commandline)
+    {
+        $process = new Process($commandline);
+
+        $process->setTimeout(30);
+        $process->run();
+
+        if (!$process->isSuccessful()) {
+            throw new ProcessFailedException($process);
+        }
     }
 }

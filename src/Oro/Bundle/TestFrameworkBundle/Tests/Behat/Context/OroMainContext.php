@@ -93,11 +93,7 @@ class OroMainContext extends MinkContext implements
         $manager = $this->getContainer()->get('oro_user.manager');
 
         $user = $manager->createUser();
-        // 'test' password
-        $user
-            ->setPassword('g3dg06kxNIX6AZrZHTjOmdu/k3buFPx6MHTo6KEn9px03wleHDIAhpwS/4TbdOyZpBWFS8qrImlwAehTjHah7g==')
-            ->setSalt('3z7ouvbt1rqc88ow8o0wk04o0goowkw')
-        ;
+        $user->setPlainPassword('test');
 
         foreach ($data->getRows() as $row) {
             switch ($row[0]) {
@@ -126,8 +122,7 @@ class OroMainContext extends MinkContext implements
             ->setOrganization($organization)
         ;
 
-        $em->persist($user);
-        $em->flush();
+        $manager->updateUser($user);
     }
 
     /**

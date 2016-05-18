@@ -12,9 +12,13 @@
             <argument type="service" id="symfony2_extension.kernel" />
             <tag name="oro_test.db_dumper" driver="pdo_pgsql" />
         </service>
-        <service id="oro_test.listener.db_isolation_subscriber" class="Oro\Bundle\TestFrameworkBundle\Behat\Listener\DbIsolationSubscriber">
+        <service id="oro_test.listener.db_restore_subscriber" class="Oro\Bundle\TestFrameworkBundle\Behat\Listener\DbRestoreSubscriber">
             <argument />
-            <tag name="event_dispatcher.subscriber" priority="10" />
+            <tag name="event_dispatcher.subscriber" />
+        </service>
+        <service id="oro_test.listener.db_dump_subscriber" class="Oro\Bundle\TestFrameworkBundle\Behat\Listener\DbDumpSubscriber">
+            <argument />
+            <tag name="event_dispatcher.subscriber" />
         </service>
 
         <service id="oro_element_factory" class="Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory">

@@ -2,8 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Dumper;
 
-use Symfony\Component\Process\Process;
-
 class MysqlDumper extends AbstractDbDumper
 {
     /**
@@ -11,7 +9,7 @@ class MysqlDumper extends AbstractDbDumper
      */
     public function dumpDb()
     {
-        $dumpDbProcess = new Process(sprintf(
+        $this->runProcess(sprintf(
             'MYSQL_PWD=%s mysqldump -h %s -u %s %s > %s/%4$s.sql',
             $this->dbPass,
             $this->dbHost,
@@ -19,9 +17,6 @@ class MysqlDumper extends AbstractDbDumper
             $this->dbName,
             $this->cacheDir
         ));
-
-        $dumpDbProcess->setTimeout(30);
-        $dumpDbProcess->run();
     }
 
     /**
@@ -29,18 +24,15 @@ class MysqlDumper extends AbstractDbDumper
      */
     public function restoreDb()
     {
-        $restoreDbProcess = new Process(sprintf(
+        $this->runProcess(sprintf(
             'MYSQL_PWD=%s mysql -e "drop database %s;" -h %s -u %s'.
-            ' && mysql -e "create database %2$s;" -h %3$s -u %4$s'.
-            ' && mysql -h %3$s -u %4$s %2$s < %5$s/%2$s.sql',
+            ' && MYSQL_PWD=%1$s mysql -e "create database %2$s;" -h %3$s -u %4$s'.
+            ' && MYSQL_PWD=%1$s mysql -h %3$s -u %4$s %2$s < %5$s/%2$s.sql',
             $this->dbPass,
             $this->dbName,
             $this->dbHost,
             $this->dbUser,
             $this->cacheDir
         ));
-
-        $restoreDbProcess->setTimeout(30);
-        $restoreDbProcess->run();
     }
 }

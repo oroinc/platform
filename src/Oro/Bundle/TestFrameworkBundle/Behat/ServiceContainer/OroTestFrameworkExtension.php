@@ -25,7 +25,7 @@ class OroTestFrameworkExtension implements TestworkExtension
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
         $this->processElements($container);
-        $this->processDbIsolationSubscriber($container);
+        $this->processDbIsolationSubscribers($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -72,11 +72,16 @@ class OroTestFrameworkExtension implements TestworkExtension
     /**
      * @param ContainerBuilder $container
      */
-    private function processDbIsolationSubscriber(ContainerBuilder $container)
+    private function processDbIsolationSubscribers(ContainerBuilder $container)
     {
-        $container->getDefinition('oro_test.listener.db_isolation_subscriber')->replaceArgument(
+        $dumper = $this->getDumper($container);
+        $container->getDefinition('oro_test.listener.db_restore_subscriber')->replaceArgument(
             0,
-            $this->getDumper($container)
+            $dumper
+        );
+        $container->getDefinition('oro_test.listener.db_dump_subscriber')->replaceArgument(
+            0,
+            $dumper
         );
     }
 
