@@ -32,7 +32,7 @@
         "symfony/assetic-bundle": "2.3.0",
         "symfony/swiftmailer-bundle": "2.3.*",
         "symfony/monolog-bundle": "2.7.*",
-        "sensio/distribution-bundle": "4.0.3",
+        "sensio/distribution-bundle": "4.0.*",
         "sensio/framework-extra-bundle": "2.3.4",
         "incenteev/composer-parameter-handler": "2.1.0",
         "jms/job-queue-bundle": "1.2.*",

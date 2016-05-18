@@ -40,7 +40,10 @@
                 {{ chartView.render()|raw }}
             </div>
         {% endif %}
-        {% set renderParams = renderParams|default({})|merge({enableViews: false}) %}
+        {% set renderParams = renderParams|default({})|merge({
+            enableFullScreenLayout: true,
+            enableViews: false
+        }) %}
         {% set gridParams =  {
             '_grid_view': {'_disabled': true},
             '_tags'     : {'_disabled': true}
