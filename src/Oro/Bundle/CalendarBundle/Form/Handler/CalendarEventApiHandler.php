@@ -134,6 +134,11 @@ class CalendarEventApiHandler
             ->find(Attendee::ORIGIN_CLIENT);
         $attendee->setOrigin($origin);
 
+        $type = $this->manager
+            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::TYPE_ENUM_CODE))
+            ->find(Attendee::TYPE_ORGANIZER);
+        $attendee->setType($type);
+
         return $attendee;
     }
 
