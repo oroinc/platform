@@ -237,7 +237,9 @@ class QueryValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getDataSourceInterfaceMock()
     {
-        return $this->getMock('Oro\Bundle\DataGridBundle\Datasource\DatasourceInterface');
+        return $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datasource\Orm\OrmDatasource')
+                    ->disableOriginalConstructor()
+                    ->getMock();
     }
 
     /**

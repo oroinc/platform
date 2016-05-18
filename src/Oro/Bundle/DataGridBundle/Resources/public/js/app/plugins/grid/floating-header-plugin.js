@@ -34,17 +34,21 @@ define(function(require) {
             }
 
             this.setupCache();
-            this.rescrollCb = this.enableOtherScroll();
             this.headerHeight = this.domCache.theadTr.height();
-            this.fixHeaderCellWidth();
+
+            this.isHeaderCellWidthFixed = false;
+            this.rescrollCb = this.enableOtherScroll();
+            if (!this.isHeaderCellWidthFixed) {
+                this.fixHeaderCellWidth();
+            }
             this.$grid.on('click.float-thead', 'thead:first .dropdown', _.bind(function() {
                 this.setFloatTheadMode(this.scrollVisible ? 'relative' : 'default');
             }, this));
             this.domCache.gridContainer.parents().add(document).on('scroll', this.checkLayout);
 
-            this.listenTo(mediator, 'layout:headerStateChange', this.selectMode);
+            this.listenTo(mediator, 'layout:headerStateChange', this.checkLayout);
+            this.listenTo(mediator, 'layout:reposition', this.checkLayout);
             this.listenTo(this.grid, 'content:update', this.onGridContentUpdate);
-            this.listenTo(this.grid, 'layout:update', this.fixHeaderCellWidth);
             this.listenTo(this.grid, 'ensureCellIsVisible', this.ensureCellIsVisible);
             this.checkLayoutIntervalId = setInterval(this.checkLayout, 400);
             this.connected = true;
@@ -54,22 +58,24 @@ define(function(require) {
         disable: function() {
             this.connected = false;
             clearInterval(this.checkLayoutIntervalId);
-            this.checkLayout();
 
-            this.setFloatTheadMode('default');
-            this.disableOtherScroll();
-            this.$grid.off('click.float-thead');
             this.domCache.gridContainer.parents().add(document).off('scroll', this.checkLayout);
-            // remove css
-            this.domCache.headerCells.attr('style', '');
-            this.domCache.firstRowCells.attr('style', '');
+
+            if (!this.manager.disposing) {
+                this.setFloatTheadMode('default');
+                this.disableOtherScroll();
+                this.$grid.off('click.float-thead');
+                // remove css
+                this.domCache.headerCells.attr('style', '');
+                this.domCache.firstRowCells.attr('style', '');
+            }
             FloatingHeaderPlugin.__super__.disable.call(this);
         },
 
         setupCache: function() {
             this.$grid = this.grid.$grid;
             this.$el = this.grid.$el;
-            this.documentHeight = $(document).height();
+            this.documentHeight = scrollHelper.documentHeight();
             this.domCache = {
                 body: $(document.body),
                 gridContainer: this.$grid.parent(),
@@ -85,6 +91,7 @@ define(function(require) {
         },
 
         fixHeaderCellWidth: function() {
+            this.isHeaderCellWidthFixed = true;
             this.setupCache();
             var headerCells = this.domCache.headerCells;
             var firstRowCells = this.domCache.firstRowCells;
@@ -355,8 +362,12 @@ define(function(require) {
                     visible: self.scrollVisible,
                     scrollHeight:  scrollContainer[0].scrollHeight,
                     clientHeight:  scrollContainer[0].clientHeight,
-                    clientWidth:   scrollContainer[0].clientWidth,
                     scrollTop:     scrollContainer[0].scrollTop
+                });
+                // update width in separate cycle
+                // it can change during visibility change
+                scrollStateModel.set({
+                    clientWidth:   scrollContainer[0].clientWidth
                 });
             }
 
@@ -413,6 +424,10 @@ define(function(require) {
                 if (this._lastScrollLeft !== scrollLeft) {
                     this.selectMode();
                     this._lastScrollLeft = scrollLeft;
+                } else {
+                    if (this._lastClientRect.bottom !== scrollContainerRect.bottom) {
+                        this.rescrollCb();
+                    }
                 }
             }
             this._lastClientRect = scrollContainerRect;

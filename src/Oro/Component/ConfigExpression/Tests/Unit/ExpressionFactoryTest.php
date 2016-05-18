@@ -63,7 +63,16 @@ class ExpressionFactoryTest extends \PHPUnit_Framework_TestCase
     public function testCreate()
     {
         $options = ['key' => 'value'];
-        $expr    = $this->getMock('Oro\Component\ConfigExpression\ExpressionInterface');
+        $expr    = $this
+            ->getMockForAbstractClass(
+                'Oro\Component\ConfigExpression\ExpressionInterface',
+                array(),
+                '',
+                true,
+                true,
+                true,
+                array('setContextAccessor', 'initialize')
+            );
 
         $expr->expects($this->never())
             ->method('setContextAccessor');

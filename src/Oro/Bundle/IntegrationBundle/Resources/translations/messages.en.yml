@@ -81,8 +81,8 @@ oro:
             connector.label: Connector
 
         sync: A sync job has been added to the queue. {{ job_view_link }}
-        sync_error: Failed to add sync job to the queue. Error: %s.
-        sync_error_integration_deactivated: Failed to add sync job to the queue. Integration is not active.
+        sync_error: 'Failed to add sync job to the queue. Error: %s.'
+        sync_error_integration_deactivated: 'Failed to add sync job to the queue. Integration is not active.'
         progress: Check progress.
         activate: Activate
         deactivate: Deactivate

@@ -73,7 +73,6 @@ class TranslatableEntityTypeTest extends \PHPUnit_Framework_TestCase
     {
         $this->classMetadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadataInfo')
             ->disableOriginalConstructor()
-            ->setMethods(array('getSingleIdentifierFieldName'))
             ->getMock();
         $this->classMetadata->expects($this->any())
             ->method('getSingleIdentifierFieldName')

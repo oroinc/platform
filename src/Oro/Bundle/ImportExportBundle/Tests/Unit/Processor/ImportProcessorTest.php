@@ -36,7 +36,7 @@ class ImportProcessorTest extends \PHPUnit_Framework_TestCase
         $this->object = new \stdClass();
 
         $this->context = $this->getMockBuilder('Oro\Bundle\ImportExportBundle\Context\ContextInterface')
-            ->setMethods(array('getOption'))
+            ->setMethods(array('getOption', 'addFailureException'))
             ->getMockForAbstractClass();
 
         $this->serializer = $this->getMockBuilder('Symfony\Component\Serializer\SerializerInterface')
