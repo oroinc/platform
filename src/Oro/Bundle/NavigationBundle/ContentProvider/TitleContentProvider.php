@@ -9,7 +9,14 @@ class TitleContentProvider extends TitleServiceAwareContentProvider
      */
     public function getContent()
     {
-        return $this->titleService->render(array(), null, null, null, true);
+        try {
+            $val = $this->titleService->render(array(), null, null, null, true);
+        } catch (\Exception $e) {
+            print_r($e);
+            throw $e;
+        }
+
+        return $val;
     }
 
     /**
