@@ -112,11 +112,11 @@ abstract class AbstractStrategy
     }
 
     /**
+     * This method implements @see \Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface::getCalculatedEndTime()
+     *
      * @param Entity\Recurrence $recurrence
      *
      * @return \DateTime|null
-     *
-     * @see Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface
      */
     public function getCalculatedEndTime(Entity\Recurrence $recurrence)
     {
