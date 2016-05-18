@@ -136,9 +136,10 @@ services:
             - '@oro_workflow.serializer.data.serializer'
             - '@oro_workflow.handler.transition_helper'
 
-    oro_workflow.service.workflow_definition:
-        class: Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionService
+    oro_workflow.handler.workflow_definition:
+        class: Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionHandler
         arguments:
             - '@oro_workflow.configuration.builder.workflow_definition.handle'
             - '@oro_workflow.workflow_assembler'
             - '@oro_entity.doctrine_helper'
+            - '%oro_workflow.workflow_definition.entity.class%'

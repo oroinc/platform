@@ -9,13 +9,16 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
-class WorkflowDefinitionService
+class WorkflowDefinitionHandler
 {
     /** @var WorkflowDefinitionHandleBuilder */
     protected $definitionBuilder;
 
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
+
+    /** @var string */
+    protected $entityClass;
 
     /** @var EntityRepository */
     protected $entityRepository;
@@ -27,36 +30,25 @@ class WorkflowDefinitionService
      * @param WorkflowDefinitionHandleBuilder $definitionBuilder
      * @param WorkflowAssembler $workflowAssembler
      * @param DoctrineHelper $doctrineHelper
+     * @param string $entityClass
      */
     public function __construct(
         WorkflowDefinitionHandleBuilder $definitionBuilder,
         WorkflowAssembler $workflowAssembler,
-        DoctrineHelper $doctrineHelper
+        DoctrineHelper $doctrineHelper,
+        $entityClass
     ) {
         $this->definitionBuilder = $definitionBuilder;
         $this->workflowAssembler = $workflowAssembler;
         $this->doctrineHelper = $doctrineHelper;
-    }
-
-    /**
-     * @param array $configuration
-     * @return WorkflowDefinition
-     */
-    public function createWorkflowDefinitionObject(array $configuration)
-    {
-        $workflowDefinition = new WorkflowDefinition();
-        if (!empty($configuration['name'])) {
-            $workflowDefinition->setName($configuration['name']);
-        }
-
-        return $workflowDefinition;
+        $this->entityClass = $entityClass;
     }
 
     /**
      * @param WorkflowDefinition $workflowDefinition
      * @param WorkflowDefinition|null $newDefinition
      */
-    public function saveWorkflowDefinition(
+    public function updateWorkflowDefinition(
         WorkflowDefinition $workflowDefinition,
         WorkflowDefinition $newDefinition = null
     ) {
@@ -70,8 +62,9 @@ class WorkflowDefinitionService
             }
         }
         $this->workflowAssembler->assemble($workflowDefinition);
+
+        $this->getEntityManager()->beginTransaction();
         try {
-            $this->getEntityManager()->beginTransaction();
             $this->getEntityManager()->persist($workflowDefinition);
             $this->getEntityManager()->flush($workflowDefinition);
             $this->getEntityManager()->commit();
@@ -102,7 +95,7 @@ class WorkflowDefinitionService
     {
         if (null === $this->entityManager) {
             $this->entityManager = $this->doctrineHelper
-                ->getEntityManagerForClass('OroWorkflowBundle:WorkflowDefinition');
+                ->getEntityManagerForClass($this->entityClass);
         }
 
         return $this->entityManager;
@@ -115,7 +108,7 @@ class WorkflowDefinitionService
     {
         if (null === $this->entityRepository) {
             $this->entityRepository = $this->doctrineHelper
-                ->getEntityRepositoryForClass('OroWorkflowBundle:WorkflowDefinition');
+                ->getEntityRepositoryForClass($this->entityClass);
         }
 
         return $this->entityRepository;

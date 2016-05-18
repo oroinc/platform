@@ -9,11 +9,10 @@ use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionService;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionHandler;
 
-class WorkflowDefinitionServiceTest extends \PHPUnit_Framework_TestCase
+class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
 {
-
     /** @var \PHPUnit_Framework_MockObject_MockObject|WorkflowDefinitionHandleBuilder */
     protected $definitionBuilder;
 
@@ -23,7 +22,7 @@ class WorkflowDefinitionServiceTest extends \PHPUnit_Framework_TestCase
     /** @var \PHPUnit_Framework_MockObject_MockObject|EntityManager */
     protected $entityManager;
 
-    /** @var WorkflowDefinitionService */
+    /** @var WorkflowDefinitionHandler */
     protected $service;
 
     /**
@@ -65,50 +64,22 @@ class WorkflowDefinitionServiceTest extends \PHPUnit_Framework_TestCase
             ->willReturn($this->entityRepository);
 
 
-        $this->service = new WorkflowDefinitionService(
+        $this->service = new WorkflowDefinitionHandler(
             $this->definitionBuilder,
             $assembler,
-            $doctrineHelper
+            $doctrineHelper,
+            'OroWorkflowBundle:WorkflowDefinition'
         );
     }
 
     /**
-     * @dataProvider createWorkflowDefinitionObjectDataProvider
-     *
-     * @param array $configuration
-     * @param $expectedName
-     */
-    public function testCreateWorkflowDefinitionObject(array $configuration, $expectedName)
-    {
-        $definition = $this->service->createWorkflowDefinitionObject($configuration);
-        $this->assertEquals($expectedName, $definition->getName());
-    }
-
-    /**
-     * @return array
-     */
-    public function createWorkflowDefinitionObjectDataProvider()
-    {
-        return [
-            'full name' => [
-                'configuration' => ['name' => 'test name'],
-                'expectedName' => 'test name',
-            ],
-            'no name' => [
-                'configuration' => [],
-                'expectedName' => null,
-            ],
-        ];
-    }
-
-    /**
-     * @dataProvider saveWorkflowDefinitionDataProvider
+     * @dataProvider updateWorkflowDefinitionDataProvider
      *
      * @param WorkflowDefinition $definition
      * @param WorkflowDefinition $existingDefinition
      * @param WorkflowDefinition $newDefinition
      */
-    public function testSaveWorkflowDefinition(
+    public function testUpdateWorkflowDefinition(
         WorkflowDefinition $definition,
         WorkflowDefinition $existingDefinition = null,
         WorkflowDefinition $newDefinition = null
@@ -123,7 +94,7 @@ class WorkflowDefinitionServiceTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($existingDefinition);
         }
 
-        $this->service->saveWorkflowDefinition($definition, $newDefinition);
+        $this->service->updateWorkflowDefinition($definition, $newDefinition);
 
         if ($newDefinition) {
             $this->assertEquals($definition, $newDefinition);
@@ -138,7 +109,7 @@ class WorkflowDefinitionServiceTest extends \PHPUnit_Framework_TestCase
     /**
      * @return array
      */
-    public function saveWorkflowDefinitionDataProvider()
+    public function updateWorkflowDefinitionDataProvider()
     {
         $definition1 = new WorkflowDefinition();
         $definition1

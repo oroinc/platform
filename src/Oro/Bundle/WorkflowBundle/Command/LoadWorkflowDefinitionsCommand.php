@@ -7,11 +7,9 @@ use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Console\Output\OutputInterface;
 
-use Doctrine\ORM\EntityManager;
-
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
-use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionHandler;
 
 class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
 {
@@ -55,8 +53,8 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
             $usedDirectories,
             $usedWorkflows
         );
-        /** @var WorkflowDefinitionService $definitionService */
-        $definitionService = $container->get('oro_workflow.service.workflow_definition');
+        /** @var WorkflowDefinitionHandler $definitionHandler */
+        $definitionHandler = $container->get('oro_workflow.handler.workflow_definition');
 
         if ($workflowConfiguration) {
             $output->writeln('Loading workflow definitions...');
@@ -71,7 +69,7 @@ class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
                 // all loaded workflows set as system by default
                 $workflowDefinition->setSystem(true);
 
-                $definitionService->saveWorkflowDefinition($workflowDefinition);
+                $definitionHandler->updateWorkflowDefinition($workflowDefinition);
             }
         } else {
             $output->writeln('No workflow definitions found.');

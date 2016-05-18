@@ -14,7 +14,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionService;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionHandler;
 
 /**
  * @Rest\NamePrefix("oro_api_workflow_definition_")
@@ -68,7 +68,7 @@ class WorkflowDefinitionController extends FOSRestController
             /** @var WorkflowDefinitionHandleBuilder $definitionBuilder */
             $definitionBuilder = $this->get('oro_workflow.configuration.builder.workflow_definition.handle');
             $builtDefinition = $definitionBuilder->buildFromRawConfiguration($this->getConfiguration());
-            $this->getService()->saveWorkflowDefinition($workflowDefinition, $builtDefinition);
+            $this->getHandler()->updateWorkflowDefinition($workflowDefinition, $builtDefinition);
         } catch (\Exception $exception) {
             return $this->handleView(
                 $this->view(
@@ -100,7 +100,7 @@ class WorkflowDefinitionController extends FOSRestController
     public function postAction(WorkflowDefinition $workflowDefinition = null)
     {
         if (!$workflowDefinition) {
-            $workflowDefinition = $this->getService()->createWorkflowDefinitionObject($this->getConfiguration());
+            $workflowDefinition = new WorkflowDefinition();
         }
 
         return $this->putAction($workflowDefinition);
@@ -133,7 +133,7 @@ class WorkflowDefinitionController extends FOSRestController
         if ($workflowDefinition->isSystem()) {
             return $this->handleView($this->view(null, Codes::HTTP_FORBIDDEN));
         } else {
-            $this->getService()->deleteWorkflowDefinition($workflowDefinition);
+            $this->getHandler()->deleteWorkflowDefinition($workflowDefinition);
 
             return $this->handleView($this->view(null, Codes::HTTP_NO_CONTENT));
         }
@@ -148,10 +148,10 @@ class WorkflowDefinitionController extends FOSRestController
     }
 
     /**
-     * @return WorkflowDefinitionService
+     * @return WorkflowDefinitionHandler
      */
-    protected function getService()
+    protected function getHandler()
     {
-        return $this->get('oro_workflow.service.workflow_definition');
+        return $this->get('oro_workflow.handler.workflow_definition');
     }
 }
