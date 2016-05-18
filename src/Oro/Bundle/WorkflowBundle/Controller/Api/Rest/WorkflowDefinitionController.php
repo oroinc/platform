@@ -14,7 +14,7 @@ use Oro\Bundle\SecurityBundle\Annotation\Acl;
 use Oro\Bundle\SecurityBundle\Annotation\AclAncestor;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionHandler;
+use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 
 /**
  * @Rest\NamePrefix("oro_api_workflow_definition_")

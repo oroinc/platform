@@ -1,13 +1,14 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Model;
+namespace Oro\Bundle\WorkflowBundle\Handler;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
+use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
 
 class WorkflowDefinitionHandler
 {
@@ -16,6 +17,9 @@ class WorkflowDefinitionHandler
 
     /** @var WorkflowAssembler */
     protected $workflowAssembler;
+
+    /** @var ManagerRegistry  */
+    protected $managerRegistry;
 
     /** @var string */
     protected $entityClass;
@@ -29,18 +33,18 @@ class WorkflowDefinitionHandler
     /**
      * @param WorkflowDefinitionHandleBuilder $definitionBuilder
      * @param WorkflowAssembler $workflowAssembler
-     * @param DoctrineHelper $doctrineHelper
+     * @param ManagerRegistry $managerRegistry
      * @param string $entityClass
      */
     public function __construct(
         WorkflowDefinitionHandleBuilder $definitionBuilder,
         WorkflowAssembler $workflowAssembler,
-        DoctrineHelper $doctrineHelper,
+        ManagerRegistry $managerRegistry,
         $entityClass
     ) {
         $this->definitionBuilder = $definitionBuilder;
         $this->workflowAssembler = $workflowAssembler;
-        $this->doctrineHelper = $doctrineHelper;
+        $this->managerRegistry = $managerRegistry;
         $this->entityClass = $entityClass;
     }
 
@@ -94,8 +98,7 @@ class WorkflowDefinitionHandler
     private function getEntityManager()
     {
         if (null === $this->entityManager) {
-            $this->entityManager = $this->doctrineHelper
-                ->getEntityManagerForClass($this->entityClass);
+            $this->entityManager = $this->managerRegistry->getManagerForClass($this->entityClass);
         }
 
         return $this->entityManager;
@@ -107,8 +110,7 @@ class WorkflowDefinitionHandler
     private function getEntityRepository()
     {
         if (null === $this->entityRepository) {
-            $this->entityRepository = $this->doctrineHelper
-                ->getEntityRepositoryForClass($this->entityClass);
+            $this->entityRepository = $this->getEntityManager()->getRepository($this->entityClass);
         }
 
         return $this->entityRepository;

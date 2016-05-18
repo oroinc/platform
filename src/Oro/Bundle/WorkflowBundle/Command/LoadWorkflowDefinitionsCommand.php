@@ -9,7 +9,7 @@ use Symfony\Component\Console\Output\OutputInterface;
 
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowConfigurationProvider;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionConfigurationBuilder;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionHandler;
+use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 
 class LoadWorkflowDefinitionsCommand extends ContainerAwareCommand
 {

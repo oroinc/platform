@@ -1,15 +1,15 @@
 <?php
 
-namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model;
+namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Handler;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
 use Doctrine\ORM\EntityManager;
 use Doctrine\ORM\EntityRepository;
 
-use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\WorkflowBundle\Configuration\WorkflowDefinitionHandleBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowAssembler;
-use Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionHandler;
+use Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler;
 
 class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
 {
@@ -23,7 +23,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
     protected $entityManager;
 
     /** @var WorkflowDefinitionHandler */
-    protected $service;
+    protected $handler;
 
     /**
      * {@inheritdoc}
@@ -43,31 +43,27 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
 
         $this->entityManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(['createQueryBuilder', 'beginTransaction', 'commit', 'persist', 'flush', 'remove'])
             ->getMock();
 
         $this->entityRepository = $this->getMockBuilder('Doctrine\ORM\EntityRepository')
             ->disableOriginalConstructor()
             ->getMock();
 
-        /** @var \PHPUnit_Framework_MockObject_MockObject|DoctrineHelper $doctrineHelper */
-        $doctrineHelper = $this->getMockBuilder('Oro\Bundle\EntityBundle\ORM\DoctrineHelper')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $doctrineHelper->expects($this->any())
-            ->method('getEntityManagerForClass')
-            ->willReturn($this->entityManager);
-
-        $doctrineHelper->expects($this->any())
-            ->method('getEntityRepositoryForClass')
+        $this->entityManager->expects($this->any())
+            ->method('getRepository')
             ->willReturn($this->entityRepository);
 
+        /** @var \PHPUnit_Framework_MockObject_MockObject|ManagerRegistry $managerRegistry */
+        $managerRegistry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
 
-        $this->service = new WorkflowDefinitionHandler(
+        $managerRegistry->expects($this->any())
+            ->method('getManagerForClass')
+            ->willReturn($this->entityManager);
+
+        $this->handler = new WorkflowDefinitionHandler(
             $this->definitionBuilder,
             $assembler,
-            $doctrineHelper,
+            $managerRegistry,
             'OroWorkflowBundle:WorkflowDefinition'
         );
     }
@@ -94,7 +90,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
                 ->willReturn($existingDefinition);
         }
 
-        $this->service->updateWorkflowDefinition($definition, $newDefinition);
+        $this->handler->updateWorkflowDefinition($definition, $newDefinition);
 
         if ($newDefinition) {
             $this->assertEquals($definition, $newDefinition);
@@ -157,7 +153,7 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->expects($this->exactly((int) $expected))
             ->method('flush');
 
-        $this->assertEquals($expected, $this->service->deleteWorkflowDefinition($definition));
+        $this->assertEquals($expected, $this->handler->deleteWorkflowDefinition($definition));
     }
 
     /**

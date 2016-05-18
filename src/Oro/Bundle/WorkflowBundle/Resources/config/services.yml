@@ -137,9 +137,9 @@ services:
             - '@oro_workflow.handler.transition_helper'
 
     oro_workflow.handler.workflow_definition:
-        class: Oro\Bundle\WorkflowBundle\Model\WorkflowDefinitionHandler
+        class: Oro\Bundle\WorkflowBundle\Handler\WorkflowDefinitionHandler
         arguments:
             - '@oro_workflow.configuration.builder.workflow_definition.handle'
             - '@oro_workflow.workflow_assembler'
-            - '@oro_entity.doctrine_helper'
+            - '@doctrine'
             - '%oro_workflow.workflow_definition.entity.class%'
