@@ -8,6 +8,7 @@ use Behat\Behat\EventDispatcher\Event\FeatureTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioLikeTested;
 use Behat\Behat\EventDispatcher\Event\ScenarioTested;
 use Behat\Mink\Mink;
+use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 use Symfony\Component\HttpKernel\KernelInterface;
 use Symfony\Component\Process\Exception\ProcessFailedException;
@@ -17,33 +18,15 @@ class DbIsolationSubscriber implements EventSubscriberInterface
 {
     const ANNOTATION = 'dbIsolation';
 
-    /** @var string */
-    protected $dbName;
-
-    /** @var string */
-    protected $dbPass;
-
-    /** @var string */
-    protected $dbUser;
-
-    /** @var string */
-    protected $cacheDir;
-
-    /** @var Process */
-    protected $dumpDbProcess;
+    /** @var  DbDumperInterface  */
+    protected $dbDumper;
 
     /**
-     * DbIsolationSubscriber constructor.
+     * @param DbDumperInterface $dbDumper
      */
-    public function __construct(KernelInterface $kernel)
+    public function __construct(DbDumperInterface $dbDumper)
     {
-        $kernel->boot();
-        $container = $kernel->getContainer();
-
-        $this->cacheDir = $kernel->getCacheDir();
-        $this->dbName = $container->getParameter('database_name');
-        $this->dbUser = $container->getParameter('database_user');
-        $this->dbPass = $container->getParameter('database_password');
+        $this->dbDumper = $dbDumper;
     }
 
     /**
@@ -63,16 +46,7 @@ class DbIsolationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        $this->dumpDbProcess = new Process(sprintf(
-            'mysqldump -u %s -p%s %s > %s/%s.sql',
-            $this->dbUser,
-            $this->dbPass,
-            $this->dbName,
-            $this->cacheDir,
-            $this->dbName
-        ));
-        $this->dumpDbProcess->setTimeout(30);
-        $this->dumpDbProcess->start();
+        $this->dbDumper->dumpDb();
     }
 
     public function dbRestore(AfterFeatureTested $event)
@@ -81,30 +55,6 @@ class DbIsolationSubscriber implements EventSubscriberInterface
             return;
         }
 
-        while ($this->dumpDbProcess->isRunning()) {
-        // waiting for process to finish
-        }
-
-        if (false === $this->dumpDbProcess->isSuccessful()) {
-            throw new ProcessFailedException($this->dumpDbProcess);
-        }
-
-        $process = new Process(sprintf(
-            "mysql -e 'drop database %s;' -u %s -p%s".
-            " && mysql -e 'create database %s;' -u %s -p%s".
-            " && mysql -u %s -p%s %s < %s/%s.sql",
-            $this->dbName,
-            $this->dbUser,
-            $this->dbPass,
-            $this->dbName,
-            $this->dbUser,
-            $this->dbPass,
-            $this->dbUser,
-            $this->dbPass,
-            $this->dbName,
-            $this->cacheDir,
-            $this->dbName
-        ));
-        $process->run();
+        $this->dbDumper->restoreDb();
     }
 }

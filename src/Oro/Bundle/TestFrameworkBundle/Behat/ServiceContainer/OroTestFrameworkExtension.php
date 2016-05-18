@@ -11,16 +11,16 @@ use Behat\Testwork\EventDispatcher\ServiceContainer\EventDispatcherExtension;
 use Behat\Testwork\ServiceContainer\Extension as TestworkExtension;
 use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
+use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
+use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
 
 class OroTestFrameworkExtension implements TestworkExtension
 {
-    const ELEMENT_FACTORY_ID = 'oro_element_factory';
-
     /**
      * {@inheritdoc}
      */
@@ -28,7 +28,8 @@ class OroTestFrameworkExtension implements TestworkExtension
     {
         $container->get(Symfony2Extension::KERNEL_ID)->registerBundles();
         $this->processBundleAutoload($container);
-        $this->processElementFactory($container);
+        $this->processElements($container);
+        $this->processDbIsolationSubscriber($container);
         $container->get(Symfony2Extension::KERNEL_ID)->shutdown();
     }
 
@@ -66,21 +67,46 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function load(ContainerBuilder $container, array $config)
     {
+        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/config'));
+        $loader->load('services.xml');
+
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
-        $this->loadDbIsolationSubscriber($container);
-        $this->loadElementFactoryInitializer($container);
     }
 
     /**
      * @param ContainerBuilder $container
      */
-    private function loadDbIsolationSubscriber(ContainerBuilder $container)
+    private function processDbIsolationSubscriber(ContainerBuilder $container)
     {
-        $definition = new Definition('Oro\Bundle\TestFrameworkBundle\Behat\Listener\DbIsolationSubscriber', [
-            new Reference(Symfony2Extension::KERNEL_ID)
-        ]);
-        $definition->addTag(EventDispatcherExtension::SUBSCRIBER_TAG, ['priority' => 10]);
-        $container->setDefinition('oro_test.listener.db_isolation_subscriber', $definition);
+        $container->getDefinition('oro_test.listener.db_isolation_subscriber')->replaceArgument(
+            0,
+            $this->getDumper($container)
+        );
+    }
+
+    /**
+     * @param ContainerBuilder $container
+     * @return Reference
+     */
+    private function getDumper(ContainerBuilder $container)
+    {
+        $driver = $container->get(Symfony2Extension::KERNEL_ID)->getContainer()->getParameter('database_driver');
+
+        $taggedServices = $container->findTaggedServiceIds(
+            'oro_test.db_dumper'
+        );
+
+        foreach ($taggedServices as $id => $tags) {
+            foreach ($tags as $attributes) {
+                if ($attributes["driver"] !== $driver) {
+                    continue;
+                }
+
+                return new Reference($id);
+            }
+        }
+
+        throw new \InvalidArgumentException(sprintf('You must specify db dumper service for "%s" driver', $driver));
     }
 
     /**
@@ -143,7 +169,7 @@ class OroTestFrameworkExtension implements TestworkExtension
     /**
      * @param ContainerBuilder $container
      */
-    private function processElementFactory(ContainerBuilder $container)
+    private function processElements(ContainerBuilder $container)
     {
         $elementConfiguration = [];
         $kernel = $container->get(Symfony2Extension::KERNEL_ID);
@@ -163,27 +189,7 @@ class OroTestFrameworkExtension implements TestworkExtension
             $elementConfiguration = array_merge($elementConfiguration, Yaml::parse($mappingPath));
         }
 
-        $elementFactory = new Definition(
-            'Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory',
-            [
-                new Reference(MinkExtension::MINK_ID),
-                $elementConfiguration,
-            ]
-        );
-        $container->setDefinition(self::ELEMENT_FACTORY_ID, $elementFactory);
-    }
-
-    /**
-     * @param ContainerBuilder $container
-     */
-    private function loadElementFactoryInitializer(ContainerBuilder $container)
-    {
-        $formFillerAwareInitializerDefinition = new Definition(
-            'Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ElementFactoryInitializer',
-            [new Reference(self::ELEMENT_FACTORY_ID)]
-        );
-        $formFillerAwareInitializerDefinition->addTag(ContextExtension::INITIALIZER_TAG, array('priority' => 0));
-        $container->setDefinition('oro_behat_form_filler_initializer', $formFillerAwareInitializerDefinition);
+        $container->getDefinition('oro_element_factory')->replaceArgument(1, $elementConfiguration);
     }
 
     /**

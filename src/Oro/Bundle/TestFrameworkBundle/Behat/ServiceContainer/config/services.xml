@@ -1,0 +1,29 @@
+<?xml version="1.0" ?>
+<container xmlns="http://symfony.com/schema/dic/services"
+           xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+           xsi:schemaLocation="http://symfony.com/schema/dic/services http://symfony.com/schema/dic/services/services-1.0.xsd">
+
+    <services>
+        <service id="oro_test.dumper.mysql" class="Oro\Bundle\TestFrameworkBundle\Behat\Dumper\MysqlDumper">
+            <argument type="service" id="symfony2_extension.kernel" />
+            <tag name="oro_test.db_dumper" driver="pdo_mysql" />
+        </service>
+        <service id="oro_test.dumper.pgsql" class="Oro\Bundle\TestFrameworkBundle\Behat\Dumper\PgsqlDumper">
+            <argument type="service" id="symfony2_extension.kernel" />
+            <tag name="oro_test.db_dumper" driver="pdo_pgsql" />
+        </service>
+        <service id="oro_test.listener.db_isolation_subscriber" class="Oro\Bundle\TestFrameworkBundle\Behat\Listener\DbIsolationSubscriber">
+            <argument />
+            <tag name="event_dispatcher.subscriber" priority="10" />
+        </service>
+
+        <service id="oro_element_factory" class="Oro\Bundle\TestFrameworkBundle\Behat\Element\OroElementFactory">
+            <argument type="service" id="mink" />
+            <argument />
+        </service>
+        <service id="oro_behat_element_factory_initializer" class="Oro\Bundle\TestFrameworkBundle\Behat\Context\Initializer\ElementFactoryInitializer">
+            <argument type="service" id="oro_element_factory" />
+            <tag name="context.initializer" priority="0" />
+        </service>
+    </services>
+</container>
