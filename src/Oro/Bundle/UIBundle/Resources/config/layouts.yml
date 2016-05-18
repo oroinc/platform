@@ -18,3 +18,10 @@ services:
             - '@oro_ui.user_agent_provider'
         tags:
             - { name: layout.context_configurator }
+
+    oro_ui.layout_context_configurator.root_id:
+            class: Oro\Bundle\UIBundle\Layout\Extension\RootIdContextConfigurator
+            arguments:
+                - '@request_stack'
+            tags:
+                - { name: layout.context_configurator }
