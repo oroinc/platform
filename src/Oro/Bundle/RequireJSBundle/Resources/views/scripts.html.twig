@@ -7,7 +7,7 @@
     });
     {{ config_extend|default('') }}
 {% endset %}
-<script type="text/javascript" src="{{ asset('bundles/oroui/lib/asap/asap.js') }}"></script>
+<script type="text/javascript" src="{{ asset('bundles/ororequirejs/lib/asap/asap.js') }}"></script>
 {% if compressed and requirejs_build_exists() %}
     <script type="text/javascript">
         var require = (function(){
@@ -27,8 +27,8 @@
             var originalSetTimeout = window.setTimeout;
             window.setTimeout = function(fn, timeout) {
                 try {
-                    require.s.contexts._.nextTick = setImmediate;
-                    require.nextTick = setImmediate;
+                    require.s.contexts._.nextTick = asap;
+                    require.nextTick = asap;
                     window.setTimeout = originalSetTimeout;
                 } catch (e) {
                     // wait next cycle
@@ -36,7 +36,7 @@
                 if (timeout === 0) {
                     return asap(fn);
                 }
-                return setTimeout.apply(this, arguments);
+                return originalSetTimeout.apply(this, arguments);
             }
         })();
     </script>
@@ -44,8 +44,8 @@
 {% else %}
     <script type="text/javascript" src="{{ asset('bundles/ororequirejs/lib/require.js') }}"></script>
     <script type="text/javascript">
-        require.nextTick = setImmediate;
-        require.s.contexts._.nextTick = setImmediate;
+        require.nextTick = asap;
+        require.s.contexts._.nextTick = asap;
     </script>
     <script type="text/javascript">
         {{ get_requirejs_config() }}

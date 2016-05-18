@@ -117,7 +117,7 @@ config:
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'
-        'asap': 'bundles/oroui/lib/asap/asap.js'
+        'asap': 'bundles/ororequirejs/lib/asap/asap.js' # OroUI bundle depends on Require JS bundle
         'base64': 'bundles/oroui/lib/base64.js'
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui-1.11.2.js'
