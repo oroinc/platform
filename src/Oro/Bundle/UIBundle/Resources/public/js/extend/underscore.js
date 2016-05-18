@@ -25,10 +25,10 @@ define(['underscore'], function(_) {
     });
 
     /**
-     * setImmediate should be exposed by requireJs bundle
+     * asap() should be exposed by requireJs bundle
      */
-    if (window.setImmediate) {
-        _.defer = window.setImmediate;
+    if (window.asap) {
+        _.defer = window.asap;
     }
 
     return _;
