@@ -274,10 +274,10 @@ class ArrayUtil
                     $first[$idx] = $value;
                 } else {
                     if (is_array($value)) {
-                        if (!is_array($first[$idx])) {
-                            $first[$idx] = $value;
-                        } else {
+                        if (is_array($first[$idx])) {
                             $first[$idx] = self::arrayMergeRecursiveDistinct($first[$idx], $value);
+                        } else {
+                            $first[$idx] = $value;
                         }
                     } else {
                         $first[$idx] = $value;
