@@ -29,11 +29,15 @@ abstract class AbstractType implements BlockTypeInterface
      */
     public function buildView(BlockView $view, BlockInterface $block, array $options)
     {
-        $optionsNames = array_keys($this->options);
-        foreach ($optionsNames as $name) {
-            if (array_key_exists($name, $options)) {
-                $view->vars[$name] = $options[$name];
+        foreach ($this->options as $name => $settings) {
+            if (!array_key_exists($name, $options)) {
+                continue;
             }
+            $isOptional = !is_array($settings) || empty($settings['required']);
+            if ($isOptional && !isset($options[$name])) {
+                continue;
+            }
+            $view->vars[$name] = $options[$name];
         }
     }
 
@@ -54,13 +58,13 @@ abstract class AbstractType implements BlockTypeInterface
             if (!is_array($settings)) {
                 continue;
             }
-            if (array_key_exists('required', $settings) && $settings['required']) {
+            if (isset($settings['required']) && $settings['required']) {
                 $resolver->setRequired($name);
             }
             if (array_key_exists('default', $settings)) {
                 $resolver->setDefault($name, $settings['default']);
             }
-            if (array_key_exists('normalizers', $settings)) {
+            if (isset($settings['normalizers'])) {
                 $resolver->setNormalizer($name, $settings['normalizers']);
             }
             if (array_key_exists('allowed_values', $settings)) {
