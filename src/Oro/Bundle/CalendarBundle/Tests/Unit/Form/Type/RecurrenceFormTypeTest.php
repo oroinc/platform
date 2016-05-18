@@ -4,8 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Tests\Unit\Form\Type;
 
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Model\Recurrence as RecurrenceModel;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Form\Type\RecurrenceFormType;
 
 class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
@@ -33,7 +32,7 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
                     'required' => true,
                     'label' => 'oro.calendar.recurrence.entity_label',
                     'empty_value' => false,
-                    'choices' => RecurrenceModel::getRecurrenceTypes(),
+                    'choices' => Recurrence::getRecurrenceTypes(),
                 ]
             )
             ->will($this->returnSelf());
@@ -57,7 +56,7 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
                     'required' => false,
                     'label' => 'oro.calendar.recurrence.instance.label',
                     'empty_value' => false,
-                    'choices' => RecurrenceModel::getInstances(),
+                    'choices' => Recurrence::getInstances(),
                 ]
             )
             ->will($this->returnSelf());
@@ -70,7 +69,7 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
                     'required' => false,
                     'label' => 'oro.calendar.recurrence.day_of_week.label',
                     'multiple' => true,
-                    'choices' => RecurrenceModel::getDaysOfWeek(),
+                    'choices' => Recurrence::getDaysOfWeek(),
                 ]
             )
             ->will($this->returnSelf());

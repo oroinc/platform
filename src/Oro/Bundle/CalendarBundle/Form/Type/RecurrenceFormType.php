@@ -2,11 +2,12 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Type;
 
-use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Symfony\Component\Form\AbstractType;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\OptionsResolver\OptionsResolver;
+
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class RecurrenceFormType extends AbstractType
 {

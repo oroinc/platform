@@ -5,13 +5,12 @@ namespace Oro\Bundle\CalendarBundle\Provider;
 use Doctrine\ORM\Query;
 use Doctrine\ORM\QueryBuilder;
 
-use Oro\Bundle\CalendarBundle\Entity\Calendar;
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Entity;
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
+use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
 use Oro\Bundle\EntityBundle\ORM\DoctrineHelper;
 use Oro\Bundle\EntityBundle\Provider\EntityNameResolver;
-use Oro\Component\PhpUtils\ArrayUtil;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class UserCalendarProvider extends AbstractCalendarProvider
@@ -65,7 +64,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
 
         $result = [];
 
-        /** @var Calendar[] $calendars */
+        /** @var Entity\Calendar[] $calendars */
         $calendars = $qb->getQuery()->getResult();
         foreach ($calendars as $calendar) {
             $resultItem = [
@@ -126,11 +125,11 @@ class UserCalendarProvider extends AbstractCalendarProvider
     }
 
     /**
-     * @param Calendar $calendar
+     * @param Entity\Calendar $calendar
      *
      * @return string
      */
-    protected function buildCalendarName(Calendar $calendar)
+    protected function buildCalendarName(Entity\Calendar $calendar)
     {
         return $calendar->getName() ?: $this->entityNameResolver->getName($calendar->getOwner());
     }
@@ -207,7 +206,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
         $occurrences = [];
         foreach ($items as $item) {
             if (!empty($item[$key]) && empty($item['recurringEventId'])) {
-                $recurrence = new Recurrence();
+                $recurrence = new Entity\Recurrence();
                 foreach ($item[$key] as $field => $value) {
                     $value = in_array($field, ['startTime', 'endTime'], true) ? new \DateTime($value) : $value;
                     if ($field !== 'id') {

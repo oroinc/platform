@@ -2,10 +2,11 @@
 
 namespace Oro\Bundle\CalendarBundle\Validator;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface;
 use Symfony\Component\Validator\Constraint;
 use Symfony\Component\Validator\ConstraintValidator;
+
+use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
 
 class RecurrenceValidator extends ConstraintValidator
 {

@@ -2,28 +2,24 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Model\Recurrence;
 
-use Symfony\Component\Translation\TranslatorInterface;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
+use Oro\Bundle\CalendarBundle\Model\Recurrence\MonthlyStrategy;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\DailyStrategy;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
-
-class DailyStrategyTest extends \PHPUnit_Framework_TestCase
+class MonthlyStrategyTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var DailyStrategy */
+    /** @var MonthlyStrategy  */
     protected $strategy;
 
-    /**
-     * @var \PHPUnit_Framework_MockObject_MockObject
-     */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $validator;
 
     protected function setUp()
     {
         $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
             ->getMock();
-        $helper = new StrategyHelper($this->validator);
-        /** @var \PHPUnit_Framework_MockObject_MockObject|TranslatorInterface */
+        $model = new Recurrence($this->validator);
+        /** @var \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\Translation\TranslatorInterface */
         $translator = $this->getMock('Symfony\Component\Translation\TranslatorInterface');
         $translator->expects($this->any())
             ->method('transChoice')
@@ -47,18 +43,18 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->strategy = new DailyStrategy($helper, $translator, $dateTimeFormatter);
+        $this->strategy = new MonthlyStrategy($model, $translator, $dateTimeFormatter);
     }
 
     public function testGetName()
     {
-        $this->assertEquals($this->strategy->getName(), 'recurrence_daily');
+        $this->assertEquals($this->strategy->getName(), 'recurrence_monthly');
     }
 
     public function testSupports()
     {
-        $recurrence = new Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY);
+        $recurrence = new Entity\Recurrence();
+        $recurrence->setRecurrenceType(Recurrence::TYPE_MONTHLY);
         $this->assertTrue($this->strategy->supports($recurrence));
 
         $recurrence->setRecurrenceType('Test');
@@ -79,9 +75,10 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
                 return new \DateTime($date);
             }, $expected
         );
-        $recurrence = new Recurrence();
+        $recurrence = new Entity\Recurrence();
         $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
             ->setInterval($params['interval'])
+            ->setDayOfMonth($params['dayOfMonth'])
             ->setStartTime(new \DateTime($params['startTime']))
             ->setEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
@@ -103,9 +100,10 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetRecurrencePattern($recurrenceData, $expected)
     {
-        $recurrence = new Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
+        $recurrence = new Entity\Recurrence();
+        $recurrence->setRecurrenceType(Recurrence::TYPE_MONTHLY)
             ->setInterval($recurrenceData['interval'])
+            ->setDayOfMonth($recurrenceData['dayOfMonth'])
             ->setStartTime(new \DateTime($recurrenceData['startTime']))
             ->setEndTime(new \DateTime($recurrenceData['endTime']))
             ->setOccurrences($recurrenceData['occurrences']);
@@ -121,9 +119,10 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
      */
     public function testGetCalculatedEndTime($recurrenceData, $expected)
     {
-        $recurrence = new Recurrence();
-        $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
+        $recurrence = new Entity\Recurrence();
+        $recurrence->setRecurrenceType(Recurrence::TYPE_MONTHLY)
             ->setInterval($recurrenceData['interval'])
+            ->setDayOfMonth($recurrenceData['dayOfMonth'])
             ->setStartTime(new \DateTime($recurrenceData['startTime']))
             ->setOccurrences($recurrenceData['occurrences']);
 
@@ -146,12 +145,13 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < end < startTime < endTime' => [
                 'params' => [
-                    'interval' => 5,
+                    'interval' => 2,
+                    'dayOfMonth' => 25,
                     'occurrences' => null,
                     'start' => '2016-03-28',
-                    'end' => '2016-04-17',
-                    'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
+                    'end' => '2016-05-01',
+                    'startTime' => '2016-05-25',
+                    'endTime' => '2016-07-30',
                 ],
                 'expected' => [
                 ],
@@ -162,16 +162,16 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < startTime < end < endTime' => [
                 'params' => [
-                    'interval' => 5,
+                    'interval' => 2,
+                    'dayOfMonth' => 25,
                     'occurrences' => null,
                     'start' => '2016-03-28',
                     'end' => '2016-05-01',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
+                    'endTime' => '2016-06-30',
                 ],
                 'expected' => [
                     '2016-04-25',
-                    '2016-04-30',
                 ],
             ],
             /**
@@ -180,17 +180,17 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'start < startTime < endTime < end' => [
                 'params' => [
-                    'interval' => 5,
+                    'interval' => 2,
+                    'dayOfMonth' => 25,
                     'occurrences' => null,
-                    'start' => '2016-05-30',
-                    'end' => '2016-07-03',
+                    'start' => '2016-03-01',
+                    'end' => '2016-10-01',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
+                    'endTime' => '2016-08-01',
                 ],
                 'expected' => [
-                    '2016-05-30',
-                    '2016-06-04',
-                    '2016-06-09',
+                    '2016-04-25',
+                    '2016-06-25',
                 ],
             ],
             /**
@@ -199,17 +199,16 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
              */
             'startTime < start < endTime < end' => [
                 'params' => [
-                    'interval' => 5,
+                    'interval' => 2,
+                    'dayOfMonth' => 25,
                     'occurrences' => null,
-                    'start' => '2016-04-30',
-                    'end' => '2016-05-30',
+                    'start' => '2016-05-30',
+                    'end' => '2016-07-03',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-05-10',
+                    'endTime' => '2016-06-30',
                 ],
                 'expected' => [
-                    '2016-04-30',
-                    '2016-05-05',
-                    '2016-05-10',
+                    '2016-06-25',
                 ],
             ],
             /**
@@ -219,89 +218,42 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             'startTime < endTime < start < end' => [
                 'params' => [
                     'interval' => 5,
+                    'dayOfMonth' => 25,
                     'occurrences' => null,
-                    'start' => '2016-06-11',
-                    'end' => '2016-07-03',
+                    'start' => '2016-07-25',
+                    'end' => '2016-09-04',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
+                    'endTime' => '2016-06-30',
                 ],
                 'expected' => [
                 ],
             ],
 
-            'start = end = startTime = endTime' => [
+            'startTime < start < end < endTime with X occurrences' => [
                 'params' => [
-                    'interval' => 5,
-                    'occurrences' => null,
-                    'start' => '2016-04-24',
-                    'end' => '2016-04-24',
-                    'startTime' => '2016-04-24',
-                    'endTime' => '2016-04-24',
+                    'interval' => 2,
+                    'dayOfMonth' => 25,
+                    'occurrences' => 3,
+                    'start' => '2016-07-25',
+                    'end' => '2016-09-04',
+                    'startTime' => '2016-04-25',
+                    'endTime' => '2016-12-31',
                 ],
                 'expected' => [
-                    '2016-04-24',
+                    '2016-08-25',
                 ],
             ],
-            'start = end = (startTime + 1 day) = (endTime + 1 day)' => [
+            'startTime < start < end < endTime with no matches' => [
                 'params' => [
-                    'interval' => 5,
-                    'occurrences' => null,
-                    'start' => '2016-04-24',
-                    'end' => '2016-04-24',
+                    'interval' => 2,
+                    'dayOfMonth' => 25,
+                    'occurrences' => 3,
+                    'start' => '2016-09-06',
+                    'end' => '2016-11-06',
                     'startTime' => '2016-04-25',
-                    'endTime' => '2016-04-25',
+                    'endTime' => '2016-12-31',
                 ],
                 'expected' => [
-                ],
-            ],
-            'startTime = endTime = (start + interval days) = (end + interval days)' => [
-                'params' => [
-                    'interval' => 5,
-                    'occurrences' => null,
-                    'start' => '2016-04-30',
-                    'end' => '2016-04-30',
-                    'startTime' => '2016-04-25',
-                    'endTime' => '2016-04-25',
-                ],
-                'expected' => [
-                ],
-            ],
-            'start < startTime < endTime < end after x occurrences' => [
-                'params' => [
-                    'interval' => 5,
-                    'occurrences' => 8,
-                    'start' => '2016-05-30',
-                    'end' => '2016-07-03',
-                    'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
-                ],
-                'expected' => [
-                    '2016-05-30',
-                ],
-            ],
-            'start < startTime < endTime < end after y occurrences' => [
-                'params' => [
-                    'interval' => 5,
-                    'occurrences' => 7,
-                    'start' => '2016-05-30',
-                    'end' => '2016-07-03',
-                    'startTime' => '2016-04-25',
-                    'endTime' => '2016-06-10',
-                ],
-                'expected' => [
-                ],
-            ],
-            'no endTime' => [
-                'params' => [
-                    'interval' => 5,
-                    'occurrences' => 8,
-                    'start' => '2016-05-30',
-                    'end' => '2016-07-03',
-                    'startTime' => '2016-04-25',
-                    'endTime' => '9999-12-31',
-                ],
-                'expected' => [
-                    '2016-05-30',
                 ],
             ],
         ];
@@ -316,29 +268,32 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             'without_occurrences_and_end_date' => [
                 'params' => [
                     'interval' => 2,
+                    'dayOfMonth' => 10,
                     'startTime' => '2016-04-28',
                     'endTime' => Recurrence::MAX_END_DATE,
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.daily'
+                'expected' => 'oro.calendar.recurrence.patterns.monthly'
             ],
             'with_occurrences' => [
                 'params' => [
                     'interval' => 2,
+                    'dayOfMonth' => 10,
                     'startTime' => '2016-04-28',
                     'endTime' => Recurrence::MAX_END_DATE,
                     'occurrences' => 3,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.dailyoro.calendar.recurrence.patterns.occurrences'
+                'expected' => 'oro.calendar.recurrence.patterns.monthlyoro.calendar.recurrence.patterns.occurrences'
             ],
             'with_end_date' => [
                 'params' => [
                     'interval' => 2,
+                    'dayOfMonth' => 10,
                     'startTime' => '2016-04-28',
                     'endTime' => '2016-06-10',
                     'occurrences' => null,
                 ],
-                'expected' => 'oro.calendar.recurrence.patterns.dailyoro.calendar.recurrence.patterns.end_date'
+                'expected' => 'oro.calendar.recurrence.patterns.monthlyoro.calendar.recurrence.patterns.end_date'
             ]
         ];
     }
@@ -352,6 +307,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             'without_end_date' => [
                 'params' => [
                     'interval' => 2,
+                    'dayOfMonth' => 10,
                     'startTime' => '2016-04-28',
                     'endTime' => null,
                     'occurrences' => null,
@@ -361,6 +317,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             'with_end_date' => [
                 'params' => [
                     'interval' => 2,
+                    'dayOfMonth' => 10,
                     'startTime' => '2016-04-28',
                     'endTime' => '2016-05-12',
                     'occurrences' => null,
@@ -370,11 +327,32 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             'with_occurrences' => [
                 'params' => [
                     'interval' => 2,
-                    'startTime' => '2016-04-28',
+                    'dayOfMonth' => 18,
+                    'startTime' => '2016-04-14T00:00:00+03:00',
                     'endTime' => null,
                     'occurrences' => 5,
                 ],
-                'expected' => new \DateTime('2016-05-06')
+                'expected' => new \DateTime('2016-12-18T00:00:00+03:00')
+            ],
+            'with_occurrences_1' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 10,
+                    'startTime' => '2016-04-14T00:00:00+03:00',
+                    'endTime' => null,
+                    'occurrences' => 3,
+                ],
+                'expected' => new \DateTime('2016-10-10T00:00:00+03:00')
+            ],
+            'with_occurrences_2' => [
+                'params' => [
+                    'interval' => 2,
+                    'dayOfMonth' => 14,
+                    'startTime' => '2016-04-14T00:00:00+03:00',
+                    'endTime' => null,
+                    'occurrences' => 3,
+                ],
+                'expected' => new \DateTime('2016-08-14T00:00:00+03:00')
             ]
         ];
     }

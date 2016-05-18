@@ -18,7 +18,7 @@ use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarProperty;
 use Oro\Bundle\CalendarBundle\Entity\Recurrence;
 use Oro\Bundle\CalendarBundle\Entity\SystemCalendar;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface;
+use Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface;
 use Oro\Bundle\EntityConfigBundle\DependencyInjection\Utils\ServiceLink;
 use Oro\Bundle\OrganizationBundle\Entity\Organization;
 use Oro\Bundle\SecurityBundle\Authentication\Token\OrganizationContextTokenInterface;

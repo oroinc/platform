@@ -1,17 +1,18 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class DailyStrategy extends AbstractStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
+    public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->strategyHelper->validateRecurrence($recurrence);
+        $this->model->validateRecurrence($recurrence);
         $result = [];
         $occurrenceDate = $recurrence->getStartTime();
         $fromStartInterval = 1;
@@ -42,7 +43,7 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Recurrence $recurrence)
+    public function supports(Entity\Recurrence $recurrence)
     {
         return $recurrence->getRecurrenceType() === Recurrence::TYPE_DAILY;
     }
@@ -50,7 +51,7 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Recurrence $recurrence)
+    public function getRecurrencePattern(Entity\Recurrence $recurrence)
     {
         $interval = $recurrence->getInterval();
 
@@ -86,7 +87,7 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getLastOccurrence(Recurrence $recurrence)
+    public function getLastOccurrence(Entity\Recurrence $recurrence)
     {
         return $this->getNextOccurrence(
             $recurrence->getInterval() * ($recurrence->getOccurrences() - 1),
@@ -97,7 +98,7 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidationErrorMessage(Recurrence $recurrence)
+    public function getValidationErrorMessage(Entity\Recurrence $recurrence)
     {
         if ($recurrence->getInterval() > 99) {
             return "Parameter 'interval' can't be more than 99 for Daily recurrence pattern";

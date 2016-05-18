@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\CalendarBundle\Twig;
 
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
+use Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 class RecurrenceExtension extends \Twig_Extension
@@ -20,24 +20,24 @@ class RecurrenceExtension extends \Twig_Extension
     /** @var PropertyAccessor */
     protected $propertyAccessor;
 
-    /** @var  StrategyHelper */
-    protected $recurrenceHelper;
+    /** @var Recurrence */
+    protected $model;
 
     /**
      * RecurrenceExtension constructor.
      *
      * @param DelegateStrategy $delegateStrategy
      * @param TranslatorInterface $translator
-     * @param StrategyHelper $strategyHelper
+     * @param Recurrence $model
      */
     public function __construct(
         DelegateStrategy $delegateStrategy,
         TranslatorInterface $translator,
-        StrategyHelper $strategyHelper
+        Recurrence $model
     ) {
         $this->delegateStrategy = $delegateStrategy;
         $this->translator = $translator;
-        $this->recurrenceHelper = $strategyHelper;
+        $this->model = $model;
     }
 
     /**
@@ -58,11 +58,11 @@ class RecurrenceExtension extends \Twig_Extension
     }
 
     /**
-     * @param Recurrence $recurrence
+     * @param Entity\Recurrence $recurrence
      *
      * @return string
      */
-    public function getRecurrencePattern(Recurrence $recurrence)
+    public function getRecurrencePattern(Entity\Recurrence $recurrence)
     {
         return $this->delegateStrategy->getRecurrencePattern($recurrence);
     }
@@ -83,12 +83,12 @@ class RecurrenceExtension extends \Twig_Extension
             return $this->translator->trans('oro.calendar.calendarevent.recurrence.na');
         }
         $propertyAccessor = $this->getPropertyAccessor();
-        $recurrence = new Recurrence();
+        $recurrence = new Entity\Recurrence();
         foreach ($attributes as $attr => $value) {
             $propertyAccessor->setValue($recurrence, $attr, $value);
         }
 
-        $this->recurrenceHelper->validateRecurrence($recurrence);
+        $this->model->validateRecurrence($recurrence);
 
         return $this->getRecurrencePattern($recurrence);
     }

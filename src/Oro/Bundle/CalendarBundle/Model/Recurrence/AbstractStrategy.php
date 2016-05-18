@@ -1,17 +1,17 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 use Symfony\Component\Translation\TranslatorInterface;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\LocaleBundle\Formatter\DateTimeFormatter;
 
 abstract class AbstractStrategy
 {
-    /** @var StrategyHelper */
-    protected $strategyHelper;
+    /** @var Recurrence */
+    protected $model;
 
     /** @var TranslatorInterface */
     protected $translator;
@@ -20,16 +20,16 @@ abstract class AbstractStrategy
     protected $dateTimeFormatter;
 
     /**
-     * @param StrategyHelper $strategyHelper
+     * @param Recurrence $model
      * @param TranslatorInterface $translator
      * @param DateTimeFormatter $formatter
      */
     public function __construct(
-        StrategyHelper $strategyHelper,
+        Recurrence $model,
         TranslatorInterface $translator,
         DateTimeFormatter $formatter
     ) {
-        $this->strategyHelper = $strategyHelper;
+        $this->model = $model;
         $this->translator = $translator;
         $this->dateTimeFormatter = $formatter;
     }
@@ -37,13 +37,13 @@ abstract class AbstractStrategy
     /**
      * Returns occurrences text pattern, if it is applicable for recurrence.
      *
-     * @param Recurrence $recurrence
+     * @param Entity\Recurrence $recurrence
      *
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    public function getOccurrencesPattern(Recurrence $recurrence)
+    public function getOccurrencesPattern(Entity\Recurrence $recurrence)
     {
         $occurrences = $recurrence->getOccurrences();
         $result = '';
@@ -61,13 +61,13 @@ abstract class AbstractStrategy
     /**
      * Returns end date text pattern, if it is applicable for recurrence.
      *
-     * @param Recurrence $recurrence
+     * @param Entity\Recurrence $recurrence
      *
      * @return string
      *
      * @throws \InvalidArgumentException
      */
-    protected function getEndDatePattern(Recurrence $recurrence)
+    protected function getEndDatePattern(Entity\Recurrence $recurrence)
     {
         $result = '';
         $maxEndDate = new \DateTime(Recurrence::MAX_END_DATE);
@@ -84,7 +84,7 @@ abstract class AbstractStrategy
     /**
      * Returns recurrence pattern text according to its translation and parameters.
      *
-     * @param Recurrence $recurrence
+     * @param Entity\Recurrence $recurrence
      * @param string $translationId
      * @param integer $count
      * @param array $translationParameters
@@ -93,8 +93,12 @@ abstract class AbstractStrategy
      *
      * @throws \InvalidArgumentException
      */
-    protected function getFullRecurrencePattern(Recurrence $recurrence, $translationId, $count, $translationParameters)
-    {
+    protected function getFullRecurrencePattern(
+        Entity\Recurrence $recurrence,
+        $translationId,
+        $count,
+        $translationParameters
+    ) {
         $result = $this->translator->transChoice(
             $translationId,
             $count,
@@ -108,13 +112,13 @@ abstract class AbstractStrategy
     }
 
     /**
-     * @param Recurrence $recurrence
+     * @param Entity\Recurrence $recurrence
      *
      * @return \DateTime|null
      *
      * @see Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface
      */
-    public function getCalculatedEndTime(Recurrence $recurrence)
+    public function getCalculatedEndTime(Entity\Recurrence $recurrence)
     {
         $occurrences = $recurrence->getOccurrences();
         $currentEndTime = $recurrence->getEndTime();
@@ -131,9 +135,9 @@ abstract class AbstractStrategy
     /**
      * Returns last occurrence date according occurrences value.
      *
-     * @param Recurrence $recurrence
+     * @param Entity\Recurrence $recurrence
      *
      * @return \DateTime
      */
-    abstract public function getLastOccurrence(Recurrence $recurrence);
+    abstract public function getLastOccurrence(Entity\Recurrence $recurrence);
 }

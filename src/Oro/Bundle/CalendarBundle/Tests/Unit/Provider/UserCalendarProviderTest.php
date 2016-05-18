@@ -38,7 +38,7 @@ class UserCalendarProviderTest extends \PHPUnit_Framework_TestCase
                 ->disableOriginalConstructor()
                 ->getMock();
         $this->recurrenceStrategy =
-            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy')
+            $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy')
                 ->disableOriginalConstructor()
                 ->getMock();
 

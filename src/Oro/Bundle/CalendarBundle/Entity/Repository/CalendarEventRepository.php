@@ -5,7 +5,8 @@ namespace Oro\Bundle\CalendarBundle\Entity\Repository;
 use Doctrine\Common\Collections\Criteria;
 use Doctrine\ORM\EntityRepository;
 use Doctrine\ORM\QueryBuilder;
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class CalendarEventRepository extends EntityRepository
 {
@@ -52,6 +53,30 @@ class CalendarEventRepository extends EntityRepository
 
         $this->addRecurrenceData($qb);
         $this->addFilters($qb, $filters);
+
+        return $qb;
+    }
+
+    /**
+     * Returns a query builder which can be used to get a list of user calendar events associated with recurring event.
+     * Recurring event will be returned as well.
+     *
+     * @param array $filters
+     * @param array $extraFields
+     * @param null|string $recurringEventId
+     *
+     * @return QueryBuilder
+     */
+    public function getUserEventListByRecurringEventQueryBuilder(
+        $filters = [],
+        $extraFields = [],
+        $recurringEventId = null
+    ) {
+        $qb = $this->getUserEventListQueryBuilder($filters, $extraFields);
+        if ($recurringEventId) {
+            $qb->orWhere('e.id = :recurringEventId')
+                ->setParameter('recurringEventId', $recurringEventId);
+        }
 
         return $qb;
     }

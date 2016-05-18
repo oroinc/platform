@@ -2,13 +2,13 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Unit\Twig;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
-use Oro\Bundle\CalendarBundle\Strategy\Recurrence\Helper\StrategyHelper;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\CalendarBundle\Twig\RecurrenceExtension;
 
 class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
 {
-    /** @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy */
+    /** @var \PHPUnit_Framework_MockObject_MockObject|\Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy */
     protected $delegateStrategy;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|\Symfony\Component\Translation\TranslatorInterface */
@@ -24,7 +24,7 @@ class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
 
     protected function setUp()
     {
-        $this->delegateStrategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Strategy\Recurrence\DelegateStrategy')
+        $this->delegateStrategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\DelegateStrategy')
             ->disableOriginalConstructor()
             ->getMock();
         $this->translator = $this->getMockBuilder('Symfony\Component\Translation\TranslatorInterface')
@@ -32,8 +32,8 @@ class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
             ->getMock();
         $this->validator = $this->getMockBuilder('Symfony\Component\Validator\Validator\ValidatorInterface')
             ->getMock();
-        $helper = new StrategyHelper($this->validator);
-        $this->extension = new RecurrenceExtension($this->delegateStrategy, $this->translator, $helper);
+        $model = new Recurrence($this->validator);
+        $this->extension = new RecurrenceExtension($this->delegateStrategy, $this->translator, $model);
     }
 
     public function testGetName()
@@ -46,7 +46,7 @@ class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
         $this->delegateStrategy->expects($this->once())
             ->method('getRecurrencePattern')
             ->willReturn('test_pattern');
-        $this->assertEquals('test_pattern', $this->extension->getRecurrencePattern(new Recurrence()));
+        $this->assertEquals('test_pattern', $this->extension->getRecurrencePattern(new Entity\Recurrence()));
     }
     
     public function testGetRecurrencePatternByAttributesWithNA()

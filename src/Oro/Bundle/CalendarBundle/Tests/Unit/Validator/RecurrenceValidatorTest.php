@@ -47,7 +47,7 @@ class EmailRecipientsValidatorTest extends \PHPUnit_Framework_TestCase
      */
     protected function getValidator()
     {
-        $recurrenceStrategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Strategy\Recurrence\StrategyInterface')
+        $recurrenceStrategy = $this->getMockBuilder('Oro\Bundle\CalendarBundle\Model\Recurrence\StrategyInterface')
             ->getMock();
         $recurrenceStrategy->expects($this->once())
             ->method('getValidationErrorMessage');

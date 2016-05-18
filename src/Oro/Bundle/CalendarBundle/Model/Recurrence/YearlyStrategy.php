@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 /**
  * Recurrence with type Recurrence::TYPE_YEARLY will provide interval a number of month, which is multiple of 12.
@@ -12,7 +13,7 @@ class YearlyStrategy extends MonthlyStrategy
     /**
      * {@inheritdoc}
      */
-    public function supports(Recurrence $recurrence)
+    public function supports(Entity\Recurrence $recurrence)
     {
         return $recurrence->getRecurrenceType() === Recurrence::TYPE_YEARLY;
     }
@@ -20,7 +21,7 @@ class YearlyStrategy extends MonthlyStrategy
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Recurrence $recurrence)
+    public function getRecurrencePattern(Entity\Recurrence $recurrence)
     {
         $interval = (int)($recurrence->getInterval() / 12);
         $currentDate = new \DateTime();
@@ -46,7 +47,7 @@ class YearlyStrategy extends MonthlyStrategy
     /**
      * {@inheritdoc}
      */
-    protected function getFirstOccurrence(Recurrence $recurrence)
+    protected function getFirstOccurrence(Entity\Recurrence $recurrence)
     {
         $dayOfMonth = $recurrence->getDayOfMonth();
         $monthOfYear = $recurrence->getMonthOfYear();
@@ -64,7 +65,7 @@ class YearlyStrategy extends MonthlyStrategy
     /**
      * {@inheritdoc}
      */
-    public function getValidationErrorMessage(Recurrence $recurrence)
+    public function getValidationErrorMessage(Entity\Recurrence $recurrence)
     {
         if ($recurrence->getInterval() % 12 !== 0) {
             return "Parameter 'interval' value must be a multiple of 12 for Yearly recurrence pattern.";

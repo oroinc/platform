@@ -1,17 +1,18 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
+    public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->strategyHelper->validateRecurrence($recurrence);
+        $this->model->validateRecurrence($recurrence);
         $result = [];
         $occurrenceDate = $this->getFirstOccurrence($recurrence);
         $interval = $recurrence->getInterval();
@@ -42,7 +43,7 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Recurrence $recurrence)
+    public function supports(Entity\Recurrence $recurrence)
     {
         return $recurrence->getRecurrenceType() === Recurrence::TYPE_MONTHLY;
     }
@@ -50,7 +51,7 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Recurrence $recurrence)
+    public function getRecurrencePattern(Entity\Recurrence $recurrence)
     {
         $interval = $recurrence->getInterval();
 
@@ -86,11 +87,11 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * Returns first occurrence according to recurrence rules.
      *
-     * @param Recurrence $recurrence
+     * @param Entity\Recurrence $recurrence
      *
      * @return \DateTime
      */
-    protected function getFirstOccurrence(Recurrence $recurrence)
+    protected function getFirstOccurrence(Entity\Recurrence $recurrence)
     {
         $dayOfMonth = $recurrence->getDayOfMonth();
         $occurrenceDate = clone $recurrence->getStartTime();
@@ -106,7 +107,7 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getLastOccurrence(Recurrence $recurrence)
+    public function getLastOccurrence(Entity\Recurrence $recurrence)
     {
         $occurrenceDate = $this->getFirstOccurrence($recurrence);
 
@@ -119,7 +120,7 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidationErrorMessage(Recurrence $recurrence)
+    public function getValidationErrorMessage(Entity\Recurrence $recurrence)
     {
         if (empty($recurrence->getDayOfMonth())) {
             return "Parameter 'dayOfMonth' can't be empty for Monthly recurrence pattern.";

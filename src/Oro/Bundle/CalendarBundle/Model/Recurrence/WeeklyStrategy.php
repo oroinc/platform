@@ -1,17 +1,18 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
+    public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->strategyHelper->validateRecurrence($recurrence);
+        $this->model->validateRecurrence($recurrence);
         $result = [];
         $weekDays = $recurrence->getDayOfWeek();
 
@@ -72,7 +73,7 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Recurrence $recurrence)
+    public function supports(Entity\Recurrence $recurrence)
     {
         return $recurrence->getRecurrenceType() === Recurrence::TYPE_WEEKLY;
     }
@@ -80,7 +81,7 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Recurrence $recurrence)
+    public function getRecurrencePattern(Entity\Recurrence $recurrence)
     {
         $interval = $recurrence->getInterval();
         $days = [];
@@ -147,7 +148,7 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getLastOccurrence(Recurrence $recurrence)
+    public function getLastOccurrence(Entity\Recurrence $recurrence)
     {
         $weekDays = $recurrence->getDayOfWeek();
 
@@ -189,7 +190,7 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidationErrorMessage(Recurrence $recurrence)
+    public function getValidationErrorMessage(Entity\Recurrence $recurrence)
     {
         if (empty($recurrence->getDayOfWeek())) {
             return "Parameter 'dayOfWeek' can't be empty for Weekly recurrence pattern.";

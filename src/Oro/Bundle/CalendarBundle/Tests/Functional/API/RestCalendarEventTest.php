@@ -2,7 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Tests\Functional\API;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**

@@ -1,8 +1,9 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 /**
  * Recurrence with type Recurrence::TYPE_YEAR_N_TH will provide interval a number of month, which is multiple of 12.
@@ -12,9 +13,9 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
+    public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->strategyHelper->validateRecurrence($recurrence);
+        $this->model->validateRecurrence($recurrence);
         $result = [];
         $startTime = $recurrence->getStartTime();
         $dayOfWeek = $recurrence->getDayOfWeek();
@@ -66,7 +67,7 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Recurrence $recurrence)
+    public function supports(Entity\Recurrence $recurrence)
     {
         return $recurrence->getRecurrenceType() === Recurrence::TYPE_YEAR_N_TH;
     }
@@ -74,12 +75,12 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Recurrence $recurrence)
+    public function getRecurrencePattern(Entity\Recurrence $recurrence)
     {
         $interval = (int)($recurrence->getInterval() / 12);
-        $instanceValue = $this->strategyHelper->getInstanceRelativeValue($recurrence->getInstance());
+        $instanceValue = $this->model->getInstanceRelativeValue($recurrence->getInstance());
         $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
-        $day = $this->strategyHelper->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
+        $day = $this->model->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
         $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
         $currentDate = new \DateTime();
         $currentDate->setDate($currentDate->format('Y'), $recurrence->getMonthOfYear(), $currentDate->format('d'));
@@ -116,7 +117,7 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
     {
         $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
-        $instanceRelativeValue = $this->strategyHelper->getInstanceRelativeValue($instance);
+        $instanceRelativeValue = $this->model->getInstanceRelativeValue($instance);
         $month = date('M', mktime(0, 0, 0, $monthOfYear));
         $year = $occurrenceDate->format('Y');
         $nextDays = [];
@@ -131,7 +132,7 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
         $days = [];
         $currentInstance = 1;
         while(count($days) < $instance) {
-            $instanceRelativeValue = $this->strategyHelper->getInstanceRelativeValue($currentInstance);
+            $instanceRelativeValue = $this->model->getInstanceRelativeValue($currentInstance);
             foreach ($dayOfWeek as $day) {
                 $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
             }
@@ -145,7 +146,7 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getLastOccurrence(Recurrence $recurrence)
+    public function getLastOccurrence(Entity\Recurrence $recurrence)
     {
         $startTime = $recurrence->getStartTime();
         $dayOfWeek = $recurrence->getDayOfWeek();
@@ -175,7 +176,7 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidationErrorMessage(Recurrence $recurrence)
+    public function getValidationErrorMessage(Entity\Recurrence $recurrence)
     {
         if ($recurrence->getInterval() % 12 !== 0) {
             return "Parameter 'interval' value must be a multiple of 12 for YearNth recurrence pattern.";

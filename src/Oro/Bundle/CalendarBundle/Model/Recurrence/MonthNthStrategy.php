@@ -1,17 +1,18 @@
 <?php
 
-namespace Oro\Bundle\CalendarBundle\Strategy\Recurrence;
+namespace Oro\Bundle\CalendarBundle\Model\Recurrence;
 
-use Oro\Bundle\CalendarBundle\Entity\Recurrence;
+use Oro\Bundle\CalendarBundle\Entity;
+use Oro\Bundle\CalendarBundle\Model\Recurrence;
 
 class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
      */
-    public function getOccurrences(Recurrence $recurrence, \DateTime $start, \DateTime $end)
+    public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
-        $this->strategyHelper->validateRecurrence($recurrence);
+        $this->model->validateRecurrence($recurrence);
         $result = [];
         $dayOfWeek = $recurrence->getDayOfWeek();
         if ($dayOfWeek === null || count($dayOfWeek) === 0) {
@@ -63,7 +64,7 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function supports(Recurrence $recurrence)
+    public function supports(Entity\Recurrence $recurrence)
     {
         return $recurrence->getRecurrenceType() === Recurrence::TYPE_MONTH_N_TH;
     }
@@ -71,12 +72,12 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Recurrence $recurrence)
+    public function getRecurrencePattern(Entity\Recurrence $recurrence)
     {
         $interval = $recurrence->getInterval();
-        $instanceValue = $this->strategyHelper->getInstanceRelativeValue($recurrence->getInstance());
+        $instanceValue = $this->model->getInstanceRelativeValue($recurrence->getInstance());
         $instance = $this->translator->trans('oro.calendar.recurrence.instances.' . $instanceValue);
-        $day = $this->strategyHelper->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
+        $day = $this->model->getDayOfWeekRelativeValue($recurrence->getDayOfWeek());
         $day = $this->translator->trans('oro.calendar.recurrence.days.' . $day);
 
         return $this->getFullRecurrencePattern(
@@ -109,7 +110,7 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
     {
         $occurrenceDate = new \DateTime("+{$interval} month {$date->format('c')}");
 
-        $instanceRelativeValue = $this->strategyHelper->getInstanceRelativeValue($instance);
+        $instanceRelativeValue = $this->model->getInstanceRelativeValue($instance);
         $month = $occurrenceDate->format('M');
         $year = $occurrenceDate->format('Y');
         $nextDays = [];
@@ -124,7 +125,7 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
         $days = [];
         $currentInstance = 1;
         while(count($days) < $instance) {
-            $instanceRelativeValue = $this->strategyHelper->getInstanceRelativeValue($currentInstance);
+            $instanceRelativeValue = $this->model->getInstanceRelativeValue($currentInstance);
             foreach ($daysOfWeek as $day) {
                 $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
             }
@@ -138,7 +139,7 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getLastOccurrence(Recurrence $recurrence)
+    public function getLastOccurrence(Entity\Recurrence $recurrence)
     {
         $dayOfWeek = $recurrence->getDayOfWeek();
         $startTime = $recurrence->getStartTime();
@@ -165,7 +166,7 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getValidationErrorMessage(Recurrence $recurrence)
+    public function getValidationErrorMessage(Entity\Recurrence $recurrence)
     {
         if (empty($recurrence->getInstance())) {
             return "Parameter 'instance' value can't be empty for MonthNth recurrence pattern.";
