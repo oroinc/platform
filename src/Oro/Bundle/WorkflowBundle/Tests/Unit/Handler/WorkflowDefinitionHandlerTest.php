@@ -122,7 +122,6 @@ class WorkflowDefinitionHandlerTest extends \PHPUnit_Framework_TestCase
             ->setName('definition3')
             ->setLabel('label3');
 
-
         return [
             'with new definition' => [
                 'definition' => $definition1,
