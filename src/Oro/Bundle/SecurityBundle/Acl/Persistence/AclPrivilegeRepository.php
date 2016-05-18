@@ -104,17 +104,19 @@ class AclPrivilegeRepository
                 $classes[$className] = $class;
             }
 
-            // load ACLs for all object identities
-            $acls = $this->findAcls($sid, $oids);
-
+            $rootOid = null;
             if ($extension->isRootSupported()) {
                 $rootOid = $this->manager->getRootOid($extensionKey);
                 array_unshift($oids, $rootOid);
+            }
 
+            // load ACLs for all object identities
+            $acls = $this->findAcls($sid, $oids);
+
+            $rootAcl = null;
+            if ($extension->isRootSupported()) {
                 // find ACL for the root object identity
                 $rootAcl = $this->findAclByOid($acls, $rootOid);
-            } else {
-                $rootOid = null;
             }
 
             foreach ($oids as $oid) {
