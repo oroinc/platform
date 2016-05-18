@@ -107,7 +107,7 @@ class RestCalendarEventTest extends WebTestCase
                 'allDay'          => true,
                 'backgroundColor' => '#FF0000',
                 'invitationStatus' => 'accepted',
-                'origin'           => 'client',
+                'origin'           => 'server',
                 'parentEventId'    => null,
                 'editable'         => true,
                 'removable'        => true,
