@@ -52,11 +52,11 @@ class CalendarEventApiHandler
         ActivityManager $activityManager,
         UsersToAttendeesTransformer $usersToAttendeesTransformer
     ) {
-        $this->form               = $form;
-        $this->request            = $request;
-        $this->manager            = $manager;
-        $this->emailSendProcessor = $emailSendProcessor;
-        $this->activityManager    = $activityManager;
+        $this->form                        = $form;
+        $this->request                     = $request;
+        $this->manager                     = $manager;
+        $this->emailSendProcessor          = $emailSendProcessor;
+        $this->activityManager             = $activityManager;
         $this->usersToAttendeesTransformer = $usersToAttendeesTransformer;
     }
 

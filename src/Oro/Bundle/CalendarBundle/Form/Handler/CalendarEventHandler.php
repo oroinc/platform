@@ -93,7 +93,7 @@ class CalendarEventHandler
      *
      * @return bool True on successful processing, false otherwise
      *
-     * @throw AccessDeniedException
+     * @throws AccessDeniedException
      * @throws \LogicException
      */
     public function process(CalendarEvent $entity)

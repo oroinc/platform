@@ -2,7 +2,18 @@
 
 namespace Oro\Bundle\CalendarBundle\Model;
 
-class ExtendSystemCalendar
+use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\EntityExtendBundle\Entity\AbstractEnumValue;
+
+/**
+ * @method AbstractEnumValue getType
+ * @method Attendee setType(AbstractEnumValue $value)
+ * @method AbstractEnumValue getStatus
+ * @method Attendee setStatus(AbstractEnumValue $value)
+ * @method AbstractEnumValue getOrigin
+ * @method Attendee setOrigin(AbstractEnumValue $value)
+ */
+class ExtendAttendee
 {
     /**
      * Constructor

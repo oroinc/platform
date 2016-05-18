@@ -72,13 +72,13 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
 {
     use DatesAwareTrait;
 
-    /** @derpecated use constant with STATUS_ prefix */
+    /** @deprecated use constant with STATUS_ prefix */
     const NOT_RESPONDED        = self::STATUS_NOT_RESPONDED;
-    /** @derpecated use constant with STATUS_ prefix */
+    /** @deprecated use constant with STATUS_ prefix */
     const TENTATIVELY_ACCEPTED = self::STATUS_TENTATIVELY_ACCEPTED;
-    /** @derpecated use constant with STATUS_ prefix */
+    /** @deprecated use constant with STATUS_ prefix */
     const ACCEPTED             = self::STATUS_ACCEPTED;
-    /** @derpecated use constant with STATUS_ prefix */
+    /** @deprecated use constant with STATUS_ prefix */
     const DECLINED             = self::STATUS_DECLINED;
 
     const STATUS_NOT_RESPONDED        = 'none';
@@ -86,7 +86,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     const STATUS_ACCEPTED             = 'accepted';
     const STATUS_DECLINED             = 'declined';
 
-    const WITHOUT_STATUS       = null;
+    const WITHOUT_STATUS = null;
     
     const ORIGIN_ENUM_CODE     = 'oro_cal_event_origin';
     const ORIGIN_CLIENT        = 'client';
@@ -675,11 +675,15 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      */
     public function getInvitationStatus()
     {
-        if (!$this->relatedAttendee || !($status = $this->relatedAttendee->getStatus())) {
+        if (!$this->relatedAttendee) {
             return null;
         }
 
-        return $status->getId();
+        $status = $this->relatedAttendee->getStatus();
+
+        return $status
+            ? $status->getId()
+            : null;
     }
 
     /**
@@ -687,7 +691,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      */
     public function getRealCalendarEvent()
     {
-        return $this->getParent() ? : $this;
+        return $this->getParent() ?: $this;
     }
 
 
@@ -733,6 +737,7 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     public function addAttendee(Attendee $attendee)
     {
         $attendees = $this->getRealCalendarEvent()->attendees;
+        
         if (!$attendees->contains($attendee)) {
             $attendee->setCalendarEvent($this);
             $attendees->add($attendee);

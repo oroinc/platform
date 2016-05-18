@@ -37,7 +37,7 @@ class ActionPermissionProvider
         $isEditable = (!$invitationStatus || ($invitationStatus && !$parentId))
             && $origin !== CalendarEvent::ORIGIN_EXTERNAL;
 
-        return array(
+        return [
             'accept'      => $this->isAvailableResponseButton(
                 $user,
                 $parentId,
@@ -64,7 +64,7 @@ class ActionPermissionProvider
             ),
             'view'        => true,
             'update'      => $isEditable
-        );
+        ];
     }
 
     /**

@@ -6,7 +6,6 @@ use Symfony\Component\HttpFoundation\Request;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
-use Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer;
 use Oro\Bundle\CalendarBundle\Form\Handler\CalendarEventApiHandler;
 use Oro\Bundle\CalendarBundle\Tests\Unit\ReflectionUtil;
 
@@ -30,7 +29,7 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
     /** @var ActivityManager */
     protected $activityManager;
 
-    /** @var UsersToAttendeesTransformer */
+    /** @var \PHPUnit_Framework_MockObject_MockObject */
     protected $usersToAttendeesTransformer;
 
     protected function setUp()
@@ -46,6 +45,11 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
         $this->activityManager = $this->getMockBuilder('Oro\Bundle\ActivityBundle\Manager\ActivityManager')
+            ->disableOriginalConstructor()
+            ->getMock();
+
+        $this->usersToAttendeesTransformer = $this
+            ->getMockBuilder('Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer')
             ->disableOriginalConstructor()
             ->getMock();
 
@@ -70,11 +74,6 @@ class CalendarEventApiHandlerTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($this->form));
         $this->form->expects($this->once())
             ->method('getData');
-
-        $this->usersToAttendeesTransformer = $this
-            ->getMockBuilder('Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer')
-            ->disableOriginalConstructor()
-            ->getMock();
     }
 
     public function testProcessPOST()

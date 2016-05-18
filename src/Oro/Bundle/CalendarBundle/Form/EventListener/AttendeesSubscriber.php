@@ -31,7 +31,7 @@ class AttendeesSubscriber implements EventSubscriberInterface
     public static function getSubscribedEvents()
     {
         return [
-            FormEvents::PRE_SUBMIT => ['fixSubmittedData', 100],
+            FormEvents::PRE_SUBMIT  => ['fixSubmittedData', 100],
             FormEvents::POST_SUBMIT => ['postSubmit', -100],
         ];
     }
@@ -41,8 +41,9 @@ class AttendeesSubscriber implements EventSubscriberInterface
      */
     public function fixSubmittedData(FormEvent $event)
     {
-        $data = $event->getData();
+        $data      = $event->getData();
         $attendees = $event->getForm()->getData();
+
         if (!$attendees || !$data) {
             return;
         }
@@ -54,8 +55,10 @@ class AttendeesSubscriber implements EventSubscriberInterface
 
         $nextNewKey = count($attendeeKeysByEmail);
         $fixedData = [];
+
+        /** @var array $attendee */
         foreach ($data as $attendee) {
-            if (!isset($attendee['email']) || !$attendee['email']) {
+            if (empty($attendee['email'])) {
                 return;
             }
 
@@ -75,6 +78,7 @@ class AttendeesSubscriber implements EventSubscriberInterface
     public function postSubmit(FormEvent $event)
     {
         $attendees = $event->getData();
+
         if (!$attendees) {
             return;
         }
@@ -92,7 +96,7 @@ class AttendeesSubscriber implements EventSubscriberInterface
     }
 
     /**
-     * @param User[] $users
+     * @param User[]   $users
      * @param string[] $unboundAttendeesByEmail
      */
     protected function bindUsersToAttendees(array $users, array $unboundAttendeesByEmail)
@@ -105,6 +109,7 @@ class AttendeesSubscriber implements EventSubscriberInterface
 
             foreach ($user->getEmails() as $emailEntity) {
                 $email = $emailEntity->getEmail();
+                
                 if (isset($unboundAttendeesByEmail[$email])) {
                     $unboundAttendeesByEmail[$email]->setUser($user);
                     unset($unboundAttendeesByEmail[$email]);
