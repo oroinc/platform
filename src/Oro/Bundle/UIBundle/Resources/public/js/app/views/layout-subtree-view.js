@@ -2,7 +2,7 @@ define(function(require) {
     'use strict';
 
     var LayoutSubtreeView;
-    var BaseView = require('./base/view');
+    var BaseView = require('oroui/js/app/views/base/view');
     var mediator = require('oroui/js/mediator');
     var Error = require('oroui/js/error');
     var LoadingMaskView = require('oroui/js/app/views/loading-mask-view');
@@ -19,9 +19,7 @@ define(function(require) {
         },
 
         initialize: function(options) {
-            this.options = $.extend(true, {}, this.options, _.pick(options, [
-                'url', 'rootId', 'method', 'reloadEvents'
-            ]));
+            this.options = $.extend(true, {}, this.options, options);
             LayoutSubtreeView.__super__.initialize.apply(this, arguments);
         },
 
@@ -54,7 +52,7 @@ define(function(require) {
                     layout_root_id: this.options.rootId
                 },
                 type: this.options.method
-            }
+            };
         },
 
         _onContentLoadFail: function(jqxhr) {

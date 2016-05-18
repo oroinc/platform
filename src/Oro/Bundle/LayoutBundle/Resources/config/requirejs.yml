@@ -1,3 +1,0 @@
-config:
-    paths:
-        'oro/layout-widget': 'bundles/orolayout/js/widget/layout-widget.js'
