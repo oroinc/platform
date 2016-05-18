@@ -7,19 +7,20 @@ use Oro\Component\Messaging\Transport\Amqp\AmqpQueue;
 use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
 use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
 use Oro\Component\Messaging\ZeroConfig\Amqp\AmqpFrontProducer;
+use Oro\Component\Messaging\ZeroConfig\Config;
 
 class AmqpFrontProducerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new AmqpFrontProducer($this->createAmqpSessionMock(), '', '');
+        new AmqpFrontProducer($this->createAmqpSessionMock(), new Config('', '', '', '', ''));
     }
 
     public function testThrowExceptionIfMessageNameParameterIsNotSet()
     {
         $this->setExpectedException(\LogicException::class, 'Got message without "messageName" parameter');
 
-        $producer = new AmqpFrontProducer($this->createAmqpSessionMock(), '', '');
+        $producer = new AmqpFrontProducer($this->createAmqpSessionMock(), new Config('', '', '', '', ''));
         $producer->send(new AmqpMessage());
     }
 
@@ -76,7 +77,7 @@ class AmqpFrontProducerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($topic), $this->identicalTo($queue))
         ;
 
-        $producer = new AmqpFrontProducer($session, 'topic', 'queue');
+        $producer = new AmqpFrontProducer($session, new Config('', 'topic', 'queue', '', ''));
         $producer->send($message);
     }
 
@@ -149,7 +150,7 @@ class AmqpFrontProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
 
-        $producer = new AmqpFrontProducer($session, 'topic', 'queue');
+        $producer = new AmqpFrontProducer($session, new Config('', 'topic', 'queue', '', ''));
         $producer->send($message);
     }
 

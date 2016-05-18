@@ -29,6 +29,7 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $route = new Route();
         $route->setMessageName('message-name');
         $route->setProcessorName('processor-name');
+        $route->setQueueName('queue-name');
 
         $message = new AmqpMessage();
         $message->setBody('body');
@@ -70,61 +71,7 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $expectedQueueMessageProperties = [
             'messageName' => 'message-name',
             'processorName' => 'processor-name',
-            'queueName' => 'default-queue-name',
-        ];
-
-        $this->assertEquals($expectedQueueMessageProperties, $queueMessage->getProperties());
-        $this->assertEquals('body', $queueMessage->getBody());
-    }
-
-    public function testShouldUseQueueNameFromRouteIfSetInsteadOfDefault()
-    {
-        $route = new Route();
-        $route->setMessageName('message-name');
-        $route->setProcessorName('processor-name');
-        $route->setQueueName('non-default-queue-name');
-
-        $message = new AmqpMessage();
-        $message->setBody('body');
-        $message->setProperties([
-            'messageName' => 'message-name',
-        ]);
-
-        $queueMessage = new AmqpMessage();
-
-        $routeRegistry = $this->createRouterRegistryMock();
-        $routeRegistry
-            ->expects($this->once())
-            ->method('getRoutes')
-            ->will($this->returnValue([$route]))
-        ;
-
-        $queueProducer = $this->createQueueProducerMock();
-        $queueProducer
-            ->expects($this->once())
-            ->method('send')
-            ->with($this->identicalTo($queueMessage))
-        ;
-
-        $session = $this->createSessionMock();
-        $session
-            ->expects($this->once())
-            ->method('createQueueProducer')
-            ->will($this->returnValue($queueProducer))
-        ;
-        $session
-            ->expects($this->once())
-            ->method('createMessage')
-            ->will($this->returnValue($queueMessage))
-        ;
-
-        $processor = new RouterMessageProcessor($session, $routeRegistry, 'default-queue-name');
-        $processor->process($message, $this->createTransportSessionMock());
-
-        $expectedQueueMessageProperties = [
-            'messageName' => 'message-name',
-            'processorName' => 'processor-name',
-            'queueName' => 'non-default-queue-name',
+            'queueName' => 'queue-name',
         ];
 
         $this->assertEquals($expectedQueueMessageProperties, $queueMessage->getProperties());

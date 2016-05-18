@@ -7,33 +7,21 @@ use Oro\Component\Messaging\Transport\Amqp\AmqpQueue;
 use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
 use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
 use Oro\Component\Messaging\ZeroConfig\Amqp\AmqpQueueProducer;
+use Oro\Component\Messaging\ZeroConfig\Config;
 
 class AmqpQueueProducerTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new AmqpQueueProducer($this->createAmqpSessionMock(), '');
+        new AmqpQueueProducer($this->createAmqpSessionMock(), new Config('', '', '', '', ''));
     }
 
     public function testThrowExceptionIfProcessorNameParameterIsNotSet()
     {
         $this->setExpectedException(\LogicException::class, 'Got message without "processorName" parameter');
 
-        $producer = new AmqpQueueProducer($this->createAmqpSessionMock(), '');
+        $producer = new AmqpQueueProducer($this->createAmqpSessionMock(), new Config('', '', '', '', ''));
         $producer->send(new AmqpMessage());
-    }
-
-    public function testThrowExceptionIfQueueNameParameterIsNotSet()
-    {
-        $this->setExpectedException(\LogicException::class, 'Got message without "queueName" parameter');
-
-        $message = new AmqpMessage();
-        $message->setProperties([
-            'processorName' => 'processor-name',
-        ]);
-
-        $producer = new AmqpQueueProducer($this->createAmqpSessionMock(), '');
-        $producer->send($message);
     }
 
     public function testShouldSendMessageAndCreateSchema()
@@ -90,7 +78,7 @@ class AmqpQueueProducerTest extends \PHPUnit_Framework_TestCase
             ->with($this->identicalTo($topic), $this->identicalTo($queue))
         ;
 
-        $producer = new AmqpQueueProducer($session, 'topic');
+        $producer = new AmqpQueueProducer($session, new Config('', '', '', 'topic', ''));
         $producer->send($message);
     }
 
@@ -164,7 +152,74 @@ class AmqpQueueProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
 
-        $producer = new AmqpQueueProducer($session, 'topic', 'queue');
+        $producer = new AmqpQueueProducer($session, new Config('', '', '', 'topic', 'queue'));
+        $producer->send($message);
+    }
+
+    public function testShouldUseDefaultQueueNameIfNotSetInMessage()
+    {
+        $topic = new AmqpTopic('topic');
+        $queue = new AmqpQueue('queue');
+
+        $message = new AmqpMessage();
+        $message->setProperties([
+            'processorName' => 'processor-name',
+        ]);
+
+        $session = $this->createAmqpSessionMock();
+        $session
+            ->expects($this->once())
+            ->method('createTopic')
+            ->will($this->returnValue($topic))
+        ;
+        $session
+            ->expects($this->once())
+            ->method('createQueue')
+            ->with('default-queue-name')
+            ->will($this->returnValue($queue))
+        ;
+        $session
+            ->expects($this->once())
+            ->method('createProducer')
+            ->with($this->identicalTo($topic))
+            ->will($this->returnValue($this->createAmqpMessageProducer()))
+        ;
+
+        $producer = new AmqpQueueProducer($session, new Config('', '', '', 'topic', 'default-queue-name'));
+        $producer->send($message);
+    }
+
+    public function testShouldUseQueueNameFromMessageIfSet()
+    {
+        $topic = new AmqpTopic('topic');
+        $queue = new AmqpQueue('queue');
+
+        $message = new AmqpMessage();
+        $message->setProperties([
+            'processorName' => 'processor-name',
+            'queueName' => 'message-queue-name',
+        ]);
+
+        $session = $this->createAmqpSessionMock();
+        $session
+            ->expects($this->once())
+            ->method('createTopic')
+            ->will($this->returnValue($topic))
+        ;
+        $session
+            ->expects($this->once())
+            ->method('createQueue')
+            ->with('message-queue-name')
+            ->will($this->returnValue($queue))
+        ;
+        $session
+            ->expects($this->once())
+            ->method('createProducer')
+            ->with($this->identicalTo($topic))
+            ->will($this->returnValue($this->createAmqpMessageProducer()))
+        ;
+
+        $producer = new AmqpQueueProducer($session, new Config('', '', '', 'topic', 'default-queue-name'));
         $producer->send($message);
     }
 
