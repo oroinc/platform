@@ -169,6 +169,7 @@ class EntityListenerTest extends \PHPUnit_Framework_TestCase
         $calendarMetadata = new ClassMetadata(get_class($newCalendar));
 
         $calendarRepo = $this->getMockBuilder('\Doctrine\ORM\EntityRepository')
+            ->setMethods(['findDefaultCalendar'])
             ->disableOriginalConstructor()
             ->getMock();
         $calendarRepo->expects($this->any())
