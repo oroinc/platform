@@ -40,6 +40,19 @@ class AmqpConnectionTest extends \PHPUnit_Framework_TestCase
         $this->assertInstanceOf(AmqpSession::class, $session);
     }
 
+    public function testShouldCallLibConnectionCloseMethodOnClose()
+    {
+        $libConnection = $this->createAMQPLibConnection();
+        $libConnection
+            ->expects($this->once())
+            ->method('close')
+        ;
+
+        $connection = new AmqpConnection($libConnection);
+
+        $connection->close();
+    }
+
     /**
      * @return \PHPUnit_Framework_MockObject_MockObject|AbstractConnection
      */

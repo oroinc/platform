@@ -38,6 +38,14 @@ class AmqpConnection implements Connection
     }
 
     /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $this->connection->close();
+    }
+
+    /**
      * @param array $config
      *
      * @return static

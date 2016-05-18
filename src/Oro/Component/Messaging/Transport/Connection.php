@@ -7,4 +7,6 @@ interface Connection
      * @return Session
      */
     public function createSession();
+
+    public function close();
 }

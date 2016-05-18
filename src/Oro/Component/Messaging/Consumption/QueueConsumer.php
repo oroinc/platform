@@ -1,15 +1,15 @@
 <?php
 namespace Oro\Component\Messaging\Consumption;
 
-use Oro\Component\Messaging\Transport\Session;
+use Oro\Component\Messaging\Transport\Connection;
 use Psr\Log\NullLogger;
 
 class QueueConsumer
 {
     /**
-     * @var Session
+     * @var Connection
      */
-    private $session;
+    private $connection;
 
     /**
      * @var Extensions
@@ -17,13 +17,21 @@ class QueueConsumer
     private $extensions;
 
     /**
-     * @param Session $session
+     * @param Connection $connection
      * @param Extensions $extensions
      */
-    public function __construct(Session $session, Extensions $extensions)
+    public function __construct(Connection $connection, Extensions $extensions)
     {
-        $this->session = $session;
+        $this->connection = $connection;
         $this->extensions = $extensions;
+    }
+
+    /**
+     * @return Connection
+     */
+    public function getConnection()
+    {
+        return $this->connection;
     }
 
     /**
@@ -35,8 +43,9 @@ class QueueConsumer
      */
     public function consume($queueName, MessageProcessor $messageProcessor, Extensions $extensions = null)
     {
-        $queue = $this->session->createQueue($queueName);
-        $messageConsumer = $this->session->createConsumer($queue);
+        $session = $this->connection->createSession();
+        $queue = $session->createQueue($queueName);
+        $messageConsumer = $session->createConsumer($queue);
 
         if ($extensions) {
             $extensions = new Extensions([$this->extensions, $extensions]);
@@ -44,21 +53,22 @@ class QueueConsumer
             $extensions = $this->extensions;
         }
 
-        $startContext = new Context($this->session, $messageConsumer, $messageProcessor, new NullLogger());
-        $extensions->onStart($startContext);
+        $context = new Context($session, $messageConsumer, $messageProcessor, new NullLogger());
+        $extensions->onStart($context);
+        $logger = $context->getLogger();
 
         while (true) {
-            $context = new Context($this->session, $messageConsumer, $messageProcessor, $startContext->getLogger());
+            $context = new Context($session, $messageConsumer, $messageProcessor, $logger);
+
             try {
                 $extensions->onBeforeReceive($context);
-                
 
                 if ($message = $messageConsumer->receive($timeout = 1)) {
                     $context->setMessage($message);
 
                     $extensions->onPreReceived($context);
                     if (false == $context->getStatus()) {
-                        $status = $messageProcessor->process($message, $this->session);
+                        $status = $messageProcessor->process($message, $session);
                         $status = $status ?: MessageProcessor::ACK;
                         $context->setStatus($status);
                     }
@@ -70,10 +80,7 @@ class QueueConsumer
                     } elseif (MessageProcessor::REQUEUE === $context->getStatus()) {
                         $messageConsumer->reject($message, true);
                     } else {
-                        throw new \LogicException(sprintf(
-                            'Processor returned not supported status: %s',
-                            $context->getStatus()
-                        ));
+                        throw new \LogicException(sprintf('Status is not supported: %s', $context->getStatus()));
                     }
 
                     $extensions->onPostReceived($context);
@@ -83,6 +90,7 @@ class QueueConsumer
 
                 if ($context->isExecutionInterrupted()) {
                     $extensions->onInterrupted($context);
+                    $session->close();
 
                     return;
                 }
@@ -90,7 +98,9 @@ class QueueConsumer
                 $context->setExecutionInterrupted(true);
                 $context->setException($e);
                 $extensions->onInterrupted($context);
-                
+
+                $session->close();
+
                 throw $e;
             }
         }

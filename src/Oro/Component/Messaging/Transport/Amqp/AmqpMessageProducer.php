@@ -33,10 +33,7 @@ class AmqpMessageProducer implements MessageProducer
      */
     public function send(Destination $destination, Message $message)
     {
-        InvalidDestinationException::assertDestinationInstanceOf(
-            $destination,
-            'Oro\Component\Messaging\Transport\Amqp\AmqpTopic'
-        );
+        InvalidDestinationException::assertDestinationInstanceOf($destination, AmqpTopic::class);
         
         $amqpMessage = new AMQPLibMessage($message->getBody(), $message->getHeaders());
         $amqpMessage->set('application_headers', new AMQPTable($message->getProperties()));

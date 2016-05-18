@@ -14,4 +14,11 @@ class NullConnection implements Connection
     {
         return new NullSession();
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+    }
 }

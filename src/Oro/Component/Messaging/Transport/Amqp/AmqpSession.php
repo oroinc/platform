@@ -75,10 +75,7 @@ class AmqpSession implements Session
      */
     public function createConsumer(Destination $destination)
     {
-        InvalidDestinationException::assertDestinationInstanceOf(
-            $destination,
-            'Oro\Component\Messaging\Transport\Amqp\AmqpQueue'
-        );
+        InvalidDestinationException::assertDestinationInstanceOf($destination, AmqpQueue::class);
         
         return new AmqpMessageConsumer($this, $destination);
     }
@@ -100,10 +97,7 @@ class AmqpSession implements Session
      */
     public function declareTopic(Destination $destination)
     {
-        InvalidDestinationException::assertDestinationInstanceOf(
-            $destination,
-            'Oro\Component\Messaging\Transport\Amqp\AmqpTopic'
-        );
+        InvalidDestinationException::assertDestinationInstanceOf($destination, AmqpTopic::class);
 
         $this->channel->exchange_declare(
             $destination->getTopicName(),
@@ -124,10 +118,7 @@ class AmqpSession implements Session
      */
     public function declareQueue(Destination $destination)
     {
-        InvalidDestinationException::assertDestinationInstanceOf(
-            $destination,
-            'Oro\Component\Messaging\Transport\Amqp\AmqpQueue'
-        );
+        InvalidDestinationException::assertDestinationInstanceOf($destination, AmqpQueue::class);
 
         $this->channel->queue_declare(
             $destination->getQueueName(),
@@ -148,16 +139,17 @@ class AmqpSession implements Session
      */
     public function declareBind(Destination $source, Destination $target)
     {
-        InvalidDestinationException::assertDestinationInstanceOf(
-            $source,
-            'Oro\Component\Messaging\Transport\Amqp\AmqpTopic'
-        );
-        InvalidDestinationException::assertDestinationInstanceOf(
-            $target,
-            'Oro\Component\Messaging\Transport\Amqp\AmqpQueue'
-        );
-
-        // TODO handle return value;
+        InvalidDestinationException::assertDestinationInstanceOf($source, AmqpTopic::class);
+        InvalidDestinationException::assertDestinationInstanceOf($target, AmqpQueue::class);
+        
         $this->channel->queue_bind($target->getQueueName(), $source->getTopicName());
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+        $this->channel->close();
     }
 }

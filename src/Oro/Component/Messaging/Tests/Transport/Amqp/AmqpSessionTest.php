@@ -57,7 +57,7 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
 
         $queue = $session->createQueue('aName');
         
-        $this->assertInstanceOf('Oro\Component\Messaging\Transport\Amqp\AmqpQueue', $queue);
+        $this->assertInstanceOf(AmqpQueue::class, $queue);
     }
 
     public function testShouldAllowCreateTopic()
@@ -251,6 +251,19 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
         $invalidDestination = $this->createDestination();
 
         $session->declareBind(new AmqpTopic('aName'), $invalidDestination);
+    }
+    
+    public function testShouldCallChannelCloseMethodOnClose()
+    {
+        $channelMock = $this->createAmqpChannel();
+        $channelMock
+            ->expects($this->once())
+            ->method('close')
+        ;
+        
+        $session = new AmqpSession($channelMock);
+        
+        $session->close();
     }
 
     /**

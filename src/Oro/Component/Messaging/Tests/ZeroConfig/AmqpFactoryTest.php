@@ -73,7 +73,7 @@ class AmqpFactoryTest extends \PHPUnit_Framework_TestCase
 
         $queue = $factory->createRouterQueue();
 
-        $this->assertInstanceOf('Oro\Component\Messaging\Transport\Amqp\AmqpQueue', $queue);
+        $this->assertInstanceOf(AmqpQueue::class, $queue);
     }
 
     public function testCreateRouterQueueShouldCreateQueueWithExpectedProperites()

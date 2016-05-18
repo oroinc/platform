@@ -79,4 +79,11 @@ class NullSession implements Session
     public function declareBind(Destination $source, Destination $target)
     {
     }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function close()
+    {
+    }
 }

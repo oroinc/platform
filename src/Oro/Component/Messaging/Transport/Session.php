@@ -53,4 +53,6 @@ interface Session
      * @param Destination $target
      */
     public function declareBind(Destination $source, Destination $target);
+    
+    public function close();
 }

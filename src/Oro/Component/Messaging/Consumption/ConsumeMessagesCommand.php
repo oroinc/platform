@@ -25,7 +25,7 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
      */
     public function __construct(QueueConsumer $consumer)
     {
-        parent::__construct(null);
+        parent::__construct($name = 'oro:messaging:consume');
         
         $this->consumer = $consumer;
     }
@@ -36,7 +36,6 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
     protected function configure()
     {
         $this
-            ->setName('oro:messaging:consume')
             ->setDescription('A worker that consumes message from a broker')
             ->addArgument('queue', InputArgument::REQUIRED, 'Queues to consume from')
             ->addArgument('processor-service', InputArgument::REQUIRED, 'A message processor service')
@@ -50,6 +49,8 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
     {
         $loggerExtension = new LoggerExtension(new ConsoleLogger($output));
 
+        $queueName = $input->getArgument('queue');
+
         /** @var MessageProcessor $messageProcessor */
         $messageProcessor = $this->container->get($input->getArgument('processor-service'));
         if (false == $messageProcessor instanceof  MessageProcessor) {
@@ -60,6 +61,15 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
             ));
         }
 
-        $this->consumer->consume($input->getArgument('queue'), $messageProcessor, new Extensions([$loggerExtension]));
+        $runtimeExtensions = new Extensions([$loggerExtension]);
+
+        try {
+            $this->consumer->consume($queueName, $messageProcessor, $runtimeExtensions);
+        } finally {
+            $this->consumer->getConnection()->close();
+        }
+
+        $output->writeln('sleeping');
+        sleep(100);
     }
 }
