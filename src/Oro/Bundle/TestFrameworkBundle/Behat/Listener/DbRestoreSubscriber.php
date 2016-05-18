@@ -3,7 +3,6 @@
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
-use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\FeatureTested;
 use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
@@ -33,15 +32,9 @@ class DbRestoreSubscriber implements EventSubscriberInterface
         ];
     }
 
-    public function dbDump(BeforeFeatureTested $event)
-    {
-        if (!in_array(self::ANNOTATION, $event->getFeature()->getTags())) {
-            return;
-        }
-
-        $this->dbDumper->dumpDb();
-    }
-
+    /**
+     * @param AfterFeatureTested $event
+     */
     public function dbRestore(AfterFeatureTested $event)
     {
         if (!in_array(self::ANNOTATION, $event->getFeature()->getTags())) {
