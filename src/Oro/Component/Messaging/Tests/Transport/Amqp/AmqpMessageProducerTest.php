@@ -3,6 +3,7 @@ namespace Oro\Component\Messaging\Tests\Transport\Amqp;
 
 use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
 use Oro\Component\Messaging\Transport\Amqp\AmqpMessageProducer;
+use Oro\Component\Messaging\Transport\Amqp\AmqpQueue;
 use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
 use Oro\Component\Messaging\Transport\Destination;
 use Oro\Component\Testing\ClassExtensionTrait;
@@ -39,7 +40,7 @@ class AmqpMessageProducerTest extends \PHPUnit_Framework_TestCase
         $producer->send($invalidDestination, new AmqpMessage());
     }
 
-    public function testShouldCallBasicPublishOnChannel()
+    public function testShouldSendMessageToTopic()
     {
         $channel = $this->createAmqpChannel();
         $channel
@@ -53,6 +54,43 @@ class AmqpMessageProducerTest extends \PHPUnit_Framework_TestCase
         $topic = new AmqpTopic('theTopicName');
 
         $producer->send($topic, new AmqpMessage());
+    }
+
+    public function testShouldCorrectlyPassOptionsToBasicPublishMethodWhileSendingMessageToTopic()
+    {
+        $topic = new AmqpTopic('aTopicName');
+        $topic->setRoutingKey('theTopicRoutingKey');
+        $topic->setImmediate('theImmediateBool');
+        $topic->setMandatory('theMandatoryBool');
+
+        $message = new AmqpMessage();
+
+        $channel = $this->createAmqpChannel();
+        $channel
+            ->expects($this->once())
+            ->method('basic_publish')
+            ->with($this->anything(), $this->anything(), 'theTopicRoutingKey', 'theMandatoryBool', 'theImmediateBool')
+        ;
+
+        $producer = new AmqpMessageProducer($channel);
+
+        $producer->send($topic, $message);
+    }
+
+    public function testShouldSendMessageToQueue()
+    {
+        $channel = $this->createAmqpChannel();
+        $channel
+            ->expects($this->once())
+            ->method('basic_publish')
+            ->with($this->isInstanceOf('PhpAmqpLib\Message\AMQPMessage'), '', 'theQueueName')
+        ;
+
+        $producer = new AmqpMessageProducer($channel);
+
+        $queue = new AmqpQueue('theQueueName');
+
+        $producer->send($queue, new AmqpMessage());
     }
 
     public function testShouldCorrectlyConvertMessageBodyToLibMessageBody()
@@ -123,27 +161,6 @@ class AmqpMessageProducerTest extends \PHPUnit_Framework_TestCase
         $producer = new AmqpMessageProducer($channel);
 
         $topic = new AmqpTopic('aTopicName');
-
-        $producer->send($topic, $message);
-    }
-
-    public function testShouldCorrectlyPassTopicOptionsToBasicPublishMethod()
-    {
-        $topic = new AmqpTopic('aTopicName');
-        $topic->setRoutingKey('theTopicRoutingKey');
-        $topic->setImmediate('theImmediateBool');
-        $topic->setMandatory('theMandatoryBool');
-
-        $message = new AmqpMessage();
-
-        $channel = $this->createAmqpChannel();
-        $channel
-            ->expects($this->once())
-            ->method('basic_publish')
-            ->with($this->anything(), $this->anything(), 'theTopicRoutingKey', 'theMandatoryBool', 'theImmediateBool')
-        ;
-
-        $producer = new AmqpMessageProducer($channel);
 
         $producer->send($topic, $message);
     }

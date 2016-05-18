@@ -121,7 +121,7 @@ class AmqpMessageConsumer implements MessageConsumer
                 $internalMessage->get('application_headers')->getNativeData() :
                 [];
 
-            $headers = (new AMQPArray($internalMessage->get_properties()))->getNativeData();
+            $headers = (new AMQPTable($internalMessage->get_properties()))->getNativeData();
             unset($headers['application_headers']);
             
             $message = $this->session->createMessage($internalMessage->body, $properties, $headers);

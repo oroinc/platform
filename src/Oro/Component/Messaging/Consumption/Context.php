@@ -16,7 +16,7 @@ class Context
     private $session;
 
     /**
-     * @var MessageProcessor
+     * @var MessageConsumer
      */
     private $messageConsumer;
 
@@ -99,7 +99,7 @@ class Context
     }
 
     /**
-     * @return MessageProcessor
+     * @return MessageConsumer
      */
     public function getMessageConsumer()
     {

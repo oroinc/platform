@@ -41,8 +41,13 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $logger = $this->createLogger();
         $logger
-            ->expects($this->once())
+            ->expects($this->at(0))
             ->method('debug')
+            ->with($this->stringStartsWith('Set context\'s logger'))
+        ;
+        $logger
+            ->expects($this->at(1))
+            ->method('info')
             ->with('Start consuming')
         ;
 
@@ -58,7 +63,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $logger = $this->createLogger();
         $logger
             ->expects($this->once())
-            ->method('debug')
+            ->method('info')
             ->with('Before receive')
         ;
 
@@ -74,7 +79,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $logger = $this->createLogger();
         $logger
             ->expects($this->once())
-            ->method('debug')
+            ->method('info')
             ->with('Message received')
         ;
 
@@ -90,7 +95,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $logger = $this->createLogger();
         $logger
             ->expects($this->once())
-            ->method('debug')
+            ->method('info')
             ->with('Message processed: ')
         ;
 
@@ -106,7 +111,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $logger = $this->createLogger();
         $logger
             ->expects($this->once())
-            ->method('debug')
+            ->method('info')
             ->with('Idle')
         ;
 
@@ -122,7 +127,7 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
         $logger = $this->createLogger();
         $logger
             ->expects($this->once())
-            ->method('debug')
+            ->method('info')
             ->with('Consuming interrupted')
         ;
 

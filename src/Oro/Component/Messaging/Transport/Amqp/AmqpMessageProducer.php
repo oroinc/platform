@@ -26,24 +26,27 @@ class AmqpMessageProducer implements MessageProducer
 
     /**
      * {@inheritdoc}
-     *
-     * @param AmqpTopic $destination
-     *
-     * @return void
      */
     public function send(Destination $destination, Message $message)
     {
-        InvalidDestinationException::assertDestinationInstanceOf($destination, AmqpTopic::class);
-        
         $amqpMessage = new AMQPLibMessage($message->getBody(), $message->getHeaders());
         $amqpMessage->set('application_headers', new AMQPTable($message->getProperties()));
-
-        $this->channel->basic_publish(
-            $amqpMessage,
-            $destination->getTopicName(),
-            $destination->getRoutingKey(),
-            $destination->isMandatory(),
-            $destination->isImmediate()
-        );
+        
+        if ($destination instanceof  AmqpTopic) {
+            $this->channel->basic_publish(
+                $amqpMessage,
+                $destination->getTopicName(),
+                $destination->getRoutingKey(),
+                $destination->isMandatory(),
+                $destination->isImmediate()
+            );
+        } elseif ($destination instanceof AmqpQueue) {
+            $this->channel->basic_publish($amqpMessage, '', $destination->getQueueName());
+        } else {
+            InvalidDestinationException::assertDestinationInstanceOf(
+                $destination,
+                AmqpTopic::class.' or '.AmqpQueue::class
+            );
+        }
     }
 }

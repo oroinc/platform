@@ -31,7 +31,7 @@ class SignalExtension implements Extension
         if (false == extension_loaded('pcntl')) {
             throw new LogicException('The pcntl extension is required in order to catch signals.');
         }
-        
+
         pcntl_signal(SIGTERM, [$this, 'handleSignal']);
         pcntl_signal(SIGQUIT, [$this, 'handleSignal']);
         pcntl_signal(SIGINT, [$this, 'handleSignal']);
@@ -45,6 +45,8 @@ class SignalExtension implements Extension
     public function onBeforeReceive(Context $context)
     {
         $this->logger = $context->getLogger();
+
+        $this->interruptExecutionIfNeeded($context);
     }
 
     /**
@@ -52,9 +54,7 @@ class SignalExtension implements Extension
      */
     public function onPreReceived(Context $context)
     {
-        if ($this->interruptConsumption) {
-            $context->setExecutionInterrupted($this->interruptConsumption);
-        }
+        $this->interruptExecutionIfNeeded($context);
     }
 
     /**
@@ -62,9 +62,7 @@ class SignalExtension implements Extension
      */
     public function onPostReceived(Context $context)
     {
-        if ($this->interruptConsumption) {
-            $context->setExecutionInterrupted($this->interruptConsumption);
-        }
+        $this->interruptExecutionIfNeeded($context);
     }
 
     /**
@@ -72,8 +70,19 @@ class SignalExtension implements Extension
      */
     public function onIdle(Context $context)
     {
-        if ($this->interruptConsumption) {
+        $this->interruptExecutionIfNeeded($context);
+    }
+
+    /**
+     * @param Context $context
+     */
+    public function interruptExecutionIfNeeded(Context $context)
+    {
+        if (false == $context->isExecutionInterrupted() && $this->interruptConsumption) {
+            $this->logger->debug('[SignalExtension] Interrupt execution');
             $context->setExecutionInterrupted($this->interruptConsumption);
+
+            $this->interruptConsumption = false;
         }
     }
 
@@ -83,7 +92,7 @@ class SignalExtension implements Extension
     public function handleSignal($signal)
     {
         if ($this->logger) {
-            $this->logger->debug(sprintf('Caught signal: %s', $signal));
+            $this->logger->debug(sprintf('[SignalExtension] Caught signal: %s', $signal));
         }
         
         switch ($signal) {

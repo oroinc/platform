@@ -29,7 +29,8 @@ class LoggerExtension implements Extension
     public function onStart(Context $context)
     {
         $context->setLogger($this->logger);
-        $context->getLogger()->debug('Start consuming');
+        $context->getLogger()->debug(sprintf('Set context\'s logger %s', get_class($this->logger)));
+        $context->getLogger()->info('Start consuming');
     }
 
     /**
@@ -37,7 +38,7 @@ class LoggerExtension implements Extension
      */
     public function onBeforeReceive(Context $context)
     {
-        $context->getLogger()->debug('Before receive');
+        $context->getLogger()->info('Before receive');
     }
 
     /**
@@ -45,7 +46,7 @@ class LoggerExtension implements Extension
      */
     public function onPreReceived(Context $context)
     {
-        $context->getLogger()->debug('Message received');
+        $context->getLogger()->info('Message received');
     }
 
     /**
@@ -53,7 +54,7 @@ class LoggerExtension implements Extension
      */
     public function onPostReceived(Context $context)
     {
-        $context->getLogger()->debug(sprintf('Message processed: %s', $context->getStatus()));
+        $context->getLogger()->info(sprintf('Message processed: %s', $context->getStatus()));
     }
 
     /**
@@ -61,7 +62,7 @@ class LoggerExtension implements Extension
      */
     public function onIdle(Context $context)
     {
-        $context->getLogger()->debug(sprintf('Idle'));
+        $context->getLogger()->info(sprintf('Idle'));
     }
 
     /**
@@ -70,9 +71,9 @@ class LoggerExtension implements Extension
     public function onInterrupted(Context $context)
     {
         if ($context->getException()) {
-            $context->getLogger()->debug(sprintf('Consuming interrupted by exception'));
+            $context->getLogger()->info(sprintf('Consuming interrupted by exception'));
         } else {
-            $context->getLogger()->debug(sprintf('Consuming interrupted'));
+            $context->getLogger()->info(sprintf('Consuming interrupted'));
         }
     }
 }

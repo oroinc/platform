@@ -122,6 +122,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $expectedInternalMessage = new AMQPLibMessage();
         $expectedInternalMessage->delivery_info['delivery_tag'] = 'theDeliveryTag';
         $expectedInternalMessage->delivery_info['redelivered'] = 'theRedeliveredBool';
+        $expectedInternalMessage->delivery_info['exchange'] = 'theExchange';
 
         $channelStub = new AMQPChannelStub();
         $channelStub->receivedInternalMessage = $expectedInternalMessage;
@@ -140,6 +141,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $this->assertSame($expectedMessage, $actualMessage);
         $this->assertSame('theDeliveryTag', $actualMessage->getDeliveryTag());
         $this->assertSame('theRedeliveredBool', $actualMessage->isRedelivered());
+        $this->assertSame('theExchange', $actualMessage->getExchange());
     }
 
     public function testShouldCorrectlyExtractInternalMessageBodyAndPassItMessageFactory()
@@ -147,6 +149,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $internalMessage = new AMQPLibMessage('theMessageBody');
         $internalMessage->delivery_info['delivery_tag'] = 'aTag';
         $internalMessage->delivery_info['redelivered'] = 'aRedeliveredBool';
+        $internalMessage->delivery_info['exchange'] = 'aExchange';
 
         $channelStub = new AMQPChannelStub();
         $channelStub->receivedInternalMessage = $internalMessage;
@@ -171,6 +174,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $internalMessage->set('application_headers', new AMQPTable(['theProp' => 'thePropVal']));
         $internalMessage->delivery_info['delivery_tag'] = 'aTag';
         $internalMessage->delivery_info['redelivered'] = 'aRedeliveredBool';
+        $internalMessage->delivery_info['exchange'] = 'aExchange';
 
         $channelStub = new AMQPChannelStub();
         $channelStub->receivedInternalMessage = $internalMessage;
@@ -194,6 +198,7 @@ class AmqpMessageConsumerTest extends \PHPUnit_Framework_TestCase
         $internalMessage = new AMQPLibMessage('theMessageBody', ['timestamp' => 123123123]);
         $internalMessage->delivery_info['delivery_tag'] = 'aTag';
         $internalMessage->delivery_info['redelivered'] = 'aRedeliveredBool';
+        $internalMessage->delivery_info['exchange'] = 'aExchange';
 
         $channelStub = new AMQPChannelStub();
         $channelStub->receivedInternalMessage = $internalMessage;

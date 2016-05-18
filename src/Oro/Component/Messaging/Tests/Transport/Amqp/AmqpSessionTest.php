@@ -7,6 +7,7 @@ use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
 use Oro\Component\Messaging\Transport\Destination;
 use Oro\Component\Testing\ClassExtensionTrait;
 use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Wire\AMQPTable;
 
 class AmqpSessionTest extends \PHPUnit_Framework_TestCase
 {
@@ -137,7 +138,7 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
                 'theExclusiveBool',
                 'theAutoDeleteBool',
                 'theNoWaitBool',
-                ['theKey' => 'theVal']
+                new AMQPTable(['theKey' => 'theVal'])
             )
         ;
 
@@ -193,7 +194,7 @@ class AmqpSessionTest extends \PHPUnit_Framework_TestCase
                 false,
                 false,
                 'theNoWaitBool',
-                ['theKey' => 'theVal']
+                new AMQPTable(['theKey' => 'theVal'])
             )
         ;
 
