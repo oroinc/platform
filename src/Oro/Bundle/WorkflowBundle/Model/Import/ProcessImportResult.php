@@ -6,7 +6,6 @@ use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 
-
 class ProcessImportResult
 {
     /**
@@ -25,7 +24,7 @@ class ProcessImportResult
     private $schedules;
 
     /**
-     * @return array|\Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition[]
+     * @return array|ProcessDefinition[]
      */
     public function getDefinitions()
     {
@@ -33,7 +32,7 @@ class ProcessImportResult
     }
 
     /**
-     * @param array|\Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition[] $definitions
+     * @param array|ProcessDefinition[] $definitions
      * @return $this
      */
     public function setDefinitions(array $definitions)
@@ -44,7 +43,7 @@ class ProcessImportResult
     }
 
     /**
-     * @return array|\Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger[]
+     * @return array|ProcessTrigger[]
      */
     public function getTriggers()
     {
@@ -52,7 +51,7 @@ class ProcessImportResult
     }
 
     /**
-     * @param array|\Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger[] $triggers
+     * @param array|ProcessTrigger[] $triggers
      * @return $this
      */
     public function setTriggers(array $triggers)
@@ -63,7 +62,7 @@ class ProcessImportResult
     }
 
     /**
-     * @return array|\Oro\Bundle\CronBundle\Entity\Schedule[]
+     * @return array|Schedule[]
      */
     public function getSchedules()
     {
@@ -71,7 +70,7 @@ class ProcessImportResult
     }
 
     /**
-     * @param array|\Oro\Bundle\CronBundle\Entity\Schedule[] $schedules
+     * @param array|Schedule[] $schedules
      * @return $this
      */
     public function setSchedules(array $schedules)

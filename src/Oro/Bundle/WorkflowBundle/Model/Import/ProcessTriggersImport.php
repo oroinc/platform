@@ -70,13 +70,13 @@ class ProcessTriggersImport
             $triggersConfiguration,
             $this->namedDefinitionsArray($definitions)
         );
-        
+
         /** @var ProcessTriggerRepository $triggerRepository */
         $triggerRepository = $this->getRepository();
 
         if ($triggers) { #because of flush
             $entityManager = $this->getObjectManager();
-            
+
             foreach ($triggers as $trigger) {
                 $existingTrigger = $triggerRepository->findEqualTrigger($trigger);
                 if ($existingTrigger) {
@@ -90,7 +90,7 @@ class ProcessTriggersImport
 
             $entityManager->flush();
         }
-        
+
         $this->createdSchedules = [];
 
         if (count($importedTriggers) > 0) {
