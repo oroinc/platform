@@ -901,6 +901,21 @@ class ArrayUtilTest extends \PHPUnit_Framework_TestCase
                 ],
                 ['a', 'c' => ['d' => 'd1', 'e' => 'e1']],
                 ['b', 'c' => ['d' => 'd2']]
+            ],
+            [
+                [
+                    'a',
+                    'b',
+                    'c' => ['e1','e2']
+                ],
+                [
+                    'a',
+                    'c' => 'e1',
+                ],
+                [
+                    'b',
+                    'c' => ['e1','e2']
+                ],
             ]
         ];
     }
