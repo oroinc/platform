@@ -5,14 +5,8 @@ namespace Oro\Bundle\TestFrameworkBundle\Behat\Listener;
 use Behat\Behat\EventDispatcher\Event\AfterFeatureTested;
 use Behat\Behat\EventDispatcher\Event\BeforeFeatureTested;
 use Behat\Behat\EventDispatcher\Event\FeatureTested;
-use Behat\Behat\EventDispatcher\Event\ScenarioLikeTested;
-use Behat\Behat\EventDispatcher\Event\ScenarioTested;
-use Behat\Mink\Mink;
 use Oro\Bundle\TestFrameworkBundle\Behat\Dumper\DbDumperInterface;
 use Symfony\Component\EventDispatcher\EventSubscriberInterface;
-use Symfony\Component\HttpKernel\KernelInterface;
-use Symfony\Component\Process\Exception\ProcessFailedException;
-use Symfony\Component\Process\Process;
 
 class DbIsolationSubscriber implements EventSubscriberInterface
 {

@@ -2,7 +2,6 @@
 
 namespace Oro\Bundle\TestFrameworkBundle\Behat\Dumper;
 
-use Symfony\Component\Process\Exception\ProcessFailedException;
 use Symfony\Component\Process\Process;
 
 class MysqlDumper extends AbstractDbDumper
