@@ -7,7 +7,7 @@ use Symfony\Component\Console\Tester\CommandTester;
 use Doctrine\Common\Persistence\ObjectRepository;
 
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition;
 
 /**
  * @dbIsolation
@@ -15,6 +15,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 class LoadWorkflowDefinitionsCommandTest extends WebTestCase
 {
     const NAME = 'oro:workflow:definitions:load';
+
     protected function setUp()
     {
         $this->initClient();
@@ -79,7 +80,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
     }
 
     /**
-     * @param array|ProcessDefinition[] $definitions
+     * @param array|WorkflowDefinition[] $definitions
      * @param string $name
      */
     protected function assertDefinitionLoaded(array $definitions, $name)
