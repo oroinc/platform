@@ -29,7 +29,7 @@
 {% block oro_acl_label_widget %}
     {% import 'OroUIBundle::macros.html.twig' as UI %}
     <strong>
-        {% if form.vars.roleId|default(false) and oro_entity_config_value(form.vars.className, 'field_acl_enabled', 'security')%}
+        {% if form.vars.isPlatformRole is defined and form.vars.isPlatformRole and form.vars.roleId|default(false) and oro_entity_config_value(form.vars.className, 'field_acl_enabled', 'security')%}
         <a href="{{ url('oro_field_acl_update', {id: form.vars.roleId, className: form.vars.urlSafeClassName}) }}">{{ value|trans }}</a>
         {% else %}
         {{ value|trans }}
