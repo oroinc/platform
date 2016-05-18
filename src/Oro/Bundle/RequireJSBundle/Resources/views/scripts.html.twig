@@ -7,6 +7,7 @@
     });
     {{ config_extend|default('') }}
 {% endset %}
+<script type="text/javascript" src="{{ asset('bundles/oroui/lib/asap/asap.js') }}"></script>
 {% if compressed and requirejs_build_exists() %}
     <script type="text/javascript">
         var require = (function(){
@@ -17,9 +18,30 @@
         {{ config_extend|raw }}
         require = require.c;
     </script>
+    <script type="text/javascript">
+        (function() {
+            /**
+             * Must replace default require.nextTick on first setTimeout call
+             * Default setTimeout implementation will be restored upon successfull replacement
+             */
+            var originalSetTimeout = window.setTimeout;
+            window.setTimeout = function(fn, timeout) {
+                try {
+                    require.s.contexts._.nextTick = setImmediate;
+                    require.nextTick = setImmediate;
+                    window.setTimeout = originalSetTimeout;
+                } catch (e) {
+                    // wait next cycle
+                }
+                if (timeout === 0) {
+                    return asap(fn);
+                }
+                setTimeout.apply(this, arguments);
+            }
+        })();
+    </script>
     <script type="text/javascript" src="{{ asset(get_requirejs_build_path()) }}"></script>
 {% else %}
-    <script type="text/javascript" src="{{ asset('bundles/oroui/lib/asap/asap.js') }}"></script>
     <script type="text/javascript" src="{{ asset('bundles/ororequirejs/lib/require.js') }}"></script>
     <script type="text/javascript">
         require.nextTick = setImmediate;
