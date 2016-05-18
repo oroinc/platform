@@ -26,6 +26,13 @@ class Configuration implements ConfigurationInterface
                     ->scalarNode('vhost')->isRequired()->cannotBeEmpty()->end()
                 ->end()->end()
             ->end()->end()
+            ->arrayNode('zeroconfig')->children()
+                ->scalarNode('prefix')->defaultValue('zeroconfig')->end()
+                ->scalarNode('router_topic')->defaultValue('router')->cannotBeEmpty()->end()
+                ->scalarNode('router_queue')->defaultValue('router')->cannotBeEmpty()->end()
+                ->scalarNode('queue_topic')->defaultValue('queue')->cannotBeEmpty()->end()
+                ->scalarNode('default_queue_queue')->defaultValue('queue')->cannotBeEmpty()->end()
+            ->end()->end()
         ;
 
         return $tb;
