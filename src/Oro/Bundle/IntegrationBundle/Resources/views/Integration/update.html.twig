@@ -27,7 +27,8 @@
 {% endblock breadcrumbs %}
 
 {% block navButtons %}
-    {% if entity.id and resource_granted('DELETE', entity) and edit_allowed %}
+    {% set enableDelete = oro_integration_is_delete_enabled(entity.getEditMode) %}
+    {% if entity.id and resource_granted('DELETE', entity) and enableDelete %}
         {{ UI.deleteButton({
             'dataUrl': path('oro_api_delete_integration', {'id': entity.id}),
             'dataRedirect': path('oro_integration_index'),
@@ -44,7 +45,8 @@
     {{ UI.cancelButton(path('oro_integration_index')) }}
 
     {% if entity.id %}
-        {% if edit_allowed %}
+        {% set switchEnabled = oro_integration_is_switch_enabled(entity.getEditMode) %}
+        {% if switchEnabled %}
             {% if entity.enabled %}
                 {{ _self.ajaxButton({
                 'aCss':  'btn-danger',
@@ -53,7 +55,8 @@
                 'title': 'oro.integration.deactivate'|trans,
                 'dataId': entity.id,
                 'dataUrl': path('oro_api_deactivate_integration', {'id': entity.id}),
-                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'})
+                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'}),
+                'errorMessage': 'oro.integration.deactivate.fail.message'
                 }) }}
             {% else %}
                 {{ _self.ajaxButton({
@@ -63,7 +66,8 @@
                 'title': 'oro.integration.activate'|trans,
                 'dataId': entity.id,
                 'dataUrl': path('oro_api_activate_integration', {'id': entity.id}),
-                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'})
+                'dataRedirect': path('oro_integration_update', {'id': entity.id, '_enableContentProviders': 'mainMenu'}),
+                'errorMessage': 'oro.integration.activate.fail.message'
                 }) }}
             {% endif %}
             {{ UI.buttonSeparator() }}
@@ -218,7 +222,7 @@
 
     {% set dataAttributes = {
         'page-component-module': 'orointegration/js/app/components/ajax-button',
-        'page-component-options': {'redirect': parameters.dataRedirect }|json_encode,
+        'page-component-options': {'redirect': parameters.dataRedirect, 'errorMessage': parameters.errorMessage }|json_encode,
     } %}
 
     {{ UI.clientButton(parameters|merge({'dataAttributes': dataAttributes})) }}
