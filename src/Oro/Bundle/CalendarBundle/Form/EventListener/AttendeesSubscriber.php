@@ -41,6 +41,7 @@ class AttendeesSubscriber implements EventSubscriberInterface
      */
     public function fixSubmittedData(FormEvent $event)
     {
+        /** @var Attendee[]|Collection $data */
         $data      = $event->getData();
         $attendees = $event->getForm()->getData();
 
@@ -56,7 +57,6 @@ class AttendeesSubscriber implements EventSubscriberInterface
         $nextNewKey = count($attendeeKeysByEmail);
         $fixedData = [];
 
-        /** @var array $attendee */
         foreach ($data as $attendee) {
             if (empty($attendee['email'])) {
                 return;
