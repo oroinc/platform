@@ -502,21 +502,28 @@ define(function(require) {
         },
 
         onValidationError: function(jqXHR) {
+            var fieldErrors;
+            var backendErrors;
             var responseErrors = _.result(jqXHR.responseJSON, 'errors');
-            if (!this.options.cell.disposed) {
-                var fieldName = this.options.cell.column.get('name');
-            }
             if (responseErrors) {
-                var backendErrors = {};
-                _.each(responseErrors.children, function(item, name) {
-                    if (fieldName === name && _.isArray(item.errors)) {
-                        backendErrors.value = item.errors[0];
+                if (this.disposed || this.options.cell.disposed) {
+                    _.each(responseErrors.children, function(item) {
+                        if (_.isArray(item.errors)) {
+                            mediator.execute('showMessage', 'error', item.errors[0]);
+                        }
+                    });
+                    if (_.isArray(responseErrors.errors)) {
+                        mediator.execute('showMessage', 'error', responseErrors.errors[0]);
                     }
-                }, this);
-                if (!backendErrors.hasOwnProperty('value') && _.isArray(responseErrors.errors)) {
-                    backendErrors.value = responseErrors.errors[0];
+                } else {
+                    fieldErrors = _.result(responseErrors.children, this.options.cell.column.get('name'));
+                    if (fieldErrors && _.isArray(fieldErrors.errors)) {
+                        backendErrors = {value: fieldErrors.errors[0]};
+                    } else if (_.isArray(responseErrors.errors)) {
+                        backendErrors = {value: responseErrors.errors[0]};
+                    }
+                    this.errorHolderView.setErrorMessages(backendErrors);
                 }
-                this.errorHolderView.setErrorMessages(backendErrors);
             }
         }
     });
