@@ -38,6 +38,7 @@ class LoadWorkflowDefinitionsCommandTest extends WebTestCase
      */
     public function testExecute(array $expectedMessages, array $expectedDefinitions)
     {
+        /** @var ObjectRepository $repository */
         $repository = $this->getContainer()->get('doctrine')
             ->getManagerForClass('OroWorkflowBundle:WorkflowDefinition')
             ->getRepository('OroWorkflowBundle:WorkflowDefinition');
