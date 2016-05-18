@@ -142,7 +142,7 @@ class AmqpSession implements Session
         InvalidDestinationException::assertDestinationInstanceOf($source, AmqpTopic::class);
         InvalidDestinationException::assertDestinationInstanceOf($target, AmqpQueue::class);
         
-        $this->channel->queue_bind($target->getQueueName(), $source->getTopicName());
+        $this->channel->queue_bind($target->getQueueName(), $source->getTopicName(), $source->getRoutingKey());
     }
 
     /**

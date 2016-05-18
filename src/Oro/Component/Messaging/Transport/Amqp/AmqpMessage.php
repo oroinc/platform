@@ -5,6 +5,9 @@ use Oro\Component\Messaging\Transport\Message;
 
 class AmqpMessage implements Message
 {
+    const DELIVERY_MODE_NON_PERSISTENT = 1;
+    const DELIVERY_MODE_PERSISTENT = 2;
+
     /**
      * @var string
      */
@@ -75,7 +78,7 @@ class AmqpMessage implements Message
      */
     public function getProperty($name, $default = null)
     {
-        return array_key_exists($name, $this->properties) ?$this->properties[$name] : $default;
+        return array_key_exists($name, $this->properties) ? $this->properties[$name] : $default;
     }
 
     /**
