@@ -135,19 +135,19 @@ class EmailManager
             ->em
             ->getRepository('OroEmailBundle:EmailUser')
             ->findUnseenUserEmail($user, $organization, $ids, $mailboxIds);
-        $unseenUserEmails      = $emailUserQueryBuilder->getQuery()->getResult();
+        $unseenUserEmails = $emailUserQueryBuilder->getQuery()->getResult();
+
+        if (empty($unseenUserEmails)) {
+            return false;
+        }
 
         foreach ($unseenUserEmails as $userEmail) {
             $this->setEmailUserSeen($userEmail);
         }
 
-        if (count($unseenUserEmails) > 0) {
-            $this->em->flush();
+        $this->em->flush();
 
-            return true;
-        }
-
-        return false;
+        return true;
     }
 
     /**

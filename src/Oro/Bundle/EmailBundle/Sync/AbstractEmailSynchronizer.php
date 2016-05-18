@@ -112,8 +112,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
         $maxExecTimeout = $maxExecTimeInMin > 0
             ? new \DateInterval('PT' . $maxExecTimeInMin . 'M')
             : false;
-        $processedOrigins = array();
-        $failedOriginIds = array();
+        $processedOrigins = [];
+        $failedOriginIds = [];
         while (true) {
             $origin = $this->findOriginToSync($maxConcurrentTasks, $minExecIntervalInMin);
             if ($origin === null) {
@@ -149,14 +149,7 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
             }
         }
 
-        if (!empty($failedOriginIds)) {
-            throw new \Exception(
-                sprintf(
-                    'The email synchronization failed for the following origins: %s.',
-                    implode(', ', $failedOriginIds)
-                )
-            );
-        }
+        $this->assertSyncSuccess($failedOriginIds);
 
         return 0;
     }
@@ -190,14 +183,8 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
                 }
             }
         }
-        if (!empty($failedOriginIds)) {
-            throw new \Exception(
-                sprintf(
-                    'The email synchronization failed for the following origins: %s.',
-                    implode(', ', $failedOriginIds)
-                )
-            );
-        }
+
+        $this->assertSyncSuccess($failedOriginIds);
     }
 
     /**
@@ -494,5 +481,21 @@ abstract class AbstractEmailSynchronizer implements LoggerAwareInterface
     protected function getCurrentUtcDateTime()
     {
         return new \DateTime('now', new \DateTimeZone('UTC'));
+    }
+
+    /**
+     * @param $failedOriginIds
+     * @throws \Exception
+     */
+    private function assertSyncSuccess(array $failedOriginIds)
+    {
+        if ($failedOriginIds) {
+            throw new \Exception(
+                sprintf(
+                    'The email synchronization failed for the following origins: %s.',
+                    implode(', ', $failedOriginIds)
+                )
+            );
+        }
     }
 }
