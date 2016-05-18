@@ -35,10 +35,6 @@ class GridViewsExtensionTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $repo->expects($this->any())
-            ->method('findDefaultGridView')
-            ->willReturn(null);
-
         $registry = $this->getMock('Doctrine\Common\Persistence\ManagerRegistry');
         $registry->expects($this->any())
             ->method('getRepository')

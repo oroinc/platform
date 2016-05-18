@@ -61,18 +61,21 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
         $enableUseUserEmailOrigin,
         $isOriginsNotEmpty,
         \PHPUnit_Framework_MockObject_MockObject $origin,
-        $emailOriginsTimes
+        $emailOriginsTimes,
+        $exactly
     ) {
         $organization  = $this->getMock('Oro\Bundle\OrganizationBundle\Entity\OrganizationInterface');
         $collection    = new ArrayCollection([$origin]);
         $originName    = 'origin name';
         $campaignOwner = null;
 
-        $origin->expects(self::once())->method('getOrganization')->willReturn($organization);
+        $origin->expects($this->exactly($exactly))->method('getOrganization')->willReturn($organization);
 
         if (true === $enableUseUserEmailOrigin && true === $isOriginsNotEmpty) {
-            $origin->expects(self::once())->method('isActive')->willReturn($isOriginsNotEmpty);
-            $origin->expects(self::once())->method('isSmtpConfigured')->willReturn($isOriginsNotEmpty);
+            if (!($origin instanceof \Oro\Bundle\EmailBundle\Entity\Mailbox)) {
+                $origin->expects(self::once())->method('isActive')->willReturn($isOriginsNotEmpty);
+                $origin->expects(self::once())->method('isSmtpConfigured')->willReturn($isOriginsNotEmpty);
+            }
         }
 
         if ('user' === $emailOwner) {
@@ -135,83 +138,109 @@ class EmailOriginHelperTest extends \PHPUnit_Framework_TestCase
      */
     public function findEmailOriginDataProvider()
     {
-        $emailOwnerMailBox = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Mailbox')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $userEmailOrigin = $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
-            ->disableOriginalConstructor()
-            ->getMock();
-
-        $internalEmailOrigin = $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin')
-            ->disableOriginalConstructor()
-            ->getMock();
-
         return [
             '1. EmailOwner as User with enableUseUserEmailOrigin and origin is not empty'            => [
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'user',
                 'enableUseUserEmailOrigin' => true,
                 'isUserOriginsNotEmpty'    => true,
-                'origin'                   => $userEmailOrigin,
+                'origin'                   => $this->getUserEmailOriginMock(),
                 'emailOriginsTimes'        => self::once(),
+                'exactly'                  => 1
             ],
             '2. EmailOwner as User with enableUseUserEmailOrigin and origin is empty'                => [
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'user',
                 'enableUseUserEmailOrigin' => true,
                 'isUserOriginsNotEmpty'    => false,
-                'origin'                   => $internalEmailOrigin,
+                'origin'                   => $this->getInternalEmailOriginMock(),
                 'emailOriginsTimes'        => self::exactly(2),
+                'exactly'                  => 1
             ],
             '3. EmailOwner as User without enableUseUserEmailOrigin and origin is not empty'         => [
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'user',
                 'enableUseUserEmailOrigin' => false,
                 'isUserOriginsNotEmpty'    => true,
-                'origin'                   => $userEmailOrigin,
+                'origin'                   => $this->getUserEmailOriginMock(),
                 'emailOriginsTimes'        => self::once(),
+                'exactly'                  => 1
             ],
             '4. EmailOwner as User without enableUseUserEmailOrigin and origin is empty'             => [
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'user',
                 'enableUseUserEmailOrigin' => false,
                 'isUserOriginsNotEmpty'    => false,
-                'origin'                   => $userEmailOrigin,
+                'origin'                   => $this->getUserEmailOriginMock(),
                 'emailOriginsTimes'        => self::once(),
+                'exactly'                  => 1
             ],
             '5. EmailOwner as Mailbox origin is not empty and enableUseUserEmailOrigin is empty'     => [
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'emailBox',
                 'enableUseUserEmailOrigin' => false,
                 'isUserOriginsNotEmpty'    => true,
-                'origin'                   => $emailOwnerMailBox,
+                'origin'                   => $this->getEmailOwnerMailBoxMock(),
                 'emailOriginsTimes'        => self::once(),
+                'exactly'                  => 0
             ],
             '6. EmailOwner as Mailbox origin is not empty and enableUseUserEmailOrigin is not empty' => [
                 'mailModelExpects'         => self::never(),
                 'emailOwner'               => 'emailBox',
                 'enableUseUserEmailOrigin' => true,
                 'isUserOriginsNotEmpty'    => true,
-                'origin'                   => $emailOwnerMailBox,
+                'origin'                   => $this->getEmailOwnerMailBoxMock(),
                 'emailOriginsTimes'        => self::once(),
+                'exactly'                  => 0
             ],
             '7. EmailOwner as Mailbox origin is empty and enableUseUserEmailOrigin is empty'         => [
                 'mailModelExpects'         => self::once(),
                 'emailOwner'               => 'emailBox',
                 'enableUseUserEmailOrigin' => false,
                 'isUserOriginsNotEmpty'    => false,
-                'origin'                   => $emailOwnerMailBox,
+                'origin'                   => $this->getEmailOwnerMailBoxMock(),
                 'emailOriginsTimes'        => self::once(),
+                'exactly'                  => 1
             ],
             '8. EmailOwner as Mailbox origin is not empty and enableUseUserEmailOrigin is empty'     => [
                 'mailModelExpects'         => self::once(),
                 'emailOwner'               => 'emailBox',
                 'enableUseUserEmailOrigin' => true,
                 'isUserOriginsNotEmpty'    => false,
-                'origin'                   => $emailOwnerMailBox,
+                'origin'                   => $this->getEmailOwnerMailBoxMock(),
                 'emailOriginsTimes'        => self::once(),
+                'exactly'                  => 1
             ],
         ];
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getEmailOwnerMailBoxMock()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\Mailbox')
+                    ->disableOriginalConstructor()
+                    ->getMock();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getUserEmailOriginMock()
+    {
+        return $this->getMockBuilder('Oro\Bundle\ImapBundle\Entity\UserEmailOrigin')
+                    ->disableOriginalConstructor()
+                    ->getMock();
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getInternalEmailOriginMock()
+    {
+        return $this->getMockBuilder('Oro\Bundle\EmailBundle\Entity\InternalEmailOrigin')
+                    ->disableOriginalConstructor()
+                    ->getMock();
     }
 }

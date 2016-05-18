@@ -7,16 +7,16 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Yaml\Parser;
 use Symfony\Component\Yaml\Yaml;
 
-use Composer\Script\CommandEvent;
+use Composer\Script\Event;
 
 class ScriptHandler extends SensioScriptHandler
 {
     /**
      * Installs the assets for installer bundle
      *
-     * @param CommandEvent $event A instance
+     * @param Event $event A instance
      */
-    public static function installAssets(CommandEvent $event)
+    public static function installAssets(Event $event)
     {
         $options = self::getOptions($event);
         $webDir  = $options['symfony-web-dir'];
@@ -32,9 +32,9 @@ class ScriptHandler extends SensioScriptHandler
     /**
      * Set permissions for directories
      *
-     * @param CommandEvent $event
+     * @param Event $event
      */
-    public static function setPermissions(CommandEvent $event)
+    public static function setPermissions(Event $event)
     {
         $options = self::getOptions($event);
 
@@ -60,9 +60,9 @@ class ScriptHandler extends SensioScriptHandler
     /**
      * Sets the global assets version
      *
-     * @param CommandEvent $event A instance
+     * @param Event $event A instance
      */
-    public static function setAssetsVersion(CommandEvent $event)
+    public static function setAssetsVersion(Event $event)
     {
         $options = self::getOptions($event);
 

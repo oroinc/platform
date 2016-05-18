@@ -35,7 +35,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
     /**
      * @var array
      */
-    protected $transitionDefinitions = array(
+    protected static $transitionDefinitions = array(
         'empty_definition' => array(),
         'with_pre_condition' => array(
             'pre_conditions' => array('@true' => null)
@@ -49,6 +49,10 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
         'full_definition' => array(
             'page_template' => 'Test:Page:template',
             'dialog_template' => 'Test:Dialog:template',
+            'schedule' => [
+                'cron' => '1 * * * *',
+                'filter' => 'e.field < 1'
+            ],
             'pre_conditions' => array('@true' => null),
             'conditions' => array('@true' => null),
             'post_actions' => array('@assign_value' => array('parameters' => array('$attribute', 'first_value'))),
@@ -257,7 +261,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         $transitions = $this->assembler->assemble(
             array('test' => $configuration),
-            $this->transitionDefinitions,
+            self::$transitionDefinitions,
             $steps,
             $attributes
         );
@@ -311,6 +315,14 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
             $this->assertNull($actualTransition->getPreCondition(), 'Incorrect Precondition');
         }
 
+        if (array_key_exists('schedule', $transitionDefinition)) {
+            $scheduleDefinition = $transitionDefinition['schedule'];
+            $this->assertEquals((string) $scheduleDefinition['cron'], $actualTransition->getScheduleCron());
+            if (isset($scheduleDefinition['filter'])) {
+                $this->assertEquals((string) $scheduleDefinition['filter'], $actualTransition->getScheduleFilter());
+            }
+        }
+
         $this->assertEquals($expectedCondition, $actualTransition->getCondition(), 'Incorrect condition');
         $this->assertEquals($expectedAction, $actualTransition->getPostAction(), 'Incorrect post_action');
     }
@@ -349,7 +361,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     ),
                     'frontend_options' => array('class' => 'foo', 'icon' => 'bar'),
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['empty_definition'],
+                'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
             ),
             'with_condition' => array(
                 'configuration' => array(
@@ -357,7 +369,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label',
                     'step_to' => 'step',
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['with_condition'],
+                'transitionDefinition' => self::$transitionDefinitions['with_condition'],
             ),
             'with_post_actions' => array(
                 'configuration' => array(
@@ -365,7 +377,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label',
                     'step_to' => 'step',
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['with_post_actions'],
+                'transitionDefinition' => self::$transitionDefinitions['with_post_actions'],
             ),
             'full_definition' => array(
                 'configuration' => array(
@@ -375,7 +387,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'label' => 'label',
                     'step_to' => 'step',
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['full_definition'],
+                'transitionDefinition' => self::$transitionDefinitions['full_definition'],
             ),
             'start_transition' => array(
                 'configuration' => array(
@@ -386,7 +398,7 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
                     'step_to' => 'step',
                     'is_start' => true,
                 ),
-                'transitionDefinition' => $this->transitionDefinitions['empty_definition'],
+                'transitionDefinition' => self::$transitionDefinitions['empty_definition'],
             ),
         );
     }

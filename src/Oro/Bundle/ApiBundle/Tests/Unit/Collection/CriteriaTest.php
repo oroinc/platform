@@ -312,11 +312,26 @@ class CriteriaTest extends OrmRelatedTestCase
                 $this->criteria->expr()->eq('groups.name', 'test_group')
             )
         );
-        $this->assertQuery(
-            'SELECT e FROM Test:User e'
-            . ' LEFT JOIN e.groups groups'
-            . ' LEFT JOIN e.category category'
-            . ' WHERE category.name = :category_name OR groups.name = :groups_name'
-        );
+
+        /**
+         * Changed expected result according to changes
+         * in user defined sorting algorithm in php7
+         * https://bugs.php.net/bug.php?id=69158
+         */
+        if (version_compare(PHP_VERSION, '7.0.0', '>=')) {
+            $this->assertQuery(
+                'SELECT e FROM Test:User e'
+                . ' LEFT JOIN e.category category'
+                . ' LEFT JOIN e.groups groups'
+                . ' WHERE category.name = :category_name OR groups.name = :groups_name'
+            );
+        } else {
+            $this->assertQuery(
+                'SELECT e FROM Test:User e'
+                . ' LEFT JOIN e.groups groups'
+                . ' LEFT JOIN e.category category'
+                . ' WHERE category.name = :category_name OR groups.name = :groups_name'
+            );
+        }
     }
 }
