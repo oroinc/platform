@@ -3,13 +3,10 @@ namespace Oro\Bundle\MessagingBundle\Tests\Unit\DependencyInjection;
 
 use Oro\Bundle\MessagingBundle\DependencyInjection\OroMessagingExtension;
 use Oro\Component\Messaging\Transport\Amqp\AmqpConnection;
-use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
 use Oro\Component\Messaging\Transport\Null\NullConnection;
-use Oro\Component\Messaging\Transport\Null\NullSession;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\DependencyInjection\Alias;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\DependencyInjection\Extension;
 
 class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
@@ -26,14 +23,6 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
         new OroMessagingExtension();
     }
 
-    public function testThrowIfTransportNotConfigured()
-    {
-        $extension = new OroMessagingExtension();
-
-        $this->setExpectedException(\LogicException::class, 'Default transport is not configured.');
-        $extension->load([], new ContainerBuilder());
-    }
-
     public function testShouldConfigureAmqpTransport()
     {
         $container = new ContainerBuilder();
@@ -42,6 +31,7 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension->load([[
             'transport' => [
+                'default' => 'amqp',
                 'amqp' => [
                     'host' => 'theHost',
                     'port' => 'thePort',
@@ -63,14 +53,6 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
             'password' => 'thePassword',
             'vhost' => 'theVhost'
         ], $connection->getArgument(0));
-
-        $this->assertTrue($container->hasDefinition('oro_messaging.transport.amqp.session'));
-        $session = $container->getDefinition('oro_messaging.transport.amqp.session');
-        $this->assertEquals(AmqpSession::class, $session->getClass());
-        $this->assertEquals(
-            [new Reference('oro_messaging.transport.amqp.connection'), 'createSession'],
-            $session->getFactory()
-        );
     }
 
     public function testShouldUseAmqpTransportAsDefault()
@@ -81,6 +63,7 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension->load([[
             'transport' => [
+                'default' => 'amqp',
                 'amqp' => [
                     'host' => 'theHost',
                     'port' => 'thePort',
@@ -92,8 +75,8 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
         ]], $container);
 
         $this->assertEquals(
-            new Alias('oro_messaging.transport.amqp.session'),
-            $container->getAlias('oro_messaging.transport.session')
+            new Alias('oro_messaging.transport.amqp.connection'),
+            $container->getAlias('oro_messaging.transport.connection')
         );
     }
 
@@ -105,6 +88,7 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension->load([[
             'transport' => [
+                'default' => 'null',
                 'null' => true
             ]
         ]], $container);
@@ -112,14 +96,6 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertTrue($container->hasDefinition('oro_messaging.transport.null.connection'));
         $connection = $container->getDefinition('oro_messaging.transport.null.connection');
         $this->assertEquals(NullConnection::class, $connection->getClass());
-
-        $this->assertTrue($container->hasDefinition('oro_messaging.transport.null.session'));
-        $session = $container->getDefinition('oro_messaging.transport.null.session');
-        $this->assertEquals(NullSession::class, $session->getClass());
-        $this->assertEquals(
-            [new Reference('oro_messaging.transport.null.connection'), 'createSession'],
-            $session->getFactory()
-        );
     }
 
     public function testShouldUseNullTransportAsDefault()
@@ -130,13 +106,14 @@ class OroMessagingExtensionTest extends \PHPUnit_Framework_TestCase
 
         $extension->load([[
             'transport' => [
+                'default' => 'null',
                 'null' => true
             ]
         ]], $container);
 
         $this->assertEquals(
-            new Alias('oro_messaging.transport.null.session'),
-            $container->getAlias('oro_messaging.transport.session')
+            new Alias('oro_messaging.transport.null.connection'),
+            $container->getAlias('oro_messaging.transport.connection')
         );
     }
 }

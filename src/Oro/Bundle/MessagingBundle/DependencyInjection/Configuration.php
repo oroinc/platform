@@ -15,7 +15,8 @@ class Configuration implements ConfigurationInterface
         $rootNode = $tb->root('oro_messaging');
 
         $rootNode->children()
-            ->arrayNode('transport')->children()
+            ->arrayNode('transport')->isRequired()->children()
+                ->scalarNode('default')->isRequired()->cannotBeEmpty()->end()
                 ->booleanNode('null')->defaultFalse()->end()
                 ->arrayNode('amqp')->children()
                     ->scalarNode('host')->isRequired()->cannotBeEmpty()->end()

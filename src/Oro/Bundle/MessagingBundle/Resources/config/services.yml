@@ -7,7 +7,7 @@ services:
     oro_messaging.consumption.queue_consumer:
         class: Oro\Component\Messaging\Consumption\QueueConsumer
         arguments:
-            - @oro_messaging.transport.session
+            - @oro_messaging.transport.connection
             - @oro_messaging.consumption.extensions
 
     oro_messaging.command.consume_messages:

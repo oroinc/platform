@@ -4,6 +4,7 @@ namespace Oro\Bundle\MessagingBundle\Tests\Unit\DependencyInjection;
 use Oro\Bundle\MessagingBundle\DependencyInjection\Configuration;
 use Oro\Component\Testing\ClassExtensionTrait;
 use Symfony\Component\Config\Definition\ConfigurationInterface;
+use Symfony\Component\Config\Definition\Exception\InvalidConfigurationException;
 use Symfony\Component\Config\Definition\Processor;
 
 class ConfigurationTest extends \PHPUnit_Framework_TestCase
@@ -20,14 +21,34 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         new Configuration();
     }
 
-    public function testShouldAcceptEmptyConfiguration()
+    public function testThrowIfTransportNotConfigured()
     {
+        $this->setExpectedException(
+            InvalidConfigurationException::class,
+            'The child node "transport" at path "oro_messaging" must be configured.'
+        );
+
         $configuration = new Configuration();
 
         $processor = new Processor();
-        $config = $processor->processConfiguration($configuration, [[]]);
+        $processor->processConfiguration($configuration, [[]]);
+    }
 
-        $this->assertEquals([], $config);
+    public function testThrowIfDefaultTransportNotConfigured()
+    {
+        $this->setExpectedException(
+            InvalidConfigurationException::class,
+            'The path "oro_messaging.transport.default" cannot contain an empty value, but got null.'
+        );
+
+        $configuration = new Configuration();
+
+        $processor = new Processor();
+        $processor->processConfiguration($configuration, [[
+            'transport' => [
+                'default' => null,
+            ]
+        ]]);
     }
 
     public function testShouldAllowConfigureAmqpTransport()
@@ -37,6 +58,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration($configuration, [[
             'transport' => [
+                'default' => 'amqp',
                 'amqp' => [
                     'host' => 'theHost',
                     'port' => 'thePort',
@@ -49,6 +71,7 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
 
         $this->assertEquals([
             'transport' => [
+                'default' => 'amqp',
                 'amqp' => [
                     'host' => 'theHost',
                     'port' => 'thePort',
@@ -68,12 +91,14 @@ class ConfigurationTest extends \PHPUnit_Framework_TestCase
         $processor = new Processor();
         $config = $processor->processConfiguration($configuration, [[
             'transport' => [
+                'default' => 'null',
                 'null' => true,
             ]
         ]]);
 
         $this->assertEquals([
             'transport' => [
+                'default' => 'null',
                 'null' => true,
             ]
         ], $config);
