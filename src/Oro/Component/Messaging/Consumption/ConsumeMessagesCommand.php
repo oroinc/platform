@@ -68,8 +68,5 @@ class ConsumeMessagesCommand extends Command implements ContainerAwareInterface
         } finally {
             $this->consumer->getConnection()->close();
         }
-
-        $output->writeln('sleeping');
-        sleep(100);
     }
 }
