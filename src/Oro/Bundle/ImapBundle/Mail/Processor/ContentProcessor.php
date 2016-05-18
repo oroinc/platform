@@ -54,7 +54,7 @@ class ContentProcessor
                 }
 
                 $contentTypeHeader = $this->getPartContentType($part);
-                if (strtolower($contentTypeHeader->getType()) === $format) {
+                if ($contentTypeHeader && (strtolower($contentTypeHeader->getType()) === $format)) {
                     return $this->extractContent($part);
                 }
             }
