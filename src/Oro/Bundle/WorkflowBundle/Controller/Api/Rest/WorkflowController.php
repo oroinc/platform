@@ -4,6 +4,7 @@ namespace Oro\Bundle\WorkflowBundle\Controller\Api\Rest;
 
 use FOS\RestBundle\Util\Codes;
 use FOS\RestBundle\Controller\FOSRestController;
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Symfony\Component\HttpFoundation\Response;
 use Symfony\Component\HttpKernel\Exception\BadRequestHttpException;
 use Symfony\Component\HttpKernel\Exception\HttpException;
@@ -26,6 +27,7 @@ use Oro\Bundle\WorkflowBundle\Exception\InvalidTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 use Oro\Bundle\WorkflowBundle\Exception\UnknownAttributeException;
 use Oro\Bundle\WorkflowBundle\Exception\WorkflowNotFoundException;
+use Symfony\Component\HttpKernel\Exception\NotFoundHttpException;
 
 /**
  * @Rest\NamePrefix("oro_api_workflow_")
@@ -151,7 +153,26 @@ class WorkflowController extends FOSRestController
     public function transitAction(WorkflowItem $workflowItem, $transitionName)
     {
         try {
-            $this->get('oro_workflow.manager')->transit($workflowItem, $transitionName);
+            /** @var WorkflowManager $workflowManager */
+            $workflowManager = $this->get('oro_workflow.manager');
+
+            /**
+             * \Oro\Bundle\WorkflowBundle\Model\WorkflowManager::transit may produce a DB exception
+             * and bring transaction to the rollback-only state.
+             * App exits after that in production mode, so it's normal behaviour. But during functional tests
+             * this breaks all tests in queue after this one.
+             * So we should check transition availability to exclude exceptional situation.
+             */
+            if (!$workflowManager->isTransitionAvailable($workflowItem, $transitionName)) {
+                throw InvalidTransitionException::stepHasNoAllowedTransition(
+                    $workflowItem->getWorkflowName(),
+                    $workflowItem->getCurrentStep()->getName(),
+                    $transitionName
+                );
+            }
+
+            $workflowManager->transit($workflowItem, $transitionName);
+
         } catch (WorkflowNotFoundException $e) {
             return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND);
         } catch (InvalidTransitionException $e) {
@@ -170,6 +191,64 @@ class WorkflowController extends FOSRestController
                 Codes::HTTP_OK
             )
         );
+    }
+
+    /**
+     * Returns:
+     * - HTTP_OK (200) response: array('workflowItem' => array('id' => int, 'result' => array(...), ...))
+     * - HTTP_BAD_REQUEST (400) response: array('message' => errorMessageString)
+     * - HTTP_FORBIDDEN (403) response: array('message' => errorMessageString)
+     * - HTTP_NOT_FOUND (404) response: array('message' => errorMessageString)
+     * - HTTP_INTERNAL_SERVER_ERROR (500) response: array('message' => errorMessageString)
+     *
+     * @Rest\Get(
+     *      "/api/rest/{version}/workflow/transit/{entityName}/{entityId}/{transitionName}",
+     *      requirements={"version"="latest|v1", "entityId"="\d+"},
+     *      defaults={"version"="latest", "_format"="json"}
+     * )
+     * @ApiDoc(description="Perform transition for workflow item by entity class and id", resource=true)
+     * @AclAncestor("oro_workflow")
+     *
+     * @param string $entityName The class name, url-safe class name, alias or plural alias of the entity
+     * @param int    $entityId
+     * @param string $transitionName
+     *
+     * @return Response
+     */
+    public function transitByEntityAction($entityName, $entityId, $transitionName)
+    {
+        try {
+            /** @var EntityRoutingHelper $routingHelper */
+            $routingHelper = $this->get('oro_entity.routing_helper');
+
+            try {
+                $entity = $routingHelper->getEntity($entityName, $entityId);
+            } catch (\ReflectionException $e) {
+                throw new BadRequestHttpException($e->getMessage(), $e);
+            }
+
+            /** @var WorkflowManager $workflowManager */
+            $workflowManager = $this->get('oro_workflow.manager');
+
+            $workflowItem = $workflowManager->getWorkflowItemByEntity($entity);
+            if (!$workflowItem) {
+                throw new NotManageableEntityException($routingHelper->resolveEntityClass($entityName));
+            }
+
+        } catch (NotFoundHttpException $e) {
+            return $this->handleError($e->getMessage(), Codes::HTTP_NOT_FOUND);
+
+        } catch (NotManageableEntityException $e) {
+            return $this->handleError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+
+        } catch (BadRequestHttpException $e) {
+            return $this->handleError($e->getMessage(), Codes::HTTP_BAD_REQUEST);
+
+        } catch (\Exception $e) {
+            return $this->handleError($e->getMessage(), Codes::HTTP_INTERNAL_SERVER_ERROR);
+        }
+
+        return $this->transitAction($workflowItem, $transitionName);
     }
 
     /**

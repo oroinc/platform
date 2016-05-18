@@ -3,12 +3,12 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Functional\Controller\Api\Rest;
 
 use Doctrine\ORM\EntityManager;
-
+use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity;
 use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
-
-use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
+use Oro\Bundle\WorkflowBundle\Tests\Functional\DataFixtures\LoadWorkflowDefinitions;
+use Symfony\Bundle\FrameworkBundle\Client;
 
 /**
  * @dbIsolation
@@ -163,6 +163,222 @@ class WorkflowControllerTest extends WebTestCase
         // assert that entity workflow item was reset
         $testEntity = $this->refreshEntity($testEntity);
         $this->assertEntityWorkflowItem($testEntity, null);
+    }
+
+    /**
+     * Tests transition
+     * {@see \Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::transitAction}
+     * {@see \Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::transitByEntityAction}
+     *
+     * @dataProvider transitActionProvider
+     *
+     * @param array $testCase
+     */
+    public function testTransitAction($testCase)
+    {
+        // set and assert active workflow
+        $this->getWorkflowManager()->activateWorkflow(LoadWorkflowDefinitions::WITH_START_STEP);
+        $this->assertActiveWorkflow($this->entityClass, LoadWorkflowDefinitions::WITH_START_STEP);
+
+        // create and assert test entity
+        $testEntity = $this->createNewEntity();
+        $this->assertEntityWorkflowItem($testEntity, LoadWorkflowDefinitions::WITH_START_STEP);
+
+        // transit workflow item for entity
+        $this->client->request(
+            'GET',
+            $this->getUrl(
+                $testCase['urlName'],
+                $testCase['params']($this->client, $testEntity)
+            )
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), $testCase['responseCode']);
+
+        // assert result
+        $testCase['assertResult']($this->entityManager, $result, $testEntity);
+    }
+
+    /**
+     * Produce parameters for testing
+     * \Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::transitAction and
+     * \Oro\Bundle\WorkflowBundle\Controller\Api\Rest\WorkflowController::transitByEntityAction
+     *
+     * @return array
+     */
+    public function transitActionProvider()
+    {
+        /** @noinspection PhpUnusedParameterInspection */
+        /**
+         * Default asserts (failed requests)
+         *
+         * @param EntityManager       $entityManager
+         * @param array               $result WebTestCase::getJsonResponseContent result
+         * @param WorkflowAwareEntity $testEntity
+         *
+         */
+        $assertResult = function (EntityManager $entityManager, $result, WorkflowAwareEntity $testEntity) {
+            // assert entity workflow step
+            $entityManager->refresh($testEntity);
+            $this->assertEquals($testEntity->getWorkflowStep()->getName(), LoadWorkflowDefinitions::START_STEP);
+        };
+
+        /**
+         * Success transition result asserts
+         *
+         * @param EntityManager       $entityManager
+         * @param array               $result WebTestCase::getJsonResponseContent result
+         * @param WorkflowAwareEntity $testEntity
+         */
+        $assertSuccessResult = function (EntityManager $entityManager, $result, WorkflowAwareEntity $testEntity) {
+            $this->assertArrayHasKey('workflowItem', $result);
+            $this->assertEquals($result['workflowItem']['id'], $testEntity->getWorkflowItem()->getId());
+            $this->assertEquals(
+                $result['workflowItem']['workflow_name'],
+                $testEntity->getWorkflowItem()->getWorkflowName()
+            );
+            $this->assertEquals($result['workflowItem']['entity_id'], $testEntity->getId());
+
+            // assert entity workflow step
+            $entityManager->refresh($testEntity);
+            $this->assertEquals($testEntity->getWorkflowStep()->getName(), LoadWorkflowDefinitions::FINISH_STEP);
+        };
+
+        /** @noinspection PhpUnusedParameterInspection */
+        /**
+         * Default params for oro_workflow_api_rest_workflow_transit
+         *
+         * @param Client              $client
+         * @param WorkflowAwareEntity $testEntity
+         *
+         * @return array
+         */
+        $params = function (Client $client, WorkflowAwareEntity $testEntity) {
+            return [
+                'workflowItemId' => $testEntity->getWorkflowItem()->getId(),
+                'transitionName' => LoadWorkflowDefinitions::FINISH_TRANSITION,
+            ];
+        };
+
+        /** @noinspection PhpUnusedParameterInspection */
+        /**
+         * Default params for oro_workflow_api_rest_workflow_transitbyentity
+         *
+         * @param Client              $client
+         * @param WorkflowAwareEntity $testEntity
+         *
+         * @return array
+         */
+        $paramsByEntity = function (Client $client, WorkflowAwareEntity $testEntity) {
+            return [
+                'entityName'     => $this->entityClass,
+                'entityId'       => $testEntity->getId(),
+                'transitionName' => LoadWorkflowDefinitions::FINISH_TRANSITION,
+            ];
+        };
+
+
+        return [
+            // ----------------------------------------------------------------------
+            // oro_workflow_api_rest_workflow_transitbyentity
+            // ----------------------------------------------------------------------
+            [
+                'successful_transition' => [
+                    'urlName'      => 'oro_workflow_api_rest_workflow_transitbyentity',
+                    'params'       => $paramsByEntity,
+                    'responseCode' => 200,
+                    'assertResult' => $assertSuccessResult,
+                ]
+            ],
+            [
+                'url_safe_class_name' => [
+                    'urlName'      => 'oro_workflow_api_rest_workflow_transitbyentity',
+                    'params'       => function (Client $client, WorkflowAwareEntity $testEntity) use ($paramsByEntity) {
+                        /** @var EntityRoutingHelper $routingHelper */
+                        $routingHelper = $client->getContainer()->get('oro_entity.routing_helper');
+
+                        return array_merge($paramsByEntity($client, $testEntity), [
+                            'entityName' => $routingHelper->getUrlSafeClassName($this->entityClass),
+                        ]);
+                    },
+                    'responseCode' => 200,
+                    'assertResult' => $assertSuccessResult,
+                ]
+            ],
+            [
+                'class_does_not_exists' => [
+                    'urlName'      => 'oro_workflow_api_rest_workflow_transitbyentity',
+                    'params'       => function (Client $client, WorkflowAwareEntity $testEntity) use ($paramsByEntity) {
+                        return array_merge($paramsByEntity($client, $testEntity), [
+                            'entityName' => 'Does\Not\Exists\Class\Foo\Bar',
+                        ]);
+                    },
+                    'responseCode' => 400,
+                    'assertResult' => $assertResult,
+                ]
+            ],
+            [
+                'entity_does_not_exists' => [
+                    'urlName'      => 'oro_workflow_api_rest_workflow_transitbyentity',
+                    'params'       => function (Client $client, WorkflowAwareEntity $testEntity) use ($paramsByEntity) {
+                        return array_merge($paramsByEntity($client, $testEntity), [
+                            'entityId' => 0,
+                        ]);
+                    },
+                    'responseCode' => 404,
+                    'assertResult' => $assertResult,
+                ]
+            ],
+            [
+                'transition_does_not_exists' => [
+                    'urlName'      => 'oro_workflow_api_rest_workflow_transitbyentity',
+                    'params'       => function (Client $client, WorkflowAwareEntity $testEntity) use ($paramsByEntity) {
+                        return array_merge($paramsByEntity($client, $testEntity), [
+                            'transitionName' => 'test_does_not_exists_transition',
+                        ]);
+                    },
+                    'responseCode' => 400,
+                    'assertResult' => $assertResult,
+                ]
+            ],
+
+
+            // ----------------------------------------------------------------------
+            // oro_workflow_api_rest_workflow_transit
+            // ----------------------------------------------------------------------
+            [
+                'successful_transition' => [
+                    'urlName'      => 'oro_workflow_api_rest_workflow_transit',
+                    'params'       => $params,
+                    'responseCode' => 200,
+                    'assertResult' => $assertSuccessResult,
+                ]
+            ],
+            [
+                'workflow_item_does_not_exists' => [
+                    'urlName'      => 'oro_workflow_api_rest_workflow_transit',
+                    'params'       => function (Client $client, WorkflowAwareEntity $testEntity) use ($params) {
+                        return array_merge($params($client, $testEntity), [
+                            'workflowItemId' => 0,
+                        ]);
+                    },
+                    'responseCode' => 404,
+                    'assertResult' => $assertResult,
+                ]
+            ],
+            [
+                'transition_does_not_exists' => [
+                    'urlName'      => 'oro_workflow_api_rest_workflow_transit',
+                    'params'       => function (Client $client, WorkflowAwareEntity $testEntity) use ($params) {
+                        return array_merge($params($client, $testEntity), [
+                            'transitionName' => 'test_does_not_exists_transition',
+                        ]);
+                    },
+                    'responseCode' => 400,
+                    'assertResult' => $assertResult,
+                ]
+            ],
+        ];
     }
 
     protected function createNewEntity()

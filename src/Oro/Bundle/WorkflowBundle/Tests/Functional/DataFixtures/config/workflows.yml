@@ -5,28 +5,48 @@ workflows:
         steps:
             open:
                 label: 'Open'
+                allowed_transitions:
+                    - finish_transition
                 order: 10
+            close:
+                label: 'Close'
+                order: 20
         transition_definitions:
             start_transiotion_definition: ~
+            finish_transiotion_definition: ~
         transitions:
             start_transition:
-                label: 'Start transiotion'
-                step_to: open
+                label: 'Start transition'
                 is_start: true
+                step_to: open
                 transition_definition: start_transiotion_definition
+            finish_transition:
+                label: 'Finish transition'
+                step_to: close
+                transition_definition: finish_transiotion_definition
 
     test_start_step_flow:
         label: 'Test Flow With Start Step'
         entity: Oro\Bundle\TestFrameworkBundle\Entity\WorkflowAwareEntity
         start_step: open
         steps:
-           open:
-               label: 'Open'
-               order: 10
+            open:
+                label: 'Open'
+                allowed_transitions:
+                    - finish_transition
+                order: 10
+            close:
+                label: 'Close'
+                order: 20
         transition_definitions:
-           start_transiotion_definition: ~
+            start_transiotion_definition: ~
+            finish_transiotion_definition: ~
         transitions:
-           start_transition:
-               label: 'Start transiotion'
-               step_to: open
-               transition_definition: start_transiotion_definition
+            start_transition:
+                label: 'Start transition'
+                step_to: open
+                transition_definition: start_transiotion_definition
+            finish_transition:
+                label: 'Finish transition'
+                step_to: close
+                transition_definition: finish_transiotion_definition
