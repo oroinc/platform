@@ -153,8 +153,7 @@ class OriginFolderFilterProvider
     {
         $folders = array_filter(
             $folders,
-            function ($item) {
-                /** @var EmailFolder $item */
+            function (EmailFolder $item) {
                 return $item->isSyncEnabled();
             }
         );

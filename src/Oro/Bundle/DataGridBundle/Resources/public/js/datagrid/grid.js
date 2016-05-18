@@ -151,7 +151,15 @@ define(function(require) {
             var opts = options || {};
             this.pluginManager = new PluginManager(this);
             if (options.plugins) {
-                this.pluginManager.enable(options.plugins);
+                for (var i = 0; i < options.plugins.length; i++) {
+                    var plugin = options.plugins[i];
+                    if (_.isFunction(plugin)) {
+                        this.pluginManager.enable(plugin);
+                    } else {
+                        this.pluginManager.create(plugin.constructor, plugin.options);
+                        this.pluginManager.enable(plugin.constructor);
+                    }
+                }
             }
 
             this.trigger('beforeParseOptions', options);
@@ -233,8 +241,6 @@ define(function(require) {
          * @param options
          */
         backgridInitialize: function(options) {
-            this.columns = options.columns;
-
             var filteredOptions = _.omit(
                 options,
                 ['el', 'id', 'attributes', 'className', 'tagName', 'events', 'themeOptions']
@@ -486,6 +492,7 @@ define(function(require) {
 
             this.columns = options.columns = new GridColumns(options.columns);
             this.columns.sort();
+            this.trigger('columns:ready');
         },
 
         /**
@@ -853,6 +860,8 @@ define(function(require) {
                 mediator.trigger('grid_render:complete', this.$el);
                 this._resolveDeferredRender();
             }, this));
+
+            this.rendered = true;
 
             return this;
         },

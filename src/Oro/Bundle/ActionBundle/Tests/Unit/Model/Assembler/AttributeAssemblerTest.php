@@ -30,9 +30,6 @@ class AttributeAssemblerTest extends \PHPUnit_Framework_TestCase
         $this->attributeGuesser = $this->getMockBuilder('Oro\Bundle\ActionBundle\Model\AttributeGuesser')
             ->disableOriginalConstructor()
             ->getMock();
-        $this->attributeGuesser->expects($this->any())
-            ->method('fixPropertyPath')
-            ->willReturnArgument(0);
 
         $this->assembler = new AttributeAssembler($this->attributeGuesser);
     }
