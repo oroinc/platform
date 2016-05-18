@@ -33,6 +33,11 @@ class AmqpMessage implements Message
      */
     private $deliveryTag;
 
+    /**
+     * @var string
+     */
+    private $exchange;
+
     public function __construct()
     {
         $this->properties = [];
@@ -135,5 +140,21 @@ class AmqpMessage implements Message
     public function setDeliveryTag($deliveryTag)
     {
         $this->deliveryTag = $deliveryTag;
+    }
+
+    /**
+     * @return string
+     */
+    public function getExchange()
+    {
+        return $this->exchange;
+    }
+
+    /**
+     * @param string $exchange
+     */
+    public function setExchange($exchange)
+    {
+        $this->exchange = $exchange;
     }
 }

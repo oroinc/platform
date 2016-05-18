@@ -5,6 +5,7 @@ use Oro\Component\Messaging\Transport\Destination;
 use Oro\Component\Messaging\Transport\Exception\InvalidDestinationException;
 use Oro\Component\Messaging\Transport\Session;
 use PhpAmqpLib\Channel\AMQPChannel;
+use PhpAmqpLib\Wire\AMQPTable;
 
 class AmqpSession implements Session
 {
@@ -107,7 +108,7 @@ class AmqpSession implements Session
             $autoDelete = false, // rabbitmq specific
             $internal = false, // rabbitmq specific
             $destination->isNoWait(),
-            $destination->getTable()
+            $destination->getTable() ? new AMQPTable($destination->getTable()) : null
         );
     }
 
@@ -127,7 +128,7 @@ class AmqpSession implements Session
             $destination->isExclusive(),
             $destination->isAutoDelete(),
             $destination->isNoWait(),
-            $destination->getTable()
+            $destination->getTable() ? new AMQPTable($destination->getTable()) : null
         );
     }
 

@@ -7,6 +7,9 @@ use Oro\Component\Messaging\Transport\Queue;
 use Oro\Component\Messaging\Transport\MessageConsumer;
 use PhpAmqpLib\Exception\AMQPTimeoutException;
 use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
+use PhpAmqpLib\Wire\AMQPAbstractCollection;
+use PhpAmqpLib\Wire\AMQPArray;
+use PhpAmqpLib\Wire\AMQPTable;
 
 class AmqpMessageConsumer implements MessageConsumer
 {
@@ -118,13 +121,13 @@ class AmqpMessageConsumer implements MessageConsumer
                 $internalMessage->get('application_headers')->getNativeData() :
                 [];
 
-            $message = $this->session->createMessage(
-                $internalMessage->body,
-                $properties,
-                $internalMessage->get_properties()
-            );
+            $headers = (new AMQPArray($internalMessage->get_properties()))->getNativeData();
+            unset($headers['application_headers']);
+            
+            $message = $this->session->createMessage($internalMessage->body, $properties, $headers);
             $message->setDeliveryTag($internalMessage->delivery_info['delivery_tag']);
             $message->setRedelivered($internalMessage->delivery_info['redelivered']);
+            $message->setExchange($internalMessage->delivery_info['exchange']);
 
             $this->receivedMessage = $message;
         };
