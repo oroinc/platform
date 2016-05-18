@@ -1,11 +1,14 @@
 <?php
 namespace Oro\Component\Messaging;
 
+use Oro\Component\Messaging\Consumption\Extension\LoggerExtension;
+use Oro\Component\Messaging\Consumption\Extensions;
 use Oro\Component\Messaging\Consumption\QueueConsumer;
 use Oro\Component\Messaging\ZeroConfig\Config;
 use Oro\Component\Messaging\ZeroConfig\RouterMessageProcessor;
 use Symfony\Component\Console\Command\Command;
 use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Logger\ConsoleLogger;
 use Symfony\Component\Console\Output\OutputInterface;
 
 class RouteMessagesCommand extends Command
@@ -45,7 +48,7 @@ class RouteMessagesCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('oro:messaging:zeroconf:route-messages')
+            ->setName('oro:messaging:zeroconf:route')
             ->setDescription('A worker that routes messages to queue')
         ;
     }
@@ -55,10 +58,13 @@ class RouteMessagesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
-        $output->writeln('Consuming...');
+        $loggerExtension = new LoggerExtension(new ConsoleLogger($output));
+        $runtimeExtensions = new Extensions([$loggerExtension]);
 
-        $this->consumer->consume($this->config->getRouterQueueName(), $this->processor);
-
-        $output->writeln('Exiting');
+        try {
+            $this->consumer->consume($this->config->getRouterQueueName(), $this->processor, $runtimeExtensions);
+        } finally {
+            $this->consumer->getConnection()->close();
+        }
     }
 }
