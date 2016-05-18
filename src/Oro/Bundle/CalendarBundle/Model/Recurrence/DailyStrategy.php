@@ -51,7 +51,7 @@ class DailyStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Entity\Recurrence $recurrence)
+    public function getTextValue(Entity\Recurrence $recurrence)
     {
         $interval = $recurrence->getInterval();
 

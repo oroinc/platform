@@ -99,7 +99,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
      *
      * @dataProvider recurrencePatternsDataProvider
      */
-    public function testGetRecurrencePattern($recurrenceData, $expected)
+    public function testGetTextValue($recurrenceData, $expected)
     {
         $recurrence = new Entity\Recurrence();
         $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
@@ -108,7 +108,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
             ->setEndTime(new \DateTime($recurrenceData['endTime']))
             ->setOccurrences($recurrenceData['occurrences']);
 
-        $this->assertEquals($expected, $this->strategy->getRecurrencePattern($recurrence));
+        $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
     }
 
     /**

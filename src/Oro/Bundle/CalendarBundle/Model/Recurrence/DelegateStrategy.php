@@ -69,7 +69,7 @@ class DelegateStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Recurrence $recurrence)
+    public function getTextValue(Recurrence $recurrence)
     {
         $delegate = $this->match($recurrence);
 
@@ -79,7 +79,7 @@ class DelegateStrategy implements StrategyInterface
             );
         }
 
-        return $delegate->getRecurrencePattern($recurrence);
+        return $delegate->getTextValue($recurrence);
     }
 
     /**

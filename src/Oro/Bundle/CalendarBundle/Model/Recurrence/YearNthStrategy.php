@@ -75,7 +75,7 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Entity\Recurrence $recurrence)
+    public function getTextValue(Entity\Recurrence $recurrence)
     {
         $interval = (int)($recurrence->getInterval() / 12);
         $instanceValue = $this->model->getInstanceRelativeValue($recurrence->getInstance());

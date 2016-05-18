@@ -36,7 +36,7 @@
     {% if entity.recurrence %}
         {% set recurrencePattern = UI.renderProperty(
             'oro.calendar.calendarevent.recurrence.alias.repeat'|trans,
-            get_recurrence_pattern(entity.recurrence)
+            get_recurrence_text_value(entity.recurrence)
         ) %}
     {% endif %}
 

@@ -21,7 +21,7 @@ class YearlyStrategy extends MonthlyStrategy
     /**
      * {@inheritdoc}
      */
-    public function getRecurrencePattern(Entity\Recurrence $recurrence)
+    public function getTextValue(Entity\Recurrence $recurrence)
     {
         $interval = (int)($recurrence->getInterval() / 12);
         $currentDate = new \DateTime();

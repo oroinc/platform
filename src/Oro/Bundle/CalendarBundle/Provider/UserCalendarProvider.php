@@ -216,7 +216,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
                 $occurrenceDates = $this->recurrenceStrategy->getOccurrences($recurrence, $start, $end);
                 foreach ($occurrenceDates as $occurrenceDate) {
                     $newItem = $item;
-                    $newItem['recurrencePattern'] = $this->recurrenceStrategy->getRecurrencePattern($recurrence);
+                    $newItem['recurrencePattern'] = $this->recurrenceStrategy->getTextValue($recurrence);
                     $newItem['start'] = $occurrenceDate->format('c');
                     $endDate = new \DateTime($newItem['end']);
                     $endDate->setDate(

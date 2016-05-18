@@ -46,13 +46,13 @@ class RecurrenceExtension extends \Twig_Extension
     public function getFunctions()
     {
         return [
-            'get_recurrence_pattern' => new \Twig_Function_Method(
+            'get_recurrence_text_value' => new \Twig_Function_Method(
                 $this,
-                'getRecurrencePattern'
+                'getRecurrenceTextValue'
             ),
-            'get_recurrence_pattern_by_attributes' => new \Twig_Function_Method(
+            'get_recurrence_attributes_text_value' => new \Twig_Function_Method(
                 $this,
-                'getRecurrencePatternByAttributes'
+                'getRecurrenceAttributesTextValue'
             ),
         ];
     }
@@ -62,9 +62,9 @@ class RecurrenceExtension extends \Twig_Extension
      *
      * @return string
      */
-    public function getRecurrencePattern(Entity\Recurrence $recurrence)
+    public function getRecurrenceTextValue(Entity\Recurrence $recurrence)
     {
-        return $this->delegateStrategy->getRecurrencePattern($recurrence);
+        return $this->delegateStrategy->getTextValue($recurrence);
     }
 
     /**
@@ -77,7 +77,7 @@ class RecurrenceExtension extends \Twig_Extension
      * @throws \Symfony\Component\PropertyAccess\Exception\InvalidPropertyPathException
      * @throws \Symfony\Component\PropertyAccess\Exception\NoSuchPropertyException
      */
-    public function getRecurrencePatternByAttributes($id, array $attributes)
+    public function getRecurrenceAttributesTextValue($id, array $attributes)
     {
         if ($id === null) {
             return $this->translator->trans('oro.calendar.calendarevent.recurrence.na');
@@ -90,7 +90,7 @@ class RecurrenceExtension extends \Twig_Extension
 
         $this->model->validateRecurrence($recurrence);
 
-        return $this->getRecurrencePattern($recurrence);
+        return $this->getRecurrenceTextValue($recurrence);
     }
 
     /**

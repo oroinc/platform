@@ -41,30 +41,30 @@ class RecurrenceExtensionTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals('oro_recurrence', $this->extension->getName());
     }
 
-    public function testGetRecurrencePattern()
+    public function testGetRecurrenceTextValue()
     {
         $this->delegateStrategy->expects($this->once())
-            ->method('getRecurrencePattern')
+            ->method('getTextValue')
             ->willReturn('test_pattern');
-        $this->assertEquals('test_pattern', $this->extension->getRecurrencePattern(new Entity\Recurrence()));
+        $this->assertEquals('test_pattern', $this->extension->getRecurrenceTextValue(new Entity\Recurrence()));
     }
     
-    public function testGetRecurrencePatternByAttributesWithNA()
+    public function testGetRecurrenceAttributesTextValueWithNA()
     {
         $this->translator->expects($this->once())
             ->method('trans')
             ->willReturn('N/A');
-        $this->assertEquals('N/A', $this->extension->getRecurrencePatternByAttributes(null, []));
+        $this->assertEquals('N/A', $this->extension->getRecurrenceAttributesTextValue(null, []));
     }
 
-    public function testGetRecurrencePatternByAttributes()
+    public function testGetRecurrenceAttributesTextValue()
     {
         $this->delegateStrategy->expects($this->once())
-            ->method('getRecurrencePattern')
+            ->method('getTextValue')
             ->willReturn('test_pattern');
         $this->assertEquals(
             'test_pattern',
-            $this->extension->getRecurrencePatternByAttributes(
+            $this->extension->getRecurrenceAttributesTextValue(
                 1,
                 [
                     'recurrence_type' => 'daily',

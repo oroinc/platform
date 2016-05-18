@@ -45,7 +45,7 @@ interface StrategyInterface
      *
      * @throws \InvalidArgumentException
      */
-    public function getRecurrencePattern(Recurrence $recurrence);
+    public function getTextValue(Recurrence $recurrence);
 
     /**
      * Calculates and returns last occurrence date.
