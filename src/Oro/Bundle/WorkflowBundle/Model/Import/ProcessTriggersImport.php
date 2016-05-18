@@ -37,7 +37,7 @@ class ProcessTriggersImport
     /**
      * @var array|Schedule[]
      */
-    private $createdSchedules;
+    private $createdSchedules = [];
 
     /**
      * @param ProcessConfigurationBuilder $configurationBuilder
@@ -78,13 +78,14 @@ class ProcessTriggersImport
             $entityManager = $this->getObjectManager();
             
             foreach ($triggers as $trigger) {
-                if ($existingTrigger = $triggerRepository->findEqualTrigger($trigger)) {
+                $existingTrigger = $triggerRepository->findEqualTrigger($trigger);
+                if ($existingTrigger) {
                     $existingTrigger->import($trigger);
+                    $importedTriggers[] = $existingTrigger;
                 } else {
                     $entityManager->persist($trigger);
+                    $importedTriggers[] = $trigger;
                 }
-
-                $importedTriggers[] = $trigger;
             }
 
             $entityManager->flush();

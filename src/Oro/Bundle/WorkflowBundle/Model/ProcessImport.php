@@ -3,8 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationProvider;
-use Oro\Bundle\WorkflowBundle\Model\Import\ProcessImportResult;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessDefinitionsImport;
+use Oro\Bundle\WorkflowBundle\Model\Import\ProcessImportResult;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport;
 
 class ProcessImport
