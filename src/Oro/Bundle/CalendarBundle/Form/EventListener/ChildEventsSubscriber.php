@@ -66,7 +66,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     public function preSubmit(FormEvent $event)
     {
         $data = $event->getForm()->getData();
-
         if ($data) {
             $this->parentEvent = $data;
         }
@@ -81,10 +80,8 @@ class ChildEventsSubscriber implements EventSubscriberInterface
     {
         /** @var Attendee[] $attendees */
         $attendees = $event->getForm()->getData();
-
         if ($attendees && $this->parentEvent) {
             $existingAttendees = $this->parentEvent->getAttendees();
-
             foreach ($attendees as $key => $attendee) {
                 $existingAttendee = ArrayUtil::find(
                     function (Attendee $existingAttendee) use ($attendee) {
@@ -118,7 +115,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         $parentEvent = $event->getForm()->getData();
         $this->updateCalendarEvents($parentEvent);
         $this->updateAttendeeDisplayNames($parentEvent);
-
         if (!$parentEvent) {
             return;
         }
@@ -152,7 +148,6 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
         $attendeesByUserId = [];
         $attendees = $parent->getAttendees();
-
         foreach ($attendees as $attendee) {
             if (!$attendee->getUser()) {
                 continue;
@@ -164,17 +159,14 @@ class ChildEventsSubscriber implements EventSubscriberInterface
 
         $calendarEventOwnerIds = [];
         $calendar = $parent->getCalendar();
-
         if ($calendar && $calendar->getOwner()) {
             $owner = $calendar->getOwner();
-
             if (isset($attendeesByUserId[$owner->getId()])) {
                 $parent->setRelatedAttendee($attendeesByUserId[$owner->getId()]);
             }
             $calendarEventOwnerIds[] = $calendar->getOwner()->getId();
         }
         $events = $parent->getChildEvents();
-
         foreach ($events as $event) {
             $calendar = $event->getCalendar();
             if (!$calendar) {

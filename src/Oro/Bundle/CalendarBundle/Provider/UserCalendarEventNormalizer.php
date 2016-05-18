@@ -72,7 +72,6 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         }
 
         $extraValues['invitedUsers'] = [];
-
         foreach ($event->getAttendees() as $attendee) {
             $extraValues['invitedUsers'][] =  $this->transformEntity([
                 'displayName' => $attendee->getDisplayName(),

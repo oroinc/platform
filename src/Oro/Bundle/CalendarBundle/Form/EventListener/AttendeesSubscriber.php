@@ -44,7 +44,6 @@ class AttendeesSubscriber implements EventSubscriberInterface
         /** @var Attendee[]|Collection $data */
         $data      = $event->getData();
         $attendees = $event->getForm()->getData();
-
         if (!$attendees || !$data) {
             return;
         }
@@ -56,7 +55,6 @@ class AttendeesSubscriber implements EventSubscriberInterface
 
         $nextNewKey = count($attendeeKeysByEmail);
         $fixedData = [];
-
         foreach ($data as $attendee) {
             if (empty($attendee['email'])) {
                 return;
@@ -78,7 +76,6 @@ class AttendeesSubscriber implements EventSubscriberInterface
     public function postSubmit(FormEvent $event)
     {
         $attendees = $event->getData();
-
         if (!$attendees) {
             return;
         }
@@ -109,7 +106,6 @@ class AttendeesSubscriber implements EventSubscriberInterface
 
             foreach ($user->getEmails() as $emailEntity) {
                 $email = $emailEntity->getEmail();
-                
                 if (isset($unboundAttendeesByEmail[$email])) {
                     $unboundAttendeesByEmail[$email]->setUser($user);
                     unset($unboundAttendeesByEmail[$email]);

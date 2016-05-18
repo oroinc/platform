@@ -737,7 +737,6 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     public function addAttendee(Attendee $attendee)
     {
         $attendees = $this->getRealCalendarEvent()->attendees;
-        
         if (!$attendees->contains($attendee)) {
             $attendee->setCalendarEvent($this);
             $attendees->add($attendee);
