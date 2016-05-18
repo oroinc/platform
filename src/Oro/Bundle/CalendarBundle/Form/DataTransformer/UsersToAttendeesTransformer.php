@@ -122,7 +122,6 @@ class UsersToAttendeesTransformer implements DataTransformerInterface
     {
         $userIds = [];
         $emails  = [];
-
         foreach ($ids as $userId) {
             if (is_numeric($userId)) {
                 $userIds[] = $userId;
