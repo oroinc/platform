@@ -3,6 +3,7 @@ namespace Oro\Component\Messaging\ZeroConfig\Amqp;
 
 use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
 use \Oro\Component\Messaging\Transport\Amqp\AmqpSession as TransportAmqpSession;
+use Oro\Component\Messaging\ZeroConfig\Config;
 use Oro\Component\Messaging\ZeroConfig\SessionInterface;
 
 class AmqpSession implements SessionInterface
@@ -13,37 +14,18 @@ class AmqpSession implements SessionInterface
     protected $session;
 
     /**
-     * @var string
+     * @var Config
      */
-    protected $routerTopicName;
-
-    /**
-     * @var string
-     */
-    protected $routerQueueName;
-
-    /**
-     * @var string
-     */
-    protected $queueTopicName;
-
-    /**
-     * @var string
-     */
-    protected $defaultQueueQueueName;
+    protected $config;
 
     /**
      * @param TransportAmqpSession $session
-     * @param string               $routerTopicName
-     * @param string               $routerQueueName
-     * @param string               $queueTopicName
+     * @param Config               $config
      */
-    public function __construct(TransportAmqpSession $session, $routerTopicName, $routerQueueName, $queueTopicName)
+    public function __construct(TransportAmqpSession $session, Config $config)
     {
         $this->session = $session;
-        $this->routerTopicName = $routerTopicName;
-        $this->routerQueueName = $routerQueueName;
-        $this->queueTopicName = $queueTopicName;
+        $this->config = $config;
     }
 
     /**
@@ -61,7 +43,7 @@ class AmqpSession implements SessionInterface
      */
     public function createFrontProducer()
     {
-        return new AmqpFrontProducer($this->session, $this->routerTopicName, $this->routerQueueName);
+        return new AmqpFrontProducer($this->session, $this->config);
     }
 
     /**
@@ -69,6 +51,6 @@ class AmqpSession implements SessionInterface
      */
     public function createQueueProducer()
     {
-        return new AmqpQueueProducer($this->session, $this->queueTopicName, $this->defaultQueueQueueName);
+        return new AmqpQueueProducer($this->session, $this->config);
     }
 }

@@ -5,6 +5,7 @@ use Oro\Component\Messaging\Transport\Amqp\AmqpQueue;
 use Oro\Component\Messaging\Transport\Amqp\AmqpSession as TransportAmqpSession;
 use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
 use Oro\Component\Messaging\Transport\Message;
+use Oro\Component\Messaging\ZeroConfig\Config;
 use Oro\Component\Messaging\ZeroConfig\ProducerInterface;
 
 class AmqpFrontProducer implements ProducerInterface
@@ -15,25 +16,18 @@ class AmqpFrontProducer implements ProducerInterface
     protected $session;
 
     /**
-     * @var string
+     * @var Config
      */
-    protected $topicName;
-
-    /**
-     * @var string
-     */
-    protected $queueName;
+    protected $config;
 
     /**
      * @param TransportAmqpSession $session
-     * @param string               $topicName
-     * @param string               $queueName
+     * @param Config               $config
      */
-    public function __construct(TransportAmqpSession $session, $topicName, $queueName)
+    public function __construct(TransportAmqpSession $session, Config $config)
     {
         $this->session = $session;
-        $this->topicName = $topicName;
-        $this->queueName = $queueName;
+        $this->config = $config;
     }
 
     /**
@@ -60,7 +54,7 @@ class AmqpFrontProducer implements ProducerInterface
      */
     protected function createTopic()
     {
-        $topic = $this->session->createTopic($this->topicName);
+        $topic = $this->session->createTopic($this->config->getRouterTopicName());
         $topic->setType('fanout');
         $topic->setDurable(true);
 
@@ -72,7 +66,7 @@ class AmqpFrontProducer implements ProducerInterface
      */
     protected function createQueue()
     {
-        $queue = $this->session->createQueue($this->queueName);
+        $queue = $this->session->createQueue($this->config->getRouterQueueName());
         $queue->setDurable(true);
         $queue->setAutoDelete(false);
 

@@ -1,9 +1,7 @@
 <?php
-namespace Oro\Component\Messaging\ZeroConfig\Amqp;
+namespace Oro\Component\Messaging\ZeroConfig;
 
-use Oro\Component\Messaging\ZeroConfig\SchemaConfigInterface;
-
-class AmqpSchemaConfig implements SchemaConfigInterface
+class Config
 {
     /**
      * @var string
@@ -40,43 +38,42 @@ class AmqpSchemaConfig implements SchemaConfigInterface
     public function __construct($prefix, $routerTopicName, $routerQueueName, $queueTopicName, $defaultQueueQueueName)
     {
         $this->prefix = $prefix;
-
-        $this->routerTopicName = $this->formatName($routerTopicName);
-        $this->routerQueueName = $this->formatName($routerQueueName);
-        $this->queueTopicName = $this->formatName($queueTopicName);
-        $this->defaultQueueQueueName = $this->formatName($defaultQueueQueueName);
+        $this->routerTopicName = $routerTopicName;
+        $this->routerQueueName = $routerQueueName;
+        $this->queueTopicName = $queueTopicName;
+        $this->defaultQueueQueueName = $defaultQueueQueueName;
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getRouterTopicName()
     {
-        return $this->routerTopicName;
+        return $this->formatName($this->routerTopicName);
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getRouterQueueName()
     {
-        return $this->routerQueueName;
+        return $this->formatName($this->routerQueueName);
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
     public function getQueueTopicName()
     {
-        return $this->queueTopicName;
+        return $this->formatName($this->queueTopicName);
     }
 
     /**
-     * {@inheritdoc}
+     * @return string
      */
-    public function getQueueQueueName($queueName = null)
+    public function getDefaultQueueQueueName()
     {
-        return $queueName ? $this->formatName($queueName) : $this->defaultQueueQueueName;
+        return $this->formatName($this->defaultQueueQueueName);
     }
 
     /**
@@ -84,7 +81,7 @@ class AmqpSchemaConfig implements SchemaConfigInterface
      *
      * @return string
      */
-    protected function formatName($name)
+    public function formatName($name)
     {
         return strtolower(trim($this->prefix) . '.' . trim($name));
     }
