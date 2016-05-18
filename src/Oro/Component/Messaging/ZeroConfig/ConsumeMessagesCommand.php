@@ -61,7 +61,10 @@ class ConsumeMessagesCommand extends Command
         $loggerExtension = new LoggerExtension(new ConsoleLogger($output));
         $runtimeExtensions = new Extensions([$loggerExtension]);
 
-        $queueName = $input->getArgument('queue') ?: $this->config->getDefaultQueueQueueName();
+        $queueName = $input->getArgument('queue')
+            ? $this->config->formatName($input->getArgument('queue'))
+            : $this->config->getDefaultQueueQueueName()
+        ;
 
         try {
             $this->consumer->consume($queueName, $this->processor, $runtimeExtensions);
