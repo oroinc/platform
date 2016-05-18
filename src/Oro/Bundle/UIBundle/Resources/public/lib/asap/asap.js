@@ -294,9 +294,3 @@ if (!window.asap) {
  * always replace setImmediate
  */
 window.setImmediate = window.asap;
-
-if (window.define) {
-    window.define(function() {
-        return window.asap;
-    });
-}

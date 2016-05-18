@@ -31,6 +31,8 @@ config:
         'oroui/lib/bootstrap/js/bootstrap-popover':
             deps:
                 - 'oroui/lib/bootstrap/js/bootstrap-tooltip'
+        'asap':
+            exports: 'asap'
         'underscore':
             exports: '_'
         'backbone-bootstrap-modal':
@@ -115,6 +117,7 @@ config:
     paths:
         'text': 'bundles/oroui/lib/text.js'
         'json': 'bundles/oroui/lib/json2.js'
+        'asap': 'bundles/oroui/lib/asap/asap.js'
         'base64': 'bundles/oroui/lib/base64.js'
         'jquery': 'bundles/components/jquery/jquery.js'
         'jquery-ui': 'bundles/oroui/lib/jquery-ui-1.11.2.js'
