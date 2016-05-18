@@ -139,7 +139,7 @@ class CalendarEventType extends AbstractType
     {
         foreach ($attendees as $attendee) {
             if ($attendee->getOrigin()) {
-                return;
+                continue;
             }
 
             $server = $this->registry->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
