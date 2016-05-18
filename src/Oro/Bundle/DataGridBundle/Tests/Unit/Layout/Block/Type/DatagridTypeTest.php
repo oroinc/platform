@@ -2,11 +2,11 @@
 
 namespace Oro\Bundle\DataGridBundle\Tests\Unit\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-
 use Oro\Bundle\LayoutBundle\Tests\Unit\BlockTypeTestCase;
 use Oro\Bundle\DataGridBundle\Layout\Block\Type\DatagridType;
 use Oro\Bundle\DataGridBundle\Datagrid\NameStrategyInterface;
+
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 class DatagridTypeTest extends BlockTypeTestCase
 {
@@ -103,7 +103,7 @@ class DatagridTypeTest extends BlockTypeTestCase
     {
         $datagridType = new DatagridType($this->nameStrategy);
         $resolver = new OptionsResolver();
-        $datagridType->setDefaultOptions($resolver);
+        $datagridType->configureOptions($resolver);
 
         $actual = $resolver->resolve($options);
         $this->assertEquals($expectedOptions, $actual);

@@ -2,13 +2,11 @@
 
 namespace Oro\Component\Layout\Block\Type;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
-use Symfony\Component\OptionsResolver\OptionsResolverInterface;
-
 use Oro\Component\Layout\BlockBuilderInterface;
 use Oro\Component\Layout\BlockInterface;
 use Oro\Component\Layout\BlockView;
 use Oro\Component\Layout\BlockTypeInterface;
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
 
 abstract class AbstractType implements BlockTypeInterface
 {
@@ -49,9 +47,9 @@ abstract class AbstractType implements BlockTypeInterface
     }
 
     /**
-     * @param OptionsResolver|OptionsResolverInterface $resolver
+     * @param OptionsResolver $resolver
      */
-    public function setDefaultOptions(OptionsResolverInterface $resolver)
+    public function configureOptions(OptionsResolver $resolver)
     {
         foreach ($this->options as $name => $settings) {
             $resolver->setDefined($name);

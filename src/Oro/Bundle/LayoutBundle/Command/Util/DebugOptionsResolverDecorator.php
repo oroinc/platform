@@ -2,16 +2,39 @@
 
 namespace Oro\Bundle\LayoutBundle\Command\Util;
 
-use Symfony\Component\OptionsResolver\OptionsResolver;
+use Symfony\Component\OptionsResolver\OptionsResolver as BaseOptionResolver;
 
-class DebugOptionsResolver extends OptionsResolver
+use Oro\Component\Layout\Block\OptionsResolver\OptionsResolver;
+
+class DebugOptionsResolverDecorator
 {
+    /**
+     * @var OptionsResolver|BaseOptionResolver
+     */
+    protected $optionsResolver;
+
+    /**
+     * @param OptionsResolver|BaseOptionResolver $optionsResolver
+     */
+    public function __construct(BaseOptionResolver $optionsResolver)
+    {
+        $this->optionsResolver = $optionsResolver;
+    }
+
+    /**
+     * @return OptionsResolver|BaseOptionResolver
+     */
+    public function getOptionResolver()
+    {
+        return $this->optionsResolver;
+    }
+
     /**
      * @return array
      */
     public function getDefaultOptions()
     {
-        return $this->getPrivatePropertyValue($this, 'defaults');
+        return $this->getPrivatePropertyValue($this->optionsResolver, 'defaults');
     }
 
     /**
@@ -19,11 +42,11 @@ class DebugOptionsResolver extends OptionsResolver
      */
     public function getDefinedOptions()
     {
-        $definedOptions = $this->getPrivatePropertyValue($this, 'defined');
-        $allowedTypes   = $this->getPrivatePropertyValue($this, 'allowedTypes');
+        $definedOptions = array_keys($this->getPrivatePropertyValue($this->optionsResolver, 'defined'));
+        $allowedTypes   = $this->getPrivatePropertyValue($this->optionsResolver, 'allowedTypes');
 
         $result = [];
-        foreach (array_keys($definedOptions) as $name) {
+        foreach ($definedOptions as $name) {
             $result[$name] = isset($allowedTypes[$name]) ? (array)$allowedTypes[$name] : [];
         }
 
@@ -31,7 +54,7 @@ class DebugOptionsResolver extends OptionsResolver
     }
 
     /**
-     * @param object $object
+     * @param OptionsResolver|BaseOptionResolver $object
      * @param string $propertyName
      *
      * @return mixed
