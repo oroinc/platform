@@ -317,9 +317,9 @@ class TransitionAssemblerTest extends \PHPUnit_Framework_TestCase
 
         if (array_key_exists('schedule', $transitionDefinition)) {
             $scheduleDefinition = $transitionDefinition['schedule'];
-            $this->assertEquals((string)$scheduleDefinition['cron'], $actualTransition->getScheduleCron());
+            $this->assertEquals((string) $scheduleDefinition['cron'], $actualTransition->getScheduleCron());
             if (isset($scheduleDefinition['filter'])) {
-                $this->assertEquals((string)$scheduleDefinition['filter'], $actualTransition->getScheduleFilter());
+                $this->assertEquals((string) $scheduleDefinition['filter'], $actualTransition->getScheduleFilter());
             }
         }
 

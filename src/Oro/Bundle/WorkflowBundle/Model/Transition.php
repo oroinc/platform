@@ -4,13 +4,16 @@ namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Collections\Collection;
 
+use Oro\Component\Action\Action\ActionInterface;
 use Oro\Component\ConfigExpression\ExpressionInterface;
 
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Exception\ForbiddenTransitionException;
 
-use Oro\Component\Action\Action\ActionInterface;
-
+/**
+ * @SuppressWarnings(PHPMD.TooManyFields)
+ * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ */
 class Transition
 {
     /**
@@ -521,18 +524,26 @@ class Transition
      */
     public function setScheduleCron($cron)
     {
-        $this->scheduleCron = (string)$cron;
+        $this->scheduleCron = (string) $cron;
 
         return $this;
     }
 
     /**
-     * @param string $DQLFilter
+     * @return string
+     */
+    public function getScheduleCron()
+    {
+        return $this->scheduleCron;
+    }
+
+    /**
+     * @param string $dqlFilter
      * @return $this
      */
-    public function setScheduleFilter($DQLFilter)
+    public function setScheduleFilter($dqlFilter)
     {
-        $this->scheduleFilter = (string)$DQLFilter;
+        $this->scheduleFilter = (string) $dqlFilter;
 
         return $this;
     }
@@ -543,13 +554,5 @@ class Transition
     public function getScheduleFilter()
     {
         return $this->scheduleFilter;
-    }
-
-    /**
-     * @return string
-     */
-    public function getScheduleCron()
-    {
-        return $this->scheduleCron;
     }
 }

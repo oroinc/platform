@@ -150,7 +150,7 @@ class TransitionAssembler extends BaseAbstractAssembler
         }
 
         if (!empty($definition['schedule'])) {
-            $transition->setScheduleCron($definition['schedule']['cron']);
+            $transition->setScheduleCron($this->getOption($definition['schedule'], 'cron', null));
             $transition->setScheduleFilter($this->getOption($definition['schedule'], 'filter', null));
         }
 
