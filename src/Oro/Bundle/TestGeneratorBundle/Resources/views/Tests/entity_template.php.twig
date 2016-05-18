@@ -1,0 +1,34 @@
+<?php
+
+namespace {{ namespace }};
+
+{% for vendor in vendors %}
+{% for use in vendor %}
+use {{ use }};
+{% endfor %}
+
+{% endfor %}
+class {{ className }} extends \PHPUnit_Framework_TestCase
+{
+    use EntityTestCaseTrait;
+
+    public function testAccessors()
+    {
+{% if propertiesData.simple|length > 0 %}
+        $this->assertPropertyAccessors(new {{ testedClassName }}(), [
+{%  for key, data in propertiesData.simple %}
+            ['{{ data.propertyName }}', {% if data.value is defined %}{% if data.quotes is defined %}'{% endif %}{{ data.value }}{% if data.quotes is defined %}'{% endif %}{% else %}new {{ data.type }}(){% endif %}]{% if propertiesData.simple|length != key+1 %},{% endif %}
+
+{% endfor %}
+        ]);
+{% endif %}
+{% if propertiesData.collection|length > 0 %}
+        $this->assertPropertyCollections(new {{ testedClassName }}(), [
+    {%  for key, data in propertiesData.collection %}
+        ['{{ data.propertyName }}', new {{ data.type }}()]{% if propertiesData.simple|length != key+1 %},{% endif %}
+
+    {% endfor %}
+    ]);
+{% endif %}
+    }
+}

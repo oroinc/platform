@@ -7,6 +7,7 @@ define(function(require) {
     var tools = require('oroui/js/tools');
     var __ = require('orotranslation/js/translator');
     var ChoiceFilter = require('./choice-filter');
+    var DatePickerView = require('oroui/js/app/views/datepicker/datepicker-view');
     var VariableDatePickerView = require('orofilter/js/app/views/datepicker/variable-datepicker-view');
     var DateVariableHelper = require('orofilter/js/date-variable-helper');
     var DateValueHelper = require('orofilter/js/date-value-helper');
@@ -83,7 +84,7 @@ define(function(require) {
          *
          * @property
          */
-        picker: VariableDatePickerView,
+        picker: tools.isMobile() ? DatePickerView : VariableDatePickerView,
 
         /**
          * Additional date widget options that might be passed to filter
@@ -491,8 +492,8 @@ define(function(require) {
          * @inheritDoc
          */
         _readDOMValue: function() {
-            this.subview('start').checkConsistency();
-            this.subview('end').checkConsistency();
+            _.result(this.subview('start'), 'checkConsistency');
+            _.result(this.subview('end'), 'checkConsistency');
 
             return {
                 type: this._getInputValue(this.criteriaValueSelectors.date_type),

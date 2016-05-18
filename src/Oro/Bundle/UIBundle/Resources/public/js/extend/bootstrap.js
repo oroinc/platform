@@ -98,6 +98,17 @@ define([
         return this.$arrow;
     };
 
+    Popover.prototype.tip = function() {
+        if (!this.$tip) {
+            this.$tip = $(this.options.template);
+            var addClass = this.$element.data('class');
+            if (addClass && !this.$tip.hasClass(addClass)) {
+                this.$tip.addClass(addClass);
+            }
+        }
+        return this.$tip;
+    };
+
     Popover.prototype.applyPlacement = function(offset, placement) {
         /** Following snippet was copied from original Bootstrap method to fix bug with offset correction.
          *  See comment in the snippet

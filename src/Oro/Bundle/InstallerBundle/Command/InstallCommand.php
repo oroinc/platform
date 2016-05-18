@@ -40,6 +40,12 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->addOption('user-firstname', null, InputOption::VALUE_OPTIONAL, 'User first name')
             ->addOption('user-lastname', null, InputOption::VALUE_OPTIONAL, 'User last name')
             ->addOption('user-password', null, InputOption::VALUE_OPTIONAL, 'User password')
+            ->addOption(
+                'skip-assets',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip UI related commands during installation'
+            )
             ->addOption('force', null, InputOption::VALUE_NONE, 'Force installation')
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it')
             ->addOption(
@@ -69,7 +75,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
         }
 
         $forceInstall = $input->getOption('force');
-
+        $skipAssets = $input->getOption('skip-assets');
         $commandExecutor = $this->getCommandExecutor($input, $output);
 
         // if there is application is not installed or no --force option
@@ -123,7 +129,7 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
             ->checkStep($output)
             ->prepareStep($commandExecutor, $dropDatabase)
             ->loadDataStep($commandExecutor, $output)
-            ->finalStep($commandExecutor, $output, $input);
+            ->finalStep($commandExecutor, $output, $input, $skipAssets);
 
         $output->writeln('');
         $output->writeln(
@@ -499,10 +505,15 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
      * @param CommandExecutor $commandExecutor
      * @param OutputInterface $output
      * @param InputInterface $input
+     * @param boolean $skipAssets
      * @return InstallCommand
      */
-    protected function finalStep(CommandExecutor $commandExecutor, OutputInterface $output, InputInterface $input)
-    {
+    protected function finalStep(
+        CommandExecutor $commandExecutor,
+        OutputInterface $output,
+        InputInterface $input,
+        $skipAssets
+    ) {
         $output->writeln('<info>Preparing application.</info>');
 
         $assetsOptions = array(
@@ -518,38 +529,39 @@ class InstallCommand extends AbstractCommand implements InstallCommandInterface
                 array(
                     '--process-isolation' => true,
                 )
-            )
-            ->runCommand(
+            );
+        if (!$skipAssets) {
+            $commandExecutor->runCommand(
                 'fos:js-routing:dump',
                 array(
                     '--process-isolation' => true,
                 )
             )
-            ->runCommand('oro:localization:dump')
-            ->runCommand(
-                'oro:assets:install',
-                $assetsOptions
-            )
-            ->runCommand(
-                'assetic:dump',
-                array(
-                    '--process-isolation' => true,
+                ->runCommand('oro:localization:dump')
+                ->runCommand(
+                    'oro:assets:install',
+                    $assetsOptions
                 )
-            )
-            ->runCommand(
-                'oro:translation:dump',
-                array(
-                    '--process-isolation' => true,
+                ->runCommand(
+                    'assetic:dump',
+                    array(
+                        '--process-isolation' => true,
+                    )
                 )
-            )
-            ->runCommand(
-                'oro:requirejs:build',
-                array(
-                    '--ignore-errors'     => true,
-                    '--process-isolation' => true,
+                ->runCommand(
+                    'oro:translation:dump',
+                    array(
+                        '--process-isolation' => true,
+                    )
                 )
-            );
-
+                ->runCommand(
+                    'oro:requirejs:build',
+                    array(
+                        '--ignore-errors' => true,
+                        '--process-isolation' => true,
+                    )
+                );
+        }
         // run installer scripts
         $this->processInstallerScripts($output, $commandExecutor);
 

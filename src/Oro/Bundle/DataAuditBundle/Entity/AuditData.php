@@ -13,7 +13,7 @@ class AuditData extends AbstractKeyValue
     public $key;
 
     /**
-     * @Soap\ComplexType("Oro\Bundle\SoapBundle\Type\KeyValue\String[]", nillable=true)
+     * @Soap\ComplexType("Oro\Bundle\SoapBundle\Type\KeyValue\StringType[]", nillable=true)
      */
     protected $value;
 

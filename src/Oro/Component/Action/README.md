@@ -1,4 +1,4 @@
-Oor Action Component
+Oro Action Component
 ====================
 
 The Action component provides set of useful classes, that can be used as engine to compile and evaluate some logic,

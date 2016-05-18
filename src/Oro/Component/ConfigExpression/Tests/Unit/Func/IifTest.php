@@ -32,12 +32,12 @@ class IifTest extends \PHPUnit_Framework_TestCase
     {
         return [
             'true_expr'        => [
-                'options'        => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'        => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'context'        => ['foo' => 'true', 'bar' => 'false'],
                 'expectedResult' => 'true'
             ],
             'false_expr'       => [
-                'options'        => [new Condition\False(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'        => [new Condition\FalseCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'context'        => ['foo' => 'true', 'bar' => 'false'],
                 'expectedResult' => 'false'
             ],
@@ -89,7 +89,7 @@ class IifTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
                 'expected' => [
                     '@iif' => [
@@ -114,7 +114,7 @@ class IifTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             [
-                'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => 'Test',
                 'expected' => [
                     '@iif' => [
@@ -147,7 +147,7 @@ class IifTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => null,
                 'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), '
                     . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false]), '
@@ -163,7 +163,7 @@ class IifTest extends \PHPUnit_Framework_TestCase
                     . '])'
             ],
             [
-                'options'  => [new Condition\True(), new PropertyPath('foo'), new PropertyPath('bar')],
+                'options'  => [new Condition\TrueCondition(), new PropertyPath('foo'), new PropertyPath('bar')],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'iif\', [$factory->create(\'true\', []), '
                     . 'new \Oro\Component\ConfigExpression\CompiledPropertyPath(\'foo\', [\'foo\'], [false]), '

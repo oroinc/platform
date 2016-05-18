@@ -1,7 +1,7 @@
 oro:
     entity_config:
         action:
-            manage:              Access Entity Management
+            manage:              Access entity management
             view_entities:       View configurable entities
             update_entity:       Update configurable entity
             view_entity:         View configurable entity
@@ -50,7 +50,7 @@ oro:
 
         info:
             new_field.label:     New Field
-            records_count.label: Number of records: %count%
+            records_count.label: 'Number of records: %count%'
 
         form:
             name.label: Name

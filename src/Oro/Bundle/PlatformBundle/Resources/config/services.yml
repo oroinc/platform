@@ -37,10 +37,26 @@ services:
         calls:
             - [ setNamespace, [ 'oro_platform_version' ] ]
 
+    oro_platform.url.cache:
+        parent: oro.cache.abstract
+        calls:
+            - [ setNamespace, [ 'oro_platform_url' ] ]
+
     oro_platform.composer.version_helper:
         class: %oro_platform.composer.version_helper.class%
         calls:
             - [ setCache, [ '@oro_platform.version.cache' ] ]
+        arguments:
+            - '@oro_platform.composer.local_repo_factory'
+
+    oro_platform.form.url_generator:
+        class: 'Oro\Bundle\PlatformBundle\Form\UrlGenerator'
+        arguments:
+            - '@oro_platform.provider.package'
+            - '@oro_platform.url.cache'
+
+    oro_platform.provider.package:
+        class: 'Oro\Bundle\PlatformBundle\Provider\PackageProvider'
         arguments:
             - '@oro_platform.composer.local_repo_factory'
 

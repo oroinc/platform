@@ -31,6 +31,13 @@ class ConstraintFactory
             );
         }
 
+        /**
+         * Fixed issue with array pointer on php7
+         */
+        if (is_array($options)) {
+            reset($options);
+        }
+
         return new $className($options);
     }
 

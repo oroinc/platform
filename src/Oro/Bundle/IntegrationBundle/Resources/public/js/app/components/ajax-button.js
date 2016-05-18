@@ -7,7 +7,7 @@ define(function(require) {
     var mediator = require('oroui/js/mediator');
     var options = {
         successMessage: '',
-        errorMessage: '',
+        errorMessage: 'oro.ui.unexpected_error',
         redirect: '/'
     };
 
@@ -18,10 +18,10 @@ define(function(require) {
         url = $(e.target).data('url');
         mediator.execute('showLoading');
         $.get(url, function(data) {
-            mediator.execute('showFlashMessage', 'success', __(data.message));
+            mediator.execute('showFlashMessage', 'success', data.message);
             mediator.execute('redirectTo', {url: options.redirect}, {redirect: true});
-        }).error(function(data) {
-            mediator.execute('showFlashMessage', 'error', __(data.message));
+        }).error(function() {
+            mediator.execute('showFlashMessage', 'error', __(options.errorMessage));
         }).always(function() {
             mediator.execute('hideLoading');
         });

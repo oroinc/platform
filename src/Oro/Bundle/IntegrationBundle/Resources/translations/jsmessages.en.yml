@@ -15,6 +15,16 @@ oro:
 
         force_sync:
             title: Confirm full integration re-sync
-            message: Attention: This action will start full re-synchronization of all {{ integration_name }} data. It might require some time to complete.
+            message: 'Attention: This action will start full re-synchronization of all {{ integration_name }} data. It might require some time to complete.'
             ok: Run Re-sync
             cancel: Cancel
+
+        activate:
+            fail:
+                message:
+                    Failed to activate integration.
+
+        deactivate:
+            fail:
+                message:
+                    Failed to deactivate integration.

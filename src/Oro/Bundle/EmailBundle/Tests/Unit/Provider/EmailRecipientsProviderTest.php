@@ -120,7 +120,7 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
                     ]),
                     $this->createProvider('section2', [
                         new Recipient('recipient3@example.com', 'Recipient3 <recipient3@example.com>'),
-                    ]),
+                    ], 0),
                 ],
                 [
                     [
@@ -142,13 +142,20 @@ class EmailRecipientsProviderTest extends \PHPUnit_Framework_TestCase
         ];
     }
 
-    protected function createProvider($section, array $provided)
+    /**
+     * @param string    $section
+     * @param array     $provided
+     * @param int       $recipientExactly
+     *
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function createProvider($section, array $provided, $recipientExactly = 1)
     {
         $provider = $this->getMock('Oro\Bundle\EmailBundle\Provider\EmailRecipientsProviderInterface');
         $provider->expects($this->any())
             ->method('getSection')
             ->will($this->returnValue($section));
-        $provider->expects($this->once())
+        $provider->expects($this->exactly($recipientExactly))
             ->method('getRecipients')
             ->will($this->returnValue($provided));
 

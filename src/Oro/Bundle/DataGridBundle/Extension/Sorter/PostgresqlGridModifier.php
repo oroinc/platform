@@ -15,7 +15,7 @@ use Oro\Bundle\EntityBundle\ORM\EntityClassResolver;
 
 class PostgresqlGridModifier extends AbstractExtension
 {
-    const PRIORITY = -251;
+    const PRIORITY = -261;
 
     /** @var string */
     protected $databaseDriver;
@@ -187,7 +187,7 @@ class PostgresqlGridModifier extends AbstractExtension
         }
 
         if (!$isSelected) {
-            $queryBuilder->select($field);
+            $queryBuilder->addSelect($field);
         }
     }
 }
