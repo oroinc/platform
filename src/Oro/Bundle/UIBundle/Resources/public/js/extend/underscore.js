@@ -24,5 +24,12 @@ define(['underscore'], function(_) {
         }
     });
 
+    /**
+     * setImmediate should be exposed by requireJs bundle
+     */
+    if (window.setImmediate) {
+        _.defer = window.setImmediate;
+    }
+
     return _;
 });
