@@ -170,8 +170,6 @@ class TitleService implements TitleServiceInterface
                     $suffix = $data->getSuffix();
                 }
             } catch (RuntimeException $e) {
-                throw $e;
-
                 // wrong json string - ignore title
                 $params = [];
                 $title  = 'Untitled';
