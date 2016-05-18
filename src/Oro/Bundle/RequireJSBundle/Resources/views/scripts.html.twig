@@ -36,7 +36,7 @@
                 if (timeout === 0) {
                     return asap(fn);
                 }
-                setTimeout.apply(this, arguments);
+                return setTimeout.apply(this, arguments);
             }
         })();
     </script>
