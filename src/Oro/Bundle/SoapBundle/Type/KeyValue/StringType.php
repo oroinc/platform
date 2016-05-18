@@ -3,9 +3,9 @@
 namespace Oro\Bundle\SoapBundle\Type\KeyValue;
 
 use BeSimple\SoapBundle\ServiceDefinition\Annotation as Soap;
-use BeSimple\SoapCommon\Type\KeyValue\String as KeyValueString;
+use BeSimple\SoapCommon\Type\AbstractKeyValue;
 
-class String extends KeyValueString
+class StringType extends AbstractKeyValue
 {
     /**
      * @Soap\ComplexType("string", nillable=true)

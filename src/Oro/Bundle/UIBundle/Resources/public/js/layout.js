@@ -226,12 +226,14 @@ define(function(require) {
          * Returns available height for element if page will be transformed to fullscreen mode
          *
          * @param $mainEl
+         * @param boundingClientRect - pass boundingClientRect of $mainEl to avoid it expensive calculation
          * @returns {number}
          */
-        getAvailableHeight: function($mainEl) {
+        getAvailableHeight: function($mainEl, boundingClientRect) {
             var $parents = $mainEl.parents();
-            var documentHeight = $(document).height();
-            var heightDiff = documentHeight - $mainEl[0].getBoundingClientRect().top;
+            var documentHeight = scrollHelper.documentHeight();
+            var heightDiff = documentHeight -
+                (boundingClientRect ? boundingClientRect : $mainEl[0].getBoundingClientRect()).top;
             $parents.each(function() {
                 heightDiff += this.scrollTop;
             });
@@ -242,11 +244,12 @@ define(function(require) {
          * Returns name of preferred layout for $mainEl
          *
          * @param $mainEl
+         * @param boundingClientRect - pass boundingClientRect of $mainEl to avoid it expensive calculation
          * @returns {string}
          */
-        getPreferredLayout: function($mainEl) {
+        getPreferredLayout: function($mainEl, boundingClientRect) {
             if (!this.hasHorizontalScroll() && !tools.isMobile() &&
-                this.getAvailableHeight($mainEl) > this.minimalHeightForFullScreenLayout) {
+                this.getAvailableHeight($mainEl, boundingClientRect) > this.minimalHeightForFullScreenLayout) {
                 return 'fullscreen';
             } else {
                 return 'scroll';

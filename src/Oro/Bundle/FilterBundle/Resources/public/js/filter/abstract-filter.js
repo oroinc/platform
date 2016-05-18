@@ -94,7 +94,7 @@ define([
          *
          * @property {Array.<string|jQuery|HTMLElement>}
          */
-        dropdownFitContainers: ['.ui-dialog-content', '#container:visible', 'body'],
+        dropdownFitContainers: ['.ui-dialog-content', '#container', 'body'],
 
         /**
          * Initialize.

@@ -295,9 +295,13 @@ class ColumnsExtension extends AbstractExtension
     protected function getDefaultGridView($gridName)
     {
         if ($this->defaultGridView === false) {
+            if (!$currentUser = $this->getCurrentUser()) {
+                return null;
+            }
+            
             $defaultGridView = $this->getGridViewRepository()->findDefaultGridView(
                 $this->aclHelper,
-                $this->getCurrentUser(),
+                $currentUser,
                 $gridName
             );
 

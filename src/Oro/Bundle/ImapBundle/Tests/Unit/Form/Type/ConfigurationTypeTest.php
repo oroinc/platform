@@ -49,7 +49,7 @@ class ConfigurationTypeTest extends FormIntegrationTestCase
             ->getMock();
 
         $this->securityFacade->expects($this->any())
-            ->method('getLoggerUser')
+            ->method('getLoggedUser')
             ->willReturn($user);
 
         $this->securityFacade->expects($this->any())
