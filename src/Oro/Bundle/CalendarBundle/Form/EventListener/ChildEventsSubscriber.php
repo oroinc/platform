@@ -189,15 +189,12 @@ class ChildEventsSubscriber implements EventSubscriberInterface
         }
 
         $missingEventUserIds = array_diff($currentUserIds, $calendarEventOwnerIds);
-
         if ($missingEventUserIds) {
             $calendars = $calendarRepository->findDefaultCalendars($missingEventUserIds, $organizationId);
-
             foreach ($calendars as $calendar) {
                 $event = new CalendarEvent();
                 $event->setCalendar($calendar);
                 $parent->addChildEvent($event);
-
                 if ($calendar->getOwner() && isset($attendeesByUserId[$calendar->getOwner()->getId()])) {
                     $event->setRelatedAttendee($attendeesByUserId[$calendar->getOwner()->getId()]);
                 }
