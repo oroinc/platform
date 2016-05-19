@@ -31,11 +31,10 @@ abstract class AbstractType implements BlockTypeInterface
             if (!array_key_exists($name, $options)) {
                 continue;
             }
-            $isOptional = !is_array($settings) || empty($settings['required']);
-            if ($isOptional && !isset($options[$name])) {
-                continue;
+            $define = is_array($settings) && (!empty($settings['required']) || array_key_exists('default', $settings));
+            if ($define || isset($options[$name])) {
+                $view->vars[$name] = $options[$name];
             }
-            $view->vars[$name] = $options[$name];
         }
     }
 
