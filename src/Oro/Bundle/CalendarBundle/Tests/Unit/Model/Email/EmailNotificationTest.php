@@ -36,7 +36,7 @@ class EmailNotificationTest extends \PHPUnit_Framework_TestCase
     public function testAttendee()
     {
         $attendee = new Attendee();
-        $this->notification->setAttendee($attendee);
+        $this->notification->setEntity($attendee);
         $this->assertEquals($attendee, $this->notification->getEntity());
     }
 

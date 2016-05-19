@@ -236,15 +236,15 @@ class EmailSendProcessor
     }
 
     /**
-     * @param Attendee $attendee
-     * @param array    $emails
-     * @param string   $templateName
+     * @param Attendee|CalendarEvent $entity
+     * @param array                  $emails
+     * @param string                 $templateName
      */
-    protected function addEmailNotification(Attendee $attendee, $emails, $templateName)
+    protected function addEmailNotification($entity, $emails, $templateName)
     {
         $emailNotification = new EmailNotification($this->em);
         $emailNotification->setEmails($emails);
-        $emailNotification->setAttendee($attendee);
+        $emailNotification->setEntity($entity);
         $emailNotification->setTemplateName($templateName);
         $this->emailNotifications[] = $emailNotification;
     }

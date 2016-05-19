@@ -3,12 +3,14 @@
 namespace Oro\Bundle\CalendarBundle\Model\Email;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Util\ClassUtils;
 
 use Oro\Bundle\EmailBundle\Entity\EmailTemplate;
 
 use Oro\Bundle\ReminderBundle\Exception\InvalidArgumentException;
 use Oro\Bundle\NotificationBundle\Processor\EmailNotificationInterface;
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 
 class EmailNotification implements EmailNotificationInterface
 {
@@ -18,8 +20,8 @@ class EmailNotification implements EmailNotificationInterface
     /** @var ObjectManager */
     protected $em;
 
-    /** @var Attendee */
-    protected $attendee;
+    /** @var Attendee|CalendarEvent */
+    protected $entity;
 
     /** @var string */
     protected $templateName;
@@ -37,11 +39,20 @@ class EmailNotification implements EmailNotificationInterface
     }
 
     /**
-     * @param Attendee $attendee
+     * @param Attendee|CalendarEvent $entity
      */
-    public function setAttendee(Attendee $attendee)
+    public function setEntity($entity)
     {
-        $this->attendee = $attendee;
+        if ($entity instanceof CalendarEvent && $entity instanceof Attendee) {
+            throw new \InvalidArgumentException(sprintf(
+                '$entity needs to be one of: %s, %s but %s given',
+                'Oro\Bundle\CalendarBundle\Entity\Attendee',
+                'Oro\Bundle\CalendarBundle\Entity\CalendarEvent',
+                ClassUtils::getClass($entity)
+            ));
+        }
+
+        $this->entity = $entity;
     }
 
     /**
@@ -78,7 +89,7 @@ class EmailNotification implements EmailNotificationInterface
 
     public function getEntity()
     {
-        return $this->attendee;
+        return $this->entity;
     }
 
     /**
