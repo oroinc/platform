@@ -2,6 +2,8 @@
 
 namespace Oro\Bundle\CalendarBundle\Form\Type;
 
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -10,7 +12,10 @@ use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
+use Oro\Bundle\CalendarBundle\Form\EventListener\AttendeesSubscriber;
+use Oro\Bundle\CalendarBundle\Form\EventListener\ChildEventsSubscriber;
 use Oro\Bundle\CalendarBundle\Manager\CalendarEventManager;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
 
 class CalendarEventApiType extends CalendarEventType
@@ -20,9 +25,15 @@ class CalendarEventApiType extends CalendarEventType
 
     /**
      * @param CalendarEventManager $calendarEventManager
+     * @param ManagerRegistry $registry
+     * @param SecurityFacade $securityFacade
      */
-    public function __construct(CalendarEventManager $calendarEventManager)
-    {
+    public function __construct(
+        CalendarEventManager $calendarEventManager,
+        ManagerRegistry $registry,
+        SecurityFacade $securityFacade
+    ) {
+        parent::__construct($registry, $securityFacade);
         $this->calendarEventManager = $calendarEventManager;
     }
 
@@ -77,12 +88,19 @@ class CalendarEventApiType extends CalendarEventType
             ->add('backgroundColor', 'text', ['required' => false])
             ->add('reminders', 'oro_reminder_collection', ['required' => false])
             ->add(
-                'invitedUsers',
-                'oro_calendar_event_invitees',
-                [
-                    'required'      => false,
-                    'property_path' => 'childEvents'
-                ]
+                $builder->create(
+                    'attendees',
+                    'oro_collection',
+                    [
+                        'property_path' => 'attendees',
+                        'type' => 'oro_calendar_event_attendees_api',
+                        'options' => [
+                            'required' => false,
+                            'label'    => 'oro.calendar.calendarevent.attendees.label',
+                        ],
+                    ]
+                )
+                ->addEventSubscriber(new AttendeesSubscriber($this->registry))
             )
             ->add('notifyInvitedUsers', 'hidden', ['mapped' => false])
             ->add(
@@ -100,7 +118,11 @@ class CalendarEventApiType extends CalendarEventType
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);
-        $this->subscribeOnChildEvents($builder, 'invitedUsers');
+        $builder->addEventSubscriber(new ChildEventsSubscriber(
+            $builder,
+            $this->registry,
+            $this->securityFacade
+        ));
     }
 
     /**

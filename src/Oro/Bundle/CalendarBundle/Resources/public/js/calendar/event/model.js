@@ -109,8 +109,8 @@ define([
 
         getInvitationStatus: function() {
             var invitationStatus = this.get('invitationStatus');
-            var invitedUsers = this.get('invitedUsers');
-            if (!invitationStatus && invitedUsers && invitedUsers.length) {
+            var attendees = this.get('attendees');
+            if (!invitationStatus && attendees && attendees.length) {
                 invitationStatus = 'accepted';
             }
             return invitationStatus;

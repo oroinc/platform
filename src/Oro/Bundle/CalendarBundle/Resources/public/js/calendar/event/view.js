@@ -45,14 +45,14 @@ define([
             loadingMaskContent: '.loading-content',
             backgroundColor: 'input[name$="[backgroundColor]"]',
             calendarUid: '[name*="calendarUid"]',
-            invitedUsers: 'input[name$="[invitedUsers]"]',
+            attendees: 'input[name$="[attendees]"]',
             contexts: 'input[name$="[contexts]"]'
         },
 
         /** @property {Array} */
         userCalendarOnlyFields: [
             {fieldName: 'reminders', emptyValue: {}, selector: '.reminders-collection'},
-            {fieldName: 'invitedUsers', emptyValue: '', selector: 'input[name$="[invitedUsers]"]'}
+            {fieldName: 'attendees', emptyValue: '', selector: 'input[name$="[attendees]"]'}
         ],
 
         initialize: function(options) {
@@ -235,7 +235,7 @@ define([
             var fieldNameRegex = /\[(\w+)\]/g;
 
             // show loading mask if child events users should be updated
-            if (!_.isEmpty(modelData.invitedUsers)) {
+            if (!_.isEmpty(modelData.attendees)) {
                 this.eventDialog.once('renderComplete', function() {
                     self.showLoadingMask();
                 });
@@ -260,7 +260,7 @@ define([
                             input.prop('checked', input.val() === value);
                         }
                     } else {
-                        if (_.first(matches) === 'invitedUsers') {
+                        if (_.first(matches) === 'attendees') {
                             if (value && value.length) {
                                 input.on('select2-data-loaded', function() {
                                     self._hideMask();
@@ -353,7 +353,7 @@ define([
                     this._showUserCalendarOnlyFields(form, false);
                 }
             }, this));
-            form.find(this.selectors.invitedUsers).on('change', _.bind(function(e) {
+            form.find(this.selectors.attendees).on('change', _.bind(function(e) {
                 this._toggleCalendarUidByInvitedUsers(form);
             }, this));
 
@@ -420,10 +420,10 @@ define([
                 delete data.calendarUid;
             }
 
-            if (data.hasOwnProperty('invitedUsers')) {
-                var invitedUsers = this.eventDialog.form.find('[name="oro_calendar_event_form[invitedUsers]"]')
+            if (data.hasOwnProperty('attendees')) {
+                var attendees = this.eventDialog.form.find('[name="oro_calendar_event_form[attendees]"]')
                     .select2('data');
-                data.invitedUsers = _.map(invitedUsers, function(user) {
+                data.attendees = _.map(attendees, function(user) {
                     return {
                         displayName: user.id ? user.fullName : user.email,
                         email: user.email,

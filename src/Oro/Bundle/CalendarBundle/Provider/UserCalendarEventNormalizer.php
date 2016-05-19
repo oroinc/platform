@@ -71,9 +71,9 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             $extraValues[$field] = $propertyAccessor->getValue($event, $field);
         }
 
-        $extraValues['invitedUsers'] = [];
+        $extraValues['attendees'] = [];
         foreach ($event->getAttendees() as $attendee) {
-            $extraValues['invitedUsers'][] =  $this->transformEntity([
+            $extraValues['attendees'][] =  $this->transformEntity([
                 'displayName' => $attendee->getDisplayName(),
                 'email' => $attendee->getEmail(),
                 'createdAt' => $attendee->getCreatedAt(),
@@ -122,7 +122,8 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         $item['notifiable'] =
             !empty($item['invitationStatus'])
             && empty($item['parentEventId'])
-            && !empty($item['invitedUsers']);
+            && !empty($item['attendees'])
+            && $item['origin'] === CalendarEvent::ORIGIN_SERVER;
     }
 
     /**
