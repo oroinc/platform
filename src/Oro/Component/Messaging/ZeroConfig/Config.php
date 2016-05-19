@@ -10,50 +10,43 @@ class Config
     /**
      * @var string
      */
-    protected $prefix;
+    private $prefix;
 
     /**
      * @var string
      */
-    protected $routerTopicName;
+    private $defaultQueueName;
 
     /**
      * @var string
      */
-    protected $routerQueueName;
+    private $routerMessageProcessorName;
 
     /**
      * @var string
      */
-    protected $queueTopicName;
+    private $routerQueueName;
 
     /**
-     * @var string
+     * @param string $prefix
+     * @param string $routerMessageProcessorName
+     * @param string $routerQueueName
+     * @param string $defaultQueueName
      */
-    protected $defaultQueueQueueName;
-
-    /**
-     * @param $prefix
-     * @param $routerTopicName
-     * @param $routerQueueName
-     * @param $queueTopicName
-     * @param $defaultQueueQueueName
-     */
-    public function __construct($prefix, $routerTopicName, $routerQueueName, $queueTopicName, $defaultQueueQueueName)
+    public function __construct($prefix, $routerMessageProcessorName, $routerQueueName, $defaultQueueName)
     {
         $this->prefix = $prefix;
-        $this->routerTopicName = $routerTopicName;
+        $this->routerMessageProcessorName = $routerMessageProcessorName;
         $this->routerQueueName = $routerQueueName;
-        $this->queueTopicName = $queueTopicName;
-        $this->defaultQueueQueueName = $defaultQueueQueueName;
+        $this->defaultQueueName = $defaultQueueName;
     }
 
     /**
      * @return string
      */
-    public function getRouterTopicName()
+    public function getRouterMessageProcessorName()
     {
-        return $this->formatName($this->routerTopicName);
+        return $this->routerMessageProcessorName;
     }
 
     /**
@@ -67,17 +60,9 @@ class Config
     /**
      * @return string
      */
-    public function getQueueTopicName()
+    public function getDefaultQueueName()
     {
-        return $this->formatName($this->queueTopicName);
-    }
-
-    /**
-     * @return string
-     */
-    public function getDefaultQueueQueueName()
-    {
-        return $this->formatName($this->defaultQueueQueueName);
+        return $this->formatName($this->defaultQueueName);
     }
 
     /**

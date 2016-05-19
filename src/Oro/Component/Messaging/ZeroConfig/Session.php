@@ -2,16 +2,15 @@
 namespace Oro\Component\Messaging\ZeroConfig;
 
 use Oro\Component\Messaging\Transport\Message;
+use Oro\Component\Messaging\Transport\MessageProducer;
 use Oro\Component\Messaging\Transport\Queue;
-use Oro\Component\Messaging\Transport\Topic;
-use Oro\Component\Messaging\Transport\Session as TransportSession;
 
 interface Session
 {
     /**
-     * @return Message
+     * @return MessageProducer
      */
-    public function createMessage();
+    public function createProducer();
 
     /**
      * @return FrontProducer
@@ -19,36 +18,19 @@ interface Session
     public function createFrontProducer();
 
     /**
-     * @return QueueProducer
+     * @return Message
      */
-    public function createQueueProducer();
-
-    /**
-     * @return Topic
-     */
-    public function createRouterTopic();
-
-    /**
-     * @return Queue
-     */
-    public function createRouterQueue();
+    public function createMessage();
 
     /**
      * @param string $queueName
-     * 
-     * @return Topic
-     */
-    public function createQueueTopic($queueName);
-
-    /**
-     * @param string $queueName
-     * 
+     *
      * @return Queue
      */
-    public function createQueueQueue($queueName);
+    public function createQueue($queueName);
 
     /**
-     * @return TransportSession
+     * @return Config
      */
-    public function getTransportSession();
+    public function getConfig();
 }

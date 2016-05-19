@@ -1,8 +1,6 @@
 <?php
 namespace Oro\Component\Messaging\ZeroConfig;
 
-use Oro\Component\Messaging\Transport\Message;
-
 class FrontProducer
 {
     /**
@@ -11,18 +9,11 @@ class FrontProducer
     protected $session;
 
     /**
-     * @var Config
-     */
-    protected $config;
-
-    /**
      * @param Session $session
-     * @param Config  $config
      */
-    public function __construct(Session $session, Config $config)
+    public function __construct(Session $session)
     {
         $this->session = $session;
-        $this->config = $config;
     }
 
     /**
@@ -31,22 +22,20 @@ class FrontProducer
      */
     public function send($topic, $body)
     {
+        $config = $this->session->getConfig();
+
         $message = $this->session->createMessage();
+
         $message->setBody($body);
 
         $properties = $message->getProperties();
         $properties[Config::PARAMETER_TOPIC_NAME] = $topic;
+        $properties[Config::PARAMETER_PROCESSOR_NAME] = $config->getRouterMessageProcessorName();
+        $properties[Config::PARAMETER_QUEUE_NAME] = $config->getRouterQueueName();
         $message->setProperties($properties);
 
-        $transportSession = $this->session->getTransportSession();
-
-        $topic = $this->session->createRouterTopic();
-        $queue = $this->session->createRouterQueue();
-
-        $transportSession->declareTopic($topic);
-        $transportSession->declareQueue($queue);
-        $transportSession->declareBind($topic, $queue);
-
-        $transportSession->createProducer()->send($topic, $message);
+        $queue = $this->session->createQueue($config->getRouterQueueName());
+        
+        $this->session->createProducer()->send($queue, $message);
     }
 }

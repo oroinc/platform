@@ -70,7 +70,7 @@ class NullMessage implements Message
      */
     public function getProperty($name, $default = null)
     {
-        return array_key_exists($name, $this->properties) ?$this->properties[$name] : $default;
+        return array_key_exists($name, $this->properties) ? $this->properties[$name] : $default;
     }
 
     /**

@@ -5,52 +5,24 @@ use Oro\Component\Messaging\ZeroConfig\Config;
 
 class ConfigTest extends \PHPUnit_Framework_TestCase
 {
-    public function testShouldReturnRouterTopicName()
+    public function testShouldReturnRouterMessageProcessorNameSetInConstructor()
     {
-        $config = new Config('', 'TOPIC','', '', '', '');
+        $config = new Config('aPrefix', 'aRouterMessageProcessorName', 'aRouterQueueName', 'aDefaultQueueName');
 
-        $this->assertSame('topic', $config->getRouterTopicName());
+        $this->assertEquals('aRouterMessageProcessorName', $config->getRouterMessageProcessorName());
     }
 
-    public function testShouldReturnRouterQueueName()
+    public function testShouldReturnRouterQueueNameSetInConstructor()
     {
-        $config = new Config('', '','QUEUE', '', '');
+        $config = new Config('aPrefix', 'aRouterMessageProcessorName', 'aRouterQueueName', 'aDefaultQueueName');
 
-        $this->assertSame('queue', $config->getRouterQueueName());
+        $this->assertEquals('aprefix.arouterqueuename', $config->getRouterQueueName());
     }
 
-    public function testShouldReturnQueueTopicName()
+    public function testShouldReturnDefaultQueueNameSetInConstructor()
     {
-        $config = new Config('', '','', 'TOPIC', '');
+        $config = new Config('aPrefix', 'aRouterMessageProcessorName', 'aRouterQueueName', 'aDefaultQueueName');
 
-        $this->assertSame('topic', $config->getQueueTopicName());
-    }
-
-    public function testShouldReturnDefaultQueueQueueName()
-    {
-        $config = new Config('', '','', '', 'QUEUE');
-
-        $this->assertSame('queue', $config->getDefaultQueueQueueName());
-    }
-
-    public function testFormatNameShouldLowercaseName()
-    {
-        $config = new Config('', '','', '', '', '');
-
-        $this->assertSame('lowercase', $config->formatName('LOWERCASE'));
-    }
-
-    public function testFormatNameShouldAddPrefix()
-    {
-        $config = new Config('prefix', '','', '', '', '');
-
-        $this->assertSame('prefix.name', $config->formatName('name'));
-    }
-
-    public function testFormatNameShouldRemoveDotsFromBeginningAndEnd()
-    {
-        $config = new Config('.prefix', '','', '', '', '');
-
-        $this->assertSame('prefix.name', $config->formatName('name.'));
+        $this->assertEquals('aprefix.adefaultqueuename', $config->getDefaultQueueName());
     }
 }

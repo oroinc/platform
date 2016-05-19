@@ -18,27 +18,27 @@ class ConsumeMessagesCommand extends Command
     protected $consumer;
 
     /**
-     * @var RouterMessageProcessor
+     * @var DelegateMessageProcessor
      */
     protected $processor;
 
     /**
-     * @var Config
+     * @var Session
      */
-    protected $config;
+    private $session;
 
     /**
-     * @param QueueConsumer         $consumer
-     * @param QueueMessageProcessor $processor
-     * @param Config                $config
+     * @param QueueConsumer $consumer
+     * @param DelegateMessageProcessor $processor
+     * @param Session $session
      */
-    public function __construct(QueueConsumer $consumer, QueueMessageProcessor $processor, Config $config)
+    public function __construct(QueueConsumer $consumer, DelegateMessageProcessor $processor, Session $session)
     {
-        parent::__construct(null);
+        parent::__construct('oro:messaging:zeroconfig:consume');
 
         $this->consumer = $consumer;
         $this->processor = $processor;
-        $this->config = $config;
+        $this->session = $session;
     }
 
     /**
@@ -47,7 +47,6 @@ class ConsumeMessagesCommand extends Command
     protected function configure()
     {
         $this
-            ->setName('oro:messaging:zeroconf:consume')
             ->setDescription('A worker that processes messages')
             ->addArgument('queue', InputArgument::OPTIONAL, 'Queues to consume from')
         ;
@@ -58,12 +57,14 @@ class ConsumeMessagesCommand extends Command
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
+        $config = $this->session->getConfig();
+        
         $loggerExtension = new LoggerExtension(new ConsoleLogger($output));
         $runtimeExtensions = new Extensions([$loggerExtension]);
 
         $queueName = $input->getArgument('queue')
-            ? $this->config->formatName($input->getArgument('queue'))
-            : $this->config->getDefaultQueueQueueName()
+            ? $config->formatName($input->getArgument('queue'))
+            : $config->getDefaultQueueName()
         ;
 
         try {

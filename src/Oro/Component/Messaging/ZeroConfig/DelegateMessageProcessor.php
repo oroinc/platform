@@ -5,7 +5,7 @@ use Oro\Component\Messaging\Consumption\MessageProcessor;
 use Oro\Component\Messaging\Transport\Message;
 use Oro\Component\Messaging\Transport\Session as TransportSession;
 
-class QueueMessageProcessor implements MessageProcessor
+class DelegateMessageProcessor implements MessageProcessor
 {
     /**
      * @var MessageProcessorRegistryInterface
@@ -27,7 +27,10 @@ class QueueMessageProcessor implements MessageProcessor
     {
         $processorName = $message->getProperty(Config::PARAMETER_PROCESSOR_NAME);
         if (false == $processorName) {
-            throw new \LogicException(sprintf('Got message without required parameter: "%s"', Config::PARAMETER_PROCESSOR_NAME));
+            throw new \LogicException(sprintf(
+                'Got message without required parameter: "%s"',
+                Config::PARAMETER_PROCESSOR_NAME
+            ));
         }
 
         return $this->registry->get($processorName)->process($message, $session);
