@@ -18,13 +18,14 @@ class BuildRouteRegistryPass implements CompilerPassInterface
             return;
         }
 
+        $tagName = 'oro_messaging.zeroconfig.message_processor';
+
         $routeRegistryDef = $container->getDefinition('oro_messaging.zeroconfig.route_registry');
 
-        $tags = $container->findTaggedServiceIds('oro_messaging.zeroconfig.message_processor');
-        foreach ($tags as $serviceId => $tagAttributes) {
+        foreach ($container->findTaggedServiceIds($tagName) as $serviceId => $tagAttributes) {
             foreach ($tagAttributes as $tagAttribute) {
                 if (false == isset($tagAttribute['messageName']) || false == $tagAttribute['messageName']) {
-
+                    throw new \LogicException(sprintf('Message name is not set but it is required. service: "%s", tag: "%s"', $serviceId, $tagName));
                 }
 
                 $queueName = null;
@@ -32,11 +33,15 @@ class BuildRouteRegistryPass implements CompilerPassInterface
                     $queueName = $tagAttribute['queueName'];
                 }
 
+                $processorName = $serviceId;
+                if (isset($tagAttribute['processorName']) && $tagAttribute['processorName']) {
+                    $processorName = $tagAttribute['processorName'];
+                }
 
                 $routeDef = new Definition(Route::class);
                 $routeDef->setPublic(false);
                 $routeDef->addMethodCall('setMessageName', [$tagAttribute['messageName']]);
-                $routeDef->addMethodCall('setProcessorName', [$serviceId]);
+                $routeDef->addMethodCall('setProcessorName', [$processorName]);
                 $routeDef->addMethodCall('setQueueName', [$queueName]);
 
                 $routeRegistryDef->addMethodCall('addRoute', [$tagAttribute['messageName'], $routeDef]);
