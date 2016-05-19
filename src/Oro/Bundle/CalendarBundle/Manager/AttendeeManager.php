@@ -66,16 +66,6 @@ class AttendeeManager
      */
     protected function isAttendeeRemovable(Attendee $attendee, $disableUserRemoval = false)
     {
-        $user          = $attendee->getUser();
-        $calendarEvent = $attendee->getCalendarEvent();
-
-        return (
-            $user instanceof User
-            && !$disableUserRemoval
-            && (
-                $attendee->getId() !== $calendarEvent->getRelatedAttendee()->getId()
-                && $attendee->getId() !== $calendarEvent->getRealCalendarEvent()->getRelatedAttendee()->getId()
-            )
-        );
+        return !$disableUserRemoval && $attendee->getUser() instanceof User;
     }
 }

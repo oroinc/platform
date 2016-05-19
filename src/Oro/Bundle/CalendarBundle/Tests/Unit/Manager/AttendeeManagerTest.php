@@ -125,7 +125,7 @@ class AttendeeManagerTest extends \PHPUnit_Framework_TestCase
         return [
             'have user and event owner' =>[
                 'attendee' => $attendee1,
-                'result' => ['fullName' => 'name@example.com', 'email' => 'name@example.com', 'locked' => true]
+                'result' => ['fullName' => 'name@example.com', 'email' => 'name@example.com']
             ],
             'does not have user' =>[
                 'attendee' => $attendee2,
