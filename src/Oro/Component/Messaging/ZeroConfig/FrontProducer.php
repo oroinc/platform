@@ -3,7 +3,7 @@ namespace Oro\Component\Messaging\ZeroConfig;
 
 use Oro\Component\Messaging\Transport\Message;
 
-class FrontProducer implements ProducerInterface
+class FrontProducer
 {
     /**
      * @var Session

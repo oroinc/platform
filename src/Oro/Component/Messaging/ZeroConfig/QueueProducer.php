@@ -3,7 +3,7 @@ namespace Oro\Component\Messaging\ZeroConfig;
 
 use Oro\Component\Messaging\Transport\Message;
 
-class QueueProducer implements ProducerInterface
+class QueueProducer
 {
     /**
      * @var Session

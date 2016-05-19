@@ -4,7 +4,7 @@ namespace Oro\Component\Messaging\Tests\ZeroConfig;
 use Oro\Component\Messaging\Transport\Null\NullMessage;
 use Oro\Component\Messaging\Transport\Session as TransportSession;
 use Oro\Component\Messaging\ZeroConfig\Config;
-use Oro\Component\Messaging\ZeroConfig\ProducerInterface;
+use Oro\Component\Messaging\ZeroConfig\QueueProducer;
 use Oro\Component\Messaging\ZeroConfig\Route;
 use Oro\Component\Messaging\ZeroConfig\RouteRegistryInterface;
 use Oro\Component\Messaging\ZeroConfig\RouterMessageProcessor;
@@ -104,10 +104,10 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|ProducerInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|QueueProducer
      */
     protected function createQueueProducerMock()
     {
-        return $this->getMock(ProducerInterface::class);
+        return $this->getMock(QueueProducer::class, [], [], '', false);
     }
 }

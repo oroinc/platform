@@ -14,12 +14,12 @@ interface Session
     public function createMessage();
 
     /**
-     * @return ProducerInterface
+     * @return FrontProducer
      */
     public function createFrontProducer();
 
     /**
-     * @return ProducerInterface
+     * @return QueueProducer
      */
     public function createQueueProducer();
 
