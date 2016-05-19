@@ -25,6 +25,10 @@ class OroTestFrameworkExtensionTest extends \PHPUnit_Framework_TestCase
     {
         $containerBuilder = $this->getContainerBuilder($bundles);
         $containerBuilder->setParameter('suite.configurations', $suiteConfig);
+        $containerBuilder->get('symfony2_extension.kernel')->getContainer()->setParameter(
+            'database_driver',
+            'pdo_mysql'
+        );
         $config = [
             'shared_contexts' => $this->sharedContexts,
             'elements_namespace_suffix' => '\Tests\Behat\Page\Element',

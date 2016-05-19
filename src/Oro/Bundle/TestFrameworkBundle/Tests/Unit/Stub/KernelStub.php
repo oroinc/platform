@@ -3,12 +3,20 @@
 namespace Oro\Bundle\TestFrameworkBundle\Tests\Unit\Stub;
 
 use Symfony\Component\Config\Loader\LoaderInterface;
+use Symfony\Component\DependencyInjection\Container;
 use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\HttpKernel\KernelInterface;
 
 class KernelStub implements KernelInterface
 {
     protected $bundleMap;
+
+    protected $container;
+
+    public function __construct()
+    {
+        $this->container = new Container();
+    }
 
     /**
      * @param array $bundleMap
@@ -130,6 +138,7 @@ class KernelStub implements KernelInterface
      */
     public function getContainer()
     {
+        return $this->container;
     }
 
     /**
