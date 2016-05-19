@@ -3,8 +3,9 @@ define([
     'backbone',
     'backgrid',
     './header-row',
-    './header-cell/header-cell'
-], function(_, Backbone, Backgrid, HeaderRow, HeaderCell) {
+    './header-cell/header-cell',
+    './util'
+], function(_, Backbone, Backgrid, HeaderRow, HeaderCell, util) {
     'use strict';
 
     var Header;
@@ -48,9 +49,11 @@ define([
                 this.columns = new Backgrid.Columns(this.columns);
             }
 
+            this.filteredColumns = util.createFilteredColumnCollection(this.columns);
+
             var rowOptions = {
                 columns: this.columns,
-                collection: this.collection,
+                collection: this.filteredColumns,
                 headerCell: this.headerCell
             };
             this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
@@ -66,9 +69,6 @@ define([
             if (this.disposed) {
                 return;
             }
-            _.each(this.row.cells, function(cell) {
-                cell.dispose();
-            });
             delete this.row.cells;
             delete this.row;
             delete this.columns;

@@ -51,39 +51,43 @@ define([
             // it is placed here to pass THIS within closure
             var _this = this;
             this.columns = options.columns;
-            this.itemView = function(options) {
-                var column = options.model;
-                var cellOptions = {
-                    column: column,
-                    model: _this.model,
-                    themeOptions: {
-                        className: 'grid-cell grid-body-cell'
+            // let descendants override itemView
+            if (!this.itemView) {
+                this.itemView = function(options) {
+                    var column = options.model;
+                    var cellOptions = {
+                        column: column,
+                        model: _this.model,
+                        themeOptions: {
+                            className: 'grid-cell grid-body-cell'
+                        }
+                    };
+                    if (column.get('name')) {
+                        cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
                     }
+                    var Cell = column.get('cell');
+                    _this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
+                    var cell = new Cell(cellOptions);
+                    if (column.has('align')) {
+                        cell.$el.removeClass('align-left align-center align-right');
+                        cell.$el.addClass('align-' + column.get('align'));
+                    }
+                    if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
+                        cell.$el.addClass('skip-row-click');
+                    }
+
+                    // use columns collection as event bus since there is no alternatives
+                    _this.columns.trigger('afterMakeCell', _this, cell);
+
+                    return cell;
                 };
-                if (column.get('name')) {
-                    cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
-                }
-                var Cell = column.get('cell');
-                _this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
-                var cell = new Cell(cellOptions);
-                if (column.has('align')) {
-                    cell.$el.removeClass('align-left align-center align-right');
-                    cell.$el.addClass('align-' + column.get('align'));
-                }
-                if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
-                    cell.$el.addClass('skip-row-click');
-                }
-
-                // use columns collection as event bus since there is no alternatives
-                _this.columns.trigger('afterMakeCell', _this, cell);
-
-                return cell;
-            };
+            }
 
             _.extend(this, _.pick(options, ['themeOptions', 'template']));
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
 
             Row.__super__.initialize.apply(this, arguments);
+            this.cells = this.subviews;
         },
 
         /**

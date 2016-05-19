@@ -1,10 +1,10 @@
 define([
     'underscore',
     'backgrid',
-    './columns',
     './row',
-    '../pageable-collection'
-], function(_, Backgrid, GridColumns, Row, PageableCollection) {
+    '../pageable-collection',
+    './util'
+], function(_, Backgrid, Row, PageableCollection, util) {
     'use strict';
 
     var Body;
@@ -46,7 +46,7 @@ define([
             }
 
             this.columns = options.columns;
-            this.filteredColumns = this.createFilteredColumnCollection(this.columns);
+            this.filteredColumns = util.createFilteredColumnCollection(this.columns);
 
             this.backgridInitialize(opts);
         },
@@ -91,20 +91,6 @@ define([
             delete this.filteredColumns;
 
             Body.__super__.dispose.call(this);
-        },
-
-        createFilteredColumnCollection: function(columns) {
-            var filteredColumns = new GridColumns(columns.where({renderable: true}));
-
-            filteredColumns.listenTo(columns, 'change:renderable add remove reset', function() {
-                filteredColumns.reset(columns.where({renderable: true}));
-            });
-
-            filteredColumns.listenTo(columns, 'sort', function() {
-                filteredColumns.sort();
-            });
-
-            return filteredColumns;
         },
 
         createRows: function() {

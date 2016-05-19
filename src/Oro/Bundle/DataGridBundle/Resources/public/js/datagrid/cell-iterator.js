@@ -9,26 +9,7 @@ define(function(require) {
     var CellIterator;
     var BaseClass = require('oroui/js/base-class');
     var $ = require('jquery');
-
-    /* This function is available in newer underscore/lodash versions */
-    function findIndex(collection, predicate) {
-        for (var i = 0; i < collection.length; i++) {
-            var item = collection[i];
-            if (predicate(item)) {
-                return i;
-            }
-        }
-    }
-
-    /* This function is available in newer underscore/lodash versions */
-    function findLastIndex(collection, predicate) {
-        for (var i = collection.length - 1; i >= 0; i--) {
-            var item = collection[i];
-            if (predicate(item)) {
-                return i;
-            }
-        }
-    }
+    var _ = require('underscore');
 
     CellIterator = BaseClass.extend({
         constructor: function(grid, cell) {
@@ -53,8 +34,8 @@ define(function(require) {
             var isFirstRow = rowI === 0;
             var isLastRow = rowI >= this.rows.length - 1;
             var columnI = this.columns.indexOf(this.current.column);
-            var isFirstColumn = columnI <= findIndex(this.columns.models, this.isColumnVisible);
-            var isLastColumn = columnI >= findLastIndex(this.columns.models, this.isColumnVisible);
+            var isFirstColumn = columnI <= _.findIndex(this.columns.models, this.isColumnVisible);
+            var isLastColumn = columnI >= _.findLastIndex(this.columns.models, this.isColumnVisible);
             return {
                 row: {
                     i: rowI,
