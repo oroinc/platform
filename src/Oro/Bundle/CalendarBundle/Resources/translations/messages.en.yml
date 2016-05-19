@@ -116,7 +116,7 @@ oro:
             system_calendar.label:   System Calendar
             invitation.label:        Guests
             invitation_status.label: Invitation status
-            attendees.label: Attendees
+            attendees.label: Guests
             related_attendee.label: Related Attendee
             origin.label: Origin
 
@@ -156,7 +156,7 @@ oro:
 
         attendee:
             entity_label: Attendee
-            entity_plural_label: Attendees
+            entity_plural_label: Guests
             calendar_event.label: Calendar Event
             display_name.label: Display Name
             email.label: Email
@@ -169,4 +169,4 @@ oro:
             type.label: Type
 
         autocomplete:
-            attendees: Calendar event Attendees
+            attendees: Calendar event Guests
