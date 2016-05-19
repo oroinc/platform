@@ -4,6 +4,7 @@ namespace Oro\Component\Messaging\Tests\ZeroConfig;
 use Oro\Component\Messaging\Consumption\MessageProcessor;
 use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
 use Oro\Component\Messaging\Transport\Session;
+use Oro\Component\Messaging\ZeroConfig\Config;
 use Oro\Component\Messaging\ZeroConfig\MessageProcessorRegistryInterface;
 use Oro\Component\Messaging\ZeroConfig\QueueMessageProcessor;
 
@@ -16,7 +17,7 @@ class QueueMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfProcessorNameIsNotSet()
     {
-        $this->setExpectedException(\LogicException::class, 'Got message without "processorName" parameter');
+        $this->setExpectedException(\LogicException::class, 'Got message without required parameter: "oro.messaging.zero_conf.processor_name"');
 
         $processor = new QueueMessageProcessor($this->createMessageProcessorRegistryMock());
         $processor->process(new AmqpMessage(), $this->createTransportSessionMock());
@@ -27,7 +28,7 @@ class QueueMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $session = $this->createTransportSessionMock();
         $message = new AmqpMessage();
         $message->setProperties([
-            'processorName' => 'processor-name',
+            Config::PARAMETER_PROCESSOR_NAME => 'processor-name',
         ]);
 
         $messageProcessor = $this->createMessageProcessorMock();
