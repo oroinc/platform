@@ -40,20 +40,17 @@ class OroMessagingExtension extends Extension
             "oro_messaging.transport.$defaultTransport.connection"
         );
 
-        if (isset($config['zeroconfig'])) {
-            $loader->load('zeroconfig.yml');
-            $this->loadZeroConfig($config, $container);
+        if (isset($config['zero_config'])) {
+            $loader->load('zero_config.yml');
+
+            $configDef = $container->getDefinition('oro_messaging.zero_config.config');
+            $configDef->setArguments([
+                $config['zero_config']['prefix'],
+                $config['zero_config']['router_topic'],
+                $config['zero_config']['router_queue'],
+                $config['zero_config']['queue_topic'],
+                $config['zero_config']['default_queue_queue']
+            ]);
         }
-    }
-
-    protected function loadZeroConfig(array $config, ContainerBuilder $container)
-    {
-        $zeroconfig = $config['zeroconfig'];
-
-        $container->setParameter('oro_messaging.zeroconfig.prefix', $zeroconfig['prefix']);
-        $container->setParameter('oro_messaging.zeroconfig.router_topic', $zeroconfig['router_topic']);
-        $container->setParameter('oro_messaging.zeroconfig.router_queue', $zeroconfig['router_queue']);
-        $container->setParameter('oro_messaging.zeroconfig.queue_topic', $zeroconfig['queue_topic']);
-        $container->setParameter('oro_messaging.zeroconfig.default_queue_queue', $zeroconfig['default_queue_queue']);
     }
 }
