@@ -11,6 +11,7 @@ parameters:
     oro_workflow.process.logger.class: Oro\Bundle\WorkflowBundle\Model\ProcessLogger
     oro_workflow.registry.class: Oro\Bundle\WorkflowBundle\Model\WorkflowRegistry
     oro_workflow.workflow_definition.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowDefinition
+    oro_workflow.workflow_item.entity.class: Oro\Bundle\WorkflowBundle\Entity\WorkflowItem
     oro_workflow.workflow_result.class: Oro\Bundle\WorkflowBundle\Model\WorkflowResult
     oro_workflow.handler.transition_helper.class: Oro\Bundle\WorkflowBundle\Handler\Helper\TransitionHelper
     oro_workflow.handler.transition_handler.class: Oro\Bundle\WorkflowBundle\Handler\TransitionHandler
