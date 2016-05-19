@@ -94,7 +94,7 @@ define([
         createFilteredColumnCollection: function(columns) {
             var filteredColumns = new GridColumns(columns.where({renderable: true}));
 
-            filteredColumns.listenTo(columns, 'change:renderable', function() {
+            filteredColumns.listenTo(columns, 'change:renderable add remove reset', function() {
                 filteredColumns.reset(columns.where({renderable: true}));
             });
 
