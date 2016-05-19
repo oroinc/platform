@@ -1,9 +1,10 @@
 define([
     'underscore',
     'backgrid',
+    './columns',
     './row',
     '../pageable-collection'
-], function(_, Backgrid, Row, PageableCollection) {
+], function(_, Backgrid, GridColumns, Row, PageableCollection) {
     'use strict';
 
     var Body;
@@ -88,9 +89,24 @@ define([
         },
 
         createRows: function() {
+            if (this.filteredColumns) {
+                this.filteredColumns.dispose();
+            }
+            var columns = this.columns;
+            var filteredColumns = new GridColumns(columns.where({renderable: true}));
+            this.filteredColumns = filteredColumns;
+
+            filteredColumns.listenTo(columns, 'change:renderable', function() {
+                filteredColumns.reset(columns.where({renderable: true}));
+            });
+
+            filteredColumns.listenTo(columns, 'sort', function() {
+                filteredColumns.sort();
+            });
+
             this.rows = this.collection.map(function(model) {
                 var rowOptions = {
-                    columns: this.columns,
+                    collection: filteredColumns,
                     model: model
                 };
                 this.columns.trigger('configureInitializeOptions', this.row, rowOptions);

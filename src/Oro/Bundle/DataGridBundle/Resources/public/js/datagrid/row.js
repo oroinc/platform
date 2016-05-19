@@ -1,9 +1,9 @@
 define([
     'jquery',
     'underscore',
-    'backgrid',
+    'chaplin',
     'oroui/js/tools'
-], function($, _, Backgrid, tools) {
+], function($, _, Chaplin, tools) {
     'use strict';
 
     var Row;
@@ -17,9 +17,12 @@ define([
      *
      * @export  orodatagrid/js/datagrid/row
      * @class   orodatagrid.datagrid.Row
-     * @extends Backgrid.Row
+     * @extends Chaplin.CollectionView
      */
-    Row = Backgrid.Row.extend({
+    Row = Chaplin.CollectionView.extend({
+        tagName: 'tr',
+        autoRender: false,
+        animationDuretion: 0,
 
         /** @property */
         events: {
@@ -44,29 +47,16 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
+            // underscore bind does not work somehow
+            var _this = this;
+            var _itemView = this.itemView;
+            this.itemView = function(options) {
+                return _itemView.call(_this, options);
+            };
             _.extend(this, _.pick(options, ['themeOptions', 'template']));
-            Row.__super__.initialize.apply(this, arguments);
-
-            this.listenTo(this.columns, 'sort', this.updateCellsOrder);
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
-        },
 
-        /**
-         * Handles columns sort event and updates order of cells
-         */
-        updateCellsOrder: function() {
-            var cell;
-            var fragment = document.createDocumentFragment();
-
-            for (var i = 0; i < this.columns.length; i++) {
-                cell = _.find(this.cells, {column: this.columns.at(i)});
-                if (cell) {
-                    fragment.appendChild(cell.el);
-                }
-            }
-
-            this.$el.html(fragment);
-            this.trigger('columns:reorder');
+            Row.__super__.initialize.apply(this, arguments);
         },
 
         /**
@@ -97,7 +87,6 @@ define([
                 cell.dispose();
             });
             delete this.cells;
-            delete this.columns;
             Row.__super__.dispose.call(this);
         },
 
@@ -202,7 +191,8 @@ define([
         /**
          * @inheritDoc
          */
-        makeCell: function(column) {
+        itemView: function(options) {
+            var column = options.model;
             var cellOptions = {
                 column: column,
                 model: this.model,
@@ -214,7 +204,7 @@ define([
                 cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
             }
             var Cell = column.get('cell');
-            this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
+            this.collection.trigger('configureInitializeOptions', Cell, cellOptions);
             var cell = new Cell(cellOptions);
             if (column.has('align')) {
                 cell.$el.removeClass('align-left align-center align-right');
@@ -225,7 +215,7 @@ define([
             }
 
             // use columns collection as event bus since there is no alternatives
-            this.columns.trigger('afterMakeCell', this, cell);
+            this.collection.trigger('afterMakeCell', this, cell);
 
             return cell;
         },

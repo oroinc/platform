@@ -179,11 +179,13 @@ define([
                 this.adjustTitle(pageData.title);
             }
 
+            this.publishEvent('page:statsUpdate', pageData, actionArgs, jqXHR, updatePromises);
             this.publishEvent('page:update', pageData, actionArgs, jqXHR, updatePromises);
 
             // once all views has been updated, trigger page:afterChange
             $.when.apply($, updatePromises).done(_.debounce(function() {
                 self.publishEvent('page:afterChange');
+                self.publishEvent('page:statsAfterChange');
             }, 0));
         },
 
