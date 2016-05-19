@@ -8,6 +8,7 @@ use Symfony\Component\Form\FormEvents;
 
 use Oro\Bundle\EntityConfigBundle\Config\ConfigManager;
 use Oro\Bundle\EntityConfigBundle\Config\Id\ConfigIdInterface;
+use Oro\Bundle\EntityConfigBundle\Config\Id\EntityConfigId;
 use Oro\Bundle\EntityExtendBundle\EntityConfig\ExtendScope;
 
 class ConfigTypeSubscriber implements EventSubscriberInterface
@@ -64,12 +65,14 @@ class ConfigTypeSubscriber implements EventSubscriberInterface
                 $extendConfigProvider = $this->configManager->getProvider('extend');
                 $extendConfig         = $extendConfigProvider->getConfig($configId->getClassName());
 
-                $pendingChanges = $extendConfig->get('pending_changes', false, []);
-                $pendingChanges[$configId->getScope()][$form->getName()] = [
-                    $oldVal,
-                    $newVal,
-                ];
-                $extendConfig->set('pending_changes', $pendingChanges);
+                if ($configId instanceof EntityConfigId) {
+                    $pendingChanges = $extendConfig->get('pending_changes', false, []);
+                    $pendingChanges[$configId->getScope()][$form->getName()] = [
+                        $oldVal,
+                        $newVal,
+                    ];
+                    $extendConfig->set('pending_changes', $pendingChanges);
+                }
 
                 if ($extendConfig->is('state', ExtendScope::STATE_ACTIVE)) {
                     $extendConfig->set('state', ExtendScope::STATE_UPDATE);
