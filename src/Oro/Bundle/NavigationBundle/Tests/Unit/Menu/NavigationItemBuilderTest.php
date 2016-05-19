@@ -39,7 +39,17 @@ class NavigationItemBuilderBuilderTest extends \PHPUnit_Framework_TestCase
 
     public function testBuildAnonUser()
     {
-        $token = $this->getMock('Symfony\Component\Security\Core\Authentication\Token\TokenInterface');
+        $token = $this
+            ->getMockForAbstractClass(
+                'Symfony\Component\Security\Core\Authentication\Token\TokenInterface',
+                [],
+                '',
+                true,
+                true,
+                true,
+                ['getUser', 'getOrganizationContext']
+            )
+        ;
         $token->expects($this->once())
             ->method('getUser')
             ->will($this->returnValue('anon.'));

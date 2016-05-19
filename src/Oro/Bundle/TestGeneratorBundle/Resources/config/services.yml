@@ -1,0 +1,21 @@
+services:
+    oro_test_generator.generator.test.absctract:
+        abstract: true
+        arguments:
+            - '@twig'
+            - '@kernel'
+
+    oro_test_generator.generator.test.unit:
+        public: true
+        parent: oro_test_generator.generator.test.absctract
+        class: Oro\Bundle\TestGeneratorBundle\Generator\UnitTestGenerator
+
+    oro_test_generator.generator.test.entity:
+        public: true
+        parent: oro_test_generator.generator.test.absctract
+        class: Oro\Bundle\TestGeneratorBundle\Generator\EntityTestGenerator
+
+    oro_test_generator.generator.test.functional:
+        public: true
+        parent: oro_test_generator.generator.test.absctract
+        class: Oro\Bundle\TestGeneratorBundle\Generator\FunctionalTestGenerator

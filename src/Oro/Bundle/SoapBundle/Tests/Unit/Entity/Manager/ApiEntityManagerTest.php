@@ -52,7 +52,7 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->setConstructorArgs(array($className))
-            ->setMethods(array('getSingleIdentifierFieldName', 'getIdentifierValues'))
+            ->setMethods(['getSingleIdentifierFieldName', 'getIdentifierValues', 'getName'])
             ->getMock();
         $metadata->expects($this->once())
             ->method('getSingleIdentifierFieldName')
@@ -78,7 +78,7 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->setConstructorArgs(array($className))
-            ->setMethods(array('getIdentifierFieldNames', 'getIdentifierValues'))
+            ->setMethods(array('getIdentifierFieldNames', 'getIdentifierValues', 'getName'))
             ->getMock();
 
         $metadata->expects($this->once())
@@ -87,7 +87,7 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $objectManager = $this->getMockBuilder('Doctrine\ORM\EntityManager')
             ->disableOriginalConstructor()
-            ->setMethods(array('getClassMetadata', 'getRepository'))
+            ->setMethods(array('getClassMetadata', 'getRepository', 'getName'))
             ->getMock();
 
         $criteria = ['gender' => 'male'];
@@ -131,7 +131,7 @@ class ApiEntityManagerTest extends \PHPUnit_Framework_TestCase
 
         $metadata = $this->getMockBuilder('Doctrine\ORM\Mapping\ClassMetadata')
             ->setConstructorArgs(array($className))
-            ->setMethods(array('getIdentifierFieldNames', 'getIdentifierValues'))
+            ->setMethods(array('getIdentifierFieldNames', 'getIdentifierValues', 'getName'))
             ->getMock();
 
         $metadata->expects($this->once())

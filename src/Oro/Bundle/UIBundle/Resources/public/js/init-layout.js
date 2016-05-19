@@ -307,26 +307,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                     })
                     .appendTo($(document.body));
             }
-
-            if ($('.sf-toolbar').length) {
-                adjustHeight = (function() {
-                    var orig = adjustHeight;
-                    var waitForDebugBar = function(attempt) {
-                        if ($('.sf-toolbar').children().length) {
-                            $('body').addClass('dev-mode');
-                            _.delay(orig, 10);
-                        } else if (attempt < 100) {
-                            _.delay(waitForDebugBar, 500, attempt + 1);
-                        }
-                    };
-
-                    return _.wrap(adjustHeight, function(orig) {
-                        $('body').removeClass('dev-mode');
-                        orig();
-                        waitForDebugBar(0);
-                    });
-                }());
-            }
         }
 
         var adjustReloaded = function() {
