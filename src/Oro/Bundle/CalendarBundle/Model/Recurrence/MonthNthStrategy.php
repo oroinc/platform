@@ -168,7 +168,7 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
      */
     public function getValidationErrorMessage(Entity\Recurrence $recurrence)
     {
-        if (empty($recurrence->getInstance())) {
+        if (!$recurrence->getInstance()) {
             return "Parameter 'instance' value can't be empty for MonthNth recurrence pattern.";
         }
 
