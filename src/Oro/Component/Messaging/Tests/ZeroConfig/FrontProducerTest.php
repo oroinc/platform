@@ -17,24 +17,13 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
         new FrontProducer($this->createSessionMock(), new Config('', '', '', '', ''));
     }
 
-    public function testThrowExceptionIfMessageNameParameterIsNotSet()
-    {
-        $this->setExpectedException(\LogicException::class, 'Got message without required parameter: "oro.messaging.zero_conf.message_name"');
-
-        $producer = new FrontProducer($this->createSessionMock(), new Config('', '', '', '', ''));
-        $producer->send(new NullMessage());
-    }
-
     public function testShouldSendMessageAndCreateSchema()
     {
         $topic = new NullTopic('topic');
         $queue = new NullQueue('queue');
 
         $message = new NullMessage();
-        $message->setBody('body');
-        $message->setProperties([
-            Config::PARAMETER_MESSAGE_NAME => 'name',
-        ]);
+
 
         $messageProducer = $this->createMessageProducer();
         $messageProducer
@@ -68,6 +57,11 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
         $session = $this->createSessionMock();
         $session
             ->expects($this->once())
+            ->method('createMessage')
+            ->will($this->returnValue($message))
+        ;
+        $session
+            ->expects($this->once())
             ->method('getTransportSession')
             ->will($this->returnValue($transportSession))
         ;
@@ -83,7 +77,7 @@ class FrontProducerTest extends \PHPUnit_Framework_TestCase
         ;
 
         $producer = new FrontProducer($session, new Config('', '', '', '', ''));
-        $producer->send($message);
+        $producer->send('name', 'body');
     }
 
     /**

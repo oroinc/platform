@@ -26,15 +26,18 @@ class FrontProducer
     }
 
     /**
-     * {@inheritdoc}
+     * @param string $topic
+     * @param string $body
      */
-    public function send(Message $message)
+    public function send($topic, $body)
     {
-        $messageName = $message->getProperty(Config::PARAMETER_MESSAGE_NAME);
-        if (false == $messageName) {
-            throw new \LogicException(sprintf('Got message without required parameter: "%s"', Config::PARAMETER_MESSAGE_NAME));
-        }
-        
+        $message = $this->session->createMessage();
+        $message->setBody($body);
+
+        $properties = $message->getProperties();
+        $properties[Config::PARAMETER_MESSAGE_NAME] = $topic;
+        $message->setProperties($properties);
+
         $transportSession = $this->session->getTransportSession();
 
         $topic = $this->session->createRouterTopic();
