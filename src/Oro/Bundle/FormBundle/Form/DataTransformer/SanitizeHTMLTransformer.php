@@ -6,6 +6,7 @@ use Symfony\Component\Filesystem\Filesystem;
 use Symfony\Component\Form\DataTransformerInterface;
 
 use Oro\Bundle\FormBundle\Form\Converter\TagDefinitionConverter;
+use Oro\Bundle\FormBundle\Validator\HtmlPurifierTelValidator;
 
 class SanitizeHTMLTransformer implements DataTransformerInterface
 {
@@ -55,13 +56,14 @@ class SanitizeHTMLTransformer implements DataTransformerInterface
      */
     protected function sanitize($value)
     {
+        \HTMLPurifier_URISchemeRegistry::instance()->register('tel', new HtmlPurifierTelValidator());
         $config = \HTMLPurifier_Config::createDefault();
         $this->fillAllowedElementsConfig($config);
         $this->fillCacheConfig($config);
         // add inline data support
         $config->set(
             'URI.AllowedSchemes',
-            ['http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'data' => true]
+            ['http' => true, 'https' => true, 'mailto' => true, 'ftp' => true, 'data' => true, 'tel' => true]
         );
         $config->set('Attr.AllowedFrameTargets', ['_blank']);
         $purifier = new \HTMLPurifier($config);
