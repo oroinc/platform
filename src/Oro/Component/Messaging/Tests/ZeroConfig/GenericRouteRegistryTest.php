@@ -16,16 +16,16 @@ class GenericRouteRegistryTest extends \PHPUnit_Framework_TestCase
         $registry = new GenericRouteRegistry();
 
         // guard
-        $this->assertEmpty($registry->getRoutes('message'));
+        $this->assertEmpty($registry->getRoutes('topic'));
 
         $route = new Route();
-        $route->setMessageName('message');
+        $route->setTopicName('topic');
 
         // test
         $registry->addRoute($route);
 
-        $this->assertCount(1, $registry->getRoutes('message'));
-        $this->assertSame($route, $registry->getRoutes('message')[0]);
+        $this->assertCount(1, $registry->getRoutes('topic'));
+        $this->assertSame($route, $registry->getRoutes('topic')[0]);
     }
 
     public function testCouldSetManyRoutes()
@@ -33,18 +33,18 @@ class GenericRouteRegistryTest extends \PHPUnit_Framework_TestCase
         $registry = new GenericRouteRegistry();
 
         // guard
-        $this->assertEmpty($registry->getRoutes('message'));
+        $this->assertEmpty($registry->getRoutes('topic'));
 
         $route1 = new Route();
-        $route1->setMessageName('message');
+        $route1->setTopicName('topic');
         $route2 = new Route();
-        $route2->setMessageName('message');
+        $route2->setTopicName('topic');
 
         // test
         $registry->setRoutes([$route1, $route2]);
 
-        $this->assertCount(2, $registry->getRoutes('message'));
-        $this->assertSame($route1, $registry->getRoutes('message')[0]);
-        $this->assertSame($route2, $registry->getRoutes('message')[1]);
+        $this->assertCount(2, $registry->getRoutes('topic'));
+        $this->assertSame($route1, $registry->getRoutes('topic')[0]);
+        $this->assertSame($route2, $registry->getRoutes('topic')[1]);
     }
 }

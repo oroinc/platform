@@ -6,7 +6,7 @@ class Route
     /**
      * @var string
      */
-    protected $messageName;
+    protected $topicName;
 
     /**
      * @var string
@@ -21,17 +21,17 @@ class Route
     /**
      * @return string
      */
-    public function getMessageName()
+    public function getTopicName()
     {
-        return $this->messageName;
+        return $this->topicName;
     }
 
     /**
-     * @param string $messageName
+     * @param string $topicName
      */
-    public function setMessageName($messageName)
+    public function setTopicName($topicName)
     {
-        $this->messageName = $messageName;
+        $this->topicName = $topicName;
     }
 
     /**

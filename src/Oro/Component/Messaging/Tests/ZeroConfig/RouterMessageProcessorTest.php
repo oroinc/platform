@@ -19,7 +19,7 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
 
     public function testShouldThrowExceptionIfMessageNameParameterIsNotSet()
     {
-        $this->setExpectedException(\LogicException::class, 'Got message without required parameter: "oro.messaging.zero_conf.message_name"');
+        $this->setExpectedException(\LogicException::class, 'Got message without required parameter: "oro.messaging.zero_conf.topic_name"');
 
         $processor = new RouterMessageProcessor($this->createSessionMock(), $this->createRouterRegistryMock());
         $processor->process(new NullMessage(), $this->createTransportSessionMock());
@@ -28,14 +28,14 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
     public function testShouldSendRoutedMessageToQueue()
     {
         $route = new Route();
-        $route->setMessageName('message-name');
+        $route->setTopicName('topic-name');
         $route->setProcessorName('processor-name');
         $route->setQueueName('queue-name');
 
         $message = new NullMessage();
         $message->setBody('body');
         $message->setProperties([
-            Config::PARAMETER_MESSAGE_NAME => 'message-name',
+            Config::PARAMETER_TOPIC_NAME => 'topic-name',
         ]);
 
         $queueMessage = new NullMessage();
@@ -70,7 +70,7 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $processor->process($message, $this->createTransportSessionMock());
 
         $expectedQueueMessageProperties = [
-            Config::PARAMETER_MESSAGE_NAME => 'message-name',
+            Config::PARAMETER_TOPIC_NAME => 'topic-name',
             Config::PARAMETER_PROCESSOR_NAME => 'processor-name',
             Config::PARAMETER_QUEUE_NAME => 'queue-name',
         ];

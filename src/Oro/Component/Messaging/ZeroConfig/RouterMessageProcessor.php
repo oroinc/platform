@@ -32,12 +32,12 @@ class RouterMessageProcessor implements MessageProcessor
      */
     public function process(Message $message, TransportSession $session)
     {
-        $messageName = $message->getProperty(Config::PARAMETER_MESSAGE_NAME);
-        if (false == $messageName) {
-            throw new \LogicException(sprintf('Got message without required parameter: "%s"', Config::PARAMETER_MESSAGE_NAME));
+        $topicName = $message->getProperty(Config::PARAMETER_TOPIC_NAME);
+        if (false == $topicName) {
+            throw new \LogicException(sprintf('Got message without required parameter: "%s"', Config::PARAMETER_TOPIC_NAME));
         }
 
-        foreach ($this->routeRegistry->getRoutes($messageName) as $route) {
+        foreach ($this->routeRegistry->getRoutes($topicName) as $route) {
             $properties = $message->getProperties();
             $properties[Config::PARAMETER_PROCESSOR_NAME] = $route->getProcessorName();
             $properties[Config::PARAMETER_QUEUE_NAME] = $route->getQueueName();

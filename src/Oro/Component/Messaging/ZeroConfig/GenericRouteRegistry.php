@@ -18,7 +18,7 @@ class GenericRouteRegistry implements RouteRegistryInterface
      */
     public function addRoute(Route $route)
     {
-        $this->routes[$route->getMessageName()][] = $route;
+        $this->routes[$route->getTopicName()][] = $route;
     }
 
     /**
@@ -34,10 +34,10 @@ class GenericRouteRegistry implements RouteRegistryInterface
     /**
      * {@inheritdoc}
      */
-    public function getRoutes($messageName)
+    public function getRoutes($topicName)
     {
-        if (isset($this->routes[$messageName])) {
-            return $this->routes[$messageName];
+        if (isset($this->routes[$topicName])) {
+            return $this->routes[$topicName];
         }
 
         return [];

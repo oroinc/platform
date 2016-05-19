@@ -35,7 +35,7 @@ class FrontProducer
         $message->setBody($body);
 
         $properties = $message->getProperties();
-        $properties[Config::PARAMETER_MESSAGE_NAME] = $topic;
+        $properties[Config::PARAMETER_TOPIC_NAME] = $topic;
         $message->setProperties($properties);
 
         $transportSession = $this->session->getTransportSession();
