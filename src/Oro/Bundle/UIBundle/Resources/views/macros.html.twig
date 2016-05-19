@@ -868,7 +868,7 @@
                     {% if renderLabel %}
                         {{ oro_field_config_value(oro_class_name(entity), 'owner', 'label')|trans }}:
                     {% endif %}
-                    {% if ownerPath is defined and resource_granted('VIEW', entity.owner) %}
+                    {% if ownerPath is defined and resource_granted('VIEW', owner) %}
                         <a href="{{ ownerPath }}">{{ ownerName }}</a>
                     {% else %}
                         {{ ownerName }}
