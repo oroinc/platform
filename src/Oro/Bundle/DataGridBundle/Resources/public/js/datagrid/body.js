@@ -86,8 +86,10 @@ define([
             });
             delete this.rows;
             delete this.columns;
+
             this.filteredColumns.dispose();
             delete this.filteredColumns;
+
             Body.__super__.dispose.call(this);
         },
 
@@ -106,11 +108,9 @@ define([
         },
 
         createRows: function() {
-            var filteredColumns = this.filteredColumns;
-
             this.rows = this.collection.map(function(model) {
                 var rowOptions = {
-                    collection: filteredColumns,
+                    collection: this.filteredColumns,
                     model: model
                 };
                 this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
