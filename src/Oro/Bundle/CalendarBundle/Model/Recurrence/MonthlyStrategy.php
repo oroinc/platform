@@ -122,7 +122,7 @@ class MonthlyStrategy extends AbstractStrategy implements StrategyInterface
      */
     public function getValidationErrorMessage(Entity\Recurrence $recurrence)
     {
-        if (empty($recurrence->getDayOfMonth())) {
+        if (!$recurrence->getDayOfMonth()) {
             return "Parameter 'dayOfMonth' can't be empty for Monthly recurrence pattern.";
         }
 

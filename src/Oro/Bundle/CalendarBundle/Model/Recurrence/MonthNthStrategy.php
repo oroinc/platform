@@ -172,7 +172,7 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
             return "Parameter 'instance' value can't be empty for MonthNth recurrence pattern.";
         }
 
-        if (empty($recurrence->getDayOfWeek())) {
+        if (!$recurrence->getDayOfWeek()) {
             return "Parameter 'dayOfWeek' can't be empty for MonthNth recurrence pattern.";
         }
 

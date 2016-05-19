@@ -182,15 +182,15 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
             return "Parameter 'interval' value must be a multiple of 12 for YearNth recurrence pattern.";
         }
 
-        if (empty($recurrence->getInstance())) {
+        if (!$recurrence->getInstance()) {
             return "Parameter 'instance' value can't be empty for YearNth recurrence pattern.";
         }
 
-        if (empty($recurrence->getDayOfWeek())) {
+        if (!$recurrence->getDayOfWeek()) {
             return "Parameter 'dayOfWeek' can't be empty for YearNth recurrence pattern.";
         }
 
-        if (empty($recurrence->getMonthOfYear())) {
+        if (!$recurrence->getMonthOfYear()) {
             return "Parameter 'monthOfYear' can't be empty for YearNth recurrence pattern.";
         }
 

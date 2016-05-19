@@ -71,11 +71,11 @@ class YearlyStrategy extends MonthlyStrategy
             return "Parameter 'interval' value must be a multiple of 12 for Yearly recurrence pattern.";
         }
 
-        if (empty($recurrence->getDayOfMonth())) {
+        if (!$recurrence->getDayOfMonth()) {
             return "Parameter 'dayOfMonth' can't be empty for Yearly recurrence pattern.";
         }
 
-        if (empty($recurrence->getMonthOfYear())) {
+        if (!$recurrence->getMonthOfYear()) {
             return "Parameter 'monthOfYear' can't be empty for Yearly recurrence pattern.";
         }
 
