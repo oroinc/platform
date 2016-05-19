@@ -856,10 +856,10 @@
             {% set owner = oro_get_entity_owner(entity) %}
             {% if owner %}
                 {% if (ownerType == 'USER') %}
-                    {% set ownerPath = path('oro_user_view', {'id': entity.owner.id}) %}
+                    {% set ownerPath = path('oro_user_view', {'id': owner.id}) %}
                     {% set ownerName = owner|oro_format_name %}
                 {% elseif (ownerType == 'BUSINESS_UNIT') %}
-                    {% set ownerPath = path('oro_business_unit_view', {'id': entity.owner.id}) %}
+                    {% set ownerPath = path('oro_business_unit_view', {'id': owner.id}) %}
                     {% set ownerName = owner.name %}
                 {% elseif (ownerType == 'ORGANIZATION') %}
                     {% set ownerName = owner.name %}
