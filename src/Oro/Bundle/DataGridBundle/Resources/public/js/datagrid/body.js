@@ -111,6 +111,7 @@ define([
             this.rows = this.collection.map(function(model) {
                 var rowOptions = {
                     collection: this.filteredColumns,
+                    columns: this.columns,
                     model: model
                 };
                 this.columns.trigger('configureInitializeOptions', this.row, rowOptions);
