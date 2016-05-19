@@ -25,8 +25,8 @@ class LoadCalendarEventData extends AbstractFixture
             $user->getId(),
             $organization->getId()
         );
-        $filePath = __DIR__ . DIRECTORY_SEPARATOR . 'calendar_event_fixture.yml';
-        $data = Yaml::parse($filePath);
+        $fileName = __DIR__ . DIRECTORY_SEPARATOR . 'calendar_event_fixture.yml';
+        $data = Yaml::parse(file_get_contents($fileName));
 
         foreach ($data as $item) {
             $start = new \DateTime(gmdate(DATE_RFC3339, strtotime($item['start'])));
