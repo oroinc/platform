@@ -50,6 +50,7 @@ define([
             // itemView function is called as new this.itemView
             // it is placed here to pass THIS within closure
             var _this = this;
+            this.columns = options.columns;
             this.itemView = function(options) {
                 var column = options.model;
                 var cellOptions = {
@@ -63,7 +64,7 @@ define([
                     cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
                 }
                 var Cell = column.get('cell');
-                _this.collection.trigger('configureInitializeOptions', Cell, cellOptions);
+                _this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
                 var cell = new Cell(cellOptions);
                 if (column.has('align')) {
                     cell.$el.removeClass('align-left align-center align-right');
@@ -74,7 +75,7 @@ define([
                 }
 
                 // use columns collection as event bus since there is no alternatives
-                _this.collection.trigger('afterMakeCell', _this, cell);
+                _this.columns.trigger('afterMakeCell', _this, cell);
 
                 return cell;
             };
