@@ -29,6 +29,7 @@ class AbstractTypeTest extends BaseBlockTypeTestCase
                 'option' => null,
                 'option_default' => ['default' => 'value'],
                 'option_default_false' => ['default' => false],
+                'option_default_null' => ['default' => null],
                 'option_required' => ['required' => true],
             ]);
         $layoutFactoryBuilder->addType($this->type);
@@ -57,6 +58,7 @@ class AbstractTypeTest extends BaseBlockTypeTestCase
                     'translation_domain' => 'messages',
                     'option_default' => 'value',
                     'option_default_false' => false,
+                    'option_default_null' => null,
                     'option_required' => true,
                 ]
             ],
@@ -107,6 +109,7 @@ class AbstractTypeTest extends BaseBlockTypeTestCase
             'translation_domain' => 'test_translation_domain',
             'option_default' => 'value',
             'option_default_false' => false,
+            'option_default_null' => null,
             'test_var' => 'test_var_val',
             'attr' => ['test_attr' => 'test_attr_val'],
             'label' => 'Test Label',
