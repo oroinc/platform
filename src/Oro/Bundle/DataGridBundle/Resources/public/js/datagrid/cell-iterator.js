@@ -10,6 +10,26 @@ define(function(require) {
     var BaseClass = require('oroui/js/base-class');
     var $ = require('jquery');
 
+    /* This function is available in newer underscore/lodash versions */
+    function findIndex(collection, predicate) {
+        for (var i = 0; i < collection.length; i++) {
+            var item = collection[i];
+            if (predicate(item)) {
+                return i;
+            }
+        }
+    }
+
+    /* This function is available in newer underscore/lodash versions */
+    function findLastIndex(collection, predicate) {
+        for (var i = collection.length - 1; i >= 0; i--) {
+            var item = collection[i];
+            if (predicate(item)) {
+                return i;
+            }
+        }
+    }
+
     CellIterator = BaseClass.extend({
         constructor: function(grid, cell) {
             this.current = cell;
@@ -24,13 +44,17 @@ define(function(require) {
             return deferred.promise();
         },
 
+        isColumnVisible: function(column) {
+            return column.get('renderable');
+        },
+
         getCurrentCellInfo: function() {
             var rowI = this.rows.indexOf(this.current.model);
             var isFirstRow = rowI === 0;
             var isLastRow = rowI >= this.rows.length - 1;
             var columnI = this.columns.indexOf(this.current.column);
-            var isFirstColumn = columnI === 0;
-            var isLastColumn = columnI >= this.columns.length - 1;
+            var isFirstColumn = columnI <= findIndex(this.columns.models, this.isColumnVisible);
+            var isLastColumn = columnI >= findLastIndex(this.columns.models, this.isColumnVisible);
             return {
                 row: {
                     i: rowI,
@@ -74,7 +98,7 @@ define(function(require) {
                 if (info.row.last) {
                     // navigate to next page
                     return this.getNextPage().then(function() {
-                        _this.current = _this.grid.findCellByIndex(0, 0);
+                        _this.current = _this.findCellByIndexOrNext(0, 0, 1);
                         return _this.current;
                     });
                 }
@@ -85,7 +109,7 @@ define(function(require) {
                 columnI = info.column.i + 1;
             }
 
-            this.current = this.grid.findCellByIndex(rowI, columnI);
+            this.current = this.findCellByIndexOrNext(rowI, columnI, 1);
 
             return this.toResolvedPromise(this.current);
         },
@@ -101,15 +125,16 @@ define(function(require) {
             if (info.row.last) {
                 // navigate to next page
                 return this.getNextPage().then(function() {
-                    _this.current = _this.grid.findCellByIndex(0, columnI);
+                    _this.current = _this.findCellByIndexOrNext(0, columnI, 1);
                     return _this.current;
                 });
             }
 
-            this.current = this.grid.findCellByIndex(rowI, columnI);
+            this.current = this.findCellByIndexOrNext(rowI, columnI, 1);
 
             return this.toResolvedPromise(this.current);
         },
+
         prev: function() {
             var info = this.getCurrentCellInfo();
             var columnI;
@@ -120,7 +145,8 @@ define(function(require) {
                 if (info.row.first) {
                     // navigate to prev page
                     return this.getPreviousPage().then(function() {
-                        _this.current = _this.grid.findCellByIndex(_this.rows.length - 1, _this.columns.length - 1);
+                        _this.current =
+                            _this.findCellByIndexOrNext(_this.rows.length - 1, _this.columns.length - 1, -1);
                         return _this.current;
                     });
                 }
@@ -131,7 +157,7 @@ define(function(require) {
                 columnI = info.column.i - 1;
             }
 
-            this.current = this.grid.findCellByIndex(rowI, columnI);
+            this.current = this.findCellByIndexOrNext(rowI, columnI, -1);
 
             return this.toResolvedPromise(this.current);
         },
@@ -148,14 +174,23 @@ define(function(require) {
             if (info.row.first) {
                 // navigate to prev page
                 return this.getPreviousPage().then(function() {
-                    _this.current = _this.grid.findCellByIndex(_this.rows.length - 1, columnI);
+                    _this.current = _this.findCellByIndexOrNext(_this.rows.length - 1, columnI, -1);
                     return _this.current;
                 });
             }
 
-            this.current = this.grid.findCellByIndex(rowI, columnI);
+            this.current = this.findCellByIndexOrNext(rowI, columnI, -1);
 
             return this.toResolvedPromise(this.current);
+        },
+
+        findCellByIndexOrNext: function(rowI, columnI, direction) {
+            var current;
+            while (!current && columnI >= 0 && columnI < this.columns.length) {
+                current = this.grid.findCellByIndex(rowI, columnI);
+                columnI += direction;
+            }
+            return current;
         }
     });
 
