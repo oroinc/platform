@@ -46,6 +46,7 @@ class WsseToken extends Token implements OrganizationContextTokenInterface
     {
         list($organizationData, $parentStr) = explode('||', $serialized);
         $this->organization = unserialize($organizationData);
+
         parent::unserialize($parentStr);
     }
 }
