@@ -115,17 +115,15 @@ define([
         delegateEvents: function() {
             this.undelegateCellEvents();
             var events = this.simplifiedEvents.getEventsMap();
-            for (var key in events) {
-                if (events.hasOwnProperty(key)) {
-                    var match = key.match(delegateEventSplitter);
-                    var eventName = match[1];
-                    var selector = match[2];
-                    eventName += '.cellDE' + this.cid;
-                    if (selector === '') {
-                        this.$el.on(eventName, 'td', _.bind(this.delegateEventToCell, this, key));
-                    } else {
-                        this.$el.on(eventName, 'td ' + selector, _.bind(this.delegateEventToCell, this, key));
-                    }
+            for (var key in events) { // jshint ignore:line
+                var match = key.match(delegateEventSplitter);
+                var eventName = match[1];
+                var selector = match[2];
+                eventName += '.cellDE' + this.cid;
+                if (selector === '') {
+                    this.$el.on(eventName, 'td', _.bind(this.delegateEventToCell, this, key));
+                } else {
+                    this.$el.on(eventName, 'td ' + selector, _.bind(this.delegateEventToCell, this, key));
                 }
             }
             Row.__super__.delegateEvents.apply(this, arguments);
