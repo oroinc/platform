@@ -22,7 +22,7 @@ define([
     Row = Chaplin.CollectionView.extend({
         tagName: 'tr',
         autoRender: false,
-        animationDuretion: 0,
+        animationDuration: 0,
 
         /** @property */
         events: {
@@ -47,12 +47,38 @@ define([
          * @inheritDoc
          */
         initialize: function(options) {
-            // underscore bind does not work somehow
+            // itemView function is called as new this.itemView
+            // it is placed here to pass THIS within closure
             var _this = this;
-            var _itemView = this.itemView;
             this.itemView = function(options) {
-                return _itemView.call(_this, options);
+                var column = options.model;
+                var cellOptions = {
+                    column: column,
+                    model: _this.model,
+                    themeOptions: {
+                        className: 'grid-cell grid-body-cell'
+                    }
+                };
+                if (column.get('name')) {
+                    cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
+                }
+                var Cell = column.get('cell');
+                _this.collection.trigger('configureInitializeOptions', Cell, cellOptions);
+                var cell = new Cell(cellOptions);
+                if (column.has('align')) {
+                    cell.$el.removeClass('align-left align-center align-right');
+                    cell.$el.addClass('align-' + column.get('align'));
+                }
+                if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
+                    cell.$el.addClass('skip-row-click');
+                }
+
+                // use columns collection as event bus since there is no alternatives
+                _this.collection.trigger('afterMakeCell', _this, cell);
+
+                return cell;
             };
+
             _.extend(this, _.pick(options, ['themeOptions', 'template']));
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
 
@@ -186,38 +212,6 @@ define([
                 text = document.selection.createRange().text;
             }
             return text;
-        },
-
-        /**
-         * @inheritDoc
-         */
-        itemView: function(options) {
-            var column = options.model;
-            var cellOptions = {
-                column: column,
-                model: this.model,
-                themeOptions: {
-                    className: 'grid-cell grid-body-cell'
-                }
-            };
-            if (column.get('name')) {
-                cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
-            }
-            var Cell = column.get('cell');
-            this.collection.trigger('configureInitializeOptions', Cell, cellOptions);
-            var cell = new Cell(cellOptions);
-            if (column.has('align')) {
-                cell.$el.removeClass('align-left align-center align-right');
-                cell.$el.addClass('align-' + column.get('align'));
-            }
-            if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
-                cell.$el.addClass('skip-row-click');
-            }
-
-            // use columns collection as event bus since there is no alternatives
-            this.collection.trigger('afterMakeCell', this, cell);
-
-            return cell;
         },
 
         render: function() {
