@@ -3,8 +3,11 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\ORM\EntityRepository;
+
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+
 use Oro\Component\DoctrineUtils\ORM\EntityManagementTrait;
 
 class ProcessDefinitionsImport
@@ -76,7 +79,7 @@ class ProcessDefinitionsImport
     }
 
     /**
-     * @return \Doctrine\ORM\EntityRepository
+     * @return EntityRepository
      */
     public function getDefinitionsRepository()
     {

@@ -3,11 +3,14 @@
 namespace Oro\Bundle\WorkflowBundle\Model\Import;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
+use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler;
+
 use Oro\Component\DoctrineUtils\ORM\EntityManagementTrait;
 
 class ProcessTriggersImport
@@ -60,15 +63,20 @@ class ProcessTriggersImport
     /**
      * @param array $triggersConfiguration
      * @param array|ProcessDefinition[] $definitions
-     * @return \Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger[]
+     * @return ProcessTrigger[]
      */
     public function import(array $triggersConfiguration, array $definitions)
     {
         $importedTriggers = [];
 
+        $namedDefinitions = [];
+        foreach ($definitions as $definition) {
+            $namedDefinitions[$definition->getName()] = $definition;
+        }
+
         $triggers = $this->configurationBuilder->buildProcessTriggers(
             $triggersConfiguration,
-            $this->namedDefinitionsArray($definitions)
+            $namedDefinitions
         );
 
         /** @var ProcessTriggerRepository $triggerRepository */
@@ -101,20 +109,6 @@ class ProcessTriggersImport
         }
 
         return $importedTriggers;
-    }
-
-    /**
-     * @param array|ProcessDefinition[] $definitions
-     * @return array|ProcessDefinition[]
-     */
-    private function namedDefinitionsArray(array $definitions)
-    {
-        $namedDefinitions = [];
-        foreach ($definitions as $definition) {
-            $namedDefinitions[$definition->getName()] = $definition;
-        }
-
-        return $namedDefinitions;
     }
 
     /**
