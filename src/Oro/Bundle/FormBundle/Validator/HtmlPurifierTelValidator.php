@@ -7,6 +7,9 @@ class HtmlPurifierTelValidator extends \HTMLPurifier_URIScheme
     public $browsable = false;
     public $may_omit_host = true;
 
+    /**
+     * @inheritdoc
+     */
     public function doValidate(&$uri, $config, $context)
     {
         $uri->userinfo = null;
