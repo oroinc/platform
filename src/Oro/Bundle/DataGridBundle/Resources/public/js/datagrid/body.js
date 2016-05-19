@@ -45,6 +45,9 @@ define([
                 this.rowClassName = opts.rowClassName;
             }
 
+            this.columns = options.columns;
+            this.filteredColumns = this.createFilteredColumnCollection(this.columns);
+
             this.backgridInitialize(opts);
         },
 
@@ -54,8 +57,6 @@ define([
          * @param {Object} options
          */
         backgridInitialize: function(options) {
-            this.columns = options.columns;
-
             this.row = options.row || Row;
             this.createRows();
 
@@ -85,16 +86,13 @@ define([
             });
             delete this.rows;
             delete this.columns;
+            this.filteredColumns.dispose();
+            delete this.filteredColumns;
             Body.__super__.dispose.call(this);
         },
 
-        createRows: function() {
-            if (this.filteredColumns) {
-                this.filteredColumns.dispose();
-            }
-            var columns = this.columns;
+        createFilteredColumnCollection: function(columns) {
             var filteredColumns = new GridColumns(columns.where({renderable: true}));
-            this.filteredColumns = filteredColumns;
 
             filteredColumns.listenTo(columns, 'change:renderable', function() {
                 filteredColumns.reset(columns.where({renderable: true}));
@@ -103,6 +101,12 @@ define([
             filteredColumns.listenTo(columns, 'sort', function() {
                 filteredColumns.sort();
             });
+
+            return filteredColumns;
+        },
+
+        createRows: function() {
+            var filteredColumns = this.filteredColumns;
 
             this.rows = this.collection.map(function(model) {
                 var rowOptions = {
