@@ -11,11 +11,9 @@ use Symfony\Component\Security\Core\Exception\AccessDeniedException;
 
 use Oro\Bundle\ActivityBundle\Manager\ActivityManager;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
-use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Entity\Calendar;
-use Oro\Bundle\CalendarBundle\Form\DataTransformer\UsersToAttendeesTransformer;
 use Oro\Bundle\CalendarBundle\Model\Email\EmailSendProcessor;
 use Oro\Bundle\UserBundle\Entity\User;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
@@ -43,9 +41,6 @@ class CalendarEventHandler
     /** @var EmailSendProcessor */
     protected $emailSendProcessor;
 
-    /** @var UsersToAttendeesTransformer */
-    protected $usersToAttendeesTransformer;
-
     /**
      * @param FormInterface               $form
      * @param Request                     $request
@@ -54,7 +49,6 @@ class CalendarEventHandler
      * @param EntityRoutingHelper         $entityRoutingHelper
      * @param SecurityFacade              $securityFacade
      * @param EmailSendProcessor          $emailSendProcessor
-     * @param UsersToAttendeesTransformer $usersToAttendeesTransformer
      */
     public function __construct(
         FormInterface $form,
@@ -63,8 +57,7 @@ class CalendarEventHandler
         ActivityManager $activityManager,
         EntityRoutingHelper $entityRoutingHelper,
         SecurityFacade $securityFacade,
-        EmailSendProcessor $emailSendProcessor,
-        UsersToAttendeesTransformer $usersToAttendeesTransformer
+        EmailSendProcessor $emailSendProcessor
     ) {
         $this->form                        = $form;
         $this->request                     = $request;
@@ -73,7 +66,6 @@ class CalendarEventHandler
         $this->entityRoutingHelper         = $entityRoutingHelper;
         $this->securityFacade              = $securityFacade;
         $this->emailSendProcessor          = $emailSendProcessor;
-        $this->usersToAttendeesTransformer = $usersToAttendeesTransformer;
     }
 
     /**
@@ -178,37 +170,14 @@ class CalendarEventHandler
                 $this->securityFacade->getOrganization()->getId()
             );
         $entity->setCalendar($defaultCalendar);
-        $entity->setRelatedAttendee($this->createRelatedAttendee($defaultCalendar->getOwner()));
-    }
-
-    /**
-     * @param User $user
-     *
-     * @return Attendee
-     */
-    protected function createRelatedAttendee(User $user)
-    {
-        $attendee = $this->usersToAttendeesTransformer->userToAttendee($user);
-
-        $status = $this->manager
-            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
-            ->find(Attendee::STATUS_NONE);
-        $attendee->setStatus($status);
-
-        $origin = $this->manager
-            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
-            ->find(Attendee::ORIGIN_SERVER);
-        $attendee->setOrigin($origin);
-
-        return $attendee;
     }
 
     /**
      * "Success" form handler
      *
-     * @param CalendarEvent   $entity
-     * @param ArrayCollection $originalAttendees
-     * @param boolean         $notify
+     * @param CalendarEvent              $entity
+     * @param ArrayCollection|Attendee[] $originalAttendees
+     * @param boolean                    $notify
      */
     protected function onSuccess(CalendarEvent $entity, ArrayCollection $originalAttendees, $notify)
     {
