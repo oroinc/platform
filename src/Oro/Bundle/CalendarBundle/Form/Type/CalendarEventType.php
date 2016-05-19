@@ -12,6 +12,7 @@ use Symfony\Component\Form\FormEvents;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
 use Oro\Bundle\CalendarBundle\Entity\Attendee;
+use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\EventListener\CalendarUidSubscriber;
 use Oro\Bundle\CalendarBundle\Form\EventListener\ChildEventsSubscriber;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
@@ -128,23 +129,34 @@ class CalendarEventType extends AbstractType
                 return;
             }
 
-            $this->setDefaultOrigin($calendarEvent->getAttendees());
+            $this->setDefaultOrigin($calendarEvent);
         }, 10);
     }
 
     /**
-     * @param Collection|Attendee[] $attendees
+     * @param CalendarEvent $event
      */
-    protected function setDefaultOrigin(Collection $attendees)
+    protected function setDefaultOrigin(CalendarEvent $event)
     {
+        if (!$event->getOrigin()) {
+            $calendarEventServer = $this->registry
+                ->getRepository(ExtendHelper::buildEnumValueClassName(CalendarEvent::ORIGIN_ENUM_CODE))
+                ->find(CalendarEvent::ORIGIN_SERVER);
+
+            $event->setOrigin($calendarEventServer);
+        }
+
+        $attendeeServer = $this->registry
+            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
+            ->find(Attendee::ORIGIN_SERVER);
+
+        $attendees = $event->getAttendees();
         foreach ($attendees as $attendee) {
             if ($attendee->getOrigin()) {
                 continue;
             }
 
-            $server = $this->registry->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
-                ->find(Attendee::ORIGIN_SERVER);
-            $attendee->setOrigin($server);
+            $attendee->setOrigin($attendeeServer);
         }
     }
 

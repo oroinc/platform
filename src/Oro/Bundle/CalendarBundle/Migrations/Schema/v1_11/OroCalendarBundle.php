@@ -150,7 +150,9 @@ class OroCalendarBundle implements Migration, ExtendExtensionAwareInterface
             false,
             false,
             [
-                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM]
+                'extend' => ['owner' => ExtendScope::OWNER_CUSTOM],
+                'view'   => ['is_displayable' => false],
+                'form'   => ['is_enabled' => false],
             ]
         );
     }
