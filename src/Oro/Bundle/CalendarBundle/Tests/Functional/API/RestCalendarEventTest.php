@@ -589,4 +589,114 @@ class RestCalendarEventTest extends WebTestCase
         $this->assertEquals('simple_user@example.com', $simpleUser->getEmail());
         $this->assertEquals('simple_user', $simpleUser->getUser()->getUsername());
     }
+
+
+    /**
+     * Create new event with invitedUsers field
+     *
+     * @return int
+     *
+     * @deprecated since 1.10
+     */
+    public function testPostInvitedUsers()
+    {
+        $user = $this->getReference('simple_user');
+
+        $request = [
+            'calendar'        => self::DEFAULT_USER_CALENDAR_ID,
+            'id'              => null,
+            'title'           => 'Test Event',
+            'description'     => 'Test Description',
+            'start'           => '2016-05-04T11:29:46+00:00',
+            'end'             => '2016-05-04T11:29:46+00:00',
+            'allDay'          => true,
+            'backgroundColor' => '#FF0000',
+            'origin'          => 'server',
+            'invitedUsers'    => [$user->getId()]
+        ];
+        $this->client->request('POST', $this->getUrl('oro_api_post_calendarevent'), $request);
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 201);
+
+        $this->assertNotEmpty($result);
+        $this->assertTrue(isset($result['id']));
+
+        return $result['id'];
+    }
+
+    /**
+     * @depends testPostInvitedUsers
+     *
+     * @param int $id
+     *
+     * @deprecated since 1.10
+     */
+    public function testGetAfterPostInvitedUsers($id)
+    {
+        $user = $this->getReference('simple_user');
+
+        $this->client->request(
+            'GET',
+            $this->getUrl('oro_api_get_calendarevent', ['id' => $id])
+        );
+
+        $result = $this->getJsonResponseContent($this->client->getResponse(), 200);
+
+        $this->assertNotEmpty($result);
+        unset(
+            $result['attendees'][0]['createdAt'],
+            $result['attendees'][0]['updatedAt'],
+            $result['attendees'][1]['createdAt'],
+            $result['attendees'][1]['updatedAt']
+        );
+
+        $this->assertCount(1, $result['attendees']);
+        $this->assertCount(1, $result['invitedUsers']);
+
+        $this->assertEquals(
+            [
+                'id'               => $id,
+                'calendar'         => self::DEFAULT_USER_CALENDAR_ID,
+                'title'            => 'Test Event',
+                'description'      => 'Test Description',
+                'start'            => '2016-05-04T11:29:46+00:00',
+                'end'              => '2016-05-04T11:29:46+00:00',
+                'allDay'           => true,
+                'backgroundColor'  => '#FF0000',
+                'invitationStatus' => 'none',
+                'origin'           => 'client',
+                'parentEventId'    => null,
+                'editable'         => true,
+                'removable'        => true,
+                'notifiable'       => false,
+                'attendees'        => [
+                    [
+                        'displayName' => 'Elley Towards',
+                        'email'       => 'simple_user@example.com',
+                        'origin'      => 'client',
+                        'status'      => 'none',
+                        'type'        => 'optional',
+                    ],
+                ],
+                'invitedUsers'     => [$user->getId()]
+            ],
+            $this->extractInterestingResponseData($result)
+        );
+
+        $calendarEvent = $this->getContainer()->get('doctrine')
+            ->getRepository('OroCalendarBundle:CalendarEvent')
+            ->find($id);
+
+        $attendees = $calendarEvent->getAttendees();
+        $this->assertCount(2, $attendees);
+
+        $admin = $attendees->first();
+        $this->assertEquals('admin@example.com', $admin->getEmail());
+        $this->assertEquals('admin', $admin->getUser()->getUsername());
+        $this->assertEquals($admin, $calendarEvent->getRelatedAttendee());
+
+        $simpleUser = $attendees->get(1);
+        $this->assertEquals('simple_user@example.com', $simpleUser->getEmail());
+        $this->assertEquals('simple_user', $simpleUser->getUser()->getUsername());
+    }
 }

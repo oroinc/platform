@@ -4,6 +4,7 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
+use Oro\Bundle\CalendarBundle\Form\EventListener\InvitedUsersSubscriber;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
 use Symfony\Component\Form\FormEvent;
@@ -115,6 +116,16 @@ class CalendarEventApiType extends CalendarEventType
                 ]
             )
             ->add('origin');
+
+        /** @deprecated since 1.10 */
+        $builder->add(
+            'invitedUsers',
+            'oro_user_multiselect',
+            [
+                'required' => false,
+                'mapped'   => false
+            ]
+        );
 
         $builder->addEventSubscriber(new PatchSubscriber());
         $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);

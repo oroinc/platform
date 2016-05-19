@@ -2,6 +2,7 @@
 
 namespace Oro\Bundle\CalendarBundle\Provider;
 
+use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 use Oro\Component\PropertyAccess\PropertyAccessor;
 
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
@@ -49,6 +50,7 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
         }
 
         $result = [$item];
+        $this->applyAdditionalData($result, $calendarId);
         $this->applyPermissions($result[0], $calendarId);
         $this->reminderManager->applyReminders($result, 'Oro\Bundle\CalendarBundle\Entity\CalendarEvent');
 
@@ -71,7 +73,8 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
             $extraValues[$field] = $propertyAccessor->getValue($event, $field);
         }
 
-        $extraValues['attendees'] = [];
+        $extraValues['attendees']    = [];
+        $extraValues['invitedUsers'] = [];
         foreach ($event->getAttendees() as $attendee) {
             $extraValues['attendees'][] =  $this->transformEntity([
                 'displayName' => $attendee->getDisplayName(),
@@ -82,6 +85,10 @@ class UserCalendarEventNormalizer extends AbstractCalendarEventNormalizer
                 'status' => $attendee->getStatus() ? $attendee->getStatus()->getId() : null,
                 'type' => $attendee->getType() ? $attendee->getType()->getId() : null,
             ]);
+
+            if ($attendee->getUser()) {
+                $extraValues['invitedUsers'][] = $attendee->getUser()->getId();
+            }
         }
 
         return array_merge(
