@@ -149,6 +149,10 @@ define([
                         }
                         e.delegateTarget = tdEl;
                         method.call(view, e);
+
+                        if (e.isPropagationStopped) {
+                            e.stopImmediatePropagation();
+                        }
                     }
                     break;
                 }
