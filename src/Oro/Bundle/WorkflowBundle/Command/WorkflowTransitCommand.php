@@ -12,9 +12,9 @@ use Symfony\Component\Console\Output\OutputInterface;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 
-class ExecuteWorkflowTransitionCommand extends ContainerAwareCommand
+class WorkflowTransitCommand extends ContainerAwareCommand
 {
-    const NAME = 'oro:workflow:transition:execute';
+    const NAME = 'oro:workflow:transit';
 
     /**
      * @inheritdoc
@@ -46,20 +46,23 @@ class ExecuteWorkflowTransitionCommand extends ContainerAwareCommand
         $transitionName = $input->getOption('transition');
 
         if (!filter_var($workflowItemId, FILTER_VALIDATE_INT)) {
-            $output->writeln('<error>No Workflow Item identifier defined</error>');
-            return;
+            $e = new \RuntimeException('No Workflow Item identifier defined');
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+            throw $e;
         }
 
         if (!$transitionName) {
-            $output->writeln('<error>No Transition name defined</error>');
-            return;
+            $e = new \RuntimeException('No Transition name defined');
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+            throw $e;
         }
 
         /** @var WorkflowItem $workflowItem */
         $workflowItem = $this->getRepository()->find($workflowItemId);
         if (!$workflowItem) {
-            $output->writeln('<error>Workflow Item not found</error>');
-            return;
+            $e = new \RuntimeException('Workflow Item not found');
+            $output->writeln(sprintf('<error>%s</error>', $e->getMessage()));
+            throw $e;
         }
 
         /** @var WorkflowManager $workflowManager */

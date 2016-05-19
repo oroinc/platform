@@ -8,16 +8,16 @@ use Doctrine\ORM\EntityRepository;
 use Symfony\Component\Console\Input\Input;
 use Symfony\Component\DependencyInjection\ContainerInterface;
 
-use Oro\Bundle\WorkflowBundle\Command\ExecuteWorkflowTransitionCommand;
+use Oro\Bundle\WorkflowBundle\Command\WorkflowTransitCommand;
 use Oro\Bundle\WorkflowBundle\Entity\WorkflowItem;
 use Oro\Bundle\WorkflowBundle\Model\WorkflowManager;
 use Oro\Bundle\WorkflowBundle\Tests\Unit\Command\Stub\TestOutput;
 
-class ExecuteWorkflowTransitionCommandTest extends \PHPUnit_Framework_TestCase
+class WorkflowTransitCommandTest extends \PHPUnit_Framework_TestCase
 {
     const CLASS_NAME = 'OroWorkflowBundle:WorkflowItem';
 
-    /** @var ExecuteWorkflowTransitionCommand */
+    /** @var WorkflowTransitCommand */
     private $command;
 
     /** @var \PHPUnit_Framework_MockObject_MockObject|ContainerInterface */
@@ -64,7 +64,7 @@ class ExecuteWorkflowTransitionCommandTest extends \PHPUnit_Framework_TestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->command = new ExecuteWorkflowTransitionCommand();
+        $this->command = new WorkflowTransitCommand();
         $this->command->setContainer($this->container);
 
         $this->input = $this->getMockForAbstractClass('Symfony\Component\Console\Input\InputInterface');
@@ -74,13 +74,13 @@ class ExecuteWorkflowTransitionCommandTest extends \PHPUnit_Framework_TestCase
     protected function tearDown()
     {
         unset(
-            $this->container,
-            $this->repo,
-            $this->workflowManager,
-            $this->managerRegistry,
-            $this->input,
-            $this->output,
-            $this->command
+        $this->container,
+        $this->repo,
+        $this->workflowManager,
+        $this->managerRegistry,
+        $this->input,
+        $this->output,
+        $this->command
         );
     }
 
@@ -111,15 +111,23 @@ class ExecuteWorkflowTransitionCommandTest extends \PHPUnit_Framework_TestCase
 
         $workflowItem = $this->createWorkflowItem($id);
 
-        $this->repo->expects($this->once())
-            ->method('find')
-            ->with($id)
-            ->willReturn($workflowItem);
+        if (!$transition || !is_numeric($id)) {
+            $this->repo->expects($this->never())->method('find');
+        } else {
+            $this->repo->expects($this->once())
+                ->method('find')
+                ->with($id)
+                ->willReturn($workflowItem);
+        }
 
-        $this->workflowManager->expects($this->once())
-            ->method('transit')
-            ->with($workflowItem, $transition)
-            ->will($exception ? $this->throwException($exception) : $this->returnSelf());
+        if ((!$workflowItem) || (!$transition)) {
+            $this->workflowManager->expects($this->never())->method('transit');
+        } else {
+            $this->workflowManager->expects($this->once())
+                ->method('transit')
+                ->with($workflowItem, $transition)
+                ->will($exception ? $this->throwException($exception) : $this->returnSelf());
+        }
 
         if ($exception) {
             $this->setExpectedException(get_class($exception), $exception->getMessage());
@@ -164,65 +172,42 @@ class ExecuteWorkflowTransitionCommandTest extends \PHPUnit_Framework_TestCase
                 ],
                 'exception' => new \RuntimeException('Transition 1 exception'),
             ],
+            'no workflow item' => [
+                'id' => 99,
+                'name' => 'transit',
+                'output' => [
+                    'Start transition...',
+                    'Exception: Workflow Item not found',
+                ],
+                'exception' => new \RuntimeException('Workflow Item not found'),
+            ],
+            'no transition' => [
+                'id' => 2,
+                'name' => null,
+                'output' => [
+                    'No Transition name defined',
+                ],
+                'exception' => new \RuntimeException('No Transition name defined'),
+            ],
+            'wrong workflow item id' => [
+                'id' => 'item_id',
+                'name' => null,
+                'output' => [
+                    'No Workflow Item identifier defined',
+                ],
+                'exception' => new \RuntimeException('No Workflow Item identifier defined'),
+            ],
         ];
-    }
-
-    public function testExecuteNoWorkflowItemError()
-    {
-        $this->expectContainerGetManagerRegistryAndWorkflowManager();
-
-        $this->input->expects($this->exactly(2))
-            ->method('getOption')
-            ->willReturnMap([
-                ['workflow-item', 1],
-                ['transition', 'transit'],
-            ]);
-
-        $this->workflowManager->expects($this->never())->method($this->anything());
-
-        $this->command->execute($this->input, $this->output);
-
-        $this->assertAttributeEquals(['Workflow Item not found'], 'messages', $this->output);
-    }
-
-    public function testExecuteEmptyWrongIdSpecified()
-    {
-        $this->input->expects($this->exactly(2))
-            ->method('getOption')
-            ->willReturnMap([
-                ['workflow-item', '123a'],
-                ['transition', 'transit'],
-            ]);
-
-        $this->workflowManager->expects($this->never())->method($this->anything());
-
-        $this->command->execute($this->input, $this->output);
-
-        $this->assertAttributeEquals(['No Workflow Item identifier defined'], 'messages', $this->output);
-    }
-
-    public function testExecuteNoTransitionNameError()
-    {
-        $this->input->expects($this->exactly(2))
-            ->method('getOption')
-            ->willReturnMap([
-                ['workflow-item', 1],
-            ]);
-
-        $this->workflowManager->expects($this->never())->method($this->anything());
-
-        $this->command->execute($this->input, $this->output);
-
-        $this->assertAttributeEquals(['No Transition name defined'], 'messages', $this->output);
     }
 
     protected function expectContainerGetManagerRegistryAndWorkflowManager()
     {
-        $this->container->expects($this->once())
+        $this->container->expects($this->any())
             ->method('getParameter')
             ->with('oro_workflow.workflow_item.entity.class')
             ->willReturn(self::CLASS_NAME);
-        $this->container->expects($this->atLeastOnce())
+
+        $this->container->expects($this->any())
             ->method('get')
             ->willReturnMap([
                 ['oro_workflow.manager', 1, $this->workflowManager],
@@ -236,6 +221,10 @@ class ExecuteWorkflowTransitionCommandTest extends \PHPUnit_Framework_TestCase
      */
     protected function createWorkflowItem($id)
     {
+        if ($id > 2) {
+            return null;
+        }
+
         $workflowItem = new WorkflowItem();
         $workflowItem
             ->setId($id);
