@@ -76,9 +76,6 @@ define([
                     cell.$el.addClass('skip-row-click');
                 }
 
-                // use columns collection as event bus since there is no alternatives
-                _this.collection.trigger('afterMakeCell', _this, cell);
-
                 return cell;
             };
 

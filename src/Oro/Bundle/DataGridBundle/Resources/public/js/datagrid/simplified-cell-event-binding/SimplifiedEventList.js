@@ -3,6 +3,13 @@ define(['underscore', 'backbone'], function(_, Backbone) {
 
     function SimplifiedEventList(columns) {
         this.columns = columns;
+
+        // listener will be removed with columns instance
+        // no need to dispose this class
+        columns.on('change:renderable add remove reset change:columnEventList', function() {
+            delete this.cachedEventList;
+            this.trigger('change');
+        }, this);
     }
 
     SimplifiedEventList.prototype = {
@@ -10,6 +17,9 @@ define(['underscore', 'backbone'], function(_, Backbone) {
             if (!this.cachedEventList) {
                 var simplifiedCellEvents = {};
                 this.columns.each(function(column) {
+                    if (!column.get('renderable')) {
+                        return;
+                    }
                     var cellCtor = column.get('cell');
                     if (cellCtor.simplifiedEventBinding) {
                         for (var eventName in cellCtor.prototype.events) { // jshint ignore:line

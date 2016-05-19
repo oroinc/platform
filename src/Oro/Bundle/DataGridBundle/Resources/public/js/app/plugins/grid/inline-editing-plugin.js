@@ -27,21 +27,21 @@ define(function(require) {
 
         initialize: function(main, options) {
             this.activeEditorComponents = [];
+            this.patchCellConstructor = _.bind(this.patchCellConstructor, this);
             InlineEditingPlugin.__super__.initialize.apply(this, arguments);
         },
 
         enable: function() {
             this.main.$el.addClass('grid-editable');
-            this.listenTo(this.main, {
-                afterMakeCell: this.onAfterMakeCell
-            });
+
             this.listenTo(this.main.collection, {
                 beforeFetch: this.beforeGridCollectionFetch
             });
+
             if (this.main.columns) {
-                this.listenColumnEvents();
+                this.processColumnsAndListenEvents();
             } else {
-                this.listenToOnce(this.main, 'columns:ready', this.listenColumnEvents);
+                this.listenToOnce(this.main, 'columns:ready', this.processColumnsAndListenEvents);
             }
             this.listenTo(mediator, {
                 'page:beforeChange': this.removeActiveEditorComponents,
@@ -61,10 +61,16 @@ define(function(require) {
             $(window).on('beforeunload.' + this.cid, _.bind(this.onWindowUnload, this));
         },
 
-        listenColumnEvents: function() {
+        processColumnsAndListenEvents: function() {
+            this.processColumns();
             this.listenTo(this.main.columns, {
                 'change:renderable': this.onColumnStateChange
             });
+            this.main.columns.trigger('change:columnEventList');
+        },
+
+        processColumns: function() {
+            this.main.columns.each(this.patchCellConstructor);
         },
 
         disable: function() {
@@ -144,36 +150,76 @@ define(function(require) {
             }
         },
 
-        onAfterMakeCell: function(row, cell) {
-            var _this = this;
-            function enterEditModeIfNeeded(e) {
-                if (_this.isEditable(cell)) {
-                    _this.enterEditMode(cell);
+        patchCellConstructor: function(column) {
+            var cellCtor = column.get('cell');
+            var inlineEditingPlugin = this;
+            var oldEvents = cellCtor.prototype.events;
+
+            /**
+             * Select one of two handlers and run it
+             *
+             * @param fnIfEditable
+             * @param fnIfUneditable
+             * @param e
+             */
+            function selectAndRun(fnIfEditable, fnIfUneditable, e) {
+                /* jshint ignore:start */
+                if (this.isEditable()) {
+                    if (_.isString(fnIfEditable)) {
+                        fnIfEditable = this[fnIfEditable];
+                    }
+                    if (!fnIfEditable) {
+                        return;
+                    }
+                    fnIfEditable.call(this, e);
+                } else {
+                    if (_.isString(fnIfUneditable)) {
+                        fnIfUneditable = this[fnIfUneditable];
+                    }
+                    if (!fnIfUneditable) {
+                        return;
+                    }
+                    fnIfUneditable.call(this, e);
                 }
-                e.preventDefault();
-                e.stopPropagation();
+                /* jshint ignore:end */
             }
-            var originalRender = cell.render;
-            cell.render = function() {
-                var cell = this;
-                originalRender.apply(cell, arguments);
-                var originalEvents = cell.events;
-                if (_this.isEditable(cell)) {
-                    cell.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
-                    cell.$el.append('<i data-role="edit" ' +
-                        'class="icon-pencil skip-row-click hide-text inline-editor__edit-action"' +
-                        'title="' + __('Edit') + '">' + __('Edit') + '</i>');
-                    cell.$el.attr('title', _this.helpMessage);
-                    cell.events = _.extend(Object.create(cell.events), {
-                        'dblclick': enterEditModeIfNeeded,
-                        'mousedown [data-role=edit]': enterEditModeIfNeeded,
-                        'click': _.noop
-                    });
+
+            var extended = cellCtor.extend({
+                events: _.extend(Object.create(oldEvents), {
+                    'dblclick': _.partial(selectAndRun, 'enterEditModeIfNeeded', oldEvents.dblclick),
+                    'mousedown [data-role=edit]': _.partial(selectAndRun, 'enterEditModeIfNeeded',
+                                                            oldEvents['mousedown [data-role=edit]']),
+                    'click': _.partial(selectAndRun, _.noop, oldEvents.click)
+                }),
+
+                render: function() {
+                    cellCtor.prototype.render.apply(this, arguments);
+                    if (inlineEditingPlugin.isEditable(this)) {
+                        this.$el.addClass('editable view-mode prevent-text-selection-on-dblclick');
+                        this.$el.append('<i data-role="edit" ' +
+                            'class="icon-pencil skip-row-click hide-text inline-editor__edit-action"' +
+                            'title="' + __('Edit') + '">' + __('Edit') + '</i>');
+                        this.$el.attr('title', inlineEditingPlugin.helpMessage);
+                    }
+                },
+
+                isEditable: function() {
+                    return inlineEditingPlugin.isEditable(this);
+                },
+
+                enterEditModeIfNeeded: function(e) {
+                    if (this.isEditable(this)) {
+                        inlineEditingPlugin.enterEditMode(this);
+                    }
+                    e.preventDefault();
+                    e.stopPropagation();
                 }
-                cell.delegateEvents();
-                cell.events = originalEvents;
-                return cell;
-            };
+            });
+
+            column.set({
+                cell: extended,
+                oldCell: cellCtor
+            });
         },
 
         hasChanges: function() {
@@ -207,7 +253,8 @@ define(function(require) {
                     throw new Error('Unknown behaviour');
             }
             return editable ?
-                this.getCellEditorOptions(cell).save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
+                this.getCellEditorOptions(cell)
+                    .save_api_accessor.validateUrlParameters(cell.model.toJSON()) :
                 false;
         },
 
