@@ -30,7 +30,7 @@ define([
             reminders: {},
             parentEventId: null,
             invitationStatus: null,
-            invitedUsers: null,
+            attendees: null,
             editable: false,
             removable: false,
             calendarAlias: null,
