@@ -117,6 +117,16 @@ class Recurrence
     protected $endTime;
 
     /**
+     * Contains additionally calculated end datetime for range of recurrence.
+     * It is used for SQL query and recurrence strategies optimization.
+     *
+     * @var \DateTime
+     *
+     * @ORM\Column(name="additional_end_time", type="datetime")
+     */
+    protected $additionalEndTime;
+
+    /**
      * Contains the number of occurrences for range of recurrence.
      * It means that recurrence ends after X occurrences, where X is 'occurrences' value.
      *
@@ -326,6 +336,26 @@ class Recurrence
     public function getEndTime()
     {
         return $this->endTime;
+    }
+
+    /**
+     * @param \DateTime|null $additionalEndTime
+     *
+     * @return self
+     */
+    public function setAdditionalEndTime($additionalEndTime)
+    {
+        $this->additionalEndTime = $additionalEndTime;
+
+        return $this;
+    }
+
+    /**
+     * @return \DateTime|null
+     */
+    public function getAdditionalEndTime()
+    {
+        return $this->additionalEndTime;
     }
 
     /**

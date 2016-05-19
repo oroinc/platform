@@ -177,7 +177,7 @@ class RestCalendarEventTest extends WebTestCase
         $event = $this->getContainer()->get('doctrine')->getRepository('OroCalendarBundle:CalendarEvent')
             ->find($result['id']);
         $this->assertNotNull($event);
-        $this->assertEquals(Recurrence::MAX_END_DATE, $event->getRecurrence()->getEndTime()->format(DATE_RFC3339));
+        $this->assertEquals(Recurrence::MAX_END_DATE, $event->getRecurrence()->getAdditionalEndTime()->format(DATE_RFC3339));
 
         return ['id' => $result['id'], 'recurrenceId' => $event->getRecurrence()->getId()];
     }

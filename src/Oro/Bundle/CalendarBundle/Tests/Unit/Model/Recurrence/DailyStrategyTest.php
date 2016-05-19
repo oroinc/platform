@@ -82,10 +82,12 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
         $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
             ->setInterval($params['interval'])
             ->setStartTime(new \DateTime($params['startTime']))
-            ->setEndTime(new \DateTime($params['endTime']));
+            ->setEndTime(new \DateTime($params['endTime']))
+            ->setAdditionalEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
             $recurrence->setOccurrences($params['occurrences']);
         }
+
         $result = $this->strategy->getOccurrences(
             $recurrence,
             new \DateTime($params['start']),
@@ -106,7 +108,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
         $recurrence->setRecurrenceType(Recurrence::TYPE_DAILY)
             ->setInterval($recurrenceData['interval'])
             ->setStartTime(new \DateTime($recurrenceData['startTime']))
-            ->setEndTime(new \DateTime($recurrenceData['endTime']))
+            ->setEndTime($recurrenceData['endTime'] === null ? null : new \DateTime($recurrenceData['endTime']))
             ->setOccurrences($recurrenceData['occurrences']);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
@@ -318,7 +320,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
                 'params' => [
                     'interval' => 2,
                     'startTime' => '2016-04-28',
-                    'endTime' => Recurrence::MAX_END_DATE,
+                    'endTime' => null,
                     'occurrences' => null,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.daily'
@@ -327,7 +329,7 @@ class DailyStrategyTest extends \PHPUnit_Framework_TestCase
                 'params' => [
                     'interval' => 2,
                     'startTime' => '2016-04-28',
-                    'endTime' => Recurrence::MAX_END_DATE,
+                    'endTime' => null,
                     'occurrences' => 3,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.dailyoro.calendar.recurrence.patterns.occurrences'

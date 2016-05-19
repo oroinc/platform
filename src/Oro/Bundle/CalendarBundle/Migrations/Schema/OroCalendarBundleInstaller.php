@@ -255,9 +255,11 @@ class OroCalendarBundleInstaller implements Installation
         $table->addColumn('month_of_year', 'integer', ['notnull' => false]);
         $table->addColumn('start_time', 'datetime', []);
         $table->addColumn('end_time', 'datetime', ['notnull' => false]);
+        $table->addColumn('additional_end_time', 'datetime', []);
         $table->addColumn('occurrences', 'integer', ['notnull' => false]);
         $table->setPrimaryKey(['id']);
         $table->addIndex(['start_time'], 'oro_calendar_r_start_time_idx', []);
         $table->addIndex(['end_time'], 'oro_calendar_r_end_time_idx', []);
+        $table->addIndex(['additional_end_time'], 'oro_calendar_r_a_end_time_idx', []);
     }
 }

@@ -82,7 +82,8 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             ->setMonthOfYear($params['monthOfYear'])
             ->setDayOfWeek($params['daysOfWeek'])
             ->setStartTime(new \DateTime($params['startTime']))
-            ->setEndTime(new \DateTime($params['endTime']));
+            ->setEndTime(new \DateTime($params['endTime']))
+            ->setAdditionalEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
             $recurrence->setOccurrences($params['occurrences']);
         }
@@ -109,7 +110,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
             ->setMonthOfYear($recurrenceData['monthOfYear'])
             ->setStartTime(new \DateTime($recurrenceData['startTime']))
-            ->setEndTime(new \DateTime($recurrenceData['endTime']))
+            ->setEndTime($recurrenceData['endTime'] === null ? null : new \DateTime($recurrenceData['endTime']))
             ->setOccurrences($recurrenceData['occurrences']);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
@@ -381,7 +382,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
                     'dayOfWeek' => ['saturday'],
                     'monthOfYear' => 6,
                     'startTime' => '2016-04-28',
-                    'endTime' => Recurrence::MAX_END_DATE,
+                    'endTime' => null,
                     'occurrences' => null,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.yearnth'
@@ -393,7 +394,7 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
                     'dayOfWeek' => ['saturday'],
                     'monthOfYear' => 6,
                     'startTime' => '2016-04-28',
-                    'endTime' => Recurrence::MAX_END_DATE,
+                    'endTime' => null,
                     'occurrences' => 3,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.yearnthoro.calendar.recurrence.patterns.occurrences'

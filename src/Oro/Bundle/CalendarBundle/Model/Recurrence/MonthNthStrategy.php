@@ -47,7 +47,7 @@ class MonthNthStrategy extends AbstractStrategy implements StrategyInterface
         }
 
         $occurrences = $recurrence->getOccurrences();
-        while ($occurrenceDate <= $recurrence->getEndTime()
+        while ($occurrenceDate <= $recurrence->getAdditionalEndTime()
             && $occurrenceDate <= $end
             && ($occurrences === null || $fromStartInterval <= $occurrences)
         ) {

@@ -81,7 +81,8 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
             ->setInterval($params['interval'])
             ->setDayOfWeek($params['daysOfWeek'])
             ->setStartTime(new \DateTime($params['startTime']))
-            ->setEndTime(new \DateTime($params['endTime']));
+            ->setEndTime(new \DateTime($params['endTime']))
+            ->setAdditionalEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
             $recurrence->setOccurrences($params['occurrences']);
         }
@@ -106,7 +107,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
             ->setInterval($recurrenceData['interval'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
             ->setStartTime(new \DateTime($recurrenceData['startTime']))
-            ->setEndTime(new \DateTime($recurrenceData['endTime']))
+            ->setEndTime($recurrenceData['endTime'] === null ? null : new \DateTime($recurrenceData['endTime']))
             ->setOccurrences($recurrenceData['occurrences']);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
@@ -375,7 +376,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     'interval' => 2,
                     'dayOfWeek' => ['monday'],
                     'startTime' => '2016-04-28',
-                    'endTime' => Recurrence::MAX_END_DATE,
+                    'endTime' => null,
                     'occurrences' => null,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.weekly'
@@ -385,7 +386,7 @@ class WeeklyStrategyTest extends \PHPUnit_Framework_TestCase
                     'interval' => 2,
                     'dayOfWeek' => ['monday'],
                     'startTime' => '2016-04-28',
-                    'endTime' => Recurrence::MAX_END_DATE,
+                    'endTime' => null,
                     'occurrences' => 3,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.weeklyoro.calendar.recurrence.patterns.occurrences'

@@ -82,7 +82,8 @@ class MonthNthStrategyTest extends \PHPUnit_Framework_TestCase
             ->setDayOfWeek($params['daysOfWeek'])
             ->setInstance($params['instance'])
             ->setStartTime(new \DateTime($params['startTime']))
-            ->setEndTime(new \DateTime($params['endTime']));
+            ->setEndTime(new \DateTime($params['endTime']))
+            ->setAdditionalEndTime(new \DateTime($params['endTime']));
         if ($params['occurrences']) {
             $recurrence->setOccurrences($params['occurrences']);
         }
@@ -108,7 +109,7 @@ class MonthNthStrategyTest extends \PHPUnit_Framework_TestCase
             ->setInstance($recurrenceData['instance'])
             ->setDayOfWeek($recurrenceData['dayOfWeek'])
             ->setStartTime(new \DateTime($recurrenceData['startTime']))
-            ->setEndTime(new \DateTime($recurrenceData['endTime']))
+            ->setEndTime($recurrenceData['endTime'] === null ? null : new \DateTime($recurrenceData['endTime']))
             ->setOccurrences($recurrenceData['occurrences']);
 
         $this->assertEquals($expected, $this->strategy->getTextValue($recurrence));
@@ -315,7 +316,7 @@ class MonthNthStrategyTest extends \PHPUnit_Framework_TestCase
                     'instance' => 3,
                     'dayOfWeek' => ['sunday'],
                     'startTime' => '2016-04-28',
-                    'endTime' => Recurrence::MAX_END_DATE,
+                    'endTime' => null,
                     'occurrences' => null,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.monthnth'
@@ -326,7 +327,7 @@ class MonthNthStrategyTest extends \PHPUnit_Framework_TestCase
                     'instance' => 3,
                     'dayOfWeek' => ['sunday'],
                     'startTime' => '2016-04-28',
-                    'endTime' => Recurrence::MAX_END_DATE,
+                    'endTime' => null,
                     'occurrences' => 3,
                 ],
                 'expected' => 'oro.calendar.recurrence.patterns.monthnthoro.calendar.recurrence.patterns.occurrences'

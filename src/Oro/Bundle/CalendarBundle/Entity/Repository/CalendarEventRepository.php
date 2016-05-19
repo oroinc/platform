@@ -24,6 +24,8 @@ class CalendarEventRepository extends EntityRepository
     public function getUserEventListByTimeIntervalQueryBuilder($startDate, $endDate, $filters = [], $extraFields = [])
     {
         $qb = $this->getUserEventListQueryBuilder($filters, $extraFields);
+        $key = Recurrence::STRING_KEY;
+        $qb->addSelect("r.additionalEndTime as {$key}additionalEndTime");
         $this->addTimeIntervalFilter($qb, $startDate, $endDate);
 
         return $qb;

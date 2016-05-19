@@ -204,15 +204,17 @@ class UserCalendarProvider extends AbstractCalendarProvider
         $key = Recurrence::STRING_KEY;
         $propertyAccessor = $this->getPropertyAccessor();
         $occurrences = [];
+        $dateFields = ['startTime', 'endTime', 'additionalEndTime'];
         foreach ($items as $item) {
             if (!empty($item[$key]) && empty($item['recurringEventId'])) {
                 $recurrence = new Entity\Recurrence();
                 foreach ($item[$key] as $field => $value) {
-                    $value = in_array($field, ['startTime', 'endTime'], true) ? new \DateTime($value) : $value;
+                    $value = in_array($field, $dateFields, true) && $value !== null ? new \DateTime($value) : $value;
                     if ($field !== 'id') {
                         $propertyAccessor->setValue($recurrence, $field, $value);
                     }
                 }
+                unset($item[$key]['additionalEndTime']);
                 $occurrenceDates = $this->recurrenceStrategy->getOccurrences($recurrence, $start, $end);
                 foreach ($occurrenceDates as $occurrenceDate) {
                     $newItem = $item;
@@ -280,7 +282,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
         $queryBuilder->orWhere(
             $expr->andX(
                 $expr->lte('r.startTime', ':endDate'),
-                $expr->gte('r.endTime', ':startDate')
+                $expr->gte('r.additionalEndTime', ':startDate')
             )
         )
         ->orWhere(

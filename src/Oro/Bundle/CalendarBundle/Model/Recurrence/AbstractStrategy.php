@@ -70,8 +70,7 @@ abstract class AbstractStrategy
     protected function getEndDatePattern(Entity\Recurrence $recurrence)
     {
         $result = '';
-        $maxEndDate = new \DateTime(Recurrence::MAX_END_DATE);
-        if ($recurrence->getOccurrences() === null && $recurrence->getEndTime() < $maxEndDate) {
+        if ($recurrence->getEndTime() !== null) {
             $result = $this->translator->trans(
                 'oro.calendar.recurrence.patterns.end_date',
                 ['%date%' => $this->dateTimeFormatter->formatDate($recurrence->getEndTime())]
@@ -123,10 +122,10 @@ abstract class AbstractStrategy
         $occurrences = $recurrence->getOccurrences();
         $currentEndTime = $recurrence->getEndTime();
 
-        if (empty($occurrences)) {
-            $result = empty($currentEndTime) ? new \DateTime(Recurrence::MAX_END_DATE) : $currentEndTime;
-        } else {
+        if (empty($currentEndTime) && !empty($occurrences)) {
             $result = $this->getLastOccurrence($recurrence);
+        } else {
+            $result = empty($currentEndTime) ? new \DateTime(Recurrence::MAX_END_DATE) : $currentEndTime;
         }
 
         return $result;

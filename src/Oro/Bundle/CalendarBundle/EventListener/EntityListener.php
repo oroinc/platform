@@ -68,7 +68,7 @@ class EntityListener
         }
 
         if ($entity instanceof Recurrence) {
-            $entity->setEndTime($this->recurrenceStrategy->getCalculatedEndTime($entity));
+            $entity->setAdditionalEndTime($this->recurrenceStrategy->getCalculatedEndTime($entity));
         }
     }
 
@@ -79,7 +79,7 @@ class EntityListener
     {
         $entity = $args->getEntity();
         if ($entity instanceof Recurrence) {
-            $entity->setEndTime($this->recurrenceStrategy->getCalculatedEndTime($entity));
+            $entity->setAdditionalEndTime($this->recurrenceStrategy->getCalculatedEndTime($entity));
         }
     }
 

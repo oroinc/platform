@@ -46,11 +46,11 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
 
         $afterFullWeeksDate = new \DateTime("+{$fullWeeks} week {$startTime->format('c')}");
 
-        while ($afterFullWeeksDate <= $end && $afterFullWeeksDate <= $recurrence->getEndTime()) {
+        while ($afterFullWeeksDate <= $end && $afterFullWeeksDate <= $recurrence->getAdditionalEndTime()) {
             foreach ($weekDays as $day) {
                 $next = $this->getNextOccurrence($day, $afterFullWeeksDate);
                 if ($next > $end
-                    || $next > $recurrence->getEndTime()
+                    || $next > $recurrence->getAdditionalEndTime()
                     || ($recurrence->getOccurrences() && $fromStartInterval >= $recurrence->getOccurrences())
                 ) {
                     return $result;
@@ -59,7 +59,7 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
                 if ($next >= $start
                     && $next <= $end
                     && $next >= $recurrence->getStartTime()
-                    && $next <= $recurrence->getEndTime()
+                    && $next <= $recurrence->getAdditionalEndTime()
                 ) {
                     $result[] = $next;
                 }
