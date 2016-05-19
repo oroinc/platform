@@ -30,6 +30,11 @@ use Oro\Bundle\ImapBundle\Util\DateTimeParser;
  */
 class ImapEmailManager
 {
+    /**
+     * According to RFC 2822
+     */
+    const SUBJECT_MAX_LENGTH = 998;
+
     /** @var ImapConnector */
     protected $connector;
 
@@ -167,6 +172,7 @@ class ImapEmailManager
      * @param int $uid The UID of an email message
      *
      * @return Email|null An Email DTO or null if an email with the given UID was not found
+     * @throws \RuntimeException When message can't be parsed correctly
      */
     public function findEmail($uid)
     {
@@ -196,11 +202,11 @@ class ImapEmailManager
             $email
                 ->setId(
                     new ItemId(
-                        intval($headers->get('UID')->getFieldValue()),
+                        (int) $headers->get('UID')->getFieldValue(),
                         $this->connector->getUidValidity()
                     )
                 )
-                ->setSubject($this->getString($headers, 'Subject'))
+                ->setSubject($this->getString($headers, 'Subject', self::SUBJECT_MAX_LENGTH))
                 ->setFrom($this->getString($headers, 'From'))
                 ->setSentAt($this->getDateTime($headers, 'Date'))
                 ->setReceivedAt($this->getReceivedAt($headers))
@@ -263,7 +269,7 @@ class ImapEmailManager
 
         $acceptHeader = new AcceptHeader($items);
 
-        return $acceptHeader->__toString();
+        return (string) $acceptHeader;
     }
 
     /**
@@ -271,12 +277,13 @@ class ImapEmailManager
      *
      * @param Headers $headers
      * @param string $name
+     * @param int $lengthLimit if more than 0 returns part of header specified length
      *
      * @return string
      *
      * @throws \RuntimeException if a value of the requested header cannot be converted to a string
      */
-    protected function getString(Headers $headers, $name)
+    protected function getString(Headers $headers, $name, $lengthLimit = 0)
     {
         $header = $headers->get($name);
         if ($header === false) {
@@ -298,7 +305,12 @@ class ImapEmailManager
             );
         }
 
-        return $header->getFieldValue();
+        $headerValue = $header->getFieldValue();
+        if ($lengthLimit > 0 && $lengthLimit < mb_strlen($headerValue)) {
+            $headerValue = mb_strcut($headerValue, 0, $lengthLimit);
+        }
+
+        return $headerValue;
     }
 
     /**
@@ -382,6 +394,7 @@ class ImapEmailManager
      * @param string $name
      *
      * @return \DateTime
+     * @throws \Exception if header contain incorrect DateTime string
      */
     protected function getDateTime(Headers $headers, $name)
     {
@@ -399,6 +412,7 @@ class ImapEmailManager
      * @param Headers $headers
      *
      * @return \DateTime
+     * @throws \Exception if Received header contain incorrect DateTime string
      */
     protected function getReceivedAt(Headers $headers)
     {
