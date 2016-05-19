@@ -1,7 +1,8 @@
 define([
     'backgrid',
-    'chaplin'
-], function(Backgrid, Chaplin) {
+    'chaplin',
+    './util'
+], function(Backgrid, Chaplin, util) {
     'use strict';
 
     var HeaderRow;
@@ -42,7 +43,13 @@ define([
             }
             HeaderRow.__super__.initialize.apply(this, arguments);
             this.cells = this.subviews;
-        }
+        },
+
+        /**
+         * Cells is not removed from DOM by Chaplin.CollectionView or their realizations
+         * Do that manually as it is critical for FloatingHeader plugin
+         */
+        removeSubview: util.removeSubview
     });
 
     return HeaderRow;

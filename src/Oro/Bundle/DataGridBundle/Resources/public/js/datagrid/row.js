@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'chaplin',
-    'oroui/js/tools'
-], function($, _, Chaplin, tools) {
+    'oroui/js/tools',
+    './util'
+], function($, _, Chaplin, tools, util) {
     'use strict';
 
     var Row;
@@ -235,6 +236,12 @@ define([
 
             return this;
         },
+
+        /**
+         * Cells is not removed from DOM by Chaplin.CollectionView or their realizations
+         * Do that manually as it is critical for FloatingHeader plugin
+         */
+        removeSubview: util.removeSubview,
 
         renderCustomTemplate: function() {
             var $checkbox;
