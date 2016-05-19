@@ -450,7 +450,9 @@
         knownOnly - if true renders only emails which have an owner; otherwise, all emails. Default value is false
 #}
 {% macro email_participant_name_or_me(emailAddress, emailAddressName, noLink, knownOnly) -%}
-    {% if emailAddress.owner is not null and emailAddress.owner.id == app.user.id -%}
+    {% if emailAddress.owner is not null and
+          oro_class_name(emailAddress.owner, true) == oro_class_name(app.user, true) and
+          emailAddress.owner.id == app.user.id -%}
         {% if noLink|default(false) -%}
             {{ 'Me'|trans|lower }}
         {%- else -%}
@@ -599,4 +601,16 @@
             {{ buttons|raw }}
         </div>
     </div>
+{% endmacro %}
+
+{#
+    Wrap text to tag
+#}
+{% macro wrapTextToTag(text, isWrap, tag) %}
+    {% set tag = tag is not null ? tag : 'strong' %}
+    {% if isWrap == true %}
+        <{{ tag }}>{{ text }}</{{ tag }}>
+    {% else %}
+        {{ text }}
+    {% endif %}
 {% endmacro %}

@@ -139,15 +139,7 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
             ['oro_datagrid.datagrid.build.before', 'Oro\Bundle\DataGridBundle\Event\BuildBefore'],
             ['oro_datagrid.datagrid.build.after', 'Oro\Bundle\DataGridBundle\Event\BuildAfter'],
         ];
-
-        $extToAdd    = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface');
-        $extToAdd2   = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface');
-        $extNotToAdd = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface');
-
-        $extToAdd->expects($this->any())->method('isApplicable')->will($this->returnValue(true));
-        $extToAdd2->expects($this->any())->method('isApplicable')->will($this->returnValue(true));
-        $extNotToAdd->expects($this->any())->method('isApplicable')->will($this->returnValue(false));
-
+        
         return [
             'Base datagrid should be created without extensions'         => [
                 DatagridConfiguration::createNamed(self::TEST_DATAGRID_NAME, []),
@@ -169,14 +161,21 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
                 self::DEFAULT_DATAGRID_CLASS,
                 $baseEventList,
                 1,
-                [$extToAdd, $extNotToAdd]
+                [
+                    $this->getExtensionVisitorMock(),
+                    $this->getExtensionVisitorMock(false)
+                ]
             ],
             'Both extensions passed check'                               => [
                 DatagridConfiguration::createNamed(self::TEST_DATAGRID_NAME, []),
                 self::DEFAULT_DATAGRID_CLASS,
                 $baseEventList,
                 2,
-                [$extToAdd, $extNotToAdd, $extToAdd2]
+                [
+                    $this->getExtensionVisitorMock(),
+                    $this->getExtensionVisitorMock(false),
+                    $this->getExtensionVisitorMock()
+                ]
             ],
             'With minified parameters without grid params'               => [
                 DatagridConfiguration::createNamed(self::TEST_DATAGRID_NAME, []),
@@ -276,5 +275,22 @@ class BuilderTest extends \PHPUnit_Framework_TestCase
         return $this->getMockBuilder('Oro\Bundle\DataGridBundle\Datagrid\Builder')
             ->setConstructorArgs($args)
             ->setMethods($methods)->getMock();
+    }
+
+
+    /**
+     * @param bool $returnValue
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getExtensionVisitorMock($returnValue = true)
+    {
+        $extMock = $this->getMockForAbstractClass('Oro\Bundle\DataGridBundle\Extension\ExtensionVisitorInterface');
+
+        $extMock->expects($this->any())
+                ->method('isApplicable')
+                ->will($this->returnValue($returnValue));
+
+        return $extMock;
+
     }
 }

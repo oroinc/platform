@@ -35,7 +35,7 @@ class HtmlTagProvider
         ],
         [
             'name' => 'a',
-            'attrs' => ['!href', 'target=_blank', 'title'],
+            'attrs' => ['!href', 'target', 'title'],
         ],
         'dl',
         'dt',

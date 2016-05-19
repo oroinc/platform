@@ -365,11 +365,11 @@ class CommandExecutor
         if (isset($_SERVER['argv']) && php_sapi_name() === 'cli') {
             if (!$isPrefix) {
                 return in_array($command, $_SERVER['argv'], true);
-            } else {
-                foreach ($_SERVER['argv'] as $arg) {
-                    if (is_string($arg) && strpos($arg, $command) === 0) {
-                        return true;
-                    }
+            }
+
+            foreach ($_SERVER['argv'] as $arg) {
+                if (is_string($arg) && strpos($arg, $command) === 0) {
+                    return true;
                 }
             }
         }

@@ -26,6 +26,13 @@ class ExtendScope
     const STATE_DELETE = 'Deleted';
 
     /**
+     * The previously deleted entity (not implemented yet) or field was marked as "to be restored"
+     * and database schema update is required to apply this changes to a database
+     * and update Doctrine's metadata and proxies.
+     */
+    const STATE_RESTORE = 'Restored';
+
+    /**
      * An entity or field properties and database schema, Doctrine's metadata and proxies are up-to-date.
      */
     const STATE_ACTIVE  = 'Active';

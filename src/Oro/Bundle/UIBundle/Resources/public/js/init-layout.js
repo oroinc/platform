@@ -307,26 +307,6 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
                     })
                     .appendTo($(document.body));
             }
-
-            if ($('.sf-toolbar').length) {
-                adjustHeight = (function() {
-                    var orig = adjustHeight;
-                    var waitForDebugBar = function(attempt) {
-                        if ($('.sf-toolbar').children().length) {
-                            $('body').addClass('dev-mode');
-                            _.delay(orig, 10);
-                        } else if (attempt < 100) {
-                            _.delay(waitForDebugBar, 500, attempt + 1);
-                        }
-                    };
-
-                    return _.wrap(adjustHeight, function(orig) {
-                        $('body').removeClass('dev-mode');
-                        orig();
-                        waitForDebugBar(0);
-                    });
-                }());
-            }
         }
 
         var adjustReloaded = function() {
@@ -427,6 +407,14 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
             .replace(new RegExp(collectionInfo.prototypeName, 'g'), collectionInfo.nextIndex);
     };
 
+    var validateContainer = function($container) {
+        var $validationField = $container.find('[data-name="collection-validation"]:first');
+        var $form = $validationField.closest('form');
+        if ($form.data('validator')) {
+            $form.validate().element($validationField.get(0));
+        }
+    };
+
     $(document).on('click', '.add-list-item', function(e) {
         e.preventDefault();
         if ($(this).attr('disabled')) {
@@ -446,6 +434,7 @@ require(['jquery', 'underscore', 'orotranslation/js/translator', 'oroui/js/tools
         $listContainer.find('input.position-input').each(function(i, el) {
             $(el).val(i);
         });
+        validateContainer($listContainer);
     });
 
     $(document).on('click', '.addAfterRow', function(e) {

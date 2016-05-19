@@ -19,12 +19,12 @@ services:
             - { name: oro_layout.expression, alias: not }
 
     oro_layout.expression.true:
-        class: Oro\Component\ConfigExpression\Condition\True
+        class: Oro\Component\ConfigExpression\Condition\TrueCondition
         tags:
             - { name: oro_layout.expression, alias: "true" }
 
     oro_layout.expression.false:
-        class: Oro\Component\ConfigExpression\Condition\False
+        class: Oro\Component\ConfigExpression\Condition\FalseCondition
         tags:
             - { name: oro_layout.expression, alias: "false" }
 

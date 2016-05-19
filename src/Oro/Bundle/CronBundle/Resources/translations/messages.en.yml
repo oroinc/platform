@@ -1,7 +1,7 @@
 oro:
     cron:
         action:
-            jobs_management: Access Job Queue
+            jobs_management: Access job queue
 
         header:
             command:      Command
@@ -19,6 +19,8 @@ oro:
             trace:        Stack trace
             view:         View
             job:          'Job "%name%"'
+            started_at:   Started At
+            closed_at:    Closed At
 
         menu:
             cron_job.description:          Cron job queue
@@ -49,7 +51,6 @@ oro:
             dependencies: Dendencies
             in_deps:      Incoming Dependencies
             original:     Original Job
-            related:      Related Entities
             related:      Related Entities
 
         job:

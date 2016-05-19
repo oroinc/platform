@@ -23,6 +23,12 @@ class PlatformUpdateCommand extends AbstractCommand
                 InputOption::VALUE_NONE,
                 'Forces operation to be executed.'
             )
+            ->addOption(
+                'skip-assets',
+                null,
+                InputOption::VALUE_NONE,
+                'Skip UI related commands during update'
+            )
             ->addOption('symlink', null, InputOption::VALUE_NONE, 'Symlinks the assets instead of copying it');
 
         parent::configure();
@@ -59,13 +65,20 @@ class PlatformUpdateCommand extends AbstractCommand
                 ->runCommand('oro:process:configuration:load', array('--process-isolation' => true))
                 ->runCommand('oro:migration:data:load', array('--process-isolation' => true))
                 ->runCommand('oro:navigation:init', array('--process-isolation' => true))
-                ->runCommand('oro:assets:install', $assetsOptions)
-                ->runCommand('assetic:dump')
-                ->runCommand('router:cache:clear', array('--process-isolation' => true))
-                ->runCommand('fos:js-routing:dump', array('--process-isolation' => true))
-                ->runCommand('oro:localization:dump', array('--process-isolation' => true))
-                ->runCommand('oro:translation:dump', array('--process-isolation' => true))
-                ->runCommand('oro:requirejs:build', array('--ignore-errors' => true, '--process-isolation' => true));
+                ->runCommand('router:cache:clear', array('--process-isolation' => true));
+
+            if (!$input->getOption('skip-assets')) {
+                $commandExecutor
+                    ->runCommand('oro:assets:install', $assetsOptions)
+                    ->runCommand('assetic:dump')
+                    ->runCommand('fos:js-routing:dump', array('--process-isolation' => true))
+                    ->runCommand('oro:localization:dump', array('--process-isolation' => true))
+                    ->runCommand('oro:translation:dump', array('--process-isolation' => true))
+                    ->runCommand(
+                        'oro:requirejs:build',
+                        array('--ignore-errors' => true, '--process-isolation' => true)
+                    );
+            }
         } else {
             $output->writeln(
                 '<comment>ATTENTION</comment>: Database backup is highly recommended before executing this command.'

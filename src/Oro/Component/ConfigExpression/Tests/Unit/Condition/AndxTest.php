@@ -22,8 +22,8 @@ class AndxTest extends \PHPUnit_Framework_TestCase
             $this->condition,
             $this->condition->initialize(
                 [
-                    new Condition\True(),
-                    new Condition\True(),
+                    new Condition\TrueCondition(),
+                    new Condition\TrueCondition(),
                 ]
             )
         );
@@ -37,12 +37,12 @@ class AndxTest extends \PHPUnit_Framework_TestCase
 
         $this->condition->setMessage($currentConditionError);
 
-        $falseConditionWithError = new Condition\False();
+        $falseConditionWithError = new Condition\FalseCondition();
         $falseConditionWithError->setMessage($nestedConditionError);
 
         $this->condition->initialize(
             [
-                new Condition\True(),
+                new Condition\TrueCondition(),
                 $falseConditionWithError,
             ]
         );
@@ -85,7 +85,7 @@ class AndxTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'options'  => [new Condition\True()],
+                'options'  => [new Condition\TrueCondition()],
                 'message'  => null,
                 'expected' => [
                     '@and' => [
@@ -96,7 +96,7 @@ class AndxTest extends \PHPUnit_Framework_TestCase
                 ]
             ],
             [
-                'options'  => [new Condition\True(), new Condition\False()],
+                'options'  => [new Condition\TrueCondition(), new Condition\FalseCondition()],
                 'message'  => 'Test',
                 'expected' => [
                     '@and' => [
@@ -128,12 +128,12 @@ class AndxTest extends \PHPUnit_Framework_TestCase
     {
         return [
             [
-                'options'  => [new Condition\True()],
+                'options'  => [new Condition\TrueCondition()],
                 'message'  => null,
                 'expected' => '$factory->create(\'and\', [$factory->create(\'true\', [])])'
             ],
             [
-                'options'  => [new Condition\True(), new Condition\False()],
+                'options'  => [new Condition\TrueCondition(), new Condition\FalseCondition()],
                 'message'  => 'Test',
                 'expected' => '$factory->create(\'and\', '
                     . '[$factory->create(\'true\', []), $factory->create(\'false\', [])])'

@@ -28,9 +28,15 @@ class AbstractEnumTypeTestCase extends TypeTestCase
             ->disableOriginalConstructor()
             ->getMock();
 
-        $this->doctrine = $this->getMockBuilder('Doctrine\Common\Persistence\ManagerRegistry')
-            ->disableOriginalConstructor()
-            ->getMock();
+        $this->doctrine = $this->getMockForAbstractClass(
+            'Doctrine\Common\Persistence\ManagerRegistry',
+            [],
+            '',
+            true,
+            true,
+            true,
+            ['anything', 'getRepository']
+        );
 
         parent::setUp();
     }
