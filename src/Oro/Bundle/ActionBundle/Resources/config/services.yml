@@ -177,7 +177,7 @@ services:
             - { name: layout.block_type, alias: action_line_buttons }
 
     oro_action.layout.block_type.action_combined_buttons:
-        class: '%oro_layout.block_type.configurable.class%'
+        parent: oro_layout.block_type.abstract_configurable
         calls:
             - [setName, ['action_combined_buttons']]
             - [setParent, ['action_line_buttons']]
