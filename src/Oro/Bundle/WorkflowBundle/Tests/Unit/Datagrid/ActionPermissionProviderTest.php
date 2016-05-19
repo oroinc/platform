@@ -112,17 +112,6 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
 
     public function getWorkflowDefinitionActivationDataProvider()
     {
-        $definition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
-        $definition->expects($this->any())
-            ->method('getValue')
-            ->will(
-                $this->returnValueMap(
-                    array(
-                        array('name', 'workflow_name'),
-                        array('entityClass', '\stdClass')
-                    )
-                )
-            );
 
         return array(
             'no config' => array(
@@ -134,7 +123,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $definition,
+                'input' => $this->getDefinitionMock(),
                 false,
                 null
             ),
@@ -147,7 +136,7 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => false,
                     'deactivate' => true
                 ),
-                'input' => $definition,
+                'input' => $this->getDefinitionMock(),
                 true,
                 'workflow_name'
             ),
@@ -160,10 +149,31 @@ class ActionPermissionProviderTest extends \PHPUnit_Framework_TestCase
                     'activate' => true,
                     'deactivate' => false
                 ),
-                'input' => $definition,
+                'input' => $this->getDefinitionMock(),
                 true,
                 'other_workflow_name'
             )
         );
+    }
+
+    /**
+     * @return \PHPUnit_Framework_MockObject_MockObject
+     */
+    protected function getDefinitionMock()
+    {
+        $definition = $this->getMock('Oro\Bundle\DataGridBundle\Datasource\ResultRecordInterface');
+
+        $definition->expects($this->any())
+            ->method('getValue')
+            ->will(
+                $this->returnValueMap(
+                    array(
+                        array('name', 'workflow_name'),
+                        array('entityClass', '\stdClass')
+                    )
+                )
+            );
+
+        return $definition;
     }
 }

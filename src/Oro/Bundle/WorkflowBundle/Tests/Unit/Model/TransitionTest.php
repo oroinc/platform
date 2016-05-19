@@ -338,9 +338,6 @@ class TransitionTest extends \PHPUnit_Framework_TestCase
         $step->expects($this->any())
             ->method('hasAllowedTransitions')
             ->will($this->returnValue($hasAllowedTransitions));
-        $step->expects($this->any())
-            ->method('getEntity')
-            ->will($this->returnValue($stepEntity));
         return $step;
     }
 

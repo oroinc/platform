@@ -32,6 +32,7 @@ parameters:
     oro_organization.provider.filter.busines_unit_choice_tree.class: Oro\Bundle\OrganizationBundle\Provider\Filter\ChoiceTreeBusinessUnitProvider
 
     oro_organization.autocomplete.business_unit.search_handler.class:  Oro\Bundle\FormBundle\Autocomplete\SearchHandler
+    oro_organization.provider.busines_unit_acl.class: Oro\Bundle\OrganizationBundle\Provider\BusinessUnitAclProvider
 
 services:
     #
@@ -211,3 +212,10 @@ services:
     oro_organization.organization.handler.delete:
         class: Oro\Bundle\OrganizationBundle\Handler\OrganizationDeleteHandler
         parent: oro_soap.handler.delete.abstract
+
+    oro_organization.provider.busines_unit_acl:
+        class: %oro_organization.provider.busines_unit_acl.class%
+        arguments:
+            - '@oro_security.security_facade'
+            - '@?security.acl.voter.basic_permissions'
+            - '@oro_security.ownership_tree_provider'

@@ -79,7 +79,7 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [['@true' => null], new Condition\True()],
+                        [['@true' => null], new Condition\TrueCondition()],
                         [['@value' => ['$context.css_class']], $classExpr]
                     ]
                 )
@@ -198,7 +198,7 @@ class ConfigExpressionProcessorTest extends \PHPUnit_Framework_TestCase
             ->will(
                 $this->returnValueMap(
                     [
-                        [['@true' => null], new Condition\True()],
+                        [['@true' => null], new Condition\TrueCondition()],
                         [['@value' => ['$context.css_class']], $classExpr]
                     ]
                 )

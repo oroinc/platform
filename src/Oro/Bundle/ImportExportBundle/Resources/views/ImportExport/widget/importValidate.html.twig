@@ -176,6 +176,9 @@
                                 message += ' ' + link;
                             }
                             Messenger.notificationFlashMessage(data.success ? 'success' : 'error', data.message);
+                            if (data.importInfo !== undefined) {
+                                Messenger.notificationMessage('info', data.importInfo);
+                            }
                             widget.remove();
                         }).fail(function() {
                             Messenger.notificationFlashMessage('error', {{ 'Import process failed'|trans|json_encode|raw }});
