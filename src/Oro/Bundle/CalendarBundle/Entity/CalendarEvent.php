@@ -292,7 +292,10 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     protected $originalStart;
 
     /**
-     * This attribute indicates whether the occurrence was removed from user's calendar.
+     * Setting isCancelled value with this method is applicable only for events
+     * referring to recurring event (aka exceptions). If user have decided to cancel
+     * one of the events in the recurrence a new instance of exception event will be
+     * created with this flag set to false.
      *
      * @var bool
      *
@@ -300,6 +303,9 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
      */
     protected $isCancelled = false;
 
+    /**
+     * CalendarEvent constructor.
+     */
     public function __construct()
     {
         parent::__construct();

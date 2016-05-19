@@ -26,6 +26,10 @@ class Recurrence
     protected $id;
 
     /**
+     * According to recurrenceType it determines what recurrence strategy must be used for
+     * calculating new calendar event occurrences, getting textual representation etc.
+     * Possible values: daily, weekly, monthly, monthnth, yearly, yearnth.
+     *
      * @var string
      *
      * @ORM\Column(name="recurrence_type", type="string", length=16)
@@ -33,6 +37,9 @@ class Recurrence
     protected $recurrenceType;
 
     /**
+     * Contains number of units how often recurring events must repeat.
+     * For example, 'every X days', 'every X weeks', 'every X months' (where X is interval).
+     *
      * @var int
      *
      * Units of this attribute depend of recurrenceType.
@@ -46,6 +53,13 @@ class Recurrence
     protected $interval;
 
     /**
+     * Contains a value from 1 to 5, that is relative value for 'first', 'second',
+     * 'third', 'fourth' and 'last'.
+     * It is used in monthnth and yearnth strategies, for creating
+     * recurring events like 'Yearly every 2 years on the first Saturday of April',
+     * 'Monthly the fourth Saturday of every 2 months',
+     * 'Yearly every 2 years on the last Saturday of April'
+     *
      * @var int
      *
      * @ORM\Column(name="instance", type="integer", nullable=true)
@@ -53,6 +67,13 @@ class Recurrence
     protected $instance;
 
     /**
+     * Contains array of weekdays.
+     * Possible values: 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'.
+     * For relative 'weekday' value the array will be ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].
+     * For relative 'weekend' value the array will be ['sunday', 'saturday'].
+     * For relative 'any day' value
+     * the array will be ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].
+     *
      * @var []
      *
      * @ORM\Column(name="day_of_week", type="array", nullable=true)
@@ -60,6 +81,8 @@ class Recurrence
     protected $dayOfWeek;
 
     /**
+     * Contains day of month that is used by monthly and yearly strategies.
+     *
      * @var int
      *
      * @ORM\Column(name="day_of_month", type="integer", nullable=true)
@@ -67,6 +90,8 @@ class Recurrence
     protected $dayOfMonth;
 
     /**
+     * Contains month number that is used by yearly and yearnth strategies.
+     *
      * @var int
      *
      * @ORM\Column(name="month_of_year", type="integer", nullable=true)
@@ -74,6 +99,8 @@ class Recurrence
     protected $monthOfYear;
 
     /**
+     * Start datetime for range of recurrence.
+     *
      * @var \DateTime
      *
      * @ORM\Column(name="start_time", type="datetime")
@@ -81,6 +108,8 @@ class Recurrence
     protected $startTime;
 
     /**
+     * End datetime for range of recurrence.
+     *
      * @var \DateTime
      *
      * @ORM\Column(name="end_time", type="datetime", nullable=true)
@@ -88,6 +117,9 @@ class Recurrence
     protected $endTime;
 
     /**
+     * Contains the number of occurrences for range of recurrence.
+     * It means that recurrence ends after X occurrences, where X is 'occurrences' value.
+     *
      * @var int
      *
      * @ORM\Column(name="occurrences", type="integer", nullable=true)
