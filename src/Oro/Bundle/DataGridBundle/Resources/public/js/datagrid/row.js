@@ -179,10 +179,6 @@ define([
             if (this.clickTimeout) {
                 clearTimeout(this.clickTimeout);
             }
-            _.each(this.cells, function(cell) {
-                cell.dispose();
-            });
-            delete this.cells;
             Row.__super__.dispose.call(this);
         },
 
@@ -248,8 +244,8 @@ define([
                     return;
                 }
                 _this.trigger('clicked', _this, options);
-                for (var i = 0; i < _this.cells.length; i++) {
-                    var cell = _this.cells[i];
+                for (var i = 0; i < _this.subviews.length; i++) {
+                    var cell = _this.subviews[i];
                     if (cell.listenRowClick && _.isFunction(cell.onRowClicked)) {
                         cell.onRowClicked(_this, e);
                     }
