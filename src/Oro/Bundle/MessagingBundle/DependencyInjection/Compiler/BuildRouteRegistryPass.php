@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Bundle\MessagingBundle\DependencyInjection\Compiler;
 
-use Oro\Component\Messaging\ZeroConfig\Route;
 use Symfony\Component\DependencyInjection\Compiler\CompilerPassInterface;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
 use Symfony\Component\DependencyInjection\Definition;
@@ -21,32 +20,29 @@ class BuildRouteRegistryPass implements CompilerPassInterface
             return;
         }
 
-        $routeRegistryDef = $container->getDefinition($routeRegistryId);
-
+        $configs = [];
         foreach ($container->findTaggedServiceIds($processorTagName) as $serviceId => $tagAttributes) {
             foreach ($tagAttributes as $tagAttribute) {
-                if (false == isset($tagAttribute['messageName']) || false == $tagAttribute['messageName']) {
-                    throw new \LogicException(sprintf('Message name is not set but it is required. service: "%s", tag: "%s"', $serviceId, $processorTagName));
+                if (false == isset($tagAttribute['topicName']) || false == $tagAttribute['topicName']) {
+                    throw new \LogicException(sprintf('Topic name is not set but it is required. service: "%s", tag: "%s"', $serviceId, $processorTagName));
                 }
 
-                $queueName = null;
-                if (isset($tagAttribute['queueName']) && $tagAttribute['queueName']) {
-                    $queueName = $tagAttribute['queueName'];
-                }
+                $config = [];
+                $config['processor'] = $serviceId;
 
-                $processorName = $serviceId;
                 if (isset($tagAttribute['processorName']) && $tagAttribute['processorName']) {
-                    $processorName = $tagAttribute['processorName'];
+                    $config['processor'] = $tagAttribute['processorName'];
                 }
 
-                $routeDef = new Definition(Route::class);
-                $routeDef->setPublic(false);
-                $routeDef->addMethodCall('setMessageName', [$tagAttribute['messageName']]);
-                $routeDef->addMethodCall('setProcessorName', [$processorName]);
-                $routeDef->addMethodCall('setQueueName', [$queueName]);
+                if (isset($tagAttribute['queueName']) && $tagAttribute['queueName']) {
+                    $config['queue'] = $tagAttribute['queueName'];
+                }
 
-                $routeRegistryDef->addMethodCall('addRoute', [$routeDef]);
+                $configs[$tagAttribute['topicName']][] = $config;
             }
         }
+
+        $routeRegistryDef = $container->getDefinition($routeRegistryId);
+        $routeRegistryDef->addMethodCall('setRoutesConfig', [$configs]);
     }
 }
