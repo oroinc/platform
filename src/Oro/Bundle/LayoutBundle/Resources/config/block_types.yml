@@ -1,14 +1,13 @@
-parameters:
-    oro_layout.block_type.configurable.class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType
-
 services:
+    oro_layout.block_type.abstract_configurable:
+        abstract: true
+        class: Oro\Bundle\LayoutBundle\Layout\Block\Type\ConfigurableType
+
     oro_layout.block_type.abstract_configurable_container:
         abstract: true
-        class: '%oro_layout.block_type.configurable.class%'
+        parent: oro_layout.block_type.abstract_configurable
         calls:
             - [setParent, ['container']]
-        tags:
-             - { name: layout.block_type, alias: block }
 
     oro_layout.block_type.base:
         class: Oro\Component\Layout\Block\Type\BaseType
@@ -98,7 +97,7 @@ services:
              - { name: layout.block_type, alias: fieldset }
 
     oro_layout.block_type.text:
-        class: '%oro_layout.block_type.configurable.class%'
+        parent: oro_layout.block_type.abstract_configurable
         calls:
             - [setOptions, [{escape: {default: true}, text: {required: true}}]]
             - [setName, ['text']]
@@ -111,7 +110,7 @@ services:
              - { name: layout.block_type, alias: link }
 
     oro_layout.block_type.button:
-        class: '%oro_layout.block_type.configurable.class%'
+        parent: oro_layout.block_type.abstract_configurable
         calls:
             -
                 - setOptions
