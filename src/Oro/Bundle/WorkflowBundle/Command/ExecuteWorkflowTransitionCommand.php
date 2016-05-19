@@ -94,7 +94,7 @@ class ExecuteWorkflowTransitionCommand extends ContainerAwareCommand
      */
     protected function getRepository()
     {
-        $className = $this->getContainer()->get('oro_workflow.workflow_item.entity.class');
+        $className = $this->getContainer()->getParameter('oro_workflow.workflow_item.entity.class');
 
         return $this->getContainer()->get('doctrine')
             ->getManagerForClass($className)

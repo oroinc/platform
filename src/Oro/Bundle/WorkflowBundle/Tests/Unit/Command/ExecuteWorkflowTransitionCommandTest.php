@@ -218,11 +218,14 @@ class ExecuteWorkflowTransitionCommandTest extends \PHPUnit_Framework_TestCase
 
     protected function expectContainerGetManagerRegistryAndWorkflowManager()
     {
+        $this->container->expects($this->once())
+            ->method('getParameter')
+            ->with('oro_workflow.workflow_item.entity.class')
+            ->willReturn(self::CLASS_NAME);
         $this->container->expects($this->atLeastOnce())
             ->method('get')
             ->willReturnMap([
                 ['oro_workflow.manager', 1, $this->workflowManager],
-                ['oro_workflow.workflow_item.entity.class', 1, self::CLASS_NAME],
                 ['doctrine', 1, $this->managerRegistry],
             ]);
     }
