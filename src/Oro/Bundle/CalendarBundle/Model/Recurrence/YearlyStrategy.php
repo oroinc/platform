@@ -87,7 +87,7 @@ class YearlyStrategy extends MonthlyStrategy
         // Try to create DateTime object for checking if day/month of recurrence is valid.
         try {
             new \DateTime($dateString);
-        } catch(\Exception $exception) {
+        } catch (\Exception $exception) {
             return "Parameters 'dayOfMonth' and 'monthOfYear' values are invalid:"
             . " such date doesn't exist(Yearly recurrence pattern).";
         }

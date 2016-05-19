@@ -131,7 +131,7 @@ class YearNthStrategy extends AbstractStrategy implements StrategyInterface
 
         $days = [];
         $currentInstance = 1;
-        while(count($days) < $instance) {
+        while (count($days) < $instance) {
             $instanceRelativeValue = $this->model->getInstanceRelativeValue($currentInstance);
             foreach ($dayOfWeek as $day) {
                 $days[] = new \DateTime("{$instanceRelativeValue} {$day} of {$month} {$year}");
