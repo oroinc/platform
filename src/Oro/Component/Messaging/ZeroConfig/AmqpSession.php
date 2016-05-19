@@ -1,28 +1,28 @@
 <?php
 namespace Oro\Component\Messaging\ZeroConfig;
 
-use Oro\Component\Messaging\Transport\Amqp\AmqpConnection;
 use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
+use Oro\Component\Messaging\Transport\Amqp\AmqpSession as TransportAmqpSession;
 
 class AmqpSession implements Session
 {
     /**
      * @var Session
      */
-    private $session;
+    protected $session;
 
     /**
      * @var Config
      */
-    private $config;
+    protected $config;
 
     /**
-     * @param AmqpConnection $connection
-     * @param Config $config
+     * @param TransportAmqpSession $session
+     * @param Config               $config
      */
-    public function __construct(AmqpConnection $connection, Config $config)
+    public function __construct(TransportAmqpSession $session, Config $config)
     {
-        $this->session = $connection->createSession();
+        $this->session = $session;
         $this->config = $config;
     }
 
@@ -55,7 +55,7 @@ class AmqpSession implements Session
     /**
      * {@inheritdoc}
      */
-    public function createFrontTopic()
+    public function createRouterTopic()
     {
         $topic = $this->session->createTopic($this->config->getRouterTopicName());
         $topic->setType('fanout');
@@ -67,7 +67,7 @@ class AmqpSession implements Session
     /**
      * {@inheritdoc}
      */
-    public function createFrontQueue()
+    public function createRouterQueue()
     {
         $queue = $this->session->createQueue($this->config->getRouterQueueName());
         $queue->setDurable(true);

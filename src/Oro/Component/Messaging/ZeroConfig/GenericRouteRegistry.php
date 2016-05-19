@@ -1,7 +1,6 @@
 <?php
 namespace Oro\Component\Messaging\ZeroConfig;
 
-
 class GenericRouteRegistry implements RouteRegistryInterface
 {
     /**
@@ -15,24 +14,20 @@ class GenericRouteRegistry implements RouteRegistryInterface
     }
 
     /**
-     * @param string $messageName
-     *
      * @param Route $route
      */
-    public function addRoute($messageName, Route $route)
+    public function addRoute(Route $route)
     {
-        $this->routes[$messageName][] = $route;
+        $this->routes[$route->getMessageName()][] = $route;
     }
 
     /**
-     * @param string $messageName
-     *
      * @param Route[] $routes
      */
-    public function setRoutes($messageName, array $routes)
+    public function setRoutes(array $routes)
     {
         foreach ($routes as $route) {
-            $this->addRoute($messageName, $route);
+            $this->addRoute($route);
         }
     }
 

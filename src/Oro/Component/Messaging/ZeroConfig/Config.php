@@ -3,6 +3,10 @@ namespace Oro\Component\Messaging\ZeroConfig;
 
 class Config
 {
+    const PARAMETER_MESSAGE_NAME = 'oro.messaging.zero_conf.message_name';
+    const PARAMETER_PROCESSOR_NAME = 'oro.messaging.zero_conf.processor_name';
+    const PARAMETER_QUEUE_NAME = 'oro.messaging.zero_conf.queue_name';
+
     /**
      * @var string
      */

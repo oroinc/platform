@@ -26,12 +26,12 @@ interface Session
     /**
      * @return Topic
      */
-    public function createFrontTopic();
+    public function createRouterTopic();
 
     /**
      * @return Queue
      */
-    public function createFrontQueue();
+    public function createRouterQueue();
 
     /**
      * @param string $queueName

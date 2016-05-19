@@ -1,27 +1,28 @@
 <?php
 namespace Oro\Component\Messaging\Tests\ZeroConfig;
 
-use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
-use Oro\Component\Messaging\Transport\Session;
+use Oro\Component\Messaging\Transport\Null\NullMessage;
+use Oro\Component\Messaging\Transport\Session as TransportSession;
+use Oro\Component\Messaging\ZeroConfig\Config;
 use Oro\Component\Messaging\ZeroConfig\ProducerInterface;
 use Oro\Component\Messaging\ZeroConfig\Route;
 use Oro\Component\Messaging\ZeroConfig\RouteRegistryInterface;
 use Oro\Component\Messaging\ZeroConfig\RouterMessageProcessor;
-use Oro\Component\Messaging\ZeroConfig\SessionInterface;
+use Oro\Component\Messaging\ZeroConfig\Session;
 
 class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
 {
     public function testCouldBeConstructedWithRequiredArguments()
     {
-        new RouterMessageProcessor($this->createSessionMock(), $this->createRouterRegistryMock(), '');
+        new RouterMessageProcessor($this->createSessionMock(), $this->createRouterRegistryMock());
     }
 
     public function testShouldThrowExceptionIfMessageNameParameterIsNotSet()
     {
-        $this->setExpectedException(\LogicException::class, 'Got message without "messageName" parameter');
+        $this->setExpectedException(\LogicException::class, 'Got message without required parameter: "oro.messaging.zero_conf.message_name"');
 
-        $processor = new RouterMessageProcessor($this->createSessionMock(), $this->createRouterRegistryMock(), '');
-        $processor->process(new AmqpMessage(), $this->createTransportSessionMock());
+        $processor = new RouterMessageProcessor($this->createSessionMock(), $this->createRouterRegistryMock());
+        $processor->process(new NullMessage(), $this->createTransportSessionMock());
     }
 
     public function testShouldSendRoutedMessageToQueue()
@@ -31,13 +32,13 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
         $route->setProcessorName('processor-name');
         $route->setQueueName('queue-name');
 
-        $message = new AmqpMessage();
+        $message = new NullMessage();
         $message->setBody('body');
         $message->setProperties([
-            'messageName' => 'message-name',
+            Config::PARAMETER_MESSAGE_NAME => 'message-name',
         ]);
 
-        $queueMessage = new AmqpMessage();
+        $queueMessage = new NullMessage();
 
         $routeRegistry = $this->createRouterRegistryMock();
         $routeRegistry
@@ -65,13 +66,13 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
             ->will($this->returnValue($queueMessage))
         ;
 
-        $processor = new RouterMessageProcessor($session, $routeRegistry, 'default-queue-name');
+        $processor = new RouterMessageProcessor($session, $routeRegistry);
         $processor->process($message, $this->createTransportSessionMock());
 
         $expectedQueueMessageProperties = [
-            'messageName' => 'message-name',
-            'processorName' => 'processor-name',
-            'queueName' => 'queue-name',
+            Config::PARAMETER_MESSAGE_NAME => 'message-name',
+            Config::PARAMETER_PROCESSOR_NAME => 'processor-name',
+            Config::PARAMETER_QUEUE_NAME => 'queue-name',
         ];
 
         $this->assertEquals($expectedQueueMessageProperties, $queueMessage->getProperties());
@@ -87,19 +88,19 @@ class RouterMessageProcessorTest extends \PHPUnit_Framework_TestCase
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|SessionInterface
+     * @return \PHPUnit_Framework_MockObject_MockObject|Session
      */
     protected function createSessionMock()
     {
-        return $this->getMock(SessionInterface::class);
+        return $this->getMock(Session::class);
     }
 
     /**
-     * @return \PHPUnit_Framework_MockObject_MockObject|Session
+     * @return \PHPUnit_Framework_MockObject_MockObject|TransportSession
      */
     protected function createTransportSessionMock()
     {
-        return $this->getMock(Session::class);
+        return $this->getMock(TransportSession::class);
     }
 
     /**

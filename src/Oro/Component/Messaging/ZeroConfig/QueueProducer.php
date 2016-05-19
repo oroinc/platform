@@ -1,9 +1,6 @@
 <?php
 namespace Oro\Component\Messaging\ZeroConfig;
 
-use Oro\Component\Messaging\Transport\Amqp\AmqpQueue;
-use Oro\Component\Messaging\Transport\Amqp\AmqpSession as TransportAmqpSession;
-use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
 use Oro\Component\Messaging\Transport\Message;
 
 class QueueProducer implements ProducerInterface
@@ -11,7 +8,7 @@ class QueueProducer implements ProducerInterface
     /**
      * @var Session
      */
-    private $session;
+    protected $session;
 
     /**
      * @var Config
@@ -20,7 +17,7 @@ class QueueProducer implements ProducerInterface
 
     /**
      * @param Session $session
-     * @param Config $config
+     * @param Config  $config
      */
     public function __construct(Session $session, Config $config)
     {
@@ -33,28 +30,25 @@ class QueueProducer implements ProducerInterface
      */
     public function send(Message $message)
     {
-        $processorName = $message->getProperty('processorName');
+        $processorName = $message->getProperty(Config::PARAMETER_PROCESSOR_NAME);
         if (false == $processorName) {
-            throw new \LogicException('Got message without "processorName" parameter');
+            throw new \LogicException(sprintf('Got message without required parameter: "%s"', Config::PARAMETER_PROCESSOR_NAME));
         }
 
         $transportSession = $this->session->getTransportSession();
-        try {
-            $queueName = $message->getProperty('queueName')
-                ? $this->config->formatName($message->getProperty('queueName'))
-                : $this->config->getDefaultQueueQueueName()
-            ;
 
-            $topic = $this->session->createQueueTopic($queueName);
-            $queue = $this->session->createQueueQueue($queueName);
-            
-            $transportSession->declareTopic($topic);
-            $transportSession->declareQueue($topic);
-            $transportSession->declareBind($topic, $queue);
+        $queueName = $message->getProperty(Config::PARAMETER_QUEUE_NAME)
+            ? $this->config->formatName($message->getProperty(Config::PARAMETER_QUEUE_NAME))
+            : $this->config->getDefaultQueueQueueName()
+        ;
 
-            $transportSession->createProducer()->send($topic, $message);
-        } finally {
-            $transportSession->close();
-        }
+        $topic = $this->session->createQueueTopic($queueName);
+        $queue = $this->session->createQueueQueue($queueName);
+
+        $transportSession->declareTopic($topic);
+        $transportSession->declareQueue($queue);
+        $transportSession->declareBind($topic, $queue);
+
+        $transportSession->createProducer()->send($topic, $message);
     }
 }

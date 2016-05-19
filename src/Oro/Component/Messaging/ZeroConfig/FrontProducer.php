@@ -8,7 +8,7 @@ class FrontProducer implements ProducerInterface
     /**
      * @var Session
      */
-    private $session;
+    protected $session;
 
     /**
      * @var Config
@@ -16,12 +16,12 @@ class FrontProducer implements ProducerInterface
     protected $config;
 
     /**
-     * @param Session $transportFactory
-     * @param Config $config
+     * @param Session $session
+     * @param Config  $config
      */
-    public function __construct(Session $transportFactory, Config $config)
+    public function __construct(Session $session, Config $config)
     {
-        $this->session = $transportFactory;
+        $this->session = $session;
         $this->config = $config;
     }
 
@@ -30,23 +30,20 @@ class FrontProducer implements ProducerInterface
      */
     public function send(Message $message)
     {
-        $messageName = $message->getProperty('messageName');
+        $messageName = $message->getProperty(Config::PARAMETER_MESSAGE_NAME);
         if (false == $messageName) {
-            throw new \LogicException('Got message without "messageName" parameter');
+            throw new \LogicException(sprintf('Got message without required parameter: "%s"', Config::PARAMETER_MESSAGE_NAME));
         }
         
         $transportSession = $this->session->getTransportSession();
-        try {
-            $topic = $this->session->createFrontTopic();
-            $queue = $this->session->createFrontQueue();
 
-            $transportSession->declareTopic($topic);
-            $transportSession->declareQueue($topic);
-            $transportSession->declareBind($topic, $queue);
+        $topic = $this->session->createRouterTopic();
+        $queue = $this->session->createRouterQueue();
 
-            $transportSession->createProducer()->send($topic, $message);
-        } finally {
-            $transportSession->close();
-        }
+        $transportSession->declareTopic($topic);
+        $transportSession->declareQueue($queue);
+        $transportSession->declareBind($topic, $queue);
+
+        $transportSession->createProducer()->send($topic, $message);
     }
 }

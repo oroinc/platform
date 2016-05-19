@@ -19,9 +19,10 @@ class GenericRouteRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($registry->getRoutes('message'));
 
         $route = new Route();
+        $route->setMessageName('message');
 
         // test
-        $registry->addRoute('message', $route);
+        $registry->addRoute($route);
 
         $this->assertCount(1, $registry->getRoutes('message'));
         $this->assertSame($route, $registry->getRoutes('message')[0]);
@@ -35,10 +36,12 @@ class GenericRouteRegistryTest extends \PHPUnit_Framework_TestCase
         $this->assertEmpty($registry->getRoutes('message'));
 
         $route1 = new Route();
+        $route1->setMessageName('message');
         $route2 = new Route();
+        $route2->setMessageName('message');
 
         // test
-        $registry->setRoutes('message', [$route1, $route2]);
+        $registry->setRoutes([$route1, $route2]);
 
         $this->assertCount(2, $registry->getRoutes('message'));
         $this->assertSame($route1, $registry->getRoutes('message')[0]);
