@@ -1080,7 +1080,7 @@ define(function(require) {
             for (var i = 0; i < rows.length; i++) {
                 var row = rows[i];
                 if (row.model === model) {
-                    var cells = row.cells;
+                    var cells = row.subviews;
                     for (var j = 0; j < cells.length; j++) {
                         var cell = cells[j];
                         if (cell.column === column) {
@@ -1101,7 +1101,7 @@ define(function(require) {
          */
         findCellByIndex: function(modelI, columnI) {
             try {
-                return _.findWhere(this.body.rows[modelI].cells, {
+                return _.findWhere(this.body.rows[modelI].subviews, {
                     column: this.columns.at(columnI)
                 });
             } catch (e) {

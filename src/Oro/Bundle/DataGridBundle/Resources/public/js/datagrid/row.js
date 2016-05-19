@@ -2,8 +2,9 @@ define([
     'jquery',
     'underscore',
     'chaplin',
-    'oroui/js/tools'
-], function($, _, Chaplin, tools) {
+    'oroui/js/tools',
+    './util'
+], function($, _, Chaplin, tools, util) {
     'use strict';
 
     var Row;
@@ -54,30 +55,33 @@ define([
             // it is placed here to pass THIS within closure
             var _this = this;
             this.columns = options.columns;
-            this.itemView = function(options) {
-                var column = options.model;
-                var cellOptions = {
-                    column: column,
-                    model: _this.model,
-                    themeOptions: {
-                        className: 'grid-cell grid-body-cell'
+            // let descendants override itemView
+            if (!this.itemView) {
+                this.itemView = function(options) {
+                    var column = options.model;
+                    var cellOptions = {
+                        column: column,
+                        model: _this.model,
+                        themeOptions: {
+                            className: 'grid-cell grid-body-cell'
+                        }
+                    };
+                    if (column.get('name')) {
+                        cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
                     }
+                    var Cell = column.get('cell');
+                    _this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
+                    var cell = new Cell(cellOptions);
+                    if (column.has('align')) {
+                        cell.$el.removeClass('align-left align-center align-right');
+                        cell.$el.addClass('align-' + column.get('align'));
+                    }
+                    if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
+                        cell.$el.addClass('skip-row-click');
+                    }
+                    return cell;
                 };
-                if (column.get('name')) {
-                    cellOptions.themeOptions.className += ' grid-body-cell-' + column.get('name');
-                }
-                var Cell = column.get('cell');
-                _this.columns.trigger('configureInitializeOptions', Cell, cellOptions);
-                var cell = new Cell(cellOptions);
-                if (column.has('align')) {
-                    cell.$el.removeClass('align-left align-center align-right');
-                    cell.$el.addClass('align-' + column.get('align'));
-                }
-                if (!_.isUndefined(cell.skipRowClick) && cell.skipRowClick) {
-                    cell.$el.addClass('skip-row-click');
-                }
-                return cell;
-            };
+            }
 
             // code related to simplified event binding
             this.simplifiedEvents = this.collection.getSimplifiedEventList();
@@ -87,6 +91,7 @@ define([
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
 
             Row.__super__.initialize.apply(this, arguments);
+            this.cells = this.subviews;
         },
 
         /**
@@ -297,6 +302,12 @@ define([
 
             return this;
         },
+
+        /**
+         * Cells is not removed from DOM by Chaplin.CollectionView or their realizations
+         * Do that manually as it is critical for FloatingHeader plugin
+         */
+        removeSubview: util.removeSubview,
 
         renderCustomTemplate: function() {
             var $checkbox;
