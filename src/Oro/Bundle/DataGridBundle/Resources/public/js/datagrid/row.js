@@ -9,6 +9,9 @@ define([
     var Row;
     var document = window.document;
 
+    // Cached regex to split keys for `delegate`.
+    var delegateEventSplitter = /^(\S+)\s*(.*)$/;
+
     /**
      * Grid row.
      *
@@ -79,10 +82,79 @@ define([
                 return cell;
             };
 
+            // code related to simplified event binding
+            this.simplifiedEvents = this.collection.getSimplifiedEventList();
+            this.listenTo(this.simplifiedEvents, 'change', this.delegateEvents);
+
             _.extend(this, _.pick(options, ['themeOptions', 'template']));
             this.listenTo(this.model, 'backgrid:selected', this.onBackgridSelected);
 
             Row.__super__.initialize.apply(this, arguments);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        setElement: function() {
+            if (this.$el) {
+                this.undelegateCellEvents();
+            }
+            Row.__super__.setElement.apply(this, arguments);
+        },
+
+        /**
+         * Removes bound cell events
+         */
+        undelegateCellEvents: function() {
+            this.$el.off('.cellDE' + this.cid);
+        },
+
+        /**
+         * @inheritDoc
+         */
+        delegateEvents: function() {
+            this.undelegateCellEvents();
+            var events = this.simplifiedEvents.getEventsMap();
+            for (var key in events) {
+                if (events.hasOwnProperty(key)) {
+                    var match = key.match(delegateEventSplitter);
+                    var eventName = match[1];
+                    var selector = match[2];
+                    eventName += '.cellDE' + this.cid;
+                    if (selector === '') {
+                        this.$el.on(eventName, 'td', _.bind(this.delegateEventToCell, this, key));
+                    } else {
+                        this.$el.on(eventName, 'td ' + selector, _.bind(this.delegateEventToCell, this, key));
+                    }
+                }
+            }
+            Row.__super__.delegateEvents.apply(this, arguments);
+        },
+
+        /**
+         * Run event handler on cell
+         */
+        delegateEventToCell: function(key, e) {
+            var tdEl = $(e.target).closest('td')[0];
+
+            for (var i = 0; i < this.subviews.length; i++) {
+                var view = this.subviews[i];
+                if (view.el === tdEl) {
+                    if (key in view.events) {
+                        // run event
+                        var method = view.events[key];
+                        if (!_.isFunction(method)) {
+                            method = view[view.events[key]];
+                        }
+                        if (!method) {
+                            break;
+                        }
+                        e.delegateTarget = tdEl;
+                        method.call(view, e);
+                    }
+                    break;
+                }
+            }
         },
 
         /**
