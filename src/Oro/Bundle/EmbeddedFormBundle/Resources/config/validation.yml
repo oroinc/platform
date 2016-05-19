@@ -2,3 +2,5 @@ Oro\Bundle\EmbeddedFormBundle\Entity\EmbeddedForm:
     properties:
         css:
             - Oro\Bundle\EmbeddedFormBundle\Validator\Constraints\NoTags: ~
+        successMessage:
+            - NotBlank: ~

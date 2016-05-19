@@ -44,6 +44,7 @@ class EmbeddedFormType extends AbstractType
                 'textarea',
                 [
                     'label'   => 'oro.embeddedform.allowed_domains.label',
+                    'required' => false,
                     'tooltip' => 'oro.embeddedform.allowed_domains.description'
                 ]
             )
