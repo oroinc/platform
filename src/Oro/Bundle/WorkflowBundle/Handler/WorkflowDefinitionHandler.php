@@ -67,13 +67,14 @@ class WorkflowDefinitionHandler
         }
         $this->workflowAssembler->assemble($workflowDefinition);
 
-        $this->getEntityManager()->beginTransaction();
+        $em = $this->getEntityManager();
+        $em->beginTransaction();
         try {
-            $this->getEntityManager()->persist($workflowDefinition);
-            $this->getEntityManager()->flush($workflowDefinition);
-            $this->getEntityManager()->commit();
+            $em->persist($workflowDefinition);
+            $em->flush($workflowDefinition);
+            $em->commit();
         } catch (\Exception $exception) {
-            $this->getEntityManager()->rollback();
+            $em->rollback();
         }
     }
 
