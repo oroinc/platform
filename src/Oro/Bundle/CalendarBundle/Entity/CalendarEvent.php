@@ -67,6 +67,7 @@ use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
  * )
  *
  * @SuppressWarnings(PHPMD.ExcessiveClassComplexity)
+ * @SuppressWarnings(PHPMD.ExcessivePublicCount)
  */
 class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, DatesAwareInterface
 {

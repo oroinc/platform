@@ -12,6 +12,9 @@ use Oro\Bundle\TestFrameworkBundle\Test\Doctrine\ORM\Mocks\EntityManagerMock;
 
 use Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository;
 
+/**
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
+ */
 class CalendarEventRepositoryTest extends OrmTestCase
 {
     /**

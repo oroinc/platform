@@ -17,6 +17,9 @@ class RecurrenceFormTypeTest extends \PHPUnit_Framework_TestCase
         $this->type = new RecurrenceFormType();
     }
 
+    /**
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
+     */
     public function testBuildForm()
     {
         $builder = $this->getMockBuilder('Symfony\Component\Form\FormBuilder')

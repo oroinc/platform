@@ -9,6 +9,9 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
 {
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
+     * @SuppressWarnings(PHPMD.CyclomaticComplexity)
      */
     public function getOccurrences(Entity\Recurrence $recurrence, \DateTime $start, \DateTime $end)
     {
@@ -60,7 +63,7 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
                 ) {
                     $result[] = $next;
                 }
-
+                
                 $fromStartInterval = $next >= $recurrence->getStartTime() ? $fromStartInterval +1 : $fromStartInterval;
             }
             $fullWeeks += $interval;
@@ -147,6 +150,8 @@ class WeeklyStrategy extends AbstractStrategy implements StrategyInterface
 
     /**
      * {@inheritdoc}
+     *
+     * @SuppressWarnings(PHPMD.NPathComplexity)
      */
     public function getLastOccurrence(Entity\Recurrence $recurrence)
     {

@@ -72,7 +72,8 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
         $expected = array_map(
             function ($date) {
                 return new \DateTime($date);
-            }, $expected
+            },
+            $expected
         );
         $recurrence = new Entity\Recurrence();
         $recurrence->setRecurrenceType(Recurrence::TYPE_YEAR_N_TH)
@@ -140,6 +141,8 @@ class YearNthStrategyTest extends \PHPUnit_Framework_TestCase
 
     /**
      * @return array
+     *
+     * @SuppressWarnings(PHPMD.ExcessiveMethodLength)
      */
     public function propertiesDataProvider()
     {

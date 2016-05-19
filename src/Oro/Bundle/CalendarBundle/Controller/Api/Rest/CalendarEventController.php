@@ -144,7 +144,9 @@ class CalendarEventController extends RestController implements ClassResourceInt
             /** @var CalendarEventRepository $repo */
             $repo  = $this->getManager()->getRepository();
             $qb    = $repo->getUserEventListByRecurringEventQueryBuilder(
-                $filterCriteria, $extendFields, $this->getRequest()->get('recurringEventId')
+                $filterCriteria,
+                $extendFields,
+                $this->getRequest()->get('recurringEventId')
             );
             $page  = (int)$this->getRequest()->get('page', 1);
             $limit = (int)$this->getRequest()->get('limit', self::ITEMS_PER_PAGE);

@@ -77,7 +77,7 @@ abstract class AbstractCalendarEventNormalizer
             $value = (string)$value;
         } elseif ($value instanceof \DateTime) {
             $value = $value->format('c');
-        } elseif(is_array($value)) {
+        } elseif (is_array($value)) {
             $value = $this->transformEntity($value);
         }
     }

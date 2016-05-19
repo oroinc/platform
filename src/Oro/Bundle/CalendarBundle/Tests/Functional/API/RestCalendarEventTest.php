@@ -7,6 +7,8 @@ use Oro\Bundle\TestFrameworkBundle\Test\WebTestCase;
 
 /**
  * @dbIsolation
+ *
+ * @SuppressWarnings(PHPMD.TooManyPublicMethods)
  */
 class RestCalendarEventTest extends WebTestCase
 {
