@@ -2,7 +2,7 @@
     <div class="row-fluid">
         <div class="responsive-block">
             <ul class="user-status-list list-group">
-                {% for attendee in parentEvent.childAttendees %}
+                {% for attendee in parentEvent.attendees %}
                     {{ _self.build_invitation_link(attendee) }}
                 {% endfor %}
             </ul>
