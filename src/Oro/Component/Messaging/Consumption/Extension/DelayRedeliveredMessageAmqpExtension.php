@@ -8,7 +8,7 @@ use Oro\Component\Messaging\Consumption\MessageProcessor;
 use Oro\Component\Messaging\Transport\Amqp\AmqpMessage;
 use Oro\Component\Messaging\Transport\Amqp\AmqpSession;
 
-class PostponeDeadMessageAmqpExtension implements Extension
+class DelayRedeliveredMessageAmqpExtension implements Extension
 {
     use ExtensionTrait;
 
@@ -28,38 +28,36 @@ class PostponeDeadMessageAmqpExtension implements Extension
         if (false == $message->isRedelivered()) {
             return;
         }
-        $deadQueue = $session->createQueue('dead.'.$message->getExchange());
+
+        $queueName = $context->getMessageConsumer()->getQueue()->getQueueName();
+
+        $deadQueue = $session->createQueue($queueName.'.delayed');
         $deadQueue->setDurable(true);
         $deadQueue->setTable([
-            'x-dead-letter-exchange' => $message->getExchange(),
-            'x-dead-letter-routing-key' => '',
-            'x-message-ttl' => 20000,
+            'x-dead-letter-exchange' => '',
+            'x-dead-letter-routing-key' => $queueName,
+            'x-message-ttl' => 5000,
             'x-expires' => 200000,
         ]);
         $session->declareQueue($deadQueue);
         $context->getLogger()->debug(sprintf(
-            '[PostponeDeadMessage] Declare dead queue: %s',
+            '[DelayDeadAmqpExtension] Declare dead queue: %s',
             $deadQueue->getQueueName()
         ));
 
-        $deadExchange = $session->createTopic('amq.direct');
-        $deadExchange->setDurable(true);
-        $deadExchange->setRoutingKey($deadQueue->getQueueName());
-        $session->declareBind($deadExchange, $deadQueue);
-        $context->getLogger()->debug('[PostponeDeadMessage] Declare bind dead queue to amq.direct exchange');
-
         $properties = $message->getProperties();
-        unset($properties['x-death']);
-        
-        $headers = $message->getHeaders();
-        unset($headers['x-death']);
 
-        $deadMessage = $session->createMessage($message->getBody(), $properties, $headers);
+        // The x-death header must be removed because of the bug in RabbitMQ.
+        // It was reported that the bug is fixed since 3.5.4 but I tried with 3.6.1 and the bug still there.
+        // https://github.com/rabbitmq/rabbitmq-server/issues/216
+        unset($properties['x-death']);
+
+        $deadMessage = $session->createMessage($message->getBody(), $properties, $message->getHeaders());
         
-        $session->createProducer()->send($deadExchange, $deadMessage);
-        $context->getLogger()->debug('[PostponeDeadMessage] Send message to dead topic');
+        $session->createProducer()->send($deadQueue, $deadMessage);
+        $context->getLogger()->debug('[DelayDeadAmqpExtension] Send message to dead queue');
 
         $context->setStatus(MessageProcessor::REJECT);
-        $context->getLogger()->debug('[PostponeDeadMessage] Reject original message');
+        $context->getLogger()->debug('[DelayDeadAmqpExtension] Reject original message');
     }
 }
