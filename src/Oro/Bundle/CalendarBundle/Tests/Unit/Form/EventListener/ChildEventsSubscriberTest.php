@@ -143,7 +143,7 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(CalendarEvent::STATUS_ACCEPTED, $parentEvent->getInvitationStatus());
         $this->assertEquals(CalendarEvent::STATUS_NOT_RESPONDED, $firstEvent->getInvitationStatus());
         $this->assertEquals(CalendarEvent::STATUS_NOT_RESPONDED, $secondEvent->getInvitationStatus());
-        $this->assertNull($eventWithoutRelatedAttendee->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::STATUS_NOT_RESPONDED, $eventWithoutRelatedAttendee->getInvitationStatus());
         $this->assertEventDataEquals($parentEvent, $firstEvent);
         $this->assertEventDataEquals($parentEvent, $secondEvent);
         $this->assertEventDataEquals($parentEvent, $eventWithoutRelatedAttendee);
@@ -171,7 +171,7 @@ class ChildEventsSubscriberTest extends \PHPUnit_Framework_TestCase
         $this->assertEquals(CalendarEvent::STATUS_ACCEPTED, $parentEvent->getInvitationStatus());
         $this->assertEquals(CalendarEvent::STATUS_DECLINED, $firstEvent->getInvitationStatus());
         $this->assertEquals(CalendarEvent::STATUS_TENTATIVELY_ACCEPTED, $secondEvent->getInvitationStatus());
-        $this->assertNull($eventWithoutRelatedAttendee->getInvitationStatus());
+        $this->assertEquals(CalendarEvent::STATUS_NOT_RESPONDED, $eventWithoutRelatedAttendee->getInvitationStatus());
         $this->assertEventDataEquals($parentEvent, $firstEvent);
         $this->assertEventDataEquals($parentEvent, $secondEvent);
         $this->assertEventDataEquals($parentEvent, $eventWithoutRelatedAttendee);

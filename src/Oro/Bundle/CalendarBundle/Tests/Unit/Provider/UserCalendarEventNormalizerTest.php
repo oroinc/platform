@@ -249,7 +249,8 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'updatedAt'        => null,
                     'parentEventId'    => null,
                     'invitationStatus' => null,
-                    'origin'         => CalendarEvent::ORIGIN_CLIENT
+                    'origin'           => CalendarEvent::ORIGIN_CLIENT,
+                    'invitedUsers'     => []
                 ],
                 'calendarId'             => null,
                 'expected'               => [
@@ -264,12 +265,13 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => null,
+                    'invitationStatus' => CalendarEvent::STATUS_NOT_RESPONDED,
                     'attendees'     => [],
                     'editable'         => true,
                     'removable'        => true,
                     'notifiable'       => false,
-                    'origin'         => CalendarEvent::ORIGIN_CLIENT
+                    'origin'         => CalendarEvent::ORIGIN_CLIENT,
+                    'invitedUsers'     => []
                 ]
             ],
             'own calendar'           => [
@@ -285,7 +287,7 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => null,
+                    'invitationStatus' => CalendarEvent::STATUS_NOT_RESPONDED,
                     'origin'         => CalendarEvent::ORIGIN_SERVER
                 ],
                 'calendarId'             => 123,
@@ -301,12 +303,13 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => null,
-                    'attendees'     => [],
+                    'invitationStatus' => CalendarEvent::STATUS_NOT_RESPONDED,
+                    'attendees'        => [],
                     'editable'         => true,
                     'removable'        => true,
                     'notifiable'       => false,
-                    'origin'         => CalendarEvent::ORIGIN_SERVER
+                    'origin'           => CalendarEvent::ORIGIN_SERVER,
+                    'invitedUsers'     => []
                 ]
             ],
             'another calendar'       => [
@@ -321,8 +324,9 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => null,
-                    'origin'         => CalendarEvent::ORIGIN_EXTERNAL
+                    'invitationStatus' => CalendarEvent::STATUS_NOT_RESPONDED,
+                    'origin'           => CalendarEvent::ORIGIN_EXTERNAL,
+                    'invitedUsers'     => []
                 ],
                 'calendarId'             => 456,
                 'expected'               => [
@@ -337,12 +341,13 @@ class UserCalendarEventNormalizerTest extends \PHPUnit_Framework_TestCase
                     'createdAt'        => null,
                     'updatedAt'        => null,
                     'parentEventId'    => null,
-                    'invitationStatus' => null,
-                    'attendees'     => [],
+                    'invitationStatus' => CalendarEvent::STATUS_NOT_RESPONDED,
+                    'attendees'        => [],
                     'editable'         => false,
                     'removable'        => false,
                     'notifiable'       => false,
-                    'origin'         => CalendarEvent::ORIGIN_EXTERNAL
+                    'origin'           => CalendarEvent::ORIGIN_EXTERNAL,
+                    'invitedUsers'     => []
                 ]
             ],
         ];
