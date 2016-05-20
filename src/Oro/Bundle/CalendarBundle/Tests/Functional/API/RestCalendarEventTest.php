@@ -225,7 +225,7 @@ class RestCalendarEventTest extends WebTestCase
                 'end'              => '2016-05-04T11:29:46+00:00',
                 'allDay'           => true,
                 'backgroundColor'  => '#FF0000',
-                'invitationStatus' => null,
+                'invitationStatus' => 'accepted',
                 'origin'           => 'client',
                 'parentEventId'    => null,
                 'editable'         => true,
@@ -236,7 +236,7 @@ class RestCalendarEventTest extends WebTestCase
                         'displayName' => 'Admin',
                         'email'       => 'admin@example.com',
                         'origin'      => 'client',
-                        'status'      => null,
+                        'status'      => 'accepted',
                         'type'        => null,
                     ],
                     [
@@ -305,7 +305,7 @@ class RestCalendarEventTest extends WebTestCase
                     'end'              => '2016-05-04T11:29:46+00:00',
                     'allDay'           => true,
                     'backgroundColor'  => '#FF0000',
-                    'invitationStatus' => null,
+                    'invitationStatus' => 'accepted',
                     'origin'           => 'client',
                     'parentEventId'    => null,
                     'editable'         => true,
@@ -317,7 +317,7 @@ class RestCalendarEventTest extends WebTestCase
                             'displayName' => 'Admin',
                             'email'       => 'admin@example.com',
                             'origin'      => 'client',
-                            'status'      => null,
+                            'status'      => 'accepted',
                             'type'        => null,
                         ],
                         [
@@ -652,6 +652,7 @@ class RestCalendarEventTest extends WebTestCase
 
         $this->assertCount(1, $result['attendees']);
         $this->assertCount(1, $result['invitedUsers']);
+        $this->assertEquals($user->getId(), $result['invitedUsers'][0]);
 
         $this->assertEquals(
             [
@@ -678,25 +679,8 @@ class RestCalendarEventTest extends WebTestCase
                         'type'        => 'optional',
                     ],
                 ],
-                'invitedUsers'     => [$user->getId()]
             ],
             $this->extractInterestingResponseData($result)
         );
-
-        $calendarEvent = $this->getContainer()->get('doctrine')
-            ->getRepository('OroCalendarBundle:CalendarEvent')
-            ->find($id);
-
-        $attendees = $calendarEvent->getAttendees();
-        $this->assertCount(2, $attendees);
-
-        $admin = $attendees->first();
-        $this->assertEquals('admin@example.com', $admin->getEmail());
-        $this->assertEquals('admin', $admin->getUser()->getUsername());
-        $this->assertEquals($admin, $calendarEvent->getRelatedAttendee());
-
-        $simpleUser = $attendees->get(1);
-        $this->assertEquals('simple_user@example.com', $simpleUser->getEmail());
-        $this->assertEquals('simple_user', $simpleUser->getUser()->getUsername());
     }
 }

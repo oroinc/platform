@@ -119,17 +119,14 @@ class ChildEventsSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if (!$parentEvent->getChildEvents()->isEmpty()) {
-            $this->setDefaultAttendeeStatus($parentEvent->getRelatedAttendee(), CalendarEvent::STATUS_ACCEPTED);
-
-            foreach ($parentEvent->getChildEvents() as $calendarEvent) {
-                $calendarEvent
-                    ->setTitle($parentEvent->getTitle())
-                    ->setDescription($parentEvent->getDescription())
-                    ->setStart($parentEvent->getStart())
-                    ->setEnd($parentEvent->getEnd())
-                    ->setAllDay($parentEvent->getAllDay());
-            }
+        $this->setDefaultAttendeeStatus($parentEvent->getRelatedAttendee(), CalendarEvent::STATUS_ACCEPTED);
+        foreach ($parentEvent->getChildEvents() as $calendarEvent) {
+            $calendarEvent
+                ->setTitle($parentEvent->getTitle())
+                ->setDescription($parentEvent->getDescription())
+                ->setStart($parentEvent->getStart())
+                ->setEnd($parentEvent->getEnd())
+                ->setAllDay($parentEvent->getAllDay());
         }
 
         foreach ($parentEvent->getChildAttendees() as $attendee) {

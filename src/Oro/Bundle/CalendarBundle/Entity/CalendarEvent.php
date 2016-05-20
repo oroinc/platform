@@ -676,14 +676,14 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     public function getInvitationStatus()
     {
         if (!$this->relatedAttendee) {
-            return null;
+            return static::STATUS_NOT_RESPONDED;
         }
 
         $status = $this->relatedAttendee->getStatus();
 
         return $status
             ? $status->getId()
-            : null;
+            : static::STATUS_NOT_RESPONDED;
     }
 
     /**
