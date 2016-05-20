@@ -104,10 +104,10 @@ class Configuration implements ConfigurationInterface
                     ->validate()
                         ->ifTrue(
                             function ($v) {
-                                return !is_null($v) && !is_string($v) && !is_array($v);
+                                return !is_null($v) && !is_string($v) && !is_array($v) && !is_bool($v);
                             }
                         )
-                        ->thenInvalid('The "applicable" must be a string or array, given %s.')
+                        ->thenInvalid('The "applicable" must be boolean, string or array, given %s.')
                     ->end()
                     ->validate()
                         ->ifTrue(
