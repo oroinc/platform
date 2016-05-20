@@ -89,7 +89,7 @@ class ColumnsHelper
         foreach ($columns as $name => $column) {
             if (array_key_exists(ColumnsExtension::ORDER_FIELD_NAME, $column)) {
                 $orders[$name] = (int)$column[ColumnsExtension::ORDER_FIELD_NAME];
-                array_push($ignoreList, $orders[$name]);
+                $ignoreList[] = $orders[$name];
             } else {
                 $orders[$name] = 0;
             }
@@ -102,7 +102,7 @@ class ColumnsHelper
                 $order = $iteration;
                 $iteration++;
             } else {
-                array_push($ignoreList, $order);
+                $ignoreList[] = $order;
             }
         }
         unset($order);
@@ -124,11 +124,7 @@ class ColumnsHelper
             $columns = $this->prepareColumnsParam($columns, $columnsParams);
             $orders = [];
             foreach ($columns as $column) {
-                if (isset($column['order'])) {
-                    $orders[] = $column['order'];
-                } else {
-                    $orders[] = 0;
-                }
+                $orders[] = isset($column['order']) ? $column['order'] : 0;
             }
             array_multisort($orders, $columns);
         }
@@ -168,19 +164,18 @@ class ColumnsHelper
      */
     protected function findColumnData($columns, $name)
     {
-        $result = array();
-
         foreach ($columns as $key => $value) {
-            $render = (bool)((int)(substr($value, -1)));
             $columnNameParam = substr($value, 0, -1);
             if ($columnNameParam === $name) {
-                $result[ColumnsExtension::ORDER_FIELD_NAME]  = $key;
-                $result[ColumnsExtension::RENDER_FIELD_NAME] = $render;
-                return $result;
+                $render = (bool)((int)(substr($value, -1)));
+                return [
+                    ColumnsExtension::ORDER_FIELD_NAME => $key,
+                    ColumnsExtension::RENDER_FIELD_NAME => $render,
+                ];
             }
         }
 
-        return $result;
+        return [];
     }
 
     /**

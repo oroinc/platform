@@ -17,7 +17,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
     const NAME = 'oro:process:configuration:load';
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function configure()
     {
@@ -38,7 +38,7 @@ class LoadProcessConfigurationCommand extends ContainerAwareCommand
     }
 
     /**
-     * @inheritdoc
+     * {@inheritdoc}
      */
     protected function execute(InputInterface $input, OutputInterface $output)
     {
