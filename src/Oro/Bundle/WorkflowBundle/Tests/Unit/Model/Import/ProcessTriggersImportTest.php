@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Tests\Unit\Model\Import;
 
 use Doctrine\Common\Persistence\ObjectManager;
+use Doctrine\Common\Persistence\ManagerRegistry;
+
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Configuration\ProcessConfigurationBuilder;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
@@ -10,8 +12,6 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\WorkflowBundle\Entity\Repository\ProcessTriggerRepository;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessTriggersImport;
 use Oro\Bundle\WorkflowBundle\Model\ProcessTriggerScheduler;
-
-use Doctrine\Common\Persistence\ManagerRegistry;
 
 class ProcessTriggersImportTest extends \PHPUnit_Framework_TestCase
 {

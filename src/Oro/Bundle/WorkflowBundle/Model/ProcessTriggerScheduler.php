@@ -3,6 +3,8 @@
 namespace Oro\Bundle\WorkflowBundle\Model;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
+use Doctrine\Common\Persistence\ObjectManager;
+
 use Oro\Bundle\CronBundle\Entity\Manager\ScheduleManager;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Command\HandleProcessTriggerCommand;
@@ -21,7 +23,7 @@ class ProcessTriggerScheduler
     private static $command = HandleProcessTriggerCommand::NAME;
 
     /**
-     * @var \Doctrine\Common\Persistence\ObjectManager
+     * @var ObjectManager
      */
     private $objectManager;
 
@@ -34,6 +36,8 @@ class ProcessTriggerScheduler
      * @param ScheduleManager $scheduleManager
      * @param ManagerRegistry $registry
      * @param string $scheduleClass
+     *
+     * @throws \InvalidArgumentException
      */
     public function __construct(ScheduleManager $scheduleManager, ManagerRegistry $registry, $scheduleClass)
     {
@@ -50,6 +54,8 @@ class ProcessTriggerScheduler
 
     /**
      * @param ProcessTrigger $trigger
+     *
+     * @throws \InvalidArgumentException
      */
     public function add(ProcessTrigger $trigger)
     {
@@ -59,7 +65,10 @@ class ProcessTriggerScheduler
             );
         }
 
-        $arguments = $this->createArguments($trigger);
+        $arguments = [
+            sprintf('--name=%s', $trigger->getDefinition()->getName()),
+            sprintf('--id=%d', $trigger->getId())
+        ];
 
         if (!$this->scheduleManager->hasSchedule(self::$command, $arguments, $trigger->getCron())) {
             $schedule = $this->scheduleManager->createSchedule(self::$command, $arguments, $trigger->getCron());
@@ -69,20 +78,8 @@ class ProcessTriggerScheduler
     }
 
     /**
-     * @param ProcessTrigger $trigger
-     * @return array
-     */
-    private function createArguments(ProcessTrigger $trigger)
-    {
-        return [
-            sprintf('--name=%s', $trigger->getDefinition()->getName()),
-            sprintf('--id=%d', $trigger->getId())
-        ];
-    }
-
-    /**
      * Stores all newly created schedules in database
-     * @return \Oro\Bundle\CronBundle\Entity\Schedule[] array of new Schedules
+     * @return Schedule[] array of new Schedules
      */
     public function flush()
     {

@@ -6,6 +6,7 @@ use Oro\Bundle\WorkflowBundle\Entity\ProcessDefinition;
 use Oro\Bundle\WorkflowBundle\Entity\ProcessTrigger;
 use Oro\Bundle\CronBundle\Entity\Schedule;
 use Oro\Bundle\WorkflowBundle\Model\Import\ProcessImportResult;
+
 use Oro\Component\Testing\Unit\EntityTestCaseTrait;
 
 class ProcessImportResultTest extends \PHPUnit_Framework_TestCase
