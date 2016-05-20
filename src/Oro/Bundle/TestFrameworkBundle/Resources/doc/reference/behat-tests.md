@@ -31,10 +31,15 @@ Remove ```composer.lock``` file if you install dependencies with ```--no-dev``` 
 
 Install dev dependencies:
 
-```php
+```bash
 composer install
 ```
 
+Istall application without fixture in prod mode:
+
+```bash
+app/console oro:install  --force --drop-database --user-name=admin --user-email=admin@example.com --user-firstname=John --user-lastname=Doe --user-password=admin --organization-name=OroCRM --env=prod --sample-data=n
+```
 
 ### Run tests
 
@@ -106,6 +111,8 @@ If you need some specific feature steps for your bundle you should create ```Tes
 Instead of ```OroMainContext``` FeatureContext will be used for bundle test suite.
 Perhaps FeatureContext may be extended from OroMainContext for reload some feature steps.
 
+#### Page elements
+
 Every Bundle can have own number of elements. All elements must be discribed in ```Resources/config/behat_elements.yml``` in way:
 
 ```yml
@@ -135,6 +142,12 @@ Login:
  
 3. ```class``` namespace for element class. It must be extended from ```Oro\Bundle\TestFrameworkBundle\Behat\Element\Element```
 4. ```options``` it's an array of extra options that will be set in options property of Element class
+
+#### Feature isolations
+
+Every feature has interact with application, can perform CRUD operation and thereby modify database data.
+Before start test execution, dump of current state of database will be proceed.
+After every feature, database will restore from dump.
 
 ### Configuration
 
