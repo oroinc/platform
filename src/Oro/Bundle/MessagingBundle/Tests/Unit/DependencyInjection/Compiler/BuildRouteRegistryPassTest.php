@@ -44,7 +44,7 @@ class BuildRouteRegistryPassTest extends \PHPUnit_Framework_TestCase
     {
         $this->setExpectedException(
             \LogicException::class,
-            'Topic name is not set but it is required. service: "processor", tag: "oro_messaging.zero_config.message_processor"'
+            'Topic name is not set but it is required. service: "processor", tag: "oro_messaging.zero_config.message'
         );
 
         $container = new ContainerBuilder();
