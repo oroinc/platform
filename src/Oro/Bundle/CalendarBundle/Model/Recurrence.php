@@ -146,8 +146,12 @@ class Recurrence
     }
 
     /**
-     * Returns relative value for dayOfWeek of recurrence entity. In other words it returns
-     * textual representation of:
+     * Returns relative value for dayOfWeek of recurrence entity.
+     * It is used for generating textual representation
+     * of recurrences like:
+     * 'Yearly every 2 years on the first weekday of April',
+     * 'Monthly the fourth weekend of every 2 months' etc.
+     * In other words it returns textual representation of:
      * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$dayOfWeek
      *
      * Possible relative values:
