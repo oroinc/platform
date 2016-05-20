@@ -19,12 +19,20 @@ class OrganizationUsersHandler extends UserSearchHandler
     /** @var SecurityFacade */
     protected $securityFacade;
 
+    /** @var bool */
+    protected $includeCurrentUser = false;
+
     /**
      * @param SecurityFacade $securityFacade
      */
     public function setSecurityFacade(SecurityFacade $securityFacade)
     {
         $this->securityFacade = $securityFacade;
+    }
+
+    public function includeCurrentUser()
+    {
+        $this->includeCurrentUser = true;
     }
 
     /**
@@ -67,11 +75,15 @@ class OrganizationUsersHandler extends UserSearchHandler
         $queryBuilder = $this->entityRepository->createQueryBuilder('u');
         $queryBuilder->join('u.organizations', 'org')
             ->andWhere('org.id = :org')
-            ->andWhere('u.id != :currentUser')
             ->andWhere('u.enabled = :enabled')
             ->setParameter('org', $this->securityFacade->getOrganizationId())
-            ->setParameter('currentUser', $this->securityFacade->getLoggedUserId())
             ->setParameter('enabled', true);
+
+        if (!$this->includeCurrentUser) {
+            $queryBuilder
+                ->andWhere('u.id != :currentUser')
+                ->setParameter('currentUser', $this->securityFacade->getLoggedUserId());
+        }
 
         return $queryBuilder;
     }

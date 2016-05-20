@@ -84,7 +84,7 @@ class CalendarEventAttendeesType extends AbstractType
     public function configureOptions(OptionsResolver $resolver)
     {
         $resolver->setDefaults([
-            'autocomplete_alias' => 'organization_users',
+            'autocomplete_alias' => 'organization_all_users',
             'layout_template' => false,
             'configs' => function (Options $options, $value) {
                 $newConfigs = [
