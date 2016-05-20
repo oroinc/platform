@@ -18,7 +18,7 @@ class Router implements \Oro\Component\Messaging\Router\Router
 
     /**
      * @param Session $session
-     * @param array $routes
+     * @param array   $routes
      */
     public function __construct(Session $session, array $routes = [])
     {

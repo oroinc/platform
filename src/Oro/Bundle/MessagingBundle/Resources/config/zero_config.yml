@@ -12,39 +12,34 @@ services:
             - '@oro_messaging.zero_config.transport.session'
             - '@oro_messaging.zero_config.config'
 
-    oro_messaging.zero_config.route_registry:
-        class: 'Oro\Component\Messaging\ZeroConfig\GenericRouteRegistry'
-
-    oro_messaging.zero_config.route_message_processor:
-        class: 'Oro\Component\Messaging\ZeroConfig\RouterMessageProcessor'
+    oro_messaging.zero_config.router:
+        class: 'Oro\Component\Messaging\ZeroConfig\Router'
         arguments:
             - '@oro_messaging.zero_config.session'
-            - '@oro_messaging.zero_config.route_registry'
+            - ~
+
+    oro_messaging.zero_config.route_message_processor:
+        class: 'Oro\Component\Messaging\Router\RouterMessageProcessor'
+        arguments:
+            - '@oro_messaging.zero_config.router'
+        tags:
+            - { name: 'oro_messaging.zero_config.message_processor', topicName: '__router__' }
 
     oro_messaging.zero_config.message_processor_registry:
         class: 'Oro\Component\Messaging\ZeroConfig\ContainerAwareMessageProcessorRegistry'
         calls:
             - ['setContainer', ['@service_container']]
 
-    oro_messaging.zero_config.queue_message_processor:
-        class: 'Oro\Component\Messaging\ZeroConfig\QueueMessageProcessor'
+    oro_messaging.zero_config.delegate_message_processor:
+        class: 'Oro\Component\Messaging\ZeroConfig\DelegateMessageProcessor'
         arguments:
             - '@oro_messaging.zero_config.message_processor_registry'
-
-    oro_messaging.zero_config.route_messages_command:
-        class: Oro\Component\Messaging\ZeroConfig\RouteMessagesCommand
-        arguments:
-            - '@oro_messaging.consumption.queue_consumer'
-            - '@oro_messaging.zero_config.route_message_processor'
-            - '@oro_messaging.zero_config.config'
-        tags:
-            - { name: 'console.command' }
 
     oro_messaging.zero_config.consume_messages_command:
         class: Oro\Component\Messaging\ZeroConfig\ConsumeMessagesCommand
         arguments:
             - '@oro_messaging.consumption.queue_consumer'
-            - '@oro_messaging.zero_config.queue_message_processor'
-            - '@oro_messaging.zero_config.config'
+            - '@oro_messaging.zero_config.delegate_message_processor'
+            - '@oro_messaging.zero_config.session'
         tags:
             - { name: 'console.command' }

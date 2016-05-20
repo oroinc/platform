@@ -15,9 +15,12 @@ class ContainerAwareMessageProcessorRegistry implements MessageProcessorRegistry
      */
     protected $processors;
 
-    public function __construct()
+    /**
+     * @param array $processors
+     */
+    public function __construct(array $processors = [])
     {
-        $this->processors = [];
+        $this->processors = $processors;
     }
 
     /**

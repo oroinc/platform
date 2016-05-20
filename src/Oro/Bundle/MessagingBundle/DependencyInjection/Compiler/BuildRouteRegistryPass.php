@@ -14,9 +14,9 @@ class BuildRouteRegistryPass implements CompilerPassInterface
     public function process(ContainerBuilder $container)
     {
         $processorTagName = 'oro_messaging.zero_config.message_processor';
-        $routeRegistryId = 'oro_messaging.zero_config.route_registry';
+        $routerId = 'oro_messaging.zero_config.router';
 
-        if (false == $container->hasDefinition($routeRegistryId)) {
+        if (false == $container->hasDefinition($routerId)) {
             return;
         }
 
@@ -27,22 +27,21 @@ class BuildRouteRegistryPass implements CompilerPassInterface
                     throw new \LogicException(sprintf('Topic name is not set but it is required. service: "%s", tag: "%s"', $serviceId, $processorTagName));
                 }
 
-                $config = [];
-                $config['processor'] = $serviceId;
-
+                $processorName = $serviceId;
                 if (isset($tagAttribute['processorName']) && $tagAttribute['processorName']) {
-                    $config['processor'] = $tagAttribute['processorName'];
+                    $processorName = $tagAttribute['processorName'];
                 }
 
+                $queueName = null;
                 if (isset($tagAttribute['queueName']) && $tagAttribute['queueName']) {
-                    $config['queue'] = $tagAttribute['queueName'];
+                    $queueName = $tagAttribute['queueName'];
                 }
 
-                $configs[$tagAttribute['topicName']][] = $config;
+                $configs[$tagAttribute['topicName']][] = [$processorName, $queueName];
             }
         }
 
-        $routeRegistryDef = $container->getDefinition($routeRegistryId);
-        $routeRegistryDef->addMethodCall('setRoutesConfig', [$configs]);
+        $routerDef = $container->getDefinition($routerId);
+        $routerDef->replaceArgument(1, $configs);
     }
 }

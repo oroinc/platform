@@ -18,8 +18,7 @@ class BuildMessageProcessorRegistryPass implements CompilerPassInterface
             return;
         }
 
-        $processorRegistryDef = $container->getDefinition($processorRegistryId);
-
+        $processorIds = [];
         foreach ($container->findTaggedServiceIds($processorTagName) as $serviceId => $tagAttributes) {
             foreach ($tagAttributes as $tagAttribute) {
                 if (false == isset($tagAttribute['topicName']) || false == $tagAttribute['topicName']) {
@@ -31,8 +30,11 @@ class BuildMessageProcessorRegistryPass implements CompilerPassInterface
                     $processorName = $tagAttribute['processorName'];
                 }
 
-                $processorRegistryDef->addMethodCall('set', [$processorName, $serviceId]);
+                $processorIds[$processorName] = $serviceId;
             }
         }
+
+        $processorRegistryDef = $container->getDefinition($processorRegistryId);
+        $processorRegistryDef->setArguments([$processorIds]);
     }
 }

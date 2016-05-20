@@ -43,13 +43,14 @@ class OroMessagingExtension extends Extension
         if (isset($config['zero_config'])) {
             $loader->load('zero_config.yml');
 
+            $routerProcessorName = 'oro_messaging.zero_config.route_message_processor';
+
             $configDef = $container->getDefinition('oro_messaging.zero_config.config');
             $configDef->setArguments([
                 $config['zero_config']['prefix'],
-                $config['zero_config']['router_topic'],
+                $config['zero_config']['router_processor'] ?: $routerProcessorName,
                 $config['zero_config']['router_queue'],
-                $config['zero_config']['queue_topic'],
-                $config['zero_config']['default_queue_queue']
+                $config['zero_config']['default_queue'],
             ]);
         }
     }
