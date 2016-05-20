@@ -143,14 +143,14 @@ class LoggerExtensionTest extends \PHPUnit_Framework_TestCase
      */
     protected function createContextStub($logger)
     {
-        $loggerMock = $this->getMock(Context::class, [], [], '', false);
-        $loggerMock
+        $sessionMock = $this->getMock(Context::class, [], [], '', false);
+        $sessionMock
             ->expects($this->any())
             ->method('getLogger')
             ->willReturn($logger)
         ;
 
-        return $loggerMock;
+        return $sessionMock;
     }
 
     /**

@@ -11,6 +11,12 @@ services:
         tags:
             - { name: 'oro_messaging.consumption.extension' }
 
+    oro_messaging.consumption.json_decode_extension:
+        class: 'Oro\Component\Messaging\Consumption\Extension\JsonDecodeExtension'
+        public: false
+        tags:
+            - { name: 'oro_messaging.consumption.extension' }
+
     oro_messaging.consumption.delay_redelivered_message_amqp_extension:
         class: 'Oro\Component\Messaging\Consumption\Extension\DelayRedeliveredMessageAmqpExtension'
         public: false

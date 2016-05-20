@@ -6,6 +6,7 @@ use Oro\Component\Messaging\Transport\Amqp\AmqpMessageProducer;
 use Oro\Component\Messaging\Transport\Amqp\AmqpQueue;
 use Oro\Component\Messaging\Transport\Amqp\AmqpTopic;
 use Oro\Component\Messaging\Transport\Destination;
+use Oro\Component\Messaging\Transport\Exception\InvalidMessageException;
 use Oro\Component\Testing\ClassExtensionTrait;
 use PhpAmqpLib\Channel\AMQPChannel;
 use PhpAmqpLib\Message\AMQPMessage as AMQPLibMessage;
@@ -38,6 +39,36 @@ class AmqpMessageProducerTest extends \PHPUnit_Framework_TestCase
         $invalidDestination = $this->createDestination();
 
         $producer->send($invalidDestination, new AmqpMessage());
+    }
+
+    public function testThrowIfBodyIsNotScalarButObject()
+    {
+        $producer = new AmqpMessageProducer($this->createAmqpChannel());
+
+        $message = new AmqpMessage();
+        $message->setBody(new \stdClass());
+
+        $this->setExpectedException(
+            InvalidMessageException::class,
+            'The message body must be a scalar or null. Got: stdClass'
+        );
+
+        $producer->send(new AmqpTopic('aTopic'), $message);
+    }
+
+    public function testThrowIfBodyIsNotSerializable()
+    {
+        $producer = new AmqpMessageProducer($this->createAmqpChannel());
+
+        $message = new AmqpMessage();
+        $message->setBody(['foo' => 'fooVal']);
+
+        $this->setExpectedException(
+            InvalidMessageException::class,
+            'The message body must be a scalar or null. Got: array'
+        );
+
+        $producer->send(new AmqpTopic('aTopic'), $message);
     }
 
     public function testShouldSendMessageToTopic()
