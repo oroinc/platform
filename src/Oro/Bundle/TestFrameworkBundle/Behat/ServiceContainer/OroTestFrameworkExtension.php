@@ -11,7 +11,7 @@ use Behat\Testwork\ServiceContainer\ExtensionManager;
 use Symfony\Component\Config\Definition\Builder\ArrayNodeDefinition;
 use Symfony\Component\Config\FileLocator;
 use Symfony\Component\DependencyInjection\ContainerBuilder;
-use Symfony\Component\DependencyInjection\Loader\XmlFileLoader;
+use Symfony\Component\DependencyInjection\Loader\YamlFileLoader;
 use Symfony\Component\DependencyInjection\Reference;
 use Symfony\Component\HttpKernel\Bundle\BundleInterface;
 use Symfony\Component\Yaml\Yaml;
@@ -64,8 +64,8 @@ class OroTestFrameworkExtension implements TestworkExtension
      */
     public function load(ContainerBuilder $container, array $config)
     {
-        $loader = new XmlFileLoader($container, new FileLocator(__DIR__.'/config'));
-        $loader->load('services.xml');
+        $loader = new YamlFileLoader($container, new FileLocator(__DIR__.'/config'));
+        $loader->load('services.yml');
 
         $container->setParameter('oro_test.shared_contexts', $config['shared_contexts']);
     }

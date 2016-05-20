@@ -9,8 +9,6 @@ use Symfony\Component\EventDispatcher\EventSubscriberInterface;
 
 class DbRestoreSubscriber implements EventSubscriberInterface
 {
-    const ANNOTATION = 'dbIsolation';
-
     /** @var  DbDumperInterface  */
     protected $dbDumper;
 
@@ -37,10 +35,6 @@ class DbRestoreSubscriber implements EventSubscriberInterface
      */
     public function dbRestore(AfterFeatureTested $event)
     {
-        if (!in_array(self::ANNOTATION, $event->getFeature()->getTags())) {
-            return;
-        }
-
         $this->dbDumper->restoreDb();
     }
 }
