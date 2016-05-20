@@ -146,13 +146,18 @@ class Recurrence
     }
 
     /**
-     * Returns relative value for dayOfWeek of recurrence entity.
+     * Returns relative value for dayOfWeek of recurrence entity. In other words it returns
+     * textual representation of:
+     * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$dayOfWeek
+     *
+     * Possible relative values:
+     * @see \Oro\Bundle\CalendarBundle\Entity\Recurrence::$dayOfWeek
      *
      * @param array $dayOfWeek
      *
      * @return string
      */
-    public function getDayOfWeekRelativeValue($dayOfWeek)
+    public function getDayOfWeekRelativeValue(array $dayOfWeek)
     {
         sort($dayOfWeek);
         sort(self::$weekends);

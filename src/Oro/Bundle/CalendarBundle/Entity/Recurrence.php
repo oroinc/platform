@@ -95,8 +95,9 @@ class Recurrence
      * Possible values: 'sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'.
      * For relative 'weekday' value the array will be ['monday', 'tuesday', 'wednesday', 'thursday', 'friday'].
      * For relative 'weekend' value the array will be ['sunday', 'saturday'].
-     * For relative 'any day' value
+     * For relative 'day' value
      * the array will be ['sunday', 'monday', 'tuesday', 'wednesday', 'thursday', 'friday', 'saturday'].
+     * In other cases there is no relative value and $dayOfWeek array contains one of possible values.
      *
      * Constants for days:
      * @see \Oro\Bundle\CalendarBundle\Model\Recurrence::DAY_SUNDAY
