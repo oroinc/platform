@@ -185,7 +185,7 @@ define([
          * Apply additional logic for "between" filters
          * - Swap start/end values if end value is lower than start
          * - Change filter type to more than/less than, when only one value is filled
-         * 
+         *
          * @param {*} value
          * @protected
          */
