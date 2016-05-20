@@ -59,7 +59,7 @@ class HtmlPurifierTelValidatorTest extends \PHPUnit_Framework_TestCase
             [
                 'phone' => '654 75456',
                 'expectedValue' => false
-            ],
+            ]
         ];
     }
 }
