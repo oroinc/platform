@@ -3,7 +3,7 @@
 
 {% block button %}
     {% set options = oro_action_frontend_options(operation) %}
-    {% if onlyLink is not defined %}<div class="pull-left btn-group icons-holder operation-button" operation-name="{{ operation.name }}">{% endif %}
+    {% if onlyLink is not defined %}<div class="pull-left btn-group icons-holder" operation-name="{{ operation.name }}">{% endif %}
         {% block link %}
             <a {% if (params.id is defined) %}id="{{ params.id }}"{% endif %}
                 href="{{ options.options.url|default('javascript:void(0);') }}"

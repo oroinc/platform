@@ -12,7 +12,6 @@ use Oro\Bundle\EntityConfigBundle\Metadata\Annotation\Config;
  * @Config(
  *      routeName="oro_test_item_value_index",
  *      routeView="oro_test_item_value_view",
- *      routeCreate="oro_test_item_value_create",
  *      routeUpdate="oro_test_item_value_update"
  * )
  */
@@ -26,6 +25,8 @@ class ItemValue implements TestFrameworkEntityInterface
     protected $id;
 
     /**
+     * @var Item
+     *
      * @ORM\ManyToOne(targetEntity="Item", inversedBy="values")
      */
     protected $entity;
@@ -40,7 +41,7 @@ class ItemValue implements TestFrameworkEntityInterface
 
     /**
      * @param Item $item
-     * @return ItemValue
+     * @return $this
      */
     public function setEntity(Item $item)
     {
@@ -49,6 +50,9 @@ class ItemValue implements TestFrameworkEntityInterface
         return $this;
     }
 
+    /**
+     * @return Item
+     */
     public function getEntity()
     {
         return $this->entity;

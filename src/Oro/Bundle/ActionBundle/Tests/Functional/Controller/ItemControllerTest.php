@@ -28,9 +28,8 @@ class ItemControllerTest extends WebTestCase
     public function testIndexPage()
     {
         $crawler = $this->client->request('GET', $this->getUrl('oro_test_item_index'));
-        $result = $this->client->getResponse();
 
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         // no DELETE and UPDATE operations
         $this->assertCount(0, $crawler->filter('[operation-name="UPDATE"]'));
@@ -56,9 +55,8 @@ class ItemControllerTest extends WebTestCase
         $item = $this->getReference(LoadItems::ITEM1);
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_test_item_view', ['id' => $item->getId()]));
-        $result = $this->client->getResponse();
 
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         // default DELETE and UPDATE operations
         $this->assertCount(1, $crawler->filter('[operation-name="UPDATE"]'));
@@ -86,9 +84,8 @@ class ItemControllerTest extends WebTestCase
         $item = $this->getReference(LoadItems::ITEM1);
 
         $crawler = $this->client->request('GET', $this->getUrl('oro_test_item_update', ['id' => $item->getId()]));
-        $result = $this->client->getResponse();
 
-        $this->assertHtmlResponseStatusCodeEquals($result, 200);
+        $this->assertHtmlResponseStatusCodeEquals($this->client->getResponse(), 200);
 
         // default DELETE operation, no UPDATE operation
         $this->assertCount(1, $crawler->filter('[operation-name="DELETE"]'));
@@ -98,7 +95,7 @@ class ItemControllerTest extends WebTestCase
     /**
      * @param Crawler $crawler
      * @param string $gridName
-     * @return data
+     * @return array
      */
     protected function assertDataGrid(Crawler $crawler, $gridName)
     {
