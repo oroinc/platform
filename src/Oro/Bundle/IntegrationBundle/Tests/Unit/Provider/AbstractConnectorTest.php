@@ -50,7 +50,6 @@ class AbstractConnectorTest extends \PHPUnit_Framework_TestCase
 
         $this->transportSettings = $this->getMockForAbstractClass('Oro\\Bundle\\IntegrationBundle\\Entity\\Transport');
         $this->transportMock     = $this->getMock('Oro\\Bundle\\IntegrationBundle\\Provider\\TransportInterface');
-        $this->transportMock->expects($this->any())->method('getTest');
     }
 
     protected function tearDown()

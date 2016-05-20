@@ -46,7 +46,7 @@ oro:
         pagination:
             page: Page:
             total: of {{ pages }} | Total of {{ records }} records
-            total_mobile: of {{ pages }} | Total: {{ records }}
+            total_mobile: 'of {{ pages }} | Total: {{ records }}'
 
         condition_builder:
             criteria:

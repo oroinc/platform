@@ -6,6 +6,7 @@ use Oro\Bundle\EntityBundle\Provider\EntityProvider;
 use Oro\Bundle\EntityBundle\Tools\EntityRoutingHelper;
 use Oro\Bundle\EntityConfigBundle\Provider\ConfigProvider;
 use Oro\Bundle\EntityExtendBundle\Tools\ExtendHelper;
+use Oro\Bundle\SecurityBundle\SecurityFacade;
 
 class ContextGridProvider
 {
@@ -18,19 +19,25 @@ class ContextGridProvider
     /** @var ConfigProvider */
     protected $entityConfigProvider;
 
+    /** @var SecurityFacade  */
+    protected $securityFacade;
+
     /**
      * @param EntityRoutingHelper $routingHelper
      * @param EntityProvider      $entityProvider
      * @param ConfigProvider      $entityConfigProvider
+     * @param SecurityFacade      $securityFacade
      */
     public function __construct(
         EntityRoutingHelper $routingHelper,
         EntityProvider $entityProvider,
-        ConfigProvider $entityConfigProvider
+        ConfigProvider $entityConfigProvider,
+        SecurityFacade $securityFacade
     ) {
         $this->routingHelper        = $routingHelper;
         $this->entityProvider       = $entityProvider;
         $this->entityConfigProvider = $entityConfigProvider;
+        $this->securityFacade       = $securityFacade;
     }
 
     /**
@@ -49,6 +56,10 @@ class ContextGridProvider
 
         $count = count($targetEntities);
         for ($i = 0; $i < $count; $i++) {
+            if (!$this->securityFacade->isGranted('VIEW', 'entity:'.$targetEntities[$i]['name'])) {
+                continue;
+            }
+
             $targetEntity = $targetEntities[$i];
             $className    = $targetEntity['name'];
             $gridName     = $this->getContextGridByEntity($className);
@@ -59,8 +70,6 @@ class ContextGridProvider
                     'first'     => count($entityTargets) === 0,
                     'gridName'  => $gridName
                 ];
-
-                $i++;
             }
         }
 
