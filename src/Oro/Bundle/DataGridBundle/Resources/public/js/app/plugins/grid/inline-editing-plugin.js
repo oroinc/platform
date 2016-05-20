@@ -269,40 +269,43 @@ define(function(require) {
         },
 
         getCellEditorOptions: function(cell) {
-            var columnMetadata = cell.column.get('metadata');
-            var editor = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
-            var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
+            var cellEditorOptions = cell.column.get('cellEditorOptions');
+            if (!cellEditorOptions) {
+                var columnMetadata = cell.column.get('metadata');
+                cellEditorOptions = $.extend(true, {}, _.result(_.result(columnMetadata, 'inline_editing'), 'editor'));
+                var saveApiAccessor = _.result(_.result(columnMetadata, 'inline_editing'), 'save_api_accessor');
 
-            if (!editor.component_options) {
-                editor.component_options = {};
-            }
-
-            if (saveApiAccessor) {
-                if (!(saveApiAccessor instanceof ApiAccessor)) {
-                    var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
-                        saveApiAccessor);
-                    var ConcreteApiAccessor = saveApiOptions.class;
-                    saveApiAccessor = new ConcreteApiAccessor(_.omit(saveApiOptions, 'class'));
+                if (!cellEditorOptions.component_options) {
+                    cellEditorOptions.component_options = {};
                 }
-                editor.save_api_accessor = saveApiAccessor;
-            } else {
-                // use main
-                editor.save_api_accessor = this.saveApiAccessor;
+
+                if (saveApiAccessor) {
+                    if (!(saveApiAccessor instanceof ApiAccessor)) {
+                        var saveApiOptions = _.extend({}, this.options.metadata.inline_editing.save_api_accessor,
+                            saveApiAccessor);
+                        var ConcreteApiAccessor = saveApiOptions.class;
+                        saveApiAccessor = new ConcreteApiAccessor(_.omit(saveApiOptions, 'class'));
+                    }
+                    cellEditorOptions.save_api_accessor = saveApiAccessor;
+                } else {
+                    // use main
+                    cellEditorOptions.save_api_accessor = this.saveApiAccessor;
+                }
+
+                var validationRules = _.result(columnMetadata.inline_editing, 'validation_rules') || {};
+
+                _.each(validationRules, function(params, ruleName) {
+                    // normalize rule's params, in case is it was defined as 'NotBlank: ~'
+                    validationRules[ruleName] = params || {};
+                });
+
+                cellEditorOptions.viewOptions = $.extend(true, {}, cellEditorOptions.view_options || {}, {
+                    validationRules: validationRules
+                });
+
+                cell.column.set('cellEditorOptions', cellEditorOptions);
             }
-
-            var validationRules = _.result(columnMetadata.inline_editing, 'validation_rules') || {};
-
-            _.each(validationRules, function(params, ruleName) {
-                // normalize rule's params, in case is it was defined as 'NotBlank: ~'
-                validationRules[ruleName] = params || {};
-            });
-
-            editor.viewOptions = $.extend(true, {}, editor.view_options || {}, {
-                className: this.buildClassNames(editor, cell).join(' '),
-                validationRules: validationRules
-            });
-
-            return editor;
+            return cellEditorOptions;
         },
 
         getOpenedEditor: function(cell) {
@@ -330,6 +333,8 @@ define(function(require) {
             this.main.ensureCellIsVisible(cell);
 
             var editor = this.getCellEditorOptions(cell);
+            editor.viewOptions.className = this.buildClassNames(editor, cell).join(' ');
+
             var CellEditorComponent = editor.component;
             var CellEditorView = editor.view;
 
