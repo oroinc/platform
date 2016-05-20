@@ -45,7 +45,7 @@ class Recurrence
      * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\MonthNthStrategy
      * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\YearlyStrategy
      * @see \Oro\Bundle\CalendarBundle\Model\Recurrence\YearNthStrategy
-\    *
+     *
      * @var string
      *
      * @ORM\Column(name="recurrence_type", type="string", length=16)

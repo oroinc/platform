@@ -38,6 +38,7 @@ class Recurrence
     const TYPE_MONTH_N_TH = 'monthnth';
     const TYPE_YEARLY = 'yearly';
     const TYPE_YEAR_N_TH = 'yearnth';
+    /**#@-*/
 
 
     /**#@+
@@ -54,6 +55,7 @@ class Recurrence
     const INSTANCE_THIRD = 3;
     const INSTANCE_FOURTH = 4;
     const INSTANCE_LAST = 5;
+    /**#@-*/
 
     /**#@+
      * Constants of days used in recurrence.
@@ -68,6 +70,7 @@ class Recurrence
     const DAY_THURSDAY = 'thursday';
     const DAY_FRIDAY = 'friday';
     const DAY_SATURDAY = 'saturday';
+    /**#@-*/
 
     /** @var ValidatorInterface */
     protected $validator;

@@ -170,6 +170,7 @@ class UserCalendarProvider extends AbstractCalendarProvider
         foreach ($items as $index => $item) {
             if (empty($item[Recurrence::STRING_KEY]) && empty($item['recurringEventId'])) {
                 $events[] = $item;
+                unset($items[$index]);
             }
         }
 
