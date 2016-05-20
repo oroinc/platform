@@ -13,6 +13,7 @@ use Oro\Bundle\ReminderBundle\Entity\RemindableInterface;
 use Oro\Bundle\ReminderBundle\Model\ReminderData;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareInterface;
 use Oro\Bundle\EntityBundle\EntityProperty\DatesAwareTrait;
+use Oro\Component\PhpUtils\ArrayUtil;
 
 /**
  * @ORM\Entity(repositoryClass="Oro\Bundle\CalendarBundle\Entity\Repository\CalendarEventRepository")
@@ -755,6 +756,10 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     public function removeAttendee(Attendee $attendee)
     {
         if ($this->getRealCalendarEvent()->attendees->contains($attendee)) {
+            $event = $this->getEventByAttendee($attendee);
+            if ($event) {
+                $event->relatedAttendee = null;
+            }
             $this->getRealCalendarEvent()->attendees->removeElement($attendee);
         }
 
@@ -788,5 +793,25 @@ class CalendarEvent extends ExtendCalendarEvent implements RemindableInterface, 
     public function __toString()
     {
         return (string)$this->getTitle();
+    }
+
+    /**
+     * @param Attendee $attendee
+     *
+     * @return CalendarEvent|null
+     */
+    protected function getEventByAttendee(Attendee $attendee)
+    {
+        $events = $this->getRealCalendarEvent()->getChildEvents()->toArray();
+        $events[] = $this->getRealCalendarEvent();
+
+        return ArrayUtil::find(
+            function (CalendarEvent $event) use ($attendee) {
+                $relatedAttendee = $event->getRelatedAttendee();
+
+                return $relatedAttendee && $relatedAttendee->getId() === $attendee->getId();
+            },
+            $events
+        );
     }
 }
