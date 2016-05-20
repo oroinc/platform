@@ -15,7 +15,6 @@ use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 class EmailNotification implements EmailNotificationInterface
 {
     const TEMPLATE_ENTITY = 'Oro\Bundle\EmailBundle\Entity\EmailTemplate';
-    const ENTITY_CLASS_NAME = 'Oro\Bundle\CalendarBundle\Entity\Attendee';
 
     /** @var ObjectManager */
     protected $em;
@@ -76,7 +75,7 @@ class EmailNotification implements EmailNotificationInterface
      */
     public function getTemplate()
     {
-        return $this->loadTemplate(self::ENTITY_CLASS_NAME, $this->templateName);
+        return $this->loadTemplate(ClassUtils::getClass($this->entity), $this->templateName);
     }
 
     /**
