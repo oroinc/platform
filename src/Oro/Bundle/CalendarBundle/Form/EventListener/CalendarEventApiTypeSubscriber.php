@@ -51,7 +51,7 @@ class CalendarEventApiTypeSubscriber implements EventSubscriberInterface
             return;
         }
 
-        if ($this->request->request->has('attendees') && count($this->request->request->get('attendees')) > 0) {
+        if ($this->request->request->has('attendees')) {
             $form->remove('invitedUsers');
         }
     }
