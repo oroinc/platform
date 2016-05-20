@@ -26,7 +26,7 @@ class ContentDecoder
             }
         }
         if (!empty($fromEncoding) && !empty($toEncoding) && strtolower($fromEncoding) !== strtolower($toEncoding)) {
-            $str = mb_convert_encoding($str, $toEncoding, $fromEncoding);
+            $str = iconv($fromEncoding, $toEncoding, $str);
         }
 
         return $str;

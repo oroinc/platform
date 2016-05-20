@@ -6,6 +6,7 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
      * @name   oroui.tools
      */
     var tools = {};
+    var iOS = /(iPad|iPhone)/.test(navigator.userAgent);
 
     _.extend(tools, Chaplin.utils);
 
@@ -168,6 +169,13 @@ define(['jquery', 'underscore', 'chaplin'], function($, _, Chaplin) {
          */
         isMobile: function() {
             return _.isMobile();
+        },
+
+        /**
+         * Are we currently on iOS device
+         */
+        isIOS: function() {
+            return iOS;
         },
 
         /**
