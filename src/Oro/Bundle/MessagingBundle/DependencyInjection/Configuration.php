@@ -29,8 +29,8 @@ class Configuration implements ConfigurationInterface
             ->arrayNode('zero_config')->children()
                 ->scalarNode('prefix')->defaultValue('oro.messaging.zero_config')->end()
                 ->scalarNode('router_processor')->defaultNull()->end()
-                ->scalarNode('router_queue')->defaultValue('queue')->cannotBeEmpty()->end()
-                ->scalarNode('default_queue')->defaultValue('queue')->cannotBeEmpty()->end()
+                ->scalarNode('router_destination')->defaultValue('default')->cannotBeEmpty()->end()
+                ->scalarNode('default_destination')->defaultValue('default')->cannotBeEmpty()->end()
             ->end()->end()
         ;
 

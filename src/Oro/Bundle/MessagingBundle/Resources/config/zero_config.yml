@@ -20,7 +20,7 @@ services:
         public: false
         arguments:
             - '@oro_messaging.zero_config.session'
-            - ~
+            - []
 
     oro_messaging.zero_config.route_message_processor:
         class: 'Oro\Component\Messaging\Router\RouterMessageProcessor'
@@ -66,7 +66,7 @@ services:
     oro_messaging.zero_config.consume_messages_command:
         class: 'Oro\Component\Messaging\ZeroConfig\ConsumeMessagesCommand'
         arguments:
-            - '@oro_messaging.consumption.queue_consumer'
+            - '@oro_messaging.zero_config.queue_consumer'
             - '@oro_messaging.zero_config.delegate_message_processor'
             - '@oro_messaging.zero_config.session'
         tags:

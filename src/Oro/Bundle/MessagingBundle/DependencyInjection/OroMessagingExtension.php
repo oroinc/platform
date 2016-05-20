@@ -49,8 +49,8 @@ class OroMessagingExtension extends Extension
             $configDef->setArguments([
                 $config['zero_config']['prefix'],
                 $config['zero_config']['router_processor'] ?: $routerProcessorName,
-                $config['zero_config']['router_queue'],
-                $config['zero_config']['default_queue'],
+                $config['zero_config']['router_destination'],
+                $config['zero_config']['default_destination'],
             ]);
         }
     }
