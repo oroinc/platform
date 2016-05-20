@@ -28,10 +28,12 @@ services:
 
     oro_calendar.calendar_event.form.type.api:
         class: %oro_calendar.calendar_event.form.type.api.class%
+        scope: request
         arguments:
             - '@oro_calendar.calendar_event_manager'
             - '@doctrine'
             - '@oro_security.security_facade'
+            - '@request'
         tags:
             - { name: form.type, alias: oro_calendar_event_api }
 

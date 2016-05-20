@@ -70,14 +70,13 @@ class CalendarEventApiHandler
     {
         $this->form->setData($entity);
 
-        if (in_array($this->request->getMethod(), array('POST', 'PUT'))) {
+        if (in_array($this->request->getMethod(), ['POST', 'PUT'])) {
             // clone attendees to have have original attendees at disposal later
             $originalAttendees = new ArrayCollection($entity->getAttendees()->toArray());
 
             $this->form->submit($this->request);
 
             if ($this->form->isValid()) {
-                $this->ensureRelatedAttendeeSet($entity);
                 if ($this->form->has('invitedUsers')) {
                     $this->convertInvitedUsersToAttendee($entity, $this->form->get('invitedUsers')->getData());
                 }
@@ -99,23 +98,6 @@ class CalendarEventApiHandler
         }
 
         return false;
-    }
-
-    /**
-     * @param CalendarEvent $event
-     */
-    public function ensureRelatedAttendeeSet(CalendarEvent $event)
-    {
-        if ($event->getRelatedAttendee()) {
-            return;
-        }
-
-        $calendar = $event->getCalendar();
-        if (!$calendar) {
-            return;
-        }
-
-        $event->setRelatedAttendee($this->createRelatedAttendee($calendar->getOwner()));
     }
 
     /**
@@ -149,33 +131,11 @@ class CalendarEventApiHandler
     }
 
     /**
-     * @param User $user
-     *
-     * @return Attendee
-     */
-    protected function createRelatedAttendee(User $user)
-    {
-        $attendee = $this->usersToAttendeesTransformer->userToAttendee($user);
-
-        $status = $this->manager
-            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::STATUS_ENUM_CODE))
-            ->find(Attendee::STATUS_NONE);
-        $attendee->setStatus($status);
-
-        $origin = $this->manager
-            ->getRepository(ExtendHelper::buildEnumValueClassName(Attendee::ORIGIN_ENUM_CODE))
-            ->find(Attendee::ORIGIN_CLIENT);
-        $attendee->setOrigin($origin);
-
-        return $attendee;
-    }
-
-    /**
      * "Success" form handler
      *
-     * @param CalendarEvent   $entity
-     * @param ArrayCollection $originalAttendees
-     * @param boolean         $notify
+     * @param CalendarEvent              $entity
+     * @param ArrayCollection|Attendee[] $originalAttendees
+     * @param boolean                    $notify
      */
     protected function onSuccess(
         CalendarEvent $entity,

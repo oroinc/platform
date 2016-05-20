@@ -4,38 +4,42 @@ namespace Oro\Bundle\CalendarBundle\Form\Type;
 
 use Doctrine\Common\Persistence\ManagerRegistry;
 
-use Oro\Bundle\CalendarBundle\Form\EventListener\InvitedUsersSubscriber;
 use Symfony\Component\Form\Extension\Core\Type\DateTimeType;
 use Symfony\Component\Form\FormBuilderInterface;
-use Symfony\Component\Form\FormEvent;
-use Symfony\Component\Form\FormEvents;
+use Symfony\Component\HttpFoundation\Request;
 use Symfony\Component\OptionsResolver\OptionsResolverInterface;
 
-use Oro\Bundle\CalendarBundle\Entity\Calendar;
 use Oro\Bundle\CalendarBundle\Entity\CalendarEvent;
 use Oro\Bundle\CalendarBundle\Form\EventListener\AttendeesSubscriber;
 use Oro\Bundle\CalendarBundle\Form\EventListener\ChildEventsSubscriber;
 use Oro\Bundle\CalendarBundle\Manager\CalendarEventManager;
 use Oro\Bundle\SecurityBundle\SecurityFacade;
 use Oro\Bundle\SoapBundle\Form\EventListener\PatchSubscriber;
+use Oro\Bundle\CalendarBundle\Form\EventListener\CalendarEventApiTypeSubscriber;
 
 class CalendarEventApiType extends CalendarEventType
 {
     /** @var CalendarEventManager */
     protected $calendarEventManager;
 
+    /** @var Request */
+    protected $request;
+
     /**
      * @param CalendarEventManager $calendarEventManager
-     * @param ManagerRegistry $registry
-     * @param SecurityFacade $securityFacade
+     * @param ManagerRegistry      $registry
+     * @param SecurityFacade       $securityFacade
+     * @param Request              $request
      */
     public function __construct(
         CalendarEventManager $calendarEventManager,
         ManagerRegistry $registry,
-        SecurityFacade $securityFacade
+        SecurityFacade $securityFacade,
+        Request $request
     ) {
         parent::__construct($registry, $securityFacade);
         $this->calendarEventManager = $calendarEventManager;
+        $this->request              = $request;
     }
 
     /**
@@ -128,7 +132,10 @@ class CalendarEventApiType extends CalendarEventType
         );
 
         $builder->addEventSubscriber(new PatchSubscriber());
-        $builder->addEventListener(FormEvents::POST_SUBMIT, [$this, 'postSubmitData']);
+        $builder->addEventSubscriber(new CalendarEventApiTypeSubscriber(
+            $this->calendarEventManager,
+            $this->request
+        ));
         $builder->addEventSubscriber(new ChildEventsSubscriber(
             $builder,
             $this->registry,
@@ -149,33 +156,6 @@ class CalendarEventApiType extends CalendarEventType
                 'extra_fields_message' => 'This form should not contain extra fields: "{{ extra_fields }}"',
             )
         );
-    }
-
-    /**
-     * POST_SUBMIT event handler
-     *
-     * @param FormEvent $event
-     */
-    public function postSubmitData(FormEvent $event)
-    {
-        $form = $event->getForm();
-
-        /** @var CalendarEvent $data */
-        $data = $form->getData();
-        if (empty($data)) {
-            return;
-        }
-
-        $calendarId = $form->get('calendar')->getData();
-        if (empty($calendarId)) {
-            return;
-        }
-        $calendarAlias = $form->get('calendarAlias')->getData();
-        if (empty($calendarAlias)) {
-            $calendarAlias = Calendar::CALENDAR_ALIAS;
-        }
-
-        $this->calendarEventManager->setCalendar($data, $calendarAlias, (int)$calendarId);
     }
 
     /**
