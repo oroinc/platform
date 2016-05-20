@@ -33,6 +33,7 @@ UPGRADE FROM 1.9 to 1.10
 - Added migration `Oro\Bundle\SecurityBundle\Migrations\Schema\v1_1\UpdateAclEntriesMigrationQuery` for updating ACL Entries to use custom Permissions.
 - Added `acl_permission` twig extension - allows get `Permission` by `AclPermission`.
 - Added third parameter `$byCurrentGroup` to `Oro\Bundle\SecurityBundle\Acl\Extension\AclExtensionInterface::getPermissions` for getting permissions only for current application group name. Updated same method in `Oro\Bundle\SecurityBundle\Acl\Extension\ActionAclExtension` and `Oro\Bundle\SecurityBundle\Acl\Extension\EntityAclExtension`.
+- For php version from 7.0.0 to 7.0.5 we replaced `Symfony\Component\Security\Acl\Domain\Entry` on `Oro\Bundle\SecurityBundle\Acl\Domain\Entry` to avoid [bug](https://bugs.php.net/bug.php?id=71940) with unserialization of an object reference
 
 ####WorkflowBundle
 - Class `Oro\Bundle\WorkflowBundle\Exception\ActionException` marked as deprecated. Use `Oro\Component\Action\Exception\ActionException` instead.
@@ -98,3 +99,13 @@ UPGRADE FROM 1.9 to 1.10
 ####TranslationBundle:
 - Added translation strategies to dynamically handle translation fallbacks
 - Refactored `Oro/Bundle/TranslationBundle/Translation/Translator` to support translation strategies
+
+####DataGridBundle
+- The class Oro\Bundle\DataGridBundle\Common\Object was renamed to DataObject
+- Changed priority in next extensions:
+    * Oro\Bundle\DataGridBundle\Extension\Sorter\OrmSorterExtension from -250 to -260 
+    * Oro\Bundle\DataGridBundle\Extension\Sorter\PostgresqlGridModifier from -251 to -261
+    
+####ConfigExpression
+- The class Oro\Component\ConfigExpression\Condition\False was renamed to FalseCondition
+- The class Oro\Component\ConfigExpression\Condition\True was renamed to TrueCondition

@@ -39,6 +39,11 @@ There are next filters form types:
     <td>Represents number filter form</td>
 </tr>
 <tr>
+    <td><a href="#oro_type_number_range_filter-form-type">NumberRangeFilterType</a></td>
+    <td>oro_type_number_range_filter</td>
+    <td>Represents number range filter form</td>
+</tr>
+<tr>
     <td><a href="#oro_type_choice_filter-form-type">ChoiceFilterType</a></td>
     <td>oro_type_choice_filter</td>
     <td>Represents choice filter form</td>
@@ -194,6 +199,65 @@ NumberFilterType::DATA\_INTEGER or NumberFilterType::DATA\_DECIMAL.
 **formatter_options**
 
 In addition to data_type option, this option can contain parameters for number formatter that is used by value field. 
+Available attributes are:
+
+* decimals - maximum fraction digits
+* grouping - use grouping to separate digits
+* orderSeparator - symbol of grouping separator
+* decimalSeparator - symbol of decimal separator.
+
+### oro\_type\_number\_range\_filter Form Type
+
+**Options**
+
+* data_type
+* formatter_options
+
+**Inherit Options**
+
+* field_type
+* field_options
+* operator_choices
+* operator_type
+* operator_options
+* show_filter
+
+**Default Options**
+
+* field_type = text
+* operator\_choices
+    * NumberRangeFilterType::TYPE\_BETWEEN
+    * NumberRangeFilterType::TYPE\_NOT\_BETWEEN
+    * NumberRangeFilterType::TYPE\_GREATER\_EQUAL
+    * NumberRangeFilterType::TYPE\_GREATER\_EQUAL
+    * NumberRangeFilterType::TYPE\_GREATER\_THAN
+    * NumberRangeFilterType::TYPE\_EQUAL
+    * NumberRangeFilterType::TYPE\_LESS\_EQUAL
+    * NumberRangeFilterType::TYPE\_LESS\_THAN
+    * FilterUtility::TYPE\_EMPTY
+    * FilterUtility::TYPE\_NOT\_EMPTY
+* data\_type = NumberFilterType::DATA\_INTEGER
+
+**Parent Type**
+
+oro\_type\_number\_filter
+
+**Class**
+
+_Oro\Bundle\FilterBundle\Form\Type\Filter\NumberRangeFilterType_
+
+**JS Class**
+
+_Oro.Filter.NumberRangeFilter_
+
+**Options**
+
+* **data\_type** - This option can be used for configuration of value field type. Can be a value of one of constants:
+NumberFilterType::DATA\_INTEGER or NumberFilterType::DATA\_DECIMAL.
+
+**formatter_options**
+
+In addition to data_type option, this option can contain parameters for number formatter that is used by value field.
 Available attributes are:
 
 * decimals - maximum fraction digits
